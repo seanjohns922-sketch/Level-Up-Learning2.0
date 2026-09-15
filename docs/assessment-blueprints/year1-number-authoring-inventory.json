@@ -1,0 +1,3869 @@
+{
+  "status": "authoring-only",
+  "assertions": 1350,
+  "forms": {
+    "pretest": [
+      {
+        "id": "number-1-pretest-01-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-01",
+          "descriptor": "AC9M1N01",
+          "evidence": "Represent a number with tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Range to 120; same number of tens and presence of zero ones.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Build 111 with tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 111,
+          "standard": true
+        },
+        "visual": "Editable tens rods made of ten visibly joined equal squares and separate ones. Blank labelled mat. Same controls and supply limits across forms; no target model.",
+        "materials": "shells",
+        "rubric": "Exactly 11 tens and the requested ones. Save both counts; do not accept digit concatenation as construction evidence.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-02-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-02",
+          "descriptor": "AC9M1N01",
+          "evidence": "Order numbers spanning the hundred boundary.",
+          "response": "ordering",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide unsorted labelled cards and an empty ordered row; audio must read the values without sorting them."
+          },
+          "invariants": [
+            "Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Every card must be ordered correctly; equivalent values and ties need an explicit authored policy."
+        },
+        "prompt": "Put the numbers in order. Smallest first.",
+        "task": {
+          "kind": "order",
+          "cards": [
+            120,
+            96,
+            110,
+            100
+          ]
+        },
+        "visual": "Four unsorted numeral cards and an empty ordered row. Include one value below 100, then 100, 110 and 120 in every form. No visual length cues.",
+        "materials": "shells",
+        "rubric": "All four numerals in ascending order. Save card order; numeric gaps vary slightly within the same boundary-crossing task.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-03-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-03",
+          "descriptor": "AC9M1N01",
+          "evidence": "Locate and name numbers up to 120.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show endpoints and sufficient equally spaced ticks; target point must be editable, not already positioned correctly."
+          },
+          "invariants": [
+            "Same interval and labelled endpoints; include the 120 boundary in the form.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct location/value at the declared line resolution; save target position and scale."
+        },
+        "prompt": "Mark 114 on the number line.",
+        "task": {
+          "kind": "number-line",
+          "min": 100,
+          "max": 120,
+          "step": 1,
+          "target": 114
+        },
+        "visual": "Horizontal 100–120 line with 21 evenly spaced ticks and labels at 100, 110, 120. Tap-to-place marker starts absent. Targets all inside the final decade.",
+        "materials": "shells",
+        "rubric": "Marker on the exact target tick. Save tick value and number-line scale; no freehand-pixel penalty.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-04-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-04",
+          "descriptor": "AC9M1N02",
+          "evidence": "Partition a two-digit number into tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Same two-digit band; standard partition required.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Show 34 as tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 34,
+          "standard": true
+        },
+        "visual": "Blank Tens and Ones mats with movable rods and unit squares. No hundred block and no pre-filled model.",
+        "materials": "shells",
+        "rubric": "Standard tens/ones partition with fewer than ten ones; model value equals the requested number.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-05-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-05",
+          "descriptor": "AC9M1N02",
+          "evidence": "Create different partitions of one- and two-digit numbers.",
+          "response": "construction",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "One one-digit partition and one two-digit exchange; same part count and value conservation.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Split 7 into two parts. Then show 34 with one fewer ten.",
+        "task": {
+          "kind": "two-partitions",
+          "small": 7,
+          "large": 34,
+          "exchangeTens": 1
+        },
+        "visual": "Two explicitly separated parts: a small collection with two empty trays, then a standard tens/ones model and a blank alternative model. Exchange control conserves value; no correct alternative shown.",
+        "materials": "shells",
+        "rubric": "Part A: two nonempty groups conserving the small total. Part B: exactly one fewer ten and ten more ones than the standard partition. Both parts required for one point. Accept every valid small partition.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-06-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-06",
+          "descriptor": "AC9M1N03",
+          "evidence": "Quantify a collection grouped in tens.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show every object clearly; equal object sizes, no occlusion, readable grouping and no printed total."
+          },
+          "invariants": [
+            "Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Exact quantity; preserve entered answer."
+        },
+        "prompt": "How many objects altogether?",
+        "task": {
+          "kind": "count-tens",
+          "groups": 12,
+          "perGroup": 10
+        },
+        "visual": "Twelve visible ten-object bundles arranged in three rows of four. Every bundle visibly contains ten equal objects. No printed group count or total; materials differ by form, same layout density.",
+        "materials": "shells",
+        "rubric": "Exact quantity 120. An entered number demonstrates quantification of grouped objects, not an observed counting strategy.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-07-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-07",
+          "descriptor": "AC9M1N03",
+          "evidence": "Group a collection in fives to count efficiently.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Make groups of 5. How many objects altogether?",
+        "task": {
+          "kind": "make-groups",
+          "total": 20,
+          "groupSize": 5
+        },
+        "visual": "Ungrouped countable objects, empty group workspace and total field. Child creates groups; do not pre-draw the correct number of groups. Support multi-select to avoid grading motor endurance.",
+        "materials": "shells",
+        "rubric": "All objects conserved in groups of five, plus exact entered total. Save group membership and total. Actual grouping must be submitted, not just a numeric answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-08-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-08",
+          "descriptor": "AC9M1N04",
+          "evidence": "Add within 20 using part-whole knowledge.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten and operand-size demand.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 8 + 5?",
+        "task": {
+          "kind": "add",
+          "left": 8,
+          "right": 5
+        },
+        "visual": "Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
+        "materials": "shells",
+        "rubric": "Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-09-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-09",
+          "descriptor": "AC9M1N04",
+          "evidence": "Subtract within 20.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten pattern and difference band.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 14 − 6?",
+        "task": {
+          "kind": "subtract",
+          "whole": 14,
+          "removed": 6
+        },
+        "visual": "Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
+        "materials": "shells",
+        "rubric": "Exact difference. All examples subtract a single digit from a teen, crossing ten and leaving a single-digit result.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-10-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-10",
+          "descriptor": "AC9M1N04",
+          "evidence": "Find and explain a missing part in an additive relationship.",
+          "response": "number-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show the original quantities/expression and any model needed to evaluate the claim; do not show the corrected calculation."
+          },
+          "invariants": [
+            "Whole within 20; same missing-part position and regrouping.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require both the numerical result and a mathematically valid reason; save both separately."
+        },
+        "prompt": "The whole is 13. One part is 8. Find the missing part and explain.",
+        "task": {
+          "kind": "missing-part",
+          "whole": 13,
+          "known": 8,
+          "reasonChoices": [
+            "Take the known part from the whole.",
+            "Add the whole and the known part.",
+            "Use the whole as the missing part."
+          ]
+        },
+        "visual": "Whole/known-part/blank-part model with labelled quantities; number response and neutral read-aloud reason choices. Rotate reason order without changing distractors.",
+        "materials": "shells",
+        "rubric": "Correct missing part and inverse/whole-minus-known reason. A correct numeral with an additive misconception does not pass.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-11-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-11",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model an add-to situation and communicate the result.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Totals within 20; same story structure and number of quantities.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "8 birds are here. 4 arrive. Show how many birds there are now.",
+        "task": {
+          "kind": "addition-story",
+          "initial": 8,
+          "arrive": 4,
+          "objects": "birds"
+        },
+        "visual": "Familiar scene labelled Here and Arriving, with blank modelling space and more objects than the required result. No displayed plus sign or final collection. Child creates the two source groups and result.",
+        "materials": "shells",
+        "rubric": "Model shows both stated quantities and correct combined total; entered result matches. Object origin/grouping retained. No correct result-only shortcut.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-12-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-12",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model a take-away situation.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Within 20; same removal structure and remaining-quantity question.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "14 birds are here. 5 leave. Show how many birds stay.",
+        "task": {
+          "kind": "subtraction-story",
+          "initial": 14,
+          "leave": 5,
+          "objects": "birds"
+        },
+        "visual": "Scene with starting collection and empty Away area. Child moves the departing objects and enters the remainder. All objects remain inspectable, with no automatic correct removal.",
+        "materials": "shells",
+        "rubric": "Original collection conserved across Here/Away; exactly the stated departures and correct remaining numeral. All cases cross ten.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-13-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-13",
+          "descriptor": "AC9M1N05",
+          "evidence": "Represent a simple money transaction.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "challenging",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Whole-dollar Australian amounts using authentic $1/$2 coins; no nonexistent coin denominations.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "You have $9. A pen costs $5. Pay exactly. How many dollars remain?",
+        "task": {
+          "kind": "money",
+          "wallet": [
+            2,
+            1,
+            2,
+            2,
+            2
+          ],
+          "price": 5,
+          "object": "pen"
+        },
+        "visual": "Whole-dollar price tag and wallet of authentic Australian $1 and $2 coin representations with readable denominations, distinguishable sizes, paid/kept areas. Do not invent $3/$4 coins or imply coins are identical units.",
+        "materials": "shells",
+        "rubric": "Choose available coins that pay exactly the price, retain every other coin and enter correct dollars left. Accept all valid coin combinations; no change-making required.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-14-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-14",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal sharing and state each share.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same recipient count and divisible total within the taught counting range.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Share 12 shells equally between 3 children. How many does each get?",
+        "task": {
+          "kind": "share",
+          "total": 12,
+          "recipients": 3,
+          "objects": "shells"
+        },
+        "visual": "Three equal recipient mats and an unallocated collection. No objects pre-shared or count labels revealing share size. Same tap and multi-select controls.",
+        "materials": "shells",
+        "rubric": "All original objects allocated equally to three recipients and exact each-share numeral. Save allocations and entered share; no remainder.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-15-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-15",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal grouping and state the number of groups.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same group size and no-remainder structure.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Pack 12 shells in groups of 3. How many groups?",
+        "task": {
+          "kind": "group",
+          "total": 12,
+          "size": 3,
+          "objects": "shells"
+        },
+        "visual": "Ungrouped objects and add-group control; no prebuilt number of trays. Child forms complete groups of three and enters how many groups.",
+        "materials": "shells",
+        "rubric": "All objects conserved, each nonempty group has three, entered group count equals constructed group count. Save memberships, not just a quotient.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-16-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-16",
+          "descriptor": "AC9M1N06",
+          "evidence": "Explain why a proposed sharing arrangement is unequal.",
+          "response": "selection-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show all relevant evidence and plausible choices with balanced visual prominence; do not highlight the correct method."
+          },
+          "invariants": [
+            "Same group count and one redistribution needed; conserve total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require the correct choice and its valid evidence-based reason; save each part."
+        },
+        "prompt": "Is this sharing equal? Choose why.",
+        "task": {
+          "kind": "unequal-share",
+          "groups": [
+            5,
+            3,
+            4
+          ],
+          "reasonChoices": [
+            "Every tray must have the same number.",
+            "There are three trays, so it is equal.",
+            "Only the total matters, not each tray."
+          ]
+        },
+        "visual": "Three equally sized trays displaying a fixed unequal allocation. Yes/No and reason choices with neutral audio. Every example is repairable by moving one object.",
+        "materials": "shells",
+        "rubric": "No, supported by the unequal per-tray quantities/equal-sharing criterion. Total conservation alone is not sufficient. Require choice and reason.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-17-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-17",
+          "descriptor": "AC9M1A01",
+          "evidence": "Continue a skip-counting sequence.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Twos, fives or tens; same step and missing-position count across forms.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Fill both empty spaces.",
+        "task": {
+          "kind": "skip-two",
+          "terms": [
+            12,
+            14,
+            16,
+            null,
+            null
+          ]
+        },
+        "visual": "Five number cards with the fourth and fifth blank. First three numbers imply a step of two; do not print that rule in the question.",
+        "materials": "shells",
+        "rubric": "Both missing values correctly continue the constant step. All starting values even; no odd/even offset mismatch across forms.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-18-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-18",
+          "descriptor": "AC9M1A01",
+          "evidence": "Create a skip-counting sequence using objects and numbers.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Same starting-number band and fixed step; do not substitute a repeating pattern.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Start at 20. Add 10 each time. Build and label three steps.",
+        "task": {
+          "kind": "create-tens",
+          "start": 20,
+          "stages": 3
+        },
+        "visual": "Three empty stage panels, each with tens-bundle and ones tools plus a numeral field. Starting number and +10 instruction supplied. No completed quantities. Use tens bundles, not dozens of required single-object clicks.",
+        "materials": "shells",
+        "rubric": "Build and label three stages: start, start+10, start+20. Every stage's model and numeral agree. This creates a growing sequence, not a repeating picture.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-19-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-19",
+          "descriptor": "AC9M1A02",
+          "evidence": "Identify and continue the repeating unit.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit length and two visual attributes.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Show the repeating part. Then build the next three shapes.",
+        "task": {
+          "kind": "continue-pattern",
+          "unit": [
+            "blue-circle",
+            "gold-square",
+            "red-triangle"
+          ],
+          "repetitions": 2,
+          "blanks": 3
+        },
+        "visual": "Two complete ABC units, then three blank continuation positions. Three symbols vary in shape and colour, with independent text/audio labels. Child also constructs the shortest unit in a separate blank strip.",
+        "materials": "shells",
+        "rubric": "Correct shortest three-symbol unit and all three next symbols. Neither colour alone nor correct continuation without unit identification is enough.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-pretest-20-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "pretest",
+        "slot": {
+          "id": "number-1-20",
+          "descriptor": "AC9M1A02",
+          "evidence": "Create a repeating pattern using a specified unit.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit complexity and required repetitions; retain actual construction.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Use this repeating part to build three repeats.",
+        "task": {
+          "kind": "create-pattern",
+          "unit": [
+            "gold-circle",
+            "red-triangle",
+            "blue-square"
+          ],
+          "repetitions": 3
+        },
+        "visual": "Supplied three-symbol ABC unit, unsorted shape/colour palette and nine empty positions. No target sequence or next-symbol highlighting. Every form uses the same attribute and unit complexity.",
+        "materials": "shells",
+        "rubric": "Actual nine-symbol construction consists of exactly three copies of the requested unit in order. Save all placed symbols; do not replace with a multiple-choice option.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      }
+    ],
+    "posttest": [
+      {
+        "id": "number-1-posttest-01-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-01",
+          "descriptor": "AC9M1N01",
+          "evidence": "Represent a number with tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Range to 120; same number of tens and presence of zero ones.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Build 114 with tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 114,
+          "standard": true
+        },
+        "visual": "Editable tens rods made of ten visibly joined equal squares and separate ones. Blank labelled mat. Same controls and supply limits across forms; no target model.",
+        "materials": "beads",
+        "rubric": "Exactly 11 tens and the requested ones. Save both counts; do not accept digit concatenation as construction evidence.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-02-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-02",
+          "descriptor": "AC9M1N01",
+          "evidence": "Order numbers spanning the hundred boundary.",
+          "response": "ordering",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide unsorted labelled cards and an empty ordered row; audio must read the values without sorting them."
+          },
+          "invariants": [
+            "Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Every card must be ordered correctly; equivalent values and ties need an explicit authored policy."
+        },
+        "prompt": "Put the numbers in order. Smallest first.",
+        "task": {
+          "kind": "order",
+          "cards": [
+            100,
+            120,
+            97,
+            110
+          ]
+        },
+        "visual": "Four unsorted numeral cards and an empty ordered row. Include one value below 100, then 100, 110 and 120 in every form. No visual length cues.",
+        "materials": "beads",
+        "rubric": "All four numerals in ascending order. Save card order; numeric gaps vary slightly within the same boundary-crossing task.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-03-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-03",
+          "descriptor": "AC9M1N01",
+          "evidence": "Locate and name numbers up to 120.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show endpoints and sufficient equally spaced ticks; target point must be editable, not already positioned correctly."
+          },
+          "invariants": [
+            "Same interval and labelled endpoints; include the 120 boundary in the form.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct location/value at the declared line resolution; save target position and scale."
+        },
+        "prompt": "Mark 117 on the number line.",
+        "task": {
+          "kind": "number-line",
+          "min": 100,
+          "max": 120,
+          "step": 1,
+          "target": 117
+        },
+        "visual": "Horizontal 100–120 line with 21 evenly spaced ticks and labels at 100, 110, 120. Tap-to-place marker starts absent. Targets all inside the final decade.",
+        "materials": "beads",
+        "rubric": "Marker on the exact target tick. Save tick value and number-line scale; no freehand-pixel penalty.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-04-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-04",
+          "descriptor": "AC9M1N02",
+          "evidence": "Partition a two-digit number into tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Same two-digit band; standard partition required.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Show 37 as tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 37,
+          "standard": true
+        },
+        "visual": "Blank Tens and Ones mats with movable rods and unit squares. No hundred block and no pre-filled model.",
+        "materials": "beads",
+        "rubric": "Standard tens/ones partition with fewer than ten ones; model value equals the requested number.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-05-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-05",
+          "descriptor": "AC9M1N02",
+          "evidence": "Create different partitions of one- and two-digit numbers.",
+          "response": "construction",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "One one-digit partition and one two-digit exchange; same part count and value conservation.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Split 8 into two parts. Then show 37 with one fewer ten.",
+        "task": {
+          "kind": "two-partitions",
+          "small": 8,
+          "large": 37,
+          "exchangeTens": 1
+        },
+        "visual": "Two explicitly separated parts: a small collection with two empty trays, then a standard tens/ones model and a blank alternative model. Exchange control conserves value; no correct alternative shown.",
+        "materials": "beads",
+        "rubric": "Part A: two nonempty groups conserving the small total. Part B: exactly one fewer ten and ten more ones than the standard partition. Both parts required for one point. Accept every valid small partition.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-06-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-06",
+          "descriptor": "AC9M1N03",
+          "evidence": "Quantify a collection grouped in tens.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show every object clearly; equal object sizes, no occlusion, readable grouping and no printed total."
+          },
+          "invariants": [
+            "Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Exact quantity; preserve entered answer."
+        },
+        "prompt": "How many objects altogether?",
+        "task": {
+          "kind": "count-tens",
+          "groups": 12,
+          "perGroup": 10
+        },
+        "visual": "Twelve visible ten-object bundles arranged in three rows of four. Every bundle visibly contains ten equal objects. No printed group count or total; materials differ by form, same layout density.",
+        "materials": "beads",
+        "rubric": "Exact quantity 120. An entered number demonstrates quantification of grouped objects, not an observed counting strategy.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-07-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-07",
+          "descriptor": "AC9M1N03",
+          "evidence": "Group a collection in fives to count efficiently.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Make groups of 5. How many objects altogether?",
+        "task": {
+          "kind": "make-groups",
+          "total": 25,
+          "groupSize": 5
+        },
+        "visual": "Ungrouped countable objects, empty group workspace and total field. Child creates groups; do not pre-draw the correct number of groups. Support multi-select to avoid grading motor endurance.",
+        "materials": "beads",
+        "rubric": "All objects conserved in groups of five, plus exact entered total. Save group membership and total. Actual grouping must be submitted, not just a numeric answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-08-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-08",
+          "descriptor": "AC9M1N04",
+          "evidence": "Add within 20 using part-whole knowledge.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten and operand-size demand.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 9 + 5?",
+        "task": {
+          "kind": "add",
+          "left": 9,
+          "right": 5
+        },
+        "visual": "Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
+        "materials": "beads",
+        "rubric": "Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-09-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-09",
+          "descriptor": "AC9M1N04",
+          "evidence": "Subtract within 20.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten pattern and difference band.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 15 − 7?",
+        "task": {
+          "kind": "subtract",
+          "whole": 15,
+          "removed": 7
+        },
+        "visual": "Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
+        "materials": "beads",
+        "rubric": "Exact difference. All examples subtract a single digit from a teen, crossing ten and leaving a single-digit result.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-10-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-10",
+          "descriptor": "AC9M1N04",
+          "evidence": "Find and explain a missing part in an additive relationship.",
+          "response": "number-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show the original quantities/expression and any model needed to evaluate the claim; do not show the corrected calculation."
+          },
+          "invariants": [
+            "Whole within 20; same missing-part position and regrouping.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require both the numerical result and a mathematically valid reason; save both separately."
+        },
+        "prompt": "The whole is 14. One part is 9. Find the missing part and explain.",
+        "task": {
+          "kind": "missing-part",
+          "whole": 14,
+          "known": 9,
+          "reasonChoices": [
+            "Add the whole and the known part.",
+            "Take the known part from the whole.",
+            "Use the whole as the missing part."
+          ]
+        },
+        "visual": "Whole/known-part/blank-part model with labelled quantities; number response and neutral read-aloud reason choices. Rotate reason order without changing distractors.",
+        "materials": "beads",
+        "rubric": "Correct missing part and inverse/whole-minus-known reason. A correct numeral with an additive misconception does not pass.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-11-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-11",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model an add-to situation and communicate the result.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Totals within 20; same story structure and number of quantities.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "9 frogs are here. 4 arrive. Show how many frogs there are now.",
+        "task": {
+          "kind": "addition-story",
+          "initial": 9,
+          "arrive": 4,
+          "objects": "frogs"
+        },
+        "visual": "Familiar scene labelled Here and Arriving, with blank modelling space and more objects than the required result. No displayed plus sign or final collection. Child creates the two source groups and result.",
+        "materials": "beads",
+        "rubric": "Model shows both stated quantities and correct combined total; entered result matches. Object origin/grouping retained. No correct result-only shortcut.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-12-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-12",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model a take-away situation.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Within 20; same removal structure and remaining-quantity question.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "15 frogs are here. 6 leave. Show how many frogs stay.",
+        "task": {
+          "kind": "subtraction-story",
+          "initial": 15,
+          "leave": 6,
+          "objects": "frogs"
+        },
+        "visual": "Scene with starting collection and empty Away area. Child moves the departing objects and enters the remainder. All objects remain inspectable, with no automatic correct removal.",
+        "materials": "beads",
+        "rubric": "Original collection conserved across Here/Away; exactly the stated departures and correct remaining numeral. All cases cross ten.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-13-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-13",
+          "descriptor": "AC9M1N05",
+          "evidence": "Represent a simple money transaction.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "challenging",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Whole-dollar Australian amounts using authentic $1/$2 coins; no nonexistent coin denominations.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "You have $11. A book costs $7. Pay exactly. How many dollars remain?",
+        "task": {
+          "kind": "money",
+          "wallet": [
+            2,
+            2,
+            1,
+            2,
+            2,
+            2
+          ],
+          "price": 7,
+          "object": "book"
+        },
+        "visual": "Whole-dollar price tag and wallet of authentic Australian $1 and $2 coin representations with readable denominations, distinguishable sizes, paid/kept areas. Do not invent $3/$4 coins or imply coins are identical units.",
+        "materials": "beads",
+        "rubric": "Choose available coins that pay exactly the price, retain every other coin and enter correct dollars left. Accept all valid coin combinations; no change-making required.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-14-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-14",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal sharing and state each share.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same recipient count and divisible total within the taught counting range.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Share 15 beads equally between 3 children. How many does each get?",
+        "task": {
+          "kind": "share",
+          "total": 15,
+          "recipients": 3,
+          "objects": "beads"
+        },
+        "visual": "Three equal recipient mats and an unallocated collection. No objects pre-shared or count labels revealing share size. Same tap and multi-select controls.",
+        "materials": "beads",
+        "rubric": "All original objects allocated equally to three recipients and exact each-share numeral. Save allocations and entered share; no remainder.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-15-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-15",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal grouping and state the number of groups.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same group size and no-remainder structure.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Pack 15 beads in groups of 3. How many groups?",
+        "task": {
+          "kind": "group",
+          "total": 15,
+          "size": 3,
+          "objects": "beads"
+        },
+        "visual": "Ungrouped objects and add-group control; no prebuilt number of trays. Child forms complete groups of three and enters how many groups.",
+        "materials": "beads",
+        "rubric": "All objects conserved, each nonempty group has three, entered group count equals constructed group count. Save memberships, not just a quotient.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-16-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-16",
+          "descriptor": "AC9M1N06",
+          "evidence": "Explain why a proposed sharing arrangement is unequal.",
+          "response": "selection-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show all relevant evidence and plausible choices with balanced visual prominence; do not highlight the correct method."
+          },
+          "invariants": [
+            "Same group count and one redistribution needed; conserve total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require the correct choice and its valid evidence-based reason; save each part."
+        },
+        "prompt": "Is this sharing equal? Choose why.",
+        "task": {
+          "kind": "unequal-share",
+          "groups": [
+            4,
+            5,
+            6
+          ],
+          "reasonChoices": [
+            "There are three trays, so it is equal.",
+            "Every tray must have the same number.",
+            "Only the total matters, not each tray."
+          ]
+        },
+        "visual": "Three equally sized trays displaying a fixed unequal allocation. Yes/No and reason choices with neutral audio. Every example is repairable by moving one object.",
+        "materials": "beads",
+        "rubric": "No, supported by the unequal per-tray quantities/equal-sharing criterion. Total conservation alone is not sufficient. Require choice and reason.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-17-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-17",
+          "descriptor": "AC9M1A01",
+          "evidence": "Continue a skip-counting sequence.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Twos, fives or tens; same step and missing-position count across forms.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Fill both empty spaces.",
+        "task": {
+          "kind": "skip-two",
+          "terms": [
+            14,
+            16,
+            18,
+            null,
+            null
+          ]
+        },
+        "visual": "Five number cards with the fourth and fifth blank. First three numbers imply a step of two; do not print that rule in the question.",
+        "materials": "beads",
+        "rubric": "Both missing values correctly continue the constant step. All starting values even; no odd/even offset mismatch across forms.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-18-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-18",
+          "descriptor": "AC9M1A01",
+          "evidence": "Create a skip-counting sequence using objects and numbers.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Same starting-number band and fixed step; do not substitute a repeating pattern.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Start at 30. Add 10 each time. Build and label three steps.",
+        "task": {
+          "kind": "create-tens",
+          "start": 30,
+          "stages": 3
+        },
+        "visual": "Three empty stage panels, each with tens-bundle and ones tools plus a numeral field. Starting number and +10 instruction supplied. No completed quantities. Use tens bundles, not dozens of required single-object clicks.",
+        "materials": "beads",
+        "rubric": "Build and label three stages: start, start+10, start+20. Every stage's model and numeral agree. This creates a growing sequence, not a repeating picture.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-19-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-19",
+          "descriptor": "AC9M1A02",
+          "evidence": "Identify and continue the repeating unit.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit length and two visual attributes.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Show the repeating part. Then build the next three shapes.",
+        "task": {
+          "kind": "continue-pattern",
+          "unit": [
+            "red-square",
+            "blue-triangle",
+            "gold-circle"
+          ],
+          "repetitions": 2,
+          "blanks": 3
+        },
+        "visual": "Two complete ABC units, then three blank continuation positions. Three symbols vary in shape and colour, with independent text/audio labels. Child also constructs the shortest unit in a separate blank strip.",
+        "materials": "beads",
+        "rubric": "Correct shortest three-symbol unit and all three next symbols. Neither colour alone nor correct continuation without unit identification is enough.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-posttest-20-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "posttest",
+        "slot": {
+          "id": "number-1-20",
+          "descriptor": "AC9M1A02",
+          "evidence": "Create a repeating pattern using a specified unit.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit complexity and required repetitions; retain actual construction.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Use this repeating part to build three repeats.",
+        "task": {
+          "kind": "create-pattern",
+          "unit": [
+            "blue-triangle",
+            "gold-square",
+            "red-circle"
+          ],
+          "repetitions": 3
+        },
+        "visual": "Supplied three-symbol ABC unit, unsorted shape/colour palette and nine empty positions. No target sequence or next-symbol highlighting. Every form uses the same attribute and unit complexity.",
+        "materials": "beads",
+        "rubric": "Actual nine-symbol construction consists of exactly three copies of the requested unit in order. Save all placed symbols; do not replace with a multiple-choice option.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      }
+    ],
+    "diagnostic-start": [
+      {
+        "id": "number-1-diagnostic-start-01-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-01",
+          "descriptor": "AC9M1N01",
+          "evidence": "Represent a number with tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Range to 120; same number of tens and presence of zero ones.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Build 112 with tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 112,
+          "standard": true
+        },
+        "visual": "Editable tens rods made of ten visibly joined equal squares and separate ones. Blank labelled mat. Same controls and supply limits across forms; no target model.",
+        "materials": "cards",
+        "rubric": "Exactly 11 tens and the requested ones. Save both counts; do not accept digit concatenation as construction evidence.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-02-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-02",
+          "descriptor": "AC9M1N01",
+          "evidence": "Order numbers spanning the hundred boundary.",
+          "response": "ordering",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide unsorted labelled cards and an empty ordered row; audio must read the values without sorting them."
+          },
+          "invariants": [
+            "Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Every card must be ordered correctly; equivalent values and ties need an explicit authored policy."
+        },
+        "prompt": "Put the numbers in order. Smallest first.",
+        "task": {
+          "kind": "order",
+          "cards": [
+            110,
+            98,
+            100,
+            120
+          ]
+        },
+        "visual": "Four unsorted numeral cards and an empty ordered row. Include one value below 100, then 100, 110 and 120 in every form. No visual length cues.",
+        "materials": "cards",
+        "rubric": "All four numerals in ascending order. Save card order; numeric gaps vary slightly within the same boundary-crossing task.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-03-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-03",
+          "descriptor": "AC9M1N01",
+          "evidence": "Locate and name numbers up to 120.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show endpoints and sufficient equally spaced ticks; target point must be editable, not already positioned correctly."
+          },
+          "invariants": [
+            "Same interval and labelled endpoints; include the 120 boundary in the form.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct location/value at the declared line resolution; save target position and scale."
+        },
+        "prompt": "Mark 113 on the number line.",
+        "task": {
+          "kind": "number-line",
+          "min": 100,
+          "max": 120,
+          "step": 1,
+          "target": 113
+        },
+        "visual": "Horizontal 100–120 line with 21 evenly spaced ticks and labels at 100, 110, 120. Tap-to-place marker starts absent. Targets all inside the final decade.",
+        "materials": "cards",
+        "rubric": "Marker on the exact target tick. Save tick value and number-line scale; no freehand-pixel penalty.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-04-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-04",
+          "descriptor": "AC9M1N02",
+          "evidence": "Partition a two-digit number into tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Same two-digit band; standard partition required.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Show 35 as tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 35,
+          "standard": true
+        },
+        "visual": "Blank Tens and Ones mats with movable rods and unit squares. No hundred block and no pre-filled model.",
+        "materials": "cards",
+        "rubric": "Standard tens/ones partition with fewer than ten ones; model value equals the requested number.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-05-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-05",
+          "descriptor": "AC9M1N02",
+          "evidence": "Create different partitions of one- and two-digit numbers.",
+          "response": "construction",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "One one-digit partition and one two-digit exchange; same part count and value conservation.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Split 9 into two parts. Then show 35 with one fewer ten.",
+        "task": {
+          "kind": "two-partitions",
+          "small": 9,
+          "large": 35,
+          "exchangeTens": 1
+        },
+        "visual": "Two explicitly separated parts: a small collection with two empty trays, then a standard tens/ones model and a blank alternative model. Exchange control conserves value; no correct alternative shown.",
+        "materials": "cards",
+        "rubric": "Part A: two nonempty groups conserving the small total. Part B: exactly one fewer ten and ten more ones than the standard partition. Both parts required for one point. Accept every valid small partition.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-06-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-06",
+          "descriptor": "AC9M1N03",
+          "evidence": "Quantify a collection grouped in tens.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show every object clearly; equal object sizes, no occlusion, readable grouping and no printed total."
+          },
+          "invariants": [
+            "Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Exact quantity; preserve entered answer."
+        },
+        "prompt": "How many objects altogether?",
+        "task": {
+          "kind": "count-tens",
+          "groups": 12,
+          "perGroup": 10
+        },
+        "visual": "Twelve visible ten-object bundles arranged in three rows of four. Every bundle visibly contains ten equal objects. No printed group count or total; materials differ by form, same layout density.",
+        "materials": "cards",
+        "rubric": "Exact quantity 120. An entered number demonstrates quantification of grouped objects, not an observed counting strategy.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-07-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-07",
+          "descriptor": "AC9M1N03",
+          "evidence": "Group a collection in fives to count efficiently.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Make groups of 5. How many objects altogether?",
+        "task": {
+          "kind": "make-groups",
+          "total": 30,
+          "groupSize": 5
+        },
+        "visual": "Ungrouped countable objects, empty group workspace and total field. Child creates groups; do not pre-draw the correct number of groups. Support multi-select to avoid grading motor endurance.",
+        "materials": "cards",
+        "rubric": "All objects conserved in groups of five, plus exact entered total. Save group membership and total. Actual grouping must be submitted, not just a numeric answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-08-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-08",
+          "descriptor": "AC9M1N04",
+          "evidence": "Add within 20 using part-whole knowledge.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten and operand-size demand.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 8 + 6?",
+        "task": {
+          "kind": "add",
+          "left": 8,
+          "right": 6
+        },
+        "visual": "Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
+        "materials": "cards",
+        "rubric": "Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-09-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-09",
+          "descriptor": "AC9M1N04",
+          "evidence": "Subtract within 20.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten pattern and difference band.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 13 − 6?",
+        "task": {
+          "kind": "subtract",
+          "whole": 13,
+          "removed": 6
+        },
+        "visual": "Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
+        "materials": "cards",
+        "rubric": "Exact difference. All examples subtract a single digit from a teen, crossing ten and leaving a single-digit result.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-10-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-10",
+          "descriptor": "AC9M1N04",
+          "evidence": "Find and explain a missing part in an additive relationship.",
+          "response": "number-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show the original quantities/expression and any model needed to evaluate the claim; do not show the corrected calculation."
+          },
+          "invariants": [
+            "Whole within 20; same missing-part position and regrouping.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require both the numerical result and a mathematically valid reason; save both separately."
+        },
+        "prompt": "The whole is 15. One part is 8. Find the missing part and explain.",
+        "task": {
+          "kind": "missing-part",
+          "whole": 15,
+          "known": 8,
+          "reasonChoices": [
+            "Use the whole as the missing part.",
+            "Add the whole and the known part.",
+            "Take the known part from the whole."
+          ]
+        },
+        "visual": "Whole/known-part/blank-part model with labelled quantities; number response and neutral read-aloud reason choices. Rotate reason order without changing distractors.",
+        "materials": "cards",
+        "rubric": "Correct missing part and inverse/whole-minus-known reason. A correct numeral with an additive misconception does not pass.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-11-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-11",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model an add-to situation and communicate the result.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Totals within 20; same story structure and number of quantities.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "7 ducks are here. 5 arrive. Show how many ducks there are now.",
+        "task": {
+          "kind": "addition-story",
+          "initial": 7,
+          "arrive": 5,
+          "objects": "ducks"
+        },
+        "visual": "Familiar scene labelled Here and Arriving, with blank modelling space and more objects than the required result. No displayed plus sign or final collection. Child creates the two source groups and result.",
+        "materials": "cards",
+        "rubric": "Model shows both stated quantities and correct combined total; entered result matches. Object origin/grouping retained. No correct result-only shortcut.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-12-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-12",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model a take-away situation.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Within 20; same removal structure and remaining-quantity question.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "13 ducks are here. 5 leave. Show how many ducks stay.",
+        "task": {
+          "kind": "subtraction-story",
+          "initial": 13,
+          "leave": 5,
+          "objects": "ducks"
+        },
+        "visual": "Scene with starting collection and empty Away area. Child moves the departing objects and enters the remainder. All objects remain inspectable, with no automatic correct removal.",
+        "materials": "cards",
+        "rubric": "Original collection conserved across Here/Away; exactly the stated departures and correct remaining numeral. All cases cross ten.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-13-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-13",
+          "descriptor": "AC9M1N05",
+          "evidence": "Represent a simple money transaction.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "challenging",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Whole-dollar Australian amounts using authentic $1/$2 coins; no nonexistent coin denominations.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "You have $13. A ball costs $9. Pay exactly. How many dollars remain?",
+        "task": {
+          "kind": "money",
+          "wallet": [
+            2,
+            2,
+            2,
+            1,
+            2,
+            2,
+            2
+          ],
+          "price": 9,
+          "object": "ball"
+        },
+        "visual": "Whole-dollar price tag and wallet of authentic Australian $1 and $2 coin representations with readable denominations, distinguishable sizes, paid/kept areas. Do not invent $3/$4 coins or imply coins are identical units.",
+        "materials": "cards",
+        "rubric": "Choose available coins that pay exactly the price, retain every other coin and enter correct dollars left. Accept all valid coin combinations; no change-making required.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-14-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-14",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal sharing and state each share.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same recipient count and divisible total within the taught counting range.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Share 18 cards equally between 3 children. How many does each get?",
+        "task": {
+          "kind": "share",
+          "total": 18,
+          "recipients": 3,
+          "objects": "cards"
+        },
+        "visual": "Three equal recipient mats and an unallocated collection. No objects pre-shared or count labels revealing share size. Same tap and multi-select controls.",
+        "materials": "cards",
+        "rubric": "All original objects allocated equally to three recipients and exact each-share numeral. Save allocations and entered share; no remainder.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-15-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-15",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal grouping and state the number of groups.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same group size and no-remainder structure.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Pack 18 cards in groups of 3. How many groups?",
+        "task": {
+          "kind": "group",
+          "total": 18,
+          "size": 3,
+          "objects": "cards"
+        },
+        "visual": "Ungrouped objects and add-group control; no prebuilt number of trays. Child forms complete groups of three and enters how many groups.",
+        "materials": "cards",
+        "rubric": "All objects conserved, each nonempty group has three, entered group count equals constructed group count. Save memberships, not just a quotient.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-16-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-16",
+          "descriptor": "AC9M1N06",
+          "evidence": "Explain why a proposed sharing arrangement is unequal.",
+          "response": "selection-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show all relevant evidence and plausible choices with balanced visual prominence; do not highlight the correct method."
+          },
+          "invariants": [
+            "Same group count and one redistribution needed; conserve total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require the correct choice and its valid evidence-based reason; save each part."
+        },
+        "prompt": "Is this sharing equal? Choose why.",
+        "task": {
+          "kind": "unequal-share",
+          "groups": [
+            6,
+            7,
+            5
+          ],
+          "reasonChoices": [
+            "Only the total matters, not each tray.",
+            "There are three trays, so it is equal.",
+            "Every tray must have the same number."
+          ]
+        },
+        "visual": "Three equally sized trays displaying a fixed unequal allocation. Yes/No and reason choices with neutral audio. Every example is repairable by moving one object.",
+        "materials": "cards",
+        "rubric": "No, supported by the unequal per-tray quantities/equal-sharing criterion. Total conservation alone is not sufficient. Require choice and reason.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-17-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-17",
+          "descriptor": "AC9M1A01",
+          "evidence": "Continue a skip-counting sequence.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Twos, fives or tens; same step and missing-position count across forms.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Fill both empty spaces.",
+        "task": {
+          "kind": "skip-two",
+          "terms": [
+            16,
+            18,
+            20,
+            null,
+            null
+          ]
+        },
+        "visual": "Five number cards with the fourth and fifth blank. First three numbers imply a step of two; do not print that rule in the question.",
+        "materials": "cards",
+        "rubric": "Both missing values correctly continue the constant step. All starting values even; no odd/even offset mismatch across forms.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-18-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-18",
+          "descriptor": "AC9M1A01",
+          "evidence": "Create a skip-counting sequence using objects and numbers.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Same starting-number band and fixed step; do not substitute a repeating pattern.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Start at 40. Add 10 each time. Build and label three steps.",
+        "task": {
+          "kind": "create-tens",
+          "start": 40,
+          "stages": 3
+        },
+        "visual": "Three empty stage panels, each with tens-bundle and ones tools plus a numeral field. Starting number and +10 instruction supplied. No completed quantities. Use tens bundles, not dozens of required single-object clicks.",
+        "materials": "cards",
+        "rubric": "Build and label three stages: start, start+10, start+20. Every stage's model and numeral agree. This creates a growing sequence, not a repeating picture.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-19-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-19",
+          "descriptor": "AC9M1A02",
+          "evidence": "Identify and continue the repeating unit.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit length and two visual attributes.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Show the repeating part. Then build the next three shapes.",
+        "task": {
+          "kind": "continue-pattern",
+          "unit": [
+            "gold-triangle",
+            "red-circle",
+            "blue-square"
+          ],
+          "repetitions": 2,
+          "blanks": 3
+        },
+        "visual": "Two complete ABC units, then three blank continuation positions. Three symbols vary in shape and colour, with independent text/audio labels. Child also constructs the shortest unit in a separate blank strip.",
+        "materials": "cards",
+        "rubric": "Correct shortest three-symbol unit and all three next symbols. Neither colour alone nor correct continuation without unit identification is enough.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-start-20-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-start",
+        "slot": {
+          "id": "number-1-20",
+          "descriptor": "AC9M1A02",
+          "evidence": "Create a repeating pattern using a specified unit.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit complexity and required repetitions; retain actual construction.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Use this repeating part to build three repeats.",
+        "task": {
+          "kind": "create-pattern",
+          "unit": [
+            "red-square",
+            "blue-circle",
+            "gold-triangle"
+          ],
+          "repetitions": 3
+        },
+        "visual": "Supplied three-symbol ABC unit, unsorted shape/colour palette and nine empty positions. No target sequence or next-symbol highlighting. Every form uses the same attribute and unit complexity.",
+        "materials": "cards",
+        "rubric": "Actual nine-symbol construction consists of exactly three copies of the requested unit in order. Save all placed symbols; do not replace with a multiple-choice option.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      }
+    ],
+    "diagnostic-mid": [
+      {
+        "id": "number-1-diagnostic-mid-01-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-01",
+          "descriptor": "AC9M1N01",
+          "evidence": "Represent a number with tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Range to 120; same number of tens and presence of zero ones.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Build 115 with tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 115,
+          "standard": true
+        },
+        "visual": "Editable tens rods made of ten visibly joined equal squares and separate ones. Blank labelled mat. Same controls and supply limits across forms; no target model.",
+        "materials": "buttons",
+        "rubric": "Exactly 11 tens and the requested ones. Save both counts; do not accept digit concatenation as construction evidence.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-02-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-02",
+          "descriptor": "AC9M1N01",
+          "evidence": "Order numbers spanning the hundred boundary.",
+          "response": "ordering",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide unsorted labelled cards and an empty ordered row; audio must read the values without sorting them."
+          },
+          "invariants": [
+            "Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Every card must be ordered correctly; equivalent values and ties need an explicit authored policy."
+        },
+        "prompt": "Put the numbers in order. Smallest first.",
+        "task": {
+          "kind": "order",
+          "cards": [
+            99,
+            120,
+            110,
+            100
+          ]
+        },
+        "visual": "Four unsorted numeral cards and an empty ordered row. Include one value below 100, then 100, 110 and 120 in every form. No visual length cues.",
+        "materials": "buttons",
+        "rubric": "All four numerals in ascending order. Save card order; numeric gaps vary slightly within the same boundary-crossing task.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-03-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-03",
+          "descriptor": "AC9M1N01",
+          "evidence": "Locate and name numbers up to 120.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show endpoints and sufficient equally spaced ticks; target point must be editable, not already positioned correctly."
+          },
+          "invariants": [
+            "Same interval and labelled endpoints; include the 120 boundary in the form.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct location/value at the declared line resolution; save target position and scale."
+        },
+        "prompt": "Mark 116 on the number line.",
+        "task": {
+          "kind": "number-line",
+          "min": 100,
+          "max": 120,
+          "step": 1,
+          "target": 116
+        },
+        "visual": "Horizontal 100–120 line with 21 evenly spaced ticks and labels at 100, 110, 120. Tap-to-place marker starts absent. Targets all inside the final decade.",
+        "materials": "buttons",
+        "rubric": "Marker on the exact target tick. Save tick value and number-line scale; no freehand-pixel penalty.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-04-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-04",
+          "descriptor": "AC9M1N02",
+          "evidence": "Partition a two-digit number into tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Same two-digit band; standard partition required.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Show 38 as tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 38,
+          "standard": true
+        },
+        "visual": "Blank Tens and Ones mats with movable rods and unit squares. No hundred block and no pre-filled model.",
+        "materials": "buttons",
+        "rubric": "Standard tens/ones partition with fewer than ten ones; model value equals the requested number.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-05-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-05",
+          "descriptor": "AC9M1N02",
+          "evidence": "Create different partitions of one- and two-digit numbers.",
+          "response": "construction",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "One one-digit partition and one two-digit exchange; same part count and value conservation.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Split 7 into two parts. Then show 38 with one fewer ten.",
+        "task": {
+          "kind": "two-partitions",
+          "small": 7,
+          "large": 38,
+          "exchangeTens": 1
+        },
+        "visual": "Two explicitly separated parts: a small collection with two empty trays, then a standard tens/ones model and a blank alternative model. Exchange control conserves value; no correct alternative shown.",
+        "materials": "buttons",
+        "rubric": "Part A: two nonempty groups conserving the small total. Part B: exactly one fewer ten and ten more ones than the standard partition. Both parts required for one point. Accept every valid small partition.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-06-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-06",
+          "descriptor": "AC9M1N03",
+          "evidence": "Quantify a collection grouped in tens.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show every object clearly; equal object sizes, no occlusion, readable grouping and no printed total."
+          },
+          "invariants": [
+            "Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Exact quantity; preserve entered answer."
+        },
+        "prompt": "How many objects altogether?",
+        "task": {
+          "kind": "count-tens",
+          "groups": 12,
+          "perGroup": 10
+        },
+        "visual": "Twelve visible ten-object bundles arranged in three rows of four. Every bundle visibly contains ten equal objects. No printed group count or total; materials differ by form, same layout density.",
+        "materials": "buttons",
+        "rubric": "Exact quantity 120. An entered number demonstrates quantification of grouped objects, not an observed counting strategy.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-07-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-07",
+          "descriptor": "AC9M1N03",
+          "evidence": "Group a collection in fives to count efficiently.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Make groups of 5. How many objects altogether?",
+        "task": {
+          "kind": "make-groups",
+          "total": 25,
+          "groupSize": 5
+        },
+        "visual": "Ungrouped countable objects, empty group workspace and total field. Child creates groups; do not pre-draw the correct number of groups. Support multi-select to avoid grading motor endurance.",
+        "materials": "buttons",
+        "rubric": "All objects conserved in groups of five, plus exact entered total. Save group membership and total. Actual grouping must be submitted, not just a numeric answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-08-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-08",
+          "descriptor": "AC9M1N04",
+          "evidence": "Add within 20 using part-whole knowledge.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten and operand-size demand.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 7 + 5?",
+        "task": {
+          "kind": "add",
+          "left": 7,
+          "right": 5
+        },
+        "visual": "Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
+        "materials": "buttons",
+        "rubric": "Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-09-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-09",
+          "descriptor": "AC9M1N04",
+          "evidence": "Subtract within 20.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten pattern and difference band.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 16 − 8?",
+        "task": {
+          "kind": "subtract",
+          "whole": 16,
+          "removed": 8
+        },
+        "visual": "Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
+        "materials": "buttons",
+        "rubric": "Exact difference. All examples subtract a single digit from a teen, crossing ten and leaving a single-digit result.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-10-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-10",
+          "descriptor": "AC9M1N04",
+          "evidence": "Find and explain a missing part in an additive relationship.",
+          "response": "number-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show the original quantities/expression and any model needed to evaluate the claim; do not show the corrected calculation."
+          },
+          "invariants": [
+            "Whole within 20; same missing-part position and regrouping.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require both the numerical result and a mathematically valid reason; save both separately."
+        },
+        "prompt": "The whole is 12. One part is 7. Find the missing part and explain.",
+        "task": {
+          "kind": "missing-part",
+          "whole": 12,
+          "known": 7,
+          "reasonChoices": [
+            "Use the whole as the missing part.",
+            "Take the known part from the whole.",
+            "Add the whole and the known part."
+          ]
+        },
+        "visual": "Whole/known-part/blank-part model with labelled quantities; number response and neutral read-aloud reason choices. Rotate reason order without changing distractors.",
+        "materials": "buttons",
+        "rubric": "Correct missing part and inverse/whole-minus-known reason. A correct numeral with an additive misconception does not pass.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-11-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-11",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model an add-to situation and communicate the result.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Totals within 20; same story structure and number of quantities.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "8 cars are here. 5 arrive. Show how many cars there are now.",
+        "task": {
+          "kind": "addition-story",
+          "initial": 8,
+          "arrive": 5,
+          "objects": "cars"
+        },
+        "visual": "Familiar scene labelled Here and Arriving, with blank modelling space and more objects than the required result. No displayed plus sign or final collection. Child creates the two source groups and result.",
+        "materials": "buttons",
+        "rubric": "Model shows both stated quantities and correct combined total; entered result matches. Object origin/grouping retained. No correct result-only shortcut.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-12-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-12",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model a take-away situation.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Within 20; same removal structure and remaining-quantity question.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "16 cars are here. 7 leave. Show how many cars stay.",
+        "task": {
+          "kind": "subtraction-story",
+          "initial": 16,
+          "leave": 7,
+          "objects": "cars"
+        },
+        "visual": "Scene with starting collection and empty Away area. Child moves the departing objects and enters the remainder. All objects remain inspectable, with no automatic correct removal.",
+        "materials": "buttons",
+        "rubric": "Original collection conserved across Here/Away; exactly the stated departures and correct remaining numeral. All cases cross ten.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-13-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-13",
+          "descriptor": "AC9M1N05",
+          "evidence": "Represent a simple money transaction.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "challenging",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Whole-dollar Australian amounts using authentic $1/$2 coins; no nonexistent coin denominations.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "You have $11. A toy costs $5. Pay exactly. How many dollars remain?",
+        "task": {
+          "kind": "money",
+          "wallet": [
+            2,
+            2,
+            2,
+            2,
+            1,
+            2
+          ],
+          "price": 5,
+          "object": "toy"
+        },
+        "visual": "Whole-dollar price tag and wallet of authentic Australian $1 and $2 coin representations with readable denominations, distinguishable sizes, paid/kept areas. Do not invent $3/$4 coins or imply coins are identical units.",
+        "materials": "buttons",
+        "rubric": "Choose available coins that pay exactly the price, retain every other coin and enter correct dollars left. Accept all valid coin combinations; no change-making required.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-14-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-14",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal sharing and state each share.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same recipient count and divisible total within the taught counting range.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Share 15 buttons equally between 3 children. How many does each get?",
+        "task": {
+          "kind": "share",
+          "total": 15,
+          "recipients": 3,
+          "objects": "buttons"
+        },
+        "visual": "Three equal recipient mats and an unallocated collection. No objects pre-shared or count labels revealing share size. Same tap and multi-select controls.",
+        "materials": "buttons",
+        "rubric": "All original objects allocated equally to three recipients and exact each-share numeral. Save allocations and entered share; no remainder.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-15-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-15",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal grouping and state the number of groups.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same group size and no-remainder structure.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Pack 15 buttons in groups of 3. How many groups?",
+        "task": {
+          "kind": "group",
+          "total": 15,
+          "size": 3,
+          "objects": "buttons"
+        },
+        "visual": "Ungrouped objects and add-group control; no prebuilt number of trays. Child forms complete groups of three and enters how many groups.",
+        "materials": "buttons",
+        "rubric": "All objects conserved, each nonempty group has three, entered group count equals constructed group count. Save memberships, not just a quotient.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-16-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-16",
+          "descriptor": "AC9M1N06",
+          "evidence": "Explain why a proposed sharing arrangement is unequal.",
+          "response": "selection-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show all relevant evidence and plausible choices with balanced visual prominence; do not highlight the correct method."
+          },
+          "invariants": [
+            "Same group count and one redistribution needed; conserve total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require the correct choice and its valid evidence-based reason; save each part."
+        },
+        "prompt": "Is this sharing equal? Choose why.",
+        "task": {
+          "kind": "unequal-share",
+          "groups": [
+            6,
+            5,
+            4
+          ],
+          "reasonChoices": [
+            "Only the total matters, not each tray.",
+            "Every tray must have the same number.",
+            "There are three trays, so it is equal."
+          ]
+        },
+        "visual": "Three equally sized trays displaying a fixed unequal allocation. Yes/No and reason choices with neutral audio. Every example is repairable by moving one object.",
+        "materials": "buttons",
+        "rubric": "No, supported by the unequal per-tray quantities/equal-sharing criterion. Total conservation alone is not sufficient. Require choice and reason.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-17-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-17",
+          "descriptor": "AC9M1A01",
+          "evidence": "Continue a skip-counting sequence.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Twos, fives or tens; same step and missing-position count across forms.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Fill both empty spaces.",
+        "task": {
+          "kind": "skip-two",
+          "terms": [
+            18,
+            20,
+            22,
+            null,
+            null
+          ]
+        },
+        "visual": "Five number cards with the fourth and fifth blank. First three numbers imply a step of two; do not print that rule in the question.",
+        "materials": "buttons",
+        "rubric": "Both missing values correctly continue the constant step. All starting values even; no odd/even offset mismatch across forms.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-18-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-18",
+          "descriptor": "AC9M1A01",
+          "evidence": "Create a skip-counting sequence using objects and numbers.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Same starting-number band and fixed step; do not substitute a repeating pattern.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Start at 50. Add 10 each time. Build and label three steps.",
+        "task": {
+          "kind": "create-tens",
+          "start": 50,
+          "stages": 3
+        },
+        "visual": "Three empty stage panels, each with tens-bundle and ones tools plus a numeral field. Starting number and +10 instruction supplied. No completed quantities. Use tens bundles, not dozens of required single-object clicks.",
+        "materials": "buttons",
+        "rubric": "Build and label three stages: start, start+10, start+20. Every stage's model and numeral agree. This creates a growing sequence, not a repeating picture.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-19-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-19",
+          "descriptor": "AC9M1A02",
+          "evidence": "Identify and continue the repeating unit.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit length and two visual attributes.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Show the repeating part. Then build the next three shapes.",
+        "task": {
+          "kind": "continue-pattern",
+          "unit": [
+            "blue-square",
+            "gold-circle",
+            "red-triangle"
+          ],
+          "repetitions": 2,
+          "blanks": 3
+        },
+        "visual": "Two complete ABC units, then three blank continuation positions. Three symbols vary in shape and colour, with independent text/audio labels. Child also constructs the shortest unit in a separate blank strip.",
+        "materials": "buttons",
+        "rubric": "Correct shortest three-symbol unit and all three next symbols. Neither colour alone nor correct continuation without unit identification is enough.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-mid-20-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-mid",
+        "slot": {
+          "id": "number-1-20",
+          "descriptor": "AC9M1A02",
+          "evidence": "Create a repeating pattern using a specified unit.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit complexity and required repetitions; retain actual construction.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Use this repeating part to build three repeats.",
+        "task": {
+          "kind": "create-pattern",
+          "unit": [
+            "gold-square",
+            "red-circle",
+            "blue-triangle"
+          ],
+          "repetitions": 3
+        },
+        "visual": "Supplied three-symbol ABC unit, unsorted shape/colour palette and nine empty positions. No target sequence or next-symbol highlighting. Every form uses the same attribute and unit complexity.",
+        "materials": "buttons",
+        "rubric": "Actual nine-symbol construction consists of exactly three copies of the requested unit in order. Save all placed symbols; do not replace with a multiple-choice option.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      }
+    ],
+    "diagnostic-end": [
+      {
+        "id": "number-1-diagnostic-end-01-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-01",
+          "descriptor": "AC9M1N01",
+          "evidence": "Represent a number with tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Range to 120; same number of tens and presence of zero ones.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Build 113 with tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 113,
+          "standard": true
+        },
+        "visual": "Editable tens rods made of ten visibly joined equal squares and separate ones. Blank labelled mat. Same controls and supply limits across forms; no target model.",
+        "materials": "leaves",
+        "rubric": "Exactly 11 tens and the requested ones. Save both counts; do not accept digit concatenation as construction evidence.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-02-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-02",
+          "descriptor": "AC9M1N01",
+          "evidence": "Order numbers spanning the hundred boundary.",
+          "response": "ordering",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide unsorted labelled cards and an empty ordered row; audio must read the values without sorting them."
+          },
+          "invariants": [
+            "Four cards: one value from 95–99, plus 100, 110 and 120; same zero placeholders and boundary crossings, comparable rather than identical gaps.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Every card must be ordered correctly; equivalent values and ties need an explicit authored policy."
+        },
+        "prompt": "Put the numbers in order. Smallest first.",
+        "task": {
+          "kind": "order",
+          "cards": [
+            110,
+            100,
+            120,
+            95
+          ]
+        },
+        "visual": "Four unsorted numeral cards and an empty ordered row. Include one value below 100, then 100, 110 and 120 in every form. No visual length cues.",
+        "materials": "leaves",
+        "rubric": "All four numerals in ascending order. Save card order; numeric gaps vary slightly within the same boundary-crossing task.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-03-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-03",
+          "descriptor": "AC9M1N01",
+          "evidence": "Locate and name numbers up to 120.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show endpoints and sufficient equally spaced ticks; target point must be editable, not already positioned correctly."
+          },
+          "invariants": [
+            "Same interval and labelled endpoints; include the 120 boundary in the form.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct location/value at the declared line resolution; save target position and scale."
+        },
+        "prompt": "Mark 118 on the number line.",
+        "task": {
+          "kind": "number-line",
+          "min": 100,
+          "max": 120,
+          "step": 1,
+          "target": 118
+        },
+        "visual": "Horizontal 100–120 line with 21 evenly spaced ticks and labels at 100, 110, 120. Tap-to-place marker starts absent. Targets all inside the final decade.",
+        "materials": "leaves",
+        "rubric": "Marker on the exact target tick. Save tick value and number-line scale; no freehand-pixel penalty.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-04-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-04",
+          "descriptor": "AC9M1N02",
+          "evidence": "Partition a two-digit number into tens and ones.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "Same two-digit band; standard partition required.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Show 36 as tens and ones.",
+        "task": {
+          "kind": "build-tens",
+          "target": 36,
+          "standard": true
+        },
+        "visual": "Blank Tens and Ones mats with movable rods and unit squares. No hundred block and no pre-filled model.",
+        "materials": "leaves",
+        "rubric": "Standard tens/ones partition with fewer than ten ones; model value equals the requested number.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-05-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-05",
+          "descriptor": "AC9M1N02",
+          "evidence": "Create different partitions of one- and two-digit numbers.",
+          "response": "construction",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide movable place-value units and a blank model; distinguish hundreds/tens/ones and fractional units without pre-filling the answer."
+          },
+          "invariants": [
+            "One one-digit partition and one two-digit exchange; same part count and value conservation.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Submitted units represent the requested value and any specified partition; conserve value and accept all valid configurations."
+        },
+        "prompt": "Split 8 into two parts. Then show 36 with one fewer ten.",
+        "task": {
+          "kind": "two-partitions",
+          "small": 8,
+          "large": 36,
+          "exchangeTens": 1
+        },
+        "visual": "Two explicitly separated parts: a small collection with two empty trays, then a standard tens/ones model and a blank alternative model. Exchange control conserves value; no correct alternative shown.",
+        "materials": "leaves",
+        "rubric": "Part A: two nonempty groups conserving the small total. Part B: exactly one fewer ten and ten more ones than the standard partition. Both parts required for one point. Accept every valid small partition.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-06-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-06",
+          "descriptor": "AC9M1N03",
+          "evidence": "Quantify a collection grouped in tens.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show every object clearly; equal object sizes, no occlusion, readable grouping and no printed total."
+          },
+          "invariants": [
+            "Twelve full groups of ten, reaching 120 in every form; no loose objects and no printed total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Exact quantity; preserve entered answer."
+        },
+        "prompt": "How many objects altogether?",
+        "task": {
+          "kind": "count-tens",
+          "groups": 12,
+          "perGroup": 10
+        },
+        "visual": "Twelve visible ten-object bundles arranged in three rows of four. Every bundle visibly contains ten equal objects. No printed group count or total; materials differ by form, same layout density.",
+        "materials": "leaves",
+        "rubric": "Exact quantity 120. An entered number demonstrates quantification of grouped objects, not an observed counting strategy.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-07-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-07",
+          "descriptor": "AC9M1N03",
+          "evidence": "Group a collection in fives to count efficiently.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Groups of five from 20–30 objects; complete groups; identical multi-select controls limit motor workload. Twos and tens are sampled in sequence slots.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Make groups of 5. How many objects altogether?",
+        "task": {
+          "kind": "make-groups",
+          "total": 20,
+          "groupSize": 5
+        },
+        "visual": "Ungrouped countable objects, empty group workspace and total field. Child creates groups; do not pre-draw the correct number of groups. Support multi-select to avoid grading motor endurance.",
+        "materials": "leaves",
+        "rubric": "All objects conserved in groups of five, plus exact entered total. Save group membership and total. Actual grouping must be submitted, not just a numeric answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-08-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-08",
+          "descriptor": "AC9M1N04",
+          "evidence": "Add within 20 using part-whole knowledge.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten and operand-size demand.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 9 + 6?",
+        "task": {
+          "kind": "add",
+          "left": 9,
+          "right": 6
+        },
+        "visual": "Clear addition expression with optional blank two-ten-frame workspace and counters. No completed groups or make-ten step. Same optional tools across forms.",
+        "materials": "leaves",
+        "rubric": "Exact sum. All examples cross ten, use two single-digit addends, and stay within 20. Strategy is available, not asserted from the answer.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-09-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-09",
+          "descriptor": "AC9M1N04",
+          "evidence": "Subtract within 20.",
+          "response": "number",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Display the expression and units clearly; no worked steps, highlighted strategy or intermediate result. A decorative picture is unnecessary."
+          },
+          "invariants": [
+            "Same crossing-ten pattern and difference band.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Accept mathematically equivalent values in the specified format; do not accept a correct value with a wrong required unit."
+        },
+        "prompt": "What is 14 − 7?",
+        "task": {
+          "kind": "subtract",
+          "whole": 14,
+          "removed": 7
+        },
+        "visual": "Clear subtraction expression, optional blank two-ten-frame workspace and counters. No crossed-out answer model or worked intermediate step.",
+        "materials": "leaves",
+        "rubric": "Exact difference. All examples subtract a single digit from a teen, crossing ten and leaving a single-digit result.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-10-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-10",
+          "descriptor": "AC9M1N04",
+          "evidence": "Find and explain a missing part in an additive relationship.",
+          "response": "number-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show the original quantities/expression and any model needed to evaluate the claim; do not show the corrected calculation."
+          },
+          "invariants": [
+            "Whole within 20; same missing-part position and regrouping.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require both the numerical result and a mathematically valid reason; save both separately."
+        },
+        "prompt": "The whole is 14. One part is 8. Find the missing part and explain.",
+        "task": {
+          "kind": "missing-part",
+          "whole": 14,
+          "known": 8,
+          "reasonChoices": [
+            "Take the known part from the whole.",
+            "Use the whole as the missing part.",
+            "Add the whole and the known part."
+          ]
+        },
+        "visual": "Whole/known-part/blank-part model with labelled quantities; number response and neutral read-aloud reason choices. Rotate reason order without changing distractors.",
+        "materials": "leaves",
+        "rubric": "Correct missing part and inverse/whole-minus-known reason. A correct numeral with an additive misconception does not pass.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-11-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-11",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model an add-to situation and communicate the result.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Totals within 20; same story structure and number of quantities.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "9 boats are here. 5 arrive. Show how many boats there are now.",
+        "task": {
+          "kind": "addition-story",
+          "initial": 9,
+          "arrive": 5,
+          "objects": "boats"
+        },
+        "visual": "Familiar scene labelled Here and Arriving, with blank modelling space and more objects than the required result. No displayed plus sign or final collection. Child creates the two source groups and result.",
+        "materials": "leaves",
+        "rubric": "Model shows both stated quantities and correct combined total; entered result matches. Object origin/grouping retained. No correct result-only shortcut.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-12-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-12",
+          "descriptor": "AC9M1N05",
+          "evidence": "Model a take-away situation.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Within 20; same removal structure and remaining-quantity question.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "14 boats are here. 6 leave. Show how many boats stay.",
+        "task": {
+          "kind": "subtraction-story",
+          "initial": 14,
+          "leave": 6,
+          "objects": "boats"
+        },
+        "visual": "Scene with starting collection and empty Away area. Child moves the departing objects and enters the remainder. All objects remain inspectable, with no automatic correct removal.",
+        "materials": "leaves",
+        "rubric": "Original collection conserved across Here/Away; exactly the stated departures and correct remaining numeral. All cases cross ten.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-13-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-13",
+          "descriptor": "AC9M1N05",
+          "evidence": "Represent a simple money transaction.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "challenging",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Whole-dollar Australian amounts using authentic $1/$2 coins; no nonexistent coin denominations.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "You have $13. A brush costs $7. Pay exactly. How many dollars remain?",
+        "task": {
+          "kind": "money",
+          "wallet": [
+            2,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "price": 7,
+          "object": "brush"
+        },
+        "visual": "Whole-dollar price tag and wallet of authentic Australian $1 and $2 coin representations with readable denominations, distinguishable sizes, paid/kept areas. Do not invent $3/$4 coins or imply coins are identical units.",
+        "materials": "leaves",
+        "rubric": "Choose available coins that pay exactly the price, retain every other coin and enter correct dollars left. Accept all valid coin combinations; no change-making required.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-14-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-14",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal sharing and state each share.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same recipient count and divisible total within the taught counting range.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Share 12 leaves equally between 3 children. How many does each get?",
+        "task": {
+          "kind": "share",
+          "total": 12,
+          "recipients": 3,
+          "objects": "leaves"
+        },
+        "visual": "Three equal recipient mats and an unallocated collection. No objects pre-shared or count labels revealing share size. Same tap and multi-select controls.",
+        "materials": "leaves",
+        "rubric": "All original objects allocated equally to three recipients and exact each-share numeral. Save allocations and entered share; no remainder.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-15-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-15",
+          "descriptor": "AC9M1N06",
+          "evidence": "Model equal grouping and state the number of groups.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Provide relevant objects, arrays or an editable diagram and a blank response model; do not supply the operation or completed model."
+          },
+          "invariants": [
+            "Same group size and no-remainder structure.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Score the required model, equation and contextual-result components against the slot rubric; retain all submitted parts and accept valid alternative models."
+        },
+        "prompt": "Pack 12 leaves in groups of 3. How many groups?",
+        "task": {
+          "kind": "group",
+          "total": 12,
+          "size": 3,
+          "objects": "leaves"
+        },
+        "visual": "Ungrouped objects and add-group control; no prebuilt number of trays. Child forms complete groups of three and enters how many groups.",
+        "materials": "leaves",
+        "rubric": "All objects conserved, each nonempty group has three, entered group count equals constructed group count. Save memberships, not just a quotient.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-16-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-16",
+          "descriptor": "AC9M1N06",
+          "evidence": "Explain why a proposed sharing arrangement is unequal.",
+          "response": "selection-and-reason",
+          "cognitiveDemand": "reasoning",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show all relevant evidence and plausible choices with balanced visual prominence; do not highlight the correct method."
+          },
+          "invariants": [
+            "Same group count and one redistribution needed; conserve total.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Require the correct choice and its valid evidence-based reason; save each part."
+        },
+        "prompt": "Is this sharing equal? Choose why.",
+        "task": {
+          "kind": "unequal-share",
+          "groups": [
+            3,
+            4,
+            5
+          ],
+          "reasonChoices": [
+            "Every tray must have the same number.",
+            "Only the total matters, not each tray.",
+            "There are three trays, so it is equal."
+          ]
+        },
+        "visual": "Three equally sized trays displaying a fixed unequal allocation. Yes/No and reason choices with neutral audio. Every example is repairable by moving one object.",
+        "materials": "leaves",
+        "rubric": "No, supported by the unequal per-tray quantities/equal-sharing criterion. Total conservation alone is not sufficient. Require choice and reason.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-17-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-17",
+          "descriptor": "AC9M1A01",
+          "evidence": "Continue a skip-counting sequence.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Twos, fives or tens; same step and missing-position count across forms.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Fill both empty spaces.",
+        "task": {
+          "kind": "skip-two",
+          "terms": [
+            10,
+            12,
+            14,
+            null,
+            null
+          ]
+        },
+        "visual": "Five number cards with the fourth and fifth blank. First three numbers imply a step of two; do not print that rule in the question.",
+        "materials": "leaves",
+        "rubric": "Both missing values correctly continue the constant step. All starting values even; no odd/even offset mismatch across forms.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-18-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-18",
+          "descriptor": "AC9M1A01",
+          "evidence": "Create a skip-counting sequence using objects and numbers.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show an incomplete number/shape sequence and editable missing terms or rule; do not print the rule being assessed."
+          },
+          "invariants": [
+            "Same starting-number band and fixed step; do not substitute a repeating pattern.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Correct missing terms and requested rule; a single next term does not count as creating a rule."
+        },
+        "prompt": "Start at 60. Add 10 each time. Build and label three steps.",
+        "task": {
+          "kind": "create-tens",
+          "start": 60,
+          "stages": 3
+        },
+        "visual": "Three empty stage panels, each with tens-bundle and ones tools plus a numeral field. Starting number and +10 instruction supplied. No completed quantities. Use tens bundles, not dozens of required single-object clicks.",
+        "materials": "leaves",
+        "rubric": "Build and label three stages: start, start+10, start+20. Every stage's model and numeral agree. This creates a growing sequence, not a repeating picture.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-19-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-19",
+          "descriptor": "AC9M1A02",
+          "evidence": "Identify and continue the repeating unit.",
+          "response": "construction",
+          "cognitiveDemand": "understanding",
+          "expectedDifficulty": "accessible",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit length and two visual attributes.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Show the repeating part. Then build the next three shapes.",
+        "task": {
+          "kind": "continue-pattern",
+          "unit": [
+            "red-circle",
+            "blue-square",
+            "gold-triangle"
+          ],
+          "repetitions": 2,
+          "blanks": 3
+        },
+        "visual": "Two complete ABC units, then three blank continuation positions. Three symbols vary in shape and colour, with independent text/audio labels. Child also constructs the shortest unit in a separate blank strip.",
+        "materials": "leaves",
+        "rubric": "Correct shortest three-symbol unit and all three next symbols. Neither colour alone nor correct continuation without unit identification is enough.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      },
+      {
+        "id": "number-1-diagnostic-end-20-candidate-1",
+        "version": "year1-number-authoring-2026-09-15-1",
+        "blueprintVersion": "2026-09-15-blueprint-1",
+        "form": "diagnostic-end",
+        "slot": {
+          "id": "number-1-20",
+          "descriptor": "AC9M1A02",
+          "evidence": "Create a repeating pattern using a specified unit.",
+          "response": "construction",
+          "cognitiveDemand": "application",
+          "expectedDifficulty": "moderate",
+          "representation": {
+            "required": true,
+            "specification": "Show distinct pattern stages or repeating units and an editable workspace; no completed target stage."
+          },
+          "invariants": [
+            "Same unit complexity and required repetitions; retain actual construction.",
+            "Keep the stated subskill, response mechanism, scoring, reading support and mathematical workload equivalent across all five forms; author different examples."
+          ],
+          "scoring": "Construct the requested unit/stage and explain its rule where required; accept equivalent constructions."
+        },
+        "prompt": "Use this repeating part to build three repeats.",
+        "task": {
+          "kind": "create-pattern",
+          "unit": [
+            "blue-circle",
+            "gold-triangle",
+            "red-square"
+          ],
+          "repetitions": 3
+        },
+        "visual": "Supplied three-symbol ABC unit, unsorted shape/colour palette and nine empty positions. No target sequence or next-symbol highlighting. Every form uses the same attribute and unit complexity.",
+        "materials": "leaves",
+        "rubric": "Actual nine-symbol construction consists of exactly three copies of the requested unit in order. Save all placed symbols; do not replace with a multiple-choice option.",
+        "maximumScore": 1,
+        "status": "authoring-only"
+      }
+    ]
+  },
+  "independentWorkedTargets": [
+    {
+      "build": [
+        11,
+        1
+      ],
+      "order": [
+        96,
+        100,
+        110,
+        120
+      ],
+      "line": 114,
+      "partition": [
+        3,
+        4
+      ],
+      "exchange": [
+        2,
+        14
+      ],
+      "small": [
+        2,
+        5
+      ],
+      "total": 120,
+      "groups": 4,
+      "add": 13,
+      "subtract": 8,
+      "missing": 5,
+      "arrive": 12,
+      "leave": 9,
+      "money": 4,
+      "share": 4,
+      "group": 4,
+      "skip": [
+        18,
+        20
+      ],
+      "stages": [
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "build": [
+        11,
+        4
+      ],
+      "order": [
+        97,
+        100,
+        110,
+        120
+      ],
+      "line": 117,
+      "partition": [
+        3,
+        7
+      ],
+      "exchange": [
+        2,
+        17
+      ],
+      "small": [
+        3,
+        5
+      ],
+      "total": 120,
+      "groups": 5,
+      "add": 14,
+      "subtract": 8,
+      "missing": 5,
+      "arrive": 13,
+      "leave": 9,
+      "money": 4,
+      "share": 5,
+      "group": 5,
+      "skip": [
+        20,
+        22
+      ],
+      "stages": [
+        30,
+        40,
+        50
+      ]
+    },
+    {
+      "build": [
+        11,
+        2
+      ],
+      "order": [
+        98,
+        100,
+        110,
+        120
+      ],
+      "line": 113,
+      "partition": [
+        3,
+        5
+      ],
+      "exchange": [
+        2,
+        15
+      ],
+      "small": [
+        4,
+        5
+      ],
+      "total": 120,
+      "groups": 6,
+      "add": 14,
+      "subtract": 7,
+      "missing": 7,
+      "arrive": 12,
+      "leave": 8,
+      "money": 4,
+      "share": 6,
+      "group": 6,
+      "skip": [
+        22,
+        24
+      ],
+      "stages": [
+        40,
+        50,
+        60
+      ]
+    },
+    {
+      "build": [
+        11,
+        5
+      ],
+      "order": [
+        99,
+        100,
+        110,
+        120
+      ],
+      "line": 116,
+      "partition": [
+        3,
+        8
+      ],
+      "exchange": [
+        2,
+        18
+      ],
+      "small": [
+        3,
+        4
+      ],
+      "total": 120,
+      "groups": 5,
+      "add": 12,
+      "subtract": 8,
+      "missing": 5,
+      "arrive": 13,
+      "leave": 9,
+      "money": 6,
+      "share": 5,
+      "group": 5,
+      "skip": [
+        24,
+        26
+      ],
+      "stages": [
+        50,
+        60,
+        70
+      ]
+    },
+    {
+      "build": [
+        11,
+        3
+      ],
+      "order": [
+        95,
+        100,
+        110,
+        120
+      ],
+      "line": 118,
+      "partition": [
+        3,
+        6
+      ],
+      "exchange": [
+        2,
+        16
+      ],
+      "small": [
+        2,
+        6
+      ],
+      "total": 120,
+      "groups": 4,
+      "add": 15,
+      "subtract": 7,
+      "missing": 6,
+      "arrive": 14,
+      "leave": 8,
+      "money": 6,
+      "share": 4,
+      "group": 4,
+      "skip": [
+        16,
+        18
+      ],
+      "stages": [
+        60,
+        70,
+        80
+      ]
+    }
+  ]
+}
