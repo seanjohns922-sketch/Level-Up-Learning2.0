@@ -37,6 +37,12 @@ For each descriptor, specify the observable evidence needed. For example:
 
 Shared descriptors must not be double-weighted in a whole-program result. Unassessed skills must be labelled not assessed, not zero. A Prep three-domain report must not claim complete six-strand curriculum coverage.
 
+## Question navigation — required for every realm and form
+
+All future Pre/Post/Start/Mid/End student assessments must show numbered question buttons (1–20 for a 20-item form). Use `AssessmentQuestionNavigator` with answer flags and the existing save/resume-aware navigation handler. Students can revisit answered questions and the first unanswered question; later unanswered questions stay locked. An answer need not be correct. An explicit “I don't know” response counts as answered. Clearing an earlier answer must not prevent revisiting other answered questions. Derive access from restored answers; never from scores. Use wrapping buttons at least 44px square. Keep answers when navigating and preserve existing submission and persistence rules.
+
+Protected Demo Review may use free navigation for author inspection. Never enable its `reviewMode` / `reviewNavigation` exception on student routes.
+
 ## Presentation and accessibility
 
 A visual is required whenever the mathematical evidence depends on it: lengths, balance comparisons, capacity comparisons, scales, clocks, geometry, graphs, coordinates, patterns and construction tasks. A picture is optional for symbolic work where it adds no relevant evidence. An explicit rationale is required for intentionally text-only items.

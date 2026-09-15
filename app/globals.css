@@ -406,13 +406,13 @@ html:fullscreen .assessment-shell .assessment-navigation {
   }
 
   .assessment-shell[data-compact-assessment="true"] .assessment-nav-buttons {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.35rem;
   }
 
   .assessment-shell[data-compact-assessment="true"] .assessment-nav-buttons button {
-    height: 1.75rem;
-    min-width: 1.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
     padding-left: 0.4rem;
     padding-right: 0.4rem;
   }
@@ -519,13 +519,13 @@ html:fullscreen .assessment-shell .assessment-navigation {
   }
 
   .assessment-shell[data-wide-content="true"] .assessment-nav-buttons {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.3rem;
   }
 
   .assessment-shell[data-wide-content="true"] .assessment-nav-buttons button {
-    height: 1.65rem;
-    min-width: 1.65rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
     padding-inline: 0.35rem;
   }
 

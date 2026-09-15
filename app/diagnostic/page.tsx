@@ -13,6 +13,8 @@ import {
   Save,
   Sparkles,
 } from "lucide-react";
+import AssessmentQuestionNavigator from "@/components/assessment/AssessmentQuestionNavigator";
+import { canVisitAssessmentQuestion } from "@/lib/assessment-navigation";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
 import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
@@ -114,6 +116,8 @@ export default function WholeMathsDiagnosticPage() {
   async function moveToQuestion(nextIndex: number) {
     if (!pending || !profile?.studentId) return;
     const boundedIndex = Math.max(0, Math.min(linkedQuestions.length - 1, nextIndex));
+    const flags = linkedQuestions.map(({ question }) => answers[question.id] != null && answers[question.id] !== "");
+    if (saving || !canVisitAssessmentQuestion(boundedIndex, flags, index)) return;
     setIndex(boundedIndex);
     try {
       await saveDiagnosticProgress(profile.studentId, pending.sitting_id, pending.strand, level, answers, probes, boundedIndex);
@@ -544,6 +548,12 @@ export default function WholeMathsDiagnosticPage() {
                 </div>
                 <p className="mt-2 text-right text-xs font-bold text-slate-500">{progressPercent}% through this realm</p>
               </div>
+            </div>
+            <div className="px-5 pb-5 sm:px-6">
+              <AssessmentQuestionNavigator
+                answeredFlags={linkedQuestions.map(({ question }) => answers[question.id] != null && answers[question.id] !== "")}
+                currentIndex={index} onJump={next => void moveToQuestion(next)}
+                realmId={testPresentation.assessmentRealmId} disabled={saving}/>
             </div>
           </header>
 

@@ -55,6 +55,8 @@ export default function PrepNumberCandidateReview() {
           {submitted[item.id] ? <p className="mt-3" role="status">Author check: {result.score} / 1. Response locked.</p> : null}
         </details>
       </>}
+      answeredFlags={PREP_NUMBER_CANDIDATE_FORMS[form].map(q=>Boolean(answers[q.id]))}
+      onJump={setIndex} reviewNavigation
       hasAnswer={true} isLast={index===19}
       onBack={()=>setIndex(i=>Math.max(0,i-1))}
       onNext={()=>setIndex(i=>Math.min(19,i+1))}

@@ -67,6 +67,8 @@ export default function NumberLevel1FiveFormReview() {
           <p className="mt-1 text-sm">{answered}/20 answered. Nothing was saved to a student record. Select another form above to continue.</p>
         </div> : null}
       </>}
+      answeredFlags={questions.map(q=>Boolean(answers[q.id]))}
+      onJump={i=>select(form,i)} reviewNavigation
       hasAnswer={true} isLast={index===19}
       onBack={()=>select(form,Math.max(0,index-1))} onNext={()=>select(form,Math.min(19,index+1))}
       onSubmit={()=>setFinished(previous=>({...previous,[form]:true}))}
