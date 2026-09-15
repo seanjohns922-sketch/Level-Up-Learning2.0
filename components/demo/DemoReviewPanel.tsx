@@ -409,6 +409,11 @@ export default function DemoReviewPanel() {
           <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched to the post-test standard. Ready for your manual review.</p>
           <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-1")}><Eye size={17}/> Review all five forms</button>
         </section> : null}
+        {realm === "number" && year === "Year 2" ? <section className="border-t border-teal-300/20 py-6">
+          <h2 className="mb-2 text-base font-black">Level 2 · All five forms</h2>
+          <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched slot by slot. Ready for your manual review; student tests are unchanged.</p>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-2")}><Eye size={17}/> Review all five forms</button>
+        </section> : null}
         {realm === "number" && year === "Prep" ? <section className="border-t border-teal-300/20 py-6">
           <h2 className="mb-2 text-base font-black">Prep Number Nexus review</h2>
           <p className="mb-3 text-sm text-white/70">Review the Prep candidates. Preview only; no student results are saved.</p>

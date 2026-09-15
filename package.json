@@ -204,6 +204,7 @@
     "qa:assessment-design-readiness": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-program-assessment-design.ts --require-ready",
     "qa:year1-number-matched-pair": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year1-number-matched-pair.ts",
     "qa:year1-number-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year1-number-five-forms.ts",
+    "qa:year2-number-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year2-number-five-forms.ts",
     "qa:assessment-navigation": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-assessment-navigation.ts",
     "qa:year1-number-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-year1-number-release.ts",
     "qa:ground-number-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-ground-number-release.ts"

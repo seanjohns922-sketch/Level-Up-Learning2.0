@@ -24,6 +24,21 @@ function FractionBar({ parts, selected }: { parts: number; selected: number }) {
   );
 }
 
+/** Real Australian notes and coins; $20 notes are shown as notes rather than two $10 notes. */
+function CoinsAndNotes({ amount }: { amount: number }) {
+  if (amount < 20) return renderCoins(amount);
+  const twenties = Math.floor(amount / 20);
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      {Array.from({ length: twenties }, (_, index) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={index} src="/coins/note-20.png" alt="$20" className="h-11 w-20 object-contain" />
+      ))}
+      {amount % 20 > 0 ? renderCoins(amount % 20) : null}
+    </div>
+  );
+}
+
 export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
 
@@ -31,12 +46,28 @@ export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: V
     const hundreds = Number(visual.hundreds ?? 0);
     const tens = Number(visual.tens ?? 0);
     const ones = Number(visual.ones ?? 0);
-    const unitGrid = { backgroundImage: "linear-gradient(to right, rgba(8,145,178,.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(8,145,178,.22) 1px, transparent 1px)", backgroundSize: "10% 10%" };
+    // One unit size throughout: a one is 1×1, a vertical rod 1×10 and a flat 10×10 units.
+    const unit = 16;
+    const side = unit * 10;
+    const lines = Array.from({ length: 9 }, (_, index) => (index + 1) * unit);
     return (
-      <Surface><div className="grid gap-6 sm:grid-cols-3">
-        <div className="flex flex-col items-center gap-3"><div className="text-sm font-black text-cyan-900">Hundreds</div><div className="flex flex-wrap justify-center gap-2" aria-label={`${hundreds} hundreds flats`}>{Array.from({ length: hundreds }, (_, index) => <span key={index} className="h-20 w-20 rounded-sm border-2 border-cyan-700 bg-cyan-100" style={unitGrid} />)}</div></div>
-        <div className="flex flex-col items-center gap-3"><div className="text-sm font-black text-cyan-900">Tens</div><div className="flex justify-center gap-2" aria-label={`${tens} tens rods`}>{Array.from({ length: tens }, (_, rod) => <span key={rod} className="grid overflow-hidden rounded-sm border-2 border-cyan-700 bg-cyan-100">{Array.from({ length: 10 }, (__, unit) => <span key={unit} className="h-2.5 w-7 border-b border-cyan-700/35 last:border-b-0" />)}</span>)}</div></div>
-        <div className="flex flex-col items-center gap-3"><div className="text-sm font-black text-amber-900">Ones</div><div className="grid grid-cols-5 gap-2" aria-label={`${ones} ones blocks`}>{Array.from({ length: ones }, (_, index) => <span key={index} className="h-7 w-7 rounded-sm border-2 border-amber-600/55 bg-amber-100" />)}</div></div>
+      <Surface><div className="flex flex-wrap items-start justify-center gap-8">
+        <div className="flex max-w-full flex-col items-center gap-3"><div className="text-sm font-black text-cyan-900">Hundreds</div><div className="flex flex-wrap justify-center gap-2" role="img" aria-label={`${hundreds} hundreds flats`}>{Array.from({ length: hundreds }, (_, index) => (
+          <svg key={index} viewBox={`0 0 ${side} ${side}`} className="h-auto w-[6.5rem] shrink-0 sm:w-40" aria-hidden="true">
+            <rect x="1" y="1" width={side - 2} height={side - 2} fill="#cffafe" stroke="#0e7490" strokeWidth="2" />
+            {lines.map((offset) => <path key={`h${offset}`} d={`M1 ${offset}H${side - 1}`} stroke="#0e7490" strokeOpacity="0.35" />)}
+            {lines.map((offset) => <path key={`v${offset}`} d={`M${offset} 1V${side - 1}`} stroke="#0e7490" strokeOpacity="0.35" />)}
+          </svg>
+        ))}</div></div>
+        <div className="flex flex-col items-center gap-3"><div className="text-sm font-black text-cyan-900">Tens</div><div className="flex min-h-10 flex-wrap justify-center gap-2" role="img" aria-label={`${tens} tens rods`}>{Array.from({ length: tens }, (_, rod) => (
+          <svg key={rod} viewBox={`0 0 ${unit} ${side}`} className="h-auto w-[0.65rem] shrink-0 sm:w-4" aria-hidden="true">
+            <rect x="1" y="1" width={unit - 2} height={side - 2} fill="#cffafe" stroke="#0e7490" strokeWidth="2" />
+            {lines.map((offset) => <path key={offset} d={`M1 ${offset}H${unit - 1}`} stroke="#0e7490" strokeOpacity="0.35" />)}
+          </svg>
+        ))}</div></div>
+        <div className="flex flex-col items-center gap-3"><div className="text-sm font-black text-amber-900">Ones</div><div className="grid min-h-10 grid-cols-5 gap-2" role="img" aria-label={`${ones} ones blocks`}>{Array.from({ length: ones }, (_, index) => (
+          <svg key={index} viewBox={`0 0 ${unit} ${unit}`} className="h-auto w-[0.65rem] sm:w-4" aria-hidden="true"><rect x="1" y="1" width={unit - 2} height={unit - 2} fill="#fef3c7" stroke="#b45309" strokeWidth="2" /></svg>
+        ))}</div></div>
       </div></Surface>
     );
   }
@@ -57,6 +88,11 @@ export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: V
 
   if (type === "number_y2_fraction_halving") {
     const before = Number(visual.before ?? 4);
+    // v3 forms hide the result (after: null) so the child reasons about halving instead of counting.
+    if (visual.after === null) {
+      const whole = typeof visual.whole === "string" ? visual.whole : null;
+      return <Surface><div className="grid items-center gap-5 sm:grid-cols-[1fr_auto_auto]"><div className="space-y-2">{whole ? <div className="text-center text-sm font-black capitalize text-cyan-900">{whole}</div> : null}<FractionBar parts={before} selected={0} /></div><span className="text-center text-3xl font-black text-cyan-800" aria-hidden="true">→</span><Tile muted>?</Tile></div></Surface>;
+    }
     const after = Number(visual.after ?? 8);
     return <Surface><div className="grid items-center gap-5 sm:grid-cols-[1fr_auto_1fr]"><FractionBar parts={before} selected={before} /><span className="text-3xl font-black text-cyan-800">→</span><FractionBar parts={after} selected={after} /></div></Surface>;
   }
@@ -79,6 +115,8 @@ export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: V
     const supplied = (visual.groups as number[] | undefined) ?? [];
     const total = Number(visual.total ?? 0);
     const groupSize = Number(visual.groupSize ?? 0);
+    // v3 grouping questions show loose counters; drawing the groups would give the answer away.
+    if (visual.loose === true) return <Surface><div className="flex justify-center"><Counters count={total} /></div></Surface>;
     const groups = supplied.length ? supplied : total && groupSize ? Array.from({ length: total / groupSize }, () => groupSize) : [];
     return <Surface><div className="flex flex-wrap justify-center gap-3">{groups.map((count, index) => <div key={index} className="rounded-lg border border-cyan-800/20 bg-white p-3"><Counters count={count} /></div>)}</div></Surface>;
   }
@@ -92,7 +130,7 @@ export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: V
   if (type === "number_y2_money") {
     const amounts = (visual.amounts as number[] | undefined) ?? [];
     const labels = (visual.labels as string[] | undefined) ?? [];
-    return <Surface><div className="grid gap-4 sm:grid-cols-2">{amounts.map((amount, index) => <div key={index} className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg border border-amber-700/20 bg-amber-50 p-4"><div className="text-sm font-black text-slate-700">{labels[index] ?? "Money"}</div><div className="flex min-h-12 items-center justify-center">{renderCoins(amount)}</div></div>)}</div></Surface>;
+    return <Surface><div className="grid gap-4 sm:grid-cols-2">{amounts.map((amount, index) => <div key={index} className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-lg border border-amber-700/20 bg-amber-50 p-4"><div className="text-sm font-black text-slate-700">{labels[index] ?? "Money"}</div><div className="flex min-h-12 items-center justify-center [&_img]:h-16 [&_img]:w-auto"><CoinsAndNotes amount={amount} /></div></div>)}</div></Surface>;
   }
 
   if (type === "number_y2_sequence") {
@@ -112,6 +150,8 @@ export default function NumberNexusYear2AssessmentVisual({ visual }: { visual: V
   }
 
   if (type === "number_y2_double_halve") {
+    // v3 halving questions show one unsplit collection; two drawn halves would give the answer away.
+    if (visual.split === false) return <Surface><div className="flex min-h-28 items-center justify-center rounded-lg border border-cyan-800/20 bg-white p-4"><Counters count={Number(visual.total ?? 0)} /></div></Surface>;
     const factor = Number(visual.factor ?? 0);
     return <Surface><div className="grid gap-4 sm:grid-cols-2">{[0, 1].map((group) => <div key={group} className="flex min-h-28 items-center justify-center rounded-lg border border-cyan-800/20 bg-white p-4"><Counters count={factor} /></div>)}</div></Surface>;
   }
