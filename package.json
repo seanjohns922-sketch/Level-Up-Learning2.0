@@ -199,7 +199,9 @@
     "qa:realmies-collection": "node scripts/realmies-collection-ui-audit.mjs",
     "qa:ground-baselines": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-ground-baselines.ts",
     "qa:starpath-rebuild": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-starpath-rebuild.ts",
-    "qa:assessment-repairs": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-assessment-repairs.ts"
+    "qa:assessment-repairs": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-assessment-repairs.ts",
+    "qa:assessment-design": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-program-assessment-design.ts",
+    "qa:assessment-design-readiness": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-program-assessment-design.ts --require-ready"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

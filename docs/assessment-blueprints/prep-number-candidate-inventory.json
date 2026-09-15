@@ -1,0 +1,2441 @@
+{
+  "status": "candidate-not-released",
+  "assertions": 1365,
+  "items": [
+    {
+      "form": "pretest",
+      "slot": "number-0-01",
+      "code": "AC9MFN01",
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          17
+        ],
+        "choices": [
+          [
+            2,
+            0,
+            5
+          ],
+          [
+            7,
+            17,
+            19
+          ]
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          0,
+          17
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-02",
+      "code": "AC9MFN02",
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 0,
+        "quickLook": true
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-03",
+      "code": "AC9MFN03",
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 0,
+        "quickLook": false
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          20
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-04",
+      "code": "AC9MFN04",
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          3,
+          4
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          7
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-05",
+      "code": "AC9MFN05",
+      "prompt": "3 robots are here. Tap 2 more robots to join them.",
+      "task": {
+        "kind": "add",
+        "start": 3,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-06",
+      "code": "AC9MFN06",
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-07",
+      "code": "AC9MFA01",
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "robot",
+          "star",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "crystal",
+          "star"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "star",
+      "workedResponse": {
+        "symbols": [
+          "star",
+          "robot",
+          "star",
+          "robot"
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-08",
+      "code": "AC9MFN01",
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          20,
+          7,
+          0,
+          13
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          0,
+          7,
+          13,
+          20
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-09",
+      "code": "AC9MFN04",
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 8,
+        "part": 3
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          5
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-10",
+      "code": "AC9MFN03",
+      "prompt": "Match one from A with one from B. Which has more?",
+      "task": {
+        "kind": "compare",
+        "a": 8,
+        "b": 6
+      },
+      "token": "star",
+      "workedResponse": {
+        "pairs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          -1,
+          -1
+        ],
+        "choice": 0
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-11",
+      "code": "AC9MFN05",
+      "prompt": "8 robots are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 8,
+        "change": 3
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-12",
+      "code": "AC9MFN04",
+      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "task": {
+        "kind": "partition",
+        "total": 7
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-13",
+      "code": "AC9MFN02",
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          4,
+          5,
+          3
+        ],
+        "layout": 0
+      },
+      "token": "star",
+      "workedResponse": {
+        "choice": 1
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-14",
+      "code": "AC9MFN06",
+      "prompt": "Make groups of 2. Use all the objects.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-15",
+      "code": "AC9MFN01",
+      "prompt": "Put 7 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 7,
+        "supply": 12
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-16",
+      "code": "AC9MFN04",
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 8,
+        "previous": [
+          3,
+          5
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-17",
+      "code": "AC9MFN03",
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 8,
+        "layout": 0,
+        "reasons": [
+          "Nothing was added or taken away.",
+          "More space means more objects.",
+          "They are smaller now."
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          8
+        ],
+        "reason": "Nothing was added or taken away."
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-18",
+      "code": "AC9MFN05",
+      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "task": {
+        "kind": "provide",
+        "recipients": 5,
+        "supply": 10
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-19",
+      "code": "AC9MFN06",
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2,
+        "initial": [
+          5,
+          3
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "pretest",
+      "slot": "number-0-20",
+      "code": "AC9MFA01",
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "robot",
+          "crystal",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "star",
+          "crystal"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "symbols": [
+          "crystal",
+          "robot"
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-01",
+      "code": "AC9MFN01",
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          18
+        ],
+        "choices": [
+          [
+            0,
+            3,
+            6
+          ],
+          [
+            18,
+            8,
+            16
+          ]
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          0,
+          18
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-02",
+      "code": "AC9MFN02",
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 1,
+        "quickLook": true
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-03",
+      "code": "AC9MFN03",
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 1,
+        "quickLook": false
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          20
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-04",
+      "code": "AC9MFN04",
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          5,
+          3
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          8
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-05",
+      "code": "AC9MFN05",
+      "prompt": "4 stars are here. Tap 2 more stars to join them.",
+      "task": {
+        "kind": "add",
+        "start": 4,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-06",
+      "code": "AC9MFN06",
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-07",
+      "code": "AC9MFA01",
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "star",
+          "crystal",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "robot",
+          "crystal"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "symbols": [
+          "crystal",
+          "star",
+          "crystal",
+          "star"
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-08",
+      "code": "AC9MFN01",
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          6,
+          20,
+          12,
+          0
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          0,
+          6,
+          12,
+          20
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-09",
+      "code": "AC9MFN04",
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 9,
+        "part": 4
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          5
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-10",
+      "code": "AC9MFN03",
+      "prompt": "Match one from A with one from B. Which has more?",
+      "task": {
+        "kind": "compare",
+        "a": 7,
+        "b": 9
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "pairs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "choice": 1
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-11",
+      "code": "AC9MFN05",
+      "prompt": "9 stars are here. Move 4 away.",
+      "task": {
+        "kind": "remove",
+        "start": 9,
+        "change": 4
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-12",
+      "code": "AC9MFN04",
+      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "task": {
+        "kind": "partition",
+        "total": 8
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-13",
+      "code": "AC9MFN02",
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          5,
+          3,
+          4
+        ],
+        "layout": 1
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "choice": 0
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-14",
+      "code": "AC9MFN06",
+      "prompt": "Make groups of 2. Use all the objects.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-15",
+      "code": "AC9MFN01",
+      "prompt": "Put 8 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 8,
+        "supply": 12
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-16",
+      "code": "AC9MFN04",
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 9,
+        "previous": [
+          4,
+          5
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-17",
+      "code": "AC9MFN03",
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 9,
+        "layout": 1,
+        "reasons": [
+          "More space means more objects.",
+          "Nothing was added or taken away.",
+          "They are smaller now."
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          9
+        ],
+        "reason": "Nothing was added or taken away."
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-18",
+      "code": "AC9MFN05",
+      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "task": {
+        "kind": "provide",
+        "recipients": 6,
+        "supply": 10
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-19",
+      "code": "AC9MFN06",
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2,
+        "initial": [
+          4,
+          6
+        ]
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "posttest",
+      "slot": "number-0-20",
+      "code": "AC9MFA01",
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "robot",
+          "star",
+          "robot"
+        ],
+        "palette": [
+          "robot",
+          "crystal",
+          "star"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "robot",
+      "workedResponse": {
+        "symbols": [
+          "star",
+          "robot"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-01",
+      "code": "AC9MFN01",
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          19
+        ],
+        "choices": [
+          [
+            4,
+            7,
+            0
+          ],
+          [
+            17,
+            9,
+            19
+          ]
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          0,
+          19
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-02",
+      "code": "AC9MFN02",
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 2,
+        "quickLook": true
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-03",
+      "code": "AC9MFN03",
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 2,
+        "quickLook": false
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-04",
+      "code": "AC9MFN04",
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          4,
+          5
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "values": [
+          9
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-05",
+      "code": "AC9MFN05",
+      "prompt": "3 crystals are here. Tap 3 more crystals to join them.",
+      "task": {
+        "kind": "add",
+        "start": 3,
+        "change": 3,
+        "supply": 6
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-06",
+      "code": "AC9MFN06",
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-07",
+      "code": "AC9MFA01",
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "crystal",
+          "robot",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "star",
+          "robot"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "robot",
+      "workedResponse": {
+        "symbols": [
+          "robot",
+          "crystal",
+          "robot",
+          "crystal"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-08",
+      "code": "AC9MFN01",
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          14,
+          0,
+          20,
+          8
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          0,
+          8,
+          14,
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-09",
+      "code": "AC9MFN04",
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 7,
+        "part": 3
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-10",
+      "code": "AC9MFN03",
+      "prompt": "Match one from A with one from B. Which has more?",
+      "task": {
+        "kind": "compare",
+        "a": 9,
+        "b": 7
+      },
+      "token": "robot",
+      "workedResponse": {
+        "pairs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          -1,
+          -1
+        ],
+        "choice": 0
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-11",
+      "code": "AC9MFN05",
+      "prompt": "7 crystals are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 7,
+        "change": 3
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-12",
+      "code": "AC9MFN04",
+      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "task": {
+        "kind": "partition",
+        "total": 9
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-13",
+      "code": "AC9MFN02",
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          3,
+          4,
+          5
+        ],
+        "layout": 2
+      },
+      "token": "robot",
+      "workedResponse": {
+        "choice": 2
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-14",
+      "code": "AC9MFN06",
+      "prompt": "Make groups of 2. Use all the objects.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-15",
+      "code": "AC9MFN01",
+      "prompt": "Put 9 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 9,
+        "supply": 12
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-16",
+      "code": "AC9MFN04",
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 7,
+        "previous": [
+          3,
+          4
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-17",
+      "code": "AC9MFN03",
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 7,
+        "layout": 2,
+        "reasons": [
+          "They are smaller now.",
+          "More space means more objects.",
+          "Nothing was added or taken away."
+        ]
+      },
+      "token": "star",
+      "workedResponse": {
+        "values": [
+          7
+        ],
+        "reason": "Nothing was added or taken away."
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-18",
+      "code": "AC9MFN05",
+      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "task": {
+        "kind": "provide",
+        "recipients": 7,
+        "supply": 10
+      },
+      "token": "crystal",
+      "workedResponse": {
+        "placements": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-19",
+      "code": "AC9MFN06",
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2,
+        "initial": [
+          4,
+          2
+        ]
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-start",
+      "slot": "number-0-20",
+      "code": "AC9MFA01",
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "crystal",
+          "star",
+          "crystal",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "robot",
+          "crystal"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "star",
+      "workedResponse": {
+        "symbols": [
+          "crystal",
+          "star"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-01",
+      "code": "AC9MFN01",
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          16
+        ],
+        "choices": [
+          [
+            1,
+            0,
+            8
+          ],
+          [
+            6,
+            16,
+            18
+          ]
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          0,
+          16
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-02",
+      "code": "AC9MFN02",
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 3,
+        "quickLook": true
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-03",
+      "code": "AC9MFN03",
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 3,
+        "quickLook": false
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-04",
+      "code": "AC9MFN04",
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          4,
+          3
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          7
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-05",
+      "code": "AC9MFN05",
+      "prompt": "4 robots are here. Tap 3 more robots to join them.",
+      "task": {
+        "kind": "add",
+        "start": 4,
+        "change": 3,
+        "supply": 6
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-06",
+      "code": "AC9MFN06",
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-07",
+      "code": "AC9MFA01",
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "star",
+          "robot",
+          "star"
+        ],
+        "palette": [
+          "star",
+          "crystal",
+          "robot"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "symbols": [
+          "robot",
+          "star",
+          "robot",
+          "star"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-08",
+      "code": "AC9MFN01",
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          20,
+          11,
+          5,
+          0
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          0,
+          5,
+          11,
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-09",
+      "code": "AC9MFN04",
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 8,
+        "part": 4
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-10",
+      "code": "AC9MFN03",
+      "prompt": "Match one from A with one from B. Which has more?",
+      "task": {
+        "kind": "compare",
+        "a": 6,
+        "b": 8
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "pairs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "choice": 1
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-11",
+      "code": "AC9MFN05",
+      "prompt": "9 robots are here. Move 3 away.",
+      "task": {
+        "kind": "remove",
+        "start": 9,
+        "change": 3
+      },
+      "token": "robot",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-12",
+      "code": "AC9MFN04",
+      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "task": {
+        "kind": "partition",
+        "total": 8
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-13",
+      "code": "AC9MFN02",
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          4,
+          3,
+          5
+        ],
+        "layout": 3
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "choice": 2
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-14",
+      "code": "AC9MFN06",
+      "prompt": "Make groups of 2. Use all the objects.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-15",
+      "code": "AC9MFN01",
+      "prompt": "Put 6 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 6,
+        "supply": 12
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-16",
+      "code": "AC9MFN04",
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 8,
+        "previous": [
+          2,
+          6
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-17",
+      "code": "AC9MFN03",
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 8,
+        "layout": 3,
+        "reasons": [
+          "They are smaller now.",
+          "Nothing was added or taken away.",
+          "More space means more objects."
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          8
+        ],
+        "reason": "Nothing was added or taken away."
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-18",
+      "code": "AC9MFN05",
+      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "task": {
+        "kind": "provide",
+        "recipients": 6,
+        "supply": 10
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-19",
+      "code": "AC9MFN06",
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 8,
+        "recipients": 2,
+        "initial": [
+          3,
+          5
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-mid",
+      "slot": "number-0-20",
+      "code": "AC9MFA01",
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "crystal",
+          "star",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "robot",
+          "star"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "shell",
+      "workedResponse": {
+        "symbols": [
+          "star",
+          "crystal"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-01",
+      "code": "AC9MFN01",
+      "prompt": "Choose each number. You can listen to its name.",
+      "task": {
+        "kind": "numerals",
+        "targets": [
+          0,
+          15
+        ],
+        "choices": [
+          [
+            0,
+            9,
+            2
+          ],
+          [
+            17,
+            5,
+            15
+          ]
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          0,
+          15
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-02",
+      "code": "AC9MFN02",
+      "prompt": "Look at the dots. How many?",
+      "task": {
+        "kind": "count",
+        "count": 4,
+        "layout": 4,
+        "quickLook": true
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-03",
+      "code": "AC9MFN03",
+      "prompt": "How many objects?",
+      "task": {
+        "kind": "count",
+        "count": 20,
+        "layout": 4,
+        "quickLook": false
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-04",
+      "code": "AC9MFN04",
+      "prompt": "Put these parts together. How many altogether?",
+      "task": {
+        "kind": "combine",
+        "parts": [
+          3,
+          5
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          8
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-05",
+      "code": "AC9MFN05",
+      "prompt": "5 stars are here. Tap 2 more stars to join them.",
+      "task": {
+        "kind": "add",
+        "start": 5,
+        "change": 2,
+        "supply": 6
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-06",
+      "code": "AC9MFN06",
+      "prompt": "Share all the objects equally between the two trays.",
+      "task": {
+        "kind": "share",
+        "total": 6,
+        "recipients": 2
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-07",
+      "code": "AC9MFA01",
+      "prompt": "Copy this pattern into the empty spaces.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "star",
+          "crystal",
+          "star",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "robot",
+          "star"
+        ],
+        "blanks": 4,
+        "copy": true
+      },
+      "token": "shell",
+      "workedResponse": {
+        "symbols": [
+          "star",
+          "crystal",
+          "star",
+          "crystal"
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-08",
+      "code": "AC9MFN01",
+      "prompt": "Put the numbers in order. Smallest first.",
+      "task": {
+        "kind": "order",
+        "cards": [
+          15,
+          0,
+          9,
+          20
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          0,
+          9,
+          15,
+          20
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-09",
+      "code": "AC9MFN04",
+      "prompt": "How many objects belong in the empty part?",
+      "task": {
+        "kind": "missing",
+        "whole": 9,
+        "part": 5
+      },
+      "token": "shell",
+      "workedResponse": {
+        "values": [
+          4
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-10",
+      "code": "AC9MFN03",
+      "prompt": "Match one from A with one from B. Which has more?",
+      "task": {
+        "kind": "compare",
+        "a": 10,
+        "b": 8
+      },
+      "token": "shell",
+      "workedResponse": {
+        "pairs": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          -1,
+          -1
+        ],
+        "choice": 0
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-11",
+      "code": "AC9MFN05",
+      "prompt": "8 stars are here. Move 4 away.",
+      "task": {
+        "kind": "remove",
+        "start": 8,
+        "change": 4
+      },
+      "token": "star",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-12",
+      "code": "AC9MFN04",
+      "prompt": "Split all the objects between the two trays. Use both trays.",
+      "task": {
+        "kind": "partition",
+        "total": 7
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-13",
+      "code": "AC9MFN02",
+      "prompt": "Which card has the same number of dots?",
+      "task": {
+        "kind": "match",
+        "count": 5,
+        "choices": [
+          3,
+          5,
+          4
+        ],
+        "layout": 4
+      },
+      "token": "shell",
+      "workedResponse": {
+        "choice": 1
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-14",
+      "code": "AC9MFN06",
+      "prompt": "Make groups of 2. Use all the objects.",
+      "task": {
+        "kind": "group",
+        "total": 8,
+        "size": 2
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-15",
+      "code": "AC9MFN01",
+      "prompt": "Put 10 objects on the mat.",
+      "task": {
+        "kind": "build",
+        "target": 10,
+        "supply": 12
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-16",
+      "code": "AC9MFN04",
+      "prompt": "Make different parts. Use all the objects and both trays. Swapping parts does not count.",
+      "task": {
+        "kind": "partition",
+        "total": 9,
+        "previous": [
+          3,
+          6
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-17",
+      "code": "AC9MFN03",
+      "prompt": "The objects spread out. How many now? Choose why.",
+      "task": {
+        "kind": "conserve",
+        "count": 9,
+        "layout": 4,
+        "reasons": [
+          "Nothing was added or taken away.",
+          "They are smaller now.",
+          "More space means more objects."
+        ]
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "values": [
+          9
+        ],
+        "reason": "Nothing was added or taken away."
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-18",
+      "code": "AC9MFN05",
+      "prompt": "Give each robot one object. Leave the extras in the supply.",
+      "task": {
+        "kind": "provide",
+        "recipients": 5,
+        "supply": 10
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-19",
+      "code": "AC9MFN06",
+      "prompt": "Make the sharing equal. Keep all the objects.",
+      "task": {
+        "kind": "share",
+        "total": 10,
+        "recipients": 2,
+        "initial": [
+          6,
+          4
+        ]
+      },
+      "token": "shell",
+      "workedResponse": {
+        "placements": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "form": "diagnostic-end",
+      "slot": "number-0-20",
+      "code": "AC9MFA01",
+      "prompt": "Build the next two parts of the pattern.",
+      "task": {
+        "kind": "pattern",
+        "source": [
+          "robot",
+          "crystal",
+          "robot",
+          "crystal"
+        ],
+        "palette": [
+          "crystal",
+          "star",
+          "robot"
+        ],
+        "blanks": 2,
+        "copy": false
+      },
+      "token": "leaf",
+      "workedResponse": {
+        "symbols": [
+          "robot",
+          "crystal"
+        ]
+      }
+    }
+  ]
+}
