@@ -58,7 +58,7 @@ function make(form:NumberLevel3Form):NumberLevel3ReviewItem[]{
  num(`What is ${p.double[0]} + ${p.double[1]}?`,p.double[0]+p.double[1],{kind:'equation',expression:`${p.double[0]} + ${p.double[1]} = ?`}),
  num(`What is ${p.near[0]} − ${p.near[1]}?`,p.near[0]-p.near[1],{kind:'equation',expression:`${p.near[0]} − ${p.near[1]} = ?`}),
  num(`What is the difference between ${p.difference[0]} and ${p.difference[1]}?`,p.difference[1]-p.difference[0],{kind:'equation',expression:`${p.difference[1]} − ${p.difference[0]} = ?`}),
- num(`Write $${p.dollars}.40 as a number of cents.`,p.dollars*100+40,{kind:'money',dollars:p.dollars,twenties:p.twenties}),
+ num('Write the total amount below in cents.',p.dollars*100+40,{kind:'money',dollars:p.dollars,twenties:p.twenties}),
  num('How many 10-cent coins have the same total value?',p.coinDollars*10+p.coinTwenties*2,{kind:'money',dollars:p.coinDollars,twenties:p.coinTwenties,targetCoin:10}),
  num('More cans arrive, then damaged cans are removed. How many usable cans remain?',p.story[0]+p.story[1]-p.story[2],{kind:'story',unit:'cans',stages:[{label:'At first',value:p.story[0]},{label:'More arrive',value:p.story[1]},{label:'Damaged and removed',value:p.story[2]}]}),
  num('Tickets sell in the morning and afternoon. How many remain unsold?',p.tickets[0]-p.tickets[1]-p.tickets[2],{kind:'story',unit:'tickets',stages:[{label:'At first',value:p.tickets[0]},{label:'Sold in morning',value:p.tickets[1]},{label:'Sold in afternoon',value:p.tickets[2]}]}),
@@ -80,7 +80,7 @@ export function level3SpokenPrompt(q:NumberLevel3ReviewItem):string {
  const v=q.visual;
  const information=v.kind==='place'?v.parts.map((n,i)=>`${n/10**(4-i)} ${['ten thousands','thousands','hundreds','tens','ones'][i]}`).join(', ')
  :v.kind==='estimate'?v.amounts.map((n,i)=>`Collection ${i+1}: ${n} ${v.unit}`).join('. ')
- :v.kind==='money'?`${v.dollars} dollars and ${v.twenties} twenty-cent coins.`
+ :v.kind==='money'?`${Math.floor(v.dollars/2)} two-dollar coins${v.dollars%2 ? ", one one-dollar coin" : ""}, and ${v.twenties} twenty-cent coins.`
  :v.kind==='story'?v.stages.map(s=>`${s.label}: ${s.value} ${v.unit}`).join('. ')
  :v.kind==='groups'?`${v.groups} bags, ${v.size} oranges in each.`
  :v.kind==='array'?`${v.rows} rows with ${v.columns} counters in each row.`

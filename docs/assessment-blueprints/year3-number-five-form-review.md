@@ -20,7 +20,7 @@ The revised post-test retains the mathematical examples/answers for Q1–Q16 and
 | 6 | AC9M3N03; secondary AC9M3A02 | Near-double two-digit addition; one carry, total below 100. |
 | 7 | AC9M3N03 | Subtract a high-nineties number from 101–105; count-on distance 5–6. |
 | 8 | AC9M3N03; secondary AC9M3A01 | Find a difference across 100; difference 36–37. Inverse calculation is possible but explanation is not observed. |
-| 9 | AC9M3M06 | Convert dollars and 40 cents to cents, with Australian denomination diagrams. |
+| 9 | AC9M3M06 | Determine the total value of the pictured Australian coins and write it in cents. Neither the prompt nor read-aloud supplies a total; speech describes the individual coin denominations and counts. |
 | 10 | AC9M3M06 | Represent mixed dollars/20-cent coins using an equivalent number of 10-cent coins. |
 | 11 | AC9M3N06 | Increase then decrease: three-digit plus two-digit minus two-digit. Both steps require two regroupings under a column method. |
 | 12 | AC9M3N06 | Two decreases from a three-digit ticket total; both subtraction steps require two regroupings. |

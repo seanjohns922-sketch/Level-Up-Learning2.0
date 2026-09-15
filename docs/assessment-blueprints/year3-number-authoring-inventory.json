@@ -257,7 +257,7 @@
       {
         "id": "y3-number-review-pretest-09-v3",
         "type": "numeric",
-        "prompt": "Write $4.40 as a number of cents.",
+        "prompt": "Write the total amount below in cents.",
         "correctAnswer": "440",
         "options": [],
         "visual": {
@@ -924,7 +924,7 @@
       {
         "id": "y3-number-review-posttest-09-v3",
         "type": "numeric",
-        "prompt": "Write $6.40 as a number of cents.",
+        "prompt": "Write the total amount below in cents.",
         "correctAnswer": "640",
         "options": [],
         "visual": {
@@ -1591,7 +1591,7 @@
       {
         "id": "y3-number-review-start-09-v3",
         "type": "numeric",
-        "prompt": "Write $5.40 as a number of cents.",
+        "prompt": "Write the total amount below in cents.",
         "correctAnswer": "540",
         "options": [],
         "visual": {
@@ -2258,7 +2258,7 @@
       {
         "id": "y3-number-review-mid-09-v3",
         "type": "numeric",
-        "prompt": "Write $7.40 as a number of cents.",
+        "prompt": "Write the total amount below in cents.",
         "correctAnswer": "740",
         "options": [],
         "visual": {
@@ -2925,7 +2925,7 @@
       {
         "id": "y3-number-review-end-09-v3",
         "type": "numeric",
-        "prompt": "Write $8.40 as a number of cents.",
+        "prompt": "Write the total amount below in cents.",
         "correctAnswer": "840",
         "options": [],
         "visual": {
