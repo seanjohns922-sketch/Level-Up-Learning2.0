@@ -90,9 +90,9 @@ const cardSource = fs.readFileSync(path.join(process.cwd(), "components/assessme
 const visualSource = fs.readFileSync(path.join(process.cwd(), "components/assessment/NumberNexusYear2AssessmentVisual.tsx"), "utf8");
 check(!/data\/activities|data\/quizzes/.test(bankSource), "Banks import lesson or weekly-quiz content.");
 check(apiSource.includes("YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS") && apiSource.includes("YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS"), "Production resolver does not import both Year 2 banks.");
-check(getPretestForYearLabel("Year 2", "number").every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Year-label Pre-Test route is wrong.");
+check(getPretestForYearLabel("Year 2", "number", 5, 3, 2).every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Year-label Pre-Test route is wrong.");
 check(getPretestForLevel(2, "number").every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS[index]?.id), "Level Pre-Test route is wrong.");
-check(getPosttestForYearLabel("Year 2", "number")?.questions.every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS[index]?.id) === true, "Year-label Post-Test route is wrong.");
+check(getPosttestForYearLabel("Year 2", "number", 5, 3, 2)?.questions.every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS[index]?.id) === true, "Year-label Post-Test route is wrong.");
 check(getPosttestForLevel(2, "number")?.questions.every((item, index) => item.id === YEAR2_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS[index]?.id) === true, "Level Post-Test route is wrong.");
 check(allItems.every((item) => String((item.visual as { type?: unknown })?.type).startsWith("number_y2_")), "A production item does not use the Year 2 visual system.");
 check(shellSource.includes('year === "Year 2"') && shellSource.includes("max-w-6xl"), "Year 2 does not use the modern wide shell.");

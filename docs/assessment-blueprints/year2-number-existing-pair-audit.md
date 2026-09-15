@@ -1,6 +1,6 @@
 # Level 2 Number: existing pre/post audit
 
-Status: desk audit complete; five-form authoring in progress. Not yet owner-reviewed or released. Source: supplied Australian Curriculum Mathematics F–6 v9 PDF, Year 2 Number and Algebra descriptors (pages 19–22), `year2NumberNexusIndependentBanks.ts` (v2 pair) and the Year 2 Number teaching sequence (`data/programs/raw/year2NumberRows.ts`). Released v2 questions are not edited; every change below applies to new v3 forms only.
+Status: owner-approved and released as v3 (2026-09-15) after one review change (slot 3). Released v2 questions are unchanged and still served to existing attempts. Source: supplied Australian Curriculum Mathematics F–6 v9 PDF, Year 2 Number and Algebra descriptors (pages 19–22), `year2NumberNexusIndependentBanks.ts` (v2 pair) and the Year 2 Number teaching sequence (`data/programs/raw/year2NumberRows.ts`).
 
 ## Item decisions
 
@@ -10,7 +10,7 @@ All 40 v2 answer keys are mathematically consistent with their prompts. “Keep�
 |---|---|---|---|
 | 1 | N01 | Read MAB 326 / 542 | **Tweak.** Same instruction in every form (post currently omits “write the number”). Renderer unit sizes are inconsistent: a one is 28×28 px, a rod unit 28×10 px, a flat cell 8 px. Use one unit size across ones, rods and flats. |
 | 2 | N01 | Order 907, 970, 1000 smallest first / 909, 990, 1000 largest first | **Tweak.** Same direction (smallest first) in every form; keep look-alike digits and 1000. |
-| 3 | N02 | 5 hundreds 0 tens 4 ones / 7 hundreds 0 tens 8 ones | **Keep.** Zero placeholder, matched demand. |
+| 3 | N02 | 5 hundreds 0 tens 4 ones / 7 hundreds 0 tens 8 ones | **Tweak (owner review).** Naming the hundreds, tens and ones in order reads out the numeral. Every form now asks “What number do these blocks make?”; the blocks show the empty tens place, so the child must write the zero. |
 | 4 | N02 | Which does not make 603 (zero shifted: 600 + 30) / 482 (digits swapped: 400 + 28) | **Tweak.** Different misconceptions. Every form: a three-digit number with zero tens, one valid standard and one valid non-standard partition, and a distractor that shifts the zero. Keep “does not” visible and read aloud. |
 | 5 | N03 | “One of 4 equal parts is selected. Write the numerator.” / 3 of 4 parts selected | **Replace.** The pre prompt states the answer; “numerator” is not Year 2 language; three-quarters is a non-unit fraction (Year 3, AC9M3N03). Every form: one shape in equal parts with one part shaded; choose one-half, one-quarter or one-eighth (week 12 lesson 3, “Match the fraction”). Selected-response count rises from 4 to 5 (limit 6). Wording must avoid the week 12 quiz prompts. |
 | 6 | N03 | Halve each quarter → 8 / halve each half → 4 | **Tweak.** The visual already shows the finished parts (count, not reason), the forms reach different fractions, and the pre example duplicates the week 12 quiz. Every form starts from quarters, shows only the starting whole, and asks how many equal parts after halving each once. **Limitation:** the example space is tiny, so every form's answer is 8 and forms differ only by the whole being halved. Treat as repeated evidence of the same fact, not independent examples. |
@@ -29,7 +29,7 @@ All 40 v2 answer keys are mathematically consistent with their prompts. “Keep�
 | 19 | A02 | 9 + 8 = 17 → 17 − 8 / 7 + 6 = 13 → 13 − 6 | **Tweak.** Pre fact duplicates the week 7 quiz. Keep structure; new facts within 20. |
 | 20 | A03 | “Double 8 is 16. Halve 16…” with two groups of 8 drawn | **Tweak.** The prompt and visual both give the answer; 8/16 duplicates the week 10 quiz. Every form: “Halve N”, N even from 12 to 20, one unsplit collection. Only five such numbers exist, so 16 (the week 10 quiz double) appears in one form only (Mid). |
 
-Summary: keep 2, tweak 17, replace 1.
+Summary: keep 1, tweak 18, replace 1 (slot 3 tweaked after owner review).
 
 ## Coverage and difficulty
 
@@ -83,4 +83,16 @@ Not yet verified or built:
 - Other forms and slots were checked by the audit, not viewed on screen; tablet widths and audible read-aloud were not checked.
 - Release routing is not built: shared realm/level version registry (replacing the Level 1 and Prep bespoke helpers), v3 pre-test activation, post-test matched to baseline version, diagnostic cycle pinning (database migration), v3 comparison group for growth, and save/resume, first-submission and teacher-report checks. These follow owner approval so they apply to the final approved content.
 
-Next: owner child-view review of all five forms → apply feedback to every corresponding form → release routing and persistence verification → release when authorised.
+Owner review: approved, with one change applied to all five forms (slot 3 no longer reads out the digits).
+
+## Release (v3)
+
+- Production forms: `data/assessments/revisions/year2NumberReleasedForms.ts`, IDs `y2-number-{pre|post|start|mid|end}-NN-v3`, version 3.0.0; content identical to the approved review forms.
+- Pre-test: new sittings resolve v3; a saved sitting resumes its own version (`savedYear2NumberVersion`).
+- Post-test: matches the recorded baseline (`year2NumberPostVersion`): a v3 baseline or saved v3 draft gets v3; unknown or v2 baselines stay on v2.
+- Diagnostics: `number_level2_bank_version` on each sitting (migration `20260915180000_number_level2_five_form_release.sql`). Existing sittings keep v2; a student's first sitting in an academic year pins the cycle and later checkpoints inherit it. Pinned v3 cycles use the Start/Mid/End forms; recent pre/post evidence is adopted only when its version matches.
+- Growth: v3 attempts form `paired-number-Year 2-2026-09-15-v3`; v2 and v3 are never compared, and different learning cycles are never compared.
+- The client asks for `get_pending_whole_math_diagnostic_level2` and falls back to the earlier RPCs, so the web release is safe before the migration is applied; until then diagnostics keep v2.
+- Order: deploy web, then apply the migration.
+
+Release checks: `qa:year2-number-release` (added to prebuild) verifies released content equals the approved forms, v3/v2 routing, saved-version resume, baseline-matched post-tests, pinned and legacy diagnostics, growth grouping, snapshots and migration wiring. Also passing: `qa:year2-number-five-forms`, `qa:number-nexus-year2-bank`, `qa:year1-number-release`, `qa:ground-number-release`, `qa:whole-maths-diagnostic`, `qa:live-maths-progression`, `qa:assessment-repairs`, `qa:assessment-layout`; TypeScript and ESLint without errors. Not verified: a production database round trip with a real student account (save, resume, submit, teacher report) after the migration is applied.

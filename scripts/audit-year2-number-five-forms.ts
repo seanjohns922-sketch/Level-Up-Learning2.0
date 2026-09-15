@@ -99,7 +99,7 @@ for (const form of formNames) {
     switch (index) {
       case 0: { const h = Number(v.hundreds), t = Number(v.tens), o = Number(v.ones); within(h, 2, 7, label); within(t, 1, 9, label); within(o, 1, 9, label); solved = String(h * 100 + t * 10 + o); break; }
       case 1: { const values = v.values as number[]; assert.equal(values.length, 3); assert.ok(values.includes(1000)); const others = values.filter((n) => n !== 1000); assert.equal(sortedDigits(others[0]!), sortedDigits(others[1]!), `${label} look-alike numbers`); assert.deepEqual(item.options, values.map(String)); solved = [...values].sort((x, y) => x - y).join("||"); break; }
-      case 2: { assert.equal(v.tens, 0); assert.deepEqual(nums(item.prompt), [Number(v.hundreds), 0, Number(v.ones)]); solved = String(Number(v.hundreds) * 100 + Number(v.ones)); break; }
+      case 2: { assert.equal(v.tens, 0); assert.equal(nums(item.prompt).length, 0, `${label} prompt must not read out the digits`); solved = String(Number(v.hundreds) * 100 + Number(v.ones)); break; }
       case 3: { const whole = Number(v.whole); assert.equal(Math.floor(whole / 10) % 10, 0, `${label} zero tens`); const choices = v.choices as [number, number][]; const wrong = choices.filter(([x, y]) => x + y !== whole); assert.equal(wrong.length, 1, `${label} exactly one invalid partition`); solved = `${wrong[0]![0]} + ${wrong[0]![1]}`; assert.deepEqual(item.options, choices.map(([x, y]) => `${x} + ${y}`)); break; }
       case 4: { assert.equal(v.selected, 1); assert.ok(v.parts === 4 || v.parts === 8); assert.deepEqual([...(item.options ?? [])].sort(), ["one-eighth", "one-half", "one-quarter"]); solved = v.parts === 8 ? "one-eighth" : "one-quarter"; break; }
       case 5: { assert.equal(v.before, 4); assert.equal(v.after, null, `${label} must not show the finished parts`); assert.equal(typeof v.whole, "string"); solved = String(Number(v.before) * 2); break; }
@@ -150,9 +150,11 @@ assert.equal(v2Pre[4]!.prompt, "One of 4 equal parts is selected. Write the nume
 assert.equal(v2Post[10]!.prompt, "Put 30 counters into groups of 5. How many groups?", "v2 post Q11 changed");
 assert.deepEqual(v2Pre[5]!.visual, { type: "number_y2_fraction_halving", before: 4, after: 8 }, "v2 pre Q6 visual changed");
 
-// Student routing stays on the released v2 pair until owner approval and versioned activation.
-assert.ok(getPretestForYearLabel("Year 2", "number").every((item) => item.id.endsWith("-v2")), "Year 2 pre-test routing changed before release");
-assert.ok(getPosttestForYearLabel("Year 2", "number")!.questions.every((item) => item.id.endsWith("-v2")), "Year 2 post-test routing changed before release");
+// Owner-approved release: new Level 2 tests resolve the v3 forms; the v2 pair stays available for existing attempts.
+assert.ok(getPretestForYearLabel("Year 2", "number").every((item) => /^y2-number-pre-\d{2}-v3$/.test(item.id)), "Year 2 pre-test must resolve the released v3 forms");
+assert.ok(getPosttestForYearLabel("Year 2", "number")!.questions.every((item) => /^y2-number-post-\d{2}-v3$/.test(item.id)), "Year 2 post-test must resolve the released v3 forms");
+assert.ok(getPretestForYearLabel("Year 2", "number", 5, 3, 2).every((item) => item.id.endsWith("-v2")), "The v2 pre-test must remain available");
+assert.ok(getPosttestForYearLabel("Year 2", "number", 5, 3, 2)!.questions.every((item) => item.id.endsWith("-v2")), "The v2 post-test must remain available");
 
 // Protected review is isolated: the real question card and shell, free navigation, no learner writes.
 const read = (relative: string) => readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -166,4 +168,4 @@ assert.ok(reviewWrapper.includes("NUMBER_LEVEL2_FIVE_FORMS") && reviewWrapper.in
 assert.ok(reviewRoute.includes("getServerStarpathAccess") && reviewRoute.includes('if (!access.allowed) redirect("/login")'), "Review route must require demo access");
 assert.ok(demoPanel.includes('router.push("/demo-review/number-level-2")'), "Demo Review must link to the Level 2 five-form review");
 
-console.log(`Number Level 2 five forms: ${checks} independently solved items, five different examples per slot, matched blueprint (8/9/3, 3/6/7/4), selected responses within limit, no weekly-quiz reuse, v2 banks and student routing unchanged, protected review isolated.`);
+console.log(`Number Level 2 five forms: ${checks} independently solved items, five different examples per slot, matched blueprint (8/9/3, 3/6/7/4), selected responses within limit, no weekly-quiz reuse, v2 banks unchanged and still routable, released v3 routing, protected review isolated.`);

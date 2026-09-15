@@ -149,7 +149,7 @@ function slotContents(form: NumberLevel2Form): SlotContent[] {
   return [
     { prompt: "Write the number the blocks show.", correctAnswer: String(h1 * 100 + t1 * 10 + o1), visual: { type: "number_y2_place_value", hundreds: h1, tens: t1, ones: o1 } },
     { prompt: "Put these numbers in order. Smallest first.", correctAnswer: [...p.order].sort((x, y) => x - y).join("||"), visual: { type: "number_y2_number_cards", values: [...p.order] }, options: p.order.map(String) },
-    { prompt: `What number do ${p.zero[0]} hundreds, 0 tens and ${p.zero[1]} ones make?`, correctAnswer: String(p.zero[0] * 100 + p.zero[1]), visual: { type: "number_y2_place_value", hundreds: p.zero[0], tens: 0, ones: p.zero[1] } },
+    { prompt: "What number do these blocks make?", correctAnswer: String(p.zero[0] * 100 + p.zero[1]), visual: { type: "number_y2_place_value", hundreds: p.zero[0], tens: 0, ones: p.zero[1] } },
     { prompt: `Which partition does NOT make ${p.partition.hundreds * 100 + p.partition.ones}?`, correctAnswer: partitionOption.shifted, visual: { type: "number_y2_partition_choices", whole: p.partition.hundreds * 100 + p.partition.ones, choices: p.partition.order.map((kind) => partitionPairs[kind]) }, options: p.partition.order.map((kind) => partitionOption[kind]) },
     { prompt: "The shape has equal parts. What is the shaded part called?", correctAnswer: p.fraction.parts === 8 ? "one-eighth" : "one-quarter", visual: { type: "number_y2_fraction", parts: p.fraction.parts, selected: 1 }, options: [...p.fraction.order] },
     { prompt: `This ${p.halvingWhole} is cut into quarters. Cut each quarter in half. How many equal parts?`, correctAnswer: "8", visual: { type: "number_y2_fraction_halving", before: 4, after: null, whole: p.halvingWhole } },

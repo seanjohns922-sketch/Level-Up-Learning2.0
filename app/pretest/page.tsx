@@ -3,6 +3,7 @@ import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
 import { savedGroundNumberVersion } from "@/lib/ground-number-assessment-version";
 
 import { savedYear1NumberVersion } from "@/lib/year1-number-assessment-version";
+import { savedYear2NumberVersion } from "@/lib/year2-number-assessment-version";
 import { assessmentEvidenceMetadata, isGroundBaseline, hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Pin, PartyPopper } from "lucide-react";
@@ -403,13 +404,14 @@ function PretestPage() {
 
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
+  const [numberLevel2Version, setNumberLevel2Version] = useState<2 | 3>(3);
   const questions: Question[] = useMemo(
     () => candidateReviewEnabled
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version]
   );
 
   const [index, setIndex] = useState(0);
@@ -499,7 +501,11 @@ function PretestPage() {
     setNumberLevel1Version(version);
     const groundVersion=progressRealmId==="number"&&year==="Prep"&&!isDemoPreviewMode() ? savedGroundNumberVersion(snapshot?.questionIds)??3 : 3;
     setGroundNumberVersion(groundVersion);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion);
+    // A saved Level 2 sitting keeps its question version; new sittings use the released v3 forms.
+    const level2Version = progressRealmId === "number" && year === "Year 2" && !isDemoPreviewMode()
+      ? savedYear2NumberVersion(snapshot?.questionIds) ?? 3 : 3;
+    setNumberLevel2Version(level2Version);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
