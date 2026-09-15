@@ -93,7 +93,7 @@
       "form": "pretest",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "3 robots are here. Add 2 more robots.",
+      "prompt": "3 robots are here. Tap 2 more robots to join them.",
       "task": {
         "kind": "add",
         "start": 3,
@@ -576,7 +576,7 @@
       "form": "posttest",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "4 stars are here. Add 2 more stars.",
+      "prompt": "4 stars are here. Tap 2 more stars to join them.",
       "task": {
         "kind": "add",
         "start": 4,
@@ -1066,7 +1066,7 @@
       "form": "diagnostic-start",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "3 crystals are here. Add 3 more crystals.",
+      "prompt": "3 crystals are here. Tap 3 more crystals to join them.",
       "task": {
         "kind": "add",
         "start": 3,
@@ -1552,7 +1552,7 @@
       "form": "diagnostic-mid",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "4 robots are here. Add 3 more robots.",
+      "prompt": "4 robots are here. Tap 3 more robots to join them.",
       "task": {
         "kind": "add",
         "start": 4,
@@ -2038,7 +2038,7 @@
       "form": "diagnostic-end",
       "slot": "number-0-05",
       "code": "AC9MFN05",
-      "prompt": "5 stars are here. Add 2 more stars.",
+      "prompt": "5 stars are here. Tap 2 more stars to join them.",
       "task": {
         "kind": "add",
         "start": 5,

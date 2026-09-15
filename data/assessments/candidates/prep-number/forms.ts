@@ -32,7 +32,7 @@ const rows: Row[] = [
     {kind:"combine",parts:[3,4]}, {kind:"combine",parts:[5,3]}, {kind:"combine",parts:[4,5]},
     {kind:"combine",parts:[4,3]}, {kind:"combine",parts:[3,5]},
   ] },
-  { prompts: ["3 robots are here. Add 2 more robots.","4 stars are here. Add 2 more stars.","3 crystals are here. Add 3 more crystals.","4 robots are here. Add 3 more robots.","5 stars are here. Add 2 more stars."], tasks: [
+  { prompts: ["3 robots are here. Tap 2 more robots to join them.","4 stars are here. Tap 2 more stars to join them.","3 crystals are here. Tap 3 more crystals to join them.","4 robots are here. Tap 3 more robots to join them.","5 stars are here. Tap 2 more stars to join them."], tasks: [
     {kind:"add",start:3,change:2,supply:6}, {kind:"add",start:4,change:2,supply:6},
     {kind:"add",start:3,change:3,supply:6}, {kind:"add",start:4,change:3,supply:6},
     {kind:"add",start:5,change:2,supply:6},

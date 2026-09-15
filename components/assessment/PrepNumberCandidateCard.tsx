@@ -70,6 +70,30 @@ export default function PrepNumberCandidateCard({item,value,onChange}: {item:Pre
 
   let content: React.ReactNode;
   switch(t.kind) {
+    case "add": {
+      const placements=r.placements ?? [];
+      const noun=item.token==="crystal" ? "crystals" : item.token==="star" ? "stars" : "robots";
+      function toggleExtra(objectIndex:number) {
+        update({placements:placements.map((destination,i)=>i===objectIndex ? (destination===0 ? -1 : 0) : destination)});
+      }
+      content=<div className="space-y-4">
+        <Panel label={`${noun[0].toUpperCase()+noun.slice(1)} here`}>
+          <div className="flex min-h-20 flex-wrap items-center justify-center gap-2">
+            {placements.map((destination,i)=>destination!==0 ? null : i<t.start
+              ? <CandidateToken key={i} token={item.token}/>
+              : <button key={i} type="button" aria-label={`Move ${item.token} back`} onClick={()=>toggleExtra(i)} className="rounded-xl p-1 ring-2 ring-teal-600 focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-700"><CandidateToken token={item.token}/></button>)}
+          </div>
+        </Panel>
+        <Panel label={`More ${noun}`}>
+          <p className="mb-3 text-center text-base text-slate-700">Tap an extra {item.token} to join the group above.</p>
+          <div className="flex min-h-16 flex-wrap justify-center gap-2">
+            {placements.map((destination,i)=>i<t.start || destination!==-1 ? null : <button key={i} type="button" aria-label={`Add one ${item.token}`} onClick={()=>toggleExtra(i)} className="rounded-xl p-1 hover:bg-teal-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-cyan-700"><CandidateToken token={item.token}/></button>)}
+          </div>
+        </Panel>
+        <p className="text-center text-sm text-slate-600">To undo, tap an object you added.</p>
+      </div>;
+      break;
+    }
     case "numerals": content=<div className="grid gap-5">{t.targets.map((target,i)=><Panel key={i} label={`Choose ${numberName(target)}`}><div className="mb-3 flex justify-center"><OptionReadAloudButton text={numberName(target)}/></div><div className="flex flex-wrap justify-center gap-3">{t.choices[i].map(n=><button key={n} type="button" className={button+(r.values?.[i]===n ? selected : "")} aria-pressed={r.values?.[i]===n} onClick={()=>{const v=[...(r.values ?? [-1,-1])];v[i]=n;update({values:v});}}>{n}</button>)}</div></Panel>)}</div>;break;
     case "count": content=<><Panel label="Look carefully">{t.quickLook ? <Dots count={t.count} layout={t.layout}/> : <Objects count={t.count} token={item.token}/>}</Panel>{numeric()}{t.quickLook ? <p className="text-center text-sm text-slate-600">Take the time you need.</p> : null}</>;break;
     case "combine": content=<><div className="grid grid-cols-2 gap-3">{t.parts.map((n,i)=><Panel key={i} label={`Part ${i+1}`}><Dots count={n}/></Panel>)}</div><Panel label="Whole">{numeric()}</Panel></>;break;
