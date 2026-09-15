@@ -57,4 +57,4 @@ The generated inventory contains every prompt, option, answer, visual parameter 
 
 Validation completed: all 100 question cards server-render without invalid quantities; all 23 existing release gates pass; TypeScript and lint pass; isolated production build passes using webpack with the existing local configuration. No credentials were copied into the checkout. The local review server uses port 3003.
 
-Owner review adjustments: Q9/Q10 Australian coin images, Q11 can illustrations, and Q19 fraction notation without model aids apply to all five forms. Answers, question identities and scoring are unchanged. Other levels retain their existing fraction visuals.
+Owner review adjustments: Q9/Q10 Australian coin images, Q11 can illustrations, Q12 ticket illustrations, and Q19 fraction notation without model aids apply to all five forms. Answers, question identities and scoring are unchanged. Other levels retain their existing fraction visuals.
