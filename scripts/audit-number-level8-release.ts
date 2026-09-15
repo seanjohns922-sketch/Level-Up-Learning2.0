@@ -27,7 +27,7 @@ assert.equal(diagnosticQuestionCount('measurement','Year 6'),20);
 const snapshots=buildAssessmentQuestionSnapshots(forms.pretest,()=> 'idk',()=>false,'2026-09-16T00:00:00Z');
 assert.equal(snapshots.length,30);assert.ok(snapshots.every(q=>q.response_status==='dont_know'&&!q.correct));
 assert.equal(assessmentEvidenceMetadata('number','Year 8',forms.pretest).assessment_evidence?.comparison_group,'paired-number-Year 8-2026-09-16-v1');
-for(const file of ['app/pretest/page.tsx','app/posttest/page.tsx','components/assessment/NumberExtensionAssessment.tsx','components/demo/FiveFormAssessmentReview.tsx'])assert.ok(readFileSync(file,'utf8').includes('onIdk='),file);
+for(const file of ['app/pretest/page.tsx','app/posttest/page.tsx','components/assessment/NumberExtensionAssessment.tsx','components/demo/FiveFormAssessmentReview.tsx','components/demo/NumberLevel1FiveFormReview.tsx','components/demo/NumberLevel3FiveFormReview.tsx','components/demo/PrepNumberCandidateReview.tsx'])assert.ok(readFileSync(file,'utf8').includes('onIdk='),file);
 for(const file of ['app/diagnostic/page.tsx','components/demo/DiagnosticPreview.tsx'])assert.ok(readFileSync(file,'utf8').includes('UNKNOWN_ANSWER'),file);
 const panel=readFileSync('components/demo/DemoReviewPanel.tsx','utf8');
 assert.ok(panel.includes('id:"Year 8",label:"Level 8"'));assert.ok(!panel.includes('Review Level 8'));assert.ok(!panel.includes('All five forms'));

@@ -55,7 +55,8 @@ export default function NumberLevel1FiveFormReview() {
       questionPrompt={question.prompt}
       promptAction={<ReadAloudBtn text={question.prompt}/>}
       questionContent={<>
-        <AssessmentQuestionCard key={question.id} question={question} value={value} onChange={answer=>setAnswers(previous=>({...previous,[question.id]:answer}))} realmId="number"/>
+        <AssessmentQuestionCard key={question.id} question={question} value={value === "idk" ? "" : value} onChange={answer=>setAnswers(previous=>({...previous,[question.id]:answer}))} realmId="number"/>
+        {value === "idk" ? <p role="status" className="mt-3 text-teal-100">Marked “I don’t know”. You can still answer this question.</p> : null}
         <details className="mt-5 rounded-lg border border-teal-700 p-4 text-teal-50">
           <summary className="cursor-pointer font-bold">Review details</summary>
           <p className="mt-3 text-sm">{question.primaryDescriptorCode} · {question.skillLabel} · Intended difficulty: {question.difficulty}</p>
@@ -72,6 +73,7 @@ export default function NumberLevel1FiveFormReview() {
       hasAnswer={true} isLast={index===19}
       onBack={()=>select(form,Math.max(0,index-1))} onNext={()=>select(form,Math.min(19,index+1))}
       onSubmit={()=>setFinished(previous=>({...previous,[form]:true}))}
+      onIdk={()=>{setAnswers(previous=>({...previous,[question.id]:"idk"}));if(index<19)select(form,index+1);else setFinished(previous=>({...previous,[form]:true}));}}
       onExit={()=>router.push("/demo-review?realm=number&year=Year%201")}
     />
   </ReadAloudRateProvider>;

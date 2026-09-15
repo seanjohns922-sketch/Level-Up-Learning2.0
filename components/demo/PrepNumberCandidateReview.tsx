@@ -24,7 +24,7 @@ export default function PrepNumberCandidateReview() {
   const prepItem=PREP_NUMBER_CANDIDATE_FORMS[form][index];
   const year1Item=YEAR1_NUMBER_CANDIDATE_SPECS[form][index];
   const item=level==="Prep" ? prepItem : year1Item;
-  const raw=answers[item.id] ?? null;
+  const raw=answers[item.id] === "idk" ? null : answers[item.id] ?? null;
   const result=level==="Prep" ? scorePrepNumberSubmission(prepItem,parsePrepNumberSubmission(prepItem,raw)) : scoreYear1NumberSubmission(year1Item,raw);
   const formLabel = {pretest:"Pre-Test",posttest:"Post-Test","diagnostic-start":"Diagnostic Start","diagnostic-mid":"Diagnostic Mid","diagnostic-end":"Diagnostic End"}[form];
   return <ReadAloudRateProvider>
@@ -44,6 +44,7 @@ export default function PrepNumberCandidateReview() {
       promptAction={<ReadAloudBtn text={item.prompt} size="md"/>}
       questionContent={<>
         {finishedItem===item.id ? <p role="status" className="mb-4 rounded-xl border border-teal-300/30 bg-teal-950 p-3 text-teal-100">Preview complete. No student results were saved. Use the question selector to review any question.</p> : null}
+        {answers[item.id] === "idk" ? <p role="status" className="mb-3 text-teal-100">Marked “I don’t know”. You can still answer this question.</p> : null}
         <fieldset disabled={submitted[item.id]}>{level==="Prep" ? <PrepNumberCandidateCard key={`${item.id}:${resetVersion}`} item={prepItem} value={raw} onChange={value=>setAnswers(previous=>({...previous,[item.id]:value}))}/> : <Year1NumberCandidateCard key={`${item.id}:${resetVersion}`} item={year1Item} value={raw} onChange={value=>setAnswers(previous=>({...previous,[item.id]:value}))}/>}</fieldset>
         <details className="mt-4 rounded-xl border border-teal-300/20 p-3 text-sm text-teal-100">
           <summary className="cursor-pointer font-bold">Author review controls</summary>
@@ -61,6 +62,7 @@ export default function PrepNumberCandidateReview() {
       onBack={()=>setIndex(i=>Math.max(0,i-1))}
       onNext={()=>setIndex(i=>Math.min(19,i+1))}
       onSubmit={()=>{setSubmitted(s=>({...s,[item.id]:true}));setFinishedItem(item.id);}}
+      onIdk={()=>{setAnswers(previous=>({...previous,[item.id]:"idk"}));if(index<19)setIndex(index+1);else setFinishedItem(item.id);}}
       onExit={()=>{window.location.href="/demo-review?realm=number&year=Prep";}}
     />
   </ReadAloudRateProvider>;
