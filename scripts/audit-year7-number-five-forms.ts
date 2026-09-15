@@ -11,11 +11,11 @@ const keys=[
  ['15','64','2³ × 7²','8 × 10⁵ + 3 × 10³ + 6 × 10','-9/4','85','56.85','8','31/28','1/28','15/28','20/21','16.56','3.6','-9','9','4:5','160','212','75'],
 ];
 const extraKeys=[
- ['7','6','5','2/7','96','9','-12||-7||0||5','180','Pack B','50 × 10 − 280'],
- ['8','7','6','3/7','126','11','-14||-8||0||6','280','Pack B','45 × 9 − 240'],
- ['9','8','7','4/7','160','13','-16||-9||0||7','400','Pack B','60 × 9 − 360'],
- ['10','9','4','5/7','198','15','-18||-10||0||8','540','Pack B','70 × 9 − 340'],
- ['11','10','8','6/7','240','17','-20||-11||0||9','700','Pack B','70 × 8 − 280'],
+ ['7','36','5','2/7','96','9','-12||-7||0||5','180','Pack B','50 × 10 − 280'],
+ ['8','42','6','3/7','126','11','-14||-8||0||6','280','Pack B','45 × 9 − 240'],
+ ['9','48','7','4/7','160','13','-16||-9||0||7','400','Pack B','60 × 9 − 360'],
+ ['10','54','4','5/7','198','15','-18||-10||0||8','540','Pack B','70 × 9 − 340'],
+ ['11','60','8','6/7','240','17','-20||-11||0||9','700','Pack B','70 × 8 − 280'],
 ];
 keys.forEach((key,i)=>key.push(...extraKeys[i]));
 const rational=(s:string)=>{const [n,d]=s.split('/').map(Number);return n/d;};
@@ -42,12 +42,14 @@ for(const [f,name] of names.entries()){
  const packs=bank[28].visual.packs as Array<{label:string;kg:number;price:number}>;const cheapest=[...packs].sort((a,b)=>a.price/a.kg-b.price/b.kg);assert.equal(cheapest[0].label,bank[28].correctAnswer);assert.ok(cheapest[0].price/cheapest[0].kg<cheapest[1].price/cheapest[1].kg);
  assert.notDeepEqual(bank[19].visual,bank[29].visual,'Separate financial examples avoid providing each other’s answer');
  assert.ok(Number(bank[14].correctAnswer)<0&&Number(bank[15].correctAnswer)>0);assert.equal(bank[14].inputMode,'text');
+ const factors=bank[21].visual.values as number[];assert.equal(gcd(factors[0],factors[1]),Number(bank[21].correctAnswer));assert.ok(factors.every(n=>n>=72));
  const line=bank[4];assert.equal(rational(line.correctAnswer),Number(line.visual.marker));assert.ok(!line.readAloudText.includes(line.correctAnswer));assert.ok(Number(line.visual.marker)>-3&&Number(line.visual.marker)<1);
  // Equivalent arithmetic, including all four positive-fraction operations.
  for(let i=8;i<=11;i++){
   const [a,op,b]=String(bank[i].visual.expression).split(' '),x=rational(a),y=rational(b);
   const expected=op==='+'?x+y:op==='−'?x-y:op==='×'?x*y:x/y;
   assert.ok(Math.abs(rational(bank[i].correctAnswer)-expected)<1e-12);
+  for(const option of bank[i].options!)assert.equal(Math.abs(rational(option)-expected)<1e-12,option===bank[i].correctAnswer);
   assert.ok(x>0&&y>0);assert.equal(a.split('/')[1],i===10?'4':'7');assert.equal(b.split('/')[1],i===10?'7':'4');
  }
  const paint=bank[7];assert.ok(Number(paint.correctAnswer)*2>=Number(paint.visual.litres));assert.ok((Number(paint.correctAnswer)-1)*2<Number(paint.visual.litres));

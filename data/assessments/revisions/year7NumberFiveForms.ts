@@ -22,15 +22,15 @@ export const NUMBER_LEVEL7_BLUEPRINT=[
  ['AC9M7N04','Read a negative fraction on a number line','moderate'],['AC9M7N04','Convert a fraction to a percentage','easy'],
  ['AC9M7N05','Round a decimal to a specified accuracy','easy'],['AC9M7N05','Round a purchase up for its purpose','moderate'],
  ['AC9M7N06','Add unlike fractions','moderate'],['AC9M7N06','Subtract unlike fractions','moderate'],
- ['AC9M7N06','Multiply positive fractions','moderate'],['AC9M7N06','Divide positive fractions','challenging'],
- ['AC9M7N06','Multiply decimals','moderate'],['AC9M7N06','Divide by a decimal','challenging'],
+ ['AC9M7N06','Multiply positive fractions','moderate'],['AC9M7N06','Divide positive fractions','moderate'],
+ ['AC9M7N06','Multiply decimals','moderate'],['AC9M7N06','Divide by a decimal','moderate'],
  ['AC9M7N07','Add integers across zero','moderate'],['AC9M7N07','Subtract a negative integer','moderate'],
- ['AC9M7N08','Simplify a part-to-part ratio','moderate'],['AC9M7N08','Share a quantity in a ratio','challenging'],
+ ['AC9M7N08','Simplify a part-to-part ratio','moderate'],['AC9M7N08','Share a quantity in a ratio','moderate'],
  ['AC9M7N09','Model a discount and delivery cost','challenging'],['AC9M7N09','Model profit as a percentage of cost','challenging'],
- ['AC9M7N01','Locate a non-square root between integers','moderate'],['AC9M7N02','Find the highest common factor','challenging'],
+ ['AC9M7N01','Locate a non-square root between integers','moderate'],['AC9M7N02','Find the highest common factor','moderate'],
  ['AC9M7N03','Identify a place-value exponent','moderate'],['AC9M7N04','Simplify a positive fraction','moderate'],
  ['AC9M7N05','Estimate a contextual decimal product','moderate'],['AC9M7N06','Combine decimal operations','challenging'],
- ['AC9M7N07','Order negative and positive integers','easy'],['AC9M7N08','Find one component of a mixture','challenging'],
+ ['AC9M7N07','Order negative and positive integers','easy'],['AC9M7N08','Find one component of a mixture','moderate'],
  ['AC9M7N09','Compare unit prices','challenging'],['AC9M7N09','Choose a profit model','moderate'],
 ] as const;
 function make(form:NumberLevel7Form,f:number){
@@ -38,17 +38,28 @@ function make(form:NumberLevel7Form,f:number){
  const expanded=`${a} × 10⁵ + ${b} × 10³ + ${c} × 10`;
  const target=a*100000+b*1000+c*10;
  const frac=(pair:readonly [string,string,string],op:string,prompt:string)=>{
-  const [n,d]=pair[2].split('/').map(Number);
-  return choice(prompt,pair[2],[pair[2],`${n+2}/${d}`,`${n+1}/${d}`,`${n+3}/${d}`],calc(`${pair[0]} ${op} ${pair[1]}`),`${pair[0]} ${op==='×'?'times':op==='÷'?'divided by':op==='+'?'plus':'minus'} ${pair[1]}.`);
+  const [a,b]=pair[0].split('/').map(Number),[c,d]=pair[1].split('/').map(Number);
+  const [n,den]=pair[2].split('/').map(Number);
+  // Distractors represent operations on numerators/denominators and incorrect reciprocals.
+  const wrong=op==='+'?[[a+c,b+d],[a+c,b*d],[Math.abs(a*d-c*b),b*d]]
+    :op==='−'?[[a-c,b*d],[a*d+c*b,b*d],[Math.abs(a-c),Math.abs(b-d)]]
+    :op==='×'?[[a*d+c*b,b*d],[a*d,b*c],[a*c,b+d]]
+    :[[a*c,b*d],[b*c,a*d],[a,b*c*d]];
+  const options=[pair[2]],seen=[n/den];
+  for(const [num,div] of [...wrong,[n+1,den],[n+2,den]]){
+   if(div>0&&!seen.some(v=>Math.abs(v-num/div)<1e-12)){options.push(`${num}/${div}`);seen.push(num/div);}
+   if(options.length===4)break;
+  }
+  return choice(prompt,pair[2],options,calc(`${pair[0]} ${op} ${pair[1]}`),`${pair[0]} ${op==='×'?'times':op==='÷'?'divided by':op==='+'?'plus':'minus'} ${pair[1]}.`);
  };
  const ratio=`${p.ratio[0]}:${p.ratio[1]}`;
  const fractionLabel=`${p.line*4}/4`;
- const extra={bound:7+f,hcf:6+f,exponent:[5,6,7,4,8][f],simpleNumerator:2+f,estimate:[12.48+f*2,7.65+f],mixParts:[2+f,3+f],mixUnit:60+f*10};
+ const extra={bound:7+f,hcf:36+f*6,exponent:[5,6,7,4,8][f],simpleNumerator:2+f,estimate:[12.48+f*2,7.65+f],mixParts:[2+f,3+f],mixUnit:60+f*10};
  const packData=[{label:'Pack A',kg:3,price:24+6*f},{label:'Pack B',kg:5,price:35+10*f},{label:'Pack C',kg:4,price:32+8*f},{label:'Pack D',kg:2,price:18+4*f}];
  const temperatures=[-12-f*2,-7-f,0,5+f];
  const extras:Example[]=[
-  numeric('Between which whole numbers is this square root? Enter the smaller number.',extra.bound,calc(`√${extra.bound**2+extra.bound}`),`Square root of ${extra.bound**2+extra.bound}.`),
-  numeric('What is the highest common factor of these numbers?',extra.hcf,calc(`${extra.hcf*5}    ${extra.hcf*7}`),`${extra.hcf*5} and ${extra.hcf*7}.`),
+  numeric('Which whole number is immediately below this square root?',extra.bound,calc(`√${extra.bound**2+extra.bound}`),`Square root of ${extra.bound**2+extra.bound}.`),
+  numeric('What is the highest common factor of these numbers?',extra.hcf,visual('factors',{values:[extra.hcf*2,extra.hcf*3]}),`${extra.hcf*2} and ${extra.hcf*3}.`),
   numeric('Enter the missing exponent.',extra.exponent,visual('power',{digit:a,number:a*10**extra.exponent}),`${a*10**extra.exponent} equals ${a} times ten to the power of a missing number.`),
   choice('Choose the fraction in simplest form.',`${extra.simpleNumerator}/7`,[`${extra.simpleNumerator}/7`,`${extra.simpleNumerator*2}/14`,`${extra.simpleNumerator}/21`,`${extra.simpleNumerator+1}/7`],calc(`${extra.simpleNumerator*3}/21`),`${extra.simpleNumerator*3} over twenty-one.`),
   numeric('Round both values to whole numbers. Estimate the cost in dollars.',Math.round(extra.estimate[0])*Math.round(extra.estimate[1]),visual('estimate',{metres:extra.estimate[0],price:extra.estimate[1]}),`${extra.estimate[0]} metres at ${extra.estimate[1]} dollars per metre.`),
@@ -82,7 +93,8 @@ function make(form:NumberLevel7Form,f:number){
   const shift=(f+i)%4;
   const options=e.options?[...e.options.slice(shift),...e.options.slice(0,shift)]:undefined;
   const id=`y7-number-review-${form}-${String(i+1).padStart(2,'0')}-v1`;
-  return {...e,options,id,inputMode:i===14?'text' as const:'decimal' as const,answer:e.correctAnswer,version:'1.0.0-review.1',form,sourcePool:'assessment_review',bankId:`number-level7-${form}-review-v1`,yearLevel:7,realmId:'number',strand:'Number',primaryDescriptorCode:code,curriculumCodes:[code],skillId:`number-y7-slot-${i+1}`,skillLabel,structureKey:`number-y7-slot-${i+1}`,contextKey:id,difficulty,statistics:createUncalibratedItemStatistics(difficulty),showFractionModels:false,responseMode:e.type==='mcq'?'selected_response':e.type==='number_order'?'manipulated_response':'constructed_response',scoring:{kind:'exact',correctResponse:e.correctAnswer},renderer:{type:e.type,payload:{prompt:e.prompt,visual:e.visual,options}}};
+  const presentedVisual:Visual & {topic:string}={...e.visual,topic:['Squares and roots','Squares and roots','Prime factors','Place value','Rational numbers','Fraction to percentage','Decimal accuracy','Paint project','Fraction addition','Fraction subtraction','Fraction multiplication','Fraction division','Decimal multiplication','Decimal division','Signed numbers','Signed numbers','Counter ratios','Sharing in a ratio','Backpack purchase','Fundraiser','Root bounds','Common factors','Powers of ten','Equivalent fractions','Fabric estimate','Decimal operations','Temperatures','Mixing a drink','Compare packs','Profit model'][i]};
+  return {...e,visual:presentedVisual,options,id,inputMode:i===14?'text' as const:'decimal' as const,answer:e.correctAnswer,version:'1.0.0-review.2',form,sourcePool:'assessment_review',bankId:`number-level7-${form}-review-v1`,yearLevel:7,realmId:'number',strand:'Number',primaryDescriptorCode:code,curriculumCodes:[code],skillId:`number-y7-slot-${i+1}`,skillLabel,structureKey:`number-y7-slot-${i+1}`,contextKey:id,difficulty,statistics:createUncalibratedItemStatistics(difficulty),showFractionModels:false,responseMode:e.type==='mcq'?'selected_response':e.type==='number_order'?'manipulated_response':'constructed_response',scoring:{kind:'exact',correctResponse:e.correctAnswer},renderer:{type:e.type,payload:{prompt:e.prompt,visual:presentedVisual,options}}};
  });
 }
 export const NUMBER_LEVEL7_FIVE_FORMS=Object.fromEntries(NUMBER_LEVEL7_FORMS.map((form,f)=>[form,make(form,f)])) as Record<NumberLevel7Form,ReturnType<typeof make>>;

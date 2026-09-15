@@ -41,3 +41,11 @@ Before student release, extend the supported diagnostic range, version pinning, 
 ## Verification
 
 An independent 150-answer key checks scoring, every multiple-choice option, ordering, fraction arithmetic, number-line positions, purchase rounding and financial calculations. The audit checks nine-code coverage, five distinct examples per slot, consistent metadata and the protected review route. Render and TypeScript checks cover the question cards. Owner manual review is next.
+
+## Presentation and difficulty review
+
+The second review revision adds larger context illustrations, framed mathematical notation, clearer number-line markers and topic headers. Artwork is decorative: assessed amounts remain in explicit text, and no illustrated fraction areas, factor lists or computed totals reveal answers. All five forms use the same presentation for corresponding slots.
+
+Fraction distractors now include adding numerators and denominators, using the wrong operation and incorrect reciprocals, with rational-equivalence checks to keep exactly one valid answer. The highest-common-factor question now uses two- and three-digit pairs from 72 to 180. The root-bounds prompt directly asks for the whole number immediately below the root.
+
+Difficulty labels were corrected for routine fraction division, decimal division, ratio sharing and mixtures: these are standard Year 7 demands rather than automatically challenging because they are new topics. Each form now has four accessible, 22 moderate and four challenging items. The harder items involve discount plus delivery, percentage profit, combined decimal operations and unit-price comparison. These labels remain uncalibrated author judgements.
