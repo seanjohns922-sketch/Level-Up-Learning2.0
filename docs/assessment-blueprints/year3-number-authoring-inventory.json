@@ -1,0 +1,3340 @@
+{
+  "status": "review-only",
+  "forms": {
+    "pretest": [
+      {
+        "id": "y3-number-review-pretest-01-v3",
+        "type": "numeric",
+        "prompt": "What number does this place-value chart show?",
+        "correctAnswer": "13426",
+        "options": [],
+        "visual": {
+          "kind": "place",
+          "parts": [
+            10000,
+            3000,
+            400,
+            20,
+            6
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-1",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Represent numbers beyond 10,000",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-pretest-02-v3",
+        "type": "number_order",
+        "prompt": "Order these numbers from smallest to largest.",
+        "correctAnswer": "13,064||13,406||13,460||13,640",
+        "options": [
+          "13,406",
+          "13,640",
+          "13,460",
+          "13,064"
+        ],
+        "visual": {
+          "kind": "cards",
+          "values": [
+            13406,
+            13640,
+            13460,
+            13064
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-2",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Order five-digit numbers",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-03-v3",
+        "type": "numeric",
+        "prompt": "Round 4,342 to the nearest 100.",
+        "correctAnswer": "4300",
+        "options": [],
+        "visual": {
+          "kind": "round",
+          "value": 4342,
+          "step": 100
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-3",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Round to estimate",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-pretest-04-v3",
+        "type": "numeric",
+        "prompt": "Round each collection to the nearest hundred. About how many cards altogether?",
+        "correctAnswer": "400",
+        "options": [],
+        "visual": {
+          "kind": "estimate",
+          "amounts": [
+            246,
+            172
+          ],
+          "unit": "cards"
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-4",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Estimate a combined collection",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-05-v3",
+        "type": "numeric",
+        "prompt": "What is 48 + 19?",
+        "correctAnswer": "67",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "48 + 19 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-5",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using compensation",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-06-v3",
+        "type": "numeric",
+        "prompt": "What is 37 + 38?",
+        "correctAnswer": "75",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "37 + 38 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-6",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using near doubles",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-07-v3",
+        "type": "numeric",
+        "prompt": "What is 103 − 98?",
+        "correctAnswer": "5",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "103 − 98 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-7",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03"
+        ],
+        "skillLabel": "Subtract by counting on",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-08-v3",
+        "type": "numeric",
+        "prompt": "What is the difference between 87 and 124?",
+        "correctAnswer": "37",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "124 − 87 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-8",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A01"
+        ],
+        "skillLabel": "Find a difference across 100",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-09-v3",
+        "type": "numeric",
+        "prompt": "Write $4.40 as a number of cents.",
+        "correctAnswer": "440",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 4,
+          "twenties": 2
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-9",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent dollars and cents",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-pretest-10-v3",
+        "type": "numeric",
+        "prompt": "How many 10-cent coins have the same total value?",
+        "correctAnswer": "26",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 2,
+          "twenties": 3,
+          "targetCoin": 10
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-10",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent equivalent coin values",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-pretest-11-v3",
+        "type": "numeric",
+        "prompt": "More cans arrive, then damaged cans are removed. How many usable cans remain?",
+        "correctAnswer": "287",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "cans",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 236
+            },
+            {
+              "label": "More arrive",
+              "value": 78
+            },
+            {
+              "label": "Damaged and removed",
+              "value": 27
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-11",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model an increase then decrease",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-pretest-12-v3",
+        "type": "numeric",
+        "prompt": "Tickets sell in the morning and afternoon. How many remain unsold?",
+        "correctAnswer": "159",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "tickets",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 420
+            },
+            {
+              "label": "Sold in morning",
+              "value": 176
+            },
+            {
+              "label": "Sold in afternoon",
+              "value": 85
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-12",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model two decreases",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-pretest-13-v3",
+        "type": "numeric",
+        "prompt": "Each bag holds 7 oranges. How many oranges altogether?",
+        "correctAnswer": "35",
+        "options": [],
+        "visual": {
+          "kind": "groups",
+          "groups": 5,
+          "size": 7
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-13",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Solve an equal-group problem",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-14-v3",
+        "type": "mcq",
+        "prompt": "Which multiplication sentence matches this array?",
+        "correctAnswer": "4 × 6 = 24",
+        "options": [
+          "4 + 6 = 10",
+          "4 × 6 = 24",
+          "3 × 6 = 18",
+          "4 × 5 = 20"
+        ],
+        "visual": {
+          "kind": "array",
+          "rows": 4,
+          "columns": 6
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-14",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Connect an array to multiplication",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-15-v3",
+        "type": "numeric",
+        "prompt": "What number makes this multiplication correct?",
+        "correctAnswer": "7",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "5 × ? = 35"
+        },
+        "linkedWeeks": [
+          8,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2
+        ],
+        "skillId": "number-y3-slot-15",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3A03",
+        "curriculumCodes": [
+          "AC9M3A03",
+          "AC9M3N04"
+        ],
+        "skillLabel": "Find an unknown multiplication factor",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-16-v3",
+        "type": "numeric",
+        "prompt": "Follow the steps and decision. What is the final number?",
+        "correctAnswer": "10",
+        "options": [],
+        "visual": {
+          "kind": "algorithm",
+          "start": 14,
+          "extra": 3
+        },
+        "linkedWeeks": [
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-16",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N07",
+        "curriculumCodes": [
+          "AC9M3N07"
+        ],
+        "skillLabel": "Follow steps and a decision",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-pretest-17-v3",
+        "type": "mcq",
+        "prompt": "Which model shows 1/2 of a whole?",
+        "correctAnswer": "A",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "visual": {
+          "kind": "fractionChoices",
+          "models": [
+            {
+              "denominator": 2,
+              "numerator": 1
+            },
+            {
+              "denominator": 3,
+              "numerator": 1
+            },
+            {
+              "denominator": 4,
+              "numerator": 1
+            },
+            {
+              "denominator": 5,
+              "numerator": 1
+            },
+            {
+              "denominator": 10,
+              "numerator": 1
+            }
+          ]
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-17",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Recognise a unit fraction",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-pretest-18-v3",
+        "type": "numeric",
+        "prompt": "How many more tenths are needed to complete the whole?",
+        "correctAnswer": "7",
+        "options": [],
+        "visual": {
+          "kind": "completeWhole",
+          "filled": 3,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-18",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Complete a whole with tenths",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-19-v3",
+        "type": "fraction_order",
+        "prompt": "Order these fractions from smallest to largest.",
+        "correctAnswer": "1/10,4/10,7/10",
+        "options": [
+          "7/10",
+          "1/10",
+          "4/10"
+        ],
+        "visual": {
+          "kind": "fractionOrder",
+          "values": [
+            "7/10",
+            "1/10",
+            "4/10"
+          ]
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-19",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Order multiples of one-tenth",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-pretest-20-v3",
+        "type": "fraction_number_line",
+        "prompt": "Mark 3/10 on the number line.",
+        "correctAnswer": "3/10",
+        "options": [],
+        "visual": {
+          "kind": "numberLine",
+          "numerator": 3,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-20",
+        "version": "3.0.0-review.1",
+        "form": "pretest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Locate tenths on a number line",
+        "difficulty": "moderate"
+      }
+    ],
+    "posttest": [
+      {
+        "id": "y3-number-review-posttest-01-v3",
+        "type": "numeric",
+        "prompt": "What number does this place-value chart show?",
+        "correctAnswer": "25648",
+        "options": [],
+        "visual": {
+          "kind": "place",
+          "parts": [
+            20000,
+            5000,
+            600,
+            40,
+            8
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-1",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Represent numbers beyond 10,000",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-posttest-02-v3",
+        "type": "number_order",
+        "prompt": "Order these numbers from smallest to largest.",
+        "correctAnswer": "25,086||25,608||25,680||25,860",
+        "options": [
+          "25,608",
+          "25,860",
+          "25,680",
+          "25,086"
+        ],
+        "visual": {
+          "kind": "cards",
+          "values": [
+            25608,
+            25860,
+            25680,
+            25086
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-2",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Order five-digit numbers",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-03-v3",
+        "type": "numeric",
+        "prompt": "Round 6,742 to the nearest 100.",
+        "correctAnswer": "6700",
+        "options": [],
+        "visual": {
+          "kind": "round",
+          "value": 6742,
+          "step": 100
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-3",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Round to estimate",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-posttest-04-v3",
+        "type": "numeric",
+        "prompt": "Round each collection to the nearest hundred. About how many cards altogether?",
+        "correctAnswer": "500",
+        "options": [],
+        "visual": {
+          "kind": "estimate",
+          "amounts": [
+            346,
+            172
+          ],
+          "unit": "cards"
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-4",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Estimate a combined collection",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-05-v3",
+        "type": "numeric",
+        "prompt": "What is 57 + 19?",
+        "correctAnswer": "76",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "57 + 19 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-5",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using compensation",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-06-v3",
+        "type": "numeric",
+        "prompt": "What is 46 + 47?",
+        "correctAnswer": "93",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "46 + 47 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-6",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using near doubles",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-07-v3",
+        "type": "numeric",
+        "prompt": "What is 104 − 99?",
+        "correctAnswer": "5",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "104 − 99 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-7",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03"
+        ],
+        "skillLabel": "Subtract by counting on",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-08-v3",
+        "type": "numeric",
+        "prompt": "What is the difference between 96 and 132?",
+        "correctAnswer": "36",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "132 − 96 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-8",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A01"
+        ],
+        "skillLabel": "Find a difference across 100",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-09-v3",
+        "type": "numeric",
+        "prompt": "Write $6.40 as a number of cents.",
+        "correctAnswer": "640",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 6,
+          "twenties": 2
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-9",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent dollars and cents",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-posttest-10-v3",
+        "type": "numeric",
+        "prompt": "How many 10-cent coins have the same total value?",
+        "correctAnswer": "36",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 3,
+          "twenties": 3,
+          "targetCoin": 10
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-10",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent equivalent coin values",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-posttest-11-v3",
+        "type": "numeric",
+        "prompt": "More cans arrive, then damaged cans are removed. How many usable cans remain?",
+        "correctAnswer": "283",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "cans",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 245
+            },
+            {
+              "label": "More arrive",
+              "value": 67
+            },
+            {
+              "label": "Damaged and removed",
+              "value": 29
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-11",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model an increase then decrease",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-posttest-12-v3",
+        "type": "numeric",
+        "prompt": "Tickets sell in the morning and afternoon. How many remain unsold?",
+        "correctAnswer": "169",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "tickets",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 450
+            },
+            {
+              "label": "Sold in morning",
+              "value": 186
+            },
+            {
+              "label": "Sold in afternoon",
+              "value": 95
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-12",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model two decreases",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-posttest-13-v3",
+        "type": "numeric",
+        "prompt": "Each bag holds 6 oranges. How many oranges altogether?",
+        "correctAnswer": "30",
+        "options": [],
+        "visual": {
+          "kind": "groups",
+          "groups": 5,
+          "size": 6
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-13",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Solve an equal-group problem",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-14-v3",
+        "type": "mcq",
+        "prompt": "Which multiplication sentence matches this array?",
+        "correctAnswer": "4 × 5 = 20",
+        "options": [
+          "4 × 4 = 16",
+          "4 + 5 = 9",
+          "4 × 5 = 20",
+          "3 × 5 = 15"
+        ],
+        "visual": {
+          "kind": "array",
+          "rows": 4,
+          "columns": 5
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-14",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Connect an array to multiplication",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-15-v3",
+        "type": "numeric",
+        "prompt": "What number makes this multiplication correct?",
+        "correctAnswer": "8",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "5 × ? = 40"
+        },
+        "linkedWeeks": [
+          8,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2
+        ],
+        "skillId": "number-y3-slot-15",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3A03",
+        "curriculumCodes": [
+          "AC9M3A03",
+          "AC9M3N04"
+        ],
+        "skillLabel": "Find an unknown multiplication factor",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-16-v3",
+        "type": "numeric",
+        "prompt": "Follow the steps and decision. What is the final number?",
+        "correctAnswer": "12",
+        "options": [],
+        "visual": {
+          "kind": "algorithm",
+          "start": 18,
+          "extra": 3
+        },
+        "linkedWeeks": [
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-16",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N07",
+        "curriculumCodes": [
+          "AC9M3N07"
+        ],
+        "skillLabel": "Follow steps and a decision",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-posttest-17-v3",
+        "type": "mcq",
+        "prompt": "Which model shows 1/5 of a whole?",
+        "correctAnswer": "D",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "visual": {
+          "kind": "fractionChoices",
+          "models": [
+            {
+              "denominator": 2,
+              "numerator": 1
+            },
+            {
+              "denominator": 3,
+              "numerator": 1
+            },
+            {
+              "denominator": 4,
+              "numerator": 1
+            },
+            {
+              "denominator": 5,
+              "numerator": 1
+            },
+            {
+              "denominator": 10,
+              "numerator": 1
+            }
+          ]
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-17",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Recognise a unit fraction",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-posttest-18-v3",
+        "type": "numeric",
+        "prompt": "How many more tenths are needed to complete the whole?",
+        "correctAnswer": "6",
+        "options": [],
+        "visual": {
+          "kind": "completeWhole",
+          "filled": 4,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-18",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Complete a whole with tenths",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-19-v3",
+        "type": "fraction_order",
+        "prompt": "Order these fractions from smallest to largest.",
+        "correctAnswer": "2/10,5/10,8/10",
+        "options": [
+          "8/10",
+          "2/10",
+          "5/10"
+        ],
+        "visual": {
+          "kind": "fractionOrder",
+          "values": [
+            "8/10",
+            "2/10",
+            "5/10"
+          ]
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-19",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Order multiples of one-tenth",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-posttest-20-v3",
+        "type": "fraction_number_line",
+        "prompt": "Mark 7/10 on the number line.",
+        "correctAnswer": "7/10",
+        "options": [],
+        "visual": {
+          "kind": "numberLine",
+          "numerator": 7,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-20",
+        "version": "3.0.0-review.1",
+        "form": "posttest",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Locate tenths on a number line",
+        "difficulty": "moderate"
+      }
+    ],
+    "start": [
+      {
+        "id": "y3-number-review-start-01-v3",
+        "type": "numeric",
+        "prompt": "What number does this place-value chart show?",
+        "correctAnswer": "32567",
+        "options": [],
+        "visual": {
+          "kind": "place",
+          "parts": [
+            30000,
+            2000,
+            500,
+            60,
+            7
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-1",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Represent numbers beyond 10,000",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-start-02-v3",
+        "type": "number_order",
+        "prompt": "Order these numbers from smallest to largest.",
+        "correctAnswer": "32,056||32,506||32,560||32,650",
+        "options": [
+          "32,506",
+          "32,650",
+          "32,560",
+          "32,056"
+        ],
+        "visual": {
+          "kind": "cards",
+          "values": [
+            32506,
+            32650,
+            32560,
+            32056
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-2",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Order five-digit numbers",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-03-v3",
+        "type": "numeric",
+        "prompt": "Round 5,243 to the nearest 100.",
+        "correctAnswer": "5200",
+        "options": [],
+        "visual": {
+          "kind": "round",
+          "value": 5243,
+          "step": 100
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-3",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Round to estimate",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-start-04-v3",
+        "type": "numeric",
+        "prompt": "Round each collection to the nearest hundred. About how many cards altogether?",
+        "correctAnswer": "700",
+        "options": [],
+        "visual": {
+          "kind": "estimate",
+          "amounts": [
+            446,
+            273
+          ],
+          "unit": "cards"
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-4",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Estimate a combined collection",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-05-v3",
+        "type": "numeric",
+        "prompt": "What is 66 + 19?",
+        "correctAnswer": "85",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "66 + 19 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-5",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using compensation",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-06-v3",
+        "type": "numeric",
+        "prompt": "What is 28 + 29?",
+        "correctAnswer": "57",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "28 + 29 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-6",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using near doubles",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-07-v3",
+        "type": "numeric",
+        "prompt": "What is 102 − 97?",
+        "correctAnswer": "5",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "102 − 97 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-7",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03"
+        ],
+        "skillLabel": "Subtract by counting on",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-08-v3",
+        "type": "numeric",
+        "prompt": "What is the difference between 78 and 115?",
+        "correctAnswer": "37",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "115 − 78 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-8",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A01"
+        ],
+        "skillLabel": "Find a difference across 100",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-09-v3",
+        "type": "numeric",
+        "prompt": "Write $5.40 as a number of cents.",
+        "correctAnswer": "540",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 5,
+          "twenties": 2
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-9",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent dollars and cents",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-start-10-v3",
+        "type": "numeric",
+        "prompt": "How many 10-cent coins have the same total value?",
+        "correctAnswer": "46",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 4,
+          "twenties": 3,
+          "targetCoin": 10
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-10",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent equivalent coin values",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-start-11-v3",
+        "type": "numeric",
+        "prompt": "More cans arrive, then damaged cans are removed. How many usable cans remain?",
+        "correctAnswer": "295",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "cans",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 254
+            },
+            {
+              "label": "More arrive",
+              "value": 68
+            },
+            {
+              "label": "Damaged and removed",
+              "value": 27
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-11",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model an increase then decrease",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-start-12-v3",
+        "type": "numeric",
+        "prompt": "Tickets sell in the morning and afternoon. How many remain unsold?",
+        "correctAnswer": "158",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "tickets",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 430
+            },
+            {
+              "label": "Sold in morning",
+              "value": 187
+            },
+            {
+              "label": "Sold in afternoon",
+              "value": 85
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-12",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model two decreases",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-start-13-v3",
+        "type": "numeric",
+        "prompt": "Each bag holds 8 oranges. How many oranges altogether?",
+        "correctAnswer": "40",
+        "options": [],
+        "visual": {
+          "kind": "groups",
+          "groups": 5,
+          "size": 8
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-13",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Solve an equal-group problem",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-14-v3",
+        "type": "mcq",
+        "prompt": "Which multiplication sentence matches this array?",
+        "correctAnswer": "4 × 7 = 28",
+        "options": [
+          "3 × 7 = 21",
+          "4 × 6 = 24",
+          "4 + 7 = 11",
+          "4 × 7 = 28"
+        ],
+        "visual": {
+          "kind": "array",
+          "rows": 4,
+          "columns": 7
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-14",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Connect an array to multiplication",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-15-v3",
+        "type": "numeric",
+        "prompt": "What number makes this multiplication correct?",
+        "correctAnswer": "9",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "5 × ? = 45"
+        },
+        "linkedWeeks": [
+          8,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2
+        ],
+        "skillId": "number-y3-slot-15",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3A03",
+        "curriculumCodes": [
+          "AC9M3A03",
+          "AC9M3N04"
+        ],
+        "skillLabel": "Find an unknown multiplication factor",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-16-v3",
+        "type": "numeric",
+        "prompt": "Follow the steps and decision. What is the final number?",
+        "correctAnswer": "14",
+        "options": [],
+        "visual": {
+          "kind": "algorithm",
+          "start": 22,
+          "extra": 3
+        },
+        "linkedWeeks": [
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-16",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N07",
+        "curriculumCodes": [
+          "AC9M3N07"
+        ],
+        "skillLabel": "Follow steps and a decision",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-start-17-v3",
+        "type": "mcq",
+        "prompt": "Which model shows 1/4 of a whole?",
+        "correctAnswer": "C",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "visual": {
+          "kind": "fractionChoices",
+          "models": [
+            {
+              "denominator": 2,
+              "numerator": 1
+            },
+            {
+              "denominator": 3,
+              "numerator": 1
+            },
+            {
+              "denominator": 4,
+              "numerator": 1
+            },
+            {
+              "denominator": 5,
+              "numerator": 1
+            },
+            {
+              "denominator": 10,
+              "numerator": 1
+            }
+          ]
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-17",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Recognise a unit fraction",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-start-18-v3",
+        "type": "numeric",
+        "prompt": "How many more tenths are needed to complete the whole?",
+        "correctAnswer": "4",
+        "options": [],
+        "visual": {
+          "kind": "completeWhole",
+          "filled": 6,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-18",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Complete a whole with tenths",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-19-v3",
+        "type": "fraction_order",
+        "prompt": "Order these fractions from smallest to largest.",
+        "correctAnswer": "3/10,6/10,9/10",
+        "options": [
+          "9/10",
+          "3/10",
+          "6/10"
+        ],
+        "visual": {
+          "kind": "fractionOrder",
+          "values": [
+            "9/10",
+            "3/10",
+            "6/10"
+          ]
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-19",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Order multiples of one-tenth",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-start-20-v3",
+        "type": "fraction_number_line",
+        "prompt": "Mark 4/10 on the number line.",
+        "correctAnswer": "4/10",
+        "options": [],
+        "visual": {
+          "kind": "numberLine",
+          "numerator": 4,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-20",
+        "version": "3.0.0-review.1",
+        "form": "start",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Locate tenths on a number line",
+        "difficulty": "moderate"
+      }
+    ],
+    "mid": [
+      {
+        "id": "y3-number-review-mid-01-v3",
+        "type": "numeric",
+        "prompt": "What number does this place-value chart show?",
+        "correctAnswer": "47386",
+        "options": [],
+        "visual": {
+          "kind": "place",
+          "parts": [
+            40000,
+            7000,
+            300,
+            80,
+            6
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-1",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Represent numbers beyond 10,000",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-mid-02-v3",
+        "type": "number_order",
+        "prompt": "Order these numbers from smallest to largest.",
+        "correctAnswer": "47,038||47,308||47,380||47,830",
+        "options": [
+          "47,308",
+          "47,830",
+          "47,380",
+          "47,038"
+        ],
+        "visual": {
+          "kind": "cards",
+          "values": [
+            47308,
+            47830,
+            47380,
+            47038
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-2",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Order five-digit numbers",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-03-v3",
+        "type": "numeric",
+        "prompt": "Round 7,541 to the nearest 100.",
+        "correctAnswer": "7500",
+        "options": [],
+        "visual": {
+          "kind": "round",
+          "value": 7541,
+          "step": 100
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-3",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Round to estimate",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-mid-04-v3",
+        "type": "numeric",
+        "prompt": "Round each collection to the nearest hundred. About how many cards altogether?",
+        "correctAnswer": "600",
+        "options": [],
+        "visual": {
+          "kind": "estimate",
+          "amounts": [
+            346,
+            272
+          ],
+          "unit": "cards"
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-4",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Estimate a combined collection",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-05-v3",
+        "type": "numeric",
+        "prompt": "What is 75 + 19?",
+        "correctAnswer": "94",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "75 + 19 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-5",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using compensation",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-06-v3",
+        "type": "numeric",
+        "prompt": "What is 38 + 39?",
+        "correctAnswer": "77",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "38 + 39 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-6",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using near doubles",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-07-v3",
+        "type": "numeric",
+        "prompt": "What is 105 − 99?",
+        "correctAnswer": "6",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "105 − 99 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-7",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03"
+        ],
+        "skillLabel": "Subtract by counting on",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-08-v3",
+        "type": "numeric",
+        "prompt": "What is the difference between 89 and 126?",
+        "correctAnswer": "37",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "126 − 89 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-8",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A01"
+        ],
+        "skillLabel": "Find a difference across 100",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-09-v3",
+        "type": "numeric",
+        "prompt": "Write $7.40 as a number of cents.",
+        "correctAnswer": "740",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 7,
+          "twenties": 2
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-9",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent dollars and cents",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-mid-10-v3",
+        "type": "numeric",
+        "prompt": "How many 10-cent coins have the same total value?",
+        "correctAnswer": "28",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 2,
+          "twenties": 4,
+          "targetCoin": 10
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-10",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent equivalent coin values",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-mid-11-v3",
+        "type": "numeric",
+        "prompt": "More cans arrive, then damaged cans are removed. How many usable cans remain?",
+        "correctAnswer": "294",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "cans",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 263
+            },
+            {
+              "label": "More arrive",
+              "value": 59
+            },
+            {
+              "label": "Damaged and removed",
+              "value": 28
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-11",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model an increase then decrease",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-mid-12-v3",
+        "type": "numeric",
+        "prompt": "Tickets sell in the morning and afternoon. How many remain unsold?",
+        "correctAnswer": "167",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "tickets",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 440
+            },
+            {
+              "label": "Sold in morning",
+              "value": 178
+            },
+            {
+              "label": "Sold in afternoon",
+              "value": 95
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-12",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model two decreases",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-mid-13-v3",
+        "type": "numeric",
+        "prompt": "Each bag holds 9 oranges. How many oranges altogether?",
+        "correctAnswer": "45",
+        "options": [],
+        "visual": {
+          "kind": "groups",
+          "groups": 5,
+          "size": 9
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-13",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Solve an equal-group problem",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-14-v3",
+        "type": "mcq",
+        "prompt": "Which multiplication sentence matches this array?",
+        "correctAnswer": "4 × 8 = 32",
+        "options": [
+          "4 × 8 = 32",
+          "3 × 8 = 24",
+          "4 × 7 = 28",
+          "4 + 8 = 12"
+        ],
+        "visual": {
+          "kind": "array",
+          "rows": 4,
+          "columns": 8
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-14",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Connect an array to multiplication",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-15-v3",
+        "type": "numeric",
+        "prompt": "What number makes this multiplication correct?",
+        "correctAnswer": "6",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "5 × ? = 30"
+        },
+        "linkedWeeks": [
+          8,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2
+        ],
+        "skillId": "number-y3-slot-15",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3A03",
+        "curriculumCodes": [
+          "AC9M3A03",
+          "AC9M3N04"
+        ],
+        "skillLabel": "Find an unknown multiplication factor",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-16-v3",
+        "type": "numeric",
+        "prompt": "Follow the steps and decision. What is the final number?",
+        "correctAnswer": "16",
+        "options": [],
+        "visual": {
+          "kind": "algorithm",
+          "start": 26,
+          "extra": 3
+        },
+        "linkedWeeks": [
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-16",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N07",
+        "curriculumCodes": [
+          "AC9M3N07"
+        ],
+        "skillLabel": "Follow steps and a decision",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-mid-17-v3",
+        "type": "mcq",
+        "prompt": "Which model shows 1/3 of a whole?",
+        "correctAnswer": "B",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "visual": {
+          "kind": "fractionChoices",
+          "models": [
+            {
+              "denominator": 2,
+              "numerator": 1
+            },
+            {
+              "denominator": 3,
+              "numerator": 1
+            },
+            {
+              "denominator": 4,
+              "numerator": 1
+            },
+            {
+              "denominator": 5,
+              "numerator": 1
+            },
+            {
+              "denominator": 10,
+              "numerator": 1
+            }
+          ]
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-17",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Recognise a unit fraction",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-mid-18-v3",
+        "type": "numeric",
+        "prompt": "How many more tenths are needed to complete the whole?",
+        "correctAnswer": "3",
+        "options": [],
+        "visual": {
+          "kind": "completeWhole",
+          "filled": 7,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-18",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Complete a whole with tenths",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-19-v3",
+        "type": "fraction_order",
+        "prompt": "Order these fractions from smallest to largest.",
+        "correctAnswer": "1/10,5/10,8/10",
+        "options": [
+          "8/10",
+          "1/10",
+          "5/10"
+        ],
+        "visual": {
+          "kind": "fractionOrder",
+          "values": [
+            "8/10",
+            "1/10",
+            "5/10"
+          ]
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-19",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Order multiples of one-tenth",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-mid-20-v3",
+        "type": "fraction_number_line",
+        "prompt": "Mark 6/10 on the number line.",
+        "correctAnswer": "6/10",
+        "options": [],
+        "visual": {
+          "kind": "numberLine",
+          "numerator": 6,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-20",
+        "version": "3.0.0-review.1",
+        "form": "mid",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Locate tenths on a number line",
+        "difficulty": "moderate"
+      }
+    ],
+    "end": [
+      {
+        "id": "y3-number-review-end-01-v3",
+        "type": "numeric",
+        "prompt": "What number does this place-value chart show?",
+        "correctAnswer": "54729",
+        "options": [],
+        "visual": {
+          "kind": "place",
+          "parts": [
+            50000,
+            4000,
+            700,
+            20,
+            9
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-1",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Represent numbers beyond 10,000",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-end-02-v3",
+        "type": "number_order",
+        "prompt": "Order these numbers from smallest to largest.",
+        "correctAnswer": "54,027||54,270||54,702||54,720",
+        "options": [
+          "54,702",
+          "54,720",
+          "54,270",
+          "54,027"
+        ],
+        "visual": {
+          "kind": "cards",
+          "values": [
+            54702,
+            54720,
+            54270,
+            54027
+          ]
+        },
+        "linkedWeeks": [
+          1,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-2",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N01",
+        "curriculumCodes": [
+          "AC9M3N01"
+        ],
+        "skillLabel": "Order five-digit numbers",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-03-v3",
+        "type": "numeric",
+        "prompt": "Round 8,643 to the nearest 100.",
+        "correctAnswer": "8600",
+        "options": [],
+        "visual": {
+          "kind": "round",
+          "value": 8643,
+          "step": 100
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-3",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Round to estimate",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-end-04-v3",
+        "type": "numeric",
+        "prompt": "Round each collection to the nearest hundred. About how many cards altogether?",
+        "correctAnswer": "600",
+        "options": [],
+        "visual": {
+          "kind": "estimate",
+          "amounts": [
+            246,
+            373
+          ],
+          "unit": "cards"
+        },
+        "linkedWeeks": [
+          2,
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-4",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N05",
+        "curriculumCodes": [
+          "AC9M3N05"
+        ],
+        "skillLabel": "Estimate a combined collection",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-05-v3",
+        "type": "numeric",
+        "prompt": "What is 68 + 19?",
+        "correctAnswer": "87",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "68 + 19 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-5",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using compensation",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-06-v3",
+        "type": "numeric",
+        "prompt": "What is 47 + 48?",
+        "correctAnswer": "95",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "47 + 48 = ?"
+        },
+        "linkedWeeks": [
+          3
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-6",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A02"
+        ],
+        "skillLabel": "Add using near doubles",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-07-v3",
+        "type": "numeric",
+        "prompt": "What is 101 − 96?",
+        "correctAnswer": "5",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "101 − 96 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-7",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03"
+        ],
+        "skillLabel": "Subtract by counting on",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-08-v3",
+        "type": "numeric",
+        "prompt": "What is the difference between 97 and 134?",
+        "correctAnswer": "37",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "134 − 97 = ?"
+        },
+        "linkedWeeks": [
+          4
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-8",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N03",
+        "curriculumCodes": [
+          "AC9M3N03",
+          "AC9M3A01"
+        ],
+        "skillLabel": "Find a difference across 100",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-09-v3",
+        "type": "numeric",
+        "prompt": "Write $8.40 as a number of cents.",
+        "correctAnswer": "840",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 8,
+          "twenties": 2
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-9",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent dollars and cents",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-end-10-v3",
+        "type": "numeric",
+        "prompt": "How many 10-cent coins have the same total value?",
+        "correctAnswer": "38",
+        "options": [],
+        "visual": {
+          "kind": "money",
+          "dollars": 3,
+          "twenties": 4,
+          "targetCoin": 10
+        },
+        "linkedWeeks": [
+          9
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-10",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3M06",
+        "curriculumCodes": [
+          "AC9M3M06"
+        ],
+        "skillLabel": "Represent equivalent coin values",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-end-11-v3",
+        "type": "numeric",
+        "prompt": "More cans arrive, then damaged cans are removed. How many usable cans remain?",
+        "correctAnswer": "293",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "cans",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 272
+            },
+            {
+              "label": "More arrive",
+              "value": 59
+            },
+            {
+              "label": "Damaged and removed",
+              "value": 38
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-11",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model an increase then decrease",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-end-12-v3",
+        "type": "numeric",
+        "prompt": "Tickets sell in the morning and afternoon. How many remain unsold?",
+        "correctAnswer": "178",
+        "options": [],
+        "visual": {
+          "kind": "story",
+          "unit": "tickets",
+          "stages": [
+            {
+              "label": "At first",
+              "value": 460
+            },
+            {
+              "label": "Sold in morning",
+              "value": 197
+            },
+            {
+              "label": "Sold in afternoon",
+              "value": 85
+            }
+          ]
+        },
+        "linkedWeeks": [
+          6
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-12",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N06",
+        "curriculumCodes": [
+          "AC9M3N06"
+        ],
+        "skillLabel": "Model two decreases",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-end-13-v3",
+        "type": "numeric",
+        "prompt": "Each bag holds 4 oranges. How many oranges altogether?",
+        "correctAnswer": "20",
+        "options": [],
+        "visual": {
+          "kind": "groups",
+          "groups": 5,
+          "size": 4
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-13",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Solve an equal-group problem",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-14-v3",
+        "type": "mcq",
+        "prompt": "Which multiplication sentence matches this array?",
+        "correctAnswer": "4 × 9 = 36",
+        "options": [
+          "4 + 9 = 13",
+          "4 × 9 = 36",
+          "3 × 9 = 27",
+          "4 × 8 = 32"
+        ],
+        "visual": {
+          "kind": "array",
+          "rows": 4,
+          "columns": 9
+        },
+        "linkedWeeks": [
+          7
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-14",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N04",
+        "curriculumCodes": [
+          "AC9M3N04"
+        ],
+        "skillLabel": "Connect an array to multiplication",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-15-v3",
+        "type": "numeric",
+        "prompt": "What number makes this multiplication correct?",
+        "correctAnswer": "10",
+        "options": [],
+        "visual": {
+          "kind": "equation",
+          "expression": "5 × ? = 50"
+        },
+        "linkedWeeks": [
+          8,
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2
+        ],
+        "skillId": "number-y3-slot-15",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3A03",
+        "curriculumCodes": [
+          "AC9M3A03",
+          "AC9M3N04"
+        ],
+        "skillLabel": "Find an unknown multiplication factor",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-16-v3",
+        "type": "numeric",
+        "prompt": "Follow the steps and decision. What is the final number?",
+        "correctAnswer": "18",
+        "options": [],
+        "visual": {
+          "kind": "algorithm",
+          "start": 30,
+          "extra": 3
+        },
+        "linkedWeeks": [
+          10
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-16",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N07",
+        "curriculumCodes": [
+          "AC9M3N07"
+        ],
+        "skillLabel": "Follow steps and a decision",
+        "difficulty": "challenging"
+      },
+      {
+        "id": "y3-number-review-end-17-v3",
+        "type": "mcq",
+        "prompt": "Which model shows 1/10 of a whole?",
+        "correctAnswer": "E",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "visual": {
+          "kind": "fractionChoices",
+          "models": [
+            {
+              "denominator": 2,
+              "numerator": 1
+            },
+            {
+              "denominator": 3,
+              "numerator": 1
+            },
+            {
+              "denominator": 4,
+              "numerator": 1
+            },
+            {
+              "denominator": 5,
+              "numerator": 1
+            },
+            {
+              "denominator": 10,
+              "numerator": 1
+            }
+          ]
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-17",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Recognise a unit fraction",
+        "difficulty": "accessible"
+      },
+      {
+        "id": "y3-number-review-end-18-v3",
+        "type": "numeric",
+        "prompt": "How many more tenths are needed to complete the whole?",
+        "correctAnswer": "2",
+        "options": [],
+        "visual": {
+          "kind": "completeWhole",
+          "filled": 8,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          11
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-18",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Complete a whole with tenths",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-19-v3",
+        "type": "fraction_order",
+        "prompt": "Order these fractions from smallest to largest.",
+        "correctAnswer": "2/10,6/10,9/10",
+        "options": [
+          "9/10",
+          "2/10",
+          "6/10"
+        ],
+        "visual": {
+          "kind": "fractionOrder",
+          "values": [
+            "9/10",
+            "2/10",
+            "6/10"
+          ]
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-19",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Order multiples of one-tenth",
+        "difficulty": "moderate"
+      },
+      {
+        "id": "y3-number-review-end-20-v3",
+        "type": "fraction_number_line",
+        "prompt": "Mark 8/10 on the number line.",
+        "correctAnswer": "8/10",
+        "options": [],
+        "visual": {
+          "kind": "numberLine",
+          "numerator": 8,
+          "denominator": 10
+        },
+        "linkedWeeks": [
+          12
+        ],
+        "linkedLessons": [
+          1,
+          2,
+          3
+        ],
+        "skillId": "number-y3-slot-20",
+        "version": "3.0.0-review.1",
+        "form": "end",
+        "primaryDescriptorCode": "AC9M3N02",
+        "curriculumCodes": [
+          "AC9M3N02"
+        ],
+        "skillLabel": "Locate tenths on a number line",
+        "difficulty": "moderate"
+      }
+    ]
+  }
+}

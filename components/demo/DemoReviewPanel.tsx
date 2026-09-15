@@ -399,6 +399,11 @@ export default function DemoReviewPanel() {
           </div>
         </section>
 
+        {realm === "number" && year === "Year 3" ? <section className="border-t border-teal-300/20 py-6">
+          <h2 className="mb-2 text-base font-black">Level 3 · All five forms</h2>
+          <p className="mb-3 text-sm text-white/70">Review the matched questions and updated visuals across Pre-Test, Post-Test, Start, Mid and End.</p>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-3")}><Eye size={17}/> Review all five forms</button>
+        </section> : null}
         {realm === "number" && year === "Year 1" ? <section className="border-t border-teal-300/20 py-6">
           <h2 className="mb-2 text-base font-black">Level 1 · All five forms</h2>
           <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched to the post-test standard. Ready for your manual review.</p>
