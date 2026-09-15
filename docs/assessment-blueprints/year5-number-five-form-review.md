@@ -1,6 +1,6 @@
 # Number Nexus Level 5 — five matched forms for owner review
 
-Status: review only. Pre-Test, Post-Test, Start, Mid and End each contain 20 questions. The existing Level 5 post-test is the benchmark; the existing student banks remain available unchanged until this review is approved and a version-safe release is prepared.
+Review record: subsequently approved by the owner and released for students on 15 September 2026; see `year5-number-live-release.md`. Original review scope: Pre-Test, Post-Test, Start, Mid and End each contain 20 questions. The existing Level 5 post-test is the benchmark; the existing student banks remain available unchanged until this review is approved and a version-safe release is prepared.
 
 ## Curriculum and difficulty review
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgePercent, Landmark, Scale } from "lucide-react";
+import { BadgePercent, Landmark, Scale, Package, Utensils, Building2 } from "lucide-react";
 import NumberNexusYear5AssessmentVisual from "@/components/assessment/NumberNexusYear5AssessmentVisual";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import { Fraction } from "@/components/FractionText";
@@ -47,8 +47,34 @@ function mappedVisualReadAloud(type: string, visual: Visual) {
   return String(visual.expression ?? "");
 }
 
+const money = (value:unknown) => Number(value).toLocaleString('en-AU',{style:'currency',currency:'AUD'});
+function DataCard({label,value,note}:{label:string;value:React.ReactNode;note?:string}) {
+ return <div className="rounded-xl border border-teal-900/20 bg-white p-5 text-center"><div className="text-sm font-black text-teal-800">{label}</div><div className="my-3 text-3xl font-black text-slate-950">{value}</div>{note?<div className="text-sm font-semibold text-slate-600">{note}</div>:null}</div>;
+}
+function CoordinateGrid({points}:{points:Array<{x:number;y:number;label:string}>}) {
+ const ticks=Array.from({length:13},(_,i)=>i-6);
+ return <svg viewBox="0 0 380 380" className="mx-auto w-full max-w-[420px]" role="img" aria-label="Cartesian grid with labelled axes and point P marked"><rect x="20" y="20" width="340" height="340" rx="12" fill="white" stroke="#b7d4d0"/>{ticks.map(t=><g key={t}><path d={`M${190+t*24} 46V334 M46 ${190+t*24}H334`} stroke={t===0?'#24434a':'#d4e6e4'} strokeWidth={t===0?2:1}/>{t!==0?<><text x={190+t*24} y="207" textAnchor="middle" fontSize="12" fill="#294850">{t}</text><text x="179" y={194-t*24} textAnchor="end" fontSize="12" fill="#294850">{t}</text></>:null}</g>)}<text x="179" y="207" textAnchor="end" fontSize="12" fill="#294850">0</text><text x="345" y="183" fontSize="16" fontWeight="bold" fill="#134e4a">x</text><text x="199" y="35" fontSize="16" fontWeight="bold" fill="#134e4a">y</text>{points.map(p=><g key={p.label}><circle cx={190+p.x*24} cy={190-p.y*24} r="6" fill="#0d9488" stroke="#134e4a" strokeWidth="2"/><text x={201+p.x*24} y={180-p.y*24} fontSize="18" fontWeight="bold" fill="#134e4a">{p.label}</text></g>)}</svg>;
+}
 export default function NumberNexusYear6AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
+
+  if (visual.reviewPresentation && ['number_y6_integer_set','number_y6_fraction_set','number_y6_prime_choice'].includes(type)) return null;
+  if (visual.reviewPresentation && type==='number_y6_coordinate') return <Surface><CoordinateGrid points={visual.points as Array<{x:number;y:number;label:string}>}/></Surface>;
+  if (visual.reviewPresentation && type==='number_y6_tank') {
+   const full=Number(visual.percentFull),waterY=220-full*1.8;
+   return <Surface><div className="mx-auto grid max-w-3xl items-center gap-5 sm:grid-cols-[220px_1fr]"><svg viewBox="0 0 220 260" className="mx-auto h-60 w-52" role="img" aria-label={`Tank ${full} percent full`}><path d="M40 40Q110 12 180 40V220Q110 248 40 220Z" fill="#e6f6f6" stroke="#326f79" strokeWidth="3"/><path d={`M42 ${waterY}Q110 ${waterY+20} 178 ${waterY}V218Q110 244 42 218Z`} fill="#42b6ce"/><ellipse cx="110" cy={waterY} rx="68" ry="16" fill="#8ad5e4"/><ellipse cx="110" cy="40" rx="70" ry="18" fill="#f4fbfb" stroke="#326f79" strokeWidth="3"/><path d="M40 40V220M180 40V220" stroke="#326f79" strokeWidth="3"/></svg><div className="grid gap-4"><DataCard label="Total capacity" value={`${visual.capacity} L`}/><DataCard label="Currently full" value={`${full}%`}/></div></div></Surface>;
+  }
+  if (visual.reviewPresentation && type==='number_y6_round_estimate') return <Surface><div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2"><DataCard label="Percentage" value={`${visual.percent}%`} note="Round to a whole percent"/><DataCard label="Quantity" value={String(visual.quantity)} note="Round to the nearest ten"/></div></Surface>;
+  if (visual.reviewPresentation && type==='number_y6_budget') {
+   const purchases=visual.purchases as Array<{label:string;quantity:number;price:number}>;
+   return <Surface><div className="mx-auto max-w-4xl"><div className="mb-5 flex items-center justify-between rounded-xl bg-teal-900 p-5 text-white"><span className="font-bold">Money available</span><span className="text-3xl font-black">{money(visual.budget)}</span></div><div className="grid gap-5 sm:grid-cols-2">{purchases.map(p=>{const Icon=/meal/i.test(p.label)?Utensils:Building2;return <div key={p.label} className="rounded-xl border border-teal-900/20 bg-white p-5"><Icon className="mb-3 h-12 w-12 text-teal-700" aria-hidden="true"/><div className="mb-4 text-xl font-black">{p.label}</div><div className="grid grid-cols-2 gap-4"><div><div className="text-xs font-black text-teal-800">QUANTITY TO BUY</div><div className="mt-2 text-3xl font-black">{p.quantity}</div></div><div><div className="text-xs font-black text-teal-800">PRICE FOR ONE</div><div className="mt-2 text-3xl font-black">{money(p.price)}</div><div className="text-sm text-slate-600">each</div></div></div></div>;})}</div></div></Surface>;
+  }
+  if (visual.reviewPresentation && type==='number_y6_rates') {
+   const packs=visual.packs as Array<{label:string;kg:number;price:number}>;
+   return <Surface><div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2">{packs.map(p=><div key={p.label} className="rounded-xl border border-teal-900/20 bg-white p-6 text-center"><Package className="mx-auto mb-3 h-16 w-16 text-teal-700" strokeWidth={1.5} aria-hidden="true"/><div className="text-lg font-black text-teal-800">{p.label}</div><div className="my-3 text-4xl font-black">{p.kg} kg</div><div className="text-2xl font-black">{money(p.price)}</div><div className="mt-1 text-sm text-slate-600">for ONE pack</div></div>)}</div></Surface>;
+  }
+  if (visual.reviewPresentation && type==='number_y6_kit_budget') return <Surface><div className="mx-auto max-w-3xl"><Package className="mx-auto mb-4 h-16 w-16 text-teal-700" strokeWidth={1.5} aria-hidden="true"/><div className="grid gap-4 sm:grid-cols-3"><DataCard label="Money available" value={money(visual.budget)}/><DataCard label="Original price for ONE kit" value={money(visual.price)}/><DataCard label="Discount on EACH kit" value={`${visual.discount}%`} note="No extra fees"/></div></div></Surface>;
+  if (visual.reviewPresentation && type==='number_y6_discount') return <Surface><BadgePercent className="mx-auto mb-4 h-14 w-14 text-teal-700" aria-hidden="true"/><div className="mx-auto grid max-w-3xl gap-5 sm:grid-cols-2"><DataCard label="Original price" value={money(visual.price)}/><DataCard label="Discount" value={`${visual.discount}%`} note="off the original price"/></div></Surface>;
 
   if (type === "number_y6_coordinate") {
     const points = (visual.points as Array<{ x: number; y: number; label: string }> | undefined) ?? [];
