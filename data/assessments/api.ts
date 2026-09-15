@@ -1,6 +1,7 @@
 import { GROUND_NUMBER_V3_FORMS } from "./releases/groundNumber";
 import { YEAR1_NUMBER_RELEASED_FORMS } from "./revisions/year1NumberReleasedForms";
 import { YEAR4_NUMBER_RELEASED_FORMS } from "./revisions/year4NumberReleasedForms";
+import { YEAR5_NUMBER_RELEASED_FORMS } from "./revisions/year5NumberReleasedForms";
 import { YEAR2_NUMBER_RELEASED_FORMS } from "./revisions/year2NumberReleasedForms";
 import { YEAR1_NUMBER_MATCHED_PRE_ITEMS, YEAR1_NUMBER_MATCHED_POST_ITEMS } from "./revisions/year1NumberMatchedPair";
 import { YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS, YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS } from "./year6NumberNexusIndependentBanks";
@@ -209,7 +210,7 @@ export function getAssessmentYearLabel(level: SupportedMathLevel): string {
   return yearLabelForLevel(level);
 }
 
-export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3): PretestQuestion[] {
+export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3): PretestQuestion[] {
   switch (realmId) {
     case "space":
       return getStarpathPretest(yearLabel);
@@ -240,13 +241,13 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
     return [...(numberLevel4Version === 2 ? YEAR4_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS : YEAR4_NUMBER_RELEASED_FORMS.pretest)] as unknown as PretestQuestion[];
   }
   if (yearLabel === "Year 5") {
-    return [...YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as PretestQuestion[];
+    return [...(numberLevel5Version === 2 ? YEAR5_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS : YEAR5_NUMBER_RELEASED_FORMS.pretest)] as unknown as PretestQuestion[];
   }
   if (isGroundLevelYear(yearLabel)) return [...(groundNumberVersion===1 ? GROUND_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS : GROUND_NUMBER_V3_FORMS.pretest)] as unknown as PretestQuestion[];
   return getPretestForYear(yearLabel);
 }
 
-export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3): PostTest | undefined {
+export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3): PostTest | undefined {
   switch (realmId) {
     case "space":
       return getStarpathPosttest(yearLabel);
@@ -294,7 +295,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
   if (yearLabel === "Year 5") {
     return {
       yearLabel: "Year 5",
-      questions: [...YEAR5_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS],
+      questions: [...(numberLevel5Version === 2 ? YEAR5_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS : YEAR5_NUMBER_RELEASED_FORMS.posttest)],
     };
   }
   return POSTTESTS[yearLabel];

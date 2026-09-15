@@ -5,6 +5,7 @@ import { groundNumberPostVersion } from "@/lib/ground-number-assessment-version"
 import { year1NumberPostVersion } from "@/lib/year1-number-assessment-version";
 import { year2NumberPostVersion } from "@/lib/year2-number-assessment-version";
 import { year4NumberPostVersion } from "@/lib/year4-number-assessment-version";
+import { year5NumberPostVersion } from "@/lib/year5-number-assessment-version";
 import { assessmentEvidenceMetadata } from "@/lib/assessment-growth";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -371,6 +372,7 @@ function PostTestPage() {
   // Until the recorded baseline is restored, Level 2 stays on the original pair.
   const [numberLevel2Version, setNumberLevel2Version] = useState<2 | 3>(2);
   const [numberLevel4Version, setNumberLevel4Version] = useState<2 | 3>(2);
+  const [numberLevel5Version, setNumberLevel5Version] = useState<2 | 3>(2);
   const questions = useMemo<Question[]>(
     () => candidateReviewEnabled
       ? starpathCandidateReviewRequested
@@ -378,8 +380,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version],
   );
 
   const [idx, setIdx] = useState(0);
@@ -417,6 +419,7 @@ function PostTestPage() {
       setGroundNumberVersion(3);
       setNumberLevel2Version(3);
       setNumberLevel4Version(3);
+    setNumberLevel5Version(3);
       setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
@@ -467,6 +470,14 @@ function PostTestPage() {
             draftIds = draft?.questionIds ?? (draft?.answers ? Object.keys(draft.answers) : undefined);
           } catch { /* A malformed draft does not change the recorded baseline version. */ }
           setNumberLevel4Version(year4NumberPostVersion(restored.rows.flatMap(row => row.assessment_attempts ?? []), draftIds));
+        }
+        if (progressRealmId === "number" && year === "Year 5") {
+          let draftIds: string[] | undefined;
+          try {
+            const draft = JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId, year)) ?? "null");
+            draftIds = draft?.questionIds ?? (draft?.answers ? Object.keys(draft.answers) : undefined);
+          } catch { /* A malformed draft does not change the recorded baseline version. */ }
+          setNumberLevel5Version(year5NumberPostVersion(restored.rows.flatMap(row => row.assessment_attempts ?? []), draftIds));
         }
         setCanonicalProgress(progress);
         setRestoreState("ready");

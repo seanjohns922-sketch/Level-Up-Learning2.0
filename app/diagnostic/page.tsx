@@ -93,7 +93,7 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
