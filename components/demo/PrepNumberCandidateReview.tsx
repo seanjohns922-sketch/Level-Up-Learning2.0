@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import Year1NumberCandidateCard from "@/components/assessment/Year1NumberCandidateCard";
 import { YEAR1_NUMBER_CANDIDATE_SPECS } from "@/data/assessments/candidates/year1-number/authoring";
@@ -12,6 +13,7 @@ import { parsePrepNumberSubmission, scorePrepNumberSubmission } from "@/data/ass
 
 // Protected Demo Review. No learner identity, database writes or rewards.
 export default function PrepNumberCandidateReview() {
+  const router = useRouter();
   const [level,setLevel]=useState<"Prep"|"Year 1">("Prep");
   const [resetVersion,setResetVersion]=useState(0);
   const [finishedItem,setFinishedItem]=useState<string|null>(null);
@@ -29,7 +31,7 @@ export default function PrepNumberCandidateReview() {
     <div className="border-b border-teal-300/20 bg-[#001b18] px-4 py-3 text-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4">
         <p className="text-sm text-teal-100">Candidate preview · saves no student data</p>
-        <label className="text-sm">Level<select aria-label="Assessment level" value={level} onChange={e=>setLevel(e.target.value as "Prep"|"Year 1")} className="ml-2 min-h-12 rounded-lg border border-teal-300/30 bg-[#042925] px-3 text-white"><option value="Prep">Prep</option><option value="Year 1">Level 1</option></select></label>
+        <label className="text-sm">Level<select aria-label="Assessment level" value={level} onChange={e=>{ if(e.target.value === "Year 1") router.push("/demo-review/number-level-1"); else setLevel("Prep"); }} className="ml-2 min-h-12 rounded-lg border border-teal-300/30 bg-[#042925] px-3 text-white"><option value="Prep">Prep</option><option value="Year 1">Level 1</option></select></label>
         <label className="text-sm">Form<select aria-label="Assessment form" value={form} onChange={e=>setForm(e.target.value as DesignedForm)} className="ml-2 min-h-12 rounded-lg border border-teal-300/30 bg-[#042925] px-3 text-white">{ASSESSMENT_FORMS.map(f=><option key={f} value={f}>{f}</option>)}</select></label>
         <label className="text-sm">Question<select aria-label="Question number" value={index} onChange={e=>setIndex(Number(e.target.value))} className="ml-2 min-h-12 rounded-lg border border-teal-300/30 bg-[#042925] px-3 text-white">{Array.from({length:20},(_,i)=><option key={i} value={i}>{i+1}</option>)}</select></label>
       </div>

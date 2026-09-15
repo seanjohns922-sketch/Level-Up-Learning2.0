@@ -392,10 +392,15 @@ export default function DemoReviewPanel() {
           </div>
         </section>
 
-        {realm === "number" && (year === "Prep" || year === "Year 1") ? <section className="border-t border-teal-300/20 py-6">
-          <h2 className="mb-2 text-base font-black">New Number Nexus assessments</h2>
-          <p className="mb-3 text-sm text-white/70">Review the Prep and Level 1 candidates across all five forms. Preview only; no student results are saved.</p>
-          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/assessment-candidates")}><Eye size={17}/> Open candidate assessments</button>
+        {realm === "number" && year === "Year 1" ? <section className="border-t border-teal-300/20 py-6">
+          <h2 className="mb-2 text-base font-black">Level 1 · All five forms</h2>
+          <p className="mb-3 text-sm text-white/70">Pre-Test, Post-Test, Start, Mid and End matched to the post-test standard. Ready for your manual review.</p>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/number-level-1")}><Eye size={17}/> Review all five forms</button>
+        </section> : null}
+        {realm === "number" && year === "Prep" ? <section className="border-t border-teal-300/20 py-6">
+          <h2 className="mb-2 text-base font-black">Prep Number Nexus review</h2>
+          <p className="mb-3 text-sm text-white/70">Review the Prep candidates. Preview only; no student results are saved.</p>
+          <button type="button" className={actionClass()} onClick={()=>router.push("/demo-review/assessment-candidates")}><Eye size={17}/> Open Prep assessments</button>
         </section> : null}
 
         <section className="border-t border-white/10 py-6">
