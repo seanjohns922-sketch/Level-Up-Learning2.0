@@ -7,3 +7,5 @@ Validation: 100 answer/scoring checks, production snapshots, API routing, old-dr
 Migration: `20260915190000_number_level4_five_form_release.sql`, applied after web deployment. It relies on the already-present Level 2 released RPC. This release does not reset student progress or replace historical assessment evidence.
 
 Difficulty labels are author judgements, not statistical calibration. The forms sample each Level 4 Number descriptor; they do not alone demonstrate every explanation, strategy or algorithm-creation component of the curriculum.
+
+Production verification: web commit `2a4cdec2` reached Vercel success; migration applied and recorded on 2026-09-15. Read-only verification confirmed default v3, enabled pinning trigger, released RPC and adoption guard. The two existing diagnostic sittings remained v2.

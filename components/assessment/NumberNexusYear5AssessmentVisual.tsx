@@ -1,6 +1,6 @@
 "use client";
 
-import { Bus, Calculator, PackageOpen, ReceiptText, Ticket, Users } from "lucide-react";
+import { Armchair, Utensils, Building2, Bus, Calculator, PackageOpen, ReceiptText, Ticket, Users } from "lucide-react";
 
 type Visual = Record<string, unknown>;
 
@@ -38,8 +38,32 @@ function IconHeading({ type }: { type: string }) {
   return <Icon className="mx-auto mb-3 h-8 w-8 text-cyan-800" aria-hidden />;
 }
 
+function Fraction({value}:{value:string}) {
+ const [n,d]=value.split('/');
+ return <span className="inline-grid min-w-12 grid-rows-[1fr_auto_1fr] place-items-center text-3xl font-black"><span>{n}</span><span className="h-0.5 w-full bg-slate-900"/><span>{d}</span></span>;
+}
+function BusPicture() {
+ return <svg viewBox="0 0 220 110" className="mx-auto h-28 w-56" aria-hidden="true"><rect x="8" y="12" width="198" height="73" rx="12" fill="#0f766e" stroke="#164e63" strokeWidth="3"/>{[22,60,98,136].map(x=><rect key={x} x={x} y="24" width="29" height="29" rx="3" fill="#d2f4f0"/>)}<path d="M178 23H197V73H178Z" fill="#d2f4f0"/><path d="M17 62H169" stroke="#8dd3c7" strokeWidth="4"/><circle cx="48" cy="86" r="17" fill="#253547"/><circle cx="168" cy="86" r="17" fill="#253547"/><circle cx="48" cy="86" r="8" fill="#cbd5e1"/><circle cx="168" cy="86" r="8" fill="#cbd5e1"/><rect x="197" y="64" width="10" height="9" rx="2" fill="#fde68a"/></svg>;
+}
+
 export default function NumberNexusYear5AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
+
+  if (visual.reviewPresentation && (type === "number_y5_decimal_set" || type === "number_y5_fraction_set")) return null; // The ordering response cards show the values once.
+  if (visual.reviewPresentation && type === "number_y5_fraction_equation") {
+    return <Surface><div className="flex flex-wrap items-center justify-center gap-5 py-3">{String(visual.expression).split(' ').map((part,i)=>part.includes('/')?<Fraction key={i} value={part}/>:<span key={i} className="text-3xl font-black">{part}</span>)}</div></Surface>;
+  }
+  if (visual.reviewPresentation && type === "number_y5_fdp") return <Surface><div className="flex items-center justify-center gap-6 py-3"><Fraction value={String(visual.fraction)}/><span className="text-3xl font-black">=</span><Tile muted>? %</Tile></div></Surface>;
+  if (visual.reviewPresentation && type === "number_y5_sequence") return <Surface><div className="flex flex-wrap items-center justify-center gap-4">{(visual.values as Array<number|string>).map((v,i)=><Tile key={i} muted={v==='?'}>{v}</Tile>)}</div></Surface>;
+  if (visual.reviewPresentation && type === "number_y5_decision") return <Surface><div className="mx-auto max-w-2xl text-center"><div className="mx-auto mb-4 w-fit"><Tile>{String(visual.start)}</Tile></div><div className="rounded-xl border-2 border-teal-700 bg-teal-50 p-4 text-xl font-black">Is the number divisible by 3?</div><div className="mt-4 grid grid-cols-2 gap-4"><div className="rounded-xl border border-slate-300 bg-white p-4"><div className="mb-2 text-sm font-black uppercase text-teal-800">Yes ↓</div><div className="text-xl font-bold">Divide by 3</div></div><div className="rounded-xl border border-slate-300 bg-white p-4"><div className="mb-2 text-sm font-black uppercase text-teal-800">No ↓</div><div className="text-xl font-bold">Add 1</div></div></div><div className="mt-4 text-sm font-black uppercase text-teal-800">Output ↓</div><div className="mx-auto mt-2 w-fit"><Tile muted>?</Tile></div></div></Surface>;
+  if (visual.reviewPresentation && type === "number_y5_budget") {
+    const purchases=visual.purchases as Array<{label:string;quantity:number;price:number}>;
+    return <Surface><div className="mx-auto max-w-4xl"><div className="mb-5 flex items-center justify-between rounded-xl bg-teal-900 px-5 py-4 text-white"><span className="font-bold">Money available</span><span className="text-3xl font-black">${Number(visual.budget).toLocaleString()}</span></div><div className="grid gap-4 sm:grid-cols-2">{purchases.map(p=>{const Icon=/meal/i.test(p.label)?Utensils:Building2;return <div key={p.label} className="rounded-xl border border-slate-300 bg-white p-5"><Icon className="mb-3 h-12 w-12 text-teal-700" aria-hidden="true"/><div className="mb-4 text-xl font-black">{p.label}</div><div className="grid grid-cols-2 gap-4"><div><div className="text-xs font-black uppercase text-teal-800">Quantity to buy</div><div className="mt-2 text-3xl font-black">{p.quantity}</div></div><div><div className="text-xs font-black uppercase text-teal-800">Price for ONE</div><div className="mt-2 text-3xl font-black">${p.price}</div><div className="text-sm text-slate-600">each</div></div></div></div>;})}</div></div></Surface>;
+  }
+  if (visual.reviewPresentation && type === "number_y5_model") {
+    const rows=visual.rows as Array<[string,string]>;
+    return <Surface><div className="mx-auto max-w-4xl">{visual.context==='buses'?<BusPicture/>:<div className="mb-5 flex justify-center gap-3" aria-hidden="true">{[0,1,2,3,4].map(i=><Armchair key={i} className="h-12 w-12 text-teal-700" strokeWidth={1.5}/>)}</div>}<div className={`grid gap-4 ${rows.length===2?'sm:grid-cols-2':'sm:grid-cols-3'}`}>{rows.map(([label,value])=><div key={label} className="rounded-xl border border-slate-300 bg-white p-5 text-center"><div className="text-sm font-black text-teal-800">{label}</div><div className="mt-3 text-4xl font-black">{value}</div></div>)}</div></div></Surface>;
+  }
 
   if (type === "number_y5_decimal_chart") {
     const [whole = "0", decimal = "000"] = String(visual.value ?? "0.000").split(".");
