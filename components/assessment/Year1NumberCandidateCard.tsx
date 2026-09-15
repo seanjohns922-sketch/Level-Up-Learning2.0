@@ -1,5 +1,6 @@
 "use client";
 
+import { PlaceValueBlocks } from "@/components/assessment/PlaceValueBlocks";
 import { useState } from "react";
 import Image from "next/image";
 import { Bird, Car, Sailboat, Shell, Leaf, Circle, Square } from "lucide-react";
@@ -18,11 +19,8 @@ function Token({material}:{material:string}) {
   const Icon=material==="birds" || material==="ducks" ? Bird : material==="cars" ? Car : material==="boats" ? Sailboat : material==="shells" ? Shell : material==="leaves" ? Leaf : material==="cards" ? Square : Circle;
   return <span className="grid h-10 w-10 place-items-center rounded-lg border border-teal-700 bg-teal-50 text-teal-900"><Icon size={25} aria-hidden="true"/></span>;
 }
-function TenRod() {
-  return <span className="inline-flex shrink-0 overflow-hidden rounded border border-teal-900" aria-label="Ten rod">{Array.from({length:10},(_,i)=><span key={i} className="h-5 w-2.5 border-r border-teal-900/50 bg-teal-300 last:border-r-0"/>)}</span>;
-}
 function Blocks({tens,ones}:{tens:number;ones:number}) {
-  return <div className="flex min-h-16 flex-wrap items-center justify-center gap-3">{Array.from({length:tens},(_,i)=><TenRod key={`t${i}`}/>)}{Array.from({length:ones},(_,i)=><span key={`o${i}`} className="h-5 w-5 rounded-sm border border-amber-800 bg-amber-300" aria-label="One block"/>)}</div>;
+  return <PlaceValueBlocks tens={tens} ones={ones} />;
 }
 function Shape({symbol}:{symbol:string}) {
   const [colour,shape]=symbol.split("-");

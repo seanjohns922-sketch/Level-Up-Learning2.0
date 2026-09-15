@@ -4,6 +4,8 @@ import { BookOpen, Circle, CircleDot, Gamepad2, Puzzle, Sprout, WalletCards, Win
 import { GroundAssessmentToken } from "@/components/assessment/NumberNexusGroundAssessmentVisual";
 import { renderCoins } from "@/components/week7/moneyAssets";
 
+import { PlaceValueBlocks } from "@/components/assessment/PlaceValueBlocks";
+
 type Visual = Record<string, unknown>;
 
 function Surface({ children }: { children: React.ReactNode }) {
@@ -14,20 +16,20 @@ function Surface({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Counter({ token = "counter" }: { token?: string }) {
+function Counter({ token = "counter", colour }: { token?: string; colour?: string }) {
   if (["star", "robot", "crystal"].includes(token)) return <GroundAssessmentToken token={token} />;
-  const Icon = token === "book" ? BookOpen : token === "plant" ? Sprout : Circle;
+  const Icon = token === "book" ? BookOpen : ["plant", "seedling"].includes(token) ? Sprout : Circle;
   return (
-    <span className="grid h-9 w-9 place-items-center rounded-lg border border-cyan-700/30 bg-cyan-50 text-cyan-800">
+    <span className={`grid h-9 w-9 place-items-center rounded-lg border ${colour === "red" ? "border-red-700/30 bg-red-50 text-red-700" : colour === "blue" ? "border-blue-700/30 bg-blue-50 text-blue-700" : "border-cyan-700/30 bg-cyan-50 text-cyan-800"}`}>
       <Icon className="h-5 w-5" aria-hidden />
     </span>
   );
 }
 
-function CounterSet({ count, token }: { count: number; token?: string }) {
+function CounterSet({ count, token, colour }: { count: number; token?: string; colour?: string }) {
   return (
     <div className="flex max-w-sm flex-wrap justify-center gap-2">
-      {Array.from({ length: count }, (_, index) => <Counter key={index} token={token} />)}
+      {Array.from({ length: count }, (_, index) => <Counter key={index} token={token} colour={colour} />)}
     </div>
   );
 }
@@ -65,26 +67,7 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
     const ones = Number(visual.ones ?? 0);
     return (
       <Surface>
-        <div className="flex flex-wrap items-start justify-center gap-8 sm:gap-12">
-          <div className="flex flex-col items-center gap-3">
-            <div className="text-sm font-black text-cyan-900">Tens</div>
-            <div className="flex items-end gap-2" aria-label={`${tens} tens blocks, worth ${tens * 10}`}>
-              {Array.from({ length: tens }, (_, rodIndex) => (
-                <span key={rodIndex} className="grid overflow-hidden rounded-sm border-2 border-cyan-700 bg-cyan-100 shadow-sm">
-                  {Array.from({ length: 10 }, (__, unitIndex) => (
-                    <span key={unitIndex} className="h-2.5 w-7 border-b border-cyan-700/35 last:border-b-0" />
-                  ))}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-3">
-            <div className="text-sm font-black text-amber-900">Ones</div>
-            <div className="grid grid-cols-5 gap-2" aria-label={`${ones} ones blocks`}>
-              {Array.from({ length: ones }, (_, index) => <span key={index} className="h-7 w-7 rounded-sm border-2 border-amber-600/55 bg-amber-100 shadow-sm" />)}
-            </div>
-          </div>
-        </div>
+        <PlaceValueBlocks tens={tens} ones={ones} />
       </Surface>
     );
   }
@@ -158,9 +141,9 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
     return (
       <Surface>
         <div className="flex flex-wrap items-center justify-center gap-5">
-          <CounterSet count={start} token={token} />
+          <CounterSet count={start} token={token} colour={token === "book" ? "red" : undefined} />
           <span className="text-3xl font-black text-cyan-800">+</span>
-          <CounterSet count={change} token={token} />
+          <CounterSet count={change} token={token} colour={token === "book" ? "blue" : undefined} />
         </div>
       </Surface>
     );
@@ -231,7 +214,7 @@ export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: V
     return (
       <Surface>
         <div className="grid gap-3 sm:grid-cols-3">
-          {[10, 4, 8].map((size, index) => <div key={size} className="rounded-lg border border-cyan-800/20 bg-white p-4 text-center text-xl font-black">{[3, 6, 4][index]} groups of {size}</div>)}
+          {((visual.choices ?? []) as Array<{ count: number; size: number }>).map(({ count, size }, index) => <div key={index} className="rounded-lg border border-cyan-800/20 bg-white p-4 text-center text-xl font-black">{count} groups of {size}</div>)}
         </div>
       </Surface>
     );

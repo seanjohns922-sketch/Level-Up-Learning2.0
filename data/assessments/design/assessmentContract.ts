@@ -1,3 +1,11 @@
+/** Apply to every realm/level: preserve sound released items; drafts are references. */
+export const ASSESSMENT_MAINTENANCE_POLICY = {
+  basis: "audit-existing-pre-post",
+  decisions: ["keep", "tweak", "replace", "gap"],
+  sequence: ["audit-pair", "targeted-corrections", "align-diagnostic-forms", "verify-content-ui-persistence", "owner-review"],
+  candidateDraftsAreMandatory: false,
+} as const;
+
 /** Authoring contract, deliberately separate from released banks and placement rules. */
 export const ASSESSMENT_DESIGN_VERSION = "2026-09-15-blueprint-1";
 export const ASSESSMENT_FORMS = ["pretest", "posttest", "diagnostic-start", "diagnostic-mid", "diagnostic-end"] as const;

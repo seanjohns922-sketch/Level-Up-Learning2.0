@@ -1,17 +1,19 @@
-# Assessment blueprint rebuild
+# Assessment audit blueprint
 
-Status: all 35 blueprints drafted and structurally checked, with 700 explicit skill slots. This specification does not approve or release new assessments. The new design modules are not imported by student assessment routes. Existing scores, placement, diagnostics and progression remain unchanged during authoring.
+The agreed approach for every realm and level is to audit and refine the existing pre/post pair, then align diagnostic Start/Mid/End to that pair. Preserve sound questions, familiar interactions and realm styling. The earlier 700 drafted slots and Prep/Year 1 candidate forms are reference drafts, not approved replacements or mandatory templates.
+
+For each existing question record **keep, tweak, replace or gap**, with a specific reason. Check curriculum evidence, mathematical accuracy, wording, visuals, intended difficulty and usability. Add or replace only where that audit establishes a need. Do not bundle unrelated skills into complicated tasks merely to fit a draft slot.
 
 ## Scope and sequence
 
-There are 35 realm/level blueprints and five forms for each: realm pre-test, realm post-test, diagnostic Start, diagnostic Mid and diagnostic End. That means 175 forms of 20 questions when the rebuild is complete, not five different curricula.
+There are 35 realm/level blueprints and five forms for each: realm pre-test, realm post-test, diagnostic Start, diagnostic Mid and diagnostic End. These are five comparable forms within each realm/level, using the audited pair as their starting point.
 
 - Prep: Number, Measurement and Space. Foundation Algebra remains integrated in Number. Foundation Statistics (AC9MFST01) is deliberately outside the assessed program scope; do not add a Prep Statistica test or make it a progression prerequisite.
 - Levels 1–2: Number (including the assigned Algebra content), Measurement, Space and Statistics.
 - Levels 3–6: all six existing realms. Original ACARA strand ownership must survive cross-realm placement of a descriptor.
 - No Level 7–8 work in this rebuild.
 
-Work proceeds in this order: curriculum blueprint → all five forms authored/revised → content and rendered-screen audit/corrections → owner child-view review → targeted corrections and release. Earlier manual findings are inputs to the specifications, not a request for another premature manual review.
+Work proceeds in this order: audit existing pre/post → targeted corrections and pair equivalence review → align Start/Mid/End → content, rendered-screen and persistence audit → owner child-view review → targeted corrections and release. Earlier manual findings are inputs to the specifications, not a request for another premature manual review.
 
 ## One blueprint, five independent forms
 
@@ -76,6 +78,6 @@ The existing real diagnostic persistence path must remain intact. Demo preview u
 
 ## Outstanding work
 
-All 35 levels now have 20 explicit skill-slot contracts, matched profiles across their five forms, and a review against the supplied curriculum descriptor scopes. No replacement forms have been authored or rendered yet. All 35 released levels still reuse pre/post items in the diagnostic checkpoints. Saving/version/reporting requirements above describe the target and require implementation verification; they are not a claim that every field is already persisted today.
+The previous 35 draft slot contracts remain reference material. Prep and Year 1 candidate previews exist, but their new tasks do not supersede the existing banks. The existing Level 1 Number pair is the current audit target; see `year1-number-existing-pair-audit.md`. Diagnostic checkpoints still reuse pre/post questions. Independent matched checkpoint forms and saving/version/reporting checks remain outstanding.
 
 Do not ask the owner to begin the final manual review until those stages are complete. Do not push this specification as though it were a completed assessment release.
