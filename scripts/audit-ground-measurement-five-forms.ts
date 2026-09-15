@@ -1,3 +1,4 @@
+import { groundMeasurementVisualSpeech } from '../data/assessments/revisions/groundMeasurementVisualSpeech';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import {GROUND_MEASUREMENT_FIVE_FORMS as forms,GROUND_MEASUREMENT_FORMS as names,GROUND_MEASUREMENT_BLUEPRINT as blueprint} from '../data/assessments/revisions/groundMeasurementFiveForms';
@@ -39,7 +40,18 @@ for(const name of names){
 for(let i=0;i<20;i++){
  const items=names.map(n=>forms[n][i]);assert.equal(new Set(items.map(q=>q.type)).size,1);assert.equal(new Set(items.map(q=>q.structureKey)).size,1);assert.equal(new Set(items.map(q=>JSON.stringify(q.visual))).size,5,`Slot ${i+1}: distinct visual examples`);
 }
-for(const asset of ['routine-3d/routine-wakeup.png','routine-3d/routine-bed.png','week2-3d/book.png','week2-3d/apple.png'])assert.ok(existsSync('public/images/measurelands/'+asset));
+for(const asset of ['routine-3d/routine-wakeup.png','routine-3d/routine-bed.png','week2-3d/book.png','week2-3d/apple.png','week2-3d/rock.png','week2-3d/soccer-ball.png','week2-3d/backpack.png','timeofday-3d/morning.png','timeofday-3d/lunch.png','timeofday-3d/afternoon.png'])assert.ok(existsSync('public/images/measurelands/'+asset));
 assert.ok(readFileSync('app/demo-review/measurement-ground/page.tsx','utf8').includes("if(!access.allowed)redirect('/login')"));
 writeFileSync('docs/assessment-blueprints/ground-measurement-authoring-inventory.json',JSON.stringify(forms,null,2)+'\n');
 console.log('Ground Measurement: 100 independently checked answers, diagrams, scoring and unknown responses; 13 direct-comparison and 7 sequence items per form; matched difficulty and response types; five distinct visual examples per slot.');
+
+for (const bank of Object.values(forms)) for (const q of bank) {
+ const v=q.visual, speech=groundMeasurementVisualSpeech(v);
+ assert.ok(speech.length>20 && !/undefined|NaN/.test(speech), q.id);
+ const visible = v.task==='daypart' ? [v.scene!] : v.task==='weekday' ? [v.context!, ...v.days!.filter(d=>d!=='?')] : v.labels;
+ for (const text of visible) assert.ok(speech.includes(text), `${q.id}: missing spoken label ${text}`);
+ if(v.task==='routine') assert.ok(speech.includes('Tap the answers below in order.'));
+ if(v.task==='capacity') for(const text of ['At first','After pouring','full','empty']) assert.ok(speech.includes(text));
+ if(v.task==='duration') for(const text of ['Both start together','Finished','Watch both activities']) assert.ok(speech.includes(text));
+}
+console.log('All 100 diagrams have narration covering their visible labels, captions and instructions.');

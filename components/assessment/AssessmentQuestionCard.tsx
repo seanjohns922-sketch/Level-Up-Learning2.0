@@ -489,7 +489,7 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
+      <div className={isEarlyNumberVisual ? "assessment-order-layout mt-3" : "assessment-order-layout mt-6"}>
         {showOrderVisual ? renderedVisual : null}
         <div className={algorithm ? "grid gap-3" : "grid gap-4 md:grid-cols-3"}>
           {numbers.map((num, index) => (
@@ -586,7 +586,7 @@ export default function AssessmentQuestionCard({
     }
 
     return (
-      <div className={isEarlyNumberVisual ? "mt-3" : "mt-6"}>
+      <div className={isEarlyNumberVisual ? "assessment-order-layout mt-3" : "assessment-order-layout mt-6"}>
         {showOrderVisual ? renderedVisual : null}
         <div className="grid gap-4 md:grid-cols-3">
           {fractions.map((fraction) => (
@@ -939,6 +939,7 @@ export default function AssessmentQuestionCard({
             return (
               <div
                 key={label}
+                data-assessment-choice-selected={isSelected}
                 className={[
                   "flex min-h-20 items-center justify-between gap-3 rounded-lg border-2 bg-[#f8fbfc] text-left text-slate-950 shadow-sm transition",
                   isSelected

@@ -879,3 +879,70 @@ html:fullscreen .measurelands-month-grid {
 body:has(.assessment-shell) .fullscreen-toggle:not([data-inline="true"]) {
   display: none;
 }
+
+/* Measurement assessment chrome uses the same brass/earth palette as its realm.
+   Object colours inside question diagrams remain part of the assessment evidence. */
+.assessment-shell[data-assessment-realm="measurement"] {
+  --measurement-border: rgba(214,184,108,.4);
+  --measurement-ink: #3b2a14;
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-question-card {
+  background: linear-gradient(135deg,#241706,#35230e);
+  border-color: var(--measurement-border);
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-question-marker > div,
+.assessment-shell[data-assessment-realm="measurement"] .assessment-navigation {
+  border-color: var(--measurement-border);
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-question-marker > div {
+  background: var(--measurement-border);
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-navigation button:not(:disabled) {
+  border-color: #b8893a;
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-navigation button:first-child,
+.assessment-shell[data-assessment-realm="measurement"] .assessment-navigation button:has(svg) {
+  background: #453018;
+  color: #fff0c4;
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-navigation button:disabled {
+  background: #2b2113;
+  color: #a5987c;
+  border-color: #66512e;
+}
+.assessment-shell[data-assessment-realm="measurement"] [data-assessment-choice-selected] {
+  background: #fffaf0;
+  border-color: #d4bd89;
+  color: var(--measurement-ink);
+}
+.assessment-shell[data-assessment-realm="measurement"] [data-assessment-choice-selected="true"] {
+  background: #fff0c4;
+  border-color: #a57729;
+  --tw-ring-color: rgba(184,137,58,.25);
+}
+.assessment-shell[data-assessment-realm="measurement"] [data-assessment-choice-selected]:hover {
+  border-color: #a57729;
+}
+.assessment-shell[data-assessment-realm="measurement"] button:focus-visible,
+.assessment-shell[data-assessment-realm="measurement"] select:focus-visible {
+  outline-color: #d6b86c;
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-order-layout > div:not(:first-child),
+.assessment-shell[data-assessment-realm="measurement"] .assessment-order-layout > div > div,
+.assessment-shell[data-assessment-realm="measurement"] .assessment-order-layout > div > div > div {
+  border-color: #d4bd89;
+}
+.assessment-shell[data-assessment-realm="measurement"] .assessment-order-layout button {
+  color: var(--measurement-ink);
+  border-color: #b8893a;
+}
+
+.assessment-shell[data-assessment-realm="measurement"] [data-read-aloud-button] {
+  background: #fffaf0;
+  color: #6b471b;
+  border-color: #b8893a;
+}
+.assessment-shell[data-assessment-realm="measurement"] [data-read-aloud-button]:hover {
+  background: #fff0c4;
+  color: #3b2a14;
+}

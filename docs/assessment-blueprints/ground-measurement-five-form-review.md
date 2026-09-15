@@ -38,3 +38,22 @@ The three most demanding slots require choosing a fair comparison, explaining a 
 Demo Review → Measurement → Ground. The normal Pre/Post and Start/Mid/End controls open the five new review forms. Direct route: `/demo-review/measurement-ground`.
 
 These are review candidates. Existing student assessment banks and diagnostic placement rules remain unchanged until approval and a versioned release.
+
+## Realm presentation and read-aloud checklist
+
+Use the realm theme throughout the review header, form tabs, dropdown, question
+cards, answer states, navigation, progress and audio controls. Keep meaningful
+object colours inside diagrams. This checklist applies when starting every realm.
+
+Every student-facing question prompt, answer choice, diagram label, caption and
+instruction needs a nearby read-aloud control. A labelled Read diagram button can
+read a whole panel in display order. Do not narrate hidden answers. All 100 Ground
+Measurement diagrams have their labels and instructions checked by the audit.
+
+Reused weekly-lesson artwork: book, apple, rock, soccer ball and backpack
+for balance objects; existing morning/night scenes; and morning, lunch and
+afternoon pictures for the day-part ordering cards. Keep length, balance and
+pouring geometry controlled so artwork cannot change the mathematical evidence.
+
+For every realm, inspect existing weekly-lesson assets first and reuse them
+wherever they accurately illustrate an assessment question.

@@ -4,13 +4,23 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Moon, Sun, Sunrise, Utensils, Play } from 'lucide-react';
 import type { GroundMeasurementVisual } from '@/data/assessments/revisions/groundMeasurementFiveForms';
+import ReadAloudBtn from '@/components/ReadAloudBtn';
+import { groundMeasurementVisualSpeech } from '@/data/assessments/revisions/groundMeasurementVisualSpeech';
 import { MeasurelandsEventBadge } from '@/components/measurelands/MeasurelandsEventBadge';
 
 const ink='#3b2a14';
 const colours:Record<string,string>={Red:'#dc4545',Blue:'#287fb7',Green:'#16876b',Purple:'#8554b7',Orange:'#d97916'};
 function ObjectPicture({name,x,y,size=65}:{name:string;x:number;y:number;size?:number}){
- const asset:Record<string,string>={Book:'book',Apple:'apple'};
- if(asset[name])return <image href={`/images/measurelands/week2-3d/${asset[name]}.png`} x={x-size/2} y={y-size} width={size} height={size}/>;
+ const assets:Record<string,{file:string; width:number; height:number; bounds:string}>={
+  Book:{file:'book',width:1536,height:1024,bounds:'348 86 906 840'},
+  Apple:{file:'apple',width:1254,height:1254,bounds:'215 137 821 912'},
+  Stone:{file:'rock',width:1254,height:1254,bounds:'158 244 938 798'},
+  Ball:{file:'soccer-ball',width:1254,height:1254,bounds:'177 124 908 917'},
+  Bag:{file:'backpack',width:1254,height:1254,bounds:'232 110 808 1025'},
+ };
+ const asset=assets[name];
+ // Ignore transparent export padding so the object sits on the balance pan.
+ if(asset)return <svg x={x-size/2} y={y-size} width={size} height={size} viewBox={asset.bounds} preserveAspectRatio="xMidYMax meet"><image href={`/images/measurelands/week2-3d/${asset.file}.png`} width={asset.width} height={asset.height}/></svg>;
  return <g transform={`translate(${x-size/2},${y-size}) scale(${size/70})`} stroke={ink} strokeWidth="2.5" strokeLinejoin="round">
   {name==='Stone'?<path d="M5 60L9 30 27 10 49 15 65 38 61 60Z" fill="#a3b2b9"/>:name==='Sponge'?<><rect x="4" y="20" width="62" height="40" rx="9" fill="#f5cf62"/>{[15,32,49].map(cx=><circle key={cx} cx={cx} cy="37" r="4" fill="#d0a83c" stroke="none"/>)}</>:name==='Tin'?<><path d="M12 15V59Q35 72 58 59V15" fill="#90bbc1"/><ellipse cx="35" cy="15" rx="23" ry="9" fill="#cfedef"/><path d="M12 32H58M12 49H58" stroke="#50828b"/></>:name==='Ball'?<><circle cx="35" cy="35" r="31" fill="#f5aa65"/><path d="M5 35H65M35 4Q10 35 35 66M35 4Q60 35 35 66" fill="none"/></>:name==='Cup'?<><path d="M53 20H61Q78 36 54 43" fill="none"/><path d="M8 15H55L50 58Q31 70 13 58Z" fill="#deb9ed"/></>:name==='Bag'?<><path d="M14 22H56L64 64H6Z" fill="#dfa76a"/><path d="M22 23V17Q35 -1 48 17V23" fill="none"/></>:<><path d="M6 23L35 8 64 23V59L35 69 6 59Z" fill={name==='Block'?'#e6aa64':'#c99d75'}/><path d="M6 23L35 35 64 23M35 35V69" fill="none"/></>}
  </g>;
@@ -29,8 +39,8 @@ export default function GroundMeasurementAssessmentVisual({visual:v}:{visual:Gro
  else if(v.task==='duration')content=<DurationComparison key={v.labels.join('-')} visual={v}/>;
  else if(v.task==='daypart')content=<div className="mx-auto grid max-w-lg gap-4 sm:grid-cols-2"><Sky night={v.target==='night'}/><div className="flex items-center justify-center rounded-2xl bg-white p-2">{/* Existing weekly-lesson artwork. */}<img src={`/images/measurelands/${v.art}`} alt={v.scene} width="140" height="140" className="h-32 w-32 object-contain"/></div><p className="text-center text-lg font-bold text-amber-950 sm:col-span-2">{v.scene}</p></div>;
  else if(v.task==='weekday')content=<div><p className="mb-4 text-center text-lg font-bold text-amber-900">{v.context}</p><div className="flex items-center justify-center gap-3">{v.days!.map((day,i)=><div className="contents" key={i}>{i>0?<ArrowRight className="shrink-0 text-amber-700" aria-hidden/>:null}<div className="min-w-0 flex-1 overflow-hidden rounded-xl border-2 border-amber-300 bg-white text-center"><div className="h-5 bg-amber-300"/><p className="px-2 py-7 text-xl font-black text-amber-950 sm:text-3xl">{day}</p></div></div>)}</div></div>;
- else content=<div><p className="mb-4 text-center text-lg font-bold text-amber-900">{v.context}</p><div className="grid gap-3 sm:grid-cols-3">{[1,2,0].map(i=>{const Icon=v.objects?.[i]==='moon'?Moon:v.objects?.[i]==='sunrise'?Sunrise:v.objects?.[i]==='lunch'?Utensils:Sun;return <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-200 bg-white p-4 sm:flex-col"><Icon size={48} className="shrink-0 text-amber-700"/><p className="text-center text-lg font-bold text-amber-950">{v.labels[i]}</p></div>})}</div><p className="mt-4 text-center text-base text-amber-900">Tap the answers below in order.</p></div>;
- return <section className="mb-5 rounded-2xl border-2 border-amber-200 bg-[#fffaf0] p-4 shadow-sm sm:p-6">{content}</section>;
+ else content=<div><p className="mb-4 text-center text-lg font-bold text-amber-900">{v.context}</p><div className="grid gap-3 sm:grid-cols-3">{[1,2,0].map(i=>{const Icon=v.objects?.[i]==='moon'?Moon:v.objects?.[i]==='sunrise'?Sunrise:v.objects?.[i]==='lunch'?Utensils:Sun;return <div key={i} className="flex items-center gap-3 rounded-xl border border-amber-200 bg-white p-4 sm:flex-col">{v.scene==='dayparts'?<img src={`/images/measurelands/timeofday-3d/${['morning','lunch','afternoon'][i]}.png`} alt="" width="140" height="140" className="h-28 w-28 rounded-xl object-contain"/>:<Icon size={48} className="shrink-0 text-amber-700"/>}<p className="text-center text-lg font-bold text-amber-950">{v.labels[i]}</p></div>})}</div><p className="mt-4 text-center text-base text-amber-900">Tap the answers below in order.</p></div>;
+ return <section className="mb-5 rounded-2xl border-2 border-amber-200 bg-[#fffaf0] p-4 shadow-sm sm:p-6"><div className="mb-3 flex justify-end"><ReadAloudBtn text={groundMeasurementVisualSpeech(v)} label="Read diagram" size="md" /></div>{content}</section>;
 }
 
 function DurationComparison({visual:v}:{visual:GroundMeasurementVisual}){

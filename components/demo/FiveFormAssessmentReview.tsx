@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
 import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCard";
 import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
 
 type CardQuestion = Parameters<typeof AssessmentQuestionCard>[0]["question"];
@@ -20,7 +21,7 @@ export type FiveFormReviewItem = {
   difficulty?: string;
 };
 
-const buttonClass = "min-h-11 rounded-lg border border-teal-700 px-4 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300";
+const buttonClass = "min-h-11 rounded-lg border px-4 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 ";
 
 /** Protected author review of matched forms: component state only; no learner writes or progression calls. */
 export default function FiveFormAssessmentReview<Form extends string>({
@@ -46,6 +47,9 @@ export default function FiveFormAssessmentReview<Form extends string>({
   forms: Record<Form, readonly FiveFormReviewItem[]>;
   defaultForm: Form;
 }) {
+  const theme = getRealmTheme(realmId);
+  const panelStyle = { background: theme.cardSurface, color: theme.chipText, borderColor: theme.chipBorder };
+  const buttonStyle = { ...panelStyle, outlineColor: theme.accentText };
   const router = useRouter();
   const params = useSearchParams();
   const requestedForm = params.get("form");
@@ -70,25 +74,25 @@ export default function FiveFormAssessmentReview<Form extends string>({
 
   return (
     <ReadAloudRateProvider>
-      <div className="bg-[#001b18] px-4 pb-4 pt-20 text-white md:pt-4">
+      <div className="px-4 pb-4 pt-20 text-white md:pt-4" style={panelStyle}>
         <section className="mx-auto max-w-6xl space-y-3" aria-label="Five-form review controls">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-xl font-black">{title}</h1>
-            <span className="text-sm text-teal-100">Review only · Student results are not saved</span>
+            <span className="text-sm" style={{color:theme.chipText}}>Review only · Student results are not saved</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {formOrder.map((candidate) => (
-              <button key={candidate} type="button" aria-pressed={form === candidate} onClick={() => select(candidate, index)} className={`${buttonClass} ${form === candidate ? "bg-teal-200 text-teal-950" : "bg-teal-950 text-teal-50"}`}>
+              <button key={candidate} type="button" aria-pressed={form === candidate} onClick={() => select(candidate, index)} className={buttonClass} style={form === candidate ? {...buttonStyle,background:theme.accentText,color:"#171208"} : buttonStyle}>
                 {labels[candidate]}
               </button>
             ))}
             <label className="ml-auto flex items-center gap-2 text-sm font-bold">Question
-              <select aria-label="Review question" value={index} onChange={(event) => select(form, Number(event.target.value))} className="min-h-11 rounded-lg border border-teal-700 bg-teal-950 px-3 text-white">
+              <select aria-label="Review question" value={index} onChange={(event) => select(form, Number(event.target.value))} className="min-h-11 rounded-lg border px-3" style={{...buttonStyle, background: theme.isMeasurement ? "#241706" : "#10202a"}}>
                 {questions.map((item, position) => <option key={item.id} value={position}>{position + 1} — {item.skillLabel}</option>)}
               </select>
             </label>
           </div>
-          <p className="text-sm text-teal-100/80">Switch forms to compare the same skill. You can move freely between all {questions.length} questions.</p>
+          <p className="text-sm" style={{color:theme.accentTextSoft}}>Switch forms to compare the same skill. You can move freely between all {questions.length} questions.</p>
         </section>
       </div>
       <AssessmentShell
@@ -102,15 +106,15 @@ export default function FiveFormAssessmentReview<Form extends string>({
         promptAction={<ReadAloudBtn text={question.readAloudText ?? question.prompt} />}
         questionContent={<>
           <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value === "idk" ? "" : value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
-          {value === "idk" ? <p role="status" className="mt-3 text-teal-100">Marked “I don’t know”. You can still answer this question.</p> : null}
-          <details className="mt-5 rounded-lg border border-teal-700 p-4 text-teal-50">
+          {value === "idk" ? <p role="status" className="mt-3" style={{color:theme.chipText}}>Marked “I don’t know”. You can still answer this question.</p> : null}
+          <details className="mt-5 rounded-lg border p-4" style={panelStyle}>
             <summary className="cursor-pointer font-bold">Review details</summary>
             <p className="mt-3 text-sm">{question.primaryDescriptorCode} · {question.skillLabel} · Intended difficulty: {question.difficulty}</p>
-            <button type="button" className={`${buttonClass} mt-3 bg-teal-950`} onClick={() => setShowAnswer((previous) => !previous)}>{showAnswer ? "Hide answer" : "Show answer"}</button>
+            <button type="button" className={`${buttonClass} mt-3`} style={buttonStyle} onClick={() => setShowAnswer((previous) => !previous)}>{showAnswer ? "Hide answer" : "Show answer"}</button>
             {showAnswer ? <p className="mt-3 font-bold">Answer: {question.correctAnswer.split("||").join(", ")}{value ? ` · Your answer: ${scored(question) ? "correct" : "incorrect"}` : ""}</p> : null}
           </details>
           {finished[form] ? (
-            <div role="status" className="mt-5 rounded-lg border border-teal-500 bg-teal-950 p-4 text-teal-50">
+            <div role="status" className="mt-5 rounded-lg border p-4" style={panelStyle}>
               <p className="font-bold">{labels[form]} review: {correct}/{questions.length} ({Math.round((correct / questions.length) * 100)}%)</p>
               <p className="mt-1 text-sm">{answered}/{questions.length} answered. Nothing was saved to a student record. Select another form above to continue.</p>
             </div>
