@@ -1,4 +1,5 @@
 "use client";
+import { groundMeasurementPostVersion } from "@/lib/ground-measurement-assessment-version";
 import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
 import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
 import { year3NumberPostVersion } from "@/lib/year3-number-assessment-version";
@@ -377,6 +378,7 @@ function PostTestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [groundMeasurementVersion,setGroundMeasurementVersion]=useState<3|4>(4);
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(2);
   // Until the recorded baseline is restored, Level 2 stays on the original pair.
@@ -392,8 +394,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion],
   );
 
   const [idx, setIdx] = useState(0);
@@ -452,6 +454,11 @@ function PostTestPage() {
           setRestoreError("Your saved program could not be found. Ask your teacher to check your placement.");
           setRestoreState("error");
           return;
+        }
+        if(progressRealmId === "measurement" && year === "Prep") {
+          let draftIds:string[]|undefined;
+          try { const draft=JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId,year))??"null");draftIds=draft?.questionIds??(draft?.answers?Object.keys(draft.answers):undefined); } catch { /* Retain baseline version. */ }
+          setGroundMeasurementVersion(groundMeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
         }
         if (progressRealmId === "number" && year === "Prep") {
           let draftIds: string[] | undefined;

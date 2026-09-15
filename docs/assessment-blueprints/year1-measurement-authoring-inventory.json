@@ -1,0 +1,5137 @@
+{
+  "pretest": [
+    {
+      "prompt": "Which attribute describes how heavy an object is?",
+      "answer": "Mass",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Teddy"
+        ],
+        "description": "Look at the object.",
+        "arts": [
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "Length",
+        "Mass",
+        "Capacity"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-01",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Mass",
+      "readAloudText": "Which attribute describes how heavy an object is?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-1",
+      "skillLabel": "Identify mass",
+      "structureKey": "y1-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Mass"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal blocks long is the pencil?",
+      "answer": "7",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Pencil"
+        ],
+        "description": "Equal blocks touch end to end below the pencil.",
+        "values": [
+          7
+        ],
+        "unit": "blocks"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-pretest-02",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "7",
+      "readAloudText": "How many equal blocks long is the pencil?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-2",
+      "skillLabel": "Measure in equal blocks",
+      "structureKey": "y1-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day comes next?",
+      "answer": "Saturday",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "Friday",
+          "?"
+        ],
+        "description": "The calendar shows Friday, then a missing day."
+      },
+      "options": [
+        "Sunday",
+        "Saturday",
+        "Thursday"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-03",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Saturday",
+      "readAloudText": "Which day comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-3",
+      "skillLabel": "Sequence weekdays",
+      "structureKey": "y1-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Saturday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which ribbon is longer?",
+      "answer": "Ribbon A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons are measured with the same-sized blocks.",
+        "values": [
+          9,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "Ribbon A",
+        "Ribbon B",
+        "Same length"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-04",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Ribbon A",
+      "readAloudText": "Which ribbon is longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-4",
+      "skillLabel": "Compare lengths with the same unit",
+      "structureKey": "y1-measurement-slot-4",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ribbon A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "answer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Compare the unit rows. Units should measure from one end to the other.",
+        "variants": [
+          "fair",
+          "gap",
+          "overlap"
+        ],
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-05",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "A",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-5",
+      "skillLabel": "Recognise end-to-end measurement",
+      "structureKey": "y1-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes how long this takes?",
+      "answer": "Hours",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A school day"
+        ],
+        "description": "A school day",
+        "arts": [
+          "duration-3d/school-day.png"
+        ]
+      },
+      "options": [
+        "Years",
+        "Hours",
+        "Weeks"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-06",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Hours",
+      "readAloudText": "Which unit best describes how long this takes?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-6",
+      "skillLabel": "Choose hours for a familiar duration",
+      "structureKey": "y1-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Hours"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object is heavier?",
+      "answer": "Book",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "balance",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The book pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Book",
+        "Ball",
+        "Same mass"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-07",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Book",
+      "readAloudText": "Which object is heavier?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-7",
+      "skillLabel": "Read direct mass evidence",
+      "structureKey": "y1-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Book"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal squares long is the strip?",
+      "answer": "8",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Strip"
+        ],
+        "description": "Equal squares cover the length with no gaps or overlaps.",
+        "values": [
+          8
+        ],
+        "unit": "squares"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-pretest-08",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "8",
+      "readAloudText": "How many equal squares long is the strip?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-8",
+      "skillLabel": "Measure using equal squares",
+      "structureKey": "y1-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month comes next?",
+      "answer": "December",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "November",
+          "?"
+        ],
+        "description": "November, then a missing month."
+      },
+      "options": [
+        "January",
+        "October",
+        "December"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-09",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "December",
+      "readAloudText": "Which month comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-9",
+      "skillLabel": "Sequence months across the year",
+      "structureKey": "y1-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "December"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which container holds more?",
+      "answer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B"
+        ],
+        "description": "Both containers were filled using the same cup.",
+        "values": [
+          4,
+          7
+        ],
+        "arts": [
+          "containers/jug.png",
+          "containers/bottle.png"
+        ],
+        "unit": "cups"
+      },
+      "options": [
+        "A",
+        "B",
+        "Same capacity"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-10",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "B",
+      "readAloudText": "Which container holds more?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-10",
+      "skillLabel": "Compare capacity using equal cups",
+      "structureKey": "y1-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object matches the string length?",
+      "answer": "Box A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "string",
+        "labels": [
+          "String",
+          "Box A",
+          "Box B"
+        ],
+        "description": "The string was used to compare the two boxes. The same string length is shown for each comparison.",
+        "values": [
+          6,
+          6,
+          8
+        ],
+        "target": 6,
+        "unit": "length"
+      },
+      "options": [
+        "Box B",
+        "Neither box",
+        "Box A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-11",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Box A",
+      "readAloudText": "Which object matches the string length?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-11",
+      "skillLabel": "Use string for an indirect length comparison",
+      "structureKey": "y1-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order these durations from shortest to longest.",
+      "answer": "1 hour||1 day||1 week",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "1 day",
+          "1 hour",
+          "1 week"
+        ],
+        "description": "One hour. One day. One week."
+      },
+      "options": [
+        "1 week",
+        "1 day",
+        "1 hour"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-pretest-12",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "1 hour||1 day||1 week",
+      "readAloudText": "Order these durations from shortest to longest.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-12",
+      "skillLabel": "Order hours, days and weeks",
+      "structureKey": "y1-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1 hour||1 day||1 week"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which activity lasted longer?",
+      "answer": "Trip A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "Trip A",
+          "Trip B"
+        ],
+        "description": "Compare the recorded trip times.",
+        "values": [
+          5,
+          2
+        ],
+        "unit": "hours",
+        "arts": [
+          "duration-3d/travel.png",
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Trip A",
+        "Trip B",
+        "Same time"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-13",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Trip A",
+      "readAloudText": "Which activity lasted longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-13",
+      "skillLabel": "Compare event durations",
+      "structureKey": "y1-measurement-slot-13",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Trip A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the containers from least to greatest capacity.",
+      "answer": "A||C||B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container was filled using the same cup.",
+        "values": [
+          4,
+          8,
+          6
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-pretest-14",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "A||C||B",
+      "readAloudText": "Order the containers from least to greatest capacity.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-14",
+      "skillLabel": "Order three capacities",
+      "structureKey": "y1-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A||C||B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes this change?",
+      "answer": "Years",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Young tree",
+          "Tall tree"
+        ],
+        "description": "A young tree grows into a tall tree.",
+        "arts": [
+          "week1-3d/sapling.png",
+          "week1-3d/tree.png"
+        ]
+      },
+      "options": [
+        "Years",
+        "Hours",
+        "Days"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-15",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Years",
+      "readAloudText": "Which unit best describes this change?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-15",
+      "skillLabel": "Choose years for a long duration",
+      "structureKey": "y1-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Years"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the objects from lightest to heaviest.",
+      "answer": "A||C||B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each object balances with the shown number of identical cubes.",
+        "values": [
+          6,
+          10,
+          8
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/teddy-bear.png",
+          "week2-3d/soccer-ball.png",
+          "week2-3d/book.png"
+        ]
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-pretest-16",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "A||C||B",
+      "readAloudText": "Order the objects from lightest to heaviest.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-16",
+      "skillLabel": "Order three masses",
+      "structureKey": "y1-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A||C||B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why does the second row use fewer blocks?",
+      "answer": "Its blocks are longer",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Small blocks",
+          "Large blocks"
+        ],
+        "description": "Both rows measure the same length, without gaps or overlaps.",
+        "values": [
+          8,
+          4
+        ],
+        "unit": "different units"
+      },
+      "options": [
+        "The object became shorter",
+        "The blocks overlap",
+        "Its blocks are longer"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-17",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Its blocks are longer",
+      "readAloudText": "Why does the second row use fewer blocks?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-17",
+      "skillLabel": "Explain different-sized length units",
+      "structureKey": "y1-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its blocks are longer"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the activities from morning to night.",
+      "answer": "Wake up||Eat lunch||Go to bed",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Eat lunch",
+          "Go to bed",
+          "Wake up"
+        ],
+        "description": "Put the pictured activities in order.",
+        "arts": [
+          "duration-3d/lunch.png",
+          "routine-3d/routine-bed.png",
+          "routine-3d/routine-wakeup.png"
+        ]
+      },
+      "options": [
+        "Go to bed",
+        "Eat lunch",
+        "Wake up"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-pretest-18",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "Wake up||Eat lunch||Go to bed",
+      "readAloudText": "Order the activities from morning to night.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-18",
+      "skillLabel": "Sequence familiar daily events",
+      "structureKey": "y1-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wake up||Eat lunch||Go to bed"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month has more days?",
+      "answer": "May",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "April",
+          "May"
+        ],
+        "description": "Compare the number of days in these months.",
+        "values": [
+          30,
+          31
+        ],
+        "unit": "days"
+      },
+      "options": [
+        "April",
+        "May",
+        "Same number"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-19",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "May",
+      "readAloudText": "Which month has more days?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-19",
+      "skillLabel": "Compare days in months",
+      "structureKey": "y1-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "May"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why is comparing these cube counts unfair?",
+      "answer": "The cubes have different masses",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Heavy cubes",
+          "Light cubes"
+        ],
+        "description": "A bag balances with heavy cubes. A toy balances with light cubes.",
+        "values": [
+          5,
+          8
+        ],
+        "unit": "mixed cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "Both objects must use ten cubes",
+        "The colours must match",
+        "The cubes have different masses"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-pretest-20",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "correctAnswer": "The cubes have different masses",
+      "readAloudText": "Why is comparing these cube counts unfair?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-20",
+      "skillLabel": "Recognise unfair mass units",
+      "structureKey": "y1-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "The cubes have different masses"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "Which attribute describes how heavy an object is?",
+      "answer": "Mass",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Ball"
+        ],
+        "description": "Look at the object.",
+        "arts": [
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Mass",
+        "Capacity",
+        "Length"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-01",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Mass",
+      "readAloudText": "Which attribute describes how heavy an object is?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-1",
+      "skillLabel": "Identify mass",
+      "structureKey": "y1-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Mass"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal blocks long is the pencil?",
+      "answer": "5",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Pencil"
+        ],
+        "description": "Equal blocks touch end to end below the pencil.",
+        "values": [
+          5
+        ],
+        "unit": "blocks"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-posttest-02",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "5",
+      "readAloudText": "How many equal blocks long is the pencil?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-2",
+      "skillLabel": "Measure in equal blocks",
+      "structureKey": "y1-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day comes next?",
+      "answer": "Wednesday",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "Tuesday",
+          "?"
+        ],
+        "description": "The calendar shows Tuesday, then a missing day."
+      },
+      "options": [
+        "Wednesday",
+        "Monday",
+        "Thursday"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-03",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Wednesday",
+      "readAloudText": "Which day comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-3",
+      "skillLabel": "Sequence weekdays",
+      "structureKey": "y1-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wednesday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which ribbon is longer?",
+      "answer": "Ribbon B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons are measured with the same-sized blocks.",
+        "values": [
+          6,
+          9
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "Ribbon B",
+        "Same length",
+        "Ribbon A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-04",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Ribbon B",
+      "readAloudText": "Which ribbon is longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-4",
+      "skillLabel": "Compare lengths with the same unit",
+      "structureKey": "y1-measurement-slot-4",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ribbon B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "answer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Compare the unit rows. Units should measure from one end to the other.",
+        "variants": [
+          "overlap",
+          "fair",
+          "gap"
+        ],
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-05",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "B",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-5",
+      "skillLabel": "Recognise end-to-end measurement",
+      "structureKey": "y1-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes how long this takes?",
+      "answer": "Hours",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A long movie"
+        ],
+        "description": "A long movie",
+        "arts": [
+          "duration-3d/movie.png"
+        ]
+      },
+      "options": [
+        "Hours",
+        "Weeks",
+        "Years"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-06",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Hours",
+      "readAloudText": "Which unit best describes how long this takes?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-6",
+      "skillLabel": "Choose hours for a familiar duration",
+      "structureKey": "y1-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Hours"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object is heavier?",
+      "answer": "Ball",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "balance",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The ball pan is lower.",
+        "values": [
+          75,
+          125
+        ],
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Ball",
+        "Same mass",
+        "Book"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-07",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Ball",
+      "readAloudText": "Which object is heavier?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-7",
+      "skillLabel": "Read direct mass evidence",
+      "structureKey": "y1-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ball"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal squares long is the strip?",
+      "answer": "7",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Strip"
+        ],
+        "description": "Equal squares cover the length with no gaps or overlaps.",
+        "values": [
+          7
+        ],
+        "unit": "squares"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-posttest-08",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "7",
+      "readAloudText": "How many equal squares long is the strip?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-8",
+      "skillLabel": "Measure using equal squares",
+      "structureKey": "y1-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month comes next?",
+      "answer": "October",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "September",
+          "?"
+        ],
+        "description": "September, then a missing month."
+      },
+      "options": [
+        "August",
+        "October",
+        "November"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-09",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "October",
+      "readAloudText": "Which month comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-9",
+      "skillLabel": "Sequence months across the year",
+      "structureKey": "y1-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "October"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which container holds more?",
+      "answer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B"
+        ],
+        "description": "Both containers were filled using the same cup.",
+        "values": [
+          7,
+          4
+        ],
+        "arts": [
+          "containers/jug.png",
+          "containers/bottle.png"
+        ],
+        "unit": "cups"
+      },
+      "options": [
+        "B",
+        "Same capacity",
+        "A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-10",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "A",
+      "readAloudText": "Which container holds more?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-10",
+      "skillLabel": "Compare capacity using equal cups",
+      "structureKey": "y1-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object matches the string length?",
+      "answer": "Box B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "string",
+        "labels": [
+          "String",
+          "Box A",
+          "Box B"
+        ],
+        "description": "The string was used to compare the two boxes. The same string length is shown for each comparison.",
+        "values": [
+          7,
+          5,
+          7
+        ],
+        "target": 7,
+        "unit": "length"
+      },
+      "options": [
+        "Neither box",
+        "Box A",
+        "Box B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-11",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Box B",
+      "readAloudText": "Which object matches the string length?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-11",
+      "skillLabel": "Use string for an indirect length comparison",
+      "structureKey": "y1-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order these durations from shortest to longest.",
+      "answer": "1 hour||1 day||1 week",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "1 hour",
+          "1 week",
+          "1 day"
+        ],
+        "description": "One hour. One day. One week."
+      },
+      "options": [
+        "1 hour",
+        "1 week",
+        "1 day"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-posttest-12",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "1 hour||1 day||1 week",
+      "readAloudText": "Order these durations from shortest to longest.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-12",
+      "skillLabel": "Order hours, days and weeks",
+      "structureKey": "y1-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1 hour||1 day||1 week"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which activity lasted longer?",
+      "answer": "Trip B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "Trip A",
+          "Trip B"
+        ],
+        "description": "Compare the recorded trip times.",
+        "values": [
+          3,
+          6
+        ],
+        "unit": "hours",
+        "arts": [
+          "duration-3d/travel.png",
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Trip B",
+        "Same time",
+        "Trip A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-13",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Trip B",
+      "readAloudText": "Which activity lasted longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-13",
+      "skillLabel": "Compare event durations",
+      "structureKey": "y1-measurement-slot-13",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Trip B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the containers from least to greatest capacity.",
+      "answer": "B||A||C",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container was filled using the same cup.",
+        "values": [
+          8,
+          5,
+          10
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-posttest-14",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "B||A||C",
+      "readAloudText": "Order the containers from least to greatest capacity.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-14",
+      "skillLabel": "Order three capacities",
+      "structureKey": "y1-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B||A||C"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes this change?",
+      "answer": "Years",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Young tree",
+          "Tall tree"
+        ],
+        "description": "A young tree grows into a tall tree.",
+        "arts": [
+          "week1-3d/sapling.png",
+          "week1-3d/tree.png"
+        ]
+      },
+      "options": [
+        "Hours",
+        "Days",
+        "Years"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-15",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Years",
+      "readAloudText": "Which unit best describes this change?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-15",
+      "skillLabel": "Choose years for a long duration",
+      "structureKey": "y1-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Years"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the objects from lightest to heaviest.",
+      "answer": "C||A||B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each object balances with the shown number of identical cubes.",
+        "values": [
+          9,
+          12,
+          7
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/soccer-ball.png",
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-posttest-16",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "C||A||B",
+      "readAloudText": "Order the objects from lightest to heaviest.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-16",
+      "skillLabel": "Order three masses",
+      "structureKey": "y1-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C||A||B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why does the second row use fewer blocks?",
+      "answer": "Its blocks are longer",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Small blocks",
+          "Large blocks"
+        ],
+        "description": "Both rows measure the same length, without gaps or overlaps.",
+        "values": [
+          10,
+          5
+        ],
+        "unit": "different units"
+      },
+      "options": [
+        "The blocks overlap",
+        "Its blocks are longer",
+        "The object became shorter"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-17",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Its blocks are longer",
+      "readAloudText": "Why does the second row use fewer blocks?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-17",
+      "skillLabel": "Explain different-sized length units",
+      "structureKey": "y1-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its blocks are longer"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the activities from morning to night.",
+      "answer": "Have breakfast||Go to school||Go to bed",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Go to school",
+          "Go to bed",
+          "Have breakfast"
+        ],
+        "description": "Put the pictured activities in order.",
+        "arts": [
+          "routine-3d/routine-school.png",
+          "routine-3d/routine-bed.png",
+          "timeofday-3d/breakfast.png"
+        ]
+      },
+      "options": [
+        "Go to school",
+        "Go to bed",
+        "Have breakfast"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-posttest-18",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "Have breakfast||Go to school||Go to bed",
+      "readAloudText": "Order the activities from morning to night.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-18",
+      "skillLabel": "Sequence familiar daily events",
+      "structureKey": "y1-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Have breakfast||Go to school||Go to bed"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month has more days?",
+      "answer": "July",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "June",
+          "July"
+        ],
+        "description": "Compare the number of days in these months.",
+        "values": [
+          30,
+          31
+        ],
+        "unit": "days"
+      },
+      "options": [
+        "July",
+        "Same number",
+        "June"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-19",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "July",
+      "readAloudText": "Which month has more days?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-19",
+      "skillLabel": "Compare days in months",
+      "structureKey": "y1-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "July"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why is comparing these cube counts unfair?",
+      "answer": "The cubes have different masses",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Heavy cubes",
+          "Light cubes"
+        ],
+        "description": "A bag balances with heavy cubes. A toy balances with light cubes.",
+        "values": [
+          6,
+          9
+        ],
+        "unit": "mixed cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "The colours must match",
+        "The cubes have different masses",
+        "Both objects must use ten cubes"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-posttest-20",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "correctAnswer": "The cubes have different masses",
+      "readAloudText": "Why is comparing these cube counts unfair?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-20",
+      "skillLabel": "Recognise unfair mass units",
+      "structureKey": "y1-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "The cubes have different masses"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "Which attribute describes how heavy an object is?",
+      "answer": "Mass",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book"
+        ],
+        "description": "Look at the object.",
+        "arts": [
+          "week2-3d/book.png"
+        ]
+      },
+      "options": [
+        "Capacity",
+        "Length",
+        "Mass"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-01",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Mass",
+      "readAloudText": "Which attribute describes how heavy an object is?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-1",
+      "skillLabel": "Identify mass",
+      "structureKey": "y1-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Mass"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal blocks long is the pencil?",
+      "answer": "8",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Pencil"
+        ],
+        "description": "Equal blocks touch end to end below the pencil.",
+        "values": [
+          8
+        ],
+        "unit": "blocks"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-start-02",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "8",
+      "readAloudText": "How many equal blocks long is the pencil?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-2",
+      "skillLabel": "Measure in equal blocks",
+      "structureKey": "y1-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day comes next?",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "Sunday",
+          "?"
+        ],
+        "description": "The calendar shows Sunday, then a missing day."
+      },
+      "options": [
+        "Saturday",
+        "Tuesday",
+        "Monday"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-03",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Monday",
+      "readAloudText": "Which day comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-3",
+      "skillLabel": "Sequence weekdays",
+      "structureKey": "y1-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which ribbon is longer?",
+      "answer": "Ribbon A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons are measured with the same-sized blocks.",
+        "values": [
+          9,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "Same length",
+        "Ribbon A",
+        "Ribbon B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-04",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Ribbon A",
+      "readAloudText": "Which ribbon is longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-4",
+      "skillLabel": "Compare lengths with the same unit",
+      "structureKey": "y1-measurement-slot-4",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ribbon A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "answer": "C",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Compare the unit rows. Units should measure from one end to the other.",
+        "variants": [
+          "gap",
+          "overlap",
+          "fair"
+        ],
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-05",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "C",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-5",
+      "skillLabel": "Recognise end-to-end measurement",
+      "structureKey": "y1-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes how long this takes?",
+      "answer": "Hours",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A morning at school"
+        ],
+        "description": "A morning at school",
+        "arts": [
+          "routine-3d/routine-school.png"
+        ]
+      },
+      "options": [
+        "Weeks",
+        "Years",
+        "Hours"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-06",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Hours",
+      "readAloudText": "Which unit best describes how long this takes?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-6",
+      "skillLabel": "Choose hours for a familiar duration",
+      "structureKey": "y1-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Hours"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object is heavier?",
+      "answer": "Book",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "balance",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The book pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Same mass",
+        "Book",
+        "Ball"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-07",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Book",
+      "readAloudText": "Which object is heavier?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-7",
+      "skillLabel": "Read direct mass evidence",
+      "structureKey": "y1-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Book"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal squares long is the strip?",
+      "answer": "9",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Strip"
+        ],
+        "description": "Equal squares cover the length with no gaps or overlaps.",
+        "values": [
+          9
+        ],
+        "unit": "squares"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-start-08",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "9",
+      "readAloudText": "How many equal squares long is the strip?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-8",
+      "skillLabel": "Measure using equal squares",
+      "structureKey": "y1-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month comes next?",
+      "answer": "January",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "December",
+          "?"
+        ],
+        "description": "December, then a missing month."
+      },
+      "options": [
+        "January",
+        "February",
+        "November"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-09",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "January",
+      "readAloudText": "Which month comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-9",
+      "skillLabel": "Sequence months across the year",
+      "structureKey": "y1-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "January"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which container holds more?",
+      "answer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B"
+        ],
+        "description": "Both containers were filled using the same cup.",
+        "values": [
+          4,
+          7
+        ],
+        "arts": [
+          "containers/jug.png",
+          "containers/bottle.png"
+        ],
+        "unit": "cups"
+      },
+      "options": [
+        "Same capacity",
+        "A",
+        "B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-10",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "B",
+      "readAloudText": "Which container holds more?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-10",
+      "skillLabel": "Compare capacity using equal cups",
+      "structureKey": "y1-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object matches the string length?",
+      "answer": "Box A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "string",
+        "labels": [
+          "String",
+          "Box A",
+          "Box B"
+        ],
+        "description": "The string was used to compare the two boxes. The same string length is shown for each comparison.",
+        "values": [
+          8,
+          8,
+          10
+        ],
+        "target": 8,
+        "unit": "length"
+      },
+      "options": [
+        "Box A",
+        "Box B",
+        "Neither box"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-11",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Box A",
+      "readAloudText": "Which object matches the string length?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-11",
+      "skillLabel": "Use string for an indirect length comparison",
+      "structureKey": "y1-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order these durations from shortest to longest.",
+      "answer": "1 hour||1 day||1 week",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "1 day",
+          "1 hour",
+          "1 week"
+        ],
+        "description": "One hour. One day. One week."
+      },
+      "options": [
+        "1 hour",
+        "1 week",
+        "1 day"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-start-12",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "1 hour||1 day||1 week",
+      "readAloudText": "Order these durations from shortest to longest.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-12",
+      "skillLabel": "Order hours, days and weeks",
+      "structureKey": "y1-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1 hour||1 day||1 week"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which activity lasted longer?",
+      "answer": "Trip A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "Trip A",
+          "Trip B"
+        ],
+        "description": "Compare the recorded trip times.",
+        "values": [
+          5,
+          2
+        ],
+        "unit": "hours",
+        "arts": [
+          "duration-3d/travel.png",
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Same time",
+        "Trip A",
+        "Trip B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-13",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Trip A",
+      "readAloudText": "Which activity lasted longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-13",
+      "skillLabel": "Compare event durations",
+      "structureKey": "y1-measurement-slot-13",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Trip A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the containers from least to greatest capacity.",
+      "answer": "C||A||B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container was filled using the same cup.",
+        "values": [
+          7,
+          9,
+          4
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-start-14",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "C||A||B",
+      "readAloudText": "Order the containers from least to greatest capacity.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-14",
+      "skillLabel": "Order three capacities",
+      "structureKey": "y1-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C||A||B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes this change?",
+      "answer": "Years",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Young tree",
+          "Tall tree"
+        ],
+        "description": "A young tree grows into a tall tree.",
+        "arts": [
+          "week1-3d/sapling.png",
+          "week1-3d/tree.png"
+        ]
+      },
+      "options": [
+        "Days",
+        "Years",
+        "Hours"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-15",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Years",
+      "readAloudText": "Which unit best describes this change?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-15",
+      "skillLabel": "Choose years for a long duration",
+      "structureKey": "y1-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Years"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the objects from lightest to heaviest.",
+      "answer": "B||A||C",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each object balances with the shown number of identical cubes.",
+        "values": [
+          8,
+          5,
+          11
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png",
+          "week2-3d/backpack.png"
+        ]
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-start-16",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "B||A||C",
+      "readAloudText": "Order the objects from lightest to heaviest.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-16",
+      "skillLabel": "Order three masses",
+      "structureKey": "y1-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B||A||C"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why does the second row use fewer blocks?",
+      "answer": "Its blocks are longer",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Small blocks",
+          "Large blocks"
+        ],
+        "description": "Both rows measure the same length, without gaps or overlaps.",
+        "values": [
+          12,
+          6
+        ],
+        "unit": "different units"
+      },
+      "options": [
+        "Its blocks are longer",
+        "The object became shorter",
+        "The blocks overlap"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-17",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Its blocks are longer",
+      "readAloudText": "Why does the second row use fewer blocks?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-17",
+      "skillLabel": "Explain different-sized length units",
+      "structureKey": "y1-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its blocks are longer"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the activities from morning to night.",
+      "answer": "Wake up||Play after school||Go to bed",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Play after school",
+          "Go to bed",
+          "Wake up"
+        ],
+        "description": "Put the pictured activities in order.",
+        "arts": [
+          "timeofday-3d/afternoon.png",
+          "routine-3d/routine-bed.png",
+          "routine-3d/routine-wakeup.png"
+        ]
+      },
+      "options": [
+        "Go to bed",
+        "Wake up",
+        "Play after school"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-start-18",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "Wake up||Play after school||Go to bed",
+      "readAloudText": "Order the activities from morning to night.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-18",
+      "skillLabel": "Sequence familiar daily events",
+      "structureKey": "y1-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wake up||Play after school||Go to bed"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month has more days?",
+      "answer": "August",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "August",
+          "September"
+        ],
+        "description": "Compare the number of days in these months.",
+        "values": [
+          31,
+          30
+        ],
+        "unit": "days"
+      },
+      "options": [
+        "Same number",
+        "August",
+        "September"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-19",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "August",
+      "readAloudText": "Which month has more days?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-19",
+      "skillLabel": "Compare days in months",
+      "structureKey": "y1-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "August"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why is comparing these cube counts unfair?",
+      "answer": "The cubes have different masses",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Heavy cubes",
+          "Light cubes"
+        ],
+        "description": "A bag balances with heavy cubes. A toy balances with light cubes.",
+        "values": [
+          7,
+          10
+        ],
+        "unit": "mixed cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "The cubes have different masses",
+        "Both objects must use ten cubes",
+        "The colours must match"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-start-20",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "correctAnswer": "The cubes have different masses",
+      "readAloudText": "Why is comparing these cube counts unfair?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-20",
+      "skillLabel": "Recognise unfair mass units",
+      "structureKey": "y1-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "The cubes have different masses"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "Which attribute describes how heavy an object is?",
+      "answer": "Mass",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Apple"
+        ],
+        "description": "Look at the object.",
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "options": [
+        "Length",
+        "Mass",
+        "Capacity"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-01",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Mass",
+      "readAloudText": "Which attribute describes how heavy an object is?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-1",
+      "skillLabel": "Identify mass",
+      "structureKey": "y1-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Mass"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal blocks long is the pencil?",
+      "answer": "6",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Pencil"
+        ],
+        "description": "Equal blocks touch end to end below the pencil.",
+        "values": [
+          6
+        ],
+        "unit": "blocks"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-mid-02",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "6",
+      "readAloudText": "How many equal blocks long is the pencil?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-2",
+      "skillLabel": "Measure in equal blocks",
+      "structureKey": "y1-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day comes next?",
+      "answer": "Friday",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "Thursday",
+          "?"
+        ],
+        "description": "The calendar shows Thursday, then a missing day."
+      },
+      "options": [
+        "Saturday",
+        "Friday",
+        "Wednesday"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-03",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Friday",
+      "readAloudText": "Which day comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-3",
+      "skillLabel": "Sequence weekdays",
+      "structureKey": "y1-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Friday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which ribbon is longer?",
+      "answer": "Ribbon B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons are measured with the same-sized blocks.",
+        "values": [
+          6,
+          9
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "Ribbon A",
+        "Ribbon B",
+        "Same length"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-04",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Ribbon B",
+      "readAloudText": "Which ribbon is longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-4",
+      "skillLabel": "Compare lengths with the same unit",
+      "structureKey": "y1-measurement-slot-4",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ribbon B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "answer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Compare the unit rows. Units should measure from one end to the other.",
+        "variants": [
+          "fair",
+          "gap",
+          "overlap"
+        ],
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-05",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "A",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-5",
+      "skillLabel": "Recognise end-to-end measurement",
+      "structureKey": "y1-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes how long this takes?",
+      "answer": "Hours",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "An afternoon outing"
+        ],
+        "description": "An afternoon outing",
+        "arts": [
+          "duration-3d/zoo.png"
+        ]
+      },
+      "options": [
+        "Years",
+        "Hours",
+        "Weeks"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-06",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Hours",
+      "readAloudText": "Which unit best describes how long this takes?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-6",
+      "skillLabel": "Choose hours for a familiar duration",
+      "structureKey": "y1-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Hours"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object is heavier?",
+      "answer": "Ball",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "balance",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The ball pan is lower.",
+        "values": [
+          75,
+          125
+        ],
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Book",
+        "Ball",
+        "Same mass"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-07",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Ball",
+      "readAloudText": "Which object is heavier?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-7",
+      "skillLabel": "Read direct mass evidence",
+      "structureKey": "y1-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ball"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal squares long is the strip?",
+      "answer": "6",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Strip"
+        ],
+        "description": "Equal squares cover the length with no gaps or overlaps.",
+        "values": [
+          6
+        ],
+        "unit": "squares"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-mid-08",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "6",
+      "readAloudText": "How many equal squares long is the strip?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-8",
+      "skillLabel": "Measure using equal squares",
+      "structureKey": "y1-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month comes next?",
+      "answer": "May",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "April",
+          "?"
+        ],
+        "description": "April, then a missing month."
+      },
+      "options": [
+        "June",
+        "March",
+        "May"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-09",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "May",
+      "readAloudText": "Which month comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-9",
+      "skillLabel": "Sequence months across the year",
+      "structureKey": "y1-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "May"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which container holds more?",
+      "answer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B"
+        ],
+        "description": "Both containers were filled using the same cup.",
+        "values": [
+          7,
+          4
+        ],
+        "arts": [
+          "containers/jug.png",
+          "containers/bottle.png"
+        ],
+        "unit": "cups"
+      },
+      "options": [
+        "A",
+        "B",
+        "Same capacity"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-10",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "A",
+      "readAloudText": "Which container holds more?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-10",
+      "skillLabel": "Compare capacity using equal cups",
+      "structureKey": "y1-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object matches the string length?",
+      "answer": "Box B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "string",
+        "labels": [
+          "String",
+          "Box A",
+          "Box B"
+        ],
+        "description": "The string was used to compare the two boxes. The same string length is shown for each comparison.",
+        "values": [
+          6,
+          4,
+          6
+        ],
+        "target": 6,
+        "unit": "length"
+      },
+      "options": [
+        "Box B",
+        "Neither box",
+        "Box A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-11",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Box B",
+      "readAloudText": "Which object matches the string length?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-11",
+      "skillLabel": "Use string for an indirect length comparison",
+      "structureKey": "y1-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order these durations from shortest to longest.",
+      "answer": "1 hour||1 day||1 week",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "1 hour",
+          "1 week",
+          "1 day"
+        ],
+        "description": "One hour. One day. One week."
+      },
+      "options": [
+        "1 day",
+        "1 hour",
+        "1 week"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-mid-12",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "1 hour||1 day||1 week",
+      "readAloudText": "Order these durations from shortest to longest.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-12",
+      "skillLabel": "Order hours, days and weeks",
+      "structureKey": "y1-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1 hour||1 day||1 week"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which activity lasted longer?",
+      "answer": "Trip B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "Trip A",
+          "Trip B"
+        ],
+        "description": "Compare the recorded trip times.",
+        "values": [
+          3,
+          6
+        ],
+        "unit": "hours",
+        "arts": [
+          "duration-3d/travel.png",
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Trip A",
+        "Trip B",
+        "Same time"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-13",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Trip B",
+      "readAloudText": "Which activity lasted longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-13",
+      "skillLabel": "Compare event durations",
+      "structureKey": "y1-measurement-slot-13",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Trip B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the containers from least to greatest capacity.",
+      "answer": "B||A||C",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container was filled using the same cup.",
+        "values": [
+          6,
+          3,
+          8
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-mid-14",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "B||A||C",
+      "readAloudText": "Order the containers from least to greatest capacity.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-14",
+      "skillLabel": "Order three capacities",
+      "structureKey": "y1-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B||A||C"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes this change?",
+      "answer": "Years",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Young tree",
+          "Tall tree"
+        ],
+        "description": "A young tree grows into a tall tree.",
+        "arts": [
+          "week1-3d/sapling.png",
+          "week1-3d/tree.png"
+        ]
+      },
+      "options": [
+        "Years",
+        "Hours",
+        "Days"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-15",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Years",
+      "readAloudText": "Which unit best describes this change?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-15",
+      "skillLabel": "Choose years for a long duration",
+      "structureKey": "y1-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Years"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the objects from lightest to heaviest.",
+      "answer": "C||A||B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each object balances with the shown number of identical cubes.",
+        "values": [
+          7,
+          10,
+          4
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/apple.png",
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-mid-16",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "C||A||B",
+      "readAloudText": "Order the objects from lightest to heaviest.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-16",
+      "skillLabel": "Order three masses",
+      "structureKey": "y1-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C||A||B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why does the second row use fewer blocks?",
+      "answer": "Its blocks are longer",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Small blocks",
+          "Large blocks"
+        ],
+        "description": "Both rows measure the same length, without gaps or overlaps.",
+        "values": [
+          8,
+          4
+        ],
+        "unit": "different units"
+      },
+      "options": [
+        "The object became shorter",
+        "The blocks overlap",
+        "Its blocks are longer"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-17",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Its blocks are longer",
+      "readAloudText": "Why does the second row use fewer blocks?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-17",
+      "skillLabel": "Explain different-sized length units",
+      "structureKey": "y1-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its blocks are longer"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the activities from morning to night.",
+      "answer": "Have breakfast||Eat lunch||Go to bed",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Eat lunch",
+          "Go to bed",
+          "Have breakfast"
+        ],
+        "description": "Put the pictured activities in order.",
+        "arts": [
+          "duration-3d/lunch.png",
+          "routine-3d/routine-bed.png",
+          "timeofday-3d/breakfast.png"
+        ]
+      },
+      "options": [
+        "Go to bed",
+        "Eat lunch",
+        "Have breakfast"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-mid-18",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "Have breakfast||Eat lunch||Go to bed",
+      "readAloudText": "Order the activities from morning to night.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-18",
+      "skillLabel": "Sequence familiar daily events",
+      "structureKey": "y1-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Have breakfast||Eat lunch||Go to bed"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month has more days?",
+      "answer": "October",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "October",
+          "November"
+        ],
+        "description": "Compare the number of days in these months.",
+        "values": [
+          31,
+          30
+        ],
+        "unit": "days"
+      },
+      "options": [
+        "October",
+        "November",
+        "Same number"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-19",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "October",
+      "readAloudText": "Which month has more days?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-19",
+      "skillLabel": "Compare days in months",
+      "structureKey": "y1-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "October"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why is comparing these cube counts unfair?",
+      "answer": "The cubes have different masses",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Heavy cubes",
+          "Light cubes"
+        ],
+        "description": "A bag balances with heavy cubes. A toy balances with light cubes.",
+        "values": [
+          8,
+          11
+        ],
+        "unit": "mixed cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "Both objects must use ten cubes",
+        "The colours must match",
+        "The cubes have different masses"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-mid-20",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "correctAnswer": "The cubes have different masses",
+      "readAloudText": "Why is comparing these cube counts unfair?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-20",
+      "skillLabel": "Recognise unfair mass units",
+      "structureKey": "y1-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "The cubes have different masses"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "Which attribute describes how heavy an object is?",
+      "answer": "Mass",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Bag"
+        ],
+        "description": "Look at the object.",
+        "arts": [
+          "week2-3d/backpack.png"
+        ]
+      },
+      "options": [
+        "Mass",
+        "Capacity",
+        "Length"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-01",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Mass",
+      "readAloudText": "Which attribute describes how heavy an object is?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-1",
+      "skillLabel": "Identify mass",
+      "structureKey": "y1-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Mass"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal blocks long is the pencil?",
+      "answer": "9",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Pencil"
+        ],
+        "description": "Equal blocks touch end to end below the pencil.",
+        "values": [
+          9
+        ],
+        "unit": "blocks"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-end-02",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "9",
+      "readAloudText": "How many equal blocks long is the pencil?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-2",
+      "skillLabel": "Measure in equal blocks",
+      "structureKey": "y1-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day comes next?",
+      "answer": "Sunday",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "Saturday",
+          "?"
+        ],
+        "description": "The calendar shows Saturday, then a missing day."
+      },
+      "options": [
+        "Sunday",
+        "Friday",
+        "Monday"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-03",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Sunday",
+      "readAloudText": "Which day comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-3",
+      "skillLabel": "Sequence weekdays",
+      "structureKey": "y1-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Sunday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which ribbon is longer?",
+      "answer": "Ribbon A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons are measured with the same-sized blocks.",
+        "values": [
+          9,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "Ribbon B",
+        "Same length",
+        "Ribbon A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-04",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Ribbon A",
+      "readAloudText": "Which ribbon is longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-4",
+      "skillLabel": "Compare lengths with the same unit",
+      "structureKey": "y1-measurement-slot-4",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ribbon A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "answer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Compare the unit rows. Units should measure from one end to the other.",
+        "variants": [
+          "overlap",
+          "fair",
+          "gap"
+        ],
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-05",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "B",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-5",
+      "skillLabel": "Recognise end-to-end measurement",
+      "structureKey": "y1-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes how long this takes?",
+      "answer": "Hours",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A long bus trip"
+        ],
+        "description": "A long bus trip",
+        "arts": [
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Hours",
+        "Weeks",
+        "Years"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-06",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Hours",
+      "readAloudText": "Which unit best describes how long this takes?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-6",
+      "skillLabel": "Choose hours for a familiar duration",
+      "structureKey": "y1-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Hours"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object is heavier?",
+      "answer": "Book",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "balance",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The book pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "Ball",
+        "Same mass",
+        "Book"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-07",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Book",
+      "readAloudText": "Which object is heavier?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-7",
+      "skillLabel": "Read direct mass evidence",
+      "structureKey": "y1-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Book"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many equal squares long is the strip?",
+      "answer": "10",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Strip"
+        ],
+        "description": "Equal squares cover the length with no gaps or overlaps.",
+        "values": [
+          10
+        ],
+        "unit": "squares"
+      },
+      "type": "numeric",
+      "id": "y1-measurement-review-end-08",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "10",
+      "readAloudText": "How many equal squares long is the strip?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-8",
+      "skillLabel": "Measure using equal squares",
+      "structureKey": "y1-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month comes next?",
+      "answer": "August",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "July",
+          "?"
+        ],
+        "description": "July, then a missing month."
+      },
+      "options": [
+        "June",
+        "August",
+        "September"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-09",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "August",
+      "readAloudText": "Which month comes next?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-9",
+      "skillLabel": "Sequence months across the year",
+      "structureKey": "y1-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "August"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which container holds more?",
+      "answer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B"
+        ],
+        "description": "Both containers were filled using the same cup.",
+        "values": [
+          4,
+          7
+        ],
+        "arts": [
+          "containers/jug.png",
+          "containers/bottle.png"
+        ],
+        "unit": "cups"
+      },
+      "options": [
+        "B",
+        "Same capacity",
+        "A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-10",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "B",
+      "readAloudText": "Which container holds more?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-10",
+      "skillLabel": "Compare capacity using equal cups",
+      "structureKey": "y1-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which object matches the string length?",
+      "answer": "Box A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "string",
+        "labels": [
+          "String",
+          "Box A",
+          "Box B"
+        ],
+        "description": "The string was used to compare the two boxes. The same string length is shown for each comparison.",
+        "values": [
+          7,
+          7,
+          9
+        ],
+        "target": 7,
+        "unit": "length"
+      },
+      "options": [
+        "Neither box",
+        "Box A",
+        "Box B"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-11",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Box A",
+      "readAloudText": "Which object matches the string length?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-11",
+      "skillLabel": "Use string for an indirect length comparison",
+      "structureKey": "y1-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order these durations from shortest to longest.",
+      "answer": "1 hour||1 day||1 week",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "1 day",
+          "1 hour",
+          "1 week"
+        ],
+        "description": "One hour. One day. One week."
+      },
+      "options": [
+        "1 day",
+        "1 hour",
+        "1 week"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-end-12",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "1 hour||1 day||1 week",
+      "readAloudText": "Order these durations from shortest to longest.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-12",
+      "skillLabel": "Order hours, days and weeks",
+      "structureKey": "y1-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1 hour||1 day||1 week"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which activity lasted longer?",
+      "answer": "Trip A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "timeline",
+        "labels": [
+          "Trip A",
+          "Trip B"
+        ],
+        "description": "Compare the recorded trip times.",
+        "values": [
+          5,
+          2
+        ],
+        "unit": "hours",
+        "arts": [
+          "duration-3d/travel.png",
+          "duration-3d/travel.png"
+        ]
+      },
+      "options": [
+        "Trip B",
+        "Same time",
+        "Trip A"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-13",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Trip A",
+      "readAloudText": "Which activity lasted longer?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-13",
+      "skillLabel": "Compare event durations",
+      "structureKey": "y1-measurement-slot-13",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Trip A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the containers from least to greatest capacity.",
+      "answer": "C||B||A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container was filled using the same cup.",
+        "values": [
+          9,
+          7,
+          5
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-end-14",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "C||B||A",
+      "readAloudText": "Order the containers from least to greatest capacity.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-14",
+      "skillLabel": "Order three capacities",
+      "structureKey": "y1-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C||B||A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which unit best describes this change?",
+      "answer": "Years",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Young tree",
+          "Tall tree"
+        ],
+        "description": "A young tree grows into a tall tree.",
+        "arts": [
+          "week1-3d/sapling.png",
+          "week1-3d/tree.png"
+        ]
+      },
+      "options": [
+        "Hours",
+        "Days",
+        "Years"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-15",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Years",
+      "readAloudText": "Which unit best describes this change?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-15",
+      "skillLabel": "Choose years for a long duration",
+      "structureKey": "y1-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Years"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the objects from lightest to heaviest.",
+      "answer": "C||B||A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each object balances with the shown number of identical cubes.",
+        "values": [
+          11,
+          8,
+          6
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png",
+          "week2-3d/soccer-ball.png"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-end-16",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "C||B||A",
+      "readAloudText": "Order the objects from lightest to heaviest.",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-16",
+      "skillLabel": "Order three masses",
+      "structureKey": "y1-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C||B||A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why does the second row use fewer blocks?",
+      "answer": "Its blocks are longer",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Small blocks",
+          "Large blocks"
+        ],
+        "description": "Both rows measure the same length, without gaps or overlaps.",
+        "values": [
+          10,
+          5
+        ],
+        "unit": "different units"
+      },
+      "options": [
+        "The blocks overlap",
+        "Its blocks are longer",
+        "The object became shorter"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-17",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Its blocks are longer",
+      "readAloudText": "Why does the second row use fewer blocks?",
+      "primaryDescriptorCode": "AC9M1M02",
+      "curriculumCodes": [
+        "AC9M1M02"
+      ],
+      "skillId": "y1-measurement-slot-17",
+      "skillLabel": "Explain different-sized length units",
+      "structureKey": "y1-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its blocks are longer"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Order the activities from morning to night.",
+      "answer": "Wake up||Go to school||Go to bed",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Go to school",
+          "Go to bed",
+          "Wake up"
+        ],
+        "description": "Put the pictured activities in order.",
+        "arts": [
+          "routine-3d/routine-school.png",
+          "routine-3d/routine-bed.png",
+          "routine-3d/routine-wakeup.png"
+        ]
+      },
+      "options": [
+        "Go to school",
+        "Go to bed",
+        "Wake up"
+      ],
+      "type": "number_order",
+      "id": "y1-measurement-review-end-18",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "Wake up||Go to school||Go to bed",
+      "readAloudText": "Order the activities from morning to night.",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-18",
+      "skillLabel": "Sequence familiar daily events",
+      "structureKey": "y1-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wake up||Go to school||Go to bed"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which month has more days?",
+      "answer": "March",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "calendar",
+        "labels": [
+          "March",
+          "April"
+        ],
+        "description": "Compare the number of days in these months.",
+        "values": [
+          31,
+          30
+        ],
+        "unit": "days"
+      },
+      "options": [
+        "April",
+        "Same number",
+        "March"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-19",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "March",
+      "readAloudText": "Which month has more days?",
+      "primaryDescriptorCode": "AC9M1M03",
+      "curriculumCodes": [
+        "AC9M1M03"
+      ],
+      "skillId": "y1-measurement-slot-19",
+      "skillLabel": "Compare days in months",
+      "structureKey": "y1-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "March"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Why is comparing these cube counts unfair?",
+      "answer": "The cubes have different masses",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Heavy cubes",
+          "Light cubes"
+        ],
+        "description": "A bag balances with heavy cubes. A toy balances with light cubes.",
+        "values": [
+          9,
+          12
+        ],
+        "unit": "mixed cubes",
+        "arts": [
+          "week2-3d/backpack.png",
+          "week2-3d/teddy-bear.png"
+        ]
+      },
+      "options": [
+        "The colours must match",
+        "The cubes have different masses",
+        "Both objects must use ten cubes"
+      ],
+      "type": "mcq",
+      "id": "y1-measurement-review-end-20",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "correctAnswer": "The cubes have different masses",
+      "readAloudText": "Why is comparing these cube counts unfair?",
+      "primaryDescriptorCode": "AC9M1M01",
+      "curriculumCodes": [
+        "AC9M1M01"
+      ],
+      "skillId": "y1-measurement-slot-20",
+      "skillLabel": "Recognise unfair mass units",
+      "structureKey": "y1-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "The cubes have different masses"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ]
+}

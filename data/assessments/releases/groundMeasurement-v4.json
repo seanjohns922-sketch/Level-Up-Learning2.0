@@ -1,0 +1,5762 @@
+{
+  "pretest": [
+    {
+      "id": "y0-measurement-pre-01-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which ribbon is longer?",
+      "readAloudText": "Which ribbon is longer? Both ribbons start at the same line. Red and Green ribbons.",
+      "options": [
+        "Red",
+        "Green",
+        "Same length"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Both ribbons start at the same line. Red and Green ribbons.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-1",
+      "skillLabel": "Compare lengths from aligned ends",
+      "structureKey": "ground-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-02-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which pencil is shorter?",
+      "readAloudText": "Which pencil is shorter? Two pencils with their left ends lined up.",
+      "options": [
+        "Green",
+        "Same length",
+        "Red"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Two pencils with their left ends lined up.",
+        "values": [
+          135,
+          225
+        ],
+        "objects": [
+          "pencil",
+          "pencil"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-2",
+      "skillLabel": "Identify the shorter object",
+      "structureKey": "ground-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-03-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which tower is taller?",
+      "readAloudText": "Which tower is taller? Two towers stand on the same floor.",
+      "options": [
+        "Same height",
+        "Red",
+        "Green"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "height",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Two towers stand on the same floor.",
+        "values": [
+          162.5,
+          104
+        ],
+        "objects": [
+          "tower",
+          "tower"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-3",
+      "skillLabel": "Compare heights from a common baseline",
+      "structureKey": "ground-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-04-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can we compare these lengths fairly?",
+      "readAloudText": "How can we compare these lengths fairly? Two ribbons start at different places. Choose how to compare their lengths.",
+      "options": [
+        "Line up one end",
+        "Leave a gap",
+        "Count the colours"
+      ],
+      "correctAnswer": "Line up one end",
+      "answer": "Line up one end",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "align",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Two ribbons start at different places. Choose how to compare their lengths.",
+        "values": [
+          220,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-4",
+      "skillLabel": "Choose a fair direct length comparison",
+      "structureKey": "ground-measurement-slot-4",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Line up one end"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-05-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is heavier?",
+      "readAloudText": "Which object is heavier? A balance holds a stone and a sponge. The stone pan is lower.",
+      "options": [
+        "Sponge",
+        "Same mass",
+        "Stone"
+      ],
+      "correctAnswer": "Stone",
+      "answer": "Stone",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Stone",
+          "Sponge"
+        ],
+        "description": "A balance holds a stone and a sponge. The stone pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Stone",
+          "Sponge"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-5",
+      "skillLabel": "Identify the heavier object on a balance",
+      "structureKey": "ground-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Stone"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-06-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is lighter?",
+      "readAloudText": "Which object is lighter? A balance holds a stone and a sponge. The sponge pan is higher.",
+      "options": [
+        "Same mass",
+        "Stone",
+        "Sponge"
+      ],
+      "correctAnswer": "Sponge",
+      "answer": "Sponge",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Stone",
+          "Sponge"
+        ],
+        "description": "A balance holds a stone and a sponge. The sponge pan is higher.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Stone",
+          "Sponge"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-6",
+      "skillLabel": "Identify the lighter object on a balance",
+      "structureKey": "ground-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Sponge"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-07-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this level balance show?",
+      "readAloudText": "What does this level balance show? The balance is level. Both pans are at the same height.",
+      "options": [
+        "Stone is heavier",
+        "Sponge is heavier",
+        "Same mass"
+      ],
+      "correctAnswer": "Same mass",
+      "answer": "Same mass",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Stone",
+          "Sponge"
+        ],
+        "description": "The balance is level. Both pans are at the same height.",
+        "values": [
+          100,
+          100
+        ],
+        "objects": [
+          "Stone",
+          "Sponge"
+        ],
+        "equal": true
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-7",
+      "skillLabel": "Recognise equal masses on a level balance",
+      "structureKey": "ground-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same mass"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-08-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small stone and a larger sponge are on a balance. The small object's pan is lower.",
+      "options": [
+        "Its pan is lower",
+        "Its colour is darker",
+        "It looks bigger"
+      ],
+      "correctAnswer": "Its pan is lower",
+      "answer": "Its pan is lower",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Stone",
+          "Sponge"
+        ],
+        "description": "A small stone and a larger sponge are on a balance. The small object's pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Stone",
+          "Sponge"
+        ],
+        "scene": "size-trap"
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-8",
+      "skillLabel": "Use balance evidence rather than object size",
+      "structureKey": "ground-measurement-slot-8",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its pan is lower"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-09-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds more?",
+      "readAloudText": "Which container holds more? At first, Red is full and Green is empty. Pour from Red until Green is full. Some water remains in the first container.",
+      "options": [
+        "Same capacity",
+        "Red",
+        "Green"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "At first, Red is full and Green is empty. Pour from Red until Green is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-9",
+      "skillLabel": "Compare capacity using a direct pouring test",
+      "structureKey": "ground-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-10-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds less?",
+      "readAloudText": "Which container holds less? At first, Red is full and Green is empty. Pour from Red until Green is full. Some water remains in the first container.",
+      "options": [
+        "Red",
+        "Green",
+        "Same capacity"
+      ],
+      "correctAnswer": "Green",
+      "answer": "Green",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "At first, Red is full and Green is empty. Pour from Red until Green is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-10",
+      "skillLabel": "Identify the smaller capacity from pouring evidence",
+      "structureKey": "ground-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Green"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-11-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this pouring test show?",
+      "readAloudText": "What does this pouring test show? At first, Red is full and Green is empty. Pour from Red until Green is full. The first container is now empty.",
+      "options": [
+        "Green",
+        "Same capacity",
+        "Red"
+      ],
+      "correctAnswer": "Same capacity",
+      "answer": "Same capacity",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "At first, Red is full and Green is empty. Pour from Red until Green is full. The first container is now empty.",
+        "source": 0,
+        "remainder": false,
+        "equal": true,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-11",
+      "skillLabel": "Recognise equal capacity from an exact fill",
+      "structureKey": "ground-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same capacity"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-12-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity lasts longer?",
+      "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Same time",
+        "Drawing",
+        "Building a sandcastle"
+      ],
+      "correctAnswer": "Drawing",
+      "answer": "Drawing",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Drawing",
+          "Building a sandcastle"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Drawing",
+          "Building a sandcastle"
+        ],
+        "activityArts": [
+          "duration-3d/drawing.png",
+          "duration-3d/sandcastle.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-12",
+      "skillLabel": "Compare durations with a common start",
+      "structureKey": "ground-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Drawing"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-13-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity finishes sooner?",
+      "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Drawing",
+        "Building a sandcastle",
+        "Same time"
+      ],
+      "correctAnswer": "Building a sandcastle",
+      "answer": "Building a sandcastle",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Drawing",
+          "Building a sandcastle"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Drawing",
+          "Building a sandcastle"
+        ],
+        "activityArts": [
+          "duration-3d/drawing.png",
+          "duration-3d/sandcastle.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-13",
+      "skillLabel": "Identify the event that finishes sooner",
+      "structureKey": "ground-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Building a sandcastle"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-14-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Mia wakes up beside a window with sunlight.",
+      "options": [
+        "Afternoon",
+        "Night",
+        "Morning"
+      ],
+      "correctAnswer": "Morning",
+      "answer": "Morning",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Mia wakes up beside a window with sunlight.",
+        "target": "morning",
+        "context": "Mia",
+        "scene": "Mia wakes up.",
+        "art": "timeofday-3d/wakeup.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-14",
+      "skillLabel": "Connect a morning scene with a familiar event",
+      "structureKey": "ground-measurement-slot-14",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-15-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Mia sleeps in bed beside a window with the moon and stars.",
+      "options": [
+        "Night",
+        "Morning",
+        "Lunchtime"
+      ],
+      "correctAnswer": "Night",
+      "answer": "Night",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Mia sleeps in bed beside a window with the moon and stars.",
+        "target": "night",
+        "context": "Mia",
+        "scene": "Mia sleeps in bed.",
+        "art": "routine-3d/routine-bed.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-15",
+      "skillLabel": "Connect a night scene with a familiar event",
+      "structureKey": "ground-measurement-slot-15",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Night"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-16-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes next?",
+      "readAloudText": "Which day comes next? Today is Monday. Which day is tomorrow?",
+      "options": [
+        "Tuesday",
+        "Sunday",
+        "Wednesday"
+      ],
+      "correctAnswer": "Tuesday",
+      "answer": "Tuesday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Today is Monday. Which day is tomorrow?",
+        "days": [
+          "Monday",
+          "?"
+        ],
+        "context": "Mia's class day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-16",
+      "skillLabel": "Identify the next weekday",
+      "structureKey": "ground-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Tuesday"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-17-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day was yesterday?",
+      "readAloudText": "Which day was yesterday? Today is Tuesday. Which day was yesterday?",
+      "options": [
+        "Tuesday",
+        "Wednesday",
+        "Monday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Today is Tuesday. Which day was yesterday?",
+        "days": [
+          "?",
+          "Tuesday"
+        ],
+        "context": "Mia's activity day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-17",
+      "skillLabel": "Identify the previous weekday",
+      "structureKey": "ground-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-18-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes after Sunday?",
+      "readAloudText": "Which day comes after Sunday? Mia waters the garden on Sunday. Which day comes next?",
+      "options": [
+        "Tuesday",
+        "Monday",
+        "Saturday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Red",
+          "Green"
+        ],
+        "description": "Mia waters the garden on Sunday. Which day comes next?",
+        "days": [
+          "Sunday",
+          "?"
+        ],
+        "context": "Mia's garden roster"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-18",
+      "skillLabel": "Continue the weekly cycle after Sunday",
+      "structureKey": "ground-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-19-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these times of day in order.",
+      "readAloudText": "Put these times of day in order. Plan Mia's day, starting with morning.",
+      "options": [
+        "Afternoon",
+        "Lunchtime",
+        "Morning"
+      ],
+      "correctAnswer": "Morning||Lunchtime||Afternoon",
+      "answer": "Morning||Lunchtime||Afternoon",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning",
+          "Lunchtime",
+          "Afternoon"
+        ],
+        "description": "Plan Mia's day, starting with morning.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "sun"
+        ],
+        "scene": "dayparts",
+        "context": "Mia's day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-19",
+      "skillLabel": "Sequence morning, lunchtime and afternoon",
+      "structureKey": "ground-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning||Lunchtime||Afternoon"
+      }
+    },
+    {
+      "id": "y0-measurement-pre-20-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "bankId": "measurelands-ground-pretest-v4",
+      "sourcePool": "pretest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these events in order, from morning to night.",
+      "readAloudText": "Put these events in order, from morning to night. The pictures show Breakfast in the morning, Lunch at lunchtime and Bedtime at night.",
+      "options": [
+        "Lunch",
+        "Bedtime",
+        "Breakfast"
+      ],
+      "correctAnswer": "Breakfast||Lunch||Bedtime",
+      "answer": "Breakfast||Lunch||Bedtime",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Breakfast",
+          "Lunch",
+          "Bedtime"
+        ],
+        "description": "The pictures show Breakfast in the morning, Lunch at lunchtime and Bedtime at night.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "moon"
+        ],
+        "scene": "events",
+        "context": "Mia's daily events"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-20",
+      "skillLabel": "Sequence three pictured daily events",
+      "structureKey": "ground-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Breakfast||Lunch||Bedtime"
+      }
+    }
+  ],
+  "posttest": [
+    {
+      "id": "y0-measurement-post-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which ribbon is longer?",
+      "readAloudText": "Which ribbon is longer? Both ribbons start at the same line. Blue and Purple ribbons.",
+      "options": [
+        "Purple",
+        "Same length",
+        "Blue"
+      ],
+      "correctAnswer": "Purple",
+      "answer": "Purple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Both ribbons start at the same line. Blue and Purple ribbons.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-1",
+      "skillLabel": "Compare lengths from aligned ends",
+      "structureKey": "ground-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Purple"
+      }
+    },
+    {
+      "id": "y0-measurement-post-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which pencil is shorter?",
+      "readAloudText": "Which pencil is shorter? Two pencils with their left ends lined up.",
+      "options": [
+        "Same length",
+        "Blue",
+        "Purple"
+      ],
+      "correctAnswer": "Purple",
+      "answer": "Purple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Two pencils with their left ends lined up.",
+        "values": [
+          225,
+          135
+        ],
+        "objects": [
+          "pencil",
+          "pencil"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-2",
+      "skillLabel": "Identify the shorter object",
+      "structureKey": "ground-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Purple"
+      }
+    },
+    {
+      "id": "y0-measurement-post-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which tower is taller?",
+      "readAloudText": "Which tower is taller? Two towers stand on the same floor.",
+      "options": [
+        "Blue",
+        "Purple",
+        "Same height"
+      ],
+      "correctAnswer": "Purple",
+      "answer": "Purple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "height",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Two towers stand on the same floor.",
+        "values": [
+          104,
+          162.5
+        ],
+        "objects": [
+          "tower",
+          "tower"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-3",
+      "skillLabel": "Compare heights from a common baseline",
+      "structureKey": "ground-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Purple"
+      }
+    },
+    {
+      "id": "y0-measurement-post-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can we compare these lengths fairly?",
+      "readAloudText": "How can we compare these lengths fairly? Two ribbons start at different places. Choose how to compare their lengths.",
+      "options": [
+        "Leave a gap",
+        "Count the colours",
+        "Line up one end"
+      ],
+      "correctAnswer": "Line up one end",
+      "answer": "Line up one end",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "align",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Two ribbons start at different places. Choose how to compare their lengths.",
+        "values": [
+          220,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-4",
+      "skillLabel": "Choose a fair direct length comparison",
+      "structureKey": "ground-measurement-slot-4",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Line up one end"
+      }
+    },
+    {
+      "id": "y0-measurement-post-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is heavier?",
+      "readAloudText": "Which object is heavier? A balance holds a tin and a box. The box pan is lower.",
+      "options": [
+        "Same mass",
+        "Tin",
+        "Box"
+      ],
+      "correctAnswer": "Box",
+      "answer": "Box",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Tin",
+          "Box"
+        ],
+        "description": "A balance holds a tin and a box. The box pan is lower.",
+        "values": [
+          75,
+          125
+        ],
+        "objects": [
+          "Tin",
+          "Box"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-5",
+      "skillLabel": "Identify the heavier object on a balance",
+      "structureKey": "ground-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Box"
+      }
+    },
+    {
+      "id": "y0-measurement-post-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is lighter?",
+      "readAloudText": "Which object is lighter? A balance holds a tin and a box. The tin pan is higher.",
+      "options": [
+        "Tin",
+        "Box",
+        "Same mass"
+      ],
+      "correctAnswer": "Tin",
+      "answer": "Tin",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Tin",
+          "Box"
+        ],
+        "description": "A balance holds a tin and a box. The tin pan is higher.",
+        "values": [
+          75,
+          125
+        ],
+        "objects": [
+          "Tin",
+          "Box"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-6",
+      "skillLabel": "Identify the lighter object on a balance",
+      "structureKey": "ground-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Tin"
+      }
+    },
+    {
+      "id": "y0-measurement-post-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this level balance show?",
+      "readAloudText": "What does this level balance show? The balance is level. Both pans are at the same height.",
+      "options": [
+        "Box is heavier",
+        "Same mass",
+        "Tin is heavier"
+      ],
+      "correctAnswer": "Same mass",
+      "answer": "Same mass",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Tin",
+          "Box"
+        ],
+        "description": "The balance is level. Both pans are at the same height.",
+        "values": [
+          100,
+          100
+        ],
+        "objects": [
+          "Tin",
+          "Box"
+        ],
+        "equal": true
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-7",
+      "skillLabel": "Recognise equal masses on a level balance",
+      "structureKey": "ground-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same mass"
+      }
+    },
+    {
+      "id": "y0-measurement-post-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small tin and a larger box are on a balance. The small object's pan is lower.",
+      "options": [
+        "Its colour is darker",
+        "It looks bigger",
+        "Its pan is lower"
+      ],
+      "correctAnswer": "Its pan is lower",
+      "answer": "Its pan is lower",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Tin",
+          "Box"
+        ],
+        "description": "A small tin and a larger box are on a balance. The small object's pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Tin",
+          "Box"
+        ],
+        "scene": "size-trap"
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-8",
+      "skillLabel": "Use balance evidence rather than object size",
+      "structureKey": "ground-measurement-slot-8",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its pan is lower"
+      }
+    },
+    {
+      "id": "y0-measurement-post-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds more?",
+      "readAloudText": "Which container holds more? At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. Some water remains in the first container.",
+      "options": [
+        "Blue",
+        "Purple",
+        "Same capacity"
+      ],
+      "correctAnswer": "Purple",
+      "answer": "Purple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. Some water remains in the first container.",
+        "source": 1,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-9",
+      "skillLabel": "Compare capacity using a direct pouring test",
+      "structureKey": "ground-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Purple"
+      }
+    },
+    {
+      "id": "y0-measurement-post-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds less?",
+      "readAloudText": "Which container holds less? At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. Some water remains in the first container.",
+      "options": [
+        "Purple",
+        "Same capacity",
+        "Blue"
+      ],
+      "correctAnswer": "Blue",
+      "answer": "Blue",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. Some water remains in the first container.",
+        "source": 1,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-10",
+      "skillLabel": "Identify the smaller capacity from pouring evidence",
+      "structureKey": "ground-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Blue"
+      }
+    },
+    {
+      "id": "y0-measurement-post-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this pouring test show?",
+      "readAloudText": "What does this pouring test show? At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. The first container is now empty.",
+      "options": [
+        "Same capacity",
+        "Blue",
+        "Purple"
+      ],
+      "correctAnswer": "Same capacity",
+      "answer": "Same capacity",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "At first, Purple is full and Blue is empty. Pour from Purple until Blue is full. The first container is now empty.",
+        "source": 1,
+        "remainder": false,
+        "equal": true,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-11",
+      "skillLabel": "Recognise equal capacity from an exact fill",
+      "structureKey": "ground-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same capacity"
+      }
+    },
+    {
+      "id": "y0-measurement-post-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity lasts longer?",
+      "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Painting",
+        "Reading",
+        "Same time"
+      ],
+      "correctAnswer": "Reading",
+      "answer": "Reading",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Painting",
+          "Reading"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "Painting",
+          "Reading"
+        ],
+        "activityArts": [
+          "routine-3d/routine-art.png",
+          "duration-3d/reading.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-12",
+      "skillLabel": "Compare durations with a common start",
+      "structureKey": "ground-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reading"
+      }
+    },
+    {
+      "id": "y0-measurement-post-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity finishes sooner?",
+      "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Reading",
+        "Same time",
+        "Painting"
+      ],
+      "correctAnswer": "Painting",
+      "answer": "Painting",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Painting",
+          "Reading"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "Painting",
+          "Reading"
+        ],
+        "activityArts": [
+          "routine-3d/routine-art.png",
+          "duration-3d/reading.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-13",
+      "skillLabel": "Identify the event that finishes sooner",
+      "structureKey": "ground-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Painting"
+      }
+    },
+    {
+      "id": "y0-measurement-post-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Noah eats breakfast beside a window with sunlight.",
+      "options": [
+        "Night",
+        "Morning",
+        "Afternoon"
+      ],
+      "correctAnswer": "Morning",
+      "answer": "Morning",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Noah eats breakfast beside a window with sunlight.",
+        "target": "morning",
+        "context": "Noah",
+        "scene": "Noah eats breakfast.",
+        "art": "timeofday-3d/breakfast.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-14",
+      "skillLabel": "Connect a morning scene with a familiar event",
+      "structureKey": "ground-measurement-slot-14",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning"
+      }
+    },
+    {
+      "id": "y0-measurement-post-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Noah reads in bed beside a window with the moon and stars.",
+      "options": [
+        "Morning",
+        "Lunchtime",
+        "Night"
+      ],
+      "correctAnswer": "Night",
+      "answer": "Night",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Noah reads in bed beside a window with the moon and stars.",
+        "target": "night",
+        "context": "Noah",
+        "scene": "Noah reads in bed.",
+        "art": "timeofday-3d/reading-bed.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-15",
+      "skillLabel": "Connect a night scene with a familiar event",
+      "structureKey": "ground-measurement-slot-15",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Night"
+      }
+    },
+    {
+      "id": "y0-measurement-post-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes next?",
+      "readAloudText": "Which day comes next? Today is Tuesday. Which day is tomorrow?",
+      "options": [
+        "Monday",
+        "Thursday",
+        "Wednesday"
+      ],
+      "correctAnswer": "Wednesday",
+      "answer": "Wednesday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Today is Tuesday. Which day is tomorrow?",
+        "days": [
+          "Tuesday",
+          "?"
+        ],
+        "context": "Noah's class day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-16",
+      "skillLabel": "Identify the next weekday",
+      "structureKey": "ground-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wednesday"
+      }
+    },
+    {
+      "id": "y0-measurement-post-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day was yesterday?",
+      "readAloudText": "Which day was yesterday? Today is Wednesday. Which day was yesterday?",
+      "options": [
+        "Thursday",
+        "Tuesday",
+        "Wednesday"
+      ],
+      "correctAnswer": "Tuesday",
+      "answer": "Tuesday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Today is Wednesday. Which day was yesterday?",
+        "days": [
+          "?",
+          "Wednesday"
+        ],
+        "context": "Noah's activity day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-17",
+      "skillLabel": "Identify the previous weekday",
+      "structureKey": "ground-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Tuesday"
+      }
+    },
+    {
+      "id": "y0-measurement-post-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes after Sunday?",
+      "readAloudText": "Which day comes after Sunday? Noah waters the garden on Sunday. Which day comes next?",
+      "options": [
+        "Monday",
+        "Saturday",
+        "Tuesday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Blue",
+          "Purple"
+        ],
+        "description": "Noah waters the garden on Sunday. Which day comes next?",
+        "days": [
+          "Sunday",
+          "?"
+        ],
+        "context": "Noah's garden roster"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-18",
+      "skillLabel": "Continue the weekly cycle after Sunday",
+      "structureKey": "ground-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-post-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these times of day in order.",
+      "readAloudText": "Put these times of day in order. Plan Noah's day, starting with morning.",
+      "options": [
+        "Lunchtime",
+        "Afternoon",
+        "Morning"
+      ],
+      "correctAnswer": "Morning||Lunchtime||Afternoon",
+      "answer": "Morning||Lunchtime||Afternoon",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning",
+          "Lunchtime",
+          "Afternoon"
+        ],
+        "description": "Plan Noah's day, starting with morning.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "sun"
+        ],
+        "scene": "dayparts",
+        "context": "Noah's day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-19",
+      "skillLabel": "Sequence morning, lunchtime and afternoon",
+      "structureKey": "ground-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning||Lunchtime||Afternoon"
+      }
+    },
+    {
+      "id": "y0-measurement-post-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-posttest-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these events in order, from morning to night.",
+      "readAloudText": "Put these events in order, from morning to night. The pictures show Get dressed in the morning, Eat lunch at lunchtime and Go to bed at night.",
+      "options": [
+        "Go to bed",
+        "Get dressed",
+        "Eat lunch"
+      ],
+      "correctAnswer": "Get dressed||Eat lunch||Go to bed",
+      "answer": "Get dressed||Eat lunch||Go to bed",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Get dressed",
+          "Eat lunch",
+          "Go to bed"
+        ],
+        "description": "The pictures show Get dressed in the morning, Eat lunch at lunchtime and Go to bed at night.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "moon"
+        ],
+        "scene": "events",
+        "context": "Noah's daily events"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-20",
+      "skillLabel": "Sequence three pictured daily events",
+      "structureKey": "ground-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Get dressed||Eat lunch||Go to bed"
+      }
+    }
+  ],
+  "start": [
+    {
+      "id": "y0-measurement-start-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which ribbon is longer?",
+      "readAloudText": "Which ribbon is longer? Both ribbons start at the same line. Green and Orange ribbons.",
+      "options": [
+        "Same length",
+        "Green",
+        "Orange"
+      ],
+      "correctAnswer": "Green",
+      "answer": "Green",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Both ribbons start at the same line. Green and Orange ribbons.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-1",
+      "skillLabel": "Compare lengths from aligned ends",
+      "structureKey": "ground-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Green"
+      }
+    },
+    {
+      "id": "y0-measurement-start-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which pencil is shorter?",
+      "readAloudText": "Which pencil is shorter? Two pencils with their left ends lined up.",
+      "options": [
+        "Green",
+        "Orange",
+        "Same length"
+      ],
+      "correctAnswer": "Green",
+      "answer": "Green",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Two pencils with their left ends lined up.",
+        "values": [
+          135,
+          225
+        ],
+        "objects": [
+          "pencil",
+          "pencil"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-2",
+      "skillLabel": "Identify the shorter object",
+      "structureKey": "ground-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Green"
+      }
+    },
+    {
+      "id": "y0-measurement-start-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which tower is taller?",
+      "readAloudText": "Which tower is taller? Two towers stand on the same floor.",
+      "options": [
+        "Orange",
+        "Same height",
+        "Green"
+      ],
+      "correctAnswer": "Green",
+      "answer": "Green",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "height",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Two towers stand on the same floor.",
+        "values": [
+          162.5,
+          104
+        ],
+        "objects": [
+          "tower",
+          "tower"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-3",
+      "skillLabel": "Compare heights from a common baseline",
+      "structureKey": "ground-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Green"
+      }
+    },
+    {
+      "id": "y0-measurement-start-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can we compare these lengths fairly?",
+      "readAloudText": "How can we compare these lengths fairly? Two ribbons start at different places. Choose how to compare their lengths.",
+      "options": [
+        "Count the colours",
+        "Line up one end",
+        "Leave a gap"
+      ],
+      "correctAnswer": "Line up one end",
+      "answer": "Line up one end",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "align",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Two ribbons start at different places. Choose how to compare their lengths.",
+        "values": [
+          220,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-4",
+      "skillLabel": "Choose a fair direct length comparison",
+      "structureKey": "ground-measurement-slot-4",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Line up one end"
+      }
+    },
+    {
+      "id": "y0-measurement-start-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is heavier?",
+      "readAloudText": "Which object is heavier? A balance holds a book and a ball. The book pan is lower.",
+      "options": [
+        "Book",
+        "Ball",
+        "Same mass"
+      ],
+      "correctAnswer": "Book",
+      "answer": "Book",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "A balance holds a book and a ball. The book pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Book",
+          "Ball"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-5",
+      "skillLabel": "Identify the heavier object on a balance",
+      "structureKey": "ground-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Book"
+      }
+    },
+    {
+      "id": "y0-measurement-start-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is lighter?",
+      "readAloudText": "Which object is lighter? A balance holds a book and a ball. The ball pan is higher.",
+      "options": [
+        "Ball",
+        "Same mass",
+        "Book"
+      ],
+      "correctAnswer": "Ball",
+      "answer": "Ball",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "A balance holds a book and a ball. The ball pan is higher.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Book",
+          "Ball"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-6",
+      "skillLabel": "Identify the lighter object on a balance",
+      "structureKey": "ground-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Ball"
+      }
+    },
+    {
+      "id": "y0-measurement-start-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this level balance show?",
+      "readAloudText": "What does this level balance show? The balance is level. Both pans are at the same height.",
+      "options": [
+        "Same mass",
+        "Book is heavier",
+        "Ball is heavier"
+      ],
+      "correctAnswer": "Same mass",
+      "answer": "Same mass",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "The balance is level. Both pans are at the same height.",
+        "values": [
+          100,
+          100
+        ],
+        "objects": [
+          "Book",
+          "Ball"
+        ],
+        "equal": true
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-7",
+      "skillLabel": "Recognise equal masses on a level balance",
+      "structureKey": "ground-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same mass"
+      }
+    },
+    {
+      "id": "y0-measurement-start-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small book and a larger ball are on a balance. The small object's pan is lower.",
+      "options": [
+        "It looks bigger",
+        "Its pan is lower",
+        "Its colour is darker"
+      ],
+      "correctAnswer": "Its pan is lower",
+      "answer": "Its pan is lower",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Book",
+          "Ball"
+        ],
+        "description": "A small book and a larger ball are on a balance. The small object's pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Book",
+          "Ball"
+        ],
+        "scene": "size-trap"
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-8",
+      "skillLabel": "Use balance evidence rather than object size",
+      "structureKey": "ground-measurement-slot-8",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its pan is lower"
+      }
+    },
+    {
+      "id": "y0-measurement-start-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds more?",
+      "readAloudText": "Which container holds more? At first, Green is full and Orange is empty. Pour from Green until Orange is full. Some water remains in the first container.",
+      "options": [
+        "Orange",
+        "Same capacity",
+        "Green"
+      ],
+      "correctAnswer": "Green",
+      "answer": "Green",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "At first, Green is full and Orange is empty. Pour from Green until Orange is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-9",
+      "skillLabel": "Compare capacity using a direct pouring test",
+      "structureKey": "ground-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Green"
+      }
+    },
+    {
+      "id": "y0-measurement-start-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds less?",
+      "readAloudText": "Which container holds less? At first, Green is full and Orange is empty. Pour from Green until Orange is full. Some water remains in the first container.",
+      "options": [
+        "Same capacity",
+        "Green",
+        "Orange"
+      ],
+      "correctAnswer": "Orange",
+      "answer": "Orange",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "At first, Green is full and Orange is empty. Pour from Green until Orange is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-10",
+      "skillLabel": "Identify the smaller capacity from pouring evidence",
+      "structureKey": "ground-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Orange"
+      }
+    },
+    {
+      "id": "y0-measurement-start-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this pouring test show?",
+      "readAloudText": "What does this pouring test show? At first, Green is full and Orange is empty. Pour from Green until Orange is full. The first container is now empty.",
+      "options": [
+        "Green",
+        "Orange",
+        "Same capacity"
+      ],
+      "correctAnswer": "Same capacity",
+      "answer": "Same capacity",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "At first, Green is full and Orange is empty. Pour from Green until Orange is full. The first container is now empty.",
+        "source": 0,
+        "remainder": false,
+        "equal": true,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-11",
+      "skillLabel": "Recognise equal capacity from an exact fill",
+      "structureKey": "ground-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same capacity"
+      }
+    },
+    {
+      "id": "y0-measurement-start-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity lasts longer?",
+      "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Brushing teeth",
+        "Same time",
+        "Washing hands"
+      ],
+      "correctAnswer": "Washing hands",
+      "answer": "Washing hands",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "activityArts": [
+          "duration-3d/wash-hands.png",
+          "duration-3d/brush-teeth.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-12",
+      "skillLabel": "Compare durations with a common start",
+      "structureKey": "ground-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Washing hands"
+      }
+    },
+    {
+      "id": "y0-measurement-start-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity finishes sooner?",
+      "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Same time",
+        "Washing hands",
+        "Brushing teeth"
+      ],
+      "correctAnswer": "Brushing teeth",
+      "answer": "Brushing teeth",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "activityArts": [
+          "duration-3d/wash-hands.png",
+          "duration-3d/brush-teeth.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-13",
+      "skillLabel": "Identify the event that finishes sooner",
+      "structureKey": "ground-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Brushing teeth"
+      }
+    },
+    {
+      "id": "y0-measurement-start-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Ava wakes up beside a window with sunlight.",
+      "options": [
+        "Morning",
+        "Afternoon",
+        "Night"
+      ],
+      "correctAnswer": "Morning",
+      "answer": "Morning",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Ava wakes up beside a window with sunlight.",
+        "target": "morning",
+        "context": "Ava",
+        "scene": "Ava wakes up.",
+        "art": "routine-3d/routine-wakeup.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-14",
+      "skillLabel": "Connect a morning scene with a familiar event",
+      "structureKey": "ground-measurement-slot-14",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning"
+      }
+    },
+    {
+      "id": "y0-measurement-start-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Ava sleeps in bed beside a window with the moon and stars.",
+      "options": [
+        "Lunchtime",
+        "Night",
+        "Morning"
+      ],
+      "correctAnswer": "Night",
+      "answer": "Night",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Ava sleeps in bed beside a window with the moon and stars.",
+        "target": "night",
+        "context": "Ava",
+        "scene": "Ava sleeps in bed.",
+        "art": "timeofday-3d/sleeping.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-15",
+      "skillLabel": "Connect a night scene with a familiar event",
+      "structureKey": "ground-measurement-slot-15",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Night"
+      }
+    },
+    {
+      "id": "y0-measurement-start-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes next?",
+      "readAloudText": "Which day comes next? Today is Wednesday. Which day is tomorrow?",
+      "options": [
+        "Friday",
+        "Thursday",
+        "Tuesday"
+      ],
+      "correctAnswer": "Thursday",
+      "answer": "Thursday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Today is Wednesday. Which day is tomorrow?",
+        "days": [
+          "Wednesday",
+          "?"
+        ],
+        "context": "Ava's class day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-16",
+      "skillLabel": "Identify the next weekday",
+      "structureKey": "ground-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Thursday"
+      }
+    },
+    {
+      "id": "y0-measurement-start-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day was yesterday?",
+      "readAloudText": "Which day was yesterday? Today is Thursday. Which day was yesterday?",
+      "options": [
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "correctAnswer": "Wednesday",
+      "answer": "Wednesday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Today is Thursday. Which day was yesterday?",
+        "days": [
+          "?",
+          "Thursday"
+        ],
+        "context": "Ava's activity day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-17",
+      "skillLabel": "Identify the previous weekday",
+      "structureKey": "ground-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Wednesday"
+      }
+    },
+    {
+      "id": "y0-measurement-start-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes after Sunday?",
+      "readAloudText": "Which day comes after Sunday? Ava waters the garden on Sunday. Which day comes next?",
+      "options": [
+        "Saturday",
+        "Tuesday",
+        "Monday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Green",
+          "Orange"
+        ],
+        "description": "Ava waters the garden on Sunday. Which day comes next?",
+        "days": [
+          "Sunday",
+          "?"
+        ],
+        "context": "Ava's garden roster"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-18",
+      "skillLabel": "Continue the weekly cycle after Sunday",
+      "structureKey": "ground-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-start-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these times of day in order.",
+      "readAloudText": "Put these times of day in order. Plan Ava's day, starting with morning.",
+      "options": [
+        "Afternoon",
+        "Morning",
+        "Lunchtime"
+      ],
+      "correctAnswer": "Morning||Lunchtime||Afternoon",
+      "answer": "Morning||Lunchtime||Afternoon",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning",
+          "Lunchtime",
+          "Afternoon"
+        ],
+        "description": "Plan Ava's day, starting with morning.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "sun"
+        ],
+        "scene": "dayparts",
+        "context": "Ava's day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-19",
+      "skillLabel": "Sequence morning, lunchtime and afternoon",
+      "structureKey": "ground-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning||Lunchtime||Afternoon"
+      }
+    },
+    {
+      "id": "y0-measurement-start-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-start-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these events in order, from morning to night.",
+      "readAloudText": "Put these events in order, from morning to night. The pictures show Pack school bag in the morning, Have lunch at lunchtime and Put on pyjamas at night.",
+      "options": [
+        "Put on pyjamas",
+        "Have lunch",
+        "Pack school bag"
+      ],
+      "correctAnswer": "Pack school bag||Have lunch||Put on pyjamas",
+      "answer": "Pack school bag||Have lunch||Put on pyjamas",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Pack school bag",
+          "Have lunch",
+          "Put on pyjamas"
+        ],
+        "description": "The pictures show Pack school bag in the morning, Have lunch at lunchtime and Put on pyjamas at night.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "moon"
+        ],
+        "scene": "events",
+        "context": "Ava's daily events"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-20",
+      "skillLabel": "Sequence three pictured daily events",
+      "structureKey": "ground-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Pack school bag||Have lunch||Put on pyjamas"
+      }
+    }
+  ],
+  "mid": [
+    {
+      "id": "y0-measurement-mid-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which ribbon is longer?",
+      "readAloudText": "Which ribbon is longer? Both ribbons start at the same line. Purple and Red ribbons.",
+      "options": [
+        "Purple",
+        "Red",
+        "Same length"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Both ribbons start at the same line. Purple and Red ribbons.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-1",
+      "skillLabel": "Compare lengths from aligned ends",
+      "structureKey": "ground-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which pencil is shorter?",
+      "readAloudText": "Which pencil is shorter? Two pencils with their left ends lined up.",
+      "options": [
+        "Red",
+        "Same length",
+        "Purple"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Two pencils with their left ends lined up.",
+        "values": [
+          225,
+          135
+        ],
+        "objects": [
+          "pencil",
+          "pencil"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-2",
+      "skillLabel": "Identify the shorter object",
+      "structureKey": "ground-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which tower is taller?",
+      "readAloudText": "Which tower is taller? Two towers stand on the same floor.",
+      "options": [
+        "Same height",
+        "Purple",
+        "Red"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "height",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Two towers stand on the same floor.",
+        "values": [
+          104,
+          162.5
+        ],
+        "objects": [
+          "tower",
+          "tower"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-3",
+      "skillLabel": "Compare heights from a common baseline",
+      "structureKey": "ground-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can we compare these lengths fairly?",
+      "readAloudText": "How can we compare these lengths fairly? Two ribbons start at different places. Choose how to compare their lengths.",
+      "options": [
+        "Line up one end",
+        "Leave a gap",
+        "Count the colours"
+      ],
+      "correctAnswer": "Line up one end",
+      "answer": "Line up one end",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "align",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Two ribbons start at different places. Choose how to compare their lengths.",
+        "values": [
+          220,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-4",
+      "skillLabel": "Choose a fair direct length comparison",
+      "structureKey": "ground-measurement-slot-4",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Line up one end"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is heavier?",
+      "readAloudText": "Which object is heavier? A balance holds a block and a cup. The cup pan is lower.",
+      "options": [
+        "Cup",
+        "Same mass",
+        "Block"
+      ],
+      "correctAnswer": "Cup",
+      "answer": "Cup",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Block",
+          "Cup"
+        ],
+        "description": "A balance holds a block and a cup. The cup pan is lower.",
+        "values": [
+          75,
+          125
+        ],
+        "objects": [
+          "Block",
+          "Cup"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-5",
+      "skillLabel": "Identify the heavier object on a balance",
+      "structureKey": "ground-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Cup"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is lighter?",
+      "readAloudText": "Which object is lighter? A balance holds a block and a cup. The block pan is higher.",
+      "options": [
+        "Same mass",
+        "Block",
+        "Cup"
+      ],
+      "correctAnswer": "Block",
+      "answer": "Block",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Block",
+          "Cup"
+        ],
+        "description": "A balance holds a block and a cup. The block pan is higher.",
+        "values": [
+          75,
+          125
+        ],
+        "objects": [
+          "Block",
+          "Cup"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-6",
+      "skillLabel": "Identify the lighter object on a balance",
+      "structureKey": "ground-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Block"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this level balance show?",
+      "readAloudText": "What does this level balance show? The balance is level. Both pans are at the same height.",
+      "options": [
+        "Block is heavier",
+        "Cup is heavier",
+        "Same mass"
+      ],
+      "correctAnswer": "Same mass",
+      "answer": "Same mass",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Block",
+          "Cup"
+        ],
+        "description": "The balance is level. Both pans are at the same height.",
+        "values": [
+          100,
+          100
+        ],
+        "objects": [
+          "Block",
+          "Cup"
+        ],
+        "equal": true
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-7",
+      "skillLabel": "Recognise equal masses on a level balance",
+      "structureKey": "ground-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same mass"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small block and a larger cup are on a balance. The small object's pan is lower.",
+      "options": [
+        "Its pan is lower",
+        "Its colour is darker",
+        "It looks bigger"
+      ],
+      "correctAnswer": "Its pan is lower",
+      "answer": "Its pan is lower",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Block",
+          "Cup"
+        ],
+        "description": "A small block and a larger cup are on a balance. The small object's pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Block",
+          "Cup"
+        ],
+        "scene": "size-trap"
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-8",
+      "skillLabel": "Use balance evidence rather than object size",
+      "structureKey": "ground-measurement-slot-8",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its pan is lower"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds more?",
+      "readAloudText": "Which container holds more? At first, Red is full and Purple is empty. Pour from Red until Purple is full. Some water remains in the first container.",
+      "options": [
+        "Same capacity",
+        "Purple",
+        "Red"
+      ],
+      "correctAnswer": "Red",
+      "answer": "Red",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "At first, Red is full and Purple is empty. Pour from Red until Purple is full. Some water remains in the first container.",
+        "source": 1,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-9",
+      "skillLabel": "Compare capacity using a direct pouring test",
+      "structureKey": "ground-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Red"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds less?",
+      "readAloudText": "Which container holds less? At first, Red is full and Purple is empty. Pour from Red until Purple is full. Some water remains in the first container.",
+      "options": [
+        "Purple",
+        "Red",
+        "Same capacity"
+      ],
+      "correctAnswer": "Purple",
+      "answer": "Purple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "At first, Red is full and Purple is empty. Pour from Red until Purple is full. Some water remains in the first container.",
+        "source": 1,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-10",
+      "skillLabel": "Identify the smaller capacity from pouring evidence",
+      "structureKey": "ground-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Purple"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this pouring test show?",
+      "readAloudText": "What does this pouring test show? At first, Red is full and Purple is empty. Pour from Red until Purple is full. The first container is now empty.",
+      "options": [
+        "Red",
+        "Same capacity",
+        "Purple"
+      ],
+      "correctAnswer": "Same capacity",
+      "answer": "Same capacity",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "At first, Red is full and Purple is empty. Pour from Red until Purple is full. The first container is now empty.",
+        "source": 1,
+        "remainder": false,
+        "equal": true,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-11",
+      "skillLabel": "Recognise equal capacity from an exact fill",
+      "structureKey": "ground-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same capacity"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity lasts longer?",
+      "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Same time",
+        "Putting on shoes",
+        "Drawing"
+      ],
+      "correctAnswer": "Drawing",
+      "answer": "Drawing",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "activityArts": [
+          "duration-3d/shoes.png",
+          "duration-3d/drawing.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-12",
+      "skillLabel": "Compare durations with a common start",
+      "structureKey": "ground-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Drawing"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity finishes sooner?",
+      "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Putting on shoes",
+        "Drawing",
+        "Same time"
+      ],
+      "correctAnswer": "Putting on shoes",
+      "answer": "Putting on shoes",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          160,
+          250
+        ],
+        "objects": [
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "activityArts": [
+          "duration-3d/shoes.png",
+          "duration-3d/drawing.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-13",
+      "skillLabel": "Identify the event that finishes sooner",
+      "structureKey": "ground-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Putting on shoes"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Leo eats breakfast beside a window with sunlight.",
+      "options": [
+        "Afternoon",
+        "Night",
+        "Morning"
+      ],
+      "correctAnswer": "Morning",
+      "answer": "Morning",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Leo eats breakfast beside a window with sunlight.",
+        "target": "morning",
+        "context": "Leo",
+        "scene": "Leo eats breakfast.",
+        "art": "routine-3d/routine-breakfast.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-14",
+      "skillLabel": "Connect a morning scene with a familiar event",
+      "structureKey": "ground-measurement-slot-14",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Leo sleeps in bed beside a window with the moon and stars.",
+      "options": [
+        "Night",
+        "Morning",
+        "Lunchtime"
+      ],
+      "correctAnswer": "Night",
+      "answer": "Night",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Leo sleeps in bed beside a window with the moon and stars.",
+        "target": "night",
+        "context": "Leo",
+        "scene": "Leo sleeps in bed.",
+        "art": "routine-3d/routine-bed.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-15",
+      "skillLabel": "Connect a night scene with a familiar event",
+      "structureKey": "ground-measurement-slot-15",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Night"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes next?",
+      "readAloudText": "Which day comes next? Today is Thursday. Which day is tomorrow?",
+      "options": [
+        "Friday",
+        "Wednesday",
+        "Saturday"
+      ],
+      "correctAnswer": "Friday",
+      "answer": "Friday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Today is Thursday. Which day is tomorrow?",
+        "days": [
+          "Thursday",
+          "?"
+        ],
+        "context": "Leo's class day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-16",
+      "skillLabel": "Identify the next weekday",
+      "structureKey": "ground-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Friday"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day was yesterday?",
+      "readAloudText": "Which day was yesterday? Today is Friday. Which day was yesterday?",
+      "options": [
+        "Friday",
+        "Saturday",
+        "Thursday"
+      ],
+      "correctAnswer": "Thursday",
+      "answer": "Thursday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Today is Friday. Which day was yesterday?",
+        "days": [
+          "?",
+          "Friday"
+        ],
+        "context": "Leo's activity day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-17",
+      "skillLabel": "Identify the previous weekday",
+      "structureKey": "ground-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Thursday"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes after Sunday?",
+      "readAloudText": "Which day comes after Sunday? Leo waters the garden on Sunday. Which day comes next?",
+      "options": [
+        "Tuesday",
+        "Monday",
+        "Saturday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Purple",
+          "Red"
+        ],
+        "description": "Leo waters the garden on Sunday. Which day comes next?",
+        "days": [
+          "Sunday",
+          "?"
+        ],
+        "context": "Leo's garden roster"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-18",
+      "skillLabel": "Continue the weekly cycle after Sunday",
+      "structureKey": "ground-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these times of day in order.",
+      "readAloudText": "Put these times of day in order. Plan Leo's day, starting with morning.",
+      "options": [
+        "Afternoon",
+        "Lunchtime",
+        "Morning"
+      ],
+      "correctAnswer": "Morning||Lunchtime||Afternoon",
+      "answer": "Morning||Lunchtime||Afternoon",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning",
+          "Lunchtime",
+          "Afternoon"
+        ],
+        "description": "Plan Leo's day, starting with morning.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "sun"
+        ],
+        "scene": "dayparts",
+        "context": "Leo's day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-19",
+      "skillLabel": "Sequence morning, lunchtime and afternoon",
+      "structureKey": "ground-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning||Lunchtime||Afternoon"
+      }
+    },
+    {
+      "id": "y0-measurement-mid-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-mid-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these events in order, from morning to night.",
+      "readAloudText": "Put these events in order, from morning to night. The pictures show Morning story in the morning, Lunch picnic at lunchtime and Bedtime story at night.",
+      "options": [
+        "Lunch picnic",
+        "Bedtime story",
+        "Morning story"
+      ],
+      "correctAnswer": "Morning story||Lunch picnic||Bedtime story",
+      "answer": "Morning story||Lunch picnic||Bedtime story",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning story",
+          "Lunch picnic",
+          "Bedtime story"
+        ],
+        "description": "The pictures show Morning story in the morning, Lunch picnic at lunchtime and Bedtime story at night.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "moon"
+        ],
+        "scene": "events",
+        "context": "Leo's daily events"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-20",
+      "skillLabel": "Sequence three pictured daily events",
+      "structureKey": "ground-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning story||Lunch picnic||Bedtime story"
+      }
+    }
+  ],
+  "end": [
+    {
+      "id": "y0-measurement-end-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which ribbon is longer?",
+      "readAloudText": "Which ribbon is longer? Both ribbons start at the same line. Orange and Blue ribbons.",
+      "options": [
+        "Blue",
+        "Same length",
+        "Orange"
+      ],
+      "correctAnswer": "Orange",
+      "answer": "Orange",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Both ribbons start at the same line. Orange and Blue ribbons.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-1",
+      "skillLabel": "Compare lengths from aligned ends",
+      "structureKey": "ground-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Orange"
+      }
+    },
+    {
+      "id": "y0-measurement-end-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which pencil is shorter?",
+      "readAloudText": "Which pencil is shorter? Two pencils with their left ends lined up.",
+      "options": [
+        "Same length",
+        "Orange",
+        "Blue"
+      ],
+      "correctAnswer": "Orange",
+      "answer": "Orange",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "length",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Two pencils with their left ends lined up.",
+        "values": [
+          135,
+          225
+        ],
+        "objects": [
+          "pencil",
+          "pencil"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-2",
+      "skillLabel": "Identify the shorter object",
+      "structureKey": "ground-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Orange"
+      }
+    },
+    {
+      "id": "y0-measurement-end-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which tower is taller?",
+      "readAloudText": "Which tower is taller? Two towers stand on the same floor.",
+      "options": [
+        "Orange",
+        "Blue",
+        "Same height"
+      ],
+      "correctAnswer": "Orange",
+      "answer": "Orange",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "height",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Two towers stand on the same floor.",
+        "values": [
+          162.5,
+          104
+        ],
+        "objects": [
+          "tower",
+          "tower"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-3",
+      "skillLabel": "Compare heights from a common baseline",
+      "structureKey": "ground-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Orange"
+      }
+    },
+    {
+      "id": "y0-measurement-end-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can we compare these lengths fairly?",
+      "readAloudText": "How can we compare these lengths fairly? Two ribbons start at different places. Choose how to compare their lengths.",
+      "options": [
+        "Leave a gap",
+        "Count the colours",
+        "Line up one end"
+      ],
+      "correctAnswer": "Line up one end",
+      "answer": "Line up one end",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "align",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Two ribbons start at different places. Choose how to compare their lengths.",
+        "values": [
+          220,
+          160
+        ],
+        "objects": [
+          "ribbon",
+          "ribbon"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-4",
+      "skillLabel": "Choose a fair direct length comparison",
+      "structureKey": "ground-measurement-slot-4",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Line up one end"
+      }
+    },
+    {
+      "id": "y0-measurement-end-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is heavier?",
+      "readAloudText": "Which object is heavier? A balance holds a apple and a bag. The apple pan is lower.",
+      "options": [
+        "Same mass",
+        "Apple",
+        "Bag"
+      ],
+      "correctAnswer": "Apple",
+      "answer": "Apple",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Apple",
+          "Bag"
+        ],
+        "description": "A balance holds a apple and a bag. The apple pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Apple",
+          "Bag"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-5",
+      "skillLabel": "Identify the heavier object on a balance",
+      "structureKey": "ground-measurement-slot-5",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Apple"
+      }
+    },
+    {
+      "id": "y0-measurement-end-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which object is lighter?",
+      "readAloudText": "Which object is lighter? A balance holds a apple and a bag. The bag pan is higher.",
+      "options": [
+        "Apple",
+        "Bag",
+        "Same mass"
+      ],
+      "correctAnswer": "Bag",
+      "answer": "Bag",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Apple",
+          "Bag"
+        ],
+        "description": "A balance holds a apple and a bag. The bag pan is higher.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Apple",
+          "Bag"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-6",
+      "skillLabel": "Identify the lighter object on a balance",
+      "structureKey": "ground-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Bag"
+      }
+    },
+    {
+      "id": "y0-measurement-end-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this level balance show?",
+      "readAloudText": "What does this level balance show? The balance is level. Both pans are at the same height.",
+      "options": [
+        "Bag is heavier",
+        "Same mass",
+        "Apple is heavier"
+      ],
+      "correctAnswer": "Same mass",
+      "answer": "Same mass",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Apple",
+          "Bag"
+        ],
+        "description": "The balance is level. Both pans are at the same height.",
+        "values": [
+          100,
+          100
+        ],
+        "objects": [
+          "Apple",
+          "Bag"
+        ],
+        "equal": true
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-7",
+      "skillLabel": "Recognise equal masses on a level balance",
+      "structureKey": "ground-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same mass"
+      }
+    },
+    {
+      "id": "y0-measurement-end-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small apple and a larger bag are on a balance. The small object's pan is lower.",
+      "options": [
+        "Its colour is darker",
+        "It looks bigger",
+        "Its pan is lower"
+      ],
+      "correctAnswer": "Its pan is lower",
+      "answer": "Its pan is lower",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "mass",
+        "labels": [
+          "Apple",
+          "Bag"
+        ],
+        "description": "A small apple and a larger bag are on a balance. The small object's pan is lower.",
+        "values": [
+          125,
+          75
+        ],
+        "objects": [
+          "Apple",
+          "Bag"
+        ],
+        "scene": "size-trap"
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-8",
+      "skillLabel": "Use balance evidence rather than object size",
+      "structureKey": "ground-measurement-slot-8",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Its pan is lower"
+      }
+    },
+    {
+      "id": "y0-measurement-end-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds more?",
+      "readAloudText": "Which container holds more? At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. Some water remains in the first container.",
+      "options": [
+        "Orange",
+        "Blue",
+        "Same capacity"
+      ],
+      "correctAnswer": "Orange",
+      "answer": "Orange",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-9",
+      "skillLabel": "Compare capacity using a direct pouring test",
+      "structureKey": "ground-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Orange"
+      }
+    },
+    {
+      "id": "y0-measurement-end-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which container holds less?",
+      "readAloudText": "Which container holds less? At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. Some water remains in the first container.",
+      "options": [
+        "Blue",
+        "Same capacity",
+        "Orange"
+      ],
+      "correctAnswer": "Blue",
+      "answer": "Blue",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. Some water remains in the first container.",
+        "source": 0,
+        "remainder": true,
+        "equal": false,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-10",
+      "skillLabel": "Identify the smaller capacity from pouring evidence",
+      "structureKey": "ground-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Blue"
+      }
+    },
+    {
+      "id": "y0-measurement-end-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What does this pouring test show?",
+      "readAloudText": "What does this pouring test show? At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. The first container is now empty.",
+      "options": [
+        "Same capacity",
+        "Orange",
+        "Blue"
+      ],
+      "correctAnswer": "Same capacity",
+      "answer": "Same capacity",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "capacity",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "At first, Orange is full and Blue is empty. Pour from Orange until Blue is full. The first container is now empty.",
+        "source": 0,
+        "remainder": false,
+        "equal": true,
+        "objects": [
+          "container",
+          "container"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-11",
+      "skillLabel": "Recognise equal capacity from an exact fill",
+      "structureKey": "ground-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Same capacity"
+      }
+    },
+    {
+      "id": "y0-measurement-end-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity lasts longer?",
+      "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Reading",
+        "Eating lunch",
+        "Same time"
+      ],
+      "correctAnswer": "Reading",
+      "answer": "Reading",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Reading",
+          "Eating lunch"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Reading",
+          "Eating lunch"
+        ],
+        "activityArts": [
+          "duration-3d/reading.png",
+          "duration-3d/lunch.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-12",
+      "skillLabel": "Compare durations with a common start",
+      "structureKey": "ground-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reading"
+      }
+    },
+    {
+      "id": "y0-measurement-end-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which activity finishes sooner?",
+      "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
+      "options": [
+        "Eating lunch",
+        "Same time",
+        "Reading"
+      ],
+      "correctAnswer": "Eating lunch",
+      "answer": "Eating lunch",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "duration",
+        "labels": [
+          "Reading",
+          "Eating lunch"
+        ],
+        "description": "Both activities start together. Each strip ends when that activity finishes.",
+        "values": [
+          250,
+          160
+        ],
+        "objects": [
+          "Reading",
+          "Eating lunch"
+        ],
+        "activityArts": [
+          "duration-3d/reading.png",
+          "duration-3d/lunch.png"
+        ]
+      },
+      "primaryDescriptorCode": "AC9MFM01",
+      "curriculumCodes": [
+        "AC9MFM01"
+      ],
+      "skillId": "ground-measurement-slot-13",
+      "skillLabel": "Identify the event that finishes sooner",
+      "structureKey": "ground-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Eating lunch"
+      }
+    },
+    {
+      "id": "y0-measurement-end-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Zoe wakes up beside a window with sunlight.",
+      "options": [
+        "Night",
+        "Morning",
+        "Afternoon"
+      ],
+      "correctAnswer": "Morning",
+      "answer": "Morning",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Zoe wakes up beside a window with sunlight.",
+        "target": "morning",
+        "context": "Zoe",
+        "scene": "Zoe wakes up.",
+        "art": "timeofday-3d/morning.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-14",
+      "skillLabel": "Connect a morning scene with a familiar event",
+      "structureKey": "ground-measurement-slot-14",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning"
+      }
+    },
+    {
+      "id": "y0-measurement-end-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "What time of day is shown?",
+      "readAloudText": "What time of day is shown? Zoe reads in bed beside a window with the moon and stars.",
+      "options": [
+        "Morning",
+        "Lunchtime",
+        "Night"
+      ],
+      "correctAnswer": "Night",
+      "answer": "Night",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "daypart",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Zoe reads in bed beside a window with the moon and stars.",
+        "target": "night",
+        "context": "Zoe",
+        "scene": "Zoe reads in bed.",
+        "art": "timeofday-3d/reading-bed.png"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-15",
+      "skillLabel": "Connect a night scene with a familiar event",
+      "structureKey": "ground-measurement-slot-15",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Night"
+      }
+    },
+    {
+      "id": "y0-measurement-end-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes next?",
+      "readAloudText": "Which day comes next? Today is Friday. Which day is tomorrow?",
+      "options": [
+        "Thursday",
+        "Sunday",
+        "Saturday"
+      ],
+      "correctAnswer": "Saturday",
+      "answer": "Saturday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Today is Friday. Which day is tomorrow?",
+        "days": [
+          "Friday",
+          "?"
+        ],
+        "context": "Zoe's class day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-16",
+      "skillLabel": "Identify the next weekday",
+      "structureKey": "ground-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Saturday"
+      }
+    },
+    {
+      "id": "y0-measurement-end-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day was yesterday?",
+      "readAloudText": "Which day was yesterday? Today is Saturday. Which day was yesterday?",
+      "options": [
+        "Sunday",
+        "Friday",
+        "Saturday"
+      ],
+      "correctAnswer": "Friday",
+      "answer": "Friday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Today is Saturday. Which day was yesterday?",
+        "days": [
+          "?",
+          "Saturday"
+        ],
+        "context": "Zoe's activity day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-17",
+      "skillLabel": "Identify the previous weekday",
+      "structureKey": "ground-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Friday"
+      }
+    },
+    {
+      "id": "y0-measurement-end-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "mcq",
+      "prompt": "Which day comes after Sunday?",
+      "readAloudText": "Which day comes after Sunday? Zoe waters the garden on Sunday. Which day comes next?",
+      "options": [
+        "Monday",
+        "Saturday",
+        "Tuesday"
+      ],
+      "correctAnswer": "Monday",
+      "answer": "Monday",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "weekday",
+        "labels": [
+          "Orange",
+          "Blue"
+        ],
+        "description": "Zoe waters the garden on Sunday. Which day comes next?",
+        "days": [
+          "Sunday",
+          "?"
+        ],
+        "context": "Zoe's garden roster"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-18",
+      "skillLabel": "Continue the weekly cycle after Sunday",
+      "structureKey": "ground-measurement-slot-18",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Monday"
+      }
+    },
+    {
+      "id": "y0-measurement-end-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these times of day in order.",
+      "readAloudText": "Put these times of day in order. Plan Zoe's day, starting with morning.",
+      "options": [
+        "Lunchtime",
+        "Afternoon",
+        "Morning"
+      ],
+      "correctAnswer": "Morning||Lunchtime||Afternoon",
+      "answer": "Morning||Lunchtime||Afternoon",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning",
+          "Lunchtime",
+          "Afternoon"
+        ],
+        "description": "Plan Zoe's day, starting with morning.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "sun"
+        ],
+        "scene": "dayparts",
+        "context": "Zoe's day"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-19",
+      "skillLabel": "Sequence morning, lunchtime and afternoon",
+      "structureKey": "ground-measurement-slot-19",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning||Lunchtime||Afternoon"
+      }
+    },
+    {
+      "id": "y0-measurement-end-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "bankId": "measurelands-ground-end-v4",
+      "sourcePool": "posttest",
+      "realmId": "measurement",
+      "yearLevel": 0,
+      "strand": "Measurement",
+      "type": "number_order",
+      "prompt": "Put these events in order, from morning to night.",
+      "readAloudText": "Put these events in order, from morning to night. The pictures show Morning play in the morning, Lunch break at lunchtime and Night-time rest at night.",
+      "options": [
+        "Night-time rest",
+        "Morning play",
+        "Lunch break"
+      ],
+      "correctAnswer": "Morning play||Lunch break||Night-time rest",
+      "answer": "Morning play||Lunch break||Night-time rest",
+      "visual": {
+        "type": "measurement_ground_panel",
+        "task": "routine",
+        "labels": [
+          "Morning play",
+          "Lunch break",
+          "Night-time rest"
+        ],
+        "description": "The pictures show Morning play in the morning, Lunch break at lunchtime and Night-time rest at night.",
+        "objects": [
+          "sunrise",
+          "lunch",
+          "moon"
+        ],
+        "scene": "events",
+        "context": "Zoe's daily events"
+      },
+      "primaryDescriptorCode": "AC9MFM02",
+      "curriculumCodes": [
+        "AC9MFM02"
+      ],
+      "skillId": "ground-measurement-slot-20",
+      "skillLabel": "Sequence three pictured daily events",
+      "structureKey": "ground-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "showFractionModels": false,
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Morning play||Lunch break||Night-time rest"
+      }
+    }
+  ]
+}

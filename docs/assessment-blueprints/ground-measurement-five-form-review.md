@@ -35,9 +35,9 @@ The three most demanding slots require choosing a fair comparison, explaining a 
 
 ## Review access
 
-Demo Review → Measurement → Ground. The normal Pre/Post and Start/Mid/End controls open the five new review forms. Direct route: `/demo-review/measurement-ground`.
+Demo Review → Measurement → Ground. The normal Pre/Post and Start/Mid/End controls use the approved production forms in demo mode. The original author review remains at `/demo-review/measurement-ground`.
 
-These are review candidates. Existing student assessment banks and diagnostic placement rules remain unchanged until approval and a versioned release.
+Approved for student release on 16 September 2026. The immutable v4 snapshot is `data/assessments/releases/groundMeasurement-v4.json`. New assessments use this release; saved attempts, historical pre/post comparisons and existing diagnostic academic-year cycles retain their prior version. Migration `20260916110000_ground_measurement_release.sql` enables Prep Measurement in new supervised diagnostic cycles. Level 1 remains a separate review candidate until approved.
 
 ## Realm presentation and read-aloud checklist
 

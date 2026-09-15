@@ -43,7 +43,7 @@ const PREVIEW_STRANDS = DIAGNOSTIC_STRANDS.filter((definition) => definition.ava
 type PreviewCheckpoint = (typeof CHECKPOINTS)[number]["id"];
 
 function minimumLevel(strand: AcStrand) {
-  return strand === "number" ? 0 : strand === "algebra" || strand === "probability" ? 3 : 1;
+  return strand === "number" || strand === "measurement" ? 0 : strand === "algebra" || strand === "probability" ? 3 : 1;
 }
 
 function levelsFor(strand: AcStrand) {
@@ -151,7 +151,7 @@ export default function DiagnosticPreview() {
 
 function PreviewSession({ strand, level, checkpoint }: { strand: AcStrand; level: string; checkpoint: PreviewCheckpoint }) {
   const questions = useMemo(
-    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5,3,3,3,3,3,3,8),
+    () => getDiagnosticQuestions(strand, level, PREVIEW_SITTING_ID, checkpoint, 5,3,3,3,3,3,3,8,4),
     [checkpoint, level, strand],
   );
   const [index, setIndex] = useState(0);

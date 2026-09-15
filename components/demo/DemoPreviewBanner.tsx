@@ -24,8 +24,8 @@ export default function DemoPreviewBanner() {
   function exitDemoMode() {
     if (reviewingAssessment) {
       const strand = searchParams.get("strand");
-      const realm = pathname.includes("measurement-ground") ? "measurement" : pathname.includes("number") ? "number" : searchParams.get("realm_id") ?? (strand === "algebra" ? "pattern" : strand === "probability" ? "chance" : strand) ?? "number";
-      const year = /^\/demo-review\/number-level-[1-8]$/.test(pathname) ? `Year ${pathname.slice(-1)}` : searchParams.get("year") ?? searchParams.get("level") ?? "Prep";
+      const realm = pathname.includes("measurement-") ? "measurement" : pathname.includes("number") ? "number" : searchParams.get("realm_id") ?? (strand === "algebra" ? "pattern" : strand === "probability" ? "chance" : strand) ?? "number";
+      const year = pathname === "/demo-review/measurement-level1" ? "Year 1" : /^\/demo-review\/number-level-[1-8]$/.test(pathname) ? `Year ${pathname.slice(-1)}` : searchParams.get("year") ?? searchParams.get("level") ?? "Prep";
       router.push(`/demo-review?${new URLSearchParams({realm,year}).toString()}`);
       return;
     }

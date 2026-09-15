@@ -1,4 +1,5 @@
 "use client";
+import { savedGroundMeasurementVersion } from "@/lib/ground-measurement-assessment-version";
 import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
 import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
 import { savedYear3NumberVersion } from "@/lib/year3-number-assessment-version";
@@ -414,6 +415,7 @@ function PretestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [groundMeasurementVersion,setGroundMeasurementVersion]=useState<3|4>(4);
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
   const [numberLevel2Version, setNumberLevel2Version] = useState<2 | 3>(3);
@@ -426,8 +428,8 @@ function PretestPage() {
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion]
   );
 
   const [index, setIndex] = useState(0);
@@ -529,7 +531,9 @@ function PretestPage() {
     setNumberLevel6Version(level6Version);
     const level3Version = progressRealmId === "number" && year === "Year 3" && !isDemoPreviewMode() ? savedYear3NumberVersion(snapshot?.questionIds) ?? 3 : 3;
     setNumberLevel3Version(level3Version);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version);
+    const measurementVersion=progressRealmId==="measurement" && year==="Prep" && !isDemoPreviewMode() ? savedGroundMeasurementVersion(snapshot?.questionIds)??3 : 4;
+    setGroundMeasurementVersion(snapshot?.questionIds?.length ? measurementVersion : 4);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version,snapshot?.questionIds?.length ? measurementVersion : 4);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
