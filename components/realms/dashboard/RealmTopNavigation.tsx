@@ -97,7 +97,7 @@ export default function RealmTopNavigation({
           {progressLabel}
         </span>
       </div>
-      {realmName === "Number Nexus" ? <NumberExtensionLinks/> : null}
+      {realmName === "Number Nexus" ? <span className="hidden xl:inline-flex"><NumberExtensionLinks/></span> : null}
       <DemoModeNavigationControls
         accent={accent}
         text={text}
