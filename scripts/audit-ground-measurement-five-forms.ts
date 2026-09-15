@@ -48,10 +48,18 @@ console.log('Ground Measurement: 100 independently checked answers, diagrams, sc
 for (const bank of Object.values(forms)) for (const q of bank) {
  const v=q.visual, speech=groundMeasurementVisualSpeech(v);
  assert.ok(speech.length>20 && !/undefined|NaN/.test(speech), q.id);
- const visible = v.task==='daypart' ? [v.scene!] : v.task==='weekday' ? [v.context!, ...v.days!.filter(d=>d!=='?')] : v.labels;
- for (const text of visible) assert.ok(speech.includes(text), `${q.id}: missing spoken label ${text}`);
+ const visible = v.task==='daypart' ? [] : v.task==='weekday' ? [v.context!, ...v.days!.filter(d=>d!=='?')] : v.labels;
+ for (const text of visible) assert.ok(speech.toLowerCase().includes(text.toLowerCase()), `${q.id}: missing spoken label ${text}`);
  if(v.task==='routine') assert.ok(speech.includes('Tap the answers below in order.'));
- if(v.task==='capacity') for(const text of ['At first','After pouring','full','empty']) assert.ok(speech.includes(text));
- if(v.task==='duration') for(const text of ['Both start together','Finished','Watch both activities']) assert.ok(speech.includes(text));
+ if(v.task==='capacity') for(const text of ['At first','After pouring','full','empty']) assert.ok(speech.toLowerCase().includes(text.toLowerCase()));
+ if(v.task==='duration') for(const text of ['Both start together','Finished','Watch both activities']) assert.ok(speech.toLowerCase().includes(text.toLowerCase()));
 }
 console.log('All 100 diagrams have narration covering their visible labels, captions and instructions.');
+
+for(const bank of Object.values(forms)) {
+ assert.notDeepEqual(bank[0].visual.values,bank[1].visual.values,'Pencils must differ from ribbons');
+ for(const q of bank.filter(q=>q.visual.task==='duration')) {
+  assert.equal(q.visual.activityArts?.length,2);
+  for(const art of q.visual.activityArts!) assert.ok(existsSync('public/images/measurelands/'+art));
+ }
+}

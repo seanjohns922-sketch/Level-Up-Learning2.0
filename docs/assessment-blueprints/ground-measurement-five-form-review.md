@@ -25,7 +25,7 @@ Length endpoints and tower bases align. Unequal balances pivot at the midpoint; 
 
 Capacity diagrams show before and after. Initially the pouring container is full and the receiving container empty. Afterwards the receiver is full; the source either retains water or is empty. Straight-sided vessels keep the illustrated water areas consistent. Labels never claim all tall/wide containers hold more. No numeric capacity units are introduced.
 
-Duration replay uses a shared start and playback rate. The shorter activity finishes first. Static strips remain available, so animation is optional. Morning/night pictures reuse the existing weekly-lesson artwork. Ordering choices never begin in the correct order.
+Duration replay uses a shared start and playback rate. The shorter activity finishes first. Static strips remain available, so animation is optional. Morning/night questions show one large existing lesson picture, without a separate sky panel or activity caption. The picture itself supplies the context. Ordering choices never begin in the correct order.
 
 Read-aloud and “I don’t know” are available. Review navigation allows free movement; this protected route saves no student results. Exit returns to Measurement → Ground in Demo Review.
 
@@ -57,3 +57,9 @@ pouring geometry controlled so artwork cannot change the mathematical evidence.
 
 For every realm, inspect existing weekly-lesson assets first and reuse them
 wherever they accurately illustrate an assessment question.
+
+Manual-review refinements: Q2 uses different lengths and reverses the longer
+object relative to Q1. Q8 enlarges the objects and labels their relative size;
+the question asks how the child can tell which is heavier. Q12–13 use matching
+lesson activity pictures alongside the same-start duration strips. Q14–15 show
+only one large activity picture; prompts and choices retain read-aloud.

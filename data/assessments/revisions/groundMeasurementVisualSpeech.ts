@@ -11,11 +11,13 @@ export function groundMeasurementVisualSpeech(v: GroundMeasurementVisual): strin
     case 'duration':
       return `Both start together. ${v.labels.join('. ')}. Each strip is labelled Finished when its activity ends. The strip stops growing when the activity finishes. Press Watch both activities to replay.`;
     case 'daypart':
-      return `${v.scene} ${v.description}`;
+      return v.description;
     case 'weekday':
       return `${v.context}. ${v.days!.map(day => day === '?' ? 'Missing day' : day).join(', then ')}. ${v.description}`;
     case 'routine':
       return `${v.context}. ${[1, 2, 0].map(i => v.labels[i]).join('. ')}. Tap the answers below in order.`;
+    case 'mass':
+      return v.scene === 'size-trap' ? `Small ${v.labels[0].toLowerCase()}. Large ${v.labels[1].toLowerCase()}. ${v.description}` : `${v.labels.join('. ')}. ${v.description}`;
     default:
       return `${v.labels.join('. ')}. ${v.description}`;
   }

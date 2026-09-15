@@ -75,8 +75,8 @@
         "Same length",
         "Red"
       ],
-      "correctAnswer": "Green",
-      "answer": "Green",
+      "correctAnswer": "Red",
+      "answer": "Red",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "length",
@@ -86,8 +86,8 @@
         ],
         "description": "Two pencils with their left ends lined up.",
         "values": [
-          250,
-          160
+          135,
+          225
         ],
         "objects": [
           "pencil",
@@ -113,7 +113,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Green"
+        "correctResponse": "Red"
       }
     },
     {
@@ -417,8 +417,8 @@
       "yearLevel": 0,
       "strand": "Measurement",
       "type": "mcq",
-      "prompt": "Why is the small object heavier?",
-      "readAloudText": "Why is the small object heavier? A small stone and a larger sponge are on a balance. The small object's pan is lower.",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small stone and a larger sponge are on a balance. The small object's pan is lower.",
       "options": [
         "Its pan is lower",
         "Its colour is darker",
@@ -652,7 +652,7 @@
       "options": [
         "Same time",
         "Drawing",
-        "Building"
+        "Building a sandcastle"
       ],
       "correctAnswer": "Drawing",
       "answer": "Drawing",
@@ -661,7 +661,7 @@
         "task": "duration",
         "labels": [
           "Drawing",
-          "Building"
+          "Building a sandcastle"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -670,7 +670,11 @@
         ],
         "objects": [
           "Drawing",
-          "Building"
+          "Building a sandcastle"
+        ],
+        "activityArts": [
+          "duration-3d/drawing.png",
+          "duration-3d/sandcastle.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -709,17 +713,17 @@
       "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
         "Drawing",
-        "Building",
+        "Building a sandcastle",
         "Same time"
       ],
-      "correctAnswer": "Building",
-      "answer": "Building",
+      "correctAnswer": "Building a sandcastle",
+      "answer": "Building a sandcastle",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
           "Drawing",
-          "Building"
+          "Building a sandcastle"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -728,7 +732,11 @@
         ],
         "objects": [
           "Drawing",
-          "Building"
+          "Building a sandcastle"
+        ],
+        "activityArts": [
+          "duration-3d/drawing.png",
+          "duration-3d/sandcastle.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -750,7 +758,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Building"
+        "correctResponse": "Building a sandcastle"
       }
     },
     {
@@ -764,7 +772,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Mia wakes up as the sun rises.",
+      "readAloudText": "What time of day is shown? Mia wakes up beside a window with sunlight.",
       "options": [
         "Afternoon",
         "Night",
@@ -779,11 +787,11 @@
           "Red",
           "Green"
         ],
-        "description": "Mia wakes up as the sun rises.",
+        "description": "Mia wakes up beside a window with sunlight.",
         "target": "morning",
         "context": "Mia",
         "scene": "Mia wakes up.",
-        "art": "routine-3d/routine-wakeup.png"
+        "art": "timeofday-3d/wakeup.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -818,7 +826,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Mia gets ready for bed under a dark sky with the moon and stars.",
+      "readAloudText": "What time of day is shown? Mia sleeps in bed beside a window with the moon and stars.",
       "options": [
         "Night",
         "Morning",
@@ -833,10 +841,10 @@
           "Red",
           "Green"
         ],
-        "description": "Mia gets ready for bed under a dark sky with the moon and stars.",
+        "description": "Mia sleeps in bed beside a window with the moon and stars.",
         "target": "night",
         "context": "Mia",
-        "scene": "Mia gets ready for bed.",
+        "scene": "Mia sleeps in bed.",
         "art": "routine-3d/routine-bed.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
@@ -1219,8 +1227,8 @@
         "Blue",
         "Purple"
       ],
-      "correctAnswer": "Blue",
-      "answer": "Blue",
+      "correctAnswer": "Purple",
+      "answer": "Purple",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "length",
@@ -1230,8 +1238,8 @@
         ],
         "description": "Two pencils with their left ends lined up.",
         "values": [
-          160,
-          250
+          225,
+          135
         ],
         "objects": [
           "pencil",
@@ -1257,7 +1265,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Blue"
+        "correctResponse": "Purple"
       }
     },
     {
@@ -1561,8 +1569,8 @@
       "yearLevel": 0,
       "strand": "Measurement",
       "type": "mcq",
-      "prompt": "Why is the small object heavier?",
-      "readAloudText": "Why is the small object heavier? A small tin and a larger box are on a balance. The small object's pan is lower.",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small tin and a larger box are on a balance. The small object's pan is lower.",
       "options": [
         "Its colour is darker",
         "It looks bigger",
@@ -1815,6 +1823,10 @@
         "objects": [
           "Painting",
           "Reading"
+        ],
+        "activityArts": [
+          "routine-3d/routine-art.png",
+          "duration-3d/reading.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -1873,6 +1885,10 @@
         "objects": [
           "Painting",
           "Reading"
+        ],
+        "activityArts": [
+          "routine-3d/routine-art.png",
+          "duration-3d/reading.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -1908,7 +1924,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Noah eats breakfast as the sun rises.",
+      "readAloudText": "What time of day is shown? Noah eats breakfast beside a window with sunlight.",
       "options": [
         "Night",
         "Morning",
@@ -1923,11 +1939,11 @@
           "Blue",
           "Purple"
         ],
-        "description": "Noah eats breakfast as the sun rises.",
+        "description": "Noah eats breakfast beside a window with sunlight.",
         "target": "morning",
         "context": "Noah",
         "scene": "Noah eats breakfast.",
-        "art": "routine-3d/routine-breakfast.png"
+        "art": "timeofday-3d/breakfast.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -1962,7 +1978,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Noah reads in bed under a dark sky with the moon and stars.",
+      "readAloudText": "What time of day is shown? Noah reads in bed beside a window with the moon and stars.",
       "options": [
         "Morning",
         "Lunchtime",
@@ -1977,7 +1993,7 @@
           "Blue",
           "Purple"
         ],
-        "description": "Noah reads in bed under a dark sky with the moon and stars.",
+        "description": "Noah reads in bed beside a window with the moon and stars.",
         "target": "night",
         "context": "Noah",
         "scene": "Noah reads in bed.",
@@ -2363,8 +2379,8 @@
         "Orange",
         "Same length"
       ],
-      "correctAnswer": "Orange",
-      "answer": "Orange",
+      "correctAnswer": "Green",
+      "answer": "Green",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "length",
@@ -2374,8 +2390,8 @@
         ],
         "description": "Two pencils with their left ends lined up.",
         "values": [
-          250,
-          160
+          135,
+          225
         ],
         "objects": [
           "pencil",
@@ -2401,7 +2417,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Orange"
+        "correctResponse": "Green"
       }
     },
     {
@@ -2705,8 +2721,8 @@
       "yearLevel": 0,
       "strand": "Measurement",
       "type": "mcq",
-      "prompt": "Why is the small object heavier?",
-      "readAloudText": "Why is the small object heavier? A small book and a larger ball are on a balance. The small object's pan is lower.",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small book and a larger ball are on a balance. The small object's pan is lower.",
       "options": [
         "It looks bigger",
         "Its pan is lower",
@@ -2938,18 +2954,18 @@
       "prompt": "Which activity lasts longer?",
       "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
-        "Singing",
+        "Brushing teeth",
         "Same time",
-        "Clapping"
+        "Washing hands"
       ],
-      "correctAnswer": "Clapping",
-      "answer": "Clapping",
+      "correctAnswer": "Washing hands",
+      "answer": "Washing hands",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Clapping",
-          "Singing"
+          "Washing hands",
+          "Brushing teeth"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -2957,8 +2973,12 @@
           160
         ],
         "objects": [
-          "Clapping",
-          "Singing"
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "activityArts": [
+          "duration-3d/wash-hands.png",
+          "duration-3d/brush-teeth.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -2980,7 +3000,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Clapping"
+        "correctResponse": "Washing hands"
       }
     },
     {
@@ -2997,17 +3017,17 @@
       "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
         "Same time",
-        "Clapping",
-        "Singing"
+        "Washing hands",
+        "Brushing teeth"
       ],
-      "correctAnswer": "Singing",
-      "answer": "Singing",
+      "correctAnswer": "Brushing teeth",
+      "answer": "Brushing teeth",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Clapping",
-          "Singing"
+          "Washing hands",
+          "Brushing teeth"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -3015,8 +3035,12 @@
           160
         ],
         "objects": [
-          "Clapping",
-          "Singing"
+          "Washing hands",
+          "Brushing teeth"
+        ],
+        "activityArts": [
+          "duration-3d/wash-hands.png",
+          "duration-3d/brush-teeth.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -3038,7 +3062,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Singing"
+        "correctResponse": "Brushing teeth"
       }
     },
     {
@@ -3052,7 +3076,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Ava gets ready for school as the sun rises.",
+      "readAloudText": "What time of day is shown? Ava wakes up beside a window with sunlight.",
       "options": [
         "Morning",
         "Afternoon",
@@ -3067,11 +3091,11 @@
           "Green",
           "Orange"
         ],
-        "description": "Ava gets ready for school as the sun rises.",
+        "description": "Ava wakes up beside a window with sunlight.",
         "target": "morning",
         "context": "Ava",
-        "scene": "Ava gets ready for school.",
-        "art": "routine-3d/routine-school.png"
+        "scene": "Ava wakes up.",
+        "art": "routine-3d/routine-wakeup.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -3106,7 +3130,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Ava has a bedtime bath under a dark sky with the moon and stars.",
+      "readAloudText": "What time of day is shown? Ava sleeps in bed beside a window with the moon and stars.",
       "options": [
         "Lunchtime",
         "Night",
@@ -3121,11 +3145,11 @@
           "Green",
           "Orange"
         ],
-        "description": "Ava has a bedtime bath under a dark sky with the moon and stars.",
+        "description": "Ava sleeps in bed beside a window with the moon and stars.",
         "target": "night",
         "context": "Ava",
-        "scene": "Ava has a bedtime bath.",
-        "art": "routine-3d/routine-bath.png"
+        "scene": "Ava sleeps in bed.",
+        "art": "timeofday-3d/sleeping.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -3507,8 +3531,8 @@
         "Same length",
         "Purple"
       ],
-      "correctAnswer": "Purple",
-      "answer": "Purple",
+      "correctAnswer": "Red",
+      "answer": "Red",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "length",
@@ -3518,8 +3542,8 @@
         ],
         "description": "Two pencils with their left ends lined up.",
         "values": [
-          160,
-          250
+          225,
+          135
         ],
         "objects": [
           "pencil",
@@ -3545,7 +3569,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Purple"
+        "correctResponse": "Red"
       }
     },
     {
@@ -3849,8 +3873,8 @@
       "yearLevel": 0,
       "strand": "Measurement",
       "type": "mcq",
-      "prompt": "Why is the small object heavier?",
-      "readAloudText": "Why is the small object heavier? A small block and a larger cup are on a balance. The small object's pan is lower.",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small block and a larger cup are on a balance. The small object's pan is lower.",
       "options": [
         "Its pan is lower",
         "Its colour is darker",
@@ -4083,17 +4107,17 @@
       "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
         "Same time",
-        "Packing",
-        "Tidying"
+        "Putting on shoes",
+        "Drawing"
       ],
-      "correctAnswer": "Tidying",
-      "answer": "Tidying",
+      "correctAnswer": "Drawing",
+      "answer": "Drawing",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Packing",
-          "Tidying"
+          "Putting on shoes",
+          "Drawing"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -4101,8 +4125,12 @@
           250
         ],
         "objects": [
-          "Packing",
-          "Tidying"
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "activityArts": [
+          "duration-3d/shoes.png",
+          "duration-3d/drawing.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -4124,7 +4152,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Tidying"
+        "correctResponse": "Drawing"
       }
     },
     {
@@ -4140,18 +4168,18 @@
       "prompt": "Which activity finishes sooner?",
       "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
-        "Packing",
-        "Tidying",
+        "Putting on shoes",
+        "Drawing",
         "Same time"
       ],
-      "correctAnswer": "Packing",
-      "answer": "Packing",
+      "correctAnswer": "Putting on shoes",
+      "answer": "Putting on shoes",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Packing",
-          "Tidying"
+          "Putting on shoes",
+          "Drawing"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -4159,8 +4187,12 @@
           250
         ],
         "objects": [
-          "Packing",
-          "Tidying"
+          "Putting on shoes",
+          "Drawing"
+        ],
+        "activityArts": [
+          "duration-3d/shoes.png",
+          "duration-3d/drawing.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -4182,7 +4214,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Packing"
+        "correctResponse": "Putting on shoes"
       }
     },
     {
@@ -4196,7 +4228,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Leo reads a story as the sun rises.",
+      "readAloudText": "What time of day is shown? Leo eats breakfast beside a window with sunlight.",
       "options": [
         "Afternoon",
         "Night",
@@ -4211,11 +4243,11 @@
           "Purple",
           "Red"
         ],
-        "description": "Leo reads a story as the sun rises.",
+        "description": "Leo eats breakfast beside a window with sunlight.",
         "target": "morning",
         "context": "Leo",
-        "scene": "Leo reads a story.",
-        "art": "routine-3d/routine-reading.png"
+        "scene": "Leo eats breakfast.",
+        "art": "routine-3d/routine-breakfast.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -4250,7 +4282,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Leo eats dinner under a dark sky with the moon and stars.",
+      "readAloudText": "What time of day is shown? Leo sleeps in bed beside a window with the moon and stars.",
       "options": [
         "Night",
         "Morning",
@@ -4265,11 +4297,11 @@
           "Purple",
           "Red"
         ],
-        "description": "Leo eats dinner under a dark sky with the moon and stars.",
+        "description": "Leo sleeps in bed beside a window with the moon and stars.",
         "target": "night",
         "context": "Leo",
-        "scene": "Leo eats dinner.",
-        "art": "routine-3d/routine-dinner.png"
+        "scene": "Leo sleeps in bed.",
+        "art": "routine-3d/routine-bed.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -4651,8 +4683,8 @@
         "Orange",
         "Blue"
       ],
-      "correctAnswer": "Blue",
-      "answer": "Blue",
+      "correctAnswer": "Orange",
+      "answer": "Orange",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "length",
@@ -4662,8 +4694,8 @@
         ],
         "description": "Two pencils with their left ends lined up.",
         "values": [
-          250,
-          160
+          135,
+          225
         ],
         "objects": [
           "pencil",
@@ -4689,7 +4721,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Blue"
+        "correctResponse": "Orange"
       }
     },
     {
@@ -4993,8 +5025,8 @@
       "yearLevel": 0,
       "strand": "Measurement",
       "type": "mcq",
-      "prompt": "Why is the small object heavier?",
-      "readAloudText": "Why is the small object heavier? A small apple and a larger bag are on a balance. The small object's pan is lower.",
+      "prompt": "How can you tell the smaller object is heavier?",
+      "readAloudText": "How can you tell the smaller object is heavier? A small apple and a larger bag are on a balance. The small object's pan is lower.",
       "options": [
         "Its colour is darker",
         "It looks bigger",
@@ -5226,18 +5258,18 @@
       "prompt": "Which activity lasts longer?",
       "readAloudText": "Which activity lasts longer? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
-        "Dancing",
-        "Walking",
+        "Reading",
+        "Eating lunch",
         "Same time"
       ],
-      "correctAnswer": "Dancing",
-      "answer": "Dancing",
+      "correctAnswer": "Reading",
+      "answer": "Reading",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Dancing",
-          "Walking"
+          "Reading",
+          "Eating lunch"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -5245,8 +5277,12 @@
           160
         ],
         "objects": [
-          "Dancing",
-          "Walking"
+          "Reading",
+          "Eating lunch"
+        ],
+        "activityArts": [
+          "duration-3d/reading.png",
+          "duration-3d/lunch.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -5268,7 +5304,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Dancing"
+        "correctResponse": "Reading"
       }
     },
     {
@@ -5284,18 +5320,18 @@
       "prompt": "Which activity finishes sooner?",
       "readAloudText": "Which activity finishes sooner? Both activities start together. Each strip ends when that activity finishes.",
       "options": [
-        "Walking",
+        "Eating lunch",
         "Same time",
-        "Dancing"
+        "Reading"
       ],
-      "correctAnswer": "Walking",
-      "answer": "Walking",
+      "correctAnswer": "Eating lunch",
+      "answer": "Eating lunch",
       "visual": {
         "type": "measurement_ground_panel",
         "task": "duration",
         "labels": [
-          "Dancing",
-          "Walking"
+          "Reading",
+          "Eating lunch"
         ],
         "description": "Both activities start together. Each strip ends when that activity finishes.",
         "values": [
@@ -5303,8 +5339,12 @@
           160
         ],
         "objects": [
-          "Dancing",
-          "Walking"
+          "Reading",
+          "Eating lunch"
+        ],
+        "activityArts": [
+          "duration-3d/reading.png",
+          "duration-3d/lunch.png"
         ]
       },
       "primaryDescriptorCode": "AC9MFM01",
@@ -5326,7 +5366,7 @@
       "showFractionModels": false,
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Walking"
+        "correctResponse": "Eating lunch"
       }
     },
     {
@@ -5340,7 +5380,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Zoe draws a picture as the sun rises.",
+      "readAloudText": "What time of day is shown? Zoe wakes up beside a window with sunlight.",
       "options": [
         "Night",
         "Morning",
@@ -5355,11 +5395,11 @@
           "Orange",
           "Blue"
         ],
-        "description": "Zoe draws a picture as the sun rises.",
+        "description": "Zoe wakes up beside a window with sunlight.",
         "target": "morning",
         "context": "Zoe",
-        "scene": "Zoe draws a picture.",
-        "art": "routine-3d/routine-art.png"
+        "scene": "Zoe wakes up.",
+        "art": "timeofday-3d/morning.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
@@ -5394,7 +5434,7 @@
       "strand": "Measurement",
       "type": "mcq",
       "prompt": "What time of day is shown?",
-      "readAloudText": "What time of day is shown? Zoe sleeps in bed under a dark sky with the moon and stars.",
+      "readAloudText": "What time of day is shown? Zoe reads in bed beside a window with the moon and stars.",
       "options": [
         "Morning",
         "Lunchtime",
@@ -5409,11 +5449,11 @@
           "Orange",
           "Blue"
         ],
-        "description": "Zoe sleeps in bed under a dark sky with the moon and stars.",
+        "description": "Zoe reads in bed beside a window with the moon and stars.",
         "target": "night",
         "context": "Zoe",
-        "scene": "Zoe sleeps in bed.",
-        "art": "timeofday-3d/sleeping.png"
+        "scene": "Zoe reads in bed.",
+        "art": "timeofday-3d/reading-bed.png"
       },
       "primaryDescriptorCode": "AC9MFM02",
       "curriculumCodes": [
