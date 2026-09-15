@@ -38,6 +38,9 @@ for(const [level,banks,review,count] of [[3,level3,review3,20],[7,level7,review7
 for(const level of ['Prep','Year 1','Year 2','Year 3','Year 4','Year 5','Year 6']){
  assert.equal(getPretestForYearLabel(level).length,20);assert.equal(getPosttestForYearLabel(level)?.questions.length,20);
 }
+
+const unknownSnapshots=buildAssessmentQuestionSnapshots(level7.pretest,()=> 'idk',()=>false,'2026-09-16T00:00:00Z');
+assert.ok(unknownSnapshots.every(q=>q.response_status==='dont_know'&&!q.correct));
 const old3=getPretestForYearLabel('Year 3','number',2,1,2,2,2,2,2);
 assert.equal(savedYear3NumberVersion(old3.map(q=>q.id)),2);assert.equal(savedYear3NumberVersion(level3.pretest.map(q=>q.id)),3);
 assert.equal(year3NumberPostVersion([]),2);
