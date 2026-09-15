@@ -59,6 +59,35 @@ function MoneyItemIcon({ label }: { label: string }) {
 export default function NumberNexusYear1AssessmentVisual({ visual }: { visual: Visual }) {
   const type = String(visual.type ?? "");
 
+  if (type === "number_y1_growth_story") {
+    return <Surface><div className="grid gap-4 sm:grid-cols-2">
+      {[{label:"Before planting",count:Number(visual.before)},{label:"After planting",count:Number(visual.after)}].map(({label,count})=><div key={label} className="flex flex-col items-center gap-4 rounded-xl border border-teal-800/20 bg-white p-4">
+        <h3 className="text-lg font-bold">{label}: {count} seedlings</h3>
+        <CounterSet count={count} token="seedling"/>
+      </div>)}
+    </div></Surface>;
+  }
+
+  if (type === "number_y1_shop_change") {
+    const prices = visual.prices as number[];
+    const labels = visual.labels as string[];
+    return <Surface><div className="space-y-4">
+      <div className="rounded-xl border border-amber-800/20 bg-amber-50 p-4 text-center text-xl font-black">You pay ${Number(visual.paid)}</div>
+      <div className="grid grid-cols-2 gap-4">{prices.map((price,i)=><div key={i} className="flex flex-col items-center gap-3 rounded-xl border border-teal-800/20 bg-white p-4">
+        <MoneyItemIcon label={labels[i]}/><h3 className="text-lg font-bold">{labels[i]}</h3><span className="text-3xl font-black">${price}</span>
+      </div>)}</div>
+      <p className="text-center text-lg font-bold">Your change: $ ?</p>
+    </div></Surface>;
+  }
+
+  if (type === "number_y1_balance_trays") {
+    const groups = visual.groups as number[];
+    const labels = visual.labels as string[];
+    return <Surface><div className="grid gap-4 sm:grid-cols-2">{groups.map((count,i)=><div key={i} className="flex flex-col items-center gap-4 rounded-xl border-2 border-teal-800/30 bg-white p-4">
+      <h3 className="text-lg font-bold">{labels[i]}: {count} counters</h3><CounterSet count={count}/>
+    </div>)}</div></Surface>;
+  }
+
   if (type === "number_y1_place_value") {
     if (typeof visual.number === "number") {
       return <Surface><div className="flex justify-center"><NumberTile>{visual.number}</NumberTile></div></Surface>;

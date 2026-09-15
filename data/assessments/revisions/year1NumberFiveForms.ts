@@ -1,4 +1,5 @@
 /** Review set based on the original post-test, before the v3 difficulty reductions.
+ * Six owner-reviewed slots are strengthened equally in every form.
  * These forms do not replace student banks until owner review and versioned activation.
  */
 import { YEAR1_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS as benchmark } from "../year1NumberNexusIndependentBanks";
@@ -15,7 +16,7 @@ export type NumberLevel1ReviewItem = Omit<typeof benchmark[number], "form" | "so
   benchmarkQuestionId: string;
   slotId: string;
 };
-type Example = { prompt?: string; correctAnswer: string; visual: Record<string, unknown>; options?: string[] };
+type Example = { prompt?: string; correctAnswer: string; visual: Record<string, unknown>; options?: string[]; type?: "numeric"; skillLabel?: string; cognitiveCategory?: "reasoning" | "application" };
 const numeric = (answer: number, visual: Record<string, unknown>, prompt?: string): Example => ({ correctAnswer: String(answer), visual, ...(prompt ? { prompt } : {}) });
 const profiles = {
   pretest: { tens:5, ones:8, partTens:40, partOnes:2, groups:6, add:[8,7], seedlings:[8,5], share:12, twos:6, pattern:["star","robot"], path:107, whole:17, part:12, partition:[75,40], largeGroups:25, subtract:[17,9], money:[7,6], division:21, fives:15, order:[120,96,108], coins:[4,3], names:["Mia","Sam"], equalShare:4 },
@@ -57,32 +58,61 @@ function examples(form: Exclude<NumberLevel1Form,"posttest">): Example[] {
   ];
 }
 
+// Fixed examples for the six revised end-of-Level-1 tasks. N04 stays within 20;
+// challenge comes from the unknown position and modelling, not Year 2 arithmetic.
+export const NUMBER_LEVEL1_STRENGTHENED_SLOTS = [3,4,12,13,18,19] as const;
+const revisedProfiles = {
+  pretest:  {add:[8,17], grow:[8,15], subtract:[8,7], prices:[7,6], coins:[[1,1,1,1,1,1,1,1],[2,2,2,2,2,2]], names:["Mia","Sam"], trays:[11,5]},
+  posttest: {add:[9,17], grow:[9,16], subtract:[9,8], prices:[6,5], coins:[[1,1,1,1,1,1,1],[2,2,2,2,2,2]], names:["Liam","Aria"], trays:[12,4]},
+  start:    {add:[7,15], grow:[7,15], subtract:[7,9], prices:[7,5], coins:[[1,1,1,1,1,1,1,1],[2,2,2,2,2,2,2]], names:["Ava","Leo"], trays:[10,4]},
+  mid:      {add:[8,15], grow:[8,16], subtract:[8,9], prices:[8,5], coins:[[1,1,1,1,1,1,1,1,1],[2,2,2,2,2,2]], names:["Zoe","Max"], trays:[13,5]},
+  end:      {add:[9,16], grow:[9,17], subtract:[9,7], prices:[9,5], coins:[[1,1,1,1,1,1,1,1,1],[2,2,2,2,2,2,2]], names:["Ivy","Ben"], trays:[12,6]},
+} as const;
+function strengthenedExamples(form: NumberLevel1Form): Record<number, Example> {
+  const p = revisedProfiles[form];
+  const total = (coins: readonly number[]) => coins.reduce((a,b)=>a+b,0);
+  return {
+    3: {...numeric(p.add[1]-p.add[0],{type:"number_y1_equation",expression:`${p.add[0]} + ? = ${p.add[1]}`},"What number makes this addition correct?"),skillLabel:"Find a Missing Addend",cognitiveCategory:"reasoning"},
+    4: {...numeric(p.grow[1]-p.grow[0],{type:"number_y1_growth_story",before:p.grow[0],after:p.grow[1]},`There were ${p.grow[0]} seedlings. Now there are ${p.grow[1]}. How many were planted?`),skillLabel:"Find an Unknown Increase",cognitiveCategory:"application"},
+    12: {...numeric(p.subtract[0]+p.subtract[1],{type:"number_y1_equation",expression:`? − ${p.subtract[0]} = ${p.subtract[1]}`},"What starting number makes this subtraction correct?"),skillLabel:"Find a Missing Starting Number",cognitiveCategory:"reasoning"},
+    13: {...numeric(20-p.prices[0]-p.prices[1],{type:"number_y1_shop_change",paid:20,prices:[...p.prices],labels:["Puzzle","Kite"]},"You pay $20 for both toys. How much change?"),skillLabel:"Calculate Change for Two Items",cognitiveCategory:"application"},
+    18: {...numeric(total(p.coins[1])-total(p.coins[0]),{type:"number_y1_money_compare",groups:p.coins.map(coins=>[...coins]),labels:[...p.names]},`How many more dollars does ${p.names[1]} have than ${p.names[0]}?`),type:"numeric",options:[],skillLabel:"Compare Coin Values",cognitiveCategory:"reasoning"},
+    19: {...numeric((p.trays[0]-p.trays[1])/2,{type:"number_y1_balance_trays",groups:[...p.trays],labels:["Tray A","Tray B"]},"Move counters from Tray A to Tray B to make them equal. How many?"),type:"numeric",options:[],skillLabel:"Redistribute into Equal Shares",cognitiveCategory:"reasoning"},
+  };
+}
+
 function makeForm(form: NumberLevel1Form): NumberLevel1ReviewItem[] {
   const variants = form === "posttest" ? null : examples(form);
+  const strengthened = strengthenedExamples(form);
   return benchmark.map((base,index) => {
-    const variant = variants?.[index];
+    const variant = strengthened[index] ?? variants?.[index];
+    const type = variant?.type ?? base.type;
     const prompt = variant?.prompt ?? base.prompt;
     const correctAnswer = variant?.correctAnswer ?? String(base.correctAnswer);
     const visual = structuredClone(variant?.visual ?? base.visual) as Record<string, unknown>;
     const options = [...(variant?.options ?? base.options ?? [])] as string[];
-    // Intended demand, not empirical calibration: a yes/no comparison is not "challenging".
-    const difficulty = [3,4,10,11,12,13,14,16,17,18].includes(index) ? "moderate" : "easy";
-    const cognitiveCategory = index === 19 ? "understanding" : base.cognitiveCategory;
+    // Intended demand, not empirical calibration. The revised reasoning items are more demanding.
+    const difficulty = [3,12,18,19].includes(index) ? "challenging" : [4,10,11,13,14,16,17].includes(index) ? "moderate" : "easy";
+    const cognitiveCategory = variant?.cognitiveCategory ?? base.cognitiveCategory;
     return {
       ...base,
-      id:`y1-number-review-${form}-${String(index+1).padStart(2,"0")}-v4`,
-      version:"4.0.0-review.1", form, sourcePool:"assessment_review",
-      bankId:`number-nexus-level-1-${form}-v4-review`,
+      id:`y1-number-review-${form}-${String(index+1).padStart(2,"0")}-v5`,
+      version:"5.0.0-review.1", form, sourcePool:"assessment_review",
+      bankId:`number-nexus-level-1-${form}-v5-review`,
       benchmarkQuestionId:base.id, slotId:`number-level-1-slot-${String(index+1).padStart(2,"0")}`,
-      contextKey:`y1-number-review-${form}-${index+1}-v4`,
-      structureKey:`y1-number-post-benchmark-slot-${index+1}`,
-      prompt,correctAnswer,answer:correctAnswer,visual,options,
+      contextKey:`y1-number-review-${form}-${index+1}-v5`,
+      structureKey:`y1-number-reviewed-slot-${index+1}-v5`,
+      prompt,correctAnswer,answer:correctAnswer,visual,options,type,
+      skillLabel:variant?.skillLabel ?? base.skillLabel,
+      responseMode:type === "numeric" ? "constructed_response" : base.responseMode,
+      inputMode:type === "numeric" ? "decimal" : base.inputMode,
+      isTransfer:cognitiveCategory === "transfer",
       difficulty,cognitiveCategory,
       requiresReasoning:cognitiveCategory === "reasoning" || cognitiveCategory === "transfer",
       statistics:createUncalibratedItemStatistics(difficulty),
-      ...(base.type === "mcq" ? {selectedAnswerPosition:options.indexOf(correctAnswer)+1} : {}),
-      renderer:{...base.renderer,payload:{prompt,correctAnswer,visual,...(options.length ? {options} : {})}},
-      scoring:{...base.scoring,correctResponse:correctAnswer},
+      selectedAnswerPosition:type === "mcq" ? options.indexOf(correctAnswer)+1 : undefined,
+      renderer:{...base.renderer,type:type === "numeric" ? "numeric_entry" : base.renderer.type,payload:{prompt,correctAnswer,visual,...(options.length ? {options} : {})}},
+      scoring:type === "numeric" ? {kind:"numeric_tolerance",correctResponse:correctAnswer,tolerance:0} : {...base.scoring,correctResponse:correctAnswer},
     };
   });
 }
