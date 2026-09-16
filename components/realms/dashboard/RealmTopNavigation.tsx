@@ -1,5 +1,6 @@
 "use client";
 
+import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import type { CSSProperties, ReactNode } from "react";
 import { ArrowLeft, User, Zap } from "lucide-react";
@@ -97,6 +98,7 @@ export default function RealmTopNavigation({
           {progressLabel}
         </span>
       </div>
+      {realmName === "Measurelands" ? <span className="hidden xl:inline-flex"><MeasurementExtensionLinks/></span> : null}
       {realmName === "Number Nexus" ? <span className="hidden xl:inline-flex"><NumberExtensionLinks/></span> : null}
       <DemoModeNavigationControls
         accent={accent}

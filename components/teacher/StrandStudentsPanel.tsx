@@ -32,6 +32,7 @@ import {
   type NormalizedWeeklyQuizAttempt,
   type TeacherProgressOverrideReason,
 } from "@/lib/realm-progress-compat";
+import MeasurementExtensionReport from "./MeasurementExtensionReport";
 import NumberExtensionReport from "./NumberExtensionReport";
 import AssessmentReplay from "./AssessmentReplay";
 import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
@@ -1306,6 +1307,7 @@ function StudentStrandDetail({
         />
       </div>
 
+      {supportedRealmId === "measurement" ? <MeasurementExtensionReport key={student.id} studentId={student.id} studentName={studentName}/> : null}
       {supportedRealmId === "number" ? <NumberExtensionReport key={student.id} studentId={student.id} studentName={studentName}/> : null}
       {growth && <div className="rounded-2xl border border-indigo-200 bg-white p-4">
         <h3 className="font-bold text-slate-900">{yearToLevelLabel(yearLabel)} assessment growth</h3>

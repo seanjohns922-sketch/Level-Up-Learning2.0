@@ -1,0 +1,5177 @@
+{
+  "pretest": [
+    {
+      "prompt": "How many millilitres does each small interval show?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "interval",
+        "description": "The marks are equally spaced.",
+        "values": [
+          80,
+          4
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y4-measurement-pre-01-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres does each small interval show?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-1",
+      "skillLabel": "Read intervals on a scale",
+      "structureKey": "y4-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "11.4",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Read both ends of the pencil. The ruler shows centimetres and millimetres.",
+        "values": [
+          11.4
+        ],
+        "start": 0
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-pre-02-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-2",
+      "skillLabel": "Read partial centimetres",
+      "structureKey": "y4-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11.4"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around the whole garden.",
+        "values": [
+          7,
+          3
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-pre-03-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-3",
+      "skillLabel": "Measure a rectangle perimeter",
+      "structureKey": "y4-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this altogether?",
+      "correctAnswer": "135",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "duration",
+        "description": "Convert the whole duration to minutes.",
+        "values": [
+          135
+        ],
+        "labels": [
+          "2 hours 15 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-pre-04-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this altogether?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-4",
+      "skillLabel": "Convert hours and minutes",
+      "structureKey": "y4-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "135"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Obtuse",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the purple angle A.",
+        "values": [
+          115
+        ],
+        "rotation": 0
+      },
+      "options": [
+        "Acute",
+        "Right",
+        "Obtuse",
+        "Straight"
+      ],
+      "id": "y4-measurement-pre-05-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-5",
+      "skillLabel": "Identify an obtuse angle",
+      "structureKey": "y4-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Obtuse"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "450",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "scale",
+        "description": "Read the mass of the book on the scale.",
+        "values": [
+          450
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y4-measurement-pre-06-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-6",
+      "skillLabel": "Read an unlabelled mass mark",
+      "structureKey": "y4-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "450"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area in square centimetres?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each small square has an area of 1 square centimetre.",
+        "values": [
+          5,
+          4
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-pre-07-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-7",
+      "skillLabel": "Measure area using square units",
+      "structureKey": "y4-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the activity last?",
+      "correctAnswer": "50",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts and finishes on the same afternoon.",
+        "values": [
+          855,
+          905
+        ],
+        "labels": [
+          "Start: 2:15 pm",
+          "Finish: 3:05 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-pre-08-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the activity last?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-8",
+      "skillLabel": "Find elapsed time across an hour",
+      "structureKey": "y4-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle does the purple arc show?",
+      "correctAnswer": "Straight",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at angle A. The arc shows the turn between the arms.",
+        "values": [
+          180
+        ],
+        "rotation": 0
+      },
+      "options": [
+        "Right",
+        "Straight",
+        "Reflex",
+        "Full revolution"
+      ],
+      "id": "y4-measurement-pre-09-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What type of angle does the purple arc show?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-9",
+      "skillLabel": "Recognise a straight angle",
+      "structureKey": "y4-measurement-slot-9",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Straight"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in litres?",
+      "correctAnswer": "1.25",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "jug",
+        "description": "Read the water level on the litre scale.",
+        "values": [
+          1.25
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y4-measurement-pre-10-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in litres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-10",
+      "skillLabel": "Read partial litre capacity",
+      "structureKey": "y4-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of the garden, in metres?",
+      "correctAnswer": "26",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around all six sides.",
+        "values": [
+          7,
+          6,
+          3,
+          2
+        ],
+        "lShape": true,
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-pre-11-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of the garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-11",
+      "skillLabel": "Measure an L-shaped perimeter",
+      "structureKey": "y4-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "26"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the activity finish?",
+      "correctAnswer": "1855",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1085,
+          50
+        ],
+        "labels": [
+          "Start: 6:05 pm",
+          "Lasts: 50 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-pre-12-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What time does the activity finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-12",
+      "skillLabel": "Find a finishing time",
+      "structureKey": "y4-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1855"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which shaded angle is larger?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Compare angles A and B. Look at the openings.",
+        "values": [
+          110
+        ],
+        "compareArms": true,
+        "rotation": 0
+      },
+      "options": [
+        "A",
+        "B",
+        "Both are equal"
+      ],
+      "id": "y4-measurement-pre-13-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which shaded angle is larger?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-13",
+      "skillLabel": "Compare angles with unequal arms",
+      "structureKey": "y4-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What temperature is shown in degrees Celsius?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "thermometer",
+        "description": "Read the top of the red column.",
+        "values": [
+          18
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°C",
+        "ariaLabel": "Answer in °C"
+      },
+      "id": "y4-measurement-pre-14-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What temperature is shown in degrees Celsius?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-14",
+      "skillLabel": "Read a thermometer",
+      "structureKey": "y4-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much larger is area A, in square centimetres?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Every small square is 1 square centimetre. Both grids use the same-sized squares.",
+        "values": [
+          6,
+          4,
+          6,
+          3
+        ],
+        "labels": [
+          "A",
+          "B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-pre-15-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How much larger is area A, in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-15",
+      "skillLabel": "Compare areas on equal grids",
+      "structureKey": "y4-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes pass from start to finish?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts before noon and finishes after noon on the same day.",
+        "values": [
+          700,
+          785
+        ],
+        "labels": [
+          "Start: 11:40 am",
+          "Finish: 1:05 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-pre-16-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes pass from start to finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-16",
+      "skillLabel": "Find elapsed time across noon",
+      "structureKey": "y4-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Reflex",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the large purple angle A.",
+        "values": [
+          230
+        ],
+        "rotation": 0
+      },
+      "options": [
+        "Acute",
+        "Obtuse",
+        "Straight",
+        "Reflex"
+      ],
+      "id": "y4-measurement-pre-17-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-17",
+      "skillLabel": "Identify a reflex angle",
+      "structureKey": "y4-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reflex"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8.4",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Measure from one pencil end to the other. The ruler shows centimetres and millimetres.",
+        "values": [
+          8.4
+        ],
+        "start": 2.3
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-pre-18-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y4-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8.4"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the shaded area in square centimetres?",
+      "correctAnswer": "13",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each grid square is 1 square centimetre.",
+        "values": [
+          5,
+          4
+        ],
+        "areaCells": [
+          [
+            1,
+            0,
+            "se"
+          ],
+          [
+            2,
+            0,
+            "full"
+          ],
+          [
+            3,
+            0,
+            "sw"
+          ],
+          [
+            0,
+            1,
+            "se"
+          ],
+          [
+            1,
+            1,
+            "full"
+          ],
+          [
+            2,
+            1,
+            "full"
+          ],
+          [
+            3,
+            1,
+            "full"
+          ],
+          [
+            4,
+            1,
+            "sw"
+          ],
+          [
+            0,
+            2,
+            "full"
+          ],
+          [
+            1,
+            2,
+            "full"
+          ],
+          [
+            2,
+            2,
+            "full"
+          ],
+          [
+            3,
+            2,
+            "full"
+          ],
+          [
+            4,
+            2,
+            "full"
+          ],
+          [
+            1,
+            3,
+            "ne"
+          ],
+          [
+            2,
+            3,
+            "full"
+          ],
+          [
+            3,
+            3,
+            "nw"
+          ]
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-pre-19-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the shaded area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-19",
+      "skillLabel": "Measure irregular area using whole and half squares",
+      "structureKey": "y4-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "13"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the break finish?",
+      "correctAnswer": "1220",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The trip is followed straight away by the break. Enter hours, minutes and AM or PM.",
+        "values": [
+          635,
+          80,
+          25
+        ],
+        "labels": [
+          "Trip starts: 10:35 am",
+          "Trip lasts: 80 minutes",
+          "Break lasts: 25 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-pre-20-v4",
+      "version": 4,
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What time does the break finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-20",
+      "skillLabel": "Find a finish time after two activities",
+      "structureKey": "y4-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1220"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "How many millilitres does each small interval show?",
+      "correctAnswer": "25",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "interval",
+        "description": "The marks are equally spaced.",
+        "values": [
+          100,
+          4
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y4-measurement-post-01-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres does each small interval show?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-1",
+      "skillLabel": "Read intervals on a scale",
+      "structureKey": "y4-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "12.6",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Read both ends of the pencil. The ruler shows centimetres and millimetres.",
+        "values": [
+          12.6
+        ],
+        "start": 0
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-post-02-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-2",
+      "skillLabel": "Read partial centimetres",
+      "structureKey": "y4-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12.6"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around the whole garden.",
+        "values": [
+          6,
+          4
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-post-03-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-3",
+      "skillLabel": "Measure a rectangle perimeter",
+      "structureKey": "y4-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this altogether?",
+      "correctAnswer": "150",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "duration",
+        "description": "Convert the whole duration to minutes.",
+        "values": [
+          150
+        ],
+        "labels": [
+          "2 hours 30 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-post-04-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this altogether?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-4",
+      "skillLabel": "Convert hours and minutes",
+      "structureKey": "y4-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "150"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Obtuse",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the purple angle A.",
+        "values": [
+          125
+        ],
+        "rotation": 12
+      },
+      "options": [
+        "Right",
+        "Obtuse",
+        "Straight",
+        "Acute"
+      ],
+      "id": "y4-measurement-post-05-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-5",
+      "skillLabel": "Identify an obtuse angle",
+      "structureKey": "y4-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Obtuse"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "650",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "scale",
+        "description": "Read the mass of the book on the scale.",
+        "values": [
+          650
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y4-measurement-post-06-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-6",
+      "skillLabel": "Read an unlabelled mass mark",
+      "structureKey": "y4-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "650"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area in square centimetres?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each small square has an area of 1 square centimetre.",
+        "values": [
+          6,
+          3
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-post-07-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-7",
+      "skillLabel": "Measure area using square units",
+      "structureKey": "y4-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the activity last?",
+      "correctAnswer": "45",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts and finishes on the same afternoon.",
+        "values": [
+          935,
+          980
+        ],
+        "labels": [
+          "Start: 3:35 pm",
+          "Finish: 4:20 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-post-08-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the activity last?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-8",
+      "skillLabel": "Find elapsed time across an hour",
+      "structureKey": "y4-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "45"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle does the purple arc show?",
+      "correctAnswer": "Straight",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at angle A. The arc shows the turn between the arms.",
+        "values": [
+          180
+        ],
+        "rotation": 18
+      },
+      "options": [
+        "Straight",
+        "Reflex",
+        "Full revolution",
+        "Right"
+      ],
+      "id": "y4-measurement-post-09-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What type of angle does the purple arc show?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-9",
+      "skillLabel": "Recognise a straight angle",
+      "structureKey": "y4-measurement-slot-9",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Straight"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in litres?",
+      "correctAnswer": "1.75",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "jug",
+        "description": "Read the water level on the litre scale.",
+        "values": [
+          1.75
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y4-measurement-post-10-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in litres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-10",
+      "skillLabel": "Read partial litre capacity",
+      "structureKey": "y4-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of the garden, in metres?",
+      "correctAnswer": "30",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around all six sides.",
+        "values": [
+          8,
+          7,
+          3,
+          2
+        ],
+        "lShape": true,
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-post-11-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of the garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-11",
+      "skillLabel": "Measure an L-shaped perimeter",
+      "structureKey": "y4-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "30"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the activity finish?",
+      "correctAnswer": "1915",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1105,
+          50
+        ],
+        "labels": [
+          "Start: 6:25 pm",
+          "Lasts: 50 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-post-12-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What time does the activity finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-12",
+      "skillLabel": "Find a finishing time",
+      "structureKey": "y4-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1915"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which shaded angle is larger?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Compare angles A and B. Look at the openings.",
+        "values": [
+          120
+        ],
+        "compareArms": true,
+        "rotation": 10
+      },
+      "options": [
+        "B",
+        "Both are equal",
+        "A"
+      ],
+      "id": "y4-measurement-post-13-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which shaded angle is larger?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-13",
+      "skillLabel": "Compare angles with unequal arms",
+      "structureKey": "y4-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What temperature is shown in degrees Celsius?",
+      "correctAnswer": "23",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "thermometer",
+        "description": "Read the top of the red column.",
+        "values": [
+          23
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°C",
+        "ariaLabel": "Answer in °C"
+      },
+      "id": "y4-measurement-post-14-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What temperature is shown in degrees Celsius?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-14",
+      "skillLabel": "Read a thermometer",
+      "structureKey": "y4-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "23"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much larger is area A, in square centimetres?",
+      "correctAnswer": "7",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Every small square is 1 square centimetre. Both grids use the same-sized squares.",
+        "values": [
+          7,
+          4,
+          7,
+          3
+        ],
+        "labels": [
+          "A",
+          "B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-post-15-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How much larger is area A, in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-15",
+      "skillLabel": "Compare areas on equal grids",
+      "structureKey": "y4-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes pass from start to finish?",
+      "correctAnswer": "95",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts before noon and finishes after noon on the same day.",
+        "values": [
+          690,
+          785
+        ],
+        "labels": [
+          "Start: 11:30 am",
+          "Finish: 1:05 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-post-16-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes pass from start to finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-16",
+      "skillLabel": "Find elapsed time across noon",
+      "structureKey": "y4-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "95"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Reflex",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the large purple angle A.",
+        "values": [
+          250
+        ],
+        "rotation": 10
+      },
+      "options": [
+        "Obtuse",
+        "Straight",
+        "Reflex",
+        "Acute"
+      ],
+      "id": "y4-measurement-post-17-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-17",
+      "skillLabel": "Identify a reflex angle",
+      "structureKey": "y4-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reflex"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8.5",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Measure from one pencil end to the other. The ruler shows centimetres and millimetres.",
+        "values": [
+          8.5
+        ],
+        "start": 3.2
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-post-18-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y4-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8.5"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the shaded area in square centimetres?",
+      "correctAnswer": "17",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each grid square is 1 square centimetre.",
+        "values": [
+          6,
+          4
+        ],
+        "areaCells": [
+          [
+            1,
+            0,
+            "se"
+          ],
+          [
+            2,
+            0,
+            "full"
+          ],
+          [
+            3,
+            0,
+            "full"
+          ],
+          [
+            4,
+            0,
+            "sw"
+          ],
+          [
+            0,
+            1,
+            "se"
+          ],
+          [
+            1,
+            1,
+            "full"
+          ],
+          [
+            2,
+            1,
+            "full"
+          ],
+          [
+            3,
+            1,
+            "full"
+          ],
+          [
+            4,
+            1,
+            "full"
+          ],
+          [
+            5,
+            1,
+            "sw"
+          ],
+          [
+            0,
+            2,
+            "full"
+          ],
+          [
+            1,
+            2,
+            "full"
+          ],
+          [
+            2,
+            2,
+            "full"
+          ],
+          [
+            3,
+            2,
+            "full"
+          ],
+          [
+            4,
+            2,
+            "full"
+          ],
+          [
+            5,
+            2,
+            "full"
+          ],
+          [
+            1,
+            3,
+            "ne"
+          ],
+          [
+            2,
+            3,
+            "full"
+          ],
+          [
+            3,
+            3,
+            "full"
+          ],
+          [
+            4,
+            3,
+            "nw"
+          ]
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-post-19-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the shaded area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-19",
+      "skillLabel": "Measure irregular area using whole and half squares",
+      "structureKey": "y4-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "17"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the break finish?",
+      "correctAnswer": "1220",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The trip is followed straight away by the break. Enter hours, minutes and AM or PM.",
+        "values": [
+          625,
+          85,
+          30
+        ],
+        "labels": [
+          "Trip starts: 10:25 am",
+          "Trip lasts: 85 minutes",
+          "Break lasts: 30 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-post-20-v4",
+      "version": 4,
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What time does the break finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-20",
+      "skillLabel": "Find a finish time after two activities",
+      "structureKey": "y4-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1220"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "How many millilitres does each small interval show?",
+      "correctAnswer": "50",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "interval",
+        "description": "The marks are equally spaced.",
+        "values": [
+          200,
+          4
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y4-measurement-start-01-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many millilitres does each small interval show?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-1",
+      "skillLabel": "Read intervals on a scale",
+      "structureKey": "y4-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "10.7",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Read both ends of the pencil. The ruler shows centimetres and millimetres.",
+        "values": [
+          10.7
+        ],
+        "start": 0
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-start-02-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-2",
+      "skillLabel": "Read partial centimetres",
+      "structureKey": "y4-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10.7"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "22",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around the whole garden.",
+        "values": [
+          8,
+          3
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-start-03-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-3",
+      "skillLabel": "Measure a rectangle perimeter",
+      "structureKey": "y4-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "22"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this altogether?",
+      "correctAnswer": "165",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "duration",
+        "description": "Convert the whole duration to minutes.",
+        "values": [
+          165
+        ],
+        "labels": [
+          "2 hours 45 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-start-04-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this altogether?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-4",
+      "skillLabel": "Convert hours and minutes",
+      "structureKey": "y4-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "165"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Obtuse",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the purple angle A.",
+        "values": [
+          135
+        ],
+        "rotation": 24
+      },
+      "options": [
+        "Obtuse",
+        "Straight",
+        "Acute",
+        "Right"
+      ],
+      "id": "y4-measurement-start-05-v4",
+      "version": 4,
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-5",
+      "skillLabel": "Identify an obtuse angle",
+      "structureKey": "y4-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Obtuse"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "350",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "scale",
+        "description": "Read the mass of the book on the scale.",
+        "values": [
+          350
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y4-measurement-start-06-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-6",
+      "skillLabel": "Read an unlabelled mass mark",
+      "structureKey": "y4-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "350"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area in square centimetres?",
+      "correctAnswer": "21",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each small square has an area of 1 square centimetre.",
+        "values": [
+          7,
+          3
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-start-07-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-7",
+      "skillLabel": "Measure area using square units",
+      "structureKey": "y4-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "21"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the activity last?",
+      "correctAnswer": "50",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts and finishes on the same afternoon.",
+        "values": [
+          975,
+          1025
+        ],
+        "labels": [
+          "Start: 4:15 pm",
+          "Finish: 5:05 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-start-08-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the activity last?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-8",
+      "skillLabel": "Find elapsed time across an hour",
+      "structureKey": "y4-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle does the purple arc show?",
+      "correctAnswer": "Straight",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at angle A. The arc shows the turn between the arms.",
+        "values": [
+          180
+        ],
+        "rotation": 36
+      },
+      "options": [
+        "Reflex",
+        "Full revolution",
+        "Right",
+        "Straight"
+      ],
+      "id": "y4-measurement-start-09-v4",
+      "version": 4,
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What type of angle does the purple arc show?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-9",
+      "skillLabel": "Recognise a straight angle",
+      "structureKey": "y4-measurement-slot-9",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Straight"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in litres?",
+      "correctAnswer": "0.75",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "jug",
+        "description": "Read the water level on the litre scale.",
+        "values": [
+          0.75
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y4-measurement-start-10-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in litres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-10",
+      "skillLabel": "Read partial litre capacity",
+      "structureKey": "y4-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0.75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of the garden, in metres?",
+      "correctAnswer": "30",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around all six sides.",
+        "values": [
+          9,
+          6,
+          3,
+          2
+        ],
+        "lShape": true,
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-start-11-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of the garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-11",
+      "skillLabel": "Measure an L-shaped perimeter",
+      "structureKey": "y4-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "30"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the activity finish?",
+      "correctAnswer": "1900",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1095,
+          45
+        ],
+        "labels": [
+          "Start: 6:15 pm",
+          "Lasts: 45 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-start-12-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What time does the activity finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-12",
+      "skillLabel": "Find a finishing time",
+      "structureKey": "y4-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1900"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which shaded angle is larger?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Compare angles A and B. Look at the openings.",
+        "values": [
+          130
+        ],
+        "compareArms": true,
+        "rotation": 20
+      },
+      "options": [
+        "Both are equal",
+        "A",
+        "B"
+      ],
+      "id": "y4-measurement-start-13-v4",
+      "version": 4,
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which shaded angle is larger?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-13",
+      "skillLabel": "Compare angles with unequal arms",
+      "structureKey": "y4-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What temperature is shown in degrees Celsius?",
+      "correctAnswer": "27",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "thermometer",
+        "description": "Read the top of the red column.",
+        "values": [
+          27
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°C",
+        "ariaLabel": "Answer in °C"
+      },
+      "id": "y4-measurement-start-14-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What temperature is shown in degrees Celsius?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-14",
+      "skillLabel": "Read a thermometer",
+      "structureKey": "y4-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "27"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much larger is area A, in square centimetres?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Every small square is 1 square centimetre. Both grids use the same-sized squares.",
+        "values": [
+          8,
+          4,
+          8,
+          3
+        ],
+        "labels": [
+          "A",
+          "B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-start-15-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How much larger is area A, in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-15",
+      "skillLabel": "Compare areas on equal grids",
+      "structureKey": "y4-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes pass from start to finish?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts before noon and finishes after noon on the same day.",
+        "values": [
+          695,
+          780
+        ],
+        "labels": [
+          "Start: 11:35 am",
+          "Finish: 1:00 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-start-16-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes pass from start to finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-16",
+      "skillLabel": "Find elapsed time across noon",
+      "structureKey": "y4-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Reflex",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the large purple angle A.",
+        "values": [
+          240
+        ],
+        "rotation": 20
+      },
+      "options": [
+        "Straight",
+        "Reflex",
+        "Acute",
+        "Obtuse"
+      ],
+      "id": "y4-measurement-start-17-v4",
+      "version": 4,
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-17",
+      "skillLabel": "Identify a reflex angle",
+      "structureKey": "y4-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reflex"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9.3",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Measure from one pencil end to the other. The ruler shows centimetres and millimetres.",
+        "values": [
+          9.3
+        ],
+        "start": 2.4
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-start-18-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y4-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9.3"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the shaded area in square centimetres?",
+      "correctAnswer": "21",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each grid square is 1 square centimetre.",
+        "values": [
+          7,
+          4
+        ],
+        "areaCells": [
+          [
+            1,
+            0,
+            "se"
+          ],
+          [
+            2,
+            0,
+            "full"
+          ],
+          [
+            3,
+            0,
+            "full"
+          ],
+          [
+            4,
+            0,
+            "full"
+          ],
+          [
+            5,
+            0,
+            "sw"
+          ],
+          [
+            0,
+            1,
+            "se"
+          ],
+          [
+            1,
+            1,
+            "full"
+          ],
+          [
+            2,
+            1,
+            "full"
+          ],
+          [
+            3,
+            1,
+            "full"
+          ],
+          [
+            4,
+            1,
+            "full"
+          ],
+          [
+            5,
+            1,
+            "full"
+          ],
+          [
+            6,
+            1,
+            "sw"
+          ],
+          [
+            0,
+            2,
+            "full"
+          ],
+          [
+            1,
+            2,
+            "full"
+          ],
+          [
+            2,
+            2,
+            "full"
+          ],
+          [
+            3,
+            2,
+            "full"
+          ],
+          [
+            4,
+            2,
+            "full"
+          ],
+          [
+            5,
+            2,
+            "full"
+          ],
+          [
+            6,
+            2,
+            "full"
+          ],
+          [
+            1,
+            3,
+            "ne"
+          ],
+          [
+            2,
+            3,
+            "full"
+          ],
+          [
+            3,
+            3,
+            "full"
+          ],
+          [
+            4,
+            3,
+            "full"
+          ],
+          [
+            5,
+            3,
+            "nw"
+          ]
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-start-19-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the shaded area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-19",
+      "skillLabel": "Measure irregular area using whole and half squares",
+      "structureKey": "y4-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "21"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the break finish?",
+      "correctAnswer": "1225",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The trip is followed straight away by the break. Enter hours, minutes and AM or PM.",
+        "values": [
+          645,
+          75,
+          25
+        ],
+        "labels": [
+          "Trip starts: 10:45 am",
+          "Trip lasts: 75 minutes",
+          "Break lasts: 25 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-start-20-v4",
+      "version": 4,
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What time does the break finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-20",
+      "skillLabel": "Find a finish time after two activities",
+      "structureKey": "y4-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1225"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "How many millilitres does each small interval show?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "interval",
+        "description": "The marks are equally spaced.",
+        "values": [
+          80,
+          4
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y4-measurement-mid-01-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many millilitres does each small interval show?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-1",
+      "skillLabel": "Read intervals on a scale",
+      "structureKey": "y4-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "11.8",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Read both ends of the pencil. The ruler shows centimetres and millimetres.",
+        "values": [
+          11.8
+        ],
+        "start": 0
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-mid-02-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-2",
+      "skillLabel": "Read partial centimetres",
+      "structureKey": "y4-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11.8"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "22",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around the whole garden.",
+        "values": [
+          7,
+          4
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-mid-03-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-3",
+      "skillLabel": "Measure a rectangle perimeter",
+      "structureKey": "y4-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "22"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this altogether?",
+      "correctAnswer": "195",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "duration",
+        "description": "Convert the whole duration to minutes.",
+        "values": [
+          195
+        ],
+        "labels": [
+          "3 hours 15 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-mid-04-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this altogether?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-4",
+      "skillLabel": "Convert hours and minutes",
+      "structureKey": "y4-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "195"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Obtuse",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the purple angle A.",
+        "values": [
+          120
+        ],
+        "rotation": 36
+      },
+      "options": [
+        "Straight",
+        "Acute",
+        "Right",
+        "Obtuse"
+      ],
+      "id": "y4-measurement-mid-05-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-5",
+      "skillLabel": "Identify an obtuse angle",
+      "structureKey": "y4-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Obtuse"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "750",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "scale",
+        "description": "Read the mass of the book on the scale.",
+        "values": [
+          750
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y4-measurement-mid-06-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-6",
+      "skillLabel": "Read an unlabelled mass mark",
+      "structureKey": "y4-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area in square centimetres?",
+      "correctAnswer": "25",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each small square has an area of 1 square centimetre.",
+        "values": [
+          5,
+          5
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-mid-07-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-7",
+      "skillLabel": "Measure area using square units",
+      "structureKey": "y4-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the activity last?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts and finishes on the same afternoon.",
+        "values": [
+          875,
+          930
+        ],
+        "labels": [
+          "Start: 2:35 pm",
+          "Finish: 3:30 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-mid-08-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the activity last?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-8",
+      "skillLabel": "Find elapsed time across an hour",
+      "structureKey": "y4-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle does the purple arc show?",
+      "correctAnswer": "Straight",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at angle A. The arc shows the turn between the arms.",
+        "values": [
+          180
+        ],
+        "rotation": 54
+      },
+      "options": [
+        "Full revolution",
+        "Right",
+        "Straight",
+        "Reflex"
+      ],
+      "id": "y4-measurement-mid-09-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What type of angle does the purple arc show?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-9",
+      "skillLabel": "Recognise a straight angle",
+      "structureKey": "y4-measurement-slot-9",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Straight"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in litres?",
+      "correctAnswer": "1.25",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "jug",
+        "description": "Read the water level on the litre scale.",
+        "values": [
+          1.25
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y4-measurement-mid-10-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in litres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-10",
+      "skillLabel": "Read partial litre capacity",
+      "structureKey": "y4-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of the garden, in metres?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around all six sides.",
+        "values": [
+          8,
+          6,
+          3,
+          2
+        ],
+        "lShape": true,
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-mid-11-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of the garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-11",
+      "skillLabel": "Measure an L-shaped perimeter",
+      "structureKey": "y4-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the activity finish?",
+      "correctAnswer": "1920",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1115,
+          45
+        ],
+        "labels": [
+          "Start: 6:35 pm",
+          "Lasts: 45 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-mid-12-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What time does the activity finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-12",
+      "skillLabel": "Find a finishing time",
+      "structureKey": "y4-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1920"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which shaded angle is larger?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Compare angles A and B. Look at the openings.",
+        "values": [
+          115
+        ],
+        "compareArms": true,
+        "rotation": 30
+      },
+      "options": [
+        "A",
+        "B",
+        "Both are equal"
+      ],
+      "id": "y4-measurement-mid-13-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which shaded angle is larger?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-13",
+      "skillLabel": "Compare angles with unequal arms",
+      "structureKey": "y4-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What temperature is shown in degrees Celsius?",
+      "correctAnswer": "16",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "thermometer",
+        "description": "Read the top of the red column.",
+        "values": [
+          16
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°C",
+        "ariaLabel": "Answer in °C"
+      },
+      "id": "y4-measurement-mid-14-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What temperature is shown in degrees Celsius?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-14",
+      "skillLabel": "Read a thermometer",
+      "structureKey": "y4-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "16"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much larger is area A, in square centimetres?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Every small square is 1 square centimetre. Both grids use the same-sized squares.",
+        "values": [
+          6,
+          4,
+          6,
+          3
+        ],
+        "labels": [
+          "A",
+          "B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-mid-15-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How much larger is area A, in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-15",
+      "skillLabel": "Compare areas on equal grids",
+      "structureKey": "y4-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes pass from start to finish?",
+      "correctAnswer": "95",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts before noon and finishes after noon on the same day.",
+        "values": [
+          685,
+          780
+        ],
+        "labels": [
+          "Start: 11:25 am",
+          "Finish: 1:00 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-mid-16-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes pass from start to finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-16",
+      "skillLabel": "Find elapsed time across noon",
+      "structureKey": "y4-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "95"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Reflex",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the large purple angle A.",
+        "values": [
+          220
+        ],
+        "rotation": 30
+      },
+      "options": [
+        "Reflex",
+        "Acute",
+        "Obtuse",
+        "Straight"
+      ],
+      "id": "y4-measurement-mid-17-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-17",
+      "skillLabel": "Identify a reflex angle",
+      "structureKey": "y4-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reflex"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8.6",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Measure from one pencil end to the other. The ruler shows centimetres and millimetres.",
+        "values": [
+          8.6
+        ],
+        "start": 3.1
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-mid-18-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y4-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8.6"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the shaded area in square centimetres?",
+      "correctAnswer": "17",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each grid square is 1 square centimetre.",
+        "values": [
+          6,
+          4
+        ],
+        "areaCells": [
+          [
+            1,
+            3,
+            "ne"
+          ],
+          [
+            2,
+            3,
+            "full"
+          ],
+          [
+            3,
+            3,
+            "full"
+          ],
+          [
+            4,
+            3,
+            "nw"
+          ],
+          [
+            0,
+            2,
+            "ne"
+          ],
+          [
+            1,
+            2,
+            "full"
+          ],
+          [
+            2,
+            2,
+            "full"
+          ],
+          [
+            3,
+            2,
+            "full"
+          ],
+          [
+            4,
+            2,
+            "full"
+          ],
+          [
+            5,
+            2,
+            "nw"
+          ],
+          [
+            0,
+            1,
+            "full"
+          ],
+          [
+            1,
+            1,
+            "full"
+          ],
+          [
+            2,
+            1,
+            "full"
+          ],
+          [
+            3,
+            1,
+            "full"
+          ],
+          [
+            4,
+            1,
+            "full"
+          ],
+          [
+            5,
+            1,
+            "full"
+          ],
+          [
+            1,
+            0,
+            "se"
+          ],
+          [
+            2,
+            0,
+            "full"
+          ],
+          [
+            3,
+            0,
+            "full"
+          ],
+          [
+            4,
+            0,
+            "sw"
+          ]
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-mid-19-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the shaded area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-19",
+      "skillLabel": "Measure irregular area using whole and half squares",
+      "structureKey": "y4-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "17"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the break finish?",
+      "correctAnswer": "1220",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The trip is followed straight away by the break. Enter hours, minutes and AM or PM.",
+        "values": [
+          615,
+          95,
+          30
+        ],
+        "labels": [
+          "Trip starts: 10:15 am",
+          "Trip lasts: 95 minutes",
+          "Break lasts: 30 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-mid-20-v4",
+      "version": 4,
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What time does the break finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-20",
+      "skillLabel": "Find a finish time after two activities",
+      "structureKey": "y4-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1220"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "How many millilitres does each small interval show?",
+      "correctAnswer": "25",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "interval",
+        "description": "The marks are equally spaced.",
+        "values": [
+          100,
+          4
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y4-measurement-end-01-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many millilitres does each small interval show?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-1",
+      "skillLabel": "Read intervals on a scale",
+      "structureKey": "y4-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "12.3",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Read both ends of the pencil. The ruler shows centimetres and millimetres.",
+        "values": [
+          12.3
+        ],
+        "start": 0
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-end-02-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-2",
+      "skillLabel": "Read partial centimetres",
+      "structureKey": "y4-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12.3"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "24",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around the whole garden.",
+        "values": [
+          9,
+          3
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-end-03-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-3",
+      "skillLabel": "Measure a rectangle perimeter",
+      "structureKey": "y4-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "24"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this altogether?",
+      "correctAnswer": "210",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "duration",
+        "description": "Convert the whole duration to minutes.",
+        "values": [
+          210
+        ],
+        "labels": [
+          "3 hours 30 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-end-04-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this altogether?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-4",
+      "skillLabel": "Convert hours and minutes",
+      "structureKey": "y4-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "210"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Obtuse",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the purple angle A.",
+        "values": [
+          140
+        ],
+        "rotation": 48
+      },
+      "options": [
+        "Acute",
+        "Right",
+        "Obtuse",
+        "Straight"
+      ],
+      "id": "y4-measurement-end-05-v4",
+      "version": 4,
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-5",
+      "skillLabel": "Identify an obtuse angle",
+      "structureKey": "y4-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Obtuse"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "550",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "scale",
+        "description": "Read the mass of the book on the scale.",
+        "values": [
+          550
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y4-measurement-end-06-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-6",
+      "skillLabel": "Read an unlabelled mass mark",
+      "structureKey": "y4-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "550"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area in square centimetres?",
+      "correctAnswer": "24",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each small square has an area of 1 square centimetre.",
+        "values": [
+          6,
+          4
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-end-07-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-7",
+      "skillLabel": "Measure area using square units",
+      "structureKey": "y4-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "24"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the activity last?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts and finishes on the same afternoon.",
+        "values": [
+          915,
+          970
+        ],
+        "labels": [
+          "Start: 3:15 pm",
+          "Finish: 4:10 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-end-08-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the activity last?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-8",
+      "skillLabel": "Find elapsed time across an hour",
+      "structureKey": "y4-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle does the purple arc show?",
+      "correctAnswer": "Straight",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at angle A. The arc shows the turn between the arms.",
+        "values": [
+          180
+        ],
+        "rotation": 72
+      },
+      "options": [
+        "Right",
+        "Straight",
+        "Reflex",
+        "Full revolution"
+      ],
+      "id": "y4-measurement-end-09-v4",
+      "version": 4,
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What type of angle does the purple arc show?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-9",
+      "skillLabel": "Recognise a straight angle",
+      "structureKey": "y4-measurement-slot-9",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Straight"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in litres?",
+      "correctAnswer": "1.75",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "jug",
+        "description": "Read the water level on the litre scale.",
+        "values": [
+          1.75
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y4-measurement-end-10-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in litres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-10",
+      "skillLabel": "Read partial litre capacity",
+      "structureKey": "y4-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of the garden, in metres?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "perimeter",
+        "description": "Find the distance around all six sides.",
+        "values": [
+          7,
+          7,
+          3,
+          2
+        ],
+        "lShape": true,
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y4-measurement-end-11-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of the garden, in metres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-11",
+      "skillLabel": "Measure an L-shaped perimeter",
+      "structureKey": "y4-measurement-slot-11",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the activity finish?",
+      "correctAnswer": "1850",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1075,
+          55
+        ],
+        "labels": [
+          "Start: 5:55 pm",
+          "Lasts: 55 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-end-12-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What time does the activity finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-12",
+      "skillLabel": "Find a finishing time",
+      "structureKey": "y4-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1850"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which shaded angle is larger?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Compare angles A and B. Look at the openings.",
+        "values": [
+          125
+        ],
+        "compareArms": true,
+        "rotation": 40
+      },
+      "options": [
+        "B",
+        "Both are equal",
+        "A"
+      ],
+      "id": "y4-measurement-end-13-v4",
+      "version": 4,
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which shaded angle is larger?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-13",
+      "skillLabel": "Compare angles with unequal arms",
+      "structureKey": "y4-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What temperature is shown in degrees Celsius?",
+      "correctAnswer": "32",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "thermometer",
+        "description": "Read the top of the red column.",
+        "values": [
+          32
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°C",
+        "ariaLabel": "Answer in °C"
+      },
+      "id": "y4-measurement-end-14-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What temperature is shown in degrees Celsius?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-14",
+      "skillLabel": "Read a thermometer",
+      "structureKey": "y4-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "32"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much larger is area A, in square centimetres?",
+      "correctAnswer": "7",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Every small square is 1 square centimetre. Both grids use the same-sized squares.",
+        "values": [
+          7,
+          4,
+          7,
+          3
+        ],
+        "labels": [
+          "A",
+          "B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-end-15-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How much larger is area A, in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-15",
+      "skillLabel": "Compare areas on equal grids",
+      "structureKey": "y4-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes pass from start to finish?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The activity starts before noon and finishes after noon on the same day.",
+        "values": [
+          705,
+          790
+        ],
+        "labels": [
+          "Start: 11:45 am",
+          "Finish: 1:10 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y4-measurement-end-16-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes pass from start to finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-16",
+      "skillLabel": "Find elapsed time across noon",
+      "structureKey": "y4-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What type of angle is shaded?",
+      "correctAnswer": "Reflex",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "angle",
+        "description": "Look at the large purple angle A.",
+        "values": [
+          260
+        ],
+        "rotation": 40
+      },
+      "options": [
+        "Acute",
+        "Obtuse",
+        "Straight",
+        "Reflex"
+      ],
+      "id": "y4-measurement-end-17-v4",
+      "version": 4,
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What type of angle is shaded?",
+      "primaryDescriptorCode": "AC9M4M04",
+      "curriculumCodes": [
+        "AC9M4M04"
+      ],
+      "skillId": "y4-measurement-slot-17",
+      "skillLabel": "Identify a reflex angle",
+      "structureKey": "y4-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Reflex"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9.2",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "ruler",
+        "description": "Measure from one pencil end to the other. The ruler shows centimetres and millimetres.",
+        "values": [
+          9.2
+        ],
+        "start": 2.6
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y4-measurement-end-18-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M4M01",
+      "curriculumCodes": [
+        "AC9M4M01"
+      ],
+      "skillId": "y4-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y4-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9.2"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the shaded area in square centimetres?",
+      "correctAnswer": "13",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "area",
+        "description": "Each grid square is 1 square centimetre.",
+        "values": [
+          5,
+          4
+        ],
+        "areaCells": [
+          [
+            1,
+            3,
+            "ne"
+          ],
+          [
+            2,
+            3,
+            "full"
+          ],
+          [
+            3,
+            3,
+            "nw"
+          ],
+          [
+            0,
+            2,
+            "ne"
+          ],
+          [
+            1,
+            2,
+            "full"
+          ],
+          [
+            2,
+            2,
+            "full"
+          ],
+          [
+            3,
+            2,
+            "full"
+          ],
+          [
+            4,
+            2,
+            "nw"
+          ],
+          [
+            0,
+            1,
+            "full"
+          ],
+          [
+            1,
+            1,
+            "full"
+          ],
+          [
+            2,
+            1,
+            "full"
+          ],
+          [
+            3,
+            1,
+            "full"
+          ],
+          [
+            4,
+            1,
+            "full"
+          ],
+          [
+            1,
+            0,
+            "se"
+          ],
+          [
+            2,
+            0,
+            "full"
+          ],
+          [
+            3,
+            0,
+            "sw"
+          ]
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm²",
+        "ariaLabel": "Answer in cm²"
+      },
+      "id": "y4-measurement-end-19-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the shaded area in square centimetres?",
+      "primaryDescriptorCode": "AC9M4M02",
+      "curriculumCodes": [
+        "AC9M4M02"
+      ],
+      "skillId": "y4-measurement-slot-19",
+      "skillLabel": "Measure irregular area using whole and half squares",
+      "structureKey": "y4-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "13"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the break finish?",
+      "correctAnswer": "1230",
+      "visual": {
+        "type": "measurement_year4_panel",
+        "task": "timeline",
+        "description": "The trip is followed straight away by the break. Enter hours, minutes and AM or PM.",
+        "values": [
+          655,
+          70,
+          25
+        ],
+        "labels": [
+          "Trip starts: 10:55 am",
+          "Trip lasts: 70 minutes",
+          "Break lasts: 25 minutes"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour and two-digit minutes, then choose AM or PM"
+      },
+      "id": "y4-measurement-end-20-v4",
+      "version": 4,
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What time does the break finish?",
+      "primaryDescriptorCode": "AC9M4M03",
+      "curriculumCodes": [
+        "AC9M4M03"
+      ],
+      "skillId": "y4-measurement-slot-20",
+      "skillLabel": "Find a finish time after two activities",
+      "structureKey": "y4-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1230"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ]
+}

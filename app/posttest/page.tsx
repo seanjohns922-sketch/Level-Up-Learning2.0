@@ -1,4 +1,7 @@
 "use client";
+import { year3MeasurementPostVersion } from "@/lib/year3-measurement-assessment-version";
+import { year4MeasurementPostVersion } from "@/lib/year4-measurement-assessment-version";
+import MeasurementExtensionAssessment from "@/components/assessment/MeasurementExtensionAssessment";
 import { year1MeasurementPostVersion } from "@/lib/year1-measurement-assessment-version";
 import { year2MeasurementPostVersion } from "@/lib/year2-measurement-assessment-version";
 import { year5MeasurementPostVersion } from "@/lib/year5-measurement-assessment-version";
@@ -345,6 +348,7 @@ export default function PostTestPageWrapper() {
 
 function AssessmentRoute() {
   const params=useSearchParams();
+  if (["Year 7","Year 8"].includes(params.get("year")??"") && params.get("realm_id")==="measurement") return <MeasurementExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/>;
   return ["Year 7","Year 8"].includes(params.get("year")??"") && (params.get("realm_id")??"number")==="number"
     ? <NumberExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/> : <PostTestPage/>;
 }
@@ -386,6 +390,7 @@ function PostTestPage() {
   const [year1MeasurementVersion,setYear1MeasurementVersion]=useState<3|4>(4);
   const [year2MeasurementVersion,setYear2MeasurementVersion]=useState<3|4>(4);
   const [year5MeasurementVersion,setYear5MeasurementVersion]=useState<3|4>(4);
+  const [measurementReleaseVersion,setMeasurementReleaseVersion]=useState<0|1>(1);
   const [year6MeasurementVersion,setYear6MeasurementVersion]=useState<3|4>(4);
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(2);
@@ -402,8 +407,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion],
   );
 
   const [idx, setIdx] = useState(0);
@@ -473,12 +478,13 @@ function PostTestPage() {
           try { const draft=JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId,year))??"null");draftIds=draft?.questionIds??(draft?.answers?Object.keys(draft.answers):undefined); } catch { /* Retain baseline version. */ }
           setYear1MeasurementVersion(year1MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
         }
-        if(progressRealmId === "measurement" && year === "Year 2") {
+        if(progressRealmId === "measurement") {
           let draftIds:string[]|undefined;
           try { const draft=JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId,year))??"null");draftIds=draft?.questionIds??(draft?.answers?Object.keys(draft.answers):undefined); } catch { /* Retain baseline version. */ }
           setYear2MeasurementVersion(year2MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
           setYear5MeasurementVersion(year5MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
           setYear6MeasurementVersion(year6MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
+          setMeasurementReleaseVersion((year==="Year 3" ? year3MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds) : year==="Year 4" ? year4MeasurementPostVersion(restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds) : 4)===4?1:0);
         }
         if (progressRealmId === "number" && year === "Prep") {
           let draftIds: string[] | undefined;
