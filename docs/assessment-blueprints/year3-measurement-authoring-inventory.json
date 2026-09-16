@@ -1,0 +1,4352 @@
+{
+  "pretest": [
+    {
+      "prompt": "Which unit measures the mass of this full school bag?",
+      "correctAnswer": "Kilograms",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "object",
+        "description": "A full school bag.",
+        "arts": [
+          "week2-3d/backpack.png"
+        ]
+      },
+      "options": [
+        "Grams",
+        "Kilograms",
+        "Millilitres"
+      ],
+      "id": "y3-measurement-review-pretest-01",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which unit measures the mass of this full school bag?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-1",
+      "skillLabel": "Choose a mass unit",
+      "structureKey": "y3-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Kilograms"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          8
+        ],
+        "start": 0,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-pretest-02",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-2",
+      "skillLabel": "Read a centimetre ruler",
+      "structureKey": "y3-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this?",
+      "correctAnswer": "120",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to minutes.",
+        "values": [
+          2
+        ],
+        "unit": "hours",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-03",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-3",
+      "skillLabel": "Convert hours to minutes",
+      "structureKey": "y3-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "7:25",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 7,
+        "minute": 25
+      },
+      "options": [
+        "7:25",
+        "7:30",
+        "8:25"
+      ],
+      "id": "y3-measurement-review-pretest-04",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-4",
+      "skillLabel": "Read five-minute time",
+      "structureKey": "y3-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7:25"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How does this opening compare with a right angle?",
+      "correctAnswer": "Less than a right angle",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the door opening with a square corner.",
+        "angle": 40,
+        "rotation": 0
+      },
+      "options": [
+        "Equal to a right angle",
+        "Greater than a right angle",
+        "Less than a right angle"
+      ],
+      "id": "y3-measurement-review-pretest-05",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "How does this opening compare with a right angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-5",
+      "skillLabel": "Compare with a right angle",
+      "structureKey": "y3-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Less than a right angle"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many metres long is the row?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "Each desk is about 1 metre long. The desks touch end to end.",
+        "quantity": 3,
+        "values": [
+          1
+        ],
+        "unit": "m",
+        "labels": [
+          "One desk"
+        ],
+        "arts": [
+          "everyday-3d/object-desk.png"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-06",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "About how many metres long is the row?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-6",
+      "skillLabel": "Estimate length from a benchmark",
+      "structureKey": "y3-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "400",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "scale",
+        "description": "Read the scale. Its numbered marks are in grams.",
+        "values": [
+          400
+        ],
+        "unit": "g"
+      },
+      "id": "y3-measurement-review-pretest-07",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-7",
+      "skillLabel": "Read a labelled mass scale",
+      "structureKey": "y3-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "400"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many seconds is this?",
+      "correctAnswer": "180",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to seconds.",
+        "values": [
+          3
+        ],
+        "unit": "minutes",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-08",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many seconds is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-8",
+      "skillLabel": "Convert minutes to seconds",
+      "structureKey": "y3-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "180"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "8:47",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 8,
+        "minute": 47
+      },
+      "options": [
+        "9:47",
+        "8:47",
+        "8:42"
+      ],
+      "id": "y3-measurement-review-pretest-09",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-9",
+      "skillLabel": "Read time to the minute",
+      "structureKey": "y3-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8:47"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many right angles make this half turn?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Follow the arrow from Start to Finish.",
+        "angle": 180,
+        "rotation": 0
+      },
+      "options": [
+        "1",
+        "2",
+        "4"
+      ],
+      "id": "y3-measurement-review-pretest-10",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "How many right angles make this half turn?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-10",
+      "skillLabel": "Relate a turn to right angles",
+      "structureKey": "y3-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many grams do these apples weigh altogether?",
+      "correctAnswer": "450",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One apple weighs about 150 grams. The apples are similar sizes.",
+        "quantity": 3,
+        "values": [
+          150
+        ],
+        "unit": "g",
+        "labels": [
+          "One apple"
+        ],
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-11",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "About how many grams do these apples weigh altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-11",
+      "skillLabel": "Estimate mass from a benchmark",
+      "structureKey": "y3-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "450"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in millilitres?",
+      "correctAnswer": "400",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "jug",
+        "description": "Read the water level. The numbered marks show millilitres.",
+        "values": [
+          400
+        ],
+        "unit": "mL"
+      },
+      "id": "y3-measurement-review-pretest-12",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in millilitres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-12",
+      "skillLabel": "Read a labelled measuring jug",
+      "structureKey": "y3-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "400"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes longer is activity A?",
+      "correctAnswer": "15",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Compare the two activity times.",
+        "values": [
+          1,
+          45
+        ],
+        "labels": [
+          "Activity A: 1 hour",
+          "Activity B: 45 minutes"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-13",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes longer is activity A?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-13",
+      "skillLabel": "Compare durations in hours and minutes",
+      "structureKey": "y3-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "15"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which digital time matches this clock?",
+      "correctAnswer": "11:13",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 11,
+        "minute": 13
+      },
+      "options": [
+        "11:18",
+        "12:13",
+        "11:13"
+      ],
+      "id": "y3-measurement-review-pretest-14",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which digital time matches this clock?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-14",
+      "skillLabel": "Match analogue and digital time",
+      "structureKey": "y3-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11:13"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which opening makes the larger angle?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the openings, labelled A and B.",
+        "angle": 50,
+        "compareArms": true,
+        "rotation": 0
+      },
+      "options": [
+        "Both are equal",
+        "A",
+        "B"
+      ],
+      "id": "y3-measurement-review-pretest-15",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which opening makes the larger angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-15",
+      "skillLabel": "Compare angles with different arm lengths",
+      "structureKey": "y3-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many centimetres longer is ribbon A?",
+      "correctAnswer": "27",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ribbons",
+        "description": "Compare the two ribbon lengths.",
+        "values": [
+          84,
+          57
+        ],
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "unit": "cm",
+        "object": "ribbon"
+      },
+      "id": "y3-measurement-review-pretest-16",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many centimetres longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-16",
+      "skillLabel": "Find a length difference",
+      "structureKey": "y3-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "27"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many millilitres do these full cups hold altogether?",
+      "correctAnswer": "750",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One cup holds about 250 millilitres. All cups are the same size.",
+        "quantity": 3,
+        "values": [
+          250
+        ],
+        "unit": "mL",
+        "labels": [
+          "One cup"
+        ],
+        "arts": [
+          "containers-3d/cup.png"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-17",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "About how many millilitres do these full cups hold altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-17",
+      "skillLabel": "Estimate capacity from a benchmark",
+      "structureKey": "y3-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "750"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          9
+        ],
+        "start": 2,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-pretest-18",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y3-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "4:57",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 4,
+        "minute": 57
+      },
+      "options": [
+        "4:57",
+        "5:57",
+        "4:52"
+      ],
+      "id": "y3-measurement-review-pretest-19",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-19",
+      "skillLabel": "Read time near the next hour",
+      "structureKey": "y3-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4:57"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many hours is this?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to hours.",
+        "values": [
+          2
+        ],
+        "unit": "days",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-pretest-20",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many hours is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-20",
+      "skillLabel": "Convert days to hours",
+      "structureKey": "y3-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "Which unit measures the mass of this large pumpkin?",
+      "correctAnswer": "Kilograms",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "object",
+        "description": "A large pumpkin.",
+        "arts": [
+          "week2-3d/pumpkin.png"
+        ]
+      },
+      "options": [
+        "Kilograms",
+        "Millilitres",
+        "Grams"
+      ],
+      "id": "y3-measurement-review-posttest-01",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which unit measures the mass of this large pumpkin?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-1",
+      "skillLabel": "Choose a mass unit",
+      "structureKey": "y3-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Kilograms"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          9
+        ],
+        "start": 0,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-posttest-02",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-2",
+      "skillLabel": "Read a centimetre ruler",
+      "structureKey": "y3-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this?",
+      "correctAnswer": "180",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to minutes.",
+        "values": [
+          3
+        ],
+        "unit": "hours",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-03",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-3",
+      "skillLabel": "Convert hours to minutes",
+      "structureKey": "y3-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "180"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "8:35",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 8,
+        "minute": 35
+      },
+      "options": [
+        "8:40",
+        "9:35",
+        "8:35"
+      ],
+      "id": "y3-measurement-review-posttest-04",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-4",
+      "skillLabel": "Read five-minute time",
+      "structureKey": "y3-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8:35"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How does this opening compare with a right angle?",
+      "correctAnswer": "Less than a right angle",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the door opening with a square corner.",
+        "angle": 50,
+        "rotation": 15
+      },
+      "options": [
+        "Greater than a right angle",
+        "Less than a right angle",
+        "Equal to a right angle"
+      ],
+      "id": "y3-measurement-review-posttest-05",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "How does this opening compare with a right angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-5",
+      "skillLabel": "Compare with a right angle",
+      "structureKey": "y3-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Less than a right angle"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many metres long is the row?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "Each desk is about 1 metre long. The desks touch end to end.",
+        "quantity": 4,
+        "values": [
+          1
+        ],
+        "unit": "m",
+        "labels": [
+          "One desk"
+        ],
+        "arts": [
+          "everyday-3d/object-desk.png"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-06",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "About how many metres long is the row?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-6",
+      "skillLabel": "Estimate length from a benchmark",
+      "structureKey": "y3-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "600",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "scale",
+        "description": "Read the scale. Its numbered marks are in grams.",
+        "values": [
+          600
+        ],
+        "unit": "g"
+      },
+      "id": "y3-measurement-review-posttest-07",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-7",
+      "skillLabel": "Read a labelled mass scale",
+      "structureKey": "y3-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "600"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many seconds is this?",
+      "correctAnswer": "240",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to seconds.",
+        "values": [
+          4
+        ],
+        "unit": "minutes",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-08",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many seconds is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-8",
+      "skillLabel": "Convert minutes to seconds",
+      "structureKey": "y3-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "240"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "9:43",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 9,
+        "minute": 43
+      },
+      "options": [
+        "9:43",
+        "9:38",
+        "10:43"
+      ],
+      "id": "y3-measurement-review-posttest-09",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-9",
+      "skillLabel": "Read time to the minute",
+      "structureKey": "y3-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9:43"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many right angles make this half turn?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Follow the arrow from Start to Finish.",
+        "angle": 180,
+        "rotation": 30
+      },
+      "options": [
+        "2",
+        "4",
+        "1"
+      ],
+      "id": "y3-measurement-review-posttest-10",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "How many right angles make this half turn?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-10",
+      "skillLabel": "Relate a turn to right angles",
+      "structureKey": "y3-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many grams do these apples weigh altogether?",
+      "correctAnswer": "600",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One apple weighs about 150 grams. The apples are similar sizes.",
+        "quantity": 4,
+        "values": [
+          150
+        ],
+        "unit": "g",
+        "labels": [
+          "One apple"
+        ],
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-11",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "About how many grams do these apples weigh altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-11",
+      "skillLabel": "Estimate mass from a benchmark",
+      "structureKey": "y3-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "600"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in millilitres?",
+      "correctAnswer": "600",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "jug",
+        "description": "Read the water level. The numbered marks show millilitres.",
+        "values": [
+          600
+        ],
+        "unit": "mL"
+      },
+      "id": "y3-measurement-review-posttest-12",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in millilitres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-12",
+      "skillLabel": "Read a labelled measuring jug",
+      "structureKey": "y3-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "600"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes longer is activity A?",
+      "correctAnswer": "25",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Compare the two activity times.",
+        "values": [
+          1,
+          35
+        ],
+        "labels": [
+          "Activity A: 1 hour",
+          "Activity B: 35 minutes"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-13",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes longer is activity A?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-13",
+      "skillLabel": "Compare durations in hours and minutes",
+      "structureKey": "y3-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "25"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which digital time matches this clock?",
+      "correctAnswer": "12:17",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 12,
+        "minute": 17
+      },
+      "options": [
+        "1:17",
+        "12:17",
+        "12:22"
+      ],
+      "id": "y3-measurement-review-posttest-14",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which digital time matches this clock?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-14",
+      "skillLabel": "Match analogue and digital time",
+      "structureKey": "y3-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12:17"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which opening makes the larger angle?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the openings, labelled A and B.",
+        "angle": 60,
+        "compareArms": true,
+        "rotation": 10
+      },
+      "options": [
+        "A",
+        "B",
+        "Both are equal"
+      ],
+      "id": "y3-measurement-review-posttest-15",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which opening makes the larger angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-15",
+      "skillLabel": "Compare angles with different arm lengths",
+      "structureKey": "y3-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many centimetres longer is ribbon A?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ribbons",
+        "description": "Compare the two ribbon lengths.",
+        "values": [
+          76,
+          48
+        ],
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "unit": "cm",
+        "object": "ribbon"
+      },
+      "id": "y3-measurement-review-posttest-16",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many centimetres longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-16",
+      "skillLabel": "Find a length difference",
+      "structureKey": "y3-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many millilitres do these full cups hold altogether?",
+      "correctAnswer": "800",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One cup holds about 200 millilitres. All cups are the same size.",
+        "quantity": 4,
+        "values": [
+          200
+        ],
+        "unit": "mL",
+        "labels": [
+          "One cup"
+        ],
+        "arts": [
+          "containers-3d/cup.png"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-17",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "About how many millilitres do these full cups hold altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-17",
+      "skillLabel": "Estimate capacity from a benchmark",
+      "structureKey": "y3-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "800"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          8
+        ],
+        "start": 3,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-posttest-18",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y3-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "5:56",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 5,
+        "minute": 56
+      },
+      "options": [
+        "6:56",
+        "5:51",
+        "5:56"
+      ],
+      "id": "y3-measurement-review-posttest-19",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-19",
+      "skillLabel": "Read time near the next hour",
+      "structureKey": "y3-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5:56"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many hours is this?",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to hours.",
+        "values": [
+          3
+        ],
+        "unit": "days",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-posttest-20",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many hours is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-20",
+      "skillLabel": "Convert days to hours",
+      "structureKey": "y3-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "Which unit measures the mass of this watermelon?",
+      "correctAnswer": "Kilograms",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "object",
+        "description": "A watermelon.",
+        "arts": [
+          "week2-3d/watermelon.png"
+        ]
+      },
+      "options": [
+        "Millilitres",
+        "Grams",
+        "Kilograms"
+      ],
+      "id": "y3-measurement-review-start-01",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which unit measures the mass of this watermelon?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-1",
+      "skillLabel": "Choose a mass unit",
+      "structureKey": "y3-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Kilograms"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "10",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          10
+        ],
+        "start": 0,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-start-02",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-2",
+      "skillLabel": "Read a centimetre ruler",
+      "structureKey": "y3-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this?",
+      "correctAnswer": "240",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to minutes.",
+        "values": [
+          4
+        ],
+        "unit": "hours",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-start-03",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-3",
+      "skillLabel": "Convert hours to minutes",
+      "structureKey": "y3-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "240"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "9:20",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 9,
+        "minute": 20
+      },
+      "options": [
+        "10:20",
+        "9:20",
+        "9:25"
+      ],
+      "id": "y3-measurement-review-start-04",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-4",
+      "skillLabel": "Read five-minute time",
+      "structureKey": "y3-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9:20"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How does this opening compare with a right angle?",
+      "correctAnswer": "Less than a right angle",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the door opening with a square corner.",
+        "angle": 60,
+        "rotation": 30
+      },
+      "options": [
+        "Less than a right angle",
+        "Equal to a right angle",
+        "Greater than a right angle"
+      ],
+      "id": "y3-measurement-review-start-05",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "How does this opening compare with a right angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-5",
+      "skillLabel": "Compare with a right angle",
+      "structureKey": "y3-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Less than a right angle"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many metres long is the row?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "Each desk is about 1 metre long. The desks touch end to end.",
+        "quantity": 2,
+        "values": [
+          1
+        ],
+        "unit": "m",
+        "labels": [
+          "One desk"
+        ],
+        "arts": [
+          "everyday-3d/object-desk.png"
+        ]
+      },
+      "id": "y3-measurement-review-start-06",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "About how many metres long is the row?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-6",
+      "skillLabel": "Estimate length from a benchmark",
+      "structureKey": "y3-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "300",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "scale",
+        "description": "Read the scale. Its numbered marks are in grams.",
+        "values": [
+          300
+        ],
+        "unit": "g"
+      },
+      "id": "y3-measurement-review-start-07",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-7",
+      "skillLabel": "Read a labelled mass scale",
+      "structureKey": "y3-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "300"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many seconds is this?",
+      "correctAnswer": "120",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to seconds.",
+        "values": [
+          2
+        ],
+        "unit": "minutes",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-start-08",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many seconds is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-8",
+      "skillLabel": "Convert minutes to seconds",
+      "structureKey": "y3-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "10:48",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 10,
+        "minute": 48
+      },
+      "options": [
+        "10:43",
+        "11:48",
+        "10:48"
+      ],
+      "id": "y3-measurement-review-start-09",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-9",
+      "skillLabel": "Read time to the minute",
+      "structureKey": "y3-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10:48"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many right angles make this half turn?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Follow the arrow from Start to Finish.",
+        "angle": 180,
+        "rotation": 60
+      },
+      "options": [
+        "4",
+        "1",
+        "2"
+      ],
+      "id": "y3-measurement-review-start-10",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "How many right angles make this half turn?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-10",
+      "skillLabel": "Relate a turn to right angles",
+      "structureKey": "y3-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many grams do these apples weigh altogether?",
+      "correctAnswer": "600",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One apple weighs about 200 grams. The apples are similar sizes.",
+        "quantity": 3,
+        "values": [
+          200
+        ],
+        "unit": "g",
+        "labels": [
+          "One apple"
+        ],
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y3-measurement-review-start-11",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "About how many grams do these apples weigh altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-11",
+      "skillLabel": "Estimate mass from a benchmark",
+      "structureKey": "y3-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "600"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in millilitres?",
+      "correctAnswer": "300",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "jug",
+        "description": "Read the water level. The numbered marks show millilitres.",
+        "values": [
+          300
+        ],
+        "unit": "mL"
+      },
+      "id": "y3-measurement-review-start-12",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in millilitres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-12",
+      "skillLabel": "Read a labelled measuring jug",
+      "structureKey": "y3-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "300"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes longer is activity A?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Compare the two activity times.",
+        "values": [
+          1,
+          40
+        ],
+        "labels": [
+          "Activity A: 1 hour",
+          "Activity B: 40 minutes"
+        ]
+      },
+      "id": "y3-measurement-review-start-13",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes longer is activity A?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-13",
+      "skillLabel": "Compare durations in hours and minutes",
+      "structureKey": "y3-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which digital time matches this clock?",
+      "correctAnswer": "1:12",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 1,
+        "minute": 12
+      },
+      "options": [
+        "1:12",
+        "1:17",
+        "2:12"
+      ],
+      "id": "y3-measurement-review-start-14",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which digital time matches this clock?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-14",
+      "skillLabel": "Match analogue and digital time",
+      "structureKey": "y3-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1:12"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which opening makes the larger angle?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the openings, labelled A and B.",
+        "angle": 45,
+        "compareArms": true,
+        "rotation": 20
+      },
+      "options": [
+        "B",
+        "Both are equal",
+        "A"
+      ],
+      "id": "y3-measurement-review-start-15",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which opening makes the larger angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-15",
+      "skillLabel": "Compare angles with different arm lengths",
+      "structureKey": "y3-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many centimetres longer is ribbon A?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ribbons",
+        "description": "Compare the two ribbon lengths.",
+        "values": [
+          93,
+          65
+        ],
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "unit": "cm",
+        "object": "ribbon"
+      },
+      "id": "y3-measurement-review-start-16",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many centimetres longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-16",
+      "skillLabel": "Find a length difference",
+      "structureKey": "y3-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many millilitres do these full cups hold altogether?",
+      "correctAnswer": "600",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One cup holds about 200 millilitres. All cups are the same size.",
+        "quantity": 3,
+        "values": [
+          200
+        ],
+        "unit": "mL",
+        "labels": [
+          "One cup"
+        ],
+        "arts": [
+          "containers-3d/cup.png"
+        ]
+      },
+      "id": "y3-measurement-review-start-17",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "About how many millilitres do these full cups hold altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-17",
+      "skillLabel": "Estimate capacity from a benchmark",
+      "structureKey": "y3-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "600"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          9
+        ],
+        "start": 4,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-start-18",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y3-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "6:58",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 6,
+        "minute": 58
+      },
+      "options": [
+        "6:53",
+        "6:58",
+        "7:58"
+      ],
+      "id": "y3-measurement-review-start-19",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-19",
+      "skillLabel": "Read time near the next hour",
+      "structureKey": "y3-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6:58"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many hours is this?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to hours.",
+        "values": [
+          2
+        ],
+        "unit": "days",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-start-20",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many hours is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-20",
+      "skillLabel": "Convert days to hours",
+      "structureKey": "y3-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "Which unit measures the mass of this chair?",
+      "correctAnswer": "Kilograms",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "object",
+        "description": "A chair.",
+        "arts": [
+          "week2-3d/chair.png"
+        ]
+      },
+      "options": [
+        "Grams",
+        "Kilograms",
+        "Millilitres"
+      ],
+      "id": "y3-measurement-review-mid-01",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which unit measures the mass of this chair?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-1",
+      "skillLabel": "Choose a mass unit",
+      "structureKey": "y3-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Kilograms"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "11",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          11
+        ],
+        "start": 0,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-mid-02",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-2",
+      "skillLabel": "Read a centimetre ruler",
+      "structureKey": "y3-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this?",
+      "correctAnswer": "120",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to minutes.",
+        "values": [
+          2
+        ],
+        "unit": "hours",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-mid-03",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-3",
+      "skillLabel": "Convert hours to minutes",
+      "structureKey": "y3-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "10:40",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 10,
+        "minute": 40
+      },
+      "options": [
+        "10:40",
+        "10:45",
+        "11:40"
+      ],
+      "id": "y3-measurement-review-mid-04",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-4",
+      "skillLabel": "Read five-minute time",
+      "structureKey": "y3-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10:40"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How does this opening compare with a right angle?",
+      "correctAnswer": "Less than a right angle",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the door opening with a square corner.",
+        "angle": 45,
+        "rotation": 45
+      },
+      "options": [
+        "Equal to a right angle",
+        "Greater than a right angle",
+        "Less than a right angle"
+      ],
+      "id": "y3-measurement-review-mid-05",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "How does this opening compare with a right angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-5",
+      "skillLabel": "Compare with a right angle",
+      "structureKey": "y3-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Less than a right angle"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many metres long is the row?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "Each desk is about 1 metre long. The desks touch end to end.",
+        "quantity": 3,
+        "values": [
+          1
+        ],
+        "unit": "m",
+        "labels": [
+          "One desk"
+        ],
+        "arts": [
+          "everyday-3d/object-desk.png"
+        ]
+      },
+      "id": "y3-measurement-review-mid-06",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "About how many metres long is the row?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-6",
+      "skillLabel": "Estimate length from a benchmark",
+      "structureKey": "y3-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "700",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "scale",
+        "description": "Read the scale. Its numbered marks are in grams.",
+        "values": [
+          700
+        ],
+        "unit": "g"
+      },
+      "id": "y3-measurement-review-mid-07",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-7",
+      "skillLabel": "Read a labelled mass scale",
+      "structureKey": "y3-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "700"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many seconds is this?",
+      "correctAnswer": "180",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to seconds.",
+        "values": [
+          3
+        ],
+        "unit": "minutes",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-mid-08",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many seconds is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-8",
+      "skillLabel": "Convert minutes to seconds",
+      "structureKey": "y3-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "180"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "11:42",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 11,
+        "minute": 42
+      },
+      "options": [
+        "12:42",
+        "11:42",
+        "11:37"
+      ],
+      "id": "y3-measurement-review-mid-09",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-9",
+      "skillLabel": "Read time to the minute",
+      "structureKey": "y3-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11:42"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many right angles make this half turn?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Follow the arrow from Start to Finish.",
+        "angle": 180,
+        "rotation": 90
+      },
+      "options": [
+        "1",
+        "2",
+        "4"
+      ],
+      "id": "y3-measurement-review-mid-10",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "How many right angles make this half turn?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-10",
+      "skillLabel": "Relate a turn to right angles",
+      "structureKey": "y3-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many grams do these apples weigh altogether?",
+      "correctAnswer": "800",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One apple weighs about 200 grams. The apples are similar sizes.",
+        "quantity": 4,
+        "values": [
+          200
+        ],
+        "unit": "g",
+        "labels": [
+          "One apple"
+        ],
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y3-measurement-review-mid-11",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "About how many grams do these apples weigh altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-11",
+      "skillLabel": "Estimate mass from a benchmark",
+      "structureKey": "y3-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "800"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in millilitres?",
+      "correctAnswer": "700",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "jug",
+        "description": "Read the water level. The numbered marks show millilitres.",
+        "values": [
+          700
+        ],
+        "unit": "mL"
+      },
+      "id": "y3-measurement-review-mid-12",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in millilitres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-12",
+      "skillLabel": "Read a labelled measuring jug",
+      "structureKey": "y3-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "700"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes longer is activity A?",
+      "correctAnswer": "35",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Compare the two activity times.",
+        "values": [
+          1,
+          25
+        ],
+        "labels": [
+          "Activity A: 1 hour",
+          "Activity B: 25 minutes"
+        ]
+      },
+      "id": "y3-measurement-review-mid-13",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes longer is activity A?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-13",
+      "skillLabel": "Compare durations in hours and minutes",
+      "structureKey": "y3-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "35"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which digital time matches this clock?",
+      "correctAnswer": "2:18",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 2,
+        "minute": 18
+      },
+      "options": [
+        "2:23",
+        "3:18",
+        "2:18"
+      ],
+      "id": "y3-measurement-review-mid-14",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which digital time matches this clock?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-14",
+      "skillLabel": "Match analogue and digital time",
+      "structureKey": "y3-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2:18"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which opening makes the larger angle?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the openings, labelled A and B.",
+        "angle": 55,
+        "compareArms": true,
+        "rotation": 30
+      },
+      "options": [
+        "Both are equal",
+        "A",
+        "B"
+      ],
+      "id": "y3-measurement-review-mid-15",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which opening makes the larger angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-15",
+      "skillLabel": "Compare angles with different arm lengths",
+      "structureKey": "y3-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many centimetres longer is ribbon A?",
+      "correctAnswer": "27",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ribbons",
+        "description": "Compare the two ribbon lengths.",
+        "values": [
+          85,
+          58
+        ],
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "unit": "cm",
+        "object": "ribbon"
+      },
+      "id": "y3-measurement-review-mid-16",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many centimetres longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-16",
+      "skillLabel": "Find a length difference",
+      "structureKey": "y3-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "27"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many millilitres do these full cups hold altogether?",
+      "correctAnswer": "1000",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One cup holds about 250 millilitres. All cups are the same size.",
+        "quantity": 4,
+        "values": [
+          250
+        ],
+        "unit": "mL",
+        "labels": [
+          "One cup"
+        ],
+        "arts": [
+          "containers-3d/cup.png"
+        ]
+      },
+      "id": "y3-measurement-review-mid-17",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "About how many millilitres do these full cups hold altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-17",
+      "skillLabel": "Estimate capacity from a benchmark",
+      "structureKey": "y3-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1000"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          8
+        ],
+        "start": 2,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-mid-18",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y3-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "7:57",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 7,
+        "minute": 57
+      },
+      "options": [
+        "7:57",
+        "8:57",
+        "7:52"
+      ],
+      "id": "y3-measurement-review-mid-19",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-19",
+      "skillLabel": "Read time near the next hour",
+      "structureKey": "y3-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7:57"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many hours is this?",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to hours.",
+        "values": [
+          3
+        ],
+        "unit": "days",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-mid-20",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many hours is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-20",
+      "skillLabel": "Convert days to hours",
+      "structureKey": "y3-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "Which unit measures the mass of this full bucket?",
+      "correctAnswer": "Kilograms",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "object",
+        "description": "A full bucket.",
+        "arts": [
+          "week2-3d/bucket.png"
+        ]
+      },
+      "options": [
+        "Kilograms",
+        "Millilitres",
+        "Grams"
+      ],
+      "id": "y3-measurement-review-end-01",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which unit measures the mass of this full bucket?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-1",
+      "skillLabel": "Choose a mass unit",
+      "structureKey": "y3-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Kilograms"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "12",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          12
+        ],
+        "start": 0,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-end-02",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-2",
+      "skillLabel": "Read a centimetre ruler",
+      "structureKey": "y3-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes is this?",
+      "correctAnswer": "180",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to minutes.",
+        "values": [
+          3
+        ],
+        "unit": "hours",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-end-03",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-3",
+      "skillLabel": "Convert hours to minutes",
+      "structureKey": "y3-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "180"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "11:25",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 11,
+        "minute": 25
+      },
+      "options": [
+        "11:30",
+        "12:25",
+        "11:25"
+      ],
+      "id": "y3-measurement-review-end-04",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-4",
+      "skillLabel": "Read five-minute time",
+      "structureKey": "y3-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11:25"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How does this opening compare with a right angle?",
+      "correctAnswer": "Less than a right angle",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the door opening with a square corner.",
+        "angle": 55,
+        "rotation": 60
+      },
+      "options": [
+        "Greater than a right angle",
+        "Less than a right angle",
+        "Equal to a right angle"
+      ],
+      "id": "y3-measurement-review-end-05",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "How does this opening compare with a right angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-5",
+      "skillLabel": "Compare with a right angle",
+      "structureKey": "y3-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Less than a right angle"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many metres long is the row?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "Each desk is about 1 metre long. The desks touch end to end.",
+        "quantity": 4,
+        "values": [
+          1
+        ],
+        "unit": "m",
+        "labels": [
+          "One desk"
+        ],
+        "arts": [
+          "everyday-3d/object-desk.png"
+        ]
+      },
+      "id": "y3-measurement-review-end-06",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "About how many metres long is the row?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-6",
+      "skillLabel": "Estimate length from a benchmark",
+      "structureKey": "y3-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What mass does the scale show in grams?",
+      "correctAnswer": "500",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "scale",
+        "description": "Read the scale. Its numbered marks are in grams.",
+        "values": [
+          500
+        ],
+        "unit": "g"
+      },
+      "id": "y3-measurement-review-end-07",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What mass does the scale show in grams?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-7",
+      "skillLabel": "Read a labelled mass scale",
+      "structureKey": "y3-measurement-slot-7",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "500"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many seconds is this?",
+      "correctAnswer": "240",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to seconds.",
+        "values": [
+          4
+        ],
+        "unit": "minutes",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-end-08",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many seconds is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-8",
+      "skillLabel": "Convert minutes to seconds",
+      "structureKey": "y3-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "240"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "12:46",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 12,
+        "minute": 46
+      },
+      "options": [
+        "12:46",
+        "12:41",
+        "1:46"
+      ],
+      "id": "y3-measurement-review-end-09",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-9",
+      "skillLabel": "Read time to the minute",
+      "structureKey": "y3-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12:46"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many right angles make this half turn?",
+      "correctAnswer": "2",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Follow the arrow from Start to Finish.",
+        "angle": 180,
+        "rotation": 120
+      },
+      "options": [
+        "2",
+        "4",
+        "1"
+      ],
+      "id": "y3-measurement-review-end-10",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "How many right angles make this half turn?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-10",
+      "skillLabel": "Relate a turn to right angles",
+      "structureKey": "y3-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many grams do these apples weigh altogether?",
+      "correctAnswer": "750",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One apple weighs about 250 grams. The apples are similar sizes.",
+        "quantity": 3,
+        "values": [
+          250
+        ],
+        "unit": "g",
+        "labels": [
+          "One apple"
+        ],
+        "arts": [
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y3-measurement-review-end-11",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "About how many grams do these apples weigh altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-11",
+      "skillLabel": "Estimate mass from a benchmark",
+      "structureKey": "y3-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "750"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much water is in the jug, in millilitres?",
+      "correctAnswer": "500",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "jug",
+        "description": "Read the water level. The numbered marks show millilitres.",
+        "values": [
+          500
+        ],
+        "unit": "mL"
+      },
+      "id": "y3-measurement-review-end-12",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How much water is in the jug, in millilitres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-12",
+      "skillLabel": "Read a labelled measuring jug",
+      "structureKey": "y3-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "500"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes longer is activity A?",
+      "correctAnswer": "10",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Compare the two activity times.",
+        "values": [
+          1,
+          50
+        ],
+        "labels": [
+          "Activity A: 1 hour",
+          "Activity B: 50 minutes"
+        ]
+      },
+      "id": "y3-measurement-review-end-13",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes longer is activity A?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-13",
+      "skillLabel": "Compare durations in hours and minutes",
+      "structureKey": "y3-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which digital time matches this clock?",
+      "correctAnswer": "3:14",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 3,
+        "minute": 14
+      },
+      "options": [
+        "4:14",
+        "3:14",
+        "3:19"
+      ],
+      "id": "y3-measurement-review-end-14",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which digital time matches this clock?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-14",
+      "skillLabel": "Match analogue and digital time",
+      "structureKey": "y3-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3:14"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which opening makes the larger angle?",
+      "correctAnswer": "Both are equal",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "angle",
+        "description": "Compare the openings, labelled A and B.",
+        "angle": 65,
+        "compareArms": true,
+        "rotation": 40
+      },
+      "options": [
+        "A",
+        "B",
+        "Both are equal"
+      ],
+      "id": "y3-measurement-review-end-15",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which opening makes the larger angle?",
+      "primaryDescriptorCode": "AC9M3M05",
+      "curriculumCodes": [
+        "AC9M3M05"
+      ],
+      "skillId": "y3-measurement-slot-15",
+      "skillLabel": "Compare angles with different arm lengths",
+      "structureKey": "y3-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Both are equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many centimetres longer is ribbon A?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ribbons",
+        "description": "Compare the two ribbon lengths.",
+        "values": [
+          74,
+          46
+        ],
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "unit": "cm",
+        "object": "ribbon"
+      },
+      "id": "y3-measurement-review-end-16",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many centimetres longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-16",
+      "skillLabel": "Find a length difference",
+      "structureKey": "y3-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "About how many millilitres do these full cups hold altogether?",
+      "correctAnswer": "450",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "benchmark",
+        "description": "One cup holds about 150 millilitres. All cups are the same size.",
+        "quantity": 3,
+        "values": [
+          150
+        ],
+        "unit": "mL",
+        "labels": [
+          "One cup"
+        ],
+        "arts": [
+          "containers-3d/cup.png"
+        ]
+      },
+      "id": "y3-measurement-review-end-17",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "About how many millilitres do these full cups hold altogether?",
+      "primaryDescriptorCode": "AC9M3M01",
+      "curriculumCodes": [
+        "AC9M3M01"
+      ],
+      "skillId": "y3-measurement-slot-17",
+      "skillLabel": "Estimate capacity from a benchmark",
+      "structureKey": "y3-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "450"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the pencil in centimetres?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "ruler",
+        "description": "Read the pencil from end to end. The ruler is marked in centimetres.",
+        "values": [
+          9
+        ],
+        "start": 3,
+        "object": "pencil"
+      },
+      "id": "y3-measurement-review-end-18",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the pencil in centimetres?",
+      "primaryDescriptorCode": "AC9M3M02",
+      "curriculumCodes": [
+        "AC9M3M02"
+      ],
+      "skillId": "y3-measurement-slot-18",
+      "skillLabel": "Measure from a non-zero ruler mark",
+      "structureKey": "y3-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "8:56",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "hour": 8,
+        "minute": 56
+      },
+      "options": [
+        "9:56",
+        "8:51",
+        "8:56"
+      ],
+      "id": "y3-measurement-review-end-19",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M3M04",
+      "curriculumCodes": [
+        "AC9M3M04"
+      ],
+      "skillId": "y3-measurement-slot-19",
+      "skillLabel": "Read time near the next hour",
+      "structureKey": "y3-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8:56"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many hours is this?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year3_panel",
+        "task": "duration",
+        "description": "Convert the duration to hours.",
+        "values": [
+          2
+        ],
+        "unit": "days",
+        "labels": [
+          "Duration"
+        ]
+      },
+      "id": "y3-measurement-review-end-20",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many hours is this?",
+      "primaryDescriptorCode": "AC9M3M03",
+      "curriculumCodes": [
+        "AC9M3M03"
+      ],
+      "skillId": "y3-measurement-slot-20",
+      "skillLabel": "Convert days to hours",
+      "structureKey": "y3-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ]
+}

@@ -70,8 +70,10 @@ export function RulerWithObject({
   showZeroHero,
   taps,
   precision,
+  objectShape,
 }: {
   rulerCm: number;
+  objectShape?: "pencil";
   object?: ObjModel;
   showZeroHero?: boolean;
   taps?: Taps;
@@ -238,11 +240,18 @@ export function RulerWithObject({
         {object ? (
           <g>
             <ellipse cx={objX + objW / 2} cy={objTop + OBJ_H + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
+            {objectShape === "pencil" ? <>
+              <rect x={objX} y={objTop} width={objW - 25} height={OBJ_H} fill="#e4b345" stroke="#82561b" />
+              <path d={`M${objX+objW-25} ${objTop}L${objX+objW} ${objTop+OBJ_H/2}L${objX+objW-25} ${objTop+OBJ_H}Z`} fill="#eed1a0" stroke="#82561b" />
+              <path d={`M${objX+objW-8} ${objTop+10}L${objX+objW} ${objTop+OBJ_H/2}L${objX+objW-8} ${objTop+20}Z`} fill="#333" />
+              <path d={`M${objX+3} ${objTop+7}H${objX+objW-28}`} stroke="#ffe59b" strokeWidth="4" />
+            </> : <>
             <rect x={objX} y={objTop} width={objW} height={OBJ_H} rx={8} fill={`url(#obj-${uid})`} stroke="rgba(0,0,0,0.16)" strokeWidth={1} />
             <rect x={objX + 1.5} y={objTop + 2} width={objW - 3} height={5} rx={3} fill="#FFFFFF" opacity={0.32} />
             <text x={objX + Math.min(objW / 2, 18)} y={objTop + OBJ_H / 2 + 6} textAnchor="middle" fontSize={17}>
               {object.icon}
             </text>
+            </>}
             {showZeroHero ? <line x1={objX} x2={objX} y1={objTop + OBJ_H} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
           </g>
         ) : null}
