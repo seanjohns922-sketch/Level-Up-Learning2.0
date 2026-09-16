@@ -30,3 +30,9 @@ Manual-review refinements: child-friendly mass wording; the existing lesson penc
 image aligned with the equal blocks; clearer ribbon and box drawings; full trip
 times in question narration plus per-trip audio; and 2026 calendar grids for the
 month-length comparisons. All five forms share these refinements.
+
+Object-visual standard for all realms and levels: show a recognisable depiction
+of the named object rather than a labelled placeholder bar. Reuse lesson artwork
+or a shared geometry-preserving renderer. Ribbons now use the shared
+`MeasuredRibbon` fabric drawing in Ground, Level 1 and ribbon-labelled informal
+measurement diagrams; endpoints and unit alignment remain unchanged.

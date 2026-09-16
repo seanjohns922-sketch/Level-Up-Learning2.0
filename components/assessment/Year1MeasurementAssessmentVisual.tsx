@@ -1,5 +1,6 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- Reuse local lesson artwork. */
+import MeasuredRibbon from './MeasuredRibbon';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import GroundMeasurementAssessmentVisual from './GroundMeasurementAssessmentVisual';
 import type {Measurement1Visual} from '@/data/assessments/revisions/year1MeasurementFiveForms';
@@ -13,8 +14,7 @@ export default function Year1MeasurementAssessmentVisual({visual:v}:{visual:Meas
    const count=v.values![i],x=155,y=15+i*110,step=different?400/count:400/max,kind=v.variants?.[i]??'fair';const objectWidth=different?400:count*step;
    return <g key={label}><text x="5" y={y+25} fill="#3b2a14" fontSize="19" fontWeight="700">{label}</text>
     {v.task==='string'?<><path d={`M${x} ${y+22}H${x+objectWidth}`} stroke={i===0?'#b4793c':i===1?'#2c8794':'#9463b0'} strokeWidth={i===0?6:28} strokeLinecap={i===0?'round':'butt'}/>{i>0?<rect x={x} y={y+8} width={objectWidth} height={28} fill={i===1?'#c89b6c':'#d2b0df'} stroke="#714c2b" strokeWidth="2"/>:null}{i>0?<path d={`M${x} ${y+52}H${x+v.target!*step}`} stroke="#b4793c" strokeWidth="5" strokeDasharray="8 3"/>:null}</>:<>
-    {label==='Pencil'?<svg x={x} y={y-4} width={objectWidth} height="38" viewBox="21 108 729 44" preserveAspectRatio="none"><image href="/images/measurelands/measure-objects-3d/pencil.png" width="768" height="256"/></svg>:<rect x={x} y={y+4} width={v.task==='fair'?6*step:objectWidth} height="24" rx="4" fill={i%2?'#9463b0':'#2c8794'}/>}
-    {label.startsWith('Ribbon')?<path d={`M${x+4} ${y+10}H${x+objectWidth-4}`} stroke="#ffffff" strokeOpacity=".4" strokeWidth="3"/>:null}
+    {label.startsWith('Ribbon')?<MeasuredRibbon x={x} y={y+4} width={objectWidth} height={24} colour={i%2?'#9463b0':'#2c8794'}/>:label==='Pencil'?<svg x={x} y={y-4} width={objectWidth} height="38" viewBox="21 108 729 44" preserveAspectRatio="none"><image href="/images/measurelands/measure-objects-3d/pencil.png" width="768" height="256"/></svg>:<rect x={x} y={y+4} width={v.task==='fair'?6*step:objectWidth} height="24" rx="4" fill={i%2?'#9463b0':'#2c8794'}/>}
     {Array.from({length:count},(_,j)=><rect key={j} x={x+j*step*(kind==='gap'?1.18:kind==='overlap'?.8:1)} y={y+38} width={step} height="32" fill={j%2?'#f5d78e':'#ffeab8'} stroke="#8b642f" strokeWidth="2"/>)}
     <path d={`M${x} ${y-2}V${y+76}`} stroke="#8b642f" strokeDasharray="4 4"/>
     </>}
