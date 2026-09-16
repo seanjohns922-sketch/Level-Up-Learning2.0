@@ -23,9 +23,9 @@ reserved for challenge slots. No degree calculation or unlabelled-scale interpol
 Visual reuse: inspected the Year 3 lesson object pools and instrument components.
 Reuse RulerWithObject, MeasurelandsScale, MeasurelandsJug and ClockFace. The ruler
 has an opt-in recognisable pencil whose tip/end share the ruler's coordinates;
-existing lesson rendering is unchanged. Use the existing stitched ribbon renderer.
+existing lesson rendering is unchanged. Length differences use timber planks with exact proportional lengths.
 Inspected lesson PNGs: backpack, pumpkin, watermelon, chair, bucket, apple, cup and
-desk. Use these for units and benchmark groups. Angle diagrams have controlled
+desk. Use these for units and benchmark groups. The right-angle comparison identifies angle A using purple shading and a callout. Angle diagrams have controlled
 openings and arm lengths, including unequal arm lengths with equal angles.
 
 Question/option read-aloud and IDK/navigation come from the shared assessment

@@ -1,6 +1,6 @@
 import {createUncalibratedItemStatistics} from '../assessmentItemStandard';
 export const YEAR3_MEASUREMENT_FORMS=['pretest','posttest','start','mid','end'] as const;
-export type Measurement3Visual={type:'measurement_year3_panel';task:'object'|'ruler'|'clock'|'scale'|'jug'|'angle'|'benchmark'|'duration'|'ribbons';description:string;values?:number[];labels?:string[];arts?:string[];unit?:string;hour?:number;minute?:number;start?:number;angle?:number;rotation?:number;compareArms?:boolean;quantity?:number;object?:'pencil'|'ribbon';};
+export type Measurement3Visual={type:'measurement_year3_panel';task:'object'|'ruler'|'clock'|'scale'|'jug'|'angle'|'benchmark'|'duration'|'planks';description:string;values?:number[];labels?:string[];arts?:string[];unit?:string;hour?:number;minute?:number;start?:number;angle?:number;rotation?:number;compareArms?:boolean;quantity?:number;object?:'pencil'|'plank';};
 export const YEAR3_MEASUREMENT_BLUEPRINT=[
  ['AC9M3M01','Choose a mass unit','easy'],['AC9M3M02','Read a centimetre ruler','easy'],['AC9M3M03','Convert hours to minutes','easy'],['AC9M3M04','Read five-minute time','easy'],['AC9M3M05','Compare with a right angle','easy'],
  ['AC9M3M01','Estimate length from a benchmark','moderate'],['AC9M3M02','Read a labelled mass scale','easy'],['AC9M3M03','Convert minutes to seconds','moderate'],['AC9M3M04','Read time to the minute','moderate'],['AC9M3M05','Relate a turn to right angles','moderate'],
@@ -19,7 +19,7 @@ function make(form:typeof YEAR3_MEASUREMENT_FORMS[number],f:number){
  add('How long is the pencil in centimetres?',String(8+f),v('ruler','Read the pencil from end to end. The ruler is marked in centimetres.',{values:[8+f],start:0,object:'pencil'}));
  const hours=[2,3,4,2,3][f];add('How many minutes is this?',String(hours*60),v('duration','Convert the duration to minutes.',{values:[hours],unit:'hours',labels:['Duration']}));
  const h=hour(7+f),m=[25,35,20,40,25][f];add('What time does the clock show?',time(h,m),clock(h,m),[time(h,m),time(h,m+5),time(h+1,m)]);
- add('How does this opening compare with a right angle?','Less than a right angle',v('angle','Compare the door opening with a square corner.',{angle:[40,50,60,45,55][f],rotation:f*15}),['Less than a right angle','Equal to a right angle','Greater than a right angle']);
+ add('How does the shaded angle compare with a right angle?','Less than a right angle',v('angle','Look at angle A, shaded purple.',{angle:[40,50,60,45,55][f],rotation:f*15}),['Less than a right angle','Equal to a right angle','Greater than a right angle']);
  const desks=[3,4,2,3,4][f];add('About how many metres long is the row?',String(desks),v('benchmark','Each desk is about 1 metre long. The desks touch end to end.',{quantity:desks,values:[1],unit:'m',labels:['One desk'],arts:['everyday-3d/object-desk.png']}));
  const mass=[400,600,300,700,500][f];add('What mass does the scale show in grams?',String(mass),v('scale','Read the scale. Its numbered marks are in grams.',{values:[mass],unit:'g'}));
  const minutes=[3,4,2,3,4][f];add('How many seconds is this?',String(minutes*60),v('duration','Convert the duration to seconds.',{values:[minutes],unit:'minutes',labels:['Duration']}));
@@ -30,7 +30,7 @@ function make(form:typeof YEAR3_MEASUREMENT_FORMS[number],f:number){
  const shorter=[45,35,40,25,50][f];add('How many minutes longer is activity A?',String(60-shorter),v('duration','Compare the two activity times.',{values:[1,shorter],labels:['Activity A: 1 hour',`Activity B: ${shorter} minutes`]}));
  const hd=hour(11+f),md=[13,17,12,18,14][f];add('Which digital time matches this clock?',time(hd,md),clock(hd,md),[time(hd,md),time(hd,md+5),time(hd+1,md)]);
  add('Which opening makes the larger angle?','Both are equal',v('angle','Compare the openings, labelled A and B.',{angle:[50,60,45,55,65][f],compareArms:true,rotation:f*10}),['A','B','Both are equal']);
- const a=[84,76,93,85,74][f],b=[57,48,65,58,46][f];add('How many centimetres longer is ribbon A?',String(a-b),v('ribbons','Compare the two ribbon lengths.',{values:[a,b],labels:['Ribbon A','Ribbon B'],unit:'cm',object:'ribbon'}));
+ const a=[84,76,93,85,74][f],b=[57,48,65,58,46][f];add('How many centimetres longer is plank A?',String(a-b),v('planks','Compare the two timber plank lengths.',{values:[a,b],labels:['Plank A','Plank B'],unit:'cm',object:'plank'}));
  const cups=[3,4,3,4,3][f],cupSize=[250,200,200,250,150][f];add('About how many millilitres do these full cups hold altogether?',String(cups*cupSize),v('benchmark',`One cup holds about ${cupSize} millilitres. All cups are the same size.`,{quantity:cups,values:[cupSize],unit:'mL',labels:['One cup'],arts:['containers-3d/cup.png']}));
  const offset=[2,3,4,2,3][f],length=[9,8,9,8,9][f];add('How long is the pencil in centimetres?',String(length),v('ruler','Read the pencil from end to end. The ruler is marked in centimetres.',{values:[length],start:offset,object:'pencil'}));
  const hc=hour(4+f),mc=[57,56,58,57,56][f];add('What time does the clock show?',time(hc,mc),clock(hc,mc),[time(hc,mc),time(hc+1,mc),time(hc,mc-5)]);

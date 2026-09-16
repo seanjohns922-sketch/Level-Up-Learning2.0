@@ -172,12 +172,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How does this opening compare with a right angle?",
+      "prompt": "How does the shaded angle compare with a right angle?",
       "correctAnswer": "Less than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
-        "description": "Compare the door opening with a square corner.",
+        "description": "Look at angle A, shaded purple.",
         "angle": 40,
         "rotation": 0
       },
@@ -190,7 +190,7 @@
       "version": "1.0.0-review.1",
       "form": "pretest",
       "type": "mcq",
-      "readAloudText": "How does this opening compare with a right angle?",
+      "readAloudText": "How does the shaded angle compare with a right angle?",
       "primaryDescriptorCode": "AC9M3M05",
       "curriculumCodes": [
         "AC9M3M05"
@@ -649,28 +649,28 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many centimetres longer is ribbon A?",
+      "prompt": "How many centimetres longer is plank A?",
       "correctAnswer": "27",
       "visual": {
         "type": "measurement_year3_panel",
-        "task": "ribbons",
-        "description": "Compare the two ribbon lengths.",
+        "task": "planks",
+        "description": "Compare the two timber plank lengths.",
         "values": [
           84,
           57
         ],
         "labels": [
-          "Ribbon A",
-          "Ribbon B"
+          "Plank A",
+          "Plank B"
         ],
         "unit": "cm",
-        "object": "ribbon"
+        "object": "plank"
       },
       "id": "y3-measurement-review-pretest-16",
       "version": "1.0.0-review.1",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many centimetres longer is ribbon A?",
+      "readAloudText": "How many centimetres longer is plank A?",
       "primaryDescriptorCode": "AC9M3M02",
       "curriculumCodes": [
         "AC9M3M02"
@@ -1042,12 +1042,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How does this opening compare with a right angle?",
+      "prompt": "How does the shaded angle compare with a right angle?",
       "correctAnswer": "Less than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
-        "description": "Compare the door opening with a square corner.",
+        "description": "Look at angle A, shaded purple.",
         "angle": 50,
         "rotation": 15
       },
@@ -1060,7 +1060,7 @@
       "version": "1.0.0-review.1",
       "form": "posttest",
       "type": "mcq",
-      "readAloudText": "How does this opening compare with a right angle?",
+      "readAloudText": "How does the shaded angle compare with a right angle?",
       "primaryDescriptorCode": "AC9M3M05",
       "curriculumCodes": [
         "AC9M3M05"
@@ -1519,28 +1519,28 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many centimetres longer is ribbon A?",
+      "prompt": "How many centimetres longer is plank A?",
       "correctAnswer": "28",
       "visual": {
         "type": "measurement_year3_panel",
-        "task": "ribbons",
-        "description": "Compare the two ribbon lengths.",
+        "task": "planks",
+        "description": "Compare the two timber plank lengths.",
         "values": [
           76,
           48
         ],
         "labels": [
-          "Ribbon A",
-          "Ribbon B"
+          "Plank A",
+          "Plank B"
         ],
         "unit": "cm",
-        "object": "ribbon"
+        "object": "plank"
       },
       "id": "y3-measurement-review-posttest-16",
       "version": "1.0.0-review.1",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many centimetres longer is ribbon A?",
+      "readAloudText": "How many centimetres longer is plank A?",
       "primaryDescriptorCode": "AC9M3M02",
       "curriculumCodes": [
         "AC9M3M02"
@@ -1912,12 +1912,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How does this opening compare with a right angle?",
+      "prompt": "How does the shaded angle compare with a right angle?",
       "correctAnswer": "Less than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
-        "description": "Compare the door opening with a square corner.",
+        "description": "Look at angle A, shaded purple.",
         "angle": 60,
         "rotation": 30
       },
@@ -1930,7 +1930,7 @@
       "version": "1.0.0-review.1",
       "form": "start",
       "type": "mcq",
-      "readAloudText": "How does this opening compare with a right angle?",
+      "readAloudText": "How does the shaded angle compare with a right angle?",
       "primaryDescriptorCode": "AC9M3M05",
       "curriculumCodes": [
         "AC9M3M05"
@@ -2389,28 +2389,28 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many centimetres longer is ribbon A?",
+      "prompt": "How many centimetres longer is plank A?",
       "correctAnswer": "28",
       "visual": {
         "type": "measurement_year3_panel",
-        "task": "ribbons",
-        "description": "Compare the two ribbon lengths.",
+        "task": "planks",
+        "description": "Compare the two timber plank lengths.",
         "values": [
           93,
           65
         ],
         "labels": [
-          "Ribbon A",
-          "Ribbon B"
+          "Plank A",
+          "Plank B"
         ],
         "unit": "cm",
-        "object": "ribbon"
+        "object": "plank"
       },
       "id": "y3-measurement-review-start-16",
       "version": "1.0.0-review.1",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many centimetres longer is ribbon A?",
+      "readAloudText": "How many centimetres longer is plank A?",
       "primaryDescriptorCode": "AC9M3M02",
       "curriculumCodes": [
         "AC9M3M02"
@@ -2782,12 +2782,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How does this opening compare with a right angle?",
+      "prompt": "How does the shaded angle compare with a right angle?",
       "correctAnswer": "Less than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
-        "description": "Compare the door opening with a square corner.",
+        "description": "Look at angle A, shaded purple.",
         "angle": 45,
         "rotation": 45
       },
@@ -2800,7 +2800,7 @@
       "version": "1.0.0-review.1",
       "form": "mid",
       "type": "mcq",
-      "readAloudText": "How does this opening compare with a right angle?",
+      "readAloudText": "How does the shaded angle compare with a right angle?",
       "primaryDescriptorCode": "AC9M3M05",
       "curriculumCodes": [
         "AC9M3M05"
@@ -3259,28 +3259,28 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many centimetres longer is ribbon A?",
+      "prompt": "How many centimetres longer is plank A?",
       "correctAnswer": "27",
       "visual": {
         "type": "measurement_year3_panel",
-        "task": "ribbons",
-        "description": "Compare the two ribbon lengths.",
+        "task": "planks",
+        "description": "Compare the two timber plank lengths.",
         "values": [
           85,
           58
         ],
         "labels": [
-          "Ribbon A",
-          "Ribbon B"
+          "Plank A",
+          "Plank B"
         ],
         "unit": "cm",
-        "object": "ribbon"
+        "object": "plank"
       },
       "id": "y3-measurement-review-mid-16",
       "version": "1.0.0-review.1",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many centimetres longer is ribbon A?",
+      "readAloudText": "How many centimetres longer is plank A?",
       "primaryDescriptorCode": "AC9M3M02",
       "curriculumCodes": [
         "AC9M3M02"
@@ -3652,12 +3652,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How does this opening compare with a right angle?",
+      "prompt": "How does the shaded angle compare with a right angle?",
       "correctAnswer": "Less than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
-        "description": "Compare the door opening with a square corner.",
+        "description": "Look at angle A, shaded purple.",
         "angle": 55,
         "rotation": 60
       },
@@ -3670,7 +3670,7 @@
       "version": "1.0.0-review.1",
       "form": "end",
       "type": "mcq",
-      "readAloudText": "How does this opening compare with a right angle?",
+      "readAloudText": "How does the shaded angle compare with a right angle?",
       "primaryDescriptorCode": "AC9M3M05",
       "curriculumCodes": [
         "AC9M3M05"
@@ -4129,28 +4129,28 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many centimetres longer is ribbon A?",
+      "prompt": "How many centimetres longer is plank A?",
       "correctAnswer": "28",
       "visual": {
         "type": "measurement_year3_panel",
-        "task": "ribbons",
-        "description": "Compare the two ribbon lengths.",
+        "task": "planks",
+        "description": "Compare the two timber plank lengths.",
         "values": [
           74,
           46
         ],
         "labels": [
-          "Ribbon A",
-          "Ribbon B"
+          "Plank A",
+          "Plank B"
         ],
         "unit": "cm",
-        "object": "ribbon"
+        "object": "plank"
       },
       "id": "y3-measurement-review-end-16",
       "version": "1.0.0-review.1",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many centimetres longer is ribbon A?",
+      "readAloudText": "How many centimetres longer is plank A?",
       "primaryDescriptorCode": "AC9M3M02",
       "curriculumCodes": [
         "AC9M3M02"
