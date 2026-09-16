@@ -58,7 +58,7 @@ for (const [index, expected] of Object.entries(calculations)) {
 
 // A correct numerical value cannot compensate for an incorrect justification.
 for (const [realm, level, indices] of [["number", 6, [16,19]], ["measurement", 5, [14,18]]] as const) {
-  const questions = getPretestForYearLabel(`Year ${level}`, realm, 5, 3, 3, 3, 3, 2);
+  const questions = getPretestForYearLabel(`Year ${level}`, realm, 5, 3, 3, 3, 3, 2, 3, 4, 4, 4, 3);
   for (const index of indices) {
     const q = questions[index]!;
     const [value, reason] = String(q.correctAnswer).split("||");
@@ -67,10 +67,10 @@ for (const [realm, level, indices] of [["number", 6, [16,19]], ["measurement", 5
     assert.equal(isAssessmentAnswerCorrect(q, value!), false);
   }
 }
-const estimate = getPretestForYearLabel("Year 5", "measurement")[2]!;
+const estimate = getPretestForYearLabel("Year 5", "measurement", 5, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3)[2]!;
 for (const answer of ["60", "70", "80"]) assert.equal(isAssessmentAnswerCorrect(estimate, answer), true);
 for (const answer of ["59", "81", "junk"]) assert.equal(isAssessmentAnswerCorrect(estimate, answer), false);
-const exactAngle = getPretestForYearLabel("Year 5", "measurement")[6]!;
+const exactAngle = getPretestForYearLabel("Year 5", "measurement", 5, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3)[6]!;
 assert.equal(isAssessmentAnswerCorrect(exactAngle, "123"), false, "Exact protractor reading does not inherit estimate tolerance");
 // This section verifies the retained repair bank; released forms have their own audit.
 const year3 = getPretestForYearLabel("Year 3", "number", 5, 3, 3, 3, 3, 3, 2);

@@ -1,0 +1,5910 @@
+{
+  "pretest": [
+    {
+      "prompt": "Which unit is most suitable for measuring the length of this small screw?",
+      "correctAnswer": "Millimetres",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "precision",
+        "description": "Choose a sensible everyday unit for the small screw.",
+        "values": [
+          0
+        ],
+        "labels": [
+          "small screw"
+        ]
+      },
+      "options": [
+        "Millimetres",
+        "Centimetres",
+        "Metres",
+        "Kilometres"
+      ],
+      "id": "y5-measurement-pre-01-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which unit is most suitable for measuring the length of this small screw?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-1",
+      "skillLabel": "Choose a suitable metric unit",
+      "structureKey": "y5-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Millimetres"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres of fencing are needed, leaving the gate opening?",
+      "correctAnswer": "36",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+        "values": [
+          12,
+          7
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+          "values": [
+            12,
+            7
+          ],
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-pre-02-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-2",
+      "skillLabel": "Find fencing length allowing for a gate",
+      "structureKey": "y5-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "36"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the best estimate of the angle?",
+      "correctAnswer": "55°",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "estimate",
+        "description": "Estimate the opening marked by the curved arc.",
+        "values": [
+          55
+        ]
+      },
+      "options": [
+        "25°",
+        "55°",
+        "90°"
+      ],
+      "id": "y5-measurement-pre-03-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which is the best estimate of the angle?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-3",
+      "skillLabel": "Estimate an angle",
+      "structureKey": "y5-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55°"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "1415",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter hours and two-digit minutes using 24-hour time.",
+        "values": [
+          855
+        ],
+        "labels": [
+          "Library closes",
+          "2:15 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-pre-04-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-4",
+      "skillLabel": "Convert afternoon time to 24-hour time",
+      "structureKey": "y5-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1415"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "235",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the full board length.",
+        "values": [
+          235
+        ],
+        "labels": [
+          "2 m 35 cm"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y5-measurement-pre-05-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-5",
+      "skillLabel": "Express a mixed length in centimetres",
+      "structureKey": "y5-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "235"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres of carpet cover the floor?",
+      "correctAnswer": "40",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
+        "values": [
+          8,
+          5
+        ],
+        "labels": [
+          "Carpeted floor"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-pre-06-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many square metres of carpet cover the floor?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-6",
+      "skillLabel": "Calculate a rectangular floor area",
+      "structureKey": "y5-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "40"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "64",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure the opening between the dark baseline and purple arm.",
+        "values": [
+          64
+        ],
+        "baseline": "right"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-pre-07-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-7",
+      "skillLabel": "Read a protractor from the right",
+      "structureKey": "y5-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "64"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using AM or PM.",
+      "correctAnswer": "1845",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1125
+        ],
+        "labels": [
+          "Train departs",
+          "18:45"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour, minutes and AM or PM"
+      },
+      "id": "y5-measurement-pre-08-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "Write this time using AM or PM.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-8",
+      "skillLabel": "Convert 24-hour time to AM/PM",
+      "structureKey": "y5-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1845"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Find the full boundary length. All six side lengths are shown.",
+        "values": [
+          12,
+          9,
+          4,
+          3
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "Find the full boundary length. All six side lengths are shown.",
+          "values": [
+            12,
+            9,
+            4,
+            3
+          ],
+          "lShape": true,
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-pre-09-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-9",
+      "skillLabel": "Find an irregular perimeter",
+      "structureKey": "y5-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 58°.",
+      "correctAnswer": "58",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          58
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-pre-10-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 58°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-10",
+      "skillLabel": "Construct an acute angle",
+      "structureKey": "y5-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "58"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres are in the container?",
+      "correctAnswer": "2350",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the amount of water in the container.",
+        "values": [
+          2350
+        ],
+        "labels": [
+          "2 L 350 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y5-measurement-pre-11-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres are in the container?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-11",
+      "skillLabel": "Express mixed capacity in millilitres",
+      "structureKey": "y5-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2350"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "106",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
+        "values": [
+          14,
+          9,
+          5,
+          4
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-pre-12-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-12",
+      "skillLabel": "Calculate a composite floor area",
+      "structureKey": "y5-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "106"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "0025",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "The coach leaves just after midnight. Enter 24-hour time.",
+        "values": [
+          25
+        ],
+        "labels": [
+          "Coach departs",
+          "12:25 am"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-pre-13-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-13",
+      "skillLabel": "Convert a time just after midnight",
+      "structureKey": "y5-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0025"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "124",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure from the dark baseline on the left.",
+        "values": [
+          124
+        ],
+        "baseline": "left"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-pre-14-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-14",
+      "skillLabel": "Read an obtuse angle from the left",
+      "structureKey": "y5-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "124"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many grams heavier is parcel A?",
+      "correctAnswer": "670",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "Compare the two parcel masses.",
+        "values": [
+          2450,
+          1780
+        ],
+        "labels": [
+          "Parcel A: 2 kg 450 g",
+          "Parcel B: 1 kg 780 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y5-measurement-pre-15-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many grams heavier is parcel A?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-15",
+      "skillLabel": "Compare mixed-unit masses",
+      "structureKey": "y5-measurement-slot-15",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "670"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "62",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
+        "values": [
+          9,
+          3,
+          7,
+          5
+        ],
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-pre-16-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the total area of both gardens in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-16",
+      "skillLabel": "Combine two rectangular garden areas",
+      "structureKey": "y5-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "62"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which measurement and angle name are correct?",
+      "correctAnswer": "36° — acute",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Read the opening from the left baseline.",
+        "values": [
+          36
+        ],
+        "baseline": "left"
+      },
+      "options": [
+        "144° — obtuse",
+        "36° — obtuse",
+        "36° — acute"
+      ],
+      "id": "y5-measurement-pre-17-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which measurement and angle name are correct?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-17",
+      "skillLabel": "Measure and name an angle",
+      "structureKey": "y5-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "36° — acute"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey take?",
+      "correctAnswer": "95",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "timetable",
+        "description": "Both times are on the same day. The timetable uses 24-hour time.",
+        "values": [
+          1045,
+          1140
+        ],
+        "labels": [
+          "Departs: 17:25",
+          "Arrives: 19:00"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y5-measurement-pre-18-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey take?",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-18",
+      "skillLabel": "Use a 24-hour timetable",
+      "structureKey": "y5-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "95"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres need paving?",
+      "correctAnswer": "39",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+        "values": [
+          8,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "area",
+          "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+          "values": [
+            8,
+            6
+          ],
+          "areaCells": [
+            [
+              0,
+              0,
+              "full"
+            ],
+            [
+              1,
+              0,
+              "full"
+            ],
+            [
+              2,
+              0,
+              "full"
+            ],
+            [
+              3,
+              0,
+              "full"
+            ],
+            [
+              4,
+              0,
+              "full"
+            ],
+            [
+              5,
+              0,
+              "full"
+            ],
+            [
+              6,
+              0,
+              "full"
+            ],
+            [
+              7,
+              0,
+              "full"
+            ],
+            [
+              0,
+              1,
+              "full"
+            ],
+            [
+              1,
+              1,
+              "full"
+            ],
+            [
+              2,
+              1,
+              "full"
+            ],
+            [
+              3,
+              1,
+              "full"
+            ],
+            [
+              4,
+              1,
+              "full"
+            ],
+            [
+              5,
+              1,
+              "full"
+            ],
+            [
+              6,
+              1,
+              "full"
+            ],
+            [
+              7,
+              1,
+              "full"
+            ],
+            [
+              0,
+              2,
+              "full"
+            ],
+            [
+              1,
+              2,
+              "full"
+            ],
+            [
+              5,
+              2,
+              "full"
+            ],
+            [
+              6,
+              2,
+              "full"
+            ],
+            [
+              7,
+              2,
+              "full"
+            ],
+            [
+              0,
+              3,
+              "full"
+            ],
+            [
+              1,
+              3,
+              "full"
+            ],
+            [
+              5,
+              3,
+              "full"
+            ],
+            [
+              6,
+              3,
+              "full"
+            ],
+            [
+              7,
+              3,
+              "full"
+            ],
+            [
+              0,
+              4,
+              "full"
+            ],
+            [
+              1,
+              4,
+              "full"
+            ],
+            [
+              5,
+              4,
+              "full"
+            ],
+            [
+              6,
+              4,
+              "full"
+            ],
+            [
+              7,
+              4,
+              "full"
+            ],
+            [
+              0,
+              5,
+              "full"
+            ],
+            [
+              1,
+              5,
+              "full"
+            ],
+            [
+              2,
+              5,
+              "full"
+            ],
+            [
+              3,
+              5,
+              "full"
+            ],
+            [
+              4,
+              5,
+              "full"
+            ],
+            [
+              5,
+              5,
+              "full"
+            ],
+            [
+              6,
+              5,
+              "full"
+            ],
+            [
+              7,
+              5,
+              "full"
+            ]
+          ]
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-pre-19-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many square metres need paving?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-19",
+      "skillLabel": "Find the area available for paving",
+      "structureKey": "y5-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "39"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 116°.",
+      "correctAnswer": "116",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          116
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-pre-20-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 116°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-20",
+      "skillLabel": "Construct an obtuse angle",
+      "structureKey": "y5-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "116"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "Which unit is most suitable for measuring the length of this pencil?",
+      "correctAnswer": "Centimetres",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "precision",
+        "description": "Choose a sensible everyday unit for the pencil.",
+        "values": [
+          1
+        ],
+        "labels": [
+          "pencil"
+        ],
+        "art": "week1-3d/pencil.png"
+      },
+      "options": [
+        "Centimetres",
+        "Metres",
+        "Kilometres",
+        "Millimetres"
+      ],
+      "id": "y5-measurement-post-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which unit is most suitable for measuring the length of this pencil?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-1",
+      "skillLabel": "Choose a suitable metric unit",
+      "structureKey": "y5-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Centimetres"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres of fencing are needed, leaving the gate opening?",
+      "correctAnswer": "41",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "A 3-metre gate opening needs no fencing. Fence the rest of the boundary.",
+        "values": [
+          14,
+          8
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "A 3-metre gate opening needs no fencing. Fence the rest of the boundary.",
+          "values": [
+            14,
+            8
+          ],
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-post-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-2",
+      "skillLabel": "Find fencing length allowing for a gate",
+      "structureKey": "y5-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "41"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the best estimate of the angle?",
+      "correctAnswer": "65°",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "estimate",
+        "description": "Estimate the opening marked by the curved arc.",
+        "values": [
+          65
+        ]
+      },
+      "options": [
+        "65°",
+        "100°",
+        "35°"
+      ],
+      "id": "y5-measurement-post-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which is the best estimate of the angle?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-3",
+      "skillLabel": "Estimate an angle",
+      "structureKey": "y5-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "65°"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "1525",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter hours and two-digit minutes using 24-hour time.",
+        "values": [
+          925
+        ],
+        "labels": [
+          "Library closes",
+          "3:25 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-post-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-4",
+      "skillLabel": "Convert afternoon time to 24-hour time",
+      "structureKey": "y5-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1525"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "265",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the full board length.",
+        "values": [
+          265
+        ],
+        "labels": [
+          "2 m 65 cm"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y5-measurement-post-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-5",
+      "skillLabel": "Express a mixed length in centimetres",
+      "structureKey": "y5-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "265"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres of carpet cover the floor?",
+      "correctAnswer": "36",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
+        "values": [
+          9,
+          4
+        ],
+        "labels": [
+          "Carpeted floor"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-post-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many square metres of carpet cover the floor?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-6",
+      "skillLabel": "Calculate a rectangular floor area",
+      "structureKey": "y5-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "36"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure the opening between the dark baseline and purple arm.",
+        "values": [
+          72
+        ],
+        "baseline": "right"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-post-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-7",
+      "skillLabel": "Read a protractor from the right",
+      "structureKey": "y5-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using AM or PM.",
+      "correctAnswer": "1955",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1195
+        ],
+        "labels": [
+          "Train departs",
+          "19:55"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour, minutes and AM or PM"
+      },
+      "id": "y5-measurement-post-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "Write this time using AM or PM.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-8",
+      "skillLabel": "Convert 24-hour time to AM/PM",
+      "structureKey": "y5-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1955"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Find the full boundary length. All six side lengths are shown.",
+        "values": [
+          14,
+          10,
+          4,
+          3
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "Find the full boundary length. All six side lengths are shown.",
+          "values": [
+            14,
+            10,
+            4,
+            3
+          ],
+          "lShape": true,
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-post-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-9",
+      "skillLabel": "Find an irregular perimeter",
+      "structureKey": "y5-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 64°.",
+      "correctAnswer": "64",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          64
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-post-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 64°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-10",
+      "skillLabel": "Construct an acute angle",
+      "structureKey": "y5-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "64"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres are in the container?",
+      "correctAnswer": "2650",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the amount of water in the container.",
+        "values": [
+          2650
+        ],
+        "labels": [
+          "2 L 650 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y5-measurement-post-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres are in the container?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-11",
+      "skillLabel": "Express mixed capacity in millilitres",
+      "structureKey": "y5-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2650"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "142",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
+        "values": [
+          16,
+          10,
+          6,
+          3
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-post-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-12",
+      "skillLabel": "Calculate a composite floor area",
+      "structureKey": "y5-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "142"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "0035",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "The coach leaves just after midnight. Enter 24-hour time.",
+        "values": [
+          35
+        ],
+        "labels": [
+          "Coach departs",
+          "12:35 am"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-post-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-13",
+      "skillLabel": "Convert a time just after midnight",
+      "structureKey": "y5-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0035"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "136",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure from the dark baseline on the left.",
+        "values": [
+          136
+        ],
+        "baseline": "left"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-post-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-14",
+      "skillLabel": "Read an obtuse angle from the left",
+      "structureKey": "y5-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "136"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many grams heavier is parcel A?",
+      "correctAnswer": "760",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "Compare the two parcel masses.",
+        "values": [
+          2650,
+          1890
+        ],
+        "labels": [
+          "Parcel A: 2 kg 650 g",
+          "Parcel B: 1 kg 890 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y5-measurement-post-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many grams heavier is parcel A?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-15",
+      "skillLabel": "Compare mixed-unit masses",
+      "structureKey": "y5-measurement-slot-15",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "760"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
+        "values": [
+          10,
+          3,
+          8,
+          5
+        ],
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-post-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the total area of both gardens in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-16",
+      "skillLabel": "Combine two rectangular garden areas",
+      "structureKey": "y5-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which measurement and angle name are correct?",
+      "correctAnswer": "44° — acute",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Read the opening from the left baseline.",
+        "values": [
+          44
+        ],
+        "baseline": "left"
+      },
+      "options": [
+        "44° — obtuse",
+        "44° — acute",
+        "136° — obtuse"
+      ],
+      "id": "y5-measurement-post-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which measurement and angle name are correct?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-17",
+      "skillLabel": "Measure and name an angle",
+      "structureKey": "y5-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "44° — acute"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey take?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "timetable",
+        "description": "Both times are on the same day. The timetable uses 24-hour time.",
+        "values": [
+          1095,
+          1180
+        ],
+        "labels": [
+          "Departs: 18:15",
+          "Arrives: 19:40"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y5-measurement-post-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey take?",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-18",
+      "skillLabel": "Use a 24-hour timetable",
+      "structureKey": "y5-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres need paving?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+        "values": [
+          9,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "area",
+          "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+          "values": [
+            9,
+            6
+          ],
+          "areaCells": [
+            [
+              0,
+              0,
+              "full"
+            ],
+            [
+              1,
+              0,
+              "full"
+            ],
+            [
+              2,
+              0,
+              "full"
+            ],
+            [
+              3,
+              0,
+              "full"
+            ],
+            [
+              4,
+              0,
+              "full"
+            ],
+            [
+              5,
+              0,
+              "full"
+            ],
+            [
+              6,
+              0,
+              "full"
+            ],
+            [
+              7,
+              0,
+              "full"
+            ],
+            [
+              8,
+              0,
+              "full"
+            ],
+            [
+              0,
+              1,
+              "full"
+            ],
+            [
+              1,
+              1,
+              "full"
+            ],
+            [
+              2,
+              1,
+              "full"
+            ],
+            [
+              3,
+              1,
+              "full"
+            ],
+            [
+              4,
+              1,
+              "full"
+            ],
+            [
+              5,
+              1,
+              "full"
+            ],
+            [
+              6,
+              1,
+              "full"
+            ],
+            [
+              7,
+              1,
+              "full"
+            ],
+            [
+              8,
+              1,
+              "full"
+            ],
+            [
+              0,
+              2,
+              "full"
+            ],
+            [
+              1,
+              2,
+              "full"
+            ],
+            [
+              6,
+              2,
+              "full"
+            ],
+            [
+              7,
+              2,
+              "full"
+            ],
+            [
+              8,
+              2,
+              "full"
+            ],
+            [
+              0,
+              3,
+              "full"
+            ],
+            [
+              1,
+              3,
+              "full"
+            ],
+            [
+              6,
+              3,
+              "full"
+            ],
+            [
+              7,
+              3,
+              "full"
+            ],
+            [
+              8,
+              3,
+              "full"
+            ],
+            [
+              0,
+              4,
+              "full"
+            ],
+            [
+              1,
+              4,
+              "full"
+            ],
+            [
+              6,
+              4,
+              "full"
+            ],
+            [
+              7,
+              4,
+              "full"
+            ],
+            [
+              8,
+              4,
+              "full"
+            ],
+            [
+              0,
+              5,
+              "full"
+            ],
+            [
+              1,
+              5,
+              "full"
+            ],
+            [
+              2,
+              5,
+              "full"
+            ],
+            [
+              3,
+              5,
+              "full"
+            ],
+            [
+              4,
+              5,
+              "full"
+            ],
+            [
+              5,
+              5,
+              "full"
+            ],
+            [
+              6,
+              5,
+              "full"
+            ],
+            [
+              7,
+              5,
+              "full"
+            ],
+            [
+              8,
+              5,
+              "full"
+            ]
+          ]
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-post-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many square metres need paving?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-19",
+      "skillLabel": "Find the area available for paving",
+      "structureKey": "y5-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 128°.",
+      "correctAnswer": "128",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          128
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-post-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 128°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-20",
+      "skillLabel": "Construct an obtuse angle",
+      "structureKey": "y5-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "128"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "Which unit is most suitable for measuring the width of this book?",
+      "correctAnswer": "Centimetres",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "precision",
+        "description": "Choose a sensible everyday unit for the book.",
+        "values": [
+          2
+        ],
+        "labels": [
+          "book"
+        ],
+        "art": "week2-3d/book.png"
+      },
+      "options": [
+        "Metres",
+        "Kilometres",
+        "Millimetres",
+        "Centimetres"
+      ],
+      "id": "y5-measurement-start-01-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which unit is most suitable for measuring the width of this book?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-1",
+      "skillLabel": "Choose a suitable metric unit",
+      "structureKey": "y5-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Centimetres"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres of fencing are needed, leaving the gate opening?",
+      "correctAnswer": "36",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+        "values": [
+          13,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+          "values": [
+            13,
+            6
+          ],
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-start-02-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-2",
+      "skillLabel": "Find fencing length allowing for a gate",
+      "structureKey": "y5-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "36"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the best estimate of the angle?",
+      "correctAnswer": "50°",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "estimate",
+        "description": "Estimate the opening marked by the curved arc.",
+        "values": [
+          50
+        ]
+      },
+      "options": [
+        "85°",
+        "20°",
+        "50°"
+      ],
+      "id": "y5-measurement-start-03-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which is the best estimate of the angle?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-3",
+      "skillLabel": "Estimate an angle",
+      "structureKey": "y5-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50°"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "1615",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter hours and two-digit minutes using 24-hour time.",
+        "values": [
+          975
+        ],
+        "labels": [
+          "Library closes",
+          "4:15 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-start-04-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-4",
+      "skillLabel": "Convert afternoon time to 24-hour time",
+      "structureKey": "y5-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1615"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "245",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the full board length.",
+        "values": [
+          245
+        ],
+        "labels": [
+          "2 m 45 cm"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y5-measurement-start-05-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-5",
+      "skillLabel": "Express a mixed length in centimetres",
+      "structureKey": "y5-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "245"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres of carpet cover the floor?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
+        "values": [
+          7,
+          6
+        ],
+        "labels": [
+          "Carpeted floor"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-start-06-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many square metres of carpet cover the floor?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-6",
+      "skillLabel": "Calculate a rectangular floor area",
+      "structureKey": "y5-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "56",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure the opening between the dark baseline and purple arm.",
+        "values": [
+          56
+        ],
+        "baseline": "right"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-start-07-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-7",
+      "skillLabel": "Read a protractor from the right",
+      "structureKey": "y5-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "56"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using AM or PM.",
+      "correctAnswer": "2035",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1235
+        ],
+        "labels": [
+          "Train departs",
+          "20:35"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour, minutes and AM or PM"
+      },
+      "id": "y5-measurement-start-08-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "Write this time using AM or PM.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-8",
+      "skillLabel": "Convert 24-hour time to AM/PM",
+      "structureKey": "y5-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2035"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Find the full boundary length. All six side lengths are shown.",
+        "values": [
+          13,
+          8,
+          4,
+          3
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "Find the full boundary length. All six side lengths are shown.",
+          "values": [
+            13,
+            8,
+            4,
+            3
+          ],
+          "lShape": true,
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-start-09-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-9",
+      "skillLabel": "Find an irregular perimeter",
+      "structureKey": "y5-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 72°.",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          72
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-start-10-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 72°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-10",
+      "skillLabel": "Construct an acute angle",
+      "structureKey": "y5-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres are in the container?",
+      "correctAnswer": "2450",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the amount of water in the container.",
+        "values": [
+          2450
+        ],
+        "labels": [
+          "2 L 450 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y5-measurement-start-11-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many millilitres are in the container?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-11",
+      "skillLabel": "Express mixed capacity in millilitres",
+      "structureKey": "y5-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2450"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "163",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
+        "values": [
+          18,
+          11,
+          7,
+          5
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-start-12-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-12",
+      "skillLabel": "Calculate a composite floor area",
+      "structureKey": "y5-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "163"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "0045",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "The coach leaves just after midnight. Enter 24-hour time.",
+        "values": [
+          45
+        ],
+        "labels": [
+          "Coach departs",
+          "12:45 am"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-start-13-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-13",
+      "skillLabel": "Convert a time just after midnight",
+      "structureKey": "y5-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0045"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "118",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure from the dark baseline on the left.",
+        "values": [
+          118
+        ],
+        "baseline": "left"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-start-14-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-14",
+      "skillLabel": "Read an obtuse angle from the left",
+      "structureKey": "y5-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "118"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many grams heavier is parcel A?",
+      "correctAnswer": "890",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "Compare the two parcel masses.",
+        "values": [
+          2850,
+          1960
+        ],
+        "labels": [
+          "Parcel A: 2 kg 850 g",
+          "Parcel B: 1 kg 960 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y5-measurement-start-15-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many grams heavier is parcel A?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-15",
+      "skillLabel": "Compare mixed-unit masses",
+      "structureKey": "y5-measurement-slot-15",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "890"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "78",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
+        "values": [
+          11,
+          3,
+          9,
+          5
+        ],
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-start-16-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the total area of both gardens in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-16",
+      "skillLabel": "Combine two rectangular garden areas",
+      "structureKey": "y5-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "78"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which measurement and angle name are correct?",
+      "correctAnswer": "32° — acute",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Read the opening from the left baseline.",
+        "values": [
+          32
+        ],
+        "baseline": "left"
+      },
+      "options": [
+        "32° — acute",
+        "148° — obtuse",
+        "32° — obtuse"
+      ],
+      "id": "y5-measurement-start-17-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which measurement and angle name are correct?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-17",
+      "skillLabel": "Measure and name an angle",
+      "structureKey": "y5-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "32° — acute"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey take?",
+      "correctAnswer": "105",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "timetable",
+        "description": "Both times are on the same day. The timetable uses 24-hour time.",
+        "values": [
+          1060,
+          1165
+        ],
+        "labels": [
+          "Departs: 17:40",
+          "Arrives: 19:25"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y5-measurement-start-18-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey take?",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-18",
+      "skillLabel": "Use a 24-hour timetable",
+      "structureKey": "y5-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "105"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres need paving?",
+      "correctAnswer": "51",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+        "values": [
+          10,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "area",
+          "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+          "values": [
+            10,
+            6
+          ],
+          "areaCells": [
+            [
+              0,
+              0,
+              "full"
+            ],
+            [
+              1,
+              0,
+              "full"
+            ],
+            [
+              2,
+              0,
+              "full"
+            ],
+            [
+              3,
+              0,
+              "full"
+            ],
+            [
+              4,
+              0,
+              "full"
+            ],
+            [
+              5,
+              0,
+              "full"
+            ],
+            [
+              6,
+              0,
+              "full"
+            ],
+            [
+              7,
+              0,
+              "full"
+            ],
+            [
+              8,
+              0,
+              "full"
+            ],
+            [
+              9,
+              0,
+              "full"
+            ],
+            [
+              0,
+              1,
+              "full"
+            ],
+            [
+              1,
+              1,
+              "full"
+            ],
+            [
+              2,
+              1,
+              "full"
+            ],
+            [
+              3,
+              1,
+              "full"
+            ],
+            [
+              4,
+              1,
+              "full"
+            ],
+            [
+              5,
+              1,
+              "full"
+            ],
+            [
+              6,
+              1,
+              "full"
+            ],
+            [
+              7,
+              1,
+              "full"
+            ],
+            [
+              8,
+              1,
+              "full"
+            ],
+            [
+              9,
+              1,
+              "full"
+            ],
+            [
+              0,
+              2,
+              "full"
+            ],
+            [
+              1,
+              2,
+              "full"
+            ],
+            [
+              5,
+              2,
+              "full"
+            ],
+            [
+              6,
+              2,
+              "full"
+            ],
+            [
+              7,
+              2,
+              "full"
+            ],
+            [
+              8,
+              2,
+              "full"
+            ],
+            [
+              9,
+              2,
+              "full"
+            ],
+            [
+              0,
+              3,
+              "full"
+            ],
+            [
+              1,
+              3,
+              "full"
+            ],
+            [
+              5,
+              3,
+              "full"
+            ],
+            [
+              6,
+              3,
+              "full"
+            ],
+            [
+              7,
+              3,
+              "full"
+            ],
+            [
+              8,
+              3,
+              "full"
+            ],
+            [
+              9,
+              3,
+              "full"
+            ],
+            [
+              0,
+              4,
+              "full"
+            ],
+            [
+              1,
+              4,
+              "full"
+            ],
+            [
+              5,
+              4,
+              "full"
+            ],
+            [
+              6,
+              4,
+              "full"
+            ],
+            [
+              7,
+              4,
+              "full"
+            ],
+            [
+              8,
+              4,
+              "full"
+            ],
+            [
+              9,
+              4,
+              "full"
+            ],
+            [
+              0,
+              5,
+              "full"
+            ],
+            [
+              1,
+              5,
+              "full"
+            ],
+            [
+              2,
+              5,
+              "full"
+            ],
+            [
+              3,
+              5,
+              "full"
+            ],
+            [
+              4,
+              5,
+              "full"
+            ],
+            [
+              5,
+              5,
+              "full"
+            ],
+            [
+              6,
+              5,
+              "full"
+            ],
+            [
+              7,
+              5,
+              "full"
+            ],
+            [
+              8,
+              5,
+              "full"
+            ],
+            [
+              9,
+              5,
+              "full"
+            ]
+          ]
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-start-19-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many square metres need paving?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-19",
+      "skillLabel": "Find the area available for paving",
+      "structureKey": "y5-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "51"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 134°.",
+      "correctAnswer": "134",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          134
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-start-20-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 134°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-20",
+      "skillLabel": "Construct an obtuse angle",
+      "structureKey": "y5-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "134"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "Which unit is most suitable for measuring the length of this classroom?",
+      "correctAnswer": "Metres",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "precision",
+        "description": "Choose a sensible everyday unit for the classroom.",
+        "values": [
+          3
+        ],
+        "labels": [
+          "classroom"
+        ],
+        "art": "everyday-3d/object-classroom.png"
+      },
+      "options": [
+        "Kilometres",
+        "Millimetres",
+        "Centimetres",
+        "Metres"
+      ],
+      "id": "y5-measurement-mid-01-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which unit is most suitable for measuring the length of this classroom?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-1",
+      "skillLabel": "Choose a suitable metric unit",
+      "structureKey": "y5-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Metres"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres of fencing are needed, leaving the gate opening?",
+      "correctAnswer": "41",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "A 3-metre gate opening needs no fencing. Fence the rest of the boundary.",
+        "values": [
+          15,
+          7
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "A 3-metre gate opening needs no fencing. Fence the rest of the boundary.",
+          "values": [
+            15,
+            7
+          ],
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-mid-02-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-2",
+      "skillLabel": "Find fencing length allowing for a gate",
+      "structureKey": "y5-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "41"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the best estimate of the angle?",
+      "correctAnswer": "70°",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "estimate",
+        "description": "Estimate the opening marked by the curved arc.",
+        "values": [
+          70
+        ]
+      },
+      "options": [
+        "40°",
+        "70°",
+        "105°"
+      ],
+      "id": "y5-measurement-mid-03-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which is the best estimate of the angle?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-3",
+      "skillLabel": "Estimate an angle",
+      "structureKey": "y5-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70°"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "1715",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter hours and two-digit minutes using 24-hour time.",
+        "values": [
+          1035
+        ],
+        "labels": [
+          "Library closes",
+          "5:15 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-mid-04-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-4",
+      "skillLabel": "Convert afternoon time to 24-hour time",
+      "structureKey": "y5-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1715"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "275",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the full board length.",
+        "values": [
+          275
+        ],
+        "labels": [
+          "2 m 75 cm"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y5-measurement-mid-05-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-5",
+      "skillLabel": "Express a mixed length in centimetres",
+      "structureKey": "y5-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "275"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres of carpet cover the floor?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
+        "values": [
+          8,
+          6
+        ],
+        "labels": [
+          "Carpeted floor"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-mid-06-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many square metres of carpet cover the floor?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-6",
+      "skillLabel": "Calculate a rectangular floor area",
+      "structureKey": "y5-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "68",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure the opening between the dark baseline and purple arm.",
+        "values": [
+          68
+        ],
+        "baseline": "right"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-mid-07-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-7",
+      "skillLabel": "Read a protractor from the right",
+      "structureKey": "y5-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "68"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using AM or PM.",
+      "correctAnswer": "1825",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1105
+        ],
+        "labels": [
+          "Train departs",
+          "18:25"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour, minutes and AM or PM"
+      },
+      "id": "y5-measurement-mid-08-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "Write this time using AM or PM.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-8",
+      "skillLabel": "Convert 24-hour time to AM/PM",
+      "structureKey": "y5-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1825"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Find the full boundary length. All six side lengths are shown.",
+        "values": [
+          15,
+          9,
+          4,
+          3
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "Find the full boundary length. All six side lengths are shown.",
+          "values": [
+            15,
+            9,
+            4,
+            3
+          ],
+          "lShape": true,
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-mid-09-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-9",
+      "skillLabel": "Find an irregular perimeter",
+      "structureKey": "y5-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 56°.",
+      "correctAnswer": "56",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          56
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-mid-10-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 56°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-10",
+      "skillLabel": "Construct an acute angle",
+      "structureKey": "y5-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "56"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres are in the container?",
+      "correctAnswer": "2750",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the amount of water in the container.",
+        "values": [
+          2750
+        ],
+        "labels": [
+          "2 L 750 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y5-measurement-mid-11-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many millilitres are in the container?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-11",
+      "skillLabel": "Express mixed capacity in millilitres",
+      "structureKey": "y5-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "160",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
+        "values": [
+          15,
+          12,
+          5,
+          4
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-mid-12-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-12",
+      "skillLabel": "Calculate a composite floor area",
+      "structureKey": "y5-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "160"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "0020",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "The coach leaves just after midnight. Enter 24-hour time.",
+        "values": [
+          20
+        ],
+        "labels": [
+          "Coach departs",
+          "12:20 am"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-mid-13-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-13",
+      "skillLabel": "Convert a time just after midnight",
+      "structureKey": "y5-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0020"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "128",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure from the dark baseline on the left.",
+        "values": [
+          128
+        ],
+        "baseline": "left"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-mid-14-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-14",
+      "skillLabel": "Read an obtuse angle from the left",
+      "structureKey": "y5-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "128"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many grams heavier is parcel A?",
+      "correctAnswer": "680",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "Compare the two parcel masses.",
+        "values": [
+          2350,
+          1670
+        ],
+        "labels": [
+          "Parcel A: 2 kg 350 g",
+          "Parcel B: 1 kg 670 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y5-measurement-mid-15-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many grams heavier is parcel A?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-15",
+      "skillLabel": "Compare mixed-unit masses",
+      "structureKey": "y5-measurement-slot-15",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "680"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "86",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
+        "values": [
+          12,
+          3,
+          10,
+          5
+        ],
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-mid-16-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the total area of both gardens in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-16",
+      "skillLabel": "Combine two rectangular garden areas",
+      "structureKey": "y5-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "86"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which measurement and angle name are correct?",
+      "correctAnswer": "48° — acute",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Read the opening from the left baseline.",
+        "values": [
+          48
+        ],
+        "baseline": "left"
+      },
+      "options": [
+        "132° — obtuse",
+        "48° — obtuse",
+        "48° — acute"
+      ],
+      "id": "y5-measurement-mid-17-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which measurement and angle name are correct?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-17",
+      "skillLabel": "Measure and name an angle",
+      "structureKey": "y5-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48° — acute"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey take?",
+      "correctAnswer": "95",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "timetable",
+        "description": "Both times are on the same day. The timetable uses 24-hour time.",
+        "values": [
+          1115,
+          1210
+        ],
+        "labels": [
+          "Departs: 18:35",
+          "Arrives: 20:10"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y5-measurement-mid-18-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey take?",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-18",
+      "skillLabel": "Use a 24-hour timetable",
+      "structureKey": "y5-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "95"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres need paving?",
+      "correctAnswer": "36",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+        "values": [
+          8,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "area",
+          "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+          "values": [
+            8,
+            6
+          ],
+          "areaCells": [
+            [
+              0,
+              0,
+              "full"
+            ],
+            [
+              1,
+              0,
+              "full"
+            ],
+            [
+              2,
+              0,
+              "full"
+            ],
+            [
+              3,
+              0,
+              "full"
+            ],
+            [
+              4,
+              0,
+              "full"
+            ],
+            [
+              5,
+              0,
+              "full"
+            ],
+            [
+              6,
+              0,
+              "full"
+            ],
+            [
+              7,
+              0,
+              "full"
+            ],
+            [
+              0,
+              1,
+              "full"
+            ],
+            [
+              1,
+              1,
+              "full"
+            ],
+            [
+              2,
+              1,
+              "full"
+            ],
+            [
+              3,
+              1,
+              "full"
+            ],
+            [
+              4,
+              1,
+              "full"
+            ],
+            [
+              5,
+              1,
+              "full"
+            ],
+            [
+              6,
+              1,
+              "full"
+            ],
+            [
+              7,
+              1,
+              "full"
+            ],
+            [
+              0,
+              2,
+              "full"
+            ],
+            [
+              1,
+              2,
+              "full"
+            ],
+            [
+              6,
+              2,
+              "full"
+            ],
+            [
+              7,
+              2,
+              "full"
+            ],
+            [
+              0,
+              3,
+              "full"
+            ],
+            [
+              1,
+              3,
+              "full"
+            ],
+            [
+              6,
+              3,
+              "full"
+            ],
+            [
+              7,
+              3,
+              "full"
+            ],
+            [
+              0,
+              4,
+              "full"
+            ],
+            [
+              1,
+              4,
+              "full"
+            ],
+            [
+              6,
+              4,
+              "full"
+            ],
+            [
+              7,
+              4,
+              "full"
+            ],
+            [
+              0,
+              5,
+              "full"
+            ],
+            [
+              1,
+              5,
+              "full"
+            ],
+            [
+              2,
+              5,
+              "full"
+            ],
+            [
+              3,
+              5,
+              "full"
+            ],
+            [
+              4,
+              5,
+              "full"
+            ],
+            [
+              5,
+              5,
+              "full"
+            ],
+            [
+              6,
+              5,
+              "full"
+            ],
+            [
+              7,
+              5,
+              "full"
+            ]
+          ]
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-mid-19-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many square metres need paving?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-19",
+      "skillLabel": "Find the area available for paving",
+      "structureKey": "y5-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "36"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 122°.",
+      "correctAnswer": "122",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          122
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-mid-20-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 122°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-20",
+      "skillLabel": "Construct an obtuse angle",
+      "structureKey": "y5-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "122"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "Which unit is most suitable for measuring the thickness of this thin coin?",
+      "correctAnswer": "Millimetres",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "precision",
+        "description": "Choose a sensible everyday unit for the thin coin.",
+        "values": [
+          4
+        ],
+        "labels": [
+          "thin coin"
+        ]
+      },
+      "options": [
+        "Millimetres",
+        "Centimetres",
+        "Metres",
+        "Kilometres"
+      ],
+      "id": "y5-measurement-end-01-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which unit is most suitable for measuring the thickness of this thin coin?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-1",
+      "skillLabel": "Choose a suitable metric unit",
+      "structureKey": "y5-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Millimetres"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres of fencing are needed, leaving the gate opening?",
+      "correctAnswer": "46",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+        "values": [
+          16,
+          8
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "A 2-metre gate opening needs no fencing. Fence the rest of the boundary.",
+          "values": [
+            16,
+            8
+          ],
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-end-02-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-2",
+      "skillLabel": "Find fencing length allowing for a gate",
+      "structureKey": "y5-measurement-slot-2",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "46"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the best estimate of the angle?",
+      "correctAnswer": "60°",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "estimate",
+        "description": "Estimate the opening marked by the curved arc.",
+        "values": [
+          60
+        ]
+      },
+      "options": [
+        "60°",
+        "95°",
+        "30°"
+      ],
+      "id": "y5-measurement-end-03-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which is the best estimate of the angle?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-3",
+      "skillLabel": "Estimate an angle",
+      "structureKey": "y5-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "60°"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "1835",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter hours and two-digit minutes using 24-hour time.",
+        "values": [
+          1115
+        ],
+        "labels": [
+          "Library closes",
+          "6:35 pm"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-end-04-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-4",
+      "skillLabel": "Convert afternoon time to 24-hour time",
+      "structureKey": "y5-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1835"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "255",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the full board length.",
+        "values": [
+          255
+        ],
+        "labels": [
+          "2 m 55 cm"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y5-measurement-end-05-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-5",
+      "skillLabel": "Express a mixed length in centimetres",
+      "structureKey": "y5-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "255"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres of carpet cover the floor?",
+      "correctAnswer": "45",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
+        "values": [
+          9,
+          5
+        ],
+        "labels": [
+          "Carpeted floor"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-end-06-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many square metres of carpet cover the floor?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-6",
+      "skillLabel": "Calculate a rectangular floor area",
+      "structureKey": "y5-measurement-slot-6",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "45"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "74",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure the opening between the dark baseline and purple arm.",
+        "values": [
+          74
+        ],
+        "baseline": "right"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-end-07-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-7",
+      "skillLabel": "Read a protractor from the right",
+      "structureKey": "y5-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "74"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using AM or PM.",
+      "correctAnswer": "1925",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "Enter the hour and two-digit minutes. Choose AM or PM.",
+        "values": [
+          1165
+        ],
+        "labels": [
+          "Train departs",
+          "19:25"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "12h_meridiem",
+        "ariaLabel": "Enter the hour, minutes and AM or PM"
+      },
+      "id": "y5-measurement-end-08-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "Write this time using AM or PM.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-8",
+      "skillLabel": "Convert 24-hour time to AM/PM",
+      "structureKey": "y5-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1925"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perimeter of this garden, in metres?",
+      "correctAnswer": "52",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Find the full boundary length. All six side lengths are shown.",
+        "values": [
+          16,
+          10,
+          4,
+          3
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "perimeter",
+          "description": "Find the full boundary length. All six side lengths are shown.",
+          "values": [
+            16,
+            10,
+            4,
+            3
+          ],
+          "lShape": true,
+          "unit": "m"
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y5-measurement-end-09-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the perimeter of this garden, in metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-9",
+      "skillLabel": "Find an irregular perimeter",
+      "structureKey": "y5-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "52"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 68°.",
+      "correctAnswer": "68",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          68
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-end-10-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 68°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-10",
+      "skillLabel": "Construct an acute angle",
+      "structureKey": "y5-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "68"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres are in the container?",
+      "correctAnswer": "2250",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "The label gives the amount of water in the container.",
+        "values": [
+          2250
+        ],
+        "labels": [
+          "2 L 250 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y5-measurement-end-11-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many millilitres are in the container?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-11",
+      "skillLabel": "Express mixed capacity in millilitres",
+      "structureKey": "y5-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2250"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "146",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
+        "values": [
+          17,
+          10,
+          6,
+          4
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-end-12-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-12",
+      "skillLabel": "Calculate a composite floor area",
+      "structureKey": "y5-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "146"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Write this time using 24-hour time.",
+      "correctAnswer": "0050",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "time",
+        "description": "The coach leaves just after midnight. Enter 24-hour time.",
+        "values": [
+          50
+        ],
+        "labels": [
+          "Coach departs",
+          "12:50 am"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter 24-hour time"
+      },
+      "id": "y5-measurement-end-13-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "Write this time using 24-hour time.",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-13",
+      "skillLabel": "Convert a time just after midnight",
+      "structureKey": "y5-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "0050"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the angle in degrees?",
+      "correctAnswer": "142",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Measure from the dark baseline on the left.",
+        "values": [
+          142
+        ],
+        "baseline": "left"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y5-measurement-end-14-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the angle in degrees?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-14",
+      "skillLabel": "Read an obtuse angle from the left",
+      "structureKey": "y5-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "142"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many grams heavier is parcel A?",
+      "correctAnswer": "870",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "mixed",
+        "description": "Compare the two parcel masses.",
+        "values": [
+          2750,
+          1880
+        ],
+        "labels": [
+          "Parcel A: 2 kg 750 g",
+          "Parcel B: 1 kg 880 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y5-measurement-end-15-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many grams heavier is parcel A?",
+      "primaryDescriptorCode": "AC9M5M01",
+      "curriculumCodes": [
+        "AC9M5M01"
+      ],
+      "skillId": "y5-measurement-slot-15",
+      "skillLabel": "Compare mixed-unit masses",
+      "structureKey": "y5-measurement-slot-15",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "870"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "94",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
+        "values": [
+          13,
+          3,
+          11,
+          5
+        ],
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-end-16-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the total area of both gardens in square metres?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-16",
+      "skillLabel": "Combine two rectangular garden areas",
+      "structureKey": "y5-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "94"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which measurement and angle name are correct?",
+      "correctAnswer": "38° — acute",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "protractor",
+        "description": "Read the opening from the left baseline.",
+        "values": [
+          38
+        ],
+        "baseline": "left"
+      },
+      "options": [
+        "38° — obtuse",
+        "38° — acute",
+        "142° — obtuse"
+      ],
+      "id": "y5-measurement-end-17-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which measurement and angle name are correct?",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-17",
+      "skillLabel": "Measure and name an angle",
+      "structureKey": "y5-measurement-slot-17",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "38° — acute"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey take?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "timetable",
+        "description": "Both times are on the same day. The timetable uses 24-hour time.",
+        "values": [
+          1085,
+          1170
+        ],
+        "labels": [
+          "Departs: 18:05",
+          "Arrives: 19:30"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y5-measurement-end-18-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey take?",
+      "primaryDescriptorCode": "AC9M5M03",
+      "curriculumCodes": [
+        "AC9M5M03"
+      ],
+      "skillId": "y5-measurement-slot-18",
+      "skillLabel": "Use a 24-hour timetable",
+      "structureKey": "y5-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres need paving?",
+      "correctAnswer": "45",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "base",
+        "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+        "values": [
+          9,
+          6
+        ],
+        "base": {
+          "type": "measurement_year4_panel",
+          "task": "area",
+          "description": "Pave only the purple area. The white centre is a garden bed. Each square is 1 square metre.",
+          "values": [
+            9,
+            6
+          ],
+          "areaCells": [
+            [
+              0,
+              0,
+              "full"
+            ],
+            [
+              1,
+              0,
+              "full"
+            ],
+            [
+              2,
+              0,
+              "full"
+            ],
+            [
+              3,
+              0,
+              "full"
+            ],
+            [
+              4,
+              0,
+              "full"
+            ],
+            [
+              5,
+              0,
+              "full"
+            ],
+            [
+              6,
+              0,
+              "full"
+            ],
+            [
+              7,
+              0,
+              "full"
+            ],
+            [
+              8,
+              0,
+              "full"
+            ],
+            [
+              0,
+              1,
+              "full"
+            ],
+            [
+              1,
+              1,
+              "full"
+            ],
+            [
+              2,
+              1,
+              "full"
+            ],
+            [
+              3,
+              1,
+              "full"
+            ],
+            [
+              4,
+              1,
+              "full"
+            ],
+            [
+              5,
+              1,
+              "full"
+            ],
+            [
+              6,
+              1,
+              "full"
+            ],
+            [
+              7,
+              1,
+              "full"
+            ],
+            [
+              8,
+              1,
+              "full"
+            ],
+            [
+              0,
+              2,
+              "full"
+            ],
+            [
+              1,
+              2,
+              "full"
+            ],
+            [
+              5,
+              2,
+              "full"
+            ],
+            [
+              6,
+              2,
+              "full"
+            ],
+            [
+              7,
+              2,
+              "full"
+            ],
+            [
+              8,
+              2,
+              "full"
+            ],
+            [
+              0,
+              3,
+              "full"
+            ],
+            [
+              1,
+              3,
+              "full"
+            ],
+            [
+              5,
+              3,
+              "full"
+            ],
+            [
+              6,
+              3,
+              "full"
+            ],
+            [
+              7,
+              3,
+              "full"
+            ],
+            [
+              8,
+              3,
+              "full"
+            ],
+            [
+              0,
+              4,
+              "full"
+            ],
+            [
+              1,
+              4,
+              "full"
+            ],
+            [
+              5,
+              4,
+              "full"
+            ],
+            [
+              6,
+              4,
+              "full"
+            ],
+            [
+              7,
+              4,
+              "full"
+            ],
+            [
+              8,
+              4,
+              "full"
+            ],
+            [
+              0,
+              5,
+              "full"
+            ],
+            [
+              1,
+              5,
+              "full"
+            ],
+            [
+              2,
+              5,
+              "full"
+            ],
+            [
+              3,
+              5,
+              "full"
+            ],
+            [
+              4,
+              5,
+              "full"
+            ],
+            [
+              5,
+              5,
+              "full"
+            ],
+            [
+              6,
+              5,
+              "full"
+            ],
+            [
+              7,
+              5,
+              "full"
+            ],
+            [
+              8,
+              5,
+              "full"
+            ]
+          ]
+        }
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y5-measurement-end-19-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many square metres need paving?",
+      "primaryDescriptorCode": "AC9M5M02",
+      "curriculumCodes": [
+        "AC9M5M02"
+      ],
+      "skillId": "y5-measurement-slot-19",
+      "skillLabel": "Find the area available for paving",
+      "structureKey": "y5-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "45"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Construct an angle of 138°.",
+      "correctAnswer": "138",
+      "visual": {
+        "type": "measurement_year5_panel",
+        "task": "construct",
+        "description": "Drag the purple handle. You can also focus the diagram and use the arrow keys.",
+        "values": [
+          138
+        ],
+        "baseline": "right"
+      },
+      "id": "y5-measurement-end-20-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "Construct an angle of 138°.",
+      "primaryDescriptorCode": "AC9M5M04",
+      "curriculumCodes": [
+        "AC9M5M04"
+      ],
+      "skillId": "y5-measurement-slot-20",
+      "skillLabel": "Construct an obtuse angle",
+      "structureKey": "y5-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "138"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ]
+}

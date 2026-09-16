@@ -1,6 +1,7 @@
 "use client";
 import { savedYear1MeasurementVersion } from "@/lib/year1-measurement-assessment-version";
 import { savedYear2MeasurementVersion } from "@/lib/year2-measurement-assessment-version";
+import { savedYear5MeasurementVersion } from "@/lib/year5-measurement-assessment-version";
 import { savedGroundMeasurementVersion } from "@/lib/ground-measurement-assessment-version";
 import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
 import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
@@ -420,6 +421,7 @@ function PretestPage() {
   const [groundMeasurementVersion,setGroundMeasurementVersion]=useState<3|4>(4);
   const [year1MeasurementVersion,setYear1MeasurementVersion]=useState<3|4>(4);
   const [year2MeasurementVersion,setYear2MeasurementVersion]=useState<3|4>(4);
+  const [year5MeasurementVersion,setYear5MeasurementVersion]=useState<3|4>(4);
   const [groundNumberVersion,setGroundNumberVersion]=useState<1|3>(3);
   const [numberLevel1Version, setNumberLevel1Version] = useState<2 | 3 | 5>(5);
   const [numberLevel2Version, setNumberLevel2Version] = useState<2 | 3>(3);
@@ -432,8 +434,8 @@ function PretestPage() {
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion]
   );
 
   const [index, setIndex] = useState(0);
@@ -541,7 +543,9 @@ function PretestPage() {
     setYear1MeasurementVersion(measurement1Version);
     const measurement2Version=progressRealmId==="measurement" && year==="Year 2" && !isDemoPreviewMode() && snapshot?.questionIds?.length ? savedYear2MeasurementVersion(snapshot.questionIds)??3 : 4;
     setYear2MeasurementVersion(measurement2Version);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version,snapshot?.questionIds?.length ? measurementVersion : 4,measurement1Version,measurement2Version);
+    const measurement5Version=progressRealmId==="measurement" && year==="Year 5" && !isDemoPreviewMode() && snapshot?.questionIds?.length ? savedYear5MeasurementVersion(snapshot.questionIds)??3 : 4;
+    setYear5MeasurementVersion(measurement5Version);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version,snapshot?.questionIds?.length ? measurementVersion : 4,measurement1Version,measurement2Version,measurement5Version);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
@@ -573,6 +577,7 @@ function PretestPage() {
     setGroundNumberVersion(3);
     setYear1MeasurementVersion(4);
     setYear2MeasurementVersion(4);
+    setYear5MeasurementVersion(4);
     setGroundMeasurementVersion(4);
     clearPretestResume(year, localProgressRealmId);
     setAnswers(Array(questions.length).fill(null));

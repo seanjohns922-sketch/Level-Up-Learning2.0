@@ -1,6 +1,6 @@
 # Level 5 Measurelands: five matched assessment forms
 
-Status: manual review only. No student bank or diagnostic release is included.
+Status: approved for student release. Frozen v4 forms serve new pre/post attempts and newly pinned diagnostic cycles; existing v3 attempts and cycles remain unchanged.
 
 Source: supplied Australian Curriculum v9 F–6 Mathematics content document, Year 5 Measurement, page 54, AC9M5M01–04. Existing `year5MeasurelandsIndependentBanks` and the Year 5 lesson common files for precision, area, time, angles and the capstone were inspected before authoring.
 
