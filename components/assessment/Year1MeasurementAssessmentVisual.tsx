@@ -4,7 +4,7 @@ import MeasuredRibbon from './MeasuredRibbon';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import GroundMeasurementAssessmentVisual from './GroundMeasurementAssessmentVisual';
 import type {Measurement1Visual} from '@/data/assessments/revisions/year1MeasurementFiveForms';
-export function measurement1Speech(v:Measurement1Visual){return [v.description,...(v.task==='calendar'&&v.values?['Calendar year 2026. Columns: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.']:[]),...v.labels.map((label,i)=>`${label==='?'?'Missing item':label}${v.values?.[i]!==undefined&&!['units','fair','string','balance'].includes(v.task)?`: ${v.values[i]} ${v.unit??''}`:''}`)].join('. ');}
+export function measurement1Speech(v:Measurement1Visual){return [v.description,...(v.task==='calendar'&&v.values?['Calendar year 2026. Columns: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.']:[]),...v.labels.map((label,i)=>`${label==='?'?'Missing item':label}${v.values?.[i]!==undefined&&!['units','fair','string','balance','calendar'].includes(v.task)?`: ${v.values[i]} ${v.unit??''}`:''}`)].join('. ');}
 export default function Year1MeasurementAssessmentVisual({visual:v}:{visual:Measurement1Visual}){
  if(v.task==='balance')return <GroundMeasurementAssessmentVisual visual={{type:'measurement_ground_panel',task:'mass',labels:v.labels,values:v.values,description:v.description}}/>;
  let content;
@@ -26,7 +26,7 @@ export default function Year1MeasurementAssessmentVisual({visual:v}:{visual:Meas
   <p className="text-xl font-black text-amber-950">{label}</p>
   {v.task==='timeline'&&v.values?<ReadAloudBtn text={`${label}: ${v.values[i]} ${v.unit}.`} label={`Read ${label}`} size="md"/>:null}
   {v.task==='calendar'&&v.values?<div className="w-full max-w-sm text-amber-950"><p className="mb-2 font-bold">2026</p><div className="grid grid-cols-7 gap-1" style={{gridTemplateColumns:'repeat(7,minmax(0,1fr))'}}>{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day=><span key={day} className="text-xs font-bold">{day}</span>)}{Array.from({length:(new Date(Date.UTC(2026,['January','February','March','April','May','June','July','August','September','October','November','December'].indexOf(label),1)).getUTCDay()+6)%7},(_,day)=><span key={`blank-${day}`}/>)}{Array.from({length:v.values[i]},(_,day)=><span key={day} className="rounded border border-amber-200 bg-amber-50 p-1 text-sm font-bold">{day+1}</span>)}</div></div>:null}
-  {v.values?.[i]!==undefined?<p className="text-2xl font-black text-amber-950">{v.values[i]} <span className="text-lg">{v.unit}</span></p>:null}
+  {v.values?.[i]!==undefined&&v.task!=='calendar'?<p className="text-2xl font-black text-amber-950">{v.values[i]} <span className="text-lg">{v.unit}</span></p>:null}
   {v.task==='capacity'?<div className="flex max-w-56 flex-wrap justify-center gap-1" aria-hidden>{Array.from({length:v.values![i]},(_,j)=><svg key={j} viewBox="0 0 28 32" className="h-7 w-6"><path d="M4 5H22L20 28H6Z" fill="#8bcee7" stroke="#327592" strokeWidth="2"/><path d="M22 9Q34 16 22 21" fill="none" stroke="#327592" strokeWidth="2"/></svg>)}</div>:null}
   {v.unit?.includes('cubes')?<div className="flex max-w-56 flex-wrap justify-center gap-1" aria-hidden>{Array.from({length:v.values![i]},(_,j)=><span key={j} className="h-5 w-5 border-2 border-amber-800 bg-amber-200"/>)}</div>:null}
  </div>)}</div>;

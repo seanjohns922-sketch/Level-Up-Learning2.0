@@ -24,7 +24,7 @@ Independent audits recompute answers and check scoring, unknown responses, asset
 paths, ordering and consistency across forms. Manual child-view review remains.
 
 Review: Demo Review → Measurelands → Level 1 → Pre/Post or Start/Mid/End.
-These are protected review forms; existing Level 1 student banks are unchanged.
+Approved for student release on 16 September 2026. The immutable v4 snapshot is in `data/assessments/releases/year1Measurement-v4.json`. New pre/post assessments and new diagnostic cycles use the five matched forms. Saved attempts, older baselines and already-started academic-year diagnostic cycles retain their prior version. Migration: `20260916123000_measurement_level1_release.sql`. Calendar totals are omitted visually and from narration; children use the displayed dates.
 
 Manual-review refinements: child-friendly mass wording; the existing lesson pencil
 image aligned with the equal blocks; clearer ribbon and box drawings; full trip

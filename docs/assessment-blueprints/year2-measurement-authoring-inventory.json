@@ -1,0 +1,4532 @@
+{
+  "pretest": [
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "correctAnswer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Use equal blocks, touching end to end.",
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks",
+        "variants": [
+          "fair",
+          "gap",
+          "overlap"
+        ]
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "id": "y2-measurement-review-pretest-01",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-1",
+      "skillLabel": "Use equal length units",
+      "structureKey": "y2-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the sandwich is shaded?",
+      "correctAnswer": "One quarter",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The sandwich is cut into equal pieces.",
+        "variant": 0,
+        "parts": 4,
+        "shaded": 1,
+        "object": "sandwich"
+      },
+      "options": [
+        "One quarter",
+        "One eighth",
+        "One half"
+      ],
+      "id": "y2-measurement-review-pretest-02",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What fraction of the sandwich is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-2",
+      "skillLabel": "Recognise quarters",
+      "structureKey": "y2-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One quarter"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many days pass from planting to checking?",
+      "correctAnswer": "5",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Planting: 5 April. Checking: 10 April.",
+        "variant": 0,
+        "month": 3,
+        "dates": [
+          5,
+          10
+        ]
+      },
+      "id": "y2-measurement-review-pretest-03",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many days pass from planting to checking?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-3",
+      "skillLabel": "Count days between events",
+      "structureKey": "y2-measurement-slot-3",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "3 o'clock",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 0,
+        "hour": 3,
+        "minute": 0
+      },
+      "options": [
+        "3 o'clock",
+        "4 o'clock",
+        "Half past 3"
+      ],
+      "id": "y2-measurement-review-pretest-04",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-4",
+      "skillLabel": "Read the hour",
+      "structureKey": "y2-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3 o'clock"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 0,
+        "steps": 1,
+        "showEnd": true
+      },
+      "options": [
+        "Half turn",
+        "Full turn",
+        "Quarter turn"
+      ],
+      "id": "y2-measurement-review-pretest-05",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-5",
+      "skillLabel": "Identify a quarter turn",
+      "structureKey": "y2-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many blocks longer is ribbon A?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons use the same-sized blocks.",
+        "values": [
+          7,
+          4
+        ],
+        "unit": "blocks"
+      },
+      "id": "y2-measurement-review-pretest-06",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many blocks longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-6",
+      "skillLabel": "Compare lengths in the same units",
+      "structureKey": "y2-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the ribbon is shaded?",
+      "correctAnswer": "One eighth",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The ribbon is cut into equal pieces.",
+        "variant": 0,
+        "parts": 8,
+        "shaded": 1,
+        "object": "ribbon"
+      },
+      "options": [
+        "One quarter",
+        "One half",
+        "One eighth"
+      ],
+      "id": "y2-measurement-review-pretest-07",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What fraction of the ribbon is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-7",
+      "skillLabel": "Recognise eighths",
+      "structureKey": "y2-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One eighth"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is four days after 13 April?",
+      "correctAnswer": "17",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "The marked date is 13 April. Enter the day number.",
+        "variant": 0,
+        "month": 3,
+        "dates": [
+          13
+        ]
+      },
+      "id": "y2-measurement-review-pretest-08",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What date is four days after 13 April?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-8",
+      "skillLabel": "Find a later date",
+      "structureKey": "y2-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "17"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Half past 6",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 0,
+        "hour": 6,
+        "minute": 30
+      },
+      "options": [
+        "Half past 7",
+        "Half past 6",
+        "6 o'clock"
+      ],
+      "id": "y2-measurement-review-pretest-09",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-9",
+      "skillLabel": "Read half past",
+      "structureKey": "y2-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Half past 6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "The pointer makes a half turn. Where will it point?",
+      "correctAnswer": "Down",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Start facing up. Make a half turn clockwise.",
+        "variant": 0,
+        "steps": 2,
+        "showEnd": false
+      },
+      "options": [
+        "Right",
+        "Down",
+        "Left"
+      ],
+      "id": "y2-measurement-review-pretest-10",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "The pointer makes a half turn. Where will it point?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-10",
+      "skillLabel": "Apply a half turn",
+      "structureKey": "y2-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Down"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubes heavier is the book?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book",
+          "Apple"
+        ],
+        "description": "Each object balances with these equal cubes.",
+        "values": [
+          12,
+          8
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y2-measurement-review-pretest-11",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many cubes heavier is the book?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-11",
+      "skillLabel": "Compare masses in equal cubes",
+      "structureKey": "y2-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many more cups fit in B than A?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container is filled using the same cup.",
+        "values": [
+          5,
+          9,
+          7
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "id": "y2-measurement-review-pretest-12",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many more cups fit in B than A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-12",
+      "skillLabel": "Compare capacities in equal cups",
+      "structureKey": "y2-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Are these two pieces halves?",
+      "correctAnswer": "No, the pieces are not equal",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "Look at the two pieces of paper.",
+        "variant": 0,
+        "parts": 2,
+        "shaded": 1,
+        "unequal": true,
+        "object": "paper"
+      },
+      "options": [
+        "Yes, there are two pieces",
+        "No, the pieces are not equal",
+        "Yes, both pieces are paper"
+      ],
+      "id": "y2-measurement-review-pretest-13",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Are these two pieces halves?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-13",
+      "skillLabel": "Check equal halves",
+      "structureKey": "y2-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "No, the pieces are not equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is two weeks after 3 April?",
+      "correctAnswer": "17",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Start at 3 April. Enter the day number.",
+        "variant": 0,
+        "month": 3,
+        "dates": [
+          3
+        ]
+      },
+      "id": "y2-measurement-review-pretest-14",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What date is two weeks after 3 April?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-14",
+      "skillLabel": "Find a date two weeks later",
+      "structureKey": "y2-measurement-slot-14",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "17"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter past 8",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 0,
+        "hour": 8,
+        "minute": 15
+      },
+      "options": [
+        "Half past 8",
+        "Quarter past 8",
+        "Quarter to 8"
+      ],
+      "id": "y2-measurement-review-pretest-15",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-15",
+      "skillLabel": "Read quarter past",
+      "structureKey": "y2-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter past 8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Three-quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 0,
+        "steps": 3,
+        "showEnd": true
+      },
+      "options": [
+        "Quarter turn",
+        "Half turn",
+        "Three-quarter turn"
+      ],
+      "id": "y2-measurement-review-pretest-16",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-16",
+      "skillLabel": "Identify a three-quarter turn",
+      "structureKey": "y2-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Three-quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which blocks measure the ribbon more accurately?",
+      "correctAnswer": "Small blocks",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "precision",
+        "description": "The ribbon ends between two large blocks. Compare the large and small blocks.",
+        "variant": 0,
+        "parts": 4
+      },
+      "options": [
+        "Small blocks",
+        "Either size gives the same detail",
+        "Large blocks"
+      ],
+      "id": "y2-measurement-review-pretest-17",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which blocks measure the ribbon more accurately?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-17",
+      "skillLabel": "Use smaller units for a gap",
+      "structureKey": "y2-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Small blocks"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day is 11 April?",
+      "correctAnswer": "Saturday",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Find 11 April on the calendar.",
+        "variant": 0,
+        "month": 3,
+        "dates": [
+          11
+        ]
+      },
+      "options": [
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "id": "y2-measurement-review-pretest-18",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which day is 11 April?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-18",
+      "skillLabel": "Find a weekday from a date",
+      "structureKey": "y2-measurement-slot-18",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Saturday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter to 5",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 0,
+        "hour": 4,
+        "minute": 45
+      },
+      "options": [
+        "Quarter to 5",
+        "Quarter to 4",
+        "Quarter past 4"
+      ],
+      "id": "y2-measurement-review-pretest-19",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-19",
+      "skillLabel": "Read quarter to",
+      "structureKey": "y2-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter to 5"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Full turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow back to Start.",
+        "variant": 0,
+        "steps": 4,
+        "showEnd": true
+      },
+      "options": [
+        "Three-quarter turn",
+        "Full turn",
+        "Half turn"
+      ],
+      "id": "y2-measurement-review-pretest-20",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-20",
+      "skillLabel": "Identify a full turn",
+      "structureKey": "y2-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Full turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "correctAnswer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Use equal blocks, touching end to end.",
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks",
+        "variants": [
+          "overlap",
+          "fair",
+          "gap"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "id": "y2-measurement-review-posttest-01",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-1",
+      "skillLabel": "Use equal length units",
+      "structureKey": "y2-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the sandwich is shaded?",
+      "correctAnswer": "One quarter",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The sandwich is cut into equal pieces.",
+        "variant": 1,
+        "parts": 4,
+        "shaded": 1,
+        "object": "sandwich"
+      },
+      "options": [
+        "One eighth",
+        "One half",
+        "One quarter"
+      ],
+      "id": "y2-measurement-review-posttest-02",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What fraction of the sandwich is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-2",
+      "skillLabel": "Recognise quarters",
+      "structureKey": "y2-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One quarter"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many days pass from planting to checking?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Planting: 6 June. Checking: 12 June.",
+        "variant": 1,
+        "month": 5,
+        "dates": [
+          6,
+          12
+        ]
+      },
+      "id": "y2-measurement-review-posttest-03",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many days pass from planting to checking?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-3",
+      "skillLabel": "Count days between events",
+      "structureKey": "y2-measurement-slot-3",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "4 o'clock",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 1,
+        "hour": 4,
+        "minute": 0
+      },
+      "options": [
+        "5 o'clock",
+        "Half past 4",
+        "4 o'clock"
+      ],
+      "id": "y2-measurement-review-posttest-04",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-4",
+      "skillLabel": "Read the hour",
+      "structureKey": "y2-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4 o'clock"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 1,
+        "steps": 1,
+        "showEnd": true
+      },
+      "options": [
+        "Full turn",
+        "Quarter turn",
+        "Half turn"
+      ],
+      "id": "y2-measurement-review-posttest-05",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-5",
+      "skillLabel": "Identify a quarter turn",
+      "structureKey": "y2-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many blocks longer is ribbon A?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons use the same-sized blocks.",
+        "values": [
+          8,
+          5
+        ],
+        "unit": "blocks"
+      },
+      "id": "y2-measurement-review-posttest-06",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many blocks longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-6",
+      "skillLabel": "Compare lengths in the same units",
+      "structureKey": "y2-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the ribbon is shaded?",
+      "correctAnswer": "One eighth",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The ribbon is cut into equal pieces.",
+        "variant": 1,
+        "parts": 8,
+        "shaded": 1,
+        "object": "ribbon"
+      },
+      "options": [
+        "One half",
+        "One eighth",
+        "One quarter"
+      ],
+      "id": "y2-measurement-review-posttest-07",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What fraction of the ribbon is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-7",
+      "skillLabel": "Recognise eighths",
+      "structureKey": "y2-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One eighth"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is four days after 14 June?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "The marked date is 14 June. Enter the day number.",
+        "variant": 1,
+        "month": 5,
+        "dates": [
+          14
+        ]
+      },
+      "id": "y2-measurement-review-posttest-08",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What date is four days after 14 June?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-8",
+      "skillLabel": "Find a later date",
+      "structureKey": "y2-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Half past 7",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 1,
+        "hour": 7,
+        "minute": 30
+      },
+      "options": [
+        "Half past 7",
+        "7 o'clock",
+        "Half past 8"
+      ],
+      "id": "y2-measurement-review-posttest-09",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-9",
+      "skillLabel": "Read half past",
+      "structureKey": "y2-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Half past 7"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "The pointer makes a half turn. Where will it point?",
+      "correctAnswer": "Left",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Start facing right. Make a half turn clockwise.",
+        "variant": 1,
+        "steps": 2,
+        "showEnd": false
+      },
+      "options": [
+        "Left",
+        "Up",
+        "Down"
+      ],
+      "id": "y2-measurement-review-posttest-10",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "The pointer makes a half turn. Where will it point?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-10",
+      "skillLabel": "Apply a half turn",
+      "structureKey": "y2-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Left"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubes heavier is the book?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book",
+          "Apple"
+        ],
+        "description": "Each object balances with these equal cubes.",
+        "values": [
+          13,
+          9
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y2-measurement-review-posttest-11",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many cubes heavier is the book?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-11",
+      "skillLabel": "Compare masses in equal cubes",
+      "structureKey": "y2-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many more cups fit in B than A?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container is filled using the same cup.",
+        "values": [
+          6,
+          10,
+          8
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "id": "y2-measurement-review-posttest-12",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many more cups fit in B than A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-12",
+      "skillLabel": "Compare capacities in equal cups",
+      "structureKey": "y2-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Are these two pieces halves?",
+      "correctAnswer": "No, the pieces are not equal",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "Look at the two pieces of paper.",
+        "variant": 1,
+        "parts": 2,
+        "shaded": 1,
+        "unequal": true,
+        "object": "paper"
+      },
+      "options": [
+        "No, the pieces are not equal",
+        "Yes, both pieces are paper",
+        "Yes, there are two pieces"
+      ],
+      "id": "y2-measurement-review-posttest-13",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Are these two pieces halves?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-13",
+      "skillLabel": "Check equal halves",
+      "structureKey": "y2-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "No, the pieces are not equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is two weeks after 4 June?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Start at 4 June. Enter the day number.",
+        "variant": 1,
+        "month": 5,
+        "dates": [
+          4
+        ]
+      },
+      "id": "y2-measurement-review-posttest-14",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What date is two weeks after 4 June?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-14",
+      "skillLabel": "Find a date two weeks later",
+      "structureKey": "y2-measurement-slot-14",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter past 9",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 1,
+        "hour": 9,
+        "minute": 15
+      },
+      "options": [
+        "Quarter past 9",
+        "Quarter to 9",
+        "Half past 9"
+      ],
+      "id": "y2-measurement-review-posttest-15",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-15",
+      "skillLabel": "Read quarter past",
+      "structureKey": "y2-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter past 9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Three-quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 1,
+        "steps": 3,
+        "showEnd": true
+      },
+      "options": [
+        "Half turn",
+        "Three-quarter turn",
+        "Quarter turn"
+      ],
+      "id": "y2-measurement-review-posttest-16",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-16",
+      "skillLabel": "Identify a three-quarter turn",
+      "structureKey": "y2-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Three-quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which blocks measure the ribbon more accurately?",
+      "correctAnswer": "Small blocks",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "precision",
+        "description": "The ribbon ends between two large blocks. Compare the large and small blocks.",
+        "variant": 1,
+        "parts": 5
+      },
+      "options": [
+        "Either size gives the same detail",
+        "Large blocks",
+        "Small blocks"
+      ],
+      "id": "y2-measurement-review-posttest-17",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which blocks measure the ribbon more accurately?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-17",
+      "skillLabel": "Use smaller units for a gap",
+      "structureKey": "y2-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Small blocks"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day is 12 June?",
+      "correctAnswer": "Friday",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Find 12 June on the calendar.",
+        "variant": 1,
+        "month": 5,
+        "dates": [
+          12
+        ]
+      },
+      "options": [
+        "Friday",
+        "Saturday",
+        "Thursday"
+      ],
+      "id": "y2-measurement-review-posttest-18",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which day is 12 June?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-18",
+      "skillLabel": "Find a weekday from a date",
+      "structureKey": "y2-measurement-slot-18",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Friday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter to 6",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 1,
+        "hour": 5,
+        "minute": 45
+      },
+      "options": [
+        "Quarter to 5",
+        "Quarter past 5",
+        "Quarter to 6"
+      ],
+      "id": "y2-measurement-review-posttest-19",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-19",
+      "skillLabel": "Read quarter to",
+      "structureKey": "y2-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter to 6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Full turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow back to Start.",
+        "variant": 1,
+        "steps": 4,
+        "showEnd": true
+      },
+      "options": [
+        "Full turn",
+        "Half turn",
+        "Three-quarter turn"
+      ],
+      "id": "y2-measurement-review-posttest-20",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-20",
+      "skillLabel": "Identify a full turn",
+      "structureKey": "y2-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Full turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "correctAnswer": "C",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Use equal blocks, touching end to end.",
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks",
+        "variants": [
+          "gap",
+          "overlap",
+          "fair"
+        ]
+      },
+      "options": [
+        "C",
+        "A",
+        "B"
+      ],
+      "id": "y2-measurement-review-start-01",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-1",
+      "skillLabel": "Use equal length units",
+      "structureKey": "y2-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "C"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the sandwich is shaded?",
+      "correctAnswer": "One quarter",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The sandwich is cut into equal pieces.",
+        "variant": 2,
+        "parts": 4,
+        "shaded": 1,
+        "object": "sandwich"
+      },
+      "options": [
+        "One half",
+        "One quarter",
+        "One eighth"
+      ],
+      "id": "y2-measurement-review-start-02",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What fraction of the sandwich is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-2",
+      "skillLabel": "Recognise quarters",
+      "structureKey": "y2-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One quarter"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many days pass from planting to checking?",
+      "correctAnswer": "5",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Planting: 7 September. Checking: 12 September.",
+        "variant": 2,
+        "month": 8,
+        "dates": [
+          7,
+          12
+        ]
+      },
+      "id": "y2-measurement-review-start-03",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many days pass from planting to checking?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-3",
+      "skillLabel": "Count days between events",
+      "structureKey": "y2-measurement-slot-3",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "5 o'clock",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 2,
+        "hour": 5,
+        "minute": 0
+      },
+      "options": [
+        "Half past 5",
+        "5 o'clock",
+        "6 o'clock"
+      ],
+      "id": "y2-measurement-review-start-04",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-4",
+      "skillLabel": "Read the hour",
+      "structureKey": "y2-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5 o'clock"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 2,
+        "steps": 1,
+        "showEnd": true
+      },
+      "options": [
+        "Quarter turn",
+        "Half turn",
+        "Full turn"
+      ],
+      "id": "y2-measurement-review-start-05",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-5",
+      "skillLabel": "Identify a quarter turn",
+      "structureKey": "y2-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many blocks longer is ribbon A?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons use the same-sized blocks.",
+        "values": [
+          9,
+          6
+        ],
+        "unit": "blocks"
+      },
+      "id": "y2-measurement-review-start-06",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many blocks longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-6",
+      "skillLabel": "Compare lengths in the same units",
+      "structureKey": "y2-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the ribbon is shaded?",
+      "correctAnswer": "One eighth",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The ribbon is cut into equal pieces.",
+        "variant": 2,
+        "parts": 8,
+        "shaded": 1,
+        "object": "ribbon"
+      },
+      "options": [
+        "One eighth",
+        "One quarter",
+        "One half"
+      ],
+      "id": "y2-measurement-review-start-07",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What fraction of the ribbon is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-7",
+      "skillLabel": "Recognise eighths",
+      "structureKey": "y2-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One eighth"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is four days after 15 September?",
+      "correctAnswer": "19",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "The marked date is 15 September. Enter the day number.",
+        "variant": 2,
+        "month": 8,
+        "dates": [
+          15
+        ]
+      },
+      "id": "y2-measurement-review-start-08",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What date is four days after 15 September?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-8",
+      "skillLabel": "Find a later date",
+      "structureKey": "y2-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "19"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Half past 8",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 2,
+        "hour": 8,
+        "minute": 30
+      },
+      "options": [
+        "8 o'clock",
+        "Half past 9",
+        "Half past 8"
+      ],
+      "id": "y2-measurement-review-start-09",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-9",
+      "skillLabel": "Read half past",
+      "structureKey": "y2-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Half past 8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "The pointer makes a half turn. Where will it point?",
+      "correctAnswer": "Up",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Start facing down. Make a half turn clockwise.",
+        "variant": 2,
+        "steps": 2,
+        "showEnd": false
+      },
+      "options": [
+        "Right",
+        "Left",
+        "Up"
+      ],
+      "id": "y2-measurement-review-start-10",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "The pointer makes a half turn. Where will it point?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-10",
+      "skillLabel": "Apply a half turn",
+      "structureKey": "y2-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Up"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubes heavier is the book?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book",
+          "Apple"
+        ],
+        "description": "Each object balances with these equal cubes.",
+        "values": [
+          14,
+          8
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y2-measurement-review-start-11",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many cubes heavier is the book?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-11",
+      "skillLabel": "Compare masses in equal cubes",
+      "structureKey": "y2-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many more cups fit in B than A?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container is filled using the same cup.",
+        "values": [
+          7,
+          11,
+          9
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "id": "y2-measurement-review-start-12",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many more cups fit in B than A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-12",
+      "skillLabel": "Compare capacities in equal cups",
+      "structureKey": "y2-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Are these two pieces halves?",
+      "correctAnswer": "No, the pieces are not equal",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "Look at the two pieces of paper.",
+        "variant": 2,
+        "parts": 2,
+        "shaded": 1,
+        "unequal": true,
+        "object": "paper"
+      },
+      "options": [
+        "Yes, both pieces are paper",
+        "Yes, there are two pieces",
+        "No, the pieces are not equal"
+      ],
+      "id": "y2-measurement-review-start-13",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Are these two pieces halves?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-13",
+      "skillLabel": "Check equal halves",
+      "structureKey": "y2-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "No, the pieces are not equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is two weeks after 5 September?",
+      "correctAnswer": "19",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Start at 5 September. Enter the day number.",
+        "variant": 2,
+        "month": 8,
+        "dates": [
+          5
+        ]
+      },
+      "id": "y2-measurement-review-start-14",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What date is two weeks after 5 September?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-14",
+      "skillLabel": "Find a date two weeks later",
+      "structureKey": "y2-measurement-slot-14",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "19"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter past 10",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 2,
+        "hour": 10,
+        "minute": 15
+      },
+      "options": [
+        "Quarter to 10",
+        "Half past 10",
+        "Quarter past 10"
+      ],
+      "id": "y2-measurement-review-start-15",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-15",
+      "skillLabel": "Read quarter past",
+      "structureKey": "y2-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter past 10"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Three-quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 2,
+        "steps": 3,
+        "showEnd": true
+      },
+      "options": [
+        "Three-quarter turn",
+        "Quarter turn",
+        "Half turn"
+      ],
+      "id": "y2-measurement-review-start-16",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-16",
+      "skillLabel": "Identify a three-quarter turn",
+      "structureKey": "y2-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Three-quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which blocks measure the ribbon more accurately?",
+      "correctAnswer": "Small blocks",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "precision",
+        "description": "The ribbon ends between two large blocks. Compare the large and small blocks.",
+        "variant": 2,
+        "parts": 6
+      },
+      "options": [
+        "Large blocks",
+        "Small blocks",
+        "Either size gives the same detail"
+      ],
+      "id": "y2-measurement-review-start-17",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which blocks measure the ribbon more accurately?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-17",
+      "skillLabel": "Use smaller units for a gap",
+      "structureKey": "y2-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Small blocks"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day is 13 September?",
+      "correctAnswer": "Sunday",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Find 13 September on the calendar.",
+        "variant": 2,
+        "month": 8,
+        "dates": [
+          13
+        ]
+      },
+      "options": [
+        "Monday",
+        "Saturday",
+        "Sunday"
+      ],
+      "id": "y2-measurement-review-start-18",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which day is 13 September?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-18",
+      "skillLabel": "Find a weekday from a date",
+      "structureKey": "y2-measurement-slot-18",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Sunday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter to 7",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 2,
+        "hour": 6,
+        "minute": 45
+      },
+      "options": [
+        "Quarter past 6",
+        "Quarter to 7",
+        "Quarter to 6"
+      ],
+      "id": "y2-measurement-review-start-19",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-19",
+      "skillLabel": "Read quarter to",
+      "structureKey": "y2-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter to 7"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Full turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow back to Start.",
+        "variant": 2,
+        "steps": 4,
+        "showEnd": true
+      },
+      "options": [
+        "Half turn",
+        "Three-quarter turn",
+        "Full turn"
+      ],
+      "id": "y2-measurement-review-start-20",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-20",
+      "skillLabel": "Identify a full turn",
+      "structureKey": "y2-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Full turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "correctAnswer": "A",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Use equal blocks, touching end to end.",
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks",
+        "variants": [
+          "fair",
+          "gap",
+          "overlap"
+        ]
+      },
+      "options": [
+        "A",
+        "B",
+        "C"
+      ],
+      "id": "y2-measurement-review-mid-01",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-1",
+      "skillLabel": "Use equal length units",
+      "structureKey": "y2-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "A"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the sandwich is shaded?",
+      "correctAnswer": "One quarter",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The sandwich is cut into equal pieces.",
+        "variant": 3,
+        "parts": 4,
+        "shaded": 1,
+        "object": "sandwich"
+      },
+      "options": [
+        "One quarter",
+        "One eighth",
+        "One half"
+      ],
+      "id": "y2-measurement-review-mid-02",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What fraction of the sandwich is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-2",
+      "skillLabel": "Recognise quarters",
+      "structureKey": "y2-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One quarter"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many days pass from planting to checking?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Planting: 8 November. Checking: 14 November.",
+        "variant": 3,
+        "month": 10,
+        "dates": [
+          8,
+          14
+        ]
+      },
+      "id": "y2-measurement-review-mid-03",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many days pass from planting to checking?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-3",
+      "skillLabel": "Count days between events",
+      "structureKey": "y2-measurement-slot-3",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "6 o'clock",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 3,
+        "hour": 6,
+        "minute": 0
+      },
+      "options": [
+        "6 o'clock",
+        "7 o'clock",
+        "Half past 6"
+      ],
+      "id": "y2-measurement-review-mid-04",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-4",
+      "skillLabel": "Read the hour",
+      "structureKey": "y2-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6 o'clock"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 3,
+        "steps": 1,
+        "showEnd": true
+      },
+      "options": [
+        "Half turn",
+        "Full turn",
+        "Quarter turn"
+      ],
+      "id": "y2-measurement-review-mid-05",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-5",
+      "skillLabel": "Identify a quarter turn",
+      "structureKey": "y2-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many blocks longer is ribbon A?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons use the same-sized blocks.",
+        "values": [
+          10,
+          7
+        ],
+        "unit": "blocks"
+      },
+      "id": "y2-measurement-review-mid-06",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many blocks longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-6",
+      "skillLabel": "Compare lengths in the same units",
+      "structureKey": "y2-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the ribbon is shaded?",
+      "correctAnswer": "One eighth",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The ribbon is cut into equal pieces.",
+        "variant": 3,
+        "parts": 8,
+        "shaded": 1,
+        "object": "ribbon"
+      },
+      "options": [
+        "One quarter",
+        "One half",
+        "One eighth"
+      ],
+      "id": "y2-measurement-review-mid-07",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What fraction of the ribbon is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-7",
+      "skillLabel": "Recognise eighths",
+      "structureKey": "y2-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One eighth"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is four days after 16 November?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "The marked date is 16 November. Enter the day number.",
+        "variant": 3,
+        "month": 10,
+        "dates": [
+          16
+        ]
+      },
+      "id": "y2-measurement-review-mid-08",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What date is four days after 16 November?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-8",
+      "skillLabel": "Find a later date",
+      "structureKey": "y2-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Half past 9",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 3,
+        "hour": 9,
+        "minute": 30
+      },
+      "options": [
+        "Half past 10",
+        "Half past 9",
+        "9 o'clock"
+      ],
+      "id": "y2-measurement-review-mid-09",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-9",
+      "skillLabel": "Read half past",
+      "structureKey": "y2-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Half past 9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "The pointer makes a half turn. Where will it point?",
+      "correctAnswer": "Right",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Start facing left. Make a half turn clockwise.",
+        "variant": 3,
+        "steps": 2,
+        "showEnd": false
+      },
+      "options": [
+        "Up",
+        "Right",
+        "Down"
+      ],
+      "id": "y2-measurement-review-mid-10",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "The pointer makes a half turn. Where will it point?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-10",
+      "skillLabel": "Apply a half turn",
+      "structureKey": "y2-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Right"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubes heavier is the book?",
+      "correctAnswer": "6",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book",
+          "Apple"
+        ],
+        "description": "Each object balances with these equal cubes.",
+        "values": [
+          15,
+          9
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y2-measurement-review-mid-11",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many cubes heavier is the book?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-11",
+      "skillLabel": "Compare masses in equal cubes",
+      "structureKey": "y2-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "6"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many more cups fit in B than A?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container is filled using the same cup.",
+        "values": [
+          8,
+          12,
+          10
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "id": "y2-measurement-review-mid-12",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many more cups fit in B than A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-12",
+      "skillLabel": "Compare capacities in equal cups",
+      "structureKey": "y2-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Are these two pieces halves?",
+      "correctAnswer": "No, the pieces are not equal",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "Look at the two pieces of paper.",
+        "variant": 3,
+        "parts": 2,
+        "shaded": 1,
+        "unequal": true,
+        "object": "paper"
+      },
+      "options": [
+        "Yes, there are two pieces",
+        "No, the pieces are not equal",
+        "Yes, both pieces are paper"
+      ],
+      "id": "y2-measurement-review-mid-13",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Are these two pieces halves?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-13",
+      "skillLabel": "Check equal halves",
+      "structureKey": "y2-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "No, the pieces are not equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is two weeks after 6 November?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Start at 6 November. Enter the day number.",
+        "variant": 3,
+        "month": 10,
+        "dates": [
+          6
+        ]
+      },
+      "id": "y2-measurement-review-mid-14",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What date is two weeks after 6 November?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-14",
+      "skillLabel": "Find a date two weeks later",
+      "structureKey": "y2-measurement-slot-14",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter past 11",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 3,
+        "hour": 11,
+        "minute": 15
+      },
+      "options": [
+        "Half past 11",
+        "Quarter past 11",
+        "Quarter to 11"
+      ],
+      "id": "y2-measurement-review-mid-15",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-15",
+      "skillLabel": "Read quarter past",
+      "structureKey": "y2-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter past 11"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Three-quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 3,
+        "steps": 3,
+        "showEnd": true
+      },
+      "options": [
+        "Quarter turn",
+        "Half turn",
+        "Three-quarter turn"
+      ],
+      "id": "y2-measurement-review-mid-16",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-16",
+      "skillLabel": "Identify a three-quarter turn",
+      "structureKey": "y2-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Three-quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which blocks measure the ribbon more accurately?",
+      "correctAnswer": "Small blocks",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "precision",
+        "description": "The ribbon ends between two large blocks. Compare the large and small blocks.",
+        "variant": 3,
+        "parts": 7
+      },
+      "options": [
+        "Small blocks",
+        "Either size gives the same detail",
+        "Large blocks"
+      ],
+      "id": "y2-measurement-review-mid-17",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which blocks measure the ribbon more accurately?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-17",
+      "skillLabel": "Use smaller units for a gap",
+      "structureKey": "y2-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Small blocks"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day is 14 November?",
+      "correctAnswer": "Saturday",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Find 14 November on the calendar.",
+        "variant": 3,
+        "month": 10,
+        "dates": [
+          14
+        ]
+      },
+      "options": [
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "id": "y2-measurement-review-mid-18",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which day is 14 November?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-18",
+      "skillLabel": "Find a weekday from a date",
+      "structureKey": "y2-measurement-slot-18",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Saturday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter to 8",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 3,
+        "hour": 7,
+        "minute": 45
+      },
+      "options": [
+        "Quarter to 8",
+        "Quarter to 7",
+        "Quarter past 7"
+      ],
+      "id": "y2-measurement-review-mid-19",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-19",
+      "skillLabel": "Read quarter to",
+      "structureKey": "y2-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter to 8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Full turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow back to Start.",
+        "variant": 3,
+        "steps": 4,
+        "showEnd": true
+      },
+      "options": [
+        "Three-quarter turn",
+        "Full turn",
+        "Half turn"
+      ],
+      "id": "y2-measurement-review-mid-20",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-20",
+      "skillLabel": "Identify a full turn",
+      "structureKey": "y2-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Full turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "Which row measures the strip correctly?",
+      "correctAnswer": "B",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "fair",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Use equal blocks, touching end to end.",
+        "values": [
+          6,
+          6,
+          6
+        ],
+        "unit": "blocks",
+        "variants": [
+          "overlap",
+          "fair",
+          "gap"
+        ]
+      },
+      "options": [
+        "B",
+        "C",
+        "A"
+      ],
+      "id": "y2-measurement-review-end-01",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which row measures the strip correctly?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-1",
+      "skillLabel": "Use equal length units",
+      "structureKey": "y2-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "B"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the sandwich is shaded?",
+      "correctAnswer": "One quarter",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The sandwich is cut into equal pieces.",
+        "variant": 4,
+        "parts": 4,
+        "shaded": 1,
+        "object": "sandwich"
+      },
+      "options": [
+        "One eighth",
+        "One half",
+        "One quarter"
+      ],
+      "id": "y2-measurement-review-end-02",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What fraction of the sandwich is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-2",
+      "skillLabel": "Recognise quarters",
+      "structureKey": "y2-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One quarter"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many days pass from planting to checking?",
+      "correctAnswer": "5",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Planting: 9 May. Checking: 14 May.",
+        "variant": 4,
+        "month": 4,
+        "dates": [
+          9,
+          14
+        ]
+      },
+      "id": "y2-measurement-review-end-03",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many days pass from planting to checking?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-3",
+      "skillLabel": "Count days between events",
+      "structureKey": "y2-measurement-slot-3",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "5"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "7 o'clock",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 4,
+        "hour": 7,
+        "minute": 0
+      },
+      "options": [
+        "8 o'clock",
+        "Half past 7",
+        "7 o'clock"
+      ],
+      "id": "y2-measurement-review-end-04",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-4",
+      "skillLabel": "Read the hour",
+      "structureKey": "y2-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7 o'clock"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 4,
+        "steps": 1,
+        "showEnd": true
+      },
+      "options": [
+        "Full turn",
+        "Quarter turn",
+        "Half turn"
+      ],
+      "id": "y2-measurement-review-end-05",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-5",
+      "skillLabel": "Identify a quarter turn",
+      "structureKey": "y2-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many blocks longer is ribbon A?",
+      "correctAnswer": "3",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "units",
+        "labels": [
+          "Ribbon A",
+          "Ribbon B"
+        ],
+        "description": "Both ribbons use the same-sized blocks.",
+        "values": [
+          11,
+          8
+        ],
+        "unit": "blocks"
+      },
+      "id": "y2-measurement-review-end-06",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many blocks longer is ribbon A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-6",
+      "skillLabel": "Compare lengths in the same units",
+      "structureKey": "y2-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What fraction of the ribbon is shaded?",
+      "correctAnswer": "One eighth",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "The ribbon is cut into equal pieces.",
+        "variant": 4,
+        "parts": 8,
+        "shaded": 1,
+        "object": "ribbon"
+      },
+      "options": [
+        "One half",
+        "One eighth",
+        "One quarter"
+      ],
+      "id": "y2-measurement-review-end-07",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What fraction of the ribbon is shaded?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-7",
+      "skillLabel": "Recognise eighths",
+      "structureKey": "y2-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "One eighth"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is four days after 17 May?",
+      "correctAnswer": "21",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "The marked date is 17 May. Enter the day number.",
+        "variant": 4,
+        "month": 4,
+        "dates": [
+          17
+        ]
+      },
+      "id": "y2-measurement-review-end-08",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What date is four days after 17 May?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-8",
+      "skillLabel": "Find a later date",
+      "structureKey": "y2-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "21"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Half past 10",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 4,
+        "hour": 10,
+        "minute": 30
+      },
+      "options": [
+        "Half past 10",
+        "10 o'clock",
+        "Half past 11"
+      ],
+      "id": "y2-measurement-review-end-09",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-9",
+      "skillLabel": "Read half past",
+      "structureKey": "y2-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Half past 10"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "The pointer makes a half turn. Where will it point?",
+      "correctAnswer": "Down",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Start facing up. Make a half turn clockwise.",
+        "variant": 4,
+        "steps": 2,
+        "showEnd": false
+      },
+      "options": [
+        "Down",
+        "Left",
+        "Right"
+      ],
+      "id": "y2-measurement-review-end-10",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "The pointer makes a half turn. Where will it point?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-10",
+      "skillLabel": "Apply a half turn",
+      "structureKey": "y2-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Down"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubes heavier is the book?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "objects",
+        "labels": [
+          "Book",
+          "Apple"
+        ],
+        "description": "Each object balances with these equal cubes.",
+        "values": [
+          16,
+          8
+        ],
+        "unit": "equal cubes",
+        "arts": [
+          "week2-3d/book.png",
+          "week2-3d/apple.png"
+        ]
+      },
+      "id": "y2-measurement-review-end-11",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many cubes heavier is the book?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-11",
+      "skillLabel": "Compare masses in equal cubes",
+      "structureKey": "y2-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many more cups fit in B than A?",
+      "correctAnswer": "4",
+      "visual": {
+        "type": "measurement_year1_panel",
+        "task": "capacity",
+        "labels": [
+          "A",
+          "B",
+          "C"
+        ],
+        "description": "Each container is filled using the same cup.",
+        "values": [
+          9,
+          13,
+          11
+        ],
+        "unit": "cups",
+        "arts": [
+          "containers/jug.png",
+          "containers/bucket.png",
+          "containers/bottle.png"
+        ]
+      },
+      "id": "y2-measurement-review-end-12",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many more cups fit in B than A?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-12",
+      "skillLabel": "Compare capacities in equal cups",
+      "structureKey": "y2-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Are these two pieces halves?",
+      "correctAnswer": "No, the pieces are not equal",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "fraction",
+        "description": "Look at the two pieces of paper.",
+        "variant": 4,
+        "parts": 2,
+        "shaded": 1,
+        "unequal": true,
+        "object": "paper"
+      },
+      "options": [
+        "No, the pieces are not equal",
+        "Yes, both pieces are paper",
+        "Yes, there are two pieces"
+      ],
+      "id": "y2-measurement-review-end-13",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Are these two pieces halves?",
+      "primaryDescriptorCode": "AC9M2M02",
+      "curriculumCodes": [
+        "AC9M2M02"
+      ],
+      "skillId": "y2-measurement-slot-13",
+      "skillLabel": "Check equal halves",
+      "structureKey": "y2-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "No, the pieces are not equal"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What date is two weeks after 7 May?",
+      "correctAnswer": "21",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Start at 7 May. Enter the day number.",
+        "variant": 4,
+        "month": 4,
+        "dates": [
+          7
+        ]
+      },
+      "id": "y2-measurement-review-end-14",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What date is two weeks after 7 May?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-14",
+      "skillLabel": "Find a date two weeks later",
+      "structureKey": "y2-measurement-slot-14",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "21"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter past 12",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 4,
+        "hour": 12,
+        "minute": 15
+      },
+      "options": [
+        "Quarter past 12",
+        "Quarter to 12",
+        "Half past 12"
+      ],
+      "id": "y2-measurement-review-end-15",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-15",
+      "skillLabel": "Read quarter past",
+      "structureKey": "y2-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter past 12"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Three-quarter turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow from Start to Finish.",
+        "variant": 4,
+        "steps": 3,
+        "showEnd": true
+      },
+      "options": [
+        "Half turn",
+        "Three-quarter turn",
+        "Quarter turn"
+      ],
+      "id": "y2-measurement-review-end-16",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-16",
+      "skillLabel": "Identify a three-quarter turn",
+      "structureKey": "y2-measurement-slot-16",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Three-quarter turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which blocks measure the ribbon more accurately?",
+      "correctAnswer": "Small blocks",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "precision",
+        "description": "The ribbon ends between two large blocks. Compare the large and small blocks.",
+        "variant": 4,
+        "parts": 8
+      },
+      "options": [
+        "Either size gives the same detail",
+        "Large blocks",
+        "Small blocks"
+      ],
+      "id": "y2-measurement-review-end-17",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which blocks measure the ribbon more accurately?",
+      "primaryDescriptorCode": "AC9M2M01",
+      "curriculumCodes": [
+        "AC9M2M01"
+      ],
+      "skillId": "y2-measurement-slot-17",
+      "skillLabel": "Use smaller units for a gap",
+      "structureKey": "y2-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Small blocks"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which day is 15 May?",
+      "correctAnswer": "Friday",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "calendar",
+        "description": "Find 15 May on the calendar.",
+        "variant": 4,
+        "month": 4,
+        "dates": [
+          15
+        ]
+      },
+      "options": [
+        "Friday",
+        "Saturday",
+        "Thursday"
+      ],
+      "id": "y2-measurement-review-end-18",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which day is 15 May?",
+      "primaryDescriptorCode": "AC9M2M03",
+      "curriculumCodes": [
+        "AC9M2M03"
+      ],
+      "skillId": "y2-measurement-slot-18",
+      "skillLabel": "Find a weekday from a date",
+      "structureKey": "y2-measurement-slot-18",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Friday"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the clock show?",
+      "correctAnswer": "Quarter to 9",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "clock",
+        "description": "Read the clock face.",
+        "variant": 4,
+        "hour": 8,
+        "minute": 45
+      },
+      "options": [
+        "Quarter to 8",
+        "Quarter past 8",
+        "Quarter to 9"
+      ],
+      "id": "y2-measurement-review-end-19",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "What time does the clock show?",
+      "primaryDescriptorCode": "AC9M2M04",
+      "curriculumCodes": [
+        "AC9M2M04"
+      ],
+      "skillId": "y2-measurement-slot-19",
+      "skillLabel": "Read quarter to",
+      "structureKey": "y2-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Quarter to 9"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How much did the pointer turn?",
+      "correctAnswer": "Full turn",
+      "visual": {
+        "type": "measurement_year2_panel",
+        "task": "turn",
+        "description": "Follow the clockwise arrow back to Start.",
+        "variant": 4,
+        "steps": 4,
+        "showEnd": true
+      },
+      "options": [
+        "Full turn",
+        "Half turn",
+        "Three-quarter turn"
+      ],
+      "id": "y2-measurement-review-end-20",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "How much did the pointer turn?",
+      "primaryDescriptorCode": "AC9M2M05",
+      "curriculumCodes": [
+        "AC9M2M05"
+      ],
+      "skillId": "y2-measurement-slot-20",
+      "skillLabel": "Identify a full turn",
+      "structureKey": "y2-measurement-slot-20",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Full turn"
+      },
+      "inputMode": "numeric",
+      "strand": "Measurement"
+    }
+  ]
+}
