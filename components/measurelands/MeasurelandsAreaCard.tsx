@@ -42,7 +42,7 @@ function edgeLine(c: number, r: number, side: Side): [number, number, number, nu
 
 /** Renders a set of cells; `filled` cells show a tile, others show an empty slot.
  *  If onTap given, cells are tappable. `outline` draws the shape boundary. */
-function Tiles({ cells, gridW, gridH, filled, onTap, outline, glow, size }: { cells: Array<[number, number]>; gridW: number; gridH: number; filled: Set<string>; onTap?: (k: string) => void; outline?: boolean; glow?: boolean; size?: number }) {
+export function Tiles({ cells, gridW, gridH, filled, onTap, outline, glow, size }: { cells: Array<[number, number]>; gridW: number; gridH: number; filled: Set<string>; onTap?: (k: string) => void; outline?: boolean; glow?: boolean; size?: number }) {
   const w = gridW * U + PAD * 2, h = gridH * U + PAD * 2;
   return (
     <div className="mx-auto" style={{ maxWidth: size ?? Math.min(w, 400) }}>
