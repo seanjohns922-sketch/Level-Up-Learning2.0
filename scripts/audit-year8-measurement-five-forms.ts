@@ -30,7 +30,7 @@ for(const bank of Object.values(forms)){
    case 18:expected=n[4]*(n[0]/n[1]-n[2]/n[3]);expected=rounded(expected);break;
    case 20:expected='The model underestimates the time because the flow rate decreases.';assert.ok(n[2]+(n[1]-n[0]*n[2])/(n[0]/2)>n[1]/n[0]);break;
    case 21:{const arm=(n[0]-n[2])/2;expected=2*arm+2*n[3]+n[2]+2*n[1]+n[0];break;}
-   case 22:expected=n[0]*n[1]*n[2]*(1-.25)/1000;break;
+   case 22:expected=Math.floor(n[0]/n[3])*Math.floor(n[1]/n[4])*Math.floor(n[2]/n[5]);assert.notEqual(expected,n[0]*n[1]*n[2]/(n[3]*n[4]*n[5]));break;
    case 23:expected=rounded(3.14*(n[0]**2-n[1]**2));assert.ok(n[0]>n[1]);break;
    case 24:{const starts=[9*60-10*60,9*60-8*60,n[0]-5.5*60],ends=[17*60-10*60,17*60-8*60,17*60-5.5*60];const start=Math.max(...starts);assert.ok(start+30<=Math.min(...ends));expected=time(start+10*60);break;}
    case 25:expected=n[0]/1000*60;break;
@@ -54,6 +54,7 @@ for(let i=0;i<30;i++){
  const matched=Object.values(forms).map(bank=>bank[i]);
  for(const key of ['type','difficulty','skillId','primaryDescriptorCode'] as const)assert.equal(new Set(matched.map(q=>q[key])).size,1);
  assert.equal(new Set(matched.map(q=>JSON.stringify(q.visual))).size,5);
+ assert.equal(new Set(matched.map(q=>q.visual.orientation)).size,4);
 }
 writeFileSync('docs/assessment-blueprints/year8-measurement-authoring-inventory.json',JSON.stringify(forms,null,2)+'\n');
 console.log('Level 8 Measurement: 150 independently checked answers, seven curriculum descriptors, five matched 30-question forms, time-zone/day rollover and geometry constraints, correct/wrong/blank/IDK scoring passed.');

@@ -13,7 +13,8 @@
           4,
           3
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -21,7 +22,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-pretest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of this L-shaped garden?",
@@ -60,7 +61,8 @@
           25,
           20
         ],
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -68,7 +70,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-pretest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the capacity of this rectangular tank in litres?",
@@ -106,7 +108,8 @@
           3
         ],
         "variant": "radius",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -114,7 +117,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-pretest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of this circular garden?",
@@ -164,7 +167,8 @@
             "offset": 10,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -173,7 +177,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-pretest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the time in Brisbane at this instant?",
@@ -215,7 +219,8 @@
         "labels": [
           "Distance: 150 km",
           "Travel time: 3 hours"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -223,7 +228,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-pretest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the coach’s average speed?",
@@ -263,7 +268,8 @@
           10
         ],
         "unknown": "hypotenuse",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -271,7 +277,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y8-measurement-review-pretest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the length of the hypotenuse marked x?",
@@ -304,7 +310,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "The marked route is straight. The map scale applies to every length.",
+        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
         "values": [
           25000,
           4
@@ -313,7 +319,8 @@
         "labels": [
           "Map scale: 1 : 25000",
           "Route on map: 4 cm"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "1 km, after converting the scaled centimetres to kilometres.",
@@ -321,7 +328,7 @@
         "4 km, because centimetres on any map are kilometres on the ground."
       ],
       "id": "y8-measurement-review-pretest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which calculation result correctly interprets this map scale?",
@@ -361,7 +368,8 @@
           5,
           4
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -369,7 +377,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this L-shaped courtyard?",
@@ -409,7 +417,8 @@
           40
         ],
         "variant": "triangular",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -417,7 +426,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y8-measurement-review-pretest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many millilitres can this triangular-prism container hold?",
@@ -455,7 +464,8 @@
           14
         ],
         "variant": "diameter",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -463,7 +473,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How much edging is needed to go once around this circular pond?",
@@ -513,7 +523,8 @@
             "offset": 8,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -522,7 +533,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-pretest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the time in Perth at this instant?",
@@ -564,7 +575,8 @@
         "labels": [
           "Distance: 60 km",
           "Travel time: 90 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -572,7 +584,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-pretest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the train’s average speed in kilometres per hour?",
@@ -612,7 +624,8 @@
           13
         ],
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -620,7 +633,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the length of the side marked x?",
@@ -664,7 +677,8 @@
           "Wall area: 97 m²",
           "Coverage per litre, per coat: 8 m²",
           "Coats needed: 2"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "24 pots: round down after allowing for two coats.",
@@ -672,7 +686,7 @@
         "25 one-litre pots: allow for two coats and round up to have enough paint."
       ],
       "id": "y8-measurement-review-pretest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which plan buys enough paint with the fewest one-litre pots?",
@@ -711,7 +725,8 @@
           6,
           4
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -719,7 +734,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-pretest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the total area of this wall and triangular gable?",
@@ -762,7 +777,8 @@
         "unit": "m",
         "labels": [
           "Flow rate: 100 litres per minute"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -770,7 +786,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-pretest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many minutes will the empty rectangular pool take to fill?",
@@ -808,7 +824,8 @@
           10
         ],
         "variant": "semicircle",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -816,7 +833,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this semicircular garden?",
@@ -867,7 +884,8 @@
             "offset": 10,
             "detail": "Tuesday 05:50"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -875,7 +893,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-pretest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many minutes does this flight take?",
@@ -921,7 +939,8 @@
           "Car A: 7 litres per 100 km",
           "Car B: 15 litres per 250 km",
           "Distance to compare: 500 km"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -929,7 +948,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-pretest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many fewer litres does car B use than car A over 500 km?",
@@ -970,7 +989,8 @@
         ],
         "variant": "ladder",
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -978,7 +998,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How high up the wall does the ladder reach?",
@@ -1022,7 +1042,8 @@
           "Tank capacity: 1800 L",
           "Initial flow rate: 60 L/min",
           "Model prediction: 30 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "The model stays correct because the capacity is unchanged.",
@@ -1030,7 +1051,7 @@
         "The model overestimates the time because less water enters each minute."
       ],
       "id": "y8-measurement-review-pretest-21",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "How should the predicted filling time be reviewed?",
@@ -1071,7 +1092,8 @@
           4
         ],
         "variant": "notch",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -1079,7 +1101,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-22",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this courtyard with an inward notch?",
@@ -1107,38 +1129,39 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many more litres can be added before this tank is full?",
-      "correctAnswer": "90",
+      "prompt": "How many whole tissue boxes fit in this shipping carton?",
+      "correctAnswer": "27",
       "visual": {
         "type": "measurement_year8_panel",
-        "task": "prism",
-        "description": "The tank is one-quarter full. Use the inside dimensions. 1000 cm³ equals 1 litre.",
+        "task": "packing",
+        "description": "Keep all boxes upright in straight rows. Match length to length, width to width and height to height; do not turn the boxes. Carton dimensions are internal and tissue-box dimensions are external.",
         "values": [
-          60,
-          40,
-          50
+          62,
+          34,
+          27,
+          20,
+          10,
+          8
         ],
         "unit": "cm",
-        "labels": [
-          "Water already in tank: one-quarter of its capacity"
-        ]
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
-        "unit": "L",
-        "ariaLabel": "Answer in L"
+        "unit": "boxes",
+        "ariaLabel": "Answer in boxes"
       },
       "id": "y8-measurement-review-pretest-23",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many more litres can be added before this tank is full?",
+      "readAloudText": "How many whole tissue boxes fit in this shipping carton?",
       "primaryDescriptorCode": "AC9M8M02",
       "curriculumCodes": [
         "AC9M8M02"
       ],
       "skillId": "y8-measurement-slot-23",
-      "skillLabel": "Find remaining prism capacity",
+      "skillLabel": "Pack boxes using three dimensions",
       "structureKey": "y8-measurement-slot-23",
       "difficulty": "challenging",
       "statistics": {
@@ -1151,7 +1174,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "90"
+        "correctResponse": "27"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -1168,7 +1191,8 @@
           5
         ],
         "variant": "ring",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -1176,7 +1200,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-pretest-24",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of the shaded circular path?",
@@ -1233,7 +1257,8 @@
             "offset": 5.5,
             "detail": "Available 09:00–17:00"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -1242,7 +1267,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-pretest-25",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the earliest Brisbane time when all three teams can start a 30-minute meeting?",
@@ -1282,7 +1307,8 @@
         "variant": "water",
         "labels": [
           "Water flow: 750 millilitres per second"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -1290,7 +1316,7 @@
         "ariaLabel": "Answer in L/min"
       },
       "id": "y8-measurement-review-pretest-26",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is this tap’s flow rate in litres per minute?",
@@ -1328,7 +1354,8 @@
           9,
           12
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -1336,7 +1363,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-pretest-27",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How long is the diagonal cable across this rectangular floor?",
@@ -1369,7 +1396,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Follow both marked route sections. Walk at the constant speed shown, then take the stated rest break. Round the total UP to a whole minute.",
+        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           3,
           4,
@@ -1383,7 +1410,8 @@
           "Map sections: 3 cm and 4 cm",
           "Walking speed: 4 km/h",
           "Rest break: 15 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "120 minutes, including walking both sections and the rest break.",
@@ -1391,7 +1419,7 @@
         "60 minutes, counting the first section and the rest break."
       ],
       "id": "y8-measurement-review-pretest-28",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which plan allows enough whole minutes for this walk?",
@@ -1432,7 +1460,8 @@
         "unit": "cm",
         "labels": [
           "Circumference: 31.4 cm"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -1440,7 +1469,7 @@
         "ariaLabel": "Answer in cm²"
       },
       "id": "y8-measurement-review-pretest-29",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of this circle?",
@@ -1494,7 +1523,8 @@
         ],
         "labels": [
           "Flight duration: 11 hours 0 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "Monday 22:00",
@@ -1502,7 +1532,7 @@
         "Tuesday 05:00"
       ],
       "id": "y8-measurement-review-pretest-30",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "On what day and at what local time does the flight arrive in Tokyo?",
@@ -1544,7 +1574,8 @@
           5,
           4
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1552,7 +1583,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-posttest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of this L-shaped garden?",
@@ -1591,7 +1622,8 @@
           30,
           25
         ],
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1599,7 +1631,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-posttest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the capacity of this rectangular tank in litres?",
@@ -1637,7 +1669,8 @@
           4
         ],
         "variant": "radius",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1645,7 +1678,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-posttest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of this circular garden?",
@@ -1695,7 +1728,8 @@
             "offset": 10,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "time",
@@ -1704,7 +1738,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-posttest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the time in Brisbane at this instant?",
@@ -1746,7 +1780,8 @@
         "labels": [
           "Distance: 180 km",
           "Travel time: 3 hours"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1754,7 +1789,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-posttest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the coach’s average speed?",
@@ -1794,7 +1829,8 @@
           15
         ],
         "unknown": "hypotenuse",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1802,7 +1838,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y8-measurement-review-posttest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the length of the hypotenuse marked x?",
@@ -1835,7 +1871,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "The marked route is straight. The map scale applies to every length.",
+        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
         "values": [
           30000,
           5
@@ -1844,7 +1880,8 @@
         "labels": [
           "Map scale: 1 : 30000",
           "Route on map: 5 cm"
-        ]
+        ],
+        "orientation": 1
       },
       "options": [
         "150 km, because 1000 centimetres equals 1 kilometre.",
@@ -1852,7 +1889,7 @@
         "1.5 km, after converting the scaled centimetres to kilometres."
       ],
       "id": "y8-measurement-review-posttest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which calculation result correctly interprets this map scale?",
@@ -1892,7 +1929,8 @@
           6,
           5
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1900,7 +1938,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this L-shaped courtyard?",
@@ -1940,7 +1978,8 @@
           45
         ],
         "variant": "triangular",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1948,7 +1987,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y8-measurement-review-posttest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many millilitres can this triangular-prism container hold?",
@@ -1986,7 +2025,8 @@
           16
         ],
         "variant": "diameter",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -1994,7 +2034,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How much edging is needed to go once around this circular pond?",
@@ -2044,7 +2084,8 @@
             "offset": 8,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "time",
@@ -2053,7 +2094,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-posttest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the time in Perth at this instant?",
@@ -2095,7 +2136,8 @@
         "labels": [
           "Distance: 75 km",
           "Travel time: 90 minutes"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2103,7 +2145,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-posttest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the train’s average speed in kilometres per hour?",
@@ -2143,7 +2185,8 @@
           26
         ],
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2151,7 +2194,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the length of the side marked x?",
@@ -2195,7 +2238,8 @@
           "Wall area: 107 m²",
           "Coverage per litre, per coat: 9 m²",
           "Coats needed: 2"
-        ]
+        ],
+        "orientation": 1
       },
       "options": [
         "12 pots: calculate the paint for one coat only.",
@@ -2203,7 +2247,7 @@
         "23 pots: round down after allowing for two coats."
       ],
       "id": "y8-measurement-review-posttest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which plan buys enough paint with the fewest one-litre pots?",
@@ -2242,7 +2286,8 @@
           7,
           5
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2250,7 +2295,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-posttest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the total area of this wall and triangular gable?",
@@ -2293,7 +2338,8 @@
         "unit": "m",
         "labels": [
           "Flow rate: 100 litres per minute"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2301,7 +2347,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-posttest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many minutes will the empty rectangular pool take to fill?",
@@ -2339,7 +2385,8 @@
           12
         ],
         "variant": "semicircle",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2347,7 +2394,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this semicircular garden?",
@@ -2398,7 +2445,8 @@
             "offset": 10,
             "detail": "Tuesday 06:20"
           }
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2406,7 +2454,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-posttest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many minutes does this flight take?",
@@ -2452,7 +2500,8 @@
           "Car A: 8 litres per 100 km",
           "Car B: 17 litres per 250 km",
           "Distance to compare: 500 km"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2460,7 +2509,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-posttest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many fewer litres does car B use than car A over 500 km?",
@@ -2501,7 +2550,8 @@
         ],
         "variant": "ladder",
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2509,7 +2559,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How high up the wall does the ladder reach?",
@@ -2553,7 +2603,8 @@
           "Tank capacity: 2100 L",
           "Initial flow rate: 70 L/min",
           "Model prediction: 30 minutes"
-        ]
+        ],
+        "orientation": 1
       },
       "options": [
         "The model underestimates the time because the flow rate decreases.",
@@ -2561,7 +2612,7 @@
         "The model stays correct because the capacity is unchanged."
       ],
       "id": "y8-measurement-review-posttest-21",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "How should the predicted filling time be reviewed?",
@@ -2602,7 +2653,8 @@
           5
         ],
         "variant": "notch",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2610,7 +2662,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-22",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this courtyard with an inward notch?",
@@ -2638,38 +2690,39 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many more litres can be added before this tank is full?",
-      "correctAnswer": "105",
+      "prompt": "How many whole tissue boxes fit in this shipping carton?",
+      "correctAnswer": "36",
       "visual": {
         "type": "measurement_year8_panel",
-        "task": "prism",
-        "description": "The tank is one-quarter full. Use the inside dimensions. 1000 cm³ equals 1 litre.",
+        "task": "packing",
+        "description": "Keep all boxes upright in straight rows. Match length to length, width to width and height to height; do not turn the boxes. Carton dimensions are internal and tissue-box dimensions are external.",
         "values": [
-          70,
-          40,
-          50
+          82,
+          34,
+          27,
+          20,
+          10,
+          8
         ],
         "unit": "cm",
-        "labels": [
-          "Water already in tank: one-quarter of its capacity"
-        ]
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
-        "unit": "L",
-        "ariaLabel": "Answer in L"
+        "unit": "boxes",
+        "ariaLabel": "Answer in boxes"
       },
       "id": "y8-measurement-review-posttest-23",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many more litres can be added before this tank is full?",
+      "readAloudText": "How many whole tissue boxes fit in this shipping carton?",
       "primaryDescriptorCode": "AC9M8M02",
       "curriculumCodes": [
         "AC9M8M02"
       ],
       "skillId": "y8-measurement-slot-23",
-      "skillLabel": "Find remaining prism capacity",
+      "skillLabel": "Pack boxes using three dimensions",
       "structureKey": "y8-measurement-slot-23",
       "difficulty": "challenging",
       "statistics": {
@@ -2682,7 +2735,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "105"
+        "correctResponse": "36"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -2699,7 +2752,8 @@
           6
         ],
         "variant": "ring",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2707,7 +2761,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-posttest-24",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of the shaded circular path?",
@@ -2764,7 +2818,8 @@
             "offset": 5.5,
             "detail": "Available 09:30–17:00"
           }
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "time",
@@ -2773,7 +2828,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-posttest-25",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the earliest Brisbane time when all three teams can start a 30-minute meeting?",
@@ -2813,7 +2868,8 @@
         "variant": "water",
         "labels": [
           "Water flow: 1000 millilitres per second"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2821,7 +2877,7 @@
         "ariaLabel": "Answer in L/min"
       },
       "id": "y8-measurement-review-posttest-26",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is this tap’s flow rate in litres per minute?",
@@ -2859,7 +2915,8 @@
           12,
           16
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2867,7 +2924,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-posttest-27",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How long is the diagonal cable across this rectangular floor?",
@@ -2900,7 +2957,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Follow both marked route sections. Walk at the constant speed shown, then take the stated rest break. Round the total UP to a whole minute.",
+        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           4,
           5,
@@ -2914,7 +2971,8 @@
           "Map sections: 4 cm and 5 cm",
           "Walking speed: 5 km/h",
           "Rest break: 20 minutes"
-        ]
+        ],
+        "orientation": 1
       },
       "options": [
         "108 minutes, counting only the walking time.",
@@ -2922,7 +2980,7 @@
         "128 minutes, including walking both sections and the rest break."
       ],
       "id": "y8-measurement-review-posttest-28",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which plan allows enough whole minutes for this walk?",
@@ -2963,7 +3021,8 @@
         "unit": "cm",
         "labels": [
           "Circumference: 37.68 cm"
-        ]
+        ],
+        "orientation": 1
       },
       "answerFormat": {
         "kind": "number",
@@ -2971,7 +3030,7 @@
         "ariaLabel": "Answer in cm²"
       },
       "id": "y8-measurement-review-posttest-29",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of this circle?",
@@ -3025,7 +3084,8 @@
         ],
         "labels": [
           "Flight duration: 11 hours 10 minutes"
-        ]
+        ],
+        "orientation": 1
       },
       "options": [
         "Tuesday 22:30",
@@ -3033,7 +3093,7 @@
         "Monday 22:30"
       ],
       "id": "y8-measurement-review-posttest-30",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "On what day and at what local time does the flight arrive in Tokyo?",
@@ -3075,7 +3135,8 @@
           6,
           5
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3083,7 +3144,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-start-01",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of this L-shaped garden?",
@@ -3122,7 +3183,8 @@
           35,
           30
         ],
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3130,7 +3192,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-start-02",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the capacity of this rectangular tank in litres?",
@@ -3168,7 +3230,8 @@
           5
         ],
         "variant": "radius",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3176,7 +3239,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-start-03",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of this circular garden?",
@@ -3226,7 +3289,8 @@
             "offset": 10,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "time",
@@ -3235,7 +3299,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-start-04",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the time in Brisbane at this instant?",
@@ -3277,7 +3341,8 @@
         "labels": [
           "Distance: 210 km",
           "Travel time: 3 hours"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3285,7 +3350,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-start-05",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the coach’s average speed?",
@@ -3325,7 +3390,8 @@
           20
         ],
         "unknown": "hypotenuse",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3333,7 +3399,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y8-measurement-review-start-06",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the length of the hypotenuse marked x?",
@@ -3366,7 +3432,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "The marked route is straight. The map scale applies to every length.",
+        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
         "values": [
           35000,
           6
@@ -3375,7 +3441,8 @@
         "labels": [
           "Map scale: 1 : 35000",
           "Route on map: 6 cm"
-        ]
+        ],
+        "orientation": 2
       },
       "options": [
         "6 km, because centimetres on any map are kilometres on the ground.",
@@ -3383,7 +3450,7 @@
         "210 km, because 1000 centimetres equals 1 kilometre."
       ],
       "id": "y8-measurement-review-start-07",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which calculation result correctly interprets this map scale?",
@@ -3423,7 +3490,8 @@
           7,
           6
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3431,7 +3499,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-08",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this L-shaped courtyard?",
@@ -3471,7 +3539,8 @@
           50
         ],
         "variant": "triangular",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3479,7 +3548,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y8-measurement-review-start-09",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many millilitres can this triangular-prism container hold?",
@@ -3517,7 +3586,8 @@
           18
         ],
         "variant": "diameter",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3525,7 +3595,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-10",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How much edging is needed to go once around this circular pond?",
@@ -3575,7 +3645,8 @@
             "offset": 8,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "time",
@@ -3584,7 +3655,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-start-11",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the time in Perth at this instant?",
@@ -3626,7 +3697,8 @@
         "labels": [
           "Distance: 90 km",
           "Travel time: 90 minutes"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3634,7 +3706,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-start-12",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the train’s average speed in kilometres per hour?",
@@ -3674,7 +3746,8 @@
           39
         ],
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3682,7 +3755,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-13",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the length of the side marked x?",
@@ -3726,7 +3799,8 @@
           "Wall area: 117 m²",
           "Coverage per litre, per coat: 10 m²",
           "Coats needed: 2"
-        ]
+        ],
+        "orientation": 2
       },
       "options": [
         "24 one-litre pots: allow for two coats and round up to have enough paint.",
@@ -3734,7 +3808,7 @@
         "12 pots: calculate the paint for one coat only."
       ],
       "id": "y8-measurement-review-start-14",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which plan buys enough paint with the fewest one-litre pots?",
@@ -3773,7 +3847,8 @@
           8,
           6
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3781,7 +3856,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-start-15",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the total area of this wall and triangular gable?",
@@ -3824,7 +3899,8 @@
         "unit": "m",
         "labels": [
           "Flow rate: 100 litres per minute"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3832,7 +3908,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-start-16",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many minutes will the empty rectangular pool take to fill?",
@@ -3870,7 +3946,8 @@
           14
         ],
         "variant": "semicircle",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3878,7 +3955,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-17",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this semicircular garden?",
@@ -3929,7 +4006,8 @@
             "offset": 10,
             "detail": "Tuesday 06:50"
           }
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3937,7 +4015,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-start-18",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many minutes does this flight take?",
@@ -3983,7 +4061,8 @@
           "Car A: 9 litres per 100 km",
           "Car B: 19 litres per 250 km",
           "Distance to compare: 500 km"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -3991,7 +4070,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-start-19",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many fewer litres does car B use than car A over 500 km?",
@@ -4032,7 +4111,8 @@
         ],
         "variant": "ladder",
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4040,7 +4120,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-20",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How high up the wall does the ladder reach?",
@@ -4084,7 +4164,8 @@
           "Tank capacity: 2400 L",
           "Initial flow rate: 80 L/min",
           "Model prediction: 30 minutes"
-        ]
+        ],
+        "orientation": 2
       },
       "options": [
         "The model overestimates the time because less water enters each minute.",
@@ -4092,7 +4173,7 @@
         "The model underestimates the time because the flow rate decreases."
       ],
       "id": "y8-measurement-review-start-21",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "mcq",
       "readAloudText": "How should the predicted filling time be reviewed?",
@@ -4133,7 +4214,8 @@
           6
         ],
         "variant": "notch",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4141,7 +4223,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-22",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this courtyard with an inward notch?",
@@ -4169,38 +4251,39 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many more litres can be added before this tank is full?",
-      "correctAnswer": "120",
+      "prompt": "How many whole tissue boxes fit in this shipping carton?",
+      "correctAnswer": "45",
       "visual": {
         "type": "measurement_year8_panel",
-        "task": "prism",
-        "description": "The tank is one-quarter full. Use the inside dimensions. 1000 cm³ equals 1 litre.",
+        "task": "packing",
+        "description": "Keep all boxes upright in straight rows. Match length to length, width to width and height to height; do not turn the boxes. Carton dimensions are internal and tissue-box dimensions are external.",
         "values": [
-          80,
-          40,
-          50
+          102,
+          34,
+          27,
+          20,
+          10,
+          8
         ],
         "unit": "cm",
-        "labels": [
-          "Water already in tank: one-quarter of its capacity"
-        ]
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
-        "unit": "L",
-        "ariaLabel": "Answer in L"
+        "unit": "boxes",
+        "ariaLabel": "Answer in boxes"
       },
       "id": "y8-measurement-review-start-23",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many more litres can be added before this tank is full?",
+      "readAloudText": "How many whole tissue boxes fit in this shipping carton?",
       "primaryDescriptorCode": "AC9M8M02",
       "curriculumCodes": [
         "AC9M8M02"
       ],
       "skillId": "y8-measurement-slot-23",
-      "skillLabel": "Find remaining prism capacity",
+      "skillLabel": "Pack boxes using three dimensions",
       "structureKey": "y8-measurement-slot-23",
       "difficulty": "challenging",
       "statistics": {
@@ -4213,7 +4296,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "120"
+        "correctResponse": "45"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -4230,7 +4313,8 @@
           7
         ],
         "variant": "ring",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4238,7 +4322,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-start-24",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of the shaded circular path?",
@@ -4295,7 +4379,8 @@
             "offset": 5.5,
             "detail": "Available 10:00–17:00"
           }
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "time",
@@ -4304,7 +4389,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-start-25",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the earliest Brisbane time when all three teams can start a 30-minute meeting?",
@@ -4344,7 +4429,8 @@
         "variant": "water",
         "labels": [
           "Water flow: 1250 millilitres per second"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4352,7 +4438,7 @@
         "ariaLabel": "Answer in L/min"
       },
       "id": "y8-measurement-review-start-26",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is this tap’s flow rate in litres per minute?",
@@ -4390,7 +4476,8 @@
           15,
           20
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4398,7 +4485,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-start-27",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How long is the diagonal cable across this rectangular floor?",
@@ -4431,7 +4518,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Follow both marked route sections. Walk at the constant speed shown, then take the stated rest break. Round the total UP to a whole minute.",
+        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           5,
           6,
@@ -4445,7 +4532,8 @@
           "Map sections: 5 cm and 6 cm",
           "Walking speed: 6 km/h",
           "Rest break: 25 minutes"
-        ]
+        ],
+        "orientation": 2
       },
       "options": [
         "75 minutes, counting the first section and the rest break.",
@@ -4453,7 +4541,7 @@
         "110 minutes, counting only the walking time."
       ],
       "id": "y8-measurement-review-start-28",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which plan allows enough whole minutes for this walk?",
@@ -4494,7 +4582,8 @@
         "unit": "cm",
         "labels": [
           "Circumference: 43.96 cm"
-        ]
+        ],
+        "orientation": 2
       },
       "answerFormat": {
         "kind": "number",
@@ -4502,7 +4591,7 @@
         "ariaLabel": "Answer in cm²"
       },
       "id": "y8-measurement-review-start-29",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of this circle?",
@@ -4556,7 +4645,8 @@
         ],
         "labels": [
           "Flight duration: 11 hours 20 minutes"
-        ]
+        ],
+        "orientation": 2
       },
       "options": [
         "Tuesday 06:00",
@@ -4564,7 +4654,7 @@
         "Tuesday 23:00"
       ],
       "id": "y8-measurement-review-start-30",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "start",
       "type": "mcq",
       "readAloudText": "On what day and at what local time does the flight arrive in Tokyo?",
@@ -4606,7 +4696,8 @@
           7,
           6
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4614,7 +4705,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-mid-01",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of this L-shaped garden?",
@@ -4653,7 +4744,8 @@
           40,
           35
         ],
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4661,7 +4753,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-mid-02",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the capacity of this rectangular tank in litres?",
@@ -4699,7 +4791,8 @@
           6
         ],
         "variant": "radius",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4707,7 +4800,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-mid-03",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of this circular garden?",
@@ -4757,7 +4850,8 @@
             "offset": 10,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "time",
@@ -4766,7 +4860,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-mid-04",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the time in Brisbane at this instant?",
@@ -4808,7 +4902,8 @@
         "labels": [
           "Distance: 240 km",
           "Travel time: 3 hours"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4816,7 +4911,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-mid-05",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the coach’s average speed?",
@@ -4856,7 +4951,8 @@
           25
         ],
         "unknown": "hypotenuse",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4864,7 +4960,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y8-measurement-review-mid-06",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the length of the hypotenuse marked x?",
@@ -4897,7 +4993,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "The marked route is straight. The map scale applies to every length.",
+        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
         "values": [
           40000,
           7
@@ -4906,7 +5002,8 @@
         "labels": [
           "Map scale: 1 : 40000",
           "Route on map: 7 cm"
-        ]
+        ],
+        "orientation": 3
       },
       "options": [
         "2.8 km, after converting the scaled centimetres to kilometres.",
@@ -4914,7 +5011,7 @@
         "7 km, because centimetres on any map are kilometres on the ground."
       ],
       "id": "y8-measurement-review-mid-07",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which calculation result correctly interprets this map scale?",
@@ -4954,7 +5051,8 @@
           8,
           7
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -4962,7 +5060,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-08",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this L-shaped courtyard?",
@@ -5002,7 +5100,8 @@
           55
         ],
         "variant": "triangular",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5010,7 +5109,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y8-measurement-review-mid-09",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many millilitres can this triangular-prism container hold?",
@@ -5048,7 +5147,8 @@
           20
         ],
         "variant": "diameter",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5056,7 +5156,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-10",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How much edging is needed to go once around this circular pond?",
@@ -5106,7 +5206,8 @@
             "offset": 8,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "time",
@@ -5115,7 +5216,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-mid-11",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the time in Perth at this instant?",
@@ -5157,7 +5258,8 @@
         "labels": [
           "Distance: 105 km",
           "Travel time: 90 minutes"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5165,7 +5267,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-mid-12",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the train’s average speed in kilometres per hour?",
@@ -5205,7 +5307,8 @@
           52
         ],
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5213,7 +5316,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-13",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the length of the side marked x?",
@@ -5257,7 +5360,8 @@
           "Wall area: 127 m²",
           "Coverage per litre, per coat: 11 m²",
           "Coats needed: 2"
-        ]
+        ],
+        "orientation": 3
       },
       "options": [
         "23 pots: round down after allowing for two coats.",
@@ -5265,7 +5369,7 @@
         "24 one-litre pots: allow for two coats and round up to have enough paint."
       ],
       "id": "y8-measurement-review-mid-14",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which plan buys enough paint with the fewest one-litre pots?",
@@ -5304,7 +5408,8 @@
           9,
           7
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5312,7 +5417,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-mid-15",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the total area of this wall and triangular gable?",
@@ -5355,7 +5460,8 @@
         "unit": "m",
         "labels": [
           "Flow rate: 100 litres per minute"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5363,7 +5469,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-mid-16",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many minutes will the empty rectangular pool take to fill?",
@@ -5401,7 +5507,8 @@
           16
         ],
         "variant": "semicircle",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5409,7 +5516,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-17",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this semicircular garden?",
@@ -5460,7 +5567,8 @@
             "offset": 10,
             "detail": "Tuesday 07:20"
           }
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5468,7 +5576,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-mid-18",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many minutes does this flight take?",
@@ -5514,7 +5622,8 @@
           "Car A: 10 litres per 100 km",
           "Car B: 21 litres per 250 km",
           "Distance to compare: 500 km"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5522,7 +5631,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-mid-19",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many fewer litres does car B use than car A over 500 km?",
@@ -5563,7 +5672,8 @@
         ],
         "variant": "ladder",
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5571,7 +5681,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-20",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How high up the wall does the ladder reach?",
@@ -5615,7 +5725,8 @@
           "Tank capacity: 2700 L",
           "Initial flow rate: 90 L/min",
           "Model prediction: 30 minutes"
-        ]
+        ],
+        "orientation": 3
       },
       "options": [
         "The model stays correct because the capacity is unchanged.",
@@ -5623,7 +5734,7 @@
         "The model overestimates the time because less water enters each minute."
       ],
       "id": "y8-measurement-review-mid-21",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "How should the predicted filling time be reviewed?",
@@ -5664,7 +5775,8 @@
           7
         ],
         "variant": "notch",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5672,7 +5784,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-22",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this courtyard with an inward notch?",
@@ -5700,38 +5812,39 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many more litres can be added before this tank is full?",
-      "correctAnswer": "135",
+      "prompt": "How many whole tissue boxes fit in this shipping carton?",
+      "correctAnswer": "54",
       "visual": {
         "type": "measurement_year8_panel",
-        "task": "prism",
-        "description": "The tank is one-quarter full. Use the inside dimensions. 1000 cm³ equals 1 litre.",
+        "task": "packing",
+        "description": "Keep all boxes upright in straight rows. Match length to length, width to width and height to height; do not turn the boxes. Carton dimensions are internal and tissue-box dimensions are external.",
         "values": [
-          90,
-          40,
-          50
+          122,
+          34,
+          27,
+          20,
+          10,
+          8
         ],
         "unit": "cm",
-        "labels": [
-          "Water already in tank: one-quarter of its capacity"
-        ]
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
-        "unit": "L",
-        "ariaLabel": "Answer in L"
+        "unit": "boxes",
+        "ariaLabel": "Answer in boxes"
       },
       "id": "y8-measurement-review-mid-23",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many more litres can be added before this tank is full?",
+      "readAloudText": "How many whole tissue boxes fit in this shipping carton?",
       "primaryDescriptorCode": "AC9M8M02",
       "curriculumCodes": [
         "AC9M8M02"
       ],
       "skillId": "y8-measurement-slot-23",
-      "skillLabel": "Find remaining prism capacity",
+      "skillLabel": "Pack boxes using three dimensions",
       "structureKey": "y8-measurement-slot-23",
       "difficulty": "challenging",
       "statistics": {
@@ -5744,7 +5857,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "135"
+        "correctResponse": "54"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -5761,7 +5874,8 @@
           8
         ],
         "variant": "ring",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5769,7 +5883,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-mid-24",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of the shaded circular path?",
@@ -5826,7 +5940,8 @@
             "offset": 5.5,
             "detail": "Available 10:30–17:00"
           }
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "time",
@@ -5835,7 +5950,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-mid-25",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the earliest Brisbane time when all three teams can start a 30-minute meeting?",
@@ -5875,7 +5990,8 @@
         "variant": "water",
         "labels": [
           "Water flow: 1500 millilitres per second"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5883,7 +5999,7 @@
         "ariaLabel": "Answer in L/min"
       },
       "id": "y8-measurement-review-mid-26",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is this tap’s flow rate in litres per minute?",
@@ -5921,7 +6037,8 @@
           18,
           24
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -5929,7 +6046,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-mid-27",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How long is the diagonal cable across this rectangular floor?",
@@ -5962,7 +6079,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Follow both marked route sections. Walk at the constant speed shown, then take the stated rest break. Round the total UP to a whole minute.",
+        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           6,
           7,
@@ -5976,7 +6093,8 @@
           "Map sections: 6 cm and 7 cm",
           "Walking speed: 7 km/h",
           "Rest break: 30 minutes"
-        ]
+        ],
+        "orientation": 3
       },
       "options": [
         "142 minutes, including walking both sections and the rest break.",
@@ -5984,7 +6102,7 @@
         "82 minutes, counting the first section and the rest break."
       ],
       "id": "y8-measurement-review-mid-28",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which plan allows enough whole minutes for this walk?",
@@ -6025,7 +6143,8 @@
         "unit": "cm",
         "labels": [
           "Circumference: 50.24 cm"
-        ]
+        ],
+        "orientation": 3
       },
       "answerFormat": {
         "kind": "number",
@@ -6033,7 +6152,7 @@
         "ariaLabel": "Answer in cm²"
       },
       "id": "y8-measurement-review-mid-29",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of this circle?",
@@ -6087,7 +6206,8 @@
         ],
         "labels": [
           "Flight duration: 11 hours 30 minutes"
-        ]
+        ],
+        "orientation": 3
       },
       "options": [
         "Monday 23:30",
@@ -6095,7 +6215,7 @@
         "Tuesday 06:30"
       ],
       "id": "y8-measurement-review-mid-30",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "On what day and at what local time does the flight arrive in Tokyo?",
@@ -6137,7 +6257,8 @@
           8,
           7
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6145,7 +6266,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-end-01",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of this L-shaped garden?",
@@ -6184,7 +6305,8 @@
           45,
           40
         ],
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6192,7 +6314,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-end-02",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the capacity of this rectangular tank in litres?",
@@ -6230,7 +6352,8 @@
           7
         ],
         "variant": "radius",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6238,7 +6361,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-end-03",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of this circular garden?",
@@ -6288,7 +6411,8 @@
             "offset": 10,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -6297,7 +6421,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-end-04",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the time in Brisbane at this instant?",
@@ -6339,7 +6463,8 @@
         "labels": [
           "Distance: 270 km",
           "Travel time: 3 hours"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6347,7 +6472,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-end-05",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the coach’s average speed?",
@@ -6387,7 +6512,8 @@
           30
         ],
         "unknown": "hypotenuse",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6395,7 +6521,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y8-measurement-review-end-06",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the length of the hypotenuse marked x?",
@@ -6428,7 +6554,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "The marked route is straight. The map scale applies to every length.",
+        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
         "values": [
           45000,
           8
@@ -6437,7 +6563,8 @@
         "labels": [
           "Map scale: 1 : 45000",
           "Route on map: 8 cm"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "360 km, because 1000 centimetres equals 1 kilometre.",
@@ -6445,7 +6572,7 @@
         "3.6 km, after converting the scaled centimetres to kilometres."
       ],
       "id": "y8-measurement-review-end-07",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which calculation result correctly interprets this map scale?",
@@ -6485,7 +6612,8 @@
           9,
           8
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6493,7 +6621,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-08",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this L-shaped courtyard?",
@@ -6533,7 +6661,8 @@
           60
         ],
         "variant": "triangular",
-        "unit": "cm"
+        "unit": "cm",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6541,7 +6670,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y8-measurement-review-end-09",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many millilitres can this triangular-prism container hold?",
@@ -6579,7 +6708,8 @@
           22
         ],
         "variant": "diameter",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6587,7 +6717,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-10",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How much edging is needed to go once around this circular pond?",
@@ -6637,7 +6767,8 @@
             "offset": 8,
             "detail": "Time: ?"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -6646,7 +6777,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-end-11",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the time in Perth at this instant?",
@@ -6688,7 +6819,8 @@
         "labels": [
           "Distance: 120 km",
           "Travel time: 90 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6696,7 +6828,7 @@
         "ariaLabel": "Answer in km/h"
       },
       "id": "y8-measurement-review-end-12",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the train’s average speed in kilometres per hour?",
@@ -6736,7 +6868,8 @@
           65
         ],
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6744,7 +6877,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-13",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the length of the side marked x?",
@@ -6788,7 +6921,8 @@
           "Wall area: 137 m²",
           "Coverage per litre, per coat: 12 m²",
           "Coats needed: 2"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "12 pots: calculate the paint for one coat only.",
@@ -6796,7 +6930,7 @@
         "22 pots: round down after allowing for two coats."
       ],
       "id": "y8-measurement-review-end-14",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which plan buys enough paint with the fewest one-litre pots?",
@@ -6835,7 +6969,8 @@
           10,
           8
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6843,7 +6978,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-end-15",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the total area of this wall and triangular gable?",
@@ -6886,7 +7021,8 @@
         "unit": "m",
         "labels": [
           "Flow rate: 100 litres per minute"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6894,7 +7030,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-end-16",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many minutes will the empty rectangular pool take to fill?",
@@ -6932,7 +7068,8 @@
           18
         ],
         "variant": "semicircle",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6940,7 +7077,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-17",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this semicircular garden?",
@@ -6991,7 +7128,8 @@
             "offset": 10,
             "detail": "Tuesday 07:50"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -6999,7 +7137,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y8-measurement-review-end-18",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many minutes does this flight take?",
@@ -7045,7 +7183,8 @@
           "Car A: 11 litres per 100 km",
           "Car B: 23 litres per 250 km",
           "Distance to compare: 500 km"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7053,7 +7192,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y8-measurement-review-end-19",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many fewer litres does car B use than car A over 500 km?",
@@ -7094,7 +7233,8 @@
         ],
         "variant": "ladder",
         "unknown": "height",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7102,7 +7242,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-20",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How high up the wall does the ladder reach?",
@@ -7146,7 +7286,8 @@
           "Tank capacity: 3000 L",
           "Initial flow rate: 100 L/min",
           "Model prediction: 30 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "The model underestimates the time because the flow rate decreases.",
@@ -7154,7 +7295,7 @@
         "The model stays correct because the capacity is unchanged."
       ],
       "id": "y8-measurement-review-end-21",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "mcq",
       "readAloudText": "How should the predicted filling time be reviewed?",
@@ -7195,7 +7336,8 @@
           8
         ],
         "variant": "notch",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7203,7 +7345,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-22",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this courtyard with an inward notch?",
@@ -7231,38 +7373,39 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many more litres can be added before this tank is full?",
-      "correctAnswer": "150",
+      "prompt": "How many whole tissue boxes fit in this shipping carton?",
+      "correctAnswer": "63",
       "visual": {
         "type": "measurement_year8_panel",
-        "task": "prism",
-        "description": "The tank is one-quarter full. Use the inside dimensions. 1000 cm³ equals 1 litre.",
+        "task": "packing",
+        "description": "Keep all boxes upright in straight rows. Match length to length, width to width and height to height; do not turn the boxes. Carton dimensions are internal and tissue-box dimensions are external.",
         "values": [
-          100,
-          40,
-          50
+          142,
+          34,
+          27,
+          20,
+          10,
+          8
         ],
         "unit": "cm",
-        "labels": [
-          "Water already in tank: one-quarter of its capacity"
-        ]
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
-        "unit": "L",
-        "ariaLabel": "Answer in L"
+        "unit": "boxes",
+        "ariaLabel": "Answer in boxes"
       },
       "id": "y8-measurement-review-end-23",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many more litres can be added before this tank is full?",
+      "readAloudText": "How many whole tissue boxes fit in this shipping carton?",
       "primaryDescriptorCode": "AC9M8M02",
       "curriculumCodes": [
         "AC9M8M02"
       ],
       "skillId": "y8-measurement-slot-23",
-      "skillLabel": "Find remaining prism capacity",
+      "skillLabel": "Pack boxes using three dimensions",
       "structureKey": "y8-measurement-slot-23",
       "difficulty": "challenging",
       "statistics": {
@@ -7275,7 +7418,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "150"
+        "correctResponse": "63"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -7292,7 +7435,8 @@
           9
         ],
         "variant": "ring",
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7300,7 +7444,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y8-measurement-review-end-24",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of the shaded circular path?",
@@ -7357,7 +7501,8 @@
             "offset": 5.5,
             "detail": "Available 11:00–17:00"
           }
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "time",
@@ -7366,7 +7511,7 @@
         "ariaLabel": "Local time in 24-hour time"
       },
       "id": "y8-measurement-review-end-25",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the earliest Brisbane time when all three teams can start a 30-minute meeting?",
@@ -7406,7 +7551,8 @@
         "variant": "water",
         "labels": [
           "Water flow: 1750 millilitres per second"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7414,7 +7560,7 @@
         "ariaLabel": "Answer in L/min"
       },
       "id": "y8-measurement-review-end-26",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is this tap’s flow rate in litres per minute?",
@@ -7452,7 +7598,8 @@
           21,
           28
         ],
-        "unit": "m"
+        "unit": "m",
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7460,7 +7607,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y8-measurement-review-end-27",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How long is the diagonal cable across this rectangular floor?",
@@ -7493,7 +7640,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Follow both marked route sections. Walk at the constant speed shown, then take the stated rest break. Round the total UP to a whole minute.",
+        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           7,
           8,
@@ -7507,7 +7654,8 @@
           "Map sections: 7 cm and 8 cm",
           "Walking speed: 8 km/h",
           "Rest break: 35 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "113 minutes, counting only the walking time.",
@@ -7515,7 +7663,7 @@
         "148 minutes, including walking both sections and the rest break."
       ],
       "id": "y8-measurement-review-end-28",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which plan allows enough whole minutes for this walk?",
@@ -7556,7 +7704,8 @@
         "unit": "cm",
         "labels": [
           "Circumference: 56.52 cm"
-        ]
+        ],
+        "orientation": 0
       },
       "answerFormat": {
         "kind": "number",
@@ -7564,7 +7713,7 @@
         "ariaLabel": "Answer in cm²"
       },
       "id": "y8-measurement-review-end-29",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of this circle?",
@@ -7618,7 +7767,8 @@
         ],
         "labels": [
           "Flight duration: 11 hours 40 minutes"
-        ]
+        ],
+        "orientation": 0
       },
       "options": [
         "Wednesday 00:00",
@@ -7626,7 +7776,7 @@
         "Tuesday 00:00"
       ],
       "id": "y8-measurement-review-end-30",
-      "version": "1.0.0-review.1",
+      "version": "1.1.0-review.1",
       "form": "end",
       "type": "mcq",
       "readAloudText": "On what day and at what local time does the flight arrive in Tokyo?",
