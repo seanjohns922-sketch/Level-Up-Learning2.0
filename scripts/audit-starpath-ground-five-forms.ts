@@ -25,7 +25,15 @@ for (const form of GROUND_STARPATH_FORMS) {
       assert.equal(groundPlacementIsCorrect(task, task.answer), true, `${form} question ${index + 1} stored placement must score correctly`);
     }
     if ("correctOptionId" in task && "options" in task && Array.isArray(task.options)) {
-      assert.ok(task.options.some((option) => option.id === task.correctOptionId), `${form} question ${index + 1} correct option must be visible`);
+      assert.ok(
+        task.options.some((option) =>
+          typeof option === "object"
+          && option !== null
+          && "id" in option
+          && option.id === task.correctOptionId
+        ),
+        `${form} question ${index + 1} correct option must be visible`,
+      );
     }
     if (task.kind === "starpathOddOneOut") {
       assert.ok(task.options.some((option) => option.id === task.oddOptionId), `${form} question ${index + 1} odd option must be visible`);
