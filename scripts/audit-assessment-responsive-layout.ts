@@ -1,3 +1,4 @@
+import {needsFullWidthAssessment} from "../lib/assessment-layout";
 import fs from "node:fs";
 import path from "node:path";
 import { getPosttestForYearLabel, getPretestForYearLabel } from "@/data/assessments/api";
@@ -48,3 +49,15 @@ assert(css.includes('.assessment-native-task[data-assessment-task-kind='), "Comp
 assert(!gridReference.includes('min-w-[330px]'), "Starpath grid reference must not force horizontal scrolling.");
 
 console.log(`Assessment responsive layout audit passed: ${questionCount} questions, ${renderers.size} renderer types, ${realms.length} realms.`);
+
+// Never squeeze horizontal evidence into the side column when tightening the layout.
+for (const visual of [
+  {type: 'number_y4_number_line'}, {type: 'number_y6_fraction_placement'},
+  {kind: 'numberLine'}, {type: 'number_y2_fraction_compare'},
+  {type: 'number_y5_decimal_chart'}, {type: 'number_y7_panel', kind: 'packs'},
+  {type: 'number_y8_panel', kind: 'tax'}, {kind: 'story'},
+]) assert(needsFullWidthAssessment('numeric', visual, 'number'), `Full-width evidence was narrowed: ${JSON.stringify(visual)}`);
+assert(needsFullWidthAssessment('fraction_number_line', undefined, 'number'), 'Interactive number lines must retain full width.');
+assert(needsFullWidthAssessment('number_order', undefined, 'number'), 'Ordering controls must retain full width.');
+assert(!needsFullWidthAssessment('numeric', {type:'number_y7_panel',kind:'expression'}, 'number'), 'Simple expressions should use the compact side-by-side layout.');
+assert(needsFullWidthAssessment('numeric', {type:'measurement_year6_panel',rows:[]}, 'measurement'), 'Timetable width regressed.');

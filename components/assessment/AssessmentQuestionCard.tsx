@@ -28,6 +28,7 @@ import InformalMeasurementVisual from "./InformalMeasurementVisual";
 import GroundMeasurementComparisonVisual from "./GroundMeasurementComparisonVisual";
 import { useMemo, useRef, useState, isValidElement, cloneElement, type ReactNode } from "react";
 import AssessmentWorkspace from "./AssessmentWorkspace";
+import {needsFullWidthAssessment} from "@/lib/assessment-layout";
 import { RotateCcw, Trash2, Undo2 } from "lucide-react";
 import { FractionText, MathFormattedText } from "@/components/FractionText";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -1066,8 +1067,8 @@ export default function AssessmentQuestionCard({
   const children = Array.isArray(response.props.children) ? response.props.children : [response.props.children];
   const visualIndex = children.findIndex(child => child === renderedVisual || (isValidElement<{children?:ReactNode}>(child) && child.props.children === renderedVisual));
   if (visualIndex < 0) return response; // Integrated construction/placement tasks keep their whole canvas.
-  const wideTask = Array.isArray(visual?.rows) || /timetable|journey|construct|pair|coordinate|grid|table|calendar/i.test(String(visual?.task ?? visual?.type ?? '')) || ['number_order','fraction_order','pattern_build','build_whole'].includes(type);
-  return <AssessmentWorkspace visual={renderedVisual} realmId={realmId} wide={wideTask}>
+  const wideTask = needsFullWidthAssessment(type, visual, realmId);
+  return <AssessmentWorkspace visual={renderedVisual} realmId={realmId} wide={wideTask} responseKind={type === "numeric" && !visual?.reasonOptions ? "numeric" : "choices"}>
     {cloneElement(response, {className: `${response.props.className ?? ''} assessment-response-controls`}, children.filter((_,index)=>index!==visualIndex))}
   </AssessmentWorkspace>;
 

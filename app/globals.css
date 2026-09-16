@@ -1001,3 +1001,45 @@ body:has(.assessment-shell) .fullscreen-toggle:not([data-inline="true"]) {
 .assessment-shell:not([data-assessment-realm="measurement"]) .assessment-workspace { background: #f8fbfc; color: #172c35; }
 .assessment-shell .assessment-workspace .assessment-response-content .text-white { color: #302818; }
 .assessment-shell .assessment-workspace .assessment-response-content button[aria-pressed="true"] { border-color: var(--workspace-accent); }
+
+/* Number Nexus: preserve the complete horizontal evidence; compact the controls below it. */
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace {
+  background: #f0fdfa;
+  color: #134e4a;
+}
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace-skip {
+  background: #f0fdfa;
+  color: #134e4a;
+  border-color: #0f766e;
+}
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace-skip:hover { background: #ccfbf1; }
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace .assessment-choice-options > button[aria-pressed="true"] {
+  background: #ccfbf1;
+  border-color: #0f766e;
+}
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace[data-wide-task="true"] .assessment-response-panel {
+  max-width: none;
+  gap: .75rem;
+}
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace[data-wide-task="true"] .assessment-workspace-skip {
+  max-width: 320px;
+  align-self: center;
+}
+.assessment-shell[data-assessment-realm="number"] .assessment-workspace-visual > :first-child {
+  max-height: none;
+}
+@media (min-width: 700px) {
+  .assessment-shell[data-assessment-realm="number"] .assessment-workspace[data-wide-task="true"][data-response-kind="numeric"] .assessment-response-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, .65fr);
+    align-items: center;
+    max-width: 760px;
+  }
+  .assessment-shell[data-assessment-realm="number"] .assessment-workspace[data-wide-task="true"] .assessment-choice-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .assessment-shell[data-assessment-realm="number"] .number-pack-comparison { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .assessment-shell[data-assessment-realm="number"] .number-pack-comparison .shrink-0 > svg { width: 64px; height: 80px; }
+}
