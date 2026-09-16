@@ -3,6 +3,7 @@ import type { FoundationShape } from "@/data/activities/starpath/ground/types";
 // Starpath's cosmic objects and the familiar shape each one is built around.
 // Two objects per shape gives scenes real visual variety across lessons.
 export type ShapeObjectId =
+  | "clock"
   | "planet"
   | "moon"
   | "rocket"
@@ -13,6 +14,7 @@ export type ShapeObjectId =
   | "bridge";
 
 export const SHAPE_OBJECTS: Record<ShapeObjectId, { label: string; shape: FoundationShape; part: string }> = {
+  clock: { label: "Clock", shape: "circle", part: "The clock face is a circle." },
   planet: { label: "Planet", shape: "circle", part: "The planet is a circle." },
   moon: { label: "Moon", shape: "circle", part: "The moon is a circle." },
   rocket: { label: "Rocket", shape: "triangle", part: "The rocket nose is a triangle." },

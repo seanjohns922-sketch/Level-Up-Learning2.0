@@ -95,7 +95,7 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3,pending.measurement_level6_bank_version??3,pending.measurement_release_version??0) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3,pending.measurement_level6_bank_version??3,pending.measurement_release_version??0,pending.space_ground_bank_version??0) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
@@ -181,7 +181,7 @@ export default function WholeMathsDiagnosticPage() {
       questionIds: linkedQuestions.map(({ question }) => question.id),
     };
     const nextProbes = [...probes, probe];
-    const minimumLevel = (pending.strand === "number" && pending.number_ground_bank_version===3 || pending.strand === "measurement" && pending.measurement_ground_bank_version===4) ? 0 : pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
+    const minimumLevel = (pending.strand === "space" && pending.space_ground_bank_version===3 || pending.strand === "number" && pending.number_ground_bank_version===3 || pending.strand === "measurement" && pending.measurement_ground_bank_version===4) ? 0 : pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
     const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel,pending.strand === "number" ? pending.number_maximum_level ?? 6 : pending.strand === "measurement" && pending.measurement_release_version===1 ? 8 : 6);
     const nextProbeLevel = decision.shouldProbeNext
       ? diagnosticLevelNumber(level) + 1

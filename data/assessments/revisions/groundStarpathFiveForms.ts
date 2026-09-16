@@ -106,6 +106,14 @@ function rotateOptions(task: PracticeTask, amount: number): PracticeTask {
 }
 
 function diversifyTask(task: PracticeTask, variant: number): PracticeTask {
+  if (task.kind === "starpathObjectShape") {
+    // Positional-scene objects and shape-recognition objects use different catalogues.
+    // Keep the circular feature assessed by the source question.
+    const objects = ["planet", "moon", "rocket"] as const;
+    const prompts = ["What shape is the planet?", "What shape is the moon?", "What shape is the rocket window?"];
+    const prompt = prompts[variant]!;
+    return { ...task, objectId: objects[variant]!, prompt, speakText: prompt };
+  }
   if (task.kind === "starpathShapeName") {
     const option = task.options[(variant + 1) % task.options.length]!;
     return { ...task, shape: option.name, correctOptionId: option.id };

@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 const WRONG_PREFIX = "__measurelands_task_incorrect__";
 
@@ -15,6 +16,7 @@ export function MeasurelandsAssessmentTask({
   correctToken,
   onRecord,
   onClear,
+  realmId = "measurement",
 }: {
   questionId: string;
   task: PracticeTask;
@@ -22,7 +24,9 @@ export function MeasurelandsAssessmentTask({
   correctToken: string;
   onRecord: (value: string) => void;
   onClear: () => void;
+  realmId?: string;
 }) {
+  const theme = getRealmTheme(realmId);
   const recordedRef = useRef(Boolean(value));
   const [taskNonce, setTaskNonce] = useState(0);
 
@@ -46,7 +50,8 @@ export function MeasurelandsAssessmentTask({
 
   return (
     <div
-      className="assessment-native-task relative"
+      className={`assessment-native-task relative${realmId === "space" ? " rounded-2xl border-2 bg-white p-4 text-slate-950 sm:p-5" : ""}`}
+      style={realmId === "space" ? { borderColor: theme.borderRing } : undefined}
       data-assessment-task-kind={task.kind}
     >
       <div className={hasRecordedAnswer ? "pointer-events-none select-none" : undefined}>
@@ -72,7 +77,8 @@ export function MeasurelandsAssessmentTask({
           <button
             type="button"
             onClick={changeAnswer}
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg border-2 border-amber-800 bg-white px-4 py-2 text-sm font-black text-amber-950 transition hover:bg-amber-50 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border-2 px-4 py-2 text-sm font-black transition hover:brightness-110 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2"
+            style={{ background: theme.cardSurface, color: theme.chipText, borderColor: theme.chipBorder, outlineColor: theme.accentText }}
           >
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
             Change response

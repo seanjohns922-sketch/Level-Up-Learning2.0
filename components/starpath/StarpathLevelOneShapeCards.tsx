@@ -347,15 +347,16 @@ export function StarpathShapeClassifyCard({
             </span>
           </button>
         ) : (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
-            className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
-          >
-            <span className="text-lg font-black text-indigo-950">{option.label}</span>
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
+              className="relative h-full w-full flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            >
+              <span className="text-lg font-black text-indigo-950">{option.label}</span>
+            </button>
             <OptionReadAloudButton text={option.label} className="absolute right-2 top-1/2 -translate-y-1/2" />
-          </button>
+          </div>
         ))}
       </div>
     </div>

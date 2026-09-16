@@ -414,7 +414,7 @@ export default function DemoReviewPanel() {
 
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
-          {year !== "Prep" || realm === "number" || realm === "measurement" ? (
+          {year !== "Prep" || realm === "number" || realm === "measurement" || realm === "space" ? (
             <div className="grid gap-3 sm:grid-cols-3">
               {DIAGNOSTIC_PREVIEW_CHECKPOINTS.map((checkpoint) => (
                 <button key={checkpoint.id} type="button" onClick={() => router.push(diagnosticPreviewHref(realm, year, checkpoint.id))} className={actionClass()}>

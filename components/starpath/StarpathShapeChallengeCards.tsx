@@ -130,16 +130,17 @@ export function StarpathOddOneOutCard({
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {task.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            aria-label={option.shape}
-            onClick={() => (option.id === task.oddOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
-            className="relative flex min-h-40 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
-          >
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              aria-label={option.shape}
+              onClick={() => (option.id === task.oddOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
+              className="relative h-full w-full flex min-h-40 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            >
+              <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
+            </button>
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
-            <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
-          </button>
+          </div>
         ))}
       </div>
     </div>
@@ -212,15 +213,16 @@ export function StarpathShapeNameCard({
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {task.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
-            className="relative flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
-          >
-            <span className="text-xl font-black capitalize text-indigo-950">{option.name}</span>
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
+              className="relative w-full flex min-h-16 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white px-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            >
+              <span className="text-xl font-black capitalize text-indigo-950">{option.name}</span>
+            </button>
             <OptionReadAloudButton text={option.name} className="absolute right-2 top-1/2 -translate-y-1/2" />
-          </button>
+          </div>
         ))}
       </div>
     </div>
@@ -248,16 +250,17 @@ export function StarpathObjectShapeCard({
       </div>
       <div className="grid grid-cols-3 gap-4">
         {task.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            aria-label={option.shape}
-            onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
-            className="relative flex min-h-36 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
-          >
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              aria-label={option.shape}
+              onClick={() => (option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
+              className="relative w-full flex min-h-36 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            >
+              <ShapeVisual shape={option.shape} colour={option.colour} className="h-20 w-20 sm:h-24 sm:w-24" />
+            </button>
             <OptionReadAloudButton text={option.shape} className="absolute right-2 top-2" />
-            <ShapeVisual shape={option.shape} colour={option.colour} className="h-20 w-20 sm:h-24 sm:w-24" />
-          </button>
+          </div>
         ))}
       </div>
     </div>

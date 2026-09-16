@@ -791,18 +791,19 @@ export function StarpathShapeMatchCard({
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {task.options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            onClick={() => option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id))}
-            aria-label={option.shape}
-            className="relative flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
-          >
+          <div key={option.id} className="relative">
+            <button
+              type="button"
+              onClick={() => option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id))}
+              aria-label={option.shape}
+              className="relative h-full w-full flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            >
+              <div style={{ transform: `rotate(${option.rotation ?? 0}deg)` }}>
+                <ShapeVisual shape={option.shape} colour={option.colour} scale={option.scale} className="h-28 w-28" />
+              </div>
+            </button>
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
-            <div style={{ transform: `rotate(${option.rotation ?? 0}deg)` }}>
-              <ShapeVisual shape={option.shape} colour={option.colour} scale={option.scale} className="h-28 w-28" />
-            </div>
-          </button>
+          </div>
         ))}
       </div>
     </div>
@@ -882,6 +883,14 @@ const DEFAULT_SCENE_OBJECTS: ShapeObjectId[] = ["planet", "flag", "window", "doo
 export function SceneObjectVisual({ objectId }: { objectId: ShapeObjectId }) {
   return (
     <svg viewBox="0 0 120 120" className="h-24 w-24" aria-hidden="true">
+      {objectId === "clock" ? (
+        <>
+          <circle cx="60" cy="60" r="42" fill="#fff" stroke="#7c3aed" strokeWidth="7" />
+          <path d="M60 25v7M95 60h-7M60 95v-7M25 60h7" stroke="#312e81" strokeWidth="4" />
+          <path d="M60 38v22h20" fill="none" stroke="#312e81" strokeWidth="5" strokeLinecap="round" />
+          <circle cx="60" cy="60" r="4" fill="#312e81" />
+        </>
+      ) : null}
       {objectId === "planet" ? (
         <>
           <ellipse cx="60" cy="65" rx="54" ry="15" fill="none" stroke="#fde68a" strokeWidth="8" transform="rotate(-12 60 65)" />

@@ -1,3 +1,4 @@
+import { GROUND_STARPATH_FIVE_FORMS } from '@/data/assessments/revisions/groundStarpathFiveForms';
 import { YEAR3_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year3Measurement';
 import { YEAR4_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year4Measurement';
 import { YEAR7_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year7Measurement';
@@ -63,6 +64,7 @@ export function getDiagnosticQuestions(
   year5MeasurementVersion:3|4=3,
   year6MeasurementVersion:3|4=3,
   measurementReleaseVersion:0|1=0,
+  spaceGroundVersion: 0 | 3 = 0,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
@@ -71,7 +73,9 @@ export function getDiagnosticQuestions(
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
   const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0);
   const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0)?.questions ?? [];
-  const levelTest = strand === "measurement" && measurementReleaseVersion===1 && ["Year 3","Year 4","Year 7","Year 8"].includes(level)
+  const levelTest = strand === "space" && level === "Prep" && spaceGroundVersion === 3
+    ? GROUND_STARPATH_FIVE_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
+    : strand === "measurement" && measurementReleaseVersion===1 && ["Year 3","Year 4","Year 7","Year 8"].includes(level)
     ? ({"Year 3":YEAR3_MEASUREMENT_RELEASED_FORMS,"Year 4":YEAR4_MEASUREMENT_RELEASED_FORMS,"Year 7":YEAR7_MEASUREMENT_RELEASED_FORMS,"Year 8":YEAR8_MEASUREMENT_RELEASED_FORMS}[level as "Year 3"])[checkpoint==="ad_hoc"?"start":checkpoint]
     : strand === "measurement" && level === "Year 6" && year6MeasurementVersion===4
     ? YEAR6_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]

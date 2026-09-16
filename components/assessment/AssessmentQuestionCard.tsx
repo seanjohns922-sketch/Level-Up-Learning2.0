@@ -25,6 +25,8 @@ import FractionPlacementLine from "./FractionPlacementLine";
 import PrepNumberCandidateCard from "./PrepNumberCandidateCard";
 import { groundNumberReleaseItem } from "@/data/assessments/releases/groundNumber";
 import NumberReasoningResponse from "./NumberReasoningResponse";
+import { MeasurelandsAssessmentTask } from "./MeasurelandsAssessmentTask";
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 import InformalMeasurementVisual from "./InformalMeasurementVisual";
 import GroundMeasurementComparisonVisual from "./GroundMeasurementComparisonVisual";
@@ -64,6 +66,8 @@ import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
 import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 
 type GenericQuestion = {
+  practiceTask?: PracticeTask;
+  correctAnswer?: string | number;
   showFractionModels?: boolean;
   id?: string;
   type?: string;
@@ -367,6 +371,11 @@ export default function AssessmentQuestionCard({
     [type, value]
   );
 
+  if (realmId === "space" && question.practiceTask && question.id && question.correctAnswer != null) {
+    return <MeasurelandsAssessmentTask key={question.id} questionId={question.id}
+      task={question.practiceTask} value={value ?? ""} correctToken={String(question.correctAnswer)}
+      onRecord={onChange} onClear={() => onChange("")} realmId={realmId} />;
+  }
   if (/^y3-number-.*-v3$/.test(question.id ?? "") && visual?.kind) return <NumberLevel3QuestionCard question={question as unknown as NumberLevel3ReviewItem} value={value ?? ""} onChange={onChange}/>;
   const groundItem=groundNumberReleaseItem(question);
   if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;

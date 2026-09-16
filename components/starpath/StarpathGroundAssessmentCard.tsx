@@ -126,19 +126,20 @@ export function StarpathGroundAssessmentCard({
                 const placed = placements.some((item) => item.tokenId === token.id);
                 const selected = selectedTokenId === token.id;
                 return (
-                  <button
-                    key={token.id}
-                    type="button"
-                    disabled={placed}
-                    onClick={() => setSelectedTokenId(token.id)}
-                    aria-label={token.label}
-                    className={`relative flex h-24 w-28 items-center justify-center rounded-lg border bg-white p-2 transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
-                      selected ? "border-cyan-500 ring-4 ring-cyan-100" : "border-slate-200 hover:border-cyan-300"
-                    } disabled:opacity-35`}
-                  >
-                    <TokenVisual token={token} compact />
+                  <div key={token.id} className="relative">
+                    <button
+                      type="button"
+                      disabled={placed}
+                      onClick={() => setSelectedTokenId(token.id)}
+                      aria-label={token.label}
+                      className={`relative flex h-24 w-28 items-center justify-center rounded-lg border bg-white p-2 transition focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 ${
+                        selected ? "border-cyan-500 ring-4 ring-cyan-100" : "border-slate-200 hover:border-cyan-300"
+                      } disabled:opacity-35`}
+                    >
+                      <TokenVisual token={token} compact />
+                    </button>
                     <OptionReadAloudButton text={token.label} className="absolute right-1 top-1" />
-                  </button>
+                  </div>
                 );
               })}
             </div>
