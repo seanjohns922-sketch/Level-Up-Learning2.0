@@ -1,0 +1,5442 @@
+{
+  "pretest": [
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "125",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the full length of the timber board.",
+        "values": [
+          1.25,
+          100
+        ],
+        "labels": [
+          "1.25 m"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y6-measurement-pre-01-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-1",
+      "skillLabel": "Convert decimal metres to centimetres",
+      "structureKey": "y6-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "125"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this rectangular garden?",
+      "correctAnswer": "112",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "rectangle",
+        "description": "Use the measurements on the garden plan.",
+        "values": [
+          14,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden plan"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-pre-02-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-2",
+      "skillLabel": "Calculate a rectangular area",
+      "structureKey": "y6-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "112"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey from Central to Seabrook take?",
+      "correctAnswer": "75",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "journey",
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Central → Seabrook",
+        "rows": [
+          {
+            "service": "Central → Seabrook",
+            "departs": 535,
+            "arrives": 610
+          },
+          {
+            "service": "Central → Hillcrest",
+            "departs": 560,
+            "arrives": 625
+          },
+          {
+            "service": "Central → Riverside",
+            "departs": 585,
+            "arrives": 680
+          },
+          {
+            "service": "Central → Oakwood",
+            "departs": 610,
+            "arrives": 670
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-pre-03-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey from Central to Seabrook take?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-3",
+      "skillLabel": "Read journey duration from a timetable",
+      "structureKey": "y6-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked with a question mark?",
+      "correctAnswer": "115",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "The two angles lie on a straight line.",
+        "values": [
+          65,
+          115
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-pre-04-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-4",
+      "skillLabel": "Find an angle on a straight line",
+      "structureKey": "y6-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "115"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the mass of the parcel in grams?",
+      "correctAnswer": "2350",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the parcel’s mass.",
+        "values": [
+          2.35,
+          1000
+        ],
+        "labels": [
+          "2.35 kg"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y6-measurement-pre-05-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the mass of the parcel in grams?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-5",
+      "skillLabel": "Convert decimal kilograms to grams",
+      "structureKey": "y6-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2350"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of the L-shaped floor?",
+      "correctAnswer": "186",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "composite",
+        "description": "Use the labelled dimensions to calculate the whole floor area.",
+        "values": [
+          18,
+          12,
+          6,
+          5
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-pre-06-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area of the L-shaped floor?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-6",
+      "skillLabel": "Combine rectangular parts of a floor",
+      "structureKey": "y6-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "186"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes will you wait at Central for the first train you can catch to Seabrook?",
+      "correctAnswer": "27",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "wait",
+        "description": "You arrive at Central at 09:38. Allow at least 8 minutes to change platforms. Take the first possible train to Seabrook. Count the wait from your arrival, including the platform change. All services run on the same day.",
+        "values": [
+          578,
+          8
+        ],
+        "targetDestination": "Seabrook",
+        "rows": [
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 572,
+            "arrives": 626
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 583,
+            "arrives": 637
+          },
+          {
+            "service": "Central → Hillcrest",
+            "destination": "Hillcrest",
+            "departs": 588,
+            "arrives": 642
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 605,
+            "arrives": 659
+          },
+          {
+            "service": "Central → Riverside",
+            "destination": "Riverside",
+            "departs": 613,
+            "arrives": 667
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 623,
+            "arrives": 677
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-pre-07-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes will you wait at Central for the first train you can catch to Seabrook?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-7",
+      "skillLabel": "Find the waiting time at a connection",
+      "structureKey": "y6-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "27"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the opposite angle marked with a question mark?",
+      "correctAnswer": "48",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "opposite",
+        "description": "Two straight lines cross. Find the marked angle.",
+        "values": [
+          48
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-pre-08-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the opposite angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-8",
+      "skillLabel": "Use vertically opposite angles",
+      "structureKey": "y6-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "48"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many litres of water are in the bottle?",
+      "correctAnswer": "1.25",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the amount of water.",
+        "values": [
+          1250,
+          0.001
+        ],
+        "labels": [
+          "1250 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y6-measurement-pre-09-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many litres of water are in the bottle?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-9",
+      "skillLabel": "Convert millilitres to decimal litres",
+      "structureKey": "y6-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.25"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the latest train you can catch and still arrive on time?",
+      "correctAnswer": "Train C",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "services",
+        "description": "You must arrive by 11:00. All services run on the same day.",
+        "values": [
+          660
+        ],
+        "rows": [
+          {
+            "service": "Train A",
+            "departs": 550,
+            "arrives": 630
+          },
+          {
+            "service": "Train B",
+            "departs": 580,
+            "arrives": 655
+          },
+          {
+            "service": "Train C",
+            "departs": 610,
+            "arrives": 650
+          },
+          {
+            "service": "Train D",
+            "departs": 630,
+            "arrives": 670
+          }
+        ]
+      },
+      "options": [
+        "Train A",
+        "Train B",
+        "Train C",
+        "Train D"
+      ],
+      "id": "y6-measurement-pre-10-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which is the latest train you can catch and still arrive on time?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-10",
+      "skillLabel": "Select a service that meets an arrival deadline",
+      "structureKey": "y6-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Train C"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "77",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "Three angles share a straight line.",
+        "values": [
+          35,
+          68,
+          77
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-pre-11-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-11",
+      "skillLabel": "Find a third angle on a straight line",
+      "structureKey": "y6-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "77"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres larger is garden B than garden A?",
+      "correctAnswer": "16",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairArea",
+        "description": "The gardens have the same perimeter. Compare their areas.",
+        "values": [
+          14,
+          4,
+          12,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-pre-12-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many square metres larger is garden B than garden A?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-12",
+      "skillLabel": "Compare areas with equal perimeters",
+      "structureKey": "y6-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "16"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres long is this route?",
+      "correctAnswer": "1750",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The sign gives the full route distance.",
+        "values": [
+          1.75,
+          1000
+        ],
+        "labels": [
+          "1.75 km"
+        ],
+        "art": "route"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-pre-13-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many metres long is this route?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-13",
+      "skillLabel": "Convert decimal kilometres to metres",
+      "structureKey": "y6-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1230",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "finish",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
+        "values": [
+          535,
+          45,
+          85,
+          35,
+          50
+        ],
+        "labels": [
+          "Leave school: 08:55",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter the finishing time in 24-hour time"
+      },
+      "id": "y6-measurement-pre-14-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What time does the class arrive back at school?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-14",
+      "skillLabel": "Find an itinerary finishing time",
+      "structureKey": "y6-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1230"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle around the point?",
+      "correctAnswer": "150",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "All three angles meet at one point.",
+        "values": [
+          115,
+          95,
+          150
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-pre-15-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle around the point?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-15",
+      "skillLabel": "Find an unknown angle around a point",
+      "structureKey": "y6-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "150"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the width of this rectangular garden?",
+      "correctAnswer": "7",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "missingWidth",
+        "description": "The total area and the length are given. Find the width.",
+        "values": [
+          12,
+          7,
+          84
+        ],
+        "unit": "m",
+        "labels": [
+          "Area: 84 square metres"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-pre-16-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the width of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-16",
+      "skillLabel": "Find a rectangle width from its area",
+      "structureKey": "y6-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "7"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total mass of both parcels in kilograms?",
+      "correctAnswer": "2.4",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "Add the two parcel masses. Give your answer in kilograms.",
+        "values": [
+          1.75,
+          650
+        ],
+        "labels": [
+          "Parcel A: 1.75 kg",
+          "Parcel B: 650 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "kg",
+        "ariaLabel": "Answer in kg"
+      },
+      "id": "y6-measurement-pre-17-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the total mass of both parcels in kilograms?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-17",
+      "skillLabel": "Combine masses in different units",
+      "structureKey": "y6-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2.4"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the whole journey from Oakwood to Seabrook take, including the change at Central?",
+      "correctAnswer": "141",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "connection",
+        "description": "Take the train from Oakwood to Central. Allow at least 10 minutes to change platforms, then catch the first possible train to Seabrook. Include the wait in your total journey time. All services run on the same day.",
+        "values": [
+          10
+        ],
+        "targetDestination": "Seabrook",
+        "rows": [
+          {
+            "service": "Oakwood → Central",
+            "destination": "Central",
+            "departs": 945,
+            "arrives": 1000
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 995,
+            "arrives": 1063
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 1008,
+            "arrives": 1076
+          },
+          {
+            "service": "Central → Hillcrest",
+            "destination": "Hillcrest",
+            "departs": 1011,
+            "arrives": 1079
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 1018,
+            "arrives": 1086
+          },
+          {
+            "service": "Central → Riverside",
+            "destination": "Riverside",
+            "departs": 1026,
+            "arrives": 1094
+          },
+          {
+            "service": "Central → Seabrook",
+            "destination": "Seabrook",
+            "departs": 1038,
+            "arrives": 1068
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-pre-18-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the whole journey from Oakwood to Seabrook take, including the change at Central?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-18",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
+      "structureKey": "y6-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "141"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "correctAnswer": "10",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairPerimeter",
+        "description": "Both rectangular gardens have the same area. Compare their perimeters.",
+        "values": [
+          18,
+          4,
+          9,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-pre-19-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-19",
+      "skillLabel": "Compare perimeters of equal-area rectangles",
+      "structureKey": "y6-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "Four angles meet at one point.",
+        "values": [
+          68,
+          92,
+          115,
+          85
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-pre-20-v4",
+      "version": "4.0.0",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-20",
+      "skillLabel": "Find an unknown angle among four angles at a point",
+      "structureKey": "y6-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "175",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the full length of the timber board.",
+        "values": [
+          1.75,
+          100
+        ],
+        "labels": [
+          "1.75 m"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y6-measurement-post-01-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-1",
+      "skillLabel": "Convert decimal metres to centimetres",
+      "structureKey": "y6-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "175"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this rectangular garden?",
+      "correctAnswer": "112",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "rectangle",
+        "description": "Use the measurements on the garden plan.",
+        "values": [
+          16,
+          7
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden plan"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-post-02-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-2",
+      "skillLabel": "Calculate a rectangular area",
+      "structureKey": "y6-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "112"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey from Parkside to Glenfield take?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "journey",
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Parkside → Glenfield",
+        "rows": [
+          {
+            "service": "Parkside → Bayswater",
+            "departs": 540,
+            "arrives": 640
+          },
+          {
+            "service": "Parkside → Glenfield",
+            "departs": 565,
+            "arrives": 650
+          },
+          {
+            "service": "Parkside → Fairview",
+            "departs": 590,
+            "arrives": 695
+          },
+          {
+            "service": "Parkside → Westhaven",
+            "departs": 615,
+            "arrives": 685
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-post-03-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey from Parkside to Glenfield take?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-3",
+      "skillLabel": "Read journey duration from a timetable",
+      "structureKey": "y6-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked with a question mark?",
+      "correctAnswer": "68",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "The two angles lie on a straight line.",
+        "values": [
+          112,
+          68
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-post-04-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-4",
+      "skillLabel": "Find an angle on a straight line",
+      "structureKey": "y6-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "68"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the mass of the parcel in grams?",
+      "correctAnswer": "1750",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the parcel’s mass.",
+        "values": [
+          1.75,
+          1000
+        ],
+        "labels": [
+          "1.75 kg"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y6-measurement-post-05-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the mass of the parcel in grams?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-5",
+      "skillLabel": "Convert decimal kilograms to grams",
+      "structureKey": "y6-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of the L-shaped floor?",
+      "correctAnswer": "232",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "composite",
+        "description": "Use the labelled dimensions to calculate the whole floor area.",
+        "values": [
+          20,
+          13,
+          7,
+          4
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-post-06-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area of the L-shaped floor?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-6",
+      "skillLabel": "Combine rectangular parts of a floor",
+      "structureKey": "y6-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "232"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes will you wait at Parkside for the first train you can catch to Bayswater?",
+      "correctAnswer": "32",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "wait",
+        "description": "You arrive at Parkside at 10:23. Allow at least 10 minutes to change platforms. Take the first possible train to Bayswater. Count the wait from your arrival, including the platform change. All services run on the same day.",
+        "values": [
+          623,
+          10
+        ],
+        "targetDestination": "Bayswater",
+        "rows": [
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 617,
+            "arrives": 671
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 630,
+            "arrives": 684
+          },
+          {
+            "service": "Parkside → Glenfield",
+            "destination": "Glenfield",
+            "departs": 635,
+            "arrives": 689
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 655,
+            "arrives": 709
+          },
+          {
+            "service": "Parkside → Fairview",
+            "destination": "Fairview",
+            "departs": 663,
+            "arrives": 717
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 673,
+            "arrives": 727
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-post-07-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes will you wait at Parkside for the first train you can catch to Bayswater?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-7",
+      "skillLabel": "Find the waiting time at a connection",
+      "structureKey": "y6-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "32"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the opposite angle marked with a question mark?",
+      "correctAnswer": "116",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "opposite",
+        "description": "Two straight lines cross. Find the marked angle.",
+        "values": [
+          116
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-post-08-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the opposite angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-8",
+      "skillLabel": "Use vertically opposite angles",
+      "structureKey": "y6-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "116"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many litres of water are in the bottle?",
+      "correctAnswer": "2.75",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the amount of water.",
+        "values": [
+          2750,
+          0.001
+        ],
+        "labels": [
+          "2750 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y6-measurement-post-09-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many litres of water are in the bottle?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-9",
+      "skillLabel": "Convert millilitres to decimal litres",
+      "structureKey": "y6-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2.75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the latest train you can catch and still arrive on time?",
+      "correctAnswer": "Train D",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "services",
+        "description": "You must arrive by 11:35. All services run on the same day.",
+        "values": [
+          695
+        ],
+        "rows": [
+          {
+            "service": "Train B",
+            "departs": 585,
+            "arrives": 665
+          },
+          {
+            "service": "Train C",
+            "departs": 615,
+            "arrives": 690
+          },
+          {
+            "service": "Train D",
+            "departs": 645,
+            "arrives": 685
+          },
+          {
+            "service": "Train A",
+            "departs": 665,
+            "arrives": 705
+          }
+        ]
+      },
+      "options": [
+        "Train C",
+        "Train D",
+        "Train A",
+        "Train B"
+      ],
+      "id": "y6-measurement-post-10-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which is the latest train you can catch and still arrive on time?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-10",
+      "skillLabel": "Select a service that meets an arrival deadline",
+      "structureKey": "y6-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Train D"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "65",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "Three angles share a straight line.",
+        "values": [
+          42,
+          73,
+          65
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-post-11-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-11",
+      "skillLabel": "Find a third angle on a straight line",
+      "structureKey": "y6-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "65"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres larger is garden B than garden A?",
+      "correctAnswer": "20",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairArea",
+        "description": "The gardens have the same perimeter. Compare their areas.",
+        "values": [
+          16,
+          4,
+          14,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-post-12-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many square metres larger is garden B than garden A?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-12",
+      "skillLabel": "Compare areas with equal perimeters",
+      "structureKey": "y6-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "20"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres long is this route?",
+      "correctAnswer": "2250",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The sign gives the full route distance.",
+        "values": [
+          2.25,
+          1000
+        ],
+        "labels": [
+          "2.25 km"
+        ],
+        "art": "route"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-post-13-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many metres long is this route?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-13",
+      "skillLabel": "Convert decimal kilometres to metres",
+      "structureKey": "y6-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2250"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1300",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "finish",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
+        "values": [
+          550,
+          50,
+          95,
+          40,
+          45
+        ],
+        "labels": [
+          "Leave school: 09:10",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter the finishing time in 24-hour time"
+      },
+      "id": "y6-measurement-post-14-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What time does the class arrive back at school?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-14",
+      "skillLabel": "Find an itinerary finishing time",
+      "structureKey": "y6-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1300"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle around the point?",
+      "correctAnswer": "130",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "All three angles meet at one point.",
+        "values": [
+          125,
+          105,
+          130
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-post-15-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle around the point?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-15",
+      "skillLabel": "Find an unknown angle around a point",
+      "structureKey": "y6-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "130"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the width of this rectangular garden?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "missingWidth",
+        "description": "The total area and the length are given. Find the width.",
+        "values": [
+          14,
+          9,
+          126
+        ],
+        "unit": "m",
+        "labels": [
+          "Area: 126 square metres"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-post-16-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the width of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-16",
+      "skillLabel": "Find a rectangle width from its area",
+      "structureKey": "y6-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total mass of both parcels in kilograms?",
+      "correctAnswer": "3.1",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "Add the two parcel masses. Give your answer in kilograms.",
+        "values": [
+          2.25,
+          850
+        ],
+        "labels": [
+          "Parcel A: 2.25 kg",
+          "Parcel B: 850 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "kg",
+        "ariaLabel": "Answer in kg"
+      },
+      "id": "y6-measurement-post-17-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the total mass of both parcels in kilograms?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-17",
+      "skillLabel": "Combine masses in different units",
+      "structureKey": "y6-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3.1"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the whole journey from Westhaven to Bayswater take, including the change at Parkside?",
+      "correctAnswer": "159",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "connection",
+        "description": "Take the train from Westhaven to Parkside. Allow at least 12 minutes to change platforms, then catch the first possible train to Bayswater. Include the wait in your total journey time. All services run on the same day.",
+        "values": [
+          12
+        ],
+        "targetDestination": "Bayswater",
+        "rows": [
+          {
+            "service": "Westhaven → Parkside",
+            "destination": "Parkside",
+            "departs": 975,
+            "arrives": 1040
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 1035,
+            "arrives": 1107
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 1050,
+            "arrives": 1122
+          },
+          {
+            "service": "Parkside → Glenfield",
+            "destination": "Glenfield",
+            "departs": 1053,
+            "arrives": 1125
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 1062,
+            "arrives": 1134
+          },
+          {
+            "service": "Parkside → Fairview",
+            "destination": "Fairview",
+            "departs": 1070,
+            "arrives": 1142
+          },
+          {
+            "service": "Parkside → Bayswater",
+            "destination": "Bayswater",
+            "departs": 1082,
+            "arrives": 1112
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-post-18-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the whole journey from Westhaven to Bayswater take, including the change at Parkside?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-18",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
+      "structureKey": "y6-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "159"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "correctAnswer": "12",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairPerimeter",
+        "description": "Both rectangular gardens have the same area. Compare their perimeters.",
+        "values": [
+          20,
+          4,
+          10,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-post-19-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-19",
+      "skillLabel": "Compare perimeters of equal-area rectangles",
+      "structureKey": "y6-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "85",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "Four angles meet at one point.",
+        "values": [
+          74,
+          106,
+          95,
+          85
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-post-20-v4",
+      "version": "4.0.0",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-20",
+      "skillLabel": "Find an unknown angle among four angles at a point",
+      "structureKey": "y6-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "85"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "235",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the full length of the timber board.",
+        "values": [
+          2.35,
+          100
+        ],
+        "labels": [
+          "2.35 m"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y6-measurement-start-01-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-1",
+      "skillLabel": "Convert decimal metres to centimetres",
+      "structureKey": "y6-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "235"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this rectangular garden?",
+      "correctAnswer": "108",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "rectangle",
+        "description": "Use the measurements on the garden plan.",
+        "values": [
+          18,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden plan"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-start-02-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-2",
+      "skillLabel": "Calculate a rectangular area",
+      "structureKey": "y6-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "108"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey from Junction to Brookfield take?",
+      "correctAnswer": "95",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "journey",
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Junction → Brookfield",
+        "rows": [
+          {
+            "service": "Junction → Harbourview",
+            "departs": 540,
+            "arrives": 650
+          },
+          {
+            "service": "Junction → Woodside",
+            "departs": 565,
+            "arrives": 650
+          },
+          {
+            "service": "Junction → Brookfield",
+            "departs": 590,
+            "arrives": 685
+          },
+          {
+            "service": "Junction → Mapleton",
+            "departs": 615,
+            "arrives": 695
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-start-03-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey from Junction to Brookfield take?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-3",
+      "skillLabel": "Read journey duration from a timetable",
+      "structureKey": "y6-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "95"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked with a question mark?",
+      "correctAnswer": "106",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "The two angles lie on a straight line.",
+        "values": [
+          74,
+          106
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-start-04-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-4",
+      "skillLabel": "Find an angle on a straight line",
+      "structureKey": "y6-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "106"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the mass of the parcel in grams?",
+      "correctAnswer": "3250",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the parcel’s mass.",
+        "values": [
+          3.25,
+          1000
+        ],
+        "labels": [
+          "3.25 kg"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y6-measurement-start-05-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the mass of the parcel in grams?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-5",
+      "skillLabel": "Convert decimal kilograms to grams",
+      "structureKey": "y6-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3250"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of the L-shaped floor?",
+      "correctAnswer": "260",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "composite",
+        "description": "Use the labelled dimensions to calculate the whole floor area.",
+        "values": [
+          22,
+          14,
+          8,
+          6
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-start-06-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area of the L-shaped floor?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-6",
+      "skillLabel": "Combine rectangular parts of a floor",
+      "structureKey": "y6-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "260"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes will you wait at Junction for the first train you can catch to Harbourview?",
+      "correctAnswer": "37",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "wait",
+        "description": "You arrive at Junction at 11:08. Allow at least 12 minutes to change platforms. Take the first possible train to Harbourview. Count the wait from your arrival, including the platform change. All services run on the same day.",
+        "values": [
+          668,
+          12
+        ],
+        "targetDestination": "Harbourview",
+        "rows": [
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 662,
+            "arrives": 716
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 677,
+            "arrives": 731
+          },
+          {
+            "service": "Junction → Woodside",
+            "destination": "Woodside",
+            "departs": 682,
+            "arrives": 736
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 705,
+            "arrives": 759
+          },
+          {
+            "service": "Junction → Brookfield",
+            "destination": "Brookfield",
+            "departs": 713,
+            "arrives": 767
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 723,
+            "arrives": 777
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-start-07-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes will you wait at Junction for the first train you can catch to Harbourview?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-7",
+      "skillLabel": "Find the waiting time at a connection",
+      "structureKey": "y6-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "37"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the opposite angle marked with a question mark?",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "opposite",
+        "description": "Two straight lines cross. Find the marked angle.",
+        "values": [
+          72
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-start-08-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the opposite angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-8",
+      "skillLabel": "Use vertically opposite angles",
+      "structureKey": "y6-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many litres of water are in the bottle?",
+      "correctAnswer": "3.45",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the amount of water.",
+        "values": [
+          3450,
+          0.001
+        ],
+        "labels": [
+          "3450 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y6-measurement-start-09-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many litres of water are in the bottle?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-9",
+      "skillLabel": "Convert millilitres to decimal litres",
+      "structureKey": "y6-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3.45"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the latest train you can catch and still arrive on time?",
+      "correctAnswer": "Train A",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "services",
+        "description": "You must arrive by 12:10. All services run on the same day.",
+        "values": [
+          730
+        ],
+        "rows": [
+          {
+            "service": "Train C",
+            "departs": 620,
+            "arrives": 700
+          },
+          {
+            "service": "Train D",
+            "departs": 650,
+            "arrives": 725
+          },
+          {
+            "service": "Train A",
+            "departs": 680,
+            "arrives": 720
+          },
+          {
+            "service": "Train B",
+            "departs": 700,
+            "arrives": 740
+          }
+        ]
+      },
+      "options": [
+        "Train A",
+        "Train B",
+        "Train C",
+        "Train D"
+      ],
+      "id": "y6-measurement-start-10-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which is the latest train you can catch and still arrive on time?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-10",
+      "skillLabel": "Select a service that meets an arrival deadline",
+      "structureKey": "y6-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Train A"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "63",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "Three angles share a straight line.",
+        "values": [
+          38,
+          79,
+          63
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-start-11-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-11",
+      "skillLabel": "Find a third angle on a straight line",
+      "structureKey": "y6-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "63"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres larger is garden B than garden A?",
+      "correctAnswer": "24",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairArea",
+        "description": "The gardens have the same perimeter. Compare their areas.",
+        "values": [
+          18,
+          4,
+          16,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-start-12-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many square metres larger is garden B than garden A?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-12",
+      "skillLabel": "Compare areas with equal perimeters",
+      "structureKey": "y6-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "24"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres long is this route?",
+      "correctAnswer": "3650",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The sign gives the full route distance.",
+        "values": [
+          3.65,
+          1000
+        ],
+        "labels": [
+          "3.65 km"
+        ],
+        "art": "route"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-start-13-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many metres long is this route?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-13",
+      "skillLabel": "Convert decimal kilometres to metres",
+      "structureKey": "y6-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3650"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1330",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "finish",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
+        "values": [
+          565,
+          40,
+          105,
+          45,
+          55
+        ],
+        "labels": [
+          "Leave school: 09:25",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter the finishing time in 24-hour time"
+      },
+      "id": "y6-measurement-start-14-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What time does the class arrive back at school?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-14",
+      "skillLabel": "Find an itinerary finishing time",
+      "structureKey": "y6-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1330"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle around the point?",
+      "correctAnswer": "140",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "All three angles meet at one point.",
+        "values": [
+          135,
+          85,
+          140
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-start-15-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle around the point?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-15",
+      "skillLabel": "Find an unknown angle around a point",
+      "structureKey": "y6-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "140"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the width of this rectangular garden?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "missingWidth",
+        "description": "The total area and the length are given. Find the width.",
+        "values": [
+          16,
+          8,
+          128
+        ],
+        "unit": "m",
+        "labels": [
+          "Area: 128 square metres"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-start-16-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the width of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-16",
+      "skillLabel": "Find a rectangle width from its area",
+      "structureKey": "y6-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total mass of both parcels in kilograms?",
+      "correctAnswer": "4.2",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "Add the two parcel masses. Give your answer in kilograms.",
+        "values": [
+          3.45,
+          750
+        ],
+        "labels": [
+          "Parcel A: 3.45 kg",
+          "Parcel B: 750 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "kg",
+        "ariaLabel": "Answer in kg"
+      },
+      "id": "y6-measurement-start-17-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the total mass of both parcels in kilograms?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-17",
+      "skillLabel": "Combine masses in different units",
+      "structureKey": "y6-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4.2"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the whole journey from Mapleton to Harbourview take, including the change at Junction?",
+      "correctAnswer": "177",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "connection",
+        "description": "Take the train from Mapleton to Junction. Allow at least 15 minutes to change platforms, then catch the first possible train to Harbourview. Include the wait in your total journey time. All services run on the same day.",
+        "values": [
+          15
+        ],
+        "targetDestination": "Harbourview",
+        "rows": [
+          {
+            "service": "Mapleton → Junction",
+            "destination": "Junction",
+            "departs": 1005,
+            "arrives": 1080
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 1075,
+            "arrives": 1151
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 1093,
+            "arrives": 1169
+          },
+          {
+            "service": "Junction → Woodside",
+            "destination": "Woodside",
+            "departs": 1096,
+            "arrives": 1172
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 1106,
+            "arrives": 1182
+          },
+          {
+            "service": "Junction → Brookfield",
+            "destination": "Brookfield",
+            "departs": 1114,
+            "arrives": 1190
+          },
+          {
+            "service": "Junction → Harbourview",
+            "destination": "Harbourview",
+            "departs": 1126,
+            "arrives": 1156
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-start-18-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the whole journey from Mapleton to Harbourview take, including the change at Junction?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-18",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
+      "structureKey": "y6-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "177"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "correctAnswer": "14",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairPerimeter",
+        "description": "Both rectangular gardens have the same area. Compare their perimeters.",
+        "values": [
+          22,
+          4,
+          11,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-start-19-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-19",
+      "skillLabel": "Compare perimeters of equal-area rectangles",
+      "structureKey": "y6-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "14"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "75",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "Four angles meet at one point.",
+        "values": [
+          82,
+          98,
+          105,
+          75
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-start-20-v4",
+      "version": "4.0.0",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-20",
+      "skillLabel": "Find an unknown angle among four angles at a point",
+      "structureKey": "y6-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "265",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the full length of the timber board.",
+        "values": [
+          2.65,
+          100
+        ],
+        "labels": [
+          "2.65 m"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y6-measurement-mid-01-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-1",
+      "skillLabel": "Convert decimal metres to centimetres",
+      "structureKey": "y6-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "265"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this rectangular garden?",
+      "correctAnswer": "135",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "rectangle",
+        "description": "Use the measurements on the garden plan.",
+        "values": [
+          15,
+          9
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden plan"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-mid-02-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-2",
+      "skillLabel": "Calculate a rectangular area",
+      "structureKey": "y6-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "135"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey from City Square to Elmwood take?",
+      "correctAnswer": "105",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "journey",
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "City Square → Elmwood",
+        "rows": [
+          {
+            "service": "City Square → Sandport",
+            "departs": 540,
+            "arrives": 660
+          },
+          {
+            "service": "City Square → Northbridge",
+            "departs": 565,
+            "arrives": 660
+          },
+          {
+            "service": "City Square → Meadowbank",
+            "departs": 590,
+            "arrives": 715
+          },
+          {
+            "service": "City Square → Elmwood",
+            "departs": 615,
+            "arrives": 720
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-mid-03-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey from City Square to Elmwood take?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-3",
+      "skillLabel": "Read journey duration from a timetable",
+      "structureKey": "y6-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "105"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked with a question mark?",
+      "correctAnswer": "52",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "The two angles lie on a straight line.",
+        "values": [
+          128,
+          52
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-mid-04-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-4",
+      "skillLabel": "Find an angle on a straight line",
+      "structureKey": "y6-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "52"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the mass of the parcel in grams?",
+      "correctAnswer": "2650",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the parcel’s mass.",
+        "values": [
+          2.65,
+          1000
+        ],
+        "labels": [
+          "2.65 kg"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y6-measurement-mid-05-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the mass of the parcel in grams?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-5",
+      "skillLabel": "Convert decimal kilograms to grams",
+      "structureKey": "y6-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2650"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of the L-shaped floor?",
+      "correctAnswer": "255",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "composite",
+        "description": "Use the labelled dimensions to calculate the whole floor area.",
+        "values": [
+          19,
+          15,
+          6,
+          5
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-mid-06-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area of the L-shaped floor?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-6",
+      "skillLabel": "Combine rectangular parts of a floor",
+      "structureKey": "y6-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "255"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes will you wait at City Square for the first train you can catch to Sandport?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "wait",
+        "description": "You arrive at City Square at 11:53. Allow at least 9 minutes to change platforms. Take the first possible train to Sandport. Count the wait from your arrival, including the platform change. All services run on the same day.",
+        "values": [
+          713,
+          9
+        ],
+        "targetDestination": "Sandport",
+        "rows": [
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 707,
+            "arrives": 761
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 719,
+            "arrives": 773
+          },
+          {
+            "service": "City Square → Northbridge",
+            "destination": "Northbridge",
+            "departs": 724,
+            "arrives": 778
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 755,
+            "arrives": 809
+          },
+          {
+            "service": "City Square → Meadowbank",
+            "destination": "Meadowbank",
+            "departs": 763,
+            "arrives": 817
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 773,
+            "arrives": 827
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-mid-07-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes will you wait at City Square for the first train you can catch to Sandport?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-7",
+      "skillLabel": "Find the waiting time at a connection",
+      "structureKey": "y6-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the opposite angle marked with a question mark?",
+      "correctAnswer": "134",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "opposite",
+        "description": "Two straight lines cross. Find the marked angle.",
+        "values": [
+          134
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-mid-08-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the opposite angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-8",
+      "skillLabel": "Use vertically opposite angles",
+      "structureKey": "y6-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "134"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many litres of water are in the bottle?",
+      "correctAnswer": "1.65",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the amount of water.",
+        "values": [
+          1650,
+          0.001
+        ],
+        "labels": [
+          "1650 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y6-measurement-mid-09-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many litres of water are in the bottle?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-9",
+      "skillLabel": "Convert millilitres to decimal litres",
+      "structureKey": "y6-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1.65"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the latest train you can catch and still arrive on time?",
+      "correctAnswer": "Train B",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "services",
+        "description": "You must arrive by 12:45. All services run on the same day.",
+        "values": [
+          765
+        ],
+        "rows": [
+          {
+            "service": "Train D",
+            "departs": 655,
+            "arrives": 735
+          },
+          {
+            "service": "Train A",
+            "departs": 685,
+            "arrives": 760
+          },
+          {
+            "service": "Train B",
+            "departs": 715,
+            "arrives": 755
+          },
+          {
+            "service": "Train C",
+            "departs": 735,
+            "arrives": 775
+          }
+        ]
+      },
+      "options": [
+        "Train C",
+        "Train D",
+        "Train A",
+        "Train B"
+      ],
+      "id": "y6-measurement-mid-10-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which is the latest train you can catch and still arrive on time?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-10",
+      "skillLabel": "Select a service that meets an arrival deadline",
+      "structureKey": "y6-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Train B"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "75",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "Three angles share a straight line.",
+        "values": [
+          47,
+          58,
+          75
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-mid-11-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-11",
+      "skillLabel": "Find a third angle on a straight line",
+      "structureKey": "y6-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres larger is garden B than garden A?",
+      "correctAnswer": "28",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairArea",
+        "description": "The gardens have the same perimeter. Compare their areas.",
+        "values": [
+          20,
+          4,
+          18,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-mid-12-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many square metres larger is garden B than garden A?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-12",
+      "skillLabel": "Compare areas with equal perimeters",
+      "structureKey": "y6-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "28"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres long is this route?",
+      "correctAnswer": "4250",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The sign gives the full route distance.",
+        "values": [
+          4.25,
+          1000
+        ],
+        "labels": [
+          "4.25 km"
+        ],
+        "art": "route"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-mid-13-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many metres long is this route?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-13",
+      "skillLabel": "Convert decimal kilometres to metres",
+      "structureKey": "y6-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "4250"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1340",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "finish",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
+        "values": [
+          580,
+          55,
+          115,
+          30,
+          40
+        ],
+        "labels": [
+          "Leave school: 09:40",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter the finishing time in 24-hour time"
+      },
+      "id": "y6-measurement-mid-14-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What time does the class arrive back at school?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-14",
+      "skillLabel": "Find an itinerary finishing time",
+      "structureKey": "y6-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1340"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle around the point?",
+      "correctAnswer": "140",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "All three angles meet at one point.",
+        "values": [
+          145,
+          75,
+          140
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-mid-15-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle around the point?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-15",
+      "skillLabel": "Find an unknown angle around a point",
+      "structureKey": "y6-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "140"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the width of this rectangular garden?",
+      "correctAnswer": "11",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "missingWidth",
+        "description": "The total area and the length are given. Find the width.",
+        "values": [
+          18,
+          11,
+          198
+        ],
+        "unit": "m",
+        "labels": [
+          "Area: 198 square metres"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-mid-16-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the width of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-16",
+      "skillLabel": "Find a rectangle width from its area",
+      "structureKey": "y6-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total mass of both parcels in kilograms?",
+      "correctAnswer": "3.6",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "Add the two parcel masses. Give your answer in kilograms.",
+        "values": [
+          2.65,
+          950
+        ],
+        "labels": [
+          "Parcel A: 2.65 kg",
+          "Parcel B: 950 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "kg",
+        "ariaLabel": "Answer in kg"
+      },
+      "id": "y6-measurement-mid-17-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the total mass of both parcels in kilograms?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-17",
+      "skillLabel": "Combine masses in different units",
+      "structureKey": "y6-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3.6"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the whole journey from Elmwood to Sandport take, including the change at City Square?",
+      "correctAnswer": "173",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "connection",
+        "description": "Take the train from Elmwood to City Square. Allow at least 14 minutes to change platforms, then catch the first possible train to Sandport. Include the wait in your total journey time. All services run on the same day.",
+        "values": [
+          14
+        ],
+        "targetDestination": "Sandport",
+        "rows": [
+          {
+            "service": "Elmwood → City Square",
+            "destination": "City Square",
+            "departs": 1035,
+            "arrives": 1120
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 1115,
+            "arrives": 1179
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 1132,
+            "arrives": 1196
+          },
+          {
+            "service": "City Square → Northbridge",
+            "destination": "Northbridge",
+            "departs": 1135,
+            "arrives": 1199
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 1144,
+            "arrives": 1208
+          },
+          {
+            "service": "City Square → Meadowbank",
+            "destination": "Meadowbank",
+            "departs": 1152,
+            "arrives": 1216
+          },
+          {
+            "service": "City Square → Sandport",
+            "destination": "Sandport",
+            "departs": 1164,
+            "arrives": 1194
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-mid-18-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the whole journey from Elmwood to Sandport take, including the change at City Square?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-18",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
+      "structureKey": "y6-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "173"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "correctAnswer": "16",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairPerimeter",
+        "description": "Both rectangular gardens have the same area. Compare their perimeters.",
+        "values": [
+          24,
+          4,
+          12,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-mid-19-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-19",
+      "skillLabel": "Compare perimeters of equal-area rectangles",
+      "structureKey": "y6-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "16"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "Four angles meet at one point.",
+        "values": [
+          96,
+          84,
+          110,
+          70
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-mid-20-v4",
+      "version": "4.0.0",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-20",
+      "skillLabel": "Find an unknown angle among four angles at a point",
+      "structureKey": "y6-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "How long is the timber board in centimetres?",
+      "correctAnswer": "345",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the full length of the timber board.",
+        "values": [
+          3.45,
+          100
+        ],
+        "labels": [
+          "3.45 m"
+        ],
+        "art": "measure-objects-3d/plank.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y6-measurement-end-01-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How long is the timber board in centimetres?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-1",
+      "skillLabel": "Convert decimal metres to centimetres",
+      "structureKey": "y6-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "345"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this rectangular garden?",
+      "correctAnswer": "136",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "rectangle",
+        "description": "Use the measurements on the garden plan.",
+        "values": [
+          17,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden plan"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-end-02-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-2",
+      "skillLabel": "Calculate a rectangular area",
+      "structureKey": "y6-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "136"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the journey from Union to Ocean Grove take?",
+      "correctAnswer": "115",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "journey",
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Union → Ocean Grove",
+        "rows": [
+          {
+            "service": "Union → Ocean Grove",
+            "departs": 645,
+            "arrives": 760
+          },
+          {
+            "service": "Union → Pinecrest",
+            "departs": 670,
+            "arrives": 775
+          },
+          {
+            "service": "Union → Lakeview",
+            "departs": 695,
+            "arrives": 830
+          },
+          {
+            "service": "Union → Rosewood",
+            "departs": 720,
+            "arrives": 820
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-end-03-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the journey from Union to Ocean Grove take?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-3",
+      "skillLabel": "Read journey duration from a timetable",
+      "structureKey": "y6-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "115"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked with a question mark?",
+      "correctAnswer": "127",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "The two angles lie on a straight line.",
+        "values": [
+          53,
+          127
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-end-04-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-4",
+      "skillLabel": "Find an angle on a straight line",
+      "structureKey": "y6-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "127"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the mass of the parcel in grams?",
+      "correctAnswer": "1450",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the parcel’s mass.",
+        "values": [
+          1.45,
+          1000
+        ],
+        "labels": [
+          "1.45 kg"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "g",
+        "ariaLabel": "Answer in g"
+      },
+      "id": "y6-measurement-end-05-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the mass of the parcel in grams?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-5",
+      "skillLabel": "Convert decimal kilograms to grams",
+      "structureKey": "y6-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1450"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of the L-shaped floor?",
+      "correctAnswer": "294",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "composite",
+        "description": "Use the labelled dimensions to calculate the whole floor area.",
+        "values": [
+          21,
+          16,
+          7,
+          6
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-end-06-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area of the L-shaped floor?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-6",
+      "skillLabel": "Combine rectangular parts of a floor",
+      "structureKey": "y6-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "294"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes will you wait at Union for the first train you can catch to Ocean Grove?",
+      "correctAnswer": "47",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "wait",
+        "description": "You arrive at Union at 12:38. Allow at least 11 minutes to change platforms. Take the first possible train to Ocean Grove. Count the wait from your arrival, including the platform change. All services run on the same day.",
+        "values": [
+          758,
+          11
+        ],
+        "targetDestination": "Ocean Grove",
+        "rows": [
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 752,
+            "arrives": 806
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 766,
+            "arrives": 820
+          },
+          {
+            "service": "Union → Pinecrest",
+            "destination": "Pinecrest",
+            "departs": 771,
+            "arrives": 825
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 805,
+            "arrives": 859
+          },
+          {
+            "service": "Union → Lakeview",
+            "destination": "Lakeview",
+            "departs": 813,
+            "arrives": 867
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 823,
+            "arrives": 877
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-end-07-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes will you wait at Union for the first train you can catch to Ocean Grove?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-7",
+      "skillLabel": "Find the waiting time at a connection",
+      "structureKey": "y6-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "47"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the opposite angle marked with a question mark?",
+      "correctAnswer": "58",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "opposite",
+        "description": "Two straight lines cross. Find the marked angle.",
+        "values": [
+          58
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-end-08-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the opposite angle marked with a question mark?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-8",
+      "skillLabel": "Use vertically opposite angles",
+      "structureKey": "y6-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "58"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many litres of water are in the bottle?",
+      "correctAnswer": "2.35",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The label shows the amount of water.",
+        "values": [
+          2350,
+          0.001
+        ],
+        "labels": [
+          "2350 mL"
+        ],
+        "art": "containers/bottle.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in L"
+      },
+      "id": "y6-measurement-end-09-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many litres of water are in the bottle?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-9",
+      "skillLabel": "Convert millilitres to decimal litres",
+      "structureKey": "y6-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2.35"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which is the latest train you can catch and still arrive on time?",
+      "correctAnswer": "Train C",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "services",
+        "description": "You must arrive by 13:20. All services run on the same day.",
+        "values": [
+          800
+        ],
+        "rows": [
+          {
+            "service": "Train A",
+            "departs": 690,
+            "arrives": 770
+          },
+          {
+            "service": "Train B",
+            "departs": 720,
+            "arrives": 795
+          },
+          {
+            "service": "Train C",
+            "departs": 750,
+            "arrives": 790
+          },
+          {
+            "service": "Train D",
+            "departs": 770,
+            "arrives": 810
+          }
+        ]
+      },
+      "options": [
+        "Train A",
+        "Train B",
+        "Train C",
+        "Train D"
+      ],
+      "id": "y6-measurement-end-10-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which is the latest train you can catch and still arrive on time?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-10",
+      "skillLabel": "Select a service that meets an arrival deadline",
+      "structureKey": "y6-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "Train C"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "64",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "line",
+        "description": "Three angles share a straight line.",
+        "values": [
+          52,
+          64,
+          64
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-end-11-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-11",
+      "skillLabel": "Find a third angle on a straight line",
+      "structureKey": "y6-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "64"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many square metres larger is garden B than garden A?",
+      "correctAnswer": "32",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairArea",
+        "description": "The gardens have the same perimeter. Compare their areas.",
+        "values": [
+          22,
+          4,
+          20,
+          6
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y6-measurement-end-12-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many square metres larger is garden B than garden A?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-12",
+      "skillLabel": "Compare areas with equal perimeters",
+      "structureKey": "y6-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "32"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres long is this route?",
+      "correctAnswer": "2850",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "The sign gives the full route distance.",
+        "values": [
+          2.85,
+          1000
+        ],
+        "labels": [
+          "2.85 km"
+        ],
+        "art": "route"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-end-13-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many metres long is this route?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-13",
+      "skillLabel": "Convert decimal kilometres to metres",
+      "structureKey": "y6-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2850"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1410",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "finish",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
+        "values": [
+          595,
+          45,
+          125,
+          25,
+          60
+        ],
+        "labels": [
+          "Leave school: 09:55",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
+        ]
+      },
+      "answerFormat": {
+        "kind": "time",
+        "storage": "hhmm",
+        "mode": "24h",
+        "ariaLabel": "Enter the finishing time in 24-hour time"
+      },
+      "id": "y6-measurement-end-14-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What time does the class arrive back at school?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-14",
+      "skillLabel": "Find an itinerary finishing time",
+      "structureKey": "y6-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1410"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle around the point?",
+      "correctAnswer": "140",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "All three angles meet at one point.",
+        "values": [
+          155,
+          65,
+          140
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-end-15-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle around the point?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-15",
+      "skillLabel": "Find an unknown angle around a point",
+      "structureKey": "y6-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "140"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the width of this rectangular garden?",
+      "correctAnswer": "13",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "missingWidth",
+        "description": "The total area and the length are given. Find the width.",
+        "values": [
+          20,
+          13,
+          260
+        ],
+        "unit": "m",
+        "labels": [
+          "Area: 260 square metres"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-end-16-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the width of this rectangular garden?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-16",
+      "skillLabel": "Find a rectangle width from its area",
+      "structureKey": "y6-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "13"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total mass of both parcels in kilograms?",
+      "correctAnswer": "2.3",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "convert",
+        "description": "Add the two parcel masses. Give your answer in kilograms.",
+        "values": [
+          1.85,
+          450
+        ],
+        "labels": [
+          "Parcel A: 1.85 kg",
+          "Parcel B: 450 g"
+        ],
+        "art": "week2-3d/parcel.png"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "kg",
+        "ariaLabel": "Answer in kg"
+      },
+      "id": "y6-measurement-end-17-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the total mass of both parcels in kilograms?",
+      "primaryDescriptorCode": "AC9M6M01",
+      "curriculumCodes": [
+        "AC9M6M01"
+      ],
+      "skillId": "y6-measurement-slot-17",
+      "skillLabel": "Combine masses in different units",
+      "structureKey": "y6-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2.3"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many minutes does the whole journey from Rosewood to Ocean Grove take, including the change at Union?",
+      "correctAnswer": "181",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "connection",
+        "description": "Take the train from Rosewood to Union. Allow at least 16 minutes to change platforms, then catch the first possible train to Ocean Grove. Include the wait in your total journey time. All services run on the same day.",
+        "values": [
+          16
+        ],
+        "targetDestination": "Ocean Grove",
+        "rows": [
+          {
+            "service": "Rosewood → Union",
+            "destination": "Union",
+            "departs": 1065,
+            "arrives": 1160
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 1155,
+            "arrives": 1213
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 1174,
+            "arrives": 1232
+          },
+          {
+            "service": "Union → Pinecrest",
+            "destination": "Pinecrest",
+            "departs": 1177,
+            "arrives": 1235
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 1188,
+            "arrives": 1246
+          },
+          {
+            "service": "Union → Lakeview",
+            "destination": "Lakeview",
+            "departs": 1196,
+            "arrives": 1254
+          },
+          {
+            "service": "Union → Ocean Grove",
+            "destination": "Ocean Grove",
+            "departs": 1208,
+            "arrives": 1238
+          }
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "minutes",
+        "ariaLabel": "Answer in minutes"
+      },
+      "id": "y6-measurement-end-18-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many minutes does the whole journey from Rosewood to Ocean Grove take, including the change at Union?",
+      "primaryDescriptorCode": "AC9M6M03",
+      "curriculumCodes": [
+        "AC9M6M03"
+      ],
+      "skillId": "y6-measurement-slot-18",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
+      "structureKey": "y6-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "181"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "pairPerimeter",
+        "description": "Both rectangular gardens have the same area. Compare their perimeters.",
+        "values": [
+          26,
+          4,
+          13,
+          8
+        ],
+        "unit": "m",
+        "labels": [
+          "Garden A",
+          "Garden B"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m",
+        "ariaLabel": "Answer in m"
+      },
+      "id": "y6-measurement-end-19-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
+      "primaryDescriptorCode": "AC9M6M02",
+      "curriculumCodes": [
+        "AC9M6M02"
+      ],
+      "skillId": "y6-measurement-slot-19",
+      "skillLabel": "Compare perimeters of equal-area rectangles",
+      "structureKey": "y6-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year6_panel",
+        "task": "point",
+        "description": "Four angles meet at one point.",
+        "values": [
+          88,
+          112,
+          90,
+          70
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y6-measurement-end-20-v4",
+      "version": "4.0.0",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle?",
+      "primaryDescriptorCode": "AC9M6M04",
+      "curriculumCodes": [
+        "AC9M6M04"
+      ],
+      "skillId": "y6-measurement-slot-20",
+      "skillLabel": "Find an unknown angle among four angles at a point",
+      "structureKey": "y6-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ]
+}

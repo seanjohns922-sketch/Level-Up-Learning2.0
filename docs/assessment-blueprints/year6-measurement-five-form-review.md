@@ -1,6 +1,6 @@
 # Level 6 Measurelands: five matched assessment forms
 
-Status: manual review. Student release awaits approval.
+Status: approved for student release on 16 September 2026. Frozen v4 forms serve new assessments; existing drafts, baselines and academic-year diagnostic cycles retain their original version.
 
 Source: supplied Australian Curriculum v9 F–6 Mathematics document, Year 6 Measurement, page 66, AC9M6M01–04. Inspected Level 6 lesson common files for area, composite rectangles, metric conversions, timetables and angle reasoning. The curriculum document governs descriptor mapping: timetable problems are M03 and angle relationships are M04, regardless of older lesson comments.
 
@@ -15,7 +15,7 @@ The lesson DimRect and AngleDiagram renderers are reused. Dimensions stay outsid
 
 Nineteen questions use typed numbers or time fields; one uses service choices because the response is a train name. Shared Measurelands styling, question navigation, read-aloud, I don’t know, and the normal realm/level dropdown are retained.
 
-Verification: independently recompute all 100 answers, validate units, angle sums, timetable constraints and area/perimeter relationships; check correct/incorrect/blank/IDK scoring and matched form metadata. Render all 100 panels and inspect representative layouts before the production build. No student bank is changed by this review set.
+Verification: independently recompute all 100 answers, validate units, angle sums, timetable constraints and area/perimeter relationships; check correct/incorrect/blank/IDK scoring and matched form metadata. Render all 100 panels and inspect representative layouts before the production build. The approved release is frozen separately from future review edits.
 
 ## Timetable refinement after lesson comparison
 

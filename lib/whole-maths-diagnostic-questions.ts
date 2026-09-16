@@ -1,3 +1,4 @@
+import { YEAR6_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year6Measurement';
 import { YEAR5_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year5Measurement';
 import { YEAR2_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year2Measurement';
 import { YEAR1_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year1Measurement';
@@ -56,14 +57,17 @@ export function getDiagnosticQuestions(
   year1MeasurementVersion:3|4=3,
   year2MeasurementVersion:3|4=3,
   year5MeasurementVersion:3|4=3,
+  year6MeasurementVersion:3|4=3,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   if (strand === "number" && Number(level.replace(/\D/g, "")) > numberMaximumLevel) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
-  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3);
-  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3)?.questions ?? [];
-  const levelTest = strand === "measurement" && level === "Year 5" && year5MeasurementVersion===4
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3)?.questions ?? [];
+  const levelTest = strand === "measurement" && level === "Year 6" && year6MeasurementVersion===4
+    ? YEAR6_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
+    : strand === "measurement" && level === "Year 5" && year5MeasurementVersion===4
     ? YEAR5_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
     : strand === "measurement" && level === "Year 2" && year2MeasurementVersion===4
     ? YEAR2_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]

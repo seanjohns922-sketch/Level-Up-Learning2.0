@@ -1,3 +1,4 @@
+import { YEAR6_MEASUREMENT_RELEASED_FORMS } from './releases/year6Measurement';
 import { YEAR5_MEASUREMENT_RELEASED_FORMS } from './releases/year5Measurement';
 import { YEAR2_MEASUREMENT_RELEASED_FORMS } from './releases/year2Measurement';
 import { YEAR1_MEASUREMENT_RELEASED_FORMS } from './releases/year1Measurement';
@@ -218,12 +219,12 @@ export function getAssessmentYearLabel(level: SupportedMathLevel): string {
   return yearLabelForLevel(level);
 }
 
-export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4): PretestQuestion[] {
+export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4): PretestQuestion[] {
   switch (realmId) {
     case "space":
       return getStarpathPretest(yearLabel);
     case "measurement":
-      return yearLabel==='Year 5' && year5MeasurementVersion===4 ? [...YEAR5_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : yearLabel==='Year 2' && year2MeasurementVersion===4 ? [...YEAR2_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : yearLabel==='Year 1' && year1MeasurementVersion===4 ? [...YEAR1_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : isGroundLevelYear(yearLabel) && groundMeasurementVersion===4 ? [...GROUND_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
+      return yearLabel==='Year 6' && year6MeasurementVersion===4 ? [...YEAR6_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : yearLabel==='Year 5' && year5MeasurementVersion===4 ? [...YEAR5_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : yearLabel==='Year 2' && year2MeasurementVersion===4 ? [...YEAR2_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : yearLabel==='Year 1' && year1MeasurementVersion===4 ? [...YEAR1_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : isGroundLevelYear(yearLabel) && groundMeasurementVersion===4 ? [...GROUND_MEASUREMENT_RELEASED_FORMS.pretest] as unknown as PretestQuestion[] : getMeasurelandsPretestForYear(yearLabel) as PretestQuestion[];
     case "statistics":
       return getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "pattern":
@@ -257,12 +258,12 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   return getPretestForYear(yearLabel);
 }
 
-export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4): PostTest | undefined {
+export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4): PostTest | undefined {
   switch (realmId) {
     case "space":
       return getStarpathPosttest(yearLabel);
     case "measurement":
-      return yearLabel==='Year 5' && year5MeasurementVersion===4 ? {yearLabel:'Year 5',questions:[...YEAR5_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : yearLabel==='Year 2' && year2MeasurementVersion===4 ? {yearLabel:'Year 2',questions:[...YEAR2_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : yearLabel==='Year 1' && year1MeasurementVersion===4 ? {yearLabel:'Year 1',questions:[...YEAR1_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : isGroundLevelYear(yearLabel) && groundMeasurementVersion===4 ? {yearLabel:'Prep',questions:[...GROUND_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : getMeasurelandsPosttestForYear(yearLabel);
+      return yearLabel==='Year 6' && year6MeasurementVersion===4 ? {yearLabel:'Year 6',questions:[...YEAR6_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : yearLabel==='Year 5' && year5MeasurementVersion===4 ? {yearLabel:'Year 5',questions:[...YEAR5_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : yearLabel==='Year 2' && year2MeasurementVersion===4 ? {yearLabel:'Year 2',questions:[...YEAR2_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : yearLabel==='Year 1' && year1MeasurementVersion===4 ? {yearLabel:'Year 1',questions:[...YEAR1_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : isGroundLevelYear(yearLabel) && groundMeasurementVersion===4 ? {yearLabel:'Prep',questions:[...GROUND_MEASUREMENT_RELEASED_FORMS.posttest]} as PostTest : getMeasurelandsPosttestForYear(yearLabel);
     case "statistics":
       return { yearLabel, questions: getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "pattern":

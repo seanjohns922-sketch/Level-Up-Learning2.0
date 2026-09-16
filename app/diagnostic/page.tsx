@@ -95,7 +95,7 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3,pending.measurement_level6_bank_version??3) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
