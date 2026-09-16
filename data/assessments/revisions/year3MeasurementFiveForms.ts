@@ -19,7 +19,8 @@ function make(form:typeof YEAR3_MEASUREMENT_FORMS[number],f:number){
  add('How long is the pencil in centimetres?',String(8+f),v('ruler','Read the pencil from end to end. The ruler is marked in centimetres.',{values:[8+f],start:0,object:'pencil'}));
  const hours=[2,3,4,2,3][f];add('How many minutes is this?',String(hours*60),v('duration','Convert the duration to minutes.',{values:[hours],unit:'hours',labels:['Duration']}));
  const h=hour(7+f),m=[25,35,20,40,25][f];add('What time does the clock show?',time(h,m),clock(h,m),[time(h,m),time(h,m+5),time(h+1,m)]);
- add('How does the shaded angle compare with a right angle?','Less than a right angle',v('angle','Look at angle A, shaded purple.',{angle:[40,50,60,45,55][f],rotation:f*15}),['Less than a right angle','Equal to a right angle','Greater than a right angle']);
+ const comparisonAngle=[40,130,60,120,140][f];
+ add('How does the shaded angle compare with a right angle?',comparisonAngle<90?'Less than a right angle':'Greater than a right angle',v('angle','Look at angle A, shaded purple.',{angle:comparisonAngle,rotation:f*15}),['Less than a right angle','Equal to a right angle','Greater than a right angle']);
  const desks=[3,4,2,3,4][f];add('About how many metres long is the row?',String(desks),v('benchmark','Each desk is about 1 metre long. The desks touch end to end.',{quantity:desks,values:[1],unit:'m',labels:['One desk'],arts:['everyday-3d/object-desk.png']}));
  const mass=[400,600,300,700,500][f];add('What mass does the scale show in grams?',String(mass),v('scale','Read the scale. Its numbered marks are in grams.',{values:[mass],unit:'g'}));
  const minutes=[3,4,2,3,4][f];add('How many seconds is this?',String(minutes*60),v('duration','Convert the duration to seconds.',{values:[minutes],unit:'minutes',labels:['Duration']}));

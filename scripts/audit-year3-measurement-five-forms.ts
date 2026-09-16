@@ -21,5 +21,8 @@ for(const bank of Object.values(forms)){
  });
 }
 for(let i=0;i<20;i++){const q=Object.values(forms).map(b=>b[i]);for(const key of ['type','primaryDescriptorCode','difficulty'] as const)assert.equal(new Set(q.map(x=>x[key])).size,1);}
+const comparisonAngles=Object.values(forms).map(bank=>bank[4].visual.angle!);
+assert.equal(comparisonAngles.filter(angle=>angle<90).length,2);
+assert.equal(comparisonAngles.filter(angle=>angle>90&&angle<180).length,3);
 writeFileSync('docs/assessment-blueprints/year3-measurement-authoring-inventory.json',JSON.stringify(forms,null,2)+'\n');
 console.log('Level 3 Measurement: 100 independent answer checks; labelled instrument geometry; time conversions; matched forms; scoring, IDK and assets pass.');

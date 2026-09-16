@@ -43,3 +43,5 @@ matching curriculum/difficulty/response type, ruler bounds, exact labelled scale
 readings and asset existence. All 100 panels server-rendered without invalid
 coordinates. Targeted rendered checks cover rulers, mass, capacity, angle equality
 and benchmark layout. TypeScript and production-build checks accompany publication.
+
+Question 5 varies the comparison direction: Pre and Start show angles smaller than a right angle; Post, Mid and End show larger angles. All five keep the same skill, difficulty, purple target shading and response choices.

@@ -1043,12 +1043,12 @@
     },
     {
       "prompt": "How does the shaded angle compare with a right angle?",
-      "correctAnswer": "Less than a right angle",
+      "correctAnswer": "Greater than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
         "description": "Look at angle A, shaded purple.",
-        "angle": 50,
+        "angle": 130,
         "rotation": 15
       },
       "options": [
@@ -1079,7 +1079,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Less than a right angle"
+        "correctResponse": "Greater than a right angle"
       },
       "inputMode": "numeric",
       "strand": "Measurement"
@@ -2783,12 +2783,12 @@
     },
     {
       "prompt": "How does the shaded angle compare with a right angle?",
-      "correctAnswer": "Less than a right angle",
+      "correctAnswer": "Greater than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
         "description": "Look at angle A, shaded purple.",
-        "angle": 45,
+        "angle": 120,
         "rotation": 45
       },
       "options": [
@@ -2819,7 +2819,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Less than a right angle"
+        "correctResponse": "Greater than a right angle"
       },
       "inputMode": "numeric",
       "strand": "Measurement"
@@ -3653,12 +3653,12 @@
     },
     {
       "prompt": "How does the shaded angle compare with a right angle?",
-      "correctAnswer": "Less than a right angle",
+      "correctAnswer": "Greater than a right angle",
       "visual": {
         "type": "measurement_year3_panel",
         "task": "angle",
         "description": "Look at angle A, shaded purple.",
-        "angle": 55,
+        "angle": 140,
         "rotation": 60
       },
       "options": [
@@ -3689,7 +3689,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Less than a right angle"
+        "correctResponse": "Greater than a right angle"
       },
       "inputMode": "numeric",
       "strand": "Measurement"
