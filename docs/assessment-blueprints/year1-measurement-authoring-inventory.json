@@ -1,7 +1,7 @@
 {
   "pretest": [
     {
-      "prompt": "Which attribute describes how heavy an object is?",
+      "prompt": "Which word means how heavy something is?",
       "answer": "Mass",
       "visual": {
         "type": "measurement_year1_panel",
@@ -24,7 +24,7 @@
       "version": "1.0.0-review.1",
       "form": "pretest",
       "correctAnswer": "Mass",
-      "readAloudText": "Which attribute describes how heavy an object is?",
+      "readAloudText": "Which word means how heavy something is?",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -605,7 +605,7 @@
           "Trip A",
           "Trip B"
         ],
-        "description": "Compare the recorded trip times.",
+        "description": "Look at how long each trip took.",
         "values": [
           5,
           2
@@ -626,7 +626,7 @@
       "version": "1.0.0-review.1",
       "form": "pretest",
       "correctAnswer": "Trip A",
-      "readAloudText": "Which activity lasted longer?",
+      "readAloudText": "Which activity lasted longer? Trip A: 5 hours. Trip B: 2 hours.",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -1028,7 +1028,7 @@
   ],
   "posttest": [
     {
-      "prompt": "Which attribute describes how heavy an object is?",
+      "prompt": "Which word means how heavy something is?",
       "answer": "Mass",
       "visual": {
         "type": "measurement_year1_panel",
@@ -1051,7 +1051,7 @@
       "version": "1.0.0-review.1",
       "form": "posttest",
       "correctAnswer": "Mass",
-      "readAloudText": "Which attribute describes how heavy an object is?",
+      "readAloudText": "Which word means how heavy something is?",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -1632,7 +1632,7 @@
           "Trip A",
           "Trip B"
         ],
-        "description": "Compare the recorded trip times.",
+        "description": "Look at how long each trip took.",
         "values": [
           3,
           6
@@ -1653,7 +1653,7 @@
       "version": "1.0.0-review.1",
       "form": "posttest",
       "correctAnswer": "Trip B",
-      "readAloudText": "Which activity lasted longer?",
+      "readAloudText": "Which activity lasted longer? Trip A: 3 hours. Trip B: 6 hours.",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -2055,7 +2055,7 @@
   ],
   "start": [
     {
-      "prompt": "Which attribute describes how heavy an object is?",
+      "prompt": "Which word means how heavy something is?",
       "answer": "Mass",
       "visual": {
         "type": "measurement_year1_panel",
@@ -2078,7 +2078,7 @@
       "version": "1.0.0-review.1",
       "form": "start",
       "correctAnswer": "Mass",
-      "readAloudText": "Which attribute describes how heavy an object is?",
+      "readAloudText": "Which word means how heavy something is?",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -2659,7 +2659,7 @@
           "Trip A",
           "Trip B"
         ],
-        "description": "Compare the recorded trip times.",
+        "description": "Look at how long each trip took.",
         "values": [
           5,
           2
@@ -2680,7 +2680,7 @@
       "version": "1.0.0-review.1",
       "form": "start",
       "correctAnswer": "Trip A",
-      "readAloudText": "Which activity lasted longer?",
+      "readAloudText": "Which activity lasted longer? Trip A: 5 hours. Trip B: 2 hours.",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -3082,7 +3082,7 @@
   ],
   "mid": [
     {
-      "prompt": "Which attribute describes how heavy an object is?",
+      "prompt": "Which word means how heavy something is?",
       "answer": "Mass",
       "visual": {
         "type": "measurement_year1_panel",
@@ -3105,7 +3105,7 @@
       "version": "1.0.0-review.1",
       "form": "mid",
       "correctAnswer": "Mass",
-      "readAloudText": "Which attribute describes how heavy an object is?",
+      "readAloudText": "Which word means how heavy something is?",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -3686,7 +3686,7 @@
           "Trip A",
           "Trip B"
         ],
-        "description": "Compare the recorded trip times.",
+        "description": "Look at how long each trip took.",
         "values": [
           3,
           6
@@ -3707,7 +3707,7 @@
       "version": "1.0.0-review.1",
       "form": "mid",
       "correctAnswer": "Trip B",
-      "readAloudText": "Which activity lasted longer?",
+      "readAloudText": "Which activity lasted longer? Trip A: 3 hours. Trip B: 6 hours.",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -4109,7 +4109,7 @@
   ],
   "end": [
     {
-      "prompt": "Which attribute describes how heavy an object is?",
+      "prompt": "Which word means how heavy something is?",
       "answer": "Mass",
       "visual": {
         "type": "measurement_year1_panel",
@@ -4132,7 +4132,7 @@
       "version": "1.0.0-review.1",
       "form": "end",
       "correctAnswer": "Mass",
-      "readAloudText": "Which attribute describes how heavy an object is?",
+      "readAloudText": "Which word means how heavy something is?",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"
@@ -4713,7 +4713,7 @@
           "Trip A",
           "Trip B"
         ],
-        "description": "Compare the recorded trip times.",
+        "description": "Look at how long each trip took.",
         "values": [
           5,
           2
@@ -4734,7 +4734,7 @@
       "version": "1.0.0-review.1",
       "form": "end",
       "correctAnswer": "Trip A",
-      "readAloudText": "Which activity lasted longer?",
+      "readAloudText": "Which activity lasted longer? Trip A: 5 hours. Trip B: 2 hours.",
       "primaryDescriptorCode": "AC9M1M01",
       "curriculumCodes": [
         "AC9M1M01"

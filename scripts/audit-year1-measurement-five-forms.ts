@@ -22,6 +22,8 @@ for(const bank of Object.values(forms)){
   else if(i===16){assert.equal(n[0],2*n[1]);expected='Its blocks are longer';}
   else if(i===17)expected=[v.labels[2],v.labels[0],v.labels[1]].join('||');
   else expected='The cubes have different masses';
+  if(i===0)assert.ok(!q.prompt.includes('attribute'));
+  if(i===12)for(let j=0;j<2;j++)assert.ok(q.readAloudText.includes(`${v.labels[j]}: ${n[j]} hours.`),q.id);
   assert.equal(q.correctAnswer,expected,q.id);assert.ok(isAssessmentAnswerCorrect(q,expected));assert.ok(!isAssessmentAnswerCorrect(q,'idk'));
   assert.equal(q.primaryDescriptorCode,blueprint[i][0]);assert.equal(q.difficulty,blueprint[i][2]);assert.ok(q.prompt.split(/\s+/).length<=12,q.id);
   if(q.type==='mcq')assert.equal(q.options!.filter(x=>isAssessmentAnswerCorrect(q,x)).length,1);

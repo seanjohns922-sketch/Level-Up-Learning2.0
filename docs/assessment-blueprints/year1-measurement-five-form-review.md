@@ -25,3 +25,8 @@ paths, ordering and consistency across forms. Manual child-view review remains.
 
 Review: Demo Review → Measurelands → Level 1 → Pre/Post or Start/Mid/End.
 These are protected review forms; existing Level 1 student banks are unchanged.
+
+Manual-review refinements: child-friendly mass wording; the existing lesson pencil
+image aligned with the equal blocks; clearer ribbon and box drawings; full trip
+times in question narration plus per-trip audio; and 2026 calendar grids for the
+month-length comparisons. All five forms share these refinements.
