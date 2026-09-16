@@ -40,16 +40,30 @@ function Circle({v}:{v:Measurement8Visual}){
  {!semi&&<circle cx={cx} cy={cy} r="4" fill={ink}/>}</Frame>;
 }
 function MapRoute({v}:{v:Measurement8Visual}){
- const two=v.variant==='mapRoute',unit=24,a=two?v.values[0]:v.values[1],b=two?v.values[1]:0,x=two?104:56+Math.floor((18-a)/2)*unit,y=two?260:116,bx=x+a*unit,cy=y-b*unit,gridBottom=two?284:188;
- return <svg viewBox={`0 0 560 ${two?350:254}`} aria-hidden="true" style={{maxWidth:560,width:'100%',maxHeight:two?300:218}}>
- <rect x="56" y="20" width="432" height={gridBottom-20} rx="8" fill="#eef3e5"/>
- <path d={two?"M60 50Q150 90 140 180T340 240T480 210":"M60 60Q150 105 250 65T480 165"} stroke="#cae4ed" strokeWidth="17" fill="none"/>
- {Array.from({length:19},(_,i)=><path key={`v${i}`} d={`M${56+i*24} 20V${gridBottom}`} stroke="#bdc9b1" strokeWidth="1"/>)}{Array.from({length:two?12:8},(_,i)=><path key={`h${i}`} d={`M56 ${20+i*24}H488`} stroke="#bdc9b1" strokeWidth="1"/>)}
- <path d={two?`M${x} ${y}H${bx}V${cy}`:`M${x} ${y}H${bx}`} fill="none" stroke="#8051a8" strokeWidth="5"/>
- {(two?[[x,y,'A'],[bx,y,'B'],[bx,cy,'C']]:[[x,y,'A'],[bx,y,'B']]).map(([px,py,label])=><g key={label}><circle cx={Number(px)} cy={Number(py)} r="5" fill="#583714"/>{txt(Number(px)-13,Number(py)-12,String(label))}</g>)}
- {txt((x+bx)/2,y-15,`${a} cm`)}{two&&txt(bx+14,(y+cy)/2,`${b} cm`,'start')}
- <path d={`M72 ${gridBottom+28}h24m-24-5v10m24-10v10`} stroke="#583714" strokeWidth="2"/>{txt(110,gridBottom+35,'1 grid square = 1 cm on the map','start')}
- </svg>;
+ const two=v.variant==='mapRoute',unit=two?26:40,a=two?v.values[0]:v.values[1],b=two?v.values[1]:0,x=two?112:(560-a*unit)/2,y=two?278:204,bx=x+a*unit,cy=y-b*unit;
+ const route=two?`M${x} ${y}H${bx}V${cy}`:`M${x} ${y}H${bx}`;
+ const pin=(px:number,py:number,label:string)=><g key={label}><path d={`M${px} ${py}c-5-8-12-15-12-23a12 12 0 1 1 24 0c0 8-7 15-12 23Z`} fill="#a33c41" stroke="white" strokeWidth="2"/><text x={px} y={py-20} textAnchor="middle" fontSize="14" fontWeight="800" fill="white">{label}</text></g>;
+ const badge=(px:number,py:number,label:string)=><g><rect x={px-36} y={py-18} width="72" height="27" rx="6" fill="#fffaf0" stroke="#8051a8"/><text x={px} y={py+1} textAnchor="middle" fontSize="19" fontWeight="700" fill={ink}>{label}</text></g>;
+ return <div className="w-full">
+ <svg viewBox="0 0 560 390" aria-hidden="true" style={{width:'100%',maxWidth:620,maxHeight:320,display:'block',margin:'auto'}}>
+ <rect x="20" y="20" width="520" height="302" rx="14" fill="#e6e9e8"/>
+ <path d="M22 42H149V105H22Z M380 35H522V121H425Z M33 255H95V309H33Z" fill="#bfddbc"/>
+ <path d="M24 144Q119 103 191 130T352 119T536 170" fill="none" stroke="#9bcde3" strokeWidth="23"/>
+ {[62,101,151,201,249,294].map((ry,i)=><path key={ry} d={`M30 ${ry}L530 ${ry+(i%2?14:-12)}`} stroke="white" strokeWidth="7" fill="none"/>)}
+ {[65,152,241,341,444,501].map((rx,i)=><path key={rx} d={`M${rx} 29L${rx+(i%2?20:-15)} 313`} stroke="white" strokeWidth="7" fill="none"/>)}
+ <path d="M38 306L150 222L221 153L333 37" stroke="#e1bf6b" strokeWidth="13" fill="none"/><path d="M38 306L150 222L221 153L333 37" stroke="#fff2b6" strokeWidth="7" fill="none"/>
+ <path d={two?`M35 ${y}H520M${bx} 35V310`:`M35 ${y}H520`} stroke="#c5cacc" strokeWidth="19" fill="none"/><path d={two?`M35 ${y}H520M${bx} 35V310`:`M35 ${y}H520`} stroke="white" strokeWidth="14" fill="none"/>
+ <g transform={`translate(${x-21} ${y+14})`}><rect width="42" height="22" rx="2" fill="#d9a86b" stroke="#8b6946"/><path d="M-4 0L21-15L46 0Z" fill="#a65e4e"/><rect x="17" y="10" width="9" height="12" fill="#6a737b"/><path d="M7 7h5m18 0h5" stroke="#e9f8ff" strokeWidth="5"/></g>
+ <g transform={`translate(${bx-21} ${y+14})`}><rect width="42" height="22" rx="2" fill="#8cabc4" stroke="#567185"/><path d="M-4 0L21-13L46 0Z" fill="#526e89"/><path d="M8 4v15m13-15v15m13-15v15" stroke="#eef5f4" strokeWidth="4"/></g>
+ {two&&<g transform={`translate(${bx+26} ${cy-14})`}><rect x="-8" y="-20" width="54" height="46" rx="8" fill="#bed9ad"/>{[4,27].map((tx,i)=><g key={tx}><path d={`M${tx} 4v16`} stroke="#977247" strokeWidth="4"/><circle cx={tx} cy={-3+i*5} r="12" fill="#6c9e64"/></g>)}</g>}
+ <path d={route} fill="none" stroke="white" strokeWidth="10" strokeLinejoin="round"/><path d={route} fill="none" stroke="#8051a8" strokeWidth="6" strokeLinejoin="round"/>
+ {pin(x,y,'A')}{pin(bx,y,'B')}{two&&pin(bx,cy,'C')}
+ {badge((x+bx)/2,y-50,`${a} cm`)}{two&&badge(bx+50,(y+cy)/2,`${b} cm`)}
+ <path d={`M42 350h${unit}m-${unit}-5v10m${unit}-10v10`} stroke={ink} strokeWidth="2"/>
+ <text x={60+unit} y="356" fill={ink} fontSize="18" fontWeight="700">1 cm on the original map</text>
+ </svg>
+ <p className="text-center text-base font-bold">{two?'A — School → B — Library → C — Park':'A — School → B — Library'}</p>
+ </div>;
 }
 export function measurement8Speech(v:Measurement8Visual){
  const n=v.values,u=v.unit??'';let detail='';
@@ -60,7 +74,7 @@ export function measurement8Speech(v:Measurement8Visual){
  if(v.task==='rightTriangle')detail=`Horizontal side ${n[0]} ${u}. Vertical side ${v.unknown==='height'?'x':n[1]} ${u}. Hypotenuse ${v.unknown==='hypotenuse'?'x':n[2]} ${u}. The square marks the right angle.`;
  if(v.task==='diagonal')detail=`Rectangular floor: ${n[0]} metres by ${n[1]} metres. Diagonal cable marked x.`;
  if(v.task==='circle')detail=v.variant==='ring'?`Outer radius ${n[0]} metres. Inner radius ${n[1]} metres. The ring between the circles is shaded.`:v.variant==='unknownRadius'?'The radius is unknown.':`${v.variant==='diameter'||v.variant==='semicircle'?'Diameter':'Radius'} ${n[0]} ${u}.`;
- if(v.variant==='map'||v.variant==='mapRoute')detail=v.variant==='mapRoute'?`Route A to B: ${n[0]} centimetres on the map. Route B to C: ${n[1]} centimetres on the map. One grid square represents one centimetre on the map.`:`Route A to B: ${n[1]} centimetres on the map. One grid square represents one centimetre on the map.`;
+ if(v.variant==='map'||v.variant==='mapRoute')detail=v.variant==='mapRoute'?`A is the school. B is the library. C is the park. Route A to B: ${n[0]} centimetres on the map. Route B to C: ${n[1]} centimetres on the map. The reference bar represents one centimetre on the original map.`:`A is the school. B is the library. Route A to B: ${n[1]} centimetres on the map. The reference bar represents one centimetre on the original map.`;
  return [v.description,...v.labels??[],detail,...v.rows?.map(r=>`${r.label}. UTC ${r.offset>=0?'plus':'minus'} ${Math.abs(r.offset)} hours. ${r.detail}.`)??[]].filter(Boolean).join(' ');
 }
 export default function Year8MeasurementAssessmentVisual({visual:v}:{visual:Measurement8Visual}){

@@ -30,6 +30,6 @@ Question 15 already assesses composite area with a triangle and rectangle; Quest
 
 The forms now mirror L-shapes, notches, right triangles, circle diagrams and diagonal diagrams with upright labels. Contextual walls/gables and ladders only reflect horizontally so they remain physically sensible. Numeric proportions also vary; equivalent mathematical skills and scoring are preserved.
 
-Both map questions use a controlled 1 cm reference grid and labelled segments. Distances are lengths on the original map, not physical centimetres on a device screen. City cards have distinct illustrative landmarks, and water questions show a three-dimensional tank or bucket. City artwork is decorative and does not indicate the unknown time of day. All new given text is narrated.
+Both map questions use custom street maps with school/library/park landmarks, a controlled 1 cm reference bar and labelled highlighted street segments. Distances are lengths on the original map, not physical centimetres on a device screen. City cards have distinct illustrative landmarks, and water questions show a three-dimensional tank or bucket. City artwork is decorative and does not indicate the unknown time of day. All new given text is narrated.
 
 Coverage remains a descriptor-level sample, not every elaboration: irregular-boundary approximation, cultural investigations and the full open-ended modelling process are not directly assessed by this bank. Financial elaborations remain excluded under the user's no-money scope.

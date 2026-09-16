@@ -310,7 +310,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
+        "description": "The highlighted street joins the school and library. Use its labelled map length and the scale below.",
         "values": [
           25000,
           4
@@ -1396,7 +1396,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
+        "description": "Follow the highlighted streets from the school to the library, then to the park. Use the labelled map lengths. Walk at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           3,
           4,
@@ -1871,7 +1871,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
+        "description": "The highlighted street joins the school and library. Use its labelled map length and the scale below.",
         "values": [
           30000,
           5
@@ -2957,7 +2957,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
+        "description": "Follow the highlighted streets from the school to the library, then to the park. Use the labelled map lengths. Walk at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           4,
           5,
@@ -3432,7 +3432,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
+        "description": "The highlighted street joins the school and library. Use its labelled map length and the scale below.",
         "values": [
           35000,
           6
@@ -4518,7 +4518,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
+        "description": "Follow the highlighted streets from the school to the library, then to the park. Use the labelled map lengths. Walk at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           5,
           6,
@@ -4993,7 +4993,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
+        "description": "The highlighted street joins the school and library. Use its labelled map length and the scale below.",
         "values": [
           40000,
           7
@@ -6079,7 +6079,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
+        "description": "Follow the highlighted streets from the school to the library, then to the park. Use the labelled map lengths. Walk at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           6,
           7,
@@ -6554,7 +6554,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Use the labelled map length, not a ruler on your screen.",
+        "description": "The highlighted street joins the school and library. Use its labelled map length and the scale below.",
         "values": [
           45000,
           8
@@ -7640,7 +7640,7 @@
       "visual": {
         "type": "measurement_year8_panel",
         "task": "model",
-        "description": "Each grid square represents 1 cm on the original map. Follow A to B to C at the stated speed, then rest. Round the total UP to a whole minute.",
+        "description": "Follow the highlighted streets from the school to the library, then to the park. Use the labelled map lengths. Walk at the stated speed, then rest. Round the total UP to a whole minute.",
         "values": [
           7,
           8,
