@@ -8,6 +8,8 @@ import AssessmentQuestionCard from "@/components/assessment/AssessmentQuestionCa
 import ReadAloudBtn, { ReadAloudRateProvider } from "@/components/ReadAloudBtn";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { isAssessmentAnswerCorrect } from "@/data/assessments/analysis";
+import { MeasurelandsAssessmentTask } from "@/components/assessment/MeasurelandsAssessmentTask";
+import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type CardQuestion = Parameters<typeof AssessmentQuestionCard>[0]["question"];
 type ScoredQuestion = Parameters<typeof isAssessmentAnswerCorrect>[0];
@@ -21,6 +23,7 @@ export type FiveFormReviewItem = {
   skillLabel?: string;
   primaryDescriptorCode?: string;
   difficulty?: string;
+  practiceTask?: PracticeTask;
 };
 
 const buttonClass = "min-h-11 rounded-lg border px-4 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 ";
@@ -107,13 +110,25 @@ export default function FiveFormAssessmentReview<Form extends string>({
         questionPrompt={question.prompt}
         promptAction={<ReadAloudBtn text={question.readAloudText ?? question.prompt} />}
         questionContent={<>
-          <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value === "idk" ? "" : value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
+          {question.practiceTask ? (
+            <MeasurelandsAssessmentTask
+              key={question.id}
+              questionId={question.id}
+              task={question.practiceTask}
+              value={value === "idk" ? "" : value}
+              correctToken={question.correctAnswer}
+              onRecord={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))}
+              onClear={() => setAnswers((previous) => ({ ...previous, [question.id]: "" }))}
+            />
+          ) : (
+            <AssessmentQuestionCard key={question.id} question={question as unknown as CardQuestion} value={value === "idk" ? "" : value} onChange={(answer) => setAnswers((previous) => ({ ...previous, [question.id]: answer }))} realmId={realmId} />
+          )}
           {value === "idk" ? <p role="status" className="mt-3" style={{color:theme.chipText}}>Marked “I don’t know”. You can still answer this question.</p> : null}
           <details className="mt-5 rounded-lg border p-4" style={panelStyle}>
             <summary className="cursor-pointer font-bold">Review details</summary>
             <p className="mt-3 text-sm">{question.primaryDescriptorCode} · {question.skillLabel} · Intended difficulty: {question.difficulty}</p>
             <button type="button" className={`${buttonClass} mt-3`} style={buttonStyle} onClick={() => setShowAnswer((previous) => !previous)}>{showAnswer ? "Hide answer" : "Show answer"}</button>
-            {showAnswer ? <p className="mt-3 font-bold">Answer: {formatMeasurelandsReviewAnswer(question.correctAnswer,question.answerFormat)}{value ? ` · Your answer: ${scored(question) ? "correct" : "incorrect"}` : ""}</p> : null}
+            {showAnswer ? <p className="mt-3 font-bold">{question.practiceTask ? "Expected response: complete the interactive task correctly." : `Answer: ${formatMeasurelandsReviewAnswer(question.correctAnswer,question.answerFormat)}`}{value ? ` · Your answer: ${scored(question) ? "correct" : "incorrect"}` : ""}</p> : null}
           </details>
           {finished[form] ? (
             <div role="status" className="mt-5 rounded-lg border p-4" style={panelStyle}>

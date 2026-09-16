@@ -79,6 +79,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 };
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
+  if(realm === "space" && year === "Prep") return `/demo-review/starpath-ground?form=${kind}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${kind}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${kind}`;
   if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${kind}`;
@@ -110,6 +111,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 };
 
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
+  if(realm === "space" && year === "Prep") return `/demo-review/starpath-ground?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${checkpoint}`;
