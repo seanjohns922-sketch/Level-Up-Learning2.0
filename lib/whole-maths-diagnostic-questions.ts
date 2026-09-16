@@ -1,3 +1,4 @@
+import { YEAR2_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year2Measurement';
 import { YEAR1_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year1Measurement';
 import { GROUND_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/groundMeasurement';
 import { YEAR3_NUMBER_RELEASED_FORMS } from "@/data/assessments/revisions/year3NumberReleasedForms";
@@ -52,14 +53,17 @@ export function getDiagnosticQuestions(
   numberMaximumLevel: 6 | 7 | 8 = 6,
   groundMeasurementVersion: 3 | 4 = 3,
   year1MeasurementVersion:3|4=3,
+  year2MeasurementVersion:3|4=3,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   if (strand === "number" && Number(level.replace(/\D/g, "")) > numberMaximumLevel) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
-  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3);
-  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3)?.questions ?? [];
-  const levelTest = strand === "measurement" && level === "Year 1" && year1MeasurementVersion===4
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3)?.questions ?? [];
+  const levelTest = strand === "measurement" && level === "Year 2" && year2MeasurementVersion===4
+    ? YEAR2_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
+    : strand === "measurement" && level === "Year 1" && year1MeasurementVersion===4
     ? YEAR1_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]
     : strand === "measurement" && level === "Prep" && groundMeasurementVersion===4
     ? GROUND_MEASUREMENT_RELEASED_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint]

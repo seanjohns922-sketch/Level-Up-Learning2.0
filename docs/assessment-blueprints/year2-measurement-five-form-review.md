@@ -24,7 +24,7 @@ Readable time choices replace four-digit time entry. Long misconception stories
 become concise illustrated tasks. Calendar questions now show actual dates.
 
 Review: Demo Review → Measurelands → Level 2 → Pre/Post or Start/Mid/End.
-Review-only pending approval; existing Level 2 student banks remain unchanged.
+Approved for student release: frozen v4 pre/post and Start/Mid/End banks. Existing saved attempts and academic-year diagnostic cycles retain v3 for comparable results. Calendar instructions match Week 7: count one-day jumps, not the starting date.
 
 Lesson asset pass: reuse `MeasurelandsAnalogClockCard.ClockFace` for all four
 clock slots; `week2-3d/book.png`, `week2-3d/apple.png`, and container jug/bucket/

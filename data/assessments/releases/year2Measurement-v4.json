@@ -29,8 +29,8 @@
         "B",
         "C"
       ],
-      "id": "y2-measurement-review-pretest-01",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-01-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which row measures the strip correctly?",
@@ -55,7 +55,9 @@
         "correctResponse": "A"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What fraction of the sandwich is shaded?",
@@ -74,8 +76,8 @@
         "One eighth",
         "One half"
       ],
-      "id": "y2-measurement-review-pretest-02",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-02-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What fraction of the sandwich is shaded?",
@@ -100,7 +102,9 @@
         "correctResponse": "One quarter"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How many days pass from planting to checking?",
@@ -116,8 +120,8 @@
           10
         ]
       },
-      "id": "y2-measurement-review-pretest-03",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-03-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many days pass from planting to checking? Planting: 5 April. Checking: 10 April. Count the one-day jumps from planting to checking.",
@@ -142,7 +146,9 @@
         "correctResponse": "5"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -160,8 +166,8 @@
         "4 o'clock",
         "Half past 3"
       ],
-      "id": "y2-measurement-review-pretest-04",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-04-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -186,7 +192,9 @@
         "correctResponse": "3 o'clock"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -204,8 +212,8 @@
         "Full turn",
         "Quarter turn"
       ],
-      "id": "y2-measurement-review-pretest-05",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-05-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -230,7 +238,9 @@
         "correctResponse": "Quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How many blocks longer is ribbon A?",
@@ -249,8 +259,8 @@
         ],
         "unit": "blocks"
       },
-      "id": "y2-measurement-review-pretest-06",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-06-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many blocks longer is ribbon A?",
@@ -275,7 +285,9 @@
         "correctResponse": "3"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What fraction of the ribbon is shaded?",
@@ -294,8 +306,8 @@
         "One half",
         "One eighth"
       ],
-      "id": "y2-measurement-review-pretest-07",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-07-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What fraction of the ribbon is shaded?",
@@ -320,7 +332,9 @@
         "correctResponse": "One eighth"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What date is four days after 13 April?",
@@ -335,8 +349,8 @@
           13
         ]
       },
-      "id": "y2-measurement-review-pretest-08",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-08-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What date is four days after 13 April? Start at 13 April. Count forward four one-day jumps. Enter the date number.",
@@ -361,7 +375,9 @@
         "correctResponse": "17"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -379,8 +395,8 @@
         "Half past 6",
         "6 o'clock"
       ],
-      "id": "y2-measurement-review-pretest-09",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-09-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -405,7 +421,9 @@
         "correctResponse": "Half past 6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "The pointer makes a half turn. Where will it point?",
@@ -423,8 +441,8 @@
         "Down",
         "Left"
       ],
-      "id": "y2-measurement-review-pretest-10",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-10-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "The pointer makes a half turn. Where will it point?",
@@ -449,7 +467,9 @@
         "correctResponse": "Down"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How many cubes heavier is the book?",
@@ -472,8 +492,8 @@
           "week2-3d/apple.png"
         ]
       },
-      "id": "y2-measurement-review-pretest-11",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-11-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many cubes heavier is the book?",
@@ -498,7 +518,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How many more cups fit in B than A?",
@@ -524,8 +546,8 @@
           "containers/bottle.png"
         ]
       },
-      "id": "y2-measurement-review-pretest-12",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-12-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many more cups fit in B than A?",
@@ -550,7 +572,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "Are these two pieces halves?",
@@ -570,8 +594,8 @@
         "No, the pieces are not equal",
         "Yes, both pieces are paper"
       ],
-      "id": "y2-measurement-review-pretest-13",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-13-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Are these two pieces halves?",
@@ -596,7 +620,9 @@
         "correctResponse": "No, the pieces are not equal"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What date is two weeks after 3 April?",
@@ -611,8 +637,8 @@
           3
         ]
       },
-      "id": "y2-measurement-review-pretest-14",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-14-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What date is two weeks after 3 April? Start at 3 April. Count forward two weeks. Enter the date number.",
@@ -637,7 +663,9 @@
         "correctResponse": "17"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -655,8 +683,8 @@
         "Quarter past 8",
         "Quarter to 8"
       ],
-      "id": "y2-measurement-review-pretest-15",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-15-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -681,7 +709,9 @@
         "correctResponse": "Quarter past 8"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -699,8 +729,8 @@
         "Half turn",
         "Three-quarter turn"
       ],
-      "id": "y2-measurement-review-pretest-16",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-16-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -725,7 +755,9 @@
         "correctResponse": "Three-quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "Which blocks measure the ribbon more accurately?",
@@ -742,8 +774,8 @@
         "Either size gives the same detail",
         "Large blocks"
       ],
-      "id": "y2-measurement-review-pretest-17",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-17-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which blocks measure the ribbon more accurately?",
@@ -768,7 +800,9 @@
         "correctResponse": "Small blocks"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "Which day is 11 April?",
@@ -788,8 +822,8 @@
         "Saturday",
         "Sunday"
       ],
-      "id": "y2-measurement-review-pretest-18",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-18-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which day is 11 April?",
@@ -814,7 +848,9 @@
         "correctResponse": "Saturday"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -832,8 +868,8 @@
         "Quarter to 4",
         "Quarter past 4"
       ],
-      "id": "y2-measurement-review-pretest-19",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-19-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -858,7 +894,9 @@
         "correctResponse": "Quarter to 5"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -876,8 +914,8 @@
         "Full turn",
         "Half turn"
       ],
-      "id": "y2-measurement-review-pretest-20",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-pre-20-v4",
+      "version": "4.0.0",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -902,7 +940,9 @@
         "correctResponse": "Full turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-pretest-v4",
+      "sourcePool": "pretest"
     }
   ],
   "posttest": [
@@ -935,8 +975,8 @@
         "C",
         "A"
       ],
-      "id": "y2-measurement-review-posttest-01",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-01-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which row measures the strip correctly?",
@@ -961,7 +1001,9 @@
         "correctResponse": "B"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the sandwich is shaded?",
@@ -980,8 +1022,8 @@
         "One half",
         "One quarter"
       ],
-      "id": "y2-measurement-review-posttest-02",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-02-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What fraction of the sandwich is shaded?",
@@ -1006,7 +1048,9 @@
         "correctResponse": "One quarter"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many days pass from planting to checking?",
@@ -1022,8 +1066,8 @@
           12
         ]
       },
-      "id": "y2-measurement-review-posttest-03",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-03-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many days pass from planting to checking? Planting: 6 June. Checking: 12 June. Count the one-day jumps from planting to checking.",
@@ -1048,7 +1092,9 @@
         "correctResponse": "6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -1066,8 +1112,8 @@
         "Half past 4",
         "4 o'clock"
       ],
-      "id": "y2-measurement-review-posttest-04",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-04-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -1092,7 +1138,9 @@
         "correctResponse": "4 o'clock"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -1110,8 +1158,8 @@
         "Quarter turn",
         "Half turn"
       ],
-      "id": "y2-measurement-review-posttest-05",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-05-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -1136,7 +1184,9 @@
         "correctResponse": "Quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many blocks longer is ribbon A?",
@@ -1155,8 +1205,8 @@
         ],
         "unit": "blocks"
       },
-      "id": "y2-measurement-review-posttest-06",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-06-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many blocks longer is ribbon A?",
@@ -1181,7 +1231,9 @@
         "correctResponse": "3"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the ribbon is shaded?",
@@ -1200,8 +1252,8 @@
         "One eighth",
         "One quarter"
       ],
-      "id": "y2-measurement-review-posttest-07",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-07-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What fraction of the ribbon is shaded?",
@@ -1226,7 +1278,9 @@
         "correctResponse": "One eighth"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is four days after 14 June?",
@@ -1241,8 +1295,8 @@
           14
         ]
       },
-      "id": "y2-measurement-review-posttest-08",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-08-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What date is four days after 14 June? Start at 14 June. Count forward four one-day jumps. Enter the date number.",
@@ -1267,7 +1321,9 @@
         "correctResponse": "18"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -1285,8 +1341,8 @@
         "7 o'clock",
         "Half past 8"
       ],
-      "id": "y2-measurement-review-posttest-09",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-09-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -1311,7 +1367,9 @@
         "correctResponse": "Half past 7"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "The pointer makes a half turn. Where will it point?",
@@ -1329,8 +1387,8 @@
         "Up",
         "Down"
       ],
-      "id": "y2-measurement-review-posttest-10",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-10-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "The pointer makes a half turn. Where will it point?",
@@ -1355,7 +1413,9 @@
         "correctResponse": "Left"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many cubes heavier is the book?",
@@ -1378,8 +1438,8 @@
           "week2-3d/apple.png"
         ]
       },
-      "id": "y2-measurement-review-posttest-11",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-11-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many cubes heavier is the book?",
@@ -1404,7 +1464,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many more cups fit in B than A?",
@@ -1430,8 +1492,8 @@
           "containers/bottle.png"
         ]
       },
-      "id": "y2-measurement-review-posttest-12",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-12-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many more cups fit in B than A?",
@@ -1456,7 +1518,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Are these two pieces halves?",
@@ -1476,8 +1540,8 @@
         "Yes, both pieces are paper",
         "Yes, there are two pieces"
       ],
-      "id": "y2-measurement-review-posttest-13",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-13-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Are these two pieces halves?",
@@ -1502,7 +1566,9 @@
         "correctResponse": "No, the pieces are not equal"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is two weeks after 4 June?",
@@ -1517,8 +1583,8 @@
           4
         ]
       },
-      "id": "y2-measurement-review-posttest-14",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-14-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What date is two weeks after 4 June? Start at 4 June. Count forward two weeks. Enter the date number.",
@@ -1543,7 +1609,9 @@
         "correctResponse": "18"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -1561,8 +1629,8 @@
         "Quarter to 9",
         "Half past 9"
       ],
-      "id": "y2-measurement-review-posttest-15",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-15-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -1587,7 +1655,9 @@
         "correctResponse": "Quarter past 9"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -1605,8 +1675,8 @@
         "Three-quarter turn",
         "Quarter turn"
       ],
-      "id": "y2-measurement-review-posttest-16",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-16-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -1631,7 +1701,9 @@
         "correctResponse": "Three-quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which blocks measure the ribbon more accurately?",
@@ -1648,8 +1720,8 @@
         "Large blocks",
         "Small blocks"
       ],
-      "id": "y2-measurement-review-posttest-17",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-17-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which blocks measure the ribbon more accurately?",
@@ -1674,7 +1746,9 @@
         "correctResponse": "Small blocks"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which day is 12 June?",
@@ -1694,8 +1768,8 @@
         "Saturday",
         "Thursday"
       ],
-      "id": "y2-measurement-review-posttest-18",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-18-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which day is 12 June?",
@@ -1720,7 +1794,9 @@
         "correctResponse": "Friday"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -1738,8 +1814,8 @@
         "Quarter past 5",
         "Quarter to 6"
       ],
-      "id": "y2-measurement-review-posttest-19",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-19-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -1764,7 +1840,9 @@
         "correctResponse": "Quarter to 6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -1782,8 +1860,8 @@
         "Half turn",
         "Three-quarter turn"
       ],
-      "id": "y2-measurement-review-posttest-20",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-post-20-v4",
+      "version": "4.0.0",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -1808,7 +1886,9 @@
         "correctResponse": "Full turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-posttest-v4",
+      "sourcePool": "posttest"
     }
   ],
   "start": [
@@ -1841,8 +1921,8 @@
         "A",
         "B"
       ],
-      "id": "y2-measurement-review-start-01",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-01-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which row measures the strip correctly?",
@@ -1867,7 +1947,9 @@
         "correctResponse": "C"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the sandwich is shaded?",
@@ -1886,8 +1968,8 @@
         "One quarter",
         "One eighth"
       ],
-      "id": "y2-measurement-review-start-02",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-02-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What fraction of the sandwich is shaded?",
@@ -1912,7 +1994,9 @@
         "correctResponse": "One quarter"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many days pass from planting to checking?",
@@ -1928,8 +2012,8 @@
           12
         ]
       },
-      "id": "y2-measurement-review-start-03",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-03-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many days pass from planting to checking? Planting: 7 September. Checking: 12 September. Count the one-day jumps from planting to checking.",
@@ -1954,7 +2038,9 @@
         "correctResponse": "5"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -1972,8 +2058,8 @@
         "5 o'clock",
         "6 o'clock"
       ],
-      "id": "y2-measurement-review-start-04",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-04-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -1998,7 +2084,9 @@
         "correctResponse": "5 o'clock"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -2016,8 +2104,8 @@
         "Half turn",
         "Full turn"
       ],
-      "id": "y2-measurement-review-start-05",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-05-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -2042,7 +2130,9 @@
         "correctResponse": "Quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many blocks longer is ribbon A?",
@@ -2061,8 +2151,8 @@
         ],
         "unit": "blocks"
       },
-      "id": "y2-measurement-review-start-06",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-06-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many blocks longer is ribbon A?",
@@ -2087,7 +2177,9 @@
         "correctResponse": "3"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the ribbon is shaded?",
@@ -2106,8 +2198,8 @@
         "One quarter",
         "One half"
       ],
-      "id": "y2-measurement-review-start-07",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-07-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What fraction of the ribbon is shaded?",
@@ -2132,7 +2224,9 @@
         "correctResponse": "One eighth"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is four days after 15 September?",
@@ -2147,8 +2241,8 @@
           15
         ]
       },
-      "id": "y2-measurement-review-start-08",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-08-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What date is four days after 15 September? Start at 15 September. Count forward four one-day jumps. Enter the date number.",
@@ -2173,7 +2267,9 @@
         "correctResponse": "19"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -2191,8 +2287,8 @@
         "Half past 9",
         "Half past 8"
       ],
-      "id": "y2-measurement-review-start-09",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-09-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -2217,7 +2313,9 @@
         "correctResponse": "Half past 8"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "The pointer makes a half turn. Where will it point?",
@@ -2235,8 +2333,8 @@
         "Left",
         "Up"
       ],
-      "id": "y2-measurement-review-start-10",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-10-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "The pointer makes a half turn. Where will it point?",
@@ -2261,7 +2359,9 @@
         "correctResponse": "Up"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many cubes heavier is the book?",
@@ -2284,8 +2384,8 @@
           "week2-3d/apple.png"
         ]
       },
-      "id": "y2-measurement-review-start-11",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-11-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many cubes heavier is the book?",
@@ -2310,7 +2410,9 @@
         "correctResponse": "6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many more cups fit in B than A?",
@@ -2336,8 +2438,8 @@
           "containers/bottle.png"
         ]
       },
-      "id": "y2-measurement-review-start-12",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-12-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many more cups fit in B than A?",
@@ -2362,7 +2464,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Are these two pieces halves?",
@@ -2382,8 +2486,8 @@
         "Yes, there are two pieces",
         "No, the pieces are not equal"
       ],
-      "id": "y2-measurement-review-start-13",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-13-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Are these two pieces halves?",
@@ -2408,7 +2512,9 @@
         "correctResponse": "No, the pieces are not equal"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is two weeks after 5 September?",
@@ -2423,8 +2529,8 @@
           5
         ]
       },
-      "id": "y2-measurement-review-start-14",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-14-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What date is two weeks after 5 September? Start at 5 September. Count forward two weeks. Enter the date number.",
@@ -2449,7 +2555,9 @@
         "correctResponse": "19"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -2467,8 +2575,8 @@
         "Half past 10",
         "Quarter past 10"
       ],
-      "id": "y2-measurement-review-start-15",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-15-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -2493,7 +2601,9 @@
         "correctResponse": "Quarter past 10"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -2511,8 +2621,8 @@
         "Quarter turn",
         "Half turn"
       ],
-      "id": "y2-measurement-review-start-16",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-16-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -2537,7 +2647,9 @@
         "correctResponse": "Three-quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which blocks measure the ribbon more accurately?",
@@ -2554,8 +2666,8 @@
         "Small blocks",
         "Either size gives the same detail"
       ],
-      "id": "y2-measurement-review-start-17",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-17-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which blocks measure the ribbon more accurately?",
@@ -2580,7 +2692,9 @@
         "correctResponse": "Small blocks"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which day is 13 September?",
@@ -2600,8 +2714,8 @@
         "Saturday",
         "Sunday"
       ],
-      "id": "y2-measurement-review-start-18",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-18-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which day is 13 September?",
@@ -2626,7 +2740,9 @@
         "correctResponse": "Sunday"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -2644,8 +2760,8 @@
         "Quarter to 7",
         "Quarter to 6"
       ],
-      "id": "y2-measurement-review-start-19",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-19-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -2670,7 +2786,9 @@
         "correctResponse": "Quarter to 7"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -2688,8 +2806,8 @@
         "Three-quarter turn",
         "Full turn"
       ],
-      "id": "y2-measurement-review-start-20",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-start-20-v4",
+      "version": "4.0.0",
       "form": "start",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -2714,7 +2832,9 @@
         "correctResponse": "Full turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-start-v4",
+      "sourcePool": "posttest"
     }
   ],
   "mid": [
@@ -2747,8 +2867,8 @@
         "B",
         "C"
       ],
-      "id": "y2-measurement-review-mid-01",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-01-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which row measures the strip correctly?",
@@ -2773,7 +2893,9 @@
         "correctResponse": "A"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the sandwich is shaded?",
@@ -2792,8 +2914,8 @@
         "One eighth",
         "One half"
       ],
-      "id": "y2-measurement-review-mid-02",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-02-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What fraction of the sandwich is shaded?",
@@ -2818,7 +2940,9 @@
         "correctResponse": "One quarter"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many days pass from planting to checking?",
@@ -2834,8 +2958,8 @@
           14
         ]
       },
-      "id": "y2-measurement-review-mid-03",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-03-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many days pass from planting to checking? Planting: 8 November. Checking: 14 November. Count the one-day jumps from planting to checking.",
@@ -2860,7 +2984,9 @@
         "correctResponse": "6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -2878,8 +3004,8 @@
         "7 o'clock",
         "Half past 6"
       ],
-      "id": "y2-measurement-review-mid-04",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-04-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -2904,7 +3030,9 @@
         "correctResponse": "6 o'clock"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -2922,8 +3050,8 @@
         "Full turn",
         "Quarter turn"
       ],
-      "id": "y2-measurement-review-mid-05",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-05-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -2948,7 +3076,9 @@
         "correctResponse": "Quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many blocks longer is ribbon A?",
@@ -2967,8 +3097,8 @@
         ],
         "unit": "blocks"
       },
-      "id": "y2-measurement-review-mid-06",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-06-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many blocks longer is ribbon A?",
@@ -2993,7 +3123,9 @@
         "correctResponse": "3"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the ribbon is shaded?",
@@ -3012,8 +3144,8 @@
         "One half",
         "One eighth"
       ],
-      "id": "y2-measurement-review-mid-07",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-07-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What fraction of the ribbon is shaded?",
@@ -3038,7 +3170,9 @@
         "correctResponse": "One eighth"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is four days after 16 November?",
@@ -3053,8 +3187,8 @@
           16
         ]
       },
-      "id": "y2-measurement-review-mid-08",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-08-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What date is four days after 16 November? Start at 16 November. Count forward four one-day jumps. Enter the date number.",
@@ -3079,7 +3213,9 @@
         "correctResponse": "20"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -3097,8 +3233,8 @@
         "Half past 9",
         "9 o'clock"
       ],
-      "id": "y2-measurement-review-mid-09",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-09-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -3123,7 +3259,9 @@
         "correctResponse": "Half past 9"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "The pointer makes a half turn. Where will it point?",
@@ -3141,8 +3279,8 @@
         "Right",
         "Down"
       ],
-      "id": "y2-measurement-review-mid-10",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-10-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "The pointer makes a half turn. Where will it point?",
@@ -3167,7 +3305,9 @@
         "correctResponse": "Right"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many cubes heavier is the book?",
@@ -3190,8 +3330,8 @@
           "week2-3d/apple.png"
         ]
       },
-      "id": "y2-measurement-review-mid-11",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-11-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many cubes heavier is the book?",
@@ -3216,7 +3356,9 @@
         "correctResponse": "6"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many more cups fit in B than A?",
@@ -3242,8 +3384,8 @@
           "containers/bottle.png"
         ]
       },
-      "id": "y2-measurement-review-mid-12",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-12-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many more cups fit in B than A?",
@@ -3268,7 +3410,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Are these two pieces halves?",
@@ -3288,8 +3432,8 @@
         "No, the pieces are not equal",
         "Yes, both pieces are paper"
       ],
-      "id": "y2-measurement-review-mid-13",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-13-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Are these two pieces halves?",
@@ -3314,7 +3458,9 @@
         "correctResponse": "No, the pieces are not equal"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is two weeks after 6 November?",
@@ -3329,8 +3475,8 @@
           6
         ]
       },
-      "id": "y2-measurement-review-mid-14",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-14-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What date is two weeks after 6 November? Start at 6 November. Count forward two weeks. Enter the date number.",
@@ -3355,7 +3501,9 @@
         "correctResponse": "20"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -3373,8 +3521,8 @@
         "Quarter past 11",
         "Quarter to 11"
       ],
-      "id": "y2-measurement-review-mid-15",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-15-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -3399,7 +3547,9 @@
         "correctResponse": "Quarter past 11"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -3417,8 +3567,8 @@
         "Half turn",
         "Three-quarter turn"
       ],
-      "id": "y2-measurement-review-mid-16",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-16-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -3443,7 +3593,9 @@
         "correctResponse": "Three-quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which blocks measure the ribbon more accurately?",
@@ -3460,8 +3612,8 @@
         "Either size gives the same detail",
         "Large blocks"
       ],
-      "id": "y2-measurement-review-mid-17",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-17-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which blocks measure the ribbon more accurately?",
@@ -3486,7 +3638,9 @@
         "correctResponse": "Small blocks"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which day is 14 November?",
@@ -3506,8 +3660,8 @@
         "Saturday",
         "Sunday"
       ],
-      "id": "y2-measurement-review-mid-18",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-18-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which day is 14 November?",
@@ -3532,7 +3686,9 @@
         "correctResponse": "Saturday"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -3550,8 +3706,8 @@
         "Quarter to 7",
         "Quarter past 7"
       ],
-      "id": "y2-measurement-review-mid-19",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-19-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -3576,7 +3732,9 @@
         "correctResponse": "Quarter to 8"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -3594,8 +3752,8 @@
         "Full turn",
         "Half turn"
       ],
-      "id": "y2-measurement-review-mid-20",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-mid-20-v4",
+      "version": "4.0.0",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -3620,7 +3778,9 @@
         "correctResponse": "Full turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-mid-v4",
+      "sourcePool": "posttest"
     }
   ],
   "end": [
@@ -3653,8 +3813,8 @@
         "C",
         "A"
       ],
-      "id": "y2-measurement-review-end-01",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-01-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which row measures the strip correctly?",
@@ -3679,7 +3839,9 @@
         "correctResponse": "B"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the sandwich is shaded?",
@@ -3698,8 +3860,8 @@
         "One half",
         "One quarter"
       ],
-      "id": "y2-measurement-review-end-02",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-02-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What fraction of the sandwich is shaded?",
@@ -3724,7 +3886,9 @@
         "correctResponse": "One quarter"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many days pass from planting to checking?",
@@ -3740,8 +3904,8 @@
           14
         ]
       },
-      "id": "y2-measurement-review-end-03",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-03-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many days pass from planting to checking? Planting: 9 May. Checking: 14 May. Count the one-day jumps from planting to checking.",
@@ -3766,7 +3930,9 @@
         "correctResponse": "5"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -3784,8 +3950,8 @@
         "Half past 7",
         "7 o'clock"
       ],
-      "id": "y2-measurement-review-end-04",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-04-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -3810,7 +3976,9 @@
         "correctResponse": "7 o'clock"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -3828,8 +3996,8 @@
         "Quarter turn",
         "Half turn"
       ],
-      "id": "y2-measurement-review-end-05",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-05-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -3854,7 +4022,9 @@
         "correctResponse": "Quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many blocks longer is ribbon A?",
@@ -3873,8 +4043,8 @@
         ],
         "unit": "blocks"
       },
-      "id": "y2-measurement-review-end-06",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-06-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many blocks longer is ribbon A?",
@@ -3899,7 +4069,9 @@
         "correctResponse": "3"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What fraction of the ribbon is shaded?",
@@ -3918,8 +4090,8 @@
         "One eighth",
         "One quarter"
       ],
-      "id": "y2-measurement-review-end-07",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-07-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What fraction of the ribbon is shaded?",
@@ -3944,7 +4116,9 @@
         "correctResponse": "One eighth"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is four days after 17 May?",
@@ -3959,8 +4133,8 @@
           17
         ]
       },
-      "id": "y2-measurement-review-end-08",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-08-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What date is four days after 17 May? Start at 17 May. Count forward four one-day jumps. Enter the date number.",
@@ -3985,7 +4159,9 @@
         "correctResponse": "21"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -4003,8 +4179,8 @@
         "10 o'clock",
         "Half past 11"
       ],
-      "id": "y2-measurement-review-end-09",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-09-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -4029,7 +4205,9 @@
         "correctResponse": "Half past 10"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "The pointer makes a half turn. Where will it point?",
@@ -4047,8 +4225,8 @@
         "Left",
         "Right"
       ],
-      "id": "y2-measurement-review-end-10",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-10-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "The pointer makes a half turn. Where will it point?",
@@ -4073,7 +4251,9 @@
         "correctResponse": "Down"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many cubes heavier is the book?",
@@ -4096,8 +4276,8 @@
           "week2-3d/apple.png"
         ]
       },
-      "id": "y2-measurement-review-end-11",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-11-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many cubes heavier is the book?",
@@ -4122,7 +4302,9 @@
         "correctResponse": "8"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How many more cups fit in B than A?",
@@ -4148,8 +4330,8 @@
           "containers/bottle.png"
         ]
       },
-      "id": "y2-measurement-review-end-12",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-12-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many more cups fit in B than A?",
@@ -4174,7 +4356,9 @@
         "correctResponse": "4"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Are these two pieces halves?",
@@ -4194,8 +4378,8 @@
         "Yes, both pieces are paper",
         "Yes, there are two pieces"
       ],
-      "id": "y2-measurement-review-end-13",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-13-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Are these two pieces halves?",
@@ -4220,7 +4404,9 @@
         "correctResponse": "No, the pieces are not equal"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What date is two weeks after 7 May?",
@@ -4235,8 +4421,8 @@
           7
         ]
       },
-      "id": "y2-measurement-review-end-14",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-14-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What date is two weeks after 7 May? Start at 7 May. Count forward two weeks. Enter the date number.",
@@ -4261,7 +4447,9 @@
         "correctResponse": "21"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -4279,8 +4467,8 @@
         "Quarter to 12",
         "Half past 12"
       ],
-      "id": "y2-measurement-review-end-15",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-15-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -4305,7 +4493,9 @@
         "correctResponse": "Quarter past 12"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -4323,8 +4513,8 @@
         "Three-quarter turn",
         "Quarter turn"
       ],
-      "id": "y2-measurement-review-end-16",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-16-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -4349,7 +4539,9 @@
         "correctResponse": "Three-quarter turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which blocks measure the ribbon more accurately?",
@@ -4366,8 +4558,8 @@
         "Large blocks",
         "Small blocks"
       ],
-      "id": "y2-measurement-review-end-17",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-17-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which blocks measure the ribbon more accurately?",
@@ -4392,7 +4584,9 @@
         "correctResponse": "Small blocks"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "Which day is 15 May?",
@@ -4412,8 +4606,8 @@
         "Saturday",
         "Thursday"
       ],
-      "id": "y2-measurement-review-end-18",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-18-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which day is 15 May?",
@@ -4438,7 +4632,9 @@
         "correctResponse": "Friday"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "What time does the clock show?",
@@ -4456,8 +4652,8 @@
         "Quarter past 8",
         "Quarter to 9"
       ],
-      "id": "y2-measurement-review-end-19",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-19-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "What time does the clock show?",
@@ -4482,7 +4678,9 @@
         "correctResponse": "Quarter to 9"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     },
     {
       "prompt": "How much did the pointer turn?",
@@ -4500,8 +4698,8 @@
         "Half turn",
         "Three-quarter turn"
       ],
-      "id": "y2-measurement-review-end-20",
-      "version": "1.0.0-review.1",
+      "id": "y2-measurement-end-20-v4",
+      "version": "4.0.0",
       "form": "end",
       "type": "mcq",
       "readAloudText": "How much did the pointer turn?",
@@ -4526,7 +4724,9 @@
         "correctResponse": "Full turn"
       },
       "inputMode": "numeric",
-      "strand": "Measurement"
+      "strand": "Measurement",
+      "bankId": "measurelands-level2-end-v4",
+      "sourcePool": "posttest"
     }
   ]
 }
