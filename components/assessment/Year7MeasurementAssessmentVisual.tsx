@@ -34,12 +34,12 @@ function Parallel({a,relation}:{a:number;relation:Measurement7Visual['relation']
  const upper=350,lower=upper-140/Math.tan(rad(a));
  return <Frame><path d="M60 105H580M60 245H580" stroke={edge} strokeWidth="4"/><path d={`M${lower-70/Math.tan(rad(a))} 315L${upper+65/Math.tan(rad(a))} 40`} stroke={edge} strokeWidth="4"/>{[105,245].map(y=><path key={y} d={`M490 ${y-7}l12 7-12 7m12-14l12 7-12 7`} fill="none" stroke={edge} strokeWidth="3"/>)}<Sector x={upper} y={105} start={relation==='corresponding'?360-a:180-a} end={relation==='corresponding'?360:180} label={`${a}°`}/><Sector x={lower} y={245} start={relation==='cointerior'?180:360-a} end={relation==='cointerior'?360-a:360} label="x"/></Frame>;
 }
-function AnglePolygon({n,iso=false,quad=false}:{n:number[];iso?:boolean;quad?:boolean}){
+function AnglePolygon({n,iso=false,quad=false,angleSumModel=false}:{n:number[];iso?:boolean;quad?:boolean;angleSumModel?:boolean}){
  let points:number[][];
  if(quad){const h=175;points=[[100,300],[500,300],[500-h/Math.tan(rad(n[1])),125],[100+h/Math.tan(rad(n[0])),125]];}
  else {const base=340,ta=Math.tan(rad(n[0])),tb=Math.tan(rad(n[1])),height=base*ta*tb/(ta+tb);const factor=Math.min(1,220/height);points=[[150,310],[150+base*factor,310],[150+height/ta*factor,310-height*factor]];}
  const centre=points.reduce((a,b)=>[a[0]+b[0]/points.length,a[1]+b[1]/points.length],[0,0]);
- return <Frame><polygon points={points.map(p=>p.join(',')).join(' ')} fill={fill} stroke={purple} strokeWidth="4"/>{points.map((p,i)=>{const dx=centre[0]-p[0],dy=centre[1]-p[1],len=Math.hypot(dx,dy);const label=iso?(i===0?'x':i===2?`${n[2]}°`:''):(i===points.length-1?'x':`${n[i]}°`);return <g key={i}>{text(p[0]+dx/len*55,p[1]+dy/len*55+7,label)}</g>;})}{iso&&[0,1].map(i=>{const a=points[i],b=points[2],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return <path key={i} d={`M${x-dy/l*9} ${y+dx/l*9}L${x+dy/l*9} ${y-dx/l*9}`} stroke={edge} strokeWidth="3"/>;})}</Frame>;
+ return <Frame><polygon points={points.map(p=>p.join(',')).join(' ')} fill={fill} stroke={purple} strokeWidth="4"/>{angleSumModel?<path d={`M${points[0].join(" ")}L${points[2].join(" ")}`} stroke={edge} strokeWidth="3" strokeDasharray="8 5"/>:points.map((p,i)=>{const dx=centre[0]-p[0],dy=centre[1]-p[1],len=Math.hypot(dx,dy);const label=iso?(i===0?'x':i===2?`${n[2]}°`:''):(i===points.length-1?'x':`${n[i]}°`);return <g key={i}>{text(p[0]+dx/len*55,p[1]+dy/len*55+7,label)}</g>;})}{iso&&[0,1].map(i=>{const a=points[i],b=points[2],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return <path key={i} d={`M${x-dy/l*9} ${y+dx/l*9}L${x+dy/l*9} ${y-dx/l*9}`} stroke={edge} strokeWidth="3"/>;})}</Frame>;
 }
 export function measurement7Speech(v:Measurement7Visual){
  const n=v.values,u=v.unit??'',labels=v.labels?.filter(x=>x!=='isosceles'&&x!=='symbolic')??[];let detail='';
@@ -49,7 +49,7 @@ export function measurement7Speech(v:Measurement7Visual){
  if(v.task==='circle')detail=v.labels?.includes('symbolic')?(v.circleMeasure==='radius'?'Radius r.':'Diameter d.'):`${v.circleMeasure} ${n[0]} ${u}.`;
  if(v.task==='parallel')detail=`One marked angle is ${n[0]} degrees. The other marked angle is x. Matching arrow marks identify the parallel lines.`;
  if(v.task==='triangleAngles')detail=v.labels?.includes('isosceles')?`Top angle ${n[2]} degrees. The left base angle is x. The two sloping sides have matching ticks.`:`Given angles ${n[0]} and ${n[1]} degrees. The top angle is x.`;
- if(v.task==='quadAngles')detail=`Three interior angles are ${n.slice(0,3).join(', ')} degrees. The remaining angle is x.`;
+ if(v.task==='quadAngles')detail=v.angleSumModel?'A quadrilateral with one dashed diagonal joining opposite corners.':`Three interior angles are ${n.slice(0,3).join(', ')} degrees. The remaining angle is x.`;
  if(v.task==='pairTriangles')detail=`Sail A: base ${n[0]} metres, perpendicular height ${n[1]} metres. Sail B: base ${n[2]} metres, perpendicular height ${n[3]} metres.`;
  if(v.task==='pairPrisms')detail=`Box A: length ${n[0]}, width ${n[1]}, height ${n[2]} centimetres. Box B: triangular end base ${n[3]}, perpendicular height ${n[4]}, prism length ${n[5]} centimetres.`;
  return [v.description,...labels,detail].join(' ');
@@ -62,7 +62,7 @@ export default function Year7MeasurementAssessmentVisual({visual:v}:{visual:Meas
  case 'triPrism':content=<TriPrism n={n} unit={u}/>;break;
  case 'circle':content=<Frame><circle cx="320" cy="185" r="135" fill="#f1e6cd" stroke={edge} strokeWidth="4"/><circle cx="320" cy="185" r="5" fill={edge}/><path d={`M${v.circleMeasure==='diameter'?185:320} 185H455`} stroke={purple} strokeWidth="4"/>{text(v.circleMeasure==='diameter'?320:390,220,v.labels?.includes('symbolic')?(v.circleMeasure==='radius'?'r':'d'):`${n[0]} ${u}`)}</Frame>;break;
  case 'parallel':content=<Parallel a={n[0]} relation={v.relation}/>;break;
- case 'triangleAngles':case 'quadAngles':content=<AnglePolygon n={n} iso={v.labels?.includes('isosceles')} quad={v.task==='quadAngles'}/>;break;
+ case 'triangleAngles':case 'quadAngles':content=<AnglePolygon n={n} iso={v.labels?.includes('isosceles')} quad={v.task==='quadAngles'} angleSumModel={v.angleSumModel}/>;break;
  case 'pairTriangles':case 'pairPrisms':content=<div style={{display:'flex',flexWrap:'wrap',gap:16}}>{[0,1].map(i=><div key={i} style={{flex:'1 1 280px',minWidth:0}}><p className="text-center font-bold">{v.task==='pairTriangles'?'Sail':'Box'} {i===0?'A':'B'}</p>{v.task==='pairTriangles'?<Area b={n[i*2]} h={n[i*2+1]} unit={u}/>:i===0?<RectPrism dims={n.slice(0,3)} unit={u}/>:<TriPrism n={n.slice(3)} unit={u}/>}</div>)}</div>;break;
  case 'ratio':content=<div className="flex flex-col items-center gap-4"><Year7ContextArt kind={v.labels?.[0].includes('Concentrate')?'drink':'paint'}/>{v.labels?.map(label=><p key={label} className="text-center text-xl font-bold">{label}</p>)}</div>;break;
  }
