@@ -6,10 +6,10 @@ import {volumeViewBox} from '@/components/measurelands/MeasurelandsVolumeBuilder
 import type {Measurement7Visual} from '@/data/assessments/revisions/year7MeasurementFiveForms';
 const ink='#583714',edge='#856126',purple='#8051a8',fill='#e9daf3';
 const text=(x:number,y:number,value:string|number,anchor:'middle'|'start'|'end'='middle')=><text x={x} y={y} textAnchor={anchor} fill={ink} fontSize="23" fontWeight="700">{value}</text>;
-function Frame({children}:{children:ReactNode}){return <svg viewBox="0 0 640 390" aria-hidden="true" style={{width:'100%',maxWidth:700,display:'block',margin:'auto'}}>{children}</svg>;}
+function Frame({children,viewBox="0 0 640 390"}:{children:ReactNode;viewBox?:string}){return <svg viewBox={viewBox} aria-hidden="true" style={{width:'100%',maxWidth:700,maxHeight:280,display:'block',margin:'auto'}}>{children}</svg>;}
 function Area({b,h,unit,parallel=false,unknown=false}:{b:number;h:number;unit:string;parallel?:boolean;unknown?:boolean}){
  const scale=Math.min(320/b,220/h),w=b*scale,height=h*scale,left=(640-w)/2-25,bottom=305,top=bottom-height,shift=65;
- return <Frame><path d={parallel?`M${left} ${bottom}h${w}l${shift} ${-height}h${-w}Z`:`M${left} ${bottom}h${w}L${left+w*.35} ${top}Z`} fill={fill} stroke={purple} strokeWidth="4"/><path d={`M${left+(parallel?shift:w*.35)} ${top}V${bottom}`} stroke={edge} strokeWidth="2.5" strokeDasharray="7 5"/><path d={`M${left+(parallel?shift:w*.35)} ${bottom-16}h16v16`} fill="none" stroke={edge} strokeWidth="2"/>{text(left+w/2,bottom+38,`${b} ${unit}`)}<path d={`M${left+w+shift+25} ${top}h10m-5 0V${bottom}m-5 0h10`} fill="none" stroke={edge}/>{text(left+w+shift+40,(top+bottom)/2,`${unknown?'?':h} ${unit}`,'start')}</Frame>;
+ return <Frame viewBox={`${left-12} ${top-18} ${w+185} ${height+72}`}><path d={parallel?`M${left} ${bottom}h${w}l${shift} ${-height}h${-w}Z`:`M${left} ${bottom}h${w}L${left+w*.35} ${top}Z`} fill={fill} stroke={purple} strokeWidth="4"/><path d={`M${left+(parallel?shift:w*.35)} ${top}V${bottom}`} stroke={edge} strokeWidth="2.5" strokeDasharray="7 5"/><path d={`M${left+(parallel?shift:w*.35)} ${bottom-16}h16v16`} fill="none" stroke={edge} strokeWidth="2"/>{text(left+w/2,bottom+38,`${b} ${unit}`)}<path d={`M${left+w+shift+25} ${top}h10m-5 0V${bottom}m-5 0h10`} fill="none" stroke={edge}/>{text(left+w+shift+40,(top+bottom)/2,`${unknown?'?':h} ${unit}`,'start')}</Frame>;
 }
 function RectPrism({dims,unit,unknown=false}:{dims:number[];unit:string;unknown?:boolean}){
  const [l,w,h]=dims;

@@ -1,6 +1,7 @@
 "use client";
 import type {ReactNode} from 'react';
 import Image from 'next/image';
+import AssessmentWorkspace from "./AssessmentWorkspace";
 import AssessmentQuestionCard from './AssessmentQuestionCard';
 import type {Level3Visual,NumberLevel3ReviewItem} from '@/data/assessments/revisions/year3NumberFiveForms';
 const fmt=(n:number)=>n.toLocaleString('en-AU');
@@ -52,5 +53,5 @@ function Visual({v}:{v:Level3Visual}) {
 export default function NumberLevel3QuestionCard({question,value,onChange}:{question:NumberLevel3ReviewItem;value:string;onChange:(value:string)=>void}){
  const v=question.visual;
  if(v.kind==='numberLine') return <Frame label="Choose a point on the number line"><div className="mb-4 text-center text-xl font-bold">0 to 1 · equal tenths</div><div className="overflow-x-auto pb-2"><div className="min-w-[484px]"><div className="relative mx-auto flex max-w-3xl justify-between pt-5"><div aria-hidden="true" className="absolute inset-x-5 top-[2.6rem] h-1 bg-teal-900"/>{Array.from({length:v.denominator+1},(_,i)=>{const answer=`${i}/${v.denominator}`;return <button key={i} type="button" aria-label={`Point ${i} of ${v.denominator} equal intervals`} aria-pressed={value===answer} onClick={()=>onChange(answer)} className={`relative z-10 flex h-12 min-w-6 flex-1 items-center justify-center rounded-lg focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-teal-700 sm:min-w-11 ${value===answer?'bg-teal-200':'hover:bg-teal-100'}`}><span className={`h-6 w-1 ${value===answer?'bg-teal-800':'bg-slate-600'}`}/>{value===answer?<span className="absolute top-0 h-4 w-4 rounded-full border-2 border-teal-950 bg-teal-400"/>:null}</button>})}</div><div className="mx-auto mt-2 flex max-w-3xl justify-between px-3 text-xl font-black"><span>0</span><span>1</span></div></div></div></Frame>;
- return <><Visual v={v}/><AssessmentQuestionCard question={{...question,visual:undefined,showFractionModels:v.kind!=='fractionOrder'}} value={value} onChange={onChange} realmId="number"/></>;
+ return <AssessmentWorkspace realmId="number" visual={<Visual v={v}/>} wide={v.kind==='fractionOrder'}><AssessmentQuestionCard question={{...question,visual:undefined,showFractionModels:v.kind!=='fractionOrder'}} value={value} onChange={onChange} realmId="number"/></AssessmentWorkspace>;
 }

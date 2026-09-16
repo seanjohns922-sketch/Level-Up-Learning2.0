@@ -1,5 +1,6 @@
 "use client";
 
+import {AssessmentSkipContext} from "./AssessmentWorkspace";
 import AssessmentQuestionNavigator from "./AssessmentQuestionNavigator";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { ReactNode } from "react";
@@ -31,7 +32,7 @@ interface AssessmentShellProps {
   onNext: () => void;
   onSubmit: () => void;
   onExit: () => void;
-  /** When provided, shows the "I Don't Know" skip button below the answers. */
+  /** When provided, shows the "I Don't Know" control alongside the response. */
   onIdk?: () => void;
   /** When provided, replaces the single Exit control with Home / Exit / Logout. */
   onHome?: () => void;
@@ -333,7 +334,18 @@ export default function AssessmentShell({
 
           {/* Answer area — lesson-native tasks draw dark text, so give them a light panel */}
           <div className={lightSurface ? "assessment-answer-area relative rounded-2xl bg-[#f6f5ff] p-4 text-slate-950 sm:p-6" : "assessment-answer-area relative"}>
-            {questionContent}
+            <AssessmentSkipContext.Provider value={submitted ? undefined : onIdk}>{questionContent}</AssessmentSkipContext.Provider>
+          {onIdk && !submitted ? (
+            <button
+              type="button"
+              onClick={onIdk}
+              style={{background:theme.chipBg,color:theme.accentText,borderColor:theme.chipBorder}}
+              className="assessment-fallback-skip flex min-h-12 min-w-0 max-w-sm mx-auto mt-4 items-center justify-center gap-2 rounded-lg border-2 border-slate-500 bg-slate-800 px-4 py-3 text-sm font-black text-white shadow-lg transition hover:bg-slate-700 active:scale-[0.98] sm:text-base"
+            >
+              <HelpCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span>I Don&apos;t Know <span className="hidden sm:inline">- Skip This Question</span></span>
+            </button>
+          ) : null}
           </div>
 
         {/* ── Navigation ── */}
@@ -350,17 +362,6 @@ export default function AssessmentShell({
           >
             Back
           </button>
-
-          {onIdk ? (
-            <button
-              type="button"
-              onClick={onIdk}
-              className="flex min-h-12 min-w-0 max-w-sm flex-1 items-center justify-center gap-2 rounded-lg border-2 border-slate-500 bg-slate-800 px-4 py-3 text-sm font-black text-white shadow-lg transition hover:bg-slate-700 active:scale-[0.98] sm:text-base"
-            >
-              <HelpCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-              <span>I Don&apos;t Know <span className="hidden sm:inline">- Skip This Question</span></span>
-            </button>
-          ) : null}
 
           {isLast ? (
             <button
