@@ -80,6 +80,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${kind}`;
+  if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${kind}`;
   if(realm === "measurement" && year === "Year 6") return `/demo-review/measurement-level6?form=${kind}`;
   if(realm === "measurement" && year === "Year 4") return `/demo-review/measurement-level4?form=${kind}`;
   if(realm === "measurement" && year === "Year 3") return `/demo-review/measurement-level3?form=${kind}`;
@@ -109,6 +110,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${checkpoint}`;
+  if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 6") return `/demo-review/measurement-level6?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 4") return `/demo-review/measurement-level4?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 3") return `/demo-review/measurement-level3?form=${checkpoint}`;
@@ -117,11 +119,13 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "measurement" && year === "Year 7") return true;
   if (realm === "statistics" && year === "Prep") return false;
   return getPretestForYearLabel(year, realm).length > 0;
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "measurement" && year === "Year 7") return true;
   if (realm === "statistics" && year === "Prep") return false;
   return Boolean(getPosttestForYearLabel(year, realm)?.questions.length);
 }
@@ -187,7 +191,8 @@ export default function DemoReviewPanel() {
   }, [maxWeek]);
 
   useEffect(() => {
-    if (realm !== "number" && levelNumber > 6) setYear("Year 6");
+    if (realm !== "number" && realm !== "measurement" && levelNumber > 6) setYear("Year 6");
+    if (realm === "measurement" && levelNumber > 7) setYear("Year 7");
     if (realm === "statistics" && year === "Prep") setYear("Year 1");
     if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
     if (realm === "chance" && levelNumber < 3) setYear("Year 3");
@@ -369,7 +374,7 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : [])]
+                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "measurement" ? [{id:"Year 7",label:"Level 7"}] : [])]
                   .filter((item) => realm !== "statistics" || item.id !== "Prep")
                   .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
                   .filter((item) => realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3)
@@ -389,7 +394,7 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="py-6">
-          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{realm === "measurement" && year === "Year 3" ? "Assessments for review" : "Live Assessments"}</h2></div>
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{realm === "measurement" && (year === "Year 3" || year === "Year 7") ? "Assessments for review" : "Live Assessments"}</h2></div>
           {realm === "space" && year === "Prep" ? (
             <p className="mb-3 text-xs font-bold text-amber-200">Ground opens the independent Starpath Version 1.0 production bank for review.</p>
           ) : null}

@@ -1,0 +1,4792 @@
+{
+  "pretest": [
+    {
+      "prompt": "What is the area of the triangular shade sail?",
+      "correctAnswer": "42",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The dashed line shows the perpendicular height.",
+        "values": [
+          12,
+          7
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-pretest-01",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area of the triangular shade sail?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-1",
+      "skillLabel": "Find a triangular area",
+      "structureKey": "y7-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "42"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this rectangular storage box?",
+      "correctAnswer": "96",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "Use the three labelled dimensions.",
+        "values": [
+          8,
+          4,
+          3
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-pretest-02",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this rectangular storage box?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-2",
+      "skillLabel": "Find a rectangular prism volume",
+      "structureKey": "y7-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "96"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the diameter of this circle?",
+      "correctAnswer": "12",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The marked line runs from the centre to the edge.",
+        "values": [
+          6
+        ],
+        "circleMeasure": "radius",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-pretest-03",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the diameter of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-3",
+      "skillLabel": "Relate radius and diameter",
+      "structureKey": "y7-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked x?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          55
+        ],
+        "relation": "corresponding"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-pretest-04",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked x?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-4",
+      "skillLabel": "Use corresponding angles",
+      "structureKey": "y7-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this triangle?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          45,
+          65,
+          70
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-pretest-05",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-5",
+      "skillLabel": "Find an unknown triangle angle",
+      "structureKey": "y7-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of water are needed for this drink?",
+      "correctAnswer": "750",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Keep the recipe in the same ratio.",
+        "values": [
+          1,
+          3,
+          250
+        ],
+        "labels": [
+          "Concentrate : water = 1 : 3",
+          "Concentrate available: 250 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-pretest-06",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of water are needed for this drink?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-6",
+      "skillLabel": "Scale a drink recipe",
+      "structureKey": "y7-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this parallelogram garden?",
+      "correctAnswer": "78",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallelogram",
+        "description": "Use the perpendicular height, marked by the dashed line.",
+        "values": [
+          13,
+          6
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-pretest-07",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this parallelogram garden?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-7",
+      "skillLabel": "Use perpendicular height for a parallelogram",
+      "structureKey": "y7-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "78"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this triangular prism?",
+      "correctAnswer": "108",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triPrism",
+        "description": "The shaded end is a right-angled triangle. The prism has the same cross-section throughout.",
+        "values": [
+          6,
+          4,
+          9
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-pretest-08",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this triangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-8",
+      "skillLabel": "Find a triangular prism volume",
+      "structureKey": "y7-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "108"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the circumference of the circular sign?",
+      "correctAnswer": "37.68",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "Use 3.14 for pi. Give your answer to two decimal places.",
+        "values": [
+          12
+        ],
+        "circleMeasure": "diameter",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-pretest-09",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the circumference of the circular sign?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-9",
+      "skillLabel": "Calculate circumference from diameter",
+      "structureKey": "y7-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "37.68"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and the correct reason?",
+      "correctAnswer": "50°, because alternate angles are equal.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          50
+        ],
+        "relation": "alternate"
+      },
+      "options": [
+        "50°, because alternate angles are equal.",
+        "130°, because alternate angles add to 180°.",
+        "50°, because all angles on parallel lines are equal."
+      ],
+      "id": "y7-measurement-review-pretest-10",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and the correct reason?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-10",
+      "skillLabel": "Explain alternate angles",
+      "structureKey": "y7-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50°, because alternate angles are equal."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of x in this isosceles triangle?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "The matching ticks show equal sides.",
+        "values": [
+          70,
+          70,
+          40
+        ],
+        "labels": [
+          "isosceles"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-pretest-11",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of x in this isosceles triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-11",
+      "skillLabel": "Use equal angles in an isosceles triangle",
+      "structureKey": "y7-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of blue paint are needed?",
+      "correctAnswer": "400",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Make the full amount of paint in the stated ratio.",
+        "values": [
+          2,
+          3,
+          1000
+        ],
+        "labels": [
+          "Blue : yellow = 2 : 3",
+          "Total paint needed: 1000 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-pretest-12",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of blue paint are needed?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-12",
+      "skillLabel": "Divide a mixture in a given ratio",
+      "structureKey": "y7-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "400"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perpendicular height of this triangle?",
+      "correctAnswer": "8",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The area and base length are given. Find the dashed height.",
+        "values": [
+          14,
+          8
+        ],
+        "unknown": "height",
+        "unit": "cm",
+        "labels": [
+          "Area: 56 cm²"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-pretest-13",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the perpendicular height of this triangle?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-13",
+      "skillLabel": "Find a triangle height from area",
+      "structureKey": "y7-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "8"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the missing length of this rectangular prism?",
+      "correctAnswer": "12",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "The volume and two dimensions are given.",
+        "values": [
+          12,
+          5,
+          4
+        ],
+        "unknown": "length",
+        "unit": "cm",
+        "labels": [
+          "Volume: 240 cm³"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-pretest-14",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the missing length of this rectangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-14",
+      "skillLabel": "Find a prism length from volume",
+      "structureKey": "y7-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which expression gives the exact circumference of this circle?",
+      "correctAnswer": "π × d",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The full width through the centre is labelled d.",
+        "values": [
+          10
+        ],
+        "circleMeasure": "diameter",
+        "labels": [
+          "symbolic"
+        ]
+      },
+      "options": [
+        "d ÷ π",
+        "π × d",
+        "2 × π × d"
+      ],
+      "id": "y7-measurement-review-pretest-15",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which expression gives the exact circumference of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-15",
+      "skillLabel": "Identify the exact circumference relationship",
+      "structureKey": "y7-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "π × d"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of the two triangular shade sails?",
+      "correctAnswer": "107",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairTriangles",
+        "description": "The two sails do not overlap. Find their combined area.",
+        "values": [
+          16,
+          9,
+          10,
+          7
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-pretest-16",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the total area of the two triangular shade sails?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-16",
+      "skillLabel": "Combine two triangular areas",
+      "structureKey": "y7-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "107"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "correctAnswer": "172",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairPrisms",
+        "description": "Box A is a rectangular prism. Box B is a triangular prism with a right-angled end.",
+        "values": [
+          10,
+          6,
+          5,
+          8,
+          4,
+          8
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-pretest-17",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-17",
+      "skillLabel": "Compare rectangular and triangular prism volumes",
+      "structureKey": "y7-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "172"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and explains why?",
+      "correctAnswer": "115°, because co-interior angles add to 180°.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          65
+        ],
+        "relation": "cointerior"
+      },
+      "options": [
+        "115°, because vertically opposite angles add to 180°.",
+        "115°, because co-interior angles add to 180°.",
+        "65°, because co-interior angles are equal."
+      ],
+      "id": "y7-measurement-review-pretest-18",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and explains why?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-18",
+      "skillLabel": "Explain co-interior angle calculation",
+      "structureKey": "y7-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "115°, because co-interior angles add to 180°."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this quadrilateral?",
+      "correctAnswer": "120",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "quadAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          60,
+          50,
+          130,
+          120
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-pretest-19",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this quadrilateral?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-19",
+      "skillLabel": "Use a quadrilateral angle sum",
+      "structureKey": "y7-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which plan makes the most green paint without changing the colour?",
+      "correctAnswer": "500 mL, using all the blue paint and keeping the 2:3 ratio.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Mix only blue and yellow paint. Keep the stated ratio and do not use more paint than is available.",
+        "values": [
+          2,
+          3,
+          200,
+          450
+        ],
+        "labels": [
+          "Blue : yellow = 2 : 3",
+          "Available: 200 mL blue and 450 mL yellow"
+        ],
+        "unit": "mL"
+      },
+      "options": [
+        "650 mL, because you should mix all the paint available.",
+        "750 mL, using all the yellow paint even if more blue is needed.",
+        "500 mL, using all the blue paint and keeping the 2:3 ratio."
+      ],
+      "id": "y7-measurement-review-pretest-20",
+      "version": "1.0.0-review.1",
+      "form": "pretest",
+      "type": "mcq",
+      "readAloudText": "Which plan makes the most green paint without changing the colour?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-20",
+      "skillLabel": "Choose and justify a feasible ratio plan",
+      "structureKey": "y7-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "500 mL, using all the blue paint and keeping the 2:3 ratio."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "posttest": [
+    {
+      "prompt": "What is the area of the triangular shade sail?",
+      "correctAnswer": "56",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The dashed line shows the perpendicular height.",
+        "values": [
+          14,
+          8
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-posttest-01",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area of the triangular shade sail?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-1",
+      "skillLabel": "Find a triangular area",
+      "structureKey": "y7-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "56"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this rectangular storage box?",
+      "correctAnswer": "180",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "Use the three labelled dimensions.",
+        "values": [
+          9,
+          5,
+          4
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-posttest-02",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this rectangular storage box?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-2",
+      "skillLabel": "Find a rectangular prism volume",
+      "structureKey": "y7-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "180"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the diameter of this circle?",
+      "correctAnswer": "16",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The marked line runs from the centre to the edge.",
+        "values": [
+          8
+        ],
+        "circleMeasure": "radius",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-posttest-03",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the diameter of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-3",
+      "skillLabel": "Relate radius and diameter",
+      "structureKey": "y7-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "16"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked x?",
+      "correctAnswer": "125",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          125
+        ],
+        "relation": "corresponding"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-posttest-04",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked x?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-4",
+      "skillLabel": "Use corresponding angles",
+      "structureKey": "y7-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "125"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this triangle?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          50,
+          75,
+          55
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-posttest-05",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-5",
+      "skillLabel": "Find an unknown triangle angle",
+      "structureKey": "y7-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of water are needed for this drink?",
+      "correctAnswer": "1200",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Keep the recipe in the same ratio.",
+        "values": [
+          1,
+          4,
+          300
+        ],
+        "labels": [
+          "Concentrate : water = 1 : 4",
+          "Concentrate available: 300 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-posttest-06",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of water are needed for this drink?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-6",
+      "skillLabel": "Scale a drink recipe",
+      "structureKey": "y7-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1200"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this parallelogram garden?",
+      "correctAnswer": "105",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallelogram",
+        "description": "Use the perpendicular height, marked by the dashed line.",
+        "values": [
+          15,
+          7
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-posttest-07",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the area of this parallelogram garden?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-7",
+      "skillLabel": "Use perpendicular height for a parallelogram",
+      "structureKey": "y7-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "105"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this triangular prism?",
+      "correctAnswer": "200",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triPrism",
+        "description": "The shaded end is a right-angled triangle. The prism has the same cross-section throughout.",
+        "values": [
+          8,
+          5,
+          10
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-posttest-08",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this triangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-8",
+      "skillLabel": "Find a triangular prism volume",
+      "structureKey": "y7-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "200"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the circumference of the circular sign?",
+      "correctAnswer": "50.24",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "Use 3.14 for pi. Give your answer to two decimal places.",
+        "values": [
+          16
+        ],
+        "circleMeasure": "diameter",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-posttest-09",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the circumference of the circular sign?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-9",
+      "skillLabel": "Calculate circumference from diameter",
+      "structureKey": "y7-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50.24"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and the correct reason?",
+      "correctAnswer": "115°, because alternate angles are equal.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          115
+        ],
+        "relation": "alternate"
+      },
+      "options": [
+        "65°, because alternate angles add to 180°.",
+        "115°, because all angles on parallel lines are equal.",
+        "115°, because alternate angles are equal."
+      ],
+      "id": "y7-measurement-review-posttest-10",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and the correct reason?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-10",
+      "skillLabel": "Explain alternate angles",
+      "structureKey": "y7-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "115°, because alternate angles are equal."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of x in this isosceles triangle?",
+      "correctAnswer": "65",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "The matching ticks show equal sides.",
+        "values": [
+          65,
+          65,
+          50
+        ],
+        "labels": [
+          "isosceles"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-posttest-11",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of x in this isosceles triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-11",
+      "skillLabel": "Use equal angles in an isosceles triangle",
+      "structureKey": "y7-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "65"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of blue paint are needed?",
+      "correctAnswer": "750",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Make the full amount of paint in the stated ratio.",
+        "values": [
+          3,
+          4,
+          1750
+        ],
+        "labels": [
+          "Blue : yellow = 3 : 4",
+          "Total paint needed: 1750 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-posttest-12",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of blue paint are needed?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-12",
+      "skillLabel": "Divide a mixture in a given ratio",
+      "structureKey": "y7-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perpendicular height of this triangle?",
+      "correctAnswer": "9",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The area and base length are given. Find the dashed height.",
+        "values": [
+          16,
+          9
+        ],
+        "unknown": "height",
+        "unit": "cm",
+        "labels": [
+          "Area: 72 cm²"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-posttest-13",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the perpendicular height of this triangle?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-13",
+      "skillLabel": "Find a triangle height from area",
+      "structureKey": "y7-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "9"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the missing length of this rectangular prism?",
+      "correctAnswer": "13",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "The volume and two dimensions are given.",
+        "values": [
+          13,
+          6,
+          5
+        ],
+        "unknown": "length",
+        "unit": "cm",
+        "labels": [
+          "Volume: 390 cm³"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-posttest-14",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the missing length of this rectangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-14",
+      "skillLabel": "Find a prism length from volume",
+      "structureKey": "y7-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "13"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which expression gives the exact circumference of this circle?",
+      "correctAnswer": "2 × π × r",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The line from the centre to the edge is labelled r.",
+        "values": [
+          12
+        ],
+        "circleMeasure": "radius",
+        "labels": [
+          "symbolic"
+        ]
+      },
+      "options": [
+        "2 × π × r",
+        "π × r",
+        "r ÷ π"
+      ],
+      "id": "y7-measurement-review-posttest-15",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which expression gives the exact circumference of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-15",
+      "skillLabel": "Identify the exact circumference relationship",
+      "structureKey": "y7-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2 × π × r"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of the two triangular shade sails?",
+      "correctAnswer": "138",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairTriangles",
+        "description": "The two sails do not overlap. Find their combined area.",
+        "values": [
+          18,
+          10,
+          12,
+          8
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-posttest-16",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the total area of the two triangular shade sails?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-16",
+      "skillLabel": "Combine two triangular areas",
+      "structureKey": "y7-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "138"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "correctAnswer": "237",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairPrisms",
+        "description": "Box A is a rectangular prism. Box B is a triangular prism with a right-angled end.",
+        "values": [
+          11,
+          7,
+          6,
+          10,
+          5,
+          9
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-posttest-17",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-17",
+      "skillLabel": "Compare rectangular and triangular prism volumes",
+      "structureKey": "y7-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "237"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and explains why?",
+      "correctAnswer": "110°, because co-interior angles add to 180°.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          70
+        ],
+        "relation": "cointerior"
+      },
+      "options": [
+        "110°, because co-interior angles add to 180°.",
+        "70°, because co-interior angles are equal.",
+        "110°, because vertically opposite angles add to 180°."
+      ],
+      "id": "y7-measurement-review-posttest-18",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and explains why?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-18",
+      "skillLabel": "Explain co-interior angle calculation",
+      "structureKey": "y7-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "110°, because co-interior angles add to 180°."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this quadrilateral?",
+      "correctAnswer": "115",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "quadAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          65,
+          55,
+          125,
+          115
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-posttest-19",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this quadrilateral?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-19",
+      "skillLabel": "Use a quadrilateral angle sum",
+      "structureKey": "y7-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "115"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which plan makes the most green paint without changing the colour?",
+      "correctAnswer": "875 mL, using all the blue paint and keeping the 3:4 ratio.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Mix only blue and yellow paint. Keep the stated ratio and do not use more paint than is available.",
+        "values": [
+          3,
+          4,
+          375,
+          700
+        ],
+        "labels": [
+          "Blue : yellow = 3 : 4",
+          "Available: 375 mL blue and 700 mL yellow"
+        ],
+        "unit": "mL"
+      },
+      "options": [
+        "1225 mL, using all the yellow paint even if more blue is needed.",
+        "875 mL, using all the blue paint and keeping the 3:4 ratio.",
+        "1075 mL, because you should mix all the paint available."
+      ],
+      "id": "y7-measurement-review-posttest-20",
+      "version": "1.0.0-review.1",
+      "form": "posttest",
+      "type": "mcq",
+      "readAloudText": "Which plan makes the most green paint without changing the colour?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-20",
+      "skillLabel": "Choose and justify a feasible ratio plan",
+      "structureKey": "y7-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "875 mL, using all the blue paint and keeping the 3:4 ratio."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "start": [
+    {
+      "prompt": "What is the area of the triangular shade sail?",
+      "correctAnswer": "72",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The dashed line shows the perpendicular height.",
+        "values": [
+          16,
+          9
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-start-01",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area of the triangular shade sail?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-1",
+      "skillLabel": "Find a triangular area",
+      "structureKey": "y7-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "72"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this rectangular storage box?",
+      "correctAnswer": "300",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "Use the three labelled dimensions.",
+        "values": [
+          10,
+          6,
+          5
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-start-02",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this rectangular storage box?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-2",
+      "skillLabel": "Find a rectangular prism volume",
+      "structureKey": "y7-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "300"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the diameter of this circle?",
+      "correctAnswer": "18",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The marked line runs from the centre to the edge.",
+        "values": [
+          9
+        ],
+        "circleMeasure": "radius",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-start-03",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the diameter of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-3",
+      "skillLabel": "Relate radius and diameter",
+      "structureKey": "y7-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "18"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked x?",
+      "correctAnswer": "70",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          70
+        ],
+        "relation": "corresponding"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-start-04",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked x?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-4",
+      "skillLabel": "Use corresponding angles",
+      "structureKey": "y7-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this triangle?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          55,
+          70,
+          55
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-start-05",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-5",
+      "skillLabel": "Find an unknown triangle angle",
+      "structureKey": "y7-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of water are needed for this drink?",
+      "correctAnswer": "1750",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Keep the recipe in the same ratio.",
+        "values": [
+          1,
+          5,
+          350
+        ],
+        "labels": [
+          "Concentrate : water = 1 : 5",
+          "Concentrate available: 350 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-start-06",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of water are needed for this drink?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-6",
+      "skillLabel": "Scale a drink recipe",
+      "structureKey": "y7-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this parallelogram garden?",
+      "correctAnswer": "136",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallelogram",
+        "description": "Use the perpendicular height, marked by the dashed line.",
+        "values": [
+          17,
+          8
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-start-07",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the area of this parallelogram garden?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-7",
+      "skillLabel": "Use perpendicular height for a parallelogram",
+      "structureKey": "y7-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "136"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this triangular prism?",
+      "correctAnswer": "330",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triPrism",
+        "description": "The shaded end is a right-angled triangle. The prism has the same cross-section throughout.",
+        "values": [
+          10,
+          6,
+          11
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-start-08",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this triangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-8",
+      "skillLabel": "Find a triangular prism volume",
+      "structureKey": "y7-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "330"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the circumference of the circular sign?",
+      "correctAnswer": "56.52",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "Use 3.14 for pi. Give your answer to two decimal places.",
+        "values": [
+          18
+        ],
+        "circleMeasure": "diameter",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-start-09",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the circumference of the circular sign?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-9",
+      "skillLabel": "Calculate circumference from diameter",
+      "structureKey": "y7-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "56.52"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and the correct reason?",
+      "correctAnswer": "75°, because alternate angles are equal.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          75
+        ],
+        "relation": "alternate"
+      },
+      "options": [
+        "75°, because all angles on parallel lines are equal.",
+        "75°, because alternate angles are equal.",
+        "105°, because alternate angles add to 180°."
+      ],
+      "id": "y7-measurement-review-start-10",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and the correct reason?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-10",
+      "skillLabel": "Explain alternate angles",
+      "structureKey": "y7-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75°, because alternate angles are equal."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of x in this isosceles triangle?",
+      "correctAnswer": "60",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "The matching ticks show equal sides.",
+        "values": [
+          60,
+          60,
+          60
+        ],
+        "labels": [
+          "isosceles"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-start-11",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of x in this isosceles triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-11",
+      "skillLabel": "Use equal angles in an isosceles triangle",
+      "structureKey": "y7-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "60"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of blue paint are needed?",
+      "correctAnswer": "1200",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Make the full amount of paint in the stated ratio.",
+        "values": [
+          4,
+          5,
+          2700
+        ],
+        "labels": [
+          "Blue : yellow = 4 : 5",
+          "Total paint needed: 2700 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-start-12",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of blue paint are needed?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-12",
+      "skillLabel": "Divide a mixture in a given ratio",
+      "structureKey": "y7-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1200"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perpendicular height of this triangle?",
+      "correctAnswer": "10",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The area and base length are given. Find the dashed height.",
+        "values": [
+          18,
+          10
+        ],
+        "unknown": "height",
+        "unit": "cm",
+        "labels": [
+          "Area: 90 cm²"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-start-13",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the perpendicular height of this triangle?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-13",
+      "skillLabel": "Find a triangle height from area",
+      "structureKey": "y7-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "10"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the missing length of this rectangular prism?",
+      "correctAnswer": "14",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "The volume and two dimensions are given.",
+        "values": [
+          14,
+          7,
+          6
+        ],
+        "unknown": "length",
+        "unit": "cm",
+        "labels": [
+          "Volume: 588 cm³"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-start-14",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the missing length of this rectangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-14",
+      "skillLabel": "Find a prism length from volume",
+      "structureKey": "y7-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "14"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which expression gives the exact circumference of this circle?",
+      "correctAnswer": "π × d",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The full width through the centre is labelled d.",
+        "values": [
+          14
+        ],
+        "circleMeasure": "diameter",
+        "labels": [
+          "symbolic"
+        ]
+      },
+      "options": [
+        "2 × π × d",
+        "d ÷ π",
+        "π × d"
+      ],
+      "id": "y7-measurement-review-start-15",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which expression gives the exact circumference of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-15",
+      "skillLabel": "Identify the exact circumference relationship",
+      "structureKey": "y7-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "π × d"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of the two triangular shade sails?",
+      "correctAnswer": "173",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairTriangles",
+        "description": "The two sails do not overlap. Find their combined area.",
+        "values": [
+          20,
+          11,
+          14,
+          9
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-start-16",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the total area of the two triangular shade sails?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-16",
+      "skillLabel": "Combine two triangular areas",
+      "structureKey": "y7-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "173"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "correctAnswer": "312",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairPrisms",
+        "description": "Box A is a rectangular prism. Box B is a triangular prism with a right-angled end.",
+        "values": [
+          12,
+          8,
+          7,
+          12,
+          6,
+          10
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-start-17",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-17",
+      "skillLabel": "Compare rectangular and triangular prism volumes",
+      "structureKey": "y7-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "312"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and explains why?",
+      "correctAnswer": "125°, because co-interior angles add to 180°.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          55
+        ],
+        "relation": "cointerior"
+      },
+      "options": [
+        "55°, because co-interior angles are equal.",
+        "125°, because vertically opposite angles add to 180°.",
+        "125°, because co-interior angles add to 180°."
+      ],
+      "id": "y7-measurement-review-start-18",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and explains why?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-18",
+      "skillLabel": "Explain co-interior angle calculation",
+      "structureKey": "y7-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "125°, because co-interior angles add to 180°."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this quadrilateral?",
+      "correctAnswer": "110",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "quadAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          70,
+          60,
+          120,
+          110
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-start-19",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this quadrilateral?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-19",
+      "skillLabel": "Use a quadrilateral angle sum",
+      "structureKey": "y7-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "110"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which plan makes the most green paint without changing the colour?",
+      "correctAnswer": "1350 mL, using all the blue paint and keeping the 4:5 ratio.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Mix only blue and yellow paint. Keep the stated ratio and do not use more paint than is available.",
+        "values": [
+          4,
+          5,
+          600,
+          1000
+        ],
+        "labels": [
+          "Blue : yellow = 4 : 5",
+          "Available: 600 mL blue and 1000 mL yellow"
+        ],
+        "unit": "mL"
+      },
+      "options": [
+        "1350 mL, using all the blue paint and keeping the 4:5 ratio.",
+        "1600 mL, because you should mix all the paint available.",
+        "1800 mL, using all the yellow paint even if more blue is needed."
+      ],
+      "id": "y7-measurement-review-start-20",
+      "version": "1.0.0-review.1",
+      "form": "start",
+      "type": "mcq",
+      "readAloudText": "Which plan makes the most green paint without changing the colour?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-20",
+      "skillLabel": "Choose and justify a feasible ratio plan",
+      "structureKey": "y7-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1350 mL, using all the blue paint and keeping the 4:5 ratio."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "mid": [
+    {
+      "prompt": "What is the area of the triangular shade sail?",
+      "correctAnswer": "90",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The dashed line shows the perpendicular height.",
+        "values": [
+          18,
+          10
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-mid-01",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area of the triangular shade sail?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-1",
+      "skillLabel": "Find a triangular area",
+      "structureKey": "y7-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "90"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this rectangular storage box?",
+      "correctAnswer": "462",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "Use the three labelled dimensions.",
+        "values": [
+          11,
+          7,
+          6
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-mid-02",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this rectangular storage box?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-2",
+      "skillLabel": "Find a rectangular prism volume",
+      "structureKey": "y7-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "462"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the diameter of this circle?",
+      "correctAnswer": "22",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The marked line runs from the centre to the edge.",
+        "values": [
+          11
+        ],
+        "circleMeasure": "radius",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-mid-03",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the diameter of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-3",
+      "skillLabel": "Relate radius and diameter",
+      "structureKey": "y7-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "22"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked x?",
+      "correctAnswer": "120",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          120
+        ],
+        "relation": "corresponding"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-mid-04",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked x?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-4",
+      "skillLabel": "Use corresponding angles",
+      "structureKey": "y7-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this triangle?",
+      "correctAnswer": "65",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          60,
+          55,
+          65
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-mid-05",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-5",
+      "skillLabel": "Find an unknown triangle angle",
+      "structureKey": "y7-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "65"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of water are needed for this drink?",
+      "correctAnswer": "2400",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Keep the recipe in the same ratio.",
+        "values": [
+          1,
+          6,
+          400
+        ],
+        "labels": [
+          "Concentrate : water = 1 : 6",
+          "Concentrate available: 400 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-mid-06",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of water are needed for this drink?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-6",
+      "skillLabel": "Scale a drink recipe",
+      "structureKey": "y7-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2400"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this parallelogram garden?",
+      "correctAnswer": "171",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallelogram",
+        "description": "Use the perpendicular height, marked by the dashed line.",
+        "values": [
+          19,
+          9
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-mid-07",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the area of this parallelogram garden?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-7",
+      "skillLabel": "Use perpendicular height for a parallelogram",
+      "structureKey": "y7-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "171"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this triangular prism?",
+      "correctAnswer": "504",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triPrism",
+        "description": "The shaded end is a right-angled triangle. The prism has the same cross-section throughout.",
+        "values": [
+          12,
+          7,
+          12
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-mid-08",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this triangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-8",
+      "skillLabel": "Find a triangular prism volume",
+      "structureKey": "y7-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "504"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the circumference of the circular sign?",
+      "correctAnswer": "75.36",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "Use 3.14 for pi. Give your answer to two decimal places.",
+        "values": [
+          24
+        ],
+        "circleMeasure": "diameter",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-mid-09",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the circumference of the circular sign?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-9",
+      "skillLabel": "Calculate circumference from diameter",
+      "structureKey": "y7-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75.36"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and the correct reason?",
+      "correctAnswer": "125°, because alternate angles are equal.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          125
+        ],
+        "relation": "alternate"
+      },
+      "options": [
+        "125°, because alternate angles are equal.",
+        "55°, because alternate angles add to 180°.",
+        "125°, because all angles on parallel lines are equal."
+      ],
+      "id": "y7-measurement-review-mid-10",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and the correct reason?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-10",
+      "skillLabel": "Explain alternate angles",
+      "structureKey": "y7-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "125°, because alternate angles are equal."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of x in this isosceles triangle?",
+      "correctAnswer": "55",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "The matching ticks show equal sides.",
+        "values": [
+          55,
+          55,
+          70
+        ],
+        "labels": [
+          "isosceles"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-mid-11",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of x in this isosceles triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-11",
+      "skillLabel": "Use equal angles in an isosceles triangle",
+      "structureKey": "y7-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "55"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of blue paint are needed?",
+      "correctAnswer": "1750",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Make the full amount of paint in the stated ratio.",
+        "values": [
+          5,
+          6,
+          3850
+        ],
+        "labels": [
+          "Blue : yellow = 5 : 6",
+          "Total paint needed: 3850 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-mid-12",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of blue paint are needed?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-12",
+      "skillLabel": "Divide a mixture in a given ratio",
+      "structureKey": "y7-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1750"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perpendicular height of this triangle?",
+      "correctAnswer": "11",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The area and base length are given. Find the dashed height.",
+        "values": [
+          20,
+          11
+        ],
+        "unknown": "height",
+        "unit": "cm",
+        "labels": [
+          "Area: 110 cm²"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-mid-13",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the perpendicular height of this triangle?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-13",
+      "skillLabel": "Find a triangle height from area",
+      "structureKey": "y7-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "11"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the missing length of this rectangular prism?",
+      "correctAnswer": "15",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "The volume and two dimensions are given.",
+        "values": [
+          15,
+          8,
+          7
+        ],
+        "unknown": "length",
+        "unit": "cm",
+        "labels": [
+          "Volume: 840 cm³"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-mid-14",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the missing length of this rectangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-14",
+      "skillLabel": "Find a prism length from volume",
+      "structureKey": "y7-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "15"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which expression gives the exact circumference of this circle?",
+      "correctAnswer": "2 × π × r",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The line from the centre to the edge is labelled r.",
+        "values": [
+          16
+        ],
+        "circleMeasure": "radius",
+        "labels": [
+          "symbolic"
+        ]
+      },
+      "options": [
+        "r ÷ π",
+        "2 × π × r",
+        "π × r"
+      ],
+      "id": "y7-measurement-review-mid-15",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which expression gives the exact circumference of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-15",
+      "skillLabel": "Identify the exact circumference relationship",
+      "structureKey": "y7-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2 × π × r"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of the two triangular shade sails?",
+      "correctAnswer": "212",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairTriangles",
+        "description": "The two sails do not overlap. Find their combined area.",
+        "values": [
+          22,
+          12,
+          16,
+          10
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-mid-16",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the total area of the two triangular shade sails?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-16",
+      "skillLabel": "Combine two triangular areas",
+      "structureKey": "y7-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "212"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "correctAnswer": "397",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairPrisms",
+        "description": "Box A is a rectangular prism. Box B is a triangular prism with a right-angled end.",
+        "values": [
+          13,
+          9,
+          8,
+          14,
+          7,
+          11
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-mid-17",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-17",
+      "skillLabel": "Compare rectangular and triangular prism volumes",
+      "structureKey": "y7-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "397"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and explains why?",
+      "correctAnswer": "105°, because co-interior angles add to 180°.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          75
+        ],
+        "relation": "cointerior"
+      },
+      "options": [
+        "105°, because vertically opposite angles add to 180°.",
+        "105°, because co-interior angles add to 180°.",
+        "75°, because co-interior angles are equal."
+      ],
+      "id": "y7-measurement-review-mid-18",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and explains why?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-18",
+      "skillLabel": "Explain co-interior angle calculation",
+      "structureKey": "y7-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "105°, because co-interior angles add to 180°."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this quadrilateral?",
+      "correctAnswer": "105",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "quadAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          75,
+          65,
+          115,
+          105
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-mid-19",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this quadrilateral?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-19",
+      "skillLabel": "Use a quadrilateral angle sum",
+      "structureKey": "y7-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "105"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which plan makes the most green paint without changing the colour?",
+      "correctAnswer": "1925 mL, using all the blue paint and keeping the 5:6 ratio.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Mix only blue and yellow paint. Keep the stated ratio and do not use more paint than is available.",
+        "values": [
+          5,
+          6,
+          875,
+          1350
+        ],
+        "labels": [
+          "Blue : yellow = 5 : 6",
+          "Available: 875 mL blue and 1350 mL yellow"
+        ],
+        "unit": "mL"
+      },
+      "options": [
+        "2225 mL, because you should mix all the paint available.",
+        "2475 mL, using all the yellow paint even if more blue is needed.",
+        "1925 mL, using all the blue paint and keeping the 5:6 ratio."
+      ],
+      "id": "y7-measurement-review-mid-20",
+      "version": "1.0.0-review.1",
+      "form": "mid",
+      "type": "mcq",
+      "readAloudText": "Which plan makes the most green paint without changing the colour?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-20",
+      "skillLabel": "Choose and justify a feasible ratio plan",
+      "structureKey": "y7-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "1925 mL, using all the blue paint and keeping the 5:6 ratio."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ],
+  "end": [
+    {
+      "prompt": "What is the area of the triangular shade sail?",
+      "correctAnswer": "110",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The dashed line shows the perpendicular height.",
+        "values": [
+          20,
+          11
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-end-01",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area of the triangular shade sail?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-1",
+      "skillLabel": "Find a triangular area",
+      "structureKey": "y7-measurement-slot-1",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "110"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this rectangular storage box?",
+      "correctAnswer": "672",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "Use the three labelled dimensions.",
+        "values": [
+          12,
+          8,
+          7
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-end-02",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this rectangular storage box?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-2",
+      "skillLabel": "Find a rectangular prism volume",
+      "structureKey": "y7-measurement-slot-2",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "672"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the diameter of this circle?",
+      "correctAnswer": "26",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The marked line runs from the centre to the edge.",
+        "values": [
+          13
+        ],
+        "circleMeasure": "radius",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-end-03",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the diameter of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-3",
+      "skillLabel": "Relate radius and diameter",
+      "structureKey": "y7-measurement-slot-3",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "26"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the angle marked x?",
+      "correctAnswer": "75",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          75
+        ],
+        "relation": "corresponding"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-end-04",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the angle marked x?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-4",
+      "skillLabel": "Use corresponding angles",
+      "structureKey": "y7-measurement-slot-4",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "75"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this triangle?",
+      "correctAnswer": "60",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          40,
+          80,
+          60
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-end-05",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-5",
+      "skillLabel": "Find an unknown triangle angle",
+      "structureKey": "y7-measurement-slot-5",
+      "difficulty": "easy",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "easy",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "60"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of water are needed for this drink?",
+      "correctAnswer": "3150",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Keep the recipe in the same ratio.",
+        "values": [
+          1,
+          7,
+          450
+        ],
+        "labels": [
+          "Concentrate : water = 1 : 7",
+          "Concentrate available: 450 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-end-06",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of water are needed for this drink?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-6",
+      "skillLabel": "Scale a drink recipe",
+      "structureKey": "y7-measurement-slot-6",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "3150"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the area of this parallelogram garden?",
+      "correctAnswer": "210",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallelogram",
+        "description": "Use the perpendicular height, marked by the dashed line.",
+        "values": [
+          21,
+          10
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-end-07",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the area of this parallelogram garden?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-7",
+      "skillLabel": "Use perpendicular height for a parallelogram",
+      "structureKey": "y7-measurement-slot-7",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "210"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the volume of this triangular prism?",
+      "correctAnswer": "728",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triPrism",
+        "description": "The shaded end is a right-angled triangle. The prism has the same cross-section throughout.",
+        "values": [
+          14,
+          8,
+          13
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-end-08",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the volume of this triangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-8",
+      "skillLabel": "Find a triangular prism volume",
+      "structureKey": "y7-measurement-slot-8",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "728"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the circumference of the circular sign?",
+      "correctAnswer": "87.92",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "Use 3.14 for pi. Give your answer to two decimal places.",
+        "values": [
+          28
+        ],
+        "circleMeasure": "diameter",
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-end-09",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the circumference of the circular sign?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-9",
+      "skillLabel": "Calculate circumference from diameter",
+      "structureKey": "y7-measurement-slot-9",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "87.92"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and the correct reason?",
+      "correctAnswer": "70°, because alternate angles are equal.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          70
+        ],
+        "relation": "alternate"
+      },
+      "options": [
+        "110°, because alternate angles add to 180°.",
+        "70°, because all angles on parallel lines are equal.",
+        "70°, because alternate angles are equal."
+      ],
+      "id": "y7-measurement-review-end-10",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and the correct reason?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-10",
+      "skillLabel": "Explain alternate angles",
+      "structureKey": "y7-measurement-slot-10",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "70°, because alternate angles are equal."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of x in this isosceles triangle?",
+      "correctAnswer": "50",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangleAngles",
+        "description": "The matching ticks show equal sides.",
+        "values": [
+          50,
+          50,
+          80
+        ],
+        "labels": [
+          "isosceles"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-end-11",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of x in this isosceles triangle?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-11",
+      "skillLabel": "Use equal angles in an isosceles triangle",
+      "structureKey": "y7-measurement-slot-11",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "50"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many millilitres of blue paint are needed?",
+      "correctAnswer": "2400",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Make the full amount of paint in the stated ratio.",
+        "values": [
+          6,
+          7,
+          5200
+        ],
+        "labels": [
+          "Blue : yellow = 6 : 7",
+          "Total paint needed: 5200 mL"
+        ],
+        "unit": "mL"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "mL",
+        "ariaLabel": "Answer in mL"
+      },
+      "id": "y7-measurement-review-end-12",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many millilitres of blue paint are needed?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-12",
+      "skillLabel": "Divide a mixture in a given ratio",
+      "structureKey": "y7-measurement-slot-12",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2400"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the perpendicular height of this triangle?",
+      "correctAnswer": "12",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "triangle",
+        "description": "The area and base length are given. Find the dashed height.",
+        "values": [
+          22,
+          12
+        ],
+        "unknown": "height",
+        "unit": "cm",
+        "labels": [
+          "Area: 132 cm²"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-end-13",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the perpendicular height of this triangle?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-13",
+      "skillLabel": "Find a triangle height from area",
+      "structureKey": "y7-measurement-slot-13",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "12"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the missing length of this rectangular prism?",
+      "correctAnswer": "16",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "rectPrism",
+        "description": "The volume and two dimensions are given.",
+        "values": [
+          16,
+          9,
+          8
+        ],
+        "unknown": "length",
+        "unit": "cm",
+        "labels": [
+          "Volume: 1152 cm³"
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm",
+        "ariaLabel": "Answer in cm"
+      },
+      "id": "y7-measurement-review-end-14",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the missing length of this rectangular prism?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-14",
+      "skillLabel": "Find a prism length from volume",
+      "structureKey": "y7-measurement-slot-14",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "16"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which expression gives the exact circumference of this circle?",
+      "correctAnswer": "π × d",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "circle",
+        "description": "The full width through the centre is labelled d.",
+        "values": [
+          18
+        ],
+        "circleMeasure": "diameter",
+        "labels": [
+          "symbolic"
+        ]
+      },
+      "options": [
+        "π × d",
+        "2 × π × d",
+        "d ÷ π"
+      ],
+      "id": "y7-measurement-review-end-15",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which expression gives the exact circumference of this circle?",
+      "primaryDescriptorCode": "AC9M7M03",
+      "curriculumCodes": [
+        "AC9M7M03"
+      ],
+      "skillId": "y7-measurement-slot-15",
+      "skillLabel": "Identify the exact circumference relationship",
+      "structureKey": "y7-measurement-slot-15",
+      "difficulty": "moderate",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "moderate",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "π × d"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the total area of the two triangular shade sails?",
+      "correctAnswer": "255",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairTriangles",
+        "description": "The two sails do not overlap. Find their combined area.",
+        "values": [
+          24,
+          13,
+          18,
+          11
+        ],
+        "unit": "m"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "m²",
+        "ariaLabel": "Answer in m²"
+      },
+      "id": "y7-measurement-review-end-16",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the total area of the two triangular shade sails?",
+      "primaryDescriptorCode": "AC9M7M01",
+      "curriculumCodes": [
+        "AC9M7M01"
+      ],
+      "skillId": "y7-measurement-slot-16",
+      "skillLabel": "Combine two triangular areas",
+      "structureKey": "y7-measurement-slot-16",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "255"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "correctAnswer": "492",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "pairPrisms",
+        "description": "Box A is a rectangular prism. Box B is a triangular prism with a right-angled end.",
+        "values": [
+          14,
+          10,
+          9,
+          16,
+          8,
+          12
+        ],
+        "unit": "cm"
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "cm³",
+        "ariaLabel": "Answer in cm³"
+      },
+      "id": "y7-measurement-review-end-17",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "How many cubic centimetres greater is box A’s volume than box B’s?",
+      "primaryDescriptorCode": "AC9M7M02",
+      "curriculumCodes": [
+        "AC9M7M02"
+      ],
+      "skillId": "y7-measurement-slot-17",
+      "skillLabel": "Compare rectangular and triangular prism volumes",
+      "structureKey": "y7-measurement-slot-17",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "492"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which answer gives the size of x and explains why?",
+      "correctAnswer": "120°, because co-interior angles add to 180°.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "parallel",
+        "description": "The two marked lines are parallel.",
+        "values": [
+          60
+        ],
+        "relation": "cointerior"
+      },
+      "options": [
+        "120°, because co-interior angles add to 180°.",
+        "60°, because co-interior angles are equal.",
+        "120°, because vertically opposite angles add to 180°."
+      ],
+      "id": "y7-measurement-review-end-18",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which answer gives the size of x and explains why?",
+      "primaryDescriptorCode": "AC9M7M04",
+      "curriculumCodes": [
+        "AC9M7M04"
+      ],
+      "skillId": "y7-measurement-slot-18",
+      "skillLabel": "Explain co-interior angle calculation",
+      "structureKey": "y7-measurement-slot-18",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "120°, because co-interior angles add to 180°."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "What is the size of the missing angle in this quadrilateral?",
+      "correctAnswer": "100",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "quadAngles",
+        "description": "Find the angle marked x.",
+        "values": [
+          80,
+          70,
+          110,
+          100
+        ]
+      },
+      "answerFormat": {
+        "kind": "number",
+        "unit": "°",
+        "ariaLabel": "Answer in °"
+      },
+      "id": "y7-measurement-review-end-19",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "numeric",
+      "readAloudText": "What is the size of the missing angle in this quadrilateral?",
+      "primaryDescriptorCode": "AC9M7M05",
+      "curriculumCodes": [
+        "AC9M7M05"
+      ],
+      "skillId": "y7-measurement-slot-19",
+      "skillLabel": "Use a quadrilateral angle sum",
+      "structureKey": "y7-measurement-slot-19",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "100"
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    },
+    {
+      "prompt": "Which plan makes the most green paint without changing the colour?",
+      "correctAnswer": "2600 mL, using all the blue paint and keeping the 6:7 ratio.",
+      "visual": {
+        "type": "measurement_year7_panel",
+        "task": "ratio",
+        "description": "Mix only blue and yellow paint. Keep the stated ratio and do not use more paint than is available.",
+        "values": [
+          6,
+          7,
+          1200,
+          1750
+        ],
+        "labels": [
+          "Blue : yellow = 6 : 7",
+          "Available: 1200 mL blue and 1750 mL yellow"
+        ],
+        "unit": "mL"
+      },
+      "options": [
+        "3250 mL, using all the yellow paint even if more blue is needed.",
+        "2600 mL, using all the blue paint and keeping the 6:7 ratio.",
+        "2950 mL, because you should mix all the paint available."
+      ],
+      "id": "y7-measurement-review-end-20",
+      "version": "1.0.0-review.1",
+      "form": "end",
+      "type": "mcq",
+      "readAloudText": "Which plan makes the most green paint without changing the colour?",
+      "primaryDescriptorCode": "AC9M7M06",
+      "curriculumCodes": [
+        "AC9M7M06"
+      ],
+      "skillId": "y7-measurement-slot-20",
+      "skillLabel": "Choose and justify a feasible ratio plan",
+      "structureKey": "y7-measurement-slot-20",
+      "difficulty": "challenging",
+      "statistics": {
+        "calibrationStatus": "uncalibrated",
+        "expectedDifficulty": "challenging",
+        "observedDifficulty": null,
+        "discriminationIndex": null,
+        "responseFrequency": {},
+        "sampleSize": 0
+      },
+      "scoring": {
+        "kind": "exact",
+        "correctResponse": "2600 mL, using all the blue paint and keeping the 6:7 ratio."
+      },
+      "inputMode": "decimal",
+      "strand": "Measurement"
+    }
+  ]
+}
