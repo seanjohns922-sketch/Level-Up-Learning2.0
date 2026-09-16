@@ -1,14 +1,17 @@
 {
   "pretest": [
     {
-      "prompt": "Which unit gives the most precise length for this small screw?",
+      "prompt": "Which unit is most suitable for measuring the length of this small screw?",
       "correctAnswer": "Millimetres",
       "visual": {
         "type": "measurement_year5_panel",
         "task": "precision",
-        "description": "Choose a unit for measuring the screw accurately.",
+        "description": "Choose a sensible everyday unit for the small screw.",
         "values": [
           0
+        ],
+        "labels": [
+          "small screw"
         ]
       },
       "options": [
@@ -18,16 +21,16 @@
         "Kilometres"
       ],
       "id": "y5-measurement-review-pretest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "mcq",
-      "readAloudText": "Which unit gives the most precise length for this small screw?",
+      "readAloudText": "Which unit is most suitable for measuring the length of this small screw?",
       "primaryDescriptorCode": "AC9M5M01",
       "curriculumCodes": [
         "AC9M5M01"
       ],
       "skillId": "y5-measurement-slot-1",
-      "skillLabel": "Choose a precise metric unit",
+      "skillLabel": "Choose a suitable metric unit",
       "structureKey": "y5-measurement-slot-1",
       "difficulty": "easy",
       "statistics": {
@@ -73,7 +76,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-pretest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
@@ -117,7 +120,7 @@
         "90°"
       ],
       "id": "y5-measurement-review-pretest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which is the best estimate of the angle?",
@@ -166,7 +169,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-pretest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -214,7 +217,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y5-measurement-review-pretest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -246,21 +249,15 @@
       "correctAnswer": "40",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each floor square is 1 square metre.",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
         "values": [
           8,
           5
         ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each floor square is 1 square metre.",
-          "values": [
-            8,
-            5
-          ]
-        }
+        "labels": [
+          "Carpeted floor"
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -268,7 +265,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-pretest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many square metres of carpet cover the floor?",
@@ -277,7 +274,7 @@
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-6",
-      "skillLabel": "Find a tiled floor area",
+      "skillLabel": "Calculate a rectangular floor area",
       "structureKey": "y5-measurement-slot-6",
       "difficulty": "easy",
       "statistics": {
@@ -313,7 +310,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-pretest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -362,7 +359,7 @@
         "ariaLabel": "Enter the hour, minutes and AM or PM"
       },
       "id": "y5-measurement-review-pretest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "Write this time using AM or PM.",
@@ -422,7 +419,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-pretest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this garden, in metres?",
@@ -462,7 +459,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-pretest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "Construct an angle of 58°.",
@@ -510,7 +507,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y5-measurement-review-pretest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many millilitres are in the container?",
@@ -538,172 +535,18 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What is the tiled area in square metres?",
-      "correctAnswer": "29",
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "106",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each shaded tile is 1 square metre.",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
         "values": [
-          7,
-          5
-        ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each shaded tile is 1 square metre.",
-          "values": [
-            7,
-            5
-          ],
-          "areaCells": [
-            [
-              0,
-              0,
-              "full"
-            ],
-            [
-              1,
-              0,
-              "full"
-            ],
-            [
-              2,
-              0,
-              "full"
-            ],
-            [
-              3,
-              0,
-              "full"
-            ],
-            [
-              0,
-              1,
-              "full"
-            ],
-            [
-              1,
-              1,
-              "full"
-            ],
-            [
-              2,
-              1,
-              "full"
-            ],
-            [
-              3,
-              1,
-              "full"
-            ],
-            [
-              0,
-              2,
-              "full"
-            ],
-            [
-              1,
-              2,
-              "full"
-            ],
-            [
-              2,
-              2,
-              "full"
-            ],
-            [
-              3,
-              2,
-              "full"
-            ],
-            [
-              4,
-              2,
-              "full"
-            ],
-            [
-              5,
-              2,
-              "full"
-            ],
-            [
-              6,
-              2,
-              "full"
-            ],
-            [
-              0,
-              3,
-              "full"
-            ],
-            [
-              1,
-              3,
-              "full"
-            ],
-            [
-              2,
-              3,
-              "full"
-            ],
-            [
-              3,
-              3,
-              "full"
-            ],
-            [
-              4,
-              3,
-              "full"
-            ],
-            [
-              5,
-              3,
-              "full"
-            ],
-            [
-              6,
-              3,
-              "full"
-            ],
-            [
-              0,
-              4,
-              "full"
-            ],
-            [
-              1,
-              4,
-              "full"
-            ],
-            [
-              2,
-              4,
-              "full"
-            ],
-            [
-              3,
-              4,
-              "full"
-            ],
-            [
-              4,
-              4,
-              "full"
-            ],
-            [
-              5,
-              4,
-              "full"
-            ],
-            [
-              6,
-              4,
-              "full"
-            ]
-          ]
-        }
+          14,
+          9,
+          5,
+          4
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -711,16 +554,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-pretest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "What is the tiled area in square metres?",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-12",
-      "skillLabel": "Find area of an irregular tiled space",
+      "skillLabel": "Calculate a composite floor area",
       "structureKey": "y5-measurement-slot-12",
       "difficulty": "moderate",
       "statistics": {
@@ -733,7 +576,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "29"
+        "correctResponse": "106"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -760,7 +603,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-pretest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -805,7 +648,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-pretest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -855,7 +698,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y5-measurement-review-pretest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many grams heavier is parcel A?",
@@ -883,12 +726,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many square metres larger is garden B?",
-      "correctAnswer": "8",
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "62",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "compareArea",
-        "description": "Both gardens have the same perimeter. Each grid square is 1 square metre.",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
         "values": [
           9,
           3,
@@ -906,16 +749,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-pretest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many square metres larger is garden B?",
+      "readAloudText": "What is the total area of both gardens in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-16",
-      "skillLabel": "Compare areas with the same perimeter",
+      "skillLabel": "Combine two rectangular garden areas",
       "structureKey": "y5-measurement-slot-16",
       "difficulty": "challenging",
       "statistics": {
@@ -928,7 +771,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "8"
+        "correctResponse": "62"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -951,7 +794,7 @@
         "36° — acute"
       ],
       "id": "y5-measurement-review-pretest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which measurement and angle name are correct?",
@@ -1000,7 +843,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y5-measurement-review-pretest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many minutes does the journey take?",
@@ -1251,7 +1094,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-pretest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many square metres need paving?",
@@ -1291,7 +1134,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-pretest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "Construct an angle of 116°.",
@@ -1321,15 +1164,19 @@
   ],
   "posttest": [
     {
-      "prompt": "Which unit gives the most precise length for this small screw?",
-      "correctAnswer": "Millimetres",
+      "prompt": "Which unit is most suitable for measuring the length of this pencil?",
+      "correctAnswer": "Centimetres",
       "visual": {
         "type": "measurement_year5_panel",
         "task": "precision",
-        "description": "Choose a unit for measuring the screw accurately.",
+        "description": "Choose a sensible everyday unit for the pencil.",
         "values": [
           1
-        ]
+        ],
+        "labels": [
+          "pencil"
+        ],
+        "art": "week1-3d/pencil.png"
       },
       "options": [
         "Centimetres",
@@ -1338,16 +1185,16 @@
         "Millimetres"
       ],
       "id": "y5-measurement-review-posttest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "mcq",
-      "readAloudText": "Which unit gives the most precise length for this small screw?",
+      "readAloudText": "Which unit is most suitable for measuring the length of this pencil?",
       "primaryDescriptorCode": "AC9M5M01",
       "curriculumCodes": [
         "AC9M5M01"
       ],
       "skillId": "y5-measurement-slot-1",
-      "skillLabel": "Choose a precise metric unit",
+      "skillLabel": "Choose a suitable metric unit",
       "structureKey": "y5-measurement-slot-1",
       "difficulty": "easy",
       "statistics": {
@@ -1360,7 +1207,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Millimetres"
+        "correctResponse": "Centimetres"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -1393,7 +1240,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-posttest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
@@ -1437,7 +1284,7 @@
         "35°"
       ],
       "id": "y5-measurement-review-posttest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which is the best estimate of the angle?",
@@ -1486,7 +1333,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-posttest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -1534,7 +1381,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y5-measurement-review-posttest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -1566,21 +1413,15 @@
       "correctAnswer": "36",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each floor square is 1 square metre.",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
         "values": [
           9,
           4
         ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each floor square is 1 square metre.",
-          "values": [
-            9,
-            4
-          ]
-        }
+        "labels": [
+          "Carpeted floor"
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -1588,7 +1429,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-posttest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many square metres of carpet cover the floor?",
@@ -1597,7 +1438,7 @@
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-6",
-      "skillLabel": "Find a tiled floor area",
+      "skillLabel": "Calculate a rectangular floor area",
       "structureKey": "y5-measurement-slot-6",
       "difficulty": "easy",
       "statistics": {
@@ -1633,7 +1474,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-posttest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -1682,7 +1523,7 @@
         "ariaLabel": "Enter the hour, minutes and AM or PM"
       },
       "id": "y5-measurement-review-posttest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "Write this time using AM or PM.",
@@ -1742,7 +1583,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-posttest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this garden, in metres?",
@@ -1782,7 +1623,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-posttest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "Construct an angle of 64°.",
@@ -1830,7 +1671,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y5-measurement-review-posttest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many millilitres are in the container?",
@@ -1858,197 +1699,18 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What is the tiled area in square metres?",
-      "correctAnswer": "34",
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "142",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each shaded tile is 1 square metre.",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
         "values": [
-          8,
-          5
-        ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each shaded tile is 1 square metre.",
-          "values": [
-            8,
-            5
-          ],
-          "areaCells": [
-            [
-              0,
-              0,
-              "full"
-            ],
-            [
-              1,
-              0,
-              "full"
-            ],
-            [
-              2,
-              0,
-              "full"
-            ],
-            [
-              3,
-              0,
-              "full"
-            ],
-            [
-              4,
-              0,
-              "full"
-            ],
-            [
-              0,
-              1,
-              "full"
-            ],
-            [
-              1,
-              1,
-              "full"
-            ],
-            [
-              2,
-              1,
-              "full"
-            ],
-            [
-              3,
-              1,
-              "full"
-            ],
-            [
-              4,
-              1,
-              "full"
-            ],
-            [
-              0,
-              2,
-              "full"
-            ],
-            [
-              1,
-              2,
-              "full"
-            ],
-            [
-              2,
-              2,
-              "full"
-            ],
-            [
-              3,
-              2,
-              "full"
-            ],
-            [
-              4,
-              2,
-              "full"
-            ],
-            [
-              5,
-              2,
-              "full"
-            ],
-            [
-              6,
-              2,
-              "full"
-            ],
-            [
-              7,
-              2,
-              "full"
-            ],
-            [
-              0,
-              3,
-              "full"
-            ],
-            [
-              1,
-              3,
-              "full"
-            ],
-            [
-              2,
-              3,
-              "full"
-            ],
-            [
-              3,
-              3,
-              "full"
-            ],
-            [
-              4,
-              3,
-              "full"
-            ],
-            [
-              5,
-              3,
-              "full"
-            ],
-            [
-              6,
-              3,
-              "full"
-            ],
-            [
-              7,
-              3,
-              "full"
-            ],
-            [
-              0,
-              4,
-              "full"
-            ],
-            [
-              1,
-              4,
-              "full"
-            ],
-            [
-              2,
-              4,
-              "full"
-            ],
-            [
-              3,
-              4,
-              "full"
-            ],
-            [
-              4,
-              4,
-              "full"
-            ],
-            [
-              5,
-              4,
-              "full"
-            ],
-            [
-              6,
-              4,
-              "full"
-            ],
-            [
-              7,
-              4,
-              "full"
-            ]
-          ]
-        }
+          16,
+          10,
+          6,
+          3
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -2056,16 +1718,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-posttest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "What is the tiled area in square metres?",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-12",
-      "skillLabel": "Find area of an irregular tiled space",
+      "skillLabel": "Calculate a composite floor area",
       "structureKey": "y5-measurement-slot-12",
       "difficulty": "moderate",
       "statistics": {
@@ -2078,7 +1740,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "34"
+        "correctResponse": "142"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -2105,7 +1767,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-posttest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -2150,7 +1812,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-posttest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -2200,7 +1862,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y5-measurement-review-posttest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many grams heavier is parcel A?",
@@ -2228,12 +1890,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many square metres larger is garden B?",
-      "correctAnswer": "10",
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "70",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "compareArea",
-        "description": "Both gardens have the same perimeter. Each grid square is 1 square metre.",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
         "values": [
           10,
           3,
@@ -2251,16 +1913,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-posttest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many square metres larger is garden B?",
+      "readAloudText": "What is the total area of both gardens in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-16",
-      "skillLabel": "Compare areas with the same perimeter",
+      "skillLabel": "Combine two rectangular garden areas",
       "structureKey": "y5-measurement-slot-16",
       "difficulty": "challenging",
       "statistics": {
@@ -2273,7 +1935,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "10"
+        "correctResponse": "70"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -2296,7 +1958,7 @@
         "136° — obtuse"
       ],
       "id": "y5-measurement-review-posttest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which measurement and angle name are correct?",
@@ -2345,7 +2007,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y5-measurement-review-posttest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many minutes does the journey take?",
@@ -2611,7 +2273,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-posttest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many square metres need paving?",
@@ -2651,7 +2313,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-posttest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "Construct an angle of 128°.",
@@ -2681,15 +2343,19 @@
   ],
   "start": [
     {
-      "prompt": "Which unit gives the most precise length for this small screw?",
-      "correctAnswer": "Millimetres",
+      "prompt": "Which unit is most suitable for measuring the width of this book?",
+      "correctAnswer": "Centimetres",
       "visual": {
         "type": "measurement_year5_panel",
         "task": "precision",
-        "description": "Choose a unit for measuring the screw accurately.",
+        "description": "Choose a sensible everyday unit for the book.",
         "values": [
           2
-        ]
+        ],
+        "labels": [
+          "book"
+        ],
+        "art": "week2-3d/book.png"
       },
       "options": [
         "Metres",
@@ -2698,16 +2364,16 @@
         "Centimetres"
       ],
       "id": "y5-measurement-review-start-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "mcq",
-      "readAloudText": "Which unit gives the most precise length for this small screw?",
+      "readAloudText": "Which unit is most suitable for measuring the width of this book?",
       "primaryDescriptorCode": "AC9M5M01",
       "curriculumCodes": [
         "AC9M5M01"
       ],
       "skillId": "y5-measurement-slot-1",
-      "skillLabel": "Choose a precise metric unit",
+      "skillLabel": "Choose a suitable metric unit",
       "structureKey": "y5-measurement-slot-1",
       "difficulty": "easy",
       "statistics": {
@@ -2720,7 +2386,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Millimetres"
+        "correctResponse": "Centimetres"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -2753,7 +2419,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-start-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
@@ -2797,7 +2463,7 @@
         "50°"
       ],
       "id": "y5-measurement-review-start-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which is the best estimate of the angle?",
@@ -2846,7 +2512,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-start-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -2894,7 +2560,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y5-measurement-review-start-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -2926,21 +2592,15 @@
       "correctAnswer": "42",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each floor square is 1 square metre.",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
         "values": [
           7,
           6
         ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each floor square is 1 square metre.",
-          "values": [
-            7,
-            6
-          ]
-        }
+        "labels": [
+          "Carpeted floor"
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -2948,7 +2608,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-start-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many square metres of carpet cover the floor?",
@@ -2957,7 +2617,7 @@
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-6",
-      "skillLabel": "Find a tiled floor area",
+      "skillLabel": "Calculate a rectangular floor area",
       "structureKey": "y5-measurement-slot-6",
       "difficulty": "easy",
       "statistics": {
@@ -2993,7 +2653,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-start-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -3042,7 +2702,7 @@
         "ariaLabel": "Enter the hour, minutes and AM or PM"
       },
       "id": "y5-measurement-review-start-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "Write this time using AM or PM.",
@@ -3102,7 +2762,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-start-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this garden, in metres?",
@@ -3142,7 +2802,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-start-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "Construct an angle of 72°.",
@@ -3190,7 +2850,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y5-measurement-review-start-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many millilitres are in the container?",
@@ -3218,222 +2878,18 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What is the tiled area in square metres?",
-      "correctAnswer": "39",
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "163",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each shaded tile is 1 square metre.",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
         "values": [
-          9,
+          18,
+          11,
+          7,
           5
-        ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each shaded tile is 1 square metre.",
-          "values": [
-            9,
-            5
-          ],
-          "areaCells": [
-            [
-              0,
-              0,
-              "full"
-            ],
-            [
-              1,
-              0,
-              "full"
-            ],
-            [
-              2,
-              0,
-              "full"
-            ],
-            [
-              3,
-              0,
-              "full"
-            ],
-            [
-              4,
-              0,
-              "full"
-            ],
-            [
-              5,
-              0,
-              "full"
-            ],
-            [
-              0,
-              1,
-              "full"
-            ],
-            [
-              1,
-              1,
-              "full"
-            ],
-            [
-              2,
-              1,
-              "full"
-            ],
-            [
-              3,
-              1,
-              "full"
-            ],
-            [
-              4,
-              1,
-              "full"
-            ],
-            [
-              5,
-              1,
-              "full"
-            ],
-            [
-              0,
-              2,
-              "full"
-            ],
-            [
-              1,
-              2,
-              "full"
-            ],
-            [
-              2,
-              2,
-              "full"
-            ],
-            [
-              3,
-              2,
-              "full"
-            ],
-            [
-              4,
-              2,
-              "full"
-            ],
-            [
-              5,
-              2,
-              "full"
-            ],
-            [
-              6,
-              2,
-              "full"
-            ],
-            [
-              7,
-              2,
-              "full"
-            ],
-            [
-              8,
-              2,
-              "full"
-            ],
-            [
-              0,
-              3,
-              "full"
-            ],
-            [
-              1,
-              3,
-              "full"
-            ],
-            [
-              2,
-              3,
-              "full"
-            ],
-            [
-              3,
-              3,
-              "full"
-            ],
-            [
-              4,
-              3,
-              "full"
-            ],
-            [
-              5,
-              3,
-              "full"
-            ],
-            [
-              6,
-              3,
-              "full"
-            ],
-            [
-              7,
-              3,
-              "full"
-            ],
-            [
-              8,
-              3,
-              "full"
-            ],
-            [
-              0,
-              4,
-              "full"
-            ],
-            [
-              1,
-              4,
-              "full"
-            ],
-            [
-              2,
-              4,
-              "full"
-            ],
-            [
-              3,
-              4,
-              "full"
-            ],
-            [
-              4,
-              4,
-              "full"
-            ],
-            [
-              5,
-              4,
-              "full"
-            ],
-            [
-              6,
-              4,
-              "full"
-            ],
-            [
-              7,
-              4,
-              "full"
-            ],
-            [
-              8,
-              4,
-              "full"
-            ]
-          ]
-        }
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -3441,16 +2897,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-start-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "What is the tiled area in square metres?",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-12",
-      "skillLabel": "Find area of an irregular tiled space",
+      "skillLabel": "Calculate a composite floor area",
       "structureKey": "y5-measurement-slot-12",
       "difficulty": "moderate",
       "statistics": {
@@ -3463,7 +2919,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "39"
+        "correctResponse": "163"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -3490,7 +2946,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-start-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -3535,7 +2991,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-start-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -3585,7 +3041,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y5-measurement-review-start-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many grams heavier is parcel A?",
@@ -3613,12 +3069,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many square metres larger is garden B?",
-      "correctAnswer": "12",
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "78",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "compareArea",
-        "description": "Both gardens have the same perimeter. Each grid square is 1 square metre.",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
         "values": [
           11,
           3,
@@ -3636,16 +3092,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-start-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many square metres larger is garden B?",
+      "readAloudText": "What is the total area of both gardens in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-16",
-      "skillLabel": "Compare areas with the same perimeter",
+      "skillLabel": "Combine two rectangular garden areas",
       "structureKey": "y5-measurement-slot-16",
       "difficulty": "challenging",
       "statistics": {
@@ -3658,7 +3114,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "12"
+        "correctResponse": "78"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -3681,7 +3137,7 @@
         "32° — obtuse"
       ],
       "id": "y5-measurement-review-start-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which measurement and angle name are correct?",
@@ -3730,7 +3186,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y5-measurement-review-start-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many minutes does the journey take?",
@@ -4041,7 +3497,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-start-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many square metres need paving?",
@@ -4081,7 +3537,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-start-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "Construct an angle of 134°.",
@@ -4111,15 +3567,19 @@
   ],
   "mid": [
     {
-      "prompt": "Which unit gives the most precise length for this small screw?",
-      "correctAnswer": "Millimetres",
+      "prompt": "Which unit is most suitable for measuring the length of this classroom?",
+      "correctAnswer": "Metres",
       "visual": {
         "type": "measurement_year5_panel",
         "task": "precision",
-        "description": "Choose a unit for measuring the screw accurately.",
+        "description": "Choose a sensible everyday unit for the classroom.",
         "values": [
           3
-        ]
+        ],
+        "labels": [
+          "classroom"
+        ],
+        "art": "everyday-3d/object-classroom.png"
       },
       "options": [
         "Kilometres",
@@ -4128,16 +3588,16 @@
         "Metres"
       ],
       "id": "y5-measurement-review-mid-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "mcq",
-      "readAloudText": "Which unit gives the most precise length for this small screw?",
+      "readAloudText": "Which unit is most suitable for measuring the length of this classroom?",
       "primaryDescriptorCode": "AC9M5M01",
       "curriculumCodes": [
         "AC9M5M01"
       ],
       "skillId": "y5-measurement-slot-1",
-      "skillLabel": "Choose a precise metric unit",
+      "skillLabel": "Choose a suitable metric unit",
       "structureKey": "y5-measurement-slot-1",
       "difficulty": "easy",
       "statistics": {
@@ -4150,7 +3610,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Millimetres"
+        "correctResponse": "Metres"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -4183,7 +3643,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-mid-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
@@ -4227,7 +3687,7 @@
         "105°"
       ],
       "id": "y5-measurement-review-mid-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which is the best estimate of the angle?",
@@ -4276,7 +3736,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-mid-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -4324,7 +3784,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y5-measurement-review-mid-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -4356,21 +3816,15 @@
       "correctAnswer": "48",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each floor square is 1 square metre.",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
         "values": [
           8,
           6
         ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each floor square is 1 square metre.",
-          "values": [
-            8,
-            6
-          ]
-        }
+        "labels": [
+          "Carpeted floor"
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -4378,7 +3832,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-mid-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many square metres of carpet cover the floor?",
@@ -4387,7 +3841,7 @@
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-6",
-      "skillLabel": "Find a tiled floor area",
+      "skillLabel": "Calculate a rectangular floor area",
       "structureKey": "y5-measurement-slot-6",
       "difficulty": "easy",
       "statistics": {
@@ -4423,7 +3877,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-mid-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -4472,7 +3926,7 @@
         "ariaLabel": "Enter the hour, minutes and AM or PM"
       },
       "id": "y5-measurement-review-mid-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "Write this time using AM or PM.",
@@ -4532,7 +3986,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-mid-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this garden, in metres?",
@@ -4572,7 +4026,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-mid-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "Construct an angle of 56°.",
@@ -4620,7 +4074,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y5-measurement-review-mid-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many millilitres are in the container?",
@@ -4648,207 +4102,18 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What is the tiled area in square metres?",
-      "correctAnswer": "36",
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "160",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each shaded tile is 1 square metre.",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
         "values": [
-          7,
-          6
-        ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each shaded tile is 1 square metre.",
-          "values": [
-            7,
-            6
-          ],
-          "areaCells": [
-            [
-              0,
-              0,
-              "full"
-            ],
-            [
-              1,
-              0,
-              "full"
-            ],
-            [
-              2,
-              0,
-              "full"
-            ],
-            [
-              3,
-              0,
-              "full"
-            ],
-            [
-              0,
-              1,
-              "full"
-            ],
-            [
-              1,
-              1,
-              "full"
-            ],
-            [
-              2,
-              1,
-              "full"
-            ],
-            [
-              3,
-              1,
-              "full"
-            ],
-            [
-              0,
-              2,
-              "full"
-            ],
-            [
-              1,
-              2,
-              "full"
-            ],
-            [
-              2,
-              2,
-              "full"
-            ],
-            [
-              3,
-              2,
-              "full"
-            ],
-            [
-              4,
-              2,
-              "full"
-            ],
-            [
-              5,
-              2,
-              "full"
-            ],
-            [
-              6,
-              2,
-              "full"
-            ],
-            [
-              0,
-              3,
-              "full"
-            ],
-            [
-              1,
-              3,
-              "full"
-            ],
-            [
-              2,
-              3,
-              "full"
-            ],
-            [
-              3,
-              3,
-              "full"
-            ],
-            [
-              4,
-              3,
-              "full"
-            ],
-            [
-              5,
-              3,
-              "full"
-            ],
-            [
-              6,
-              3,
-              "full"
-            ],
-            [
-              0,
-              4,
-              "full"
-            ],
-            [
-              1,
-              4,
-              "full"
-            ],
-            [
-              2,
-              4,
-              "full"
-            ],
-            [
-              3,
-              4,
-              "full"
-            ],
-            [
-              4,
-              4,
-              "full"
-            ],
-            [
-              5,
-              4,
-              "full"
-            ],
-            [
-              6,
-              4,
-              "full"
-            ],
-            [
-              0,
-              5,
-              "full"
-            ],
-            [
-              1,
-              5,
-              "full"
-            ],
-            [
-              2,
-              5,
-              "full"
-            ],
-            [
-              3,
-              5,
-              "full"
-            ],
-            [
-              4,
-              5,
-              "full"
-            ],
-            [
-              5,
-              5,
-              "full"
-            ],
-            [
-              6,
-              5,
-              "full"
-            ]
-          ]
-        }
+          15,
+          12,
+          5,
+          4
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -4856,16 +4121,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-mid-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "What is the tiled area in square metres?",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-12",
-      "skillLabel": "Find area of an irregular tiled space",
+      "skillLabel": "Calculate a composite floor area",
       "structureKey": "y5-measurement-slot-12",
       "difficulty": "moderate",
       "statistics": {
@@ -4878,7 +4143,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "36"
+        "correctResponse": "160"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -4905,7 +4170,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-mid-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -4950,7 +4215,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-mid-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -5000,7 +4265,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y5-measurement-review-mid-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many grams heavier is parcel A?",
@@ -5028,12 +4293,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many square metres larger is garden B?",
-      "correctAnswer": "14",
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "86",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "compareArea",
-        "description": "Both gardens have the same perimeter. Each grid square is 1 square metre.",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
         "values": [
           12,
           3,
@@ -5051,16 +4316,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-mid-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many square metres larger is garden B?",
+      "readAloudText": "What is the total area of both gardens in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-16",
-      "skillLabel": "Compare areas with the same perimeter",
+      "skillLabel": "Combine two rectangular garden areas",
       "structureKey": "y5-measurement-slot-16",
       "difficulty": "challenging",
       "statistics": {
@@ -5073,7 +4338,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "14"
+        "correctResponse": "86"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -5096,7 +4361,7 @@
         "48° — acute"
       ],
       "id": "y5-measurement-review-mid-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which measurement and angle name are correct?",
@@ -5145,7 +4410,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y5-measurement-review-mid-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many minutes does the journey take?",
@@ -5381,7 +4646,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-mid-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many square metres need paving?",
@@ -5421,7 +4686,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-mid-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "Construct an angle of 122°.",
@@ -5451,14 +4716,17 @@
   ],
   "end": [
     {
-      "prompt": "Which unit gives the most precise length for this small screw?",
+      "prompt": "Which unit is most suitable for measuring the thickness of this thin coin?",
       "correctAnswer": "Millimetres",
       "visual": {
         "type": "measurement_year5_panel",
         "task": "precision",
-        "description": "Choose a unit for measuring the screw accurately.",
+        "description": "Choose a sensible everyday unit for the thin coin.",
         "values": [
           4
+        ],
+        "labels": [
+          "thin coin"
         ]
       },
       "options": [
@@ -5468,16 +4736,16 @@
         "Kilometres"
       ],
       "id": "y5-measurement-review-end-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "mcq",
-      "readAloudText": "Which unit gives the most precise length for this small screw?",
+      "readAloudText": "Which unit is most suitable for measuring the thickness of this thin coin?",
       "primaryDescriptorCode": "AC9M5M01",
       "curriculumCodes": [
         "AC9M5M01"
       ],
       "skillId": "y5-measurement-slot-1",
-      "skillLabel": "Choose a precise metric unit",
+      "skillLabel": "Choose a suitable metric unit",
       "structureKey": "y5-measurement-slot-1",
       "difficulty": "easy",
       "statistics": {
@@ -5523,7 +4791,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-end-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many metres of fencing are needed, leaving the gate opening?",
@@ -5567,7 +4835,7 @@
         "30°"
       ],
       "id": "y5-measurement-review-end-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which is the best estimate of the angle?",
@@ -5616,7 +4884,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-end-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -5664,7 +4932,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y5-measurement-review-end-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -5696,21 +4964,15 @@
       "correctAnswer": "45",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each floor square is 1 square metre.",
+        "task": "rectangleArea",
+        "description": "Find the area using the length and width.",
         "values": [
           9,
           5
         ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each floor square is 1 square metre.",
-          "values": [
-            9,
-            5
-          ]
-        }
+        "labels": [
+          "Carpeted floor"
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -5718,7 +4980,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-end-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many square metres of carpet cover the floor?",
@@ -5727,7 +4989,7 @@
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-6",
-      "skillLabel": "Find a tiled floor area",
+      "skillLabel": "Calculate a rectangular floor area",
       "structureKey": "y5-measurement-slot-6",
       "difficulty": "easy",
       "statistics": {
@@ -5763,7 +5025,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-end-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -5812,7 +5074,7 @@
         "ariaLabel": "Enter the hour, minutes and AM or PM"
       },
       "id": "y5-measurement-review-end-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "Write this time using AM or PM.",
@@ -5872,7 +5134,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y5-measurement-review-end-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the perimeter of this garden, in metres?",
@@ -5912,7 +5174,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-end-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "Construct an angle of 68°.",
@@ -5960,7 +5222,7 @@
         "ariaLabel": "Answer in mL"
       },
       "id": "y5-measurement-review-end-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many millilitres are in the container?",
@@ -5988,237 +5250,18 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What is the tiled area in square metres?",
-      "correctAnswer": "42",
+      "prompt": "What is the area of this L-shaped floor in square metres?",
+      "correctAnswer": "146",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "base",
-        "description": "Each shaded tile is 1 square metre.",
+        "task": "compositeArea",
+        "description": "Use the measurements to find the whole floor area.",
         "values": [
-          8,
-          6
-        ],
-        "base": {
-          "type": "measurement_year4_panel",
-          "task": "area",
-          "description": "Each shaded tile is 1 square metre.",
-          "values": [
-            8,
-            6
-          ],
-          "areaCells": [
-            [
-              0,
-              0,
-              "full"
-            ],
-            [
-              1,
-              0,
-              "full"
-            ],
-            [
-              2,
-              0,
-              "full"
-            ],
-            [
-              3,
-              0,
-              "full"
-            ],
-            [
-              4,
-              0,
-              "full"
-            ],
-            [
-              0,
-              1,
-              "full"
-            ],
-            [
-              1,
-              1,
-              "full"
-            ],
-            [
-              2,
-              1,
-              "full"
-            ],
-            [
-              3,
-              1,
-              "full"
-            ],
-            [
-              4,
-              1,
-              "full"
-            ],
-            [
-              0,
-              2,
-              "full"
-            ],
-            [
-              1,
-              2,
-              "full"
-            ],
-            [
-              2,
-              2,
-              "full"
-            ],
-            [
-              3,
-              2,
-              "full"
-            ],
-            [
-              4,
-              2,
-              "full"
-            ],
-            [
-              5,
-              2,
-              "full"
-            ],
-            [
-              6,
-              2,
-              "full"
-            ],
-            [
-              7,
-              2,
-              "full"
-            ],
-            [
-              0,
-              3,
-              "full"
-            ],
-            [
-              1,
-              3,
-              "full"
-            ],
-            [
-              2,
-              3,
-              "full"
-            ],
-            [
-              3,
-              3,
-              "full"
-            ],
-            [
-              4,
-              3,
-              "full"
-            ],
-            [
-              5,
-              3,
-              "full"
-            ],
-            [
-              6,
-              3,
-              "full"
-            ],
-            [
-              7,
-              3,
-              "full"
-            ],
-            [
-              0,
-              4,
-              "full"
-            ],
-            [
-              1,
-              4,
-              "full"
-            ],
-            [
-              2,
-              4,
-              "full"
-            ],
-            [
-              3,
-              4,
-              "full"
-            ],
-            [
-              4,
-              4,
-              "full"
-            ],
-            [
-              5,
-              4,
-              "full"
-            ],
-            [
-              6,
-              4,
-              "full"
-            ],
-            [
-              7,
-              4,
-              "full"
-            ],
-            [
-              0,
-              5,
-              "full"
-            ],
-            [
-              1,
-              5,
-              "full"
-            ],
-            [
-              2,
-              5,
-              "full"
-            ],
-            [
-              3,
-              5,
-              "full"
-            ],
-            [
-              4,
-              5,
-              "full"
-            ],
-            [
-              5,
-              5,
-              "full"
-            ],
-            [
-              6,
-              5,
-              "full"
-            ],
-            [
-              7,
-              5,
-              "full"
-            ]
-          ]
-        }
+          17,
+          10,
+          6,
+          4
+        ]
       },
       "answerFormat": {
         "kind": "number",
@@ -6226,16 +5269,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-end-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "What is the tiled area in square metres?",
+      "readAloudText": "What is the area of this L-shaped floor in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-12",
-      "skillLabel": "Find area of an irregular tiled space",
+      "skillLabel": "Calculate a composite floor area",
       "structureKey": "y5-measurement-slot-12",
       "difficulty": "moderate",
       "statistics": {
@@ -6248,7 +5291,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "42"
+        "correctResponse": "146"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -6275,7 +5318,7 @@
         "ariaLabel": "Enter 24-hour time"
       },
       "id": "y5-measurement-review-end-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "Write this time using 24-hour time.",
@@ -6320,7 +5363,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y5-measurement-review-end-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the angle in degrees?",
@@ -6370,7 +5413,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y5-measurement-review-end-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many grams heavier is parcel A?",
@@ -6398,12 +5441,12 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many square metres larger is garden B?",
-      "correctAnswer": "16",
+      "prompt": "What is the total area of both gardens in square metres?",
+      "correctAnswer": "94",
       "visual": {
         "type": "measurement_year5_panel",
-        "task": "compareArea",
-        "description": "Both gardens have the same perimeter. Each grid square is 1 square metre.",
+        "task": "combinedArea",
+        "description": "Find each rectangular garden’s area, then add the two areas.",
         "values": [
           13,
           3,
@@ -6421,16 +5464,16 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-end-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many square metres larger is garden B?",
+      "readAloudText": "What is the total area of both gardens in square metres?",
       "primaryDescriptorCode": "AC9M5M02",
       "curriculumCodes": [
         "AC9M5M02"
       ],
       "skillId": "y5-measurement-slot-16",
-      "skillLabel": "Compare areas with the same perimeter",
+      "skillLabel": "Combine two rectangular garden areas",
       "structureKey": "y5-measurement-slot-16",
       "difficulty": "challenging",
       "statistics": {
@@ -6443,7 +5486,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "16"
+        "correctResponse": "94"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -6466,7 +5509,7 @@
         "142° — obtuse"
       ],
       "id": "y5-measurement-review-end-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which measurement and angle name are correct?",
@@ -6515,7 +5558,7 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y5-measurement-review-end-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many minutes does the journey take?",
@@ -6796,7 +5839,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y5-measurement-review-end-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many square metres need paving?",
@@ -6836,7 +5879,7 @@
         "baseline": "right"
       },
       "id": "y5-measurement-review-end-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "Construct an angle of 138°.",

@@ -76,13 +76,15 @@ export function MeasurelandsProtractor({
     for (let t = 0; t <= 180; t += 10) {
       const val = scale === "outer" ? t : 180 - t;
       const [x, y] = pt(t, rad);
-      out.push(<text key={`${scale}${t}`} x={x} y={y + 4} textAnchor="middle" fontSize={11.5} fontWeight={active && guidance === "full" ? 900 : 700} fill={faded ? "rgba(120,90,40,0.32)" : active && guidance === "full" ? "#b45309" : "#5a4423"}>{val}</text>);
+      out.push(<text key={`${scale}${t}`} x={x} y={y + (t === 0 || t === 180 ? 18 : 4)} textAnchor="middle" stroke="#fffaf0" strokeWidth={2} paintOrder="stroke" fontSize={11.5} fontWeight={active && guidance === "full" ? 900 : 700} fill={faded ? "rgba(120,90,40,0.32)" : active && guidance === "full" ? "#b45309" : "#5a4423"}>{val}</text>);
     }
     return out;
   };
 
   const [bx, by] = pt(baselineDeg, R);
   const [ax, ay] = pt(armDeg, R);
+  // Keep the drag handle well inside both numbered scales.
+  const [hx, hy] = pt(armDeg, R - 65);
   const baseGlow = guidance === "full" || guidance === "baseline";
   const atTarget = interactive && targetDeg != null && currentDeg === targetDeg;
 
@@ -101,19 +103,19 @@ export function MeasurelandsProtractor({
       {guidance === "full" ? (
         <path d={`M ${pt(0, correctScale === "outer" ? R + 2 : R - 12)[0]} ${pt(0, correctScale === "outer" ? R + 2 : R - 12)[1]} A ${correctScale === "outer" ? R + 2 : R - 12} ${correctScale === "outer" ? R + 2 : R - 12} 0 0 1 ${pt(180, correctScale === "outer" ? R + 2 : R - 12)[0]} ${pt(180, correctScale === "outer" ? R + 2 : R - 12)[1]}`} fill="none" stroke="rgba(245,158,11,0.4)" strokeWidth={8} strokeLinecap="round" style={{ animation: "mlGlowArc 1.6s ease infinite" }} />
       ) : null}
-      {num("outer")}
-      {num("inner")}
       {/* baseline arm */}
       {baseGlow ? <line x1={VX} y1={VY} x2={bx} y2={by} stroke="#f59e0b" strokeWidth={11} strokeLinecap="round" opacity={0.5} style={{ filter: "drop-shadow(0 0 3px rgba(245,158,11,0.9))" }} /> : null}
       <line x1={VX} y1={VY} x2={bx} y2={by} stroke="#2c1c07" strokeWidth={5} strokeLinecap="round" />
       {/* angle wedge arc */}
       <path d={`M ${pt(baselineDeg, 46)[0]} ${pt(baselineDeg, 46)[1]} A 46 46 0 0 ${baselineDeg === 0 ? 0 : 1} ${pt(armDeg, 46)[0]} ${pt(armDeg, 46)[1]}`} fill="none" stroke="#5b21b6" strokeWidth={3} />
       {/* measured arm */}
-      <line x1={VX} y1={VY} x2={ax} y2={ay} stroke={atTarget ? "#16a34a" : "#7c3aed"} strokeWidth={6} strokeLinecap="round" style={atTarget ? { filter: "drop-shadow(0 0 5px rgba(22,163,74,0.8))" } : undefined} />
+      <line x1={VX} y1={VY} x2={ax} y2={ay} stroke={atTarget ? "#16a34a" : "#7c3aed"} strokeWidth={2} strokeLinecap="round" style={atTarget ? { filter: "drop-shadow(0 0 5px rgba(22,163,74,0.8))" } : undefined} />
       {interactive ? (
-        <circle cx={ax} cy={ay} r={16} fill={atTarget ? "#16a34a" : "#7c3aed"} stroke="#fff" strokeWidth={3} style={{ cursor: "grab" }}
+        <circle cx={hx} cy={hy} r={14} fill={atTarget ? "#16a34a" : "#7c3aed"} stroke="#fff" strokeWidth={3} style={{ cursor: "grab" }}
           onPointerDown={(e) => { dragging.current = true; (e.target as Element).setPointerCapture?.(e.pointerId); }} />
       ) : null}
+      {num("outer")}
+      {num("inner")}
       {/* vertex + live value */}
       {highlightCentre ? <circle cx={VX} cy={VY} r={10} fill="none" stroke="#16a34a" strokeWidth={3} style={{ animation: "mlRing 1.1s ease-out infinite" }} /> : null}
       <circle cx={VX} cy={VY} r={7} fill={highlightCentre ? "#16a34a" : "#5b21b6"} stroke="#fff" strokeWidth={2} />
