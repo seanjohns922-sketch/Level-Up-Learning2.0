@@ -22,7 +22,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y6-measurement-review-pretest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -71,7 +71,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-pretest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of this rectangular garden?",
@@ -99,21 +99,34 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does this train journey take?",
+      "prompt": "How many minutes does the Lakeside 1 journey take?",
       "correctAnswer": "75",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "journey",
-        "description": "Read the timetable. Both times are on the same day.",
-        "values": [
-          535,
-          610
-        ],
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Lakeside 1",
         "rows": [
           {
-            "service": "Train to Lakeside",
+            "service": "Lakeside 1",
             "departs": 535,
             "arrives": 610
+          },
+          {
+            "service": "Lakeside 2",
+            "departs": 560,
+            "arrives": 625
+          },
+          {
+            "service": "Lakeside 3",
+            "departs": 585,
+            "arrives": 680
+          },
+          {
+            "service": "Lakeside 4",
+            "departs": 610,
+            "arrives": 670
           }
         ]
       },
@@ -123,10 +136,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-pretest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many minutes does this train journey take?",
+      "readAloudText": "How many minutes does the Lakeside 1 journey take?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -168,7 +181,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-pretest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the size of the angle marked with a question mark?",
@@ -217,7 +230,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y6-measurement-review-pretest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the mass of the parcel in grams?",
@@ -265,7 +278,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-pretest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the area of the L-shaped floor?",
@@ -293,26 +306,36 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes must you wait between the two trains?",
+      "prompt": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "correctAnswer": "27",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "wait",
-        "description": "Change trains at Central. Both services run on the same day.",
+        "description": "You arrive at Central at 09:38. You need at least 8 minutes to reach the next platform. Catch the first possible train to Coast. Include the platform change in your waiting time. All services run on the same day.",
         "values": [
           578,
-          605
+          8
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
-            "departs": 530,
-            "arrives": 578
+            "service": "Coast 1",
+            "departs": 572,
+            "arrives": 626
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Coast 2",
+            "departs": 583,
+            "arrives": 642
+          },
+          {
+            "service": "Coast 3",
             "departs": 605,
-            "arrives": 659
+            "arrives": 669
+          },
+          {
+            "service": "Coast 4",
+            "departs": 623,
+            "arrives": 692
           }
         ]
       },
@@ -322,10 +345,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-pretest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many minutes must you wait between the two trains?",
+      "readAloudText": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -366,7 +389,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-pretest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the size of the opposite angle marked with a question mark?",
@@ -415,7 +438,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y6-measurement-review-pretest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many litres of water are in the bottle?",
@@ -444,7 +467,7 @@
     },
     {
       "prompt": "Which is the latest train you can catch and still arrive on time?",
-      "correctAnswer": "Train B",
+      "correctAnswer": "Train C",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "services",
@@ -455,28 +478,34 @@
         "rows": [
           {
             "service": "Train A",
-            "departs": 560,
-            "arrives": 635
+            "departs": 550,
+            "arrives": 630
           },
           {
             "service": "Train B",
-            "departs": 595,
+            "departs": 580,
             "arrives": 655
           },
           {
             "service": "Train C",
-            "departs": 625,
-            "arrives": 675
+            "departs": 610,
+            "arrives": 650
+          },
+          {
+            "service": "Train D",
+            "departs": 630,
+            "arrives": 670
           }
         ]
       },
       "options": [
         "Train A",
         "Train B",
-        "Train C"
+        "Train C",
+        "Train D"
       ],
       "id": "y6-measurement-review-pretest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "mcq",
       "readAloudText": "Which is the latest train you can catch and still arrive on time?",
@@ -498,7 +527,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Train B"
+        "correctResponse": "Train C"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -522,7 +551,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-pretest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -574,7 +603,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-pretest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many square metres larger is garden B than garden A?",
@@ -623,7 +652,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-pretest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many metres long is this route?",
@@ -651,21 +680,25 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What time does the lunch break finish?",
-      "correctAnswer": "1115",
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1230",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "finish",
-        "description": "The tour is followed immediately by lunch. Enter the finishing time using 24-hour time.",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
         "values": [
-          555,
+          535,
+          45,
           85,
-          35
+          35,
+          50
         ],
         "labels": [
-          "Tour starts: 09:15",
-          "Tour lasts: 85 minutes",
-          "Lunch lasts: 35 minutes"
+          "Leave school: 08:55",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
         ]
       },
       "answerFormat": {
@@ -675,10 +708,10 @@
         "ariaLabel": "Enter the finishing time in 24-hour time"
       },
       "id": "y6-measurement-review-pretest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "What time does the lunch break finish?",
+      "readAloudText": "What time does the class arrive back at school?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -697,7 +730,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "1115"
+        "correctResponse": "1230"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -721,7 +754,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-pretest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle around the point?",
@@ -771,7 +804,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-pretest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the width of this rectangular garden?",
@@ -821,7 +854,7 @@
         "ariaLabel": "Answer in kg"
       },
       "id": "y6-measurement-review-pretest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the total mass of both parcels in kilograms?",
@@ -849,28 +882,40 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does the whole journey take, including the wait?",
+      "prompt": "How many minutes does the whole journey take, including the change at Central?",
       "correctAnswer": "141",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "connection",
-        "description": "Travel from Home to Coast, changing at Central. Include the wait. All times are on the same day.",
+        "description": "Take the Home to Central train, then the first train to Coast that leaves at least 10 minutes after you arrive at Central. Find the total time from leaving Home to arriving at Coast. All services run on the same day.",
         "values": [
-          945,
-          1000,
-          1018,
-          1086
+          10
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
+            "service": "Home → Central",
             "departs": 945,
             "arrives": 1000
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Central → Coast 1",
+            "departs": 995,
+            "arrives": 1063
+          },
+          {
+            "service": "Central → Coast 2",
+            "departs": 1008,
+            "arrives": 1076
+          },
+          {
+            "service": "Central → Coast 3",
             "departs": 1018,
             "arrives": 1086
+          },
+          {
+            "service": "Central → Coast 4",
+            "departs": 1038,
+            "arrives": 1068
           }
         ]
       },
@@ -880,16 +925,16 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-pretest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
-      "readAloudText": "How many minutes does the whole journey take, including the wait?",
+      "readAloudText": "How many minutes does the whole journey take, including the change at Central?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
       ],
       "skillId": "y6-measurement-slot-18",
-      "skillLabel": "Find a two-stage journey duration including a wait",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
       "structureKey": "y6-measurement-slot-18",
       "difficulty": "challenging",
       "statistics": {
@@ -932,7 +977,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-pretest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
@@ -979,7 +1024,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-pretest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "pretest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -1030,7 +1075,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y6-measurement-review-posttest-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -1079,7 +1124,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-posttest-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of this rectangular garden?",
@@ -1107,21 +1152,34 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does this train journey take?",
+      "prompt": "How many minutes does the Lakeside 2 journey take?",
       "correctAnswer": "85",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "journey",
-        "description": "Read the timetable. Both times are on the same day.",
-        "values": [
-          565,
-          650
-        ],
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Lakeside 2",
         "rows": [
           {
-            "service": "Train to Lakeside",
+            "service": "Lakeside 1",
+            "departs": 540,
+            "arrives": 640
+          },
+          {
+            "service": "Lakeside 2",
             "departs": 565,
             "arrives": 650
+          },
+          {
+            "service": "Lakeside 3",
+            "departs": 590,
+            "arrives": 695
+          },
+          {
+            "service": "Lakeside 4",
+            "departs": 615,
+            "arrives": 685
           }
         ]
       },
@@ -1131,10 +1189,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-posttest-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many minutes does this train journey take?",
+      "readAloudText": "How many minutes does the Lakeside 2 journey take?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -1176,7 +1234,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-posttest-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the size of the angle marked with a question mark?",
@@ -1225,7 +1283,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y6-measurement-review-posttest-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the mass of the parcel in grams?",
@@ -1273,7 +1331,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-posttest-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the area of the L-shaped floor?",
@@ -1301,26 +1359,36 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes must you wait between the two trains?",
+      "prompt": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "correctAnswer": "32",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "wait",
-        "description": "Change trains at Central. Both services run on the same day.",
+        "description": "You arrive at Central at 10:23. You need at least 10 minutes to reach the next platform. Catch the first possible train to Coast. Include the platform change in your waiting time. All services run on the same day.",
         "values": [
           623,
-          655
+          10
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
-            "departs": 575,
-            "arrives": 623
+            "service": "Coast 1",
+            "departs": 617,
+            "arrives": 671
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Coast 2",
+            "departs": 630,
+            "arrives": 689
+          },
+          {
+            "service": "Coast 3",
             "departs": 655,
-            "arrives": 709
+            "arrives": 719
+          },
+          {
+            "service": "Coast 4",
+            "departs": 673,
+            "arrives": 742
           }
         ]
       },
@@ -1330,10 +1398,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-posttest-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many minutes must you wait between the two trains?",
+      "readAloudText": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -1374,7 +1442,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-posttest-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the size of the opposite angle marked with a question mark?",
@@ -1423,7 +1491,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y6-measurement-review-posttest-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many litres of water are in the bottle?",
@@ -1452,7 +1520,7 @@
     },
     {
       "prompt": "Which is the latest train you can catch and still arrive on time?",
-      "correctAnswer": "Train C",
+      "correctAnswer": "Train D",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "services",
@@ -1463,28 +1531,34 @@
         "rows": [
           {
             "service": "Train B",
-            "departs": 595,
-            "arrives": 670
+            "departs": 585,
+            "arrives": 665
           },
           {
             "service": "Train C",
-            "departs": 630,
+            "departs": 615,
             "arrives": 690
           },
           {
+            "service": "Train D",
+            "departs": 645,
+            "arrives": 685
+          },
+          {
             "service": "Train A",
-            "departs": 660,
-            "arrives": 710
+            "departs": 665,
+            "arrives": 705
           }
         ]
       },
       "options": [
         "Train C",
+        "Train D",
         "Train A",
         "Train B"
       ],
       "id": "y6-measurement-review-posttest-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "mcq",
       "readAloudText": "Which is the latest train you can catch and still arrive on time?",
@@ -1506,7 +1580,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "Train C"
+        "correctResponse": "Train D"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -1530,7 +1604,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-posttest-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -1582,7 +1656,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-posttest-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many square metres larger is garden B than garden A?",
@@ -1631,7 +1705,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-posttest-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many metres long is this route?",
@@ -1659,21 +1733,25 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What time does the lunch break finish?",
-      "correctAnswer": "1200",
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1300",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "finish",
-        "description": "The tour is followed immediately by lunch. Enter the finishing time using 24-hour time.",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
         "values": [
-          585,
+          550,
+          50,
           95,
-          40
+          40,
+          45
         ],
         "labels": [
-          "Tour starts: 09:45",
-          "Tour lasts: 95 minutes",
-          "Lunch lasts: 40 minutes"
+          "Leave school: 09:10",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
         ]
       },
       "answerFormat": {
@@ -1683,10 +1761,10 @@
         "ariaLabel": "Enter the finishing time in 24-hour time"
       },
       "id": "y6-measurement-review-posttest-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "What time does the lunch break finish?",
+      "readAloudText": "What time does the class arrive back at school?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -1705,7 +1783,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "1200"
+        "correctResponse": "1300"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -1729,7 +1807,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-posttest-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle around the point?",
@@ -1779,7 +1857,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-posttest-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the width of this rectangular garden?",
@@ -1829,7 +1907,7 @@
         "ariaLabel": "Answer in kg"
       },
       "id": "y6-measurement-review-posttest-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the total mass of both parcels in kilograms?",
@@ -1857,28 +1935,40 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does the whole journey take, including the wait?",
+      "prompt": "How many minutes does the whole journey take, including the change at Central?",
       "correctAnswer": "159",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "connection",
-        "description": "Travel from Home to Coast, changing at Central. Include the wait. All times are on the same day.",
+        "description": "Take the Home to Central train, then the first train to Coast that leaves at least 12 minutes after you arrive at Central. Find the total time from leaving Home to arriving at Coast. All services run on the same day.",
         "values": [
-          975,
-          1040,
-          1062,
-          1134
+          12
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
+            "service": "Home → Central",
             "departs": 975,
             "arrives": 1040
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Central → Coast 1",
+            "departs": 1035,
+            "arrives": 1107
+          },
+          {
+            "service": "Central → Coast 2",
+            "departs": 1050,
+            "arrives": 1122
+          },
+          {
+            "service": "Central → Coast 3",
             "departs": 1062,
             "arrives": 1134
+          },
+          {
+            "service": "Central → Coast 4",
+            "departs": 1082,
+            "arrives": 1112
           }
         ]
       },
@@ -1888,16 +1978,16 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-posttest-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
-      "readAloudText": "How many minutes does the whole journey take, including the wait?",
+      "readAloudText": "How many minutes does the whole journey take, including the change at Central?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
       ],
       "skillId": "y6-measurement-slot-18",
-      "skillLabel": "Find a two-stage journey duration including a wait",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
       "structureKey": "y6-measurement-slot-18",
       "difficulty": "challenging",
       "statistics": {
@@ -1940,7 +2030,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-posttest-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
@@ -1987,7 +2077,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-posttest-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "posttest",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -2038,7 +2128,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y6-measurement-review-start-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -2087,7 +2177,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-start-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of this rectangular garden?",
@@ -2115,21 +2205,34 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does this train journey take?",
+      "prompt": "How many minutes does the Lakeside 3 journey take?",
       "correctAnswer": "95",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "journey",
-        "description": "Read the timetable. Both times are on the same day.",
-        "values": [
-          590,
-          685
-        ],
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Lakeside 3",
         "rows": [
           {
-            "service": "Train to Lakeside",
+            "service": "Lakeside 1",
+            "departs": 540,
+            "arrives": 650
+          },
+          {
+            "service": "Lakeside 2",
+            "departs": 565,
+            "arrives": 650
+          },
+          {
+            "service": "Lakeside 3",
             "departs": 590,
             "arrives": 685
+          },
+          {
+            "service": "Lakeside 4",
+            "departs": 615,
+            "arrives": 695
           }
         ]
       },
@@ -2139,10 +2242,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-start-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many minutes does this train journey take?",
+      "readAloudText": "How many minutes does the Lakeside 3 journey take?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -2184,7 +2287,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-start-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the size of the angle marked with a question mark?",
@@ -2233,7 +2336,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y6-measurement-review-start-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the mass of the parcel in grams?",
@@ -2281,7 +2384,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-start-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the area of the L-shaped floor?",
@@ -2309,26 +2412,36 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes must you wait between the two trains?",
+      "prompt": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "correctAnswer": "37",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "wait",
-        "description": "Change trains at Central. Both services run on the same day.",
+        "description": "You arrive at Central at 11:08. You need at least 12 minutes to reach the next platform. Catch the first possible train to Coast. Include the platform change in your waiting time. All services run on the same day.",
         "values": [
           668,
-          705
+          12
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
-            "departs": 620,
-            "arrives": 668
+            "service": "Coast 1",
+            "departs": 662,
+            "arrives": 716
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Coast 2",
+            "departs": 677,
+            "arrives": 736
+          },
+          {
+            "service": "Coast 3",
             "departs": 705,
-            "arrives": 759
+            "arrives": 769
+          },
+          {
+            "service": "Coast 4",
+            "departs": 723,
+            "arrives": 792
           }
         ]
       },
@@ -2338,10 +2451,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-start-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many minutes must you wait between the two trains?",
+      "readAloudText": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -2382,7 +2495,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-start-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the size of the opposite angle marked with a question mark?",
@@ -2431,7 +2544,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y6-measurement-review-start-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many litres of water are in the bottle?",
@@ -2471,28 +2584,34 @@
         "rows": [
           {
             "service": "Train C",
-            "departs": 630,
-            "arrives": 705
+            "departs": 620,
+            "arrives": 700
           },
           {
-            "service": "Train A",
-            "departs": 665,
+            "service": "Train D",
+            "departs": 650,
             "arrives": 725
           },
           {
+            "service": "Train A",
+            "departs": 680,
+            "arrives": 720
+          },
+          {
             "service": "Train B",
-            "departs": 695,
-            "arrives": 745
+            "departs": 700,
+            "arrives": 740
           }
         ]
       },
       "options": [
+        "Train A",
         "Train B",
         "Train C",
-        "Train A"
+        "Train D"
       ],
       "id": "y6-measurement-review-start-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "mcq",
       "readAloudText": "Which is the latest train you can catch and still arrive on time?",
@@ -2538,7 +2657,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-start-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -2590,7 +2709,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-start-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many square metres larger is garden B than garden A?",
@@ -2639,7 +2758,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-start-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many metres long is this route?",
@@ -2667,21 +2786,25 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What time does the lunch break finish?",
-      "correctAnswer": "1245",
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1330",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "finish",
-        "description": "The tour is followed immediately by lunch. Enter the finishing time using 24-hour time.",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
         "values": [
-          615,
+          565,
+          40,
           105,
-          45
+          45,
+          55
         ],
         "labels": [
-          "Tour starts: 10:15",
-          "Tour lasts: 105 minutes",
-          "Lunch lasts: 45 minutes"
+          "Leave school: 09:25",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
         ]
       },
       "answerFormat": {
@@ -2691,10 +2814,10 @@
         "ariaLabel": "Enter the finishing time in 24-hour time"
       },
       "id": "y6-measurement-review-start-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "What time does the lunch break finish?",
+      "readAloudText": "What time does the class arrive back at school?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -2713,7 +2836,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "1245"
+        "correctResponse": "1330"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -2737,7 +2860,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-start-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle around the point?",
@@ -2787,7 +2910,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-start-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the width of this rectangular garden?",
@@ -2837,7 +2960,7 @@
         "ariaLabel": "Answer in kg"
       },
       "id": "y6-measurement-review-start-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the total mass of both parcels in kilograms?",
@@ -2865,28 +2988,40 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does the whole journey take, including the wait?",
+      "prompt": "How many minutes does the whole journey take, including the change at Central?",
       "correctAnswer": "177",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "connection",
-        "description": "Travel from Home to Coast, changing at Central. Include the wait. All times are on the same day.",
+        "description": "Take the Home to Central train, then the first train to Coast that leaves at least 15 minutes after you arrive at Central. Find the total time from leaving Home to arriving at Coast. All services run on the same day.",
         "values": [
-          1005,
-          1080,
-          1106,
-          1182
+          15
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
+            "service": "Home → Central",
             "departs": 1005,
             "arrives": 1080
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Central → Coast 1",
+            "departs": 1075,
+            "arrives": 1151
+          },
+          {
+            "service": "Central → Coast 2",
+            "departs": 1093,
+            "arrives": 1169
+          },
+          {
+            "service": "Central → Coast 3",
             "departs": 1106,
             "arrives": 1182
+          },
+          {
+            "service": "Central → Coast 4",
+            "departs": 1126,
+            "arrives": 1156
           }
         ]
       },
@@ -2896,16 +3031,16 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-start-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
-      "readAloudText": "How many minutes does the whole journey take, including the wait?",
+      "readAloudText": "How many minutes does the whole journey take, including the change at Central?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
       ],
       "skillId": "y6-measurement-slot-18",
-      "skillLabel": "Find a two-stage journey duration including a wait",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
       "structureKey": "y6-measurement-slot-18",
       "difficulty": "challenging",
       "statistics": {
@@ -2948,7 +3083,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-start-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
@@ -2995,7 +3130,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-start-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "start",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -3046,7 +3181,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y6-measurement-review-mid-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -3095,7 +3230,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-mid-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of this rectangular garden?",
@@ -3123,19 +3258,32 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does this train journey take?",
+      "prompt": "How many minutes does the Lakeside 4 journey take?",
       "correctAnswer": "105",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "journey",
-        "description": "Read the timetable. Both times are on the same day.",
-        "values": [
-          615,
-          720
-        ],
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Lakeside 4",
         "rows": [
           {
-            "service": "Train to Lakeside",
+            "service": "Lakeside 1",
+            "departs": 540,
+            "arrives": 660
+          },
+          {
+            "service": "Lakeside 2",
+            "departs": 565,
+            "arrives": 660
+          },
+          {
+            "service": "Lakeside 3",
+            "departs": 590,
+            "arrives": 715
+          },
+          {
+            "service": "Lakeside 4",
             "departs": 615,
             "arrives": 720
           }
@@ -3147,10 +3295,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-mid-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many minutes does this train journey take?",
+      "readAloudText": "How many minutes does the Lakeside 4 journey take?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -3192,7 +3340,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-mid-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the size of the angle marked with a question mark?",
@@ -3241,7 +3389,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y6-measurement-review-mid-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the mass of the parcel in grams?",
@@ -3289,7 +3437,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-mid-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the area of the L-shaped floor?",
@@ -3317,26 +3465,36 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes must you wait between the two trains?",
+      "prompt": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "correctAnswer": "42",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "wait",
-        "description": "Change trains at Central. Both services run on the same day.",
+        "description": "You arrive at Central at 11:53. You need at least 9 minutes to reach the next platform. Catch the first possible train to Coast. Include the platform change in your waiting time. All services run on the same day.",
         "values": [
           713,
-          755
+          9
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
-            "departs": 665,
-            "arrives": 713
+            "service": "Coast 1",
+            "departs": 707,
+            "arrives": 761
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Coast 2",
+            "departs": 719,
+            "arrives": 778
+          },
+          {
+            "service": "Coast 3",
             "departs": 755,
-            "arrives": 809
+            "arrives": 819
+          },
+          {
+            "service": "Coast 4",
+            "departs": 773,
+            "arrives": 842
           }
         ]
       },
@@ -3346,10 +3504,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-mid-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many minutes must you wait between the two trains?",
+      "readAloudText": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -3390,7 +3548,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-mid-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the size of the opposite angle marked with a question mark?",
@@ -3439,7 +3597,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y6-measurement-review-mid-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many litres of water are in the bottle?",
@@ -3478,29 +3636,35 @@
         ],
         "rows": [
           {
-            "service": "Train A",
-            "departs": 665,
-            "arrives": 740
+            "service": "Train D",
+            "departs": 655,
+            "arrives": 735
           },
           {
-            "service": "Train B",
-            "departs": 700,
+            "service": "Train A",
+            "departs": 685,
             "arrives": 760
           },
           {
+            "service": "Train B",
+            "departs": 715,
+            "arrives": 755
+          },
+          {
             "service": "Train C",
-            "departs": 730,
-            "arrives": 780
+            "departs": 735,
+            "arrives": 775
           }
         ]
       },
       "options": [
+        "Train C",
+        "Train D",
         "Train A",
-        "Train B",
-        "Train C"
+        "Train B"
       ],
       "id": "y6-measurement-review-mid-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "mcq",
       "readAloudText": "Which is the latest train you can catch and still arrive on time?",
@@ -3546,7 +3710,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-mid-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -3598,7 +3762,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-mid-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many square metres larger is garden B than garden A?",
@@ -3647,7 +3811,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-mid-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many metres long is this route?",
@@ -3675,21 +3839,25 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What time does the lunch break finish?",
-      "correctAnswer": "1310",
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1340",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "finish",
-        "description": "The tour is followed immediately by lunch. Enter the finishing time using 24-hour time.",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
         "values": [
-          645,
+          580,
+          55,
           115,
-          30
+          30,
+          40
         ],
         "labels": [
-          "Tour starts: 10:45",
-          "Tour lasts: 115 minutes",
-          "Lunch lasts: 30 minutes"
+          "Leave school: 09:40",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
         ]
       },
       "answerFormat": {
@@ -3699,10 +3867,10 @@
         "ariaLabel": "Enter the finishing time in 24-hour time"
       },
       "id": "y6-measurement-review-mid-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "What time does the lunch break finish?",
+      "readAloudText": "What time does the class arrive back at school?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -3721,7 +3889,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "1310"
+        "correctResponse": "1340"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -3745,7 +3913,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-mid-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle around the point?",
@@ -3795,7 +3963,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-mid-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the width of this rectangular garden?",
@@ -3845,7 +4013,7 @@
         "ariaLabel": "Answer in kg"
       },
       "id": "y6-measurement-review-mid-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the total mass of both parcels in kilograms?",
@@ -3873,28 +4041,40 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does the whole journey take, including the wait?",
+      "prompt": "How many minutes does the whole journey take, including the change at Central?",
       "correctAnswer": "173",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "connection",
-        "description": "Travel from Home to Coast, changing at Central. Include the wait. All times are on the same day.",
+        "description": "Take the Home to Central train, then the first train to Coast that leaves at least 14 minutes after you arrive at Central. Find the total time from leaving Home to arriving at Coast. All services run on the same day.",
         "values": [
-          1035,
-          1120,
-          1144,
-          1208
+          14
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
+            "service": "Home → Central",
             "departs": 1035,
             "arrives": 1120
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Central → Coast 1",
+            "departs": 1115,
+            "arrives": 1179
+          },
+          {
+            "service": "Central → Coast 2",
+            "departs": 1132,
+            "arrives": 1196
+          },
+          {
+            "service": "Central → Coast 3",
             "departs": 1144,
             "arrives": 1208
+          },
+          {
+            "service": "Central → Coast 4",
+            "departs": 1164,
+            "arrives": 1194
           }
         ]
       },
@@ -3904,16 +4084,16 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-mid-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
-      "readAloudText": "How many minutes does the whole journey take, including the wait?",
+      "readAloudText": "How many minutes does the whole journey take, including the change at Central?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
       ],
       "skillId": "y6-measurement-slot-18",
-      "skillLabel": "Find a two-stage journey duration including a wait",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
       "structureKey": "y6-measurement-slot-18",
       "difficulty": "challenging",
       "statistics": {
@@ -3956,7 +4136,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-mid-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
@@ -4003,7 +4183,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-mid-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "mid",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -4054,7 +4234,7 @@
         "ariaLabel": "Answer in cm"
       },
       "id": "y6-measurement-review-end-01",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How long is the timber board in centimetres?",
@@ -4103,7 +4283,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-end-02",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of this rectangular garden?",
@@ -4131,21 +4311,34 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does this train journey take?",
+      "prompt": "How many minutes does the Lakeside 1 journey take?",
       "correctAnswer": "115",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "journey",
-        "description": "Read the timetable. Both times are on the same day.",
-        "values": [
-          645,
-          760
-        ],
+        "description": "Use the named service in the timetable. All services run on the same day.",
+        "values": [],
+        "targetService": "Lakeside 1",
         "rows": [
           {
-            "service": "Train to Lakeside",
+            "service": "Lakeside 1",
             "departs": 645,
             "arrives": 760
+          },
+          {
+            "service": "Lakeside 2",
+            "departs": 670,
+            "arrives": 775
+          },
+          {
+            "service": "Lakeside 3",
+            "departs": 695,
+            "arrives": 830
+          },
+          {
+            "service": "Lakeside 4",
+            "departs": 720,
+            "arrives": 820
           }
         ]
       },
@@ -4155,10 +4348,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-end-03",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many minutes does this train journey take?",
+      "readAloudText": "How many minutes does the Lakeside 1 journey take?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -4200,7 +4393,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-end-04",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the size of the angle marked with a question mark?",
@@ -4249,7 +4442,7 @@
         "ariaLabel": "Answer in g"
       },
       "id": "y6-measurement-review-end-05",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the mass of the parcel in grams?",
@@ -4297,7 +4490,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-end-06",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the area of the L-shaped floor?",
@@ -4325,26 +4518,36 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes must you wait between the two trains?",
+      "prompt": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "correctAnswer": "47",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "wait",
-        "description": "Change trains at Central. Both services run on the same day.",
+        "description": "You arrive at Central at 12:38. You need at least 11 minutes to reach the next platform. Catch the first possible train to Coast. Include the platform change in your waiting time. All services run on the same day.",
         "values": [
           758,
-          805
+          11
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
-            "departs": 710,
-            "arrives": 758
+            "service": "Coast 1",
+            "departs": 752,
+            "arrives": 806
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Coast 2",
+            "departs": 766,
+            "arrives": 825
+          },
+          {
+            "service": "Coast 3",
             "departs": 805,
-            "arrives": 859
+            "arrives": 869
+          },
+          {
+            "service": "Coast 4",
+            "departs": 823,
+            "arrives": 892
           }
         ]
       },
@@ -4354,10 +4557,10 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-end-07",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many minutes must you wait between the two trains?",
+      "readAloudText": "How many minutes are there from your arrival at Central until the first train you can catch departs?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -4398,7 +4601,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-end-08",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the size of the opposite angle marked with a question mark?",
@@ -4447,7 +4650,7 @@
         "ariaLabel": "Answer in L"
       },
       "id": "y6-measurement-review-end-09",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many litres of water are in the bottle?",
@@ -4486,29 +4689,35 @@
         ],
         "rows": [
           {
-            "service": "Train B",
-            "departs": 700,
-            "arrives": 775
+            "service": "Train A",
+            "departs": 690,
+            "arrives": 770
           },
           {
-            "service": "Train C",
-            "departs": 735,
+            "service": "Train B",
+            "departs": 720,
             "arrives": 795
           },
           {
-            "service": "Train A",
-            "departs": 765,
-            "arrives": 815
+            "service": "Train C",
+            "departs": 750,
+            "arrives": 790
+          },
+          {
+            "service": "Train D",
+            "departs": 770,
+            "arrives": 810
           }
         ]
       },
       "options": [
-        "Train C",
         "Train A",
-        "Train B"
+        "Train B",
+        "Train C",
+        "Train D"
       ],
       "id": "y6-measurement-review-end-10",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "mcq",
       "readAloudText": "Which is the latest train you can catch and still arrive on time?",
@@ -4554,7 +4763,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-end-11",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",
@@ -4606,7 +4815,7 @@
         "ariaLabel": "Answer in m²"
       },
       "id": "y6-measurement-review-end-12",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many square metres larger is garden B than garden A?",
@@ -4655,7 +4864,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-end-13",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many metres long is this route?",
@@ -4683,21 +4892,25 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "What time does the lunch break finish?",
-      "correctAnswer": "1345",
+      "prompt": "What time does the class arrive back at school?",
+      "correctAnswer": "1410",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "finish",
-        "description": "The tour is followed immediately by lunch. Enter the finishing time using 24-hour time.",
+        "description": "Follow the excursion plan in order. Each stage starts as soon as the previous stage ends. Enter the arrival time back at school using 24-hour time.",
         "values": [
-          675,
+          595,
+          45,
           125,
-          25
+          25,
+          60
         ],
         "labels": [
-          "Tour starts: 11:15",
-          "Tour lasts: 125 minutes",
-          "Lunch lasts: 25 minutes"
+          "Leave school: 09:55",
+          "Bus to the museum",
+          "Museum tour",
+          "Lunch break",
+          "Bus back to school"
         ]
       },
       "answerFormat": {
@@ -4707,10 +4920,10 @@
         "ariaLabel": "Enter the finishing time in 24-hour time"
       },
       "id": "y6-measurement-review-end-14",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "What time does the lunch break finish?",
+      "readAloudText": "What time does the class arrive back at school?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
@@ -4729,7 +4942,7 @@
       },
       "scoring": {
         "kind": "exact",
-        "correctResponse": "1345"
+        "correctResponse": "1410"
       },
       "inputMode": "decimal",
       "strand": "Measurement"
@@ -4753,7 +4966,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-end-15",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle around the point?",
@@ -4803,7 +5016,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-end-16",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the width of this rectangular garden?",
@@ -4853,7 +5066,7 @@
         "ariaLabel": "Answer in kg"
       },
       "id": "y6-measurement-review-end-17",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the total mass of both parcels in kilograms?",
@@ -4881,28 +5094,40 @@
       "strand": "Measurement"
     },
     {
-      "prompt": "How many minutes does the whole journey take, including the wait?",
+      "prompt": "How many minutes does the whole journey take, including the change at Central?",
       "correctAnswer": "181",
       "visual": {
         "type": "measurement_year6_panel",
         "task": "connection",
-        "description": "Travel from Home to Coast, changing at Central. Include the wait. All times are on the same day.",
+        "description": "Take the Home to Central train, then the first train to Coast that leaves at least 16 minutes after you arrive at Central. Find the total time from leaving Home to arriving at Coast. All services run on the same day.",
         "values": [
-          1065,
-          1160,
-          1188,
-          1246
+          16
         ],
         "rows": [
           {
-            "service": "Train 1 · Home → Central",
+            "service": "Home → Central",
             "departs": 1065,
             "arrives": 1160
           },
           {
-            "service": "Train 2 · Central → Coast",
+            "service": "Central → Coast 1",
+            "departs": 1155,
+            "arrives": 1213
+          },
+          {
+            "service": "Central → Coast 2",
+            "departs": 1174,
+            "arrives": 1232
+          },
+          {
+            "service": "Central → Coast 3",
             "departs": 1188,
             "arrives": 1246
+          },
+          {
+            "service": "Central → Coast 4",
+            "departs": 1208,
+            "arrives": 1238
           }
         ]
       },
@@ -4912,16 +5137,16 @@
         "ariaLabel": "Answer in minutes"
       },
       "id": "y6-measurement-review-end-18",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
-      "readAloudText": "How many minutes does the whole journey take, including the wait?",
+      "readAloudText": "How many minutes does the whole journey take, including the change at Central?",
       "primaryDescriptorCode": "AC9M6M03",
       "curriculumCodes": [
         "AC9M6M03"
       ],
       "skillId": "y6-measurement-slot-18",
-      "skillLabel": "Find a two-stage journey duration including a wait",
+      "skillLabel": "Select a valid connection and calculate the whole journey duration",
       "structureKey": "y6-measurement-slot-18",
       "difficulty": "challenging",
       "statistics": {
@@ -4964,7 +5189,7 @@
         "ariaLabel": "Answer in m"
       },
       "id": "y6-measurement-review-end-19",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "How many metres longer is garden A’s perimeter than garden B’s?",
@@ -5011,7 +5236,7 @@
         "ariaLabel": "Answer in °"
       },
       "id": "y6-measurement-review-end-20",
-      "version": "1.0.0-review.1",
+      "version": "1.0.0-review.2",
       "form": "end",
       "type": "numeric",
       "readAloudText": "What is the size of the missing angle?",

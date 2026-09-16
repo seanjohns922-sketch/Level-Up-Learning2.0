@@ -15,11 +15,11 @@ for(const bank of Object.values(forms)){
    case 'pairPerimeter':assert.equal(n[0]*n[1],n[2]*n[3]);answer=2*(n[0]+n[1]-n[2]-n[3]);break;
    case 'line':case 'point':assert.ok(n.every(a=>a>0&&a<360));answer=(v.task==='line'?180:360)-n.slice(0,-1).reduce((a,b)=>a+b,0);assert.equal(n.at(-1),answer);break;
    case 'opposite':answer=n[0];assert.ok(n[0]>0&&n[0]<180);break;
-   case 'journey':answer=v.rows![0].arrives-v.rows![0].departs;break;
-   case 'wait':answer=v.rows![1].departs-v.rows![0].arrives;break;
-   case 'connection':answer=v.rows![1].arrives-v.rows![0].departs;break;
-   case 'services':answer=v.rows!.filter(r=>r.arrives<=n[0]).sort((a,b)=>b.departs-a.departs)[0].service;break;
-   case 'finish':{const m=n.reduce((a,b)=>a+b,0);answer=String(Math.floor(m/60)*100+m%60).padStart(4,'0');break;}
+   case 'journey':{assert.equal(v.rows!.length,4);const row=v.rows!.find(r=>r.service===v.targetService)!;assert.ok(row);answer=row.arrives-row.departs;break;}
+   case 'wait':{assert.equal(v.rows!.length,4);const eligible=v.rows!.filter(r=>r.departs>=n[0]+n[1]).sort((a,b)=>a.departs-b.departs);assert.equal(eligible.length,2);assert.ok(v.rows!.some(r=>r.departs<n[0]));assert.ok(v.rows!.some(r=>r.departs>=n[0]&&r.departs<n[0]+n[1]));answer=eligible[0].departs-n[0];break;}
+   case 'connection':{assert.equal(v.rows!.length,5);const [first,...onward]=v.rows!;const eligible=onward.filter(r=>r.departs>=first.arrives+n[0]).sort((a,b)=>a.departs-b.departs);assert.equal(eligible.length,2);assert.ok(onward.some(r=>r.departs<first.arrives));assert.ok(onward.some(r=>r.departs>=first.arrives&&r.departs<first.arrives+n[0]));assert.ok(eligible[1].arrives<eligible[0].arrives,'Later express must not replace first catchable service');answer=eligible[0].arrives-first.departs;break;}
+   case 'services':assert.equal(v.rows!.length,4);assert.equal(v.rows!.filter(r=>r.arrives<=n[0]).length,3);answer=v.rows!.filter(r=>r.arrives<=n[0]).sort((a,b)=>b.departs-a.departs)[0].service;break;
+   case 'finish':{assert.equal(n.length,5);assert.equal(v.labels!.length,5);const m=n.reduce((a,b)=>a+b,0);answer=String(Math.floor(m/60)*100+m%60).padStart(4,'0');break;}
   }
   assert.equal(q.correctAnswer,String(answer),q.id);assert.ok(isAssessmentAnswerCorrect(q,String(answer)));assert.ok(!isAssessmentAnswerCorrect(q,'idk'));assert.ok(!isAssessmentAnswerCorrect(q,''));
   if(q.options)assert.equal(q.options.filter(a=>isAssessmentAnswerCorrect(q,a)).length,1);else assert.ok(!isAssessmentAnswerCorrect(q,String(Number(answer)+1)));
