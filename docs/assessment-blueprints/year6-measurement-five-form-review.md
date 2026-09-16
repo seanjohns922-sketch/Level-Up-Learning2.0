@@ -28,3 +28,5 @@ Compared with `data/activities/year6Measurelands/week5Common.ts`, `MeasurelandsT
 - Q18: select the first viable onward connection, then calculate total travel plus waiting. A later express arrives earlier but is not the first departing eligible service, so the stated instruction matters.
 
 Question counts, descriptor balance, response modes and other measurement content are unchanged. Read diagram includes all provided constraints and itinerary durations. The audit independently selects eligible services and checks missed-service/short-transfer distractors across all five forms. These are intended difficulty judgements; observed student results are still needed for calibration.
+
+Station refinement: Q3 now lists four distinct named routes. Q7 and Q18 use a mixed-destination departure board with named origin, interchange and destination stations, varied across the five forms. Repeat departures to the same station retain the actual station name, without numbered destination suffixes. Catchable trains to other stations are distractors; scoring checks destination as well as transfer time. All route names are included in read-aloud.
