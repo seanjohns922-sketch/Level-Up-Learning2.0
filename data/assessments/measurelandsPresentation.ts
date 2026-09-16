@@ -223,3 +223,10 @@ export function prepareMeasurelandsAssessmentPresentation(input: PresentationInp
   const unit = targetUnit(input.prompt, input.domain, input.visual);
   return { prompt, visual, inputMode: input.inputMode ?? "decimal", answerFormat: { kind: "number", unit, ariaLabel: unit ? `Answer in ${unit}` : "Numerical answer" } };
 }
+
+/** Display stored time responses in the same notation as the learner's answer widget. */
+export function formatMeasurelandsReviewAnswer(value:string,format?:MeasurelandsAnswerFormat):string {
+ if(format?.kind!=='time')return value.split('||').join(', ');
+ const {hour,minute,meridiem}=fromMeasurelandsTimeResponse(value,format.mode);
+ return hour&&minute?`${hour}:${minute}${meridiem?' '+meridiem.toLowerCase():''}`:value;
+}

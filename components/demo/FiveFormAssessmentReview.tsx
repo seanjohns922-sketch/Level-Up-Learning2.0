@@ -1,5 +1,6 @@
 "use client";
 
+import {formatMeasurelandsReviewAnswer,type MeasurelandsAnswerFormat} from "@/data/assessments/measurelandsPresentation";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AssessmentShell from "@/components/assessment/AssessmentShell";
@@ -16,6 +17,7 @@ export type FiveFormReviewItem = {
   prompt: string;
   readAloudText?: string;
   correctAnswer: string;
+  answerFormat?: MeasurelandsAnswerFormat;
   skillLabel?: string;
   primaryDescriptorCode?: string;
   difficulty?: string;
@@ -111,7 +113,7 @@ export default function FiveFormAssessmentReview<Form extends string>({
             <summary className="cursor-pointer font-bold">Review details</summary>
             <p className="mt-3 text-sm">{question.primaryDescriptorCode} · {question.skillLabel} · Intended difficulty: {question.difficulty}</p>
             <button type="button" className={`${buttonClass} mt-3`} style={buttonStyle} onClick={() => setShowAnswer((previous) => !previous)}>{showAnswer ? "Hide answer" : "Show answer"}</button>
-            {showAnswer ? <p className="mt-3 font-bold">Answer: {question.correctAnswer.split("||").join(", ")}{value ? ` · Your answer: ${scored(question) ? "correct" : "incorrect"}` : ""}</p> : null}
+            {showAnswer ? <p className="mt-3 font-bold">Answer: {formatMeasurelandsReviewAnswer(question.correctAnswer,question.answerFormat)}{value ? ` · Your answer: ${scored(question) ? "correct" : "incorrect"}` : ""}</p> : null}
           </details>
           {finished[form] ? (
             <div role="status" className="mt-5 rounded-lg border p-4" style={panelStyle}>

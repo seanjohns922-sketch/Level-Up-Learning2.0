@@ -46,7 +46,7 @@ export function MeasurelandsScale({
    *  (e.g. 0.5 kg with one minor between each labelled kilogram). */
   minorStep?: number;
   display?: "dial" | "digital";
-  object?: { label: string; emoji: string };
+  object?: { label: string; emoji: string; imageSrc?: string };
   size?: number;
 }) {
   const [uid] = useState(() => Math.random().toString(36).slice(2, 9));
@@ -104,7 +104,7 @@ export function MeasurelandsScale({
         <rect x={CX - 11} y={40} width={22} height={16} fill={NECK} />
         <ellipse cx={CX} cy={40} rx={94} ry={12} fill={`url(#pan-${uid})`} stroke="#7FB9D6" strokeWidth={1} />
         <ellipse cx={CX} cy={37} rx={80} ry={8} fill="#ffffff" opacity={0.4} />
-        {object ? (
+        {object?.imageSrc ? <image href={object.imageSrc} x={CX-36} y={-34} width={72} height={72} preserveAspectRatio="xMidYMax meet"/> : object ? (
           <text x={CX} y={34} textAnchor="middle" fontSize={48} style={{ dominantBaseline: "alphabetic" }}>
             {object.emoji}
           </text>
