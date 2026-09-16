@@ -1,4 +1,6 @@
 "use client";
+import Year6MeasurementAssessmentVisual from "./Year6MeasurementAssessmentVisual";
+import type {Measurement6Visual} from "@/data/assessments/revisions/year6MeasurementFiveForms";
 import Year5MeasurementAssessmentVisual from "./Year5MeasurementAssessmentVisual";
 import type {Measurement5Visual} from "@/data/assessments/revisions/year5MeasurementFiveForms";
 import Year4MeasurementAssessmentVisual from "./Year4MeasurementAssessmentVisual";
@@ -342,7 +344,7 @@ export default function AssessmentQuestionCard({
       : undefined;
   const isYearFiveNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y5_");
   const isYearSixNumberVisual = typeof visual?.type === "string" && visual.type.startsWith("number_y6_");
-  const isEarlyNumberVisual = visual?.type === "measurement_year5_panel" || visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year3_panel" || visual?.type === "measurement_year2_panel" || visual?.type === "measurement_year1_panel" || visual?.type === "measurement_ground_panel" ||
+  const isEarlyNumberVisual = visual?.type === "measurement_year6_panel" || visual?.type === "measurement_year5_panel" || visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year3_panel" || visual?.type === "measurement_year2_panel" || visual?.type === "measurement_year1_panel" || visual?.type === "measurement_ground_panel" ||
     question.id?.startsWith("y3-number-") ||
     question.id?.startsWith("y3-a-") ||
     question.id?.startsWith("y3-b-") ||
@@ -363,7 +365,7 @@ export default function AssessmentQuestionCard({
   const groundItem=groundNumberReleaseItem(question);
   if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;
 
-  const renderedVisual = visual?.type === "measurement_year5_panel" ? <Year5MeasurementAssessmentVisual visual={visual as unknown as Measurement5Visual} value={value} onChange={onChange}/> : visual?.type === "measurement_year4_panel" ? <Year4MeasurementAssessmentVisual visual={visual as unknown as Measurement4Visual}/> : visual?.type === "measurement_year3_panel" ? <Year3MeasurementAssessmentVisual visual={visual as unknown as Measurement3Visual}/> : visual?.type === "measurement_year2_panel" ? <Year2MeasurementAssessmentVisual visual={visual as unknown as Measurement2Visual}/> : visual?.type === "measurement_year1_panel" ? <Year1MeasurementAssessmentVisual visual={visual as unknown as Measurement1Visual}/> : visual?.type === "measurement_ground_panel" ? <GroundMeasurementAssessmentVisual visual={visual as unknown as GroundMeasurementVisual}/> : visual ? (
+  const renderedVisual = visual?.type === "measurement_year6_panel" ? <Year6MeasurementAssessmentVisual visual={visual as unknown as Measurement6Visual}/> : visual?.type === "measurement_year5_panel" ? <Year5MeasurementAssessmentVisual visual={visual as unknown as Measurement5Visual} value={value} onChange={onChange}/> : visual?.type === "measurement_year4_panel" ? <Year4MeasurementAssessmentVisual visual={visual as unknown as Measurement4Visual}/> : visual?.type === "measurement_year3_panel" ? <Year3MeasurementAssessmentVisual visual={visual as unknown as Measurement3Visual}/> : visual?.type === "measurement_year2_panel" ? <Year2MeasurementAssessmentVisual visual={visual as unknown as Measurement2Visual}/> : visual?.type === "measurement_year1_panel" ? <Year1MeasurementAssessmentVisual visual={visual as unknown as Measurement1Visual}/> : visual?.type === "measurement_ground_panel" ? <GroundMeasurementAssessmentVisual visual={visual as unknown as GroundMeasurementVisual}/> : visual ? (
     <>
       {realmId === "chance" && typeof visual.type === "string" ? (
         <ChanceVisual visual={visual as unknown as ChanceVisualData} />
@@ -825,7 +827,7 @@ export default function AssessmentQuestionCard({
 
   if (type === "numeric") {
     if (visual?.type === "measurement_year5_panel" && visual.task === "construct") return renderedVisual;
-    if ((visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year5_panel") && question.answerFormat) return <div className="space-y-4">{renderedVisual}<MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode}/></div>;
+    if ((visual?.type === "measurement_year6_panel" || visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year5_panel") && question.answerFormat) return <div className="space-y-4">{renderedVisual}<MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode}/></div>;
     if (isEarlyNumberVisual) {
       if (visual?.type === "number_y6_coordinate") {
         const [xValue = "", yValue = ""] = (value ?? "").split(",");

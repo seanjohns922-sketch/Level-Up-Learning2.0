@@ -535,7 +535,7 @@ function linearUnit(task: AreaTask): string {
 function allSet(n: number): Set<number> { return new Set(Array.from({ length: n }, (_, i) => i)); }
 
 /** A plain labelled rectangle (length × width) — no grid until `showGrid`. */
-function DimRect({ length, width, unit, showGrid, size }: { length: number; width: number; unit: string; showGrid?: boolean; size?: number }) {
+export function DimRect({ length, width, unit, showGrid, size, widthLabel }: { length: number; width: number; unit: string; showGrid?: boolean; size?: number; widthLabel?: string }) {
   const cell = Math.max(12, Math.min((size ?? 300) / length, 200 / width, 40));
   const w = cell * length, h = cell * width;
   const PADX = 58, PADY = 42, x0 = PADX, y0 = PADY;
@@ -544,7 +544,7 @@ function DimRect({ length, width, unit, showGrid, size }: { length: number; widt
   const rows = Array.from({ length: width - 1 }, (_, i) => i + 1);
   return (
     <div className="mx-auto" style={{ maxWidth: VW }}>
-      <svg viewBox={`0 0 ${VW} ${VH}`} width="100%" role="img" aria-label={`rectangle ${length} by ${width} ${unit}`}>
+      <svg viewBox={`0 0 ${VW} ${VH}`} width="100%" role="img" aria-label={`rectangle ${length} by ${widthLabel ?? width} ${unit}`}>
         <rect x={x0} y={y0} width={w} height={h} rx={7} fill="rgba(124,58,237,0.13)" stroke="#7c3aed" strokeWidth={3} />
         {showGrid ? (
           <g>
@@ -566,7 +566,7 @@ function DimRect({ length, width, unit, showGrid, size }: { length: number; widt
         <line x1={x0 - 21} y1={y0 + h} x2={x0 - 11} y2={y0 + h} stroke={WID_COLOR} strokeWidth={2} />
         <g>
           <rect x={x0 - 50} y={y0 + h / 2 - 13} width={68} height={27} rx={9} fill={WID_COLOR} />
-          <text x={x0 - 16} y={y0 + h / 2 + 6} textAnchor="middle" fontSize={15} fontWeight={900} fill="#fff">{width} {unit}</text>
+          <text x={x0 - 16} y={y0 + h / 2 + 6} textAnchor="middle" fontSize={15} fontWeight={900} fill="#fff">{widthLabel ?? width} {unit}</text>
         </g>
       </svg>
     </div>

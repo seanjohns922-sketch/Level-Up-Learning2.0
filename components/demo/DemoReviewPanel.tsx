@@ -80,6 +80,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${kind}`;
+  if(realm === "measurement" && year === "Year 6") return `/demo-review/measurement-level6?form=${kind}`;
   if(realm === "measurement" && year === "Year 4") return `/demo-review/measurement-level4?form=${kind}`;
   if(realm === "measurement" && year === "Year 3") return `/demo-review/measurement-level3?form=${kind}`;
   const params = new URLSearchParams({ year, realm_id: realm });
@@ -108,6 +109,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${checkpoint}`;
+  if(realm === "measurement" && year === "Year 6") return `/demo-review/measurement-level6?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 4") return `/demo-review/measurement-level4?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 3") return `/demo-review/measurement-level3?form=${checkpoint}`;
   const params = new URLSearchParams({ strand: DIAGNOSTIC_STRAND_FOR_REALM[realm], level: year, checkpoint });

@@ -27,7 +27,7 @@ const panel = "rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255
 function ctxLine(t: AngleTask) { return t.context ? <div className="text-center text-[12px] font-black uppercase tracking-[0.14em] text-[#a98b52]">{t.emoji} {t.context}</div> : null; }
 
 /* The angle-reasoning diagram — sectors summing to 180 (line) or 360 (point). */
-function AngleDiagram({ type, sectors, revealDeg }: { type: "line" | "point"; sectors: Sector[]; revealDeg?: number }) {
+export function AngleDiagram({ type, sectors, revealDeg }: { type: "line" | "point"; sectors: Sector[]; revealDeg?: number }) {
   const isLine = type === "line";
   const W = isLine ? 360 : 300, H = isLine ? 208 : 300;
   const vx = W / 2, vy = isLine ? H - 22 : H / 2, R = isLine ? 152 : 120;
