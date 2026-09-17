@@ -691,7 +691,7 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
           ? "implemented"
           : STARPATH_PROGRAM_STATUS,
       },
-      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
     };
   });
 
@@ -711,14 +711,14 @@ function buildLevel(definition: LevelDefinition): StarpathLevelProgram {
       ...week.skill,
       level: definition.level,
       weeks: [index + 1],
-      status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
+      status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
     })),
     weeks,
     assessments: {
       preTest: { id: `${definition.prefix}-space-pre-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS },
       postTest: { id: `${definition.prefix}-space-post-01`, questionCount: STARPATH_ASSESSMENT_QUESTION_COUNT, unlockAfterLessonId: `${definition.prefix}-space-w8-l3`, status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS },
     },
-    status: definition.prefix === "ground" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
+    status: definition.prefix === "ground" || definition.prefix === "y1" || definition.prefix === "y2" || definition.prefix === "y3" || definition.prefix === "y4" || definition.prefix === "y5" || definition.prefix === "y6" ? "implemented" : STARPATH_PROGRAM_STATUS,
   };
 }
 
