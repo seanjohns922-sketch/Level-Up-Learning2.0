@@ -3,7 +3,7 @@ import type { ShapeObjectId } from "@/data/activities/starpath/ground/shape-obje
 import type { StarpathBuildObjectId } from "@/data/activities/starpath/ground/shape-builds";
 import { GROUND_STARPATH_FORMS, type GroundStarpathForm } from "./groundStarpathFiveForms";
 
-export type ShapeSpec = { shape: StarpathShape; colour: string; rotation?: number; scale?: number; stretch?: number };
+export type ShapeSpec = { shape: StarpathShape; colour: string; rotation?: number; scale?: number; stretch?: number; vertices?: [number, number][] };
 export type GroundScene = { items: { object: string; x: number; y: number; size?: number; layer?: number }[]; prop?: { kind: "basket" | "table" | "fence"; layer: number } };
 export type GroundVisual =
   | { kind: "shapes"; shapes: ShapeSpec[] }

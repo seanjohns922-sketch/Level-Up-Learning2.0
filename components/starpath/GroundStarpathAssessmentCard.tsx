@@ -11,6 +11,7 @@ import styles from "@/components/demo/GroundStarpathRedesign.module.css";
 
 const cells = ["top left", "top middle", "top right", "middle left", "middle", "middle right", "bottom left", "bottom middle", "bottom right"];
 function Shape({ spec, small = false }: { spec: ShapeSpec; small?: boolean }) {
+  if (spec.vertices) return <svg aria-hidden="true" viewBox="0 0 100 100" className={small ? styles.smallShapeArt : styles.shapeArt}><polygon points={spec.vertices.map(p=>p.join(",")).join(" ")} transform={`rotate(${spec.rotation ?? 0} 50 50)`} fill={spec.colour} stroke="#433878" strokeWidth="3" strokeLinejoin="round"/></svg>;
   return <span style={{ display: "block", transform: `rotate(${spec.rotation ?? 0}deg) scaleX(${spec.stretch ?? 1})` }}><ShapeVisual shape={spec.shape} colour={spec.colour} scale={spec.scale} className={small ? styles.smallShapeArt : styles.shapeArt} /></span>;
 }
 function Scene({ scene }: { scene: GroundScene }) {
@@ -33,7 +34,7 @@ function Visual({ visual }: { visual: GroundVisual }) {
 }
 
 /** Assessment-only interaction. No teaching hints or correctness feedback. */
-export default function GroundStarpathAssessmentCard({ item, response: a, onChange }: { item: GroundRedesignItem; response: GroundResponse; onChange: (value: GroundResponse) => void }) {
+export default function GroundStarpathAssessmentCard({ item, response: a, onChange }: { item: Pick<GroundRedesignItem, "task" | "readAloudText">; response: GroundResponse; onChange: (value: GroundResponse) => void }) {
   const task = item.task;
   const [piece,setPiece] = useState(0);
   const [drag,setDrag] = useState<number|null>(null);
