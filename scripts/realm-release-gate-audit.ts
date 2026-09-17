@@ -280,9 +280,19 @@ for (const realm of liveRealms) {
 }
 assert(carousel.includes("isLiveRealmId(focusedRealmId)"), "Realm carousel progress scope must come from the registry.");
 
+// Parent realm presentation (name, light-surface palette, artwork) now lives in
+// lib/parent-insights.ts and ParentPortal renders it, so the parent surface is
+// both files. A live realm must still appear there, and the parent palette must
+// define it explicitly rather than merely mention its id somewhere.
 const parentPortal = read("components/parent/ParentPortal.tsx");
+const parentInsights = read("lib/parent-insights.ts");
+const parentSurface = `${parentPortal}\n${parentInsights}`;
 for (const realm of liveRealms) {
-  assert(parentPortal.includes(realm.realmId), `${realm.name} is missing from Home parent setup/reporting.`);
+  assert(parentSurface.includes(realm.realmId), `${realm.name} is missing from Home parent setup/reporting.`);
+  assert(
+    parentInsights.includes(`  ${realm.realmId}: {`),
+    `${realm.name} is missing from the parent realm palette in lib/parent-insights.ts.`,
+  );
 }
 
 const databaseFunctions = [

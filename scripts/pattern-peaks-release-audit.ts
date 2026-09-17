@@ -55,7 +55,13 @@ const resultsPage = read("app/results/page.tsx");
 assert(resultsPage.includes('realmId === "pattern" ? "pattern"'), "Assessment results must retain Pattern Peaks as the canonical realm.");
 assert(resultsPage.includes('if (realmId === "pattern") return "/pattern-peaks"'), "Assessment results must return students to Pattern Peaks.");
 const parentPortal = read("components/parent/ParentPortal.tsx");
-assert(parentPortal.includes('pattern: "Pattern Peaks"'), "The parent portal must label canonical Pattern Peaks progress.");
+// The parent-facing realm label moved to the palette in lib/parent-insights.ts,
+// which ParentPortal renders. Assert the canonical label at its new home.
+const parentInsights = read("lib/parent-insights.ts");
+assert(
+  /\n {2}pattern: \{[^}]*name: "Pattern Peaks"/.test(parentInsights),
+  "The parent portal must label canonical Pattern Peaks progress.",
+);
 assert(parentPortal.includes('realmId === "pattern" ? "algebra" : realmId'), "The parent portal must resolve Pattern Peaks curriculum through Algebra.");
 const schoolAnalytics = read("components/school/SchoolAnalyticsDashboard.tsx");
 assert(schoolAnalytics.includes('pattern: "Pattern Peaks"'), "School analytics must label Pattern Peaks results.");

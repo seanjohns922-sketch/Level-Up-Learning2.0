@@ -122,12 +122,17 @@ const parentOverviewBody = parent.slice(
   parent.indexOf("export function ParentRewards"),
 );
 check("parent overview does not render the full collection", !parentOverviewBody.includes("<UnlockedCollection"));
-check("parent shell uses a distinct navy and sky theme", has(parent, "bg-[#10243e]", "bg-[#dceeff]", "bg-blue-600"));
+// The parent shell keeps its own navy-and-sky identity (never a realm theme);
+// the 2026 visual refresh moved it to a navy gradient with a sky accent.
+check("parent shell uses a distinct navy and sky theme", has(parent, "from-[#123a55]", "to-[#0d2438]", "text-[#1f6f9c]", "bg-blue-600"));
 check("parent green is reserved for positive status", has(parent, "Active — Free Access", "border-emerald-200 bg-emerald-50", "text-emerald-900"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.
-for (const realm of ["Number Nexus", "Measurelands", "Starpath"]) check(`parent realm label ${realm}`, parent.includes(realm));
+// Parent realm labels live in the palette in lib/parent-insights.ts, which
+// ParentPortal renders, so the parent surface is both files.
+const parentSurface = `${parent}\n${read("lib/parent-insights.ts")}`;
+for (const realm of ["Number Nexus", "Measurelands", "Starpath"]) check(`parent realm label ${realm}`, parentSurface.includes(realm));
 check("parent snapshot reads canonical lesson attempts", functionBody("get_parent_child_realm_snapshot").includes("student_lesson_attempts"));
 check("parent snapshot reads canonical quiz attempts", functionBody("get_parent_child_realm_snapshot").includes("student_weekly_quiz_attempts"));
 check("parent snapshot reads canonical assessments", functionBody("get_parent_child_realm_snapshot").includes("student_realm_assessments"));

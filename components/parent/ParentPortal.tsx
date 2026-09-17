@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
-  Activity,
   ArrowLeft,
   BookOpen,
   ChevronRight,
@@ -40,6 +39,16 @@ import type { GemRarity } from "@/lib/gems";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { formatStudentLevelLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { supabase } from "@/lib/supabase";
+import ParentActivityCard from "@/components/parent/ParentActivityCard";
+import ParentReportButton from "@/components/parent/ParentReportButton";
+import ParentGrowthCard from "@/components/parent/ParentGrowthCard";
+import {
+  formatFeedTime,
+  parentRealmName,
+  parentRealmPalette,
+  type ParentActivity,
+  type ParentProgressReport,
+} from "@/lib/parent-insights";
 
 export type ParentRealm = {
   realmId: string;
@@ -146,19 +155,11 @@ type RealmSnapshot = {
   passThreshold: number;
 };
 
+// Realm identity (name, colours, artwork) lives in lib/parent-insights so all
+// six live realms stay on their own theme instead of falling back to Number
+// Nexus teal.
 function realmName(realmId: string) {
-  return ({
-    number: "Number Nexus",
-    measurement: "Measurelands",
-    space: "Starpath",
-    starpath: "Starpath",
-    statistics: "Statistica",
-    statistica: "Statistica",
-    pattern: "Pattern Peaks",
-    "pattern-peaks": "Pattern Peaks",
-    chance: "Chance Hollow",
-    "chance-hollow": "Chance Hollow",
-  } as Record<string, string>)[realmId] ?? realmId;
+  return parentRealmName(realmId);
 }
 
 function curriculumWeek(realmId: string, workingLevel: string, weekNumber: number) {
@@ -223,13 +224,6 @@ function assessmentName(type: string) {
   return normalised.replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-const realmPresentation: Record<string, { image: string; accent: string; surface: string }> = {
-  number: { image: "/images/number-nexus-home-bg-y4.jpg", accent: "#0f9f88", surface: "#ecfdf8" },
-  measurement: { image: "/images/measurelands-home-bg.png", accent: "#c98218", surface: "#fff8e8" },
-  space: { image: "/images/starpath-home-bg-y4.png", accent: "#7255c7", surface: "#f4f0ff" },
-  starpath: { image: "/images/starpath-home-bg-y4.png", accent: "#7255c7", surface: "#f4f0ff" },
-};
-
 function formatAchievementDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Recently";
@@ -246,8 +240,8 @@ export function ParentShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f7f8] text-slate-950 lg:grid lg:grid-cols-[244px_minmax(0,1fr)]">
-      <aside className="hidden min-h-screen flex-col bg-[#10243e] px-4 py-6 text-white lg:flex">
+    <div className="min-h-screen bg-[#f4f7f8] text-slate-950 lg:grid lg:grid-cols-[244px_minmax(0,1fr)]">
+      <aside className="hidden min-h-screen flex-col bg-gradient-to-b from-[#123a55] to-[#0d2438] px-4 py-6 text-white lg:flex">
         <Link href="/parent" className="flex items-center gap-3 px-2">
           <span className="grid h-11 w-11 place-items-center rounded-md bg-[#dceeff] text-[#173b68]"><Home className="h-6 w-6" /></span>
           <span><span className="block text-xs font-bold uppercase tracking-[0.18em] text-[#9fc9ff]">Level Up Learning</span><span className="text-lg font-black">Parent Home</span></span>
@@ -286,22 +280,35 @@ export function ParentShell({ children }: { children: ReactNode }) {
 }
 
 function ParentNavLink({ href, active, icon, label }: { href: string; active: boolean; icon: ReactNode; label: string }) {
-  return <Link href={href} className={`flex min-h-12 items-center gap-3 rounded-md px-4 font-bold transition ${active ? "bg-[#dceeff] text-[#173b68]" : "text-white/70 hover:bg-white/10 hover:text-white"}`}>{icon}{label}</Link>;
+  return <Link href={href} className={`flex min-h-12 items-center gap-3 rounded-xl px-4 font-bold transition ${active ? "bg-white text-[#123a55] shadow-sm" : "text-white/70 hover:bg-white/10 hover:text-white"}`}>{icon}{label}</Link>;
 }
 
 function ParentMobileNav({ href, label, active }: { href: string; label: string; active: boolean }) {
   return <Link href={href} className={`shrink-0 rounded-md px-3 py-2 text-sm font-bold ${active ? "bg-blue-100 text-blue-900" : "text-slate-600"}`}>{label}</Link>;
 }
 
-export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }) {
+/**
+ * Fixture data for the Demo Review preview. When present the real components
+ * render from it and never call Supabase, so reviewing the dashboard needs no
+ * parent login and writes nothing.
+ */
+export type ParentPreviewData = {
+  parentName: string;
+  children: ParentChild[];
+  activity?: Record<string, ParentActivity>;
+  reports?: Record<string, ParentProgressReport>;
+};
+
+export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?: string; preview?: ParentPreviewData }) {
   const router = useRouter();
-  const [children, setChildren] = useState<ParentChild[]>([]);
-  const [activeStudentId, setActiveStudentId] = useState(selectedStudentId ?? "");
-  const [parentName, setParentName] = useState("there");
-  const [loading, setLoading] = useState(true);
+  const [children, setChildren] = useState<ParentChild[]>(preview?.children ?? []);
+  const [activeStudentId, setActiveStudentId] = useState(selectedStudentId ?? preview?.children[0]?.studentId ?? "");
+  const [parentName, setParentName] = useState(preview?.parentName ?? "there");
+  const [loading, setLoading] = useState(!preview);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (preview) return;
     setLoading(true);
     setError(null);
     const { data: auth } = await supabase.auth.getUser();
@@ -322,7 +329,7 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
       setActiveStudentId((current) => selectedStudentId ?? (current || loadedChildren[0]?.studentId || ""));
     }
     setLoading(false);
-  }, [router, selectedStudentId]);
+  }, [preview, router, selectedStudentId]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void load(), 0);
@@ -371,14 +378,31 @@ export function ParentHome({ selectedStudentId }: { selectedStudentId?: string }
       ) : (
         <>
           {!selectedStudentId ? <section><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div><div className="flex gap-3 overflow-x-auto pb-2">{children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} className={`flex min-w-[230px] items-center gap-3 rounded-lg border bg-white p-3 text-left shadow-sm transition ${activeChild?.studentId === child.studentId ? "border-blue-500 ring-2 ring-blue-100" : "border-slate-200 hover:border-slate-300"}`}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-100 text-lg font-black text-blue-900">{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span><ChevronRight className="h-4 w-4 text-slate-400" /></button>)}</div></section> : null}
-          {activeChild ? <SelectedChildDashboard child={activeChild} onActivated={load} /> : null}
+          {activeChild ? (
+            <SelectedChildDashboard
+              child={activeChild}
+              onActivated={load}
+              previewActivity={preview?.activity?.[activeChild.studentId]}
+              previewReport={preview?.reports?.[activeChild.studentId]}
+            />
+          ) : null}
         </>
       )}
     </div>
   );
 }
 
-function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; onActivated: () => Promise<void> }) {
+function SelectedChildDashboard({
+  child,
+  onActivated,
+  previewActivity,
+  previewReport,
+}: {
+  child: ParentChild;
+  onActivated: () => Promise<void>;
+  previewActivity?: ParentActivity;
+  previewReport?: ParentProgressReport;
+}) {
   const [activating, setActivating] = useState(false);
   const [activationError, setActivationError] = useState<string | null>(null);
 
@@ -395,17 +419,35 @@ function SelectedChildDashboard({ child, onActivated }: { child: ParentChild; on
   const focusWeek = focusRealm?.currentWeek ? curriculumWeek(focusRealm.realmId, focusRealm.workingLevel, focusRealm.currentWeek) : null;
   const currentFocus = focusWeek?.title ?? focusRealm?.currentFocus ?? null;
   const completedLessons = child.realms.reduce((total, realm) => total + (realm.completedLessons ?? 0), 0);
+  const heroPalette = parentRealmPalette(focusRealm?.realmId ?? "number");
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
         <div className="space-y-5">
-        <section className="relative min-h-[230px] overflow-hidden rounded-lg border border-slate-200 bg-[#11243c] text-white shadow-sm"><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: "url('/images/realm-select-bg.jpg')" }} /><div className="absolute inset-0 bg-gradient-to-r from-[#102239] via-[#102239]/90 to-[#102239]/45" /><div className="relative flex h-full min-h-[230px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">Child overview</p><h2 className="mt-2 text-3xl font-black">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Activity" value={child.lastActiveAt ? formatLastActive(child.lastActiveAt).replace("Last active ", "") : "Not started"} /></div></div></section>
+        <section className="relative min-h-[240px] overflow-hidden rounded-2xl border border-slate-200 text-white shadow-md" style={{ backgroundColor: heroPalette.accentDeep }}><div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url('${heroPalette.image}')` }} /><div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(105deg, ${heroPalette.accentDeep} 0%, ${heroPalette.accentDeep}f2 42%, ${heroPalette.accentDeep}66 100%)` }} /><div className="relative flex h-full min-h-[240px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">Child overview</p><h2 className="mt-2 text-3xl font-black sm:text-4xl">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Last learned" value={child.lastActiveAt ? formatFeedTime(child.lastActiveAt) : "Not started"} /></div></div></section>
 
-        <section><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">Learning journey</p><h3 className="mt-1 text-xl font-black">Progress by realm</h3></div><Activity className="h-6 w-6 text-blue-600" /></div><div className="mt-4 grid gap-3 md:grid-cols-3">{child.realms.length ? child.realms.map((realm) => <RealmProgressCard key={realm.realmId} studentId={child.studentId} realm={realm} />) : <p className="rounded-md bg-white p-4 text-sm text-slate-600 shadow-sm">Learning hasn’t started yet.</p>}</div></section>
+        <ParentActivityCard studentId={child.studentId} previewActivity={previewActivity} />
+
+        <section>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#1f6f9c]">Learning journey</p>
+              <h3 className="mt-1 text-xl font-black">Progress by realm</h3>
+            </div>
+            <ParentReportButton studentId={child.studentId} previewReport={previewReport} previewActivity={previewActivity} />
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {child.realms.length
+              ? child.realms.map((realm) => <RealmProgressCard key={realm.realmId} studentId={child.studentId} realm={realm} />)
+              : <p className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600 shadow-sm">Learning hasn’t started yet.</p>}
+          </div>
+        </section>
         </div>
 
         <div className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? "A learning focus will appear when the weekly journey begins."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
+
+        <ParentGrowthCard studentId={child.studentId} previewReport={previewReport} />
 
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Link href="/parent/rewards" className="shrink-0 text-sm font-bold text-violet-700">View all</Link></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
@@ -533,14 +575,70 @@ function HeroMetric({ label, value }: { label: string; value: string }) {
 }
 
 function RealmProgressCard({ studentId, realm }: { studentId: string; realm: ParentRealm }) {
-  const presentation = realmPresentation[realm.realmId] ?? realmPresentation.number;
+  const palette = parentRealmPalette(realm.realmId);
   const weeks = curriculumWeeks(realm.realmId, realm.workingLevel);
   const totalLessons = weeks.reduce((total, week) => total + week.lessons.length, 0);
   const completedLessons = realm.completedLessons ?? 0;
   const progress = totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
   const currentWeek = realm.currentWeek ? weeks.find((week) => week.week === realm.currentWeek) : null;
   const focus = currentWeek?.title ?? realm.currentFocus;
-  return <Link href={`/parent/children/${studentId}/realm/${realm.realmId}`} className="group overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-md"><div className="h-20 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(90deg, rgba(8,21,35,.18), rgba(8,21,35,.5)), url('${presentation.image}')` }} /><div className="p-4"><div className="flex items-start justify-between gap-3"><div><h4 className="font-black">{realmName(realm.realmId)}</h4><p className="mt-1 text-sm text-slate-500">{displayLevel(realm.workingLevel)}{realm.currentWeek ? ` · Week ${realm.currentWeek}` : ""}</p></div><ChevronRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5" /></div><div className="mt-4 flex items-center gap-3"><div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full" style={{ width: `${progress}%`, backgroundColor: presentation.accent }} /></div><span className="w-9 text-right text-xs font-black text-slate-600">{progress}%</span></div><p className="mt-2 text-xs font-semibold text-slate-500">{completedLessons} of {totalLessons} lessons completed</p><p className="mt-3 line-clamp-2 text-sm text-slate-600">{focus ?? "Current focus will appear after learning begins."}</p></div></Link>;
+  const circumference = 2 * Math.PI * 26;
+
+  return (
+    <Link
+      href={`/parent/children/${studentId}/realm/${realm.realmId}`}
+      className="group relative overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+      style={{ borderColor: palette.border }}
+    >
+      <div
+        className="h-24 bg-cover bg-center"
+        style={{
+          backgroundImage: `linear-gradient(100deg, ${palette.accentDeep}e6 0%, ${palette.accentDeep}73 62%, ${palette.accentDeep}26 100%), url('${palette.image}')`,
+        }}
+      >
+        <div className="flex h-full items-center justify-between gap-3 px-4">
+          <div className="min-w-0">
+            <h4 className="truncate text-lg font-black text-white">{realmName(realm.realmId)}</h4>
+            <p className="mt-0.5 text-xs font-bold text-white/80">
+              {displayLevel(realm.workingLevel)}
+              {realm.currentWeek ? ` · Week ${realm.currentWeek}` : ""}
+            </p>
+          </div>
+          <span className="relative grid h-14 w-14 shrink-0 place-items-center">
+            <svg viewBox="0 0 60 60" className="h-14 w-14 -rotate-90">
+              <circle cx="30" cy="30" r="28" fill="rgba(6,14,20,0.42)" />
+              <circle cx="30" cy="30" r="26" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.4)" strokeWidth="5" />
+              <circle
+                cx="30"
+                cy="30"
+                r="26"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference - (circumference * progress) / 100}
+              />
+            </svg>
+            <span className="absolute text-xs font-black text-white">{progress}%</span>
+          </span>
+        </div>
+      </div>
+      <div className="p-4">
+        <p className="text-sm font-bold" style={{ color: palette.accentDeep }}>
+          {focus ?? "Current focus will appear after learning begins."}
+        </p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <span className="rounded-full px-2.5 py-1 text-xs font-black" style={{ backgroundColor: palette.soft, color: palette.accentDeep }}>
+            {completedLessons} of {totalLessons} lessons completed
+          </span>
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-500 transition group-hover:text-slate-800">
+            View progress <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 export function AddHomeChild() {

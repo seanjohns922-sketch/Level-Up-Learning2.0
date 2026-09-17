@@ -76,7 +76,9 @@ assert(teacherSnapshot.includes("assessment_attempts"));
 assert(realmCompat.includes('.from("student_realm_assessments")'));
 assert(realmCompat.includes("question_results"));
 assert(teacherReplay.includes("getRealmDefinition(realmId).name"));
-assert(read("components/parent/ParentPortal.tsx").includes('chance: "Chance Hollow"'));
+// The parent-facing realm label moved to the palette in lib/parent-insights.ts,
+// which ParentPortal renders. The curriculum genre mapping stays in the portal.
+assert(/\n {2}chance: \{[^}]*name: "Chance Hollow"/.test(read("lib/parent-insights.ts")));
 assert(read("components/parent/ParentPortal.tsx").includes('? "probability"'));
 assert(read("components/school/SchoolAnalyticsDashboard.tsx").includes('chance: "Chance Hollow"'));
 assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["chance", "Probability"]'));
