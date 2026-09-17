@@ -28,8 +28,9 @@ export default function GroundStarpathFiveFormReview() {
   const response = saved?.response ?? emptyGroundResponse(item.task);
   const theme = getRealmTheme("space");
   const select = (nextForm: GroundStarpathForm,nextIndex:number) => {stopSpeaking();setShowAnswer(false);router.replace(`/demo-review/starpath-ground?form=${nextForm}&question=${nextIndex+1}`,{scroll:false});};
-  const update = (next:GroundResponse) => {setRecords(old=>({...old,[item.id]:{response:next,submitted:false,skipped:false}}));setFinished(old=>({...old,[form]:false}));};
-  const submit = (skipped=false) => setRecords(old=>({...old,[item.id]:{response,submitted:true,skipped}}));
+  const update = (next:GroundResponse) => {setRecords(old=>({...old,[item.id]:{response:next,submitted:groundResponseReady(item.task,next),skipped:false}}));setFinished(old=>({...old,[form]:false}));};
+  const advance = () => index===items.length-1 ? setFinished(old=>({...old,[form]:true})) : select(form,index+1);
+  const skip = () => {setRecords(old=>({...old,[item.id]:{response,submitted:true,skipped:true}}));advance();};
   const answered = items.filter(q=>records[q.id]?.submitted).length;
   const correct = items.filter(q=>records[q.id]?.submitted&&!records[q.id].skipped&&scoreGroundResponse(q.task,records[q.id].response)).length;
   const correctOptions = item.task.options?.filter(o=>item.task.correctIds?.includes(o.id)).map(o=>o.label??`Shape ${String.fromCharCode(65+item.task.options!.indexOf(o))}`).join(", ");
@@ -51,7 +52,11 @@ export default function GroundStarpathFiveFormReview() {
         <p className={styles.counter}>Question {index+1} of 20 · {GROUND_STARPATH_LABELS[form]}</p>
         <GroundStarpathAssessmentCard key={item.id} item={item} response={response} onChange={update}/>
         <div className={styles.status} role="status">{saved?.submitted ? saved.skipped ? "You chose ‘I don’t know’." : "Answer recorded." : ""}</div>
-        <footer className={styles.footer}><button disabled={index===0} onClick={()=>select(form,index-1)}>← Back</button><button onClick={()=>submit(true)}>I don’t know</button>{saved?.submitted ? <button className={styles.primary} onClick={()=>index===19?setFinished(old=>({...old,[form]:true})):select(form,index+1)}>{index===19?"Finish":"Next →"}</button> : <button className={styles.primary} disabled={!groundResponseReady(item.task,response)} onClick={()=>submit()}>Done ✓</button>}</footer>
+        <footer className={styles.footer}>
+          <button disabled={index===0} onClick={()=>select(form,index-1)}>Back</button>
+          <button onClick={skip}>I don’t know</button>
+          <button className={styles.primary} onClick={advance}>{index===items.length-1 ? form==="posttest" ? "Submit" : "Finish" : "Next"}</button>
+        </footer>
       </section>
       <details className={styles.notes} key={item.id}><summary>Review details</summary><p>{item.primaryDescriptorCode} · {item.skillLabel} · Intended difficulty: {item.difficulty}</p><button onClick={()=>setShowAnswer(v=>!v)}>{showAnswer?"Hide answer":"Show answer"}</button>{showAnswer&&<p>Expected response: {expected}{saved?.submitted?` · Your answer: ${saved.skipped?"I don’t know":scoreGroundResponse(item.task,response)?"correct":"incorrect"}`:""}</p>}<p>All five forms use the same skill sequence. New version 4 questions are isolated from existing student attempts while this bank is reviewed.</p></details>
       {finished[form]&&<div className={styles.notes} role="status">{GROUND_STARPATH_LABELS[form]} review: {correct}/20 correct · {answered}/20 recorded. Nothing was saved to a student record.</div>}
