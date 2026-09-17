@@ -9,6 +9,7 @@ import { emptyGroundResponse, groundResponseReady, scoreGroundResponse, type Gro
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import { stopSpeaking } from "@/lib/speak";
 import GroundStarpathAssessmentCard from "@/components/starpath/GroundStarpathAssessmentCard";
+import AssessmentQuestionNavigator from "@/components/assessment/AssessmentQuestionNavigator";
 import styles from "./GroundStarpathRedesign.module.css";
 
 type RecordValue = { response: GroundResponse; submitted: boolean; skipped: boolean };
@@ -37,6 +38,15 @@ export default function GroundStarpathFiveFormReview() {
     <div className={styles.shell}>
       <header className={`${styles.header} ${styles.fullReviewHeader}`}><div><p>STARPATH · GROUND LEVEL</p><h1>Five redesigned assessments</h1></div><Link href="/demo-review?realm=space&year=Prep">Back to review</Link></header>
       <div className={styles.reviewBar}><div className={styles.formTabs} aria-label="Assessment forms">{GROUND_STARPATH_FORMS.map(f=><button key={f} aria-pressed={f===form} onClick={()=>select(f,index)}>{GROUND_STARPATH_LABELS[f]}</button>)}</div><select className={styles.reviewSelect} aria-label="Review question" value={index} onChange={e=>select(form,Number(e.target.value))}>{items.map((q,i)=><option key={q.id} value={i}>{i+1} — {q.skillLabel}</option>)}</select><span>Review only · 20 questions per form · Student results are not saved</span><span>{answered}/20 recorded</span></div>
+      <div className="mb-4">
+        <AssessmentQuestionNavigator
+          answeredFlags={items.map(q=>Boolean(records[q.id]?.submitted))}
+          currentIndex={index}
+          onJump={nextIndex=>select(form,nextIndex)}
+          realmId="space"
+          reviewMode
+        />
+      </div>
       <section className={styles.card} aria-labelledby="ground-question-heading" data-assessment-task-kind={`starpathGroundV4-${item.task.mode}`} data-question-id={item.id}>
         <p className={styles.counter}>Question {index+1} of 20 · {GROUND_STARPATH_LABELS[form]}</p>
         <GroundStarpathAssessmentCard key={item.id} item={item} response={response} onChange={update}/>
