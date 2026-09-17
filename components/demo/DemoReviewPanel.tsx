@@ -81,6 +81,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   if(realm === "space" && year === "Prep") return `/demo-review/starpath-ground?form=${kind}`;
   if(realm === "space" && year === "Year 1") return `/demo-review/starpath-level1?form=${kind}`;
+  if(realm === "space" && year === "Year 2") return `/demo-review/starpath-level2?form=${kind}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${kind}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${kind}`;
   if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${kind}`;
@@ -114,6 +115,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
   if(realm === "space" && year === "Prep") return `/demo-review/starpath-ground?form=${checkpoint}`;
   if(realm === "space" && year === "Year 1") return `/demo-review/starpath-level1?form=${checkpoint}`;
+  if(realm === "space" && year === "Year 2") return `/demo-review/starpath-level2?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 7") return `/demo-review/measurement-level7?form=${checkpoint}`;
@@ -401,7 +403,7 @@ export default function DemoReviewPanel() {
 
         <section className="py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8") ? "Assessments for review" : "Live Assessments"}</h2></div>
-          {realm === "space" && (year === "Prep" || year === "Year 1") ? (
+          {realm === "space" && (year === "Prep" || year === "Year 1" || year === "Year 2") ? (
             <p className="mb-3 text-xs font-bold text-amber-200">The five redesigned Starpath forms open for content review. Existing student attempts are unchanged.</p>
           ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
