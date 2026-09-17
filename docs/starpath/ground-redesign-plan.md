@@ -1,6 +1,6 @@
 # Ground Starpath assessment redesign
 
-Status: six isolated review examples, 17 September 2026. The current student banks are unchanged. Review these interactions before authoring/replacing the five full forms.
+Status: all five redesigned forms are implemented for protected review, 17 September 2026. Sean approved the six representative examples. The new bank contains 100 version-4 items; existing student banks remain unchanged pending content review.
 
 ## Source and scope
 
@@ -54,6 +54,19 @@ No reference picture for a naming task. Shape options have neutral identifiers i
 
 The examples use page-local state only. No assessment bank imports, Supabase writes, login/session changes or result migration. Reviewer scoring is collapsed and opt-in. These six examples are not a completed five-form release.
 
-## Next stage after design review
+## Release status and validation
 
-Author all 100 items; review individual clarity, age suitability, coverage, equivalent difficulty and visual diversity. Test correct/incorrect/alternative responses, neutral read-aloud, touch/keyboard controls, responsive layout and result restoration. Finally validate the unchanged student entry/results path before replacing live banks. Physical position tasks and open-ended picture explanations remain useful teacher observations alongside the diagnostic.
+The full review is now at `/demo-review/starpath-ground`. The six original examples remain at `/demo-review/starpath-ground-redesign` for comparison. The full review shares an assessment-only card and pure scorers rather than lesson teaching controls.
+
+Implemented all 100 items with 12 shape questions and 8 position questions per form. Added explicit version-4 IDs, shuffled correct-answer positions within each form, five authored context configurations, property-based construction scoring, and response restoration when navigating between questions/forms. Above/below accepts all spaces on the relevant row; beside accepts both sides. Squares are accepted as rectangles in construction, consistent with their mathematical definition. Naming questions avoid competing square/rectangle choices.
+
+Validation performed:
+- All 100 questions rendered and answered correctly through Chrome; single prompts, nearby read-aloud controls, neutral recording feedback, no horizontal overflow and no student-data writes.
+- All 100 layouts checked at 1366×768 and 390×844. The lowest desktop navigation row ends at 757 px. Mobile content stacks and may scroll vertically.
+- Pure scoring tests reject distractors, extra selections, incorrect reasons, collinear triangles, crossed quadrilaterals, non-square rectangles for square tasks, and misaligned composition pieces. They accept rotated constructions, all square-composition orientations and valid alternative placements.
+- Picture-piece IDs checked against actual lesson artwork; missing parts are omitted, with no ghost target. Basket overlap, tabletop contact and fence occlusion were visually checked and corrected.
+- `npm run qa:starpath-ground-redesign` is included in the prebuild release checks. TypeScript, ESLint and the existing prebuild audits pass.
+
+This is a content-review release, not a student-bank migration. The diagnostic version-3 bank, student login/RPC permissions, result persistence and placement logic are unchanged. The audit explicitly verifies that existing diagnostics still resolve to their original questions. A subsequent student rollout must version the new bank and preserve existing attempts; review-only browser tests do not claim to validate a new student endpoint.
+
+Physical position tasks and open-ended picture explanations remain useful teacher observations alongside the diagnostic. Difficulty labels are intended difficulty, not empirical calibration.
