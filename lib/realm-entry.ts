@@ -1,4 +1,5 @@
 import { isPlacementComplete, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
+import { realmEntryLevel } from "@/lib/realm-unlock";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import {
@@ -58,8 +59,13 @@ export function resolveRealmEntryRoute(args: {
 
   const route = `/${getRealmDefinition(args.realmId).slug}`;
 
-  if (isRealmFirstLevel(args.realmId, year) && !isFirstLevelPretestEnabled(args.realmId, year)) return route;
+  // Clamp to a level this realm actually teaches. A learner below a realm's
+  // floor (Chance Hollow and Pattern Peaks start at Level 3) would otherwise be
+  // sent to a pre-test bank that does not exist and shown "No questions found".
+  const entryLevel = realmEntryLevel(args.realmId, year) ?? year;
+
+  if (isRealmFirstLevel(args.realmId, entryLevel) && !isFirstLevelPretestEnabled(args.realmId, entryLevel)) return route;
   if (isPlacementComplete(args.progress)) return route;
 
-  return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;
+  return `/pretest?year=${encodeURIComponent(entryLevel)}&realm_id=${args.realmId}`;
 }

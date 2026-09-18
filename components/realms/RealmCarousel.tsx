@@ -19,6 +19,8 @@ import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
 import { isLiveRealmId, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
 import { getStudentFocusLock, isRealmBlockedByFocus, type StudentFocusLock } from "@/lib/focus-lock";
+import { realmUnlockState } from "@/lib/realm-unlock";
+import { fetchStudentRealmLevels, levelsFromRows } from "@/lib/realm-unlock-client";
 
 // Read a specific realm's scoped progress (the carousel lives on /realms where
 // the default scope is "number", so the focused realm's scope is passed
@@ -64,6 +66,33 @@ export default function RealmCarousel() {
   // realm, every other portal locks. null = free roam (the usual case, incl. at
   // home). Not applied in teacher preview / demo — that surface isn't a student.
   const [focusLock, setFocusLock] = useState<StudentFocusLock | null>(null);
+  // Every level this learner has reached, in any realm. Reaching a level
+  // anywhere is the evidence that they may attempt another realm's entry
+  // pre-test, so Chance Hollow and Pattern Peaks open once they are at Level 3
+  // somewhere. The school year counts too, so a new Year 3 learner with no
+  // placements yet is not locked out of the realms their year can access.
+  const [reachedLevels, setReachedLevels] = useState<(string | null)[]>([]);
+
+  useEffect(() => {
+    if (previewMode || DEMO_MODE) return;
+    const identity = getActiveStudentIdentity();
+    const schoolYear = getActiveStudentProfile()?.yearLevel ?? null;
+    if (!identity.studentId) {
+      setReachedLevels([schoolYear]);
+      return;
+    }
+    let cancelled = false;
+    void fetchStudentRealmLevels(identity.studentId)
+      .then((rows) => {
+        if (!cancelled) setReachedLevels([...levelsFromRows(rows), schoolYear]);
+      })
+      .catch(() => {
+        if (!cancelled) setReachedLevels([schoolYear]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [previewMode]);
 
   useEffect(() => {
     // Back at the Tower means any review session is over — restore write access.
@@ -129,9 +158,15 @@ export default function RealmCarousel() {
   // A realm the class isn't focused on is locked while Focus Mode is engaged.
   const blockedByFocus = isRealmBlockedByFocus(focusLock, current.id);
   const focusRealm = focusLock ? realms.find((r) => tryCanonicalRealmId(r.id) === focusLock.focusRealmId) ?? null : null;
+  // Realms below the learner's reach stay shut, but they stay visible: the
+  // card says when it opens instead of sending them to a missing pre-test.
+  const unlockState = previewMode || DEMO_MODE
+    ? ({ unlocked: true } as const)
+    : realmUnlockState(current.id, reachedLevels);
   const isActive =
     (DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
-    !blockedByFocus;
+    !blockedByFocus &&
+    unlockState.unlocked;
   const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm || isChanceRealm);
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
   const nextIdx = (currentIndex + 1) % realms.length;
@@ -561,6 +596,14 @@ export default function RealmCarousel() {
                   <path d="M8 11V7a4 4 0 018 0v4" />
                 </svg>
                 {focusRealm ? `Your class is working in ${focusRealm.name}` : "Locked by your teacher"}
+              </span>
+            ) : !unlockState.unlocked && !current.comingSoon ? (
+              <span className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white/70 border border-white/15" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="4" y="11" width="16" height="9" rx="2" />
+                  <path d="M8 11V7a4 4 0 018 0v4" />
+                </svg>
+                Unlocks at {unlockState.requiredLevelLabel}
               </span>
             ) : current.comingSoon ? (
               <span className="inline-block px-6 py-2.5 rounded-2xl text-sm font-bold text-amber-300/80 border border-amber-400/30" style={{ background: "rgba(251,191,36,0.1)" }}>

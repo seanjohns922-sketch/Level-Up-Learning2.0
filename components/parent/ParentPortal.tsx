@@ -42,6 +42,8 @@ import { supabase } from "@/lib/supabase";
 import ParentActivityCard from "@/components/parent/ParentActivityCard";
 import ParentReportButton from "@/components/parent/ParentReportButton";
 import ParentGrowthCard from "@/components/parent/ParentGrowthCard";
+import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
+import { realmEntryLevel, realmFloorLevel } from "@/lib/realm-unlock";
 import {
   formatFeedTime,
   parentRealmName,
@@ -650,11 +652,13 @@ export function AddHomeChild() {
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedHomeStudent | null>(null);
-  const [startingLevels, setStartingLevels] = useState<Record<"number" | "measurement" | "space", string>>({
-    number: "Year 1",
-    measurement: "Year 1",
-    space: "Year 1",
-  });
+  // One entry per live realm, each clamped into the levels that realm teaches
+  // (Statistica starts at Level 1; Pattern Peaks and Chance Hollow at Level 3).
+  const [startingLevels, setStartingLevels] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      homeRealmOptions().map((realm) => [realm.realmId, realmEntryLevel(realm.realmId, "Year 1") ?? realm.levels[0]!]),
+    ),
+  );
 
   async function createChild() {
     setWorking(true);
@@ -680,11 +684,11 @@ export function AddHomeChild() {
     if (!created) return;
     setWorking(true);
     setError(null);
-    const { error: rpcError } = await supabase.rpc("parent_set_home_starting_levels", {
+    // One realm-to-level object covers every live realm. The older
+    // three-argument RPC is still in the database for compatibility.
+    const { error: rpcError } = await supabase.rpc("parent_set_home_realm_levels", {
       p_student_id: created.studentId,
-      p_number_level: startingLevels.number,
-      p_measurement_level: startingLevels.measurement,
-      p_space_level: startingLevels.space,
+      p_levels: startingLevels,
     });
     if (rpcError) {
       setError(rpcError.message);
@@ -706,10 +710,23 @@ export function AddHomeChild() {
         <p className="text-sm text-slate-600">The student signs in with this username and the 4-digit PIN you set. Their Explorer Code remains with them if they join a school.</p>
       </div>
       <div className="mt-6 divide-y border-y border-slate-200">
-        {(["number", "measurement", "space"] as const).map((realmId) => (
-          <div key={realmId} className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
-            <div><p className="font-black">{realmName(realmId)}</p><p className="text-sm text-slate-500">Suggested from school year: {created.schoolYearLevel}</p></div>
-            <SelectLevel label={`${realmName(realmId)} starting level`} hideLabel value={startingLevels[realmId]} onChange={(value) => setStartingLevels((current) => ({ ...current, [realmId]: value }))} />
+        {homeRealmOptions().map((realm) => (
+          <div key={realm.realmId} className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center">
+            <div>
+              <p className="font-black">{realmName(realm.realmId)}</p>
+              <p className="text-sm text-slate-500">
+                {realm.levels[0] === "Prep"
+                  ? `Suggested from school year: ${created.schoolYearLevel}`
+                  : `Starts at ${displayLevel(realm.levels[0]!)}`}
+              </p>
+            </div>
+            <SelectLevel
+              label={`${realmName(realm.realmId)} starting level`}
+              hideLabel
+              levels={realm.levels}
+              value={startingLevels[realm.realmId] ?? realm.levels[0]!}
+              onChange={(value) => setStartingLevels((current) => ({ ...current, [realm.realmId]: value }))}
+            />
           </div>
         ))}
       </div>
@@ -829,8 +846,18 @@ function FormInput({ label, value, onChange }: { label: string; value: string; o
   return <label><span className="text-sm font-bold">{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 h-12 w-full rounded-md border border-slate-300 px-4" /></label>;
 }
 
-function SelectLevel({ label, value, onChange, hideLabel = false }: { label: string; value: string; onChange: (value: string) => void; hideLabel?: boolean }) {
-  return <label><span className={hideLabel ? "sr-only" : "text-sm font-bold"}>{label}</span><select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className={`${hideLabel ? "" : "mt-2 "}h-12 w-full rounded-md border border-slate-300 bg-white px-3`}>{yearLevels.map((level) => <option key={level}>{level}</option>)}</select></label>;
+function SelectLevel({ label, value, onChange, hideLabel = false, levels = yearLevels }: { label: string; value: string; onChange: (value: string) => void; hideLabel?: boolean; levels?: readonly string[] }) {
+  return <label><span className={hideLabel ? "sr-only" : "text-sm font-bold"}>{label}</span><select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)} className={`${hideLabel ? "" : "mt-2 "}h-12 w-full rounded-md border border-slate-300 bg-white px-3`}>{levels.map((level) => <option key={level}>{level}</option>)}</select></label>;
+}
+
+// Every live realm a Home learner can be placed in, with the levels that realm
+// actually teaches. Home gets the full service: the three-realm list this form
+// used to carry was simply the set of realms that existed in August 2026.
+function homeRealmOptions() {
+  return getLiveRealmDefinitions().map((realm) => ({
+    realmId: realm.realmId as string,
+    levels: realm.levelLabels,
+  }));
 }
 
 export function HomeChildSettings({ studentId }: { studentId: string }) {
@@ -870,7 +897,36 @@ export function HomeChildSettings({ studentId }: { studentId: string }) {
     </section>
     {!data.parentManaged ? <section className="border-l-4 border-blue-500 bg-blue-50 p-4"><p className="font-bold text-blue-950">School managed</p><p className="mt-1 text-sm text-blue-900">{data.schoolName ?? "The linked school"} now manages PIN resets, placement and assessment resets. Your Parent account remains read-only.</p></section> : <>
       <section className="border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Reset student PIN</h2><div className="mt-4 flex flex-wrap gap-2"><input inputMode="numeric" value={newPin} onChange={(event) => setNewPin(event.target.value.replace(/\D/g, "").slice(0, 4))} className="h-11 w-40 rounded-md border border-slate-300 px-3 text-center font-mono tracking-[0.25em]" /><button type="button" disabled={busy || newPin.length !== 4} onClick={() => void command("parent_reset_home_student_pin", { p_student_id: studentId, p_new_pin: newPin }, "PIN reset. Existing student sessions were signed out.")} className="min-h-11 rounded-md bg-blue-600 px-4 font-bold text-white disabled:bg-slate-300">Reset PIN</button></div></section>
-      <section className="border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-xl font-black">Starting levels</h2><p className="mt-1 text-sm text-slate-600">Changes stop once lessons, quizzes or a post-test have begun.</p><div className="mt-4 divide-y">{data.placements.map((placement) => <div key={placement.realmId} className="flex flex-wrap items-center justify-between gap-3 py-4"><div><p className="font-bold">{realmName(placement.realmId)}</p><p className="text-sm text-slate-500">{placement.entryMode === "pretest" ? "Pre-test entry" : "Ground Level entry"}</p></div><div className="flex gap-2"><select value={placement.workingLevel} onChange={(event) => void command("parent_change_home_starting_level", { p_student_id: studentId, p_realm_id: placement.realmId, p_assigned_level: event.target.value }, `${realmName(placement.realmId)} starting level updated.`)} disabled={busy} className="h-11 rounded-md border border-slate-300 bg-white px-3">{yearLevels.map((level) => <option key={level}>{level}</option>)}</select><button type="button" disabled={busy} onClick={() => void command("parent_reset_home_pretest", { p_student_id: studentId, p_realm_id: placement.realmId }, `${realmName(placement.realmId)} pre-test reopened. Previous results remain in history.`)} className="grid h-11 w-11 place-items-center rounded-md border border-slate-300" title="Reopen pre-test"><RotateCcw className="h-4 w-4" /></button></div></div>)}</div></section>
+      <section className="border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-xl font-black">Starting levels</h2>
+        <p className="mt-1 text-sm text-slate-600">Every realm is available at home. Changes stop once lessons, quizzes or a post-test have begun.</p>
+        <div className="mt-4 divide-y">
+          {homeRealmOptions().map((realm) => {
+            const placement = data.placements.find((row) => row.realmId === realm.realmId) ?? null;
+            const value = placement?.workingLevel && realm.levels.includes(placement.workingLevel)
+              ? placement.workingLevel
+              : realm.levels[0]!;
+            return (
+              <div key={realm.realmId} className="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div>
+                  <p className="font-bold">{realmName(realm.realmId)}</p>
+                  <p className="text-sm text-slate-500">
+                    {placement
+                      ? placement.entryMode === "pretest" ? "Pre-test entry" : "Ground Level entry"
+                      : `Not started · starts at ${displayLevel(realm.levels[0]!)}`}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <select value={value} onChange={(event) => void command("parent_change_home_starting_level", { p_student_id: studentId, p_realm_id: realm.realmId, p_assigned_level: event.target.value }, `${realmName(realm.realmId)} starting level updated.`)} disabled={busy} className="h-11 rounded-md border border-slate-300 bg-white px-3">
+                    {realm.levels.map((level) => <option key={level}>{level}</option>)}
+                  </select>
+                  <button type="button" disabled={busy || !placement} onClick={() => void command("parent_reset_home_pretest", { p_student_id: studentId, p_realm_id: realm.realmId }, `${realmName(realm.realmId)} pre-test reopened. Previous results remain in history.`)} className="grid h-11 w-11 place-items-center rounded-md border border-slate-300 disabled:opacity-40" title="Reopen pre-test"><RotateCcw className="h-4 w-4" /></button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </>}
     {message ? <p className="border border-slate-200 bg-white p-3 text-sm font-bold">{message}</p> : null}
   </div>;

@@ -4,6 +4,8 @@ import { setLastRealm } from "@/lib/last-realm";
 import { getRealmAvailability, resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 import { getRealmDefinition, type CanonicalRealmId } from "@/lib/realms/realm-registry";
+import { realmUnlockState } from "@/lib/realm-unlock";
+import { fetchStudentRealmLevels, levelsFromRows } from "@/lib/realm-unlock-client";
 import { exitReviewMode } from "@/lib/review-mode";
 import { getActiveStudentIdentity, getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
@@ -53,6 +55,17 @@ export async function resolveTowerRealmEntry(args: {
 
   const identity = getActiveStudentIdentity();
   if (!identity.studentId) return { status: "ready", route: "/login" };
+
+  // Same unlock rule as the realm carousel: a realm below this learner's reach
+  // explains itself rather than routing them to a pre-test it does not have.
+  const entryProfile = getActiveStudentProfile();
+  const reachedLevels = await fetchStudentRealmLevels(identity.studentId)
+    .then((rows) => levelsFromRows(rows))
+    .catch(() => [] as (string | null)[]);
+  const unlockState = realmUnlockState(args.realmId, [...reachedLevels, entryProfile?.yearLevel ?? null]);
+  if (!unlockState.unlocked) {
+    return { status: "unavailable", message: `${realm.name} unlocks at ${unlockState.requiredLevelLabel}.` };
+  }
 
   const restored = await restoreStudentStateFromServer(identity.studentId, availability.progressRealmId);
   announceCanonicalWorldStateRestored();
