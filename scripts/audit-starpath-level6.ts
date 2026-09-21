@@ -97,7 +97,8 @@ function auditCross(lessonId: string, t: CrossTask) {
   check(t.correctOptionIds.length === 1 && ids.has(t.correctOptionIds[0]!), `${lessonId}: exactly one valid correct answer`);
   const correct = t.options.find((o) => o.id === t.correctOptionIds[0]);
   if (t.mode === "sliceShape" || t.mode === "predict") {
-    check((correct?.label === cap(obj.sectionName) || correct?.label.startsWith(`${obj.sectionName}:`) === true), `${lessonId}/${t.mode}: section must be ${obj.sectionName} for ${obj.id}`);
+    const sides = ({rectangle:4,triangle:3,square:4,hexagon:6,circle:0} as const)[obj.sectionName];
+    check((correct?.label === cap(obj.sectionName) || correct?.label.startsWith(`${obj.sectionName}:`) === true || (sides>0 && correct?.label === `It has ${sides} straight sides, matching the base boundary.`)), `${lessonId}/${t.mode}: section must be ${obj.sectionName} for ${obj.id}`);
   } else if (t.mode === "sliceChange") {
     check(t.correctOptionIds[0] === (obj.constantSection ? "same" : "smaller"), `${lessonId}/sliceChange: wrong answer for ${obj.id}`);
   } else if (t.mode === "prism") {

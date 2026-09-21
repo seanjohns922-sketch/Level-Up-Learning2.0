@@ -84,6 +84,7 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   if(realm === "space" && year === "Year 2") return `/demo-review/starpath-level2?form=${kind}`;
   if(realm === "space" && year === "Year 3") return `/demo-review/starpath-level3?form=${kind}`;
   if(realm === "space" && year === "Year 4") return `/demo-review/starpath-level4?form=${kind}`;
+  if(realm === "space" && year === "Year 6") return `/demo-review/starpath-level6?form=${kind}`;
   if(realm === "space" && year === "Year 5") return `/demo-review/starpath-level5?form=${kind}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${kind}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${kind}`;
@@ -121,6 +122,7 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
   if(realm === "space" && year === "Year 2") return `/demo-review/starpath-level2?form=${checkpoint}`;
   if(realm === "space" && year === "Year 3") return `/demo-review/starpath-level3?form=${checkpoint}`;
   if(realm === "space" && year === "Year 4") return `/demo-review/starpath-level4?form=${checkpoint}`;
+  if(realm === "space" && year === "Year 6") return `/demo-review/starpath-level6?form=${checkpoint}`;
   if(realm === "space" && year === "Year 5") return `/demo-review/starpath-level5?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 5") return `/demo-review/measurement-level5?form=${checkpoint}`;
   if(realm === "measurement" && year === "Year 8") return `/demo-review/measurement-level8?form=${checkpoint}`;

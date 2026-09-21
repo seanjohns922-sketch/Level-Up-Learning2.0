@@ -15,7 +15,7 @@ type Node = { pts?: P[]; cx?: number; cy?: number; r?: number; fill: string };
 const ptsStr = (a: P[]) => a.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
 
 // Tiling generators, ported from the approved prototype.
-function tileNodes(id: string): Node[] {
+export function tileNodes(id: string): Node[] {
   const out: Node[] = [];
   const push = (pts: P[], i: number) => out.push({ pts, fill: PAL[i % 3]! });
   if (id === "square") {
@@ -25,8 +25,8 @@ function tileNodes(id: string): Node[] {
     const w = 48, h = 28; let i = 0;
     for (let y = -2; y < VH + h; y += h) for (let x = -2; x < VW + w; x += w) push([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], i++);
   } else if (id === "parallelogram") {
-    const w = 40, h = 30, sk = 16; let i = 0;
-    for (let y = -2; y < VH + h; y += h) for (let x = -60; x < VW + w; x += w) { const o = (Math.round((y) / h) * sk) % w; push([[x + o, y], [x + w + o, y], [x + w - sk + o, y + h], [x - sk + o, y + h]], i++); }
+    const w = 40, h = 30, sk = h / Math.sqrt(3); let i = 0;
+    for (let y = -2; y < VH + h; y += h) for (let x = -60; x < VW + w; x += w) { const o = -(Math.round((y + 2) / h) * sk) % w; push([[x + o, y], [x + w + o, y], [x + w - sk + o, y + h], [x - sk + o, y + h]], i++); }
   } else if (id === "triangle") {
     const a = 42, rh = a * Math.sqrt(3) / 2;
     for (let y = -rh; y < VH + rh; y += rh) { let i = 0; for (let x = -a; x < VW + a; x += a) { push([[x, y + rh], [x + a, y + rh], [x + a / 2, y]], i % 2); push([[x + a / 2, y], [x + 3 * a / 2, y], [x + a, y + rh]], (i + 1) % 2); i++; } }

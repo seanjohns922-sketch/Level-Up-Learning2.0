@@ -87,7 +87,7 @@ function SceneEls({ els }: { els: SceneEl[] }) {
   );
 }
 
-function SectionShape({ object, t }: { object: CrossObject; t: number }) {
+export function SectionShape({ object, t }: { object: CrossObject; t: number }) {
   const s = object.constantSection ? 1 : 1 - t;
   const cx = 60, cy = 48, fill = COL.cut, stroke = "#b45309";
   let node: React.ReactNode;
@@ -161,4 +161,9 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
       <style>{`.l6cross-stage{background:radial-gradient(120% 90% at 50% 4%, #20204e 0%, #141235 48%, #0b0a24 100%);box-shadow:0 14px 34px -16px rgba(10,8,40,.6), inset 0 0 0 1px rgba(148,163,255,.14);}`}</style>
     </div>
   );
+}
+
+// Shared controlled geometry for review diagrams, without lesson answer controls.
+export function CrossSectionVisual({objectId,height=.5}:{objectId:string;height?:number}) {
+ return <svg viewBox="35 22 150 182" role="img" aria-label={`${getCrossObject(objectId).name}, with a cut parallel to its base`}><SceneEls els={buildScene(getCrossObject(objectId),height)}/></svg>;
 }
