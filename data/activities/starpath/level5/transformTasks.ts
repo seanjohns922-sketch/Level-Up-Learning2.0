@@ -115,3 +115,17 @@ export function compareTask(round: number, target: number): TransformTask {
     feedback: { correct: "Correct — that is the transformation.", wrong: "A slide keeps the facing; a flip mirrors it; a turn rotates it. Compare the facing." },
   };
 }
+
+// Whole-figure practice follows the scaffolded marked-point tasks.
+function wholeShapeTask(task: TransformTask, operation: 'translate'|'reflect'|'rotate', round: number): TransformTask {
+  const shape = operation === 'rotate' ? [{x:3,y:4},{x:3,y:6},{x:5,y:4}] : [{x:1,y:1},{x:2,y:1},{x:1,y:3}];
+  const expectedShape = operation === 'translate' ? translate(shape, 2+round%2, 1+round%2) : operation === 'reflect' ? reflect(shape, task.line!) : rotate(shape, task.centre!, task.rotation!);
+  const instruction = operation === 'translate' ? `Translate the triangle ${transPhrase(2+round%2,1+round%2)}.` : operation === 'reflect' ? 'Reflect the triangle across the mirror line.' : `Rotate the triangle ${task.rotation===90?'a quarter turn clockwise':'a half turn'} around the marked centre.`;
+  return {...task, shape, markStart: shape[0], answer: expectedShape[0], expectedShape,
+    prompt: `${instruction} Tap all three vertices of its image.`,
+    speakText: `${instruction} Move each vertex, then join them to make the whole image. Tap a point again to remove it. Select all three vertices before choosing Check.`,
+    feedback: {correct:'All three vertices are correct. The whole triangle keeps its size and shape.',wrong:'Check every vertex. Use the same movement for each one; keep the side lengths and angles unchanged.'}};
+}
+export const translateWholeTask = (r:number,t:number) => wholeShapeTask(translateTapTask(r,t),'translate',r);
+export const reflectWholeTask = (r:number,t:number) => wholeShapeTask(reflectTapTask(r,t),'reflect',r);
+export const rotateWholeTask = (r:number,t:number) => wholeShapeTask(rotateTapTask(r,t),'rotate',r);

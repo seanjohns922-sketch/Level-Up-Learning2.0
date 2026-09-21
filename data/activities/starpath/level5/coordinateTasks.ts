@@ -181,3 +181,11 @@ export function routeTask(round: number, target: number, bounds: Bounds = DEFAUL
     feedback: { correct: "A clean, shortest route to the star.", wrong: "Stay on the grid, avoid the blocked sectors, and use the fewest moves." },
   };
 }
+
+// Construct labels on both axes, then practise reading coordinates.
+export function buildAxesTask(round: number, target: number): CoordTask {
+  return { ...originTask(round, target), buildAxes: true,
+    prompt: "Build the coordinate axes. Number every tick from the origin.",
+    speakText: "Both axes start at zero where they meet. Each interval is one unit. Enter every horizontal label from left to right and every vertical label from bottom to top, then choose Check.",
+    feedback: { correct: "Both axes start at zero and increase by one at each tick.", wrong: "Start with zero at the origin on both axes. Increase by one at every tick." } };
+}

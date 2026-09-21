@@ -78,6 +78,11 @@ function assertTask(task: PracticeTask, label: string) {
   if (task.kind === "starpathTransform") {
     const tf = task as TransformTask;
     check(tf.shape.length >= 3 && inBounds(tf.shape, tf.bounds), `${label}: transform shape must be on grid`);
+    if (tf.expectedShape) {
+      check(tf.expectedShape.length===tf.shape.length && inBounds(tf.expectedShape,tf.bounds), `${label}: whole image has every vertex on grid`);
+      const expected = tf.shape.map(p=>tf.mode==='reflect'?reflectPoint(p,tf.line!):tf.mode==='rotate'?rotatePoint(p,tf.centre!,tf.rotation!):{x:p.x+tf.answer!.x-tf.markStart!.x,y:p.y+tf.answer!.y-tf.markStart!.y});
+      check(expected.every(p=>tf.expectedShape!.some(q=>samePoint(p,q))), `${label}: whole image follows transformation`);
+    }
     if (tf.image) check(inBounds(tf.image, tf.bounds), `${label}: transform image must be on grid`);
     if (tf.render === "options") {
       const ids = new Set((tf.options ?? []).map((o) => o.id));
@@ -165,7 +170,12 @@ for (const [lessonId, content] of Object.entries(LEVEL_FIVE_LESSON_CONTENT)) {
         const tf = task as TransformTask;
         check(tf.prompt.length > 0 && tf.speakText.length > 0, `${lessonId}: prompt/speakText required`);
         check(tf.shape.length >= 3 && inBounds(tf.shape, tf.bounds), `${lessonId}: shape must be on the grid`);
-        if (tf.image) check(inBounds(tf.image, tf.bounds), `${lessonId}: image must be on the grid`);
+        if (tf.expectedShape) {
+      check(tf.expectedShape.length===tf.shape.length && inBounds(tf.expectedShape,tf.bounds), `${lessonId}: whole image has every vertex on grid`);
+      const expected = tf.shape.map(p=>tf.mode==='reflect'?reflectPoint(p,tf.line!):tf.mode==='rotate'?rotatePoint(p,tf.centre!,tf.rotation!):{x:p.x+tf.answer!.x-tf.markStart!.x,y:p.y+tf.answer!.y-tf.markStart!.y});
+      check(expected.every(p=>tf.expectedShape!.some(q=>samePoint(p,q))), `${lessonId}: whole image follows transformation`);
+    }
+    if (tf.image) check(inBounds(tf.image, tf.bounds), `${lessonId}: image must be on the grid`);
         if (tf.render === "tap") {
           check(Boolean(tf.markStart) && Boolean(tf.answer), `${lessonId}: tap needs a marked point and answer`);
           check(inBounds([tf.answer!], tf.bounds), `${lessonId}: answer must be on the grid`);

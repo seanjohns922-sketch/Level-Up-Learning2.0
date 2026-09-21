@@ -9,14 +9,14 @@ function independentNet(cells:Cell[]){const f=normals(cells);return cells.length
 export function sampleAnswer(q:Level5Item):Level5Response{
  const a=emptyLevel5Response(q),t=q.task;if(t.mode==='choice'){a.selected=t.correctId!;return a;}
  if(q.kind==='net'){
-  if(t.mode==='complete'){a.cells=q.task.example!;return a;}
+  if(t.mode==='complete'){a.cells=q.task.example!;a.folded=true;return a;}
   for(const cells of Object.values(HEXOMINOES)){for(let flip=0;flip<2;flip++){let variant=cells.map(p=>({r:p.r,c:p.c*(flip?-1:1)}));for(let rotation=0;rotation<4;rotation++){variant=normalise(variant.map(p=>({r:p.c,c:-p.r})));for(let r=0;r<5;r++)for(let c=0;c<5;c++){const candidate=variant.map(p=>({r:p.r+r,c:p.c+c}));if(scoreLevel5Response(q,{...a,cells:candidate}))return {...a,cells:candidate};}}}}throw Error(`No alternative net for ${q.id}`);
  }
  const p=q.task;if(p.mode==='pair')a.pair={x:String(p.answer!.x),y:String(p.answer!.y)};if(p.mode==='point')a.points=[p.answer!];if(p.mode==='shape')a.points=p.expected!;if(p.mode==='axes')a.labels=Object.fromEntries(p.axisValues!.flatMap(n=>[['x'+n,String(n)],['y'+n,String(n)]]));if(p.mode==='route')a.moves=p.example!;return a;
 }
 const ids=new Set<string>();
 for(const [form,items]of Object.entries(forms)){
- assert.equal(items.length,20);assert.deepEqual(items.map(q=>q.skillLabel),LEVEL5_STARPATH_BLUEPRINT);
+ assert.equal(items.length,20);assert.equal(items.filter(q=>q.kind==='plot'&&q.task.plainDiagram).length,3);assert.deepEqual(items.map(q=>q.skillLabel),LEVEL5_STARPATH_BLUEPRINT);
  assert.deepEqual(['AC9M5SP01','AC9M5SP02','AC9M5SP03'].map(code=>items.filter(q=>q.primaryDescriptorCode===code).length),[7,6,7]);
  for(const [i,q]of items.entries()){
   assert(!ids.has(q.id));ids.add(q.id);assert.equal(q.form,form);assert(q.readAloudText.includes(q.prompt));const blank=emptyLevel5Response(q);assert(!scoreLevel5Response(q,blank));assert(!level5ResponseReady(q,blank));const a=sampleAnswer(q);assert(level5ResponseReady(q,a),q.id);assert(scoreLevel5Response(q,a),q.id);
@@ -25,6 +25,7 @@ for(const [form,items]of Object.entries(forms)){
    const n=q.task;if(n.options?.some(o=>o.cells))for(const o of n.options)assert.equal(independentNet(o.cells!),o.id===n.correctId);
    if(i===2){const frames=normals(n.cells!),marked=n.cells![n.marked!],target=n.cells![Number(n.correctId!.slice(1))];assert.deepEqual(frames.get(cellKey(marked))!.n,neg(frames.get(cellKey(target))!.n));}
    if(i===3)assert(!independentNet(n.cells!));
+   if(n.foldRequired)assert(!scoreLevel5Response(q,{...a,folded:false}));
    if(n.mode==='complete')for(let r=0;r<5;r++)for(let c=0;c<5;c++){const candidate=[...n.seeds!,{r,c}];assert.equal(scoreLevel5Response(q,{...a,cells:candidate}),independentNet(candidate));}
 
    if(n.mode!=='choice'){assert(independentNet(a.cells));assert(!scoreLevel5Response(q,{...a,cells:a.cells.slice(0,-1)}));assert(!scoreLevel5Response(q,{...a,cells:[...a.cells.slice(0,-1),a.cells[0]]}));if(n.mode==='build')assert.notEqual(netSignature(a.cells),netSignature(n.cells!));}

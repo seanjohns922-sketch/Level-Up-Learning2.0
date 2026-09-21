@@ -76,11 +76,11 @@ function NetFaces({
   );
 }
 
-function FoldStage({
-  cells, coloured, folded, size = 46, focus = [], tappable = false, selected = [], onTap, height,
+export function FoldStage({
+  cells, coloured, folded, size = 46, focus = [], tappable = false, selected = [], onTap, height, compact = false,
 }: {
   cells: Cell[]; coloured: boolean; folded: boolean; size?: number;
-  focus?: string[]; tappable?: boolean; selected?: string[]; onTap?: (k: string) => void; height?: number;
+  focus?: string[]; tappable?: boolean; selected?: string[]; onTap?: (k: string) => void; height?: number; compact?: boolean;
 }) {
   const tree = useMemo(() => foldTree(cells), [cells]);
   const norm = useMemo(() => normalise(cells), [cells]);
@@ -89,7 +89,7 @@ function FoldStage({
   const box = height ?? Math.max(rows, cols) * size + size;
   if (!tree) return null;
   return (
-    <div className="relative mx-auto" style={{ perspective: 1000, perspectiveOrigin: "50% 42%", width: cols * size + size, height: box }}>
+    <div className="relative mx-auto" style={{ perspective: 1000, perspectiveOrigin: "50% 42%", width: compact && folded ? size * 3 : cols * size + size, height: box }}>
       <div
         className="absolute left-1/2 top-1/2"
         style={{ transformStyle: "preserve-3d", transform: `translate(-50%,-50%) ${folded ? "rotateX(-24deg) rotateY(-30deg)" : "rotateX(0deg) rotateY(0deg)"}`, transition: "transform 0.85s ease" }}

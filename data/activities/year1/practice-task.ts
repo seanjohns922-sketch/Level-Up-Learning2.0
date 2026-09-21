@@ -3272,6 +3272,7 @@ export type PracticeTask = (
       // x across then y up). Plot/read ordered pairs, diagnose coordinate errors,
       // and move a rover with coordinate changes or command sequences.
       kind: "starpathCoordinate";
+      buildAxes?: boolean;
       mode: "order" | "origin" | "plot" | "read" | "error" | "move" | "moveAxis" | "follow" | "commands" | "route";
       render: "tap" | "options" | "commands";
       prompt: string;
@@ -3294,6 +3295,7 @@ export type PracticeTask = (
       // reflected across a line, or rotated about a centre. Interactions: tap
       // where a marked point maps to, or judge/describe/classify a transformation.
       kind: "starpathTransform";
+      expectedShape?: Array<{ x: number; y: number }>;
       mode: "translate" | "describe" | "check" | "reflect" | "rotate" | "compare" | "sequence" | "order" | "chain";
       render: "tap" | "options";
       prompt: string;

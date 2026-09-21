@@ -1,11 +1,11 @@
-import { reflectTapTask, rotateTapTask, compareTask } from "./transformTasks";
+import { reflectWholeTask, rotateWholeTask, reflectTapTask, rotateTapTask, compareTask } from "./transformTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathTransform", "starpathTransform", "starpathTransform"] as const;
 const teach = (heading: string, prompt: string, speakText: string) => teaching(heading, prompt, speakText, "l5Trans");
 
-export const createReflectTaskSet = () => taskSet([reflectTapTask, reflectTapTask, compareTask], teach("Reflect Across a Line", "A reflection is a mirror flip across a line.", "A reflected point is the same distance from the mirror line, on the opposite side. The whole shape flips but keeps its size."));
-export const createRotateTaskSet = () => taskSet([rotateTapTask, rotateTapTask, reflectTapTask], teach("Rotate About a Point", "A rotation turns a shape around a centre.", "Every point turns the same amount around the centre and stays the same distance from it. The shape keeps its size."), 20);
+export const createReflectTaskSet = () => taskSet([reflectTapTask, reflectWholeTask, compareTask], teach("Reflect Across a Line", "A reflection is a mirror flip across a line.", "A reflected point is the same distance from the mirror line, on the opposite side. The whole shape flips but keeps its size."));
+export const createRotateTaskSet = () => taskSet([rotateTapTask, rotateWholeTask, reflectWholeTask], teach("Rotate About a Point", "A rotation turns a shape around a centre.", "Every point turns the same amount around the centre and stays the same distance from it. The shape keeps its size."), 20);
 export const createCompareTransformsTaskSet = () => taskSet([compareTask, compareTask, rotateTapTask], teach("Compare the Transformations", "Slide, flip or turn — which is it?", "A slide keeps the facing, a flip mirrors it, and a turn rotates it. Compare the shape and its image to name the transformation."), 30);
 
 export const REFLECT_CONTENT = lessonContent({

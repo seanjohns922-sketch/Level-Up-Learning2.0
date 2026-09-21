@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { samePoint, type Point } from "@/data/activities/starpath/level5/coordinates";
@@ -17,12 +18,19 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
   const cx = (x: number) => PAD_L + x * STEP;
   const cy = (y: number) => PAD_T + (bounds.y - y) * STEP;
 
+  const [vertices, setVertices] = useState<Point[]>([]);
   const [selected, setSelected] = useState<Point | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
   const markKey = task.markStart ? `${task.markStart.x}:${task.markStart.y}` : null;
 
   function submitTap() {
+    if(task.expectedShape){
+      if(settled || vertices.length!==task.expectedShape.length)return;
+      setSettled(true);
+      if(task.expectedShape.every(p=>vertices.some(v=>samePoint(p,v))))onCorrect(JSON.stringify(vertices));else onWrong(JSON.stringify(vertices));
+      return;
+    }
     if (settled || !selected) return;
     setSettled(true);
     if (task.answer && samePoint(selected, task.answer)) onCorrect(JSON.stringify(selected)); else onWrong(selected ? `${selected.x},${selected.y}` : "");
@@ -67,7 +75,7 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
           {/* image tiles */}
           {(task.image ?? []).map((p) => tile(p, "rgba(167,139,250,0.85)", false, `img${p.x}:${p.y}`))}
           {/* shape tiles */}
-          {task.shape.map((p) => tile(p, "#22d3ee", markKey === `${p.x}:${p.y}`, `sh${p.x}:${p.y}`))}
+          {task.expectedShape ? <><polygon points={task.shape.map(p=>`${cx(p.x)},${cy(p.y)}`).join(' ')} fill="#22d3ee55" stroke="#22d3ee" strokeWidth="2"/>{vertices.length>0&&<polygon points={vertices.map(p=>`${cx(p.x)},${cy(p.y)}`).join(' ')} fill="#a78bfa44" stroke="#a78bfa" strokeWidth="2"/>}</> : task.shape.map((p) => tile(p, "#22d3ee", markKey === `${p.x}:${p.y}`, `sh${p.x}:${p.y}`))}
           {/* rotation centre */}
           {task.centre ? <circle cx={cx(task.centre.x)} cy={cy(task.centre.y)} r="4.5" fill="#0b0a24" stroke="#fcd34d" strokeWidth="2.5" style={{ filter: "drop-shadow(0 0 5px rgba(252,211,77,0.9))" }} /> : null}
 
@@ -76,11 +84,11 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
             ? Array.from({ length: (bounds.x + 1) * (bounds.y + 1) }, (_, index) => {
                 const x = index % (bounds.x + 1);
                 const y = Math.floor(index / (bounds.x + 1));
-                const sel = selected && selected.x === x && selected.y === y;
+                const sel = task.expectedShape ? vertices.some(p=>p.x===x&&p.y===y) : selected && selected.x === x && selected.y === y;
                 return (
                   <g key={`t${index}`}>
                     {sel ? <circle cx={cx(x)} cy={cy(y)} r="10" fill="none" stroke="#34d399" strokeWidth="3" /> : null}
-                    <circle cx={cx(x)} cy={cy(y)} r={STEP / 2 - 2} fill="transparent" style={{ cursor: settled ? "default" : "pointer" }} onClick={() => !settled && setSelected({ x, y })} />
+                    <circle cx={cx(x)} cy={cy(y)} r={STEP / 2 - 2} fill="transparent" style={{ cursor: settled ? "default" : "pointer" }} role="button" tabIndex={0} aria-label={`Point ${x}, ${y}`} aria-pressed={!!sel} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.dispatchEvent(new MouseEvent('click',{bubbles:true}));}}} onClick={() => {if(settled)return;if(task.expectedShape)setVertices(v=>sel?v.filter(p=>p.x!==x||p.y!==y):v.length<task.expectedShape!.length?[...v,{x,y}]:v);else setSelected({x,y});}} />
                   </g>
                 );
               })
@@ -88,6 +96,7 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
         </svg>
       </div>
 
+      {task.expectedShape&&<div className="text-center"><p>{vertices.length}/3 vertices selected. Cyan: original. Purple: your image.</p><ReadAloudBtn text={`${task.speakText} Cyan is the original triangle. Purple is your image. ${vertices.length} of three vertices selected.`} label="Read diagram and controls"/></div>}
       {task.render === "options" ? (
         <>
           <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-3">
@@ -98,7 +107,7 @@ export default function StarpathTransformCard({ task, onCorrect, onWrong }: { ta
           <div className="flex justify-center"><SubmitButton disabled={settled || !chosen} onClick={submitOption} /></div>
         </>
       ) : (
-        <div className="flex justify-center"><SubmitButton disabled={settled || !selected} onClick={submitTap} /></div>
+        <div className="flex justify-center"><SubmitButton disabled={settled || (task.expectedShape?vertices.length!==task.expectedShape.length:!selected)} onClick={submitTap} /></div>
       )}
     </div>
   );

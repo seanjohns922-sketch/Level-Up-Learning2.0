@@ -1,10 +1,10 @@
-import { translateTapTask, describeTask, checkTask } from "./transformTasks";
+import { translateWholeTask, translateTapTask, describeTask, checkTask } from "./transformTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathTransform", "starpathTransform", "starpathTransform"] as const;
 const teach = (heading: string, prompt: string, speakText: string) => teaching(heading, prompt, speakText, "l5Trans");
 
-export const createSlideTaskSet = () => taskSet([translateTapTask, describeTask, translateTapTask], teach("Slide Every Point", "A slide moves every point the same amount.", "In a translation, every point of the shape moves the same distance across and up. The shape keeps its size and stays facing the same way."));
+export const createSlideTaskSet = () => taskSet([translateTapTask, describeTask, translateWholeTask], teach("Slide Every Point", "A slide moves every point the same amount.", "In a translation, every point of the shape moves the same distance across and up. The shape keeps its size and stays facing the same way."));
 export const createDescribeTaskSet = () => taskSet([describeTask, translateTapTask, checkTask], teach("Describe the Translation", "Say how far a shape slid.", "Compare a point on the shape with the matching point on its image. Describe the move as so far across and so far up."), 20);
 export const createCheckImageTaskSet = () => taskSet([checkTask, describeTask, checkTask], teach("Check the Image", "A slide never flips or turns the shape.", "Use the invariants: a translation keeps size, shape and facing. If the image is flipped or turned, it is not a slide."), 30);
 

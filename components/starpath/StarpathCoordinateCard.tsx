@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Check, RotateCcw, Play } from "lucide-react";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskHeading } from "@/components/starpath/StarpathShapeTaskCard";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { runCommands, samePoint, shortestSteps, type MoveDir, type Point } from "@/data/activities/starpath/level5/coordinates";
@@ -27,6 +28,7 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
   const cx = (x: number) => PAD_L + x * STEP;
   const cy = (y: number) => PAD_T + (bounds.y - y) * STEP;
 
+  const [axisLabels, setAxisLabels] = useState<Record<string,string>>({});
   const [selected, setSelected] = useState<Point | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [commands, setCommands] = useState<MoveDir[]>([]);
@@ -39,6 +41,13 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
   const points = task.points ?? [];
 
   function submitTap() {
+    if (task.buildAxes) {
+      if (settled) return;
+      setSettled(true);
+      const correct = ['x','y'].every(axis => Array.from({length:bounds[axis as 'x'|'y']+1},(_,n)=>n).every(n=>axisLabels[axis+n]?.trim()===String(n)));
+      if (correct) onCorrect(JSON.stringify(axisLabels)); else onWrong(JSON.stringify(axisLabels));
+      return;
+    }
     if (settled || !selected) return;
     setSettled(true);
     if (task.answer && samePoint(selected, task.answer)) onCorrect(JSON.stringify(selected)); else onWrong(selected ? `${selected.x},${selected.y}` : "");
@@ -96,10 +105,10 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
           <line x1={cx(0)} y1={cy(0)} x2={cx(0)} y2={cy(bounds.y)} stroke="#67e8f9" strokeWidth="2" />
           {/* axis numbers */}
           {Array.from({ length: bounds.x + 1 }, (_, x) => (
-            <text key={`xl${x}`} x={cx(x)} y={cy(0) + 15} textAnchor="middle" fontSize="10" fontWeight="700" fill="#a5f3fc">{x}</text>
+            task.buildAxes ? <foreignObject key={`xl${x}`} x={cx(x)-12} y={cy(0)+2} width="24" height="23"><input aria-label={`Horizontal tick ${x+1} from the left`} inputMode="numeric" maxLength={1} style={{width:24,height:22,color:"#30204c",background:"white",border:"1px solid #a78bfa",borderRadius:3,textAlign:"center"}} value={axisLabels["x"+x]??""} onChange={e=>setAxisLabels({...axisLabels,["x"+x]:e.target.value})}/></foreignObject> : <text key={`xl${x}`} x={cx(x)} y={cy(0) + 15} textAnchor="middle" fontSize="10" fontWeight="700" fill="#a5f3fc">{x}</text>
           ))}
           {Array.from({ length: bounds.y + 1 }, (_, y) => (
-            <text key={`yl${y}`} x={cx(0) - 9} y={cy(y) + 3.5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#a5f3fc">{y}</text>
+            task.buildAxes ? <foreignObject key={`yl${y}`} x={0} y={cy(y)-11} width="23" height="23"><input aria-label={`Vertical tick ${y+1} from the bottom`} inputMode="numeric" maxLength={1} style={{width:23,height:22,color:"#30204c",background:"white",border:"1px solid #a78bfa",borderRadius:3,textAlign:"center"}} value={axisLabels["y"+y]??""} onChange={e=>setAxisLabels({...axisLabels,["y"+y]:e.target.value})}/></foreignObject> : <text key={`yl${y}`} x={cx(0) - 9} y={cy(y) + 3.5} textAnchor="middle" fontSize="10" fontWeight="700" fill="#a5f3fc">{y}</text>
           ))}
           {/* blocked sectors */}
           {(task.blocked ?? []).map((cell, index) => (
@@ -116,7 +125,7 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
           {/* rover */}
           {rover ? <circle cx={cx(rover.x)} cy={cy(rover.y)} r="7" fill="#22d3ee" stroke="#ecfeff" strokeWidth="2" style={{ filter: "drop-shadow(0 0 5px rgba(34,211,238,0.8))" }} /> : null}
           {/* tap targets + selection */}
-          {isTap
+          {isTap && !task.buildAxes
             ? Array.from({ length: (bounds.x + 1) * (bounds.y + 1) }, (_, index) => {
                 const x = index % (bounds.x + 1);
                 const y = Math.floor(index / (bounds.x + 1));
@@ -143,8 +152,9 @@ export default function StarpathCoordinateCard({ task, onCorrect, onWrong }: { t
         </>
       ) : null}
 
+      {task.buildAxes&&<ReadAloudBtn text={task.speakText} label="Read axis instructions"/>}
       {isTap ? (
-        <div className="flex justify-center"><SubmitButton disabled={settled || !selected} onClick={submitTap} /></div>
+        <div className="flex justify-center"><SubmitButton disabled={settled || (task.buildAxes ? Object.keys(axisLabels).filter(k=>axisLabels[k].trim()).length<bounds.x+bounds.y+2 : !selected)} onClick={submitTap} /></div>
       ) : null}
 
       {isCommands ? (

@@ -1,18 +1,18 @@
-import { orderTask, originTask, plotTask, readTask, errorTask } from "./coordinateTasks";
+import { orderTask, originTask, buildAxesTask, plotTask, readTask, errorTask } from "./coordinateTasks";
 import { lessonContent, taskSet, teaching } from "./lessonUtils";
 
 const kinds = ["starpathCoordinate", "starpathCoordinate", "starpathCoordinate"] as const;
 const teach = (heading: string, prompt: string, speakText: string) => teaching(heading, prompt, speakText, "l5Coord");
 
-export const createBuildAxesTaskSet = () => taskSet([orderTask, originTask, orderTask], teach("Build the Axes", "A coordinate names how far across, then how far up.", "The origin is the corner where the axes meet, at zero and zero. Read a coordinate across first, then up — the order matters."));
+export const createBuildAxesTaskSet = () => taskSet([originTask, buildAxesTask, orderTask], teach("Build the Axes", "Number both axes from zero using equal steps, then read across and up.", "The origin is where both axes meet at zero. Label each tick one unit apart: zero, one, two, and so on, to the right and upwards. A coordinate gives the horizontal number first, then the vertical number."));
 export const createPlotReadTaskSet = () => taskSet([plotTask, readTask, plotTask], teach("Plot and Read", "Plot points and read their coordinates.", "To plot a point, count across then up from the origin. To read one, find how far across it is, then how far up."), 20);
 export const createCoordErrorTaskSet = () => taskSet([errorTask, readTask, errorTask], teach("Find the Coordinate Error", "Spot a swapped or mis-scaled coordinate.", "A wrong label usually swaps the across and up numbers, or counts the wrong amount. Re-count to find the true coordinate."), 30);
 
 export const BUILD_AXES_CONTENT = lessonContent({
   title: "Build the Axes",
   brief: "Set up a coordinate system: origin, axes and the across-then-up order.",
-  criteria: ["locate the origin", "read across before up", "use a consistent order"],
-  activities: ["Across then Up", "Find the Origin", "Order Matters"],
+  criteria: ["locate the origin", "number both axes in equal steps", "use a consistent order"],
+  activities: ["Find the Origin", "Number Both Axes", "Order Matters"],
   kinds,
   reflection: "Which number comes first in a coordinate?",
   reflectionOptions: ["The across number", "The up number", "Either one"],
