@@ -6,7 +6,7 @@ Pre-Test, Post-Test, Start, Mid and End have 20 matched questions each, 100 tota
 
 Checked the supplied `mathematics-curriculum-content-f-6-v9 (4).pdf`, pages 44–45, and all eight Level 4 lesson weeks. Coverage:
 
-- **AC9M4SP01 (7 questions):** represent and approximate composite shapes and objects with familiar components. Identify components, reconstruct a missing part, build a cube approximation, interpret composite solids and explain a simplified representation.
+- **AC9M4SP01 (7 questions):** represent and approximate composite shapes and objects with familiar components. Identify components, recompose a rectangular part from triangles, build a cube approximation, interpret composite solids and explain a simplified representation.
 - **AC9M4SP02 (7 questions):** create and interpret grid reference systems and pathways. Read/type references, locate squares, place landmarks at references, label a grid, trace directions, author a route via a checkpoint, and interpret a route log.
 - **AC9M4SP03 (6 questions):** recognise line/rotational symmetry and create symmetrical patterns. Test line symmetry, complete horizontal/vertical and diagonal reflections, test quarter/half turns, complete rotation patterns, and create a design satisfying symmetry and colour constraints.
 
@@ -23,3 +23,7 @@ Grid references identify squares, not coordinate intersections: letters run left
 ## Validation
 
 The `qa:starpath-level4-five-forms` prebuild audit checks 100 unique items, matched descriptor coverage, actual component sets, counts, cube heights, grid references, placement, route alternatives, independent reflection/rotation geometry, creative alternatives, wrong colours, duplicate tiles, empty answers and distractors. Browser checks cover all 100 correct answers, five 20/20 totals, desktop/mobile layout, protected anonymous access, and absence of runtime errors. TypeScript, targeted ESLint and the full prebuild suite are checked before release.
+
+## Difficulty refinement — 21 September 2026
+
+Question 3 asks how two triangular pieces can recompose a rectangular part. Questions 6 and 7 compare spatial arrangements and ways to simplify a recognisable object. All forms now test half-turn recognition, quarter-turn completion (six added tiles) and creation of a vertical-line-symmetrical design with at least six tiles and both colours. This matches intended task demands; equivalent difficulty still needs student response evidence.

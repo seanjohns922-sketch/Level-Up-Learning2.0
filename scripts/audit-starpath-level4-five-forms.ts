@@ -6,6 +6,13 @@ const ids=new Set<string>();const key=(p:{r:number;c:number})=>`${p.r},${p.c}`;
 function independentSym(t:SymTask,tiles:SymCell[]){return tiles.every(p=>{const r=t.line==='horizontal'?4-p.r:t.line==='diagonal'?p.c:t.line==='vertical'?p.r:t.turn===90?p.c:4-p.r;const c=t.line==='horizontal'?p.c:t.line==='diagonal'?p.r:t.line==='vertical'?4-p.c:4-p.c+(t.turn===90?p.c-p.r:0);return tiles.some(q=>q.r===r&&q.c===c&&q.colour===p.colour);});}
 for(const [form,items]of Object.entries(forms)){
  assert.equal(items.length,20);assert.deepEqual(items.map(q=>q.skillLabel),LEVEL4_STARPATH_BLUEPRINT);for(const [code,n]of [['AC9M4SP01',7],['AC9M4SP02',7],['AC9M4SP03',6]] as const)assert.equal(items.filter(q=>q.primaryDescriptorCode===code).length,n);
+ // Keep the same rotational demand and construction workload in every matched form.
+ const half=items[17],quarter=items[18],design=items[19];
+ assert(half.kind==='symmetry'&&half.task.turn===180);
+ assert(quarter.kind==='symmetry'&&quarter.task.turn===90);
+ assert.equal(quarter.task.expected.length-quarter.task.seeds.length,6);
+ assert(design.kind==='symmetry'&&design.task.line==='vertical'&&design.task.minCells===6);
+ const recompose=items[2];assert(recompose.kind==='composite'&&!recompose.task.hiddenPart);assert(recompose.prompt.includes('two triangular pieces'));
  for(const [i,q]of items.entries()){
   assert(!ids.has(q.id));ids.add(q.id);assert.equal(q.form,form);assert(q.readAloudText.includes(q.prompt));const a=emptyLevel4Response(q);assert(!scoreLevel4Response(q,a),q.id);assert(!level4ResponseReady(q,a));
   if(q.kind==='composite'){

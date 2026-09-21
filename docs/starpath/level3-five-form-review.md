@@ -38,3 +38,7 @@ Uses the shared Starpath theme and approved form tabs, 1–20 question navigatio
 Map construction accepts every non-overlapping, in-bounds layout satisfying the clues; it does not require one fixed arrangement. Directly above/below means the same column; directly left/right means the same row. The automated audit enumerates every possible placement for these tasks, accepting 780 valid layouts across the forms and rejecting all invalid ones. Other checks cover object properties, cube counts, viewpoints, correct/distractor scoring, empty responses, matched curriculum coverage and form variation.
 
 All 100 items passed Chrome interactions and scoring (five 20/20 review totals), with protected-access, desktop/mobile horizontal overflow and runtime-error checks. Larger tasks stack on narrow screens. TypeScript, targeted ESLint and the complete prebuild audit suite were also checked. The prebuild suite ran in an isolated checkout to avoid unrelated in-progress parent-dashboard edits in the shared workspace.
+
+## Difficulty refinement — 21 September 2026
+
+Question 6 now uses incorrect explanations based on confused geometric features rather than colour or arbitrary claims. Students must connect an object’s actual features to its purpose.

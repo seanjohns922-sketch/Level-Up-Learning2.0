@@ -25,6 +25,13 @@ function solids(f:number):SolidTask[]{
   {prompt:'Which object suits a roof with a square base and four triangular faces?',correct:'pyramid',wrong:['cone','prism'],reason:'Its triangular faces meet at one point above a square base.'},
  ] as const;
  const p=purposes[f];
+ const reasonDistractors=[
+  ['Its circular ends are different sizes, so it rolls straight.','Its flat ends slide along the track instead of rolling.'],
+  ['Its two circular ends make a pointed tip.','Its curved surface means it has no point.'],
+  ['Its curved surface leaves no gaps between stacked boxes.','Its triangular faces make a long rectangular space inside.'],
+  ['Its circular flat ends let it roll equally in every direction.','Its flat faces let it roll smoothly without stopping.'],
+  ['Its curved surface joins a square base to a point.','Its four triangular faces meet above a circular base.'],
+ ][f];
  const countModels:BlockModel[]=[{cols:3,rows:2,height:1},{cols:2,rows:2,height:2},{cols:3,rows:1,height:3},{cols:2,rows:3,height:2},{cols:2,rows:2,height:3}];
  const builds:BlockModel[]=[{cols:2,rows:2,height:2},{cols:3,rows:2,height:1},{cols:2,rows:1,height:3},{cols:3,rows:1,height:2},{cols:2,rows:2,height:3}];
  const a={cols:2,rows:1+f%2,height:2},b={cols:3,rows:1+f%2,height:2};const m=countModels[f],n=m.cols*m.rows*m.height,difference=(b.cols-a.cols)*b.rows*b.height;
@@ -34,7 +41,7 @@ function solids(f:number):SolidTask[]{
   {mode:'choice',prompt:'How many vertices does this object have altogether?',instruction:'Include the vertices hidden behind the object.',objects:[vertexObject],options:words([`${vertices}`,`${vertices-1}`,`${vertices+3}`],f+2),correctIds:['o0']},
   {mode:'multi',prompt:'Choose every object with a curved surface.',instruction:'Choose all that belong.',options:objects(['cube','sphere','cylinder','prism','cone','pyramid'],f),correctIds:['o1','o2','o4']},
   {mode:'choice',prompt:'What is true about both objects?',objects:f%2?['pyramid','cone']:['cube','prism'],options:words(f%2?['Both have at least one vertex.','Both have a curved surface.','Both have five flat faces.']:['Both have six flat faces and eight vertices.','Both have six equal square faces.','Both have a curved surface.'],f),correctIds:['o0']},
-  {mode:'choice',prompt:p.prompt,instruction:'Choose the object, then explain why its features suit the job.',options:objects([p.correct,...p.wrong],f+1),correctIds:['o0'],reasons:words([p.reason,'Its colour makes it suitable.','Any object will work equally well.'],f+2),correctReason:'o0'},
+  {mode:'choice',prompt:p.prompt,instruction:'Choose the object, then explain why its features suit the job.',options:objects([p.correct,...p.wrong],f+1),correctIds:['o0'],reasons:words([p.reason,...reasonDistractors],f+2),correctReason:'o0'},
   {mode:'choice',prompt:'What is different about these two objects?',objects:f%2?['cone','pyramid']:['pyramid','cone'],options:words(['The pyramid has only flat faces; the cone has a curved surface.','Only the cone has a vertex.','Both objects have square bases.'],f+2),correctIds:['o0']},
   {mode:'choice',prompt:'How many equal cubes make this model?',instruction:'The model is solid, with no gaps. Count hidden cubes too.',models:[m],options:words([`${n}`,`${n-m.cols}`,`${n+m.cols}`],f),correctIds:['o0']},
   {mode:'blocks',prompt:'Build a rectangular prism from equal cubes.',instruction:`Fill the ${builds[f].cols} by ${builds[f].rows} base. Make every column ${builds[f].height} cubes high, with no gaps.`,build:builds[f]},
