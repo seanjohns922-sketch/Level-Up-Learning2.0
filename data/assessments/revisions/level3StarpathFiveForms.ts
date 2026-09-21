@@ -15,11 +15,12 @@ const objects=(ids:L3ObjectId[],f:number):Choice[]=>rotate(ids.map((object,i)=>(
 function solids(f:number):SolidTask[]{
  const named: L3ObjectId[]=['cylinder','prism','pyramid','cone','sphere'];
  const names:Record<L3ObjectId,string>={cube:'Cube',prism:'Rectangular prism',pyramid:'Square-based pyramid',cylinder:'Cylinder',cone:'Cone',sphere:'Sphere'};
+ const nameDistractors:Record<L3ObjectId,L3ObjectId[]>={cube:['prism','pyramid'],prism:['cube','pyramid'],pyramid:['cone','prism'],cylinder:['cone','sphere'],cone:['pyramid','cylinder'],sphere:['cylinder','cone']};
  const faceObject:L3ObjectId=f%2?'pyramid':'prism',faceCount=f%2?5:6;
  const vertexObject:L3ObjectId=f%2?'cube':'pyramid',vertices=f%2?8:5;
  const purposes=[
   {prompt:'Which object would make a wheel that rolls along a straight track?',correct:'cylinder',wrong:['cube','cone'],reason:'Its curved surface rolls, and its circular ends are the same size.'},
-  {prompt:'Which object suits the pointed nose of a round model rocket?',correct:'cone',wrong:['sphere','cylinder'],reason:'It has a circular base and narrows to one point.'},
+  {prompt:'Which object suits the pointed nose of a round model rocket?',correct:'cone',wrong:['pyramid','cylinder'],reason:'It has a circular base and narrows to one point.'},
   {prompt:'Which object suits a long packing box that stacks neatly?',correct:'prism',wrong:['sphere','cone'],reason:'Its flat rectangular faces fit against other boxes.'},
   {prompt:'Which object suits a ball that rolls in any direction?',correct:'sphere',wrong:['cube','cylinder'],reason:'Its surface curves in every direction, with no flat faces.'},
   {prompt:'Which object suits a roof with a square base and four triangular faces?',correct:'pyramid',wrong:['cone','prism'],reason:'Its triangular faces meet at one point above a square base.'},
@@ -36,13 +37,13 @@ function solids(f:number):SolidTask[]{
  const builds:BlockModel[]=[{cols:2,rows:2,height:2},{cols:3,rows:2,height:1},{cols:2,rows:1,height:3},{cols:3,rows:1,height:2},{cols:2,rows:2,height:3}];
  const a={cols:2,rows:1+f%2,height:2},b={cols:3,rows:1+f%2,height:2};const m=countModels[f],n=m.cols*m.rows*m.height,difference=(b.cols-a.cols)*b.rows*b.height;
  return [
-  {mode:'choice',prompt:'What is the name of this object?',objects:[named[f]],options:words([names[named[f]],names[named[(f+1)%5]],names[named[(f+2)%5]]],f),correctIds:['o0']},
-  {mode:'choice',prompt:'How many flat faces does this object have altogether?',instruction:'Include the faces you cannot see.',objects:[faceObject],options:words([`${faceCount}`,`${faceCount-2}`,`${faceCount+2}`],f+1),correctIds:['o0']},
-  {mode:'choice',prompt:'How many vertices does this object have altogether?',instruction:'Include the vertices hidden behind the object.',objects:[vertexObject],options:words([`${vertices}`,`${vertices-1}`,`${vertices+3}`],f+2),correctIds:['o0']},
+  {mode:'choice',prompt:'What is the name of this object?',objects:[named[f]],options:words([names[named[f]],...nameDistractors[named[f]].map(id=>names[id])],f),correctIds:['o0']},
+  {mode:'choice',prompt:'How many flat faces does this object have altogether?',instruction:'Include the faces you cannot see.',objects:[faceObject],options:words([`${faceCount}`,`${faceCount-1}`,`${faceCount+1}`],f+1),correctIds:['o0']},
+  {mode:'choice',prompt:'How many vertices does this object have altogether?',instruction:'Include the vertices hidden behind the object.',objects:[vertexObject],options:words([`${vertices}`,`${vertices-1}`,`${f%2?6:8}`],f+2),correctIds:['o0']},
   {mode:'multi',prompt:'Choose every object with a curved surface.',instruction:'Choose all that belong.',options:objects(['cube','sphere','cylinder','prism','cone','pyramid'],f),correctIds:['o1','o2','o4']},
-  {mode:'choice',prompt:'What is true about both objects?',objects:f%2?['pyramid','cone']:['cube','prism'],options:words(f%2?['Both have at least one vertex.','Both have a curved surface.','Both have five flat faces.']:['Both have six flat faces and eight vertices.','Both have six equal square faces.','Both have a curved surface.'],f),correctIds:['o0']},
+  {mode:'choice',prompt:'What is true about both objects?',objects:f%2?['pyramid','cone']:['cube','prism'],options:words(f%2?['Both have at least one vertex.','Both have a curved surface.','Both have five flat faces.']:['Both have six flat faces and eight vertices.','Both have six equal square faces.','Both have eight flat faces and six vertices.'],f),correctIds:['o0']},
   {mode:'choice',prompt:p.prompt,instruction:'Choose the object, then explain why its features suit the job.',options:objects([p.correct,...p.wrong],f+1),correctIds:['o0'],reasons:words([p.reason,...reasonDistractors],f+2),correctReason:'o0'},
-  {mode:'choice',prompt:'What is different about these two objects?',objects:f%2?['cone','pyramid']:['pyramid','cone'],options:words(['The pyramid has only flat faces; the cone has a curved surface.','Only the cone has a vertex.','Both objects have square bases.'],f+2),correctIds:['o0']},
+  {mode:'choice',prompt:'What is different about these two objects?',objects:f%2?['cone','pyramid']:['pyramid','cone'],options:words(['The pyramid has only flat faces; the cone has a curved surface.','Only the cone has a vertex.','The pyramid has four vertices altogether; the cone has one.'],f+2),correctIds:['o0']},
   {mode:'choice',prompt:'How many equal cubes make this model?',instruction:'The model is solid, with no gaps. Count hidden cubes too.',models:[m],options:words([`${n}`,`${n-m.cols}`,`${n+m.cols}`],f),correctIds:['o0']},
   {mode:'blocks',prompt:'Build a rectangular prism from equal cubes.',instruction:`Fill the ${builds[f].cols} by ${builds[f].rows} base. Make every column ${builds[f].height} cubes high, with no gaps.`,build:builds[f]},
   {mode:'choice',prompt:'How many more cubes are in model B than model A?',instruction:'Both models are solid, with no gaps. Each small cube is the same size.',models:[a,b],options:words([`${difference}`,`${b.cols-a.cols}`,`${a.cols*a.rows*a.height+b.cols*b.rows*b.height}`],f+1),correctIds:['o0']},

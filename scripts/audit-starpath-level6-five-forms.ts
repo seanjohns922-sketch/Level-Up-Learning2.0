@@ -19,6 +19,7 @@ for(const [form,items]of Object.entries(forms)){
   if(t.mode==='shape'){assert(equal(t.operations!.reduce((ps,op)=>ps.map(p=>apply(p,op)),t.shape!),t.expected!));assert(scoreLevel6Response(q,{...a,points:[...a.points].reverse()}));assert(!scoreLevel6Response(q,{...a,points:a.points.slice(1)}));assert(!scoreLevel6Response(q,{...a,points:[a.points[0],a.points[0],a.points[1]]}));}
   if(t.mode==='tiles'){for(let cell=0;cell<6;cell++)for(let r=0;r<4;r++)assert.equal(scoreLevel6Response(q,{...a,orientations:a.orientations.map((n,j)=>j===cell?r:n)}),r===(t.orientations![cell]+2)%4);}
   if(t.mode==='sequence'){for(const first of operations)for(const second of operations)assert.equal(scoreLevel6Response(q,{...a,commands:[first,second]}),equal(t.shape!.map(p=>apply(apply(p,first),second)),t.expected!));assert(!scoreLevel6Response(q,{...a,commands:a.commands.slice(1)}));}
+  if(i===2){const sides:Record<string,number>={'Triangular prism':3,'Rectangular prism':4,'Pentagonal prism':5,'Hexagonal prism':6,'Octagonal prism':8};const sectionSides:Record<string,number>={triPrism:3,rectPrism:4,hexPrism:6};for(const o of t.options!)assert.equal(sides[o.label]===sectionSides[t.sectionObject!],t.correctIds!.includes(o.id),'Exactly one candidate has the same constant polygonal sections');}
   if(i===3)assert(t.correctIds!.every(id=>['triPrism','rectPrism','hexPrism'].includes(id)));
  }
 }
