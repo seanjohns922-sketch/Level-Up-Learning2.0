@@ -164,6 +164,6 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
 }
 
 // Shared controlled geometry for review diagrams, without lesson answer controls.
-export function CrossSectionVisual({objectId,height=.5}:{objectId:string;height?:number}) {
- return <svg viewBox="35 22 150 182" role="img" aria-label={`${getCrossObject(objectId).name}, with a cut parallel to its base`}><SceneEls els={buildScene(getCrossObject(objectId),height)}/></svg>;
+export function CrossSectionVisual({objectId,height=.5,label}:{objectId:string;height?:number;label?:string}) {
+ return <svg viewBox="35 22 150 182" role="img" aria-label={label??`${getCrossObject(objectId).name}, with a cut parallel to its base`}><SceneEls els={buildScene(getCrossObject(objectId),height)}/></svg>;
 }
