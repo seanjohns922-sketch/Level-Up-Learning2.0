@@ -27,3 +27,7 @@ Three transformation items (15, 18, 19) now use plain shape diagrams without coo
 Week 4 now includes entering every tick label on both axes, between origin identification and coordinate reading. Weeks 6–7 progress from a marked point to constructing a whole triangle image for translation, reflection and rotation. These are digital spatial tasks; physical assembly remains useful complementary evidence.
 
 Rebalance validation: all 100 individual answers passed in headless Chrome, with desktop and mobile overflow checks and no page errors. Axis entry and all three whole-triangle lesson tasks passed keyboard interaction and scoring checks. TypeScript, targeted ESLint, the Level 5 lesson and five-form audits, and the full prebuild suite passed. The folding preview now sits beside the construction grid.
+
+## Four-option multiple choice
+
+All multiple-choice items have exactly four distinct options across all five forms. Added distractors target mathematical misconceptions; the Level 6 select-two item retains four options. Level 5 cube-net choices use four geometrically distinct arrangements, independently checked to contain exactly one valid net. The opposite-face item retains the correct opposite face and three other faces. Automated audits enforce four options and unique option IDs/labels.

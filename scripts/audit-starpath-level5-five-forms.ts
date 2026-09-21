@@ -20,9 +20,10 @@ for(const [form,items]of Object.entries(forms)){
  assert.deepEqual(['AC9M5SP01','AC9M5SP02','AC9M5SP03'].map(code=>items.filter(q=>q.primaryDescriptorCode===code).length),[7,6,7]);
  for(const [i,q]of items.entries()){
   assert(!ids.has(q.id));ids.add(q.id);assert.equal(q.form,form);assert(q.readAloudText.includes(q.prompt));const blank=emptyLevel5Response(q);assert(!scoreLevel5Response(q,blank));assert(!level5ResponseReady(q,blank));const a=sampleAnswer(q);assert(level5ResponseReady(q,a),q.id);assert(scoreLevel5Response(q,a),q.id);
-  const t=q.task;if(t.mode==='choice'){assert.equal(new Set(t.options!.map(o=>o.label)).size,t.options!.length);for(const o of t.options!)if(o.id!==t.correctId)assert(!scoreLevel5Response(q,{...a,selected:o.id}));}
+  const t=q.task;if(t.mode==='choice'){assert.equal(t.options!.length,4,`${q.id}: four answer options`);assert.equal(new Set(t.options!.map(o=>o.id)).size,4);assert.equal(new Set(t.options!.map(o=>o.label)).size,t.options!.length);for(const o of t.options!)if(o.id!==t.correctId)assert(!scoreLevel5Response(q,{...a,selected:o.id}));}
   if(q.kind==='net'){
-   const n=q.task;if(n.options?.some(o=>o.cells))for(const o of n.options)assert.equal(independentNet(o.cells!),o.id===n.correctId);
+   const n=q.task;if(n.options?.some(o=>o.cells))assert.equal(new Set(n.options.map(o=>netSignature(o.cells!))).size,4,'Four distinct net diagrams');
+   if(n.options?.some(o=>o.cells))for(const o of n.options)assert.equal(independentNet(o.cells!),o.id===n.correctId);
    if(i===2){const frames=normals(n.cells!),marked=n.cells![n.marked!],target=n.cells![Number(n.correctId!.slice(1))];assert.deepEqual(frames.get(cellKey(marked))!.n,neg(frames.get(cellKey(target))!.n));}
    if(i===3)assert(!independentNet(n.cells!));
    if(n.foldRequired)assert(!scoreLevel5Response(q,{...a,folded:false}));

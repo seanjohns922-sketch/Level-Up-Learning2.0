@@ -37,3 +37,7 @@ The shared parallelogram tiling renderer was corrected so adjoining rows align a
 - Full repository prebuild audit suite, TypeScript and targeted lint checks.
 
 Review entry: `/demo-review/starpath-level6`. Existing server-side Starpath access checks remain in place. Authentication and student data persistence were not changed.
+
+## Four-option multiple choice
+
+All multiple-choice items have exactly four distinct options across all five forms. Added distractors target mathematical misconceptions; the Level 6 select-two item retains four options. Level 5 cube-net choices use four geometrically distinct arrangements, independently checked to contain exactly one valid net. The opposite-face item retains the correct opposite face and three other faces. Automated audits enforce four options and unique option IDs/labels.
