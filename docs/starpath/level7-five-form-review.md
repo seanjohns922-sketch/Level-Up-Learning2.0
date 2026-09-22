@@ -37,3 +37,7 @@ Review route: `/demo-review/starpath-level7`. The central review panel links all
 Validation completed: the full prebuild regression suite, TypeScript and targeted ESLint pass. Browser automation entered and checked correct responses for all 150 items at desktop and phone widths with no runtime errors or horizontal overflow. Separate interaction checks cover Back/Next persistence, form isolation, skip/edit, keyboard point selection, both reflection orders, Undo/Reset and finishing a form. Visual inspection corrected label placement, compact profile choices and read-aloud icon sizing.
 
 All five main review-panel entry points and the return link were checked. Final representative screens were verified at 1366, 768 and 390 pixels wide; a tablet breakpoint correction keeps choices and audio controls within the card.
+
+## Flowchart readability revision
+
+Questions 24–30 now use branching diagrams with labelled Yes/No arrows across all five forms. Prompts are shorter; Q26 offers four pictured classification trees, Q28 places its three decision controls inside the tree, and Q30 compares two flowcharts side by side. Mathematical definitions, four-choice answers, read-aloud and scoring remain explicit. The audit independently executes the repair choices and completed decision tree against all four quadrilateral groups.

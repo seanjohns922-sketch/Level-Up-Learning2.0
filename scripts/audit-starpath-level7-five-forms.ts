@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {LEVEL7_STARPATH_FORMS as forms,LEVEL7_STARPATH_BLUEPRINT,type Level7Item,type P7} from '../data/assessments/revisions/level7StarpathFiveForms';
+import {LEVEL7_STARPATH_FORMS as forms,LEVEL7_STARPATH_BLUEPRINT,type Level7Item,type P7,type Flow7,narrateFlow7} from '../data/assessments/revisions/level7StarpathFiveForms';
 import {emptyLevel7Response,scoreLevel7Response,level7ResponseReady,type Level7Response} from '../lib/starpath-level7-review';
 import {foldNet,relationBetween} from '../data/activities/starpath/level5/nets';
 export function sampleAnswer(q:Level7Item):Level7Response{const a=emptyLevel7Response(q),t=q.task;if(t.correctIds)a.selected=[...t.correctIds];if(t.mode==='number')a.value=String(t.number);if(t.mode==='pair')a.pair={x:String(t.pair!.x),y:String(t.pair!.y)};if(t.mode==='points')a.points=[...t.expected!];if(t.mode==='program')a.commands=['reflectX','reflectY'];if(t.mode==='sort')a.assignments=Object.fromEntries(t.sortRows!.map(r=>[r.id,r.answer]));if(t.mode==='decisions')a.decisions=[...t.decisionAnswers!];return a;}
@@ -30,4 +30,31 @@ for(const [form,items]of Object.entries(forms)){
 }
 assert.equal(ids.size,150);
 for(let i=0;i<30;i++)assert(new Set(Object.values(forms).map(items=>JSON.stringify(items[i].task))).size>=3,`Variation Q${i+1}`);
+// Independently execute the pictured repair choices for representative shape families.
+const runTree=(tree:Flow7,facts:Record<string,boolean>):string=>typeof tree==='string'?tree:runTree(facts[tree.question]?tree.yes:tree.no,facts);
+const quadCases=[
+ {right:true,equal:true,output:'Square'},
+ {right:true,equal:false,output:'Non-square rectangle'},
+ {right:false,equal:true,output:'Non-square rhombus'},
+ {right:false,equal:false,output:'Other quadrilateral'},
+];
+for(const items of Object.values(forms)){
+ for(const q of items.slice(23)){
+  assert(q.prompt.split(/\s+/).length<=12,`${q.id}: concise prompt`);
+  assert(!q.task.flow,`${q.id}: no sentence-list algorithm`);
+  for(const tree of q.task.trees??[])assert(narrateFlow7(tree.root).includes('If yes:'));
+ }
+ const repair=items[25].task;
+ for(const option of repair.options!){
+  assert(option.tree);
+  const valid=quadCases.every(c=>runTree(option.tree!,{'4 right angles?':c.right,'4 equal sides?':c.equal})===c.output);
+  assert.equal(valid,repair.correctIds!.includes(option.id));
+ }
+ const tree=items[27].task.trees![0].root;
+ const slots:number[]=[];
+ const visit=(node:Flow7)=>{if(typeof node==='string')return;if(node.slot!==undefined)slots.push(node.slot);visit(node.yes);visit(node.no);};
+ visit(tree);assert.deepEqual(slots,[0,1,2]);
+ const completed=(node:Flow7):Flow7=>typeof node==='string'?node:{question:items[27].task.decisionAnswers![node.slot!],yes:completed(node.yes),no:completed(node.no)};
+ for(const c of quadCases)assert.equal(runTree(completed(tree),{'Are all four angles right angles?':c.right,'Are all four sides equal?':c.equal}),c.output);
+}
 console.log('PASS: 150 Level 7 questions; 8/8/7/7 curriculum balance; four distinct choices; cube nets, profiles, counts, triangle inequalities and independent transformation checks; valid/wrong/blank responses; sorting, decision trees and both reflection orders; all coordinates within bounds; matched-form variation.');
