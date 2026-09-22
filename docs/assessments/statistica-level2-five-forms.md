@@ -17,12 +17,14 @@ The assessments sample recording and interpreting supplied survey/experiment res
 
 - Four distinct choices for each multiple-choice question, plus the separate “I don’t know” control.
 - Four familiar categories in every task; improved Level 1 object illustrations reused.
-- Eight records for list entry; ten observations for sorting, tally and graph construction.
-- Read/compare graphs have counts from 3 to 10. Every picture represents one answer and column axes use a fixed 0–12 unit scale.
+- Eight records for list entry; 15 observations for sorting, tally and raw-data displays. Table-to-graph tasks use frequencies up to 10.
+- Read/compare graphs have counts from 5 to 15. Every picture represents one answer; reading axes use a fixed 0–16 unit scale, and construction axes remain 0–12.
 - Five forms share the same skill sequence, response format, count complexity and difficulty. Contexts, category order, source order and answer order vary; the counter experiment retains colour categories.
 - Actual picture placement for sorting. Frequency tables and column graphs use labelled plus/minus controls; no extra Done step.
 - Question-number navigation, Back/Next, Finish/Submit, skip and read-aloud match the existing review flow.
 - Paired graphs use the full card width, with four compact answer choices beneath. Narrow screens stack the graphs.
+
+Frequency progression for future levels: see [the progression policy](statistica-frequency-progression.md).
 
 ## Validation
 

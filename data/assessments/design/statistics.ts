@@ -1,4 +1,6 @@
 import { defineSlots } from './slotAuthoring';
+// Frequency bands must progress between levels, alongside reasoning demand.
+// See docs/assessments/statistica-frequency-progression.md before authoring a new bank.
 export const STATISTICS_SLOTS = {
 1:defineSlots('statistics',1,[
  ['ST01','dataType','Identify a categorical variable in a familiar question.','Same familiar category set and response examples; no numerical-variable terminology required.','UA'],

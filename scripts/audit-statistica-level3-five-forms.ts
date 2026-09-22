@@ -5,6 +5,7 @@ import {emptyStatsResponse,statsResponseReady,scoreStatsResponse} from '../lib/s
 const ids=new Set<string>();
 for(const form of STATISTICA_FORMS){
  const bank=LEVEL3_STATISTICA_FORMS[form];assert.equal(bank.length,20);
+ assert.equal(Math.max(...bank[18].counts),25);assert.equal(bank[4].observations.length,18);assert.equal(Math.max(...bank[15].counts),9);
  for(const [code,n] of [['AC9M3ST01',7],['AC9M3ST03',7],['AC9M3ST02',6]] as const)assert.equal(bank.filter(q=>q.code===code).length,n);
  for(const q of bank){
   assert(!ids.has(q.id));ids.add(q.id);assert(q.prompt&&q.instruction&&q.week>=1&&q.week<=6);
