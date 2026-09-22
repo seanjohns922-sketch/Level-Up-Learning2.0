@@ -22,3 +22,14 @@
 .numericValue{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;font-size:30px;font-weight:800;color:var(--selected)}.sourceBrief{white-space:pre-line;font-size:21px;line-height:1.6;padding:12px 0}.columnControls{grid-template-columns:repeat(auto-fit,minmax(95px,1fr))}
 
 .columnControls>div{border:1px solid var(--ring);border-radius:10px;padding:6px 2px}.columnControls .adjust{gap:3px}
+
+.pictograph {width:100%; margin:12px auto;}
+.pictographKey {display:flex;align-items:center;justify-content:center;gap:12px;padding:12px;border-bottom:1px solid var(--ring);}
+.picClip {display:inline-flex;flex-shrink:0;height:36px;overflow:hidden;vertical-align:middle;}
+.picClip svg {min-width:36px;flex-shrink:0;}
+.pictographRow {display:grid;grid-template-columns:72px 1fr;align-items:center;gap:8px;padding:14px 0;border-bottom:1px solid var(--ring);}
+.pictographRow>div {display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
+.frequencyInput {min-width:0;width:62px;text-align:center;border:1px solid var(--ring);border-radius:8px;background:white;color:inherit;padding:5px;}
+.frequencyInput:focus-visible {outline:3px solid var(--selected);}
+
+.columnControls:has(input){grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}.columnControls .frequencyInput{width:50px;min-width:42px}.pictographKey{flex-wrap:wrap}
