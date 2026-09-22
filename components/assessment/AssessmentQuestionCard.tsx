@@ -1,4 +1,5 @@
 "use client";
+import ReleasedStarpathQuestion from "./ReleasedStarpathQuestion";
 import Year8MeasurementAssessmentVisual from "./Year8MeasurementAssessmentVisual";
 import type {Measurement8Visual} from "@/data/assessments/revisions/year8MeasurementFiveForms";
 import Year7MeasurementAssessmentVisual from "./Year7MeasurementAssessmentVisual";
@@ -371,6 +372,7 @@ export default function AssessmentQuestionCard({
     [type, value]
   );
 
+  if(visual?.type==='starpath_released')return <ReleasedStarpathQuestion question={question} value={value} onChange={onChange}/>;
   if (realmId === "space" && question.practiceTask && question.id && question.correctAnswer != null) {
     return <MeasurelandsAssessmentTask key={question.id} questionId={question.id}
       task={question.practiceTask} value={value ?? ""} correctToken={String(question.correctAnswer)}

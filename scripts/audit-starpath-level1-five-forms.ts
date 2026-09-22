@@ -1,3 +1,4 @@
+export const releaseSamples = new Map<string, unknown>();
 import assert from 'node:assert/strict';
 import { LEVEL1_STARPATH_FORMS as forms, LEVEL1_STARPATH_BLUEPRINT, routeCells, type Direction } from '../data/assessments/revisions/level1StarpathFiveForms';
 import {emptyLevel1Response,scoreLevel1Response,level1ResponseReady,routeIsCorrect,sameCell} from '../lib/starpath-level1-review';
@@ -54,7 +55,7 @@ for(const [form,items] of Object.entries(forms)){
     }
    }
   }
-  assert(level1ResponseReady(item,a));assert(scoreLevel1Response(item,a),`${item.id}: valid response`);
+  assert(level1ResponseReady(item,a));assert(scoreLevel1Response(item,a),`${item.id}: valid response`);releaseSamples.set(item.id,structuredClone(a));
  }
  assert(new Set(positions).size>=3,'Answer position varies across the form');
 }

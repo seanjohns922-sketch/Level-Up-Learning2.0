@@ -1,0 +1,14 @@
+import {writeFileSync,readFileSync,existsSync} from 'node:fs';
+import {GROUND_STARPATH_REDESIGNED_FORMS as ground} from '../data/assessments/revisions/groundStarpathRedesignedForms';
+import {LEVEL1_STARPATH_FORMS as l1} from '../data/assessments/revisions/level1StarpathFiveForms';
+import {LEVEL2_STARPATH_FORMS as l2} from '../data/assessments/revisions/level2StarpathFiveForms';
+import {LEVEL3_STARPATH_FORMS as l3} from '../data/assessments/revisions/level3StarpathFiveForms';
+import {LEVEL4_STARPATH_FORMS as l4} from '../data/assessments/revisions/level4StarpathFiveForms';
+import {LEVEL5_STARPATH_FORMS as l5} from '../data/assessments/revisions/level5StarpathFiveForms';
+import {LEVEL6_STARPATH_FORMS as l6} from '../data/assessments/revisions/level6StarpathFiveForms';
+import {LEVEL7_STARPATH_FORMS as l7} from '../data/assessments/revisions/level7StarpathFiveForms';
+import {LEVEL8_STARPATH_FORMS as l8} from '../data/assessments/revisions/level8StarpathFiveForms';
+const banks=[ground,l1,l2,l3,l4,l5,l6,l7,l8];
+const path='data/assessments/releases/starpath-v9.json',payload=JSON.stringify(banks,null,2)+'\n';
+if(existsSync(path)&&readFileSync(path,'utf8')!==payload)throw new Error('The v9 bank is frozen. Publish future changes under a new release version.');
+writeFileSync(path,payload);

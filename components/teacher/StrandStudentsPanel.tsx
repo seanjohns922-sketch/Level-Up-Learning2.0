@@ -32,6 +32,7 @@ import {
   type NormalizedWeeklyQuizAttempt,
   type TeacherProgressOverrideReason,
 } from "@/lib/realm-progress-compat";
+import SpaceExtensionReport from "@/components/teacher/SpaceExtensionReport";
 import MeasurementExtensionReport from "./MeasurementExtensionReport";
 import NumberExtensionReport from "./NumberExtensionReport";
 import AssessmentReplay from "./AssessmentReplay";
@@ -1307,6 +1308,7 @@ function StudentStrandDetail({
         />
       </div>
 
+      {supportedRealmId === "space" ? <SpaceExtensionReport key={student.id} studentId={student.id} studentName={studentName}/> : null}
       {supportedRealmId === "measurement" ? <MeasurementExtensionReport key={student.id} studentId={student.id} studentName={studentName}/> : null}
       {supportedRealmId === "number" ? <NumberExtensionReport key={student.id} studentId={student.id} studentName={studentName}/> : null}
       {growth && <div className="rounded-2xl border border-indigo-200 bg-white p-4">

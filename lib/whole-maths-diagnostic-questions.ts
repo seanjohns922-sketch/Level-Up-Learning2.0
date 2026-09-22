@@ -1,3 +1,4 @@
+import {releasedStarpathQuestions} from '@/data/assessments/releases/starpath';
 import { GROUND_STARPATH_FIVE_FORMS } from '@/data/assessments/revisions/groundStarpathFiveForms';
 import { YEAR3_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year3Measurement';
 import { YEAR4_MEASUREMENT_RELEASED_FORMS } from '@/data/assessments/releases/year4Measurement';
@@ -65,15 +66,16 @@ export function getDiagnosticQuestions(
   year6MeasurementVersion:3|4=3,
   measurementReleaseVersion:0|1=0,
   spaceGroundVersion: 0 | 3 = 0,
+  spaceReleaseVersion:0|1=0,
 ): LinkedDiagnosticQuestion[] {
   const definition = DIAGNOSTIC_STRANDS.find((candidate) => candidate.strand === strand);
   if (!definition?.available || !definition.realmId) return [];
   if (strand === "number" && Number(level.replace(/\D/g, "")) > numberMaximumLevel) return [];
   if (strand === "measurement" && Number(level.replace(/\D/g,"")) > (measurementReleaseVersion===1?8:6)) return [];
   // Retain existing diagnostic sittings until independent checkpoint forms are version-pinned.
-  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0);
-  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0)?.questions ?? [];
-  const levelTest = strand === "space" && level === "Prep" && spaceGroundVersion === 3
+  const pretest = getPretestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0, 0);
+  const posttest = getPosttestForYearLabel(level, definition.realmId, 2, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 0, 0)?.questions ?? [];
+  const levelTest = strand==='space' && spaceReleaseVersion===1 ? releasedStarpathQuestions(level,checkpoint==='ad_hoc'?'start':checkpoint) : strand === "space" && level === "Prep" && spaceGroundVersion === 3
     ? GROUND_STARPATH_FIVE_FORMS[checkpoint === "ad_hoc" ? "start" : checkpoint] as unknown as AssessmentQuestion[]
     : strand === "measurement" && measurementReleaseVersion===1 && ["Year 3","Year 4","Year 7","Year 8"].includes(level)
     ? ({"Year 3":YEAR3_MEASUREMENT_RELEASED_FORMS,"Year 4":YEAR4_MEASUREMENT_RELEASED_FORMS,"Year 7":YEAR7_MEASUREMENT_RELEASED_FORMS,"Year 8":YEAR8_MEASUREMENT_RELEASED_FORMS}[level as "Year 3"])[checkpoint==="ad_hoc"?"start":checkpoint]

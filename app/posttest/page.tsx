@@ -1,6 +1,9 @@
 "use client";
+import {starpathReleaseVisual,readyReleasedStarpath} from "@/lib/starpath-release-response";
+import {starpathPostReleaseVersion} from "@/lib/starpath-release-version";
 import { year3MeasurementPostVersion } from "@/lib/year3-measurement-assessment-version";
 import { year4MeasurementPostVersion } from "@/lib/year4-measurement-assessment-version";
+import SpaceExtensionAssessment from "@/components/assessment/SpaceExtensionAssessment";
 import MeasurementExtensionAssessment from "@/components/assessment/MeasurementExtensionAssessment";
 import { year1MeasurementPostVersion } from "@/lib/year1-measurement-assessment-version";
 import { year2MeasurementPostVersion } from "@/lib/year2-measurement-assessment-version";
@@ -348,6 +351,7 @@ export default function PostTestPageWrapper() {
 
 function AssessmentRoute() {
   const params=useSearchParams();
+  if (["Year 7","Year 8"].includes(params.get("year")??"") && params.get("realm_id")==="space") return <SpaceExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/>;
   if (["Year 7","Year 8"].includes(params.get("year")??"") && params.get("realm_id")==="measurement") return <MeasurementExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/>;
   return ["Year 7","Year 8"].includes(params.get("year")??"") && (params.get("realm_id")??"number")==="number"
     ? <NumberExtensionAssessment key={`posttest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="posttest"/> : <PostTestPage/>;
@@ -386,6 +390,7 @@ function PostTestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [spaceReleaseVersion,setSpaceReleaseVersion]=useState<0|1>(1);
   const [groundMeasurementVersion,setGroundMeasurementVersion]=useState<3|4>(4);
   const [year1MeasurementVersion,setYear1MeasurementVersion]=useState<3|4>(4);
   const [year2MeasurementVersion,setYear2MeasurementVersion]=useState<3|4>(4);
@@ -407,8 +412,8 @@ function PostTestPage() {
         : starpathLevel1CandidateRequested
           ? [...LEVEL1_STARPATH_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_POSTTEST_ITEMS] as unknown as Question[]
-      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion)?.questions ?? [],
-    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion],
+      : getPosttestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion,spaceReleaseVersion)?.questions ?? [],
+    [candidateReviewEnabled, starpathCandidateReviewRequested, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion,spaceReleaseVersion],
   );
 
   const [idx, setIdx] = useState(0);
@@ -467,6 +472,11 @@ function PostTestPage() {
           setRestoreError("Your saved program could not be found. Ask your teacher to check your placement.");
           setRestoreState("error");
           return;
+        }
+        if(progressRealmId==='space'){
+          let draftIds:string[]|undefined;
+          try{const draft=JSON.parse(localStorage.getItem(getPosttestDraftKey(progressRealmId,year))??'null');draftIds=draft?.questionIds??(draft?.answers?Object.keys(draft.answers):undefined);}catch{/* Keep the baseline version. */}
+          setSpaceReleaseVersion(starpathPostReleaseVersion(year,restored.rows.flatMap(row=>row.assessment_attempts??[]),draftIds));
         }
         if(progressRealmId === "measurement" && year === "Prep") {
           let draftIds:string[]|undefined;
@@ -825,7 +835,7 @@ function PostTestPage() {
 
   const isInteractiveTask =
     (q?.type === "measurelandsTask" || q?.type === "starpathTask" || q?.type === "statisticaTask" || q?.type === "patternPeaksTask" || q?.type === "chanceHollowTask") && Boolean(q.practiceTask);
-  const hasAnswer = q?.type === "prepNumberTask" ? groundNumberHasAnswer(q,picked) :
+  const hasAnswer = q && starpathReleaseVisual(q) ? readyReleasedStarpath(q,picked) : q?.type === "prepNumberTask" ? groundNumberHasAnswer(q,picked) :
     q?.type === "mab" ? mabHasSelection : q?.type === "numeric" ? picked.trim().length > 0 : !!picked;
 
   let questionContent: React.ReactNode;
@@ -975,12 +985,12 @@ function PostTestPage() {
           onSubmit={() => submit()}
           onIdk={answerIdk}
           onExit={() => router.push(isDemoPreviewMode() ? `/demo-review?realm=${progressRealmId}&year=${encodeURIComponent(year)}` : buildAssessmentReturnRoute({ year, realmId }))}
-          wideContent={isInteractiveTask}
-          hidePrompt={isInteractiveTask}
+          wideContent={isInteractiveTask || !!starpathReleaseVisual(q)}
+          hidePrompt={isInteractiveTask || !!starpathReleaseVisual(q)}
           lightSurface={isInteractiveTask}
           answeredFlags={questions.map((qq) => {
             const a = answers[qq.id];
-            return qq.type === "prepNumberTask" ? groundNumberHasAnswer(qq,a) : a !== undefined && a !== "";
+            return starpathReleaseVisual(qq) ? readyReleasedStarpath(qq,a) : qq.type === "prepNumberTask" ? groundNumberHasAnswer(qq,a) : a !== undefined && a !== "";
           })}
           onJump={(i) => {
             setMab({ tens: 0, ones: 0 });

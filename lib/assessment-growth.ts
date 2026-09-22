@@ -9,6 +9,7 @@ export function hasComparableAssessmentGrowth(realmId: string, year: string) {
 }
 function comparisonGroup(realmId: string, year: string, questions: readonly { id: string }[]): string | null {
   const usesVersion = (version: number) => questions.some(q => q.id.endsWith(`-v${version}`));
+  if(realmId=== "space" && questions.length>0 && questions.every(q=>/^y[0-8]-starpath-(pretest|posttest)-\d{2}-v9$/.test(q.id)))return `starpath-${year}-2026-09-22-v9`;
   if (realmId === "space") return STARPATH_COMPARISON_GROUP + (usesVersion(5) ? "-v5" : "");
   if (realmId === "number" && year === "Prep" && questions.length===20 && questions.every(q=>/^y0-number-(pre|post)-\d{2}-v3$/.test(q.id))) return "ground-number-2026-09-15-v3";
   if (realmId==="measurement" && year==="Prep" && questions.length===20 && questions.every(q=>/^y0-measurement-(pre|post)-\d{2}-v4$/.test(q.id))) return "ground-measurement-2026-09-16-v4";

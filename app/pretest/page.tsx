@@ -1,6 +1,9 @@
 "use client";
+import {starpathReleaseVisual,readyReleasedStarpath} from "@/lib/starpath-release-response";
+import {savedStarpathReleaseVersion} from "@/lib/starpath-release-version";
 import { savedYear3MeasurementVersion } from "@/lib/year3-measurement-assessment-version";
 import { savedYear4MeasurementVersion } from "@/lib/year4-measurement-assessment-version";
+import SpaceExtensionAssessment from "@/components/assessment/SpaceExtensionAssessment";
 import MeasurementExtensionAssessment from "@/components/assessment/MeasurementExtensionAssessment";
 import { savedYear1MeasurementVersion } from "@/lib/year1-measurement-assessment-version";
 import { savedYear2MeasurementVersion } from "@/lib/year2-measurement-assessment-version";
@@ -383,6 +386,7 @@ export default function PretestPageWrapper() {
 
 function AssessmentRoute() {
   const params=useSearchParams();
+  if (["Year 7","Year 8"].includes(params.get("year")??"") && params.get("realm_id")==="space") return <SpaceExtensionAssessment key={`pretest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="pretest"/>;
   if (["Year 7","Year 8"].includes(params.get("year")??"") && params.get("realm_id")==="measurement") return <MeasurementExtensionAssessment key={`pretest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="pretest"/>;
   return ["Year 7","Year 8"].includes(params.get("year")??"") && (params.get("realm_id")??"number")==="number"
     ? <NumberExtensionAssessment key={`pretest-${params.get("year")}`} level={params.get("year")==="Year 8"?8:7} form="pretest"/> : <PretestPage/>;
@@ -423,6 +427,7 @@ function PretestPage() {
     setCandidateReviewEnabled(candidateReviewRequested && isDemoPreviewMode());
   }, [candidateReviewRequested]);
 
+  const [spaceReleaseVersion,setSpaceReleaseVersion]=useState<0|1>(1);
   const [groundMeasurementVersion,setGroundMeasurementVersion]=useState<3|4>(4);
   const [year1MeasurementVersion,setYear1MeasurementVersion]=useState<3|4>(4);
   const [year2MeasurementVersion,setYear2MeasurementVersion]=useState<3|4>(4);
@@ -441,8 +446,8 @@ function PretestPage() {
       ? starpathLevel1CandidateRequested
         ? [...LEVEL1_STARPATH_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
         : [...YEAR6_NUMBER_NEXUS_INDEPENDENT_PRETEST_ITEMS] as unknown as Question[]
-      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion),
-    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion]
+      : getPretestForYearLabel(year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion,spaceReleaseVersion),
+    [candidateReviewEnabled, starpathLevel1CandidateRequested, year, progressRealmId, numberLevel1Version,groundNumberVersion,numberLevel2Version,numberLevel4Version,numberLevel5Version,numberLevel6Version,numberLevel3Version,groundMeasurementVersion,year1MeasurementVersion,year2MeasurementVersion,year5MeasurementVersion,year6MeasurementVersion,measurementReleaseVersion,spaceReleaseVersion]
   );
 
   const [index, setIndex] = useState(0);
@@ -468,7 +473,7 @@ function PretestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [canonicalProgress, setCanonicalProgress] = useState<StudentProgress | null>(null);
   const [restoreState, setRestoreState] = useState<"loading" | "ready" | "error">(
-    isDemoPreviewMode() ? "ready" : "loading"
+    "loading"
   );
   const [restoreError, setRestoreError] = useState("");
 
@@ -490,6 +495,7 @@ function PretestPage() {
       return;
     }
     if (isDemoPreviewMode()) {
+      setRestoreState("ready");
       setCanonicalProgress(readProgress(localProgressRealmId));
       return;
     }
@@ -556,7 +562,9 @@ function PretestPage() {
     setYear6MeasurementVersion(measurement6Version);
     const fullMeasurementVersion=progressRealmId==="measurement" && ["Year 3","Year 4"].includes(year) && !isDemoPreviewMode() && snapshot?.questionIds?.length ? ((year==="Year 3" ? savedYear3MeasurementVersion(snapshot.questionIds) : savedYear4MeasurementVersion(snapshot.questionIds))===4 ? 1 : 0) : 1;
     setMeasurementReleaseVersion(fullMeasurementVersion);
-    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version,snapshot?.questionIds?.length ? measurementVersion : 4,measurement1Version,measurement2Version,measurement5Version,measurement6Version,fullMeasurementVersion);
+    const spaceVersion=progressRealmId==="space"&&!isDemoPreviewMode()?savedStarpathReleaseVersion(snapshot?.questionIds)??1:1;
+    setSpaceReleaseVersion(spaceVersion);
+    const resumeQuestions = getPretestForYearLabel(year, progressRealmId, version,groundVersion,level2Version,level4Version,level5Version,level6Version,level3Version,snapshot?.questionIds?.length ? measurementVersion : 4,measurement1Version,measurement2Version,measurement5Version,measurement6Version,fullMeasurementVersion,spaceVersion);
     if (pretestResumeHasProgress(snapshot) && (!hasComparableAssessmentGrowth(progressRealmId, year) || JSON.stringify(snapshot?.questionIds) === JSON.stringify(resumeQuestions.map(q => q.id)))) {
       setShowResumePrompt(true);
     }
@@ -579,6 +587,7 @@ function PretestPage() {
   }
 
   function restartAssessment() {
+    setSpaceReleaseVersion(1);
     setNumberLevel1Version(5);
     setNumberLevel2Version(3);
     setNumberLevel4Version(3);
@@ -867,7 +876,7 @@ function PretestPage() {
 
   const mabTotal = mab.tens * 10 + mab.ones;
   const mabHasSelection = mab.tens > 0 || mab.ones > 0;
-  const isReady = question?.type === "prepNumberTask" ? groundNumberHasAnswer(question,selected) :
+  const isReady = question && starpathReleaseVisual(question) ? readyReleasedStarpath(question,selected) : question?.type === "prepNumberTask" ? groundNumberHasAnswer(question,selected) :
     question?.type === "mab"
       ? mabHasSelection
       : question?.type === "numeric"
@@ -1079,10 +1088,10 @@ function PretestPage() {
           onHome={exitToHome}
           onExitAssessment={exitToLevels}
           onLogout={exitLogout}
-          wideContent={isMeasurelandsTask}
-          hidePrompt={isMeasurelandsTask}
+          wideContent={isMeasurelandsTask || !!starpathReleaseVisual(question)}
+          hidePrompt={isMeasurelandsTask || !!starpathReleaseVisual(question)}
           lightSurface={isMeasurelandsTask}
-          answeredFlags={questions.map((q,i) => q.type === "prepNumberTask" ? groundNumberHasAnswer(q,answers[i]) : answers[i] !== null && answers[i] !== undefined && answers[i] !== "")}
+          answeredFlags={questions.map((q,i) => starpathReleaseVisual(q) ? readyReleasedStarpath(q,answers[i]) : q.type === "prepNumberTask" ? groundNumberHasAnswer(q,answers[i]) : answers[i] !== null && answers[i] !== undefined && answers[i] !== "")}
           onJump={(i) => setIndex(i)}
           realmId={realmId}
         />

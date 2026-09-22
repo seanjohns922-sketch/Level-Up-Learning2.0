@@ -1,3 +1,4 @@
+export const releaseSamples = new Map<string, unknown>();
 import assert from 'node:assert/strict';
 import {LEVEL2_STARPATH_FORMS as forms,LEVEL2_STARPATH_BLUEPRINT,shapeSpec,transformCell} from '../data/assessments/revisions/level2StarpathFiveForms';
 import {emptyLevel2Response,scoreLevel2Response,level2ResponseReady,level2RouteCorrect} from '../lib/starpath-level2-review';
@@ -48,7 +49,7 @@ for(const [f,[form,items]]of Object.entries(forms).entries()){
     if(!t.shown){let valid=0,rejected=0;const queue:Direction[][]=[[]];while(queue.length){const ds=queue.shift()!,path=routeCells(t.start!,ds);if(path.some(p=>p.r<0||p.r>3||p.c<0||p.c>3))continue;const last=path.at(-1)!;if(sameCell(last,t.goal!)){const invalid=path.some(p=>t.blocked.some(b=>sameCell(b,p)))||!!t.checkpoint&&!path.some(p=>sameCell(p,t.checkpoint!));assert.equal(level2RouteCorrect(t,ds),!invalid);if(invalid)rejected++;else valid++;continue;}if(ds.length<8)for(const d of ['up','right','down','left'] as Direction[])queue.push([...ds,d]);}assert(valid>1);assert(rejected>0);}
    }
   }
-  assert(level2ResponseReady(q,a));assert(scoreLevel2Response(q,a),q.id);
+  assert(level2ResponseReady(q,a));assert(scoreLevel2Response(q,a),q.id);releaseSamples.set(q.id,structuredClone(a));
  }
 }
 assert.equal(ids.size,100);for(let i=0;i<20;i++)assert(new Set(Object.values(forms).map(q=>JSON.stringify(q[i].task))).size>=3,`Question ${i+1} requires varied forms`);

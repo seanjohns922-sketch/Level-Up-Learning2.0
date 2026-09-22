@@ -1,0 +1,24 @@
+'use client';
+import type {CSSProperties} from 'react';
+import {getRealmTheme} from '@/lib/useRealmTheme';
+import {starpathReleaseVisual,initialStarpathResponse,readReleasedStarpath,encodeReleasedStarpath} from '@/lib/starpath-release-response';
+import GroundStarpathAssessmentCard from '@/components/starpath/GroundStarpathAssessmentCard';
+import type {GroundResponse} from '@/lib/starpath-ground-redesign';
+import styles from '@/components/demo/GroundStarpathRedesign.module.css';
+import Level1StarpathAssessmentCard from '@/components/starpath/Level1StarpathAssessmentCard';
+import type {Level1Response} from '@/lib/starpath-level1-review';
+import Level2StarpathAssessmentCard from '@/components/starpath/Level2StarpathAssessmentCard';
+import type {Level2Response} from '@/lib/starpath-level2-review';
+import Level3StarpathAssessmentCard from '@/components/starpath/Level3StarpathAssessmentCard';
+import type {Level3Response} from '@/lib/starpath-level3-review';
+import Level4StarpathAssessmentCard from '@/components/starpath/Level4StarpathAssessmentCard';
+import type {Level4Response} from '@/lib/starpath-level4-review';
+import Level5StarpathAssessmentCard from '@/components/starpath/Level5StarpathAssessmentCard';
+import type {Level5Response} from '@/lib/starpath-level5-review';
+import Level6StarpathAssessmentCard from '@/components/starpath/Level6StarpathAssessmentCard';
+import type {Level6Response} from '@/lib/starpath-level6-review';
+import Level7StarpathAssessmentCard from '@/components/starpath/Level7StarpathAssessmentCard';
+import type {Level7Response} from '@/lib/starpath-level7-review';
+import Level8StarpathAssessmentCard from '@/components/starpath/Level8StarpathAssessmentCard';
+import type {Level8Response} from '@/lib/starpath-level8-review';
+export default function ReleasedStarpathQuestion({question,value,onChange}:{question:{id?:string;visual?:unknown};value:string|null;onChange:(v:string)=>void}){const v=starpathReleaseVisual(question);if(!v)return null;const response=readReleasedStarpath(question.id??'',value)??initialStarpathResponse(v),change=(r:unknown)=>onChange(encodeReleasedStarpath(question.id??'',r)),theme=getRealmTheme('space');let card;switch(v.level){case 0:card=<GroundStarpathAssessmentCard item={v.item} response={response as GroundResponse} onChange={change}/>;break;case 1:card=<Level1StarpathAssessmentCard item={v.item} response={response as Level1Response} onChange={change}/>;break;case 2:card=<Level2StarpathAssessmentCard item={v.item} response={response as Level2Response} onChange={change}/>;break;case 3:card=<Level3StarpathAssessmentCard item={v.item} response={response as Level3Response} onChange={change}/>;break;case 4:card=<Level4StarpathAssessmentCard item={v.item} response={response as Level4Response} onChange={change}/>;break;case 5:card=<Level5StarpathAssessmentCard item={v.item} response={response as Level5Response} onChange={change}/>;break;case 6:card=<Level6StarpathAssessmentCard item={v.item} response={response as Level6Response} onChange={change}/>;break;case 7:card=<Level7StarpathAssessmentCard item={v.item} response={response as Level7Response} onChange={change}/>;break;case 8:card=<Level8StarpathAssessmentCard item={v.item} response={response as Level8Response} onChange={change}/>;break;}return <div className={styles.card} data-starpath-release-level={v.level} style={{'--accent':theme.accentText,'--selected':theme.ctaFrom,'--ring':theme.borderRing,'--cta':theme.ctaGradientCss,'--surface':theme.cardSurface,'--tint':theme.surfaceTint} as CSSProperties}>{card}</div>;}

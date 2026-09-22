@@ -1,3 +1,4 @@
+export const releaseSamples = new Map<string, unknown>();
 import assert from 'node:assert/strict';
 import {LEVEL4_STARPATH_FORMS as forms,LEVEL4_STARPATH_BLUEPRINT,symClosure,type SymTask,type SymCell} from '../data/assessments/revisions/level4StarpathFiveForms';
 import {emptyLevel4Response,scoreLevel4Response,level4ResponseReady,symmetric} from '../lib/starpath-level4-review';
@@ -31,7 +32,7 @@ for(const [form,items]of Object.entries(forms)){
    if(t.mode==='choice'){a.selected=[t.correctId!];assert.equal(t.correctId==='o0',independentSym(t,t.seeds));assert.equal(t.options!.length,4);for(const o of t.options!)if(o.id!==t.correctId)assert(!scoreLevel4Response(q,{...a,selected:[o.id]}));}
    else{a.tiles=t.expected;assert(!scoreLevel4Response(q,{...a,tiles:a.tiles.slice(0,-1)}));assert(!scoreLevel4Response(q,{...a,tiles:[...a.tiles,a.tiles[0]]}));const palette=[...new Set(t.expected.map(p=>p.colour))];assert(!scoreLevel4Response(q,{...a,tiles:a.tiles.map((p,i)=>i? p:{...p,colour:palette.find(c=>c!==p.colour)!})}));if(t.mode==='create'){const alternative=symClosure(t,[{r:0,c:1,colour:palette[0]},{r:1,c:1,colour:palette[1]},{r:2,c:0,colour:palette[0]}]);assert(scoreLevel4Response(q,{...a,tiles:alternative}));assert(!scoreLevel4Response(q,{...a,tiles:t.expected.map(p=>({...p,colour:palette[0]}))}));}}
   }
-  assert(level4ResponseReady(q,a),q.id);assert(scoreLevel4Response(q,a),q.id);
+  assert(level4ResponseReady(q,a),q.id);assert(scoreLevel4Response(q,a),q.id);releaseSamples.set(q.id,structuredClone(a));
  }
 }
 assert.equal(ids.size,100);for(let i=0;i<20;i++)assert(new Set(Object.values(forms).map(q=>JSON.stringify(q[i].task))).size>=3,`Question ${i+1} needs form variation`);

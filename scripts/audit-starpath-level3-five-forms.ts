@@ -1,3 +1,4 @@
+export const releaseSamples = new Map<string, unknown>();
 import assert from 'node:assert/strict';
 import {LEVEL3_STARPATH_FORMS as forms,LEVEL3_STARPATH_BLUEPRINT,relativeDirection} from '../data/assessments/revisions/level3StarpathFiveForms';
 import {emptyLevel3Response,scoreLevel3Response,level3ResponseReady,layoutCorrect} from '../lib/starpath-level3-review';
@@ -28,7 +29,7 @@ for(const [form,items]of Object.entries(forms)){
     const visit=(p:Record<string,Cell>,n:number)=>{if(n===t.landmarks.length){const unique=new Set(Object.values(p).map(c=>`${c.r},${c.c}`)).size===n;const satisfies=t.constraints!.every(c=>{const a=p[c.subject],b=p[c.reference];return c.relation==='above'?a.c===b.c&&a.r<b.r:c.relation==='below'?a.c===b.c&&a.r>b.r:c.relation==='left'?a.r===b.r&&a.c<b.c:a.r===b.r&&a.c>b.c;});const wanted=unique&&satisfies;assert.equal(layoutCorrect(t,p),wanted);if(wanted)valid++;return;}for(const c of cells)visit({...p,[t.landmarks[n].id]:c},n+1);};visit({},0);assert(valid>1);alternateLayouts+=valid;
    }else {a.selected=[t.correctId!];for(const o of t.options!)if(o.id!==t.correctId)assert(!scoreLevel3Response(q,{...a,selected:[o.id]}));if(t.explorer){const d=relativeDirection(t.explorer.facing,t.relation!),p=t.landmarks.find(l=>l.id===t.target)!.cell,e=t.explorer.cell;assert.equal(d,p.r<e.r?'up':p.r>e.r?'down':p.c<e.c?'left':'right');assert(t.landmarks.every(l=>l.cell.r>=0&&l.cell.r<4&&l.cell.c>=0&&l.cell.c<4));}if(t.mode==='views')assert.equal(t.options!.find(o=>o.id===t.correctId)!.label,t.viewAnswer==='plan'?'Plan view':'Front view');}
   }
-  assert(level3ResponseReady(q,a),q.id);assert(scoreLevel3Response(q,a),q.id);
+  assert(level3ResponseReady(q,a),q.id);assert(scoreLevel3Response(q,a),q.id);releaseSamples.set(q.id,structuredClone(a));
  }
 }
 assert.equal(ids.size,100);for(let i=0;i<20;i++)assert(new Set(Object.values(forms).map(q=>JSON.stringify(q[i].task))).size>=3,`Question ${i+1}: matched but varied forms`);

@@ -1,3 +1,4 @@
+import {starpathReleaseVisual,scoreReleasedStarpath} from '@/lib/starpath-release-response';
 import { groundNumberReleaseItem } from "./releases/groundNumber";
 import { parsePrepNumberSubmission, scorePrepNumberSubmission } from "./candidates/prep-number/scoring";
 import { decodeAssessmentResponse } from "@/lib/assessment-response";
@@ -135,6 +136,7 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  if(starpathReleaseVisual(question))return scoreReleasedStarpath(question,chosen);
   if (question.type === "prepNumberTask") {
     const item=groundNumberReleaseItem(question);
     return item !== null && scorePrepNumberSubmission(item,parsePrepNumberSubmission(item,chosen ?? null)).score===1;

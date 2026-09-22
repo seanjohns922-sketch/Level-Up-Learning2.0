@@ -1,5 +1,6 @@
 "use client";
 
+import {starpathReleaseVisual,encodeReleasedStarpath} from "@/lib/starpath-release-response";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
@@ -200,7 +201,7 @@ function SnapshotQuestion({
               options: question.options,
               visual: question.visual,
             }}
-            value={typeof question.student_answer === "string" ? question.student_answer : null}
+            value={starpathReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStarpath(question.question_id,question.student_answer) : typeof question.student_answer === "string" ? question.student_answer : null}
             onChange={() => undefined}
             realmId={realmId}
           />

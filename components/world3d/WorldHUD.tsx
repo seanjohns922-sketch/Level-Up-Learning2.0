@@ -1,5 +1,6 @@
 "use client";
 
+import SpaceExtensionLinks from "@/components/assessment/SpaceExtensionLinks";
 import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import { DoorOpen, Hammer, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
@@ -198,7 +199,7 @@ export function WorldHUD({
       {teleportOpen ? (
         <div className="worldTeleportBackdrop" role="dialog" aria-modal="true" aria-label="Realm Teleport">
           <section className="worldTeleportPanel">
-            <NumberExtensionLinks/><MeasurementExtensionLinks/>
+            <NumberExtensionLinks/><MeasurementExtensionLinks/><SpaceExtensionLinks/>
             <header><div><span>FAST TRAVEL</span><h2>REALM TELEPORT</h2></div><div className="worldTeleportHeaderActions"><WorldVoiceButton text="Fast travel. Realm Teleport. Choose a learning realm to enter." label="Read Realm Teleport" /><button type="button" onClick={() => setTeleportOpen(false)} aria-label="Close Realm Teleport" title="Close"><X size={20} /></button></div></header>
             <div className="worldTeleportGrid">
               {TOWER_REALM_PORTALS.map((portal) => {
