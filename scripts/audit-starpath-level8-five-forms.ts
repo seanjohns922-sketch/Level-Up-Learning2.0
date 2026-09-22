@@ -34,4 +34,8 @@ for(const [form,items]of Object.entries(forms)){
  }
 }
 assert.equal(ids.size,150);for(let i=0;i<30;i++)assert(new Set(Object.values(forms).map(items=>JSON.stringify(items[i].task))).size>=3,`Form variation Q${i+1}`);
+for(const items of Object.values(forms))for(const q of items){
+ assert(!/\b(SSS|SAS|ASA|AAA|RHS|SSA)\b/.test(q.prompt+' '+JSON.stringify(q.task)),q.id+' student wording avoids unexplained test abbreviations');
+ if(q.task.vocabulary)assert(q.readAloudText.includes(q.task.vocabulary),q.id+' definitions are read aloud');
+}
 console.log('PASS: 150 Level 8 items; 8/8/7/7 descriptor balance; four distinct options; actual side/angle geometry; congruence/similarity ratios and SSA counterexample; quadrilateral calculations; all 3D movements and bounds; wrong/blank responses; sorting and decision-tree alternatives; matched-form variation.');

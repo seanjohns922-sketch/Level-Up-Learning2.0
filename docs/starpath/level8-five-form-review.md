@@ -35,3 +35,7 @@ Route: `/demo-review/starpath-level8`. All five forms are available through the 
 `npm run qa:starpath-level8-five-forms` validates 150 items, code allocation, unique choices, correct/wrong/blank scoring, actual polygon side/angle geometry, similarity ratios, SSA ambiguity, quadrilateral calculations, 3D bounds and movements, sorter outputs, decision alternatives and matched-form variation. Browser checks additionally exercise the actual input controls and layouts.
 
 Verification completed: the full prebuild audit suite, TypeScript checking, targeted ESLint and whitespace checks passed. Browser testing verified correct responses for all 150 items. Final browser checks covered all five review links, desktop/tablet/mobile layouts, keyboard placement, all four 3D camera views, Back/Next answer persistence, form isolation, reset, skip and completion, with no runtime errors or horizontal overflow.
+
+## Plain-language revision
+
+Congruence questions now lead with “same shape and size”. Relevant questions define congruent and similar visibly and in question read-aloud. Answer choices describe the measured sides/angles rather than requiring SSS/SAS/ASA/RHS abbreviations. Recognition captions name the triangles without identifying the test. Later classification and algorithm wording uses matching sides, shape, size and explained scale factors. Geometry, answer IDs, curriculum allocation and scoring are unchanged.
