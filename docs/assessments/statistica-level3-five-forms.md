@@ -19,8 +19,8 @@ Week references follow the existing lessons: data types and questions in Weeks 1
 - All multiple-choice questions have four distinct options; “I don’t know” is separate.
 - Numerical values are whole-number counts 0–4. The horizontal axis labels the measured count; the vertical axis labels the number of children.
 - Numerical graph construction retains all five value positions, including one zero frequency. Zero as a data value is also distinguished from zero frequency.
-- Eight records in digital-list tasks; 18 observations in numerical frequency-table tasks. Categorical graph construction uses frequencies up to 12; numerical construction includes a zero frequency and reaches nine.
-- Larger graph-reading tasks use labelled scales in fives, with exact tick-aligned frequencies up to 25. Paired dot/column displays and construction tasks retain unit scales.
+- Eight records in digital-list tasks; 18 observations in numerical frequency-table tasks. Categorical graph construction uses frequencies up to 40; numerical construction includes a zero frequency and reaches 30. Typing and steps of five avoid excessive tapping.
+- Larger graph-reading tasks use labelled scales in fives, with exact tick-aligned frequencies up to 50. Construction uses scales in fives. Paired dot/column displays retain unit scales to keep individual dots readable.
 - Five forms match skills, representation type, count complexity and intended difficulty while rotating familiar contexts, frequencies, record order and choice positions.
 - Reuses the approved object artwork, question-number navigation, direct response recording, Back/Next, read-aloud and responsive card layout.
 

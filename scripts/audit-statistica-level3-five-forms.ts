@@ -5,7 +5,7 @@ import {emptyStatsResponse,statsResponseReady,scoreStatsResponse} from '../lib/s
 const ids=new Set<string>();
 for(const form of STATISTICA_FORMS){
  const bank=LEVEL3_STATISTICA_FORMS[form];assert.equal(bank.length,20);
- assert.equal(Math.max(...bank[18].counts),25);assert.equal(bank[4].observations.length,18);assert.equal(Math.max(...bank[15].counts),9);
+ assert.equal(Math.max(...bank[18].counts),50);assert.equal(bank[4].observations.length,18);assert.equal(Math.max(...bank[15].counts),30);
  for(const [code,n] of [['AC9M3ST01',7],['AC9M3ST03',7],['AC9M3ST02',6]] as const)assert.equal(bank.filter(q=>q.code===code).length,n);
  for(const q of bank){
   assert(!ids.has(q.id));ids.add(q.id);assert(q.prompt&&q.instruction&&q.week>=1&&q.week<=6);
@@ -22,8 +22,10 @@ for(const form of STATISTICA_FORMS){
   const label=q.options.find(o=>o.id===q.answer)?.label;
   if(q.slot===4)assert.equal(Number(label),q.counts[2]);
   if(q.slot===7){assert(q.initial);assert.equal(q.initial[2],q.counts[2]+1);assert.equal(q.initial.filter((n,i)=>n!==q.counts[i]).length,1);}
+  if([11,15,16].includes(q.slot)){assert.equal(q.graphMax,50);assert.equal(q.graphStep,5);assert.equal(q.responseMax,50);assert(q.counts.every(n=>n%5===0));assert(!statsResponseReady(q,{...correct,values:[51,...correct.values.slice(1)]}));}
+  if([4,12,14,18,19,20].includes(q.slot)){assert.equal(Math.max(...q.counts),50);assert.equal(q.graphMax,60);assert.equal(q.graphStep,5);}
   if(q.slot===16){assert.equal(q.counts.filter(n=>n===0).length,1);assert.equal(q.categories.length,5);}
-  if(q.slot===18){assert.equal(Number(label),25-10);assert.equal(q.graphStep,5);assert(q.counts.every(n=>n%5===0));}
+  if(q.slot===18){assert.equal(Number(label),50-20);assert.equal(q.graphStep,5);assert(q.counts.every(n=>n%5===0));}
   if(q.slot===19){const most=q.counts.indexOf(Math.max(...q.counts));assert.equal(label,`The answer ${most} was most common.`);assert(q.counts[0]>0,'Distractor must stay false');}
   if(q.slot===20){const max=Math.max(...q.counts),min=Math.min(...q.counts);assert.equal(label,`${q.categories[q.counts.indexOf(max)].name} received ${max-min} more votes than ${q.categories[q.counts.indexOf(min)].name}.`);}
  }
