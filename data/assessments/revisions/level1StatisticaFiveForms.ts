@@ -7,10 +7,11 @@ export const STATISTICA_FORM_LABELS: Record<StatisticaForm,string> = {pretest:'P
 export type Category = {name:string;color:string};
 export type StatsOption = {id:string;label:string};
 export type StatsItem = {
- id:string;slot:number;skillLabel:string;code:'AC9M1ST01'|'AC9M1ST02'|'AC9M2ST01'|'AC9M2ST02';week:number;difficulty:'easy'|'moderate'|'challenging';
+ id:string;slot:number;skillLabel:string;code:'AC9M1ST01'|'AC9M1ST02'|'AC9M2ST01'|'AC9M2ST02'|'AC9M3ST01'|'AC9M3ST02'|'AC9M3ST03';week:number;difficulty:'easy'|'moderate'|'challenging';
  prompt:string;instruction:string;context:string;categories:Category[];counts:number[];observations:number[];
- mode:'choice'|'counts'|'list'|'sort';source:'categories'|'objects'|'responses'|'graph'|'missing'|'duplicate'|'table'|'dual';
+ mode:'choice'|'counts'|'list'|'sort';source:'categories'|'objects'|'responses'|'graph'|'missing'|'duplicate'|'table'|'dual'|'brief';
  display:'objects'|'pictures'|'symbols'|'tally'|'columns'|'frequency';options:StatsOption[];answer:string|number[];
+ numerical?:boolean;valueLabel?:string;axisLabel?:string;graphMax?:number;graphStep?:number;sourceText?:string;
  sourceLabel?:string;graphKind?:'pictures'|'columns';secondaryKind?:'pictures'|'columns';secondaryOrder?:number[];
  initial?:number[];target?:number;recorded?:number[];
 };
