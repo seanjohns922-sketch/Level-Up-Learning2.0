@@ -17,9 +17,11 @@ for(const form of STATISTICA_FORMS){
   if(q.source==='responses'){assert.equal(q.observations.length,20);assert.deepEqual(q.categories.map((_,i)=>q.observations.filter(v=>v===i).length),q.counts);}
   if(q.source==='comparison'){assert.equal(q.counts.reduce((a,b)=>a+b),60);assert.equal(q.secondCounts!.reduce((a,b)=>a+b),60);assert.equal(q.counts.indexOf(Math.max(...q.counts)),2);assert.deepEqual(q.categories.map(c=>c.name),['0','1','2','3','4']);}
   if(q.source==='pictograph'||q.display==='pictograph'&&q.mode==='counts')assert(q.counts.every(n=>Number.isInteger(n/(q.keyUnits!/(q.allowHalf?2:1)))));
-  if(q.graphKind==='columns'||q.display==='columns'){assert.equal(q.graphMax,80);assert.equal(q.graphStep,10);assert.equal(q.graphMinorStep,5);assert.equal(Math.max(...q.counts),65);}
+  if(q.graphKind==='columns'||q.display==='columns'){assert.equal(q.graphMax,100);assert.equal(q.graphStep,10);assert.equal(q.graphMinorStep,5);assert.equal(Math.max(...q.counts),q.slot===3?80:95);}
   const label=q.options.find(o=>o.id===q.answer)?.label;
-  if(q.slot===4){assert.equal(label,'25');assert(q.allowHalf);assert.equal(q.keyUnits,10);assert(q.counts.includes(25));}
+  if(q.slot===4){assert.equal(label,'65');assert(q.allowHalf);assert.equal(q.keyUnits,10);assert(q.counts.includes(65));}
+  if([2,6,18].includes(q.slot)){assert.equal(q.keyUnits,10);assert(Math.max(...q.counts)>=60&&Math.max(...q.counts)<=80);}
+  if(q.slot===7)assert.equal(Math.max(...q.counts),100);
   if(q.slot===5)assert.equal(Number(label),Math.max(...q.counts));
   if(q.slot===6){assert.equal(q.initial!.filter((n,i)=>n!==q.counts[i]).length,1);assert.equal(q.initial![1]-q.counts[1],q.keyUnits);}
   if(q.slot===7||q.slot===19)assert.equal(Number(label),Math.max(...q.counts)-Math.min(...q.counts));
@@ -27,4 +29,4 @@ for(const form of STATISTICA_FORMS){
  }
 }
 for(let i=0;i<20;i++)for(const field of ['mode','skillLabel','code','difficulty','display','graphMax','graphStep'] as const)assert.equal(new Set(STATISTICA_FORMS.map(f=>LEVEL4_STATISTICA_FORMS[f][i][field])).size,1);
-console.log(`PASS: ${ids.size} Level 4 items; all three codes, matched demand, 20-observation recording, frequencies to 65, half symbols, scale midpoints, distribution comparisons and scoring.`);
+console.log(`PASS: ${ids.size} Level 4 items; all three codes, matched demand, 20-observation recording, reading frequencies to 100 and construction to 80, half symbols, scale midpoints, distribution comparisons and scoring.`);

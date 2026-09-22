@@ -16,7 +16,7 @@ Lesson alignment: weeks 1–2 keys and pictographs; week 3 scaled column graphs;
 
 ## Difficulty progression
 
-See [frequency progression](statistica-frequency-progression.md). Level 4 records 20 observations, constructs frequencies up to 65 and reads scales labelled by tens with intermediate marks at five. Pictographs use keys of five and ten; half symbols appear in reading tasks. Compared distributions contain 60 observations per group, with equal totals and common value ranges so the student must inspect their shapes.
+See [frequency progression](statistica-frequency-progression.md). Level 4 records 20 observations, constructs frequencies up to 80 and compares frequencies up to 100 using scales labelled by tens with intermediate marks at five. Pictographs use a key of ten; half symbols appear in reading tasks. Compared distributions contain 60 observations per group, with equal totals and common value ranges so the student must inspect their shapes.
 
 Typing is available for frequency and symbol-count construction to avoid excessive tapping. The pictograph input is explicitly the number of pictures, not the underlying frequency. Scales stay fixed as the student edits. Four choices use plausible key, scale, subtraction or inference errors. All forms match skill, numerical demand and question mode while varying contexts, category roles and answer positions.
 
