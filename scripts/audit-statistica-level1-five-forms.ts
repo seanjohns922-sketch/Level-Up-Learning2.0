@@ -15,14 +15,15 @@ for(const form of STATISTICA_FORMS){
   const wrong=typeof q.answer==='string'?{...correct,choice:q.options.find(o=>o.id!==q.answer)!.id}:{...correct,values:correct.values.map((n,i)=>i===0?n+1:n)};
   assert(!scoreStatsResponse(q,wrong),`${q.id}: reject wrong response`);
   if(q.mode==='choice'){
-   assert.equal(q.options.length,3);assert.equal(new Set(q.options.map(o=>o.label)).size,3);
+   assert.equal(q.options.length,4);assert.equal(new Set(q.options.map(o=>o.label)).size,4);
    assert.equal(q.options.filter(o=>o.id===q.answer).length,1);
-  }else if(q.mode==='list')assert.deepEqual(q.answer,q.observations);
+  }else if((q.mode==='list'||q.mode==='sort'))assert.deepEqual(q.answer,q.observations);
   else{
    const sourceCounts=q.categories.map((_,i)=>q.observations.filter(v=>v===i).length);
    assert.deepEqual(q.answer,q.target===undefined?sourceCounts:[sourceCounts[q.target]]);
   }
   const label=q.options.find(o=>o.id===q.answer)?.label;
+  if(q.slot===7){assert.equal(q.mode,'sort');assert.equal(q.categories.length,4);assert.equal(new Set(q.observations).size,4);const bad={...correct,values:correct.values.map((v,i)=>i===0?-1:v)};assert(!statsResponseReady(q,bad));assert(!scoreStatsResponse(q,bad));}
   if(q.slot===13)assert.equal(label,q.categories[q.counts.indexOf(Math.max(...q.counts))].name);
   if(q.slot===14)assert.equal(label,q.categories[q.counts.indexOf(0)].name);
   if(q.slot===15)assert.equal(Number(label),q.counts[q.target!]);
@@ -40,4 +41,4 @@ for(let i=0;i<20;i++){
  assert.equal(new Set(items.map(q=>q.skillLabel)).size,1);
  assert.equal(new Set(items.map(q=>q.observations.length)).size,1);
 }
-console.log(`PASS: ${ids.size} matched Level 1 Statistica items; curriculum balance, source data, distractors, independent answers, scoring and blank handling.`);
+console.log(`PASS: ${ids.size} matched Level 1 Statistica items; curriculum balance, source data, four-option distractors, sorting placements, independent answers, scoring and blank handling.`);

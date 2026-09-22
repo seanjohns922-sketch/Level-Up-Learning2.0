@@ -1,5 +1,6 @@
 'use client';
-import DataIcon from './DataIcon';
+import DataIcon from './StatisticaObjectArt';
+import StatisticaSortActivity from './StatisticaSortActivity';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import type {StatsItem,Category} from '@/data/assessments/revisions/level1StatisticaFiveForms';
 import type {StatsResponse} from '@/lib/statistica-level1-review';
@@ -18,14 +19,14 @@ export default function Level1StatisticaAssessmentCard({item,response,onChange}:
  return <>
   <div className={styles.question}><h2 id="stats-question-heading">{item.prompt}</h2><ReadAloudBtn className={styles.voice} label="Read question" text={`${item.prompt} ${item.instruction}`}/></div>
   {item.instruction&&<p className={styles.instruction}>{item.instruction}</p>}
-  <div className={styles.activity}>
-   <div className={styles.source} data-stats-source><div className={styles.panelHeader}><h3>{item.context}</h3><ReadAloudBtn className={styles.voice} label="Read diagram" text={`${sourceSpeech} ${listSpeech}`}/></div>
-    {item.source==='graph'?graph(item.counts):item.source==='categories'?<div className={styles.categoryChoices}>{item.categories.map(c=><div key={c.name}><DataIcon name={c.name} color={c.color} size={65}/><span>{c.name}</span></div>)}</div>:<div className={styles.observations}>{item.observations.map((v,i)=><div key={i}><span>{item.source==='objects'?'Picture':'Child'} {i+1}</span><DataIcon name={names[v]} color={item.categories[v].color} size={34}/><strong>{names[v]}</strong></div>)}</div>}
+  {item.mode==='sort'?<StatisticaSortActivity item={item} response={response} onChange={onChange}/>:<div className={styles.activity}>
+   <div className={styles.source} data-stats-source><div className={styles.panelHeader}><h3>{item.source==='categories'?'Survey answers':item.context}</h3><ReadAloudBtn className={styles.voice} label="Read diagram" text={`${sourceSpeech} ${listSpeech}`}/></div>
+    {item.source==='graph'?graph(item.counts):item.source==='categories'?<div className={styles.categoryChoices}>{item.categories.map(c=><div key={c.name}><DataIcon name={c.name} color={c.color} size={80}/><span>{c.name}</span></div>)}</div>:<div className={styles.observations}>{item.observations.map((v,i)=><div key={i}><span>{item.source==='objects'?'Picture':'Child'} {i+1}</span><DataIcon name={names[v]} color={item.categories[v].color} size={58}/><strong>{names[v]}</strong></div>)}</div>}
     {(item.source==='missing'||item.source==='duplicate')&&<div className={styles.recordList}><h4>Recorded list</h4>{item.recorded?.map((v,i)=>{const child=item.source==='duplicate'?v:i;const cat=item.source==='duplicate'?item.observations[v]:v;return <span key={i}>Child {child+1}: {names[cat]}</span>;})}</div>}
    </div>
    <div className={styles.answer}>
     {item.mode==='choice'?item.options.map(o=><div className={styles.option} key={o.id}><button aria-pressed={response.choice===o.id} onClick={()=>onChange({...response,choice:o.id,touched:true})}>{o.label}</button><ReadAloudBtn className={styles.voice} kind="option" text={o.label}/></div>):item.mode==='counts'?<><div className={styles.panelHeader}><h3>Your {item.display==='tally'?'tally':'display'}</h3><ReadAloudBtn className={styles.voice} label="Read display" text={`Your display. ${response.values.map((n,i)=>`${names[item.target??i]}: ${n}`).join('. ')}. Use plus to add one, minus to remove one.`}/></div>{graph(response.values,true)}</>:<><div className={styles.panelHeader}><h3>Your list</h3><ReadAloudBtn className={styles.voice} label="Read list" text={`${item.instruction} ${response.values.map((v,i)=>`${item.source==='objects'?'Picture':'Child'} ${i+1}: ${v<0?'not chosen':names[v]}`).join('. ')}. Choices: ${names.join(', ')}.`}/></div><div className={styles.entries}>{response.values.map((v,i)=><label key={i}>{item.source==='objects'?'Picture':'Child'} {i+1}<select aria-label={`${item.source==='objects'?'Picture':'Child'} ${i+1} answer`} value={v} onChange={e=>onChange({...response,touched:true,values:response.values.map((old,j)=>j===i?Number(e.target.value):old)})}><option value={-1}>Choose…</option>{names.map((name,k)=><option key={name} value={k}>{name}</option>)}</select></label>)}</div></>}
    </div>
-  </div>
+  </div>}
  </>;
 }
