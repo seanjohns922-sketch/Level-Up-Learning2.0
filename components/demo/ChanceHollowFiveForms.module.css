@@ -4,3 +4,5 @@
 .displays :global([data-chance-visual=coin]) svg{max-height:100px}
 
 .matrix table{font-size:16px;table-layout:fixed}.matrix th,.matrix td{padding:7px 3px;text-align:center}.matrix th:first-child{width:80px;font-size:12px}.matrix caption{font-weight:700;margin:8px 0}
+
+.simApparatus svg{max-height:90px}.simApparatus :global(.chance-visual){padding:6px}.simTable th,.simTable td{padding:7px}.simTable caption{font-size:14px;margin-bottom:6px}
