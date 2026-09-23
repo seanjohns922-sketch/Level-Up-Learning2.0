@@ -1,16 +1,14 @@
 import {chAnswerCase,CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
 import {DIFFERENCE_GRID} from './level5ChanceHollowFiveForms';
-import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 const paints=[['red','#e5484d'],['blue','#3b82f6'],['green','#22c55e'],['yellow','#eab308'],['purple','#a855f7']];
 function make(form:CHForm,f:number):CHItem[]{
- const items:CHItem[]=[],[name,c]=paints[f],[other,d]=paints[(f+1)%5];
- const spinner=(a:number,b:number):ChanceVisual=>({type:'spinner',wedges:[...Array(a).fill(c),...Array(b).fill(d)]});
+ const items:CHItem[]=[],[name]=paints[f];
  const tree={first:['H','T'],second:['H','T']},coinCaption='Toss two fair coins independently. H means heads; T means tails. Record Coin 1 first.';
  const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l8-${form}-${slot}`,slot,code:slot<=6?'AC9M8P01':slot<=22?'AC9M8P02':'AC9M8P03',week:Math.ceil(slot/5),instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){item.options=item.options.map(chAnswerCase);const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
  const rain=[35,65,45,75,20][f];
  add({skill:'Find a percentage complement',prompt:'What is the chance of no rain tomorrow?',scene:'forecast',forecastPercent:rain,caption:`The chance of rain tomorrow at this location is ${rain}%.`,options:[`${100-rain}%`,`${rain}%`,'100%',`${100-rain/2}%`],explanation:`Rain and no rain are complements: 100% − ${rain}% = ${100-rain}%.`});
- const win=[3,5,3,5,3][f];
- add({skill:'Find a fractional complement',prompt:`What is the probability of NOT landing on ${name}?`,apparatus:spinner(win,8-win),caption:`8 equal sections: ${win} ${name}, ${8-win} ${other}.`,options:[`${8-win}/8`,`${win}/8`,'1/2',`${8-win}/${win}`],explanation:`Subtract ${win}/8 from 1 to get ${(8-win)}/8.`});
+ const win=[3,5,3,5,3][f],complementColours=[paints[f],paints[(f+1)%5],paints[(f+2)%5],paints[(f+3)%5]],complementWeights=[win,6-win,1,1];
+ add({skill:'Find a fractional complement',prompt:`What is the probability of NOT landing on ${name}?`,apparatus:{type:'spinner',wedges:complementColours.flatMap(([,colour],i)=>Array(complementWeights[i]).fill(colour))},caption:`8 equal sections: ${complementColours.map(([colour],i)=>`${complementWeights[i]} ${colour}`).join(', ')}.`,options:[`${8-win}/8`,`${win}/8`,'1/2',`${8-win}/${win}`],explanation:`All three other colours count as not ${name}. Together they fill ${8-win} of 8 sections: 1 − ${win}/8 = ${8-win}/8.`});
  const fault=[.08,.12,.15,.18,.24][f],ok=Number((1-fault).toFixed(2));
  add({skill:'Find a decimal complement',prompt:'What is the probability the sensor works?',tiles:[`Fault probability: ${fault}`],caption:'On a check, the sensor either works or has a fault. These are the only outcomes.',options:[String(ok),String(fault),String(Number((1-fault/2).toFixed(2))),'1'],explanation:`Working is the complement of a fault: 1 − ${fault} = ${ok}.`});
  add({skill:'Complement a grouped event',prompt:'What is the chance of rolling neither 5 nor 6?',apparatus:{type:'die',face:f+1},caption:'Roll a fair six-sided die once. A 5 or a 6 starts the game.',options:['2/3','1/3','5/6','1/2'],explanation:'Four faces do not start the game: 1, 2, 3 and 4. Their probability is 4/6 = 2/3.'});

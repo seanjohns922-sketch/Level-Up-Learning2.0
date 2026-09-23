@@ -27,6 +27,11 @@ for(const form of CH_FORMS){const items=LEVEL7_CHANCE_FORMS[form];assert.equal(i
  assert.equal(Number(answer(22)),items[21].rows![0].counts[0]-250);
  const target=Number(items[23].prompt.match(/(\d+)%/)![1]);for(let i=0;i<4;i++){const option=items[23].options[i],range=option.match(/Win on (\d+) to (\d+)/),only=option.match(/Win only on (\d+)/);const count=Array.from({length:100},(_,j)=>j+1).filter(n=>range?n>=Number(range[1])&&n<=Number(range[2]):n===Number(only![1])).length;assert.equal(count===target,i===items[23].correct);}
  assert(Math.abs(items[29].rows![0].counts[0]/1000-.25)<.02);
+ const simulation=items.find(q=>q.experiment==='spinner')!;
+ assert.deepEqual(simulation.weights,[3,2,2,1]);assert.equal(simulation.outcomes!.length,4);
+ assert(simulation.outcomes!.every(o=>/^[A-Z]/.test(o)));
+ const apparatus=simulation.apparatus!;assert.equal(apparatus.type,'spinner');if(apparatus.type==='spinner'){const colours=[...new Set(apparatus.wedges)];assert.equal(colours.length,4);assert.deepEqual(colours.map(c=>apparatus.wedges.filter(w=>w===c).length),simulation.weights);}
+ const sampled=Array.from({length:8},(_,i)=>chOutcome(simulation,(i+.5)/8));assert.deepEqual(simulation.outcomes!.map(o=>sampled.filter(s=>s===o).length),simulation.weights);
  assert.equal(items.filter(q=>q.mode==='experiment').length,2);
 }
 assert.equal(ids.size,150);console.log('PASS: Chance Level 7: all 150 items, both Year 7 codes, visual coverage, four inequivalent choices, independent numerical answers, unbiased models, simulation boundaries and actual-result scoring.');

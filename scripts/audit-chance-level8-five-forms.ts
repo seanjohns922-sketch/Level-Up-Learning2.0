@@ -13,7 +13,7 @@ for(const form of CH_FORMS){const items=LEVEL8_CHANCE_FORMS[form];assert.equal(i
  if(q.tree)for(const label of [...q.tree.first,...q.tree.second])assert(chSpeech(q).includes(label));
  }
  close(num(1),1-items[0].forecastPercent!/100);
- const spinner=items[1].apparatus!;if(spinner.type==='spinner')close(num(2),spinner.wedges.filter(c=>c!==spinner.wedges[0]).length/8);
+ const spinner=items[1].apparatus!;if(spinner.type==='spinner'){assert.equal(new Set(spinner.wedges).size,4);assert.equal(spinner.wedges.length,8);close(num(2),spinner.wedges.filter(c=>c!==spinner.wedges[0]).length/8);}
  close(num(3),1-Number(items[2].tiles![0].split(': ')[1]));close(num(4),4/6);close(num(5),1-Number(items[4].tiles![0].split(': ')[1]));
  items[5].options.forEach((s,i)=>{const sum=s.split(' and ').map(Number).reduce((a,b)=>a+b,0);assert.equal(Math.abs(sum-1)<1e-10,i===items[5].correct);});
  assert.equal(num(8),items[7].tree!.first.length*items[7].tree!.second.length);close(num(9),.25);close(num(10),.5);close(num(11),.75);close(num(12),.75);
