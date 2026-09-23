@@ -1,0 +1,87 @@
+export const PP_FORMS=['pretest','posttest','start','mid','end'] as const;
+export type PPForm=typeof PP_FORMS[number];
+export const PP_LABELS:Record<PPForm,string>={pretest:'Pre-Test',posttest:'Post-Test',start:'Start',mid:'Mid',end:'End'};
+export type PPOperation='Double'|'Halve'|'Add the starting number'|'Add 5';
+export const PP_OPERATIONS:PPOperation[]=['Halve','Add the starting number','Add 5','Double'];
+export type PPVisual=
+ |{kind:'sequence';terms:(number|string)[];rule?:string}
+ |{kind:'cards';cards:{label:string;text:string}[]}
+ |{kind:'array';rows:number;columns:number}
+ |{kind:'decision';input:number;yes:string;no:string}
+ |{kind:'table';inputs:number[];outputs:number[]};
+export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm';options:string[];correct:number;answers:number[];labels:string[];total?:number;multiplier?:number;difficulty:'accessible'|'moderate'|'challenging'};
+export type PPResponse={choice?:number;values:string[];operations:PPOperation[];skipped?:boolean};
+const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
+const seq=(terms:(number|string)[],rule?:string):PPVisual=>({kind:'sequence',terms,rule});
+function make(form:PPForm,f:number):PPItem[]{
+ const out:PPItem[]=[];
+ const add=(q:Partial<PPItem>&Pick<PPItem,'code'|'skill'|'week'|'prompt'|'visual'>)=>{
+  const slot=out.length+1,item:PPItem={id:`pp-l3-${form}-${slot}`,slot,instruction:'',mode:'number',options:[],correct:0,answers:[],labels:['Your answer'],difficulty:slot<=5?'accessible':slot>=16?'challenging':'moderate',...q};
+  if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
+  out.push(item);
+ };
+ const a=3+f;
+ add({code:'AC9M3N07',week:1,skill:'Follow repeated doubling',prompt:'Double each number. What comes next?',visual:seq([a,a*2,a*4,'?'],'Double each time'),answers:[a*8]});
+ const part=24+f*3,other=17+f*2,whole=part+other;
+ add({code:'AC9M3A01',week:4,skill:'Explain inverse operations',prompt:'Why does this subtraction give the missing number?',visual:cards({label:'Missing part',text:`${part} + ? = ${whole}`},{label:'Calculation',text:`${whole} − ${part}`}),mode:'choice',options:['Subtraction undoes adding the known part.','Subtracting always gives the larger part.','Adding and subtracting give the same answer.','The missing part is always the difference between the digits.']});
+ const n=6+f,m=7;
+ add({code:'AC9M3A02',week:7,skill:'Extend an addition fact',prompt:'Use the known fact to find the sum.',instruction:'Work it out without a calculator.',visual:cards({label:'Known fact',text:`${n} + ${m} = ${n+m}`},{label:'Find the sum',text:`${n*10} + ${m*10} = ?`}),answers:[(n+m)*10]});
+ const columns=4+f;
+ add({code:'AC9M3A03',week:7,skill:'Use the three times table',prompt:'How many counters are in the array?',visual:{kind:'array',rows:3,columns},answers:[3*columns]});
+ const top=(5+f)*8;
+ add({code:'AC9M3N07',week:1,skill:'Follow repeated halving',prompt:'Halve each number. What comes next?',visual:seq([top,top/2,top/4,'?'],'Halve each time'),answers:[top/8]});
+ const left=28+f*7,missing=35+f*4;
+ add({code:'AC9M3A01',week:6,skill:'Find an unknown addend',prompt:'Which number makes this true?',visual:cards({label:'Find the missing part',text:`${left} + ? = ${left+missing}`}),answers:[missing]});
+ const small=8+f%3,total=small+6;
+ add({code:'AC9M3A02',week:7,skill:'Extend a subtraction fact',prompt:'Use the known fact to find the difference.',instruction:'Work it out without a calculator.',visual:cards({label:'Known fact',text:`${total} − 6 = ${small}`},{label:'Find the difference',text:`${total*10} − 60 = ?`}),answers:[small*10]});
+ const quotient=5+f;
+ add({code:'AC9M3A03',week:4,skill:'Use related division facts',prompt:'What is the missing number?',visual:cards({label:'Divide into groups of four',text:`${4*quotient} ÷ 4 = ?`}),answers:[quotient]});
+ const input=14+f*3;
+ add({code:'AC9M3N07',week:2,skill:'Follow a decision algorithm',prompt:'Follow the correct path. What number comes out?',visual:{kind:'decision',input,yes:'Halve the number',no:'Add 5'},answers:[input%2===0?input/2:input+5]});
+ const w=83+f*9,remain=36+f*4;
+ add({code:'AC9M3A01',week:6,skill:'Find an unknown subtrahend',prompt:'What number was taken away?',visual:cards({label:'Find the missing number',text:`${w} − ? = ${remain}`}),answers:[w-remain]});
+ const near=98-f,addend=7+2*f;
+ add({code:'AC9M3A02',week:7,skill:'Bridge a hundred mentally',prompt:'Find the sum in your head.',instruction:'You can use 100 as a helpful step.',visual:cards({label:'Find the sum',text:`${near} + ${addend} = ?`}),answers:[near+addend]});
+ const factor=4+f;
+ add({code:'AC9M3A03',week:6,skill:'Find an unknown factor',prompt:'What number makes this true?',visual:cards({label:'Five times a number',text:`5 × ? = ${5*factor}`}),answers:[factor]});
+ const tens=3+f;
+ add({code:'AC9M3A03',week:4,skill:'Connect multiplication and division',prompt:'Which division fact matches?',visual:cards({label:'Multiplication fact',text:`10 × ${tens} = ${10*tens}`}),mode:'choice',options:[`${10*tens} ÷ 10 = ${tens}`,`${10*tens} ÷ ${tens} = ${tens}`,`${10*tens} ÷ 10 = ${tens+1}`,`10 ÷ ${tens} = ${10*tens}`]});
+ const partitionTotal=64+f*7;
+ add({code:'AC9M3A01',week:5,skill:'Partition a number',prompt:'Split this total into two parts.',instruction:'Choose two whole numbers greater than zero. There is more than one correct answer.',visual:cards({label:'Whole',text:String(partitionTotal)},{label:'Your two parts',text:'? + ?'}),mode:'partition',total:partitionTotal,labels:['First part','Second part'],answers:[20,partitionTotal-20]});
+ const base=2+f;
+ add({code:'AC9M3N07',week:8,skill:'Describe an emerging pattern',prompt:'What happens to the numbers each time?',visual:seq([base,base*2,base*4,base*8]),mode:'choice',options:['Each number is twice the number before.','The same amount is added every time.','Each number is half the number before.','Two is added every time.']});
+ const first=38+f*10,second=8;
+ add({code:'AC9M3A02',week:7,skill:'Choose an efficient mental strategy',prompt:'Which calculation keeps the same total?',instruction:'Move 2 from the second number to the first.',visual:cards({label:'Original calculation',text:`${first} + ${second}`}),mode:'choice',options:[`${first+2} + ${second-2}`,`${first+2} + ${second}`,`${first+2} + ${second+2}`,`${first-2} + ${second-2}`]});
+ const k=4+f,product=4*k;
+ add({code:'AC9M3A03',week:6,skill:'Complete related facts',prompt:'Fill both gaps.',visual:cards({label:'First fact',text:`4 × ? = ${product}`},{label:'Second fact',text:`${product} ÷ ? = ${k}`}),answers:[k,4],labels:['First gap','Second gap']});
+ const p=38+f*6,q=27+f,r=30+f*3;
+ add({code:'AC9M3A01',week:5,skill:'Balance equivalent expressions',prompt:'What number keeps both sides equal?',visual:cards({label:'Equal totals',text:`${p} + ${q} = ${r} + ?`}),answers:[p+q-r]});
+ const minuend=152+f*11,sub=9;
+ add({code:'AC9M3A02',week:7,skill:'Apply a mental subtraction strategy',prompt:'Subtract 9 in your head.',instruction:'Do not use a calculator.',visual:cards({label:'Find the difference',text:`${minuend} − ${sub} = ?`}),answers:[minuend-sub]});
+ const multiplier=f%2===0?3:4,inputs=[2+f,4+f,7+f];
+ add({code:'AC9M3N07',week:8,skill:'Create and test an algorithm',prompt:'Build a two-step rule for this machine.',instruction:'Tap two steps in order. Your rule must work for every row. You may use a step twice.',visual:{kind:'table',inputs,outputs:inputs.map(v=>v*multiplier)},mode:'algorithm',multiplier});
+ return out;
+}
+export const LEVEL3_PP_FORMS=Object.fromEntries(PP_FORMS.map((f,i)=>[f,make(f,i)])) as Record<PPForm,PPItem[]>;
+export const ppEmpty=():PPResponse=>({values:[],operations:[]});
+export function ppReady(q:PPItem,r:PPResponse):boolean{
+ if(r.skipped)return true;
+ if(q.mode==='choice')return Number.isInteger(r.choice)&&r.choice!>=0&&r.choice!<4;
+ if(q.mode==='algorithm')return r.operations.length===2&&r.operations.every(v=>PP_OPERATIONS.includes(v));
+ return r.values.length===q.labels.length&&r.values.every(v=>/^\d+$/.test(v)&&Number.isSafeInteger(Number(v)));
+}
+export function ppRun(input:number,ops:readonly PPOperation[]):number{return ops.reduce((v,op)=>op==='Double'?v*2:op==='Halve'?v/2:op==='Add 5'?v+5:v+input,input);}
+export function ppScore(q:PPItem,r:PPResponse):boolean{
+ if(r.skipped||!ppReady(q,r))return false;
+ if(q.mode==='choice')return r.choice===q.correct;
+ if(q.mode==='algorithm')return Array.from({length:11},(_,i)=>i).every(v=>ppRun(v,r.operations)===v*q.multiplier!);
+ if(q.mode==='partition')return r.values.every(v=>Number(v)>0)&&r.values.reduce((a,b)=>a+Number(b),0)===q.total;
+ return r.values.every((v,i)=>Number(v)===q.answers[i]);
+}
+export function ppVisualSpeech(v:PPVisual):string{
+ if(v.kind==='cards')return v.cards.map(c=>`${c.label}: ${c.text}`).join('. ');
+ if(v.kind==='sequence')return `${v.rule??''}. ${v.terms.join(', ')}`;
+ if(v.kind==='array')return `${v.rows} rows of ${v.columns} counters.`;
+ if(v.kind==='decision')return `Input ${v.input}. Is it even? Yes: ${v.yes}. No: ${v.no}. Output unknown.`;
+ return `Input and output table. ${v.inputs.map((n,i)=>`Input ${n}, output ${v.outputs[i]}`).join('. ')}`;
+}
