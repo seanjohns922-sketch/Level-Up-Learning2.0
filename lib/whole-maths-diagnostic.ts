@@ -11,7 +11,7 @@ export const DIAGNOSTIC_MASTERY = 85;
 export const DIAGNOSTIC_FLOOR = 40;
 export const DIAGNOSTIC_QUESTIONS_PER_LEVEL = 20;
 export function diagnosticQuestionCount(strand: string, level: string): number {
-  return ["number","measurement","space"].includes(strand) && ["Year 7", "Year 8"].includes(level) ? 30 : DIAGNOSTIC_QUESTIONS_PER_LEVEL;
+  return ["number","measurement","space","statistics"].includes(strand) && ["Year 7", "Year 8"].includes(level) ? 30 : DIAGNOSTIC_QUESTIONS_PER_LEVEL;
 }
 
 export const DIAGNOSTIC_DOWNWARD_PROBE = 25;

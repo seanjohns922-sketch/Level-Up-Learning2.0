@@ -690,3 +690,9 @@ export async function fetchSpaceExtensionAssessments(studentId: string, level: 7
   if(error)throw new Error(error.message);
   return ((data??[]) as RealmAssessmentRow[]).sort((a,b)=>Date.parse(a.completed_at)-Date.parse(b.completed_at)).map((row,i)=>normalizeAssessmentAttempt(row,i+1));
 }
+
+export async function fetchStatisticsExtensionAssessments(studentId: string, level: 7 | 8 = 7): Promise<NormalizedAssessmentAttempt[]> {
+  const {data,error}=await supabase.rpc('get_student_realm_assessments_secure',{p_student_id:studentId,p_realm_id:'statistics',p_working_level:`Year ${level}`});
+  if(error)throw new Error(error.message);
+  return ((data??[]) as RealmAssessmentRow[]).sort((a,b)=>Date.parse(a.completed_at)-Date.parse(b.completed_at)).map((row,i)=>normalizeAssessmentAttempt(row,i+1));
+}

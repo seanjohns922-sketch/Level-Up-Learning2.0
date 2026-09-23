@@ -1,0 +1,12 @@
+import {writeFileSync,readFileSync,existsSync} from 'node:fs';
+import {LEVEL1_STATISTICA_FORMS as l1} from '../data/assessments/revisions/level1StatisticaFiveForms';
+import {LEVEL2_STATISTICA_FORMS as l2} from '../data/assessments/revisions/level2StatisticaFiveForms';
+import {LEVEL3_STATISTICA_FORMS as l3} from '../data/assessments/revisions/level3StatisticaFiveForms';
+import {LEVEL4_STATISTICA_FORMS as l4} from '../data/assessments/revisions/level4StatisticaFiveForms';
+import {LEVEL5_STATISTICA_FORMS as l5} from '../data/assessments/revisions/level5StatisticaFiveForms';
+import {LEVEL6_STATISTICA_FORMS as l6} from '../data/assessments/revisions/level6StatisticaFiveForms';
+import {LEVEL7_STATISTICA_FORMS as l7} from '../data/assessments/revisions/level7StatisticaFiveForms';
+import {LEVEL8_STATISTICA_FORMS as l8} from '../data/assessments/revisions/level8StatisticaFiveForms';
+const path='data/assessments/releases/statistica-v3.json',payload=JSON.stringify([null,l1,l2,l3,l4,l5,l6,l7,l8],null,2)+'\n';
+if(existsSync(path)&&readFileSync(path,'utf8')!==payload)throw new Error('The v3 bank is frozen. Use a new version for changes.');
+writeFileSync(path,payload);

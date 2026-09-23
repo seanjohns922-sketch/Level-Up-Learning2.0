@@ -1,6 +1,6 @@
 # Statistica Level 8 — five matched review forms
 
-Five forms, 30 questions each, available through Demo Review. No change to student-live bank selection or login permissions.
+Five forms, 30 questions each. Approved content is now frozen into the student release; see `../releases/statistica-1-8-assessments.md`. Demo Review remains available.
 
 Read the user's `mathematics-curriculum-content-7-10-v9.docx`, Year 8 Statistics section. Unlike Year 7, Year 8 has four Statistics content descriptions:
 

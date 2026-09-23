@@ -1,3 +1,4 @@
+import {readReleasedStatistica,statisticaReleaseVisual} from '@/lib/statistica-release-response';
 import {readReleasedStarpath,starpathReleaseVisual} from '@/lib/starpath-release-response';
 import { decodeAssessmentResponse } from "@/lib/assessment-response";
 import { decodeStarpathResponse } from "@/lib/starpath-assessment-response";
@@ -122,7 +123,7 @@ export function buildAssessmentQuestionSnapshots(
     const correct = isCorrect(question, studentAnswer);
     return {
       schema_version: 1,
-      scorer_version: starpathReleaseVisual(question) ? "starpath-release-2026-09-22-v1" : "assessment-2026-09-14-v1",
+      scorer_version: statisticaReleaseVisual(question) ? "statistica-release-2026-09-23-v3" : starpathReleaseVisual(question) ? "starpath-release-2026-09-22-v1" : "assessment-2026-09-14-v1",
       question_id: question.id,
       question_version: question.version ?? question.id.match(/-v(\d+)$/)?.[1] ?? "1",
       question_number: index + 1,
@@ -132,7 +133,7 @@ export function buildAssessmentQuestionSnapshots(
       visual: cloneJsonValue(question.visual),
       task_snapshot: cloneJsonValue(question.practiceTask),
       correct_answer: correctAnswerForReplay(question),
-      student_answer: cloneJsonValue(readReleasedStarpath(question.id,studentAnswer) ?? decodeAssessmentResponse(studentAnswer)?.response ?? decodeStarpathResponse(studentAnswer)?.response ?? studentAnswer),
+      student_answer: cloneJsonValue(readReleasedStatistica(question.id,studentAnswer) ?? readReleasedStarpath(question.id,studentAnswer) ?? decodeAssessmentResponse(studentAnswer)?.response ?? decodeStarpathResponse(studentAnswer)?.response ?? studentAnswer),
       correct,
       response_status: responseStatus(studentAnswer, correct),
       explanation:

@@ -1,4 +1,5 @@
 "use client";
+import {statisticaReleaseVisual,readyReleasedStatistica} from "@/lib/statistica-release-response";
 import {starpathReleaseVisual,readyReleasedStarpath} from "@/lib/starpath-release-response";
 import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
 import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
@@ -96,11 +97,11 @@ export default function WholeMathsDiagnosticPage() {
   }, [loadPending]);
 
   const linkedQuestions = useMemo(
-    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3,pending.measurement_level6_bank_version??3,pending.measurement_release_version??0,pending.space_ground_bank_version??0,pending.space_release_version??0) : [],
+    () => pending ? getDiagnosticQuestions(pending.strand, level, pending.sitting_id, pending.checkpoint, pending.number_level1_bank_version ?? 2,pending.number_ground_bank_version??1,pending.number_level2_bank_version??2,pending.number_level4_bank_version??2,pending.number_level5_bank_version??2,pending.number_level6_bank_version??2,pending.number_level3_bank_version??2,pending.number_maximum_level??6,pending.measurement_ground_bank_version??3,pending.measurement_level1_bank_version??3,pending.measurement_level2_bank_version??3,pending.measurement_level5_bank_version??3,pending.measurement_level6_bank_version??3,pending.measurement_release_version??0,pending.space_ground_bank_version??0,pending.space_release_version??0,pending.statistics_release_version??0) : [],
     [level, pending],
   );
   const current = linkedQuestions[index];
-  const isAnswered=(question:typeof linkedQuestions[number]["question"])=>answers[question.id]===UNKNOWN_ANSWER || (starpathReleaseVisual(question)?readyReleasedStarpath(question,answers[question.id]):question.type==="prepNumberTask" ? groundNumberHasAnswer(question,answers[question.id]) : answers[question.id]!=null && answers[question.id]!=="");
+  const isAnswered=(question:typeof linkedQuestions[number]["question"])=>answers[question.id]===UNKNOWN_ANSWER || (statisticaReleaseVisual(question)?readyReleasedStatistica(question,answers[question.id]):starpathReleaseVisual(question)?readyReleasedStarpath(question,answers[question.id]):question.type==="prepNumberTask" ? groundNumberHasAnswer(question,answers[question.id]) : answers[question.id]!=null && answers[question.id]!=="");
   const answeredCount = linkedQuestions.filter(({question})=>isAnswered(question)).length;
 
   async function recordAnswer(value: string) {
@@ -183,7 +184,7 @@ export default function WholeMathsDiagnosticPage() {
     };
     const nextProbes = [...probes, probe];
     const minimumLevel = (pending.strand === "space" && (pending.space_ground_bank_version===3 || pending.space_release_version===1) || pending.strand === "number" && pending.number_ground_bank_version===3 || pending.strand === "measurement" && pending.measurement_ground_bank_version===4) ? 0 : pending.strand === "algebra" || pending.strand === "probability" ? 3 : 1;
-    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel,pending.strand === "space" && pending.space_release_version===1 ? 8 : pending.strand === "number" ? pending.number_maximum_level ?? 6 : pending.strand === "measurement" && pending.measurement_release_version===1 ? 8 : 6);
+    const decision = decideDiagnosticPlacement(pending.starting_level, nextProbes,minimumLevel,pending.strand === "statistics" && pending.statistics_release_version===1 ? 8 : pending.strand === "space" && pending.space_release_version===1 ? 8 : pending.strand === "number" ? pending.number_maximum_level ?? 6 : pending.strand === "measurement" && pending.measurement_release_version===1 ? 8 : 6);
     const nextProbeLevel = decision.shouldProbeNext
       ? diagnosticLevelNumber(level) + 1
       : decision.shouldProbeLower && diagnosticLevelNumber(level) > minimumLevel
@@ -563,7 +564,7 @@ export default function WholeMathsDiagnosticPage() {
           </header>
 
           <section className="overflow-hidden rounded-[2rem] border border-white/15 bg-slate-900/90 shadow-2xl shadow-black/35 backdrop-blur-xl">
-            {!starpathReleaseVisual(current.question) && <div className="border-b border-white/10 bg-white/[0.025] px-5 py-5 sm:px-8 sm:py-6">
+            {!starpathReleaseVisual(current.question) && !statisticaReleaseVisual(current.question) && <div className="border-b border-white/10 bg-white/[0.025] px-5 py-5 sm:px-8 sm:py-6">
               <div className="flex items-center justify-between gap-4">
                 <span className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] ${testPresentation.accent}`}>
                   <span className={`h-2 w-2 rounded-full ${testPresentation.progress}`} aria-hidden="true" />

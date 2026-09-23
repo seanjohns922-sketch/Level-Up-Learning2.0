@@ -1,5 +1,6 @@
 "use client";
 
+import {statisticaReleaseVisual,encodeReleasedStatistica} from "@/lib/statistica-release-response";
 import {starpathReleaseVisual,encodeReleasedStarpath} from "@/lib/starpath-release-response";
 import { useMemo, useState } from "react";
 import {
@@ -201,7 +202,7 @@ function SnapshotQuestion({
               options: question.options,
               visual: question.visual,
             }}
-            value={starpathReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStarpath(question.question_id,question.student_answer) : typeof question.student_answer === "string" ? question.student_answer : null}
+            value={statisticaReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStatistica(question.question_id,question.student_answer) : starpathReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStarpath(question.question_id,question.student_answer) : typeof question.student_answer === "string" ? question.student_answer : null}
             onChange={() => undefined}
             realmId={realmId}
           />

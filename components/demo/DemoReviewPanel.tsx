@@ -436,7 +436,7 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="py-6">
-          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "statistics" && (year === "Year 7" || year === "Year 8")) || (realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
           {realm === "space" && (year === "Prep" || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 7" || year === "Year 8") ? (
             <p className="mb-3 text-xs font-bold text-amber-200">The five redesigned Starpath forms open for content review. Existing student attempts are unchanged.</p>
           ) : null}

@@ -1,3 +1,4 @@
+import {statisticaReleaseVisual,scoreReleasedStatistica} from '@/lib/statistica-release-response';
 import {starpathReleaseVisual,scoreReleasedStarpath} from '@/lib/starpath-release-response';
 import { groundNumberReleaseItem } from "./releases/groundNumber";
 import { parsePrepNumberSubmission, scorePrepNumberSubmission } from "./candidates/prep-number/scoring";
@@ -136,6 +137,7 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  if(statisticaReleaseVisual(question))return scoreReleasedStatistica(question,chosen);
   if(starpathReleaseVisual(question))return scoreReleasedStarpath(question,chosen);
   if (question.type === "prepNumberTask") {
     const item=groundNumberReleaseItem(question);

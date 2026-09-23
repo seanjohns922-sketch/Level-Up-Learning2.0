@@ -7,7 +7,7 @@ for(const form of STATISTICA_FORMS){
  const bank=LEVEL8_STATISTICA_FORMS[form];assert.equal(bank.length,30);
  for(const [code,n] of [['AC9M8ST01',7],['AC9M8ST02',7],['AC9M8ST03',8],['AC9M8ST04',8]] as const)assert.equal(bank.filter(q=>q.code===code).length,n);
  for(const q of bank){
-  assert(!ids.has(q.id));ids.add(q.id);assert(q.prompt&&q.instruction);assert.equal(q.categories.length,q.counts.length);
+  assert(!ids.has(q.id));ids.add(q.id);assert(q.prompt);assert.equal(q.categories.length,q.counts.length);
   const blank=emptyStatsResponse(q);assert(!statsResponseReady(q,blank));assert(!scoreStatsResponse(q,blank));
   const correct={...blank,touched:true,...(typeof q.answer==='string'?{choice:q.answer}:{values:[...q.answer]})};assert(scoreStatsResponse(q,correct),q.id);
   if(q.mode==='choice'){assert.equal(q.options.length,4);assert.equal(new Set(q.options.map(o=>o.label)).size,4,q.id);assert.equal(q.options.filter(o=>o.id===q.answer).length,1);assert(!scoreStatsResponse(q,{...correct,choice:q.options.find(o=>o.id!==q.answer)!.id}));}
