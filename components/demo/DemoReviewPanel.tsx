@@ -81,6 +81,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${kind}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${kind}`;
+  if(realm === "pattern" && year === "Year 6") return `/demo-review/pattern-level6?form=${kind}`;
   if(realm === "pattern" && year === "Year 3") return `/demo-review/pattern-level3?form=${kind}`;
   if(realm === "statistics" && year === "Year 1") return `/demo-review/statistica-level1?form=${kind}`;
   if(realm === "statistics" && year === "Year 2") return `/demo-review/statistica-level2?form=${kind}`;
@@ -132,6 +133,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${checkpoint}`;
+  if(realm === "pattern" && year === "Year 6") return `/demo-review/pattern-level6?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 3") return `/demo-review/pattern-level3?form=${checkpoint}`;
   if(realm === "statistics" && year === "Year 1") return `/demo-review/statistica-level1?form=${checkpoint}`;
   if(realm === "statistics" && year === "Year 2") return `/demo-review/statistica-level2?form=${checkpoint}`;
@@ -442,8 +444,8 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="py-6">
-          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5")) || (realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
-          {realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5") && <p className="mb-3 text-xs text-amber-200">Five Level {levelNumber} Pattern Peaks forms for content review. Pattern Peaks begins at Level 3.</p>}
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6")) || (realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
+          {realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6") && <p className="mb-3 text-xs text-amber-200">Five Level {levelNumber} Pattern Peaks forms for content review. Pattern Peaks begins at Level 3.</p>}
           {realm === "space" && (year === "Prep" || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 7" || year === "Year 8") ? (
             <p className="mb-3 text-xs font-bold text-amber-200">The five redesigned Starpath forms open for content review. Existing student attempts are unchanged.</p>
           ) : null}
