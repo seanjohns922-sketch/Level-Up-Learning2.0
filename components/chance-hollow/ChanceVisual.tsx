@@ -1,5 +1,7 @@
 "use client";
 
+import AustralianCoin from "./AustralianCoin";
+
 import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 
 // Procedural SVG apparatus for Chance Hollow questions: a spinner, coin, die,
@@ -56,30 +58,10 @@ function Spinner({ wedges, large = false }: { wedges: string[]; large?: boolean 
   );
 }
 
-// A single 3D coin: a tilted disc with a gold rim showing its thickness.
-function coinDisc(cx: number, cy: number, letter: string, key: string) {
-  const rx = 42, ry = 35, t = 10;
-  return (
-    <g key={key}>
-      <ellipse cx={cx} cy={cy + t} rx={rx} ry={ry} fill="#b8860b" />
-      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#f4c542" stroke="#b8860b" strokeWidth={3} />
-      <ellipse cx={cx} cy={cy} rx={rx - 7} ry={ry - 7} fill="none" stroke="#d9a521" strokeWidth={2.5} />
-      <text x={cx} y={cy + 14} textAnchor="middle" fontSize={40} fontWeight={900} fill="#7a5b12">{letter}</text>
-    </g>
-  );
-}
-
-// Two 3D coins side by side — heads and tails — so a coin reads as a two-sided
-// object with both outcomes on show. The given face is shown first.
+// Show both sides of the same Australian dollar, with clear outcome labels.
 function Coin({ face }: { face?: "heads" | "tails" }) {
-  const primary = face === "tails" ? "T" : "H";
-  const secondary = primary === "T" ? "H" : "T";
-  return (
-    <svg viewBox="0 0 210 116" width="200" height="110" role="img" aria-label="Coin — heads or tails">
-      {coinDisc(58, 45, primary, "a")}
-      {coinDisc(152, 45, secondary, "b")}
-    </svg>
-  );
+ const sides = face === 'tails' ? ['tails','heads'] as const : ['heads','tails'] as const;
+ return <div className="flex items-center justify-center gap-4">{sides.map(side=><div key={side} className="text-center"><AustralianCoin side={side} size={88}/><span>{side==='heads'?'Heads':'Tails'}</span></div>)}</div>;
 }
 
 const PIP_LAYOUT: Record<number, ReadonlyArray<[number, number]>> = {

@@ -1,5 +1,7 @@
 "use client";
 
+import AustralianCoin from "./AustralianCoin";
+
 import { useEffect, useRef, useState } from "react";
 import { Check, FastForward, Minus, Plus, RotateCw } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -61,11 +63,7 @@ function DieFace({ face }: { face: number }) {
 
 function CoinFace({ side }: { side: string }) {
   return (
-    <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label={`Coin showing ${side}`}>
-      <circle cx={75} cy={75} r={62} fill="#f4c542" stroke="#b8860b" strokeWidth={5} />
-      <circle cx={75} cy={75} r={50} fill="none" stroke="#d9a521" strokeWidth={3} />
-      <text x={75} y={96} textAnchor="middle" fontSize={56} fontWeight={900} fill="#7a5b12">{side === "tails" ? "T" : "H"}</text>
-    </svg>
+    <AustralianCoin side={side==='tails'?'tails':'heads'} size={150}/>
   );
 }
 

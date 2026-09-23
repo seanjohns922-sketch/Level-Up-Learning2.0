@@ -1,8 +1,10 @@
 "use client";
 
+import AustralianCoin from "./AustralianCoin";
+
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Check, CircleDot, Coins, Cpu, Dices, Minus, Play, Plus, Shield, Sparkles, Target } from "lucide-react";
+import { Check, CircleDot, Cpu, Dices, Minus, Play, Plus, Shield, Sparkles, Target } from "lucide-react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -231,7 +233,7 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong, assessmentMo
   return <div className="space-y-5">
     <TaskHeading text={task.prompt} />
     <div className="rounded-lg border-2 border-[#d7b7f5] bg-gradient-to-br from-[#f8f2ff] to-[#edfdff] p-5">
-      <div className="mb-5 flex flex-wrap items-center gap-4"><span className="grid h-14 w-14 place-items-center rounded-lg bg-[#251833] text-fuchsia-300">{task.tool === "die" ? <Dices className="h-7 w-7" /> : task.tool === "coin" ? <Coins className="h-7 w-7" /> : <CircleDot className="h-7 w-7" />}</span><div><div className="text-xs font-black uppercase text-[#8b2cf5]">{task.tool} simulator</div><div className="flex items-center gap-3 text-xl font-black text-[#2b2135]"><Fraction numerator={task.winning} denominator={task.total} /><span>{Math.round(probability * 100)}% {task.targetName}</span></div></div></div>
+      <div className="mb-5 flex flex-wrap items-center gap-4"><span className="grid h-14 w-14 place-items-center rounded-lg bg-[#251833] text-fuchsia-300">{task.tool === "die" ? <Dices className="h-7 w-7" /> : task.tool === "coin" ? <AustralianCoin side="heads" size={48}/> : <CircleDot className="h-7 w-7" />}</span><div><div className="text-xs font-black uppercase text-[#8b2cf5]">{task.tool} simulator</div><div className="flex items-center gap-3 text-xl font-black text-[#2b2135]"><Fraction numerator={task.winning} denominator={task.total} /><span>{Math.round(probability * 100)}% {task.targetName}</span></div></div></div>
       {task.challenge === "predict" && results.length === 0 ? <div className="mb-5 flex flex-wrap items-center gap-3 rounded-lg bg-white p-4"><span className="font-bold">Expected {task.targetName} in {task.stages[0]} trials:</span><button type="button" aria-label="Decrease prediction" onClick={() => setPrediction((value) => Math.max(0, value - 1))} className="grid h-10 w-10 place-items-center rounded-md border"><Minus /></button><span className="min-w-12 text-center text-2xl font-black text-[#6d3f9c]">{prediction}</span><OptionReadAloudButton text={`${prediction} expected ${task.targetName} outcomes`} /><button type="button" aria-label="Increase prediction" onClick={() => setPrediction((value) => Math.min(task.stages[0]!, value + 1))} className="grid h-10 w-10 place-items-center rounded-md bg-[#6d3f9c] text-white"><Plus /></button></div> : null}
       <div className="grid gap-3 sm:grid-cols-3">{task.stages.map((trials, index) => {
         const observed = results[index];
