@@ -82,6 +82,7 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   if(realm === "chance" && year === "Year 3") return `/demo-review/chance-level3?form=${kind}`;
   if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${kind}`;
   if(realm === "chance" && year === "Year 5") return `/demo-review/chance-level5?form=${kind}`;
+  if(realm === "chance" && year === "Year 7") return `/demo-review/chance-level7?form=${kind}`;
   if(realm === "chance" && year === "Year 6") return `/demo-review/chance-level6?form=${kind}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${kind}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${kind}`;
@@ -140,6 +141,7 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
   if(realm === "chance" && year === "Year 3") return `/demo-review/chance-level3?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 5") return `/demo-review/chance-level5?form=${checkpoint}`;
+  if(realm === "chance" && year === "Year 7") return `/demo-review/chance-level7?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 6") return `/demo-review/chance-level6?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${checkpoint}`;
@@ -175,6 +177,7 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "chance" && year === "Year 7") return true;
   if (realm === "pattern" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "statistics" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "space" && (year === "Year 7" || year === "Year 8")) return true;
@@ -184,6 +187,7 @@ function hasPretest(realm: ReviewRealm, year: YearLabel) {
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
+  if (realm === "chance" && year === "Year 7") return true;
   if (realm === "pattern" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "statistics" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "space" && (year === "Year 7" || year === "Year 8")) return true;
@@ -232,13 +236,13 @@ export default function DemoReviewPanel() {
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
-  const weeklyProgramAvailable = realm === "pattern"
+  const weeklyProgramAvailable = realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyContentAvailable = realm === "pattern"
+  const weeklyContentAvailable = realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyQuizAvailable = realm === "statistics" || realm === "chance"
+  const weeklyQuizAvailable = realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
     ? week <= 5
     : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
 
@@ -253,13 +257,14 @@ export default function DemoReviewPanel() {
   }, [maxWeek]);
 
   useEffect(() => {
-    if (realm !== "number" && realm !== "measurement" && realm !== "space" && realm !== "statistics" && realm !== "pattern" && levelNumber > 6) setYear("Year 6");
+    if (realm !== "number" && realm !== "measurement" && realm !== "space" && realm !== "statistics" && realm !== "pattern" && realm !== "chance" && levelNumber > 6) setYear("Year 6");
     if (realm === "space" && levelNumber > 8) setYear("Year 8");
     if (realm === "measurement" && levelNumber > 8) setYear("Year 8");
     if (realm === "statistics" && year === "Prep") setYear("Year 1");
     if (realm === "statistics" && levelNumber > 8) setYear("Year 8");
     if (realm === "pattern" && levelNumber > 8) setYear("Year 8");
     if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
+    if (realm === "chance" && levelNumber > 7) setYear("Year 7");
     if (realm === "chance" && levelNumber < 3) setYear("Year 3");
   }, [levelNumber, realm, year]);
 
@@ -439,7 +444,7 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "measurement" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "space" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "statistics" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "pattern" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : [])]
+                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "measurement" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "space" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "statistics" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "pattern" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "chance" ? [{id:"Year 7",label:"Level 7"}] : [])]
                   .filter((item) => realm !== "statistics" || item.id !== "Prep")
                   .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
                   .filter((item) => realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3)
@@ -459,7 +464,7 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="py-6">
-          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6" || year === "Year 7" || year === "Year 8")) || (realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
+          <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-teal-300" /><h2 className="text-base font-black">{((realm === "chance") || (realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6" || year === "Year 7" || year === "Year 8")) || (realm === "space" && (year === "Year 7" || year === "Year 8")) || (realm === "measurement" && (year === "Year 3" || year === "Year 7" || year === "Year 8"))) ? "Assessments for review" : "Live Assessments"}</h2></div>
           {realm === "pattern" && (year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 6" || year === "Year 7" || year === "Year 8") && <p className="mb-3 text-xs text-amber-200">Five Level {levelNumber} Pattern Peaks forms for content review. Pattern Peaks begins at Level 3.</p>}
           {realm === "space" && (year === "Prep" || year === "Year 1" || year === "Year 2" || year === "Year 3" || year === "Year 4" || year === "Year 5" || year === "Year 7" || year === "Year 8") ? (
             <p className="mb-3 text-xs font-bold text-amber-200">The five redesigned Starpath forms open for content review. Existing student attempts are unchanged.</p>

@@ -8,3 +8,5 @@
 .simApparatus svg{max-height:90px}.simApparatus :global(.chance-visual){padding:6px}.simTable th,.simTable td{padding:7px}.simTable caption{font-size:14px;margin-bottom:6px}
 
 .pictureTrials li{gap:3px;padding:6px}.pictureTrials svg{width:56px;height:56px;flex-shrink:0}.pictureTrials strong{font-size:15px}.outcomeKey{display:flex;align-items:center;gap:10px}.outcomeKey svg{width:56px;height:56px;flex-shrink:0}@media(max-width:500px){.outcomeKey{flex-direction:column;gap:3px;align-items:flex-start}}
+
+.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:18px 0}.tiles > span{display:grid;place-items:center;min-width:56px;min-height:58px;padding:10px 14px;background:white;border:2px solid var(--ring);border-radius:10px;font-size:22px;font-weight:750}
