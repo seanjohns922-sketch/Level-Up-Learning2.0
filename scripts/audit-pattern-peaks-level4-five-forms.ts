@@ -3,10 +3,11 @@ import fs from 'node:fs';
 import {LEVEL4_PP_FORMS} from '@/data/assessments/revisions/level4PatternPeaksFiveForms';
 import {PP_FORMS,ppEmpty,ppReady,ppScore,ppVisualSpeech,type PPResponse} from '@/data/assessments/revisions/level3PatternPeaksFiveForms';
 const fixtures=[];
-for(const [f,form]of PP_FORMS.entries()){
+for(const [formIndex,form]of PP_FORMS.entries()){
  const items=LEVEL4_PP_FORMS[form];assert.equal(items.length,20);
  for(const code of ['AC9M4A01','AC9M4A02'])assert.equal(items.filter(q=>q.code===code).length,10);
  for(const q of items){
+  const f=[0,3,1,4,2][(formIndex+q.slot-1)%5];
   assert(!ppReady(q,ppEmpty()));assert(!ppScore(q,{...ppEmpty(),skipped:true}));assert(ppVisualSpeech(q.visual).length>5);
   let expected:number[]=[];let option='';
   switch(q.slot){

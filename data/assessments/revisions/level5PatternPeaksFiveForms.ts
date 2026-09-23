@@ -1,46 +1,49 @@
 import {PP_FORMS,type PPForm,type PPItem,type PPVisual} from './level3PatternPeaksFiveForms';
 const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
-function make(form:PPForm,f:number):PPItem[]{
+// Rotate operand sets independently by skill so no form is uniformly harder.
+function make(form:PPForm,formIndex:number):PPItem[]{
+ const variant=(slot:number)=>[0,3,1,4,2][(formIndex+slot-1)%5];
+ let f=variant(1);
  const out:PPItem[]=[];
  const add=(q:Partial<PPItem>&Pick<PPItem,'code'|'skill'|'week'|'prompt'|'visual'>)=>{
   const slot=out.length+1,item:PPItem={id:`pp-l5-${form}-${slot}`,slot,instruction:'',mode:'number',options:[],correct:0,answers:[],labels:['Your answer'],difficulty:slot<=3?'accessible':slot>=17?'challenging':'moderate',...q};
-  if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
-  out.push(item);
+  if(item.options.length){const shift=(slot+formIndex)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
+  out.push(item);f=variant(slot+1);
  };
- const a=12+f,b=18+f*2,product=a*b;
+ const a=6+f,b=12+f,product=a*b;
  add({code:'AC9M5A01',week:1,skill:'Use a multiplication fact to divide',prompt:'Use the known fact to fill the gap.',visual:cards({label:'Known fact',text:`${a} × ${b} = ${product}`},{label:'Related division',text:`${product} ÷ ${b} = ?`}),answers:[a]});
- const factor=17+f,missing=13+f;
+ const factor=[6,8,7,9,6][f],missing=[18,16,18,16,24][f];
  add({code:'AC9M5A02',week:3,skill:'Find an unknown factor',prompt:'What number makes this true?',visual:cards({label:'Multiplication equation',text:`${factor} × ? = ${factor*missing}`}),answers:[missing]});
  const divisor=[4,6,5,8,9][f],candidates=[divisor*2,divisor*2+1,divisor*3,divisor*3+(f%2?divisor:1)];
  add({code:'AC9M5N10',week:7,skill:'Follow a divisibility decision',prompt:'Select every number the rule keeps.',instruction:'Select all that apply.',visual:{kind:'filter',divisor},mode:'select',candidates,answers:candidates.filter(n=>n%divisor===0)});
- const familyA=14+f,familyB=16+f*2,p=familyA*familyB;
+ const familyA=6+f,familyB=12+f,p=familyA*familyB;
  add({code:'AC9M5A01',week:1,skill:'Develop related division facts',prompt:'Complete both division facts.',visual:{kind:'family',product:p,factors:[familyA,familyB]},answers:[familyB,familyA],labels:[`${p} ÷ ${familyA} = ?`,`${p} ÷ ${familyB} = ?`]});
- const d=14+f,q=23+f*2;
+ const d=[6,8,7,9,6][f],q=[24,18,24,16,28][f];
  add({code:'AC9M5A02',week:3,skill:'Find an unknown dividend',prompt:'What is the missing starting number?',visual:cards({label:'Division equation',text:`? ÷ ${d} = ${q}`}),answers:[d*q]});
- const invA=16+f,invB=18+f;
+ const invA=6+f,invB=12+f;
  add({code:'AC9M5A01',week:1,skill:'Explain multiplication as the inverse',prompt:'Why does this check work?',visual:cards({label:'Division',text:`${invA*invB} ÷ ${invA} = ${invB}`},{label:'Check',text:`${invA} × ${invB} = ${invA*invB}`}),mode:'choice',options:['Multiplication undoes division by the same number.','The divisor and quotient can always be swapped with the dividend.','Multiplication and division always give the same result.','The check works because both calculations use addition.']});
  const pair=[[18,24],[24,36],[30,45],[28,42],[36,54]][f];
  add({code:'AC9M5N10',week:7,skill:'Find a highest common factor',prompt:'What is the largest whole number that divides both exactly?',visual:cards({label:'First number',text:String(pair[0])},{label:'Second number',text:String(pair[1])}),answers:[[6,12,15,14,18][f]]});
- const div=14+f,quot=24+f;
+ const div=6+f,quot=18+f;
  add({code:'AC9M5A02',week:3,skill:'Find an unknown divisor',prompt:'What number is the total divided by?',visual:cards({label:'Division equation',text:`${div*quot} ÷ ? = ${quot}`}),answers:[div]});
- const sa=7+f,sb=8+f;
+ const sa=[7,9,6,8,7][f],sb=[8,6,9,7,9][f];
  add({code:'AC9M5A01',week:2,skill:'Extend a fact family',prompt:'Complete the two larger division facts.',visual:cards({label:'Known fact',text:`${sa} × ${sb} = ${sa*sb}`},{label:'Larger total',text:String(sa*sb*10)}),answers:[sb,sa*10],labels:[`${sa*sb*10} ÷ ${sa*10} = ?`,`${sa*sb*10} ÷ ${sb} = ?`]});
  const ef=(3+f)*4,eo=(5+f)*3;
  add({code:'AC9M5A02',week:4,skill:'Balance equivalent products',prompt:'What number keeps the products equal?',visual:{kind:'balance',left:`${ef} × ${eo}`,right:`${ef/2} × ?`},answers:[eo*2]});
  const multiples=[[6,8],[8,12],[9,12],[6,10],[10,15]][f];
  add({code:'AC9M5N10',week:7,skill:'Find a lowest common multiple',prompt:'What is the smallest positive number in both times tables?',visual:cards({label:'First times table',text:String(multiples[0])},{label:'Second times table',text:String(multiples[1])}),answers:[[24,24,36,30,30][f]]});
- const fa=12+f,fb=15+f,fp=fa*fb;
+ const fa=6+f,fb=12+f,fp=fa*fb;
  add({code:'AC9M5A01',week:1,skill:'Identify a correct inverse fact',prompt:'Which division fact belongs to this family?',visual:{kind:'family',product:fp,factors:[fa,fb]},mode:'choice',options:[`${fp} ÷ ${fa} = ${fb}`,`${fa} ÷ ${fp} = ${fb}`,`${fp} ÷ ${fb} = ${fb}`,`${fp} ÷ ${fa} = ${fa}`]});
- const rows=6+f,extra=3+f;
+ const rows=[6,8,7,9,6][f],extra=[7,4,6,4,8][f];
  add({code:'AC9M5A02',week:6,skill:'Find a missing partial product',prompt:'Find the missing part of this calculation.',instruction:`${rows} × ${10+extra} = (${rows} × 10) + ?`,visual:{kind:'area',rows,left:10,right:extra},answers:[rows*extra]});
  const g=3+f;
  add({code:'AC9M5A02',week:5,skill:'Regroup multiplication factors',prompt:'What number fills the gap?',visual:{kind:'balance',left:`${g} × (4 × 5)`,right:'? × 5'},answers:[g*4]});
- const step=7+f,inputs=[1,2,3,4];
+ const step=[7,9,6,8,7][f],inputs=[1,2,3,4];
  add({code:'AC9M5N10',week:7,skill:'Describe a multiples-generating rule',prompt:'Which rule gives the output for every input?',visual:{kind:'table',inputs,outputs:inputs.map(n=>n*step)},mode:'choice',options:[`Multiply the input by ${step}.`,`Add ${step} to the input.`,`Multiply the input by ${step+1}.`,`Subtract ${step} from the input.`]});
  const start=14+f*2,divide=2+f;
  add({code:'AC9M5A01',week:2,skill:'Explain an extended division relationship',prompt:'Why do these divisions have the same answer?',visual:cards({label:'First division',text:`${start*divide} ÷ ${divide}`},{label:'Second division',text:`${start*divide*10} ÷ ${divide*10}`}),mode:'choice',options:['The total and group size are both multiplied by 10.','Only the total is multiplied by 10.','Only the group size is multiplied by 10.','The total and group size can be swapped.']});
- const bv=6+f,av=5*bv,known=av*(7+f);
- add({code:'AC9M5A02',week:8,skill:'Solve connected multiplicative equations',prompt:'Find A, then use it to find B.',visual:cards({label:'First equation',text:`A × ${7+f} = ${known}`},{label:'Second equation',text:'A ÷ B = 5'}),answers:[av,bv],labels:['A','B']});
+ const bv=[8,6,9,7,8][f],av=5*bv,known=av*[6,8,6,8,7][f];
+ add({code:'AC9M5A02',week:8,skill:'Solve connected multiplicative equations',prompt:'Find A, then use it to find B.',visual:cards({label:'First equation',text:`A × ${[6,8,6,8,7][f]} = ${known}`},{label:'Second equation',text:'A ÷ B = 5'}),answers:[av,bv],labels:['A','B']});
  const target=[72,96,120,144,180][f];
  add({code:'AC9M5A02',week:4,skill:'Construct an equivalent product',prompt:'Choose two factors to make this product.',instruction:'Use whole numbers from 2 to 24. There is more than one correct answer.',visual:{kind:'balance',left:'? × ?',right:String(target)},mode:'product',total:target,maxFactor:24,answers:[[6,12],[8,12],[10,12],[12,12],[12,15]][f],labels:['First factor','Second factor']});
  const base=[6,10,12,14,15][f],subfactor=[3,5,4,7,5][f];

@@ -20,3 +20,9 @@ Five multiple-choice items per form have four distinct alternatives. Most items 
 ## Checks
 
 `qa:pattern-peaks-level4-five-forms` independently solves all 100 items, checks 10 items per code, unique choice strings and mathematical answers, alternate valid equations and invalid/range rejection. Included in prebuild. TypeScript and targeted lint checked. Browser tests exercise all five complete forms, all five main-review links, two-answer and open-response questions, skip/Back, audio coverage, mobile overflow and visual inspection. Level 3's complete browser test is rerun because the renderer is now shared. Existing live banks remain untouched.
+
+## Number difficulty review — 23 September 2026
+
+Operand variants rotate independently by question across the five forms, rather than rising with form order. Every form retains the same skill sequence, support and response requirements. This balances number exposure; comparable student difficulty will still need educator review and response evidence.
+
+The three-digit additive equations, facts within 10 × 10 and later extensions through mental strategies are retained. The change is to their distribution across forms, not an across-the-board reduction in demand.

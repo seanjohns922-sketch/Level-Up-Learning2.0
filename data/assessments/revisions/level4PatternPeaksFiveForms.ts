@@ -1,11 +1,14 @@
 import {PP_FORMS,type PPForm,type PPItem,type PPVisual} from './level3PatternPeaksFiveForms';
 const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
-function make(form:PPForm,f:number):PPItem[]{
+// Rotate operand sets independently by skill so no form is uniformly harder.
+function make(form:PPForm,formIndex:number):PPItem[]{
+ const variant=(slot:number)=>[0,3,1,4,2][(formIndex+slot-1)%5];
+ let f=variant(1);
  const out:PPItem[]=[];
  const add=(q:Partial<PPItem>&Pick<PPItem,'skill'|'week'|'prompt'|'visual'>)=>{
   const slot=out.length+1,item:PPItem={id:`pp-l4-${form}-${slot}`,slot,code:slot%2?'AC9M4A01':'AC9M4A02',instruction:'',mode:'number',options:[],correct:0,answers:[],labels:['Your answer'],difficulty:slot<=4?'accessible':slot>=17?'challenging':'moderate',...q};
-  if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
-  out.push(item);
+  if(item.options.length){const shift=(slot+formIndex)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
+  out.push(item);f=variant(slot+1);
  };
  const part=145+f*13,whole=320+f*27;
  add({skill:'Find an unknown addend',week:2,prompt:'What number makes this equation true?',visual:cards({label:'Find the missing part',text:`${part} + ? = ${whole}`}),answers:[whole-part]});

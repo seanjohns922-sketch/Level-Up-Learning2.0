@@ -3,13 +3,23 @@ import fs from 'node:fs';
 import {LEVEL5_PP_FORMS} from '@/data/assessments/revisions/level5PatternPeaksFiveForms';
 import {PP_FORMS,ppEmpty,ppReady,ppScore,ppVisualSpeech,type PPResponse} from '@/data/assessments/revisions/level3PatternPeaksFiveForms';
 const fixtures=[];
-for(const [f,form] of PP_FORMS.entries()){
+for(const [formIndex,form] of PP_FORMS.entries()){
  const items=LEVEL5_PP_FORMS[form];assert.equal(items.length,20);
  for(const [code,count] of [['AC9M5A01',6],['AC9M5A02',8],['AC9M5N10',6]] as const)assert.equal(items.filter(q=>q.code===code).length,count);
- const d=[4,6,5,8,9][f];
- const worked:Record<number,number[]>={1:[12+f],2:[13+f],3:f%2?[2*d,3*d,4*d]:[2*d,3*d],4:[16+2*f,14+f],5:[(14+f)*(23+2*f)],7:[[6,12,15,14,18][f]],8:[14+f],9:[8+f,70+10*f],10:[30+6*f],11:[[24,24,36,30,30][f]],13:[(6+f)*(3+f)],14:[12+4*f],17:[30+5*f,6+f],18:[[6,12],[8,12],[10,12],[12,12],[12,15]][f],20:[[3,4],[4,5],[3,5],[4,7],[5,6]][f]};
- const options:Record<number,string>={6:'Multiplication undoes division by the same number.',12:`${(12+f)*(15+f)} ÷ ${12+f} = ${15+f}`,15:`Multiply the input by ${7+f}.`,16:'The total and group size are both multiplied by 10.',19:`Every multiple of ${[6,10,12,14,15][f]} is also a multiple of ${[3,5,4,7,5][f]}.`};
  for(const q of items){
+ const f=[0,3,1,4,2][(formIndex+q.slot-1)%5];
+ const d=[4,6,5,8,9][f];
+ const worked:Record<number,number[]>={1:[6+f],2:[[18,16,18,16,24][f]],3:f%2?[2*d,3*d,4*d]:[2*d,3*d],4:[12+f,6+f],5:[[144,144,168,144,168][f]],7:[[6,12,15,14,18][f]],8:[6+f],9:[[8,6,9,7,9][f],[70,90,60,80,70][f]],10:[30+6*f],11:[[24,24,36,30,30][f]],13:[[42,32,42,36,48][f]],14:[12+4*f],17:[[40,30,45,35,40][f],[8,6,9,7,8][f]],18:[[6,12],[8,12],[10,12],[12,12],[12,15]][f],20:[[3,4],[4,5],[3,5],[4,7],[5,6]][f]};
+ const options:Record<number,string>={6:'Multiplication undoes division by the same number.',12:`${(6+f)*(12+f)} ÷ ${6+f} = ${12+f}`,15:`Multiply the input by ${[7,9,6,8,7][f]}.`,16:'The total and group size are both multiplied by 10.',19:`Every multiple of ${[6,10,12,14,15][f]} is also a multiple of ${[3,5,4,7,5][f]}.`};
+  // Guard the agreed early calculation load independently of the worked keys.
+  if(q.slot===2||q.slot===5){
+   assert.equal(q.visual.kind,'cards');
+   if(q.visual.kind==='cards'){
+    const numbers=q.visual.cards[0].text.match(/\d+/g)!.map(Number);
+    assert(numbers[0]>=6&&numbers[0]<=9,q.id+' familiar single-digit factor/divisor');
+    if(q.slot===5)assert(numbers[1]>=16&&numbers[1]<=28);
+   }
+  }
   assert(!ppReady(q,ppEmpty()));assert(!ppScore(q,{...ppEmpty(),skipped:true}));assert(ppVisualSpeech(q.visual).length>5);
   const response:PPResponse=options[q.slot]?{...ppEmpty(),choice:q.options.indexOf(options[q.slot]),...(q.mode==='testerChoice'?{tests:[60]}:{})}:{...ppEmpty(),values:worked[q.slot].map(String)};
   assert(ppScore(q,response),q.id);
