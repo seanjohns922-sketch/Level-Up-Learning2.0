@@ -1,10 +1,10 @@
-import {CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
+import {chAnswerCase,CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
 import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 const paints=[['red','#e5484d'],['blue','#3b82f6'],['green','#22c55e'],['yellow','#eab308'],['purple','#a855f7']];
 function make(form:CHForm,f:number):CHItem[]{
  const items:CHItem[]=[],[name,c]=paints[f],[other,d]=paints[(f+1)%5];
  const spinner=(a:number,b:number):ChanceVisual=>({type:'spinner',wedges:[...Array(a).fill(c),...Array(b).fill(d)]});
- const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l6-${form}-${slot}`,slot,code:slot<=8?'AC9M6P01':'AC9M6P02',week:slot<=4?1:slot<=8?2:slot<=11?3:slot<=14?4:slot<=17?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
+ const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l6-${form}-${slot}`,slot,code:slot<=8?'AC9M6P01':'AC9M6P02',week:slot<=4?1:slot<=8?2:slot<=11?3:slot<=14?4:slot<=17?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){item.options=item.options.map(chAnswerCase);const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
  add({skill:'Interpret the probability scale',prompt:f%2?'Which value means an event is certain?':'Which value means an event is impossible?',scale:true,caption:'A probability can be written as a number from 0 to 1.',options:f%2?['1','0','0.5','100']:['0','1','0.5','−1'],explanation:'0 means impossible; 1 means certain. Decimal probabilities lie between 0 and 1.'});
  const p=[.75,.25,.6,.8,.4][f],percent=Math.round(p*100);
  add({skill:'Connect decimals and percentages',prompt:`Which percentage is equivalent to ${p}?`,caption:`The probability of an event is ${p}.`,options:[`${percent}%`,`${p}%`,`${100-percent}%`,`${percent/10}%`],explanation:`Multiply the decimal by 100: ${p} is ${percent}%.`});

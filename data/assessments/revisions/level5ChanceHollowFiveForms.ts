@@ -1,4 +1,4 @@
-import {CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
+import {chAnswerCase,CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
 import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 const paints=[['red','#e5484d'],['blue','#3b82f6'],['green','#22c55e'],['yellow','#eab308'],['purple','#a855f7']];
 export const DIFFERENCE_GRID=Array.from({length:6},(_,i)=>Array.from({length:6},(_,j)=>Math.abs(i-j)));
@@ -6,7 +6,7 @@ function make(form:CHForm,f:number):CHItem[]{
  const items:CHItem[]=[],[name,c]=paints[f],[other,d]=paints[(f+1)%5];
  const bag=(a:number,b:number):ChanceVisual=>({type:'bag',counters:[...Array(a).fill(c),...Array(b).fill(d)]});
  const spinner=(a:number,b:number):ChanceVisual=>({type:'spinner',wedges:[...Array(a).fill(c),...Array(b).fill(d)]});
- const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l5-${form}-${slot}`,slot,code:slot<=9?'AC9M5P01':'AC9M5P02',week:slot<=3?1:slot<=6?2:slot<=9?3:slot<=13?4:slot<=17?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
+ const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l5-${form}-${slot}`,slot,code:slot<=9?'AC9M5P01':'AC9M5P02',week:slot<=3?1:slot<=6?2:slot<=9?3:slot<=13?4:slot<=17?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){item.options=item.options.map(chAnswerCase);const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
  const labels=['Hearts','Diamonds','Clubs','Spades'];
  add({skill:'Choose the outcome set',prompt:'You record only the suit. What are all the possible outcomes?',outcomes:labels,rows:[{label:'Cards in each suit',counts:[13,13,13,13]}],caption:'Shuffle a standard deck of 52 cards with no jokers, then draw one card.',options:['Hearts, diamonds, clubs, spades.','Red and black.','Ace, king, queen, jack.','Hearts and spades.'],explanation:'The outcome set depends on what you record. There are four possible suits.'});
  add({skill:'Distinguish an outcome from a colour group',prompt:'Which outcomes have equal chances?',apparatus:bag(6+f,2+f),caption:`Mix and draw without looking. There are ${6+f} ${name} and ${2+f} ${other} counters, all the same size.`,options:['Each individual counter.','The two colours.','A target colour and any single counter.','The smaller colour group and the whole bag.'],explanation:'Each individual counter can be picked equally easily. The unequal colour groups do not have equal chances.'});

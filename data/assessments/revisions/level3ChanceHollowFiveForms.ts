@@ -1,3 +1,5 @@
+/** Sentence case for prose choices; numerical answers remain unchanged. */
+export const chAnswerCase=(text:string)=>text.replace(/^([a-z])/,letter=>letter.toUpperCase());
 import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 export const CH_FORMS=['pretest','posttest','start','mid','end'] as const;
 export type CHForm=typeof CH_FORMS[number];
@@ -10,7 +12,7 @@ function make(form:CHForm,f:number):CHItem[]{
  const out:CHItem[]=[],[name,c]=paints[f],[other,d]=paints[(f+1)%5],[absent]=paints[(f+2)%5];
  const bag=(a:number,b:number):ChanceVisual=>({type:'bag',counters:[...Array(a).fill(c),...Array(b).fill(d)]});
  const spinner=(a:number,b:number):ChanceVisual=>({type:'spinner',wedges:[...Array(a).fill(c),...Array(b).fill(d)]});
- const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=out.length+1,item:CHItem={id:`ch-l3-${form}-${slot}`,slot,code:slot<=10?'AC9M3P01':'AC9M3P02',week:slot<=4?1:slot<=8?3:slot<=10?4:slot<=16?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}out.push(item);};
+ const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=out.length+1,item:CHItem={id:`ch-l3-${form}-${slot}`,slot,code:slot<=10?'AC9M3P01':'AC9M3P02',week:slot<=4?1:slot<=8?3:slot<=10?4:slot<=16?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){item.options=item.options.map(chAnswerCase);const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}out.push(item);};
  const scale=['Certain','Likely','Unlikely','Impossible'];
  add({skill:'Recognise a certain event',prompt:`How likely is picking a ${name} counter?`,instruction:'Mix the bag and pick one counter without looking.',apparatus:bag(5+f,0),caption:`The bag contains only ${name} counters. All counters are the same size.`,options:scale,explanation:`Every counter is ${name}, so this event is certain.`});
  add({skill:'Recognise an impossible event',prompt:`How likely is picking a ${absent} counter?`,instruction:'Pick one counter without looking.',apparatus:bag(3,3),caption:`There are 3 ${name} and 3 ${other} counters. There are no other counters.`,options:['Impossible','Unlikely','Likely','Certain'],explanation:`There are no ${absent} counters, so it is impossible.`});

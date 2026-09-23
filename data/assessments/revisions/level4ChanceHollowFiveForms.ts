@@ -1,4 +1,4 @@
-import {CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
+import {chAnswerCase,CH_FORMS,type CHForm,type CHItem} from './level3ChanceHollowFiveForms';
 import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 const paints=[['red','#e5484d'],['blue','#3b82f6'],['green','#22c55e'],['yellow','#eab308'],['purple','#a855f7']];
 function make(form:CHForm,f:number):CHItem[]{
@@ -6,7 +6,7 @@ function make(form:CHForm,f:number):CHItem[]{
  const bag=(a:number,b:number):ChanceVisual=>({type:'bag',counters:[...Array(a).fill(c),...Array(b).fill(d)]});
  const spinner=(a:number,b:number):ChanceVisual=>({type:'spinner',wedges:[...Array(a).fill(c),...Array(b).fill(d)]});
  const display=(label:string,a:number,b:number)=>({label,apparatus:bag(a,b),caption:`${a} ${name}, ${b} ${other}. All counters have the same size.`});
- const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l4-${form}-${slot}`,slot,code:slot<=12?'AC9M4P01':'AC9M4P02',week:slot<=3?1:slot<=5?2:slot<=9?3:slot<=11?4:slot<=12?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
+ const add=(q:Partial<CHItem>&Pick<CHItem,'skill'|'prompt'|'caption'|'explanation'>)=>{const slot=items.length+1,item:CHItem={id:`ch-l4-${form}-${slot}`,slot,code:slot<=12?'AC9M4P01':'AC9M4P02',week:slot<=3?1:slot<=5?2:slot<=9?3:slot<=11?4:slot<=12?5:6,instruction:'',mode:'choice',options:[],correct:0,...q};if(item.options.length){item.options=item.options.map(chAnswerCase);const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}items.push(item);};
  const n=4+f;
  add({skill:'Identify equally likely colours',prompt:'Which statement describes the next draw?',apparatus:bag(n,n),caption:`Mix and pick without looking: ${n} ${name} and ${n} ${other} counters of the same size.`,options:[`Both colours have the same chance.`,`${name} is more likely because it is shown first.`,`${other} is more likely because it is shown last.`,`The colours must take turns.`],explanation:'There are equal numbers of the two colours, so neither is more likely.'});
  const counts=[2,5,8],shift=f%3,rot=[...counts.slice(shift),...counts.slice(0,shift)],labels=['A','B','C'];const order=labels.toSorted((a,b)=>rot[labels.indexOf(a)]-rot[labels.indexOf(b)]);
