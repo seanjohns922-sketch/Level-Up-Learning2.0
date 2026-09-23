@@ -25,4 +25,6 @@ Larger numbers alone do not establish curriculum progression. Select scales and 
 
 | 7 | 4–12 supplied observations for summary statistics, measured values and ordered stems | Editable stem-and-leaf rows, dot plots and frequency tables with modest raw counts | Frequency-weighted mean from 1,000 observations (frequencies to 400); mean/median, extremes, skewness and justified comparisons |
 
-For Level 8 onward, explicitly review this table alongside the next level's curriculum before choosing frequency bands. Raise the reading/comparison demand, rather than inflating every raw-data collection. Many-to-one keys, more demanding scales and richer distribution comparisons should be introduced where the curriculum calls for them. Extend the audit so a later rewrite cannot silently flatten the progression.
+| 8 | Small raw samples where a specific mean/outlier effect is tested; explicit sampling frames | Construct a 300-observation sample display | Frequencies to 500 in a 1,000-observation sample; proportions, repeated-sample variation, 1,000-person estimates and sampling uncertainty |
+
+For future levels, explicitly review this table alongside the next level's curriculum before choosing frequency bands. Raise the reading/comparison demand, rather than inflating every raw-data collection. Many-to-one keys, more demanding scales and richer distribution comparisons should be introduced where the curriculum calls for them. Extend the audit so a later rewrite cannot silently flatten the progression.
