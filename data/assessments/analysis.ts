@@ -1,3 +1,4 @@
+import {patternReleaseVisual,scoreReleasedPattern} from '@/lib/pattern-release-response';
 import {statisticaReleaseVisual,scoreReleasedStatistica} from '@/lib/statistica-release-response';
 import {starpathReleaseVisual,scoreReleasedStarpath} from '@/lib/starpath-release-response';
 import { groundNumberReleaseItem } from "./releases/groundNumber";
@@ -137,6 +138,7 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  if(patternReleaseVisual(question))return scoreReleasedPattern(question,chosen);
   if(statisticaReleaseVisual(question))return scoreReleasedStatistica(question,chosen);
   if(starpathReleaseVisual(question))return scoreReleasedStarpath(question,chosen);
   if (question.type === "prepNumberTask") {

@@ -1,0 +1,10 @@
+import {writeFileSync,readFileSync,existsSync} from 'node:fs';
+import {LEVEL3_PP_FORMS as l3} from '../data/assessments/revisions/level3PatternPeaksFiveForms';
+import {LEVEL4_PP_FORMS as l4} from '../data/assessments/revisions/level4PatternPeaksFiveForms';
+import {LEVEL5_PP_FORMS as l5} from '../data/assessments/revisions/level5PatternPeaksFiveForms';
+import {LEVEL6_PP_FORMS as l6} from '../data/assessments/revisions/level6PatternPeaksFiveForms';
+import {LEVEL7_PP_FORMS as l7} from '../data/assessments/revisions/level7PatternPeaksFiveForms';
+import {LEVEL8_PP_FORMS as l8} from '../data/assessments/revisions/level8PatternPeaksFiveForms';
+const path='data/assessments/releases/pattern-v1.json',payload=JSON.stringify([null,null,null,l3,l4,l5,l6,l7,l8],null,2)+'\n';
+if(existsSync(path)&&readFileSync(path,'utf8')!==payload)throw new Error('Release is frozen; use a new version.');
+writeFileSync(path,payload);

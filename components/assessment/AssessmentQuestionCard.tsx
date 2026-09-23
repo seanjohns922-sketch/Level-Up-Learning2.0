@@ -1,4 +1,5 @@
 "use client";
+import ReleasedPatternQuestion from "./ReleasedPatternQuestion";
 import ReleasedStatisticaQuestion from "./ReleasedStatisticaQuestion";
 import ReleasedStarpathQuestion from "./ReleasedStarpathQuestion";
 import Year8MeasurementAssessmentVisual from "./Year8MeasurementAssessmentVisual";
@@ -373,6 +374,7 @@ export default function AssessmentQuestionCard({
     [type, value]
   );
 
+  if(visual?.type==='pattern_released')return <ReleasedPatternQuestion question={question} value={value} onChange={onChange}/>;
   if(visual?.type==='statistica_released')return <ReleasedStatisticaQuestion question={question} value={value} onChange={onChange}/>;
   if(visual?.type==='starpath_released')return <ReleasedStarpathQuestion question={question} value={value} onChange={onChange}/>;
   if (realmId === "space" && question.practiceTask && question.id && question.correctAnswer != null) {

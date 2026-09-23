@@ -1,31 +1,14 @@
 'use client';
+import PatternPeaksAssessmentCard from './PatternPeaksAssessmentCard';
 import Link from 'next/link';
 import {useState,type CSSProperties} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
-import {PP_FORMS,PP_LABELS,PP_OPERATIONS,ppEmpty,ppReady,ppScore,ppVisualSpeech,type PPForm,type PPItem,type PPVisual,type PPResponse} from '@/data/assessments/revisions/level3PatternPeaksFiveForms';
+import {PP_FORMS,PP_LABELS,ppEmpty,ppReady,ppScore,type PPForm,type PPItem,type PPResponse} from '@/data/assessments/revisions/level3PatternPeaksFiveForms';
 import {MathFormattedText} from '@/components/FractionText';
-import {PatternGraph,PointPlotter,FormulaLab} from './PatternPeaksAdvancedVisuals';
-import ReadAloudBtn from '@/components/ReadAloudBtn';
 import AssessmentQuestionNavigator from '@/components/assessment/AssessmentQuestionNavigator';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {stopSpeaking} from '@/lib/speak';
 import styles from './StatisticaFiveForms.module.css';
-import pp from './PatternPeaksFiveForms.module.css';
-function Visual({v}:{v:PPVisual}){
- return <div className={pp.visual}>
- {v.kind==='sequence'?<>{v.rule&&<h4><MathFormattedText text={String(v.rule)}/></h4>}<div className={pp.tiles}>{v.terms.map((n,i)=><div className={pp.tiles} key={i}><span className={pp.tile}><MathFormattedText text={String(n)} fractionSize="lg"/></span>{i<v.terms.length-1&&<span className={pp.arrow} aria-hidden>→</span>}</div>)}</div></>:
- v.kind==='cards'?v.cards.map((c,i)=><div key={i}><h4><MathFormattedText text={String(c.label)}/></h4><div className={pp.equation}><MathFormattedText text={String(c.text)}/></div></div>):
- v.kind==='array'?<><h4>{v.rows} rows of {v.columns} counters</h4>{v.splitAfter&&<p className={pp.splitLabel}>{v.splitAfter} columns + {v.columns-v.splitAfter} columns</p>}<div className={pp.array}>{Array.from({length:v.rows},(_,r)=><div className={pp.arrayRow} key={r}>{Array.from({length:v.columns},(_,c)=><span className={`${pp.counter} ${v.splitAfter&&c>=v.splitAfter?pp.secondPart:''}`} data-pp-counter key={c}/>)}</div>)}</div></>:
- v.kind==='graph'?<PatternGraph v={v}/>:v.kind==='growing'?<div className={pp.growing}>{[1,2,3].map(stage=><div key={stage}><h4>Stage {stage}</h4><div className={pp.growthTiles}><div>{Array.from({length:v.rows},(_,r)=><div className={pp.arrayRow} key={r}>{Array.from({length:stage},(_,c)=><span className={pp.counter} key={c}/>)}</div>)}</div><span className={`${pp.counter} ${pp.fixedTile}`}/></div></div>)}</div>:
- v.kind==='family'?<div className={pp.partModel}><div className={pp.whole}><small>Product</small><strong>{v.product}</strong></div><div className={pp.parts}>{v.factors.map((n,i)=><div key={i}><small>Factor</small><strong>{n}</strong></div>)}</div></div>:
- v.kind==='area'?<svg viewBox='0 0 420 220' role='img' aria-label={ppVisualSpeech(v)}><rect x='60' y='45' width={330*v.left/(v.left+v.right)} height='140' fill='#c4b5fd' stroke='#644398'/><rect x={60+330*v.left/(v.left+v.right)} y='45' width={330*v.right/(v.left+v.right)} height='140' fill='#a7f3d0' stroke='#644398'/><text x={60+165*v.left/(v.left+v.right)} y='30' textAnchor='middle'>{v.left}</text><text x={390-165*v.right/(v.left+v.right)} y='30' textAnchor='middle'>{v.right}</text><text x='30' y='120' textAnchor='middle'>{v.rows}</text></svg>:
- v.kind==='filter'?<><div className={pp.decision}>Does the number divide exactly by {v.divisor}?</div><div className={pp.branches}><div>Yes ↓<div className={pp.branch}>Keep</div></div><div>No ↓<div className={pp.branch}>Leave out</div></div></div></>:
- v.kind==='balance'?<div className={pp.balance}><div className={pp.pans}><div><MathFormattedText text={String(v.left)}/></div><span>=</span><div><MathFormattedText text={String(v.right)}/></div></div><div className={pp.beam}/><div className={pp.stand}/></div>:
- v.kind==='parts'?<div className={pp.partModel}><div className={pp.whole}><small>Whole</small><strong>{v.whole}</strong></div><div className={pp.parts}>{v.parts.map((part,i)=><div key={i}><small>Part {i+1}</small><strong><MathFormattedText text={String(part)}/></strong></div>)}</div><p>Diagram not to scale</p></div>:
- v.kind==='decision'?<><div className={pp.tile}><h4>Input</h4>{v.input}</div><div className={pp.arrow} aria-hidden>↓</div><div className={pp.decision}>Is the number even?</div><div className={pp.branches}><div><strong>Yes ↙</strong><div className={pp.branch}><MathFormattedText text={String(v.yes)}/></div></div><div><strong>No ↘</strong><div className={pp.branch}><MathFormattedText text={String(v.no)}/></div></div></div><div className={pp.arrow} aria-hidden>↓</div><div className={pp.tile}><h4>Output</h4>?</div></>:
- <table className={pp.table}><thead><tr><th scope='col'>Input</th><th scope='col'>Output</th></tr></thead><tbody>{v.inputs.map((n,i)=><tr key={i}><td>{n}</td><td>{v.outputs[i]}</td></tr>)}</tbody></table>}
- </div>;
-}
 export default function PatternPeaksFiveFormReview({level,forms}:{level:3|4|5|6|7|8;forms:Record<PPForm,PPItem[]>}){
  const router=useRouter(),params=useSearchParams();const form=PP_FORMS.find(f=>f===params.get('form'))??'posttest';
  const items=forms[form],count=items.length;
@@ -42,32 +25,10 @@ export default function PatternPeaksFiveFormReview({level,forms}:{level:3|4|5|6|
  <div className={styles.reviewBar}><div className={styles.formTabs}>{PP_FORMS.map(f=><button key={f} aria-pressed={f===form} onClick={()=>select(f,index)}>{PP_LABELS[f]}</button>)}</div><select aria-label='Review question' value={index} onChange={e=>select(form,Number(e.target.value))}>{items.map((q,i)=><option key={q.id} value={i}>{i+1} — {q.skill}</option>)}</select><span>Review only · {count} questions per form · Student results are not saved</span><span>{answered}/{count} recorded</span></div>
  <AssessmentQuestionNavigator answeredFlags={items.map(q=>Boolean(records[q.id]&&ppReady(q,records[q.id])))} currentIndex={index} onJump={i=>select(form,i)} realmId='pattern' reviewMode/>
  <section className={styles.card} aria-labelledby='pp-question-heading' data-question-id={item.id}>
- <p className={styles.counter}>Question {index+1} of {count} · {PP_LABELS[form]}</p><div className={styles.question}><h2 id='pp-question-heading'><MathFormattedText text={String(item.prompt)}/></h2><ReadAloudBtn className={styles.voice} label='Read question' text={`${item.prompt} ${item.instruction}`}/></div>{item.instruction&&<p className={styles.instruction}><MathFormattedText text={String(item.instruction)}/></p>}
- <div className={styles.activity}><div className={styles.source}><div className={styles.panelHeader}><h3>{item.visual.kind==='decision'?'Number pathway':item.visual.kind==='table'?'Number machine':'Look at the model'}</h3><ReadAloudBtn className={styles.voice} label='Read diagram' text={ppVisualSpeech(item.visual)}/></div>{(!item.lab||item.lab.kind==='linear')&&<Visual v={item.visual}/>} {item.lab&&<FormulaLab key={item.id} item={item} response={response} update={update}/>}{item.mode==='testerChoice'&&<DivisibilityTester key={item.id} item={item} response={response} update={update}/>}</div>
- <div className={styles.answer}>
- {(item.mode==='choice'||item.mode==='testerChoice'||item.mode==='labChoice')?item.options.map((o,i)=><div className={styles.option} key={i}><button data-pp-option={i} aria-pressed={!response.skipped&&response.choice===i} onClick={()=>update({...ppEmpty(),tests:response.tests,experiments:response.experiments,choice:i})}><MathFormattedText text={String(o)}/></button><ReadAloudBtn className={styles.voice} kind='option' text={o}/></div>):(item.mode==='select'||item.mode==='filterBuilder')?<div className={pp.builder}>
- <div className={styles.panelHeader}><h3>{item.mode==='select'?'Choose all matching numbers':'Your two tests'}</h3><ReadAloudBtn className={styles.voice} label='Read selection' text={`Selected: ${response.values.join(', ')||'none'}. Choices: ${item.candidates!.join(', ')}. ${item.mode==='filterBuilder'?'Both tests yes: keep. Either test no: leave out.':''}`}/></div>
- {item.mode==='filterBuilder'&&<><div className={pp.steps}>{[0,1].map(i=><div className={pp.step} key={i}>Test {i+1}<strong>{response.values[i]?`Divides exactly by ${response.values[i]}?`:'?'}</strong></div>)}</div><p>Both yes → Keep · Either no → Leave out</p></>}
- <div className={pp.palette}>{item.candidates!.map(n=><div className={pp.operation} key={n}><button data-pp-candidate={n} aria-pressed={response.values.includes(String(n))} disabled={item.mode==='filterBuilder'&&response.values.length===2} onClick={()=>update({...ppEmpty(),values:item.mode==='select'&&response.values.includes(String(n))?response.values.filter(v=>v!==String(n)):[...response.values,String(n)]})}>{item.mode==='select'?n:`Divides exactly by ${n}`}</button><ReadAloudBtn className={styles.voice} kind='option' text={item.mode==='select'?String(n):`Divides exactly by ${n}`}/></div>)}</div>
- {item.mode==='filterBuilder'&&<div className={pp.tools}><button disabled={!response.values.length} onClick={()=>update({...ppEmpty(),values:response.values.slice(0,-1)})}>Undo</button><button disabled={!response.values.length} onClick={()=>update(ppEmpty())}>Clear</button></div>}
- </div>:item.mode==='plot'?<PointPlotter key={item.id} response={response} update={update}/>:item.mode==='algorithm'?<div className={pp.builder}>
- <div className={styles.panelHeader}><h3>Your two steps</h3><ReadAloudBtn className={styles.voice} label='Read your rule' text={`Step 1: ${response.operations[0]??'empty'}. Step 2: ${response.operations[1]??'empty'}. Choices: ${PP_OPERATIONS.join(', ')}. Add the starting number means use the original input, not the result of step one.`}/></div>
- <div className={pp.steps}>{[0,1].map(i=><div className={pp.step} key={i}><small>Step {i+1}</small><strong>{response.operations[i]??'?'}</strong></div>)}</div>
- <p className={styles.instruction}>“Starting number” means the original input.</p>
- <div className={pp.palette}>{PP_OPERATIONS.map(op=><div className={pp.operation} key={op}><button data-pp-operation={op} disabled={response.operations.length===2} onClick={()=>update({...ppEmpty(),operations:[...response.operations,op]})}>{op}</button><ReadAloudBtn className={styles.voice} kind='option' text={op}/></div>)}</div>
- <div className={pp.tools}><button disabled={!response.operations.length} onClick={()=>update({...ppEmpty(),operations:response.operations.slice(0,-1)})}>Undo</button><button disabled={!response.operations.length} onClick={()=>update(ppEmpty())}>Clear</button></div>
- </div>:<><div className={pp.readResponse}><ReadAloudBtn className={styles.voice} label='Read answer boxes' text={item.labels.map((label,i)=>`${label}: ${response.values[i]||'empty'}`).join('. ')}/></div><div className={pp.numbers}>{item.labels.map((label,i)=><label key={i}><MathFormattedText text={String(label)}/><input aria-label={label} inputMode={item.signed?'text':item.decimal?'decimal':'numeric'} autoComplete='off' value={response.values[i]??''} onChange={e=>update({...ppEmpty(),experiments:response.experiments,values:item.labels.map((_,j)=>i===j?e.target.value:response.values[j]??'')})}/></label>)}</div></>}
- </div></div>
- <div className={styles.status} role='status'>{response.skipped?'You chose ‘I don’t know’.':ppReady(item,response)?'Answer recorded.':''}</div>
+ <p className={styles.counter}>Question {index+1} of {count} · {PP_LABELS[form]}</p><PatternPeaksAssessmentCard item={item} response={response} update={update}/>
  <footer className={styles.footer}><button disabled={index===0} onClick={()=>select(form,index-1)}>Back</button><button onClick={()=>{update({...ppEmpty(),skipped:true});advance();}}>I don’t know</button><button className={styles.primary} onClick={advance}>{index===count-1?'Finish':'Next'}</button></footer>
  </section>
  <details className={styles.notes} key={item.id}><summary>Review details</summary><p>{item.code} · {item.skill} · {item.difficulty} · {level>=7?`Year ${level} curriculum review`:`Pattern Peaks lesson week ${item.week}`}</p><button onClick={()=>setShowAnswer(v=>!v)}>{showAnswer?'Hide answer':'Show answer'}</button>{showAnswer&&<p>Expected response: <MathFormattedText text={expected}/></p>}<p>Five parallel forms for content review. Student attempts are unchanged.</p></details>
  {finished[form]&&<div className={styles.notes} role='status'>{PP_LABELS[form]} review: {items.filter(q=>records[q.id]&&ppScore(q,records[q.id])).length}/{count} correct · {answered}/{count} recorded. Nothing was saved to a student record.</div>}
  </div></main>;
-}
-
-function DivisibilityTester({item,response,update}:{item:PPItem;response:PPResponse;update:(r:PPResponse)=>void}){
- const [input,setInput]=useState('');const n=Number(input),valid=/^\d+$/.test(input)&&Number.isInteger(n)&&n>=1&&n<=120;
- const results=(response.tests??[]).map(value=>`${value}: ${item.testDivisors!.map(d=>`${value} divided by ${d} gives ${Math.floor(value/d)}, remainder ${value%d}`).join('; ')}`);
- return <div className={pp.builder}><label>Number to test (1–120)<input aria-label='Number to test' type='number' min={1} max={120} value={input} onChange={e=>setInput(e.target.value)}/></label><button disabled={!valid} onClick={()=>update({...response,skipped:false,tests:[...(response.tests??[]).filter(v=>v!==n),n]})}>Test number</button>{results.length>0&&<><ReadAloudBtn className={styles.voice} label='Read test results' text={results.join('. ')}/><ul>{results.map(result=><li key={result}>{result}</li>)}</ul></>}</div>;
 }

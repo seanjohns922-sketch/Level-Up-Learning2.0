@@ -30,7 +30,7 @@ for (const realm of ["number", "measurement", "space", "statistics", "pattern", 
       for (const q of questions) {
         // Ground model tasks require raw evidence; their rubric is not a valid answer.
         // qa:ground-number-release independently verifies all 100 worked responses.
-        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), q.type !== "prepNumberTask" && !["starpath_released","statistica_released"].includes((q.visual as {type?:string})?.type??""), q.id);
+        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), q.type !== "prepNumberTask" && !["starpath_released","statistica_released","pattern_released"].includes((q.visual as {type?:string})?.type??""), q.id);
         assert.equal(isAssessmentAnswerCorrect(q, "__invalid_answer__"), false, q.id);
         for (const code of (q as { curriculumCodes?: string[] }).curriculumCodes ?? []) assert.ok(AUSTRALIAN_CURRICULUM_V9_PAGES[code], `${q.id}: ${code} must exist in the supplied PDF`);
         count++;
@@ -91,7 +91,7 @@ assert.equal(assessmentEvidenceMetadata("number","Year 1",[{id:"old-v1"}]).asses
 assert.deepEqual(assessmentEvidenceMetadata("statistics","Prep",[]),{},"No Ground Statistica baseline or growth group");
 // Independently execute every ordering of the Level 3 instruction cards.
 for (const [form,inputs,outputs] of [["pretest",[10,7],[16,22]],["posttest",[12,9],[20,28]]] as const) {
-  const qs = form === "pretest" ? getPretestForYearLabel("Year 3","pattern") : getPosttestForYearLabel("Year 3","pattern")!.questions;
+  const qs = form === "pretest" ? getPretestForYearLabel("Year 3","pattern",5,3,3,3,3,3,3,4,4,4,4,4,1,1,1,0) : getPosttestForYearLabel("Year 3","pattern",5,3,3,3,3,3,3,4,4,4,4,4,1,1,1,0)!.questions;
   const q = qs[19]!;
   const cards = q.options as string[];
   const permutations = cards.flatMap(a => cards.filter(b => b !== a).map(b => [a,b,cards.find(c => c !== a && c !== b)!]));

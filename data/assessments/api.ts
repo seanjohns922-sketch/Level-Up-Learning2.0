@@ -1,3 +1,4 @@
+import {releasedPatternQuestions} from './releases/pattern';
 import {releasedStatisticaQuestions} from './releases/statistica';
 import {releasedStarpathQuestions} from './releases/starpath';
 import { YEAR3_MEASUREMENT_RELEASED_FORMS } from './releases/year3Measurement';
@@ -166,7 +167,7 @@ export function getPretestForLevel(level: SupportedMathLevel, realmId: Assessmen
     case "statistics":
       return getStatisticaIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "pattern":
-      return getPatternPeaksIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
+      return releasedPatternQuestions(yearLabelForLevel(level),'pretest') as PretestQuestion[];
     case "chance":
       return getChanceHollowIndependentAssessment(level, "pretest") as unknown as PretestQuestion[];
     case "number":
@@ -198,7 +199,7 @@ export function getPosttestForLevel(level: SupportedMathLevel, realmId: Assessme
     case "statistics":
       return { yearLabel: yearLabelForLevel(level), questions: getStatisticaIndependentAssessment(level, "posttest") };
     case "pattern":
-      return { yearLabel: yearLabelForLevel(level), questions: getPatternPeaksIndependentAssessment(level, "posttest") };
+      return { yearLabel: yearLabelForLevel(level), questions: releasedPatternQuestions(yearLabelForLevel(level),'posttest') } as PostTest;
     case "chance":
       return { yearLabel: yearLabelForLevel(level), questions: getChanceHollowIndependentAssessment(level, "posttest") };
     case "number":
@@ -225,7 +226,7 @@ export function getAssessmentYearLabel(level: SupportedMathLevel): string {
   return yearLabelForLevel(level);
 }
 
-export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4,measurementReleaseVersion:0|1=1,spaceReleaseVersion:0|1=1,statisticsReleaseVersion:0|1=1): PretestQuestion[] {
+export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4,measurementReleaseVersion:0|1=1,spaceReleaseVersion:0|1=1,statisticsReleaseVersion:0|1=1,patternReleaseVersion:0|1=1): PretestQuestion[] {
   switch (realmId) {
     case "space":
       return spaceReleaseVersion===1 ? releasedStarpathQuestions(yearLabel,'pretest') as PretestQuestion[] : getStarpathPretest(yearLabel);
@@ -234,7 +235,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
     case "statistics":
       return statisticsReleaseVersion===1 ? releasedStatisticaQuestions(yearLabel,'pretest') as PretestQuestion[] : getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "pattern":
-      return getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
+      return patternReleaseVersion===1 ? releasedPatternQuestions(yearLabel,'pretest') as PretestQuestion[] : getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "chance":
       return getChanceHollowIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "pretest") as unknown as PretestQuestion[];
     case "number":
@@ -264,7 +265,7 @@ export function getPretestForYearLabel(yearLabel: string, realmId: AssessmentRea
   return getPretestForYear(yearLabel);
 }
 
-export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4,measurementReleaseVersion:0|1=1,spaceReleaseVersion:0|1=1,statisticsReleaseVersion:0|1=1): PostTest | undefined {
+export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRealmId = "number", numberLevel1Version: 2 | 3 | 5 = 5, groundNumberVersion: 1 | 3 = 3, numberLevel2Version: 2 | 3 = 3, numberLevel4Version: 2 | 3 = 3, numberLevel5Version: 2 | 3 = 3, numberLevel6Version: 2 | 3 = 3, numberLevel3Version: 2 | 3 = 3, groundMeasurementVersion: 3 | 4 = 4, year1MeasurementVersion:3|4=4, year2MeasurementVersion:3|4=4, year5MeasurementVersion:3|4=4, year6MeasurementVersion:3|4=4,measurementReleaseVersion:0|1=1,spaceReleaseVersion:0|1=1,statisticsReleaseVersion:0|1=1,patternReleaseVersion:0|1=1): PostTest | undefined {
   switch (realmId) {
     case "space":
       return spaceReleaseVersion===1 ? {yearLabel,questions:releasedStarpathQuestions(yearLabel,'posttest')} as PostTest : getStarpathPosttest(yearLabel);
@@ -273,7 +274,7 @@ export function getPosttestForYearLabel(yearLabel: string, realmId: AssessmentRe
     case "statistics":
       return { yearLabel, questions: statisticsReleaseVersion===1 ? releasedStatisticaQuestions(yearLabel,'posttest') : getStatisticaIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") } as PostTest;
     case "pattern":
-      return { yearLabel, questions: getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
+      return { yearLabel, questions: patternReleaseVersion===1 ? releasedPatternQuestions(yearLabel,'posttest') : getPatternPeaksIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") } as PostTest;
     case "chance":
       return { yearLabel, questions: getChanceHollowIndependentAssessment(Number(yearLabel.replace(/\D/g, "")), "posttest") };
     case "number":
