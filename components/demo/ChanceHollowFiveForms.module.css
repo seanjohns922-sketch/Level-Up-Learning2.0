@@ -2,3 +2,5 @@
 
 .displays{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}.displays h4{font-weight:800;text-align:center;margin-bottom:6px}.displays p{font-size:14px;text-align:center}.displays svg{width:100%;height:auto;max-height:150px}.displays :global(.chance-visual){padding:6px;background:white;border-color:var(--ring)}
 .displays :global([data-chance-visual=coin]) svg{max-height:100px}
+
+.matrix table{font-size:16px;table-layout:fixed}.matrix th,.matrix td{padding:7px 3px;text-align:center}.matrix th:first-child{width:80px;font-size:12px}.matrix caption{font-weight:700;margin:8px 0}
