@@ -7,6 +7,7 @@ export type PPVisual=
  |{kind:'sequence';terms:(number|string)[];rule?:string}
  |{kind:'cards';cards:{label:string;text:string}[]}
  |{kind:'array';rows:number;columns:number;splitAfter?:number}
+ |{kind:'graph';points:[number,number][];xTicks:number[];yTicks:number[];xLabel:string;yLabel:string;caption:string;source?:string}
  |{kind:'growing';rows:number}
  |{kind:'family';product:number;factors:number[]}
  |{kind:'area';rows:number;left:number;right:number}
@@ -15,8 +16,8 @@ export type PPVisual=
  |{kind:'parts';whole:number;parts:(number|string)[]}
  |{kind:'decision';input:number;yes:string;no:string}
  |{kind:'table';inputs:number[];outputs:number[]};
-export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07'|'AC9M4A01'|'AC9M4A02'|'AC9M5A01'|'AC9M5A02'|'AC9M5N10'|'AC9M6A01'|'AC9M6A02'|'AC9M6A03';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm'|'equivalent'|'select'|'product'|'testerChoice'|'filterBuilder'|'linearPair';options:string[];correct:number;answers:number[];labels:string[];decimal?:boolean;total?:number;candidates?:number[];testDivisors?:number[];targetMultiple?:number;maxFactor?:number;equivalence?:{left:number;right:number;max:number};multiplier?:number;algorithmOffset?:number;difficulty:'accessible'|'moderate'|'challenging'};
-export type PPResponse={choice?:number;values:string[];operations:PPOperation[];tests?:number[];skipped?:boolean};
+export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07'|'AC9M4A01'|'AC9M4A02'|'AC9M5A01'|'AC9M5A02'|'AC9M5N10'|'AC9M6A01'|'AC9M6A02'|'AC9M6A03'|'AC9M7A01'|'AC9M7A02'|'AC9M7A03'|'AC9M7A04'|'AC9M7A05'|'AC9M7A06';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm'|'equivalent'|'select'|'product'|'testerChoice'|'filterBuilder'|'linearPair'|'plot'|'labChoice'|'labNumber';options:string[];correct:number;answers:number[];labels:string[];lab?:{kind:"volume"|"distance";initial:number[];required:number[][]};plotPoints?:[number,number][];decimal?:boolean;total?:number;candidates?:number[];testDivisors?:number[];targetMultiple?:number;maxFactor?:number;equivalence?:{left:number;right:number;max:number};multiplier?:number;algorithmOffset?:number;difficulty:'accessible'|'moderate'|'challenging'};
+export type PPResponse={choice?:number;values:string[];operations:PPOperation[];tests?:number[];points?:[number,number][];experiments?:number[][];skipped?:boolean};
 const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
 const seq=(terms:(number|string)[],rule?:string):PPVisual=>({kind:'sequence',terms,rule});
 function make(form:PPForm,f:number):PPItem[]{
@@ -72,10 +73,12 @@ export const LEVEL3_PP_FORMS=Object.fromEntries(PP_FORMS.map((f,i)=>[f,make(f,i)
 export const ppEmpty=():PPResponse=>({values:[],operations:[]});
 export function ppReady(q:PPItem,r:PPResponse):boolean{
  if(r.skipped)return true;
+ if(q.lab&&!q.lab.required.every(row=>r.experiments?.some(run=>run.length===row.length&&run.every((n,i)=>n===row[i]))))return false;
+ if(q.mode==='plot')return r.points?.length===q.plotPoints!.length&&new Set(r.points.map(p=>p.join(','))).size===r.points.length&&r.points.every(([x,y])=>Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&x<=6&&y>=0&&y<=12);
  if(q.mode==='testerChoice'&&(!r.tests?.length||!r.tests.every(n=>Number.isInteger(n)&&n>=1&&n<=120)))return false;
  if(q.mode==='select')return r.values.length>0&&new Set(r.values).size===r.values.length&&r.values.every(v=>q.candidates!.includes(Number(v)));
  if(q.mode==='filterBuilder')return r.values.length===2&&r.values.every(v=>q.candidates!.includes(Number(v)));
- if(q.mode==='choice'||q.mode==='testerChoice')return Number.isInteger(r.choice)&&r.choice!>=0&&r.choice!<4;
+ if(q.mode==='choice'||q.mode==='testerChoice'||q.mode==='labChoice')return Number.isInteger(r.choice)&&r.choice!>=0&&r.choice!<4;
  if(q.mode==='algorithm')return r.operations.length===2&&r.operations.every(v=>PP_OPERATIONS.includes(v));
  if(q.decimal)return r.values.length===q.labels.length&&r.values.every(v=>/^\d+(\.\d+)?$/.test(v)&&Number.isFinite(Number(v)));
  return r.values.length===q.labels.length&&r.values.every(v=>/^\d+$/.test(v)&&Number.isSafeInteger(Number(v)));
@@ -83,7 +86,8 @@ export function ppReady(q:PPItem,r:PPResponse):boolean{
 export function ppRun(input:number,ops:readonly PPOperation[]):number{return ops.reduce((v,op)=>op==='Double'?v*2:op==='Halve'?v/2:op==='Add 5'?v+5:v+input,input);}
 export function ppScore(q:PPItem,r:PPResponse):boolean{
  if(r.skipped||!ppReady(q,r))return false;
- if(q.mode==='choice'||q.mode==='testerChoice')return r.choice===q.correct;
+ if(q.mode==='choice'||q.mode==='testerChoice'||q.mode==='labChoice')return r.choice===q.correct;
+ if(q.mode==='plot')return q.plotPoints!.every(([x,y])=>r.points!.some(p=>p[0]===x&&p[1]===y));
  if(q.mode==='select')return r.values.length===q.answers.length&&q.answers.every(n=>r.values.includes(String(n)));
  if(q.mode==='filterBuilder')return ppLcm(Number(r.values[0]),Number(r.values[1]))===q.targetMultiple;
  if(q.mode==='linearPair')return r.values.every(v=>Number(v)>=1&&Number(v)<=20)&&3*Number(r.values[0])+Number(r.values[1])===q.total;
@@ -95,6 +99,7 @@ export function ppScore(q:PPItem,r:PPResponse):boolean{
 }
 export function ppLcm(a:number,b:number):number{let x=a,y=b;while(y){const r=x%y;x=y;y=r;}return a*b/x;}
 export function ppVisualSpeech(v:PPVisual):string{
+ if(v.kind==='graph')return `${v.caption} Horizontal axis: ${v.xLabel}. Vertical axis: ${v.yLabel}. Points: ${v.points.map(p=>p.join(', ')).join('; ')}.`;
  if(v.kind==='growing')return `Stages 1, 2 and 3. Each has ${v.rows} rows of purple tiles and one green tile. Stage 1 has one purple column, stage 2 has two, stage 3 has three.`;
  if(v.kind==='family')return `Product ${v.product}. Factors ${v.factors.join(' and ')}.`;
  if(v.kind==='area')return `${v.rows} rows. The left part has ${v.left} columns; the right part has ${v.right} columns. Find the missing partial product.`;
