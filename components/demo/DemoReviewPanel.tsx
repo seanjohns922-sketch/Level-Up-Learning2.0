@@ -83,6 +83,7 @@ function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "
   if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${kind}`;
   if(realm === "chance" && year === "Year 5") return `/demo-review/chance-level5?form=${kind}`;
   if(realm === "chance" && year === "Year 7") return `/demo-review/chance-level7?form=${kind}`;
+  if(realm === "chance" && year === "Year 8") return `/demo-review/chance-level8?form=${kind}`;
   if(realm === "chance" && year === "Year 6") return `/demo-review/chance-level6?form=${kind}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${kind}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${kind}`;
@@ -142,6 +143,7 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
   if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 5") return `/demo-review/chance-level5?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 7") return `/demo-review/chance-level7?form=${checkpoint}`;
+  if(realm === "chance" && year === "Year 8") return `/demo-review/chance-level8?form=${checkpoint}`;
   if(realm === "chance" && year === "Year 6") return `/demo-review/chance-level6?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${checkpoint}`;
@@ -177,7 +179,7 @@ function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: 
 }
 
 function hasPretest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "chance" && year === "Year 7") return true;
+  if (realm === "chance" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "pattern" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "statistics" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "space" && (year === "Year 7" || year === "Year 8")) return true;
@@ -187,7 +189,7 @@ function hasPretest(realm: ReviewRealm, year: YearLabel) {
 }
 
 function hasPosttest(realm: ReviewRealm, year: YearLabel) {
-  if (realm === "chance" && year === "Year 7") return true;
+  if (realm === "chance" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "pattern" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "statistics" && (year === "Year 7" || year === "Year 8")) return true;
   if (realm === "space" && (year === "Year 7" || year === "Year 8")) return true;
@@ -264,7 +266,7 @@ export default function DemoReviewPanel() {
     if (realm === "statistics" && levelNumber > 8) setYear("Year 8");
     if (realm === "pattern" && levelNumber > 8) setYear("Year 8");
     if (realm === "pattern" && levelNumber < 3) setYear("Year 3");
-    if (realm === "chance" && levelNumber > 7) setYear("Year 7");
+    if (realm === "chance" && levelNumber > 8) setYear("Year 8");
     if (realm === "chance" && levelNumber < 3) setYear("Year 3");
   }, [levelNumber, realm, year]);
 
@@ -444,7 +446,7 @@ export default function DemoReviewPanel() {
             </label>
             <label className="text-xs font-bold text-white/60">Level
               <select value={year} onChange={(event) => setYear(event.target.value as YearLabel)} className="mt-2 h-11 w-full border border-white/15 bg-[#171a22] px-3 text-sm font-bold text-white">
-                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "measurement" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "space" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "statistics" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "pattern" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "chance" ? [{id:"Year 7",label:"Level 7"}] : [])]
+                {[...LEVEL_CATALOG, ...(realm === "number" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "measurement" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "space" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "statistics" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "pattern" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : realm === "chance" ? [{id:"Year 7",label:"Level 7"},{id:"Year 8",label:"Level 8"}] : [])]
                   .filter((item) => realm !== "statistics" || item.id !== "Prep")
                   .filter((item) => realm !== "pattern" || Number(item.id.replace("Year ", "")) >= 3)
                   .filter((item) => realm !== "chance" || Number(item.id.replace("Year ", "")) >= 3)
