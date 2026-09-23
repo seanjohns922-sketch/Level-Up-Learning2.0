@@ -1,4 +1,5 @@
 'use client';
+import ChanceWeatherForecast from '@/components/chance-hollow/ChanceWeatherForecast';
 import ChanceContextScene from '@/components/chance-hollow/ChanceContextScene';
 import Link from 'next/link';
 import ChanceOutcomePicture from './ChanceOutcomePicture';
@@ -32,7 +33,7 @@ export default function ChanceHollowFiveFormReview({level=3,forms=LEVEL3_CHANCE_
  <div className={styles.question}><h2 id='ch-question'><MathFormattedText text={q.prompt}/></h2><ReadAloudBtn text={[q.prompt,q.instruction].filter(Boolean).join('. ')} label='Read question' className={styles.voice}/></div>{q.instruction&&<p className={styles.instruction}>{q.instruction}</p>}
  <div className={styles.activity}><div className={styles.source}><div className={styles.panelHeader}><h3>{q.mode==='experiment'?'Try the experiment':q.rows||trials?'Experiment results':'Look at the evidence'}</h3><ReadAloudBtn text={chSpeech(q,r)} label='Read diagram' className={styles.voice}/></div>
  <p className={ch.caption}><MathFormattedText text={q.caption}/></p>
- {q.scene&&<ChanceContextScene scene={q.scene} count={Number(q.caption.match(/^\d+/)?.[0])||undefined}/>}
+ {q.forecastPercent!==undefined?<ChanceWeatherForecast percent={q.forecastPercent}/>:q.scene&&<ChanceContextScene scene={q.scene} count={Number(q.caption.match(/^\d+/)?.[0])||undefined}/>}
  {q.tiles&&<div className={ch.tiles} aria-label='Given outcomes or values'>{q.tiles.map((t,i)=><span key={i}><MathFormattedText text={t}/></span>)}</div>}
  {q.scale&&<svg viewBox='0 0 440 110' role='img' aria-label='Probability scale from 0 to 1 and 0 percent to 100 percent'><line x1='32' y1='45' x2='408' y2='45' stroke='currentColor' strokeWidth='3'/>{[0,.25,.5,.75,1].map((v,i)=><g key={v}><line x1={32+i*94} y1='36' x2={32+i*94} y2='54' stroke='currentColor'/><text x={32+i*94} y='26' textAnchor='middle' fontSize='16'>{v}</text><text x={32+i*94} y='77' textAnchor='middle' fontSize='16'>{v*100}%</text></g>)}</svg>}
 
