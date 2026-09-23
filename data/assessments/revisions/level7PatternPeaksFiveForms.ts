@@ -16,7 +16,7 @@ function make(form:PPForm,fi:number):PPItem[]{
  const m=2+f%3;
  add({skill:'Generate function values',prompt:'Complete the outputs for x = 1, 3 and 5.',visual:cards(`y = ${m}x + 2`),labels:['y when x = 1','y when x = 3','y when x = 5'],answers:[m+2,3*m+2,5*m+2]});
  const l=3+f;
- add({skill:'Investigate one variable digitally',prompt:'Keep length and width fixed. What happens when height doubles?',instruction:'Use the formula lab for at least two different settings before choosing.',visual:cards('V = l × w × h. Dimensions are in cm; V is in cm³.'),mode:'labChoice',lab:{kind:'volume',initial:[l,2,3],required:[[l,2,3],[l,2,6]]},options:['Volume doubles.','Volume stays the same.','Volume increases by 2 cm³.','Volume becomes four times as large.']});
+ add({skill:'Investigate one variable digitally',prompt:'The height doubles. What happens to the volume?',instruction:'Change the height from 3 cm to 6 cm, then calculate. Length and width stay fixed.',visual:cards('V = l × w × h. Dimensions are in cm; V is in cm³.'),mode:'labChoice',lab:{kind:'volume',initial:[l,2,3],required:[[l,2,3],[l,2,6]]},options:['Volume doubles.','Volume stays the same.','Volume increases by 2 cm³.','Volume becomes four times as large.']});
  const len=8+f;
  add({skill:'Use an area formula',prompt:'What is the area in square centimetres?',visual:cards(`A = l × w. Length l = ${len} cm and width w = 6 cm.`),answers:[len*6]});
  const fee=5+f;
@@ -28,7 +28,7 @@ function make(form:PPForm,fi:number):PPItem[]{
  const rows=2+f%3;
  add({skill:'Represent visual growth algebraically',prompt:'Which rule gives T, the tile count at stage n?',instruction:'Each stage adds one purple column. The green tile stays.',visual:{kind:'growing',rows},mode:'choice',options:[`T = ${rows}n + 1`,`T = ${rows+1}n`,`T = n + ${rows+1}`,`T = ${rows}(n + 1)`]});
  const speed=20+5*f;
- add({skill:'Systematically vary time in a formula',prompt:'How many extra kilometres are travelled when time changes from 2 to 3 hours?',instruction:'Keep speed fixed. Test both times in the formula lab.',visual:cards(`d = v × t. Speed v = ${speed} km/h.`),mode:'labNumber',lab:{kind:'distance',initial:[speed,2],required:[[speed,2],[speed,3]]},answers:[speed]});
+ add({skill:'Systematically vary time in a formula',prompt:'How many extra kilometres are travelled when time changes from 2 to 3 hours?',instruction:'Change the time from 2 to 3 hours, then calculate. Speed stays fixed.',visual:cards(`d = v × t. Speed v = ${speed} km/h.`),mode:'labNumber',lab:{kind:'distance',initial:[speed,2],required:[[speed,2],[speed,3]]},answers:[speed]});
  const v=30+5*f;
  add({skill:'Substitute two quantities',prompt:'How far is travelled in kilometres?',visual:cards(`d = v × t. Speed v = ${v} km/h; time t = 3 hours.`),answers:[3*v]});
  a=4+f;
@@ -39,7 +39,7 @@ function make(form:PPForm,fi:number):PPItem[]{
  add({skill:'Compare rates using graph slopes',prompt:'During which interval does distance from home increase fastest?',visual:travel([[0,0],[2,2],[4,2+height],[6,3+height],[8,3+height]],'Illustrative journey. Compare equal two-minute intervals.'),mode:'choice',options:['Minutes 2–4','Minutes 0–2','Minutes 4–6','Minutes 6–8']});
  const offset=f%3;
  add({skill:'Plot a function on Cartesian axes',prompt:'Plot all three points for this rule.',instruction:'Use x = 1, 3 and 5. Tap grid points, or enter coordinates and add each point. Tap a selected point to remove it.',visual:cards(`y = 2x + ${offset}`),mode:'plot',plotPoints:[[1,2+offset],[3,6+offset],[5,10+offset]],answers:[]});
- add({skill:'Vary two formula inputs',prompt:'Keep height fixed. What happens to volume when length and width both double?',instruction:'Test at least two settings in the formula lab.',visual:cards('V = l × w × h.'),mode:'labChoice',lab:{kind:'volume',initial:[2+f,2,3],required:[[2+f,2,3],[(2+f)*2,4,3]]},options:['It becomes four times as large.','It doubles.','It becomes eight times as large.','It increases by 4 cm³.']});
+ add({skill:'Vary two formula inputs',prompt:'Keep height fixed. What happens to volume when length and width both double?',instruction:'Double the original length and width, then calculate. Height stays fixed.',visual:cards('V = l × w × h.'),mode:'labChoice',lab:{kind:'volume',initial:[2+f,2,3],required:[[2+f,2,3],[(2+f)*2,4,3]]},options:['It becomes four times as large.','It doubles.','It becomes eight times as large.','It increases by 4 cm³.']});
  add({skill:'Interpret a formula variable',prompt:'What does b represent in this scoring formula?',visual:cards('S = 6g + b. A goal earns 6 points. A behind earns 1 point. S is total points.'),mode:'choice',options:['The number of behinds','The points from goals','The total number of scoring attempts','The total score divided by 6']});
  const width=3+f;
  add({skill:'Write an expression with two equal sides',prompt:'Which expression gives the rectangle’s perimeter?',visual:cards(`Length is n cm. Width is ${width} cm.`),mode:'choice',options:[`2n + ${2*width}`,`n + ${width}`,`${width}n`,`2n + ${width}`]});
@@ -49,7 +49,7 @@ function make(form:PPForm,fi:number):PPItem[]{
  add({skill:'Interpret a falling distance graph',prompt:'What happens between minute 4 and minute 8?',visual:travel([[0,0],[4,dist],[8,0]],'Illustrative trip: distance from home, not total distance travelled.'),mode:'choice',options:['The traveller gets closer to home.','The total distance already travelled decreases.','The traveller stays in one place.','The traveller moves farther from home.']});
  const gradient=2+f%3;
  add({skill:'Connect a graph to its function rule',prompt:'Which rule matches the plotted points?',visual:{kind:'graph',points:[[0,1],[1,gradient+1],[2,2*gradient+1],[3,3*gradient+1]],xTicks:[0,1,2,3,4],yTicks:[0,2,4,6,8,10,12,14],xLabel:'x',yLabel:'y',caption:'Points from a linear function.'},mode:'choice',options:[`y = ${gradient}x + 1`,`y = x + ${gradient}`,`y = ${gradient+1}x`,`y = ${gradient}x − 1`]});
- add({skill:'Keep a formula output constant',prompt:'Length doubles and height stays fixed. How must width change to keep the same volume?',instruction:'Compare settings in the formula lab.',visual:cards('V = l × w × h.'),mode:'labChoice',lab:{kind:'volume',initial:[3+f,4,2],required:[[3+f,4,2],[(3+f)*2,2,2]]},options:['Halve the width.','Double the width.','Keep the width unchanged.','Multiply the width by four.']});
+ add({skill:'Keep a formula output constant',prompt:'Length doubles and height stays fixed. How must width change to keep the same volume?',instruction:'The new length is already doubled. Adjust the width until both volumes match.',visual:cards('V = l × w × h.'),mode:'labChoice',lab:{kind:'volume',initial:[3+f,4,2],required:[[3+f,4,2],[(3+f)*2,2,2]]},options:['Halve the width.','Double the width.','Keep the width unchanged.','Multiply the width by four.']});
  const h=4+f;
  add({skill:'Use a formula with three quantities',prompt:'What is the total pay in dollars?',visual:cards(`P = rh + b. Hourly rate r = $12; hours h = ${h}; bonus b = $15.`),answers:[12*h+15]});
  const discount=2+f;
@@ -60,7 +60,7 @@ function make(form:PPForm,fi:number):PPItem[]{
  const stage=8+f;
  add({skill:'Work backwards from a pattern rule',prompt:'Which stage has this many tiles?',visual:cards(`T = 3n + 2, where n is the stage. T = ${3*stage+2}.`),answers:[stage]});
  const length=3+f,targetHeight=5+f%3;
- add({skill:'Find a formula input digitally',prompt:'What height makes the target volume?',instruction:'Keep length and width fixed. Test at least two heights, including your answer.',visual:cards(`Length ${length} cm; width 2 cm; target volume ${length*2*targetHeight} cm³.`),mode:'labNumber',lab:{kind:'volume',initial:[length,2,2],required:[[length,2,2],[length,2,targetHeight]]},answers:[targetHeight]});
+ add({skill:'Find a formula input digitally',prompt:`What height makes a volume of ${length*2*targetHeight} cm³?`,instruction:'Change only the height. Calculate until you reach the target volume.',visual:cards(`Length ${length} cm; width 2 cm; target volume ${length*2*targetHeight} cm³.`),mode:'labNumber',lab:{kind:'volume',initial:[length,2,2],required:[[length,2,2],[length,2,targetHeight]]},answers:[targetHeight]});
  return out;
 }
 export const LEVEL7_PP_FORMS=Object.fromEntries(PP_FORMS.map((form,i)=>[form,make(form,i)])) as Record<PPForm,PPItem[]>;
