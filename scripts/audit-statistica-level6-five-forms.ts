@@ -25,6 +25,7 @@ for(const form of STATISTICA_FORMS){
   if(q.slot===9)assert.equal(Number(label),q.counts[1]-q.counts[0]);
   if(q.slot===13){assert(q.linePoints!.every(p=>p.value<=q.graphMax!));assert(q.linePoints![1].value<q.linePoints![0].value);}
   if(q.slot===17){const v=q.categories.map(c=>parseFloat(c.name)*(c.name.endsWith(' m')?100:1));assert(Math.abs(Math.max(...v)-Math.min(...v)-parseFloat(label!))<1e-8);}
+  if(q.slot===15||q.slot===16){assert(q.plantSetup?.plant);assert(q.plantSetup!.weeks>=4);if(q.slot===16)assert(q.plantSetup!.perGroup!>=20);}
   if(q.slot===18){assert.deepEqual(q.answer,q.counts);assert.equal(Math.max(...q.counts),300);}
   if(q.slot===19){assert.equal(range(q.counts),20);assert.equal(range(q.secondCounts!),40);}
   if(q.slot===20||q.slot===14){assert.equal(q.counts.reduce((a,b)=>a+b),750);assert(Math.max(...q.counts)<375);}
