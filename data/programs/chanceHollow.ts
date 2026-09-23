@@ -65,7 +65,7 @@ const LEVEL_4_SEEDS: readonly ChanceWeekSeed[] = [
   {
     topic: "Events That Affect Each Other",
     purpose: "Recognise when one event changes the chance of the next (dependent) or leaves it unchanged (independent).",
-    curriculum: ["AC9M4P02"],
+    curriculum: ["AC9M4P01"],
     lessons: ["Does It Change?", "Spot the Link", "Predict the Next Draw"],
   },
   {
@@ -83,7 +83,7 @@ const LEVEL_4_SEEDS: readonly ChanceWeekSeed[] = [
   {
     topic: "Repeated Experiments and Variation",
     purpose: "Predict, run repeated chance experiments and notice that results vary from run to run.",
-    curriculum: ["AC9M4P01"],
+    curriculum: ["AC9M4P02"],
     lessons: ["Predict From the Tool", "Run and Record", "Compare Expected and Actual"],
   },
 ];

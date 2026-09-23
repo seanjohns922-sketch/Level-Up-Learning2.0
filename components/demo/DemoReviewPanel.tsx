@@ -80,6 +80,7 @@ const STARPATH_REVIEW_BANKS: Partial<Record<YearLabel, Partial<Record<"pretest" 
 
 function assessmentHref(realm: ReviewRealm, year: YearLabel, kind: "pretest" | "posttest") {
   if(realm === "chance" && year === "Year 3") return `/demo-review/chance-level3?form=${kind}`;
+  if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${kind}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${kind}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${kind}`;
   if(realm === "pattern" && year === "Year 6") return `/demo-review/pattern-level6?form=${kind}`;
@@ -135,6 +136,7 @@ const DIAGNOSTIC_STRAND_FOR_REALM: Record<ReviewRealm, string> = {
 
 function diagnosticPreviewHref(realm: ReviewRealm, year: YearLabel, checkpoint: "start" | "mid" | "end") {
   if(realm === "chance" && year === "Year 3") return `/demo-review/chance-level3?form=${checkpoint}`;
+  if(realm === "chance" && year === "Year 4") return `/demo-review/chance-level4?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 4") return `/demo-review/pattern-level4?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 5") return `/demo-review/pattern-level5?form=${checkpoint}`;
   if(realm === "pattern" && year === "Year 6") return `/demo-review/pattern-level6?form=${checkpoint}`;
