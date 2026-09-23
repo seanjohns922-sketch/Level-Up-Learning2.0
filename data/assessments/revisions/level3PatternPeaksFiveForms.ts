@@ -6,10 +6,12 @@ export const PP_OPERATIONS:PPOperation[]=['Halve','Add the starting number','Add
 export type PPVisual=
  |{kind:'sequence';terms:(number|string)[];rule?:string}
  |{kind:'cards';cards:{label:string;text:string}[]}
- |{kind:'array';rows:number;columns:number}
+ |{kind:'array';rows:number;columns:number;splitAfter?:number}
+ |{kind:'balance';left:string;right:string}
+ |{kind:'parts';whole:number;parts:(number|string)[]}
  |{kind:'decision';input:number;yes:string;no:string}
  |{kind:'table';inputs:number[];outputs:number[]};
-export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm';options:string[];correct:number;answers:number[];labels:string[];total?:number;multiplier?:number;difficulty:'accessible'|'moderate'|'challenging'};
+export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07'|'AC9M4A01'|'AC9M4A02';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm'|'equivalent';options:string[];correct:number;answers:number[];labels:string[];total?:number;equivalence?:{left:number;right:number;max:number};multiplier?:number;difficulty:'accessible'|'moderate'|'challenging'};
 export type PPResponse={choice?:number;values:string[];operations:PPOperation[];skipped?:boolean};
 const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
 const seq=(terms:(number|string)[],rule?:string):PPVisual=>({kind:'sequence',terms,rule});
@@ -75,13 +77,16 @@ export function ppScore(q:PPItem,r:PPResponse):boolean{
  if(r.skipped||!ppReady(q,r))return false;
  if(q.mode==='choice')return r.choice===q.correct;
  if(q.mode==='algorithm')return Array.from({length:11},(_,i)=>i).every(v=>ppRun(v,r.operations)===v*q.multiplier!);
+ if(q.mode==='equivalent')return r.values.every(v=>Number(v)>0&&Number(v)<=q.equivalence!.max)&&q.equivalence!.left+Number(r.values[0])===q.equivalence!.right+Number(r.values[1]);
  if(q.mode==='partition')return r.values.every(v=>Number(v)>0)&&r.values.reduce((a,b)=>a+Number(b),0)===q.total;
  return r.values.every((v,i)=>Number(v)===q.answers[i]);
 }
 export function ppVisualSpeech(v:PPVisual):string{
  if(v.kind==='cards')return v.cards.map(c=>`${c.label}: ${c.text}`).join('. ');
  if(v.kind==='sequence')return `${v.rule??''}. ${v.terms.join(', ')}`;
- if(v.kind==='array')return `${v.rows} rows of ${v.columns} counters.`;
+ if(v.kind==='array')return `${v.rows} rows of ${v.columns} counters.${v.splitAfter?` Split into ${v.splitAfter} columns and ${v.columns-v.splitAfter} columns.`:''}`;
+ if(v.kind==='balance')return `Equal sides. Left: ${v.left}. Right: ${v.right}.`;
+ if(v.kind==='parts')return `Whole: ${v.whole}. Parts: ${v.parts.join(', ')}. Diagram not to scale.`;
  if(v.kind==='decision')return `Input ${v.input}. Is it even? Yes: ${v.yes}. No: ${v.no}. Output unknown.`;
  return `Input and output table. ${v.inputs.map((n,i)=>`Input ${n}, output ${v.outputs[i]}`).join('. ')}`;
 }

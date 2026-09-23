@@ -1,0 +1,52 @@
+import {PP_FORMS,type PPForm,type PPItem,type PPVisual} from './level3PatternPeaksFiveForms';
+const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
+function make(form:PPForm,f:number):PPItem[]{
+ const out:PPItem[]=[];
+ const add=(q:Partial<PPItem>&Pick<PPItem,'skill'|'week'|'prompt'|'visual'>)=>{
+  const slot=out.length+1,item:PPItem={id:`pp-l4-${form}-${slot}`,slot,code:slot%2?'AC9M4A01':'AC9M4A02',instruction:'',mode:'number',options:[],correct:0,answers:[],labels:['Your answer'],difficulty:slot<=4?'accessible':slot>=17?'challenging':'moderate',...q};
+  if(item.options.length){const shift=(slot+f)%4;item.options=[...item.options.slice(shift),...item.options.slice(0,shift)];item.correct=(4-shift)%4;}
+  out.push(item);
+ };
+ const part=145+f*13,whole=320+f*27;
+ add({skill:'Find an unknown addend',week:2,prompt:'What number makes this equation true?',visual:cards({label:'Find the missing part',text:`${part} + ? = ${whole}`}),answers:[whole-part]});
+ const factor=6+f,other=7;
+ add({skill:'Recall a multiplication fact',week:5,prompt:'What is the product?',visual:cards({label:'Multiplication',text:`${factor} × ${other} = ?`}),mode:'choice',options:[String(factor*other),String(factor*other-other),String(factor*other+other),String(factor+other)]});
+ const taken=87+f*9,left=156+f*17;
+ add({skill:'Find the unknown starting amount',week:3,prompt:'What was the starting number?',visual:cards({label:'Subtraction',text:`? − ${taken} = ${left}`}),answers:[taken+left]});
+ const divisor=[7,8,9,6,7][f],quotient=6+f;
+ add({skill:'Recall a related division fact',week:5,prompt:'What number fills the gap?',visual:cards({label:'Division',text:`${divisor*quotient} ÷ ${divisor} = ?`}),answers:[quotient]});
+ const x=145+f*12,y=35+f*3,z=120+f*7;
+ add({skill:'Balance two addition expressions',week:1,prompt:'What number keeps the sides equal?',visual:{kind:'balance',left:`${x} + ${y}`,right:`${z} + ?`},answers:[x+y-z]});
+ const rows=[6,7,8,9,6][f],columns=[8,6,7,6,9][f];
+ add({skill:'Connect an array to multiplication',week:5,prompt:'How many counters are in this array?',visual:{kind:'array',rows,columns},answers:[rows*columns]});
+ const start=340+f*23,end=185+f*11;
+ add({skill:'Find an unknown amount subtracted',week:3,prompt:'What number was subtracted?',visual:cards({label:'Subtraction',text:`${start} − ? = ${end}`}),answers:[start-end]});
+ const nine=6+f;
+ add({skill:'Derive nines from tens',week:6,prompt:'Which calculation gives the missing product?',visual:cards({label:'Known fact',text:`10 × ${nine} = ${10*nine}`},{label:'Find this product',text:`9 × ${nine} = ?`}),mode:'choice',options:[`${10*nine} − ${nine}`,`${10*nine} − ${nine===9?8:9}`,`${10*nine} + ${nine}`,`${10*nine} − 1`]});
+ const minuend=183+f*15,sub=57+f*4,newSub=sub-20;
+ add({skill:'Use a common difference',week:4,prompt:'Which number keeps the differences equal?',visual:{kind:'balance',left:`${minuend} − ${sub}`,right:`? − ${newSub}`},mode:'choice',options:[String(minuend-20),String(minuend+20),String(minuend-sub),String(minuend)]});
+ const n=5+f;
+ add({skill:'Double threes to make sixes',week:6,prompt:'Use the known fact to find the new product.',visual:cards({label:'Known fact',text:`3 × ${n} = ${3*n}`},{label:'New product',text:`6 × ${n} = ?`}),answers:[6*n]});
+ const a=125+f*15,b=75+f*5,c=46+f*7;
+ add({skill:'Regroup three addends',week:4,prompt:'What number fills the gap?',visual:{kind:'balance',left:`${a} + ${b} + ${c}`,right:`${a+b} + ?`},answers:[c]});
+ const splitRows=4+f;
+ add({skill:'Split an array to find a sevens fact',week:6,prompt:'How many counters altogether?',instruction:'The array is split into five columns and two columns.',visual:{kind:'array',rows:splitRows,columns:7,splitAfter:5},answers:[splitRows*7]});
+ const change=17+f*3,l=142+f*11,r=125+f*6,p=58+f*4,rightPart=l+p-r;
+ add({skill:'Maintain equality after a change',week:1,prompt:'What number belongs in the new equation?',visual:cards({label:'Original equation',text:`${l} + ${p} = ${r} + ${rightPart}`},{label:'New equation',text:`${l+change} + ${p} = ${r} + ?`}),answers:[rightPart+change]});
+ const scale=6+f;
+ add({skill:'Extend multiplication using place value',week:7,prompt:'Use the known fact to work out the larger product.',instruction:'Do not use a calculator.',visual:cards({label:'Known fact',text:`${scale} × 7 = ${scale*7}`},{label:'Larger product',text:`${scale*10} × 7 = ?`}),answers:[scale*70]});
+ const total=325+f*29,known=140+f*13;
+ add({skill:'Find the unknown part of a whole',week:3,prompt:'What is the missing part?',visual:{kind:'parts',whole:total,parts:[known,'?']},answers:[total-known]});
+ const related=6+f,product=8*related;
+ add({skill:'Complete connected multiplication and division facts',week:5,prompt:'Fill both gaps.',visual:cards({label:'First fact',text:`8 × ? = ${product}`},{label:'Second fact',text:`${product} ÷ ? = ${related}`}),answers:[related,8],labels:['First gap','Second gap']});
+ const original=245+f*21,remainder=127+f*8;
+ add({skill:'Correct a subtraction-unknown strategy',week:3,prompt:'Which calculation finds the missing number?',visual:cards({label:'Equation',text:`${original} − ? = ${remainder}`},{label:'A student tried',text:`${original} + ${remainder} = ${original+remainder}`}),mode:'choice',options:[`${original} − ${remainder} = ${original-remainder}`,`${original} + ${remainder} = ${original+remainder}`,`${original+remainder} − ${original-remainder} = ${remainder*2}`,`${original} − ${original-remainder} = ${remainder}`]});
+ const larger=24+f*3;
+ add({skill:'Extend a fact strategy to larger numbers',week:7,prompt:'Work out this product mentally.',instruction:'Do not use a calculator.',visual:cards({label:'Multiplication',text:`9 × ${larger} = ?`}),answers:[9*larger]});
+ const lc=168+f*12,rc=200+f*15;
+ add({skill:'Construct equivalent addition expressions',week:4,prompt:'Choose two numbers to make the sides equal.',instruction:'Use whole numbers from 1 to 99. There is more than one correct answer.',visual:{kind:'balance',left:`${lc} + ?`,right:`${rc} + ?`},mode:'equivalent',equivalence:{left:lc,right:rc,max:99},answers:[rc-lc+10,10],labels:['Left gap','Right gap']});
+ const smallFactor=f%2?4:3,mult=18+f*2,knownProduct=smallFactor*mult;
+ add({skill:'Choose a strategy for a larger product',week:7,prompt:'Which calculation gives the new product?',visual:cards({label:'Known fact',text:`${smallFactor} × ${mult} = ${knownProduct}`},{label:'New product',text:`${smallFactor*2} × ${mult} = ?`}),mode:'choice',options:[`${knownProduct} + ${knownProduct}`,`${knownProduct} + ${mult}`,`${knownProduct} × ${smallFactor*2}`,`${knownProduct} ÷ 2`]});
+ return out;
+}
+export const LEVEL4_PP_FORMS=Object.fromEntries(PP_FORMS.map((f,i)=>[f,make(f,i)])) as Record<PPForm,PPItem[]>;
