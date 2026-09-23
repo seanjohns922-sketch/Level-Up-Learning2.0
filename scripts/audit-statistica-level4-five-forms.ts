@@ -19,6 +19,7 @@ for(const form of STATISTICA_FORMS){
   if(q.source==='pictograph'||q.display==='pictograph'&&q.mode==='counts')assert(q.counts.every(n=>Number.isInteger(n/(q.keyUnits!/(q.allowHalf?2:1)))));
   if(q.graphKind==='columns'||q.display==='columns'){assert.equal(q.graphMax,100);assert.equal(q.graphStep,10);assert.equal(q.graphMinorStep,5);assert.equal(Math.max(...q.counts),q.slot===3?80:95);}
   const label=q.options.find(o=>o.id===q.answer)?.label;
+  if(q.slot===17){assert.equal(q.observationArt,'seedlings');assert.equal(q.plainCategories,false);assert.equal(q.observations.filter(n=>n===0).length,3);}
   if(q.slot===4){assert.equal(label,'65');assert(q.allowHalf);assert.equal(q.keyUnits,10);assert(q.counts.includes(65));}
   if([2,6,18].includes(q.slot)){assert.equal(q.keyUnits,10);assert(Math.max(...q.counts)>=60&&Math.max(...q.counts)<=80);}
   if(q.slot===7)assert.equal(Math.max(...q.counts),100);

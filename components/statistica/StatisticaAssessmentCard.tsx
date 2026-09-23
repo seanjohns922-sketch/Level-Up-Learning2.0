@@ -1,5 +1,6 @@
 'use client';
 import ObjectArt from './StatisticaObjectArt';
+import SeedlingTray from './StatisticaSeedlingTray';
 import StatisticaSortActivity from './StatisticaSortActivity';
 import ReviewGraph from './StatisticaReviewGraph';
 import Pictograph,{pictographSpeech} from './StatisticaReviewPictograph';
@@ -18,7 +19,7 @@ export default function StatisticaAssessmentCard({item,response,onChange}:{item:
  const countSpeech=item.counts.map((n,i)=>`${names[i]}: ${n}`).join('. ');
  const graphProps={max:item.graphMax??12,step:item.graphStep??1,minorStep:item.graphMinorStep,axisLabel:item.axisLabel,valueLabel:item.valueLabel,numerical:item.numerical};
  const scaleSpeech=`Scale from zero to ${graphProps.max} in steps of ${graphProps.step}.${item.graphMinorStep?` Smaller marks show steps of ${item.graphMinorStep}.`:""} ${item.valueLabel??'Groups'} on the bottom axis.`;
- const art=(i:number,size:number)=>item.plainCategories?null:item.numerical?<span className={styles.numericValue}>{names[i]}</span>:<ObjectArt name={names[i]} color={item.categories[i].color} size={size}/>;
+ const art=(i:number,size:number)=>item.observationArt==='seedlings'?<SeedlingTray count={Number(names[i])}/>:item.numerical?<span className={styles.numericValue}>{names[i]}</span>:item.plainCategories?null:<ObjectArt name={names[i]} color={item.categories[i].color} size={size}/>;
  const sourceSpeech=item.source==='pictograph'?`${item.context}. ${pictographSpeech(item.categories,item.counts,item.keyUnits??1)} ${item.allowHalf?`Half a picture represents ${item.keyUnits!/2}.`:''}`:item.source==='comparison'?`${item.context}. ${scaleSpeech} Group A: ${countSpeech}. Group B: ${item.secondCounts?.map((n,i)=>`${names[i]}: ${n}`).join('. ')}.`:item.source==='brief'?`${item.context}. ${item.sourceText}`:item.source==='dual'?`${item.context}. Graph A uses ${item.numerical?'dots':'pictures'}. One ${item.numerical?'dot represents one child':'picture represents one answer'}. ${countSpeech}. Graph B uses columns, ${scaleSpeech} ${ (item.secondaryOrder??item.categories.map((_,i)=>i)).map(i=>`${names[i]}: ${item.counts[i]}`).join('. ')}.`:item.source==='table'?`${item.context}. Frequency table. Frequency means how many were recorded. ${countSpeech}.`:item.source==='categories'?`Possible answers: ${names.join(', ')}.`:item.source==='graph'?`${item.context}. ${item.graphKind==='columns'?`Column graph. ${scaleSpeech}`:'One picture stands for one answer.'} ${countSpeech}.`:`${item.context}. ${item.observations.map((v,i)=>`${observationLabel} ${i+1}: ${names[v]}`).join('. ')}.`;
  const listSpeech=item.source==='missing'?`Recorded list: ${item.recorded?.map((v,i)=>`Child ${i+1}: ${names[v]}`).join('. ')}.`:item.source==='duplicate'?`Recorded list: ${item.recorded?.map(i=>`Child ${i+1}: ${names[item.observations[i]]}`).join('. ')}.`:'';
  const limit=item.responseMax??(item.display==='columns'?12:20);

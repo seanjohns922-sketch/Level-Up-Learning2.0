@@ -13,6 +13,7 @@ export type StatsItem = {
  display:'objects'|'pictures'|'symbols'|'tally'|'columns'|'frequency'|'pictograph';options:StatsOption[];answer:string|number[];
  numerical?:boolean;valueLabel?:string;axisLabel?:string;graphMax?:number;graphStep?:number;sourceText?:string;
  sourceLabel?:string;graphKind?:'pictures'|'columns';secondaryKind?:'pictures'|'columns';secondaryOrder?:number[];
+ observationArt?:'seedlings';
  keyUnits?:number;symbolName?:string;allowHalf?:boolean;secondCounts?:number[];responseMax?:number;responseStep?:number;graphMinorStep?:number;plainCategories?:boolean;
  initial?:number[];target?:number;recorded?:number[];
 };

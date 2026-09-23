@@ -33,3 +33,5 @@
 .frequencyInput:focus-visible {outline:3px solid var(--selected);}
 
 .columnControls:has(input){grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}.columnControls .frequencyInput{width:50px;min-width:42px}.pictographKey{flex-wrap:wrap}
+
+.seedlingTray{display:flex;flex-direction:column;align-items:center;width:100%;gap:4px}.observations .seedlingTray svg{width:100%!important;max-width:112px;height:58px!important}.seedlingTray strong{font-size:12px;text-align:center;line-height:1.3}
