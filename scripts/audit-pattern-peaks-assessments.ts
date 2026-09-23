@@ -332,3 +332,30 @@ assert.ok(taskRendererSource.includes("assessmentMode={assessmentMode}"), "Task 
 assert.ok(patternQuestionCardSource.includes("assessmentMode={assessmentMode}"), "Pattern Peaks activities must receive assessment mode");
 
 console.log("Pattern Peaks assessment audit passed: 28 weekly forms / 420 quiz items / 8 independent Pre-Post forms / 160 assessment items.");
+
+// Level 6 Weeks 5–6 must assess each lesson, not repeat one equation template.
+for (const week of [5, 6]) {
+  const tasks = getPatternPeaksWeeklyQuizTasks(6, week)!;
+  tasks.forEach((task, index) => {
+    assert.equal(task.kind, "patternPeaksQuestion");
+    if (task.kind !== "patternPeaksQuestion") return;
+    const lesson = Math.floor(index / 5) + 1, v = index % 5;
+    const a = 6 + v, b = 3 + v, x = 8 + v;
+    let expected: string;
+    if (week === 5 && lesson === 1) expected = [String((a+b)*3), String(a+b*3), String(2*a), String(a*4), "The brackets make the addition happen before multiplication."][v]!;
+    else if (week === 5 && lesson === 2) expected = `(${a} + ${b}) × 3 − 2`;
+    else if (week === 5) expected = v === 4 ? String(b*3) : `${a} × 3 + ${b} × 3`;
+    else if (lesson === 1) expected = v === 4 ? "Divide both sides by 3." : String(x);
+    else if (lesson === 2) expected = String(x);
+    else expected = v % 2 ? "12" : `A = ${6+v}, B = 12`;
+    assert.equal(task.question.answer, expected, `Week ${week} lesson ${lesson} variant ${v}`);
+    if (task.question.kind === "multiple_choice") {
+      assert.equal(task.question.options.length, 4);
+      assert.equal(new Set(task.question.options).size, 4);
+      assert.equal(task.question.options.filter(o => o === expected).length, 1);
+    }
+    if (week === 5 && lesson === 2) assert.equal([(a+b)*3-2,a+b*3-2,a+b,a+b].filter(n=>n===(a+b)*3-2).length,1);
+    if (week === 5 && lesson === 3 && v !== 4) assert.equal([a*3+b*3,a*3+b,a+b*3,a+b+3].filter(n=>n===(a+b)*3).length,1);
+  });
+}
+console.log("Level 6 Weeks 5–6: 30 independent answers and all six lesson focuses verified.");

@@ -230,21 +230,34 @@ function sequenceQuestion(level: PatternQuizLevel, week: number, lesson: number,
     const add = 4 + variant;
     return typed("Follow both steps of the algorithm. What is the output?", input * multiply + add, { type: "function_machine_card", title: "Multi-step machine", input: String(input), rule: `× ${multiply}, then + ${add}`, output: "?" });
   }
-  if (week === 5) {
-    const a = 2 + (seed % 7);
-    const b = 3 + (variant % 5);
-    const c = 2 + (lesson % 4);
-    return typed("Evaluate the expression using the brackets first.", (a + b) * c, { type: "bracket_equation_card", title: "Brackets control the order", left: `(${a} + ${b}) × ${c}`, right: "?", bracketGroup: `${a} + ${b}`, outsideFactor: `× ${c}` });
-  }
-  if (week === 6) {
-    if (lesson === 3) {
-      const x = 7 + variant; const y = 3 + (seed % 5);
-      return typed("Use both equations. What is the value of x?", x, { type: "expression_flow", title: "Pair of unknowns", cards: [{ tokens: ["x", "+", "y", "=", String(x + y)] }, { tokens: ["x", "−", "y", "=", String(x - y)] }, { tokens: ["x", "=", "?"], note: "Both equations must be true" }] });
+  if (week === 5 || week === 6) {
+    const v = variant, a = 6 + v, b = 3 + v, c = 3;
+    const expression = (text: string): Extract<NonNullable<TypedResponseQuestion["visual"]>, {type: "expression_flow"}> => ({type: "expression_flow", title: "Check the whole relationship", cards: [{tokens: [text]}]});
+    const four = (prompt: string, answer: string, distractors: string[], evidence: string): MultipleChoiceQuestion => {
+      const options = [...distractors]; options.splice(v % 4, 0, answer);
+      return {kind: "multiple_choice", prompt, answer, options, visual: expression(evidence)};
+    };
+    if (week === 5) {
+      if (lesson === 1) {
+        if (v === 0) return typed("Work out the value.", (a+b)*c, expression(`(${a} + ${b}) × ${c} = ?`));
+        if (v === 1) return typed("Work out the value without adding brackets.", a+b*c, expression(`${a} + ${b} × ${c} = ?`));
+        if (v === 2) return typed("How much larger is the bracketed value?", (a+b)*c-(a+b*c), expression(`(${a} + ${b}) × ${c} and ${a} + ${b} × ${c}`));
+        if (v === 3) return typed("Work out the value. Multiplication and division have equal priority.", a*4, expression(`${a*3} ÷ 3 × (2 + 2) = ?`));
+        return four("Why do these expressions have different values?", "The brackets make the addition happen before multiplication.", ["Addition always happens before multiplication.", "The brackets mean multiply each number by itself.", "Multiplication is ignored when brackets appear."], `(${a} + ${b}) × ${c} and ${a} + ${b} × ${c}`);
+      }
+      if (lesson === 2) return four("Which placement of brackets makes the target?", `(${a} + ${b}) × ${c} − 2`, [`${a} + (${b} × ${c}) − 2`, `(${a} + ${b}) × (${c} − 2)`, `${a} + ${b} × (${c} − 2)`], `${a} + ${b} × ${c} − 2; target ${(a+b)*c-2}`);
+      if (v === 4) return typed("Complete the equivalent expression.", b*c, expression(`(${a} + ${b}) × ${c} = ${a} × ${c} + ?`));
+      return four("Which expression has the same value?", `${a} × ${c} + ${b} × ${c}`, [`${a} × ${c} + ${b}`, `${a} + ${b} × ${c}`, `(${a} + ${b}) + ${c}`], `(${a} + ${b}) × ${c}`);
     }
-    const outside = 2 + (lesson % 4);
-    const unknown = 3 + (seed % 8);
-    const add = 2 + variant;
-    return typed("Undo the outside operation, then find the unknown.", unknown, { type: "bracket_equation_card", title: "Unknown inside brackets", left: `(? + ${add}) × ${outside}`, right: String((unknown + add) * outside), bracketGroup: `? + ${add}`, outsideFactor: `× ${outside}` });
+    const x=8+v, add=4+v, total=(x+add)*3;
+    if (lesson === 1) {
+      if (v === 4) return four("Which first step helps find the unknown?", "Divide both sides by 3.", ["Subtract the number inside the brackets first.", "Multiply both sides by 3.", "Subtract 3 from both sides."], `(? + ${add}) × 3 = ${total}`);
+      return typed("Find the unknown inside the brackets.", x, expression(v%2 ? `(? − ${add}) × 4 = ${(x-add)*4}` : `(? + ${add}) × 3 = ${total}`));
+    }
+    if (lesson === 2) return typed("Find the unknown. Both sides must have the same value.", x, expression(v%2 ? `${total-7} + 7 = 3 × (? + ${add})` : `3 × (? + ${add}) = ${total-9} + 9`));
+    const target=30+v*3, av=6+v, bv=target-3*av;
+    if (v%2) return typed(`A is ${av}. What is B?`, bv, expression(`3 × A + B = ${target}`));
+    return four("Which pair makes the equation true?", `A = ${av}, B = ${bv}`, [`A = ${av+1}, B = ${bv}`, `A = ${av}, B = ${bv+3}`, `A = ${av-1}, B = ${bv-3}`], `3 × A + B = ${target}`);
   }
   const input = 2 + (seed % 8);
   const gate = 3 + (lesson % 4);
