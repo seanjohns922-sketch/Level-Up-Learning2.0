@@ -16,7 +16,7 @@ export type PPVisual=
  |{kind:'parts';whole:number;parts:(number|string)[]}
  |{kind:'decision';input:number;yes:string;no:string}
  |{kind:'table';inputs:number[];outputs:number[]};
-export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07'|'AC9M4A01'|'AC9M4A02'|'AC9M5A01'|'AC9M5A02'|'AC9M5N10'|'AC9M6A01'|'AC9M6A02'|'AC9M6A03'|'AC9M7A01'|'AC9M7A02'|'AC9M7A03'|'AC9M7A04'|'AC9M7A05'|'AC9M7A06';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm'|'equivalent'|'select'|'product'|'testerChoice'|'filterBuilder'|'linearPair'|'plot'|'labChoice'|'labNumber';options:string[];correct:number;answers:number[];labels:string[];lab?:{kind:"volume"|"distance";initial:number[];required:number[][]};plotPoints?:[number,number][];decimal?:boolean;total?:number;candidates?:number[];testDivisors?:number[];targetMultiple?:number;maxFactor?:number;equivalence?:{left:number;right:number;max:number};multiplier?:number;algorithmOffset?:number;difficulty:'accessible'|'moderate'|'challenging'};
+export type PPItem={id:string;slot:number;code:'AC9M3A01'|'AC9M3A02'|'AC9M3A03'|'AC9M3N07'|'AC9M4A01'|'AC9M4A02'|'AC9M5A01'|'AC9M5A02'|'AC9M5N10'|'AC9M6A01'|'AC9M6A02'|'AC9M6A03'|'AC9M7A01'|'AC9M7A02'|'AC9M7A03'|'AC9M7A04'|'AC9M7A05'|'AC9M7A06'|'AC9M8A01'|'AC9M8A02'|'AC9M8A03'|'AC9M8A04';skill:string;week:number;prompt:string;instruction:string;visual:PPVisual;mode:'number'|'choice'|'partition'|'algorithm'|'equivalent'|'select'|'product'|'testerChoice'|'filterBuilder'|'linearPair'|'plot'|'labChoice'|'labNumber';options:string[];correct:number;answers:number[];labels:string[];lab?:{kind:"volume"|"distance"|"linear";initial:number[];required:number[][]};plotPoints?:[number,number][];signed?:boolean;decimal?:boolean;total?:number;candidates?:number[];testDivisors?:number[];targetMultiple?:number;maxFactor?:number;equivalence?:{left:number;right:number;max:number};multiplier?:number;algorithmOffset?:number;difficulty:'accessible'|'moderate'|'challenging'};
 export type PPResponse={choice?:number;values:string[];operations:PPOperation[];tests?:number[];points?:[number,number][];experiments?:number[][];skipped?:boolean};
 const cards=(...cards:{label:string;text:string}[]):PPVisual=>({kind:'cards',cards});
 const seq=(terms:(number|string)[],rule?:string):PPVisual=>({kind:'sequence',terms,rule});
@@ -80,6 +80,7 @@ export function ppReady(q:PPItem,r:PPResponse):boolean{
  if(q.mode==='filterBuilder')return r.values.length===2&&r.values.every(v=>q.candidates!.includes(Number(v)));
  if(q.mode==='choice'||q.mode==='testerChoice'||q.mode==='labChoice')return Number.isInteger(r.choice)&&r.choice!>=0&&r.choice!<4;
  if(q.mode==='algorithm')return r.operations.length===2&&r.operations.every(v=>PP_OPERATIONS.includes(v));
+ if(q.signed)return r.values.length===q.labels.length&&r.values.every(v=>/^-?\d+$/.test(v)&&Number.isFinite(Number(v)));
  if(q.decimal)return r.values.length===q.labels.length&&r.values.every(v=>/^\d+(\.\d+)?$/.test(v)&&Number.isFinite(Number(v)));
  return r.values.length===q.labels.length&&r.values.every(v=>/^\d+$/.test(v)&&Number.isSafeInteger(Number(v)));
 }

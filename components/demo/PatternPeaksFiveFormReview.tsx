@@ -26,7 +26,7 @@ function Visual({v}:{v:PPVisual}){
  <table className={pp.table}><thead><tr><th scope='col'>Input</th><th scope='col'>Output</th></tr></thead><tbody>{v.inputs.map((n,i)=><tr key={i}><td>{n}</td><td>{v.outputs[i]}</td></tr>)}</tbody></table>}
  </div>;
 }
-export default function PatternPeaksFiveFormReview({level,forms}:{level:3|4|5|6|7;forms:Record<PPForm,PPItem[]>}){
+export default function PatternPeaksFiveFormReview({level,forms}:{level:3|4|5|6|7|8;forms:Record<PPForm,PPItem[]>}){
  const router=useRouter(),params=useSearchParams();const form=PP_FORMS.find(f=>f===params.get('form'))??'posttest';
  const items=forms[form],count=items.length;
  const raw=Number(params.get('question')??1)-1,index=Number.isInteger(raw)?Math.max(0,Math.min(count-1,raw)):0,item=items[index];
@@ -56,12 +56,12 @@ export default function PatternPeaksFiveFormReview({level,forms}:{level:3|4|5|6|
  <p className={styles.instruction}>“Starting number” means the original input.</p>
  <div className={pp.palette}>{PP_OPERATIONS.map(op=><div className={pp.operation} key={op}><button data-pp-operation={op} disabled={response.operations.length===2} onClick={()=>update({...ppEmpty(),operations:[...response.operations,op]})}>{op}</button><ReadAloudBtn className={styles.voice} kind='option' text={op}/></div>)}</div>
  <div className={pp.tools}><button disabled={!response.operations.length} onClick={()=>update({...ppEmpty(),operations:response.operations.slice(0,-1)})}>Undo</button><button disabled={!response.operations.length} onClick={()=>update(ppEmpty())}>Clear</button></div>
- </div>:<><div className={pp.readResponse}><ReadAloudBtn className={styles.voice} label='Read answer boxes' text={item.labels.map((label,i)=>`${label}: ${response.values[i]||'empty'}`).join('. ')}/></div><div className={pp.numbers}>{item.labels.map((label,i)=><label key={i}><MathFormattedText text={String(label)}/><input aria-label={label} inputMode={item.decimal?'decimal':'numeric'} autoComplete='off' value={response.values[i]??''} onChange={e=>update({...ppEmpty(),experiments:response.experiments,values:item.labels.map((_,j)=>i===j?e.target.value:response.values[j]??'')})}/></label>)}</div></>}
+ </div>:<><div className={pp.readResponse}><ReadAloudBtn className={styles.voice} label='Read answer boxes' text={item.labels.map((label,i)=>`${label}: ${response.values[i]||'empty'}`).join('. ')}/></div><div className={pp.numbers}>{item.labels.map((label,i)=><label key={i}><MathFormattedText text={String(label)}/><input aria-label={label} inputMode={item.signed?'text':item.decimal?'decimal':'numeric'} autoComplete='off' value={response.values[i]??''} onChange={e=>update({...ppEmpty(),experiments:response.experiments,values:item.labels.map((_,j)=>i===j?e.target.value:response.values[j]??'')})}/></label>)}</div></>}
  </div></div>
  <div className={styles.status} role='status'>{response.skipped?'You chose ‘I don’t know’.':ppReady(item,response)?'Answer recorded.':''}</div>
  <footer className={styles.footer}><button disabled={index===0} onClick={()=>select(form,index-1)}>Back</button><button onClick={()=>{update({...ppEmpty(),skipped:true});advance();}}>I don’t know</button><button className={styles.primary} onClick={advance}>{index===count-1?'Finish':'Next'}</button></footer>
  </section>
- <details className={styles.notes} key={item.id}><summary>Review details</summary><p>{item.code} · {item.skill} · {item.difficulty} · {level===7?'Year 7 curriculum review':`Pattern Peaks lesson week ${item.week}`}</p><button onClick={()=>setShowAnswer(v=>!v)}>{showAnswer?'Hide answer':'Show answer'}</button>{showAnswer&&<p>Expected response: <MathFormattedText text={expected}/></p>}<p>Five parallel forms for content review. Student attempts are unchanged.</p></details>
+ <details className={styles.notes} key={item.id}><summary>Review details</summary><p>{item.code} · {item.skill} · {item.difficulty} · {level>=7?`Year ${level} curriculum review`:`Pattern Peaks lesson week ${item.week}`}</p><button onClick={()=>setShowAnswer(v=>!v)}>{showAnswer?'Hide answer':'Show answer'}</button>{showAnswer&&<p>Expected response: <MathFormattedText text={expected}/></p>}<p>Five parallel forms for content review. Student attempts are unchanged.</p></details>
  {finished[form]&&<div className={styles.notes} role='status'>{PP_LABELS[form]} review: {items.filter(q=>records[q.id]&&ppScore(q,records[q.id])).length}/{count} correct · {answered}/{count} recorded. Nothing was saved to a student record.</div>}
  </div></main>;
 }
