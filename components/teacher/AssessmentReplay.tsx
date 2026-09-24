@@ -1,4 +1,5 @@
 "use client";
+import {chanceReleaseVisual,encodeReleasedChance} from "@/lib/chance-release-response";
 
 import {patternReleaseVisual,encodeReleasedPattern} from "@/lib/pattern-release-response";
 import {statisticaReleaseVisual,encodeReleasedStatistica} from "@/lib/statistica-release-response";
@@ -203,7 +204,7 @@ function SnapshotQuestion({
               options: question.options,
               visual: question.visual,
             }}
-            value={patternReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedPattern(question.question_id,question.student_answer) : statisticaReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStatistica(question.question_id,question.student_answer) : starpathReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStarpath(question.question_id,question.student_answer) : typeof question.student_answer === "string" ? question.student_answer : null}
+            value={chanceReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedChance(question.question_id,question.student_answer) : patternReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedPattern(question.question_id,question.student_answer) : statisticaReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStatistica(question.question_id,question.student_answer) : starpathReleaseVisual(question) && question.student_answer && typeof question.student_answer === "object" ? encodeReleasedStarpath(question.question_id,question.student_answer) : typeof question.student_answer === "string" ? question.student_answer : null}
             onChange={() => undefined}
             realmId={realmId}
           />

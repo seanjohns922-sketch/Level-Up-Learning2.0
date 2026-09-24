@@ -1,4 +1,5 @@
 "use client";
+import ReleasedChanceQuestion from "./ReleasedChanceQuestion";
 import ReleasedPatternQuestion from "./ReleasedPatternQuestion";
 import ReleasedStatisticaQuestion from "./ReleasedStatisticaQuestion";
 import ReleasedStarpathQuestion from "./ReleasedStarpathQuestion";
@@ -374,6 +375,7 @@ export default function AssessmentQuestionCard({
     [type, value]
   );
 
+  if(visual?.type==='chance_released')return <ReleasedChanceQuestion question={question} value={value} onChange={onChange}/>;
   if(visual?.type==='pattern_released')return <ReleasedPatternQuestion question={question} value={value} onChange={onChange}/>;
   if(visual?.type==='statistica_released')return <ReleasedStatisticaQuestion question={question} value={value} onChange={onChange}/>;
   if(visual?.type==='starpath_released')return <ReleasedStarpathQuestion question={question} value={value} onChange={onChange}/>;

@@ -30,7 +30,7 @@ for (const realm of ["number", "measurement", "space", "statistics", "pattern", 
       for (const q of questions) {
         // Ground model tasks require raw evidence; their rubric is not a valid answer.
         // qa:ground-number-release independently verifies all 100 worked responses.
-        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), q.type !== "prepNumberTask" && !["starpath_released","statistica_released","pattern_released"].includes((q.visual as {type?:string})?.type??""), q.id);
+        assert.equal(isAssessmentAnswerCorrect(q, String(q.correctAnswer)), q.type !== "prepNumberTask" && !["starpath_released","statistica_released","pattern_released","chance_released"].includes((q.visual as {type?:string})?.type??""), q.id);
         assert.equal(isAssessmentAnswerCorrect(q, "__invalid_answer__"), false, q.id);
         for (const code of (q as { curriculumCodes?: string[] }).curriculumCodes ?? []) assert.ok(AUSTRALIAN_CURRICULUM_V9_PAGES[code], `${q.id}: ${code} must exist in the supplied PDF`);
         count++;

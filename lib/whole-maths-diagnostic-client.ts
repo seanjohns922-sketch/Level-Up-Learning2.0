@@ -59,6 +59,7 @@ export type PendingStudentDiagnostic = {
   space_release_version?:0|1;
   statistics_release_version?:0|1;
   pattern_release_version?:0|1;
+  chance_release_version?:0|1;
   number_ground_bank_version?: 1 | 3;
   number_level2_bank_version?: 2 | 3;
   number_level4_bank_version?: 2 | 3;
@@ -172,9 +173,10 @@ export async function closeDiagnosticSchoolSession(classId: string) {
 
 export async function fetchPendingStudentDiagnostic(studentId: string, includeClosed = false) {
   // Newest pinned-version RPC first; older RPCs keep working until each migration is applied.
-  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_pattern_full", {
+  let { data, error } = await supabase.rpc("get_pending_whole_math_diagnostic_chance_full", {
     p_student_id: studentId,
   });
+  if(error && (error.code === "PGRST202" || error.code === "42883")) { ({data,error}=await supabase.rpc("get_pending_whole_math_diagnostic_pattern_full",{p_student_id:studentId})); }
   if(error && (error.code === "PGRST202" || error.code === "42883")) { ({data,error}=await supabase.rpc("get_pending_whole_math_diagnostic_statistica_full",{p_student_id:studentId})); }
   if(error && (error.code === "PGRST202" || error.code === "42883")) { ({data,error}=await supabase.rpc("get_pending_whole_math_diagnostic_starpath_full",{p_student_id:studentId})); }
   if(error && (error.code === "PGRST202" || error.code === "42883")) { ({data,error}=await supabase.rpc("get_pending_whole_math_diagnostic_starpath_ground",{p_student_id:studentId})); }

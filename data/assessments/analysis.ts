@@ -1,3 +1,4 @@
+import {chanceReleaseVisual,scoreReleasedChance} from '@/lib/chance-release-response';
 import {patternReleaseVisual,scoreReleasedPattern} from '@/lib/pattern-release-response';
 import {statisticaReleaseVisual,scoreReleasedStatistica} from '@/lib/statistica-release-response';
 import {starpathReleaseVisual,scoreReleasedStarpath} from '@/lib/starpath-release-response';
@@ -138,6 +139,7 @@ export function isAssessmentAnswerCorrect(
   question: GenericAssessmentQuestion,
   chosen: string | undefined
 ): boolean {
+  if(chanceReleaseVisual(question))return scoreReleasedChance(question,chosen);
   if(patternReleaseVisual(question))return scoreReleasedPattern(question,chosen);
   if(statisticaReleaseVisual(question))return scoreReleasedStatistica(question,chosen);
   if(starpathReleaseVisual(question))return scoreReleasedStarpath(question,chosen);

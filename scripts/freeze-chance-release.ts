@@ -1,0 +1,10 @@
+import {writeFileSync,readFileSync,existsSync} from 'node:fs';
+import {LEVEL3_CHANCE_FORMS as l3} from '../data/assessments/revisions/level3ChanceHollowFiveForms';
+import {LEVEL4_CHANCE_FORMS as l4} from '../data/assessments/revisions/level4ChanceHollowFiveForms';
+import {LEVEL5_CHANCE_FORMS as l5} from '../data/assessments/revisions/level5ChanceHollowFiveForms';
+import {LEVEL6_CHANCE_FORMS as l6} from '../data/assessments/revisions/level6ChanceHollowFiveForms';
+import {LEVEL7_CHANCE_FORMS as l7} from '../data/assessments/revisions/level7ChanceHollowFiveForms';
+import {LEVEL8_CHANCE_FORMS as l8} from '../data/assessments/revisions/level8ChanceHollowFiveForms';
+const path='data/assessments/releases/chance-v1.json',payload=JSON.stringify([null,null,null,l3,l4,l5,l6,l7,l8],null,2)+'\n';
+if(existsSync(path)&&readFileSync(path,'utf8')!==payload)throw new Error('Release is frozen; use a new version.');
+writeFileSync(path,payload);
