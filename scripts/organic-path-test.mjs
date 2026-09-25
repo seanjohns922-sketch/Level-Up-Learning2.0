@@ -157,10 +157,10 @@ for(const key of ['castle_wall','castle_corner','fence','picket_fence','rope_fen
  const scale=fitWorldItemScale(size,[2,2],WORLD_ITEM_PRESENTATION[key]);
  assert.ok(Math.abs(size.y*scale[1]-WORLD_ITEM_PRESENTATION[key].height)<1e-8,'Width-defined pieces attain their catalogue height');
 }
-assert.ok(Math.abs(CASTLE_WALL_HEIGHT-26*.55)<1e-8,'Fortress ramparts are reduced by 45%');
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_gate.height-28*.55)<1e-8);
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_turret.height-32*.55)<1e-8);
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_keep.height-34*.55)<1e-8);
+assert.ok(Math.abs(CASTLE_WALL_HEIGHT-26*.55*.65)<1e-8,'Fortress ramparts are reduced by 45% then a further 35%');
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_gate.height-28*.55*.65)<1e-8);
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_turret.height-32*.55*.65)<1e-8);
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_keep.height-34*.55*.65)<1e-8);
 assert.ok(WORLD_ITEM_PRESENTATION.castle_gate.height>CASTLE_WALL_HEIGHT);
 assert.ok(WORLD_ITEM_PRESENTATION.castle_turret.height>WORLD_ITEM_PRESENTATION.castle_gate.height);
 assert.ok(catalogue.concat(rewards).every(i=>parseGridSize(i).every(n=>Number.isInteger(n)&&n>0)));
