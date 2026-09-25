@@ -10,7 +10,7 @@ export function expeditionAccessFromAssessments(studentId:string,rows:Expedition
   const percent=countsValid?row.correct_count!/row.total_questions!*100:row.score_percent;
   if(!Number.isFinite(percent)||percent<0||percent>100)continue;
   const realm=row.realm_id as ExpeditionRealm;
-  if(row.working_level==='Year 6'&&percent>86)level7.add(realm);
+  if(row.working_level==='Year 6'&&percent>=85)level7.add(realm);
   if(row.working_level==='Year 7'&&row.passed===true)level8.add(realm);
  }
  return {level7:[...level7],level8:[...level8].filter(realm=>level7.has(realm))};
