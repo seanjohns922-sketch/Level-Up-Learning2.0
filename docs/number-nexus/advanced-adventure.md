@@ -6,7 +6,7 @@ Current release: **demo mode only**. Design review: `/demo-review/number-adventu
 
 The central hub and tower lead to the expedition outpost. Six separate trails lead to six Level 7 weekly lesson gates. A realm’s Level 6 completion will unlock its trail. Number Nexus uses the same flow as Measurelands, Starpath, Statistica, Pattern Peaks and Chance Hollow: trail → gate → weekly lessons. There is no separate Number Nexus relay course or sample guardian quiz in this world.
 
-Completing any realm’s Level 7 will open the separate Ashen Pass. The volcano leads to six Level 8 strongholds, unlocked independently by their respective Level 7 completion. The intended final reward is rescuing each realm’s stolen Core through its weekly programme and final boss.
+Completing any realm’s Level 7 will open the route to The Final Battle. The volcano leads to six Level 8 strongholds, unlocked independently by their respective Level 7 completion. The intended final reward is rescuing each realm’s stolen Core through its weekly programme and final boss.
 
 For the future student release, the retained eligibility logic qualifies a student when any completed Level 6 post-test has an exact score of 85% or above. Eligibility is read from the existing session-protected assessment-history RPC, across all six realms; pre-tests and other children’s results do not qualify. Earlier qualifying attempts remain valid after a later lower result. Each realm unlocks separately. A passed Level 7 post-test opens its Level 8 stronghold and the volcano pass.
 

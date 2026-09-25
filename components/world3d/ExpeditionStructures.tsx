@@ -129,7 +129,7 @@ export function VolcanoExpedition({open,unlockedRealms}:{open:boolean;unlockedRe
  {[-4.3,4.3].map(x=><group key={x}><Box at={[x,3.5,0]} size={[2,7,3]} colour="#465050"/><Box at={[x,7.2,0]} size={[2.6,.6,3.6]} colour="#68716d"/><Lantern at={[x,7.6,0]}/></group>)}
  <Box at={[0,7,0]} size={[10,1,2.5]} colour="#4f5957"/>
  {!open&&Array.from({length:9},(_,i)=><Beam key={i} a={[-3.4+i*.85,0,0]} b={[-3.4+i*.85,6.5,0]} width={.11} colour="#27373d"/>)}
- <Plaque at={[0,8.8,1.4]} title="THE ASHEN PASS" subtitle={open?'LEVEL 8 · PASS OPEN':'SEALED · FINISH ANY LEVEL 7'} width={9} colour={open?'#8dcbb5':'#d5a176'}/>
+ <Plaque at={[0,8.8,1.4]} title="THE FINAL BATTLE" subtitle={open?'LEVEL 8 · GATE OPEN':'SEALED · FINISH ANY LEVEL 7'} width={9} colour={open?'#8dcbb5':'#d5a176'}/>
  <Banner at={[-6,0,1]}/><Banner at={[6,0,1]}/>
  </group>
  <ExpeditionDistanceDetail x={0} z={-115} distance={150}>
