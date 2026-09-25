@@ -481,6 +481,12 @@ export default function DemoReviewPanel() {
           </div>
         </section>
 
+        {realm === "number" && <section className="border-t border-white/10 py-6">
+          <h2 className="mb-3 text-base font-black">The Core Expedition · Level 7 Preview</h2>
+          <p className="mb-3 text-xs text-white/60">Explore six Level 7 realm trails and the separate volcano route to Level 8. This design preview does not change student progress.</p>
+          <button type="button" onClick={() => router.push("/demo-review/number-adventure/3d")} className={actionClass()}><Eye size={17} /> Explore 3D Adventure Preview</button>
+        </section>}
+
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
           {year !== "Prep" || realm === "number" || realm === "measurement" || realm === "space" ? (

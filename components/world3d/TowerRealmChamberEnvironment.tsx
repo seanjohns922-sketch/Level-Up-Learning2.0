@@ -11,6 +11,8 @@ import {
   type TowerWorldQuality,
 } from "@/lib/world3d/tower-realm-chamber-config";
 
+import TowerExpeditionPortal from './TowerExpeditionPortal';
+
 function KnowledgeCore({ reducedMotion }: { reducedMotion: boolean }) {
   const coreRef = useRef<THREE.Group>(null);
   useFrame((_, delta) => {
@@ -104,12 +106,14 @@ function ChamberArchitecture({ quality }: { quality: TowerWorldQuality }) {
 }
 
 export function TowerRealmChamberEnvironment({
+  expeditionUnlocked = false,
   quality,
   reducedMotion,
   activeInteractionId,
   progressByRealm,
   previewPattern = false,
 }: {
+  expeditionUnlocked?: boolean;
   quality: TowerWorldQuality;
   reducedMotion: boolean;
   activeInteractionId: string | null;
@@ -119,7 +123,7 @@ export function TowerRealmChamberEnvironment({
   return (
     <>
       <ChamberArchitecture quality={quality} />
-      <KnowledgeCore reducedMotion={reducedMotion} />
+      {expeditionUnlocked?<TowerExpeditionPortal reducedMotion={reducedMotion}/>:<KnowledgeCore reducedMotion={reducedMotion} />}
       <Suspense fallback={null}>
         {TOWER_REALM_PORTALS.map((portal) => {
           const nearby = portal.interactionId === activeInteractionId;

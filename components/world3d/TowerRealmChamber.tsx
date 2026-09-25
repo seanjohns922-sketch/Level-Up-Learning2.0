@@ -26,6 +26,9 @@ import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { WORLD3D_CANONICAL_RESTORED_EVENT } from "@/lib/world3d/canonical-bootstrap";
 import { WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 
+import {fetchExpeditionAccess} from '@/lib/world3d/expedition-access-client';
+import {getActiveStudentIdentity} from '@/lib/studentIdentity';
+
 type TowerWorldMetrics = {
   active: boolean;
   quality: TowerWorldQuality;
@@ -72,6 +75,7 @@ function TowerMetricsReporter({ quality, activeVideoRealmId }: { quality: TowerW
 }
 
 function TowerScene({
+  expeditionUnlocked,
   quality,
   reducedMotion,
   moveInput,
@@ -81,6 +85,7 @@ function TowerScene({
   initialPosition,
   preview,
 }: {
+  expeditionUnlocked: boolean;
   quality: TowerWorldQuality;
   reducedMotion: boolean;
   moveInput: WorldMoveInput;
@@ -92,6 +97,7 @@ function TowerScene({
 }) {
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const targets = useMemo(() => [
+    ...(expeditionUnlocked?[{id:'core-expedition',position:[0,0,3] as [number,number,number],distance:4}]:[]),
     ...TOWER_REALM_PORTALS.map((portal) => ({
       id: portal.interactionId,
       position: portal.position,
@@ -102,7 +108,7 @@ function TowerScene({
       position: TOWER_CHAMBER_CONFIG.exitPoint,
       distance: 4.6,
     },
-  ], []);
+  ], [expeditionUnlocked]);
 
   return (
     <>
@@ -113,6 +119,7 @@ function TowerScene({
       <directionalLight position={[-14, 24, 12]} color="#ffd69c" intensity={2.4} />
       <directionalLight position={[18, 12, -18]} color="#9eb6d4" intensity={0.38} />
       <TowerRealmChamberEnvironment
+        expeditionUnlocked={expeditionUnlocked}
         quality={quality}
         reducedMotion={reducedMotion}
         activeInteractionId={activeInteractionId}
@@ -156,7 +163,7 @@ function buildProgressMap(version: number, preview: boolean) {
 export default function TowerRealmChamber() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const preview = searchParams.get("teacher_preview") === "1" || isDemoPreviewMode();
+  const preview = isDemoPreviewMode();
   const requestedQuality = searchParams.get("quality");
   const quality: TowerWorldQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
@@ -164,6 +171,7 @@ export default function TowerRealmChamber() {
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [entryMessage, setEntryMessage] = useState<string | null>(null);
   const [showIntro, setShowIntro] = useState(false);
+  const [expeditionUnlocked,setExpeditionUnlocked]=useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -174,6 +182,8 @@ export default function TowerRealmChamber() {
   }, [searchParams]);
 
   const progressByRealm = useMemo(() => buildProgressMap(progressVersion, preview), [preview, progressVersion]);
+  useEffect(()=>{if(preview)return;let cancelled=false;const id=getActiveStudentIdentity().studentId;if(!id)return;fetchExpeditionAccess(id).then(access=>{if(!cancelled)setExpeditionUnlocked(access.level7.length>0);}).catch(()=>{if(!cancelled)setExpeditionUnlocked(false);});return()=>{cancelled=true;};},[preview,progressVersion]);
+  const atExpedition=activeInteractionId==='core-expedition';
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const atExit = activeInteractionId === TOWER_CHAMBER_CONFIG.exitInteractionId;
 
@@ -229,17 +239,19 @@ export default function TowerRealmChamber() {
   }, [busyRealmId, preview, router]);
 
   const runActiveAction = useCallback(() => {
+    if(atExpedition){router.push(preview?'/demo-review/number-adventure/3d':'/world/expedition');return;}
     if (activePortal) {
       void enterRealm(activePortal.realmId);
       return;
     }
     if (atExit) router.push(`/world?spawn=tower-exit-spawn${preview ? "&teacher_preview=1" : ""}`);
-  }, [activePortal, atExit, enterRealm, preview, router]);
+  }, [activePortal, atExit, atExpedition, enterRealm, preview, router]);
 
   return (
-    <main data-world3d-root data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
+    <main data-world3d-root data-expedition-unlocked={preview||expeditionUnlocked} data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
       <Canvas camera={{ position: [0, 6, 22], fov: 56 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
         <TowerScene
+          expeditionUnlocked={preview||expeditionUnlocked}
           quality={quality}
           reducedMotion={reducedMotion}
           moveInput={moveInput}
@@ -264,8 +276,9 @@ export default function TowerRealmChamber() {
       />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
+      {atExpedition?<WorldInteractionPrompt location="THE CORE EXPEDITION" status="Six realms · A new challenge" actionLabel="ENTER EXPEDITION" onAction={runActiveAction}/>:null}
       {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
-      <KeyboardWorldAction enabled={Boolean(activePortal || atExit)} onAction={runActiveAction} />
+      <KeyboardWorldAction enabled={Boolean(activePortal || atExit || atExpedition)} onAction={runActiveAction} />
 
       {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850, display: "flex", alignItems: "center", gap: 8 }}>{entryMessage}<WorldVoiceButton text={entryMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, zIndex: 25, display: "grid", placeItems: "center", background: "rgba(20,13,11,.28)", color: "#fff0cf", pointerEvents: "none", animation: "towerReveal 2.4s ease both" }}><div style={{ textAlign: "center", textShadow: "0 4px 20px #000", pointerEvents: "auto" }}><div style={{ fontSize: 12, fontWeight: 950, letterSpacing: "0.2em" }}>TOWER OF KNOWLEDGE</div><div style={{ marginTop: 7, fontSize: 31, fontWeight: 950 }}>Where all learning worlds meet</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="Tower of Knowledge. Where all learning worlds meet." label="Read tower title" /></div></div><style>{`@keyframes towerReveal{0%{opacity:1;background:rgba(14,9,8,1)}28%,72%{opacity:1}100%{opacity:0}}`}</style></div> : null}

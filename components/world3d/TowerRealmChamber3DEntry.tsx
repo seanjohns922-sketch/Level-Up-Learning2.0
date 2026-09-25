@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
-import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import { getActiveStudentProfile, getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { resolveRealm3DAccess } from "@/lib/world3d/access";
 import { restoreCanonicalWorldState } from "@/lib/world3d/canonical-bootstrap";
 import { StudentRestoreSupersededError } from "@/lib/student-progress-sync";
@@ -19,7 +19,8 @@ const TowerRealmChamber = dynamic(() => import("@/components/world3d/TowerRealmC
 export default function TowerRealmChamber3DEntry({ teacherPreview = false }: { teacherPreview?: boolean }) {
   const router = useRouter();
   const storedPreview = useDemoPreviewMode();
-  const preview = teacherPreview || storedPreview;
+  const activeStudentId=getActiveStudentIdentity().studentId;
+  const preview = storedPreview || (teacherPreview && (!activeStudentId || activeStudentId==="demo-preview"));
   const [access] = useState(() => {
     const profile = getActiveStudentProfile();
     return resolveRealm3DAccess({ realmId: "number", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: false });
