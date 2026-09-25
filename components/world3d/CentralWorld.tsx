@@ -213,7 +213,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
   return (
     <>
       <color attach="background" args={["#69afe4"]} />
-      <fog attach="fog" args={["#a7b9ac", 58, 112]} />
+      <fog attach="fog" args={["#a8af8d", 90, 300]} />
       {/* Base rig, dialled back to leave room for the image-based lighting below
          so the scene reads lit rather than flat-shaded. */}
       <hemisphereLight args={["#d9efff", "#38522f", 0.7]} />

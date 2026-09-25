@@ -23,7 +23,8 @@ import { CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { WorldWater } from "./WorldWater";
 import { OrganicPaths } from "@/components/world3d/OrganicPaths";
 import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
-import { WorldPanorama } from "@/components/world3d/WorldPanorama";
+import { CentralValleyPanorama } from "./CentralValleyPanorama";
+import { CentralMeadowRim } from "./CentralMeadowRim";
 import {
   CENTRAL_WORLD_GRID,
   CENTRAL_WORLD_HOME_KEY,
@@ -881,7 +882,10 @@ function MeadowGround() {
   useEffect(() => () => texture.dispose(), [texture]);
   // Large enough that the ground always reaches the horizon panorama — no void
   // is ever visible around the Tower or the playable edge.
-  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.055} color="#c2cbab" roughness={1} /></mesh>;
+  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.055} color="#cdddba" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
+    shader.vertexShader="varying float meadowRadius;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nmeadowRadius=length(position.xy);");
+    shader.fragmentShader="varying float meadowRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>","#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(106.0,135.0,meadowRadius);");
+  }} /></mesh>;
 }
 
 function GrassTufts({ quality, groundTiles }: { quality: CentralWorldQuality; groundTiles: CentralWorldGroundTile[] }) {
@@ -1186,10 +1190,11 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, h
   return (
     <group>
       <Suspense fallback={null}>
-        <WorldPanorama asset="/images/central-world-valley-panorama.png" radius={74} height={76} y={31} rotationY={Math.PI} follow />
+        <CentralValleyPanorama quality={quality} />
       </Suspense>
       <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[135, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
         <MeadowGround />
+        <CentralMeadowRim quality={quality} />
       </Suspense>
       <PaintedGround tiles={groundTiles} />
       <GrassTufts quality={quality} groundTiles={groundTiles} />
