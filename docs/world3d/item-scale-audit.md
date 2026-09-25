@@ -37,16 +37,16 @@ The previous height-ratio footprint multiplier has been removed. Every asset has
 | Kookaburra Gum Tree | 12.60 × 16.00 × 10.28 | 18 × 18 | Tree-sized composition; perched bird reduced independently. |
 | Echidna | 0.86 × 0.60 × 1.21 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Cockatoo | 0.37 × 0.80 × 0.65 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Castle Wall | 2.00 × 26.00 × 1.44 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Wall Corner | 2.00 × 26.00 × 2.00 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Gatehouse | 37.30 × 28.00 × 12.32 | 38 × 16 | Reservation enlarged so gate reaches 28 m above 26 m ramparts. |
-| Turret | 10.66 × 32.00 × 10.66 | 16 × 16 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Keep | 24.08 × 34.00 × 24.08 | 34 × 34 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Banner | 1.61 × 5.00 × 0.55 | 4 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Drawbridge | 5.31 × 7.00 × 9.66 | 12 × 14 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Torch | 0.48 × 3.00 × 0.48 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Treasure Chest | 1.48 × 1.20 × 1.03 | 4 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Well | 2.88 × 3.50 × 2.22 | 4 × 4 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
+| Castle Wall | 2.00 × 14.30 × 1.44 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Wall Corner | 2.00 × 14.30 × 2.00 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Gatehouse | 20.52 × 15.40 × 6.78 | 22 × 10 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Turret | 5.86 × 17.60 × 5.86 | 10 × 10 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Keep | 13.25 × 18.70 × 13.25 | 20 × 20 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Banner | 0.88 × 2.75 × 0.30 | 4 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Drawbridge | 2.92 × 3.85 × 5.31 | 8 × 8 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Torch | 0.26 × 1.65 × 0.26 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Treasure Chest | 0.81 × 0.66 × 0.57 | 4 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Well | 1.58 × 1.93 × 1.22 | 4 × 4 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
 | Silver Birch | 7.73 × 14.00 × 5.93 | 16 × 16 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Autumn Tree | 10.93 × 14.00 × 8.51 | 18 × 18 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Lavender Planter | 1.63 × 1.10 × 1.38 | 4 × 4 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
@@ -69,14 +69,14 @@ The previous height-ratio footprint multiplier has been removed. Every asset has
 | Platypus | 0.56 × 0.55 × 1.48 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Blue Heeler | 0.56 × 1.15 × 1.55 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Bilby | 0.36 × 0.75 × 1.10 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Garden Stone Wall | 2.00 × 1.80 × 0.69 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Timber Gate | 2.00 × 1.60 × 0.15 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
+| Garden Stone Wall | 2.00 × 0.99 × 0.69 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Timber Gate | 2.00 × 0.88 × 0.15 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
 | Fern | 1.23 × 1.80 × 1.23 | 4 × 4 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Native Grass | 1.26 × 1.00 × 1.25 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Creek Reeds | 1.09 × 1.80 × 1.08 | 4 × 4 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Bottlebrush | 5.73 × 4.00 × 4.52 | 6 × 6 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Terracotta Planter | 1.12 × 1.10 × 0.97 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Climbing Trellis | 2.69 × 3.00 × 2.03 | 4 × 4 | Foliage reservation enlarged to prevent shrinking. |
+| Climbing Trellis | 1.48 × 1.65 × 1.12 | 4 × 4 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
 | Driftwood | 4.00 × 0.80 × 1.74 | 6 × 4 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Pebble Edging | 2.00 × 0.22 × 0.21 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Boardwalk Section | 2.00 × 0.30 × 2.00 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
@@ -93,10 +93,10 @@ The previous height-ratio footprint multiplier has been removed. Every asset has
 | Country Bicycle | 3.03 × 1.50 × 0.54 | 4 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Picnic Basket | 0.60 × 0.60 × 0.56 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Harbour Buoy | 0.91 × 1.20 × 0.91 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Carved Stone Planter | 1.43 × 1.40 × 1.24 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Stone Garden Seat | 3.62 × 1.30 × 1.18 | 4 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Garden Window Arch | 2.47 × 4.00 × 0.82 | 4 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
-| Garden Sundial | 1.21 × 1.80 × 1.21 | 2 × 2 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
+| Carved Stone Planter | 0.79 × 0.77 × 0.68 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Stone Garden Seat | 1.99 × 0.71 × 0.65 | 4 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Garden Window Arch | 1.36 × 2.20 × 0.45 | 4 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
+| Garden Sundial | 0.67 × 0.99 × 0.67 | 2 × 2 | Reduced 45%; connecting pieces retain their 2 m grid pitch. |
 | Queenslander | 8.36 × 7.00 × 8.61 | 12 × 12 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Milk Bar Arcade | 6.62 × 4.00 × 6.48 | 8 × 8 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
 | Gum Tree Cubby | 10.93 × 14.00 × 10.29 | 18 × 18 | Individual size and land checked; sizing anchor reached without footprint shrinkage. |
@@ -136,3 +136,5 @@ Validation: `npm run qa:world-scenery` checks every measured native bound agains
 Reproduce: open `/demo-review/world-art`, click **Measure all 122 models**, wait for **122 / 122**, and download measurements. Re-capture this snapshot whenever geometry changes; the checked-in snapshot is not a substitute for mounting changed geometry. **Scale comparison** shows unlike objects together, avoiding misleading per-item auto-framing.
 
 Existing saved positions and ownership are preserved. Dense existing arrangements can require manual spacing after enlargement. No SQL migration is needed.
+
+Fortress sizes revised to 55% of their previous height (and uniform size for standalone props); grid connectors preserve their 2 m joining span. Native mesh measurements are unchanged; final sizes above are recalculated using the live presentation rules.

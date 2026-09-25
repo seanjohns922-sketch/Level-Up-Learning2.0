@@ -10,7 +10,7 @@ Six sections, each covering 60 degrees plus 15 degrees of overlap, supply about 
 
 The central-only shader blends wrap boundaries in one opaque draw, follows the camera horizontally, and leaves depth clear for buildings and scenery. It uses narrow overlap bands and mirrors sections 2 and 5 to align rising/falling valley slopes. The shared realm panorama renderer is unchanged.
 
-The foreground and outer meadow share a slightly brighter, fresher green material tint (`#cdddba`) to match the stylised valley while preserving the existing grass texture and shadows. The outer meadow fades beyond 106 m. A low terrain ridge, instanced rocks and a few trees sit outside the editable grid. Fog is gentler to avoid the previous pale strip between grass and backdrop.
+The foreground and outer meadow share a lighter meadow-green material tint (`#edfacb`) to match the stylised valley while preserving the existing grass texture and shadows. The outer meadow fades beyond 106 m. A low terrain ridge, instanced rocks and a few trees sit outside the editable grid. Fog is gentler to avoid the previous pale strip between grass and backdrop.
 
 ## Final prompt
 

@@ -41,7 +41,7 @@ export function CentralMeadowRim({quality}:{quality:CentralWorldQuality}){
   rocks.current.computeBoundingSphere();
  },[count]);
  return <group>
-  <mesh geometry={geometry} receiveShadow><meshStandardMaterial map={texture} color="#cdddba" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
+  <mesh geometry={geometry} receiveShadow><meshStandardMaterial map={texture} color="#edfacb" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
    shader.vertexShader="varying float rimRadius;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nrimRadius=length(position.xz);");
    shader.fragmentShader="varying float rimRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>","#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(106.0,134.0,rimRadius);");
   }}/></mesh>
