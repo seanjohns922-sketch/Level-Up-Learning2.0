@@ -1,0 +1,50 @@
+[
+  {
+    "level": "y45",
+    "side": "front",
+    "half": 0,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-03f6b2d1-a889-4774-9989-774ba4c94d21.png"
+  },
+  {
+    "level": "y45",
+    "side": "front",
+    "half": 1,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-d2bcce95-2f34-4733-8601-c407adaab673.png"
+  },
+  {
+    "level": "y45",
+    "side": "rear",
+    "half": 0,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-afa99b52-2358-4eed-b0d2-32ac1d11fc48.png"
+  },
+  {
+    "level": "y45",
+    "side": "rear",
+    "half": 1,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-198a8674-a5b9-4135-8828-49ad3c15f981.png"
+  },
+  {
+    "level": "y6",
+    "side": "front",
+    "half": 0,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-a93a997f-ed9a-481c-9906-e905299137ae.png"
+  },
+  {
+    "level": "y6",
+    "side": "front",
+    "half": 1,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-e100ace0-0f0e-4603-aedf-71bb695653c7.png"
+  },
+  {
+    "level": "y6",
+    "side": "rear",
+    "half": 0,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-4d3f07fb-3674-457d-bb9f-f0a6b8ae9306.png"
+  },
+  {
+    "level": "y6",
+    "side": "rear",
+    "half": 1,
+    "source": "/Users/seanjohns/.codex/generated_images/01a0d62e-ba39-7dd1-973b-4794d33bd09c/exec-6e69d6e3-ec44-4ab9-8181-dd07d1ded9e0.png"
+  }
+]

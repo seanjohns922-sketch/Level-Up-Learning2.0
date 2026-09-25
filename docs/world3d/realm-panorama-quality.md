@@ -74,3 +74,31 @@ rear landscape still has a geographic discontinuity where its two source ends
 meet; the renderer blends the colour boundary but does not reconstruct that
 terrain. This follow-up addresses the reported blur, not that separate layout
 limitation. Both source art and former runtime image remain available.
+
+## Starpath Levels 4–6 artwork follow-up
+
+Levels 4 and 5 share the restored `y45` set; Level 6 uses the restored `y6` set.
+Each set comprises four native 1254 × 1254 tiles: front left/right and rear
+left/right. These replace the hazy source imagery in the 3D background only.
+The improvement is reconstructed architectural definition and reduced excess
+haze, not an increase in pixels over the previous 2752 × 1376 JPEG halves.
+The telescope observatories, rear instruments, floating platforms, crystal
+railings, constellation floors and celestial palette remain recognisable.
+Small generated details are not pixel-identical to the original illustrations.
+
+Quarter order is rear-right, front-left, front-right, rear-left. This preserves
+the original paired backdrop orientation with no added rotation. Panorama height,
+position, floor art and gameplay objects remain unchanged. One opaque ring
+renders the tiles with native linear sampling and narrow joins. Independent
+illustrations still have small geometric differences at some floor/sky joins;
+this is not an exact continuous geometric reconstruction of the environment.
+
+Runtime assets: `public/images/starpath-detail/` (1,659,472 bytes for `y45`,
+1,814,126 bytes for `y6`). PNG masters, generation manifest and exact final prompt:
+`output/imagegen/starpath-detail/`. Tool: built-in image generation.
+
+The review page enables **Compare old background** for all three levels.
+Browser checks covered Levels 4, 5 and 6, front observatories, rear instruments,
+side transitions and an off-centre Level 6 view. TypeScript, targeted ESLint,
+Starpath detail dimensions/transfer budget, Measurelands and world art audits
+pass. Earlier panorama work was pushed as `ea9d0535`.

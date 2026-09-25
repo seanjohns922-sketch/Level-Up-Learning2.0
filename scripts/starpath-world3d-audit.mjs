@@ -87,3 +87,20 @@ console.log("Starpath S3D-1 shared-world audit passed.");
 console.log(JSON.stringify({ districts: districts.length, weeks: 8, panoramaBytes: front.size + rear.size, groundArtBytes, year1ArtBytes, year45ArtBytes, year6ArtBytes }));
 
 assert.match(environment, /WorldPanoramaRing asset=\{theme\.background\} rearAsset=\{theme\.backBackground\}/, "Both Starpath hemispheres must share one opaque panorama surface");
+
+const sharp = (await import("sharp")).default;
+for (const levelSet of ["y45", "y6"]) {
+  let detailBytes = 0;
+  for (const side of ["front", "rear"]) for (const half of [0, 1]) {
+    const asset = `/images/starpath-detail/${levelSet}-${side}-${half}.webp`;
+    assert.ok(themes.includes(asset), `Missing detail tile registration: ${asset}`);
+    const url = new URL(`../public${asset}`, import.meta.url);
+    const metadata = await sharp(url.pathname).metadata();
+    assert.equal(metadata.width, 1254, `Preserve native width: ${asset}`);
+    assert.equal(metadata.height, 1254, `Preserve native height: ${asset}`);
+    detailBytes += (await stat(url)).size;
+  }
+  assert.ok(detailBytes < 3_000_000, `${levelSet} detail backgrounds exceed 3 MB`);
+  console.log(`Starpath ${levelSet} native detail tiles verified (${detailBytes} bytes).`);
+}
+assert.match(environment, /sectionAssets=\{theme\.panoramaSections\}/, "Starpath must render the detailed sections");

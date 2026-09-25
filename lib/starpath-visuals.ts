@@ -18,6 +18,7 @@ export type StarpathLevelTheme = {
   level: RealmLevelId;
   background: string;
   backBackground?: string;
+  panoramaSections?: readonly [string, string, string, string];
   groundAsset?: string;
   panoramaY?: number;
   panoramaHeight?: number;
@@ -89,6 +90,7 @@ STARPATH_LEVEL_THEMES["Year 4"] = {
   ...STARPATH_LEVEL_THEMES["Year 4"],
   background: "/images/starpath-panorama-y45-front-4k.jpg",
   backBackground: "/images/starpath-panorama-y45-rear-4k.jpg",
+  panoramaSections: ["/images/starpath-detail/y45-rear-1.webp", "/images/starpath-detail/y45-front-0.webp", "/images/starpath-detail/y45-front-1.webp", "/images/starpath-detail/y45-rear-0.webp"],
   groundAsset: "/images/starpath-y45-crystal-floor-2k.jpg",
   panoramaY: 24.7,
   panoramaHeight: 62,
@@ -101,6 +103,7 @@ STARPATH_LEVEL_THEMES["Year 5"] = {
   ...STARPATH_LEVEL_THEMES["Year 5"],
   background: "/images/starpath-panorama-y45-front-4k.jpg",
   backBackground: "/images/starpath-panorama-y45-rear-4k.jpg",
+  panoramaSections: ["/images/starpath-detail/y45-rear-1.webp", "/images/starpath-detail/y45-front-0.webp", "/images/starpath-detail/y45-front-1.webp", "/images/starpath-detail/y45-rear-0.webp"],
   groundAsset: "/images/starpath-y45-crystal-floor-2k.jpg",
   panoramaY: 24.7,
   panoramaHeight: 62,
@@ -113,6 +116,7 @@ STARPATH_LEVEL_THEMES["Year 6"] = {
   ...STARPATH_LEVEL_THEMES["Year 6"],
   background: "/images/starpath-panorama-y6-front-4k.jpg",
   backBackground: "/images/starpath-panorama-y6-rear-4k.jpg",
+  panoramaSections: ["/images/starpath-detail/y6-rear-1.webp", "/images/starpath-detail/y6-front-0.webp", "/images/starpath-detail/y6-front-1.webp", "/images/starpath-detail/y6-rear-0.webp"],
   groundAsset: "/images/starpath-y6-constellation-floor-2k.jpg",
   panoramaY: 24.7,
   panoramaHeight: 62,

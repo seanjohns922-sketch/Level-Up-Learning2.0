@@ -353,7 +353,9 @@ export function StarpathEnvironment({ theme, quality }: { theme: StarpathLevelTh
   return (
     <>
       <Suspense fallback={null}>
-        {theme.backBackground ? (
+        {theme.panoramaSections ? (
+          <WorldPanoramaRing asset={theme.background} sectionAssets={theme.panoramaSections} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} flipX sharpDetail />
+        ) : theme.backBackground ? (
           <WorldPanoramaRing asset={theme.background} rearAsset={theme.backBackground} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} flipX />
         ) : <WorldPanorama asset={theme.background} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} flipX crisp />}
       </Suspense>
