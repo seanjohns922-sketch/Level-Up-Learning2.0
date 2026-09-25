@@ -272,7 +272,7 @@ export default function TowerRealmChamber() {
       />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
-      {atExpedition?<WorldInteractionPrompt location="THE CORE EXPEDITION" status="Six realms · A new challenge" actionLabel="ENTER EXPEDITION" onAction={runActiveAction}/>:null}
+      {atExpedition?<WorldInteractionPrompt location="THE SHATTERED REALMS" status="Six realms · A new challenge" actionLabel="ENTER EXPEDITION" onAction={runActiveAction}/>:null}
       {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit || atExpedition)} onAction={runActiveAction} />
 

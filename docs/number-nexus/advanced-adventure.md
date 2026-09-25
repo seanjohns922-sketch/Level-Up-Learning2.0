@@ -1,4 +1,4 @@
-# Core Expedition world preview
+# The Shattered Realms world preview
 
 Current release: **demo mode only**. Design review: `/demo-review/number-adventure/3d`, available with an authorised demo session. The tower portal is visible only in demo mode. Saved `/world/expedition` links send authorised demo sessions to the preview and everyone else back to the tower.
 

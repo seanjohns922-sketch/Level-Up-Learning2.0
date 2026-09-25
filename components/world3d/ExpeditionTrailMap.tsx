@@ -3,7 +3,7 @@ import ReadAloudBtn from '@/components/ReadAloudBtn';
 import { EXPEDITION_TRAILS,TRAIL_SAMPLES } from '@/lib/world3d/expedition-crossroads';
 import { VOLCANO_ROUTE } from '@/lib/world3d/volcano-expedition';
 export default function ExpeditionTrailMap({position,volcanoOpen}:{position:[number,number];volcanoOpen:boolean}){return <>
- <p className="summit-eyebrow">SIXFOLD OUTPOST</p><h2 id="summit-dialog-title">Six territories. One final ascent.</h2>
+ <p className="summit-eyebrow">SIXFOLD OUTPOST</p><h2 id="summit-dialog-title">The Shattered Realms</h2>
  <ReadAloudBtn text="Six Level 7 trails leave the outpost. One: Measurelands. Two: Starpath. Three: Number Nexus, the occupied foundry. Four: Statistica. Five: Pattern Peaks. Six: Chance Hollow. The separate seventh route, the Ashen Pass, leads up the volcano to six Level 8 strongholds. Finish a realm’s Level 7 to unlock the pass and that realm’s summit gateway. The white marker shows your position."/>
  <svg className="expedition-map expedition-map-expanded" viewBox="-182 -236 337 365" role="img" aria-label="Six separate Level 7 routes surround the outpost. A seventh route winds up the northern volcano.">
  <rect x="-182" y="-236" width="337" height="365" rx="8" fill="#263c3b"/>
