@@ -9,81 +9,31 @@ import {
   type CentralWorldQuality,
 } from "@/lib/world3d/central-world-config";
 import type { EconomyItem } from "@/lib/economy";
+import { LandmarkDetails, Tree, DetailedScenery, DETAILED_SCENERY_KEYS, DetailedReward, DETAILED_REWARD_KEYS, SceneryFinish } from "@/components/world3d/DetailedScenery";
+import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery";
+import { CollectionReward, COLLECTION_REWARD_KEYS } from "./CollectionRewards";
+import { FortressScenery, FORTRESS_SCENERY_KEYS } from "@/components/world3d/FortressScenery";
+import { WildlifeScenery, WILDLIFE_KEYS, AustralianHabitat } from "@/components/world3d/WildlifeScenery";
+import { AustralianPlace, AUSTRALIAN_PLACE_KEYS } from "@/components/world3d/AustralianPlaces";
+import { DrawbridgeChains, ReferenceProp, REFERENCE_PROP_KEYS } from "@/components/world3d/ReferenceProps";
+import { SizedWorldModel } from "@/components/world3d/SizedWorldModel";
+import { getItemPresentation } from "@/lib/world3d/world-item-presentation";
+import { ConnectedBoundary } from "./ConnectedBoundary";
+import { CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
+import { WorldWater } from "./WorldWater";
+import { OrganicPaths } from "@/components/world3d/OrganicPaths";
+import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 import {
   CENTRAL_WORLD_GRID,
+  CENTRAL_WORLD_HOME_KEY,
+  DEFAULT_HOME_PLACEMENT,
   gridToWorld,
   parseGridSize,
-  rotatedGridSize,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
 } from "@/lib/world3d/central-world-layout";
-
-const COLORS = {
-  grass: "#527f37",
-  grassDark: "#31552d",
-  path: "#94745a",
-  pathEdge: "#6f5744",
-  stone: "#6d655b",
-  towerStone: "#b98843",
-  towerLight: "#dfb860",
-  towerDark: "#59412f",
-  bronze: "#76502d",
-  door: "#211c1a",
-};
-
-function ValleyPath() {
-  const geometries = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3(CENTRAL_WORLD_CONFIG.pathPoints.map(([x, z]) => new THREE.Vector3(x, 0, z)));
-    const ribbon = (width: number, y: number) => {
-      const vertices: number[] = [];
-      const indices: number[] = [];
-      const segments = 48;
-      for (let index = 0; index <= segments; index += 1) {
-        const t = index / segments;
-        const point = curve.getPoint(t);
-        const tangent = curve.getTangent(t).normalize();
-        const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).multiplyScalar(width / 2);
-        vertices.push(point.x + normal.x, y, point.z + normal.z, point.x - normal.x, y, point.z - normal.z);
-        if (index < segments) indices.push(index * 2, index * 2 + 1, index * 2 + 2, index * 2 + 1, index * 2 + 3, index * 2 + 2);
-      }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-      geometry.setIndex(indices);
-      geometry.computeVertexNormals();
-      return geometry;
-    };
-    return { edge: ribbon(4.1, 0.045), path: ribbon(3.35, 0.075) };
-  }, []);
-  return <group><mesh geometry={geometries.edge}><meshStandardMaterial color={COLORS.pathEdge} roughness={1} side={THREE.DoubleSide} /></mesh><mesh geometry={geometries.path}><meshStandardMaterial color={COLORS.path} roughness={0.96} side={THREE.DoubleSide} /></mesh></group>;
-}
-
-function MyHomePath() {
-  const geometries = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3(CENTRAL_WORLD_CONFIG.myHomePathPoints.map(([x, z]) => new THREE.Vector3(x, 0, z)));
-    const ribbon = (width: number, y: number) => {
-      const vertices: number[] = [];
-      const indices: number[] = [];
-      const segments = 28;
-      for (let index = 0; index <= segments; index += 1) {
-        const t = index / segments;
-        const point = curve.getPoint(t);
-        const tangent = curve.getTangent(t).normalize();
-        const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).multiplyScalar(width / 2);
-        vertices.push(point.x + normal.x, y, point.z + normal.z, point.x - normal.x, y, point.z - normal.z);
-        if (index < segments) indices.push(index * 2, index * 2 + 1, index * 2 + 2, index * 2 + 1, index * 2 + 3, index * 2 + 2);
-      }
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-      geometry.setIndex(indices);
-      geometry.computeVertexNormals();
-      return geometry;
-    };
-    return { edge: ribbon(2.9, 0.05), path: ribbon(2.3, 0.08) };
-  }, []);
-  return <group><mesh geometry={geometries.edge}><meshStandardMaterial color={COLORS.pathEdge} roughness={1} side={THREE.DoubleSide} /></mesh><mesh geometry={geometries.path}><meshStandardMaterial color={COLORS.path} roughness={0.96} side={THREE.DoubleSide} /></mesh></group>;
-}
 
 // ---------------------------------------------------------------------------
 // Aussie marquee models. Authored around a ~4.6-unit base span so the shared
@@ -93,15 +43,7 @@ function MyHomePath() {
 const GUM = { trunk: "#d8ceba", trunkDark: "#c2b79f", green0: "#5c7a4b", green1: "#799a5f", green2: "#6f8a60", green3: "#9cbc7e" } as const;
 
 function GumTree({ height = 3.6, canopy = 1.0 }: { height?: number; canopy?: number }) {
-  const top = height;
-  return (
-    <group>
-      <mesh position={[0, height / 2, 0]} castShadow><cylinderGeometry args={[canopy * 0.13, canopy * 0.2, height, 10]} /><meshStandardMaterial color={GUM.trunk} roughness={0.85} /></mesh>
-      {([[0, top, 0, 1.0, GUM.green0], [-0.6, top - 0.2, 0.22, 0.62, GUM.green1], [0.62, top - 0.15, 0.12, 0.62, GUM.green2], [-0.05, top + 0.32, -0.24, 0.72, GUM.green1], [0.2, top + 0.42, 0.1, 0.55, GUM.green3]] as const).map(([x, y, z, r, c], i) => (
-        <mesh key={i} position={[x * canopy, y, z * canopy]} castShadow><sphereGeometry args={[r * canopy, 14, 10]} /><meshStandardMaterial color={c} roughness={0.95} /></mesh>
-      ))}
-    </group>
-  );
+  return <group scale={[canopy,height/2.9,canopy]}><Tree variant="gum_tree" tint={GUM.green1}/></group>;
 }
 
 function Koala() {
@@ -162,9 +104,9 @@ function AflOval() {
     <group>
       <mesh position={[0, 0.34, 0]} scale={[1.35, 1, 1.05]} receiveShadow castShadow><cylinderGeometry args={[2.5, 2.78, 0.68, 48]} /><meshStandardMaterial color="#64748b" roughness={0.82} /></mesh>
       <mesh position={[0, 0.56, 0]} scale={[1.32, 1, 1.02]}><cylinderGeometry args={[2.12, 2.32, 0.5, 48]} /><meshStandardMaterial color="#475569" roughness={0.78} /></mesh>
-      <mesh position={[0, 0.63, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[1.95, 48]} /><meshStandardMaterial color="#3f9a45" roughness={0.9} /></mesh>
-      <mesh position={[0, 0.645, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.84, 1.95, 48]} /><meshBasicMaterial color="#eafff0" /></mesh>
-      <mesh position={[0, 0.65, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.24, 0.32, 24]} /><meshBasicMaterial color="#eafff0" /></mesh>
+      <mesh position={[0, 0.825, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[1.95, 48]} /><meshStandardMaterial color="#3f9a45" roughness={0.9} /></mesh>
+      <mesh position={[0, 0.84, 0]} scale={[1.32, 1, 1.02]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.84, 1.95, 48]} /><meshBasicMaterial color="#eafff0" /></mesh>
+      <mesh position={[0, 0.845, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.24, 0.32, 24]} /><meshBasicMaterial color="#eafff0" /></mesh>
       {([-1, 1] as const).map((sgn) => ([-0.5, -0.18, 0.18, 0.5] as const).map((dz, i) => (
         <mesh key={`${sgn}-${i}`} position={[sgn * 2.42, 0.63 + (Math.abs(dz) < 0.3 ? 0.9 : 0.52), dz]} castShadow><boxGeometry args={[0.06, Math.abs(dz) < 0.3 ? 1.8 : 1.04, 0.06]} /><meshStandardMaterial color="#f8fafc" roughness={0.6} /></mesh>
       )))}
@@ -198,7 +140,7 @@ function Queenslander() {
       {([[-1.5, -1.4], [1.5, -1.4], [-1.5, 1.4], [1.5, 1.4]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.6, z]}><boxGeometry args={[0.28, 1.2, 0.28]} /><meshStandardMaterial color="#8a5a3c" roughness={0.9} /></mesh>)}
       <RoundedBox args={[3.7, 2.0, 3.4]} radius={0.12} smoothness={3} position={[0, 2.2, 0]} castShadow><meshStandardMaterial color="#dbeafe" roughness={0.8} /></RoundedBox>
       <RoundedBox args={[3.8, 0.5, 3.5]} radius={0.1} smoothness={3} position={[0, 1.35, 0]} castShadow><meshStandardMaterial color="#93c5fd" roughness={0.82} /></RoundedBox>
-      <mesh position={[0, 3.7, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[3.0, 1.3, 4]} /><meshStandardMaterial color="#d24b46" roughness={0.7} metalness={0.1} /></mesh>
+      <mesh position={[0, 3.7, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[3.0, 1.3, 4]} /><meshStandardMaterial color="#a76555" roughness={0.85} metalness={0.1} /></mesh>
       {([-1.55, -0.52, 0.52, 1.55] as const).map((x) => <mesh key={x} position={[x, 2.0, 1.78]}><boxGeometry args={[0.12, 1.6, 0.12]} /><meshStandardMaterial color="#f8fafc" roughness={0.7} /></mesh>)}
       <mesh position={[0, 2.05, 1.79]}><planeGeometry args={[1.2, 1.3]} /><meshStandardMaterial color="#27382f" emissive="#dba84e" emissiveIntensity={0.2} roughness={0.8} /></mesh>
       <mesh position={[0, 1.05, 2.05]}><boxGeometry args={[1.1, 0.7, 0.7]} /><meshStandardMaterial color="#c98a52" roughness={0.85} /></mesh>
@@ -210,10 +152,10 @@ function SurfClub() {
   return (
     <group>
       <mesh position={[0, 0.16, 0]} receiveShadow><cylinderGeometry args={[2.5, 2.6, 0.3, 36]} /><meshStandardMaterial color="#f0dfa8" roughness={0.95} /></mesh>
-      <RoundedBox args={[3.6, 2.2, 2.6]} radius={0.14} smoothness={3} position={[-0.3, 1.4, 0]} castShadow><meshStandardMaterial color="#2563eb" roughness={0.62} /></RoundedBox>
-      <mesh position={[-0.3, 3.0, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[2.7, 1.0, 4]} /><meshStandardMaterial color="#e5484d" roughness={0.6} /></mesh>
+      <RoundedBox args={[3.6, 2.2, 2.6]} radius={0.14} smoothness={3} position={[-0.3, 1.4, 0]} castShadow><meshStandardMaterial color="#557d96" roughness={0.82} /></RoundedBox>
+      <mesh position={[-0.3, 3.0, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[2.7, 1.0, 4]} /><meshStandardMaterial color="#a36150" roughness={0.85} /></mesh>
       <mesh position={[-0.3, 1.5, 1.32]}><planeGeometry args={[2.6, 0.5]} /><meshStandardMaterial color="#eff6ff" emissive="#bfdbfe" emissiveIntensity={0.15} roughness={0.4} /></mesh>
-      <RoundedBox args={[1.3, 3.4, 1.3]} radius={0.1} smoothness={3} position={[1.55, 1.9, 0.2]} castShadow><meshStandardMaterial color="#1d4ed8" roughness={0.6} /></RoundedBox>
+      <RoundedBox args={[1.3, 3.4, 1.3]} radius={0.1} smoothness={3} position={[1.55, 1.9, 0.2]} castShadow><meshStandardMaterial color="#4e7386" roughness={0.8} /></RoundedBox>
       <RoundedBox args={[1.7, 1.2, 1.7]} radius={0.12} smoothness={3} position={[1.55, 3.9, 0.2]} castShadow><meshStandardMaterial color="#f8fafc" roughness={0.55} /></RoundedBox>
       {([-2.3, 2.3] as const).map((x) => (
         <group key={x} position={[x, 0.3, -1.8]}>
@@ -259,26 +201,11 @@ function LagoonPool() {
   );
 }
 
-// TODO (marketplace buildings — deferred until after Chance Hollow):
-// Sean's call is these look "povo" and need to actually read as real buildings,
-// Roblox-quality, not flat low-poly boxes. Lighting/materials were already
-// upgraded (see CentralWorld.tsx lighting pass); the remaining work is the
-// GEOMETRY, per building:
-//  - Give each building a real silhouette. Right now clubhouse/games_room/
-//    training_centre all fall through to ONE shared box+cone mesh below — split
-//    them into distinct models.
-//  - Retire the flat 4-sided cone roofs and the glowing-panel windows.
-//  - Add the parts that make a mesh read as a building: framed windows with
-//    sills, a real door, roof tiling/ridge, gutters/eaves, wall trim, railings,
-//    verandah posts — and get the proportions right (storey height vs footprint).
-//  - Queenslander / SurfClub / SydneyTower are the closest to the target; use
-//    them as the quality bar and bring the rest up to it.
-// Aim for the Roblox "stylised-but-clearly-a-building" look, staying procedural
-// (no GLB/textures — house rule). See memory: marketplace-building-quality.
+// Landmark models retained alongside the detailed reward collection.
 function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
-  if (assetKey === "clubhouse") return <Queenslander />;
-  if (assetKey === "workshop") return <SurfClub />;
-  if (assetKey === "observatory") return <SydneyTower />;
+  if (assetKey === "clubhouse") return <group><Queenslander /><LandmarkDetails variant="clubhouse" /></group>;
+  if (assetKey === "workshop") return <group><SurfClub /><LandmarkDetails variant="workshop" /></group>;
+  if (assetKey === "observatory") return <group><SydneyTower /><LandmarkDetails variant="observatory" /></group>;
   if (assetKey === "treehouse") {
     return (
       <group>
@@ -305,7 +232,7 @@ function RewardBuilding({ assetKey, accent, tier }: { assetKey: string; accent: 
 
 function RewardAnimalYard({ assetKey, accent, tier }: { assetKey: string; accent: string; tier: number }) {
   if (assetKey === "wildlife_habitat") return <KoalaGumTrees />;
-  if (assetKey === "farmyard") return <OutbackHomestead />;
+  if (assetKey === "farmyard") return <group><OutbackHomestead /><LandmarkDetails variant="farmyard" /></group>;
   return (
     <group>
       <mesh position={[0, 0.42, 0]} receiveShadow><cylinderGeometry args={[2.35, 2.55, 0.32, 36]} /><meshStandardMaterial color={accent} roughness={0.9} /></mesh>
@@ -376,10 +303,14 @@ function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; acce
   return <RewardBuilding assetKey="party_house" accent={accent} tier={tier} />;
 }
 
-function RewardPlotObject({ item, accent, tier, tint }: { item: EconomyItem; accent: string; tier: number; tint?: string }) {
+export function RewardPlotObject({ item, accent, tier, tint }: { item: EconomyItem; accent: string; tier: number; tint?: string }) {
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
   if (category === "world_basic") return <StarterScenery assetKey={assetKey} tint={tint} />;
+  if (COLLECTION_REWARD_KEYS.has(assetKey)) return <CollectionReward assetKey={assetKey} tint={tint} />;
+  if (["wildlife_habitat", "bunny_garden", "puppy_yard", "pet_sanctuary"].includes(assetKey)) return <AustralianHabitat assetKey={assetKey} />;
+  if (AUSTRALIAN_PLACE_KEYS.has(assetKey)) return <AustralianPlace assetKey={assetKey} />;
+  if (DETAILED_REWARD_KEYS.has(assetKey)) return <DetailedReward assetKey={assetKey} />;
   if (category === "animals") return <RewardAnimalYard assetKey={assetKey} accent={accent} tier={tier} />;
   if (category === "pools_play") return <RewardPlayPlace assetKey={assetKey} tier={tier} />;
   if (category === "special") return <RewardSpecialPlace assetKey={assetKey} accent={accent} tier={tier} />;
@@ -389,21 +320,18 @@ function RewardPlotObject({ item, accent, tier, tint }: { item: EconomyItem; acc
 // A eucalyptus / gum tree: pale mottled trunk, a couple of branches and a sparse
 // blue-green canopy. Shared by the standalone gum tree and the koala's tree.
 function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
-  return (
-    <group>
-      <mesh position={[0, 1.5, 0]} castShadow><cylinderGeometry args={[0.18, 0.3, 3.0, 9]} /><meshStandardMaterial color="#cfc9ba" roughness={0.9} /></mesh>
-      {([[0.16, 1.2, 0.12], [-0.14, 2.0, -0.1], [0.1, 2.6, -0.14], [-0.12, 0.9, 0.14]] as const).map(([x, y, z], i) => <mesh key={i} position={[x, y, z]} scale={[1, 1.7, 1]}><sphereGeometry args={[0.09, 8, 8]} /><meshStandardMaterial color="#9a9384" roughness={0.95} /></mesh>)}
-      <mesh position={[0.4, 2.9, 0]} rotation={[0, 0, -0.9]} castShadow><cylinderGeometry args={[0.06, 0.12, 1.0, 6]} /><meshStandardMaterial color="#c2bcae" roughness={0.9} /></mesh>
-      <mesh position={[-0.38, 3.2, 0.1]} rotation={[0, 0, 0.95]} castShadow><cylinderGeometry args={[0.05, 0.1, 0.9, 6]} /><meshStandardMaterial color="#bdb7a8" roughness={0.9} /></mesh>
-      {([[0, 3.75, 0, 0.95], [0.72, 3.4, 0.2, 0.66], [-0.66, 3.5, -0.15, 0.62], [0.2, 4.2, 0.05, 0.6], [-0.3, 3.95, 0.35, 0.5]] as const).map(([x, y, z, r], i) => <mesh key={i} position={[x, y, z]} castShadow><sphereGeometry args={[r, 12, 10]} /><meshStandardMaterial color={i % 2 ? canopyColor : "#7d9b7a"} roughness={0.95} /></mesh>)}
-    </group>
-  );
+  return <group scale={[1,1.3,1]}><Tree variant="gum_tree" tint={canopyColor}/></group>;
 }
 
 // `tint`, when set, recolours only the item's designated paint surface (petals,
 // foliage, canopy, cloth, cap, water, glow…). Structural parts — trunks, poles,
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
 function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string }) {
+  if (COLLECTION_SCENERY_KEYS.has(assetKey)) return <CollectionScenery assetKey={assetKey} tint={tint} />;
+  if (FORTRESS_SCENERY_KEYS.has(assetKey)) return <FortressScenery assetKey={assetKey} tint={tint} />;
+  if (WILDLIFE_KEYS.has(assetKey)) return <WildlifeScenery assetKey={assetKey} tint={tint} />;
+  if (REFERENCE_PROP_KEYS.has(assetKey)) return <ReferenceProp assetKey={assetKey} tint={tint} />;
+  if (DETAILED_SCENERY_KEYS.has(assetKey)) return <DetailedScenery assetKey={assetKey} tint={tint} />;
   const t = (fallback: string) => tint ?? fallback;
   if (assetKey === "lamp_post") return <group><mesh position={[0, 1.25, 0]} castShadow><cylinderGeometry args={[0.09, 0.13, 2.5, 10]} /><meshStandardMaterial color="#344239" metalness={0.45} roughness={0.48} /></mesh><mesh position={[0, 2.55, 0]}><sphereGeometry args={[0.3, 16, 12]} /><meshStandardMaterial color={t("#fff1a8")} emissive={t("#facc15")} emissiveIntensity={0.85} /></mesh></group>;
   if (assetKey === "flower_bed") return <group><mesh position={[0, 0.15, 0]}><cylinderGeometry args={[0.72, 0.82, 0.24, 20]} /><meshStandardMaterial color="#5d3b24" roughness={1} /></mesh>{[[0.3, "#f472b6"], [-0.28, "#facc15"], [0, "#a78bfa"]].map(([x, color], index) => <mesh key={index} position={[Number(x), 0.48, index === 2 ? 0.25 : -0.08]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color={t(String(color))} /></mesh>)}</group>;
@@ -716,26 +644,6 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
 // Size comes from the item's own footprint now, not a fixed per-category number,
 // so a 16 m AFL oval towers over a 4 m gum-tree cubby. Models are authored to
 // span ~4.6 world units at scale 1 and fill ~92% of the smaller footprint edge.
-function worldObjectScale(item: EconomyItem) {
-  if (item.metadata.marketplaceCategory === "world_basic") {
-    // Free scenery meshes are authored at varied natural sizes, so each item
-    // carries its own display scale (tuned to fill its footprint) rather than a
-    // one-size-fits-all value that leaves long items like the bridge undersized.
-    const custom = Number(item.metadata.worldScale);
-    const base = Number.isFinite(custom) && custom > 0 ? custom : 1.25;
-    // Trees, animals and decor read a touch small against the avatar and grid, so
-    // enlarge them. Pieces that tile cell-to-cell (fortress kit, fences, hedges)
-    // stay at their exact footprint scale so runs merge seamlessly.
-    const assetKey = item.metadata.worldAssetKey;
-    const tiles = item.metadata.worldSceneryGroup === "fortress" || assetKey === "fence" || assetKey === "hedge";
-    return base * (tiles ? 1 : 1.3);
-  }
-  const [gridW, gridD] = parseGridSize(item);
-  const footprintMetres = Math.min(gridW, gridD) * CENTRAL_WORLD_GRID.cellSize;
-  const scale = (footprintMetres * 0.92) / 4.6;
-  return Math.min(Math.max(scale, 0.62), 3.6);
-}
-
 // Per-animal wander behaviour. radius is how far (world units) it strays from
 // where it was placed — small, so a fenced paddock keeps it in. hop gives a
 // bouncy gait; otherwise it walks with a subtle bob.
@@ -750,6 +658,13 @@ const ANIMAL_GAITS: Record<string, Gait> = {
 
 function AnimalRoamer({ gait, children }: { gait: Gait; children: React.ReactNode }) {
   const ref = useRef<THREE.Group>(null);
+  const reducedMotion = useRef(false);
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => { reducedMotion.current = query.matches; };
+    update(); query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const s = useRef({ px: 0, pz: 0, tx: 0, tz: 0, yaw: 0, pause: 1.2, clock: 0, moving: false });
   // Seed each animal with a random phase after mount (random is client-only, so
   // it stays out of render) so they don't all pause and step in lockstep.
@@ -759,7 +674,7 @@ function AnimalRoamer({ gait, children }: { gait: Gait; children: React.ReactNod
   }, []);
   useFrame((_, deltaRaw) => {
     const g = ref.current;
-    if (!g) return;
+    if (!g || reducedMotion.current) return;
     const delta = Math.min(deltaRaw, 0.05);
     const st = s.current;
     st.clock += delta;
@@ -822,8 +737,9 @@ function DrawbridgeMesh({ tint, deckRef }: { tint?: string; deckRef?: React.RefO
         <mesh position={[0, 0, 1.7]} castShadow><boxGeometry args={[1.8, 0.16, 3.4]} /><meshStandardMaterial color={wood} roughness={0.9} /></mesh>
         {([-1.2, -0.6, 0, 0.6, 1.2] as const).map((z) => <mesh key={z} position={[0, 0.09, 1.7 + z]}><boxGeometry args={[1.8, 0.02, 0.05]} /><meshStandardMaterial color="#5f3f22" /></mesh>)}
         {([-0.6, 0.6] as const).map((x) => <mesh key={x} position={[x, 0.1, 1.7]}><boxGeometry args={[0.12, 0.05, 3.3]} /><meshStandardMaterial color="#6b4a2a" /></mesh>)}
-        {([-0.95, 0.95] as const).map((x) => <mesh key={x} position={[x, 0.12, 3.3]} rotation={[0.5, 0, 0]}><cylinderGeometry args={[0.03, 0.03, 2.4, 5]} /><meshStandardMaterial color="#3a3a3a" metalness={0.5} roughness={0.5} /></mesh>)}
+
       </group>
+      <DrawbridgeChains deckRef={deckRef}/>
     </group>
   );
 }
@@ -851,11 +767,10 @@ function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: s
   );
 }
 
-function PlacedWorldObject({ item, placement, preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
+function PlacedWorldObject({ item, placement, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
-  const scale = worldObjectScale(item);
-  const [width, depth] = rotatedGridSize(item, placement.rotation);
+  const [width, depth] = parseGridSize(item);
   const position = gridToWorld(placement.gridX, placement.gridZ);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
@@ -878,27 +793,27 @@ function PlacedWorldObject({ item, placement, preview = false, valid = true, ani
 
   return (
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
-      <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {preview && <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[width * CENTRAL_WORLD_GRID.cellSize - 0.18, depth * CENTRAL_WORLD_GRID.cellSize - 0.18]} />
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
-      </mesh>
-      {interactiveBridge ? (
-        <group ref={groupRef} scale={scale}>
-          <Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} />
-        </group>
+      </mesh>}
+      {CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+        <group ref={groupRef}><SizedWorldModel item={item}>
+          <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
+        </SizedWorldModel></group>
       ) : gait ? (
         <AnimalRoamer gait={gait}>
-          <group ref={groupRef} scale={scale}>
-            <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
-          </group>
+          <group ref={groupRef}><SizedWorldModel item={item}>
+            <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} /></SceneryFinish>
+          </SizedWorldModel></group>
         </AnimalRoamer>
       ) : (
-        <group ref={groupRef} scale={scale}>
-          <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} />
-        </group>
+        <group ref={groupRef}><SizedWorldModel item={item}>
+          <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} /></SceneryFinish>
+        </SizedWorldModel></group>
       )}
-      {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, 4.2 * scale, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
+      {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, getItemPresentation(item).height + .5, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
     </group>
   );
 }
@@ -915,7 +830,7 @@ function BuildModeGrid({ cursor }: { cursor: { gridX: number; gridZ: number } })
   );
 }
 
-const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a77a50", road: "#4b5563", stone: "#a8a29e", water: "#2f7fa6" };
+const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a38a69", road: "#4b5563", stone: "#a8a29e", water: "#2f7fa6" };
 
 function GroundTile({ tile, preview = false, valid = true }: { tile: CentralWorldGroundTile; preview?: boolean; valid?: boolean }) {
   const isWater = tile.tileType === "water";
@@ -924,6 +839,31 @@ function GroundTile({ tile, preview = false, valid = true }: { tile: CentralWorl
   // Water sits a touch lower and reads wet (smooth + a little reflective) so a
   // painted moat looks like water, not a blue path.
   return <mesh position={[x, preview ? 0.18 : isWater ? 0.055 : 0.105, z]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize + 0.04, preview ? 0.12 : 0.08, CENTRAL_WORLD_GRID.cellSize + 0.04]} /><meshStandardMaterial color={color} transparent={preview} opacity={preview ? 0.72 : 1} roughness={isWater ? 0.18 : 0.95} metalness={isWater ? 0.25 : 0} emissive={isWater ? "#123a4f" : "#000000"} emissiveIntensity={isWater ? 0.25 : 0} /></mesh>;
+}
+
+// Paths are now ordinary editable tiles; batch by material instead of adding
+// a draw call for every square of the starter routes.
+function GroundTileBatch({ tiles, tileType }: { tiles: CentralWorldGroundTile[]; tileType: CentralWorldGroundType }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const water = tileType === "water";
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    const transform = new THREE.Object3D();
+    tiles.forEach((tile, i) => {
+      const [x, , z] = gridToWorld(tile.gridX, tile.gridZ);
+      transform.position.set(x, water ? 0.055 : 0.105, z);
+      transform.updateMatrix();
+      ref.current!.setMatrixAt(i, transform.matrix);
+    });
+    ref.current.instanceMatrix.needsUpdate = true;
+    ref.current.computeBoundingSphere();
+  }, [tiles, water]);
+  return <instancedMesh ref={ref} args={[undefined, undefined, tiles.length]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize, 0.08, CENTRAL_WORLD_GRID.cellSize]} /><meshStandardMaterial color={GROUND_TILE_COLORS[tileType]} roughness={water ? 0.18 : 0.95} metalness={water ? 0.25 : 0} /></instancedMesh>;
+}
+
+function PaintedGround({ tiles }: { tiles: CentralWorldGroundTile[] }) {
+  const batches = useMemo(() => (["stone"] as const).map(tileType => ({ tileType, tiles: tiles.filter(tile => tile.tileType === tileType) })), [tiles]);
+  return <group><OrganicPaths tiles={tiles} /><OrganicPaths tiles={tiles} road /><WorldWater tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
 }
 
 function MeadowGround() {
@@ -941,7 +881,7 @@ function MeadowGround() {
   useEffect(() => () => texture.dispose(), [texture]);
   // Large enough that the ground always reaches the horizon panorama — no void
   // is ever visible around the Tower or the playable edge.
-  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} color="#ffffff" roughness={1} /></mesh>;
+  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.055} color="#c2cbab" roughness={1} /></mesh>;
 }
 
 function GrassTufts({ quality, groundTiles }: { quality: CentralWorldQuality; groundTiles: CentralWorldGroundTile[] }) {
@@ -1005,17 +945,58 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
-// A pointed (lancet) arch panel: a rectangle capped by a 45°-rotated square whose
-// top corner forms the point. Base sits at local y=0; total height is h + w/2.
-// Nest these (smaller + darker + pushed toward +z) to build recessed arch layers.
+// One bevelled solid gives the arch a continuous face and a carved stone edge.
 function PointedPanel({ w, h, d, color, emissive, ei = 0, roughness = 0.85, metalness = 0 }: { w: number; h: number; d: number; color: string; emissive?: string; ei?: number; roughness?: number; metalness?: number }) {
-  const head = w / Math.SQRT2;
-  return (
-    <group>
-      <mesh position={[0, h / 2, 0]}><boxGeometry args={[w, h, d]} /><meshStandardMaterial color={color} emissive={emissive ?? "#000000"} emissiveIntensity={ei} roughness={roughness} metalness={metalness} /></mesh>
-      <mesh position={[0, h, 0]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[head, head, d]} /><meshStandardMaterial color={color} emissive={emissive ?? "#000000"} emissiveIntensity={ei} roughness={roughness} metalness={metalness} /></mesh>
-    </group>
-  );
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-w / 2, 0);
+    shape.lineTo(w / 2, 0);
+    shape.lineTo(w / 2, h);
+    shape.lineTo(0, h + w / 2);
+    shape.lineTo(-w / 2, h);
+    shape.closePath();
+    const result = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: true, bevelSize: Math.min(0.06, w * 0.035), bevelThickness: 0.035, bevelSegments: 1, steps: 1 });
+    result.translate(0, 0, -d / 2);
+    return result;
+  }, [w, h, d]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh geometry={geometry} castShadow receiveShadow><meshStandardMaterial color={color} emissive={emissive ?? "#000000"} emissiveIntensity={ei} roughness={roughness} metalness={metalness} /></mesh>;
+}
+
+// Shallow staggered sandstone blocks: one draw call per storey, with real
+// mortar gaps and restrained colour variation instead of a stretched texture.
+function TowerMasonry({ width, height, base, columns, rows }: { width: number; height: number; base: number; columns: number; rows: number }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const count = 4 * rows * (columns + 1);
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    const transform = new THREE.Object3D();
+    const color = new THREE.Color();
+    const blockWidth = width / columns;
+    const course = height / rows;
+    let index = 0;
+    for (let face = 0; face < 4; face += 1) {
+      const angle = face * Math.PI / 2;
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col <= columns; col += 1) {
+          const left = Math.max(-width / 2, -width / 2 + (col - (row % 2 ? 0.5 : 0)) * blockWidth);
+          const right = Math.min(width / 2, -width / 2 + (col + 1 - (row % 2 ? 0.5 : 0)) * blockWidth);
+          const x = (left + right) / 2;
+          transform.position.set(x * Math.cos(angle) + (width / 2 + 0.018) * Math.sin(angle), base + (row + 0.5) * course, -x * Math.sin(angle) + (width / 2 + 0.018) * Math.cos(angle));
+          transform.rotation.set(0, angle, 0);
+          transform.scale.set(Math.max(0, right - left - 0.035), course - 0.035, 0.045);
+          transform.updateMatrix();
+          ref.current.setMatrixAt(index, transform.matrix);
+          color.set(T.stone).multiplyScalar(0.91 + ((row * 17 + col * 7 + face * 11) % 9) * 0.014);
+          ref.current.setColorAt(index++, color);
+        }
+      }
+    }
+    ref.current.instanceMatrix.needsUpdate = true;
+    if (ref.current.instanceColor) ref.current.instanceColor.needsUpdate = true;
+    ref.current.computeBoundingSphere();
+  }, [width, height, base, columns, rows]);
+  return <instancedMesh ref={ref} args={[undefined, undefined, count]} receiveShadow><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial roughness={0.91} /></instancedMesh>;
 }
 
 // A modular tapered gothic spire (square shaft + pyramid cap + gold finial),
@@ -1025,8 +1006,10 @@ function Spire({ h, r, tone = T.stone, finial = true }: { h: number; r: number; 
   const cap = h * 0.56;
   return (
     <group>
-      <mesh position={[0, shaft / 2, 0]} rotation={[0, Math.PI / 4, 0]}><cylinderGeometry args={[r * 0.82, r, shaft, 4]} /><meshStandardMaterial color={tone} roughness={0.72} /></mesh>
-      <mesh position={[0, shaft + cap / 2, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[r * 1.16, cap, 4]} /><meshStandardMaterial color={tone} roughness={0.64} /></mesh>
+      <mesh position={[0, 0.15, 0]} castShadow receiveShadow><boxGeometry args={[r * 1.55, 0.3, r * 1.55]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.82} /></mesh>
+      <mesh position={[0, shaft, 0]} castShadow receiveShadow><boxGeometry args={[r * 1.4, 0.18, r * 1.4]} /><meshStandardMaterial color={T.stoneHi} roughness={0.78} /></mesh>
+      <mesh castShadow receiveShadow position={[0, shaft / 2, 0]} rotation={[0, Math.PI / 4, 0]}><cylinderGeometry args={[r * 0.82, r, shaft, 4]} /><meshStandardMaterial color={tone} roughness={0.72} /></mesh>
+      <mesh castShadow receiveShadow position={[0, shaft + cap / 2, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[r * 1.16, cap, 4]} /><meshStandardMaterial color={tone} roughness={0.64} /></mesh>
       {finial ? <mesh position={[0, shaft + cap + r * 0.4, 0]}><octahedronGeometry args={[r * 0.42, 0]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.4} roughness={0.42} /></mesh> : null}
     </group>
   );
@@ -1049,7 +1032,10 @@ function GothicWindow({ w = 1.0, h = 3.0, glow = false }: { w?: number; h?: numb
     <group>
       <PointedPanel w={w + 0.5} h={h + 0.3} d={0.5} color={T.stoneWarm} />
       <group position={[0, 0.16, 0.2]}><PointedPanel w={w} h={h} d={0.4} color={T.recess} /></group>
-      <group position={[0, 0.3, 0.32]}><PointedPanel w={w * 0.64} h={h * 0.82} d={0.2} color={T.glass} emissive={T.glass} ei={glow ? 0.9 : 0.5} /></group>
+      <group position={[0, 0.3, 0.32]}><PointedPanel w={w * 0.64} h={h * 0.82} d={0.2} color={T.glass} emissive={T.glass} ei={glow ? 0.5 : 0.16} /></group>
+      <mesh position={[0, h * 0.47, 0.46]} castShadow><boxGeometry args={[0.065, h * 0.83, 0.08]} /><meshStandardMaterial color={T.bronze} metalness={0.45} roughness={0.5} /></mesh>
+      <mesh position={[0, h * 0.48, 0.46]} castShadow><boxGeometry args={[w * 0.65, 0.065, 0.08]} /><meshStandardMaterial color={T.bronze} metalness={0.45} roughness={0.5} /></mesh>
+      <mesh position={[0, 0.06, 0.28]} castShadow receiveShadow><boxGeometry args={[w + 0.65, 0.18, 0.7]} /><meshStandardMaterial color={T.stoneHi} roughness={0.8} /></mesh>
     </group>
   );
 }
@@ -1082,6 +1068,9 @@ function TowerClock({ animate }: { animate: boolean }) {
         <mesh><torusGeometry args={[3.5, 0.55, 14, 40]} /><meshStandardMaterial color={T.stoneHi} roughness={0.68} /></mesh>
         <mesh position={[0, 0, 0.12]}><torusGeometry args={[3.05, 0.26, 12, 40]} /><meshStandardMaterial color={T.bronze} metalness={0.72} roughness={0.34} /></mesh>
         <mesh position={[0, 0, 0.02]}><circleGeometry args={[3.0, 48]} /><meshStandardMaterial color={T.clockFace} roughness={0.58} /></mesh>
+        <mesh position={[0, 0, 0.11]}><torusGeometry args={[2.91, 0.035, 6, 64]} /><meshStandardMaterial color={T.gold} metalness={0.75} roughness={0.28} /></mesh>
+        <mesh position={[0, 0, 0.06]}><circleGeometry args={[1.92, 48]} /><meshStandardMaterial color="#56432d" metalness={0.3} roughness={0.65} /></mesh>
+        <mesh position={[0, 0, 0.1]}><torusGeometry args={[1.94, 0.045, 6, 48]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.75} roughness={0.3} /></mesh>
         {/* hour ticks */}
         {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <mesh key={i} position={[Math.sin(a) * 2.62, Math.cos(a) * 2.62, 0.12]} rotation={[0, 0, -a]}><boxGeometry args={[0.12, 0.46, 0.06]} /><meshStandardMaterial color={T.bronze} metalness={0.5} roughness={0.4} /></mesh>; })}
         {/* exposed gear train (lower centre, like the reference) */}
@@ -1089,8 +1078,8 @@ function TowerClock({ animate }: { animate: boolean }) {
         <group ref={gearB} position={[0.95, -0.05, 0.2]}><Gear r={0.72} teeth={9} /></group>
         <group ref={gearC} position={[0.15, 1.0, 0.16]}><Gear r={0.5} teeth={8} /></group>
         {/* dimensional hands */}
-        <group ref={minute} position={[0, 0, 0.34]}><mesh position={[0, 1.05, 0]}><boxGeometry args={[0.13, 2.3, 0.09]} /><meshStandardMaterial color="#2a2018" metalness={0.3} /></mesh></group>
-        <mesh position={[0.62, 0.42, 0.4]} rotation={[0, 0, -0.95]}><boxGeometry args={[0.15, 1.5, 0.09]} /><meshStandardMaterial color="#2a2018" metalness={0.3} /></mesh>
+        <group ref={minute} position={[0, 0, 0.34]}><mesh position={[0, 1.05, 0]}><boxGeometry args={[0.13, 2.3, 0.09]} /><meshStandardMaterial color={T.stoneHi} metalness={0.5} roughness={0.32} /></mesh></group>
+        <mesh position={[0.62, 0.42, 0.4]} rotation={[0, 0, -0.95]}><boxGeometry args={[0.15, 1.5, 0.09]} /><meshStandardMaterial color={T.stoneHi} metalness={0.5} roughness={0.32} /></mesh>
         <mesh position={[0, 0, 0.46]}><sphereGeometry args={[0.2, 12, 12]} /><meshStandardMaterial color={T.gold} metalness={0.5} roughness={0.4} /></mesh>
       </group>
     </group>
@@ -1102,30 +1091,34 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
   const detail = quality !== "low";
   const animate = quality !== "low" && !reduced;
   const doorEmissive = active ? "#f0b862" : "#3a2410";
-  const doorGlow = active ? 0.65 : 0.08;
+  const doorGlow = active ? 0.18 : 0.03;
   const corners: Array<[number, number]> = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
   const bodyTopY = 28.6;
   const upperTopY = 40.2;
   return (
     <group position={CENTRAL_WORLD_CONFIG.towerPosition} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
       {/* ---- stepped stone base / apron, blending into the hill ---- */}
-      <mesh position={[0, 0.5, 0]}><boxGeometry args={[15, 1, 14]} /><meshStandardMaterial color={T.stoneDeep} roughness={0.9} /></mesh>
-      <mesh position={[0, 1.3, 0]}><boxGeometry args={[12.5, 1, 12]} /><meshStandardMaterial color={T.stoneMid} roughness={0.86} /></mesh>
-      <mesh position={[0, 2.1, 0]}><boxGeometry args={[10.5, 1, 10]} /><meshStandardMaterial color={T.stone} roughness={0.84} /></mesh>
+      <mesh position={[0, 0.5, 0]} castShadow receiveShadow><boxGeometry args={[15, 1, 14]} /><meshStandardMaterial color={T.stoneDeep} roughness={0.9} /></mesh>
+      <mesh position={[0, 1.3, 0]} castShadow receiveShadow><boxGeometry args={[12.5, 1, 12]} /><meshStandardMaterial color={T.stoneMid} roughness={0.86} /></mesh>
+      <mesh position={[0, 2.1, 0]} castShadow receiveShadow><boxGeometry args={[10.5, 1, 10]} /><meshStandardMaterial color={T.stone} roughness={0.84} /></mesh>
 
       {/* ---- slim central body (tall, faintly tapered) ---- */}
-      <mesh position={[0, 15.6, 0]}><boxGeometry args={[7.4, 26, 7.4]} /><meshStandardMaterial color={T.stone} roughness={0.82} /></mesh>
+      <mesh position={[0, 15.6, 0]} castShadow receiveShadow><boxGeometry args={[7.4, 26, 7.4]} /><meshStandardMaterial color={T.stone} roughness={0.82} /></mesh>
+      {detail ? <TowerMasonry width={7.4} height={26} base={2.6} columns={4} rows={26} /> : null}
       {/* corner buttress ribs full height */}
-      {corners.map(([sx, sz], i) => <mesh key={`br${i}`} position={[sx * 3.55, 15.1, sz * 3.55]}><boxGeometry args={[1.2, 27, 1.2]} /><meshStandardMaterial color={T.stoneMid} roughness={0.82} /></mesh>)}
+      {corners.map(([sx, sz], i) => <mesh key={`br${i}`} position={[sx * 3.55, 15.1, sz * 3.55]} castShadow receiveShadow><boxGeometry args={[1.2, 27, 1.2]} /><meshStandardMaterial color={T.stoneMid} roughness={0.82} /></mesh>)}
       {/* vertical pilaster ribbing on the faces for carved depth */}
-      {detail ? ([-3.0, 3.0] as const).map((x) => <mesh key={`pf${x}`} position={[x, 14.6, 3.78]}><boxGeometry args={[0.7, 24, 0.55]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.78} /></mesh>) : null}
-      {detail ? ([-1, 1] as const).map((s) => <mesh key={`ps${s}`} position={[s * 3.78, 14.6, 0]}><boxGeometry args={[0.55, 24, 0.7]} /><meshStandardMaterial color={T.stoneMid} roughness={0.8} /></mesh>) : null}
+      {detail ? ([-3.0, 3.0] as const).map((x) => <mesh key={`pf${x}`} position={[x, 14.6, 3.78]} castShadow receiveShadow><boxGeometry args={[0.7, 24, 0.55]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.78} /></mesh>) : null}
+      {detail ? ([-1, 1] as const).map((s) => <mesh key={`ps${s}`} position={[s * 3.78, 14.6, 0]} castShadow receiveShadow><boxGeometry args={[0.55, 24, 0.7]} /><meshStandardMaterial color={T.stoneMid} roughness={0.8} /></mesh>) : null}
       {/* cornice band over the lower body */}
-      <mesh position={[0, bodyTopY + 0.3, 0]}><boxGeometry args={[8.4, 1.2, 8.4]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
+      <mesh position={[0, bodyTopY + 0.3, 0]} castShadow receiveShadow><boxGeometry args={[8.4, 1.2, 8.4]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
+
+      {detail ? [28.1, 29.65, 39.7].map((y, i) => <mesh key={`moulding-${y}`} position={[0, y, 0]} castShadow receiveShadow><boxGeometry args={[i === 2 ? 6.5 : 8.0, 0.18, i === 2 ? 6.5 : 8.0]} /><meshStandardMaterial color={T.bronze} roughness={0.72} /></mesh>) : null}
 
       {/* ---- upper transition body ---- */}
-      <mesh position={[0, 34.4, 0]}><boxGeometry args={[6.0, 11, 6.0]} /><meshStandardMaterial color={T.stone} roughness={0.8} /></mesh>
-      <mesh position={[0, upperTopY, 0]}><boxGeometry args={[6.8, 1, 6.8]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
+      <mesh position={[0, 34.4, 0]} castShadow receiveShadow><boxGeometry args={[6.0, 11, 6.0]} /><meshStandardMaterial color={T.stone} roughness={0.8} /></mesh>
+      {detail ? <TowerMasonry width={6} height={10.4} base={28.9} columns={3} rows={11} /> : null}
+      <mesh position={[0, upperTopY, 0]} castShadow receiveShadow><boxGeometry args={[6.8, 1, 6.8]} /><meshStandardMaterial color={T.stoneWarm} roughness={0.76} /></mesh>
 
       {/* ---- hero clock + gable on the front ---- */}
       <group position={[0, 16.5, 3.72]}><TowerClock animate={animate} /></group>
@@ -1144,17 +1137,19 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
         <group position={[0, 1.2, 1.3]}><PointedPanel w={3.2} h={7.2} d={0.5} color={T.recess} /></group>
         {/* dark door with gold knowledge emblem */}
         <group position={[0, 1.4, 1.55]}><PointedPanel w={2.5} h={6.0} d={0.3} color={T.door} emissive={doorEmissive} ei={doorGlow} /></group>
-        <mesh position={[0, 3.4, 1.85]}><torusGeometry args={[0.6, 0.14, 8, 20]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.4} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
-        <mesh position={[0, 3.4, 1.85]}><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.38} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+        {detail ? [-0.9, -0.6, -0.3, 0, 0.3, 0.6, 0.9].map((x) => <mesh key={`door-seam-${x}`} position={[x, 4.1, 1.75]}><boxGeometry args={[0.022, 5.2, 0.025]} /><meshStandardMaterial color="#574027" roughness={0.9} /></mesh>) : null}
+        {detail ? [-1, 1].map((side) => <group key={`hinges-${side}`} position={[side * 0.82, 0, 1.76]}>{[2.2, 5.6].map((y) => <mesh key={y} position={[0, y, 0]} castShadow><boxGeometry args={[0.64, 0.14, 0.07]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.7} roughness={0.38} /></mesh>)}</group>) : null}
+        <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><torusGeometry args={[0.6, 0.14, 8, 20]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.4} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+        <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.38} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
         {/* keystone lantern above the arch */}
-        <mesh position={[0, 9.6, 1.4]}><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.stoneHi} emissive="#f2c257" emissiveIntensity={active ? 0.95 : 0.4} /></mesh>
+        <mesh position={[0, 9.6, 1.4]} castShadow receiveShadow><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.stoneHi} emissive="#f2c257" emissiveIntensity={active ? 0.95 : 0.4} /></mesh>
         {/* mounted plaque */}
-        <mesh position={[0, 11.2, 1.1]}><boxGeometry args={[6.0, 1.5, 0.4]} /><meshStandardMaterial color="#2a1d12" roughness={0.7} /></mesh>
-        <mesh position={[0, 11.2, 1.31]}><boxGeometry args={[5.6, 1.1, 0.06]} /><meshStandardMaterial color={T.gold} metalness={0.5} roughness={0.45} emissive="#5c3f14" emissiveIntensity={0.2} /></mesh>
+        <mesh position={[0, 11.2, 1.1]} castShadow receiveShadow><boxGeometry args={[6.0, 1.5, 0.4]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.5} roughness={0.45} /></mesh>
+        <mesh position={[0, 11.2, 1.31]} castShadow receiveShadow><boxGeometry args={[5.6, 1.1, 0.06]} /><meshStandardMaterial color="#2a1d12" roughness={0.7} /></mesh>
       </group>
 
       {/* entrance stairs sweeping down to the path */}
-      {([[7.0, 4.4], [8.4, 5.4], [9.8, 6.5]] as const).map(([w, z], i) => <mesh key={`st${i}`} position={[0, 2.1 - i * 0.55, z]}><boxGeometry args={[w, 0.6, 1.4]} /><meshStandardMaterial color={T.stoneMid} roughness={0.85} /></mesh>)}
+      {([[7.0, 4.4], [8.4, 5.4], [9.8, 6.5]] as const).map(([w, z], i) => <RoundedBox key={`st${i}`} args={[w, 0.6, 1.4]} radius={0.07} smoothness={1} position={[0, 2.1 - i * 0.55, z]} castShadow receiveShadow><meshStandardMaterial color={T.stoneMid} roughness={0.85} /></RoundedBox>)}
       {/* buttress spires flanking the doorway */}
       {([-1, 1] as const).map((s) => <group key={`ep${s}`} position={[s * 3.7, 2.6, 3.4]}><Spire h={6} r={0.7} tone={T.stoneMid} /></group>)}
 
@@ -1169,72 +1164,25 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
       {detail ? ([[-2.5, 0], [2.5, 0], [0, -2.5], [0, 2.5]] as const).map(([x, z], i) => <group key={`cf${i}`} position={[x, upperTopY, z]}><Spire h={9} r={0.68} tone={T.stoneMid} /></group>) : null}
 
       {/* ---- landscaping so it doesn't look "placed on grass" ---- */}
-      {detail ? ([[-6.5, 5, 0.35], [6.8, 4.5, -0.3], [-5.5, -5.5, 0.4], [6, -5, 0.3]] as const).map(([x, z, r], i) => <mesh key={`rk${i}`} position={[x, r * 0.7, z]} castShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color="#7c8792" roughness={0.9} flatShading /></mesh>) : null}
-      {detail ? ([[-5.8, 4.2], [5.6, 4.8], [-6.2, -3.5], [5.2, -4.6]] as const).map(([x, z], i) => <group key={`sh${i}`} position={[x, 0, z]}>{[[0, 0.5, 0, 0.5], [-0.35, 0.4, 0.1, 0.36], [0.34, 0.42, -0.06, 0.38]].map(([dx, dy, dz, rr], j) => <mesh key={j} position={[dx, dy, dz]}><sphereGeometry args={[rr, 10, 8]} /><meshStandardMaterial color={j % 2 ? "#4d9b46" : "#3f8f3a"} roughness={0.95} /></mesh>)}</group>) : null}
+      {detail ? ([[-6.5, 5, 0.35], [6.8, 4.5, -0.3], [-5.5, -5.5, 0.4], [6, -5, 0.3]] as const).map(([x, z, r], i) => <mesh key={`rk${i}`} position={[x, r * 0.7, z]} castShadow receiveShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color="#7c8792" roughness={0.9} flatShading /></mesh>) : null}
+      {detail ? ([[-5.8, 4.2], [5.6, 4.8], [-6.2, -3.5], [5.2, -4.6]] as const).map(([x, z], i) => <group key={`sh${i}`} position={[x, 0, z]}>{[[0, 0.5, 0, 0.5], [-0.35, 0.4, 0.1, 0.36], [0.34, 0.42, -0.06, 0.38]].map(([dx, dy, dz, rr], j) => <mesh key={j} position={[dx, dy, dz]} castShadow receiveShadow><sphereGeometry args={[rr, 10, 8]} /><meshStandardMaterial color={j % 2 ? "#4d9b46" : "#3f8f3a"} roughness={0.95} /></mesh>)}</group>) : null}
 
       {/* warm stone uplight so the sandstone reads golden */}
       <pointLight position={[0, 8, 13]} color="#ffcf85" intensity={(active ? 2.4 : 1.7) * (detail ? 1 : 0.7)} distance={40} />
 
-      <Html center position={[0, 16.4, 5.4]} distanceFactor={22} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 12px", border: "1px solid rgba(230,185,85,.85)", background: "rgba(26,18,10,.92)", color: "#f4d79a", fontFamily: "ui-monospace, monospace", fontSize: 11, fontWeight: 900, letterSpacing: "0.18em", whiteSpace: "nowrap", borderRadius: 2 }}>TOWER OF KNOWLEDGE</div></Html>
+      <Html center position={[0, 13.8, 5.12]} distanceFactor={22} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 12px", border: "none", background: "transparent", color: "#f4d79a", fontFamily: "ui-monospace, monospace", fontSize: 11, fontWeight: 900, letterSpacing: "0.18em", whiteSpace: "nowrap", borderRadius: 2 }}>TOWER OF KNOWLEDGE</div></Html>
     </group>
   );
 }
 
-// A grand two-storey explorer lodge: stone base, timber-framed render walls, a
-// balcony over an arched double door, a big hip roof and a ridge banner. Reads
-// as an earned HQ, not just a house. Front faces +z (toward the entry pad).
-const LODGE = { stone: "#7c746a", stoneDark: "#5b544b", render: "#ece0c6", timber: "#8a5a34", timberDark: "#654222", roof: "#4c3a2c", glass: "#9ed2c5", banner: "#c2410c" } as const;
-
-function PlaceholderMyHome({ active, onEnter }: { active: boolean; onEnter?: () => void }) {
-  const doorGlow = active ? 0.6 : 0.06;
-  return (
-    <group position={CENTRAL_WORLD_CONFIG.myHomePosition} rotation={[0, CENTRAL_WORLD_CONFIG.myHomeRotationY, 0]} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
-      {/* stone base + entry steps */}
-      <RoundedBox args={[11, 1.0, 10]} radius={0.3} smoothness={2} position={[0, 0.5, 0]} castShadow><meshStandardMaterial color={LODGE.stone} roughness={0.9} /></RoundedBox>
-      <RoundedBox args={[4.6, 0.4, 1.4]} radius={0.12} smoothness={2} position={[0, 1.05, 5.0]}><meshStandardMaterial color={LODGE.stoneDark} roughness={0.9} /></RoundedBox>
-      {/* ground floor: stone wainscot + render walls + timber corner posts */}
-      <RoundedBox args={[8.8, 1.4, 7.4]} radius={0.18} smoothness={2} position={[0, 1.75, 0]} castShadow><meshStandardMaterial color={LODGE.stone} roughness={0.88} /></RoundedBox>
-      <RoundedBox args={[8.6, 3.0, 7.2]} radius={0.22} smoothness={2} position={[0, 3.9, 0]} castShadow><meshStandardMaterial color={LODGE.render} roughness={0.82} /></RoundedBox>
-      {([[-4.15, -3.5], [4.15, -3.5], [-4.15, 3.5], [4.15, 3.5]] as const).map(([x, z], i) => <mesh key={i} position={[x, 3.4, z]}><boxGeometry args={[0.42, 4.4, 0.42]} /><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></mesh>)}
-      {/* mid-floor timber band + balcony deck over the entry */}
-      <RoundedBox args={[8.9, 0.6, 7.5]} radius={0.12} smoothness={2} position={[0, 5.5, 0]}><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></RoundedBox>
-      <RoundedBox args={[8.0, 0.4, 1.9]} radius={0.1} smoothness={2} position={[0, 5.75, 4.0]} castShadow><meshStandardMaterial color={LODGE.timberDark} roughness={0.82} /></RoundedBox>
-      {[-3.4, -1.7, 0, 1.7, 3.4].map((x) => <mesh key={x} position={[x, 6.4, 4.85]}><boxGeometry args={[0.14, 1.0, 0.14]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>)}
-      <mesh position={[0, 6.9, 4.85]}><boxGeometry args={[7.4, 0.16, 0.16]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>
-      {/* upper storey */}
-      <RoundedBox args={[7.4, 3.0, 6.0]} radius={0.22} smoothness={2} position={[0, 7.4, 0]} castShadow><meshStandardMaterial color={LODGE.render} roughness={0.82} /></RoundedBox>
-      {([[0, 5.9], [3.5, 0], [-3.5, 0]] as const).map(([x, z], i) => <mesh key={i} position={[x, 7.4, z]}><boxGeometry args={[0.36, 3.2, 0.36]} /><meshStandardMaterial color={LODGE.timber} roughness={0.8} /></mesh>)}
-      {([-1.9, 1.9] as const).map((x) => <mesh key={x} position={[x, 7.6, 3.05]}><boxGeometry args={[1.1, 1.4, 0.16]} /><meshStandardMaterial color={LODGE.glass} emissive="#6da99c" emissiveIntensity={0.2} /></mesh>)}
-      {/* stone chimney */}
-      <mesh position={[-3.2, 8.7, -1.6]} castShadow><boxGeometry args={[1.1, 4.2, 1.1]} /><meshStandardMaterial color={LODGE.stone} roughness={0.9} /></mesh>
-      <mesh position={[-3.2, 10.9, -1.6]}><boxGeometry args={[1.3, 0.4, 1.3]} /><meshStandardMaterial color={LODGE.stoneDark} roughness={0.9} /></mesh>
-      {/* big hip roof (overhangs the walls) + ridge finial + banner */}
-      <mesh position={[0, 10.5, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[7.2, 4.4, 4]} /><meshStandardMaterial color={LODGE.roof} roughness={0.8} /></mesh>
-      <mesh position={[0, 8.5, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[7.5, 0.7, 4]} /><meshStandardMaterial color={LODGE.timberDark} roughness={0.8} /></mesh>
-      <mesh position={[0, 12.9, 0]}><cylinderGeometry args={[0.09, 0.09, 2.2, 8]} /><meshStandardMaterial color="#cbd5e1" metalness={0.3} roughness={0.5} /></mesh>
-      <mesh position={[0.95, 13.4, 0]}><planeGeometry args={[1.8, 0.7]} /><meshStandardMaterial color={LODGE.banner} emissive={LODGE.banner} emissiveIntensity={0.25} side={THREE.DoubleSide} /></mesh>
-      <mesh position={[0.95, 12.7, 0]}><planeGeometry args={[1.8, 0.6]} /><meshStandardMaterial color="#e6b64c" side={THREE.DoubleSide} /></mesh>
-      {/* arched double door + keystone lantern, glowing warm when active */}
-      <group position={[0, 0, 3.62]}>
-        <RoundedBox args={[3.6, 4.9, 0.6]} radius={1.5} smoothness={4} position={[0, 2.7, 0]}><meshStandardMaterial color={LODGE.stoneDark} roughness={0.86} /></RoundedBox>
-        {([-0.72, 0.72] as const).map((x) => <RoundedBox key={x} args={[1.32, 3.7, 0.32]} radius={0.12} smoothness={3} position={[x, 2.15, 0.34]}><meshStandardMaterial color="#3a2a1c" emissive={active ? "#dba84e" : "#241a12"} emissiveIntensity={doorGlow} roughness={0.8} /></RoundedBox>)}
-        {([-0.28, 0.28] as const).map((x) => <mesh key={x} position={[x, 2.2, 0.56]}><sphereGeometry args={[0.09, 10, 10]} /><meshStandardMaterial color="#e6b64c" metalness={0.4} roughness={0.4} /></mesh>)}
-        <mesh position={[0, 4.55, 0.5]}><sphereGeometry args={[0.34, 16, 16]} /><meshStandardMaterial color="#f0c56c" emissive="#dba84e" emissiveIntensity={active ? 0.9 : 0.4} /></mesh>
-      </group>
-      {/* ground-floor windows flanking the entry */}
-      {([-3.1, 3.1] as const).map((x) => <mesh key={x} position={[x, 3.7, 3.66]}><planeGeometry args={[1.3, 1.7]} /><meshStandardMaterial color={LODGE.glass} emissive={active ? "#dba84e" : "#6da99c"} emissiveIntensity={active ? 0.3 : 0.16} /></mesh>)}
-      {/* entry pad */}
-      <mesh position={[0, 0.08, 6.4]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[2.6, 32]} /><meshStandardMaterial color={active ? "#e9bc64" : "#917448"} emissive={active ? "#dba84e" : "#000000"} emissiveIntensity={active ? 0.35 : 0} roughness={0.92} /></mesh>
-      <pointLight position={[0, 5, 6]} color="#ffd995" intensity={active ? 1.7 : 0.7} distance={20} />
-      <Html center position={[0, 8.8, 4.2]} distanceFactor={20} zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "8px 13px", border: "1px solid rgba(255,232,185,.68)", borderRadius: 4, background: "rgba(43,37,30,.9)", color: "#fff3d6", fontFamily: "ui-monospace,monospace", fontSize: 12, fontWeight: 950, letterSpacing: ".14em", whiteSpace: "nowrap" }}>MY HOME</div></Html>
-    </group>
-  );
+function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
+  return <ExplorerLodge {...props} />;
 }
 
 // A few permanent Aussie gum trees framing the meadow. Positioned just outside
 // the build grid (|x| > 42, or z < -26 / z > 50) so they never collide with a
 // student's placed items, and clear of the Tower and My Home.
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   return (
     <group>
       <Suspense fallback={null}>
@@ -1243,19 +1191,17 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, p
       <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[135, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
         <MeadowGround />
       </Suspense>
-      <ValleyPath />
-      <MyHomePath />
-      {groundTiles.map((tile) => <GroundTile key={`${tile.gridX}:${tile.gridZ}`} tile={tile} />)}
+      <PaintedGround tiles={groundTiles} />
       <GrassTufts quality={quality} groundTiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
-      <PlaceholderMyHome active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
+      <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
-      {placedCustomisations.map((placement, index) => {
+      {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
-        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
+        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
       })}
-      {buildPreview ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} preview valid={buildPreview.valid} /> : null}
-      {groundPreview ? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
+      {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} neighbours={placedCustomisations} preview valid={buildPreview.valid} /> : null}
+      {groundPreview ? groundPreview.cells?.map(cell => <GroundTile key={cell.gridX+":"+cell.gridZ} tile={{...groundPreview.tile,...cell}} preview valid={cell.valid}/>) ?? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>
   );
 }

@@ -1,3 +1,4 @@
+import { FREE_WORLD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import type { EconomyItem } from "@/lib/economy";
 
 export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress";
@@ -9,8 +10,8 @@ function starter(
   accent: string,
   group: WorldSceneryGroup,
   gridSize = "1x1",
-  // Display scale, tuned per mesh so each item fills its footprint (long items
-  // like the bridge need more than the old flat 1.25).
+  // Legacy display scale retained for saved/catalogue compatibility. The renderer
+  // now uses measured bounds and world-item-presentation.ts size targets.
   worldScale = 1.25,
 ): EconomyItem {
   return {
@@ -27,7 +28,7 @@ function starter(
     discoverable: true,
     active: true,
     sort_order: 0,
-    metadata: { marketplaceCategory: "world_basic", worldAssetKey, worldSceneryGroup: group, gridSize, worldScale, tier: 1 },
+    metadata: { marketplaceCategory: "world_basic", worldAssetKey, worldSceneryGroup: group, worldCollection: worldCollectionFor(worldAssetKey), gridSize, worldScale, tier: 1 },
   };
 }
 
@@ -84,4 +85,30 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_torch", "Torch", "torch", "#f59e0b", "fortress", "1x1", 1.15),
   starter("central_world_starter_chest", "Treasure Chest", "chest", "#b8863f", "fortress", "1x1", 1.2),
   starter("central_world_starter_well", "Well", "well", "#9a8d7c", "fortress", "2x2", 1.15),
+  // Garden, wildlife and outdoor living additions. Existing item keys stay stable.
+  starter("central_world_starter_birch_tree", "Silver Birch", "birch_tree", "#bec6a8", "trees_plants", "2x2", 1.3),
+  starter("central_world_starter_autumn_tree", "Autumn Tree", "autumn_tree", "#ba7839", "trees_plants", "2x2", 1.3),
+  starter("central_world_starter_lavender", "Lavender Planter", "lavender", "#9580ad", "trees_plants", "1x1", 1),
+  starter("central_world_starter_sunflower", "Sunflower Planter", "sunflower", "#d3ae45", "trees_plants", "1x1", 1),
+  starter("central_world_starter_vegetable_bed", "Veggie Patch", "vegetable_bed", "#688049", "trees_plants", "2x1", 1.3),
+  starter("central_world_starter_lily_pond", "Lily Pond", "lily_pond", "#689692", "rocks_water", "2x2", 1.4),
+  starter("central_world_starter_birdbath", "Stone Birdbath", "birdbath", "#989c89", "rocks_water", "1x1", 1.3),
+  starter("central_world_starter_stepping_stones", "Stepping Stones", "stepping_stones", "#9ca08e", "rocks_water", "1x1", 1),
+  starter("central_world_starter_mossy_boulder", "Mossy Rocks", "mossy_boulder", "#737e53", "rocks_water", "1x1", 1),
+  starter("central_world_starter_picnic_table", "Picnic Table", "picnic_table", "#986f48", "furniture_fun", "2x2", 1.4),
+  starter("central_world_starter_garden_arch", "Garden Arbour", "garden_arch", "#758955", "furniture_fun", "2x2", 1.4),
+  starter("central_world_starter_gazebo", "Timber Gazebo", "gazebo", "#738980", "furniture_fun", "2x2", 1.5),
+  starter("central_world_starter_market_stall", "Market Stall", "market_stall", "#c49e5e", "furniture_fun", "2x2", 1.5),
+  starter("central_world_starter_swing", "Garden Swing", "swing", "#b08b58", "furniture_fun", "2x2", 1.4),
+  starter("central_world_starter_birdhouse", "Birdhouse", "birdhouse", "#a78256", "furniture_fun", "1x1", 1.2),
+  starter("central_world_starter_fire_pit", "Campfire Pit", "fire_pit", "#c28649", "furniture_fun", "1x1", 1.2),
+  starter("central_world_starter_campsite", "Explorer Tent", "campsite", "#b19769", "furniture_fun", "2x2", 1.4),
+  starter("central_world_starter_rabbit", "Rabbit", "rabbit", "#b4a28c", "animals", "1x1", 1.1),
+  starter("central_world_starter_duck", "Duck", "duck", "#60836a", "animals", "1x1", 1.1),
+  starter("central_world_starter_platypus", "Platypus", "platypus", "#826849", "animals", "1x1", 1.1),
+  starter("central_world_starter_blue_heeler", "Blue Heeler", "blue_heeler", "#819195", "animals", "1x1", 1.15),
+  starter("central_world_starter_bilby", "Bilby", "bilby", "#ac9c89", "animals", "1x1", 1),
+  starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "fortress", "1x1", 1),
+  starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "fortress", "1x1", 1),
+  ...FREE_WORLD_ADDITIONS.map(item => starter("central_world_starter_"+item.key,item.name,item.key,"#899b72",item.group,item.grid)),
 ];

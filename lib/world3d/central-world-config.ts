@@ -13,8 +13,8 @@ export const CENTRAL_WORLD_CONFIG = {
   towerMainEntrance: [0, 0.75, -35] as [number, number, number],
   towerExitSpawn: [0, 0.75, -31.5] as [number, number, number],
   towerPlaza: [0, 0.75, -30] as [number, number, number],
-  // Moved 15 squares (30 m) left and 15 squares forward — away from the tower —
-  // so My Home sits in its own clearing rather than crowding the tower corridor.
+  // Legacy/default home location and starter route. Runtime home rendering and
+  // navigation use the student placement via getCentralWorldHomeAnchors.
   myHomePosition: [-60, 0, 24] as [number, number, number],
   myHomeRotationY: Math.PI / 2,
   myHomeEntrance: [-54.8, 0.75, 24] as [number, number, number],

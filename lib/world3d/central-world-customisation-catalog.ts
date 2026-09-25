@@ -1,3 +1,4 @@
+import { WORLD_REWARD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import type { EconomyItem, EconomyState } from "@/lib/economy";
 
 export type CentralWorldCustomisationArea =
@@ -57,6 +58,7 @@ const ENTRIES: CatalogueEntry[] = [
 
   { plot: 8, area: "special", name: "Aussie BBQ Backyard", description: "Fire up the barbie for a backyard get-together.", assetKey: "party_house", rarity: "common", tier: 1, price: 350, accent: "#ec4899", icon: "party-popper", gridSize: "3x3" },
   { plot: 8, area: "special", name: "Kangaroo Sanctuary", description: "A protected paddock where kangaroos bound free.", assetKey: "pet_sanctuary", rarity: "legendary", tier: 3, price: 2600, accent: "#a16207", icon: "heart", gridSize: "5x4" },
+  ...WORLD_REWARD_ADDITIONS.map(item => ({plot:item.plot, area:item.area, name:item.name, description:item.description, assetKey:item.key, rarity:(item.tier===3?"legendary":item.tier===2?"rare":"common") as EconomyItem["rarity"],tier:item.tier,price:item.price,accent:"#8b9972",icon:item.icon,gridSize:item.grid})),
 ];
 
 export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((entry) => ({
@@ -77,13 +79,14 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
     slot: `world_plot_${entry.plot}`,
     worldPlotId: `customisation-plot-${entry.plot}`,
     worldAssetKey: entry.assetKey,
+    worldCollection: worldCollectionFor(entry.assetKey),
     worldArea: entry.area,
     marketplaceCategory: entry.area,
     gridSize: entry.gridSize,
     tier: entry.tier,
     marketplace_visual: {
       type: "asset",
-      src: `/marketplace/central-world/${entry.assetKey}.webp`,
+      src: `/marketplace/central-world/${entry.assetKey}.${WORLD_REWARD_ADDITIONS.some(item=>item.key===entry.assetKey)?"svg":"webp"}`,
       alt: `${entry.name} central world customisation preview`,
       previewMode: "background",
     },

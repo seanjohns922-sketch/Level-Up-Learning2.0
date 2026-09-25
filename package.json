@@ -16,6 +16,7 @@
     "qa:world3d-access": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/world3d-access-audit.mjs",
     "qa:world3d-production-parity": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/world3d-production-parity-audit.mjs",
     "qa:world3d-art": "node scripts/world3d-art-audit.mjs",
+    "qa:central-world-home": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/central-world-home-layout-test.mjs",
     "qa:central-world3d": "node scripts/central-world-3d-audit.mjs",
     "qa:tower-world3d": "node scripts/tower-world3d-audit.mjs",
     "qa:world3d-navigation": "node scripts/world3d-navigation-audit.mjs",
@@ -269,7 +270,8 @@
     "qa:chance-level6-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-level6-five-forms.ts",
     "qa:chance-level7-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-level7-five-forms.ts",
     "qa:chance-level8-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-level8-five-forms.ts",
-    "qa:chance-full-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-full-release.ts"
+    "qa:chance-full-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-full-release.ts",
+    "qa:world-scenery": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/organic-path-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
