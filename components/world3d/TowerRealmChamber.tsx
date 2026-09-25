@@ -26,8 +26,6 @@ import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { WORLD3D_CANONICAL_RESTORED_EVENT } from "@/lib/world3d/canonical-bootstrap";
 import { WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 
-import {fetchExpeditionAccess} from '@/lib/world3d/expedition-access-client';
-import {getActiveStudentIdentity} from '@/lib/studentIdentity';
 
 type TowerWorldMetrics = {
   active: boolean;
@@ -171,7 +169,6 @@ export default function TowerRealmChamber() {
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [entryMessage, setEntryMessage] = useState<string | null>(null);
   const [showIntro, setShowIntro] = useState(false);
-  const [expeditionUnlocked,setExpeditionUnlocked]=useState(false);
   const [progressVersion, setProgressVersion] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -182,8 +179,7 @@ export default function TowerRealmChamber() {
   }, [searchParams]);
 
   const progressByRealm = useMemo(() => buildProgressMap(progressVersion, preview), [preview, progressVersion]);
-  useEffect(()=>{if(preview)return;let cancelled=false;const id=getActiveStudentIdentity().studentId;if(!id)return;fetchExpeditionAccess(id).then(access=>{if(!cancelled)setExpeditionUnlocked(access.level7.length>0);}).catch(()=>{if(!cancelled)setExpeditionUnlocked(false);});return()=>{cancelled=true;};},[preview,progressVersion]);
-  const atExpedition=activeInteractionId==='core-expedition';
+  const atExpedition=preview && activeInteractionId==='core-expedition';
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const atExit = activeInteractionId === TOWER_CHAMBER_CONFIG.exitInteractionId;
 
@@ -239,7 +235,7 @@ export default function TowerRealmChamber() {
   }, [busyRealmId, preview, router]);
 
   const runActiveAction = useCallback(() => {
-    if(atExpedition){router.push(preview?'/demo-review/number-adventure/3d':'/world/expedition');return;}
+    if(atExpedition){router.push('/demo-review/number-adventure/3d');return;}
     if (activePortal) {
       void enterRealm(activePortal.realmId);
       return;
@@ -248,10 +244,10 @@ export default function TowerRealmChamber() {
   }, [activePortal, atExit, atExpedition, enterRealm, preview, router]);
 
   return (
-    <main data-world3d-root data-expedition-unlocked={preview||expeditionUnlocked} data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
+    <main data-world3d-root data-expedition-unlocked={preview} data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
       <Canvas camera={{ position: [0, 6, 22], fov: 56 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
         <TowerScene
-          expeditionUnlocked={preview||expeditionUnlocked}
+          expeditionUnlocked={preview}
           quality={quality}
           reducedMotion={reducedMotion}
           moveInput={moveInput}
