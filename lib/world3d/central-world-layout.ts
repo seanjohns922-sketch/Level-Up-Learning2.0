@@ -1,3 +1,4 @@
+import { getItemPresentation } from "./world-item-presentation";
 import type { EconomyItem } from "@/lib/economy";
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
 
@@ -99,7 +100,9 @@ export function centralWorldStarterPaths(): CentralWorldGroundTile[] {
 export function parseGridSize(item: EconomyItem): [number, number] {
   const value = typeof item.metadata.gridSize === "string" ? item.metadata.gridSize : "3x3";
   const match = /^(\d+)x(\d+)$/.exec(value);
-  return match ? [Number(match[1]), Number(match[2])] : [3, 3];
+  const [width, depth] = match ? [Number(match[1]), Number(match[2])] : [3, 3];
+  const footprint = getItemPresentation(item).footprint;
+  return footprint ? [Math.ceil(footprint[0] / CENTRAL_WORLD_GRID.cellSize), Math.ceil(footprint[1] / CENTRAL_WORLD_GRID.cellSize)] : [width, depth];
 }
 
 export function rotatedGridSize(item: EconomyItem, rotation: CentralWorldPlacement["rotation"]): [number, number] {

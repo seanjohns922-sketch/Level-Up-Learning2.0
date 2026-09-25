@@ -78,7 +78,7 @@ const GROUND_TOOLS: Array<[WorldEditTool, string, LucideIcon]> = [
   ["path", "Path", Route],
   ["road", "Road", Route],
   ["stone", "Stone", Route],
-  ["water", "Water", Waves],
+  ["water", "Water tiles", Waves],
 ];
 // A little symbol per scenery item, keyed by its worldAssetKey. Bridge,
 // toadstool and sign have no exact lucide glyph, so Landmark/Cherry/Signpost
@@ -511,12 +511,15 @@ export default function CentralWorld() {
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setEditTool(tool);
+    if (tool === "water") setWaterBrushWidth(1);
     void speak(
       tool === "move"
         ? "Move selected. Tap anything you have placed to pick it up."
         : tool === "erase"
-          ? "Eraser selected. Tap an item to remove it, or tap the ground to rub out a path."
-          : `${EDIT_TOOL_NAMES[tool]} selected. Tap or drag across the grass to paint it.`,
+          ? "Eraser selected. Tap an item to remove it, or tap the ground to remove one square of water, path or road."
+          : tool === "water"
+            ? "Water tiles selected. Tap to place one square of water. Drag to join squares into a river or lake."
+            : `${EDIT_TOOL_NAMES[tool]} selected. Tap or drag across the grass to paint it.`,
       undefined,
       "manual",
       { rate: 0.9 },
@@ -893,10 +896,12 @@ export default function CentralWorld() {
                   return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
                 })}
           </div>
+          {paletteTab === "rocks_water" && <button type="button" onClick={()=>{setPaletteTab("ground");chooseEditTool("water");}} style={{...debugButton,width:"100%",marginTop:8,padding:"10px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><Waves size={18}/>Paint your own water · 1 square at a time</button>}
           {paletteTab === "ground" && isGroundTool && editTool === "water" && <div style={{marginTop:10,color:"#e3ece3",fontSize:12}}>
-            <div style={{display:"flex",gap:5}}>{([[1,"Stream"],[3,"River"],[5,"Lake"]] as const).map(([width,label])=><button key={width} type="button" aria-pressed={waterBrushWidth===width} onClick={()=>setWaterBrushWidth(width)} style={{...debugButton,flex:1,padding:"8px 4px",background:waterBrushWidth===width?"#287b7e":debugButton.background}}>{label}</button>)}</div>
-            <p>Drag to paint water. Join strokes into rivers and lakes, or draw a moat around your fortress. Add a bridge from Rocks or a drawbridge from Fortress.</p>
-            <p>Erase reshapes the banks. Undo restores your last edit. Your home and doorway stay clear.</p>
+            <div style={{display:"flex",gap:5}}>{([[1,"1 square"],[3,"River"],[5,"Lake"]] as const).map(([width,label])=><button key={width} type="button" aria-pressed={waterBrushWidth===width} onClick={()=>{setWaterBrushWidth(width);void speak(width===1?"One square. Tap to place water, or drag to join squares.":`${label} brush selected. Drag to paint a wider area.`,undefined,"manual",{rate:.9});}} style={{...debugButton,flex:1,padding:"8px 4px",background:waterBrushWidth===width?"#287b7e":debugButton.background}}>{label}</button>)}</div>
+            <p>{waterBrushWidth===1?"Tap a grid square to add water. Drag to paint one square at a time.":`Paint a wider area with the ${waterBrushWidth===3?"river":"lake"} brush. Choose 1 square for precise edges.`} Neighbouring water joins automatically, so you can build your own river, lake or moat.</p>
+            <p>Add a bridge from Rocks or a drawbridge from Fortress.</p>
+            <p>Use Erase on clear ground to remove one water square and reshape the banks. Undo restores your last edit. Your home and doorway stay clear.</p>
           </div>}
           {paletteTab !== "ground" && !CENTRAL_WORLD_STARTER_SCENERY.some(item => item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)) && <p role="status" style={{ color: "#e1ddce", fontSize: 12 }}>No matching items in this category.</p>}
           {buildPreview && CONNECTED_BOUNDARY_KEYS.has(String(buildItem?.metadata.worldAssetKey)) && <p style={{color:"#e3ece3",fontSize:12}}>Matching fences and walls join automatically in neighbouring squares, including corners. Drag to build a row.</p>}

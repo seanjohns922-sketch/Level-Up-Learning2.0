@@ -49,6 +49,20 @@ export function AustralianPlace({assetKey}:{assetKey:string}){
   {assetKey==="games_room"?<group position={[-1.15,0,1.9]} scale={.7}><Bench/></group>:[-1,1].map(x=><group key={x}><Box p={[x,.5,1.7]} s={[.4,.9,.38]} c={iron}/><Box p={[x,.7,1.9]} s={[.28,.3,.015]} c="#b9ae73"/><Box p={[x,.47,1.94]} s={[.36,.065,.18]} c="#ad795c"/><Ball p={[x-.07,.55,1.98]} s={[.025,.04,.025]} c="#617f7b"/></group>)}
  </group>;
  if(assetKey==="water_park")return <group><mesh position={[0,.07,0]} scale={[1.3,1,.9]}><cylinderGeometry args={[1.9,2.05,.14,48]}/><meshStandardMaterial color="#bfb491"/></mesh><mesh position={[0,.15,0]} rotation={[-Math.PI/2,0,0]} scale={[1.3,.9,1]}><circleGeometry args={[1.65,48]}/><meshStandardMaterial color="#639e9b" roughness={.17} metalness={.25}/></mesh>{[-1,1].map(side=><group key={side} position={[side*1.8,0,-.8]} scale={.7}><Tree variant="gum_tree"/></group>)}{[-1,1].map(side=><group key={side} position={[side*1.5,0,1.1]} rotation={[0,side*.5,0]}><Box p={[0,.2,0]} s={[.45,.06,.85]} c={cream}/><Box p={[0,.4,-.4]} s={[.45,.55,.045]} r={[-.45,0,0]} c={cream}/></group>)}<Ring p={[.7,.19,.6]} radius={.22} tube={.055} c="#c6ab6f"/></group>;
- if(assetKey==="sports_stadium")return <group><mesh position={[0,.08,0]} rotation={[-Math.PI/2,0,0]} scale={[1.4,1,1]}><circleGeometry args={[2.1,64]}/><meshStandardMaterial color="#668452"/></mesh><mesh position={[0,.09,0]} rotation={[-Math.PI/2,0,0]} scale={[1.4,1,1]}><ringGeometry args={[1.93,1.96,64]}/><meshBasicMaterial color="#dedfc4"/></mesh><Ring p={[0,.1,0]} radius={.33} tube={.014} c="#e1ddc5"/>{[-1,1].map(side=><group key={side}>{[-.52,-.2,.2,.52].map(z=><Pole key={z} a={[side*2.6,.05,z]} b={[side*2.6,Math.abs(z)<.3?1.7:1.1,z]} radius={.027} c="#ddd9be"/>)}{[0,1,2].map(row=><Box key={row} p={[0,.15+row*.15,side*(2.1+row*.16)]} s={[3.4,.13,.17]} c={row%2?"#849087":"#aaad95"}/>)}<Pole a={[side*2.7,0,side*1.8]} b={[side*2.7,2.5,side*1.8]} radius={.035} c={iron}/><Box p={[side*2.7,2.5,side*1.8]} s={[.55,.2,.09]} c="#d6cda9"/></group>)}<Box p={[0,1.45,-2.3]} s={[1.1,.65,.08]} c={iron}/><group position={[0,1.45,-2.25]}><PaintedSign text="HOME  42 : 36" width={1}/></group></group>;
+ if(assetKey==="sports_stadium")return <group>
+  {/* Venue dimensions are authored in world metres: widening the field must not
+      turn goalposts, seating and the scoreboard into gigantic stretched props. */}
+  <mesh position={[0,.04,0]} rotation={[-Math.PI/2,0,0]} scale={[1.666667,1,1]} receiveShadow><circleGeometry args={[18,96]}/><meshStandardMaterial color="#668452"/></mesh>
+  <mesh position={[0,.055,0]} rotation={[-Math.PI/2,0,0]} scale={[1.666667,1,1]}><ringGeometry args={[16.9,17,96]}/><meshBasicMaterial color="#dedfc4"/></mesh>
+  <Ring p={[0,.07,0]} radius={3} tube={.05} c="#e1ddc5"/>
+  {[-1,1].map(side=><group key={side}>
+   {[-6,-2,2,6].map(z=><Pole key={z} a={[side*28,.05,z]} b={[side*28,Math.abs(z)<3?8:5,z]} radius={.1} c="#ddd9be"/>)}
+   {[0,1,2,3].map(row=><Box key={row} p={[0,.35+row*.45,side*(18+row*.65)]} s={[24,.22,.6]} c={row%2?"#849087":"#aaad95"}/>)}
+   {[-1,1].map(end=><group key={end}><Pole a={[end*31.5,0,side*18]} b={[end*31.5,11.5,side*18]} radius={.15} c={iron}/><Box p={[end*31.5,11.5,side*18]} s={[1,.8,.35]} c="#d6cda9"/></group>)}
+  </group>)}
+  <Box p={[0,4,-20.5]} s={[7,3,.25]} c={iron}/>
+  {[-2.5,2.5].map(x=><Pole key={x} a={[x,0,-20.5]} b={[x,4,-20.5]} radius={.12} c={iron}/>)}
+  <group position={[0,4,-20.35]}><PaintedSign text="HOME  42 : 36" width={6}/></group>
+ </group>;
  return null;
 }

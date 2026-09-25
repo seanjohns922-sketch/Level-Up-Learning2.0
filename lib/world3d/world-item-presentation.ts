@@ -1,34 +1,152 @@
-import { FREE_WORLD_ADDITIONS, WORLD_REWARD_ADDITIONS } from "./world-expansion";
 import type { EconomyItem } from "@/lib/economy";
 
-/** Metres in the world. The avatar is approximately 2.2 m tall. Small wildlife
- * is gently enlarged for legibility; buildings are compact game-scale models.
- * No arbitrary per-category multiplier: every item has a reviewed silhouette. */
-export type ItemPresentation = { height: number; width?: number; theme: "garden" | "fortress" | "australian_reward" };
-const garden: Record<string, number> = {
-  tree:5.2,pine_tree:6,palm_tree:5.6,gum_tree:6,birch_tree:5.4,autumn_tree:5.1,
-  shrub:.95,hedge:1.25,toadstool:.42,log:.6,flower_bed:.65,lavender:.8,sunflower:1.35,vegetable_bed:.55,
-  boulder:1.5,rock_pile:.8,pond:.22,fountain:2.2,bridge:1.15,lily_pond:.25,birdbath:1.15,stepping_stones:.12,mossy_boulder:.7,
-  lamp_post:3,bench:1.15,fence:1.2,mailbox:1.3,flag:3.2,umbrella:2.8,signpost:1.65,balloons:2.2,
-  picnic_table:.95,garden_arch:2.8,gazebo:3.2,market_stall:2.5,swing:2.8,birdhouse:2.1,fire_pit:.45,campsite:1.8,
-  kangaroo:2,koala:5.5,wombat:.7,emu:1.95,kookaburra:5.5,echidna:.45,cockatoo:.65,rabbit:.6,duck:.65,platypus:.4,blue_heeler:.95,bilby:.6,
+/** World metres. The avatar is 2.2 m tall. Every item has its own land reservation.
+ * Sites use width as their sizing anchor; props and trees use height. Width-led
+ * models retain proportions unless explicitly constructed as a height-adjustable
+ * connector/ground feature. Landmarks and sporting venues use compressed game scale. */
+export type ItemPresentation = {
+  height: number;
+  width?: number;
+  footprint?: [number, number];
+  resizeHeight?: boolean;
+  theme: "garden" | "fortress" | "australian_reward";
 };
-const fortress:Record<string,number>={castle_wall:3.4,castle_corner:3.4,castle_gate:4.1,castle_turret:6.4,castle_keep:7.3,castle_banner:2.8,drawbridge:3.2,torch:1.8,chest:.85,well:2.6,stone_wall:1,wood_gate:1.2};
-const rewards:Record<string,number>={clubhouse:6.2,games_room:4.4,treehouse:5.5,training_centre:4.4,workshop:6,observatory:16,puppy_yard:2.8,bunny_garden:1.1,pony_paddock:2.5,farmyard:5.8,wildlife_habitat:7.2,backyard_pool:1.2,splash_pool:2.4,water_park:6,adventure_playground:3.6,trampoline_park:3.2,sports_stadium:7,cinema:4.8,arcade:4.2,party_house:3.6,pet_sanctuary:3.1};
-const widths:Record<string,number>={hedge:2,fence:2,castle_wall:2,castle_corner:2,stone_wall:2,wood_gate:2,pond:4.5,lily_pond:3.3,bridge:4.8,stepping_stones:1.7,fire_pit:1.25,vegetable_bed:2.4,log:2.7};
-export const WORLD_ITEM_PRESENTATION:Record<string,ItemPresentation>=Object.fromEntries([
-  ...FREE_WORLD_ADDITIONS.map(item=>[item.key,{height:item.height,width:item.width,theme:item.collection==="castle"?"fortress":"garden"}]),
-  ...WORLD_REWARD_ADDITIONS.map(item=>[item.key,{height:item.height,theme:"australian_reward"}]),
-  ...Object.entries(garden).map(([key,height])=>[key,{height,width:widths[key],theme:"garden"}]),
-  ...Object.entries(fortress).map(([key,height])=>[key,{height,width:widths[key],theme:"fortress"}]),
-  ...Object.entries(rewards).map(([key,height])=>[key,{height,theme:"australian_reward"}]),
-]);
-export function getItemPresentation(item:EconomyItem){return WORLD_ITEM_PRESENTATION[String(item.metadata.worldAssetKey)]??{height:3,theme:"garden" as const};}
+export const CASTLE_WALL_HEIGHT = 26;
+export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
+  tree: {height:14, footprint:[16,16], theme:"garden"},
+  pine_tree: {height:18, footprint:[14,14], theme:"garden"},
+  palm_tree: {height:16, footprint:[16,16], theme:"garden"},
+  gum_tree: {height:18, footprint:[20,20], theme:"garden"},
+  birch_tree: {height:14, footprint:[16,16], theme:"garden"},
+  autumn_tree: {height:14, footprint:[18,18], theme:"garden"},
+  shrub: {height:1.5, footprint:[4,4], theme:"garden"},
+  hedge: {height:2, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  toadstool: {height:.6, footprint:[2,2], theme:"garden"},
+  log: {height:1, footprint:[6,2], width:5, resizeHeight:true, theme:"garden"},
+  flower_bed: {height:.85, footprint:[4,4], theme:"garden"},
+  lavender: {height:1.1, footprint:[4,4], theme:"garden"},
+  sunflower: {height:2.2, footprint:[4,4], theme:"garden"},
+  vegetable_bed: {height:.75, footprint:[6,4], width:4, resizeHeight:true, theme:"garden"},
+  boulder: {height:3, footprint:[6,6], theme:"garden"},
+  rock_pile: {height:1.4, footprint:[4,4], theme:"garden"},
+  pond: {height:.35, footprint:[10,10], width:9, resizeHeight:true, theme:"garden"},
+  fountain: {height:4, footprint:[8,8], theme:"garden"},
+  bridge: {height:2.4, footprint:[12,6], width:10, resizeHeight:true, theme:"garden"},
+  lily_pond: {height:.35, footprint:[8,8], width:7, resizeHeight:true, theme:"garden"},
+  birdbath: {height:1.5, footprint:[2,2], theme:"garden"},
+  stepping_stones: {height:.16, footprint:[4,6], width:2.5, resizeHeight:true, theme:"garden"},
+  mossy_boulder: {height:1.4, footprint:[4,4], theme:"garden"},
+  lamp_post: {height:5.5, footprint:[2,2], theme:"garden"},
+  bench: {height:1.15, footprint:[4,2], theme:"garden"},
+  fence: {height:1.6, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  mailbox: {height:1.6, footprint:[2,2], theme:"garden"},
+  flag: {height:6, footprint:[4,2], theme:"garden"},
+  umbrella: {height:3.2, footprint:[6,6], theme:"garden"},
+  signpost: {height:2.4, footprint:[4,2], theme:"garden"},
+  balloons: {height:3, footprint:[4,4], theme:"garden"},
+  picnic_table: {height:1.1, footprint:[4,4], theme:"garden"},
+  garden_arch: {height:3.4, footprint:[4,4], theme:"garden"},
+  gazebo: {height:4.5, footprint:[8,8], theme:"garden"},
+  market_stall: {height:3.5, footprint:[6,6], theme:"garden"},
+  swing: {height:3.8, footprint:[8,6], theme:"garden"},
+  birdhouse: {height:3.2, footprint:[2,2], theme:"garden"},
+  fire_pit: {height:.65, footprint:[4,4], width:2.2, resizeHeight:true, theme:"garden"},
+  campsite: {height:2.8, footprint:[8,8], theme:"garden"},
+  kangaroo: {height:2.4, footprint:[2,4], theme:"garden"},
+  koala: {height:16, footprint:[18,18], theme:"garden"},
+  wombat: {height:.9, footprint:[2,2], theme:"garden"},
+  emu: {height:2.3, footprint:[2,2], theme:"garden"},
+  kookaburra: {height:16, footprint:[18,18], theme:"garden"},
+  echidna: {height:.6, footprint:[2,2], theme:"garden"},
+  cockatoo: {height:.8, footprint:[2,2], theme:"garden"},
+  rabbit: {height:.7, footprint:[2,2], theme:"garden"},
+  duck: {height:.75, footprint:[2,2], theme:"garden"},
+  platypus: {height:.55, footprint:[2,2], theme:"garden"},
+  blue_heeler: {height:1.15, footprint:[2,2], theme:"garden"},
+  bilby: {height:.75, footprint:[2,2], theme:"garden"},
+  castle_wall: {height:26, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  castle_corner: {height:26, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  castle_gate: {height:28, footprint:[38,16], theme:"fortress"},
+  castle_turret: {height:32, footprint:[16,16], theme:"fortress"},
+  castle_keep: {height:34, footprint:[34,34], theme:"fortress"},
+  castle_banner: {height:5, footprint:[4,2], theme:"fortress"},
+  drawbridge: {height:7, footprint:[12,14], theme:"fortress"},
+  torch: {height:3, footprint:[2,2], theme:"fortress"},
+  chest: {height:1.2, footprint:[4,2], theme:"fortress"},
+  well: {height:3.5, footprint:[4,4], theme:"fortress"},
+  stone_wall: {height:1.8, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  wood_gate: {height:1.6, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  fern: {height:1.8, footprint:[4,4], theme:"garden"},
+  native_grass: {height:1, footprint:[2,2], theme:"garden"},
+  reeds: {height:1.8, footprint:[4,4], theme:"garden"},
+  bottlebrush: {height:4, footprint:[6,6], theme:"garden"},
+  terracotta_pot: {height:1.1, footprint:[2,2], theme:"garden"},
+  climbing_trellis: {height:3, footprint:[4,4], theme:"fortress"},
+  driftwood: {height:.8, footprint:[6,4], width:4, resizeHeight:true, theme:"garden"},
+  pebble_border: {height:.22, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  boardwalk: {height:.3, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  picket_fence: {height:1.6, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  rope_fence: {height:1.5, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
+  barrel: {height:1.3, footprint:[2,2], theme:"garden"},
+  crate: {height:.9, footprint:[2,2], theme:"garden"},
+  wheelbarrow: {height:1.2, footprint:[2,4], theme:"garden"},
+  watering_can: {height:.6, footprint:[2,2], theme:"garden"},
+  camp_lantern: {height:.65, footprint:[2,2], theme:"garden"},
+  log_stool: {height:.65, footprint:[2,2], theme:"garden"},
+  deck_chair: {height:1.5, footprint:[2,4], theme:"garden"},
+  surfboard: {height:2.8, footprint:[4,2], theme:"garden"},
+  bicycle: {height:1.5, footprint:[4,2], theme:"garden"},
+  picnic_basket: {height:.6, footprint:[2,2], theme:"garden"},
+  buoy: {height:1.2, footprint:[2,2], theme:"garden"},
+  stone_planter: {height:1.4, footprint:[2,2], theme:"fortress"},
+  stone_bench: {height:1.3, footprint:[4,2], theme:"fortress"},
+  arched_window: {height:4, footprint:[4,2], theme:"fortress"},
+  sundial: {height:1.8, footprint:[2,2], theme:"fortress"},
+  clubhouse: {height:7, footprint:[12,12], theme:"australian_reward"},
+  games_room: {height:4, footprint:[8,8], theme:"australian_reward"},
+  treehouse: {height:14, footprint:[18,18], theme:"australian_reward"},
+  training_centre: {height:6, footprint:[8,8], theme:"australian_reward"},
+  workshop: {height:7, footprint:[10,10], theme:"australian_reward"},
+  observatory: {height:40, footprint:[16,16], theme:"australian_reward"},
+  puppy_yard: {height:1.8, footprint:[10,10], theme:"australian_reward"},
+  bunny_garden: {height:3, footprint:[10,8], theme:"australian_reward"},
+  pony_paddock: {height:4, footprint:[26,22], width:24, theme:"australian_reward"},
+  farmyard: {height:8, footprint:[14,12], theme:"australian_reward"},
+  wildlife_habitat: {height:18, footprint:[26,22], theme:"australian_reward"},
+  backyard_pool: {height:1.5, footprint:[10,8], width:8, theme:"australian_reward"},
+  splash_pool: {height:3.5, footprint:[10,10], width:8, theme:"australian_reward"},
+  water_park: {height:12, footprint:[22,20], width:20, theme:"australian_reward"},
+  adventure_playground: {height:5, footprint:[14,12], theme:"australian_reward"},
+  trampoline_park: {height:3, footprint:[6,6], theme:"australian_reward"},
+  sports_stadium: {height:12, footprint:[66,44], width:64, theme:"australian_reward"},
+  cinema: {height:9, footprint:[24,18], width:22, theme:"australian_reward"},
+  arcade: {height:4, footprint:[8,8], theme:"australian_reward"},
+  party_house: {height:4, footprint:[10,8], theme:"australian_reward"},
+  pet_sanctuary: {height:12, footprint:[30,24], width:28, theme:"australian_reward"},
+  opera_house: {height:20, footprint:[38,36], width:36, theme:"australian_reward"},
+  harbour_bridge: {height:20, footprint:[46,16], width:44, theme:"australian_reward"},
+  lighthouse: {height:24, footprint:[18,12], theme:"australian_reward"},
+  beach_huts: {height:3.5, footprint:[12,6], theme:"australian_reward"},
+  railway_station: {height:5, footprint:[16,14], width:14, theme:"australian_reward"},
+  country_bakery: {height:4.5, footprint:[8,8], theme:"australian_reward"},
+  platypus_creek: {height:2, footprint:[14,10], width:12, theme:"australian_reward"},
+  wombat_burrows: {height:1.5, footprint:[8,6], width:6, theme:"australian_reward"},
+  cockatoo_aviary: {height:4, footprint:[6,6], theme:"australian_reward"},
+  wildlife_rescue: {height:5, footprint:[16,10], width:14, theme:"australian_reward"},
+  windmill_garden: {height:10, footprint:[8,8], theme:"australian_reward"},
+  bush_camp: {height:2.8, footprint:[8,8], theme:"australian_reward"},
+};
+export function getItemPresentation(item: EconomyItem): ItemPresentation {
+  return WORLD_ITEM_PRESENTATION[String(item.metadata.worldAssetKey)] ?? {height:3, theme:"garden"};
+}
 
-/** Uniform scaling retains proportions. The reserved grid footprint is a hard
- * ceiling so neighbouring placed items cannot overlap after this art upgrade. */
+/** Uniform scaling respects both the item's anchor and its reserved land. */
 export function fitWorldItem(size:{x:number;y:number;z:number}, footprint:[number,number], presentation:ItemPresentation){
-  const target=presentation.width?presentation.width/Math.max(size.x,.001):presentation.height/Math.max(size.y,.001);
-  const margin=presentation.width===2?0:.12;
-  return Math.max(.001,Math.min(target,(footprint[0]-margin)/Math.max(size.x,.001),(footprint[1]-margin)/Math.max(size.z,.001)));
+ const target=presentation.width?presentation.width/Math.max(size.x,.001):presentation.height/Math.max(size.y,.001);
+ const margin=presentation.width===2?0:.12;
+ return Math.max(.001,Math.min(target,(footprint[0]-margin)/Math.max(size.x,.001),(footprint[1]-margin)/Math.max(size.z,.001)));
+}
+export function fitWorldItemScale(size:{x:number;y:number;z:number},footprint:[number,number],presentation:ItemPresentation):[number,number,number]{
+ const uniform=fitWorldItem(size,footprint,presentation);
+ return [uniform,presentation.resizeHeight?presentation.height/Math.max(size.y,.001):uniform,uniform];
 }

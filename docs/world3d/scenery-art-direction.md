@@ -160,3 +160,19 @@ cardinal drag continuity, saved copy identity, rotation/colour persistence,
 home access, collision, terrain and return navigation. TypeScript/lint checks
 also run. Full end-to-end mouse and touch visual review remains pending:
 native browser control stalled and another preview was active in Chrome.
+
+
+## Scale correction — 25 September 2026
+
+Following the owner’s screenshots, mature trees now target 14–18 m against the roughly 2.2 m avatar. Castle ramparts and corners target 26 m against the approximately 58 m Tower of Knowledge; gates target 28 m, turrets 32 m and keeps 34 m. Buildings, landmarks, plants, furniture, animals and all collection additions have revised individual heights.
+
+The renderer previously capped broad models against their small legacy footprints. Placement and rendering now share expanded runtime footprints from the presentation catalogue, including items loaded from the live marketplace. Stored item keys, metadata, ownership and saved coordinates remain unchanged. No database migration is needed. Dense existing arrangements can overlap after enlargement and may need manual spacing; we do not relocate or delete student items automatically.
+
+Connected boundaries keep a two-metre cell pitch. Their live renderer uses the same height targets as individual previews, and castle masonry is built at its taller height rather than simply stretching a small brick texture. Width-defined ground features and connectors apply their explicit vertical target independently. The inspection gallery spaces larger objects apart.
+
+Validation: mature-tree proportion and footprint regression, wall/tower ratio, matching connector heights and grid pitch, all 122 sizing entries, home movement/entry protection and scenery geometry suites. Browser inspection of Silver Birch and Castle Wall against the avatar reference.
+
+
+## Item-by-item footprint correction
+
+The follow-up [122-item measured audit](item-scale-audit.md) supersedes the height-ratio footprint multiplier above. Every item now has explicit land dimensions; sites use width-led uniform sizing. The oval, drive-in, horse paddock and kangaroo sanctuary have enlarged site geometry with separately sized occupants/structures. The review page can measure all actual models sequentially and compare unlike objects under one camera. See the audit for per-item results and game-scale conventions.

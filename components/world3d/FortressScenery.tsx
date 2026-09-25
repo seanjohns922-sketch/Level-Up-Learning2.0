@@ -1,6 +1,7 @@
 "use client";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { CASTLE_WALL_HEIGHT } from "@/lib/world3d/world-item-presentation";
 import { Box, Pole, Roof } from "./DetailedScenery";
 type Block={p:[number,number,number];s:[number,number,number];yaw?:number};
 function Blocks({blocks,tint="#aaa18b"}:{blocks:Block[];tint?:string}){
@@ -22,11 +23,11 @@ function Arch({tint}:{tint?:string}){
 }
 export const FORTRESS_SCENERY_KEYS=new Set(["castle_wall","castle_corner","castle_gate","castle_turret","castle_keep","stone_wall","wood_gate"]);
 export function FortressScenery({assetKey,tint}:{assetKey:string;tint?:string}){
- if(assetKey==="castle_wall")return <Wall tint={tint}/>;
- if(assetKey==="castle_corner")return <group><Wall tint={tint}/><group rotation={[0,Math.PI/2,0]}><Wall tint={tint}/></group></group>;
+ if(assetKey==="castle_wall")return <Wall height={CASTLE_WALL_HEIGHT-.39} depth={1.35} tint={tint}/>;
+ if(assetKey==="castle_corner")return <group><Wall height={CASTLE_WALL_HEIGHT-.39} depth={1.35} tint={tint}/><group rotation={[0,Math.PI/2,0]}><Wall height={CASTLE_WALL_HEIGHT-.39} depth={1.35} tint={tint}/></group></group>;
  if(assetKey==="castle_gate")return <group>{[-1.5,1.5].map(x=><group key={x} position={[x,0,0]}><Turret height={3} radius={.57} roof={false} tint={tint}/></group>)}<Arch tint={tint}/><group position={[0,2.32,0]}><Wall width={2.3} height={.6} depth={.65} tint={tint}/></group></group>;
  if(assetKey==="castle_turret")return <Turret tint={tint}/>;
  if(assetKey==="castle_keep")return <group><Box p={[0,1.8,0]} s={[2.7,3.6,2.7]} c={tint??"#aaa18b"}/>{[-1,1].map(side=><group key={side}><group position={[0,0,side*1.37]}><Wall width={2.7} height={3.6} depth={.15} tint={tint}/></group><group position={[side*1.37,0,0]} rotation={[0,Math.PI/2,0]}><Wall width={2.7} height={3.6} depth={.15} tint={tint}/></group></group>)}{[-1,1].flatMap(x=>[-1,1].map(z=><group key={String(x)+z} position={[x*1.35,0,z*1.35]}><Turret height={3.8} radius={.36} tint={tint}/></group>))}<group position={[0,0,1.5]}><Box p={[0,.9,.05]} s={[1.2,1.8,.08]} c="#796044"/><Arch tint={tint}/></group>{[-.9,.9].map(x=><Box key={x} p={[x,2.7,1.46]} s={[.16,.62,.025]} c="#454b3d"/>)}<Roof y={3.65} width={2.1} depth={2.1}/></group>;
- if(assetKey==="stone_wall")return <Wall height={.8} depth={.4} tint={tint} battlements={false}/>;
+ if(assetKey==="stone_wall")return <Wall height={1.8} depth={.6} tint={tint} battlements={false}/>;
  return <group>{[-.9,.9].map(x=><Box key={x} p={[x,.6,0]} s={[.13,1.2,.13]} c="#8a704c"/>)}{[.3,.6,.9].map(y=><Box key={y} p={[0,y,0]} s={[1.7,.12,.07]} c={tint??"#9c8057"}/>)}<Pole a={[-.8,.2,0]} b={[.8,1,0]} radius={.035}/><Box p={[.68,.86,.065]} s={[.18,.05,.035]} c="#4d594c"/></group>;
 }

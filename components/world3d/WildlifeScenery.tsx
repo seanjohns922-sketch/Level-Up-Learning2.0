@@ -25,12 +25,20 @@ export function NativeAnimal({variant,tint}:{variant:string;tint?:string}){
 }
 export const WILDLIFE_KEYS=new Set(["kangaroo","koala","wombat","emu","kookaburra","echidna","cockatoo","rabbit","duck","platypus","blue_heeler","bilby"]);
 export function WildlifeScenery({assetKey,tint}:{assetKey:string;tint?:string}){
- if(assetKey==="koala"||assetKey==="kookaburra")return <group><Tree variant="gum_tree"/><group position={assetKey==="koala"?[.1,.95,.16]:[.48,1.75,.05]} scale={assetKey==="koala"?.65:.6}><NativeAnimal variant={assetKey} tint={tint}/></group></group>;
+ if(assetKey==="koala"||assetKey==="kookaburra")return <group><Tree variant="gum_tree"/><group position={assetKey==="koala"?[.1,.95,.16]:[.48,1.75,.05]} scale={assetKey==="koala"?.22:.16}><NativeAnimal variant={assetKey} tint={tint}/></group></group>;
  return <NativeAnimal variant={assetKey} tint={tint}/>;
 }
 export function AustralianHabitat({assetKey}:{assetKey:string}){
- if(assetKey==="wildlife_habitat")return <group>{[-1,1].map(side=><group key={side} position={[side*.85,0,side*.3]}><Tree variant="gum_tree"/><group position={[.04,1,.18]} scale={.65}><NativeAnimal variant="koala"/></group></group>)}</group>;
- if(assetKey==="bunny_garden")return <group>{[-1,1].map(side=><group key={side} position={[side*.7,0,0]}><Ball p={[0,.2,0]} s={[.55,.23,.5]} c="#ae8d61"/><Ball p={[0,.12,.43]} s={[.16,.13,.03]} c="#484132"/><group position={[.18,0,.67]} scale={.62}><NativeAnimal variant="bilby"/></group></group>)}<group position={[1.5,0,-.2]} scale={.3}><Tree variant="gum_tree"/></group></group>;
+ if(assetKey==="wildlife_habitat")return <group>{[-1,1].map(side=><group key={side} position={[side*.85,0,side*.3]}><Tree variant="gum_tree"/><group position={[.04,1,.18]} scale={.18}><NativeAnimal variant="koala"/></group></group>)}</group>;
+ if(assetKey==="bunny_garden")return <group>{[-1,1].map(side=><group key={side} position={[side*.7,0,0]}><Ball p={[0,.2,0]} s={[.55,.23,.5]} c="#ae8d61"/><Ball p={[0,.12,.43]} s={[.16,.13,.03]} c="#484132"/><group position={[.18,0,.67]} scale={.3}><NativeAnimal variant="bilby"/></group></group>)}<group position={[1.5,0,-.2]} scale={.3}><Tree variant="gum_tree"/></group></group>;
+ if(assetKey==="pet_sanctuary")return <group>
+  {[-1,1].flatMap(side=>[-13.94,-9,-4.5,0,4.5,9,13.94].map(x=><Pole key={`${side}-${x}`} a={[x,0,side*10.9]} b={[x,1.4,side*10.9]} radius={.06}/>))}
+  {[-1,1].flatMap(side=>[.5,1.1].map(y=><Pole key={`${side}-${y}`} a={[-13.94,y,side*10.9]} b={[13.94,y,side*10.9]} radius={.04}/>))}
+  {[-1,1].flatMap(side=>[.5,1.1].map(y=><Pole key={`${side}-${y}`} a={[side*13.94,y,-10.9]} b={[side*13.94,y,10.9]} radius={.04}/>))}
+  <group position={[-6,0,-3]} scale={3.1}><Tree variant="gum_tree"/></group>
+  <group position={[5,0,3]} scale={1.15}><NativeAnimal variant="kangaroo"/></group>
+  <group position={[2,0,5]} scale={.75}><NativeAnimal variant="kangaroo"/></group>
+ </group>;
  const roo=assetKey==="pet_sanctuary";
  return <group>{[-1,1].flatMap(side=>[-1.9,0,1.9].map(x=><Pole key={`${side}-${x}`} a={[x,0,side*1.6]} b={[x,.7,side*1.6]} radius={.045}/>))}{[-1,1].flatMap(side=>[.3,.6].map(y=><Pole key={`${side}-${y}`} a={[-1.9,y,side*1.6]} b={[1.9,y,side*1.6]} radius={.025}/>))}<group position={[-1,0,-.6]}>{roo?<group scale={.7}><Tree variant="gum_tree"/></group>:<group><Box p={[0,.45,0]} s={[.8,.9,.8]} c="#a58b66"/><Box p={[0,.3,.415]} s={[.33,.6,.025]} c="#4a4a37"/><Roof y={.97} width={1.1} depth={1}/></group>}</group><group position={[.5,0,.25]} scale={roo?.85:1}><NativeAnimal variant={roo?"kangaroo":"blue_heeler"}/></group>{roo&&<group position={[-.7,0,.65]} scale={.52}><NativeAnimal variant="kangaroo"/></group>}</group>;
 }
