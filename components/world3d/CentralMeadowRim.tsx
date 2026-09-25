@@ -1,5 +1,5 @@
 "use client";
-import { CENTRAL_MEADOW_MAP_FRAGMENT } from "@/lib/world3d/central-meadow-colour";
+import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
 import { useTexture } from "@react-three/drei";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -43,7 +43,7 @@ export function CentralMeadowRim({quality}:{quality:CentralWorldQuality}){
  },[count]);
  return <group>
   <mesh geometry={geometry} receiveShadow><meshStandardMaterial map={texture} color="#edfacb" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
-   shader.fragmentShader=shader.fragmentShader.replace("#include <map_fragment>",CENTRAL_MEADOW_MAP_FRAGMENT);
+   shader.fragmentShader=shader.fragmentShader.replace("#include <common>", "#include <common>\n" + CENTRAL_MEADOW_SHADER_COMMON).replace("#include <map_fragment>",CENTRAL_MEADOW_MAP_FRAGMENT);
    shader.vertexShader="varying float rimRadius;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nrimRadius=length(position.xz);");
    shader.fragmentShader="varying float rimRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>","#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(106.0,134.0,rimRadius);");
   }}/></mesh>

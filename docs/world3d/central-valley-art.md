@@ -10,7 +10,7 @@ Six sections, each covering 60 degrees plus 15 degrees of overlap, supply about 
 
 The central-only shader blends wrap boundaries in one opaque draw, follows the camera horizontally, and leaves depth clear for buildings and scenery. It uses narrow overlap bands and mirrors sections 2 and 5 to align rising/falling valley slopes. The shared realm panorama renderer is unchanged.
 
-The foreground and outer meadow share a light meadow-green treatment: the existing `#edfacb` tint plus a 50% blend toward a warm meadow green in linear colour space before lighting to match the stylised valley while softening the existing grass texture contrast and bump relief while preserving shadows. The outer meadow fades beyond 106 m. A low terrain ridge, instanced rocks and a few trees sit outside the editable grid. Fog is gentler to avoid the previous pale strip between grass and backdrop.
+The foreground and outer meadow share a palette of shaded grass green and sunlit yellow-green. Three scales of smooth procedural variation break up the flat turf colour, while the existing grass texture retains fine detail and the material still receives real scene lighting and shadows. The two surfaces use the same UV mapping so colour patches continue across their join. This replaces the previous uniform 50% colour blend. The outer meadow fades beyond 106 m. A low terrain ridge, instanced rocks and a few trees sit outside the editable grid. The flat buildable ground still meets an illustrated landscape; this colour treatment does not reconstruct the background terrain.
 
 ## Final prompt
 

@@ -214,3 +214,8 @@ export function readCentralWorldGroundTiles(scope: string) {
 export function writeCentralWorldGroundTiles(scope: string, tiles: CentralWorldGroundTile[]) {
   if (typeof window !== "undefined") window.localStorage.setItem(`${GROUND_STORAGE_PREFIX}:${scope}`, JSON.stringify(tiles));
 }
+
+/** Start fresh affects the layout only; ownership and the current home are retained. */
+export function freshCentralWorldLayout(placements: CentralWorldPlacement[]): { placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] } {
+  return { placements: [{ ...getCentralWorldHome(placements) }], tiles: [] };
+}

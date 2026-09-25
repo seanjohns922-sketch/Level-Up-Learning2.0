@@ -1,5 +1,5 @@
 "use client";
-import { CENTRAL_MEADOW_MAP_FRAGMENT } from "@/lib/world3d/central-meadow-colour";
+import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
 
 import { Edges, Html, RoundedBox, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -884,7 +884,7 @@ function MeadowGround() {
   // Large enough that the ground always reaches the horizon panorama — no void
   // is ever visible around the Tower or the playable edge.
   return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.025} color="#edfacb" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
-   shader.fragmentShader=shader.fragmentShader.replace("#include <map_fragment>",CENTRAL_MEADOW_MAP_FRAGMENT);
+   shader.fragmentShader=shader.fragmentShader.replace("#include <common>", "#include <common>\n" + CENTRAL_MEADOW_SHADER_COMMON).replace("#include <map_fragment>",CENTRAL_MEADOW_MAP_FRAGMENT);
     shader.vertexShader="varying float meadowRadius;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nmeadowRadius=length(position.xy);");
     shader.fragmentShader="varying float meadowRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>","#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(106.0,135.0,meadowRadius);");
   }} /></mesh>;

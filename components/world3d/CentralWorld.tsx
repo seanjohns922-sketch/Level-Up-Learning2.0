@@ -44,6 +44,7 @@ import {
   CENTRAL_WORLD_HOME_KEY,
   CENTRAL_WORLD_HOME_ITEM,
   getCentralWorldHome,
+  freshCentralWorldLayout,
   getCentralWorldHomeAnchors,
   gridToWorld,
   placementOccupiesCell,
@@ -340,6 +341,10 @@ export default function CentralWorld() {
   const [groundTiles, setGroundTiles] = useState<CentralWorldGroundTile[]>(() => readCentralWorldGroundTiles(placementScope));
   const [buildPlacement, setBuildPlacement] = useState<CentralWorldPlacement | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const resetDialog = useRef<HTMLDialogElement>(null);
+  const resetCancel = useRef<HTMLButtonElement>(null);
+  const [libraryOpen, setLibraryOpen] = useState(true);
+  const [librarySection, setLibrarySection] = useState<"build" | "owned">("build");
   const [editTool, setEditTool] = useState<WorldEditTool>("move");
   const [selectedInventoryItemKey, setSelectedInventoryItemKey] = useState<string | null>(null);
   const [selectedSceneryItemKey, setSelectedSceneryItemKey] = useState<string | null>(null);
@@ -461,7 +466,7 @@ export default function CentralWorld() {
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable=true]")) return;
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (resetDialog.current?.open || event.metaKey || event.ctrlKey || event.altKey) return;
       const delta = move[event.key.toLowerCase()];
       if (!delta) return;
       event.preventDefault();
@@ -495,7 +500,6 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
     setBuildZoom(28);
-    setEditHistory([]);
     setEditorOpen(true);
     // Leave the avatar where it was standing — only the build camera moves.
     void speak("Edit World. Your character stays put. With nothing chosen, the arrows move the view around. Pick something, and the arrows move it — then tap the grass to drop it.", undefined, "manual", { rate: 0.9 });
@@ -732,6 +736,23 @@ export default function CentralWorld() {
     if (paint) applyGroundAt(gridX, gridZ);
   }
 
+  function startFreshWorld() {
+    // Keep the current home, ownership and economy; only clear the editable layout.
+    setStrokeActive(false);
+    recordWorldEdit();
+    const fresh = freshCentralWorldLayout(placedCustomisations);
+    writeCentralWorldPlacements(placementScope, fresh.placements);
+    writeCentralWorldGroundTiles(placementScope, fresh.tiles);
+    setPlacedCustomisations(fresh.placements);
+    setGroundTiles(fresh.tiles);
+    setBuildPlacement(null);
+    setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(null);
+    setEditTool("move");
+    resetDialog.current?.close();
+    void speak("Your building space is clear. Your home and purchases are safe. Choose Undo to restore your previous world.", undefined, "manual", { rate: 0.9 });
+  }
+
   function undoWorldEdit() {
     const previous = editHistory.at(-1);
     if (!previous) return;
@@ -833,37 +854,27 @@ export default function CentralWorld() {
         </section>
       ) : null}
       {editorOpen ? (
-        <section className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 10, top: 10, bottom: 10, zIndex: 35, width: "min(330px, 90vw)", overflowY: "auto", border: "2px solid #5eead4", borderRadius: 7, background: "rgba(13,24,22,.96)", color: "#fff", padding: 11, boxShadow: "0 14px 40px rgba(0,0,0,.4)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-            <div><div style={{ color: "#5eead4", fontSize: 10, fontWeight: 950, letterSpacing: ".16em" }}>EDIT WORLD</div><div style={{ marginTop: 1, fontSize: 16, fontWeight: 950 }}>{buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "Move or turn your home, then choose Place" : heldItemKey ? `Arrows move ${buildItem?.name ?? "item"} · tap the grass to drop it` : isMoveTool ? "Tap an item to move it · arrows pan the view" : isGroundTool ? "Tap or drag on the grass" : isEraseTool ? "Tap an item to remove it" : "Arrows pan the view · pick something to place"}</div></div>
-            <div style={{ display: "flex", gap: 5 }}>
-              <button type="button" onClick={() => setBuildZoom((value) => Math.min(38, value + 4))} aria-label="Zoom camera out" title="Zoom out" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomOut size={18} /></button>
-              <button type="button" onClick={() => setBuildZoom((value) => Math.max(18, value - 4))} aria-label="Zoom camera in" title="Zoom in" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><ZoomIn size={18} /></button>
-              <button type="button" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit" title="Undo" style={{ ...debugButton, width: 40, height: 40, padding: 0, opacity: editHistory.length ? 1 : 0.5 }}><Undo2 size={18} /></button>
-              <WorldVoiceButton compact label="Read edit world instructions" text="Edit World. Choose a basic tool or something from your owned inventory. Tap the grass to move an item. For paths, roads and stone, touch and drag to paint. Green means the space is ready. Red means choose another space." />
-              <button type="button" onClick={closeWorldEditor} aria-label="Close Edit World" title="Close" style={{ ...debugButton, width: 40, height: 40, padding: 0 }}><X size={18} /></button>
-            </div>
+        <>
+        <header className="worldBuilderToolbar" aria-label="World builder toolbar">
+          <div className="worldBuilderTitle"><span>YOUR WORLD</span><strong>Make it yours</strong></div>
+          <div className="worldBuilderToolbarActions">
+            <button type="button" aria-expanded={libraryOpen} aria-controls="world-build-library" onClick={() => setLibraryOpen(value => !value)}><LayoutGrid size={18}/>Library</button>
+            <button type="button" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit"><Undo2 size={18}/>Undo</button>
+            <button type="button" onClick={moveMyHome} aria-pressed={buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY}><Home size={18}/>Move home</button>
+            <button type="button" onClick={() => { setStrokeActive(false); resetDialog.current?.showModal(); resetCancel.current?.focus(); }}><RotateCw size={18}/>Start fresh</button>
+            <button type="button" className="worldBuilderDone" onClick={closeWorldEditor}><Check size={18}/>Done</button>
           </div>
+        </header>
+        <section hidden={!libraryOpen} id="world-build-library" className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 12, top: 92, bottom: 16, zIndex: 35, width: "min(320px, 90vw)", overflow: "hidden", border: "1px solid #52624d", borderRadius: 16, background: "rgba(19,32,28,.97)", color: "#fff", padding: 14, boxShadow: "0 14px 40px rgba(0,0,0,.25)" }}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h2 style={{fontSize:20,margin:0}}>Build library</h2><WorldVoiceButton compact label="Read edit world instructions" text="Choose a category and an item, then tap the grass to place it. Drag to paint ground or join walls. Use Move to pick up an item, and Erase to remove it. Changes save automatically in this browser. Start fresh clears the layout. Undo brings it back."/></div>
 
-          <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}><div style={{ display: "flex", alignItems: "center", gap: 6, color: "#f8d477", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}><PackageOpen size={15} />OWNED INVENTORY <span style={{ color: "#fff", letterSpacing: 0 }}>({ownedWorldItems.length})</span></div><button type="button" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")} style={{ border: 0, background: "transparent", color: "#99f6e4", display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 900, cursor: "pointer" }}><ShoppingBag size={14} />Marketplace</button></div>
-          <div aria-label="Owned world inventory" style={{ marginTop: 5, display: "flex", gap: 6, overflowX: "auto", paddingBottom: 3, minHeight: 62 }}>
-            {ownedWorldItems.length ? ownedWorldItems.map((item) => {
-              const image = inventoryImage(item);
-              const selected = selectedInventoryItemKey === item.item_key;
-              return <button key={item.item_key} type="button" onClick={() => chooseInventoryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ position: "relative", flex: "0 0 126px", height: 58, overflow: "hidden", border: `2px solid ${selected ? "#5eead4" : "rgba(255,255,255,.22)"}`, borderRadius: 5, padding: image ? "0 7px 5px" : "7px", background: selected ? "#0f766e" : "#26332e", color: "#fff", display: "flex", alignItems: "flex-end", justifyContent: "center", fontSize: 10, fontWeight: 950, cursor: "pointer", boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}>{image ? <Image src={image} alt="" fill sizes="126px" style={{ objectFit: "cover", opacity: selected ? 0.64 : 0.48 }} /> : null}<span style={{ position: "relative", zIndex: 1, width: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px #000" }}>{item.name}</span></button>;
-            }) : <div style={{ minHeight: 54, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed rgba(255,255,255,.2)", borderRadius: 5, color: "#bfd0c8", fontSize: 11, fontWeight: 800 }}>Your purchased buildings and places will appear here.</div>}
+          <div className="worldBuilderLibraryTabs" role="group" aria-label="Item library">
+            <button type="button" aria-pressed={librarySection === "build"} onClick={() => setLibrarySection("build")}>Free to build</button>
+            <button type="button" aria-pressed={librarySection === "owned"} onClick={() => setLibrarySection("owned")}>My items ({ownedWorldItems.length})</button>
           </div>
-
-          <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
-            <button type="button" onClick={moveMyHome} aria-pressed={buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY} style={{ ...debugButton, display: "flex", justifyContent: "center", alignItems: "center", gap: 7 }}><Home size={18} />Move My Home</button>
-            <div style={{ display: "flex", gap: 6, alignItems: "center", color: "#cfe6d8", fontSize: 11, lineHeight: 1.5 }}><span>Paths are editable. Erase old paths, then paint your own. Keep the tower entrance and arrival space clear.</span><WorldVoiceButton compact label="Read home and path instructions" text="Move My Home lets you move and turn your house. Paths stay where they are. Use Erase to remove paths and Path to paint a new route. The tower entrance and arrival space must stay clear." /></div>
-          </div>
-
-          <p style={{color:"#cfe6d8",fontSize:11,margin:"8px 0"}}>Changes save automatically in this browser.</p>
-
           {/* Actions */}
           <div style={{ marginTop: 8 }}>
-            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>ACTIONS</div>
+
             <div style={{ marginTop: 4, display: "flex", gap: 5 }}>
               {([["move", "Move", Hand], ["erase", "Erase", Eraser]] as Array<[WorldEditTool, string, LucideIcon]>).map(([tool, label, Icon]) => {
                 const selected = !heldItemKey && editTool === tool;
@@ -873,6 +884,17 @@ export default function CentralWorld() {
             </div>
           </div>
 
+          {librarySection === "owned" ? <>
+          <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}><div style={{ display: "flex", alignItems: "center", gap: 6, color: "#f8d477", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}><PackageOpen size={15} />OWNED INVENTORY <span style={{ color: "#fff", letterSpacing: 0 }}>({ownedWorldItems.length})</span></div><button type="button" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")} style={{ border: 0, background: "transparent", color: "#99f6e4", display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 900, cursor: "pointer" }}><ShoppingBag size={14} />Marketplace</button></div>
+          <div className="worldLibraryResults worldOwnedItems" aria-label="Owned world inventory">
+            {ownedWorldItems.length ? ownedWorldItems.map((item) => {
+              const image = inventoryImage(item);
+              const selected = selectedInventoryItemKey === item.item_key;
+              return <button key={item.item_key} type="button" onClick={() => chooseInventoryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ position: "relative", flex: "0 0 126px", height: 58, overflow: "hidden", border: `2px solid ${selected ? "#5eead4" : "rgba(255,255,255,.22)"}`, borderRadius: 5, padding: image ? "0 7px 5px" : "7px", background: selected ? "#0f766e" : "#26332e", color: "#fff", display: "flex", alignItems: "flex-end", justifyContent: "center", fontSize: 10, fontWeight: 950, cursor: "pointer", boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}>{image ? <Image src={image} alt="" fill sizes="126px" style={{ objectFit: "cover", opacity: selected ? 0.64 : 0.48 }} /> : null}<span style={{ position: "relative", zIndex: 1, width: "100%", whiteSpace: "normal", overflowWrap: "anywhere", textShadow: "0 1px 4px #000" }}>{item.name}</span></button>;
+            }) : <div style={{ minHeight: 54, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed rgba(255,255,255,.2)", borderRadius: 5, color: "#bfd0c8", fontSize: 11, fontWeight: 800 }}>Your purchased buildings and places will appear here.</div>}
+          </div>
+
+          </> : <>
           {/* Category tabs */}
           <div role="tablist" aria-label="Build categories" style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 }}>
             {PALETTE_TABS.map(({ key, label, Icon }) => {
@@ -883,8 +905,9 @@ export default function CentralWorld() {
 
           {paletteTab !== "ground" && <select aria-label="Scenery collection" value={sceneryCollection} onChange={event => setSceneryCollection(event.target.value)} style={{width:"100%",marginTop:8,padding:8,background:"#22382e",color:"#fff7e7",border:"1px solid #607b62",borderRadius:6}}><option value="all">All collections · mix freely</option>{Object.entries(WORLD_COLLECTIONS).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>}
           {paletteTab !== "ground" && <input aria-label="Search scenery" placeholder={`Search ${CENTRAL_WORLD_STARTER_SCENERY.filter(item => item.metadata.worldSceneryGroup === paletteTab).length} items…`} value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} style={{ width: "100%", boxSizing: "border-box", marginTop: 8, padding: "9px 10px", background: "#22382e", color: "#fff7e7", border: "1px solid #607b62", borderRadius: 6 }} />}
-          {/* Active tab content */}
-          <div style={{ marginTop: 7, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 5 }}>
+          {/* Only results scroll: categories and search stay in reach. */}
+          <div key={paletteTab} className="worldLibraryResults" aria-label="Available building items" tabIndex={0}>
+          <div className="worldLibraryItemGrid">
             {paletteTab === "ground"
               ? GROUND_TOOLS.map(([tool, label, Icon]) => {
                   const selected = !heldItemKey && editTool === tool;
@@ -893,7 +916,7 @@ export default function CentralWorld() {
               : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)).map((item) => {
                   const selected = selectedSceneryItemKey === item.item_key;
                   const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? PALETTE_TABS.find(tab => tab.key === paletteTab)?.Icon ?? Sprout;
-                  return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
+                  return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ minWidth: 0, whiteSpace: "normal", overflowWrap: "anywhere", textAlign: "left", lineHeight: 1.3, fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
                 })}
           </div>
           {paletteTab === "rocks_water" && <button type="button" onClick={()=>{setPaletteTab("ground");chooseEditTool("water");}} style={{...debugButton,width:"100%",marginTop:8,padding:"10px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><Waves size={18}/>Paint your own water · 1 square at a time</button>}
@@ -904,6 +927,9 @@ export default function CentralWorld() {
             <p>Use Erase on clear ground to remove one water square and reshape the banks. Undo restores your last edit. Your home and doorway stay clear.</p>
           </div>}
           {paletteTab !== "ground" && !CENTRAL_WORLD_STARTER_SCENERY.some(item => item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)) && <p role="status" style={{ color: "#e1ddce", fontSize: 12 }}>No matching items in this category.</p>}
+          </div>
+          </>}
+          <div className="worldLibrarySelection">
           {buildPreview && CONNECTED_BOUNDARY_KEYS.has(String(buildItem?.metadata.worldAssetKey)) && <p style={{color:"#e3ece3",fontSize:12}}>Matching fences and walls join automatically in neighbouring squares, including corners. Drag to build a row.</p>}
           {paletteTab === "ground" && (editTool === "path" || editTool === "road") && <p style={{color:"#e3ece3",fontSize:12}}>Drag to draw. Matching routes join and form corners and junctions automatically.</p>}
           {buildPreview && buildItem?.metadata.marketplaceCategory === "world_basic" ? (
@@ -919,7 +945,17 @@ export default function CentralWorld() {
             </div>
           ) : null}
 
+          </div>
+          <p className="worldLibrarySaved">Saved automatically in this browser.</p>
         </section>
+        <dialog ref={resetDialog} className="worldBuilderReset" aria-labelledby="world-reset-title" aria-describedby="world-reset-description">
+          <h2 id="world-reset-title">A fresh space to build?</h2>
+          <p id="world-reset-description">Clear all placed items, paths, roads, stone and water. Your home and the tower stay. Your purchased items, rewards and XP are kept.</p>
+          <p>You can use Undo to bring your layout back before leaving or reloading this page.</p>
+          <WorldVoiceButton compact label="Read start fresh explanation" text="A fresh space to build? Clear all placed items, paths, roads, stone and water. Your home and the tower stay. Your purchased items, rewards and XP are kept. You can use Undo to bring your layout back before leaving or reloading this page."/>
+          <div className="worldBuilderResetActions"><button type="button" ref={resetCancel} onClick={() => resetDialog.current?.close()}>Keep building</button><button type="button" onClick={startFreshWorld}>Clear my layout</button></div>
+        </dialog>
+        </>
       ) : null}
 
       {/* Floating build controls, always reachable (outside the scrolling panel):
@@ -930,20 +966,20 @@ export default function CentralWorld() {
             <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? (buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "House and doorway fit · choose Place to save" : "Arrows move it · tap the grass to drop it") : "Choose clear, reachable ground with room for the doorway") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
             <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
-                <button type="button" aria-label="Move item forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>
-                <button type="button" aria-label="Move item left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={18} /></button>
-                <button type="button" aria-label="Move item backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={18} /></button>
-                <button type="button" aria-label="Move item right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={18} /></button>
+                <button type="button" aria-label={buildPreview ? "Move item forward" : "Pan view forward"} onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>
+                <button type="button" aria-label={buildPreview ? "Move item left" : "Pan view left"} onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={18} /></button>
+                <button type="button" aria-label={buildPreview ? "Move item backward" : "Pan view backward"} onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={18} /></button>
+                <button type="button" aria-label={buildPreview ? "Move item right" : "Pan view right"} onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={18} /></button>
               </div>
-              <button type="button" disabled={!buildPreview} onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn 90 degrees" style={{ ...debugButton, minHeight: 46, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, opacity: buildPreview ? 1 : 0.4 }}><RotateCw size={18} /> Turn</button>
+              {buildPreview ? <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn 90 degrees" style={{ ...debugButton, minHeight: 46, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, opacity: buildPreview ? 1 : 0.4 }}><RotateCw size={18} /> Turn</button> : null}
               {buildPreview && buildPlacement?.itemId !== CENTRAL_WORLD_HOME_KEY ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={18} /></button> : null}
               {buildPlacement ? <button type="button" onClick={() => chooseEditTool("move")} style={debugButton}>Cancel</button> : null}
-              <button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 46, minWidth: 84, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button>
+              {!(isMoveTool && !buildPreview) ? <button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 46, minWidth: 84, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button> : null}
             </div>
           </div>
 
           <div className="centralWorldCameraControls" style={{ position: "absolute", right: 16, bottom: 84, zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
-            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".14em" }}>CAMERA</div>
+            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".14em" }}>CAMERA</div><div style={{display:"flex",gap:4}}><button type="button" onClick={() => setBuildZoom(value => Math.min(38,value+4))} aria-label="Zoom camera out" style={debugButton}><ZoomOut size={18}/></button><button type="button" onClick={() => setBuildZoom(value => Math.max(18,value-4))} aria-label="Zoom camera in" style={debugButton}><ZoomIn size={18}/></button></div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 44px)", gridTemplateRows: "repeat(2, 44px)", gap: 4 }}>
               <button type="button" aria-label="Tilt camera up" onClick={() => orbitCamera(0, 0.18)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
               <button type="button" aria-label="Spin camera left" onClick={() => orbitCamera(-0.5, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
@@ -965,7 +1001,35 @@ export default function CentralWorld() {
 
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE LEVEL UP WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The Level Up World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
-      <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}@media(max-height:520px){.centralWorldEditor{width:min(300px,94vw)!important}}@media(max-width:700px){.centralWorldEditor{width:min(280px,calc(100vw - 90px))!important;bottom:auto!important;max-height:48dvh}.centralWorldBuildControls{left:50%!important;width:calc(100vw - 16px);bottom:max(8px,env(safe-area-inset-bottom))!important}.centralWorldBuildControls>div:last-child{gap:5px!important;padding:5px!important;flex-wrap:wrap;justify-content:center}.centralWorldBuildControls [role=status]{font-size:10px!important;text-align:center}.centralWorldCameraControls{right:8px!important;bottom:138px!important}}`}</style>
+      <style>{`
+        .worldBuilderToolbar{position:absolute;inset:12px 12px auto;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:rgba(19,32,28,.97);color:#fff7e7;border:1px solid #52624d;border-radius:16px;box-shadow:0 8px 30px #0003}
+        .worldBuilderTitle{display:grid;gap:2px}.worldBuilderTitle span{font-size:10px;letter-spacing:.16em;color:#efbd61;font-weight:900}.worldBuilderTitle strong{font-size:20px}
+        .worldBuilderToolbarActions{display:flex;gap:8px;flex-wrap:wrap}
+        .worldBuilderToolbar button,.worldBuilderResetActions button,.worldBuilderLibraryTabs button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 12px;border:1px solid #65765d;border-radius:10px;background:#293d32;color:#fff7e7;font-weight:800;cursor:pointer}
+        .worldBuilderToolbar button:disabled{opacity:.4;cursor:default}.worldBuilderToolbar .worldBuilderDone{background:#efbd61;color:#302618;border-color:#efbd61}
+        .centralWorldEditor button:focus-visible,.worldBuilderToolbar button:focus-visible,.worldBuilderReset button:focus-visible{outline:3px solid #efbd61;outline-offset:2px}
+        .worldBuilderLibraryTabs{display:flex;gap:5px;margin-bottom:14px}.worldBuilderLibraryTabs button{flex:1;font-size:12px}.worldBuilderLibraryTabs button[aria-pressed=true]{background:#efbd61;color:#302618;border-color:#efbd61}
+        .centralWorldEditor button{box-shadow:none!important;border-radius:9px!important;min-height:42px}.centralWorldEditor [role=tablist]{gap:6px!important;margin-top:14px!important}.centralWorldEditor [role=tab]{min-height:58px}
+        .centralWorldEditor [role=tab][aria-selected=true],.centralWorldEditor button[aria-pressed=true]{background:#efbd61!important;color:#302618!important;border-color:#efbd61!important;box-shadow:none!important}
+
+        .centralWorldEditor:not([hidden]){display:flex;flex-direction:column;box-sizing:border-box;min-height:0}
+        .centralWorldEditor> *{flex-shrink:0;min-width:0;max-width:100%}
+        .centralWorldEditor .worldBuilderLibraryTabs{margin:10px 0 2px}
+        .centralWorldEditor [role=tablist]{grid-template-columns:repeat(3,minmax(0,1fr))!important;margin-top:10px!important;gap:5px!important}
+        .centralWorldEditor [role=tab]{min-height:36px;flex-direction:row!important;justify-content:center;gap:5px!important;padding:6px 2px!important}
+        .centralWorldEditor select,.centralWorldEditor input{min-width:0;box-sizing:border-box;font-size:12px}
+        .centralWorldEditor .worldLibraryResults{flex:1 1 0;min-height:80px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#73856b transparent;margin-top:10px;padding:3px 6px 6px 2px}
+        .worldLibraryItemGrid,.worldOwnedItems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:start}
+        .worldLibraryItemGrid>button{min-width:0;width:100%;min-height:64px!important;box-sizing:border-box;padding:10px 8px!important;align-items:center!important;white-space:normal}
+        .worldOwnedItems>button{min-width:0;width:100%;height:80px!important}.worldOwnedItems>div{grid-column:1/-1;padding:12px;text-align:center}
+        .worldLibrarySelection{max-height:140px;overflow:auto}.worldLibrarySelection:empty{display:none}
+        .worldLibrarySaved{color:#c8d1bd;font-size:10px;margin:8px 0 0;padding-top:8px;border-top:1px solid #ffffff20}
+        @media(max-height:650px){.centralWorldEditor{top:86px!important;bottom:8px!important}.centralWorldEditor h2{font-size:16px!important}.centralWorldEditor button{min-height:34px}.centralWorldEditor .worldBuilderLibraryTabs{margin-top:4px}.centralWorldEditor .worldLibrarySelection{max-height:72px}.worldLibrarySaved{display:none}}
+        .worldBuilderReset{inset:0;margin:auto;max-width:440px;width:calc(100vw - 48px);padding:24px;border:1px solid #65765d;border-radius:20px;background:#182b22;color:#fff7e7;box-shadow:0 20px 90px #0008}.worldBuilderReset::backdrop{background:#071610b8}.worldBuilderReset h2{margin:0 0 12px;font-size:24px;font-weight:900}.worldBuilderReset p{line-height:1.6;color:#d1dac8}.worldBuilderResetActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.worldBuilderResetActions button:last-child{background:#efbd61;color:#302618}
+        @media(max-width:700px){.worldBuilderToolbar{inset:8px 8px auto;padding:8px;gap:6px}.worldBuilderTitle{display:none}.worldBuilderToolbarActions{width:100%;gap:4px}.worldBuilderToolbar button{flex:1;padding:8px 5px;font-size:11px;gap:4px}.centralWorldEditor{top:76px!important;max-height:none!important}.worldBuilderReset{box-sizing:border-box}}
+        @media(max-height:520px){.centralWorldEditor{overflow-y:auto!important}.centralWorldEditor .worldLibraryResults{flex:none;max-height:220px;min-height:100px}}
+      `}</style>
+      <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}@media(max-height:520px){.centralWorldEditor{width:min(300px,94vw)!important}}@media(max-width:700px){.centralWorldEditor{width:min(280px,calc(100vw - 90px))!important;bottom:160px!important;max-height:none!important}.centralWorldBuildControls{left:50%!important;width:calc(100vw - 16px);bottom:max(8px,env(safe-area-inset-bottom))!important}.centralWorldBuildControls>div:last-child{gap:5px!important;padding:5px!important;flex-wrap:wrap;justify-content:center}.centralWorldBuildControls [role=status]{font-size:10px!important;text-align:center}.centralWorldCameraControls{right:8px!important;bottom:138px!important}}`}</style>
       {transitioning ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "#211914", color: "#fff0c9", fontWeight: 900, letterSpacing: "0.16em", zIndex: 20 }}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span>ENTERING THE TOWER...</span><WorldVoiceButton text={joinSpeechParts(["Entering the tower"])} label="Read entering tower" /></div></div> : null}
     </main>
   );
