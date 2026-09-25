@@ -4,6 +4,7 @@ import { Html, RoundedBox } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
+import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 import type { MeasurelandsLevelTheme } from "@/lib/measurelands-visuals";
 import type { RealmWorldGateState } from "@/lib/world3d/realm-world-state";
@@ -137,40 +138,13 @@ export function MeasurelandsReturnBeam({ accent, active, label = "RETURN TO MEAS
 }
 
 export function MeasurelandsEnvironment({ theme, quality }: { theme: MeasurelandsLevelTheme; quality: MeasurelandsQuality; districtInterior?: boolean }) {
-  const panoramaOverlap = Math.PI * (theme.panoramaBlend ?? 0);
-
   return (
     <>
       <Suspense fallback={null}>
-        {theme.backBackground ? (
-          <>
-            <WorldPanorama
-              asset={theme.background}
-              radius={56}
-              height={theme.panoramaHeight ?? 66}
-              y={theme.panoramaY ?? 10}
-              horizontalScale={0.78}
-              skyBlendColor={theme.sky}
-              thetaStart={Math.PI / 2 - panoramaOverlap / 2}
-              thetaLength={Math.PI + panoramaOverlap}
-              edgeFade={theme.panoramaBlend}
-              flipX
-              crisp
-            />
-            <WorldPanorama
-              asset={theme.backBackground}
-              radius={56}
-              height={theme.panoramaHeight ?? 66}
-              y={theme.panoramaY ?? 10}
-              horizontalScale={0.78}
-              skyBlendColor={theme.sky}
-              thetaStart={-Math.PI / 2 - panoramaOverlap / 2}
-              thetaLength={Math.PI + panoramaOverlap}
-              edgeFade={theme.panoramaBlend}
-              flipX
-              crisp
-            />
-          </>
+        {theme.panoramaSections ? (
+          <WorldPanoramaRing asset={theme.background} sectionAssets={theme.panoramaSections} radius={56} height={theme.panoramaHeight ?? 66} y={theme.panoramaY ?? 10} horizontalScale={0.78} skyBlendColor={theme.sky} flipX sharpDetail />
+        ) : theme.backBackground ? (
+          <WorldPanoramaRing asset={theme.background} rearAsset={theme.backBackground} radius={56} height={theme.panoramaHeight ?? 66} y={theme.panoramaY ?? 10} horizontalScale={0.78} skyBlendColor={theme.sky} flipX />
         ) : (
           <WorldPanorama asset={theme.background} radius={56} height={theme.panoramaHeight ?? 66} y={theme.panoramaY ?? 10} horizontalScale={0.78} skyBlendColor={theme.sky} flipX crisp />
         )}

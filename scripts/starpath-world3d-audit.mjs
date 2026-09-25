@@ -50,13 +50,8 @@ assert.match(environment, /theme\.level === "Year 1" \|\| theme\.level === "Year
 assert.match(themes, /STARPATH_LEVEL_THEMES\["Year 4"\][\s\S]*starpath-panorama-y45-front-4k\.jpg[\s\S]*starpath-panorama-y45-rear-4k\.jpg[\s\S]*starpath-y45-crystal-floor-2k\.jpg/, "Level 4 must use the shared Level 4-5 visual assets");
 assert.match(themes, /STARPATH_LEVEL_THEMES\["Year 5"\][\s\S]*starpath-panorama-y45-front-4k\.jpg[\s\S]*starpath-panorama-y45-rear-4k\.jpg[\s\S]*starpath-y45-crystal-floor-2k\.jpg/, "Level 5 must use the shared Level 4-5 visual assets");
 assert.match(themes, /STARPATH_LEVEL_THEMES\["Year 6"\][\s\S]*starpath-panorama-y6-front-4k\.jpg[\s\S]*starpath-panorama-y6-rear-4k\.jpg[\s\S]*starpath-y6-constellation-floor-2k\.jpg/, "Level 6 must use its capstone visual assets");
-assert.match(environment, /theme\.panoramaOverlap \?\? 0\.42/, "Starpath themes must support per-level seam overlap tuning");
-assert.match(environment, /theme\.panoramaEdgeFade \?\? 0\.12/, "Starpath themes must support per-level seam feather tuning");
 assert.match(world, /guidedAdventure/, "Ground must use the single guided-adventure portal flow");
 assert.match(world, /adventurePortalPosition/, "Ground guided portal position is missing");
-assert.match(environment, /thetaStart=\{Math\.PI \/ 2 - panoramaOverlap \/ 2\}/, "The forward panorama half is missing its seam overlap");
-assert.match(environment, /thetaStart=\{-Math\.PI \/ 2 - panoramaOverlap \/ 2\}/, "The rear panorama half is missing its seam overlap");
-assert.match(environment, /edgeFade=\{panoramaEdgeFade\}/, "The panorama seam feather is missing");
 assert.ok(access.includes('"space"'), "Central 3D access does not support Starpath");
 assert.match(tower, /\/world\/starpath/, "Tower entry does not resolve to Starpath 3D");
 
@@ -90,3 +85,5 @@ assert.ok(year6ArtBytes <= 4_000_000, `Starpath Level 6 art exceeds its 4 MB bud
 
 console.log("Starpath S3D-1 shared-world audit passed.");
 console.log(JSON.stringify({ districts: districts.length, weeks: 8, panoramaBytes: front.size + rear.size, groundArtBytes, year1ArtBytes, year45ArtBytes, year6ArtBytes }));
+
+assert.match(environment, /WorldPanoramaRing asset=\{theme\.background\} rearAsset=\{theme\.backBackground\}/, "Both Starpath hemispheres must share one opaque panorama surface");

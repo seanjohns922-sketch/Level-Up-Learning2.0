@@ -17,8 +17,6 @@ const [environment, world, entry, state, route, access, towerEntry, towerConfig,
 
 assert.match(environment, /chancehollow-home-y3\.jpeg/, "Level 3 must retain its canonical forward artwork");
 assert.match(environment, /chancehollow-level3-panorama-rear\.png/, "Level 3 must provide the rear panorama hemisphere");
-assert.match(environment, /thetaStart=\{Math\.PI \/ 2/, "The forward artwork must occupy one panorama hemisphere");
-assert.match(environment, /thetaStart=\{-Math\.PI \/ 2/, "The rear artwork must occupy the other panorama hemisphere");
 assert.match(environment, /chancehollow-level3-floor\.png/, "The walkable floor must use the Chance Hollow trail texture");
 assert.match(environment, /chancehollow-home-y4\.jpeg/, "Level 4 must retain its canonical forward artwork");
 assert.match(environment, /chancehollow-level4-panorama-rear\.png/, "Level 4 must provide the rear panorama hemisphere");
@@ -65,3 +63,5 @@ for (const asset of [
 }
 
 console.log("Chance Hollow Levels 3-6 world audit passed.");
+
+assert.match(environment, /WorldPanoramaRing asset=\{visuals\.front\} rearAsset=\{visuals\.rear\}/, "Both Chance Hollow hemispheres must share one opaque panorama surface");

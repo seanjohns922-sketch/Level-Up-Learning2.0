@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { numberNexusPanoramaDetail } from "@/lib/number-nexus-visuals";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 
 export type NumberNexusArtQuality = "low" | "medium" | "high";
@@ -49,7 +50,7 @@ export type CityBlockPlacement = {
 
 export function NumberNexusPanorama(props: Parameters<typeof WorldPanorama>[0] & { skyColor?: string }) {
   const { skyColor, ...panoramaProps } = props;
-  return <WorldPanorama {...panoramaProps} repeatX={2} skyBlendColor={skyColor} />;
+  return <WorldPanorama {...panoramaProps} {...numberNexusPanoramaDetail(props.crisp)} repeatX={2} skyBlendColor={skyColor} />;
 }
 
 export function InstancedCityBlocks({ placements }: { placements: CityBlockPlacement[] }) {

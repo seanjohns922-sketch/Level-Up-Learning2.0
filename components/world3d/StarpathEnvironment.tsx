@@ -4,6 +4,7 @@ import { Html, RoundedBox } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
+import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 import type { StarpathLevelTheme } from "@/lib/starpath-visuals";
 import type { RealmWorldGateState } from "@/lib/world3d/realm-world-state";
@@ -347,25 +348,13 @@ function ObservatoryFloor({ theme }: { theme: StarpathLevelTheme }) {
 }
 
 export function StarpathEnvironment({ theme, quality }: { theme: StarpathLevelTheme; quality: StarpathQuality; districtInterior?: boolean }) {
-  const panoramaOverlap = theme.panoramaOverlap ?? 0.42;
-  const panoramaEdgeFade = theme.panoramaEdgeFade ?? 0.12;
   const panoramaY = theme.panoramaY ?? 24.7;
   const panoramaHeight = theme.panoramaHeight ?? 62;
   return (
     <>
       <Suspense fallback={null}>
         {theme.backBackground ? (
-          theme.panoramaEdgeFade !== undefined ? (
-            <>
-              <WorldPanorama asset={theme.backBackground} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} thetaStart={-Math.PI / 2 - panoramaOverlap / 2} thetaLength={Math.PI + panoramaOverlap} backgroundLayer flipX crisp />
-              <WorldPanorama asset={theme.background} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} thetaStart={Math.PI / 2 - panoramaOverlap / 2} thetaLength={Math.PI + panoramaOverlap} edgeFade={panoramaEdgeFade} backgroundLayer flipX crisp />
-            </>
-          ) : (
-            <>
-              <WorldPanorama asset={theme.background} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} thetaStart={Math.PI / 2 - panoramaOverlap / 2} thetaLength={Math.PI + panoramaOverlap} edgeFade={panoramaEdgeFade} backgroundLayer flipX crisp />
-              <WorldPanorama asset={theme.backBackground} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} thetaStart={-Math.PI / 2 - panoramaOverlap / 2} thetaLength={Math.PI + panoramaOverlap} edgeFade={panoramaEdgeFade} backgroundLayer flipX crisp />
-            </>
-          )
+          <WorldPanoramaRing asset={theme.background} rearAsset={theme.backBackground} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} flipX />
         ) : <WorldPanorama asset={theme.background} radius={52} height={panoramaHeight} y={panoramaY} rotationY={theme.panoramaRotation} horizontalScale={0.86} skyBlendColor={theme.sky} flipX crisp />}
       </Suspense>
       <fog attach="fog" args={[theme.fog, 38, 76]} />

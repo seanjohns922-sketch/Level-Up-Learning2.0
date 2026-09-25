@@ -58,3 +58,19 @@ assert.ok(background.size <= 3_000_000, `Level 3 panorama exceeds approval budge
 
 console.log("Measurelands M3D-1 shared-world audit passed.");
 console.log(JSON.stringify({ districts: districts.length, weeks: 8, level3BackgroundBytes: background.size }));
+
+// Level 3 uses real native detail tiles rather than enlarging the old 1774px wrap.
+const sharp = (await import("sharp")).default;
+let detailBytes = 0;
+for (let section = 1; section <= 4; section += 1) {
+  const relative = `public/images/measurelands-level3-detail/section-${section}.webp`;
+  const url = new URL(`../${relative}`, import.meta.url);
+  const metadata = await sharp(url.pathname).metadata();
+  assert.equal(metadata.width, 887, `${relative}: preserve native width`);
+  assert.equal(metadata.height, 1774, `${relative}: preserve native height`);
+  detailBytes += (await stat(url)).size;
+  assert.ok(themes.includes(`/images/measurelands-level3-detail/section-${section}.webp`));
+}
+assert.ok(detailBytes < 3_000_000, `Level 3 detail tiles exceed 3 MB: ${detailBytes}`);
+assert.match(environment, /sectionAssets=\{theme\.panoramaSections\}/, "Level 3 must render its detail sections");
+console.log(`Measurelands Level 3 native detail tiles verified (${detailBytes} bytes).`);

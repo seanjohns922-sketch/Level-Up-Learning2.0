@@ -3,8 +3,9 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { WorldPanoramaRing } from "./WorldPanoramaRing";
 
-export function WorldPanorama({ asset, radius = 68, height = 48, y = 20, rotationY = 0, repeatX = 1, horizontalScale = 1, crisp = true, skyBlendColor, follow = false, backgroundLayer = false, flipX = false, thetaStart = 0, thetaLength = Math.PI * 2, edgeFade = 0 }: { asset: string; radius?: number; height?: number; y?: number; rotationY?: number; repeatX?: number; horizontalScale?: number; crisp?: boolean; skyBlendColor?: string; follow?: boolean; backgroundLayer?: boolean; flipX?: boolean; thetaStart?: number; thetaLength?: number; edgeFade?: number }) {
+function LegacyPanoramaPanel({ asset, radius = 68, height = 48, y = 20, rotationY = 0, repeatX = 1, horizontalScale = 1, crisp = true, skyBlendColor, follow = false, backgroundLayer = false, flipX = false, thetaStart = 0, thetaLength = Math.PI * 2, edgeFade = 0 }: { asset: string; radius?: number; height?: number; y?: number; rotationY?: number; repeatX?: number; horizontalScale?: number; crisp?: boolean; skyBlendColor?: string; follow?: boolean; backgroundLayer?: boolean; flipX?: boolean; thetaStart?: number; thetaLength?: number; edgeFade?: number }) {
   const source = useLoader(THREE.TextureLoader, asset);
   const { gl } = useThree();
   const meshRef = useRef<THREE.Mesh>(null);
@@ -58,4 +59,13 @@ export function WorldPanorama({ asset, radius = 68, height = 48, y = 20, rotatio
   }, [crisp, edgeFade, flipX, gl, repeatX, skyBlendColor, source]);
   useEffect(() => () => texture.dispose(), [texture]);
   return <mesh ref={meshRef} renderOrder={backgroundLayer ? -1000 : 0} position={[0, y, 0]} rotation={[0, rotationY, 0]} scale={[horizontalScale, 1, 1]}><cylinderGeometry args={[radius, radius, height, 64, 1, true, thetaStart, thetaLength]} /><meshBasicMaterial map={texture} side={THREE.BackSide} toneMapped={false} fog={false} transparent={edgeFade > 0} depthTest depthWrite={edgeFade > 0 ? false : !backgroundLayer} /></mesh>;
+}
+
+// Complete horizons share the same seam and texture treatment in every realm.
+// Partial panels remain available for callers that intentionally show an arc.
+export function WorldPanorama(props: Parameters<typeof LegacyPanoramaPanel>[0] & { sharpDetail?: boolean; shadowLift?: number }) {
+  if ((props.thetaLength ?? Math.PI * 2) === Math.PI * 2 && !props.thetaStart && !props.edgeFade) {
+    return <WorldPanoramaRing {...props} />;
+  }
+  return <LegacyPanoramaPanel {...props} />;
 }

@@ -100,3 +100,8 @@ export function isNumberNexusLevel(value: string | null | undefined): value is R
 export function getNumberNexusLevelTheme(level: string | null | undefined): NumberNexusLevelTheme {
   return NUMBER_NEXUS_LEVEL_THEMES[isNumberNexusLevel(level) ? level : "Year 3"];
 }
+
+/** The final two city illustrations need native sampling and more readable shadows. */
+export function numberNexusPanoramaDetail(crisp?: boolean) {
+  return { sharpDetail: crisp === true, shadowLift: crisp ? 0.4 : 0 };
+}

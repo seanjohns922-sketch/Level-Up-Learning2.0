@@ -4,7 +4,7 @@ import { Html, RoundedBox } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { WorldPanorama } from "@/components/world3d/WorldPanorama";
+import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { RealmWorldGateState } from "@/lib/world3d/realm-world-state";
 
@@ -202,12 +202,10 @@ export function ChanceHollowReturnBeam({ accent, active, label = "RETURN TO CHAN
 
 export function ChanceHollowEnvironment({ quality, districtInterior, level = "Year 3" }: { quality: ChanceHollowQuality; districtInterior?: boolean; level?: RealmLevelId }) {
   const visuals = getChanceHollow3DVisuals(level);
-  const overlap = Math.PI * 0.045;
   return (
     <>
       <Suspense fallback={null}>
-        <WorldPanorama asset={visuals.front} radius={56} height={61} y={20} horizontalScale={0.82} skyBlendColor={visuals.sky} thetaStart={Math.PI / 2 - overlap / 2} thetaLength={Math.PI + overlap} edgeFade={0.045} backgroundLayer flipX crisp />
-        <WorldPanorama asset={visuals.rear} radius={56} height={61} y={20} horizontalScale={0.82} skyBlendColor={visuals.sky} thetaStart={-Math.PI / 2 - overlap / 2} thetaLength={Math.PI + overlap} edgeFade={0.045} backgroundLayer flipX crisp />
+        <WorldPanoramaRing asset={visuals.front} rearAsset={visuals.rear} radius={56} height={61} y={20} horizontalScale={0.82} skyBlendColor={visuals.sky} flipX />
       </Suspense>
       <fog attach="fog" args={[visuals.fog, 34, 78]} />
       <ambientLight color="#bdeaf0" intensity={0.48} />
