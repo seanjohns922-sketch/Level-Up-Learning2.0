@@ -16,3 +16,10 @@ assert.deepEqual(access('learner',[result(),result({score_percent:40,passed:fals
 assert.deepEqual(access('learner',[result(),result({working_level:'Year 7'}),result({realm_id:'space',working_level:'Year 7'})]),{level7:['number'],level8:['number']});
 assert.equal(access('learner',EXPEDITION_REALMS.map(realm_id=>result({realm_id}))).level7.length,6);
 console.log('PASS inclusive >=85 threshold, exact counts, historical unlock, identity and assessment filtering, six realms and separate Level 8 eligibility');
+for(const realm of EXPEDITION_REALMS){
+ const prior=result({realm_id:realm});
+ for(const score of [0,84,84.99])assert.equal(access('learner',[prior,result({realm_id:realm,working_level:'Year 7',score_percent:score,passed:true})]).level8.length,0);
+ for(const score of [85,86,100])assert.deepEqual(access('learner',[prior,result({realm_id:realm,working_level:'Year 7',score_percent:score,passed:false})]).level8,[realm]);
+ assert.equal(access('learner',[prior,result({realm_id:realm,working_level:'Year 7',correct_count:84,total_questions:100,score_percent:85})]).level8.length,0);
+}
+console.log('PASS Level 8 exact >=85 threshold across all six realms, independent of legacy passed flag');

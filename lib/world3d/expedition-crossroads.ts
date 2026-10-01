@@ -6,9 +6,9 @@ export const EXPEDITION_START: SummitPoint = [0, 0, 87];
 export const EXPEDITION_TRAILS = [
  {id:'measurement',name:'Measurelands',landmark:'The Quarry Road',colour:'#d7b46e',description:'Cranes, stone bridges and the surveyor’s quarry.',points:[[0,0,65],[-17,0,74],[-49,1,91],[-85,2,95],[-120,3,110]]},
  {id:'space',name:'Starpath',landmark:'Observatory Ridge',colour:'#b39bd6',description:'Follow the old stone steps towards the observatory.',points:[[0,0,65],[-18,0,60],[-50,1,48],[-85,2,58],[-120,3,42]]},
- {id:'number',name:'Number Nexus',landmark:'The Foundry Trail',colour:'#65cbb7',description:'Follow the foundry trail to your Level 7 weekly lessons.',points:[[0,0,65],[-12,0,52],[-30,0,20],[-60,0,-8],[-90,0,-25]]},
+ {id:'number',name:'Number Nexus',landmark:'The Crystal Cavern',colour:'#65cbb7',description:'Follow the crystal trail to the Number Nexus cavern.',points:[[0,0,65],[-12,0,52],[-30,0,20],[-60,0,-8],[-90,0,-25]]},
  {id:'statistics',name:'Statistica',landmark:'Forest Research Station',colour:'#83b984',description:'An expedition through the forest to the research station.',points:[[0,0,65],[14,0,52],[37,1,34],[66,2,43],[90,3,25]]},
- {id:'patterns',name:'Pattern Peaks',landmark:'The Ancient Terraces',colour:'#64ac9f',description:'A winding climb through repeating arches and mountain ruins.',points:[[0,0,65],[19,0,63],[48,1,64],[80,2,78],[121,3,67]]},
+ {id:'pattern',name:'Pattern Peaks',landmark:'The Ancient Terraces',colour:'#64ac9f',description:'A winding climb through repeating arches and mountain ruins.',points:[[0,0,65],[19,0,63],[48,1,64],[80,2,78],[121,3,67]]},
  {id:'chance',name:'Chance Hollow',landmark:'The Mistfall Cavern',colour:'#c78697',description:'Follow the creek into a lantern-lit cavern.',points:[[0,0,65],[12,0,79],[34,1,100],[69,2,113],[106,3,107]]},
 ] as const;
 

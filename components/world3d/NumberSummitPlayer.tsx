@@ -6,7 +6,7 @@ import { TrialStudentAvatar, type WorldMoveInput, type WorldLookInput } from './
 import { TRAIL_SAMPLES, nearestTrail } from '@/lib/world3d/expedition-crossroads';
 import { summitFloor, type SummitPoint } from '@/lib/world3d/number-summit';
 
-export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn,spawnKey,paused,overview,position,onNearest,onAltitude}:{move:WorldMoveInput;look:WorldLookInput;unlocked:number;volcanoOpen:boolean;spawn:SummitPoint;spawnKey:number;paused:boolean;overview:boolean;position:MutableRefObject<THREE.Vector3>;onNearest:(index:number|null)=>void;onAltitude:(height:number)=>void}){
+export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn,spawnKey,paused,overview,position,onNearest,onAltitude,floorResolver,nearestResolver}:{move:WorldMoveInput;look:WorldLookInput;unlocked:number;volcanoOpen:boolean;spawn:SummitPoint;spawnKey:number;paused:boolean;overview:boolean;position:MutableRefObject<THREE.Vector3>;onNearest:(index:number|null)=>void;onAltitude:(height:number)=>void;floorResolver?:(x:number,z:number)=>number|null;nearestResolver?:(x:number,z:number)=>number|null}){
  const group=useRef<THREE.Group>(null),keys=useRef(new Set<string>()),moving=useRef(false),sprinting=useRef(false),yaw=useRef(0),pitch=useRef(.04),nearest=useRef<number|null>(null),lastHeight=useRef(-1),snapCamera=useRef(true);
  const {camera,gl}=useThree();
  const nextMetrics=useRef(0);
@@ -35,15 +35,15 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
    const amount=Math.min(1,Math.hypot(mx,mz));if(amount){const length=Math.hypot(mx,mz);mx/=length;mz/=length;}
    const direction=f.multiplyScalar(mz).addScaledVector(r,mx);sprinting.current=Boolean(k.has('shift')||move.sprint);const distance=delta*(sprinting.current?12:5.2)*amount;
    if(amount>0){
-   const next=g.position.clone().addScaledVector(direction,distance);let floor=summitFloor(next.x,next.z,unlocked,volcanoOpen,g.position.y-.75);
-   if(floor!==null&&Math.abs(floor-(g.position.y-.75))<1.2){g.position.set(next.x,floor+.75,next.z);moving.current=amount>0;if(amount)g.rotation.y=Math.atan2(direction.x,direction.z);}else {moving.current=false;floor=summitFloor(g.position.x,g.position.z,unlocked,volcanoOpen,g.position.y-.75);if(floor!==null)g.position.y=floor+.75;}
+   const next=g.position.clone().addScaledVector(direction,distance);let floor=floorResolver?floorResolver(next.x,next.z):summitFloor(next.x,next.z,unlocked,volcanoOpen,g.position.y-.75);
+   if(floor!==null&&Math.abs(floor-(g.position.y-.75))<1.2){g.position.set(next.x,floor+.75,next.z);moving.current=amount>0;if(amount)g.rotation.y=Math.atan2(direction.x,direction.z);}else {moving.current=false;floor=floorResolver?floorResolver(g.position.x,g.position.z):summitFloor(g.position.x,g.position.z,unlocked,volcanoOpen,g.position.y-.75);if(floor!==null)g.position.y=floor+.75;}
    }else moving.current=false;
   }else moving.current=false;
   position.current.copy(g.position);
   if(process.env.NODE_ENV==='development'&&state.clock.elapsedTime>nextMetrics.current){nextMetrics.current=state.clock.elapsedTime+1;const root=document.querySelector('[data-world3d-root]');root?.setAttribute('data-render-stats',JSON.stringify({calls:gl.info.render.calls,triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries}));}
   const desired=new THREE.Vector3(g.position.x+Math.sin(yaw.current)*10,g.position.y+4.4-pitch.current*7,g.position.z+Math.cos(yaw.current)*10);
   if(snapCamera.current){camera.position.copy(desired);snapCamera.current=false;}else camera.position.lerp(desired,1-Math.exp(-delta*5));camera.lookAt(g.position.x,g.position.y+1.6,g.position.z);
-  let close:number|null=null;TRAIL_SAMPLES.forEach((path,i)=>{const p=path[58];if(Math.hypot(g.position.x-p[0],g.position.z-p[2])<6&&Math.abs(g.position.y-.75-p[1])<2)close=i;});
+  let close:number|null=nearestResolver?nearestResolver(g.position.x,g.position.z):null;if(!nearestResolver)TRAIL_SAMPLES.forEach((path,i)=>{const p=path[58];if(Math.hypot(g.position.x-p[0],g.position.z-p[2])<6&&Math.abs(g.position.y-.75-p[1])<2)close=i;});
   if(close!==nearest.current){nearest.current=close;onNearest(close);}
   const altitude=Math.max(0,Math.round(g.position.y-.75));if(altitude!==lastHeight.current){lastHeight.current=altitude;onAltitude(altitude);}
  });

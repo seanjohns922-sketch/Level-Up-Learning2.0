@@ -35,11 +35,6 @@ export function ExpeditionOutpost(){return <group>
  <Crate at={[12,0,84]} size={1.4}/><Crate at={[14,0,84]}/><Crate at={[12,1.8,84]} size={.8}/>
  <Plaque at={[0,7,99]} title="SIXFOLD OUTPOST" subtitle="HOLD THE LINE. RESTORE THE CORES." width={8}/>
  </group>;}
-function Gear({at,radius=2}:{at:SummitPoint;radius?:number}){const gear=useRef<THREE.Group>(null);useFrame((_,dt)=>{if(gear.current)gear.current.rotation.z+=Math.min(dt,.05)*.18;});return <group ref={gear} position={at}>
- <mesh rotation={[Math.PI/2,0,0]} castShadow><cylinderGeometry args={[radius,radius,.45,20]}/><meshStandardMaterial color="#697779" metalness={.7} roughness={.6}/></mesh>
- {Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return <mesh key={i} position={[Math.cos(a)*radius,Math.sin(a)*radius,0]} rotation={[0,0,a]} castShadow><boxGeometry args={[.65,.45,.55]}/><meshStandardMaterial color="#485557" metalness={.65} roughness={.55}/></mesh>;})}
- <mesh rotation={[Math.PI/2,0,0]} position={[0,0,.3]}><cylinderGeometry args={[radius*.3,radius*.3,.25,12]}/><meshStandardMaterial color="#bd8b4c" metalness={.6}/></mesh>
- </group>;}
 function Steam({at,count=10,scale=1}:{at:SummitPoint;count?:number;scale?:number}){
  const particles=useRef<THREE.Points>(null);
  const geometry=useMemo(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(count*3),3));return g;},[count]);
@@ -48,18 +43,10 @@ function Steam({at,count=10,scale=1}:{at:SummitPoint;count?:number;scale?:number
  useFrame(({clock})=>{const p=particles.current?.geometry.attributes.position;if(!p)return;for(let i=0;i<count;i++){const t=(clock.elapsedTime*.055+i/count)%1;p.setXYZ(i,Math.sin(i*4+t*2)*t*3,t*17,Math.cos(i*3+t)*t*2);}p.needsUpdate=true;});
  return <points ref={particles} geometry={geometry} position={at} scale={scale} frustumCulled={false}><pointsMaterial map={texture} size={6*scale} transparent opacity={.35} depthWrite={false} sizeAttenuation color="#abb6b4"/></points>;
 }
-function Factory({at,width=14,height=11}:{at:SummitPoint;width?:number;height?:number}){return <group position={at}>
- <Box at={[0,height/2,0]} size={[width,height,8]} colour="#414e50"/>
- {Array.from({length:Math.floor(width/2)},(_,i)=><Box key={i} at={[-width/2+1+i*2,height/2,4.08]} size={[.12,height,.16]} colour="#687071"/>)}
- <Box at={[0,height+.25,0]} size={[width+1,.5,9]} colour="#303c40"/>
- {[-1,1].map(x=><group key={x}><Box at={[x*(width/2-2),height*.65,4.13]} size={[2,2,.12]} colour="#dc9658"/><Box at={[x*(width/2-2),height*.65,4.22]} size={[.12,2,.1]} colour="#283437"/></group>)}
- <Box at={[0,2.5,4.15]} size={[4,5,.25]} colour="#202c31"/><Gear at={[0,height*.72,4.5]} radius={1.4}/>
- <Beam a={[-width/2+2,height,0]} b={[-width/2+2,height+9,0]} width={1} colour="#3e494a"/><Steam at={[-width/2+2,height+9,0]}/>
- <Banner at={[width/2+1,0,3]}/>
- </group>;}
-export function FoundryDistrict(){return <group>
- <Factory at={[-107,0,-30]} width={12} height={10}/><Factory at={[-73,0,-36]} width={12} height={15}/>
-
+export function NumberCavernEntrance(){return <group position={[-90,0,-25]}>
+ {[-1,1].map(side=><group key={side}><Stone at={[side*9,6,-5]} scale={[6,11,7]} colour="#414957"/><mesh position={[side*6,2,1]} scale={[1,3,1]}><octahedronGeometry/><meshStandardMaterial color="#67cdb7" emissive="#286b66" emissiveIntensity={.7}/></mesh></group>)}
+ <Stone at={[0,12,-6]} scale={[11,4,7]} colour="#414957"/>
+ <Box at={[0,4,-9]} size={[12,9,.5]} colour="#111a25"/>
  </group>;}
 function CraterFortress(){
  const ref=useRef<THREE.InstancedMesh>(null);
