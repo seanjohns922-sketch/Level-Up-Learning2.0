@@ -1,5 +1,7 @@
 "use client";
 
+import { number7Guide } from "@/data/activities/year7Number/curriculum";
+import { Number7SkillGuideDialog } from "@/components/lesson/Number7SkillGuide";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Sigma, Sparkle, Zap } from "lucide-react";
@@ -310,6 +312,8 @@ function titleCaseWords(value: string) {
 }
 
 function formatLessonTopicLabel(mode: string) {
+  const match=mode.match(/^y7_w(\d+)_l([1-3])_(.+)$/);
+  if(match){const guide=number7Guide(Number(match[1]),Number(match[2]));if(guide)return `${guide.title} · ${match[3]==='fast_thinking'?'Fluency':match[3]==='reasoning'?'Reasoning':'Apply'}`;}
   const byMode: Record<string, string> = {
     number_line: "Number Line",
     arrays: "Arrays",
@@ -641,7 +645,10 @@ export function Year2LessonEngine({
   const isLevelFourNumber = isNumber && levelNumber === 4;
   const isLevelFiveNumber = isNumber && levelNumber === 5;
   const isLevelSixNumber = isNumber && levelNumber === 6;
-  const isModernNumber = isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
+  const isNumber7 = isNumber && levelNumber === 7;
+  const [skillGuideOpen, setSkillGuideOpen] = useState(false);
+  const skillGuideOpenRef = useRef(false);
+  const isModernNumber = isNumber7 || isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
   const totalSeconds = 9 * 60;
   const level = useMemo(() => getLevelForLesson(lesson), [lesson]);
   const workingLevel = useMemo(() => getWorkingLevelForLesson(lesson), [lesson]);
@@ -873,7 +880,7 @@ export function Year2LessonEngine({
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsLeft((c) =>
-        brainBreakActiveRef.current || showLessonResumeRef.current ? c : c - 1
+        brainBreakActiveRef.current || showLessonResumeRef.current || skillGuideOpenRef.current ? c : c - 1
       );
     }, 1000);
     return () => clearInterval(interval);
@@ -974,7 +981,7 @@ export function Year2LessonEngine({
   function restartLesson() {
     clearLessonResume(resumeLessonKey);
     lessonSessionIdRef.current = startNewLessonSession(completionSessionKey);
-    const nextTurn = buildInitialTurn(lesson, activities);
+    const nextTurn = buildInitialTurn(lesson, activities, questionGenerator);
     setSecondsLeft(totalSeconds);
     setQuestionsAnswered(0);
     questionsAnsweredRef.current = 0;
@@ -1568,9 +1575,10 @@ export function Year2LessonEngine({
         }`}
       />
 
+      {isNumber7 && skillGuideOpen && <Number7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} />
-      <ComboActivation comboCount={comboCount} realmId={realmId} />
-      <NexusActivation comboCount={comboCount} realmId={realmId} />
+      <ComboActivation comboCount={comboCount} realmId={realmId} cave={isNumber7} />
+      <NexusActivation comboCount={comboCount} realmId={realmId} cave={isNumber7} />
       {brainBreakVillain && (
         <BrainBreak
           villain={brainBreakVillain}
@@ -1584,6 +1592,7 @@ export function Year2LessonEngine({
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
+          {isNumber7 && <button type="button" className="mb-3 w-full rounded-lg border border-teal-200 bg-teal-950 px-4 py-3 font-bold text-white" onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
           <LessonHUDRail
             levelNumber={levelNumber}
             week={lesson.week}

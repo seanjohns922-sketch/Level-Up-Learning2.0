@@ -44,6 +44,8 @@ import {
 } from "@/lib/realms/realm-journey";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
+import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
+import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
@@ -98,6 +100,7 @@ function ProgramPage() {
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
   const isExpeditionWeek = year === "Year 7" && sp.get("expedition") === "1";
+  const isNumber7 = isExpeditionWeek && realmId === "number";
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
   const isPatternRealm = realmId === "pattern";
@@ -109,10 +112,10 @@ function ProgramPage() {
   const weekNum = isExpeditionWeek ? cavernWeek(sp.get("week")) : Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const program = useMemo(
-    () => isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
+    () => isNumber7 ? NUMBER7_PROGRAM : isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
       ? starpathProgram?.weeks ?? []
       : getCurriculumPlan(year, genreIdForRealm(realmId)),
-    [isExpeditionWeek, isStarpathRealm, realmId, starpathProgram, year]
+    [isNumber7, isExpeditionWeek, isStarpathRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
     const selected = program;
@@ -472,7 +475,7 @@ function ProgramPage() {
     return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
   });
 
-  const unrestrictedMode = DEMO_MODE || previewMode;
+  const unrestrictedMode = !isNumber7 && (DEMO_MODE || previewMode);
 
   useEffect(() => {
     if (DEMO_MODE || previewMode) return;
@@ -631,7 +634,7 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
+    isNumber7 ? number7WeekUnlocked(store,weekNum) : unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
@@ -664,7 +667,7 @@ function ProgramPage() {
 
   type ProgramItem = { type: "lesson" | "quiz" | "posttest"; n: number; title: string; focus: string; comingSoon?: boolean };
   const items: ProgramItem[] = useMemo(() => {
-    if(isExpeditionWeek) return [
+    if(isExpeditionWeek && !isNumber7) return [
       ...[1,2,3].map(n=>({type:"lesson" as const,n,title:`Lesson ${n}`,focus:"Level 7 lesson content is being prepared.",comingSoon:true})),
       {type:weekNum===CAVERN_WEEK_COUNT?"posttest" as const:"quiz" as const,n:1,title:weekNum===CAVERN_WEEK_COUNT?"Level 7 Post-Test":"Weekly Quiz",focus:weekNum===CAVERN_WEEK_COUNT?"Score 85% or above to unlock this realm’s Level 8 stronghold.":"The weekly quiz will open when these lessons are ready.",comingSoon:true},
     ];
@@ -676,6 +679,7 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
+    if(isNumber7){base.push({type:"quiz",n:1,title:"Weekly Quiz",focus:"15 questions: five from each lesson. Score at least 12/15 (80%) to continue."});return base;}
     if (isChanceRealm) {
       if (weekNum === lastWeek) {
         base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Show your Level mastery and unlock your Legend" });
@@ -700,14 +704,14 @@ function ProgramPage() {
       base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 85%+ to unlock your Legend" });
     }
     return base;
-  }, [isExpeditionWeek, isChanceRealm, isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
+  }, [isNumber7, isExpeditionWeek, isChanceRealm, isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
 
   const currentWeekPlan = useMemo(() => {
     return program.find((w) => w.week === weekNum);
   }, [program, weekNum]);
 
   function openItem(item: (typeof items)[number]) {
-    if(isExpeditionWeek || item.comingSoon) return;
+    if((isExpeditionWeek && !isNumber7) || item.comingSoon) return;
     if (!weekUnlocked && !unrestrictedMode) return;
 
     if (!unrestrictedMode) {
@@ -727,6 +731,7 @@ function ProgramPage() {
       }
     }
 
+    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:'quiz'));return;}
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
@@ -871,7 +876,7 @@ function ProgramPage() {
     router.push(world3DReturnPath ?? realmHomeRoute);
   }
 
-  if (isExpeditionWeek && (!previewMode || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
+  if ((isExpeditionWeek || (year === "Year 7" && realmId === "number")) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
 
   if (canonicalStatus !== "ready") {
     return (
@@ -901,7 +906,7 @@ function ProgramPage() {
 
   return (
     <main className="min-h-screen relative">
-      {isExpeditionWeek && <div className="relative z-20 flex items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>Level 7 preview · Lessons are coming soon. Exploring does not change student progress.</span><ReadAloudBtn text="Level 7 preview. Lessons are coming soon. Exploring does not change student progress."/></div>}
+      {isExpeditionWeek && <div className="relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>{isNumber7 ? "Level 7 demo · Complete three lessons, then score 80% on the quiz. Demo progress stays separate from student records." : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span><>{isNumber7&&<a href="/curriculum/number-level7-scope-and-sequence.csv" download className="shrink-0 underline">Download scope and sequence</a>}</><ReadAloudBtn text={isNumber7 ? "Level 7 demo. Complete three lessons, then score at least eighty percent on the weekly quiz. Demo progress stays separate from student records." : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/></div>}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
       {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} /> : <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1312,7 +1317,7 @@ function ProgramPage() {
               </p>
             ) : null}
             <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isChanceRealm ? "text-rose-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
-              {isExpeditionWeek ? "Lessons coming soon" : weekUnlocked
+              {isExpeditionWeek && !isNumber7 ? "Lessons coming soon" : weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
                   : isChanceRealm
@@ -1639,9 +1644,9 @@ function ProgramPage() {
                     }}
                   />
                   <div
-                    role={isExpeditionWeek ? "group" : "button"}
+                    role={comingSoon ? "group" : "button"}
                     tabIndex={locked ? -1 : 0}
-                    aria-disabled={isExpeditionWeek ? undefined : locked}
+                    aria-disabled={comingSoon ? undefined : locked}
                     onClick={() => !locked && openItem(item)}
                     onKeyDown={(e) => {
                       if (!locked && (e.key === "Enter" || e.key === " ")) {
@@ -1653,11 +1658,11 @@ function ProgramPage() {
                       isStarpathRealm
                         ? "relative min-h-[190px] w-full rounded-[8px] p-4 text-left transition-all flex flex-col gap-2.5 group overflow-hidden"
                         : `relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden ${rt.rounded ? "rounded-3xl" : ""}`,
-                      isExpeditionWeek ? "cursor-default" : locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
+                      comingSoon ? "cursor-default" : locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
                     ].join(" ")}
                     style={{
                       clipPath: rt.cardClip,
-                      background: isExpeditionWeek ? rt.cardActiveBg : locked
+                      background: comingSoon ? rt.cardActiveBg : locked
                         ? rt.cardLockedBg
                         : needsRetry
                           ? "linear-gradient(145deg, rgba(69,36,5,0.98), rgba(120,53,15,0.96) 58%, rgba(92,45,8,0.98))"
@@ -1817,7 +1822,7 @@ function ProgramPage() {
                           {item.title}
                         </div>
                         <ReadAloudBtn
-                          text={isExpeditionWeek ? `${item.title}. Coming soon. ${item.focus}` : item.title}
+                          text={comingSoon ? `${item.title}. Coming soon. ${item.focus}` : item.title}
                           className="shrink-0 mt-0.5 !bg-white/10 !border-white/25 !text-white hover:!text-white hover:!border-white/40"
                         />
                       </div>

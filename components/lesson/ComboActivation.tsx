@@ -292,13 +292,15 @@ const CHANCE_TIERS: TierConfig[] = [
 
 type ActivationKey = { id: number; tier: TierConfig };
 
-export default function ComboActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
+const CAVE_TIERS=NEXUS_TIERS.map((tier,index)=>({...tier,title:index===0?'CRYSTAL SURGE':'CAVERN GLOW'}));
+
+export default function ComboActivation({ comboCount, realmId, cave=false }: { comboCount: number; realmId?: string; cave?:boolean }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const tiers = isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : isChance ? CHANCE_TIERS : NEXUS_TIERS;
+  const tiers = cave ? CAVE_TIERS : isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : isChance ? CHANCE_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, Compass, Dices, Orbit, Sigma, Zap } from "lucide-react";
+import { Gem, BarChart3, Compass, Dices, Orbit, Sigma, Zap } from "lucide-react";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -274,7 +274,7 @@ const CHANCE_TIER_CONFIG: typeof NEXUS_TIER_CONFIG = {
   },
 };
 
-export function ComboCounter({ count, chainLabel, realmId }: { count: number; chainLabel?: string; realmId?: string }) {
+export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count: number; chainLabel?: string; realmId?: string; cave?:boolean }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
@@ -283,7 +283,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
   // Pattern Peaks reuses the green-family combo tiers (closest to its emerald
   // theme) with its own Sigma glyph.
   const TIER_CONFIG = isMeasurement ? MEASUREMENT_TIER_CONFIG : isStarpath ? STARPATH_TIER_CONFIG : isStatistics || isPattern ? STATISTICS_TIER_CONFIG : isChance ? CHANCE_TIER_CONFIG : NEXUS_TIER_CONFIG;
-  const IconCmp = isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : isChance ? Dices : Zap;
+  const IconCmp = cave ? Gem : isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : isChance ? Dices : Zap;
   const prevCountRef = useRef(count);
   const [broken, setBroken] = useState(false);
   const [bump, setBump] = useState(false);
@@ -404,7 +404,7 @@ export function ComboCounter({ count, chainLabel, realmId }: { count: number; ch
           >
             {broken
               ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : isStatistics ? "TRAIL RESET" : isChance ? "STREAK RESET" : "CHAIN BROKEN")
-              : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
+              : cave ? "CRYSTAL STREAK" : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
           </span>
           {activeTier !== "cold" && !broken && (
             <span

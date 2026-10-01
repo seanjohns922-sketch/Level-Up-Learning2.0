@@ -6,6 +6,8 @@ import { YEAR4_PROGRAM } from "./year4";
 import { YEAR5_PROGRAM } from "./year5";
 import { YEAR6_PROGRAM } from "./year6";
 
+import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
+
 export const programs = {
   0: PREP_PROGRAM,
   1: YEAR1_PROGRAM,
@@ -14,6 +16,7 @@ export const programs = {
   4: YEAR4_PROGRAM,
   5: YEAR5_PROGRAM,
   6: YEAR6_PROGRAM,
+  7: NUMBER7_PROGRAM,
 };
 
 export const PROGRAMS_BY_YEAR: Record<string, WeekPlan[]> = {
@@ -24,6 +27,7 @@ export const PROGRAMS_BY_YEAR: Record<string, WeekPlan[]> = {
   "Year 4": YEAR4_PROGRAM,
   "Year 5": YEAR5_PROGRAM,
   "Year 6": YEAR6_PROGRAM,
+  "Year 7": NUMBER7_PROGRAM,
 };
 
 export function getProgramForYear(yearLabel: string): WeekPlan[] {

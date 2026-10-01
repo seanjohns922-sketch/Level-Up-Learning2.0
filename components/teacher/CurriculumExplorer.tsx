@@ -78,7 +78,7 @@ export default function CurriculumExplorer({
   progress,
   progressAvailable = true,
 }: Props) {
-  const genres = getGenresForYear(yearLabel);
+  const genres = getGenresForYear(yearLabel).map(g=>yearLabel === "Year 7" && g.id === "number" ? {...g,available:true}:g);
   const firstAvailable = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvailable.id);
   const [weekNum, setWeekNum] = useState<number>(1);
@@ -205,6 +205,7 @@ export default function CurriculumExplorer({
   }
 
   function handleDownloadCsv() {
+    if(yearLabel === "Year 7" && genreId === "number"){const a=document.createElement("a");a.href="/curriculum/number-level7-scope-and-sequence.csv";a.download="number-level7-scope-and-sequence.csv";a.click();return;}
     const rows: string[] = [
       ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes"].join(","),
     ];

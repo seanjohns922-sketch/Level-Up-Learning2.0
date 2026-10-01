@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { PerformanceSummaryCard } from "@/components/lesson/PerformanceSummaryCard";
@@ -111,8 +111,22 @@ import {
 } from "@/lib/resume-state";
 import { getWorld3DReturnPathForLesson } from "@/lib/world3d/return-context";
 
+import Number7SkillGuide from "@/components/lesson/Number7SkillGuide";
+import Number7AccessGate from "@/components/lesson/Number7AccessGate";
+import { generateNumber7Question } from "@/data/activities/year7Number/questions";
+import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
+
+function LessonRouteGate() {
+ const q=useSearchParams(),pathname=usePathname();
+ if(normalizeStudentYearLabel(q.get('year')??'')==='Year 7') {
+  if(!pathname.startsWith('/demo-review/shattered-realms/number/lesson'))return <main className="p-20">Level 7 lessons are available in demo review only.</main>;
+  const week=Number(q.get('week')),lesson=Number(q.get('lessonId')?.match(/-l([1-3])$/)?.[1]);
+  return <Number7AccessGate key={`${week}-${lesson}-${q.get("review")}`} week={week} lesson={lesson}><LessonPage/></Number7AccessGate>;
+ }
+ return <LessonPage/>;
+}
 export default function LessonPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonPage /></Suspense>;
+  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><LessonRouteGate /></Suspense>;
 }
 
 function isPrepGroundCustomLesson(lessonId: string, realmId: string) {
@@ -240,6 +254,13 @@ function LessonPage() {
   const mapRoute = realmId === "measurement"
     ? `/measurelands?level=${encodeURIComponent(year)}`
     : "/number-nexus";
+  const isNumber7 = realmId === "number" && year === "Year 7";
+  const [skillGuideReady, setSkillGuideReady] = useState(false);
+  const number7QuestionCompatible=useMemo(()=>isNumber7?(value:unknown)=>{
+    if(!value||typeof value!=="object")return false;
+    const q=value as {lessonId?:string;version?:number;kind?:string};
+    return q.lessonId===effectiveLessonId&&q.version===1&&q.kind==='multiple_choice';
+  }:undefined,[effectiveLessonId,isNumber7]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = isMeasurement ? "measurement" : "number";
   const lessonStrand = isMeasurement ? "Measurement" : "Number";
@@ -272,8 +293,8 @@ function LessonPage() {
       return title ? `Lesson ${lessonNumber + 1}: ${title}` : `Lesson ${lessonNumber + 1}`;
     }
     const lastWeek = Array.isArray(weeks) && weeks.length ? weeks.length : 12;
-    return week >= lastWeek ? "the Post-Test" : "this week's Quiz";
-  }, [lessonProgram, week, lessonNumber]);
+    return year === "Year 7" ? "this week's Quiz" : week >= lastWeek ? "the Post-Test" : "this week's Quiz";
+  }, [lessonProgram, week, lessonNumber, year]);
 
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
 
@@ -462,6 +483,13 @@ function LessonPage() {
   const lessonFinalizedRef = useRef(false);
 
   async function completeLesson() {
+    if(isNumber7 && previewMode) {
+      if(params.get("review")!=="1")markLessonComplete(year,week,lessonNumber,lessonRealmId);
+      clearLessonResume(effectiveLessonId);
+      clearLessonSession(lessonCompletionActivityKey);
+      router.push(cavernWeekHref('number',week));
+      return;
+    }
     if (lessonFinalizedRef.current) {
       const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
       const world3DReturnPath = getWorld3DReturnPathForLesson({
@@ -565,6 +593,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
+    if(isNumber7){router.push(cavernWeekHref("number",week));return;}
     const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     const world3DReturnPath = getWorld3DReturnPathForLesson({
       realmId: lessonRealmId,
@@ -576,7 +605,7 @@ function LessonPage() {
     router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
   }
 
-  const showWeek12Lesson3Summary = week === 12 && lessonNumber === 3;
+  const showWeek12Lesson3Summary = !isNumber7 && week === 12 && lessonNumber === 3;
   const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
   const latestLessonSummaryRef = useRef<LessonPerformanceSummary | null>(null);
   const liveLessonContext = {
@@ -589,6 +618,7 @@ function LessonPage() {
 
   async function persistLessonPerformanceSummary(summary: LessonPerformanceSummary) {
     latestLessonSummaryRef.current = summary;
+    if(previewMode) return;
     const summaryKey = `${effectiveLessonId}:${summary.questionsAnswered}:${summary.correctAnswers}:${summary.timeSpentSeconds}`;
     if (savedLessonSummaryKeysRef.current.has(summaryKey)) return;
     savedLessonSummaryKeysRef.current.add(summaryKey);
@@ -962,11 +992,7 @@ function LessonPage() {
                 ? "https://player.vimeo.com/video/1183966051?h=ff99ab69f7"
                 : undefined
             }
-            onBack={() =>
-              router.push(
-                `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : ""}`
-              )
-            }
+            onBack={isNumber7 ? () => router.push(cavernWeekHref("number",week)) : goBackToProgram}
             onStart={() => {
               void trackLiveLearningEvent({
                 eventType: "lesson_started",
@@ -1105,10 +1131,12 @@ function LessonPage() {
             demoMode={previewMode || DEMO_MODE}
             onBack={goBackToProgram}
           >
-              {lessonMeta?.activities?.length ? (
+              {isNumber7 && !skillGuideReady ? <Number7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   key={lessonMeta.id}
                   lesson={lessonMeta}
+                  questionGenerator={isNumber7 ? generateNumber7Question : undefined}
+                  isQuestionCompatible={number7QuestionCompatible}
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}

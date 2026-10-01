@@ -208,13 +208,15 @@ const STARPATH_GLYPHS = [Star, Sparkles];
 const PATTERN_GLYPHS = [Sigma, Braces, Equal];
 const CHANCE_GLYPHS = [Dices, CircleDot, Sparkles];
 
-export default function NexusActivation({ comboCount, realmId }: { comboCount: number; realmId?: string }) {
+const CAVE_THEME={...NEXUS_THEME,title:'CRYSTAL RADIANCE'};
+
+export default function NexusActivation({ comboCount, realmId, cave=false }: { comboCount: number; realmId?: string; cave?:boolean }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const t = isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
+  const t = cave ? CAVE_THEME : isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
   const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : STARPATH_GLYPHS;
   const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : isChance ? "251,191,36" : "200,160,48";
   const prevRef = useRef(comboCount);

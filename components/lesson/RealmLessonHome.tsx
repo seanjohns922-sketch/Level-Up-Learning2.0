@@ -194,6 +194,7 @@ export const REALM_LESSON_THEMES = {
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
+  if (realm === "number" && levelNumber === 7) return "/images/shattered-realms/number-cavern.webp";
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
   if (realm === "pattern") return getPatternPeaksBackground(`Year ${levelNumber}` as RealmLevelId);
@@ -457,7 +458,8 @@ export function RealmLessonHome({
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
-  const theme = REALM_LESSON_THEMES[realm];
+  const isCave=realm === "number" && levelNumber === 7;
+  const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:"Cave Mission",videoLabel:"Skill guide",startLabel:"Learn the skill",intro:"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
   const displayFocus = realm === "number" ? numberNexusLearningStatement(focus) : focus;
   const criteria =
     realm === "number"
@@ -567,10 +569,10 @@ export function RealmLessonHome({
                 <span className="text-sm font-black uppercase tracking-[0.14em]" style={{ color: theme.accentSoft }}>{theme.videoLabel}</span>
                 <span className="ml-auto inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
                   <span className="h-1.5 w-1.5 rounded-full" style={{ background: theme.accent, boxShadow: `0 0 7px ${theme.accent}` }} />
-                  {embeddedVideoSrc ? "Ready" : "Coming soon"}
+                  {embeddedVideoSrc || isCave ? "Ready" : "Coming soon"}
                 </span>
               </div>
-              {embeddedVideoSrc ? (
+              {isCave ? <button type="button" onClick={onStart} className="relative flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg border border-teal-300/20 bg-teal-950 p-5 text-center text-white"><span className="text-4xl" aria-hidden="true">◇</span><span className="text-xl font-bold">Learn the skill</span><span>Explore a worked example and a step-by-step explanation before practice.</span><span className="font-bold text-teal-200">Open guide →</span></button> : embeddedVideoSrc ? (
                 <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
                   <iframe
                     src={embeddedVideoSrc}

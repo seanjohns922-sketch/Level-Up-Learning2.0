@@ -1,8 +1,11 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Number7AccessGate from "@/components/lesson/Number7AccessGate";
+import { number7Quiz } from "@/data/activities/year7Number/questions";
+import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
 import { restoreStudentStateFromServer, saveRealmLessonAttempt, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
 import { getProgramForYear } from "@/data/programs";
@@ -7959,6 +7962,7 @@ export default function SessionPageWrapper() {
 
 function SessionPageRouteInstance() {
   const sp = useSearchParams();
+  const pathname=usePathname();
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 3");
   const week = sp.get("week") ?? "1";
   const type = sp.get("type") ?? "lesson";
@@ -7966,6 +7970,10 @@ function SessionPageRouteInstance() {
   const realmId = sp.get("realm_id") ?? "number";
   const routeKey = `${year}|${week}|${type}|${n}|${realmId}`;
 
+  if(year==='Year 7') {
+    if(realmId!=='number'||!pathname.startsWith('/demo-review/shattered-realms/number/quiz'))return <main className="p-20">Level 7 quizzes are available in demo review only.</main>;
+    return <Number7AccessGate key={`${routeKey}-${sp.get("review")}`} week={Number(week)} lesson="quiz"><SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId}/></Number7AccessGate>;
+  }
   return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId} />;
 }
 
@@ -7991,7 +7999,9 @@ function SessionPage({
   const isLevelFourNumberQuiz = quizRealmId === "number" && year === "Year 4";
   const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";
   const isLevelSixNumberQuiz = quizRealmId === "number" && year === "Year 6";
-  const isModernNumberQuiz = isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
+  const isTeacherReview = useSearchParams().get("review")==="1";
+  const isNumber7 = quizRealmId === "number" && year === "Year 7";
+  const isModernNumberQuiz = isNumber7 || isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
   const finalProgramWeek = getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
@@ -8064,6 +8074,7 @@ function SessionPage({
   const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
   function backToWeek() {
+    if(isNumber7){router.push(cavernWeekHref("number",Number(week)));return;}
     const world3DReturnPath = getWorld3DReturnPathForQuiz({
       realmId: quizRealmId,
       level: year,
@@ -8196,7 +8207,7 @@ function SessionPage({
         if (previewMode) {
           persistProgramLessonComplete(year, Number(week), n, quizRealmId);
         } else {
-          await restoreStudentStateFromServer(studentId, quizRealmId);
+          await restoreStudentStateFromServer(studentId!, quizRealmId);
         }
       }
     } catch (e) {
@@ -8221,6 +8232,7 @@ function SessionPage({
   const buildQuizQuestions = useCallback(() => {
     const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
+    if(year==='Year 7'&&!isMeasurementRealm)return number7Quiz(Number(week)).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:`y7-w${week}-l${q.lessonTag}`,activityType:'multiple_choice' as const,kind:'mcq' as const,prompt:q.prompt,options:q.options,correctIndex:q.options.indexOf(q.answer),feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.'}));
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
       return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
@@ -9043,14 +9055,14 @@ function SessionPage({
     };
 
     try {
-      if (!studentId) throw new Error("No active student session");
+      if (!studentId && !previewMode) throw new Error("No active student session");
       await saveNumberWeeklyQuizAttempt(
-        studentId, year, Number(week), attempt, completionId, quizRealmId
+        studentId ?? "demo-preview", year, Number(week), attempt, completionId, quizRealmId
       );
       if (previewMode) {
-        persistProgramQuizComplete(year, Number(week), percent, quizRealmId, score, total);
+        if(!isNumber7 || !isTeacherReview)persistProgramQuizComplete(year, Number(week), percent, quizRealmId, score, total);
       } else {
-        await restoreStudentStateFromServer(studentId, quizRealmId);
+        await restoreStudentStateFromServer(studentId!, quizRealmId);
       }
       clearCompletionId(quizCompletionKey);
     } catch (error) {
@@ -9065,7 +9077,7 @@ function SessionPage({
     setShowQuizMistakeReview(false);
     setQuizMistakeReviewItems(mistakeItems);
 
-    if (previewMode && passed) {
+    if (previewMode && passed && !(isNumber7 && isTeacherReview)) {
       completeWeek(Number(week));
     }
 
@@ -10476,7 +10488,9 @@ function SessionPage({
                   {finalScore >= Math.ceil(quizQuestions.length * ((quizConfig?.passPercent ?? 80) / 100)) ? (
                     <button
                       onClick={() =>
-                        router.push(isFinalQuizWeek
+                        router.push(isNumber7
+                          ? isFinalQuizWeek ? '/demo-review/number-level-7?teacher_preview=1&form=posttest' : cavernWeekHref('number',Number(week)+1)
+                          : isFinalQuizWeek
                           ? `/posttest?year=${encodeURIComponent(year)}${realmParam}`
                           : `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Number(week) + 1))}&legacy=1${realmParam}`)
                       }

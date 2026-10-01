@@ -26616,7 +26616,7 @@ export function buildLessonActivityPool(
   // Pattern Peaks supplies its own ACARA-aligned generator. Keep the shared
   // three-role rotation contract, but do not apply Number Nexus week policies
   // to algebra lessons that happen to share the same year/week coordinates.
-  if (lesson.id.includes("-algebra-")) {
+  if (lesson.id.includes("-algebra-") || /^y7-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id)) {
     return { activities: violations.length === 0 ? [...activities] : [], violations };
   }
 

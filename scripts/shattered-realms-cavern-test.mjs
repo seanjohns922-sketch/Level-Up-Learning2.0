@@ -28,7 +28,7 @@ for(const bad of [0,13,-1,NaN,'nope',1.5])assert.equal(cavernWeek(bad),1);
 const route=fs.readFileSync('app/demo-review/shattered-realms/[realm]/page.tsx','utf8');
 assert.match(route,/if\(!access.allowed\)redirect\('\/login'\)/);
 const program=fs.readFileSync('app/program/page.tsx','utf8');
-assert.match(program,/if\(isExpeditionWeek \|\| item.comingSoon\) return/);
+assert.match(program,/if\(\(isExpeditionWeek && !isNumber7\) \|\| item.comingSoon\) return/);
 assert.match(program,/isStarpathRealm && !isExpeditionWeek \? getStarpathWeekProgram/);
 assert.match(program,/if \(isExpeditionWeek \|\| isStarpathRealm \|\| !previewMode\) return/);
 console.log('PASS all 72 week destinations, return links, continuous cavern floor, darkness, input validation, preview guards and unavailable lesson isolation');
