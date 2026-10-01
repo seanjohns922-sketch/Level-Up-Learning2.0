@@ -1678,6 +1678,7 @@ export function Year2LessonEngine({
           {currentTurnSafe && currentActivity && currentQuestion ? (
             <ComboMilestonePop comboCount={comboCount}>
               <div
+                data-lesson-question-card
                 className={`${
                   isModernNumber
                     ? "rounded-lg border shadow-sm"
@@ -1789,7 +1790,7 @@ export function Year2LessonEngine({
                   />
                 </fieldset>
                 {status === "wrong" && wrongFeedback ? (
-                  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
+                  <div data-lesson-wrong-feedback className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-lg font-black text-red-800">Not quite.</div>
                       <ReadAloudBtn

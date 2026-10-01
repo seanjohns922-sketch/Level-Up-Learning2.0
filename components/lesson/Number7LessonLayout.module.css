@@ -1,0 +1,60 @@
+/* Use the available width before reducing spacing. Keep natural overflow for
+   small screens, zoom and long content; never clip learning or controls. */
+@media (min-width: 1024px) {
+  .home, .active { min-height: 0; }
+  .home > header, .active > header { padding: 8px 16px; }
+  .home > section { margin-top: 8px; }
+  .home > section > div:first-child {
+    min-height: 0;
+    padding: 12px 24px;
+  }
+  .home > section > div:first-child h1 { font-size: 28px; line-height: 1.15; }
+  .home > section > div:first-child p { margin-top: 6px; font-size: 14px; line-height: 1.4; }
+  .home > section > div:first-child > div:last-child > div { margin-top: 6px; }
+  .home > section > div:last-child { padding: 12px 20px; }
+  .home > section > div:last-child > * + * { margin-top: 12px; }
+  .home > section > div:last-child > div { gap: 12px; }
+  .home section section { padding: 12px; }
+  .home section section p { font-size: 16px; line-height: 1.4; margin-top: 8px; }
+  .home section section ul { margin-top: 8px; }
+  .home section section li { font-size: 14px; line-height: 1.4; }
+  .home section section li + li { margin-top: 6px; }
+  .home :global(.aspect-video) { aspect-ratio: auto; height: clamp(140px, 22dvh, 220px); }
+  .home > section > div:last-child > div > div { display: grid; gap: 12px; }
+  .home > section > div:last-child > div > div > * { margin-top: 0; }
+  .home > section > div:last-child > section > div:first-child { flex-direction: row; align-items: center; gap: 16px; }
+  .home :global(.min-h-20) { min-height: 48px; padding: 6px; flex-direction: row; gap: 8px; }
+  .home :global(.min-h-20) span { margin-top: 0; }
+  .home :global(.min-h-14) { min-height: 48px; padding-inline: 20px; }
+  .active > header { margin-bottom: 8px; }
+  .active > section > div:first-child { padding: 10px 20px; }
+  .active h1 { font-size: 24px; line-height: 1.2; }
+  .active > section > div:first-child p { margin-top: 4px; line-height: 1.4; }
+  .active > section > div:last-child { padding: 12px; }
+  .active [data-number-nexus-level="7"] > :global(.grid) { grid-template-columns: 280px minmax(0, 1fr); gap: 12px; }
+  .active [data-lesson-stats] > div { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .active [data-lesson-stats] svg { display: none; }
+  .active [data-lesson-stats] span { letter-spacing: 0; font-size: 10px; }
+  .active [data-lesson-stats] > div > div > div:last-child { padding-inline: 6px; }
+  .active [data-lesson-hud] > div:last-child { padding: 10px; }
+  .active [data-lesson-question-card] { padding: 14px; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) > div:first-child { grid-column: 1 / -1; margin-bottom: 0; }
+  .active [data-lesson-wrong-feedback] { margin-top: 0; padding: 12px; align-self: start; }
+  .active [data-lesson-wrong-feedback] > :global(.grid) { grid-template-columns: 1fr; }
+  .active [data-lesson-multiple-choice] { padding: 14px; }
+  .active [data-lesson-multiple-choice] h2 { font-size: 24px; }
+  .active [data-lesson-answer-options] { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 14px; }
+  .active [data-lesson-answer-options] > button { min-height: 56px; padding: 10px 14px; font-size: 20px; }
+  .guide { display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px 24px; padding: 16px 20px; }
+  .guide > div:first-child, .guide > div:nth-child(2), .guide > p, .guide > [data-guide-actions] { grid-column: 1 / -1; margin-top: 0; }
+  .guide h2 { font-size: 24px; }
+  .guide > p { font-size: 16px; line-height: 1.4; }
+  .guide [data-guide-example] { margin: 0; padding: 14px; align-self: stretch; }
+  .guide [data-guide-steps] ol { margin-top: 8px; }
+  .guide [data-guide-steps] li { font-size: 16px; line-height: 1.4; }
+  .guide [data-guide-steps] li + li { margin-top: 8px; }
+  .guide [data-guide-steps] > div:last-child { margin-top: 10px; padding: 10px; font-size: 14px; }
+  .guide [data-guide-actions] button { padding-block: 8px; }
+  .guide [data-guide-actions] p { margin-top: 4px; }
+}

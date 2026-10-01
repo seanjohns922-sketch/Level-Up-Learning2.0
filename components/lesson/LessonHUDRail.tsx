@@ -65,7 +65,7 @@ export function LessonHUDRail({
     typeof lessonNumber === "number";
 
   return (
-    <div className="relative">
+    <div data-lesson-hud className="relative">
       {/* Bezel */}
       <div
         aria-hidden
@@ -227,7 +227,7 @@ export function LessonHUDRail({
         </div>
 
         {/* Stats strip */}
-        <div className="lg:[&>div]:!grid-cols-1">
+        <div data-lesson-stats className={levelNumber === 7 && realmId === "number" ? undefined : "lg:[&>div]:!grid-cols-1"}>
           <LessonStatStrip
             questionsAnswered={questionsAnswered}
             correctAnswers={correctAnswers}

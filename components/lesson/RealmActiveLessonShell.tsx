@@ -1,5 +1,7 @@
 "use client";
 
+import layout from "./Number7LessonLayout.module.css";
+
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -47,7 +49,7 @@ export function RealmActiveLessonShell({
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (
-    <div className="relative isolate min-h-[calc(100vh-3rem)] text-white">
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${realm === "number" && levelNumber === 7 ? layout.active : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

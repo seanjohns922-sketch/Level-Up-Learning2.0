@@ -269,6 +269,7 @@ export default function MultipleChoiceActivity({
 
   return (
     <div
+      data-lesson-multiple-choice
       className="rounded-3xl border p-6 shadow-[0_1px_2px_rgba(2,23,22,0.04),0_8px_24px_rgba(2,23,22,0.05)]"
       style={
         isMeasurement
@@ -436,7 +437,7 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      <div className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
+      <div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)

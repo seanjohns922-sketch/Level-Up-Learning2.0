@@ -1,4 +1,5 @@
 'use client';
+import layout from './Number7LessonLayout.module.css';
 import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import { MathFormattedText } from '@/components/FractionText';
@@ -12,11 +13,11 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
  const fractionModel=week===4&&lesson===1?{total:24,shaded:18,label:'18 of 24 equal parts = 3/4'}:week===7&&lesson===2?{total:12,shaded:6,label:'2/3 of 3/4 = 6/12 = 1/2'}:week===7&&lesson===3?{total:8,shaded:6,label:'3/4 contains 6 eighths'}:null;
  const ratioModel=week===10&&lesson===1;
  const visualSpeech=square?'There are four rows, each containing four crystals. Four times four equals sixteen.':line?'Number line from negative six to eight. Start at negative four and move seven places to the right, ending at three.':fractionModel?`${fractionModel.label}. ${fractionModel.shaded} of ${fractionModel.total} equal-sized parts are shaded.`:ratioModel?'Two blue crystals and three gold crystals show the ratio two to three. There are five crystals altogether.':guide.example;
- return <section className="rounded-2xl border border-teal-200 bg-[#fffdf5] p-5 text-slate-900 shadow-xl sm:p-8" aria-label="Learn the skill">
+ return <section className={`${layout.guide} rounded-2xl border border-teal-200 bg-[#fffdf5] p-5 text-slate-900 shadow-xl sm:p-8`} aria-label="Learn the skill">
   <div className="text-xs font-bold uppercase tracking-widest text-teal-800">Learn the skill · Week {week} · Lesson {lesson}</div>
   <div className="mt-3 flex items-start justify-between gap-3"><h2 className="text-2xl font-black sm:text-3xl">{guide.title}</h2><ReadAloudBtn text={`${guide.title}. I am learning to ${guide.goal}. ${guide.idea}`} /></div>
   <p className="mt-3 text-lg leading-relaxed">{guide.idea}</p>
-  <div className="my-5 rounded-xl border border-teal-200 bg-white p-5">
+  <div data-guide-example className="my-5 rounded-xl border border-teal-200 bg-white p-5">
    <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-teal-900">Worked example</h3><ReadAloudBtn text={visualSpeech} label="Read diagram" /></div>
    {square&&<div aria-hidden="true" className="mx-auto mb-4 grid w-44 grid-cols-4 gap-3">{Array.from({length:16},(_,i)=><span key={i} className="h-7 w-7 rotate-45 rounded-sm border-2 border-teal-700 bg-gradient-to-br from-teal-100 to-teal-500 shadow-sm"/>)}</div>}
    {fractionModel&&<div className="mx-auto mb-4 max-w-md"><div aria-hidden="true" className="grid gap-1" style={{gridTemplateColumns:`repeat(${fractionModel.total===24?8:4},1fr)`}}>{Array.from({length:fractionModel.total},(_,i)=><div key={i} className={`h-8 border border-teal-700 ${i<fractionModel.shaded?'bg-teal-500':'bg-white'}`}/>)}</div><p className="mt-2 text-center font-semibold">{fractionModel.label}</p></div>}
@@ -24,10 +25,11 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
    {line&&<IntegerNumberLineVisual visual={{type:'integer_number_line',min:-6,max:8,start:-4,jump:7,end:3}}/>}
    <div className="text-center text-xl font-bold leading-relaxed sm:text-2xl"><MathFormattedText text={guide.example}/></div>
   </div>
-  <div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-teal-800">How to solve it</h3><ReadAloudBtn text={guide.steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')} /></div>
+  <div data-guide-steps><div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-teal-800">How to solve it</h3><ReadAloudBtn text={guide.steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')} /></div>
   <ol className="mt-3 space-y-3">{guide.steps.map((s,i)=><li key={s} className="flex gap-3 text-base leading-relaxed sm:text-lg"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-800 font-bold text-white">{i+1}</span><MathFormattedText text={s}/></li>)}</ol>
   <div className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`} /></div>
-  <div className="mt-6 text-center"><button type="button" onClick={onContinue} className="min-h-12 rounded-xl bg-teal-800 px-8 py-3 text-lg font-bold text-white hover:bg-teal-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-800">{review?'Back to practice':'Let’s practise'} →</button><p className="mt-2 text-sm text-slate-600">{review?'Your practice timer is paused.':'Read at your own pace. Your timer starts when practice begins.'}</p></div>
+  </div>
+  <div data-guide-actions className="mt-6 text-center"><button type="button" onClick={onContinue} className="min-h-12 rounded-xl bg-teal-800 px-8 py-3 text-lg font-bold text-white hover:bg-teal-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-800">{review?'Back to practice':'Let’s practise'} →</button><p className="mt-2 text-sm text-slate-600">{review?'Your practice timer is paused.':'Read at your own pace. Your timer starts when practice begins.'}</p></div>
  </section>;
 }
 
