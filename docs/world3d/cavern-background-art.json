@@ -1,0 +1,42 @@
+{
+  "generator": "Built-in image_gen",
+  "note": "Six original backgrounds. WebP exports only; originals retained at generator source paths. Week 1–12 use a subtle static depth crop, dimming and realm glow; no animated zoom. Only demo Level 7 weekly pages consume these assets.",
+  "assets": [
+    {
+      "realm": "number",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-70c2c565-7d4b-4cac-9fda-80441429533a.png",
+      "output": "public/images/shattered-realms/number-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: full bleed landscape 16:9 game background for a children's maths adventure weekly lesson page, no UI baked in. Create Number Nexus's ancient crystal cavern: a broad stone path winding through successive natural rock arches toward a distant mysterious turquoise glow, the stolen Core itself hidden. Large faceted teal counting crystals and a few ancient stone slabs engraved simply 1, 2, 3 at outer edges. View from inside the entrance looking deeper. Polished cinematic stylized 3D game illustration, natural angular rock forms, beautiful atmospheric depth, warm subtle lantern light, inviting discovery, not scary. Dark blue charcoal rocks, restrained turquoise accents. Keep central 65% quiet and low contrast behind existing lesson cards; intricate features concentrated at far sides and upper corners. Readable rock silhouettes, not black. Wide composition must crop well on phone. No people, characters, monsters, factory, foundry, machinery, UI, buttons, title, logo, watermark. One single finished background."
+    },
+    {
+      "realm": "measurement",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-d728db29-2e6e-41f3-91d4-4ffad39dd161.png",
+      "output": "public/images/shattered-realms/measurement-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: landscape 16:9 full bleed game background behind existing weekly lesson UI. Input image is a STYLE AND COMPOSITION REFERENCE. Create the Measurelands variation of this same coherent cave adventure, matching cinematic stylized 3D illustration, natural rock arches, broad stone path winding deeper, atmospheric depth, subtle lanterns, quiet central 65% for lesson cards, edge-focused decoration. Replace ALL numbered stones and turquoise counting crystals with: amber and gold crystals, carved measuring tick marks on stone pillars and an ancient stone compass instrument at the outer edge. Warm gold distant glow; neutral brown charcoal stone. No numbers or text. Keep the cave a natural mysterious but inviting place for children hunting a stolen Core; Core itself remains hidden beyond the distant glow. Readable rock silhouettes not black. A single finished scene, no panels. No people, monsters, factories, foundry, machinery, UI, buttons, titles, logos or watermark. Wide composition crops well on phones."
+    },
+    {
+      "realm": "space",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-4cc374cd-009d-480d-87b0-0c12767586f9.png",
+      "output": "public/images/shattered-realms/space-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: landscape 16:9 full bleed game background behind existing weekly lesson UI. Input image is a STYLE AND COMPOSITION REFERENCE. Create the Starpath variation of this same coherent cave adventure, matching cinematic stylized 3D illustration, natural rock arches, broad stone path winding deeper, atmospheric depth, subtle lanterns, quiet central 65% for lesson cards, edge-focused decoration. Replace ALL numbered stones and turquoise counting crystals with: violet geometric crystals, delicate luminous constellations embedded in the cavern ceiling, subtle geometric carvings at outer edges. Violet indigo distant glow. No numbers or text. Keep the cave a natural mysterious but inviting place for children hunting a stolen Core; Core itself remains hidden beyond the distant glow. Readable rock silhouettes not black. A single finished scene, no panels. No people, monsters, factories, foundry, machinery, UI, buttons, titles, logos or watermark. Wide composition crops well on phones."
+    },
+    {
+      "realm": "statistics",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-069eed2b-06e8-44d6-a243-52fe005f9510.png",
+      "output": "public/images/shattered-realms/statistics-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: landscape 16:9 full bleed game background behind existing weekly lesson UI. Input image is a STYLE AND COMPOSITION REFERENCE. Create the Statistica variation of this same coherent cave adventure, matching cinematic stylized 3D illustration, natural rock arches, broad stone path winding deeper, atmospheric depth, subtle lanterns, quiet central 65% for lesson cards, edge-focused decoration. Replace ALL numbered stones and turquoise counting crystals with: grouped coral, amber and moss-green crystal clusters of different heights arranged in ancient research alcoves, engraved tally records at outer edges. Soft amber distant glow with moss green surroundings. No numbers or text. Keep the cave a natural mysterious but inviting place for children hunting a stolen Core; Core itself remains hidden beyond the distant glow. Readable rock silhouettes not black. A single finished scene, no panels. No people, monsters, factories, foundry, machinery, UI, buttons, titles, logos or watermark. Wide composition crops well on phones."
+    },
+    {
+      "realm": "pattern",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-4ff47f40-3f9b-44df-bc95-b0be70391d38.png",
+      "output": "public/images/shattered-realms/pattern-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: landscape 16:9 full bleed game background behind existing weekly lesson UI. Input image is a STYLE AND COMPOSITION REFERENCE. Create the Pattern Peaks variation of this same coherent cave adventure, matching cinematic stylized 3D illustration, natural rock arches, broad stone path winding deeper, atmospheric depth, subtle lanterns, quiet central 65% for lesson cards, edge-focused decoration. Replace ALL numbered stones and turquoise counting crystals with: repeated alternating violet and emerald crystal formations, repeating carved circles and diamonds on stone arches. Emerald and violet distant glow. No numbers or text. Keep the cave a natural mysterious but inviting place for children hunting a stolen Core; Core itself remains hidden beyond the distant glow. Readable rock silhouettes not black. A single finished scene, no panels. No people, monsters, factories, foundry, machinery, UI, buttons, titles, logos or watermark. Wide composition crops well on phones."
+    },
+    {
+      "realm": "chance",
+      "source": "/Users/seanjohns/.codex/generated_images/01a0d7f3-b208-7c73-9384-e0aed4873c50/exec-a41ee77f-1698-400f-a493-d3b48f00f2c6.png",
+      "output": "public/images/shattered-realms/chance-cavern.webp",
+      "prompt": "Use case: stylized-concept. Asset type: landscape 16:9 full bleed game background behind existing weekly lesson UI. Input image is a STYLE AND COMPOSITION REFERENCE. Create the Chance Hollow variation of this same coherent cave adventure, matching cinematic stylized 3D illustration, natural rock arches, broad stone path winding deeper, atmospheric depth, subtle lanterns, quiet central 65% for lesson cards, edge-focused decoration. Replace ALL numbered stones and turquoise counting crystals with: a few weathered dice-shaped stone cubes with small inset pips at far edges, shallow branching water channels alongside the walkable path, rose quartz and soft amber crystals. Rose gold distant glow. No numbers or text. Keep the cave a natural mysterious but inviting place for children hunting a stolen Core; Core itself remains hidden beyond the distant glow. Readable rock silhouettes not black. A single finished scene, no panels. No people, monsters, factories, foundry, machinery, UI, buttons, titles, logos or watermark. Wide composition crops well on phones."
+    }
+  ]
+}

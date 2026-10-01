@@ -44,6 +44,7 @@ import {
 } from "@/lib/realms/realm-journey";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
+import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
 import {
@@ -901,13 +902,13 @@ function ProgramPage() {
   return (
     <main className="min-h-screen relative">
       {isExpeditionWeek && <div className="relative z-20 flex items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>Level 7 preview · Lessons are coming soon. Exploring does not change student progress.</span><ReadAloudBtn text="Level 7 preview. Lessons are coming soon. Exploring does not change student progress."/></div>}
-      {/* Realm background — same as student dashboard for this level */}
-      <div className="fixed inset-0 z-0">
+      {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
+      {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} /> : <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={
             isStarpathRealm
-              ? getStarpathBackground((isExpeditionWeek ? "Year 6" : curriculumYear) as RealmLevelId)
+              ? getStarpathBackground(curriculumYear as RealmLevelId)
               : isStatisticsRealm
               ? getStatisticaBackground(curriculumYear as RealmLevelId)
               : isPatternRealm
@@ -1046,7 +1047,7 @@ function ProgramPage() {
             />
           </div>
         )}
-      </div>
+      </div>}
 
       {/* ── Student avatar (shared component — appears on every Week page) ── */}
       <div
