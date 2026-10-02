@@ -22,7 +22,7 @@ function valid(key,q,option){const p=q.prompt,ns=nums(p);let e;
  case 9:e=calc(p.split(': ')[1].replace(/\.$/,''));break;
  case 10:case 11:e=ns[0]/ns[1];break;
  case 12:e=100*ns[0]/ns[1];break;
- case 13:e=ns[0]/ns[2];break;
+ case 13:e=q.visual.markers[0].position;break;
  case 14:e=-ns[0]/ns[2];break;
  case 15:{const v=option.split(', ').map(Number);return v.every((n,i)=>i===0||v[i-1]<n);}
  case 16:{const raw=p.match(/Round ([0-9.]+)/)[1],places=ns[1];const [whole,dec]=raw.split(".");const kept=Number(whole+dec.slice(0,places));e=(kept+(Number(dec[places])>=5?1:0))/10**places;break;}

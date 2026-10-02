@@ -272,8 +272,8 @@ function LessonPage() {
   const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
-    return q.readabilityRevision===1&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
-  }:undefined,[effectiveLessonId,isCave7,isNumber7,isSpace7]);
+    return q.readabilityRevision===(isNumber7&&week===5&&lessonNumber===1?2:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
+  }:undefined,[effectiveLessonId,isCave7,isNumber7,isSpace7,week,lessonNumber]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
   const lessonStrand = newCaveRealm === "pattern" ? "Algebra" : newCaveRealm === "statistics" ? "Statistics" : newCaveRealm === "chance" ? "Probability" : isSpace7 ? "Space" : isMeasurement ? "Measurement" : "Number";

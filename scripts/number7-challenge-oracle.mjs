@@ -24,7 +24,7 @@ export function validChallenge(key,q,option) {
       case 10: answer=v[0]-v[0]*v[1]/v[2];break;
       case 11: answer=v[0]-v[1]/v[2];break;
       case 12: answer=100*v[0]/v[1];break;
-      case 13: answer=v[0]/v[1]+v[2]/v[1];break;
+      case 13: answer=q.visual.markers[0].position+v[0]/v[1];break;
       case 14: answer=v[0]+v[1]/4;break;
       case 15: answer=v[2]-v[0]/v[1];break;
       case 16: {const thousandths=Number(p.match(/\$(\d+\.\d{3})/)[1].replace('.',''));answer=Math.floor((thousandths*v[0]+5)/10)/100;break;}
@@ -66,7 +66,7 @@ export function validChallenge(key,q,option) {
     case 10: return option.startsWith('Divide the top and bottom')&&o[0]===v[0]/v[2]&&eq(v[0]/v[1],v[2]/v[3]);
     case 11: answer=v[0]/v[1];break;
     case 12: return eq(o[0],v[0]/100)&&eq(o[1]/o[2],v[0]/100);
-    case 13: return eq(calculate(option.split('=')[0].trim()),v[0]/v[2])&&option.includes('divide the interval count');
+    case 13: return eq(calculate(option),q.visual.markers[0].position);
     case 14: return eq(o[0],v[0]/v[1])&&o[1]<o[0]&&o[0]<o[2]&&option.includes('left of zero');
     case 15: return option.includes(' < ')&&o[0]<o[1]&&option.includes('farther left');
     case 16: return option.startsWith('Round the original value directly')&&eq(o[0],Math.round(v[0]*10)/10)&&option.includes('hundredths digit');

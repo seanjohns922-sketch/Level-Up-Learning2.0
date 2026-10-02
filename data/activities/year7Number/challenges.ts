@@ -21,6 +21,12 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   const n = int(5, 16), a = int(3, 8), b = int(2, 6), c = int(2, 5);
   const key = (week - 1) * 3 + lesson;
   let task: Task | undefined;
+  let visual: MultipleChoiceQuestion["visual"], diagramSpeech: string | undefined;
+  const numberLine = (u:number,d:number) => {
+    const max=Math.ceil(u/d)+1;
+    visual={type:"fraction_number_line",title:"Read point P",leftLabel:"",rightLabel:"",leftPosition:0,rightPosition:max,min:0,max,subdivisions:d,markers:[{label:"P",position:u/d}]};
+    diagramSpeech=`Number line from 0 to ${max}. Each whole has ${d} equal spaces. P is ${u} spaces to the right of zero.`;
+  };
   const choice = (prompt: string, answer: string, wrong: string[], explanation: string) => {
     const options = [...new Set([answer, ...wrong])];
     if (options.length !== 4) throw Error(`Invalid choices: ${key}/${role}`);
@@ -119,11 +125,11 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
         `${percent}% means ${percent} out of 100. As a decimal it is ${d}, and as a simplified fraction it is ${frac(percent,100)}.`); break;
     }
     case 13: {
-      const d=pick([4,5,8]), u=d+a;
-      choice(`A point lies ${u} equal intervals to the right of 0, with ${d} intervals per whole. Which representation is correct?`,
-        `${u}/${d} = ${fmt(u/d)}; divide the interval count by intervals per whole.`,
-        [`${u*d} = ${u} × ${d}; multiply the interval count by intervals per whole.`,`${u+1}/${d} = ${fmt((u+1)/d)}; count the starting tick as one interval.`,`${u}/${d+1} = ${fmt(u/(d+1))}; use the number of ticks per whole as denominator.`],
-        `Each interval is 1/${d}. There are ${u} intervals, so the coordinate is ${u}/${d}, not the number of tick marks.`); break;
+      const d=pick([2,4,5]), u=d+a+(a%d===0?1:0);
+      numberLine(u,d);
+      choice('Which fraction is at P?',frac(u,d),
+        [frac(u+1,d),frac(u-1,d),frac(u+d,d)],
+        `Each space is 1/${d}. Count ${u} spaces from 0: ${u}/${d} = ${frac(u,d)}.`); break;
     }
     case 14: {
       const numerator=a*2+1, x=-numerator/2;
@@ -274,7 +280,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     case 10: { const den=pick([8,12,16]),used=den/4,total=n*den; numeric(`A tank holds ${total} L. ${used}/${den} of its capacity is used. How many litres remain?`,total*3/4,[total/4,total-used,total*used],`${used}/${den} simplifies to 1/4 used. Therefore 3/4 remains: ${total} × 3/4 = ${total*3/4} L.`); break; }
     case 11: { const length=n+.75,cut=a/4; numeric(`A rope is ${length} m long. A piece of ${a}/4 m is cut off. How many metres remain?`,length-cut,[length+cut,length-a,length-cut/10],`Convert ${a}/4 to ${fmt(cut)} m, then subtract from ${length} m to get ${fmt(length-cut)} m.`); break; }
     case 12: { const percent=pick([25,50,75]),fraction=percent/25; numeric(`A club says ${fraction}/4 of its members attend. What percentage attend?`,percent,[fraction*10,fraction,100-percent+5],`${fraction}/4 = ${percent}/100 = ${percent}%.`); break; }
-    case 13: { const d=pick([4,5,8]),start=a/d,steps=b+2; numeric(`A trail marker is at ${a}/${d} km. The next marker is ${steps} intervals farther right, each 1/${d} km. What is the next marker's coordinate in km?`,(a+steps)/d,[start+steps,(a-steps)/d,(a+steps)/(d+1)],`Add ${steps}/${d} km to ${a}/${d} km: ${a+steps}/${d} = ${fmt((a+steps)/d)} km.`); break; }
+    case 13: { const d=pick([2,4,5]),u=d+a+(a%d===0?1:0);numberLine(u,d);numeric(`Start at P. Move 1/${d} to the right. What decimal do you reach?`,(u+1)/d,[(u-1)/d,u/d,(u+d)/d],`P is ${fmt(u/d)}. Move one space right: ${fmt(u/d)} + ${fmt(1/d)} = ${fmt((u+1)/d)}.`); break; }
     case 14: { const start=-a-.5,step=.25,count=2*b+1; numeric(`On a number line, P is at ${start}. Q is ${count} quarter-unit intervals to the right of P. What is Q's coordinate?`,start+count*step,[start-count*step,-start+count*step,start+count],`Each interval is 0.25. Moving right adds ${count} × 0.25 = ${count*.25}; Q is ${fmt(start+count*.25)}.`); break; }
     case 15: { const low=-a/4,high=b/2; numeric(`At dawn it is −${a}/4 °C. At noon it is ${high} °C. By how many degrees has the temperature risen?`,high-low,[high+low,high,Math.abs(low)],`Use comparable decimals: dawn ${fmt(low)} °C. Rise = ${high} − (${fmt(low)}) = ${fmt(high-low)} °C.`); break; }
     case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`${count} metres of fabric cost $${unit.toFixed(3)} per metre. The shop rounds only the final bill to the nearest cent. What is the bill in dollars?`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
@@ -302,8 +308,8 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   if (!task) throw Error(`Missing Level 7 challenge ${key}/${role}`);
   for (let i=task.options.length-1;i>0;i--) { const j=int(0,i); [task.options[i],task.options[j]]=[task.options[j],task.options[i]]; }
   return {
-    ...task, readabilityRevision: 1, kind: 'multiple_choice' as const, skill: guide.code, seed,
+    ...task, visual, diagramSpeech, readabilityRevision: key===13?2:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
     lessonId: `y7-w${week}-l${lesson}`, version: 2 as const, tier: role,
     helper: 'Choose one answer.',
-  } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string};
+  } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string;diagramSpeech?:string};
 }
