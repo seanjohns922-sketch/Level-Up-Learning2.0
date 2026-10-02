@@ -33,6 +33,8 @@ import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { resetLegendUnlockVideosForCurrentScope } from "@/lib/legend-video-state";
 import { enqueueReveal } from "@/lib/gem-reveal";
 import { fetchDemoGemVault } from "@/lib/gems";
+import { number7ActivityHref } from "@/lib/number7-demo";
+import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
@@ -233,6 +235,7 @@ export default function DemoReviewPanel() {
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
   const maxWeek = realm === "number" ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
+  const isNumber7 = realm === "number" && year === "Year 7";
   const starpathLevel = getStarpathLevelForYear(year === "Year 7" || year === "Year 8" ? "Year 6" : year).id;
   const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
@@ -365,6 +368,7 @@ export default function DemoReviewPanel() {
   }
 
   function programHref() {
+    if (isNumber7) return cavernWeekHref("number", week);
     if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
     if (realm === "pattern") return `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(year)}&week=${week}`;
     if (realm === "chance") return `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1&realm_id=chance&teacher_preview=1`;
@@ -373,6 +377,7 @@ export default function DemoReviewPanel() {
   }
 
   function lessonHref() {
+    if (isNumber7) return number7ActivityHref(week, lesson);
     if (realm === "pattern") {
       return `/pattern-peaks/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
     }
@@ -386,6 +391,7 @@ export default function DemoReviewPanel() {
   }
 
   function quizHref() {
+    if (isNumber7) return number7ActivityHref(week, week === 12 ? "posttest" : "quiz");
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
     if (realm === "chance") return `/chance-hollow/quiz/${encodeURIComponent(year)}/${week}?teacher_preview=1`;
@@ -502,7 +508,7 @@ export default function DemoReviewPanel() {
           )}
         </section>
 
-        {levelNumber <= 6 ? <>
+        {levelNumber <= 6 || isNumber7 ? <>
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><BookOpen size={18} className="text-amber-300" /><h2 className="text-base font-black">Weekly Content</h2></div>
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_2fr]">
@@ -519,11 +525,14 @@ export default function DemoReviewPanel() {
             <div className="grid gap-2 sm:grid-cols-3 md:self-end">
               <button type="button" disabled={!weeklyProgramAvailable} onClick={() => weeklyProgramAvailable && open(programHref())} className={actionClass(weeklyProgramAvailable)}><Route size={16} /> Week</button>
               <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(lessonHref())} className={actionClass(weeklyContentAvailable)}><BookOpen size={16} /> Lesson</button>
-              <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> Quiz</button>
+              <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> {isNumber7 && week === 12 ? "Post-Test" : "Quiz"}</button>
             </div>
           </div>
         </section>
 
+        </> : <p className="py-6 text-sm text-white/60">Weekly lessons for this level are coming soon.</p>}
+
+        {levelNumber <= 6 ? <>
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><Gamepad2 size={18} className="text-emerald-300" /><h2 className="text-base font-black">Brain Breaks</h2></div>
           <p className="mb-3 text-xs text-white/50">Plays the real mid-lesson mini-game overlay. Villain matches the selected Level&apos;s age band; pick a game or leave it random. No XP is written in demo.</p>
@@ -563,7 +572,7 @@ export default function DemoReviewPanel() {
         <footer className="border-t border-white/10 py-5 text-xs leading-5 text-white/45">
           Preview actions use the real student components with demo-scoped local state. Use a mock student to validate database saving, teacher reporting, replay, progression and awarded rewards.
         </footer>
-        </> : <p className="py-6 text-sm text-white/60">Weekly lessons for Levels 7 and 8 will be added with the advanced pathway.</p>}
+        </> : null}
       </div>
 
       {activeBreak ? (
