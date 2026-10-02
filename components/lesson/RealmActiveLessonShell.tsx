@@ -37,6 +37,7 @@ export function RealmActiveLessonShell({
   onBack: () => void;
   children: ReactNode;
 }) {
+  const isCoreHunt = realm === "number" && levelNumber === 7;
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
@@ -86,7 +87,7 @@ export function RealmActiveLessonShell({
         </button>
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
           <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
-          {theme.realmName}{demoMode ? " · Demo Mode" : ""}
+          {isCoreHunt ? "Hunt for the Number Nexus Core · Level 7" : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
         </div>
       </header>
 

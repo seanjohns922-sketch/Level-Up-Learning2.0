@@ -1610,7 +1610,7 @@ export function Year2LessonEngine({
           />
         </aside>
 
-        <div className="min-w-0 space-y-3">
+        <div data-lesson-workspace className="min-w-0 space-y-3">
           {showStrategySwitchPrompt ? (
             <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-black text-sky-800 shadow-sm">
               Try a different strategy for the next question.

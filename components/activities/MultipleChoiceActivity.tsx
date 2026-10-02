@@ -154,6 +154,7 @@ export default function MultipleChoiceActivity({
   realmId?: string;
   assessmentMode?: boolean;
 }) {
+  const isCoreHunt = renderMode === "lesson" && "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const questionReadAloudText = isPattern
@@ -295,7 +296,7 @@ export default function MultipleChoiceActivity({
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
         />
-        Multiple Choice
+        {isCoreHunt ? "Core challenge" : "Multiple Choice"}
       </div>
       <div className="flex items-start gap-2.5 mt-2">
         <h2 className="text-[1.65rem] md:text-[1.85rem] font-bold text-slate-900 leading-[1.15] tracking-[-0.02em]">
@@ -493,6 +494,7 @@ export default function MultipleChoiceActivity({
                       : "bg-teal-400 opacity-0 group-hover:opacity-60",
                 ].join(" ")}
               />
+              {isCoreHunt && <span data-core-answer-letter aria-hidden="true">{String.fromCharCode(65 + index)}</span>}
               <div className="pr-10">
                 <MathFormattedText text={option} fractionSize="md" />
               </div>
