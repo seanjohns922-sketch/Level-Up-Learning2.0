@@ -1,6 +1,7 @@
 "use client";
 
 import layout from "./Number7LessonLayout.module.css";
+import measurementLayout from "./Measurement7LessonLayout.module.css";
 
 import {
   ArrowLeft,
@@ -196,7 +197,7 @@ export const REALM_LESSON_THEMES = {
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
-  if (realm === "number" && levelNumber === 7) return "/images/shattered-realms/number-cavern.webp";
+  if ((realm === "number" || realm === "measurement") && levelNumber === 7) return `/images/shattered-realms/${realm}-cavern.webp`;
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
   if (realm === "pattern") return getPatternPeaksBackground(`Year ${levelNumber}` as RealmLevelId);
@@ -460,7 +461,7 @@ export function RealmLessonHome({
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
-  const isCave=realm === "number" && levelNumber === 7;
+  const isCave=(realm === "number" || realm === "measurement") && levelNumber === 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:"Cave Mission",startLabel:"Learn the skill",intro:"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
   const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
   const criteria =
@@ -482,7 +483,7 @@ export function RealmLessonHome({
   const readAllText = `${lessonTitle}. ${theme.intro} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${realm === "number" && levelNumber === 7 ? layout.home : ""}`}>
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement") && levelNumber === 7 ? (realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

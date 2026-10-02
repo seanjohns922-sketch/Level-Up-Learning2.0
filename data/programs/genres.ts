@@ -1,4 +1,5 @@
 import type { WeekPlan, Lesson } from "./year1";
+import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
 import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
 import { programs } from "./index";
 import { PREP_MEASURELANDS_PROGRAM } from "./prepMeasurelands";
@@ -192,6 +193,7 @@ export function genreIdForRealm(realmId: string): string {
 }
 
 export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[] {
+  if(yearLabel === "Year 7" && genreId === "measurement") return MEASUREMENT7_PROGRAM;
   if(yearLabel === "Year 7" && genreId === "number") return NUMBER7_PROGRAM;
   const k = yearKey(yearLabel);
   const genre = getGenresForYear(yearLabel).find((g) => g.id === genreId);

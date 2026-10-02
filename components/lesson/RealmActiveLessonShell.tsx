@@ -1,6 +1,7 @@
 "use client";
 
 import layout from "./Number7LessonLayout.module.css";
+import measurementLayout from "./Measurement7LessonLayout.module.css";
 
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
@@ -37,7 +38,7 @@ export function RealmActiveLessonShell({
   onBack: () => void;
   children: ReactNode;
 }) {
-  const isCoreHunt = realm === "number" && levelNumber === 7;
+  const isCoreHunt = (realm === "number" || realm === "measurement") && levelNumber === 7;
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
@@ -50,7 +51,7 @@ export function RealmActiveLessonShell({
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${realm === "number" && levelNumber === 7 ? layout.active : ""}`}>
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement") && levelNumber === 7 ? (realm === "measurement" ? measurementLayout.active : layout.active) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -87,7 +88,7 @@ export function RealmActiveLessonShell({
         </button>
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
           <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
-          {isCoreHunt ? "Hunt for the Number Nexus Core · Level 7" : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
+          {isCoreHunt ? `Hunt for the ${theme.realmName} Core · Level 7` : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
         </div>
       </header>
 

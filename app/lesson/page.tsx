@@ -111,6 +111,8 @@ import {
 } from "@/lib/resume-state";
 import { getWorld3DReturnPathForLesson } from "@/lib/world3d/return-context";
 
+import Measurement7SkillGuide from "@/components/lesson/Measurement7SkillGuide";
+import { generateMeasurement7Question } from "@/data/activities/year7Measurement/questions";
 import Number7SkillGuide from "@/components/lesson/Number7SkillGuide";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { generateNumber7Question } from "@/data/activities/year7Number/questions";
@@ -119,9 +121,10 @@ import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 function LessonRouteGate() {
  const q=useSearchParams(),pathname=usePathname();
  if(normalizeStudentYearLabel(q.get('year')??'')==='Year 7') {
-  if(!pathname.startsWith('/demo-review/shattered-realms/number/lesson'))return <main className="p-20">Level 7 lessons are available in demo review only.</main>;
+  const realm=q.get('realm_id')??'number';
+  if(!['number','measurement'].includes(realm)||!pathname.startsWith(`/demo-review/shattered-realms/${realm}/lesson`))return <main className="p-20">Level 7 lessons are available in demo review only.</main>;
   const week=Number(q.get('week')),lesson=Number(q.get('lessonId')?.match(/-l([1-3])$/)?.[1]);
-  return <Number7AccessGate key={`${week}-${lesson}-${q.get("review")}`} week={week} lesson={lesson}><LessonPage/></Number7AccessGate>;
+  return <Number7AccessGate realm={realm as "number"|"measurement"} key={`${week}-${lesson}-${q.get("review")}`} week={week} lesson={lesson}><LessonPage/></Number7AccessGate>;
  }
  return <LessonPage/>;
 }
@@ -255,12 +258,14 @@ function LessonPage() {
     ? `/measurelands?level=${encodeURIComponent(year)}`
     : "/number-nexus";
   const isNumber7 = realmId === "number" && year === "Year 7";
+  const isMeasurement7 = realmId === "measurement" && year === "Year 7";
+  const isCave7 = isNumber7 || isMeasurement7;
   const [skillGuideReady, setSkillGuideReady] = useState(false);
-  const number7QuestionCompatible=useMemo(()=>isNumber7?(value:unknown)=>{
+  const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;kind?:string};
-    return q.lessonId===effectiveLessonId&&q.version===2&&q.kind==='multiple_choice';
-  }:undefined,[effectiveLessonId,isNumber7]);
+    return q.lessonId===effectiveLessonId&&q.version===(isMeasurement7?1:2)&&q.kind==='multiple_choice';
+  }:undefined,[effectiveLessonId,isCave7,isMeasurement7]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = isMeasurement ? "measurement" : "number";
   const lessonStrand = isMeasurement ? "Measurement" : "Number";
@@ -293,7 +298,7 @@ function LessonPage() {
       return title ? `Lesson ${lessonNumber + 1}: ${title}` : `Lesson ${lessonNumber + 1}`;
     }
     const lastWeek = Array.isArray(weeks) && weeks.length ? weeks.length : 12;
-    return year === "Year 7" ? "this week's Quiz" : week >= lastWeek ? "the Post-Test" : "this week's Quiz";
+    return week >= lastWeek ? "the Post-Test" : "this week's Quiz";
   }, [lessonProgram, week, lessonNumber, year]);
 
   const [startedLessonId, setStartedLessonId] = useState<string | null>(null);
@@ -483,11 +488,11 @@ function LessonPage() {
   const lessonFinalizedRef = useRef(false);
 
   async function completeLesson() {
-    if(isNumber7 && previewMode) {
+    if(isCave7 && previewMode) {
       if(params.get("review")!=="1")markLessonComplete(year,week,lessonNumber,lessonRealmId);
       clearLessonResume(effectiveLessonId);
       clearLessonSession(lessonCompletionActivityKey);
-      router.push(cavernWeekHref('number',week));
+      router.push(cavernWeekHref(lessonRealmId,week));
       return;
     }
     if (lessonFinalizedRef.current) {
@@ -593,7 +598,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    if(isNumber7){router.push(cavernWeekHref("number",week));return;}
+    if(isCave7){router.push(cavernWeekHref(lessonRealmId,week));return;}
     const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     const world3DReturnPath = getWorld3DReturnPathForLesson({
       realmId: lessonRealmId,
@@ -605,7 +610,7 @@ function LessonPage() {
     router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
   }
 
-  const showWeek12Lesson3Summary = !isNumber7 && week === 12 && lessonNumber === 3;
+  const showWeek12Lesson3Summary = !isCave7 && week === 12 && lessonNumber === 3;
   const savedLessonSummaryKeysRef = useRef<Set<string>>(new Set());
   const latestLessonSummaryRef = useRef<LessonPerformanceSummary | null>(null);
   const liveLessonContext = {
@@ -992,7 +997,7 @@ function LessonPage() {
                 ? "https://player.vimeo.com/video/1183966051?h=ff99ab69f7"
                 : undefined
             }
-            onBack={isNumber7 ? () => router.push(cavernWeekHref("number",week)) : goBackToProgram}
+            onBack={isCave7 ? () => router.push(cavernWeekHref(lessonRealmId,week)) : goBackToProgram}
             onStart={() => {
               void trackLiveLearningEvent({
                 eventType: "lesson_started",
@@ -1131,11 +1136,11 @@ function LessonPage() {
             demoMode={previewMode || DEMO_MODE}
             onBack={goBackToProgram}
           >
-              {isNumber7 && !skillGuideReady ? <Number7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : lessonMeta?.activities?.length ? (
+              {isMeasurement7 && !skillGuideReady ? <Measurement7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isNumber7 && !skillGuideReady ? <Number7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   key={lessonMeta.id}
                   lesson={lessonMeta}
-                  questionGenerator={isNumber7 ? generateNumber7Question : undefined}
+                  questionGenerator={isMeasurement7 ? generateMeasurement7Question : isNumber7 ? generateNumber7Question : undefined}
                   isQuestionCompatible={number7QuestionCompatible}
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}

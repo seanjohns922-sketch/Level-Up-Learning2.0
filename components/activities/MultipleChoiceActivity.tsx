@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
+import Year7MeasurementAssessmentVisual from "@/components/assessment/Year7MeasurementAssessmentVisual";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
@@ -155,7 +156,7 @@ export default function MultipleChoiceActivity({
   assessmentMode?: boolean;
 }) {
   const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
-  const isCoreHunt = renderMode === "lesson" && isNumber7Question;
+  const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && String(questionData.lessonId).startsWith("y7-measurement-")));
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const questionReadAloudText = isPattern
@@ -317,6 +318,7 @@ export default function MultipleChoiceActivity({
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
+      {questionData.measurementVisual && <Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
       ) : null}

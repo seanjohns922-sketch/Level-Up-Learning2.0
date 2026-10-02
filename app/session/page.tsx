@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
+import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
 import { number7Quiz } from "@/data/activities/year7Number/questions";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import Image from "next/image";
@@ -7971,8 +7972,8 @@ function SessionPageRouteInstance() {
   const routeKey = `${year}|${week}|${type}|${n}|${realmId}`;
 
   if(year==='Year 7') {
-    if(realmId!=='number'||!pathname.startsWith('/demo-review/shattered-realms/number/quiz'))return <main className="p-20">Level 7 quizzes are available in demo review only.</main>;
-    return <Number7AccessGate key={`${routeKey}-${sp.get("review")}`} week={Number(week)} lesson="quiz"><SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId}/></Number7AccessGate>;
+    if(!['number','measurement'].includes(realmId)||!pathname.startsWith(`/demo-review/shattered-realms/${realmId}/quiz`))return <main className="p-20">Level 7 quizzes are available in demo review only.</main>;
+    return <Number7AccessGate realm={realmId as "number"|"measurement"} key={`${routeKey}-${sp.get("review")}`} week={Number(week)} lesson="quiz"><SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId}/></Number7AccessGate>;
   }
   return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId} />;
 }
@@ -8000,9 +8001,9 @@ function SessionPage({
   const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";
   const isLevelSixNumberQuiz = quizRealmId === "number" && year === "Year 6";
   const isTeacherReview = useSearchParams().get("review")==="1";
-  const isNumber7 = quizRealmId === "number" && year === "Year 7";
-  const isModernNumberQuiz = isNumber7 || isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
-  const finalProgramWeek = getLastProgramWeek(quizRealmId);
+  const isNumber7 = (quizRealmId === "number" || quizRealmId === "measurement") && year === "Year 7";
+  const isModernNumberQuiz = (isNumber7 && !isMeasurementRealm) || isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
+  const finalProgramWeek = isNumber7 ? 12 : getLastProgramWeek(quizRealmId);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
   const quizLessonId = `${year}-${quizRealmId}-w${week}-weekly-quiz`;
@@ -8074,7 +8075,7 @@ function SessionPage({
   const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
   function backToWeek() {
-    if(isNumber7){router.push(cavernWeekHref("number",Number(week)));return;}
+    if(isNumber7){router.push(cavernWeekHref(quizRealmId === "measurement" ? "measurement" : "number",Number(week)));return;}
     const world3DReturnPath = getWorld3DReturnPathForQuiz({
       realmId: quizRealmId,
       level: year,
@@ -8232,7 +8233,7 @@ function SessionPage({
   const buildQuizQuestions = useCallback(() => {
     const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
-    if(year==='Year 7'&&!isMeasurementRealm)return number7Quiz(Number(week)).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:`y7-w${week}-l${q.lessonTag}`,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...(q.visual?{kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q}:{kind:'mcq' as const,options:q.options,correctIndex:q.options.indexOf(q.answer)})}));
+    if(year==='Year 7')return (isMeasurementRealm?measurement7Quiz(Number(week)):number7Quiz(Number(week))).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:q.lessonId,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...((q.visual||q.measurementVisual)?{kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q}:{kind:'mcq' as const,options:q.options,correctIndex:q.options.indexOf(q.answer)})}));
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
       return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
@@ -9782,6 +9783,7 @@ function SessionPage({
                     <div>
                       <LessonRenderer
                         activity={currentQuiz.activity}
+                        realmId={quizRealmId}
                         prompt={currentQuiz.prompt}
                         questionData={currentQuiz.questionData}
                         renderMode="quiz"
@@ -10489,7 +10491,7 @@ function SessionPage({
                     <button
                       onClick={() =>
                         router.push(isNumber7
-                          ? isFinalQuizWeek ? '/demo-review/number-level-7?teacher_preview=1&form=posttest' : cavernWeekHref('number',Number(week)+1)
+                          ? isFinalQuizWeek ? `/posttest?year=Year%207&realm_id=${quizRealmId}&teacher_preview=1` : cavernWeekHref(isMeasurementRealm?'measurement':'number',Number(week)+1)
                           : isFinalQuizWeek
                           ? `/posttest?year=${encodeURIComponent(year)}${realmParam}`
                           : `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Number(week) + 1))}&legacy=1${realmParam}`)
