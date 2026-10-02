@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
+import Cave7Visual from "@/components/lesson/cave7/Cave7Visual";
 import Space7LessonVisual from "@/components/starpath/Space7LessonVisual";
 import Year7MeasurementAssessmentVisual from "@/components/assessment/Year7MeasurementAssessmentVisual";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -157,7 +158,7 @@ export default function MultipleChoiceActivity({
   assessmentMode?: boolean;
 }) {
   const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
-  const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space)-/.test(String(questionData.lessonId))));
+  const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space|pattern|statistics|chance)-/.test(String(questionData.lessonId))));
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const isSpace = realmId === "space";
@@ -165,6 +166,7 @@ export default function MultipleChoiceActivity({
     ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
     : questionData.prompt;
   const theme = getRealmTheme(realmId);
+  const isNewCaveQuestion = "lessonId" in questionData && /^y7-(pattern|statistics|chance)-/.test(String(questionData.lessonId));
   const [picked, setPicked] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -190,7 +192,7 @@ export default function MultipleChoiceActivity({
         ? "lg:grid-cols-3"
         : "md:grid-cols-2 xl:grid-cols-4"
     : "";
-  const missingRelationshipVisual = !questionData.spaceVisual && !hasRequiredRelationshipVisual(
+  const missingRelationshipVisual = !questionData.cave7Visual && !questionData.spaceVisual && !hasRequiredRelationshipVisual(
     questionData.prompt,
     questionData.visual?.type,
     "multiple_choice",
@@ -295,7 +297,7 @@ export default function MultipleChoiceActivity({
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : (isPattern || isSpace) ? "text-violet-700" : "text-teal-700/90"}`}>
+      <div style={isNewCaveQuestion?{color:theme.ctaFrom}:undefined} className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : (isPattern || isSpace) ? "text-violet-700" : "text-teal-700/90"}`}>
         <span
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
@@ -320,6 +322,7 @@ export default function MultipleChoiceActivity({
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
+      {questionData.cave7Visual && <Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>}
       {questionData.spaceVisual && <Space7LessonVisual visual={questionData.spaceVisual}/>}
       {questionData.measurementVisual && <Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}
       {questionData.visual?.type === "mab" ? (
@@ -457,6 +460,7 @@ export default function MultipleChoiceActivity({
               key={`${option}-${index}`}
               type="button"
               onClick={() => choose(option)}
+              style={isNewCaveQuestion&&!submitted?{borderColor:isPicked?theme.ctaFrom:theme.borderRing,background:isPicked?theme.surfaceTint:"white",outlineColor:theme.ctaFrom}:undefined}
               className={[
                 "group relative w-full rounded-2xl border px-5 text-left font-extrabold tracking-tight transition-all duration-150",
                 compactPatternOptions
@@ -469,6 +473,8 @@ export default function MultipleChoiceActivity({
                     : isPicked
                     ? "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-300"
                     : "border-slate-200 bg-white text-slate-500"
+                : isNewCaveQuestion
+                  ? "border-slate-300 bg-white text-slate-900 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2"
                 : isSpace
                   ? isPicked ? "border-violet-500 bg-violet-50 text-violet-950 ring-1 ring-violet-300" : "border-violet-200 bg-white text-slate-800 hover:border-violet-400 hover:bg-violet-50"
                 : isMeasurement
@@ -490,6 +496,7 @@ export default function MultipleChoiceActivity({
               {/* Left accent bar */}
               <span
                 aria-hidden
+                style={isNewCaveQuestion?{background:theme.ctaGradientCss}:undefined}
                 className={[
                   "absolute left-0 top-2 bottom-2 w-[3px] rounded-full transition-opacity",
                   isMeasurement

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {loadCave7} from './cave7-loader.mjs';
+const {CAVE7_CURRICULA,NEW_CAVE7_PROGRAMS}=loadCave7('data/activities/cave7/curriculum.ts');
+const describe=v=>!v?'See the question text':v.kind==='formula'?`${v.formula}. ${v.meaning}`:v.kind==='table'?`${v.title}. ${v.headers.join('; ')}: ${v.rows.map(r=>r.join(', ')).join('; ')}`:v.kind==='plot'?`${v.xLabel}; ${v.yLabel}. Points: ${v.points.map(p=>`(${p.join(', ')})`).join('; ')}`:v.kind==='frequency'?`${v.unit}. ${v.values.map((n,i)=>`Value ${n}: frequency ${v.counts[i]}`).join('; ')}`:v.caption;
+const {CAVE7_GENERATORS}=loadCave7('data/activities/cave7/questions.ts');
+for(const [realm,weeks] of Object.entries(CAVE7_CURRICULA)){
+ const strand={pattern:'Algebra',statistics:'Statistics',chance:'Probability'}[realm],rows=[['Level','Strand','Week','Topic','Activity','Title','Learning intention','Curriculum','Teaching support','Worked example','Reasoning example','Application example','Student progression','Release']];
+ weeks.forEach((w,i)=>{
+  w.lessons.forEach((g,j)=>rows.push([7,strand,i+1,w.title,`Lesson ${j+1}`,g.title,`I am learning to ${g.goal}`,NEW_CAVE7_PROGRAMS[realm][i].lessons[j].curriculum.join('; '),g.idea,...['fast_thinking','reasoning','apply_create'].map(role=>{const q=CAVE7_GENERATORS[realm](i+1,j+1,7007,role);return `${q.prompt} Given: ${describe(q.cave7Visual)}. Answer: ${q.answer}. ${q.explanation}`;}),j?'Complete the previous lesson':i?'Pass all earlier weekly quizzes at 80% or higher':'Available from the start','Demo only; all activities unlocked for review']));
+  const final=i===weeks.length-1;rows.push([7,strand,i+1,w.title,final?'Post-Test':'Weekly Quiz',final?'Existing Level 7 Post-Test':'Weekly Quiz',final?'Demonstrate Level 7 mastery':'Apply the three weekly lesson skills',w.code,final?'Existing post-test unchanged':'15 questions: five per lesson (2 fluency, 1 reasoning, 2 application)','','','',final?'Existing 85% post-test requirement':'Complete three lessons; at least 12/15 (80%) to pass','Demo only; all activities unlocked for review']);
+ });
+ const csv='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\n')+'\n',file=`public/curriculum/${realm}-level7-scope-and-sequence.csv`;
+ if(process.argv.includes('--check'))assert.equal(fs.readFileSync(file,'utf8'),csv);else fs.writeFileSync(file,csv);
+ console.log(`PASS ${strand}: ${weeks.length*3} lessons, ${weeks.length-1} quizzes, final Week ${weeks.length} post-test.`);
+}

@@ -105,7 +105,7 @@ export const REALM_QUIZ_THEMES = {
 } as const satisfies Record<RealmQuizThemeId, object>;
 
 function getQuizArtwork(realm: RealmQuizThemeId, levelNumber: number, year: string) {
-  if (realm === "space" && levelNumber === 7) return "/images/shattered-realms/space-cavern.webp";
+  if (levelNumber === 7) return `/images/shattered-realms/${realm}-cavern.webp`;
   if (realm === "space") return getStarpathBackground(year as RealmLevelId);
   return getRealmLessonArtwork(realm, levelNumber, year);
 }

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import ts from 'typescript';
 import { validChallenge } from './number7-challenge-oracle.mjs';
 const cache=new Map();
-function load(path,mocks={}){if(cache.has(path))return cache.get(path);const m={exports:{}};const js=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',js)(name=>{if(mocks[name])return mocks[name];if(name==='./curriculum')return load('data/activities/year7Number/curriculum.ts');if(name==='./challenges')return load('data/activities/year7Number/challenges.ts');throw Error(name);},m,m.exports);cache.set(path,m.exports);return m.exports;}
+function load(path,mocks={}){if(cache.has(path))return cache.get(path);const m={exports:{}};const js=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;new Function('require','module','exports',js)(name=>{if(mocks[name])return mocks[name];if(name==='./cave7-config'||name==='@/lib/cave7-config')return load('lib/cave7-config.ts');if(name==='./curriculum')return load('data/activities/year7Number/curriculum.ts');if(name==='./challenges')return load('data/activities/year7Number/challenges.ts');throw Error(name);},m,m.exports);cache.set(path,m.exports);return m.exports;}
 const {NUMBER7_PROGRAM,NUMBER7_WEEKS}=load('data/activities/year7Number/curriculum.ts');
 const {number7Question,number7Quiz}=load('data/activities/year7Number/questions.ts');
 function calc(s){s=s.replace(/(\d+)\/(\d+)/g,'($1/$2)').replaceAll('−','-').replaceAll('×','*').replaceAll('÷','/').replace(/(\d+)([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g,(_,a,b)=>`(${a}**${[...b].map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)).join('')})`).replaceAll(',','');assert.match(s,/^[\d\s.()+*/-]+$/);return Function(`return (${s})`)();}
@@ -84,10 +84,10 @@ for(const kind of ['lesson','quiz']){
  for(const allowed of [false,true]){
   const routePath=`app/demo-review/shattered-realms/[realm]/${kind}/page.tsx`;
   cache.delete(routePath);
-  const route=load(routePath,{'next/navigation':{redirect:url=>{throw Error(`redirect:${url}`)},notFound:()=>{throw Error('not-found')}},'@/lib/demo-session-server':{getServerStarpathAccess:async()=>({allowed})},'@/lib/number7-demo':rules,'@/app/lesson/page':{default:'SharedLessonPage'},'@/app/session/page':{default:'SharedQuizPage'},'@/components/starpath/Space7QuizClient':{default:'SpaceQuiz'},'react/jsx-runtime':{jsx:(type,props)=>({type,props})}}).default;
+  const route=load(routePath,{'next/navigation':{redirect:url=>{throw Error(`redirect:${url}`)},notFound:()=>{throw Error('not-found')}},'@/lib/demo-session-server':{getServerStarpathAccess:async()=>({allowed})},'@/lib/number7-demo':rules,'@/app/lesson/page':{default:'SharedLessonPage'},'@/app/session/page':{default:'SharedQuizPage'},'@/components/starpath/Space7QuizClient':{default:'SpaceQuiz'},'@/components/lesson/cave7/Cave7QuizClient':{default:'CaveQuiz'},'react/jsx-runtime':{jsx:(type,props)=>({type,props})}}).default;
   const request=(realm,week,overrides={})=>({params:Promise.resolve({realm}),searchParams:Promise.resolve({realm_id:'number',year:'Year 7',week:String(week),lessonId:`y7-w${week}-l1`,teacher_preview:'1',expedition:'1',type:'quiz',n:'1',...overrides})});
   if(!allowed){await assert.rejects(route(request('number',1)),/redirect:\/login/);continue;}
-  await assert.rejects(route(request('pattern',1)),/not-found/);
+  await assert.rejects(route(request('invalid',1)),/not-found/);
   await assert.rejects(route(request('number',13)),/not-found/);
   await assert.rejects(route(request('number',1,{realm_id:'chance'})),/redirect:.*number/);
   if(kind==='quiz')await assert.rejects(route(request('number',12)),/redirect:\/posttest/);

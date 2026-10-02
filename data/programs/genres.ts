@@ -1,3 +1,4 @@
+import {NEW_CAVE7_PROGRAMS} from "@/data/activities/cave7/curriculum";
 import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import type { WeekPlan, Lesson } from "./year1";
 import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
@@ -194,6 +195,9 @@ export function genreIdForRealm(realmId: string): string {
 }
 
 export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[] {
+  if(yearLabel === "Year 7" && genreId === "algebra")return NEW_CAVE7_PROGRAMS.pattern;
+  if(yearLabel === "Year 7" && genreId === "probability")return NEW_CAVE7_PROGRAMS.chance;
+  if(yearLabel === "Year 7" && (genreId === "pattern" || genreId === "statistics" || genreId === "chance"))return NEW_CAVE7_PROGRAMS[genreId];
   if(yearLabel === "Year 7" && genreId === "space") return SPACE7_PROGRAM;
   if(yearLabel === "Year 7" && genreId === "measurement") return MEASUREMENT7_PROGRAM;
   if(yearLabel === "Year 7" && genreId === "number") return NUMBER7_PROGRAM;

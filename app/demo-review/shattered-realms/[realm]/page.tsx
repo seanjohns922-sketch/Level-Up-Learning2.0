@@ -9,5 +9,5 @@ export default async function CavernPage({params,searchParams}:{params:Promise<{
   if(!access.allowed)redirect('/login');
   const realm=cavernRealm((await params).realm);
   if(!realm)notFound();
-  return <ShatteredRealmEntry realm={realm} week={cavernWeek((await searchParams).week)}/>;
+  return <ShatteredRealmEntry realm={realm} week={cavernWeek((await searchParams).week,realm)}/>;
 }

@@ -1,5 +1,5 @@
 import type {WeekPlan} from "@/data/programs/year1";
-export const SPACE7_WEEKS = [
+const SPACE7_SOURCE_WEEKS = [
  {
   "title": "Nets and solid objects",
   "code": "AC9M7SP01",
@@ -289,5 +289,16 @@ export const SPACE7_WEEKS = [
   ]
  }
 ] as const;
+
+// Every original skill is retained; related skills now share a lesson.
+export const SPACE7_SKILL_GROUPS = [
+ [[1],[2],[3]], [[4],[5],[6]], [[7],[8],[9]],
+ [[10,11],[12],[13]], [[14,15],[16],[17,18]],
+ [[19],[20],[21]], [[22,23],[24],[27]], [[25],[26],[34]],
+ [[28],[29],[30]], [[31],[32,33],[35,36]],
+];
+export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code};}
+const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Polygon families and relationships','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Trace and repair classifiers','Create and justify classifiers'];
+export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map(keys=>{const gs=keys.map(space7SourceGuide);return [gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));
 export function space7Guide(week:number,lesson:number){const w=SPACE7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
-export const SPACE7_PROGRAM:WeekPlan[]=SPACE7_WEEKS.map((w,i)=>({id:`y7-space-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code],lessons:w.lessons.map((l,j)=>({id:`y7-space-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/space/lesson?realm_id=space&year=Year%207&week=${i+1}&lessonId=y7-space-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[w.code],activityIdeas:[l[1],'justify my answer using the given spatial properties'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:1,config:{rotationRole:role,mode:`space7_w${i+1}_l${j+1}_${role}`}}))}))}));
+export const SPACE7_PROGRAM:WeekPlan[]=SPACE7_WEEKS.map((w,i)=>({id:`y7-space-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code],lessons:w.lessons.map((l,j)=>({id:`y7-space-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/space/lesson?realm_id=space&year=Year%207&week=${i+1}&lessonId=y7-space-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[...new Set(SPACE7_SKILL_GROUPS[i][j].map(key=>space7SourceGuide(key).code))],activityIdeas:[l[1],'justify my answer using the given spatial properties'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:1,config:{rotationRole:role,mode:`space7_v2_w${i+1}_l${j+1}_${role}`}}))}))}));

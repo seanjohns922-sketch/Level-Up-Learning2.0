@@ -1,0 +1,17 @@
+import type {MultipleChoiceQuestion} from '@/data/activities/year2/lessonEngine';
+import type {ChanceVisual} from '@/data/activities/year1/practice-task';
+export type Cave7Role='fast_thinking'|'reasoning'|'apply_create';
+export type Cave7Visual={kind:'table';title:string;headers:string[];rows:string[][];caption?:string}|{kind:'plot';title:string;xLabel:string;yLabel:string;points:[number,number][];connect?:boolean}|{kind:'frequency';title:string;values:number[];counts:number[];unit:string}|{kind:'formula';title:string;formula:string;meaning:string}|{kind:'chance';title:string;apparatus:ChanceVisual;caption:string};
+export type Cave7Question=MultipleChoiceQuestion&{lessonId:string;version:1;tier:Cave7Role;steps:string[];skillKey:number;realm:'pattern'|'statistics'|'chance'};
+export function random(seed:number){let state=(seed>>>0)||1;return(lo:number,hi:number)=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return lo+Math.floor(state/4294967296*(hi-lo+1));};}
+export function scalar(text:string){if(!/^-?\d+(?:\.\d+)?(?:\/\d+)?$/.test(text))return null;const [a,b]=text.split('/').map(Number);return b===undefined?a:a/b;}
+export const round=(n:number)=>Math.round(n*10000)/10000;
+export function makeQuestion(input:{realm:Cave7Question['realm'];week:number;lesson:number;seed:number;role:Cave7Role;prompt:string;answer:string|number;wrong:(string|number)[];explanation:string;idea:string;visual?:Cave7Visual}):Cave7Question{
+ const {realm,week,lesson,role,prompt,explanation,idea,visual}=input,answer=String(input.answer),raw=[...input.wrong.map(String),...(realm==='chance'&&scalar(answer)!==null?['0','1','1/3','2/3','1/4','3/4','1/5','4/5']:[])],options=[answer];
+ for(const choice of raw){if(options.some(existing=>existing===choice||(scalar(existing)!==null&&scalar(choice)!==null&&Math.abs(scalar(existing)!-scalar(choice)!)<1e-9)))continue;options.push(choice);if(options.length===4)break;}
+ if(!prompt||!explanation||options.length!==4)throw Error(`Invalid ${realm} question ${week}/${lesson}: ${JSON.stringify(input)}`);
+ const int=random(input.seed^0x5f3759df);for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
+ return {kind:'multiple_choice',prompt,answer,options,explanation,cave7Visual:visual,lessonId:`y7-${realm}-w${week}-l${lesson}`,version:1,tier:role,steps:[idea,explanation,`Check: ${answer}. Explain how it fits the question.`],skillKey:(week-1)*3+lesson,realm};
+}
+export const numericWrong=(n:number)=>[round(n+1),round(n-1),round(n+2),round(n+5),round(n*2+3)];
+export const dataVisual=(values:number[],title='Recorded observations',unit='') : Cave7Visual=>({kind:'table',title,headers:['Observation','Value'+(unit?` (${unit})`:'')],rows:values.map((v,i)=>[String(i+1),String(v)])});

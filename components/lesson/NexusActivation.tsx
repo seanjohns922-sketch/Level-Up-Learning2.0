@@ -216,7 +216,7 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const t = cave && isStarpath ? {...STARPATH_THEME,title:"STAR CRYSTAL RADIANCE"} : cave && isMeasurement ? {...MEASURE_THEME,title:'AMBER RADIANCE'} : cave ? CAVE_THEME : isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
+  const t = cave && isStarpath ? {...STARPATH_THEME,title:"STAR CRYSTAL RADIANCE"} : cave && isMeasurement ? {...MEASURE_THEME,title:'AMBER RADIANCE'} : cave && (!realmId || realmId === "number") ? CAVE_THEME : isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
   const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : STARPATH_GLYPHS;
   const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : isChance ? "251,191,36" : "200,160,48";
   const prevRef = useRef(comboCount);

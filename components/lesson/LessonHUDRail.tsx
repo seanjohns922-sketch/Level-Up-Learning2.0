@@ -239,8 +239,8 @@ export function LessonHUDRail({
         {/* Combo chain counter */}
         <ComboCounter
           count={comboCount}
-          cave={levelNumber === 7 && (!realmId || realmId === "number" || realmId === "measurement" || realmId === "space")}
-          chainLabel={levelNumber === 7 && (!realmId || realmId === "number" || realmId === "measurement" || realmId === "space") ? "CRYSTAL STREAK" : isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
+          cave={levelNumber === 7}
+          chainLabel={levelNumber === 7 ? "CRYSTAL STREAK" : isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
           realmId={realmId}
         />
 

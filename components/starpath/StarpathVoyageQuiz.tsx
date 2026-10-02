@@ -141,7 +141,7 @@ export default function StarpathVoyageQuiz({
   const router = useRouter();
   const demoMode=useDemoPreviewMode();
   const reviewOnly=useSearchParams().get("review")==="1";
-  const caveSpace=realm==="space"&&quiz.level==="Year 7";
+  const cave7=quiz.level==="Year 7";
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
   const isPattern = realm === "pattern";
@@ -151,7 +151,7 @@ export default function StarpathVoyageQuiz({
   const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `${realm}-weekly-quiz:v2:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:${cave7?"v3":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
@@ -301,7 +301,7 @@ export default function StarpathVoyageQuiz({
     setSaving(true);
     const score = Object.values(answers).filter(Boolean).length;
     const finalPercent = total > 0 ? Math.round((score / total) * 100) : 0;
-    const studentId = caveSpace && demoMode ? null : getActiveStudentIdentity().studentId;
+    const studentId = cave7 && demoMode ? null : getActiveStudentIdentity().studentId;
     const completedAt = new Date().toISOString();
     const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
       const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));
@@ -335,7 +335,7 @@ export default function StarpathVoyageQuiz({
 
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
-      if(caveSpace && demoMode && !reviewOnly)markQuizComplete(quiz.level,quiz.week,finalPercent,realm,score,total);
+      if(cave7 && demoMode && !reviewOnly)markQuizComplete(quiz.level,quiz.week,finalPercent,realm,score,total);
       if (realm === "space" && quiz.level !== "Year 7") {
         writeStarpathDemoJourney(quiz.level, {
           currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,

@@ -10,7 +10,7 @@ export default async function CavernWeekPage({params,searchParams}:{params:Promi
   const realm=cavernRealm((await params).realm);
   if(!realm)notFound();
   const query=await searchParams;
-  const week=cavernWeek(query.week);
+  const week=cavernWeek(query.week,realm);
   if(query.realm_id!==realm||query.year!=='Year 7'||query.week!==String(week)||query.legacy!=='1'||query.teacher_preview!=='1'||query.expedition!=='1')redirect(cavernWeekHref(realm,week));
   return <ProgramPage/>;
 }

@@ -3,16 +3,17 @@ import type {LessonActivity} from '@/data/programs/types';
 import type {MultipleChoiceQuestion} from '@/data/activities/year2/lessonEngine';
 import type {Task7,P7,Polygon7,Flow7} from '@/data/assessments/revisions/level7StarpathFiveForms';
 import {HEXOMINOES,VALID_NET_IDS,foldNet,relationBetween} from '@/data/activities/starpath/level5/nets';
-import {space7Guide} from './curriculum';
+import {space7Guide,space7SourceGuide,SPACE7_SKILL_GROUPS} from './curriculum';
 export type Space7Role='fast_thinking'|'reasoning'|'apply_create';
-export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Space7Role;steps:string[]};
+export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[]};
 const pair=(p:P7)=>`(${p.x}, ${p.y})`;
 const pts=(ps:P7[])=>ps.map(pair).join('; ');
 const regular=(n:number):Polygon7=>({points:Array.from({length:n},(_,i)=>({x:3*Math.cos(2*Math.PI*i/n),y:3*Math.sin(2*Math.PI*i/n)})),caption:`A regular ${n}-sided polygon: all sides and all interior angles are equal.`});
 export function space7Question(week:number,lesson:number,seed:number,role:Space7Role='fast_thinking'):Space7Question {
- const guide=space7Guide(week,lesson);if(!guide)throw Error('Unknown Space Level 7 lesson');
+ const groups=SPACE7_SKILL_GROUPS[week-1]?.[lesson-1];if(!groups||!space7Guide(week,lesson))throw Error('Unknown Space Level 7 lesson');
+ const key=groups[(seed>>>0)%groups.length],guide=space7SourceGuide(key);
  let state=(seed>>>0)||1;const int=(lo:number,hi:number)=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return lo+Math.floor(state/4294967296*(hi-lo+1));};
- const a=int(3,8),b=int(2,5),k=int(2,4),x=int(-4,-1),y=int(1,4),dx=int(1,3),dy=-int(1,3),A=role==='apply_create',R=role==='reasoning',key=(week-1)*3+lesson;
+ const a=int(3,8),b=int(2,5),k=int(2,4),x=int(-4,-1),y=int(1,4),dx=int(1,3),dy=-int(1,3),A=role==='apply_create',R=role==='reasoning';
  let prompt='',answer='',wrong:string[]=[],explanation='',visual:Task7|undefined;
  const choose=(p:string,right:string,wrongs:string[],e:string)=>{prompt=p;answer=right;wrong=wrongs;explanation=e;};
  const numeric=(p:string,n:number,e:string)=>choose(p,String(n),[n+1,n-1,n+2,n*2,n+3].filter(v=>v!==n).map(String),e);
@@ -75,11 +76,11 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  if(key===15&&A){const kite=int(0,1)===1;choose(`A ${kite?'kite has exactly two pairs of equal adjacent sides':'trapezium is defined here to have exactly one pair of parallel sides'}. How many ${kite?'equal-side pairs':'parallel-side pairs'} does this property specify?`,kite?'2':'1',['0','3',kite?'1':'2'],'Count pairs, rather than counting the individual sides in those pairs.');}
  const options=[...new Set([answer,...wrong])].slice(0,4);if(!prompt||options.length!==4)throw Error(`Invalid options ${key}/${role}`);
  for(let i=3;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:1,tier:role,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
+ return {kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
 }
 export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:LessonActivity){return space7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Space7Role);}
 export function space7Quiz(week:number){
- if(!Number.isInteger(week)||week<1||week>11)throw Error('Unknown Space Level 7 quiz');
+ if(!Number.isInteger(week)||week<1||week>9)throw Error('Unknown Space Level 7 quiz');
  return [1,2,3].flatMap(lesson=>{const seen=new Set<string>();return (['fast_thinking','reasoning','apply_create','fast_thinking','apply_create'] as const).map((role,i)=>{
   for(let attempt=0;attempt<200;attempt++){const q=space7Question(week,lesson,970001+week*10007+lesson*101+i*7919+attempt*104729,role);const fingerprint=q.prompt+JSON.stringify(q.spaceVisual)+q.options.slice().sort().join('|');if(seen.has(fingerprint))continue;seen.add(fingerprint);return {...q,id:`y7-space-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3};}
   throw Error(`Insufficient Space quiz variations: ${week}/${lesson}/${role}`);
