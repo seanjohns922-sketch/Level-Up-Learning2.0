@@ -271,8 +271,8 @@ function LessonPage() {
   const [skillGuideReady, setSkillGuideReady] = useState(false);
   const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
-    const q=value as {lessonId?:string;version?:number;kind?:string};
-    return q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
+    const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
+    return q.readabilityRevision===1&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
   }:undefined,[effectiveLessonId,isCave7,isNumber7,isSpace7]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;

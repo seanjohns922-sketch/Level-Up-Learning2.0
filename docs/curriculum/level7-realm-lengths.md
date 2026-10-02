@@ -61,3 +61,22 @@ student release; preserving the shared reporting contract is not that walkthroug
 
 Full browser interaction was unavailable in this session; no full visual walkthrough
 or live student-to-teacher dashboard test is claimed.
+
+## Readability revision — 2 October 2026
+
+Practice randomly weights focused fluency, reasoning and application at 4:1:1.
+Weekly quiz coverage stays at five questions per lesson (two fluency, one
+reasoning and two application). No assessment pass thresholds or layouts changed.
+
+Removed generic answer-plus-paragraph wrappers from Algebra, Statistics and
+Probability. Shortened methods and choices across all realms. Number applications
+now separate square roots/perimeter, powers, percentages, ratio shares and unit
+prices from unnecessary secondary tasks. Common-multiple timing stays in seconds.
+Measurement parallel-angle questions use the angle shown, without changing it or
+adding another angle before asking for an answer.
+
+Fresh question revisions prevent old lesson wording reappearing from saved demo
+practice; shared cave quiz draft keys also advance. Scope exports are regenerated.
+The readability audit checks 11,520 generated samples against 50-word prompt and
+25-word choice ceilings, alongside independent mathematical regression checks.
+These ceilings are regression guards, not a substitute for student feedback.

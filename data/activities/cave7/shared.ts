@@ -11,7 +11,7 @@ export function makeQuestion(input:{realm:Cave7Question['realm'];week:number;les
  for(const choice of raw){if(options.some(existing=>existing===choice||(scalar(existing)!==null&&scalar(choice)!==null&&Math.abs(scalar(existing)!-scalar(choice)!)<1e-9)))continue;options.push(choice);if(options.length===4)break;}
  if(!prompt||!explanation||options.length!==4)throw Error(`Invalid ${realm} question ${week}/${lesson}: ${JSON.stringify(input)}`);
  const int=random(input.seed^0x5f3759df);for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {kind:'multiple_choice',prompt,answer,options,explanation,cave7Visual:visual,lessonId:`y7-${realm}-w${week}-l${lesson}`,version:1,tier:role,steps:[idea,explanation,`Check: ${answer}. Explain how it fits the question.`],skillKey:(week-1)*3+lesson,realm};
+ return {readabilityRevision:1,kind:'multiple_choice',prompt,answer,options,explanation,cave7Visual:visual,lessonId:`y7-${realm}-w${week}-l${lesson}`,version:1,tier:role,steps:[idea,explanation,`Check: ${answer}. Explain how it fits the question.`],skillKey:(week-1)*3+lesson,realm};
 }
 export const numericWrong=(n:number)=>[round(n+1),round(n-1),round(n+2),round(n+5),round(n*2+3)];
 export const dataVisual=(values:number[],title='Recorded observations',unit='') : Cave7Visual=>({kind:'table',title,headers:['Observation','Value'+(unit?` (${unit})`:'')],rows:values.map((v,i)=>[String(i+1),String(v)])});

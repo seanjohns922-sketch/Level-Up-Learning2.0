@@ -26,10 +26,8 @@ function expected(key,q){
  case 16:return 6.28*a*(A?b:1);
  case 17:return a/(A?6.28:3.14);
  case 18:return 3.14*a*b/(A?100:1);
- case 19:case 20:return a+(A?c:0); // marked angle is repeated before increase
- case 21:return 180-a-(A?c:0);
- case 22:case 23:return A?180-a:a;
- case 24:return A?a:180-a;
+ case 19:case 20:case 22:case 23:return a;
+ case 21:case 24:return 180-a;
  case 25:return A?a+b:180-a-b;
  case 26:return A?180-(180-a)/2:(180-a)/2;
  case 27:return A?a-b:a+b;
@@ -45,7 +43,7 @@ function expected(key,q){
  default:throw Error(key);
  }
 }
-const reasonFragments={1:'Two matching copies',2:'because it is perpendicular',3:'An end triangle can be moved',4:'Double the area',5:'It stays the same',6:'Add half base',7:'layers contains',8:' × ',9:'cross-section is a triangle',10:'Divide volume by cross-sectional area',11:'1000 cm³ equals 1 L',12:'holds half as much',13:'through the centre',14:'Circumference divided by diameter',15:' × π',16:'needs diameter',17:'Divide circumference by twice pi',18:'Circumference × number',19:'corresponding angles are equal',20:'alternate angles are equal',21:'co-interior angles sum to 180',22:'corresponding angles are equal',23:'alternate angles are equal',24:'co-interior angles sum to 180',25:'sum to 180',26:'then halve',27:'after subtracting the adjacent',28:'two triangles',29:'− 2',30:'Only if',31:'',32:'five equal ratio parts',33:'smaller scale',34:'Four times the extra',35:'cm in reality',36:'two fifths'};
+const reasonFragments={1:'Two copies',2:'because it is perpendicular',3:'Move one end triangle',4:'Double the area',5:'It stays the same',6:'Add half base',7:'layers contains',8:' × ',9:'cross-section is a triangle',10:'Divide volume by cross-sectional area',11:'1000 cm³ equals 1 L',12:'holds half as much',13:'through the centre',14:'Circumference divided by diameter',15:' × π',16:'needs diameter',17:'Divide circumference by twice pi',18:'Circumference × number',19:'corresponding angles are equal',20:'alternate angles are equal',21:'co-interior angles sum to 180',22:'corresponding angles are equal',23:'alternate angles are equal',24:'co-interior angles sum to 180',25:'sum to 180',26:'divide by 2',27:'after subtracting the adjacent',28:'two triangles',29:'− 2',30:'Only if',31:'',32:'five equal ratio parts',33:'smaller scale',34:'Four times the extra',35:'cm in reality',36:'cost of each share'};
 let count=0;
 assert.equal(MEASUREMENT7_WEEKS.length,12);
 for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){

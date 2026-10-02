@@ -2,7 +2,7 @@ import {cave7Guide} from './curriculum';
 import {makeQuestion,numericWrong,random,round,type Cave7Role,type Cave7Visual} from './shared';
 export function chance7Question(week:number,lesson:number,seed:number,role:Cave7Role='fast_thinking'){
  const g=cave7Guide('chance',week,lesson);if(!g)throw Error('Unknown Probability lesson');
- const int=random(seed),a=int(2,7),b=int(2,6),n=a+b,trials=n*int(10,30),key=(week-1)*3+lesson,A=role==='apply_create',R=role==='reasoning';
+ const int=random(seed),a=int(2,7),b=int(2,6),n=a+b,trials=n*int(10,30),key=(week-1)*3+lesson,A=role==='apply_create';
  let prompt='',answer:string|number='',wrong:(string|number)[]=[],explanation='',visual:Cave7Visual|undefined;
  const choose=(p:string,v:string|number,ws:(string|number)[],e:string)=>{prompt=p;answer=v;wrong=ws;explanation=e;};
  const num=(p:string,v:number,e:string)=>choose(p,round(v),numericWrong(round(v)),e);
@@ -41,7 +41,7 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   ['A fair coin gives exactly 25 heads in one run of 50 tosses.','Another 50-toss run is not required to give exactly 25 heads.'],
   ['One run gives more heads than tails.','The next run is not required to cancel that imbalance.'],
   ['An experiment is repeated with the same probability model and trial total.','The expected count stays the same, but observed counts can differ.']
- ] as const;const row=rows[int(0,rows.length-1)];choose(`${row[0]} Which interpretation is justified?`,row[1],['Every fair short run must be exactly balanced.','The observations prove that the next result is fixed.','The next run must reproduce the same observed counts.'],'Expected frequencies describe a model; actual independent runs fluctuate.');visual=undefined;}
+ ] as const;const row=rows[int(0,rows.length-1)];choose(`${row[0]} What do these results show?`,row[1],['Every fair short run must be exactly balanced.','These results decide the next outcome.','The next run must give the same counts.'],'Expected frequencies describe a model; actual independent runs fluctuate.');visual=undefined;}
  if(key===22){const rows=[
   ['You need an observed probability for a spinner event.','Define the event and record every trial under a consistent procedure.'],
   ['A simulation stops as soon as its first win occurs.','Set a trial total in advance and record wins and losses.'],
@@ -49,6 +49,5 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   ['Two people count “success” differently in one investigation.','Agree on a single event definition before combining their records.'],
   ['Only favourable results were saved from a run.','Record the total number of trials as well as the event count.']
  ] as const;const row=rows[int(0,rows.length-1)];choose(`${row[0]} What is the best next step?`,row[1],['Keep only results that match the prediction.','Assume the next trial must repair the previous results.','Replace every observed count by its theoretical expectation.'],'A consistent event, trial procedure and complete record make the comparison meaningful.');}
- if(R&&[2,7,8,10,13,15].includes(key)){const value=answer;choose(`${prompt} Which justification is valid?`,`${value}: ${explanation}`,[`${value}: count only favourable trials and ignore the total.`,`${value}: assume every colour name has equal probability.`,`${value}: past outcomes force the next result to balance them.`],explanation);}
  return makeQuestion({realm:'chance',week,lesson,seed,role,prompt,answer,wrong,explanation,idea:g.idea,visual});
 }

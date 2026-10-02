@@ -2,7 +2,7 @@ import {cave7Guide} from './curriculum';
 import {makeQuestion,numericWrong,random,type Cave7Role,type Cave7Visual} from './shared';
 export function pattern7Question(week:number,lesson:number,seed:number,role:Cave7Role='fast_thinking'){
  const g=cave7Guide('pattern',week,lesson);if(!g)throw Error('Unknown Algebra lesson');
- const int=random(seed),a=int(2,7),rawB=int(2,9),b=rawB===a?rawB+1:rawB,x=int(2,10),c=int(2,5),key=(week-1)*3+lesson,A=role==='apply_create',R=role==='reasoning';
+ const int=random(seed),a=int(2,7),rawB=int(2,9),b=rawB===a?rawB+1:rawB,x=int(2,10),c=int(2,5),key=(week-1)*3+lesson,A=role==='apply_create';
  let prompt='',answer:string|number='',wrong:(string|number)[]=[],explanation='',visual:Cave7Visual|undefined;
  const choose=(p:string,n:string|number,ws:(string|number)[],e:string)=>{prompt=p;answer=n;wrong=ws;explanation=e;};
  const num=(p:string,n:number,e:string)=>choose(p,n,numericWrong(n),e);
@@ -49,8 +49,5 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  }
  // Reasoning prompts assess the method or interpretation rather than a second
  // bare calculation. Given evidence remains visible in the formula/table.
- if(R&&[2,3,10,11,13,14,15,16,17,22,24,25,26,28,30,31,32,33,34,35,36].includes(key)){
-  const value=answer;choose(`${prompt} Which explanation correctly justifies the result?`,`${value}: ${explanation}`,[`${value}: add all the numbers shown, regardless of their roles.`,`${value}: reverse the order of the coordinates or operations without checking.`,`${value}: change only one side of an equation or one occurrence of a variable.`],explanation);
- }
  return makeQuestion({realm:'pattern',week,lesson,seed,role,prompt,answer,wrong,explanation,idea:g.idea,visual});
 }
