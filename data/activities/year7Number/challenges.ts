@@ -23,9 +23,9 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   let task: Task | undefined;
   let visual: MultipleChoiceQuestion["visual"], diagramSpeech: string | undefined;
   const numberLine = (u:number,d:number) => {
-    const max=Math.ceil(u/d)+1;
-    visual={type:"fraction_number_line",title:"Read point P",leftLabel:"",rightLabel:"",leftPosition:0,rightPosition:max,min:0,max,subdivisions:d,markers:[{label:"P",position:u/d}]};
-    diagramSpeech=`Number line from 0 to ${max}. Each whole has ${d} equal spaces. P is ${u} spaces to the right of zero.`;
+    const min=Math.min(0,Math.floor(u/d)-1),max=Math.max(1,Math.ceil(u/d)+1);
+    visual={type:"fraction_number_line",title:"Read point P",leftLabel:"",rightLabel:"",leftPosition:min,rightPosition:max,min,max,subdivisions:d,markers:[{label:"P",position:u/d}]};
+    diagramSpeech=`Number line from ${min} to ${max}. Each whole has ${d} equal spaces. P is ${Math.abs(u)} spaces to the ${u<0?'left':'right'} of zero.`;
   };
   const choice = (prompt: string, answer: string, wrong: string[], explanation: string) => {
     const options = [...new Set([answer, ...wrong])];
@@ -132,11 +132,11 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
         `Each space is 1/${d}. Count ${u} spaces from 0: ${u}/${d} = ${frac(u,d)}.`); break;
     }
     case 14: {
-      const numerator=a*2+1, x=-numerator/2;
-      choice(`Which statement correctly places −${numerator}/2 on a number line?`,
-        `${fmt(x)}, between ${Math.floor(x)} and ${Math.ceil(x)}; negative positions are left of zero.`,
-        [`${fmt(-x)}, between ${Math.floor(-x)} and ${Math.ceil(-x)}; fractions always have positive positions.`,`${-numerator*2}, left of zero; multiply numerator and denominator to find position.`,`${fmt(x+1)}, between ${Math.floor(x+1)} and ${Math.ceil(x+1)}; count zero as the first interval.`],
-        `The fraction is −${numerator} ÷ 2 = ${x}. The minus sign applies to the entire fraction.`); break;
+      const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0));
+      numberLine(u,d);
+      choice('Which fraction is at P?',frac(u,d),
+        [frac(-u,d),frac(u-1,d),frac(u+1,d)],
+        `P is left of 0, so it is negative. Each space is 1/${d}. Its value is ${frac(u,d)}.`); break;
     }
     case 15: {
       const x=-a/4,y=-(a+1)/4;
@@ -281,7 +281,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     case 11: { const length=n+.75,cut=a/4; numeric(`A rope is ${length} m long. A piece of ${a}/4 m is cut off. How many metres remain?`,length-cut,[length+cut,length-a,length-cut/10],`Convert ${a}/4 to ${fmt(cut)} m, then subtract from ${length} m to get ${fmt(length-cut)} m.`); break; }
     case 12: { const percent=pick([25,50,75]),fraction=percent/25; numeric(`A club says ${fraction}/4 of its members attend. What percentage attend?`,percent,[fraction*10,fraction,100-percent+5],`${fraction}/4 = ${percent}/100 = ${percent}%.`); break; }
     case 13: { const d=pick([2,4,5]),u=d+a+(a%d===0?1:0);numberLine(u,d);numeric(`Start at P. Move 1/${d} to the right. What decimal do you reach?`,(u+1)/d,[(u-1)/d,u/d,(u+d)/d],`P is ${fmt(u/d)}. Move one space right: ${fmt(u/d)} + ${fmt(1/d)} = ${fmt((u+1)/d)}.`); break; }
-    case 14: { const start=-a-.5,step=.25,count=2*b+1; numeric(`On a number line, P is at ${start}. Q is ${count} quarter-unit intervals to the right of P. What is Q's coordinate?`,start+count*step,[start-count*step,-start+count*step,start+count],`Each interval is 0.25. Moving right adds ${count} × 0.25 = ${count*.25}; Q is ${fmt(start+count*.25)}.`); break; }
+    case 14: { const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0)),direction=seed%2===0?1:-1;numberLine(u,d);numeric(`Start at P. Move 1/${d} ${direction>0?'right':'left'}. What decimal do you reach?`,(u+direction)/d,[(u-direction)/d,u/d,-(u+direction)/d],`P is ${fmt(u/d)}. Moving ${direction>0?'right adds':'left subtracts'} ${fmt(1/d)}. You reach ${fmt((u+direction)/d)}.`); break; }
     case 15: { const low=-a/4,high=b/2; numeric(`At dawn it is −${a}/4 °C. At noon it is ${high} °C. By how many degrees has the temperature risen?`,high-low,[high+low,high,Math.abs(low)],`Use comparable decimals: dawn ${fmt(low)} °C. Rise = ${high} − (${fmt(low)}) = ${fmt(high-low)} °C.`); break; }
     case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`${count} metres of fabric cost $${unit.toFixed(3)} per metre. The shop rounds only the final bill to the nearest cent. What is the bill in dollars?`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
     case 17: { const need=n+.4,price=a*5; numeric(`A job needs ${need} L of paint. Paint is sold in 3 L tins at $${price} each. What is the minimum purchase cost in dollars?`,Math.ceil(need/3)*price,[Math.floor(need/3)*price,need/3*price,Math.ceil(need)*price],`At least ${Math.ceil(need/3)} whole tins are needed. Multiply by $${price}: $${Math.ceil(need/3)*price}.`); break; }
@@ -308,7 +308,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   if (!task) throw Error(`Missing Level 7 challenge ${key}/${role}`);
   for (let i=task.options.length-1;i>0;i--) { const j=int(0,i); [task.options[i],task.options[j]]=[task.options[j],task.options[i]]; }
   return {
-    ...task, visual, diagramSpeech, readabilityRevision: key===13?2:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
+    ...task, visual, diagramSpeech, readabilityRevision: (key===13||key===14)?2:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
     lessonId: `y7-w${week}-l${lesson}`, version: 2 as const, tier: role,
     helper: 'Choose one answer.',
   } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string;diagramSpeech?:string};
