@@ -337,11 +337,12 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceModelDebugger",
   "chanceMasterTrial",
   "chanceQuizQuestion",
+  "space7Question",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
-  if (task.kind === "chanceQuizQuestion") {
+  if (task.kind === "chanceQuizQuestion" || task.kind === "space7Question") {
     return hasText(task.prompt)
       && hasText(task.speakText)
       && task.options.length >= 3

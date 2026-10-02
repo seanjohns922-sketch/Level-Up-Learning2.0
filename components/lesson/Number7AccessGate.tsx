@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useDemoPreviewMode } from '@/lib/demo-mode';
 import { number7DemoActivityAllowed } from '@/lib/number7-demo';
 import { cavernWeekHref } from '@/lib/world3d/shattered-realms';
-export default function Number7AccessGate({week,lesson,children,realm="number"}:{week:number;lesson:number|'quiz';children:ReactNode;realm?:"number"|"measurement"}) {
+export default function Number7AccessGate({week,lesson,children,realm="number"}:{week:number;lesson:number|'quiz';children:ReactNode;realm?:"number"|"measurement"|"space"}) {
  const review=useSearchParams().get("review")==="1";
  const demo=useDemoPreviewMode();const [allowed,setAllowed]=useState<boolean|null>(null);
  useEffect(()=>{let active=true;queueMicrotask(()=>{if(active)setAllowed(number7DemoActivityAllowed(demo,week,lesson));});return()=>{active=false;};},[demo,week,lesson,review]);

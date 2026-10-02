@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
+import Space7LessonVisual from "@/components/starpath/Space7LessonVisual";
 import Year7MeasurementAssessmentVisual from "@/components/assessment/Year7MeasurementAssessmentVisual";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -156,9 +157,10 @@ export default function MultipleChoiceActivity({
   assessmentMode?: boolean;
 }) {
   const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
-  const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && String(questionData.lessonId).startsWith("y7-measurement-")));
+  const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space)-/.test(String(questionData.lessonId))));
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
+  const isSpace = realmId === "space";
   const questionReadAloudText = isPattern
     ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
     : questionData.prompt;
@@ -188,7 +190,7 @@ export default function MultipleChoiceActivity({
         ? "lg:grid-cols-3"
         : "md:grid-cols-2 xl:grid-cols-4"
     : "";
-  const missingRelationshipVisual = !hasRequiredRelationshipVisual(
+  const missingRelationshipVisual = !questionData.spaceVisual && !hasRequiredRelationshipVisual(
     questionData.prompt,
     questionData.visual?.type,
     "multiple_choice",
@@ -293,7 +295,7 @@ export default function MultipleChoiceActivity({
       questionData.visual?.type === "receipt" ? (
         <MoneyContextVisual visual={questionData.visual} />
       ) : null}
-      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : isPattern ? "text-violet-700" : "text-teal-700/90"}`}>
+      <div className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-[0.22em] ${isMeasurement ? "text-[#7c5a20]" : (isPattern || isSpace) ? "text-violet-700" : "text-teal-700/90"}`}>
         <span
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
@@ -314,10 +316,11 @@ export default function MultipleChoiceActivity({
         </p>
       ) : null}
       {isMultiSelect && questionData.instruction ? (
-        <p className={`mt-2 text-sm font-bold ${isMeasurement ? "text-[#7c5a20]" : isPattern ? "text-violet-700" : "text-emerald-700"}`}>
+        <p className={`mt-2 text-sm font-bold ${isMeasurement ? "text-[#7c5a20]" : (isPattern || isSpace) ? "text-violet-700" : "text-emerald-700"}`}>
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
+      {questionData.spaceVisual && <Space7LessonVisual visual={questionData.spaceVisual}/>}
       {questionData.measurementVisual && <Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
@@ -466,6 +469,8 @@ export default function MultipleChoiceActivity({
                     : isPicked
                     ? "border-red-400 bg-red-50 text-red-900 ring-1 ring-red-300"
                     : "border-slate-200 bg-white text-slate-500"
+                : isSpace
+                  ? isPicked ? "border-violet-500 bg-violet-50 text-violet-950 ring-1 ring-violet-300" : "border-violet-200 bg-white text-slate-800 hover:border-violet-400 hover:bg-violet-50"
                 : isMeasurement
                   ? isPicked
                     ? "border-amber-500/60 bg-amber-50 text-amber-900 shadow-[0_2px_0_rgba(180,83,9,0.2),inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-amber-400/40"
@@ -514,7 +519,7 @@ export default function MultipleChoiceActivity({
             type="button"
             onClick={submitMultiSelect}
             disabled={selected.length === 0 || submitted}
-            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : isPattern ? "bg-violet-700 hover:bg-violet-800" : "bg-teal-600 hover:bg-teal-700"}`}
+            className={`rounded-2xl px-5 py-3 text-lg font-black text-white transition disabled:cursor-not-allowed disabled:bg-gray-300 ${isMeasurement ? "bg-[#8a6422] hover:bg-[#a2732e]" : (isPattern || isSpace) ? "bg-violet-700 hover:bg-violet-800" : "bg-teal-600 hover:bg-teal-700"}`}
           >
             Check answer
           </button>

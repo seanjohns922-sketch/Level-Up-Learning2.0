@@ -1,0 +1,121 @@
+/* Use the available width before reducing spacing. Keep natural overflow for
+   small screens, zoom and long content; never clip learning or controls. */
+.active > section > div:last-child {
+  background: radial-gradient(ellipse at 0 20%, #453a7080, transparent 55%), #17122d !important;
+}
+.active [data-lesson-hud] > div:first-child {
+  background: linear-gradient(140deg, #a78bfa, #ddd6fe 25%, #67519a 65%, #8070bc) !important;
+}
+.active [data-lesson-hud] > div:last-child {
+  background: radial-gradient(ellipse at 100% 0, #8b5cf655, transparent 45%), linear-gradient(155deg, #2a2050, #17122d 70%) !important;
+  box-shadow: inset 0 1px 0 #fff3, inset 0 -12px 30px #0005, 0 16px 40px #0004 !important;
+}
+.active [data-lesson-question-card] {
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+/* The question has one surface and one label, rather than two nested cards. */
+.active [data-lesson-question-card] > div:first-child { display: none; }
+.active [data-lesson-multiple-choice] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2.4vw, 36px);
+  border: 1px solid #c4b5fd;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at 100% 0, #ddd6fe80, transparent 50%), linear-gradient(150deg, #faf8ff, #f0ebff) !important;
+  box-shadow: inset 0 4px 0 #8b5cf6, 0 18px 44px #0003;
+}
+.active [data-lesson-multiple-choice] > div:first-child { color: #6d28d9; font-size: 12px; letter-spacing: .2em; }
+.active [data-lesson-multiple-choice] > div:nth-child(2) { margin-top: 24px; gap: 16px; }
+.active [data-lesson-multiple-choice] h2 { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.2; letter-spacing: -.025em; color: #25133f; }
+.active [data-lesson-multiple-choice] > p { font-size: 16px; color: #665578; margin-top: 12px; }
+.active [data-lesson-answer-options] { gap: 16px; margin-top: 28px; }
+.active [data-lesson-answer-options] > button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 112px;
+  padding: 22px;
+  border-width: 2px;
+  border-radius: 14px;
+  font-size: clamp(21px, 1.85vw, 28px);
+  line-height: 1.3;
+  box-shadow: 0 4px 0 #5b21b612;
+}
+.active [data-lesson-answer-options] > button:hover:not(:disabled) { border-color: #8b5cf6; box-shadow: 0 6px 18px #6d28d920; }
+.active [data-lesson-answer-options] > button:focus-visible { outline: 3px solid #815ba0; outline-offset: 4px; }
+.active [data-core-answer-letter] {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 44px;
+  color: #f5f3ff;
+  font-size: 16px;
+  background: linear-gradient(145deg, #7c3aed, #35225c);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.active [data-lesson-wrong-feedback] { margin-top: 16px; }
+@media (min-width: 1024px) {
+  .active [data-cave-level="7"] > :global(.grid) { grid-template-columns: 320px minmax(0, 1fr); align-items: stretch; gap: 22px; }
+  .active [data-lesson-workspace] { display: flex; flex-direction: column; }
+  .active [data-lesson-workspace] > div:last-child { flex: 1; display: flex; flex-direction: column; }
+  .active [data-lesson-question-card] { flex: 1; display: flex; flex-direction: column; }
+  .active [data-lesson-question-card] > fieldset { flex: 1; display: flex; flex-direction: column; }
+  .active [data-lesson-question-card] :global(.question-read-aloud-boundary),
+  .active [data-lesson-question-card] :global(.question-read-aloud-content) { flex: 1; display: flex; flex-direction: column; }
+  .active [data-lesson-multiple-choice] { flex: 1; }
+  .active [data-lesson-answer-options] { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(112px, 1fr); }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-multiple-choice] { padding: 22px; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-answer-options] { grid-template-columns: 1fr; gap: 10px; grid-auto-rows: auto; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-answer-options] > button { min-height: 74px; padding: 12px; font-size: 20px; }
+  .active [data-lesson-wrong-feedback] { margin: 0; padding: 20px; }
+  .active [data-lesson-wrong-feedback] > :global(.grid) { grid-template-columns: 1fr; }
+}
+@media (min-width: 1024px) {
+  .home, .active { min-height: 0; }
+  .home > header, .active > header { padding: 8px 16px; }
+  .home > section { margin-top: 8px; }
+  .home > section > div:first-child {
+    min-height: 0;
+    padding: 12px 24px;
+  }
+  .home > section > div:first-child h1 { font-size: 28px; line-height: 1.15; }
+  .home > section > div:first-child p { margin-top: 6px; font-size: 14px; line-height: 1.4; }
+  .home > section > div:first-child > div:last-child > div { margin-top: 6px; }
+  .home > section > div:last-child { padding: 12px 20px; }
+  .home > section > div:last-child > * + * { margin-top: 12px; }
+  .home > section > div:last-child > div { gap: 12px; }
+  .home section section { padding: 12px; }
+  .home section section p { font-size: 16px; line-height: 1.4; margin-top: 8px; }
+  .home section section ul { margin-top: 8px; }
+  .home section section li { font-size: 14px; line-height: 1.4; }
+  .home section section li + li { margin-top: 6px; }
+  .home :global(.aspect-video) { aspect-ratio: auto; height: clamp(140px, 22dvh, 220px); }
+  .home > section > div:last-child > div > div { display: grid; gap: 12px; }
+  .home > section > div:last-child > div > div > * { margin-top: 0; }
+  .home > section > div:last-child > section > div:first-child { flex-direction: row; align-items: center; gap: 16px; }
+  .home :global(.min-h-20) { min-height: 48px; padding: 6px; flex-direction: row; gap: 8px; }
+  .home :global(.min-h-20) span { margin-top: 0; }
+  .home :global(.min-h-14) { min-height: 48px; padding-inline: 20px; }
+  .active > header { margin-bottom: 8px; }
+  .active > section > div:first-child { padding: 10px 20px; }
+  .active h1 { font-size: 24px; line-height: 1.2; }
+  .active > section > div:first-child p { margin-top: 4px; line-height: 1.4; }
+  .active > section > div:last-child { padding: 12px; }
+  .guide { display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px 24px; padding: 16px 20px; }
+  .guide > div:first-child, .guide > div:nth-child(2), .guide > p, .guide > [data-guide-actions] { grid-column: 1 / -1; margin-top: 0; }
+  .guide h2 { font-size: 24px; }
+  .guide > p { font-size: 16px; line-height: 1.4; }
+  .guide [data-guide-example] { margin: 0; padding: 14px; align-self: stretch; }
+  .guide [data-guide-steps] ol { margin-top: 8px; }
+  .guide [data-guide-steps] li { font-size: 16px; line-height: 1.4; }
+  .guide [data-guide-steps] li + li { margin-top: 8px; }
+  .guide [data-guide-caution] { margin-top: 10px; padding: 10px; font-size: 14px; }
+  .guide [data-guide-actions] button { padding-block: 8px; }
+  .guide [data-guide-actions] p { margin-top: 4px; }
+}

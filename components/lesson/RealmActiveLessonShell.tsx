@@ -1,6 +1,7 @@
 "use client";
 
 import layout from "./Number7LessonLayout.module.css";
+import spaceLayout from "./Space7LessonLayout.module.css";
 import measurementLayout from "./Measurement7LessonLayout.module.css";
 
 import { ArrowLeft } from "lucide-react";
@@ -38,7 +39,7 @@ export function RealmActiveLessonShell({
   onBack: () => void;
   children: ReactNode;
 }) {
-  const isCoreHunt = (realm === "number" || realm === "measurement") && levelNumber === 7;
+  const isCoreHunt = (realm === "number" || realm === "measurement" || realm === "space") && levelNumber === 7;
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
@@ -51,7 +52,7 @@ export function RealmActiveLessonShell({
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement") && levelNumber === 7 ? (realm === "measurement" ? measurementLayout.active : layout.active) : ""}`}>
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement" || realm === "space") && levelNumber === 7 ? (realm === "space" ? spaceLayout.active : realm === "measurement" ? measurementLayout.active : layout.active) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

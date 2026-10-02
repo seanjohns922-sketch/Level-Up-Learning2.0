@@ -300,7 +300,7 @@ export default function ComboActivation({ comboCount, realmId, cave=false }: { c
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const tiers = cave && isMeasurement ? MEASURE_TIERS.map((tier,index)=>({...tier,title:index===0?'AMBER SURGE':'CAVERN GLOW'})) : cave ? CAVE_TIERS : isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : isChance ? CHANCE_TIERS : NEXUS_TIERS;
+  const tiers = cave && isStarpath ? STARPATH_TIERS.map((tier,index)=>({...tier,title:index===0?"STAR CRYSTAL SURGE":"CAVERN GLOW"})) : cave && isMeasurement ? MEASURE_TIERS.map((tier,index)=>({...tier,title:index===0?'AMBER SURGE':'CAVERN GLOW'})) : cave ? CAVE_TIERS : isMeasurement ? MEASURE_TIERS : isStarpath ? STARPATH_TIERS : isStatistics ? STATISTICS_TIERS : isPattern ? PATTERN_TIERS : isChance ? CHANCE_TIERS : NEXUS_TIERS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);

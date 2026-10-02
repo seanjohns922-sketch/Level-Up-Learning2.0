@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import {useDemoPreviewMode} from "@/lib/demo-mode";
+import {markQuizComplete} from "@/lib/program-progress";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,7 +30,7 @@ import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 import { getWorld3DReturnPathForQuiz } from "@/lib/world3d/return-context";
 
 export type StarpathVoyageQuizMeta = {
-  level: RealmLevelId;
+  level: RealmLevelId | "Year 7";
   levelLabel: string;
   week: number;
   title: string;
@@ -137,6 +139,9 @@ export default function StarpathVoyageQuiz({
   realm?: VoyageQuizRealm;
 }) {
   const router = useRouter();
+  const demoMode=useDemoPreviewMode();
+  const reviewOnly=useSearchParams().get("review")==="1";
+  const caveSpace=realm==="space"&&quiz.level==="Year 7";
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
   const isPattern = realm === "pattern";
@@ -296,7 +301,7 @@ export default function StarpathVoyageQuiz({
     setSaving(true);
     const score = Object.values(answers).filter(Boolean).length;
     const finalPercent = total > 0 ? Math.round((score / total) * 100) : 0;
-    const studentId = getActiveStudentIdentity().studentId;
+    const studentId = caveSpace && demoMode ? null : getActiveStudentIdentity().studentId;
     const completedAt = new Date().toISOString();
     const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
       const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));
@@ -330,7 +335,8 @@ export default function StarpathVoyageQuiz({
 
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
-      if (realm === "space") {
+      if(caveSpace && demoMode && !reviewOnly)markQuizComplete(quiz.level,quiz.week,finalPercent,realm,score,total);
+      if (realm === "space" && quiz.level !== "Year 7") {
         writeStarpathDemoJourney(quiz.level, {
           currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
           currentLesson: passedQuiz ? 0 : 3,

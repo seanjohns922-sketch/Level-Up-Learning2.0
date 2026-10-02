@@ -44,6 +44,7 @@ import {
 } from "@/lib/realms/realm-journey";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
+import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
 import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
 import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
@@ -101,7 +102,7 @@ function ProgramPage() {
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
   const isExpeditionWeek = year === "Year 7" && sp.get("expedition") === "1";
-  const isNumber7 = isExpeditionWeek && (realmId === "number" || realmId === "measurement");
+  const isNumber7 = isExpeditionWeek && (realmId === "number" || realmId === "measurement" || realmId === "space");
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
   const isPatternRealm = realmId === "pattern";
@@ -113,7 +114,7 @@ function ProgramPage() {
   const weekNum = isExpeditionWeek ? cavernWeek(sp.get("week")) : Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const program = useMemo(
-    () => isNumber7 ? (realmId === "measurement" ? MEASUREMENT7_PROGRAM : NUMBER7_PROGRAM) : isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
+    () => isNumber7 ? (realmId === "space" ? SPACE7_PROGRAM : realmId === "measurement" ? MEASUREMENT7_PROGRAM : NUMBER7_PROGRAM) : isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
       ? starpathProgram?.weeks ?? []
       : getCurriculumPlan(year, genreIdForRealm(realmId)),
     [isNumber7, isExpeditionWeek, isStarpathRealm, realmId, starpathProgram, year]
@@ -635,7 +636,7 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : isNumber7 ? number7WeekUnlocked(store,weekNum,realmId === "measurement" ? "measurement" : "number") : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
+    unrestrictedMode ? true : isNumber7 ? number7WeekUnlocked(store,weekNum,realmId === "space" ? "space" : realmId === "measurement" ? "measurement" : "number") : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
@@ -732,7 +733,7 @@ function ProgramPage() {
       }
     }
 
-    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz',realmId === 'measurement' ? 'measurement' : 'number'));return;}
+    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz',realmId === 'space' ? 'space' : realmId === 'measurement' ? 'measurement' : 'number'));return;}
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
@@ -877,7 +878,7 @@ function ProgramPage() {
     router.push(world3DReturnPath ?? realmHomeRoute);
   }
 
-  if ((isExpeditionWeek || (year === "Year 7" && (realmId === "number" || realmId === "measurement"))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
+  if ((isExpeditionWeek || (year === "Year 7" && (realmId === "number" || realmId === "measurement" || realmId === "space"))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
 
   if (canonicalStatus !== "ready") {
     return (

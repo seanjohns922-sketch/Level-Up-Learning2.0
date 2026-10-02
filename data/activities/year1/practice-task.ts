@@ -135,6 +135,7 @@ export function diffPick(
 }
 
 export type PracticeTask = (
+  | {kind:"space7Question";prompt:string;speakText:string;options:string[];answer:string;question:import("@/data/activities/year7Space/questions").Space7Question;feedback:{correct:string;wrong:string}}
   | import("@/lib/starpath-independent-construction").IndependentConstructionTask
   | {
       /** Independent Chance Hollow weekly-quiz item. Quiz questions are generated

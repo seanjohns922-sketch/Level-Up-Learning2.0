@@ -1,6 +1,7 @@
 "use client";
 
 import { number7Guide } from "@/data/activities/year7Number/curriculum";
+import {Space7SkillGuideDialog} from "./Space7SkillGuide";
 import { Measurement7SkillGuideDialog } from "@/components/lesson/Measurement7SkillGuide";
 import { Number7SkillGuideDialog } from "@/components/lesson/Number7SkillGuide";
 import type { ReactNode } from "react";
@@ -648,7 +649,8 @@ export function Year2LessonEngine({
   const isLevelSixNumber = isNumber && levelNumber === 6;
   const isNumber7 = isNumber && levelNumber === 7;
   const isMeasurement7 = isMeasurement && levelNumber === 7;
-  const isCave7 = isNumber7 || isMeasurement7;
+  const isSpace7 = realmId === "space" && levelNumber === 7;
+  const isCave7 = isNumber7 || isMeasurement7 || isSpace7;
   const [skillGuideOpen, setSkillGuideOpen] = useState(false);
   const skillGuideOpenRef = useRef(false);
   const isModernNumber = isNumber7 || isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
@@ -1579,6 +1581,7 @@ export function Year2LessonEngine({
         }`}
       />
 
+      {isSpace7 && skillGuideOpen && <Space7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isMeasurement7 && skillGuideOpen && <Measurement7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isNumber7 && skillGuideOpen && <Number7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} />
@@ -1597,7 +1600,7 @@ export function Year2LessonEngine({
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
-          {isCave7 && <button type="button" className={`mb-3 w-full rounded-lg border px-4 py-3 font-bold text-white ${isMeasurement7 ? "border-amber-200 bg-amber-950" : "border-teal-200 bg-teal-950"}`} onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
+          {isCave7 && <button type="button" className={`mb-3 w-full rounded-lg border px-4 py-3 font-bold text-white ${isSpace7 ? "border-violet-200 bg-violet-950" : isMeasurement7 ? "border-amber-200 bg-amber-950" : "border-teal-200 bg-teal-950"}`} onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
           <LessonHUDRail
             levelNumber={levelNumber}
             week={lesson.week}

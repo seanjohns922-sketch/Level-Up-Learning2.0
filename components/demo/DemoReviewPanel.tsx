@@ -233,21 +233,21 @@ export default function DemoReviewPanel() {
   const [breakGame, setBreakGame] = useState<BrainBreakGame | "random">("random");
   const [activeBreak, setActiveBreak] = useState<Villain | null>(null);
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
-  const maxWeek = realm === "number" || (realm === "measurement" && year === "Year 7") ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
+  const maxWeek = realm === "number" || ((realm === "measurement" || realm === "space") && year === "Year 7") ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
-  const isNumber7 = (realm === "number" || realm === "measurement") && year === "Year 7";
+  const isNumber7 = (realm === "number" || realm === "measurement" || realm === "space") && year === "Year 7";
   const starpathLevel = getStarpathLevelForYear(year === "Year 7" || year === "Year 8" ? "Year 6" : year).id;
   const starpathProgram = realm === "space" ? getStarpathProgram(starpathLevel) : null;
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
-  const weeklyProgramAvailable = realm === "chance" ? levelNumber <= 6 : realm === "pattern"
+  const weeklyProgramAvailable = isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyContentAvailable = realm === "chance" ? levelNumber <= 6 : realm === "pattern"
+  const weeklyContentAvailable = isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyQuizAvailable = realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
+  const weeklyQuizAvailable = isNumber7 ? true : realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
     ? week <= 5
     : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
 
@@ -368,7 +368,7 @@ export default function DemoReviewPanel() {
   }
 
   function programHref() {
-    if (isNumber7) return cavernWeekHref(realm === "measurement" ? "measurement" : "number", week);
+    if (isNumber7) return cavernWeekHref(realm === "space" ? "space" : realm === "measurement" ? "measurement" : "number", week);
     if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
     if (realm === "pattern") return `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(year)}&week=${week}`;
     if (realm === "chance") return `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1&realm_id=chance&teacher_preview=1`;
@@ -377,7 +377,7 @@ export default function DemoReviewPanel() {
   }
 
   function lessonHref() {
-    if (isNumber7) return number7ActivityHref(week, lesson, realm === "measurement" ? "measurement" : "number");
+    if (isNumber7) return number7ActivityHref(week, lesson, realm === "space" ? "space" : realm === "measurement" ? "measurement" : "number");
     if (realm === "pattern") {
       return `/pattern-peaks/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
     }
@@ -391,7 +391,7 @@ export default function DemoReviewPanel() {
   }
 
   function quizHref() {
-    if (isNumber7) return number7ActivityHref(week, week === 12 ? "posttest" : "quiz", realm === "measurement" ? "measurement" : "number");
+    if (isNumber7) return number7ActivityHref(week, week === 12 ? "posttest" : "quiz", realm === "space" ? "space" : realm === "measurement" ? "measurement" : "number");
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
     if (realm === "chance") return `/chance-hollow/quiz/${encodeURIComponent(year)}/${week}?teacher_preview=1`;

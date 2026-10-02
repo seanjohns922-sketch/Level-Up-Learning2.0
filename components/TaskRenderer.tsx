@@ -245,6 +245,7 @@ import StarpathCoordinateCard from "@/components/starpath/StarpathCoordinateCard
 import StarpathTransformCard from "@/components/starpath/StarpathTransformCard";
 import StarpathLevel6AssessmentCard from "@/components/starpath/StarpathLevel6AssessmentCard";
 import { StarpathGroundAssessmentCard } from "@/components/starpath/StarpathGroundAssessmentCard";
+import Space7ChoiceCard from "@/components/starpath/Space7ChoiceCard";
 import { isPracticeTaskSafe } from "@/lib/task-safety";
 
 type Callbacks = {
@@ -391,6 +392,8 @@ function TaskRendererInner({
   );
 
   switch (task.kind) {
+    case "space7Question":
+      return <Space7ChoiceCard key={k} question={task.question} selected={assessmentAnswer} onAnswer={(correct,response)=>{if(correct)onC(response);else onW(response);}}/>;
     case "chanceQuizQuestion":
       return <ChanceQuizQuestionCard key={k} task={t} onCorrect={onC} onWrong={onW} />;
     case "patternPeaksQuestion":

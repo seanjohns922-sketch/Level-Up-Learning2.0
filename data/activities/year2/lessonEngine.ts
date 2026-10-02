@@ -3461,6 +3461,7 @@ export type StrategyOwnershipVisualData = {
 };
 
 export type MultipleChoiceQuestion = {
+  spaceVisual?: import("@/data/assessments/revisions/level7StarpathFiveForms").Task7;
   measurementVisual?: import("@/data/assessments/revisions/year7MeasurementFiveForms").Measurement7Visual;
   kind: "multiple_choice";
   prompt: string;

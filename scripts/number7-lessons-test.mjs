@@ -84,10 +84,10 @@ for(const kind of ['lesson','quiz']){
  for(const allowed of [false,true]){
   const routePath=`app/demo-review/shattered-realms/[realm]/${kind}/page.tsx`;
   cache.delete(routePath);
-  const route=load(routePath,{'next/navigation':{redirect:url=>{throw Error(`redirect:${url}`)},notFound:()=>{throw Error('not-found')}},'@/lib/demo-session-server':{getServerStarpathAccess:async()=>({allowed})},'@/lib/number7-demo':rules,'@/app/lesson/page':{default:'SharedLessonPage'},'@/app/session/page':{default:'SharedQuizPage'},'react/jsx-runtime':{jsx:(type,props)=>({type,props})}}).default;
+  const route=load(routePath,{'next/navigation':{redirect:url=>{throw Error(`redirect:${url}`)},notFound:()=>{throw Error('not-found')}},'@/lib/demo-session-server':{getServerStarpathAccess:async()=>({allowed})},'@/lib/number7-demo':rules,'@/app/lesson/page':{default:'SharedLessonPage'},'@/app/session/page':{default:'SharedQuizPage'},'@/components/starpath/Space7QuizClient':{default:'SpaceQuiz'},'react/jsx-runtime':{jsx:(type,props)=>({type,props})}}).default;
   const request=(realm,week,overrides={})=>({params:Promise.resolve({realm}),searchParams:Promise.resolve({realm_id:'number',year:'Year 7',week:String(week),lessonId:`y7-w${week}-l1`,teacher_preview:'1',expedition:'1',type:'quiz',n:'1',...overrides})});
   if(!allowed){await assert.rejects(route(request('number',1)),/redirect:\/login/);continue;}
-  await assert.rejects(route(request('space',1)),/not-found/);
+  await assert.rejects(route(request('pattern',1)),/not-found/);
   await assert.rejects(route(request('number',13)),/not-found/);
   await assert.rejects(route(request('number',1,{realm_id:'chance'})),/redirect:.*number/);
   if(kind==='quiz')await assert.rejects(route(request('number',12)),/redirect:\/posttest/);

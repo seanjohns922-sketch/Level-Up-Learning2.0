@@ -2,6 +2,7 @@ import { normalizeWeekPlans } from "./buildProgram";
 import type { LessonActivity } from "./types";
 
 export type CurriculumCode =
+  | "AC9M7SP01" | "AC9M7SP02" | "AC9M7SP03" | "AC9M7SP04"
   | "AC9M7M01" | "AC9M7M02" | "AC9M7M03" | "AC9M7M04" | "AC9M7M05" | "AC9M7M06"
   | "AC9MFN01"
   | "AC9MFN02"

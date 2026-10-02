@@ -1,6 +1,8 @@
 "use client";
 
+import {getRealmTheme} from "@/lib/useRealmTheme";
 import layout from "./Number7LessonLayout.module.css";
+import spaceLayout from "./Space7LessonLayout.module.css";
 import measurementLayout from "./Measurement7LessonLayout.module.css";
 
 import {
@@ -29,7 +31,7 @@ import { getStatisticaBackground } from "@/lib/statistica-visuals";
 import { getPatternPeaksBackground } from "@/lib/pattern-peaks-visuals";
 import { getChanceHollowBackground } from "@/lib/chance-hollow-visuals";
 
-export type RealmLessonThemeId = "number" | "measurement" | "statistics" | "pattern" | "chance";
+export type RealmLessonThemeId = "space" | "number" | "measurement" | "statistics" | "pattern" | "chance";
 
 type RealmLessonHomeProps = {
   realm: RealmLessonThemeId;
@@ -59,6 +61,9 @@ const MEASURELANDS_BACKGROUNDS: Record<number, string> = {
 };
 
 export const REALM_LESSON_THEMES = {
+  space: {
+    realmName:"Starpath",experienceLabel:"Starpath Mission",startLabel:"Begin Mission",videoLabel:"Mission Transmission",rewardLabel:"Mission Rewards",completionLabel:"Mission Complete",legendLabel:"Realmie",intro:"Follow the crystal trail and discover spatial connections.",pageBg:"#100b26",shellBg:"#15102e",panelBg:"#201638",panelBorder:getRealmTheme("space").borderRing,accent:getRealmTheme("space").accentText,accentSoft:getRealmTheme("space").accentTextSoft,secondary:"#c4b5fd",heroOverlay:"linear-gradient(90deg,#100b26ee,#20163899,#20163833)",backdropOverlay:"linear-gradient(180deg,#100b2677,#100b26ee)",videoBg:getRealmTheme("space").cardSurface,buttonBg:getRealmTheme("space").ctaGradientCss,buttonShadow:getRealmTheme("space").ctaShadow,gridColor:getRealmTheme("space").borderRing,ThemeIcon:Star,
+  },
   number: {
     realmName: "Number Nexus",
     experienceLabel: "Nexus Mission",
@@ -197,7 +202,7 @@ export const REALM_LESSON_THEMES = {
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
-  if ((realm === "number" || realm === "measurement") && levelNumber === 7) return `/images/shattered-realms/${realm}-cavern.webp`;
+  if ((realm === "number" || realm === "measurement" || realm === "space") && levelNumber === 7) return `/images/shattered-realms/${realm}-cavern.webp`;
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
   if (realm === "pattern") return getPatternPeaksBackground(`Year ${levelNumber}` as RealmLevelId);
@@ -461,7 +466,7 @@ export function RealmLessonHome({
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
-  const isCave=(realm === "number" || realm === "measurement") && levelNumber === 7;
+  const isCave=(realm === "number" || realm === "measurement" || realm === "space") && levelNumber === 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:"Cave Mission",startLabel:"Learn the skill",intro:"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
   const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
   const criteria =
@@ -483,7 +488,7 @@ export function RealmLessonHome({
   const readAllText = `${lessonTitle}. ${theme.intro} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement") && levelNumber === 7 ? (realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${(realm === "number" || realm === "measurement" || realm === "space") && levelNumber === 7 ? (realm === "space" ? spaceLayout.home : realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
