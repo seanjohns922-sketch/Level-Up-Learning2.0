@@ -15,9 +15,15 @@ export function number7WeekUnlocked(store:ProgramProgressStore,week:number) {
 export function number7ActivityAllowed(store:ProgramProgressStore,week:number,lesson:number|'quiz') {
  if(!number7WeekUnlocked(store,week))return false;
  const p=getWeekProgress(store,'Year 7',week,'number');
- return lesson==='quiz'?p.lessonsCompleted.slice(0,3).every(Boolean):Number.isInteger(lesson)&&lesson>=1&&lesson<=3&&p.lessonsCompleted.slice(0,lesson-1).every(Boolean);
+ return lesson==='quiz'?week<12&&p.lessonsCompleted.slice(0,3).every(Boolean):Number.isInteger(lesson)&&lesson>=1&&lesson<=3&&p.lessonsCompleted.slice(0,lesson-1).every(Boolean);
 }
-export function number7ActivityHref(week:number,lesson:number|'quiz') {
+// Review access is independent of student completion. This does not grant a
+// demo session: the route's server guard and useDemoPreviewMode still do that.
+export function number7DemoActivityAllowed(demo:boolean,week:number,lesson:number|'quiz') {
+ return demo&&Number.isInteger(week)&&week>=1&&week<=12&&((lesson==='quiz'&&week<12)||(typeof lesson==='number'&&Number.isInteger(lesson)&&lesson>=1&&lesson<=3));
+}
+export function number7ActivityHref(week:number,lesson:number|'quiz'|'posttest') {
+ if(lesson==='posttest'||(week===12&&lesson==='quiz'))return '/posttest?year=Year%207&realm_id=number&teacher_preview=1';
  const params=new URLSearchParams({realm_id:'number',year:'Year 7',week:String(week),teacher_preview:'1',expedition:'1'});
  if(lesson==='quiz'){params.set('type','quiz');params.set('n','1');}else params.set('lessonId',`y7-w${week}-l${lesson}`);
  return `/demo-review/shattered-realms/number/${lesson==='quiz'?'quiz':'lesson'}?${params}`;

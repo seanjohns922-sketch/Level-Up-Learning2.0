@@ -8232,7 +8232,7 @@ function SessionPage({
   const buildQuizQuestions = useCallback(() => {
     const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
-    if(year==='Year 7'&&!isMeasurementRealm)return number7Quiz(Number(week)).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:`y7-w${week}-l${q.lessonTag}`,activityType:'multiple_choice' as const,kind:'mcq' as const,prompt:q.prompt,options:q.options,correctIndex:q.options.indexOf(q.answer),feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.'}));
+    if(year==='Year 7'&&!isMeasurementRealm)return number7Quiz(Number(week)).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:`y7-w${week}-l${q.lessonTag}`,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...(q.visual?{kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q}:{kind:'mcq' as const,options:q.options,correctIndex:q.options.indexOf(q.answer)})}));
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
       return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);

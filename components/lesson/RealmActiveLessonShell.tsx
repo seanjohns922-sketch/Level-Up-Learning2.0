@@ -41,7 +41,7 @@ export function RealmActiveLessonShell({
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
-  const displayFocus = realm === "number" && focus ? numberNexusLearningStatement(focus) : focus;
+  const displayFocus = realm === "number" && !isCoreHunt && focus ? numberNexusLearningStatement(focus) : focus;
   const learningStatement = focus
     ? /^I\s+am\s+learning\s+to\b/i.test(displayFocus ?? "")
       ? displayFocus

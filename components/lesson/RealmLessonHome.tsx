@@ -462,9 +462,9 @@ export function RealmLessonHome({
 }: RealmLessonHomeProps) {
   const isCave=realm === "number" && levelNumber === 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:"Cave Mission",startLabel:"Learn the skill",intro:"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
-  const displayFocus = realm === "number" ? numberNexusLearningStatement(focus) : focus;
+  const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
   const criteria =
-    realm === "number"
+    realm === "number" && !isCave
       ? numberNexusSuccessCriteria(successCriteria, focus)
       : uniqueCriteria(successCriteria, focus);
   const learningStatement = /^I\s+am\s+learning\s+to\b/i.test(displayFocus)

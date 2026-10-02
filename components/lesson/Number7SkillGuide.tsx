@@ -5,9 +5,11 @@ import ReadAloudBtn from '@/components/ReadAloudBtn';
 import { MathFormattedText } from '@/components/FractionText';
 import IntegerNumberLineVisual from '@/components/activities/IntegerNumberLineVisual';
 import { number7Guide } from '@/data/activities/year7Number/curriculum';
+import { number7Challenge } from '@/data/activities/year7Number/challenges';
 
 export default function Number7SkillGuide({week,lesson,onContinue,review=false}:{week:number;lesson:number;onContinue:()=>void;review?:boolean}) {
  const guide=number7Guide(week,lesson);if(!guide)return null;
+ const furtherExamples=(['reasoning','apply_create'] as const).map(role=>number7Challenge(week,lesson,7007,role));
  const square=week===1&&lesson===1;
  const line=week===9&&lesson===2;
  const fractionModel=week===4&&lesson===1?{total:24,shaded:18,label:'18 of 24 equal parts = 3/4'}:week===7&&lesson===2?{total:12,shaded:6,label:'2/3 of 3/4 = 6/12 = 1/2'}:week===7&&lesson===3?{total:8,shaded:6,label:'3/4 contains 6 eighths'}:null;
@@ -27,7 +29,16 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
   </div>
   <div data-guide-steps><div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-teal-800">How to solve it</h3><ReadAloudBtn text={guide.steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')} /></div>
   <ol className="mt-3 space-y-3">{guide.steps.map((s,i)=><li key={s} className="flex gap-3 text-base leading-relaxed sm:text-lg"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-800 font-bold text-white">{i+1}</span><MathFormattedText text={s}/></li>)}</ol>
-  <div className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`} /></div>
+  <div data-guide-caution className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`} /></div>
+  <details className="mt-3 rounded-xl border border-teal-200 bg-white p-3">
+   <summary className="cursor-pointer font-bold text-teal-900">Worked examples: reasoning and application</summary>
+   {furtherExamples.map((example,index)=><div key={example.tier} className="mt-4 border-t border-teal-100 pt-3">
+    <div className="flex items-start justify-between gap-3"><h4 className="font-bold text-teal-900">{index===0?'Explain the method':'Apply the skill'}</h4><ReadAloudBtn text={`${example.prompt} Worked solution. ${example.answer}. ${example.explanation}`} label="Read example"/></div>
+    <p className="mt-2 leading-relaxed"><MathFormattedText text={example.prompt}/></p>
+    <p className="mt-2 font-bold"><MathFormattedText text={example.answer}/></p>
+    <p className="mt-2 leading-relaxed"><MathFormattedText text={example.explanation}/></p>
+   </div>)}
+  </details>
   </div>
   <div data-guide-actions className="mt-6 text-center"><button type="button" onClick={onContinue} className="min-h-12 rounded-xl bg-teal-800 px-8 py-3 text-lg font-bold text-white hover:bg-teal-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-800">{review?'Back to practice':'Let’s practise'} →</button><p className="mt-2 text-sm text-slate-600">{review?'Your practice timer is paused.':'Read at your own pace. Your timer starts when practice begins.'}</p></div>
  </section>;

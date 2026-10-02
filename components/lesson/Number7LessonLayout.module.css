@@ -115,7 +115,7 @@
   .guide [data-guide-steps] ol { margin-top: 8px; }
   .guide [data-guide-steps] li { font-size: 16px; line-height: 1.4; }
   .guide [data-guide-steps] li + li { margin-top: 8px; }
-  .guide [data-guide-steps] > div:last-child { margin-top: 10px; padding: 10px; font-size: 14px; }
+  .guide [data-guide-caution] { margin-top: 10px; padding: 10px; font-size: 14px; }
   .guide [data-guide-actions] button { padding-block: 8px; }
   .guide [data-guide-actions] p { margin-top: 4px; }
 }

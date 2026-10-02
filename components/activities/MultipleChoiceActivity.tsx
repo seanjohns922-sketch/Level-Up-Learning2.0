@@ -154,7 +154,8 @@ export default function MultipleChoiceActivity({
   realmId?: string;
   assessmentMode?: boolean;
 }) {
-  const isCoreHunt = renderMode === "lesson" && "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
+  const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
+  const isCoreHunt = renderMode === "lesson" && isNumber7Question;
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const questionReadAloudText = isPattern
@@ -326,7 +327,10 @@ export default function MultipleChoiceActivity({
         <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
       {questionData.visual?.type === "fraction_number_line" ? (
-        <FractionNumberLineVisual visual={questionData.visual} />
+        <div data-core-number-line={isCoreHunt || undefined}>
+          {isNumber7Question && "diagramSpeech" in questionData && typeof questionData.diagramSpeech === "string" && <div className="mt-4 flex justify-end"><ReadAloudBtn text={questionData.diagramSpeech} label="Read diagram" /></div>}
+          <FractionNumberLineVisual visual={questionData.visual} />
+        </div>
       ) : null}
       {questionData.visual?.type === "fraction_context" ? (
         <FractionContextVisual visual={questionData.visual} />

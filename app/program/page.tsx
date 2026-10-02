@@ -475,7 +475,7 @@ function ProgramPage() {
     return window.sessionStorage.getItem(pathwayJournalStorageKey) === "true";
   });
 
-  const unrestrictedMode = !isNumber7 && (DEMO_MODE || previewMode);
+  const unrestrictedMode = DEMO_MODE || previewMode;
 
   useEffect(() => {
     if (DEMO_MODE || previewMode) return;
@@ -634,7 +634,7 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    isNumber7 ? number7WeekUnlocked(store,weekNum) : unrestrictedMode ? true : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
+    unrestrictedMode ? true : isNumber7 ? number7WeekUnlocked(store,weekNum) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
@@ -679,7 +679,7 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
-    if(isNumber7){base.push({type:"quiz",n:1,title:"Weekly Quiz",focus:"15 questions: five from each lesson. Score at least 12/15 (80%) to continue."});return base;}
+    if(isNumber7){base.push(weekNum===12?{type:"posttest",n:1,title:"Level 7 Post-Test",focus:"Show your Level 7 mastery in the existing post-test. Score 85% or above to unlock Level 8."}:{type:"quiz",n:1,title:"Weekly Quiz",focus:"15 questions: five from each lesson. Score at least 12/15 (80%) to continue."});return base;}
     if (isChanceRealm) {
       if (weekNum === lastWeek) {
         base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Show your Level mastery and unlock your Legend" });
@@ -731,7 +731,7 @@ function ProgramPage() {
       }
     }
 
-    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:'quiz'));return;}
+    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz'));return;}
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
@@ -833,7 +833,7 @@ function ProgramPage() {
   }
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
-  const hasWeeklyQuizThisWeek = !(isChanceRealm && weekNum === lastWeek);
+  const hasWeeklyQuizThisWeek = !((isChanceRealm || isNumber7) && weekNum === lastWeek);
   const weekComplete = isWeekCompleteForRealm(progress, realmId, weekNum);
 
   useEffect(() => {
@@ -906,7 +906,7 @@ function ProgramPage() {
 
   return (
     <main className="min-h-screen relative">
-      {isExpeditionWeek && <div className="relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>{isNumber7 ? "Level 7 demo · Complete three lessons, then score 80% on the quiz. Demo progress stays separate from student records." : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span><>{isNumber7&&<a href="/curriculum/number-level7-scope-and-sequence.csv" download className="shrink-0 underline">Download scope and sequence</a>}</><ReadAloudBtn text={isNumber7 ? "Level 7 demo. Complete three lessons, then score at least eighty percent on the weekly quiz. Demo progress stays separate from student records." : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/></div>}
+      {isExpeditionWeek && <div className="relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>{isNumber7 ? "Level 7 demo · All 12 weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%." : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span><>{isNumber7&&<a href="/curriculum/number-level7-scope-and-sequence.csv" download className="shrink-0 underline">Download scope and sequence</a>}</><ReadAloudBtn text={isNumber7 ? "Level 7 demo. All twelve weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent." : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/></div>}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
       {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} /> : <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1320,6 +1320,8 @@ function ProgramPage() {
               {isExpeditionWeek && !isNumber7 ? "Lessons coming soon" : weekUnlocked
                 ? weekComplete
                   ? "◆ Completed"
+                  : isNumber7 && weekNum === 12
+                  ? `${lessonsDoneCount}/3 Lessons · Post-Test`
                   : isChanceRealm
                   ? hasWeeklyQuizThisWeek
                     ? `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : "Quiz Pending"}`

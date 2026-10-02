@@ -67,20 +67,20 @@ function buildInitialTurn(
 }
 
 function isOrderedStrategyFluencyLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return level === 5 && lesson.week === 11 && lesson.lesson === 2;
+  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 11 && lesson.lesson === 2;
 }
 
 function isEstimateReasoningLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return level === 5 && lesson.week === 11 && lesson.lesson === 3;
+  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 11 && lesson.lesson === 3;
 }
 
 function isMultiStepCalculationLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return level === 5 && lesson.week === 12 && lesson.lesson === 2;
+  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 12 && lesson.lesson === 2;
 }
 
 function isYear6RealWorldModellingLesson(level: SupportedMathLevel, lesson: Lesson) {
   void level;
-  return lesson.week === 12 && (lesson.lesson === 2 || lesson.lesson === 3);
+  return !lesson.id.startsWith("y7-") && lesson.week === 12 && (lesson.lesson === 2 || lesson.lesson === 3);
 }
 
 function chooseNextLessonTurn(

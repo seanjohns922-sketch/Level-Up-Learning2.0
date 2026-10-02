@@ -2,7 +2,8 @@ import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngin
 import type { Lesson } from '@/data/programs/year1';
 import type { LessonActivity } from '@/data/programs/types';
 import { number7Guide } from './curriculum';
-export type Number7Question = MultipleChoiceQuestion & { skill:string; seed:number; lessonId:string; version:1; expectedValue?:number };
+import { number7Challenge, type Number7Role } from './challenges';
+export type Number7Question = MultipleChoiceQuestion & { skill:string; seed:number; lessonId:string; version:2; tier:Number7Role; diagramSpeech?:string; expectedValue?:number };
 export const gcd=(a:number,b:number):number=>b?gcd(b,a%b):Math.abs(a);
 export const fraction=(n:number,d:number)=>{const f=gcd(n,d);return d/f===1?String(n/f):`${n/f}/${d/f}`;};
 const value=(s:string)=>{const f=s.match(/^(-?\d+)\/(\d+)$/);return f?Number(f[1])/Number(f[2]):Number(s);};
@@ -10,20 +11,23 @@ const decimal=(n:number)=>String(Math.round(n*1000000)/1000000);
 const pow=(n:number,e:number)=>`${n}${String(e).split('').map(d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[Number(d)]).join('')}`;
 export function number7Question(week:number,lesson:number,seed:number,role='fast_thinking'):Number7Question {
  const guide=number7Guide(week,lesson);if(!guide)throw new Error('Unknown Level 7 Number lesson');
+ if(role==='reasoning'||role==='apply_create')return number7Challenge(week,lesson,seed,role);
  let state=(seed>>>0)||1;
  const rnd=(min:number,max:number)=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return min+state%(max-min+1);};
  const pick=<T,>(a:T[])=>a[rnd(0,a.length-1)];
- const n=rnd(3,18), a=rnd(2,8),b=rnd(2,7),c=rnd(2,6);
+ const n=rnd(3,20), a=rnd(2,8),b=rnd(2,7),c=rnd(2,6);
  const key=(week-1)*3+lesson;
  let prompt='',answer='',wrong:string[]=[],explanation='';
  let expectedValue:number|undefined;
+ let visual:MultipleChoiceQuestion["visual"],diagramSpeech:string|undefined;
+ const line=(min:number,max:number,subdivisions:number,points:Array<[string,number]>,speech:string)=>{visual={type:"fraction_number_line",title:"Read the marked points",leftLabel:"",rightLabel:"",leftPosition:min,rightPosition:max,min,max,subdivisions,markers:points.map(([label,position])=>({label,position}))};diagramSpeech=`Number line from ${min} to ${max}. Each whole is divided into ${subdivisions} equal intervals. ${speech}`;};
  const num=(p:string,v:number,e:string,d:number[]=[] )=>{prompt=p;answer=decimal(v);expectedValue=v;explanation=e;wrong=d.map(decimal);};
  const choose=(p:string,v:string,d:string[],e:string)=>{prompt=p;answer=v;wrong=d;explanation=e;const x=value(v);if(Number.isFinite(x))expectedValue=x;};
  switch(key){
  case 1:num(role==='apply_create'?`A square crystal display has ${n} rows of ${n}. How many crystals?`:`What is ${pow(n,2)}?`,n*n,`${pow(n,2)} = ${n} × ${n} = ${n*n}.`,[n*2,n*n+n,n*n-n]);break;
  case 2:num(role==='apply_create'?`A square floor has area ${n*n} m². What is its side length in metres?`:`What is √${n*n}?`,n,`${n} × ${n} = ${n*n}, so √${n*n} = ${n}.`,[n*n/2,n+1,n-1]);break;
  case 3:if(role==='apply_create')num(`A square chamber has area ${n*n} m². Find its perimeter in metres.`,n*4,`Side = √${n*n} = ${n} m. Perimeter = 4 × ${n} = ${n*4} m.`,[n,n*n*4,n*2]);else {const x=n*n+rnd(1,2*n);num(`Which whole number is immediately below √${x}?`,n,`${n*n} < ${x} < ${(n+1)**2}, so ${n} < √${x} < ${n+1}.`,[n-1,n+1,n+2]);}break;
- case 4:{const p=rnd(1,4),q=rnd(1,3),v=2**p*3**q;const term=(x:number,e:number)=>e===1?String(x):pow(x,e);choose(`Which is the prime factorisation of ${v}?`,`${term(2,p)} × ${term(3,q)}`,[`${term(2,p+1)} × ${term(3,q)}`,`${term(2,p)} × ${term(3,q+1)}`,`${term(2,p+1)} × ${term(3,q+1)}`],`${v} = ${Array(p).fill('2').concat(Array(q).fill('3')).join(' × ')}. Group identical prime factors into powers.`);break;}
+ case 4:{const bases=[2,3,5,7],first=pick(bases),second=pick(bases.filter(v=>v!==first)),p=rnd(1,3),q=rnd(1,2),v=first**p*second**q;const term=(x:number,e:number)=>e===1?String(x):pow(x,e);choose(`Which is the prime factorisation of ${v}?`,`${term(first,p)} × ${term(second,q)}`,[`${term(first,p+1)} × ${term(second,q)}`,`${term(first,p)} × ${term(second,q+1)}`,`${term(first,p+1)} × ${term(second,q+1)}`],`${v} = ${Array(p).fill(String(first)).concat(Array(q).fill(String(second))).join(' × ')}. Group identical prime factors into powers.`);break;}
  case 5:{const base=pick([2,3,5]),ex=rnd(2,5);num(`Evaluate ${pow(base,ex)}.`,base**ex,`${pow(base,ex)} means ${ex} factors of ${base}: ${Array(ex).fill(base).join(' × ')} = ${base**ex}.`,[base*ex,base**(ex-1),base**ex+base]);break;}
  case 6:{const x=a*b,y=a*c, h=gcd(x,y), l=x*y/h;const isLcm=seed%2===0;num(`Find the ${isLcm?'lowest common multiple':'highest common factor'} of ${x} and ${y}.`,isLcm?l:h,`${x} and ${y} have HCF ${h}; their LCM is ${x} × ${y} ÷ ${h} = ${l}.`,[isLcm?h:l,x+y,Math.max(x,y)+1]);break;}
  case 7:{const e=rnd(2,7);num(`What is ${pow(10,e)}?`,10**e,`${pow(10,e)} is 1 followed by ${e} zeros.`,[10*e,10**(e-1),10**(e+1)]);break;}
@@ -32,9 +36,9 @@ export function number7Question(week:number,lesson:number,seed:number,role='fast
  case 10:{const d=pick([8,10,12,15,18,20]),u=rnd(1,d-1),k=rnd(2,6);choose(`Write ${u*k}/${d*k} in simplest form.`,fraction(u,d),[fraction(u+1,d),fraction(u,d+1),fraction(u+2,d)],`Divide numerator and denominator by their highest common factor, ${gcd(u*k,d*k)}. The simplest form is ${fraction(u,d)}.`);break;}
  case 11:{const d=pick([4,5,8,10,20,25]),u=rnd(1,d-1);num(`Write ${u}/${d} as a decimal.`,u/d,`${u} ÷ ${d} = ${decimal(u/d)}.`,[u/d*10,u/d/10,(u+1)/d]);break;}
  case 12:{const d=pick([4,5,8,10,20,25]),u=rnd(1,d-1);num(`What percentage is equivalent to ${u}/${d}?`,100*u/d,`${u}/${d} = ${decimal(u/d)}. Multiply by 100 to get ${decimal(100*u/d)}%.`,[u/d,u*10,100*(u+1)/d]);break;}
- case 13:{const d=pick([2,4,5]),u=rnd(d+1,d*4-1);num(`A point is ${u} steps of 1/${d} right of zero. What is its decimal value?`,u/d,`${u} equal steps of 1/${d} give ${u}/${d} = ${decimal(u/d)}.`,[u*d,u/d+1,u/d-1]);break;}
- case 14:{const d=pick([2,4,5]),u=rnd(1,d*3);num(`A point is ${u} steps of 1/${d} left of zero. What is its decimal value?`,-u/d,`Left of zero is negative. The point is −${u}/${d} = ${decimal(-u/d)}.`,[u/d,-u*d,-u/d-1]);break;}
- case 15:{const x=-a/4,y=-(a+1)/4,z=b/4;choose('Which list is in ascending order?',[decimal(y),decimal(x),decimal(z)].join(', '),[[decimal(x),decimal(y),decimal(z)],[decimal(z),decimal(x),decimal(y)],[decimal(y),decimal(z),decimal(x)]].map(v=>v.join(', ')),`Ascending means smallest to largest. ${decimal(y)} is furthest left, then ${decimal(x)}, then ${decimal(z)}.`);break;}
+ case 13:{const d=pick([2,4,5]),u=rnd(d+1,d*4-1);line(0,Math.ceil(u/d)+1,d,[['P',u/d]],`P is ${u} small intervals right of zero.`);num(`A point is ${u} steps of 1/${d} right of zero. What is its decimal value?`,u/d,`${u} equal steps of 1/${d} give ${u}/${d} = ${decimal(u/d)}.`,[u*d,u/d+1,u/d-1]);break;}
+ case 14:{const d=pick([2,4,5]),u=rnd(1,d*3);line(Math.floor(-u/d)-1,1,d,[['P',-u/d]],`P is ${u} small intervals left of zero.`);num(`A point is ${u} steps of 1/${d} left of zero. What is its decimal value?`,-u/d,`Left of zero is negative. The point is −${u}/${d} = ${decimal(-u/d)}.`,[u/d,-u*d,-u/d-1]);break;}
+ case 15:{const x=-a/4,y=-(a+1)/4,z=b/4;line(Math.floor(y)-1,Math.ceil(z)+1,4,[['P',y],['Q',x],['R',z]],`P is ${a+1} quarter-unit intervals left of zero. Q is ${a} quarter-unit intervals left of zero. R is ${b} quarter-unit intervals right of zero.`);choose('Which list is in ascending order?',[decimal(y),decimal(x),decimal(z)].join(', '),[[decimal(x),decimal(y),decimal(z)],[decimal(z),decimal(x),decimal(y)],[decimal(y),decimal(z),decimal(x)]].map(v=>v.join(', ')),`Ascending means smallest to largest. ${decimal(y)} is furthest left, then ${decimal(x)}, then ${decimal(z)}.`);break;}
  case 16:{const t=rnd(1201,9989),places=pick([1,2]),v=t/1000,unit=10**places,res=Math.floor((t+10**(3-places)/2)/10**(3-places))/unit;num(`Round ${v.toFixed(3)} to ${places} decimal ${places===1?'place':'places'}.`,res,`Look at the digit after the ${places===1?'tenths':'hundredths'} place. The rounded value is ${res.toFixed(places)}.`,[Math.floor(v*unit)/unit,res+1/unit,res-1/unit]);answer=res.toFixed(places);wrong=wrong.map(x=>Number(x).toFixed(places));break;}
  case 17:{const capacity=pick([1,2,5]),need=rnd(21,99)/10,ans=Math.ceil(need/capacity);num(`You need ${need} L of paint. Each tin holds ${capacity} L. How many whole tins must you buy?`,ans,`${need} ÷ ${capacity} = ${decimal(need/capacity)}. Round up to ${ans} tins to have enough.`,[Math.floor(need/capacity),ans+1,ans+2]);break;}
  case 18:{const x=rnd(2,8)*10-0.2,y=rnd(2,8)+0.1,X=Math.round(x/10)*10,Y=Math.round(y);num(`Round ${x} to the nearest ten and ${y} to the nearest whole number. Estimate their product.`,X*Y,`${x} rounds to ${X}; ${y} rounds to ${Y}. Estimated product = ${X} × ${Y} = ${X*Y}.`,[X*Y*10,X*Y/10,X+Y]);break;}
@@ -62,24 +66,18 @@ export function number7Question(week:number,lesson:number,seed:number,role='fast
  const options=[answer];for(const w of wrong)if(!options.some(x=>equivalent(x,w)))options.push(w);
  let offset=1;while(options.length<4){const candidate=Number.isFinite(value(answer))?decimal(value(answer)+offset):`None of these ${offset===1?'':`(${offset})`}`;if(!options.some(x=>equivalent(x,candidate)))options.push(candidate);offset++;}
  for(let i=options.length-1;i>0;i--){const j=rnd(0,i);[options[i],options[j]]=[options[j],options[i]];}
- if(role==='reasoning' && [1,2,5,7,11,12,24,26,27].includes(key)){
-   const originalPrompt=prompt;
-   const correctModel=explanation.split('. ')[0].replace(/\.$/,'');
-   const bad=options.filter(x=>x!==answer).slice(0,3);
-   return {kind:'multiple_choice',prompt:`${originalPrompt} Which statement is correct?`,answer:correctModel,options:[correctModel,...bad.map(x=>`The answer is ${x}.`)].sort((x,y)=>((x.length+seed)%7)-((y.length+seed)%7)),explanation,helper:'Choose the statement that matches the calculation.',skill:guide.code,seed,lessonId:`y7-w${week}-l${lesson}`,version:1};
- }
- return {kind:'multiple_choice',prompt,answer,options:options.slice(0,4),explanation,helper:'Choose one answer. Use the skill guide if you need help.',skill:guide.code,seed,lessonId:`y7-w${week}-l${lesson}`,version:1,expectedValue};
+ return {kind:'multiple_choice',prompt,answer,options:options.slice(0,4),explanation,helper:'Choose one answer. Use the skill guide if you need help.',skill:guide.code,seed,lessonId:`y7-w${week}-l${lesson}`,version:2,tier:'fast_thinking',visual,diagramSpeech,expectedValue};
 }
 export function generateNumber7Question(_level:unknown,lesson:Lesson,activity:LessonActivity):Number7Question {
  if(!/^y7-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw new Error('Unsupported Level 7 lesson');
  return number7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),String(activity.config.rotationRole));
 }
 export function number7Quiz(week:number) {
- if(!Number.isInteger(week)||week<1||week>12)throw new Error('Unknown Level 7 quiz');
+ if(!Number.isInteger(week)||week<1||week>11)throw new Error('Unknown Level 7 quiz');
  return [1,2,3].flatMap(lesson=>{
   const questions:Array<Number7Question & {lessonTag:1|2|3;id:string}>=[],seen=new Set<string>();
   for(let i=0;questions.length<5&&i<300;i++){
-   const q=number7Question(week,lesson,700001+week*10007+lesson*101+i*7919,questions.length===4?'apply_create':'fast_thinking');
+   const q=number7Question(week,lesson,700001+week*10007+lesson*101+i*7919,(['fast_thinking','reasoning','apply_create','fast_thinking','apply_create'] as const)[questions.length]);
    const fingerprint=q.prompt+q.options.slice().sort().join("|");if(seen.has(fingerprint))continue;seen.add(fingerprint);
    questions.push({...q,lessonTag:lesson as 1|2|3,id:`y7-w${week}-quiz-l${lesson}-${questions.length+1}`});
   }

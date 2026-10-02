@@ -259,7 +259,7 @@ function LessonPage() {
   const number7QuestionCompatible=useMemo(()=>isNumber7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;kind?:string};
-    return q.lessonId===effectiveLessonId&&q.version===1&&q.kind==='multiple_choice';
+    return q.lessonId===effectiveLessonId&&q.version===2&&q.kind==='multiple_choice';
   }:undefined,[effectiveLessonId,isNumber7]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = isMeasurement ? "measurement" : "number";
