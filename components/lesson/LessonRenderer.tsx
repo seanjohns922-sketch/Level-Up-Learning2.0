@@ -61,6 +61,7 @@ import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 
 type LessonRendererProps = {
   initialResponse?: string;
+  answerLocked?: boolean;
   activity: LessonActivity;
   prompt: string;
   questionData: Year2QuestionData;
@@ -262,6 +263,7 @@ function renderNestedActivity({
 
 function LessonRendererInner({
   initialResponse,
+  answerLocked,
   activity,
   prompt,
   questionData,
@@ -616,6 +618,7 @@ function LessonRendererInner({
       return (
         <MultipleChoiceActivity
           initialResponse={initialResponse}
+          answerLocked={answerLocked}
           questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
           onCorrect={onCorrect}
           onWrong={onWrong}
@@ -630,6 +633,7 @@ function LessonRendererInner({
         return (
           <MultipleChoiceActivity
           initialResponse={initialResponse}
+          answerLocked={answerLocked}
             questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
             onCorrect={onCorrect}
             onWrong={onWrong}

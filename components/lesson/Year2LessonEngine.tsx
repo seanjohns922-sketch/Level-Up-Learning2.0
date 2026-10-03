@@ -1315,6 +1315,7 @@ export function Year2LessonEngine({
 
   // Prefer the actual question kind so a slot seeded as multiple choice that
   // renders a typed "?" input is labelled correctly (and vice versa).
+  const isConstructedAnswer=currentQuestion?.kind==='multiple_choice'&&!!level7Answer(currentQuestion);
   const activityLabel = (() => {
     if(currentQuestion?.kind==='multiple_choice'&&level7Answer(currentQuestion))return "YOUR ANSWER";
     const kind = currentQuestion?.kind;
@@ -1790,12 +1791,13 @@ export function Year2LessonEngine({
                 </div>
 
                 <fieldset
-                  disabled={taskLocked}
-                  className={taskLocked ? "pointer-events-none min-w-0 border-0 p-0" : "min-w-0 border-0 p-0"}
-                  aria-disabled={taskLocked}
+                  disabled={taskLocked&&!isConstructedAnswer}
+                  className={taskLocked&&!isConstructedAnswer ? "pointer-events-none min-w-0 border-0 p-0" : "min-w-0 border-0 p-0"}
+                  aria-disabled={taskLocked&&!isConstructedAnswer}
                 >
                   <LessonRenderer
                     key={questionKey}
+                    answerLocked={taskLocked}
                     activity={currentActivity}
                     prompt={lesson.title}
                     questionData={currentQuestion}

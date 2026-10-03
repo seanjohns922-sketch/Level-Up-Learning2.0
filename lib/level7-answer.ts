@@ -77,3 +77,20 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  }
  return a.toLowerCase().replace(/[ .-]/g,'')===b.toLowerCase().replace(/[ .-]/g,'');
 }
+
+export type SimplificationTip = {original:string;simplified:string;divisor:number;instruction:string;required:boolean};
+/** Offer a hint only when the value is right and a common whole-number factor exists. */
+export function level7SimplificationTip(spec:Level7Answer,response:string):SimplificationTip|null{
+ const original=clean(stripAnswerUnit(spec,response));
+ const ratio=spec.kind==='ratio';
+ if(!ratio&&spec.kind!=='fraction'&&spec.kind!=='number')return null;
+ const parts=original.match(ratio?/^(\d+)\s*:\s*(\d+)$/:/^(-?\d+)\s*\/\s*(\d+)$/);
+ if(!parts)return null;
+ const n=Number(parts[1]),d=Number(parts[2]);
+ if(!Number.isSafeInteger(n)||!Number.isSafeInteger(d)||d<=0)return null;
+ let x=Math.abs(n),y=d;while(y){[x,y]=[y,x%y];}if(x<=1)return null;
+ const required=spec.format==='simplest';
+ if(!markLevel7Answer(required?{...spec,format:undefined}:spec,response))return null;
+ const top=n/x,bottom=d/x,simplified=ratio?`${top}:${bottom}`:bottom===1?String(top):`${top}/${bottom}`;
+ return {original,simplified,divisor:x,required,instruction:ratio?`Divide both amounts by ${x}: ${n} ÷ ${x} = ${top} and ${d} ÷ ${x} = ${bottom}.`:`Divide the top and bottom by ${x}: ${n} ÷ ${x} = ${top} and ${d} ÷ ${x} = ${bottom}.`};
+}

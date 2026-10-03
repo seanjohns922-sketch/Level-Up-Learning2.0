@@ -152,6 +152,7 @@ export default function MultipleChoiceActivity({
   realmId,
   assessmentMode = false,
   initialResponse,
+  answerLocked=false,
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: (response?: string) => void;
@@ -160,6 +161,7 @@ export default function MultipleChoiceActivity({
   realmId?: string;
   assessmentMode?: boolean;
   initialResponse?: string;
+  answerLocked?: boolean;
 }) {
   const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
   const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space|pattern|statistics|chance)-/.test(String(questionData.lessonId))));
@@ -456,7 +458,7 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={renderMode==='lesson'&&submitted} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
+      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)
