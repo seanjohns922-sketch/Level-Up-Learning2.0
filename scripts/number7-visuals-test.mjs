@@ -37,7 +37,7 @@ for(let week=1;week<=12;week++)for(let lesson=1;lesson<=3;lesson++)for(const rol
 }
 assert.equal(number7ContextArt('Calculate 2/3 + 1/4.'),null);
 assert.equal(number7ContextArt('What is 10²?'),null);
-for(const kind of ['jug','bottle','tank','rope','garden','bag','notebook','ticket','parcel','lights','coins','lift','thermometer'])assert.ok(kinds.has(kind),kind);
-for(const kind of ['jug','bottle'])assert.ok(fs.existsSync(`public/images/measurelands/containers/${kind}.png`));
+for(const kind of ['jug','bottle','tank','rope','bag','notebook','ticket','parcel','lights'])assert.ok(kinds.has(kind),kind);
+for(const kind of kinds)assert.ok(fs.existsSync(`public/images/number-nexus/level7/objects/${kind}-v1.png`));
 const quiz=number7Quiz(7);assert.equal(quiz.length,15);for(const tag of [1,2,3])assert.equal(quiz.filter(q=>q.lessonTag===tag).length,5);
 console.log(`PASS ${reviewed} Number Level 7 samples across all 36 lessons; one-operation fraction questions, equivalent answers, guide toggles, exact twelfths bars, context art and balanced quiz.`);

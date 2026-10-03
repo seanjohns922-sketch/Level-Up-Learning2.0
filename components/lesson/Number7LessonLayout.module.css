@@ -127,3 +127,10 @@
 .active [data-core-number-line] > div:last-child > div:last-child > div { height: 140px; }
 .active [data-core-number-line] figure { margin-block: 8px; padding: 12px; }
 .active [data-core-number-line] svg { max-height: 180px; }
+
+@media (max-width: 639px) {
+  .active [data-number7-question-heading] { flex-wrap: wrap; }
+  .active [data-number7-question-heading] h2 { flex-basis: calc(100% - 60px); }
+  .active [data-number7-question-heading] [data-number7-context-art] { order: 3; width: 100%; height: 100px; }
+  .active [data-number7-question-heading] [data-number7-context-art] img { width: 100px; }
+}
