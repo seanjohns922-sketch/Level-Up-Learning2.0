@@ -67,7 +67,7 @@ export function number7Question(week:number,lesson:number,seed:number,role='fast
  const options=[answer];for(const w of wrong)if(!options.some(x=>equivalent(x,w)))options.push(w);
  let offset=1;while(options.length<4){const candidate=Number.isFinite(value(answer))?decimal(value(answer)+offset):`None of these ${offset===1?'':`(${offset})`}`;if(!options.some(x=>equivalent(x,candidate)))options.push(candidate);offset++;}
  for(let i=options.length-1;i>0;i--){const j=rnd(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {readabilityRevision:key===16||key===17?2:(key===13||key===14)?3:1,kind:'multiple_choice',prompt,answer,options:options.slice(0,4),explanation,helper:'Choose one answer. Use the skill guide if you need help.',skill:guide.code,seed,lessonId:`y7-w${week}-l${lesson}`,version:2,tier:'fast_thinking',visual,paintContext,diagramSpeech,expectedValue};
+ return {readabilityRevision:key===19?2:key===16||key===17?2:(key===13||key===14)?3:1,kind:'multiple_choice',prompt,answer,options:options.slice(0,4),explanation,helper:'Choose one answer. Use the skill guide if you need help.',skill:guide.code,seed,lessonId:`y7-w${week}-l${lesson}`,version:2,tier:'fast_thinking',visual,paintContext,diagramSpeech,expectedValue};
 }
 export function generateNumber7Question(_level:unknown,lesson:Lesson,activity:LessonActivity):Number7Question {
  if(!/^y7-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw new Error('Unsupported Level 7 lesson');

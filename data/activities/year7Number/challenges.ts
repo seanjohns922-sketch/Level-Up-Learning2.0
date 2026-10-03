@@ -165,8 +165,8 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     }
     case 19: {
       const d=a+1,e=d+1,u=d-1,v=1;
-      model(`Which calculation correctly represents ${u}/${d} − ${v}/${e}?`, [`(${u*e} − ${v*d}) ÷ ${d*e}`,u/d-v/e], [[`(${u} − ${v}) ÷ (${d} + ${e})`,(u-v)/(d+e)],[`(${u} + ${v}) ÷ (${d} × ${e})`,(u+v)/(d*e)],[`(${u*e} + ${v*d}) ÷ ${d*e}`,u/d+v/e],[`${u}/${d} × ${v}/${e}`,u*v/(d*e)]],
-        `Use common denominator ${d*e}: ${u}/${d} = ${u*e}/${d*e} and ${v}/${e} = ${v*d}/${d*e}. Subtract numerators to get ${frac(u*e-v*d,d*e)}.`); break;
+      choice(`Calculate ${u}/${d} − ${v}/${e}. Give a fraction.`,frac(u*e-v*d,d*e),[frac(u*e+v*d,d*e),frac(u-v,d+e),frac(u*e-v*d+1,d*e)],
+        `Match denominators: ${u}/${d} = ${u*e}/${d*e}; ${v}/${e} = ${v*d}/${d*e}. Subtract to get ${frac(u*e-v*d,d*e)}.`); break;
     }
     case 20: {
       const d=a+1,e=b+2;
@@ -284,7 +284,9 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`Fabric: ${count} m at $${unit.toFixed(3)} per metre. Find the total cost, rounded to cents.`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
     case 17: { const need=n+.4,price=a*5; paintContext={need,capacity:3,price}; numeric(`What is the cheapest total cost in dollars?`,Math.ceil(need/3)*price,[Math.floor(need/3)*price,need/3*price,Math.ceil(need)*price],`At least ${Math.ceil(need/3)} whole tins are needed. Multiply by $${price}: $${Math.ceil(need/3)*price}.`); break; }
     case 18: { const price=n*10-.2,qty=b+1,delivery=c*10; numeric(`Estimate the cost of ${qty} items at $${price.toFixed(2)} each plus $${delivery} delivery. Round the item price to the nearest ten before calculating. What is the estimate in dollars?`,qty*n*10+delivery,[qty*(n*10+delivery),qty*n+delivery,qty*n*10-delivery],`Use $${n*10} per item: ${qty} × ${n*10} + ${delivery} = $${qty*n*10+delivery}. Add delivery once.`); break; }
-    case 19: { const whole=n,d=pick([3,4,6]),e=d+1; const remaining=whole-1/d-2/e; numeric(`A container starts with ${whole} L. You use 1/${d} L, then 2/${e} L. How many litres remain? Give a decimal rounded to 3 decimal places.`,Math.round(remaining*1000)/1000,[whole-3/(d+e),whole+1/d+2/e,whole-1/d+2/e],`Use common denominator ${d*e}: used = ${e+2*d}/${d*e} L. Remaining = ${frac(whole*d*e-e-2*d,d*e)} L, or ${remaining.toFixed(3)} L to 3 decimal places.`); break; }
+    case 19: { const d=pick([3,4,6]),e=d+1,sub=seed%2===0,u=sub?d-1:1,v=1,top=sub?u*e-v*d:u*e+v*d;
+      choice(`A jug holds ${u}/${d} L. ${sub?'Use':'Add'} ${v}/${e} L. How many litres ${sub?'remain':'are there now'}? Give a fraction.`,frac(top,d*e),[frac(top+1,d*e),frac(top-1,d*e),frac(top+d,d*e)],
+        `Match denominators: ${u}/${d} = ${u*e}/${d*e}; ${v}/${e} = ${v*d}/${d*e}. ${sub?'Subtract':'Add'} the numerators: ${frac(top,d*e)} L.`); break; }
     case 20: { const total=n*12; numeric(`A tank holds ${total} L. First 3/4 of the water is set aside. Then 2/3 of that amount is used. How many litres are used?`,total*.75*2/3,[total*(.75+2/3),total*.75,total*2/3],`A fraction of a fraction means multiply: ${total} × 3/4 × 2/3 = ${total}/2 = ${total/2} L.`); break; }
     case 21: { const stock=n/2,portion=3/4; numeric(`You have ${n}/2 L of juice. Each bottle holds 3/4 L. What is the greatest number of completely full bottles you can fill?`,Math.floor(stock/portion),[Math.ceil(stock/portion),stock*portion,stock/portion+1,Math.floor(stock/portion)+2],`Divide by the bottle capacity: ${n}/2 ÷ 3/4 = ${2*n}/3. Only whole complete bottles count, so round down to ${Math.floor(2*n/3)}.`); break; }
     case 22: { const cash=n*5,one=a+.75,two=b+.85,three=c+.65; numeric(`You pay with $${cash} for items costing $${one.toFixed(2)}, $${two.toFixed(2)} and $${three.toFixed(2)}. What is your change in dollars?`,cash-one-two-three,[cash-one-two+three,cash+one+two+three,one+two+three],`Total = $${(one+two+three).toFixed(2)}. Change = $${cash} − $${(one+two+three).toFixed(2)} = $${(cash-one-two-three).toFixed(2)}.`); break; }
@@ -306,7 +308,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   if (!task) throw Error(`Missing Level 7 challenge ${key}/${role}`);
   for (let i=task.options.length-1;i>0;i--) { const j=int(0,i); [task.options[i],task.options[j]]=[task.options[j],task.options[i]]; }
   return {
-    ...task, visual, paintContext, diagramSpeech, readabilityRevision: key===16||key===17?2:(key===13||key===14)?3:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
+    ...task, visual, paintContext, diagramSpeech, readabilityRevision: key===19?2:key===16||key===17?2:(key===13||key===14)?3:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
     lessonId: `y7-w${week}-l${lesson}`, version: 2 as const, tier: role,
     helper: 'Choose one answer.',
   } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string;diagramSpeech?:string};

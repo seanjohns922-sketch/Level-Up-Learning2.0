@@ -30,7 +30,7 @@ export function validChallenge(key,q,option) {
       case 16: {const thousandths=Number(p.match(/\$(\d+\.\d{3})/)[1].replace('.',''));answer=Math.floor((thousandths*v[0]+5)/10)/100;break;}
       case 17: answer=Math.ceil(q.paintContext.need/q.paintContext.capacity)*q.paintContext.price;break;
       case 18: answer=v[0]*Math.round(v[1]/10)*10+v[2];break;
-      case 19: answer=Math.round((v[0]-v[1]/v[2]-v[3]/v[4])*1000)/1000;break;
+      case 19: answer=v[0]/v[1]+(p.includes('Use')?-1:1)*v[2]/v[3];break;
       case 20: answer=v[0]*v[1]/v[2]*v[3]/v[4];break;
       case 21: answer=Math.floor(v[0]/v[1]/(v[2]/v[3]));break;
       case 22: answer=v[0]-v[1]-v[2]-v[3];break;

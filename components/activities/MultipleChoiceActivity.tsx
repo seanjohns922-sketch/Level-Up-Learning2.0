@@ -1,5 +1,6 @@
 "use client";
 
+import Number7ContextArt from './Number7ContextArt';
 import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
 import {level7Answer} from '@/lib/level7-answer';
@@ -343,6 +344,7 @@ export default function MultipleChoiceActivity({
       {questionData.visual?.type === "decimal_shift" ? (
         <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
+      {isNumber7Question && !questionData.visual && !questionData.paintContext && <Number7ContextArt prompt={questionData.prompt}/>}
       {questionData.paintContext && <PaintTinsVisual {...questionData.paintContext} />}
       {questionData.visual?.type === "fraction_number_line" ? (
         <div data-core-number-line={isCoreHunt || undefined}>
