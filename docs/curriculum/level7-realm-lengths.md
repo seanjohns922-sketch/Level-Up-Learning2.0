@@ -80,3 +80,27 @@ practice; shared cave quiz draft keys also advance. Scope exports are regenerate
 The readability audit checks 11,520 generated samples against 50-word prompt and
 25-word choice ceilings, alongside independent mathematical regression checks.
 These ceilings are regression guards, not a substitute for student feedback.
+
+## Constructed responses — 4 October 2026
+
+Level 7 practice and weekly quizzes share `lib/level7-answer.ts` and
+`Level7AnswerInput`. Recognised numeric and symbolic questions use number inputs,
+stacked numerator/denominator boxes, paired ratio fields, labelled coordinate
+fields, ordered-value fields, sample-space entry or algebraic expression entry.
+Short shape names can be recalled. Longer reasoning, prime factorisation and
+expanded-form selection retain choices; input coverage varies by strand rather
+than forcing sentence transcription. This conversion does not yet establish an
+80–90% constructed-response rate in every realm.
+
+Equivalent fractions and ratios are accepted unless the requested form rules them
+out. Decimal-only and simplest-form prompts enforce their format. Coordinate and
+list order matters; sample-space order does not. Empty fields and invalid fraction
+denominators are validated before scoring. Changing a checked quiz answer clears
+its score until it is checked again. Quiz reviews retain the actual entered text,
+and correct lesson live events now retain the selected answer as well.
+
+Tests: `level7-answer-test.mjs` checks generated answer contracts in all realms;
+`level7-answer-input-test.mjs` exercises field entry, validation, editing and the
+actual quiz report builder. TypeScript and the full prebuild checks pass. A full
+browser walkthrough and actual student-session teacher-dashboard check are not
+claimed. Public Level 7 access remains gated; this remains a demo release.

@@ -1,4 +1,5 @@
 "use client";
+import {level7Answer} from '@/lib/level7-answer';
 
 import { number7Guide } from "@/data/activities/year7Number/curriculum";
 import {Cave7SkillGuideDialog} from "./cave7/Cave7SkillGuide";
@@ -337,6 +338,7 @@ function formatLessonTopicLabel(mode: string) {
 }
 
 function getQuestionCorrectAnswer(question: Year2QuestionData | null) {
+  if(question?.kind==='multiple_choice'){const spec=level7Answer(question);if(spec)return spec.expected;}
   if (!question) return null;
   if ("correctAnswers" in question && Array.isArray(question.correctAnswers)) {
     return question.correctAnswers.join(", ");
@@ -453,6 +455,7 @@ function getQuestionExplanation(question: Year2QuestionData | null, correctAnswe
 }
 
 function getQuestionOptions(question: Year2QuestionData | null) {
+  if(question?.kind==='multiple_choice'&&level7Answer(question))return undefined;
   if (!question || !("options" in question) || !Array.isArray(question.options)) return [];
   return question.options
     .map((option) => String(option ?? "").trim())
@@ -1164,7 +1167,7 @@ export function Year2LessonEngine({
     };
   }, [currentActivity, currentActivityIndex, currentQuestion, currentQuestionSequence, liveContext]);
 
-  function handleCorrect() {
+  function handleCorrect(studentAnswer?: string) {
     if (finished || turnState !== "answering" || scoredThisTurnRef.current) return;
     scoredThisTurnRef.current = true;
     feedbackLockRef.current = "correct";
@@ -1194,9 +1197,10 @@ export function Year2LessonEngine({
         activityLabel: formatLessonTopicLabel(mode),
         questionId: `${liveContext.lessonId}-q${currentQuestionSequence}`,
         questionText: currentQuestion?.prompt,
-        questionType: currentQuestion?.kind,
+        questionType: currentQuestion?.kind==='multiple_choice'&&level7Answer(currentQuestion)?'typed_response':currentQuestion?.kind,
         questionOptions: getQuestionOptions(currentQuestion),
         correctAnswer: getQuestionCorrectAnswer(currentQuestion),
+        selectedAnswer: studentAnswer,
         isCorrect: true,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
         attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
@@ -1266,7 +1270,7 @@ export function Year2LessonEngine({
         activityLabel: formatLessonTopicLabel(mode),
         questionId: `${liveContext.lessonId}-q${currentQuestionSequence}`,
         questionText: currentQuestion?.prompt,
-        questionType: currentQuestion?.kind,
+        questionType: currentQuestion?.kind==='multiple_choice'&&level7Answer(currentQuestion)?'typed_response':currentQuestion?.kind,
         questionOptions: getQuestionOptions(currentQuestion),
         selectedAnswer: submittedAnswer,
         correctAnswer: getQuestionCorrectAnswer(currentQuestion),
@@ -1312,6 +1316,7 @@ export function Year2LessonEngine({
   // Prefer the actual question kind so a slot seeded as multiple choice that
   // renders a typed "?" input is labelled correctly (and vice versa).
   const activityLabel = (() => {
+    if(currentQuestion?.kind==='multiple_choice'&&level7Answer(currentQuestion))return "YOUR ANSWER";
     const kind = currentQuestion?.kind;
     if (kind === "multiple_choice" || kind === "typed_response") {
       return kind.replace(/_/g, " ").toUpperCase();

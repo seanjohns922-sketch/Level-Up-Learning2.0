@@ -1,5 +1,7 @@
 "use client";
 
+import Level7AnswerInput from './Level7AnswerInput';
+import {level7Answer} from '@/lib/level7-answer';
 import { useEffect, useState } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import Cave7Visual from "@/components/lesson/cave7/Cave7Visual";
@@ -149,6 +151,7 @@ export default function MultipleChoiceActivity({
   renderMode = "lesson",
   realmId,
   assessmentMode = false,
+  initialResponse,
 }: {
   questionData: MultipleChoiceQuestion;
   onCorrect?: (response?: string) => void;
@@ -156,15 +159,17 @@ export default function MultipleChoiceActivity({
   renderMode?: "lesson" | "quiz";
   realmId?: string;
   assessmentMode?: boolean;
+  initialResponse?: string;
 }) {
   const isNumber7Question = "lessonId" in questionData && typeof questionData.lessonId === "string" && /^y7-w\d+-l[1-3]$/.test(questionData.lessonId);
   const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space|pattern|statistics|chance)-/.test(String(questionData.lessonId))));
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const isSpace = realmId === "space";
-  const questionReadAloudText = isPattern
+  const answerSpec=level7Answer(questionData as MultipleChoiceQuestion & {lessonId?:string});
+  const questionReadAloudText = answerSpec?.prompt ?? (isPattern
     ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
-    : questionData.prompt;
+    : questionData.prompt);
   const theme = getRealmTheme(realmId);
   const isNewCaveQuestion = "lessonId" in questionData && /^y7-(pattern|statistics|chance)-/.test(String(questionData.lessonId));
   const [picked, setPicked] = useState<string | null>(null);
@@ -173,6 +178,7 @@ export default function MultipleChoiceActivity({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<"correct" | "partial" | "wrong" | null>(null);
 
+  const constructed=level7Answer(questionData as MultipleChoiceQuestion & {lessonId?:string});
   const isMultiSelect =
     Array.isArray(questionData.correctAnswers) && questionData.correctAnswers.length > 0;
   const longestOptionLength = questionData.options.reduce(
@@ -302,17 +308,17 @@ export default function MultipleChoiceActivity({
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: theme.ctaTo, boxShadow: `0 0 6px ${theme.ctaFrom}` }}
         />
-        {isCoreHunt ? "Core challenge" : "Multiple Choice"}
+        {isCoreHunt ? "Core challenge" : constructed ? "Your answer" : "Multiple Choice"}
       </div>
       <div className="flex items-start gap-2.5 mt-2">
         <h2 className="text-[1.65rem] md:text-[1.85rem] font-bold text-slate-900 leading-[1.15] tracking-[-0.02em]">
-          <MathFormattedText text={questionData.prompt} />
+          <MathFormattedText text={answerSpec?.prompt??questionData.prompt} />
         </h2>
         <div className="mt-1.5">
           <ReadAloudBtn text={questionReadAloudText} label={isPattern ? "Read all" : undefined} />
         </div>
       </div>
-      {renderMode === "lesson" && questionData.helper ? (
+      {renderMode === "lesson" && questionData.helper && !constructed ? (
         <p className="mt-2 text-[15px] text-slate-500 leading-relaxed">
           <MathFormattedText text={questionData.helper} />
         </p>
@@ -450,7 +456,7 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      <div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
+      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={renderMode==='lesson'&&submitted} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)
@@ -519,7 +525,7 @@ export default function MultipleChoiceActivity({
             </button>
           );
         })}
-      </div>
+      </div>}
       {isMultiSelect ? (
         <div className="mt-5">
           <button

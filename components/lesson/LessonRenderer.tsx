@@ -60,10 +60,11 @@ import { canRenderByGeneratedKind, isLessonQuestionSafe } from "@/lib/task-safet
 import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 
 type LessonRendererProps = {
+  initialResponse?: string;
   activity: LessonActivity;
   prompt: string;
   questionData: Year2QuestionData;
-  onCorrect?: () => void;
+  onCorrect?: (response?: string) => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
   realmId?: string;
@@ -243,7 +244,7 @@ function renderNestedActivity({
   activityType: LessonActivity["activityType"];
   questionData: Year2QuestionData;
   prompt: string;
-  onCorrect?: () => void;
+  onCorrect?: (response?: string) => void;
   onWrong?: (studentAnswer?: string) => void;
   renderMode?: "lesson" | "quiz";
 }) {
@@ -260,6 +261,7 @@ function renderNestedActivity({
 }
 
 function LessonRendererInner({
+  initialResponse,
   activity,
   prompt,
   questionData,
@@ -613,6 +615,7 @@ function LessonRendererInner({
       }
       return (
         <MultipleChoiceActivity
+          initialResponse={initialResponse}
           questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
           onCorrect={onCorrect}
           onWrong={onWrong}
@@ -626,6 +629,7 @@ function LessonRendererInner({
       if (canRenderByGeneratedKind(activity) && safeQuestion.kind === "multiple_choice") {
         return (
           <MultipleChoiceActivity
+          initialResponse={initialResponse}
             questionData={toSafeMultipleChoiceQuestion(activity, safeQuestion, prompt)}
             onCorrect={onCorrect}
             onWrong={onWrong}

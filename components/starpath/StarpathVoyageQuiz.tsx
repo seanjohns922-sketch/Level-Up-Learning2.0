@@ -151,7 +151,7 @@ export default function StarpathVoyageQuiz({
   const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `${realm}-weekly-quiz:${cave7?"v4":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:${cave7?"v5":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
@@ -263,6 +263,7 @@ export default function StarpathVoyageQuiz({
 
   function answer(ok: boolean, response?: string) {
     if (!task || (!answersAreEditable && currentAnswer !== undefined)) return;
+    if(response===""){changeAnswer();return;}
     setAnswers((current) => ({ ...current, [String(index)]: ok }));
     if (response) {
       setResponses((current) => ({ ...current, [String(index)]: response }));

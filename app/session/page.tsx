@@ -6250,7 +6250,7 @@ function isQuizQuestionCorrect(
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
-  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean; response?: string }>
 ) {
   if (q.kind === "lessonActivity" || q.kind === "practiceTask") {
     return quizLessonActivityResults[q.id]?.correct === true;
@@ -6297,7 +6297,7 @@ function buildLessonBreakdown(
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
-  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean; response?: string }>,
   questionsPerLesson: number,
   lessonTitleLookup?: Record<number, string>
 ): LessonBreakdown[] {
@@ -6349,7 +6349,7 @@ function buildQuizQuestionResults(
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
-  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean; response?: string }>
 ): TeacherAttemptQuestion[] {
   return questions.map((q) => {
     let selectedAnswer: string | null = null;
@@ -6388,8 +6388,8 @@ function buildQuizQuestionResults(
       correctAnswer = q.moneyEnough?.answer ?? "correct";
     } else if (q.kind === "lessonActivity" || q.kind === "practiceTask") {
       const result = quizLessonActivityResults[q.id];
-      selectedAnswer = result?.attempted ? (result.correct ? "correct" : "incorrect") : null;
-      correctAnswer = "correct";
+      selectedAnswer = result?.attempted ? (result.response ?? (result.correct ? "correct" : "incorrect")) : null;
+      correctAnswer = q.questionData && "answer" in q.questionData ? String(q.questionData.answer) : "correct";
     }
 
     const correct = isQuizQuestionCorrect(
@@ -6431,7 +6431,7 @@ function buildQuizMistakeReviewItems(
   quizChartDone: Record<string, boolean>,
   quizMabAnswers: Record<string, { tens: number; ones: number; touched: boolean }>,
   quizMoneyAnswers: Record<string, { attempted: boolean; correct: boolean }>,
-  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean }>,
+  quizLessonActivityResults: Record<string, { attempted: boolean; correct: boolean; response?: string }>,
   weekNumber: number,
   lessonTitleLookup?: Record<number, string>
 ): MistakeReviewItem[] {
@@ -8233,7 +8233,7 @@ function SessionPage({
   const buildQuizQuestions = useCallback(() => {
     const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
-    if(year==='Year 7')return (isMeasurementRealm?measurement7Quiz(Number(week)):number7Quiz(Number(week))).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:q.lessonId,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...((q.visual||q.measurementVisual)?{kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q}:{kind:'mcq' as const,options:q.options,correctIndex:q.options.indexOf(q.answer)})}));
+    if(year==='Year 7')return (isMeasurementRealm?measurement7Quiz(Number(week)):number7Quiz(Number(week))).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:q.lessonId,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...({kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q})}));
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
       return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
@@ -8714,7 +8714,7 @@ function SessionPage({
     Record<string, { attempted: boolean; correct: boolean }>
   >({});
   const [quizLessonActivityResults, setQuizLessonActivityResults] = useState<
-    Record<string, { attempted: boolean; correct: boolean }>
+    Record<string, { attempted: boolean; correct: boolean; response?: string }>
   >({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const quizSavingRef = useRef(false);
@@ -9782,24 +9782,26 @@ function SessionPage({
                   {currentQuiz?.kind === "lessonActivity" && currentQuiz.activity && currentQuiz.questionData ? (
                     <div>
                       <LessonRenderer
+                        key={currentQuiz.id}
+                        initialResponse={quizLessonActivityResults[currentQuiz.id]?.response}
                         activity={currentQuiz.activity}
                         realmId={quizRealmId}
                         prompt={currentQuiz.prompt}
                         questionData={currentQuiz.questionData}
                         renderMode="quiz"
-                        onCorrect={() =>
+                        onCorrect={(response) =>
                           setQuizLessonActivityResults((prev) =>
                             ({
                               ...prev,
-                              [currentQuiz.id]: { attempted: true, correct: true },
+                              [currentQuiz.id]: { attempted: true, correct: true, response },
                             })
                           )
                         }
-                        onWrong={() =>
+                        onWrong={(response) =>
                           setQuizLessonActivityResults((prev) =>
                             ({
                               ...prev,
-                              [currentQuiz.id]: { attempted: true, correct: false },
+                              [currentQuiz.id]: { attempted: response!=="", correct: false, response },
                             })
                           )
                         }
