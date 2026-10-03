@@ -26,7 +26,7 @@ function valid(key,q,option){const p=q.prompt,ns=nums(p);let e;
  case 14:e=q.visual.markers[0].position;break;
  case 15:{const v=option.split(', ').map(Number);return v.every((n,i)=>i===0||v[i-1]<n);}
  case 16:{const raw=p.match(/Round ([0-9.]+)/)[1],places=ns[1];const [whole,dec]=raw.split(".");const kept=Number(whole+dec.slice(0,places));e=(kept+(Number(dec[places])>=5?1:0))/10**places;break;}
- case 17:e=Math.ceil(ns[0]/ns[1]);break;
+ case 17:e=Math.ceil(q.paintContext.need/q.paintContext.capacity);break;
  case 18:e=Math.round(ns[0]/10)*10*Math.round(ns[1]);break;
  case 19:case 20:case 21:case 22:case 23:case 27:e=calc(p.replace('Calculate ','').replace(/\.$/,''));break;
  case 24:e=ns[0]*ns[1]/100;break;

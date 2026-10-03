@@ -28,7 +28,7 @@ export function validChallenge(key,q,option) {
       case 14: answer=q.visual.markers[0].position+(p.includes('right')?1:-1)*v[0]/v[1];break;
       case 15: answer=v[2]-v[0]/v[1];break;
       case 16: {const thousandths=Number(p.match(/\$(\d+\.\d{3})/)[1].replace('.',''));answer=Math.floor((thousandths*v[0]+5)/10)/100;break;}
-      case 17: answer=Math.ceil(v[0]/v[1])*v[2];break;
+      case 17: answer=Math.ceil(q.paintContext.need/q.paintContext.capacity)*q.paintContext.price;break;
       case 18: answer=v[0]*Math.round(v[1]/10)*10+v[2];break;
       case 19: answer=Math.round((v[0]-v[1]/v[2]-v[3]/v[4])*1000)/1000;break;
       case 20: answer=v[0]*v[1]/v[2]*v[3]/v[4];break;
@@ -69,8 +69,8 @@ export function validChallenge(key,q,option) {
     case 13: return eq(calculate(option),q.visual.markers[0].position);
     case 14: return eq(calculate(option),q.visual.markers[0].position);
     case 15: return option.includes(' < ')&&o[0]<o[1]&&option.includes('farther left');
-    case 16: return option.startsWith('Round the original value directly')&&eq(o[0],Math.round(v[0]*10)/10)&&option.includes('hundredths digit');
-    case 17: return o[0]===Math.ceil(v[0]/v[1])&&option.includes('round up.');
+    case 16: return eq(Number(option),Math.round(v[0]*10)/10);
+    case 17: return Number(option)===Math.ceil(q.paintContext.need/q.paintContext.capacity);
     case 18: answer=Math.round(v[0])*Math.round(v[1]);break;
     case 19: answer=v[0]/v[1]-v[2]/v[3];break;
     case 20: return v[2]/v[3]>0&&v[2]/v[3]<1&&option.startsWith('It is smaller because')&&option.includes('positive and less than 1');

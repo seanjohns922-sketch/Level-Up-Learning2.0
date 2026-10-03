@@ -21,6 +21,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   const n = int(5, 16), a = int(3, 8), b = int(2, 6), c = int(2, 5);
   const key = (week - 1) * 3 + lesson;
   let task: Task | undefined;
+  let paintContext: MultipleChoiceQuestion["paintContext"];
   let visual: MultipleChoiceQuestion["visual"], diagramSpeech: string | undefined;
   const numberLine = (u:number,d:number) => {
     const min=Math.min(0,Math.floor(u/d)-1),max=Math.max(1,Math.ceil(u/d)+1);
@@ -147,17 +148,14 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     }
     case 16: {
       const value=n+0.249;
-      choice(`A student rounds ${value.toFixed(3)} to 2 decimal places, then to 1 decimal place. Which method gives the correct answer to 1 decimal place?`,
-        `Round the original value directly to ${fmt(n+.2)}; inspect its hundredths digit.`,
-        [`Round via ${(n+.25).toFixed(2)} to ${fmt(n+.3)}; two rounds always preserve accuracy.`,`Truncate to ${n}; any digits after the decimal point must be removed.`,`Round directly to ${fmt(n+.3)}; inspect only the thousandths digit.`],
-        `The original hundredths digit is 4, so ${value.toFixed(3)} rounds to ${fmt(n+.2)}. Rounding twice can produce a different and incorrect result.`); break;
+      numeric(`Round ${value.toFixed(3)} to 1 decimal place.`,n+.2,[n+.3,n,n+.25],
+        `Check the hundredths digit: 4. Keep the tenths digit unchanged: ${fmt(n+.2)}.`); break;
     }
     case 17: {
       const need=n+.4,capacity=3, tins=Math.ceil(need/capacity);
-      choice(`You need ${need} L of paint sold only in ${capacity} L tins. How many tins should you buy?`,
-        `${tins} tins: round up.`,
-        [`${Math.floor(need/capacity)} tins: round down.`,`${need} tins: use the litre amount.`,`${tins+1} tins: round up, then add one.`],
-        `${need} ÷ ${capacity} = ${fmt(need/capacity)} tins. ${tins-1} tins hold too little; ${tins} tins are the minimum that meet the need.`); break;
+      paintContext={need,capacity};
+      numeric('How many whole tins are needed?',tins,[Math.floor(need/capacity),need,tins+1],
+        `${need} ÷ ${capacity} = ${fmt(need/capacity)}. Round up: ${tins} tins hold enough paint.`); break;
     }
     case 18: {
       const x=n*10-.2,y=b+.1;
@@ -281,10 +279,10 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     case 11: { const length=n+.75,cut=a/4; numeric(`A rope is ${length} m long. A piece of ${a}/4 m is cut off. How many metres remain?`,length-cut,[length+cut,length-a,length-cut/10],`Convert ${a}/4 to ${fmt(cut)} m, then subtract from ${length} m to get ${fmt(length-cut)} m.`); break; }
     case 12: { const percent=pick([25,50,75]),fraction=percent/25; numeric(`A club says ${fraction}/4 of its members attend. What percentage attend?`,percent,[fraction*10,fraction,100-percent+5],`${fraction}/4 = ${percent}/100 = ${percent}%.`); break; }
     case 13: { const d=pick([2,4,5]),u=d+a+(a%d===0?1:0);numberLine(u,d);numeric(`Start at P. Move 1/${d} to the right. What decimal do you reach?`,(u+1)/d,[(u-1)/d,u/d,(u+d)/d],`P is ${fmt(u/d)}. Move one space right: ${fmt(u/d)} + ${fmt(1/d)} = ${fmt((u+1)/d)}.`); break; }
-    case 14: { const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0)),direction=seed%2===0?1:-1;numberLine(u,d);numeric(`Start at P. Move 1/${d} ${direction>0?'right':'left'}. What decimal do you reach?`,(u+direction)/d,[(u-direction)/d,u/d,-(u+direction)/d],`P is ${fmt(u/d)}. Moving ${direction>0?'right adds':'left subtracts'} ${fmt(1/d)}. You reach ${fmt((u+direction)/d)}.`); break; }
+    case 14: { const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0)),direction=seed%2===0?1:-1;numberLine(u,d);numeric(`Move 1/${d} ${direction>0?'right':'left'} from P. Give the new decimal.`,(u+direction)/d,[(u-direction)/d,u/d,-(u+direction)/d],`P is ${fmt(u/d)}. Moving ${direction>0?'right adds':'left subtracts'} ${fmt(1/d)}. You reach ${fmt((u+direction)/d)}.`); break; }
     case 15: { const low=-a/4,high=b/2; numeric(`At dawn it is −${a}/4 °C. At noon it is ${high} °C. By how many degrees has the temperature risen?`,high-low,[high+low,high,Math.abs(low)],`Use comparable decimals: dawn ${fmt(low)} °C. Rise = ${high} − (${fmt(low)}) = ${fmt(high-low)} °C.`); break; }
-    case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`${count} metres of fabric cost $${unit.toFixed(3)} per metre. The shop rounds only the final bill to the nearest cent. What is the bill in dollars?`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
-    case 17: { const need=n+.4,price=a*5; numeric(`A job needs ${need} L of paint. Paint is sold in 3 L tins at $${price} each. What is the minimum purchase cost in dollars?`,Math.ceil(need/3)*price,[Math.floor(need/3)*price,need/3*price,Math.ceil(need)*price],`At least ${Math.ceil(need/3)} whole tins are needed. Multiply by $${price}: $${Math.ceil(need/3)*price}.`); break; }
+    case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`Fabric: ${count} m at $${unit.toFixed(3)} per metre. Find the total cost, rounded to cents.`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
+    case 17: { const need=n+.4,price=a*5; paintContext={need,capacity:3,price}; numeric(`What is the cheapest total cost in dollars?`,Math.ceil(need/3)*price,[Math.floor(need/3)*price,need/3*price,Math.ceil(need)*price],`At least ${Math.ceil(need/3)} whole tins are needed. Multiply by $${price}: $${Math.ceil(need/3)*price}.`); break; }
     case 18: { const price=n*10-.2,qty=b+1,delivery=c*10; numeric(`Estimate the cost of ${qty} items at $${price.toFixed(2)} each plus $${delivery} delivery. Round the item price to the nearest ten before calculating. What is the estimate in dollars?`,qty*n*10+delivery,[qty*(n*10+delivery),qty*n+delivery,qty*n*10-delivery],`Use $${n*10} per item: ${qty} × ${n*10} + ${delivery} = $${qty*n*10+delivery}. Add delivery once.`); break; }
     case 19: { const whole=n,d=pick([3,4,6]),e=d+1; const remaining=whole-1/d-2/e; numeric(`A container starts with ${whole} L. You use 1/${d} L, then 2/${e} L. How many litres remain? Give a decimal rounded to 3 decimal places.`,Math.round(remaining*1000)/1000,[whole-3/(d+e),whole+1/d+2/e,whole-1/d+2/e],`Use common denominator ${d*e}: used = ${e+2*d}/${d*e} L. Remaining = ${frac(whole*d*e-e-2*d,d*e)} L, or ${remaining.toFixed(3)} L to 3 decimal places.`); break; }
     case 20: { const total=n*12; numeric(`A tank holds ${total} L. First 3/4 of the water is set aside. Then 2/3 of that amount is used. How many litres are used?`,total*.75*2/3,[total*(.75+2/3),total*.75,total*2/3],`A fraction of a fraction means multiply: ${total} × 3/4 × 2/3 = ${total}/2 = ${total/2} L.`); break; }
@@ -308,7 +306,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   if (!task) throw Error(`Missing Level 7 challenge ${key}/${role}`);
   for (let i=task.options.length-1;i>0;i--) { const j=int(0,i); [task.options[i],task.options[j]]=[task.options[j],task.options[i]]; }
   return {
-    ...task, visual, diagramSpeech, readabilityRevision: (key===13||key===14)?2:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
+    ...task, visual, paintContext, diagramSpeech, readabilityRevision: key===16||key===17?2:(key===13||key===14)?3:1, kind: 'multiple_choice' as const, skill: guide.code, seed,
     lessonId: `y7-w${week}-l${lesson}`, version: 2 as const, tier: role,
     helper: 'Choose one answer.',
   } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string;diagramSpeech?:string};

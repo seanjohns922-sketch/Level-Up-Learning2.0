@@ -3461,6 +3461,7 @@ export type StrategyOwnershipVisualData = {
 };
 
 export type MultipleChoiceQuestion = {
+  paintContext?: { need: number; capacity: number; price?: number };
   readabilityRevision?: number;
   cave7Visual?: import("@/data/activities/cave7/shared").Cave7Visual;
   spaceVisual?: import("@/data/assessments/revisions/level7StarpathFiveForms").Task7;

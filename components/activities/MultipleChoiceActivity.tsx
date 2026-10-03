@@ -1,5 +1,6 @@
 "use client";
 
+import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
 import {level7Answer} from '@/lib/level7-answer';
 import { useEffect, useState } from "react";
@@ -342,6 +343,7 @@ export default function MultipleChoiceActivity({
       {questionData.visual?.type === "decimal_shift" ? (
         <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
+      {questionData.paintContext && <PaintTinsVisual {...questionData.paintContext} />}
       {questionData.visual?.type === "fraction_number_line" ? (
         <div data-core-number-line={isCoreHunt || undefined}>
           {isNumber7Question && "diagramSpeech" in questionData && typeof questionData.diagramSpeech === "string" && <div className="mt-4 flex justify-end"><ReadAloudBtn text={questionData.diagramSpeech} label="Read diagram" /></div>}

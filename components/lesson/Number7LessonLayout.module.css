@@ -22,26 +22,26 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: clamp(20px, 2.4vw, 36px);
+  padding: clamp(16px, 1.8vw, 24px);
   border: 1px solid #a8d9d2;
   border-radius: 18px;
   background: radial-gradient(ellipse at 100% 0, #b4e6da80, transparent 50%), linear-gradient(150deg, #fffdf6, #eef8f5) !important;
   box-shadow: inset 0 4px 0 #66cdbb, 0 18px 44px #0003;
 }
 .active [data-lesson-multiple-choice] > div:first-child { color: #28645f; font-size: 12px; letter-spacing: .2em; }
-.active [data-lesson-multiple-choice] > div:nth-child(2) { margin-top: 24px; gap: 16px; }
-.active [data-lesson-multiple-choice] h2 { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.2; letter-spacing: -.025em; color: #12353b; }
+.active [data-lesson-multiple-choice] > div:nth-child(2) { margin-top: 14px; gap: 12px; }
+.active [data-lesson-multiple-choice] h2 { font-size: clamp(22px, 2vw, 30px); line-height: 1.2; letter-spacing: -.025em; color: #12353b; }
 .active [data-lesson-multiple-choice] > p { font-size: 16px; color: #50696c; margin-top: 12px; }
-.active [data-lesson-answer-options] { gap: 16px; margin-top: 28px; }
+.active [data-lesson-answer-options] { gap: 12px; margin-top: 16px; }
 .active [data-lesson-answer-options] > button {
   display: flex;
   align-items: center;
   gap: 16px;
-  min-height: 112px;
-  padding: 22px;
+  min-height: 76px;
+  padding: 16px;
   border-width: 2px;
   border-radius: 14px;
-  font-size: clamp(21px, 1.85vw, 28px);
+  font-size: clamp(18px, 1.5vw, 23px);
   line-height: 1.3;
   box-shadow: 0 4px 0 #163e3c12;
 }
@@ -68,9 +68,9 @@
   .active [data-lesson-question-card] :global(.question-read-aloud-boundary),
   .active [data-lesson-question-card] :global(.question-read-aloud-content) { flex: 1; display: flex; flex-direction: column; }
   .active [data-lesson-multiple-choice] { flex: 1; }
-  .active [data-lesson-answer-options] { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(112px, 1fr); }
+  .active [data-lesson-answer-options] { flex: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(76px, auto); }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-multiple-choice] { padding: 22px; }
+  .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-multiple-choice] { padding: 16px; }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-answer-options] { grid-template-columns: 1fr; gap: 10px; grid-auto-rows: auto; }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-answer-options] > button { min-height: 74px; padding: 12px; font-size: 20px; }
   .active [data-lesson-wrong-feedback] { margin: 0; padding: 20px; }
@@ -119,3 +119,11 @@
   .guide [data-guide-actions] button { padding-block: 8px; }
   .guide [data-guide-actions] p { margin-top: 4px; }
 }
+
+/* Keep the mathematical scale; trim the nested number-line frame only. */
+.active [data-core-number-line] > div:first-child { margin-top: 8px; }
+.active [data-core-number-line] > div:last-child { padding: 12px; margin-top: 8px; border-radius: 14px; }
+.active [data-core-number-line] > div:last-child > div:last-child { padding: 8px 24px; margin-top: 8px; }
+.active [data-core-number-line] > div:last-child > div:last-child > div { height: 140px; }
+.active [data-core-number-line] figure { margin-block: 8px; padding: 12px; }
+.active [data-core-number-line] svg { max-height: 180px; }

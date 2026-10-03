@@ -1,4 +1,5 @@
 'use client';
+import PaintTinsVisual from '@/components/activities/PaintTinsVisual';
 import layout from './Number7LessonLayout.module.css';
 import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
@@ -38,6 +39,7 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
    {furtherExamples.map((example,index)=><div key={example.tier} className="mt-4 border-t border-teal-100 pt-3">
     <div className="flex items-start justify-between gap-3"><h4 className="font-bold text-teal-900">{index===0?'Explain the method':'Apply the skill'}</h4><ReadAloudBtn text={`${example.prompt} ${example.diagramSpeech??''} Worked solution. ${example.answer}. ${example.explanation}`} label="Read example"/></div>
     <p className="mt-2 leading-relaxed"><MathFormattedText text={example.prompt}/></p>
+    {example.paintContext&&<PaintTinsVisual {...example.paintContext}/>}
     {example.visual?.type==='fraction_number_line'&&<FractionNumberLineVisual visual={example.visual}/>}
     <p className="mt-2 font-bold"><MathFormattedText text={example.answer}/></p>
     <p className="mt-2 leading-relaxed"><MathFormattedText text={example.explanation}/></p>
