@@ -9,9 +9,12 @@ export type ItemPresentation = {
   width?: number;
   footprint?: [number, number];
   resizeHeight?: boolean;
+  /** Preserve horizontal dimensions when lowering an existing structure. */
+  horizontalHeight?: number;
   theme: "garden" | "fortress" | "australian_reward";
 };
-export const CASTLE_WALL_HEIGHT = 9.295;
+// Lower the large fortress structures by 20%, retaining connected wall spacing.
+export const CASTLE_WALL_HEIGHT = 7.436;
 // Native mesh stays fixed; presentation fitting controls its world height.
 export const CASTLE_WALL_NATIVE_HEIGHT = 26;
 export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
@@ -66,11 +69,11 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   platypus: {height:.55, footprint:[2,2], theme:"garden"},
   blue_heeler: {height:1.15, footprint:[2,2], theme:"garden"},
   bilby: {height:.75, footprint:[2,2], theme:"garden"},
-  castle_wall: {height:9.295, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
-  castle_corner: {height:9.295, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
-  castle_gate: {height:10.01, footprint:[16,8], theme:"fortress"},
-  castle_turret: {height:11.44, footprint:[8,8], theme:"fortress"},
-  castle_keep: {height:12.155, footprint:[14,14], theme:"fortress"},
+  castle_wall: {height:CASTLE_WALL_HEIGHT, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  castle_corner: {height:CASTLE_WALL_HEIGHT, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  castle_gate: {height:8.008, horizontalHeight:10.01, resizeHeight:true, footprint:[16,8], theme:"fortress"},
+  castle_turret: {height:9.152, horizontalHeight:11.44, resizeHeight:true, footprint:[8,8], theme:"fortress"},
+  castle_keep: {height:9.724, horizontalHeight:12.155, resizeHeight:true, footprint:[14,14], theme:"fortress"},
   castle_banner: {height:1.7875, footprint:[4,2], theme:"fortress"},
   drawbridge: {height:2.5025, footprint:[6,6], theme:"fortress"},
   torch: {height:1.0725, footprint:[2,2], theme:"fortress"},
@@ -144,7 +147,7 @@ export function getItemPresentation(item: EconomyItem): ItemPresentation {
 
 /** Uniform scaling respects both the item's anchor and its reserved land. */
 export function fitWorldItem(size:{x:number;y:number;z:number}, footprint:[number,number], presentation:ItemPresentation){
- const target=presentation.width?presentation.width/Math.max(size.x,.001):presentation.height/Math.max(size.y,.001);
+ const target=presentation.width?presentation.width/Math.max(size.x,.001):(presentation.horizontalHeight??presentation.height)/Math.max(size.y,.001);
  const margin=presentation.width===2?0:.12;
  return Math.max(.001,Math.min(target,(footprint[0]-margin)/Math.max(size.x,.001),(footprint[1]-margin)/Math.max(size.z,.001)));
 }

@@ -157,10 +157,10 @@ for(const key of ['castle_wall','castle_corner','fence','picket_fence','rope_fen
  const scale=fitWorldItemScale(size,[2,2],WORLD_ITEM_PRESENTATION[key]);
  assert.ok(Math.abs(size.y*scale[1]-WORLD_ITEM_PRESENTATION[key].height)<1e-8,'Width-defined pieces attain their catalogue height');
 }
-assert.ok(Math.abs(CASTLE_WALL_HEIGHT-26*.55*.65)<1e-8,'Fortress ramparts are reduced by 45% then a further 35%');
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_gate.height-28*.55*.65)<1e-8);
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_turret.height-32*.55*.65)<1e-8);
-assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_keep.height-34*.55*.65)<1e-8);
+assert.ok(Math.abs(CASTLE_WALL_HEIGHT-26*.55*.65*.8)<1e-8,'Fortress ramparts retain their substantial scale after a further 20% height reduction');
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_gate.height-28*.55*.65*.8)<1e-8);
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_turret.height-32*.55*.65*.8)<1e-8);
+assert.ok(Math.abs(WORLD_ITEM_PRESENTATION.castle_keep.height-34*.55*.65*.8)<1e-8);
 assert.ok(WORLD_ITEM_PRESENTATION.castle_gate.height>CASTLE_WALL_HEIGHT);
 assert.ok(WORLD_ITEM_PRESENTATION.castle_turret.height>WORLD_ITEM_PRESENTATION.castle_gate.height);
 assert.ok(catalogue.concat(rewards).every(i=>parseGridSize(i).every(n=>Number.isInteger(n)&&n>0)));
@@ -172,7 +172,8 @@ assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'next-tree'
 console.log('Expanded tree footprint blocks formerly clear but now overlapping placements.');
 
 // Captured from all 122 actual React/Three models using the review page's
-// sequential measurement run. Re-capture after changing model geometry.
+// sequential measurement run. Re-capture native bounds after changing geometry;
+// fitted sizes are reprojected from those bounds when presentation targets change.
 const measurements=JSON.parse(fs.readFileSync(new URL('../docs/world3d/item-scale-measurements.json',import.meta.url),'utf8'));
 assert.equal(measurements.length,122);
 assert.equal(new Set(measurements.map(row=>row.key)).size,122);
@@ -196,6 +197,18 @@ for(const item of [...catalogue,...rewards]){
    fits=validateCentralWorldPlacement({itemId:item.item_key,gridX:gx,gridZ:gz,rotation:0},item,[],new Map());
  assert.ok(fits,'Item can actually be placed with the default home and protected landmarks: '+key);
 }
+// Lowering fortress buildings must not pull them away from saved wall connections.
+for(const key of ['castle_gate','castle_turret','castle_keep']){
+ const row=measuredItems.get(key),p=WORLD_ITEM_PRESENTATION[key];
+ const [x,y,z]=row.native;
+ const prior=fitWorldItemScale({x,y,z},row.footprint,{...p,height:p.horizontalHeight,horizontalHeight:undefined,resizeHeight:false});
+ const current=fitWorldItemScale({x,y,z},row.footprint,p);
+ assert.equal(current[0],prior[0],'Existing fortress width stays aligned: '+key);
+ assert.equal(current[2],prior[2],'Existing fortress depth stays aligned: '+key);
+ assert.ok(Math.abs(current[1]/prior[1]-.8)<1e-8,'Only fortress height drops by 20%: '+key);
+}
+const gate=measuredItems.get('castle_gate');
+assert.ok(1.4*gate.size[1]/gate.native[1]>2.2+.5,'Gate arch springline remains comfortably above the avatar');
 const sizeOf=key=>measuredItems.get(key).size;
 const areaOf=key=>sizeOf(key)[0]*sizeOf(key)[2];
 assert.ok(sizeOf('sports_stadium')[0]>=sizeOf('backyard_pool')[0]*8-1e-5,'Oval is at least eight backyard pools wide');
