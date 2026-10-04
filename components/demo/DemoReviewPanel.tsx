@@ -495,6 +495,12 @@ export default function DemoReviewPanel() {
         </section>}
 
         <section className="border-t border-white/10 py-6">
+          <div className="mb-4 flex items-center gap-2"><Eye size={18} className="text-blue-300" /><h2 className="text-base font-black">Parent Dashboard</h2></div>
+          <p className="mb-3 text-xs text-white/50">The real Parent portal rendered with a preview family, including the printable learning report. Use the mock parent account to check real permissions and saving.</p>
+          <button type="button" onClick={() => router.push("/demo-review/parent")} className={actionClass()}><Eye size={17} /> Open Parent Dashboard</button>
+        </section>
+
+        <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><ClipboardCheck size={18} className="text-sky-300" /><h2 className="text-base font-black">Whole-Maths Diagnostic</h2></div>
           {year !== "Prep" || realm === "number" || realm === "measurement" || realm === "space" ? (
             <div className="grid gap-3 sm:grid-cols-3">
