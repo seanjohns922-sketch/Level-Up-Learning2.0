@@ -79,9 +79,13 @@ check(
 );
 check(
   "The held activity cannot be changed after the first wrong submission",
+  // Choice activities lock through the fieldset; Level 7 typed answers stay focusable but
+  // lock themselves through answerLocked → Level7AnswerInput disabled.
   engine.includes("const taskLocked = turnState !== \"answering\"") &&
-    engine.includes("disabled={taskLocked}") &&
-    engine.includes('taskLocked ? "pointer-events-none min-w-0 border-0 p-0"')
+    engine.includes("disabled={taskLocked&&!isConstructedAnswer}") &&
+    engine.includes('taskLocked&&!isConstructedAnswer ? "pointer-events-none min-w-0 border-0 p-0"') &&
+    engine.includes("answerLocked={taskLocked}") &&
+    multipleChoice.includes("disabled={answerLocked||")
 );
 check(
   "A wrong submission is scored exactly once",
@@ -104,7 +108,7 @@ check(
   "Typed responses pass the student's submitted value to the shared engine",
   typed.includes("onWrong?.(typed)") &&
     engine.includes("<fieldset") &&
-    engine.includes("disabled={taskLocked}")
+    engine.includes("disabled={taskLocked&&!isConstructedAnswer}")
 );
 check(
   "Correct feedback is locked and advances only through the explicit Next Question action",

@@ -54,12 +54,13 @@ const checks = [
   {
     name: "pre-tests expose prompt audio",
     file: "app/pretest/page.tsx",
-    patterns: ["promptAction=", "<ReadAloudBtn text={question.prompt}", 'rate={realmId === "space" ? 0.85 : undefined}'],
+    // assessmentSpokenPrompt reads the question plus any visual-only text (falls back to the prompt).
+    patterns: ["promptAction=", "<ReadAloudBtn text={assessmentSpokenPrompt(question)} />", 'rate={realmId === "space" ? 0.85 : undefined}'],
   },
   {
     name: "post-tests expose prompt audio",
     file: "app/posttest/page.tsx",
-    patterns: ["promptAction=", "<ReadAloudBtn text={q.prompt}", 'rate={realmId === "space" ? 0.85 : undefined}'],
+    patterns: ["promptAction=", "<ReadAloudBtn text={assessmentSpokenPrompt(q)} />", 'rate={realmId === "space" ? 0.85 : undefined}'],
   },
   {
     name: "read-aloud controls support a scoped speech rate",
