@@ -9,6 +9,37 @@ const lin=s=>{const m=s.match(/\((\d*)y(?: ([+−]) (\d+))?\)/);return [Number(m
 const PI_TABLE={'3 (early Babylon)':3,'3 1/8 (Babylon)':3.125,'256/81 (Egypt, Rhind papyrus)':256/81,'22/7 (Archimedes, Greece)':22/7,'3.1416 (Aryabhata, India)':3.1416,'355/113 (Zu Chongzhi, China)':355/113};
 function expected(key,q){
  const n=(q.prompt.match(/\d+(?:\.\d+)?/g)||[]).map(Number),[a,b,c,d,e,f,g,h]=n,A=q.tier==='apply_create',vis=q.measurementVisual,p=q.prompt;
+ // Second application forms, recognised by their wording.
+ if(A){
+  if(/next to x on the same straight line/.test(p))return 180-expected(key,{...q,prompt:p.replace(/Find the angle that sits next to x.*$/,'Find angle x.')});
+  if(/Mulch costs/.test(p))return a*b/2*c;
+  if(/triangle has base \d+ cm and perpendicular height \d+ m\./.test(p))return a/100*b/2;
+  if(/parallelogram garden has area/.test(p))return a/b;
+  if(/Two triangles have the same area/.test(p))return 2*a/c;
+  if(/A parallelogram with the same area has base/.test(p))return b/2;
+  if(/A kite is made of two triangles/.test(p))return a*(b+c)/2;
+  if(/How deep is the water/.test(p))return c/(a*b);
+  if(/cross-sectional area \d+ cm² and volume/.test(p))return b/a;
+  if(/difference in their volumes/.test(p))return a*b/2*(d-c);
+  if(/What is the perpendicular end height in cm/.test(p))return 2*a/(c*b);
+  if(/How many litres does it hold when full/.test(p))return a*b*c/1000;
+  if(/What is the box's height in cm/.test(p))return b/2;
+  if(/coasters of radius/.test(p))return 8*a;
+  if(/Circle B has circumference/.test(p))return a*c/b;
+  if(/semicircular window/.test(p))return 3.14*a/2;
+  if(/How many complete turns does it make\? Use pi/.test(p)&&/wheel of radius/.test(p))return Math.round(b/(6.28*a));
+  if(/What is its diameter in cm\? Use pi/.test(p))return a/3.14;
+  if(/bicycle wheel has diameter/.test(p))return Math.round(b*100/(3.14*a));
+  if(/co-interior angle it makes with the bottom shelf/.test(p))return 180-a;
+  if(/What is the interior angle next to it/.test(p))return 180-a;
+  if(/two base angles of \d+°\. Find the exterior angle at the apex/.test(p))return 2*a;
+  if(/The two interior angles opposite it are equal/.test(p))return a/2;
+  if(/quadrilateral has angles of/.test(p))return 360-a-b-c;
+  if(/Each interior angle of a regular polygon/.test(p))return 360/(180-a);
+  if(/You want \d+ mL of drink/.test(p))return c/(a+b);
+  if(/mL of yellow\. How much blue/.test(p))return c/b*a;
+  if(/plenty of yellow/.test(p))return c/a*(a+b);
+ }
  switch(key){
  case 1:return a*b/2*(A?c:1);
  case 2:return a*b/(A?200:2);
@@ -155,7 +186,7 @@ const positions=new Set();
 for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','apply_create']){
  const q=measurement7Question(8,3,seed*7919,role),v=q.measurementVisual;
  assert.equal(v.task,'parallel');assert.equal(v.anglePositions[0],'belowLeft');
- positions.add(v.anglePositions[1]);assert.equal(q.prompt,'The rails are parallel. Find angle x.');
+ positions.add(v.anglePositions[1]);assert.ok(['The rails are parallel. Find angle x.','The rails are parallel. Find the angle that sits next to x on the same straight line, in degrees.'].includes(q.prompt),q.prompt);
  assert.equal(v.values.length,1,'Do not embed the hidden answer in diagram values');
 }
 assert.deepEqual([...positions].sort(),['aboveLeft','aboveRight','belowLeft','belowRight']);

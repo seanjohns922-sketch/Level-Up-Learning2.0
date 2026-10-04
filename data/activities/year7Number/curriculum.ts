@@ -57,7 +57,7 @@ const NUMBER7_CONTENT_WEEKS = [
 const NUMBER7_ORDER = [1,2,3,4,9,5,6,7,8,10,11,12];
 export const NUMBER7_WEEKS = NUMBER7_ORDER.map(content=>({...NUMBER7_CONTENT_WEEKS[content-1],content}));
 // Bump whenever lesson content moves or changes so saved resume snapshots are discarded.
-export const NUMBER7_READABILITY_REVISION = 6;
+export const NUMBER7_READABILITY_REVISION = 7;
 export function number7ContentWeek(week:number) { return NUMBER7_WEEKS[week-1]?.content; }
 export function number7ContentKey(week:number,lesson:number) { const content=number7ContentWeek(week); return content===undefined?0:(content-1)*3+lesson; }
 export function number7Guide(week:number,lesson:number) { return NUMBER7_WEEKS[week-1]?.lessons[lesson-1]; }

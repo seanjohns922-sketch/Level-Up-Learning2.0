@@ -311,7 +311,8 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   // Second application forms: half of the application questions ask a structurally different
   // question about the same skill, so a quiz's two application questions are not twins.
   // Week 6 Lessons 1–2 keep their number-line form (see level7-readability-test).
-  if (role === 'apply_create' && key !== 13 && key !== 14 && int(0, 1) === 1) {
+  // The form is chosen from a hash of the seed: this generator's low random bits alternate.
+  if (role === 'apply_create' && key !== 13 && key !== 14 && ((Math.imul(seed >>> 0, 2654435761) >>> 15) & 1) === 1) {
     const prev = { task, visual, paintContext, diagramSpeech };
     task = undefined; visual = undefined; diagramSpeech = undefined;
     const pair = pick([[2,3],[3,4],[2,5],[3,5],[4,5],[5,6]]), [A2, B2] = pair[0] > pair[1] ? pair : [pair[1], pair[0]];
