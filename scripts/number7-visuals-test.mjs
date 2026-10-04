@@ -26,9 +26,9 @@ const kinds=new Set();let reviewed=0;
 for(let week=1;week<=12;week++)for(let lesson=1;lesson<=3;lesson++)for(const role of ['fast_thinking','reasoning','apply_create'])for(let seed=1;seed<=20;seed++){
  const q=number7Question(week,lesson,seed*7919,role);reviewed++;
  const art=number7ContextArt(q.prompt);if(art)kinds.add(art);
- if(week===7&&lesson===1){
+ if(week===8&&lesson===1){
   const spec=level7Answer(q);assert.equal(spec.kind,'fraction');assert.ok(markLevel7Answer(spec,q.answer));
-  assert.ok(!/decimal|then/.test(q.prompt));assert.equal(q.readabilityRevision,2);
+  assert.ok(!/decimal|then/.test(q.prompt));assert.equal(q.readabilityRevision,4);
   if(role==='apply_create'){
    assert.equal(art,'jug');assert.equal((q.prompt.match(/\d+\/\d+/g)||[]).length,2);
    const [n,d]=q.answer.split('/').map(Number);assert.ok(markLevel7Answer(spec,`${n*2}/${d*2}`));
@@ -39,5 +39,5 @@ assert.equal(number7ContextArt('Calculate 2/3 + 1/4.'),null);
 assert.equal(number7ContextArt('What is 10²?'),null);
 for(const kind of ['jug','bottle','tank','rope','bag','notebook','ticket','parcel','lights'])assert.ok(kinds.has(kind),kind);
 for(const kind of kinds)assert.ok(fs.existsSync(`public/images/number-nexus/level7/objects/${kind}-v1.png`));
-const quiz=number7Quiz(7);assert.equal(quiz.length,15);for(const tag of [1,2,3])assert.equal(quiz.filter(q=>q.lessonTag===tag).length,5);
+const quiz=number7Quiz(8);assert.equal(quiz.length,15);for(const tag of [1,2,3])assert.equal(quiz.filter(q=>q.lessonTag===tag).length,5);
 console.log(`PASS ${reviewed} Number Level 7 samples across all 36 lessons; one-operation fraction questions, equivalent answers, guide toggles, exact twelfths bars, context art and balanced quiz.`);

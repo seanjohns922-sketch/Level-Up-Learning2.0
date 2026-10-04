@@ -15,18 +15,18 @@ export function validChallenge(key,q,option) {
       case 1: answer=v[2]*v[3]-v[0]*v[1];break;
       case 2: answer=Math.sqrt(v[0])*(Math.sqrt(v[0])+v[1]);break;
       case 3: answer=4*Math.sqrt(v[0]);break;
-      case 4: answer=v[0]/v.at(-1);break;
+      case 4: {let k=1;while(!Number.isInteger(Math.sqrt(v[0]*k)))k++;answer=k;}break;
       case 5: answer=v[0]**v[1];break;
       case 6: {const [a,b]=v;let multiple=Math.max(a,b);while(multiple%a||multiple%b)multiple++;answer=multiple;}break;
       case 7: {const m=p.match(/holds (.*?) items and sends out (.*?) items/);answer=calculate(m[1])-calculate(m[2]);break;}
       case 8: {const m=p.match(/records (.*?) items\. Another (\d+)/);answer=calculate(m[1])+Number(m[2]);break;}
-      case 9: {const m=p.match(/(\d+) = (\d+) × 10⁴ \+ □ × 10² \+ (\d+) × 10/);answer=(Number(m[1])-Number(m[2])*10000-Number(m[3])*10)/100;break;}
+      case 9: {const m=p.match(/(\d+) = (\d+) × 10⁴ \+ □ × 10³ \+ (\d+) × 10/);answer=(Number(m[1])-Number(m[2])*10000-Number(m[3])*10)/1000;break;}
       case 10: answer=v[0]-v[0]*v[1]/v[2];break;
-      case 11: answer=v[0]-v[1]/v[2];break;
+      case 11: answer=v[0]-(v[1]+v[2]/v[3]);break;
       case 12: answer=100*v[0]/v[1];break;
       case 13: answer=q.visual.markers[0].position+v[0]/v[1];break;
       case 14: answer=q.visual.markers[0].position+(p.includes('right')?1:-1)*v[0]/v[1];break;
-      case 15: answer=v[2]-v[0]/v[1];break;
+      case 15: answer=v[3]+Math.abs(v[0])+v[1]/v[2];break;
       case 16: {const thousandths=Number(p.match(/\$(\d+\.\d{3})/)[1].replace('.',''));answer=Math.floor((thousandths*v[0]+5)/10)/100;break;}
       case 17: answer=Math.ceil(q.paintContext.need/q.paintContext.capacity)*q.paintContext.price;break;
       case 18: answer=v[0]*Math.round(v[1]/10)*10+v[2];break;
@@ -38,9 +38,9 @@ export function validChallenge(key,q,option) {
       case 24: answer=v[0]*(100-v[1]-v[2])/100;break;
       case 25: answer=Math.max(...v)-Math.min(...v);break;
       case 26: answer=v[0]+v[1]-v[2];break;
-      case 27: answer=v[0]-v[1]+v[2];break;
+      case 27: assert.ok(p.includes('−$'));answer=-v[0]-v[1]+v[2];break;
       case 28: answer=(v[0]+v[2])/(v[0]+v[1]+v[2]);break;
-      case 29: answer=v[0]*v[1]/(v[1]+v[2]);break;
+      case 29: answer=v[2]/v[0]*(v[0]+v[1]);break;
       case 30: answer=(v[0]+v[2])*v[4]/v[3]-v[1];break;
       case 31: answer=v[3]-v[0]*(100-v[1])/100-v[2];break;
       case 32: answer=(v[2]-v[0]-v[1])/(v[0]+v[1])*100;break;
@@ -72,7 +72,7 @@ export function validChallenge(key,q,option) {
     case 16: return eq(Number(option),Math.round(v[0]*10)/10);
     case 17: return Number(option)===Math.ceil(q.paintContext.need/q.paintContext.capacity);
     case 18: answer=Math.round(v[0])*Math.round(v[1]);break;
-    case 19: answer=v[0]/v[1]-v[2]/v[3];break;
+    case 19: answer=v[0]/v[1]+v[2]/v[3];break;
     case 20: return v[2]/v[3]>0&&v[2]/v[3]<1&&option.startsWith('It is smaller because')&&option.includes('positive and less than 1');
     case 21: answer=v[0]/v[1]/(v[2]/v[3]);break;
     case 22: answer=v[0]+v[1];break;

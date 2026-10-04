@@ -6,6 +6,7 @@ assert.ok(mark(spec('fraction','1/2'),'2/4'));assert.ok(mark(spec('fraction','1/
 assert.ok(!mark(spec('fraction','1/2','simplest'),'2/4'));assert.ok(mark(spec('fraction','1/2','simplest'),'1/2'));assert.ok(!mark(spec('number','0.5','decimal'),'1/2'));
 assert.ok(!mark(spec('fraction','1/2'),'1/0'));assert.ok(!mark(spec('number','0'),''));assert.ok(!mark(spec('number','1'),'Infinity'));
 assert.ok(mark(spec('ratio','2:3'),'4:6'));assert.ok(!mark(spec('ratio','2:3','simplest'),'4:6'));
+assert.ok(mark(spec('ratio','1:2:3'),'2:4:6'));assert.ok(!mark(spec('ratio','1:2:3','simplest'),'2:4:6'));assert.ok(mark(spec('ratio','1:2:3','simplest'),'1:2:3'));assert.ok(!mark(spec('ratio','1:2:3'),'1:2'));assert.ok(!mark(spec('ratio','1:2:3'),'1:3:2'));
 assert.ok(mark(spec('coordinates','(-2, 3)'),'-2, 3'));assert.ok(!mark(spec('coordinates','(-2, 3)'),'3, -2'));
 assert.ok(mark(spec('expression','2(n + 3)'),'2*n+6'));assert.ok(!mark(spec('expression','2(n + 3)'),'2*n+3'));
 assert.ok(!mark(spec('expression','2n'),'process.exit()'));assert.ok(mark(spec('set','1, 2, 3'),'3, 1, 2'));assert.ok(!mark(spec('set','1, 2, 3'),'1, 1, 3'));
@@ -18,7 +19,7 @@ console.log(`PASS ${checked} generated answer contracts; equivalent fractions, s
 
 // Comparison inputs must retain all givens, including previously saved questions.
 for(let seed=1;seed<=500;seed++){
- const q=gs.number(9,1,seed,'fast_thinking'),s=level7Answer(q);
+ const q=gs.number(5,1,seed,'fast_thinking'),s=level7Answer(q); // Integers are Number week 5.
  const values=s.prompt.match(/-?\d+/g).map(Number);
  assert.equal(values.length,4);assert.equal(Number(q.answer),Math.min(...values));
  for(const value of new Set(values))assert.equal(mark(s,String(value)),value===Math.min(...values));

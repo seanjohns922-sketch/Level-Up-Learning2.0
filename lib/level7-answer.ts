@@ -39,7 +39,7 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(q.lessonId.startsWith('y7-space-')&&/^[A-F]$/.test(expected))return {...base,kind:'text'};
 
  if(/^\(?\s*-?[\d.]+\s*,\s*-?[\d.]+\s*\)?$/.test(expected)&&/point|coordinate|pair|image|P =/i.test(p))return {...base,kind:'coordinates',labels:['x','y']};
- if(/^\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?$/.test(expected))return {...base,kind:'ratio',format:/simplif/i.test(p)?'simplest':undefined};
+ if(/^\d+(?:\.\d+)?(?:\s*:\s*\d+(?:\.\d+)?){1,2}$/.test(expected))return {...base,kind:'ratio',format:/simplif/i.test(p)?'simplest':undefined,labels:['First amount','Second amount','Third amount'].slice(0,expected.split(':').length)};
  if(scalarAnswer(expected)!==null){const format=/simplest/.test(p)?'simplest':/decimal/.test(p)?'decimal':/fraction/.test(p)?'fraction':undefined;return {...base,kind:format==='fraction'||format==='simplest'||expected.includes('/')?'fraction':'number',format};}
  if(/^-?[\d./]+(?:,\s*-?[\d./]+){1,5}$/.test(expected))return {...base,kind:'list',labels:expected.split(',').map((_,i)=>`Value ${i+1}`)};
  if(/^[\d\s.nxpyThVClw+*/()=−²³⁴⁵⁶⁷⁸⁹⁰¹-]+$/.test(expected)&&/[a-zA-Z+*()/=²³⁴⁵⁶⁷⁸⁹-]/.test(expected)&&!expected.includes(';'))return {...base,kind:'expression'};
@@ -71,7 +71,8 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
   if(spec.format==='simplest'){const [n,d=1]=a.split('/').map(Number);let x=Math.abs(n),y=d;if(y<=0)return false;while(y){[x,y]=[y,x%y];}if(x!==1)return false;}
   return near(scalarAnswer(a),scalarAnswer(b));
  }
- if(spec.kind==='ratio'){const x=a.split(':').map(scalarAnswer),y=b.split(':').map(scalarAnswer);if(x.length!==2||x.some(v=>v===null)||!x[1])return false;if(spec.format==='simplest'&&(x[0]!==y[0]||x[1]!==y[1]))return false;return near(x[0]!/x[1]!,y[0]!/y[1]!);}
+ // Two- or three-part ratios: every part must scale by the same factor.
+ if(spec.kind==='ratio'){const x=a.split(':').map(scalarAnswer),y=b.split(':').map(scalarAnswer);if(x.length!==y.length||x.some(v=>v===null)||!x[0])return false;if(spec.format==='simplest'&&x.some((v,i)=>v!==y[i]))return false;return x.every((v,i)=>near(v!/x[0]!,y[i]!/y[0]!));}
  if(spec.kind==='set'){const x=a.split(',').map(scalarAnswer),y=b.split(',').map(scalarAnswer);return x.every(v=>v!==null)&&new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
  if(spec.kind==='points'){const x=a.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer),y=b.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
  if(spec.kind==='coordinates'||spec.kind==='list'){const parts=(s:string)=>s.replace(/[()]/g,'').split(',').map(scalarAnswer),x=parts(a),y=parts(b);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
@@ -89,6 +90,14 @@ export function level7SimplificationTip(spec:Level7Answer,response:string):Simpl
  const original=clean(stripAnswerUnit(spec,response));
  const ratio=spec.kind==='ratio';
  if(!ratio&&spec.kind!=='fraction'&&spec.kind!=='number')return null;
+ const ratioParts=ratio&&/^\d+(?:\s*:\s*\d+){2}$/.test(original)?original.split(':').map(Number):null;
+ if(ratioParts){
+  let x=0;for(const v of ratioParts){let p=x,q=v;while(q){[p,q]=[q,p%q];}x=p;}if(x<=1)return null;
+  const required=spec.format==='simplest';
+  if(!markLevel7Answer(required?{...spec,format:undefined}:spec,response))return null;
+  const reduced=ratioParts.map(v=>v/x);
+  return {original,simplified:reduced.join(':'),divisor:x,required,instruction:`Divide every amount by ${x}: ${ratioParts.map((v,i)=>`${v} ÷ ${x} = ${reduced[i]}`).join(', ')}.`};
+ }
  const parts=original.match(ratio?/^(\d+)\s*:\s*(\d+)$/:/^(-?\d+)\s*\/\s*(\d+)$/);
  if(!parts)return null;
  const n=Number(parts[1]),d=Number(parts[2]);

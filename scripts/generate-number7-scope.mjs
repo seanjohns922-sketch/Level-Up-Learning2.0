@@ -16,16 +16,23 @@ function load(name) {
 const {NUMBER7_WEEKS}=load('curriculum');
 const {number7Challenge}=load('challenges');
 const rows=[['Level','Strand','Week','Week topic','Activity','Title','Learning intention','Curriculum codes','Teaching support','Student unlock requirement','Release status','Reasoning example and solution','Application example and solution','Weekly quiz composition']];
-const example=q=>`${q.prompt} Solution: ${q.answer}. ${q.explanation}`;
+// Visual-only givens (paint tins) are written out so the export reads on its own.
+const visualGivens=q=>q.paintContext?` [Visual: ${q.paintContext.need} L needed; tins hold ${q.paintContext.capacity} L${q.paintContext.price?`; $${q.paintContext.price} per tin`:''}.]`:'';
+const example=q=>`${q.prompt}${visualGivens(q)} Solution: ${q.answer.replace(/[.]$/,'')}. ${q.explanation}`;
+// A different seed per lesson keeps the worked examples from reusing the same numbers.
+const seedFor=(i,j)=>7007+(i*3+j)*131;
 for(const [i,week] of NUMBER7_WEEKS.entries()) {
   for(const [j,lesson] of week.lessons.entries())rows.push([
     '7','Number',i+1,week.title,`Lesson ${j+1}`,lesson.title,`I am learning to ${lesson.goal}`,lesson.code,
     `${lesson.idea} Worked example: ${lesson.example}`,
     j?'Complete the previous lesson':i?'Pass every earlier weekly quiz with at least 80%':'Available from the start',
     'Demo review only; every demo activity is unlocked',
-    example(number7Challenge(i+1,j+1,7007,'reasoning')),example(number7Challenge(i+1,j+1,7007,'apply_create')),
+    example(number7Challenge(i+1,j+1,seedFor(i,j),'reasoning')),example(number7Challenge(i+1,j+1,seedFor(i,j),'apply_create')),
     i===11?'Existing Level 7 post-test':'5 from this lesson: 2 fluency, 1 reasoning, 2 application',
   ]);
+  if(i===11)rows.push(['7','Number',12,week.title,'Modelling Task','Sausage sizzle fundraiser','I am learning to formulate, solve and justify a mathematical model of a real situation','AC9M7N09; AC9M7N06; AC9M7N05',
+    'Teacher-marked extended task with a four-criterion rubric (formulate, represent and calculate, interpret, justify). Students may use a spreadsheet. Task and rubric: docs/lessons/number7-modelling-task.md',
+    'Teacher-marked; does not gate the post-test','Demo review only; every demo activity is unlocked','','','Rubric out of 12; not part of a weekly quiz']);
   if(i===11)rows.push(['7','Number',12,week.title,'Post-Test','Level 7 Post-Test','Demonstrate Level 7 Number mastery','AC9M7N01–AC9M7N09','Existing Level 7 post-test','Complete all three lessons; existing post-test pass threshold is 85%','Demo review only; every demo activity is unlocked','','','Existing post-test; no weekly quiz']);
   else rows.push(['7','Number',i+1,week.title,'Weekly Quiz','Weekly Quiz','Apply all three lesson skills independently',[...new Set(week.lessons.map(l=>l.code))].join('; '),
     '15 questions; 5 from each lesson','Complete all three lessons; score at least 12/15 (80%)','Demo review only; every demo activity is unlocked','','','15 total: 6 fluency, 3 reasoning, 6 application']);
@@ -34,4 +41,4 @@ const csv='\ufeff'+rows.map(row=>row.map(cell=>`"${String(cell).replaceAll('"','
 const file='public/curriculum/number-level7-scope-and-sequence.csv';
 if(process.argv.includes('--check'))assert.equal(fs.readFileSync(file,'utf8'),csv,'Scope and sequence is out of date');
 else fs.writeFileSync(file,csv);
-console.log(`${process.argv.includes('--check')?'Verified':'Generated'} 36 lessons, 11 weekly quizzes and the existing post-test with worked reasoning/application examples.`);
+console.log(`${process.argv.includes('--check')?'Verified':'Generated'} 36 lessons, 11 weekly quizzes, the modelling task and the existing post-test with worked reasoning/application examples.`);

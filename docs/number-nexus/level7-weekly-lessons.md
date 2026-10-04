@@ -2,6 +2,27 @@
 
 This demo curriculum has 12 weeks, with three lessons each. Weeks 1–11 each end with a 15-question quiz; Week 12 ends with the existing Level 7 post-test. The supplied Australian Curriculum v9 Mathematics 7–10 document, Year 7 Number AC9M7N01–N09, is the content source. The canonical sequence is `data/activities/year7Number/curriculum.ts`; the quiz samples five questions from each of that week's three lessons.
 
+## Sequence
+
+| Week | Topic | Codes |
+|---|---|---|
+| 1 | Squares and square roots (incl. two-digit squares by area model, square patterns) | N01 |
+| 2 | Prime factors and powers | N02 |
+| 3 | Place value and powers of ten | N03 |
+| 4 | Equivalent rational numbers (incl. one quantity as a percentage of another) | N04 |
+| 5 | Addition and subtraction of integers | N07 |
+| 6 | Rational numbers on a line | N04 |
+| 7 | Rounding and estimation (incl. rounding money to $10/$100) | N05 |
+| 8 | Operations with fractions (incl. mixed numbers) | N06 |
+| 9 | Operations with decimals (incl. percentages of quantities) | N06 |
+| 10 | Ratios and sharing (incl. three-part ratios, finding a share or total from one part) | N08 |
+| 11 | Percentages and financial decisions | N09 |
+| 12 | Model, solve and explain, plus a teacher-marked modelling task | N09 |
+
+Integers come before negative rationals so subtracting a negative is taught before Week 6 uses it. The generators keep their content keys (`number7ContentKey` maps a display week to its content). Any change to lesson content or order must bump `NUMBER7_READABILITY_REVISION` so that saved resume snapshots are discarded.
+
+The Week 12 modelling task (`docs/lessons/number7-modelling-task.md`) assesses the formulate–justify parts of AC9M7N09 that auto-marked questions cannot. It is teacher-marked with a rubric and does not gate the post-test.
+
 Each lesson reuses the existing Number lesson home, active shell, nine-minute engine, HUD, read-aloud, feedback, coach, reflection, mistake review and resume system. An untimed skill guide comes before practice, with expandable worked reasoning and application examples. Each lesson randomly rotates fluency, reasoning and application questions; there is no ordered difficulty ladder. Reopening the guide pauses the practice timer. Level 7 uses the cave artwork and a Crystal Streak in the existing streak position. Streak thresholds and scoring are unchanged.
 
 ## Progression
@@ -16,4 +37,4 @@ The implementation reuses the shared lesson/session routes and their existing su
 
 ## Validation
 
-`node scripts/number7-lessons-test.mjs` independently checks 21,600 generated practice questions, distractors, 36 guides, all 165 quiz items, exact 80% student boundaries, demo access and protected routes. Every quiz has five questions per lesson: two fluency, one reasoning and two application. Week 5 reuses the shared fraction number-line visual and includes diagram narration. `node scripts/generate-number7-scope.mjs --check` verifies the 48-row downloadable scope and sequence, including worked reasoning/application examples. Existing release checks and TypeScript/lint apply as well. Question difficulty is authored, not statistically calibrated.
+`node scripts/number7-lessons-test.mjs` independently checks 21,600 generated practice questions, distractors, 36 guides, all 165 quiz items, exact 80% student boundaries, demo access and protected routes. Every quiz has five questions per lesson: two fluency, one reasoning and two application. Week 6 reuses the shared fraction number-line visual and includes diagram narration. `node scripts/generate-number7-scope.mjs --check` verifies the 49-row downloadable scope and sequence (36 lessons, 11 quizzes, the modelling task and the post-test), including worked reasoning/application examples. Existing release checks and TypeScript/lint apply as well. Question difficulty is authored, not statistically calibrated.
