@@ -27,7 +27,8 @@ assert.deepEqual(resolveRealm3DAccess({ realmId: "number" }), {
   reason: "webgl-unavailable",
   source: "device",
 });
-assert.equal(resolveRealm3DAccess({ realmId: "chance" }).reason, "unsupported-realm");
+assert.equal(resolveRealm3DAccess({ realmId: "chance" }).reason, "webgl-unavailable", "Chance Hollow is supported and must honour the device gate");
+assert.equal(resolveRealm3DAccess({ realmId: "unknown-realm" }).reason, "unsupported-realm");
 
 globalThis.window.matchMedia = () => ({ matches: true });
 assert.deepEqual(canBrowserRunRealm3D({ respectReducedMotion: true }), { ok: false, reason: "reduced-motion" });
@@ -35,7 +36,9 @@ assert.deepEqual(canBrowserRunRealm3D({ respectReducedMotion: true }), { ok: fal
 globalThis.window.matchMedia = () => ({ matches: false });
 globalThis.document.createElement = () => ({ getContext: () => ({}) });
 assert.deepEqual(canBrowserRunRealm3D({ respectReducedMotion: true }), { ok: true });
-assert.equal(resolveRealm3DAccess({ realmId: "pattern" }).canExplore3D, true, "Pattern Peaks must be available to the shared 3D access gate");
+for (const realmId of ["number", "measurement", "space", "pattern", "statistics", "chance"]) {
+  assert.equal(resolveRealm3DAccess({ realmId }).canExplore3D, true, realmId + " must be available on a supported device");
+}
 
 delete process.env.NEXT_PUBLIC_REALM_3D_DEFAULT;
 assert.equal(
