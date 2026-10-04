@@ -120,6 +120,7 @@ import Measurement7SkillGuide from "@/components/lesson/Measurement7SkillGuide";
 import { generateMeasurement7Question } from "@/data/activities/year7Measurement/questions";
 import { MEASUREMENT7_READABILITY_REVISION } from "@/data/activities/year7Measurement/curriculum";
 import { CAVE7_READABILITY_REVISION } from "@/data/activities/cave7/shared";
+import { SPACE7_READABILITY_REVISION } from "@/data/activities/year7Space/curriculum";
 import Number7SkillGuide from "@/components/lesson/Number7SkillGuide";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { generateNumber7Question } from "@/data/activities/year7Number/questions";
@@ -275,7 +276,7 @@ function LessonPage() {
   const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
-    return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:isMeasurement7?MEASUREMENT7_READABILITY_REVISION:isNewCave7&&newCaveRealm?CAVE7_READABILITY_REVISION[newCaveRealm]:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
+    return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:isMeasurement7?MEASUREMENT7_READABILITY_REVISION:isSpace7?SPACE7_READABILITY_REVISION:isNewCave7&&newCaveRealm?CAVE7_READABILITY_REVISION[newCaveRealm]:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
   }:undefined,[effectiveLessonId,isCave7,isNumber7,isMeasurement7,isSpace7,isNewCave7,newCaveRealm]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;

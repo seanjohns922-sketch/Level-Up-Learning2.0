@@ -1,7 +1,7 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
 export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[]};
 // answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string};
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[]};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -42,10 +42,10 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(/^\(?\s*-?[\d.]+\s*,\s*-?[\d.]+\s*\)?$/.test(expected)&&/point|coordinate|pair|image|P =/i.test(p))return {...base,kind:'coordinates',labels:['x','y']};
  if(/^\d+(?:\.\d+)?(?:\s*:\s*\d+(?:\.\d+)?){1,2}$/.test(expected))return {...base,kind:'ratio',format:/simplif/i.test(p)?'simplest':undefined,labels:['First amount','Second amount','Third amount'].slice(0,expected.split(':').length)};
  if(scalarAnswer(expected)!==null){const format=/simplest/.test(p)?'simplest':/decimal/.test(p)?'decimal':/fraction/.test(p)?'fraction':undefined;return {...base,kind:format==='fraction'||format==='simplest'||expected.includes('/')?'fraction':'number',format};}
- if(/^-?[\d./]+(?:,\s*-?[\d./]+){1,5}$/.test(expected))return {...base,kind:'list',labels:expected.split(',').map((_,i)=>`Value ${i+1}`)};
+ if(/^-?[\d./]+(?:,\s*-?[\d./]+){1,5}$/.test(expected))return {...base,kind:'list',labels:q.answerLabels??expected.split(',').map((_,i)=>`Value ${i+1}`)};
  if(/^[\d\s.nxpyThVClw+*/()=−²³⁴⁵⁶⁷⁸⁹⁰¹-]+$/.test(expected)&&/[a-zA-Z+*()/=²³⁴⁵⁶⁷⁸⁹-]/.test(expected)&&!expected.includes(';'))return {...base,kind:'expression'};
  // Short shape names are recalled; explanatory and yes/no judgements remain choices.
- if(q.lessonId.startsWith('y7-space-')&&/^(Acute|Obtuse|Right-angled|Equilateral|Isosceles|Scalene|Square|Rectangle|Rhombus|Parallelogram|Trapezium|Kite|Concave|Convex|Regular convex|Irregular convex|Non-square rectangle|Non-square rhombus)$/i.test(expected))return {...base,kind:'text'};
+ if(q.lessonId.startsWith('y7-space-')&&/^(Acute|Obtuse|Right-angled|Equilateral|Isosceles|Scalene|Square|Rectangle|Rhombus|Parallelogram|Trapezium|Kite|Concave|Convex|Regular convex|Irregular convex|Non-square rectangle|Non-square rhombus|Other quadrilateral|Cube|Square pyramid|Triangular pyramid|Triangular prism|Rectangular prism|Pentagonal prism)$/i.test(expected))return {...base,kind:'text'};
  return null;
 }
 // Restricted arithmetic parser: no eval, function calls or arbitrary identifiers.

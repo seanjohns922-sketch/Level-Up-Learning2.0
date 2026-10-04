@@ -154,6 +154,8 @@ export default function StarpathVoyageQuiz({
   const storageKey = `${realm}-weekly-quiz:${cave7?"v5":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
+  // Level 7 diagram questions need room to show the diagram beside the answer.
+  const wideLevel7Quiz = tasks.some((task) => task.kind === "space7Question" || task.kind === "cave7Question");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
@@ -470,7 +472,7 @@ export default function StarpathVoyageQuiz({
           ) : null}
 
           {phase === "quiz" ? (
-            <div className="mx-auto max-w-3xl">
+            <div className={`mx-auto ${wideLevel7Quiz ? "max-w-5xl" : "max-w-3xl"}`}>
               <div className="mb-5 flex items-center justify-between gap-3">
                 <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#8e3341" : isPattern ? "#14785f" : isChance ? "#8f3f75" : "#5b21b6" }}>
                   Question {index + 1} of {total}

@@ -15,7 +15,7 @@ export default function Space7LessonVisual({visual:v}:{visual:Task7}){
   <div className="mb-3 flex items-start justify-between gap-3"><p className="text-sm font-semibold" style={{color:theme.ctaFrom}}>{v.instruction}</p><ReadAloudBtn text={space7VisualSpeech(v)} label="Read diagram"/></div>
   {v.diagram==='net'&&<CubeNet cells={v.cells!} marked={v.marked} labels/>}
   {v.diagram==='plans'&&<Plans t={v}/>}
-  {v.diagram==='plane'&&<Plane t={{...v,mode:'choice'}} a={{selected:[],value:"",pair:{x:"",y:""},points:[],commands:[],assignments:{},decisions:[]}} onChange={()=>{}}/>}
+  {v.diagram==='plane'&&<div className="[&_svg]:!max-h-80"><Plane t={{...v,mode:'choice'}} a={{selected:[],value:"",pair:{x:"",y:""},points:[],commands:[],assignments:{},decisions:[]}} onChange={()=>{}}/></div>}
   {v.polygons?.map((p,i)=><Polygon key={i} spec={p}/>)}
   {v.trees?.map((t,i)=><section key={i}><h3 className="text-center font-bold">{t.title}</h3><Level7Flowchart tree={t.root}/></section>)}
  </div>;
