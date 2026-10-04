@@ -265,11 +265,18 @@ export default function StarpathVoyageQuiz({
 
   function answer(ok: boolean, response?: string) {
     if (!task || (!answersAreEditable && currentAnswer !== undefined)) return;
-    if(response===""){changeAnswer();return;}
+    // Editing a typed answer un-records it but keeps the input mounted, so typing is not wiped.
+    if(response===""){forgetAnswer();return;}
     setAnswers((current) => ({ ...current, [String(index)]: ok }));
     if (response) {
       setResponses((current) => ({ ...current, [String(index)]: response }));
     }
+  }
+
+  function forgetAnswer() {
+    const answerKey = String(index);
+    setAnswers((current) => { const next = { ...current }; delete next[answerKey]; return next; });
+    setResponses((current) => { const next = { ...current }; delete next[answerKey]; return next; });
   }
 
   function changeAnswer() {
