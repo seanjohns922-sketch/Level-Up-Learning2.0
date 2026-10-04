@@ -14,7 +14,23 @@ function check(key,q){
  const h=v?.heights,front=h&&[0,1,2].map(i=>Math.max(h[i],h[i+3])),side=h&&[Math.max(...h.slice(0,3)),Math.max(...h.slice(3))],total=h&&h.reduce((s,x)=>s+x,0),occ=h&&h.filter(Boolean).length;
  // Coordinates read from the prompt's leading "P = (x, y)" and stated moves.
  const P=()=>{const m=p.match(/P = \((-?\d+), (-?\d+)\)/);return {x:+m[1],y:+m[2]};};
- switch(key){
+ const pt=(x,y)=>`(${x}, ${y})`;let alt=A;
+ // Second application forms, recognised by their wording.
+ if(!A){}
+ else if(/Every cube costs \$2/.test(p))answer=String(2*total);
+ else if(/front-left stack is removed completely/.test(p)){const nx=h.slice();nx[3]=0;answer=[0,1,2].map(i=>Math.max(nx[i],nx[i+3])).join(', ');}
+ else if(/back row is moved to stand in front/.test(p))answer=[side[1],side[0]].join(', ');
+ else if(/no stack is taller than 1 cube/.test(p))answer=String(total-occ);
+ else if(/uses exactly \d+ cubes\. Every stack is at least 1/.test(p))answer=String(n[1]-(n[0]-1));
+ else if(/How many different whole-number lengths/.test(p))answer=String(n[0]+n[1]-1-Math.abs(n[0]-n[1]));
+ else if(/three times in a row/.test(p)){const {x,y}=P();answer=pt(x+3*n[2],y+3*n[3]);}
+ else if(/halfway between P and Q/.test(p)){const {x,y}=P();answer=p.includes('x-axis')?pt(x,0):pt(0,y);}
+ else if(/Reflect it in the vertical line x = /.test(p)){const {x,y}=P(),line=n.at(-1);answer=pt(2*line-x,y);}
+ else if(/rotated 270° clockwise about the origin/.test(p)){const {x,y}=P();answer=pt(-y,x);}
+ else if(/rotated 180° about C = /.test(p)){const {x,y}=P(),m=p.match(/C = \((-?\d+), (-?\d+)\)/),cx=+m[1],cy=+m[2];answer=pt(2*cx-x,2*cy-y);}
+ else if(/Find the third angle, then trace/.test(p)){const t=180-n[0]-n[1],ang=[n[0],n[1],t];answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';}
+ else alt=false;
+ if(!alt)switch(key){
   case 1:if(A){const solids={'one square and four triangles':'Square pyramid','two triangles and three rectangles':'Triangular prism','six rectangles in three matching pairs':'Rectangular prism','four triangles':'Triangular pyramid','two pentagons and five rectangles':'Pentagonal prism'};answer=solids[p.match(/made from (.*)\. What/)[1]];}break;
   case 2:if(true){const cells=v.cells,fold=foldNet(cells),target=cells.findIndex(c=>relationBetween(fold,cells[v.marked],c)==='opposite');answer=String.fromCharCode(65+target);}break;
   case 3:if(F)answer=String(n[0]);else if(R)answer=String(n[0]+2);else{const s=n[0];answer=String(p.includes('faces')?s+2:p.includes('edges')?3*s:2*s);}break;

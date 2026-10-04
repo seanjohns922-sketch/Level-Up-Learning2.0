@@ -93,7 +93,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   else if(R)numeric(`A footprint has ${a} occupied positions and each stack is 1 to ${k} cubes tall. How many different cube totals are possible?`,a*k-a+1,`Totals run from ${a} to ${a*k}, every whole number in between: ${a*k} − ${a} + 1 = ${a*k-a+1}. One view does not fix the object.`,[a*k,a*k-a,k]);
   else numeric(`A footprint has ${a} occupied positions. Each stack is at least 1 and at most ${k} cubes tall. What is the greatest possible cube total?`,a*k,'Use the upper height limit at every occupied position.',[a+k,a*(k-1),k]);
   break;}
- case 9:{const context=int(0,2),requests=['cut connected faces from one sheet for a box','find exact stack heights and occupied floor positions','show the overall three-dimensional appearance'],answers=['A labelled net','A height plan','An isometric drawing'];
+ case 9:{const context=int(0,2),requests=['cut connected faces from one sheet for a box','find exact stack heights and occupied floor positions','show the overall three-dimensional appearance'];
   if(R){const q=pick([['What can a height plan show that an isometric drawing might hide?','Cubes hidden behind taller stacks.',['The colour of every cube.','The total area of the floor only.','Nothing; they always show the same information.']],['What does a footprint NOT tell you?','How tall each stack is.',['Which ground positions are used.','How many ground positions are used.','The shape of the base.']],['Why might an isometric drawing be less useful than a height plan for counting cubes?','Some cubes can be hidden from view.',['Isometric drawings never show cubes.','Height plans show colour.','Isometric drawings are always too small.']]] as const);choose(q[0],q[1],[...q[2]],guide.idea);}
   else{const why={Net:'A net lays out every face and the shared folding edges.','Height plan':'A height plan records every ground position and its exact stack height.','Isometric drawing':'An isometric drawing shows the overall three-dimensional form, though it can hide cubes.'},names=Object.keys(why) as (keyof typeof why)[];
    // Fluency names the representation for a stated purpose; application reads a real job.
@@ -236,6 +236,26 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   else choose(`A test set already covers ${names.filter((_,i)=>i!==missing).join(', ')}. Type the group still needed to test all four outputs.`,names[missing],names.filter((_,i)=>i!==missing),'Every intended output needs a valid test example.');
   break;}
  default:throw Error('Unknown Space lesson');
+ }
+ // Second application forms: half of the application questions ask a structurally different
+ // question about the same skill, so a quiz's two application questions are not twins.
+ if(A&&int(0,1)===1){
+  const before={visual,answerLabels};answerLabels=undefined;
+  switch(key){
+  case 4:plan();numeric(planText+'Every cube costs $2. How much does it cost to build this model, in dollars?',2*total,`There are ${heights.join(' + ')} = ${total} cubes: ${total} × $2 = $${2*total}.`,[total,2*occupied]);break;
+  case 5:{const next=heights.slice();next[3]=0;const view=[0,1,2].map(i=>Math.max(next[i],next[i+3]));plan();list(planText+'The front-left stack is removed completely. Type the new front-view heights, left to right.',view,'A stack behind can now be seen in that column; take the tallest remaining stack in each column.',[front,[0,front[1],front[2]]]);break;}
+  case 6:plan();list(planText+'The back row is moved to stand in front of the front row. Type the new side profile, back row first.',[side[1],side[0]],'The rows swap places, so the side profile is listed the other way round.',[side]);break;
+  case 7:plan();numeric(planText+'How many cubes must be removed so that no stack is taller than 1 cube?',total-occupied,`Keep one cube on each of the ${occupied} occupied positions: ${total} − ${occupied} = ${total-occupied}.`,[total,occupied]);break;
+  case 8:numeric(`A footprint has ${a} occupied positions and the model uses exactly ${a+k} cubes. Every stack is at least 1 cube tall. What is the tallest any single stack could be?`,k+1,`Put 1 cube on ${a-1} positions; the last stack gets ${a+k} − ${a-1} = ${k+1}.`,[k,a+k,a]);break;
+  case 12:numeric(`A triangle has sides of ${a} cm and ${b} cm. How many different whole-number lengths could the third side be?`,2*Math.min(a,b)-1,`The third side is strictly between ${Math.abs(a-b)} and ${a+b}: from ${Math.abs(a-b)+1} to ${a+b-1}, which is ${2*Math.min(a,b)-1} lengths.`,[2*Math.min(a,b),a+b-1,Math.abs(a-b)]);break;
+  case 21:{const p={x,y};plane([p]);point(`P = ${pair(p)} is translated by the vector (${dx}, ${dy}) three times in a row. Type the final position of P.`,{x:x+3*dx,y:y+3*dy},`Three translations add up to (${3*dx}, ${3*dy}).`,[{x:x+dx,y:y+dy}]);break;}
+  case 22:case 23:{const reflectX=key===22,p={x,y};plane([p]);point(`P = ${pair(p)} is reflected in the ${reflectX?'x':'y'}-axis to give Q. Type the point halfway between P and Q.`,reflectX?{x,y:0}:{x:0,y},`P and its image are the same distance either side of the mirror line, so the midpoint lies on the ${reflectX?'x':'y'}-axis.`,[reflectX?{x:0,y}:{x,y:0}]);break;}
+  case 24:{const line=int(1,3),p={x,y};plane([p]);point(`P = ${pair(p)}. Reflect it in the vertical line x = ${line}. Type the image of P.`,{x:2*line-x,y},`P is ${line-x} units left of x = ${line}, so the image is ${line-x} units to the right: x = ${2*line-x}.`,[{x:-x,y},{x:line-x,y}]);break;}
+  case 25:{const p={x,y};plane([p]);point(`P = ${pair(p)} is rotated 270° clockwise about the origin. Type the image of P.`,{x:-y,y:x},'270° clockwise is the same as 90° anticlockwise: (x, y) → (−y, x).',[{x:y,y:-x}]);break;}
+  case 26:{const centre={x:int(-1,1),y:int(-1,1)},p={x:centre.x+2,y:centre.y+1};plane([p],{centre});point(`P = ${pair(p)} is rotated 180° about C = ${pair(centre)}. Type the image of P.`,{x:centre.x-2,y:centre.y-1},'A half-turn about C puts the image the same distance from C on the opposite side.',[{x:-p.x,y:-p.y}]);break;}
+  case 28:{const [p1,p2]=pick([[30,60],[25,45],[50,60],[35,55],[20,40],[40,70]]),third=180-p1-p2,ang=[p1,p2,third],name=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';flow({question:'Any angle equal to 90°?',yes:'Right-angled',no:{question:'Any angle greater than 90°?',yes:'Obtuse',no:'Acute'}});choose(`A triangle has angles of ${p1}° and ${p2}°. Find the third angle, then trace this classifier. Type the output.`,name,['Acute','Right-angled','Obtuse','No output'].filter(s=>s!==name),`The third angle is 180° − ${p1}° − ${p2}° = ${third}°. Then follow each decision in order.`);break;}
+  default:visual=before.visual;answerLabels=before.answerLabels;
+  }
  }
  const options=[...new Set([answer,...wrong])].slice(0,4);if(!prompt||options.length!==4)throw Error(`Invalid options ${key}/${role}: ${prompt}`);
  for(let i=3;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
