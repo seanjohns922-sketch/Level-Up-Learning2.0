@@ -4,7 +4,7 @@ import {loadMeasurement7} from './measurement7-loader.mjs';
 const {MEASUREMENT7_WEEKS,measurement7Guide,measurement7IntroExample}=loadMeasurement7('curriculum');
 const {measurement7Question}=loadMeasurement7('questions');
 const rows=[['Level','Strand','Week','Topic','Activity','Title','Learning intention','Curriculum','Teaching support','Worked example','Reasoning example','Application example','Student progression','Release']];
-const example=q=>`${q.prompt} Answer: ${q.answer.replace(/[.]$/,'')}. ${q.explanation}`;
+const example=q=>`${q.prompt}${q.measurementVisual?.polygonAngleLabels?' Diagram angles: '+q.measurementVisual.polygonAngleLabels.join(', ')+'.':''} Answer: ${q.answer.replace(/[.]$/,'')}. ${q.explanation}`;
 // A different seed per lesson keeps the worked examples from reusing the same numbers.
 const seedFor=(i,j)=>7007+(i*3+j)*131;
 MEASUREMENT7_WEEKS.forEach((w,i)=>{

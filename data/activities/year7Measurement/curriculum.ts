@@ -1,3 +1,4 @@
+import {polygonAngleVisual} from './polygonVisual';
 import type { WeekPlan } from '@/data/programs/year1';
 export const MEASUREMENT7_WEEKS = [
  {title:'Area from rectangles',code:'AC9M7M01',lessons:[
@@ -39,7 +40,7 @@ export const MEASUREMENT7_WEEKS = [
  {title:'Polygon angle sums',code:'AC9M7M05',lessons:[
  ['Split a quadrilateral','derive a quadrilateral’s 360-degree interior angle sum','One diagonal splits a simple quadrilateral into two triangles: two lots of 180 degrees.','The diagonal does not create extra polygon corners.'],
  ['Generalise polygon sums','use triangulation to find a polygon’s interior angle sum','Split the shape into triangles from one corner. Each triangle adds 180° to the total.','The number of triangles is two fewer than the number of sides.'],
- ['Find missing polygon angles','use an angle sum to determine a missing angle','Subtract the sum of the known interior angles from the whole polygon’s interior angle sum.','Only regular polygons have all interior angles equal.']]},
+ ['Find missing polygon angles','use an angle sum to determine a missing angle','Subtract the sum of the known interior angles from the whole polygon’s interior angle sum.','Only share the angle sum equally when all the angles are equal.']]},
  {title:'Ratio models for measurement',code:'AC9M7M06',lessons:[
  ['Scale a recipe','scale capacity quantities while preserving a ratio','Multiply each part of a recipe by the same scale factor.','Adding the same amount to each ingredient does not preserve a ratio.'],
  ['Share a measured total','divide a mass or capacity total in a given ratio','Add the ratio parts, find one part, then multiply for the required share.','Part-to-part ratios are different from fractions of the whole.'],
@@ -50,12 +51,18 @@ export const MEASUREMENT7_WEEKS = [
  ['Justify a practical plan','choose and explain a feasible ratio plan with costs','Model the total in ratio parts, calculate each ingredient and its cost, then check the budget.','A valid plan must meet the quantity, ratio and budget constraints.']]},
 ] as const;
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const MEASUREMENT7_READABILITY_REVISION = 3;
+export const MEASUREMENT7_READABILITY_REVISION = 4;
 export function measurement7Guide(week:number,lesson:number){const w=MEASUREMENT7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const MEASUREMENT7_PROGRAM:WeekPlan[]=MEASUREMENT7_WEEKS.map((w,i)=>({id:`y7-measurement-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code] as WeekPlan['curriculum'],lessons:w.lessons.map((l,j)=>({id:`y7-measurement-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/measurement/lesson?realm_id=measurement&year=Year%207&week=${i+1}&lessonId=y7-measurement-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[w.code] as WeekPlan['curriculum'],activityIdeas:[l[1],'explain my method and check units and reasonableness'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{mode:`m7_w${i+1}_l${j+1}_${role}`,rotationRole:role,rotationLabel:role==='fast_thinking'?'Fluency':role==='reasoning'?'Reasoning':'Apply',lessonStructure:'8_minute_rotation'}}))}))}));
 
 // Concrete opening examples before the more varied practice questions.
 export function measurement7IntroExample(week:number,lesson:number){
+ if(week===10&&lesson===3)return {
+  prompt:'Find angle x in this quadrilateral.',answer:'80°',
+  explanation:'360° − 280° = 80°.',
+  steps:['A quadrilateral has an angle sum of 360°.','Add the known angles: 90° + 110° + 80° = 280°.','Subtract: 360° − 280° = 80°.'],
+  measurementVisual:polygonAngleVisual([90,110,80,80],['90°','110°','80°','x°']),
+ };
  if(week===10&&lesson===2)return {
   prompt:'A pentagon has 5 sides. Find its interior angle sum.',
   answer:'540°',

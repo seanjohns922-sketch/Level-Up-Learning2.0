@@ -38,7 +38,7 @@ function expected(key,q){
  case 27:return A?a-b:a+b;
  case 28:return A?180-(360-a-b-c):360-a-b-c;
  case 29:return A?a/180+2:(a-2)*180;
- case 30:{if(A){const sides=a+b;return ((sides-2)*180-90*a)/b;}const sides=p.includes('pentagon')?5:6;return (sides-2)*180-b;}
+ case 30:{const labels=vis.polygonAngleLabels,known=labels.filter(x=>x!=='x°').reduce((sum,x)=>sum+parseFloat(x),0),unknown=labels.filter(x=>x==='x°').length;return ((labels.length-2)*180-known)/unknown;}
  case 31:return c*(A?a+b:b)/a;
  case 32:return c/(a+b)*(A?b-a:a);
  case 33:{const s=Math.min(c/a,d/b);return A?c+d-(a+b)*s:(a+b)*s;}
@@ -161,3 +161,17 @@ for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','apply_create
 assert.deepEqual([...positions].sort(),['aboveLeft','aboveRight','belowLeft','belowRight']);
 for(let lesson=1;lesson<=3;lesson++)for(let seed=1;seed<=100;seed++)assert.equal(measurement7Question(7,lesson,seed,'apply_create').measurementVisual.task,'parallel');
 console.log('PASS rail and railway diagrams: all four target positions and visible givens.');
+
+// Check actual polygon geometry, not just the sum of the displayed labels.
+for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','apply_create']){
+ const q=measurement7Question(10,3,seed*7919,role),v=q.measurementVisual,points=v.polygonPoints;
+ assert.equal(v.task,'polygonAngles');assert.equal(points.length,v.polygonAngleLabels.length);
+ points.forEach((p,i)=>{
+  const prev=points[(i+points.length-1)%points.length],next=points[(i+1)%points.length];
+  const a=[prev[0]-p[0],prev[1]-p[1]],b=[next[0]-p[0],next[1]-p[1]];
+  const angle=Math.acos((a[0]*b[0]+a[1]*b[1])/(Math.hypot(...a)*Math.hypot(...b)))*180/Math.PI;
+  const label=v.polygonAngleLabels[i],expected=label==='x°'?parseFloat(q.answer):parseFloat(label);
+  assert.ok(Math.abs(angle-expected)<0.011,`${label}: drawn ${angle}, expected ${expected}`);
+ });
+}
+console.log('PASS 400 polygon diagrams: geometry matches every given and unknown angle.');
