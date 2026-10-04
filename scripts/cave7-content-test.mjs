@@ -58,20 +58,48 @@ function verify(q){
   }
  }
  if(realm==='statistics'){
-  const observations=v?.kind==='table'&&v.headers[0]==='Observation'?v.rows.map(r=>Number(r[1])):null;
-  if(key===4)expected=mean(observations);
-  if(key===5)expected=5*n[0]-observations.reduce((s,n)=>s+n,0);
-  if(key===6){const rows=v.rows.map(r=>r.map(Number));expected=rows.reduce((s,[x,f])=>s+x*f,0)/rows.reduce((s,[,f])=>s+f,0);}
-  if(key===7||key===8)expected=med(observations);
-  if(key===10)expected=Math.max(...observations)-Math.min(...observations);
-  if(key===11)expected=mean([...observations,n[0]])-mean(observations);
-  if(key===12){const sorted=[...observations].sort((a,b)=>a-b);sorted[sorted.length-1]=n[1];expected=med(sorted);}
-  if(key===16){const row=v.rows[1];expected=Number(row[0])*10+2;}
-  if(key===17){const leaves=observations.map(n=>n%10).sort((a,b)=>a-b).join(' ');assert.equal(q.answer,leaves);}
-  if(key===18){const values=v.rows.flatMap(([stem,leaves])=>leaves.split(' ').map(l=>Number(stem)*10+Number(l)));expected=A?Math.max(...values)-Math.min(...values):med(values);}
-  if(key===19)expected=observations.filter(x=>x===n[0]).length;
-  if(key===20)expected=v.counts.reduce((s,c,i)=>s+(!A||v.values[i]>n[0]?c:0),0);
-  if(key===28)expected=A?Math.max(...observations)-Math.min(...observations):mean(observations);
+  // Independent Statistics checks: recompute every typed answer from the prompt and the visual.
+  const D=v?.kind==='data'?v.values:v?.kind==='dotplot'?v.groups[0].values:v?.kind==='stemleaf'?v.stems.flatMap((st,i)=>v.leaves[i].map(l=>v.decimal?st+l/10:st*10+l)):v?.kind==='frequency'?v.values.flatMap((x,i)=>Array(v.counts[i]).fill(x)):null;
+  const Left=v?.kind==='stemleaf'&&v.left?v.stems.flatMap((st,i)=>v.left[i].map(l=>st*10+l)):null;
+  const rows=v?.kind==='table'?v.rows:null,group=i=>rows[i][1].split(',').map(Number),wf=()=>rows.reduce((t,[x,f])=>t+Number(x)*Number(f),0)/rows.reduce((t,[,f])=>t+Number(f),0);
+  const rng=a=>Math.max(...a)-Math.min(...a),P=n,F=!A&&!R,close=(a,b)=>Math.abs(a-b)<1e-4;
+  const listIs=xs=>{const got=q.answer.split(',').map(Number);assert.equal(got.length,xs.length,JSON.stringify({key,q}));got.forEach((g,i)=>assert.ok(close(g,xs[i]),JSON.stringify({key,xs,q})));};
+  const modesOf=a=>{const c=new Map();a.forEach(x=>c.set(x,(c.get(x)??0)+1));const top=Math.max(...c.values());return [...c].filter(([,k])=>k===top).map(([x])=>x).sort((x,y)=>x-y);};
+  const stem=()=>Number([...q.prompt.matchAll(/stem (\d+)/g)].at(-1)[1]);
+  switch(key){
+   case 1:assert.ok(F||R?['Discrete','Continuous'].includes(q.answer):Number.isInteger(value));break;
+   case 2:if(A)expected=2*P.at(-2)*P.at(-1);break;
+   case 3:if(R)expected=q.prompt.includes(' mm.')?P[0]/10:P[0]*100;if(A)listIs(P.slice(1,4).map(x=>x+P[0]));break;
+   case 4:if(F)expected=mean(D);else if(R){if(q.prompt.includes('increased by')){assert.ok(close(P[0],mean(D)));expected=P[0]+P[1];}else expected=mean(D);}else expected=mean(D)*P[0];break;
+   case 5:if(F)expected=P[0]*P[1]-D.reduce((t,x)=>t+x,0);else if(R)expected=P[3]*P[2]-P[0]*P[1];else expected=5*P[0]-D.reduce((t,x)=>t+x,0);break;
+   case 6:expected=A?wf()*P[0]:wf();break;
+   case 7:expected=A?med([...D].sort((a,b)=>a-b).slice(0,-1)):med(D);break;
+   case 8:expected=A?med([...D,P[0]]):med(D);break;
+   case 9:if(F)listIs(modesOf(D));else if(R){const top=Math.max(...rows.map(r=>Number(r[1])));expected=Number(rows.find(r=>Number(r[1])===top)[0]);}else expected=modesOf(D)[0];break;
+   case 10:if(F)expected=rng(D);else if(R)expected=q.prompt.includes('smallest value is')?P[1]+P[0]:P[1]-P[0];else expected=rng(group(1))-rng(group(0));break;
+   case 11:if(F)expected=mean([...D,P[0]])-mean(D);else if(R)expected=(P[0]*P[1]-P[2])/P[3];else expected=(P[0]-P[1])/D.length;break;
+   case 12:if(F){if(q.prompt.includes('replaced')){const s=[...D].sort((a,b)=>a-b);s[s.length-1]=P[0];expected=med(s);}else expected=med([...D,P[0]]);}else if(R)listIs([mean([...D,P[0]])-mean(D),med([...D,P[0]])-med(D)]);else expected=med([...D,P[0]]);break;
+   case 13:if(R)assert.equal(q.answer,mean(D)>med(D)?'Mean':'Median');if(A)assert.equal(q.answer.split(':')[0],Math.max(...D)-med(D)>20?'Median':'Mean');break;
+   case 14:if(F)listIs([mean(group(0)),mean(group(1))]);else if(R){const known=rows[1][1].split(',').filter(x=>x.trim()!=='?').map(Number);expected=5*mean(group(0))-known.reduce((t,x)=>t+x,0);}else assert.equal(q.answer,rng(group(0))<rng(group(1))?'A':'B');break;
+   case 15:if(F)expected=Math.abs(med(group(0))-med(group(1)));else if(R){const [[,mA,rA],[,mB,rB]]=rows.map(r=>r.map(Number));assert.ok(q.answer.includes(Number(mB)<Number(mA)?'lower mean':'higher mean')&&q.answer.includes(Number(rB)>Number(rA)?'larger range':'smaller range'));}else expected=(P[0]*P[1]+P[2]*P[3])/(P[0]+P[2]);break;
+   case 16:if(A)expected=D.filter(x=>x>P[0]).length;else expected=v.decimal?P[0]+P[1]/10:P[0]*10+P[1];break;
+   case 17:{const S=stem(),dec=D.some(x=>!Number.isInteger(x));listIs(D.filter(x=>Math.floor(dec?x+1e-9:x/10)===S).map(x=>dec?Math.round(x*10)%10:x%10).sort((a,b)=>a-b));break;}
+   case 18:expected=F?med(D):R?rng(D):med([...D,P[0]]);break;
+   case 19:if(F)expected=D.filter(x=>x===P[0]).length;else if(R){const full=P,missing=[...new Set(full)].filter(x=>full.filter(y=>y===x).length>D.filter(y=>y===x).length);assert.deepEqual(missing,[value]);}else expected=med(D);break;
+   case 20:if(F)expected=D.length;else if(R)expected=D.filter(x=>x>P[1]).length;else expected=mean(D);break;
+   case 21:if(F)expected=Math.max(...Left);else if(R)assert.equal(q.answer,med(Left)>med(D)?'A':'B');else expected=Math.abs(med(v.groups[0].values)-med(v.groups[1].values));break;
+   case 22:if(!A){const shape=q.answer;if(shape==='Positive')assert.ok(mean(D)>med(D));if(shape==='Negative')assert.ok(mean(D)<med(D));if(shape==='Symmetric'){const c=v.counts;assert.deepEqual(c,[...c].reverse());}}break;
+   case 23:if(F){const u=[...new Set(D)].sort((a,b)=>a-b),i=u.findIndex((x,j)=>j&&x-u[j-1]>1);listIs([u[i-1],u[i]]);}else if(R){const m=med(D);expected=D.reduce((b,x)=>Math.abs(x-m)>Math.abs(b-m)?x:b);}else expected=rng(D.filter(x=>x!==P[0]));break;
+   case 24:if(F)listIs([mean(D),med(D)]);else if(R)assert.equal(q.answer,close(mean(D),med(D))?'Equal':mean(D)>med(D)?'Mean':'Median');else expected=mean(D);break;
+   case 25:if(A)expected=mean(group(1))-mean(group(0));break;
+   case 26:{if(F)break;const fixed=D.map(x=>x<10?Math.round(x*100):x);expected=R?fixed[D.findIndex(x=>x<10)]:mean(fixed);break;}
+   case 27:if(F)listIs([mean(group(0)),mean(group(1))]);else if(R)assert.ok(q.answer.includes(`${Math.round((mean(group(1))-mean(group(0)))*1e4)/1e4} cm greater`)&&q.answer.includes(rng(group(1))<rng(group(0))?'smaller':'larger'));else expected=(mean(group(1))-mean(group(0)))/mean(group(0))*100;break;
+   case 28:if(F)expected=mean(D);else if(R)listIs([med(D),rng(D)]);else expected=mean(group(1))-mean(group(0));break;
+   case 29:if(A)expected=P[0]-med(D);break;
+   case 30:if(A)expected=P[0]/P[1]*100;break;
+  }
+  // Word answers are typed without a unit beside the box.
+  if(/^[A-Za-z]+$/.test(q.answer))assert.ok(!q.answerUnit);
  }
  if(realm==='chance'){
   const wedges=v?.kind==='chance'?v.apparatus.wedges:null,red=wedges?.filter(c=>c==='#e5484d').length;
@@ -116,5 +144,20 @@ for(const [realm,weeks] of Object.entries(CAVE7_CURRICULA)){
  }
  assert.ok(typed/total>=0.8,`Algebra typed share ${typed}/${total}`);
  console.log(`PASS Algebra: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, varied answers, unlabelled graph points.`);
+}
+// Statistics regression guards: separate reasoning tasks, mostly typed answers and varied answers.
+{
+ const {level7Answer}=loadCave7('lib/level7-answer.ts');const gen=CAVE7_GENERATORS.statistics;let typed=0,total=0;
+ for(let w=1;w<=10;w++)for(let l=1;l<=3;l++){
+  const answers={fast_thinking:new Set(),reasoning:new Set(),apply_create:new Set()};
+  for(let seed=1;seed<=100;seed++){
+   const f=gen(w,l,seed*7919,'fast_thinking'),r=gen(w,l,seed*7919,'reasoning'),a=gen(w,l,seed*7919,'apply_create');
+   assert.ok(f.prompt!==r.prompt&&f.prompt!==a.prompt,`Statistics W${w}L${l}: reasoning or application repeats fluency`);
+   for(const q of [f,r,a]){total++;if(level7Answer(q))typed++;answers[q.tier].add(q.answer);}
+  }
+  for(const [role,set] of Object.entries(answers))assert.ok(set.size>=2,`Statistics W${w}L${l} ${role}: answer never changes`);
+ }
+ assert.ok(typed/total>=0.8,`Statistics typed share ${typed}/${total}`);
+ console.log(`PASS Statistics: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, no fixed answers.`);
 }
 console.log(`PASS ${count} generated Algebra/Statistics/Probability questions and ${quizzes} quiz items: independent calculations, balanced weekly coverage and inequivalent numeric choices.`);

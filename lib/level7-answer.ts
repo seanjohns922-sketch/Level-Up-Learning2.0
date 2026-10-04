@@ -18,7 +18,8 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(legacyIntegers&&(!q.options||q.options.length<2||q.options.some(value=>!/^[-−]?\d+$/.test(value))))return null;
  const p=legacyIntegers?`Which integer is smallest: ${q.options!.join(', ')}?`:q.prompt;
  const prompt=p.replace(/Which list is the complete sample space\?/,'List every outcome in the sample space.').replace(/Which fraction is at P\?/,'What fraction is at P?').replace(/Which expression matches\?/,'Write an expression.').replace(/Which expression gives/g,'Write an expression for').replace(/Which ordered pair/g,'What ordered pair');
- const unit=q.answerUnit?(q.answerUnit==='dollars'?'$':q.answerUnit):/percentage|percent(?!age)/i.test(p)&&!p.includes('decimal')?'%':/in cm³/.test(p)?'cm³':/in m³/.test(p)?'m³':/in cm²/.test(p)?'cm²':/in m²/.test(p)?'m²':/in degrees/.test(p)?'°':/in dollars/.test(p)?'$':/in mL/.test(p)?'mL':/in g\/cm³/.test(p)?'g/cm³':/\bin (?:litres|L)\b|How many litres/.test(p)?'L':/\bin km\b/.test(p)?'km':/\bin kg\b/.test(p)?'kg':/\bin cm\b(?![²³])/.test(p)?'cm':/\bin (?:metres|m)\b(?![²³])/.test(p)?'m':undefined;
+ // An empty answerUnit means the generator has declared the answer unitless.
+ const unit=q.answerUnit!==undefined?(q.answerUnit==='dollars'?'$':q.answerUnit||undefined):/percentage|percent(?!age)/i.test(p)&&!p.includes('decimal')?'%':/in cm³/.test(p)?'cm³':/in m³/.test(p)?'m³':/in cm²/.test(p)?'cm²':/in m²/.test(p)?'m²':/in degrees/.test(p)?'°':/in dollars/.test(p)?'$':/in mL/.test(p)?'mL':/in g\/cm³/.test(p)?'g/cm³':/\bin (?:litres|L)\b|How many litres/.test(p)?'L':/\bin km\b/.test(p)?'km':/\bin kg\b/.test(p)?'kg':/\bin cm\b(?![²³])/.test(p)?'cm':/\bin (?:metres|m)\b(?![²³])/.test(p)?'m':undefined;
  const base={expected,prompt,unit};
  if(/prime factorisation|expanded form/i.test(p))return null;
  if(expected.includes('=')&&!/^[a-zA-Z]\s*=/.test(expected))return null;
@@ -35,8 +36,13 @@ export function level7Answer(q:Question):Level7Answer|null{
   const family=expected.match(/^(Rhombus|Parallelogram|Isosceles) \(.*\)$/);
   if(family)return {...base,kind:'text',expected:family[1]};
  }
- if(q.lessonId.startsWith('y7-statistics-')&&/^(Discrete|Continuous):/.test(expected))return {...base,kind:'text',expected:expected.split(':')[0],prompt:p+' Write discrete or continuous.'};
- if(q.lessonId.startsWith('y7-statistics-')&&/^(Mean|Median|Mode|Range), because/.test(expected))return {...base,kind:'text',expected:expected.split(',')[0]};
+ if(q.lessonId.startsWith('y7-statistics-')){
+  if(/^(Discrete|Continuous):/.test(expected))return {...base,unit:undefined,kind:'text',expected:expected.split(':')[0],prompt:p+' Write discrete or continuous.'};
+  if(/^(Mean|Median|Mode|Range), because/.test(expected))return {...base,unit:undefined,kind:'text',expected:expected.split(',')[0]};
+  // One-word statistical judgements (shape, centre, group) are recalled rather than chosen.
+  if(/^(Discrete|Continuous|Positive|Negative|Symmetric|Bimodal|Mean|Median|Mode|Equal|A|B)$/.test(expected))return {...base,unit:undefined,kind:'text'};
+  if(/\bmodes?\b/i.test(p)&&/^-?[\d.]+(?:,\s*-?[\d.]+)+$/.test(expected))return {...base,kind:'set'};
+ }
  if(q.lessonId.startsWith('y7-space-')&&/^[A-F]$/.test(expected))return {...base,kind:'text'};
 
  if(/^\(?\s*-?[\d.]+\s*,\s*-?[\d.]+\s*\)?$/.test(expected)&&/point|coordinate|pair|image|P =/i.test(p))return {...base,kind:'coordinates',labels:['x','y']};

@@ -106,10 +106,10 @@ const curriculum = [
         "caution": "No single measure is best for every data set."
       },
       {
-        "title": "Compare equal centres",
-        "goal": "explain why equal averages can hide different spread",
-        "idea": "Compare range and the pattern of values as well as the centre.",
-        "caution": "Equal means do not mean identical distributions."
+        "title": "Same centre, different data",
+        "goal": "build and compare data sets that share a mean or median",
+        "idea": "Mean × count gives the total, so different sets with the same total share a mean; compare their ranges too.",
+        "caution": "Equal means do not mean identical distributions or equal spread."
       },
       {
         "title": "Compare groups fairly",
@@ -160,10 +160,10 @@ const curriculum = [
         "caution": "Frequency and the measured value are different quantities."
       },
       {
-        "title": "Choose a numerical display",
-        "goal": "choose a display that supports a comparison",
-        "idea": "A useful display makes the relevant distribution features visible.",
-        "caution": "A display must preserve the data and make its scale clear."
+        "title": "Compare groups with displays",
+        "goal": "compare two groups using back-to-back stem-and-leaf plots and parallel dot plots",
+        "idea": "Put both groups on a common scale, then compare their centres and spreads.",
+        "caution": "In a back-to-back plot, read left-side leaves outward from the stem: leaf 3 on stem 4 is still 43."
       }
     ]
   },
@@ -172,9 +172,9 @@ const curriculum = [
     "code": "AC9M7ST02",
     "lessons": [
       {
-        "title": "Describe symmetry and skew",
-        "goal": "describe a distribution from its shape",
-        "idea": "A long right tail suggests positive skew; a long left tail suggests negative skew.",
+        "title": "Describe symmetry, skew and bimodal shapes",
+        "goal": "describe a distribution as symmetric, positively or negatively skewed, or bimodal",
+        "idea": "A long right tail is positive skew, a long left tail is negative skew, and two separate peaks make a bimodal shape.",
         "caution": "Name skew using the tail, not the tallest cluster."
       },
       {
@@ -186,7 +186,7 @@ const curriculum = [
       {
         "title": "Connect shape and centre",
         "goal": "explain how shape affects mean and median",
-        "idea": "Extreme values pull the mean toward the tail; the median follows the middle positions.",
+        "idea": "In a symmetric distribution the mean and median are equal or close; in a skewed one the mean is pulled toward the tail.",
         "caution": "Do not assume mean and median must always be equal."
       }
     ]
