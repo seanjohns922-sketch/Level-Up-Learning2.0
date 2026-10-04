@@ -191,6 +191,8 @@ export default function MultipleChoiceActivity({
   const theme = getRealmTheme(realmId);
   const isNewCaveQuestion = "lessonId" in questionData && /^y7-(pattern|statistics|chance)-/.test(String(questionData.lessonId));
   const [picked, setPicked] = useState<string | null>(null);
+  // Quiz answers are not marked on the spot, so say clearly when a typed answer has been saved.
+  const [quizRecorded, setQuizRecorded] = useState(Boolean(initialResponse));
   const [selected, setSelected] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -476,7 +478,7 @@ export default function MultipleChoiceActivity({
       ) : null}
 
       <VisualAnswerLayout visual={questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:questionData.spaceVisual?<Space7LessonVisual visual={questionData.spaceVisual}/>:undefined}>
-      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", (questionData.measurementVisual||questionData.cave7Visual||questionData.spaceVisual) && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
+      {constructed?<><Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>{setQuizRecorded(false);onWrong?.('');}:undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);else setQuizRecorded(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>{renderMode==='quiz'&&quizRecorded&&<p role="status" className="mt-3 rounded-lg border-2 border-emerald-300 bg-emerald-50 px-4 py-2 font-bold text-emerald-900">✓ Answer recorded. You can change it before you submit.</p>}</>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", (questionData.measurementVisual||questionData.cave7Visual||questionData.spaceVisual) && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)

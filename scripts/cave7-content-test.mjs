@@ -66,7 +66,35 @@ function verify(q){
   const listIs=xs=>{const got=q.answer.split(',').map(Number);assert.equal(got.length,xs.length,JSON.stringify({key,q}));got.forEach((g,i)=>assert.ok(close(g,xs[i]),JSON.stringify({key,xs,q})));};
   const modesOf=a=>{const c=new Map();a.forEach(x=>c.set(x,(c.get(x)??0)+1));const top=Math.max(...c.values());return [...c].filter(([,k])=>k===top).map(([x])=>x).sort((x,y)=>x-y);};
   const stem=()=>Number([...q.prompt.matchAll(/stem (\d+)/g)].at(-1)[1]);
-  switch(key){
+  // Second application forms, recognised by their wording.
+  const tot=a=>a.reduce((t,x)=>t+x,0),pr=q.prompt;let alt=true;
+  if(!A)alt=false;
+  else if(/How many of these survey questions/.test(pr)){const numeric=['How tall','How many hours','How far','How many books'];expected=pr.split(/\(\d\) /).slice(1).filter(x=>numeric.some(n=>x.startsWith(n))).length;}
+  else if(/recorded three lengths in mm/.test(pr))listIs(P.slice(0,3).map(x=>x/10));
+  else if(/One friend leaves/.test(pr))expected=5*P[0]-4*P[1];
+  else if(/households like these/.test(pr))expected=wf()*P[0];
+  else if(/Two more values are added/.test(pr))expected=med(D);
+  else if(/winner’s time/.test(pr))expected=med([...D].sort((a,b)=>a-b).slice(1));
+  else if(/exactly two modes/.test(pr)){const c=new Map();D.forEach(x=>c.set(x,(c.get(x)??0)+1));expected=[...c].find(([,k])=>k===2)[0];}
+  else if(/By how much does the range increase/.test(pr))expected=Math.max(P[0],...D)-Math.min(P[0],...D)-rng(D);
+  else if(/one-off bonus/.test(pr))expected=P[1]-P[2]/P[0];
+  else if(/two largest values were recording errors/.test(pr))expected=med([...D].sort((a,b)=>a-b).slice(0,-2));
+  else if(/Type mean, median or mode/.test(pr)&&key===13){const big=Math.max(...D)-med(D)>50,common=/sells most/.test(pr);assert.equal(q.answer,common?'Mode':big?'Median':'Mean');}
+  else if(/added to each/.test(pr)){const a=group(0),k=P[0];listIs([mean(a)+k,rng(a)]);}
+  else if(/higher is Class B’s mean journey time/.test(pr)){const mA=Number(rows[0][1].match(/\d+/)[0]);expected=mean(group(1))-mA;}
+  else if(/total of all the values on stem/.test(pr)){const S=stem();expected=tot(D.filter(x=>Math.floor(x/10)===S));}
+  else if(/key \d{2} \| 2 = \d{3} cm/.test(pr)){const S=stem();listIs(D.filter(x=>Math.floor(x/10)===S).map(x=>x%10).sort((a,b)=>a-b));}
+  else if(/mean of the values in this plot/.test(pr))expected=mean(D);
+  else if(/range of the data in the dot plot/.test(pr))expected=rng(D);
+  else if(/What percentage of the students read more than/.test(pr))expected=D.filter(x=>x>P[0]).length/D.length*100;
+  else if(/ranges of the two groups differ/.test(pr))expected=Math.abs(rng(Left)-rng(D));
+  else if(/lie before the gap/.test(pr)){const u=[...new Set(D)].sort((a,b)=>a-b),i=u.findIndex((x,j)=>j&&x-u[j-1]>1);expected=D.filter(x=>x<u[i]).length;}
+  else if(/mean minus the median/.test(pr))expected=mean(D)-med(D);
+  else if(/Design A had a median flight/.test(pr))expected=med(D)-P[0];
+  else if(/range of the heights/.test(pr))expected=rng(D.map(x=>x<10?Math.round(x*100):x));
+  else if(/difference between the two designs’ ranges/.test(pr))expected=Math.abs(rng(group(0))-rng(group(1)));
+  else alt=false;
+  if(!alt)switch(key){
    case 1:assert.ok(F||R?['Discrete','Continuous'].includes(q.answer):Number.isInteger(value));break;
    case 2:if(A)expected=2*P.at(-2)*P.at(-1);break;
    case 3:if(R)expected=q.prompt.includes(' mm.')?P[0]/10:P[0]*100;if(A)listIs(P.slice(1,4).map(x=>x+P[0]));break;
