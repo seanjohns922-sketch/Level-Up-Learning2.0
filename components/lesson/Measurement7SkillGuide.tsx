@@ -17,8 +17,10 @@ export default function Measurement7SkillGuide({week,lesson,onContinue,review=fa
   <div data-guide-example className="my-5 rounded-xl border border-amber-200 bg-white p-5">
    <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-amber-900">Worked example</h3><ReadAloudBtn text={`${example.prompt} Answer: ${example.answer}. ${example.explanation}`}/></div>
    <p className="mb-3 font-semibold"><MathFormattedText text={example.prompt}/></p>
-   {example.measurementVisual&&<Year7MeasurementAssessmentVisual visual={example.measurementVisual}/>}
-   <p className="mt-3 text-xl font-bold"><MathFormattedText text={example.explanation??''}/></p>
+   <div className={example.measurementVisual?'@container':''}><div className={example.measurementVisual?'grid items-center gap-4 @3xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]':''}>
+    {example.measurementVisual&&<div className="min-w-0"><Year7MeasurementAssessmentVisual visual={example.measurementVisual}/></div>}
+    <p className={`text-xl font-bold ${example.measurementVisual?'mt-3 @3xl:mt-0':'mt-3'}`}><MathFormattedText text={example.explanation??''}/></p>
+   </div></div>
   </div>
   <div data-guide-steps>
    <div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-amber-800">How to solve it</h3><ReadAloudBtn text={example.steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')}/></div>

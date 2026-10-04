@@ -6,7 +6,7 @@ import Number7ContextArt from './Number7ContextArt';
 import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
 import {level7Answer} from '@/lib/level7-answer';
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngine";
 import Cave7Visual from "@/components/lesson/cave7/Cave7Visual";
 import Space7LessonVisual from "@/components/starpath/Space7LessonVisual";
@@ -146,6 +146,17 @@ function SameDenominatorOperationVisual({
       </div>
     </div>
   );
+}
+
+// Diagram on the left, answer on the right when the card is wide enough, so students don't scroll
+// between the measurements and the answer box. Stacks on smaller screens.
+function VisualAnswerLayout({visual,children}:{visual?:ReactNode;children:ReactNode}){
+  if(!visual)return <>{children}</>;
+  // Container query, not viewport: the card narrows when the feedback panel opens beside it.
+  return <div className="@container mt-4"><div data-visual-answer-layout className="grid items-start gap-5 @3xl:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)]">
+    <div className="min-w-0">{visual}</div>
+    <div className="min-w-0 [&>*:first-child]:mt-0">{children}</div>
+  </div></div>;
 }
 
 export default function MultipleChoiceActivity({
@@ -339,7 +350,6 @@ export default function MultipleChoiceActivity({
       ) : null}
       {questionData.cave7Visual && <Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>}
       {questionData.spaceVisual && <Space7LessonVisual visual={questionData.spaceVisual}/>}
-      {questionData.measurementVisual && <Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
       ) : null}
@@ -467,7 +477,8 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", compactOptionColumns].join(" ")}>
+      <VisualAnswerLayout visual={questionData.measurementVisual&&<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}>
+      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", questionData.measurementVisual && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)
@@ -537,6 +548,7 @@ export default function MultipleChoiceActivity({
           );
         })}
       </div>}
+      </VisualAnswerLayout>
       {isMultiSelect ? (
         <div className="mt-5">
           <button

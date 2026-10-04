@@ -851,7 +851,7 @@ export default function AssessmentQuestionCard({
 
   if (type === "numeric") {
     if (visual?.type === "measurement_year5_panel" && visual.task === "construct") return renderedVisual;
-    if ((visual?.type === "measurement_year8_panel" || visual?.type === "measurement_year7_panel" || visual?.type === "measurement_year6_panel" || visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year5_panel") && question.answerFormat) return <div className="space-y-4">{renderedVisual}<MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode}/></div>;
+    if ((visual?.type === "measurement_year8_panel" || visual?.type === "measurement_year7_panel" || visual?.type === "measurement_year6_panel" || visual?.type === "measurement_year4_panel" || visual?.type === "measurement_year5_panel") && question.answerFormat) return <div className="@container"><div className="grid items-start gap-4 @3xl:grid-cols-[minmax(0,1.6fr)_minmax(260px,1fr)]"><div className="min-w-0">{renderedVisual}</div><div className="min-w-0"><MeasurelandsAnswerWidget key={question.id} format={question.answerFormat} value={value} onChange={onChange} inputMode={question.inputMode}/></div></div></div>;
     if (isEarlyNumberVisual) {
       if (visual?.type === "number_y6_coordinate") {
         const [xValue = "", yValue = ""] = (value ?? "").split(",");
