@@ -29,10 +29,10 @@ function expected(key,q){
  case 17:return a/(A?6.28:3.14);
  case 18:return 3.14*a*b/(A?100:1);
  // Week 7 prompts never name the relationship: read it from the diagram or the described positions.
- case 19:case 20:case 21:if(A)return p.includes('angle above the first track')||/second track, on the left/.test(p)?a:180-a;return vis.relation==='cointerior'?180-vis.values[0]:vis.values[0];
+ case 19:case 20:case 21:return vis.relation==='cointerior'?180-vis.values[0]:vis.values[0];
  case 22:{if(A){const [k1,m1]=lin(vis.angleLabels[0]),[k2,m2]=lin(vis.angleLabels[1]);return vis.relation==='cointerior'?(180-m1-m2)/(k1+k2):(m2-m1)/(k1-k2);}const [k,m]=lin(vis.angleLabels[1]),t=vis.relation==='cointerior'?180-vis.values[0]:vis.values[0];return (t-m)/k;}
  case 23:return A?(p.includes('co-interior')?180-a-b:a-b):(p.includes('co-interior')?180-a:a);
- case 24:return A?(/below the bottom rail on the left/.test(p)?180-a:a):(/inside the rails on the left of the brace\?/.test(p)?a:180-a);
+ case 24:return ['aboveLeft','belowRight'].includes(vis.anglePositions[1])?180-vis.values[0]:vis.values[0];
  case 25:return A?a+b:180-a-b;
  case 26:return A?180-(180-a)/2:(180-a)/2;
  case 27:return A?a-b:a+b;
@@ -149,3 +149,15 @@ for(const kind of ['lesson','quiz'])for(const allowed of [false,true]){
 const {generateMeasurement7Question}=loadMeasurement7('questions');
 for(const w of MEASUREMENT7_PROGRAM)for(const lesson of w.lessons)for(const activity of lesson.activities)assert.equal(generateMeasurement7Question(5,lesson,activity).lessonId,lesson.id);
 console.log('PASS demo access, 23 protected routes, invalid and cross-realm links, exact 80% gates, realm-isolated progress and engine generator integration.');
+
+// All rail calculation variants carry their givens visually, including exterior angles.
+const positions=new Set();
+for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','apply_create']){
+ const q=measurement7Question(8,3,seed*7919,role),v=q.measurementVisual;
+ assert.equal(v.task,'parallel');assert.equal(v.anglePositions[0],'belowLeft');
+ positions.add(v.anglePositions[1]);assert.equal(q.prompt,'The rails are parallel. Find angle x.');
+ assert.equal(v.values.length,1,'Do not embed the hidden answer in diagram values');
+}
+assert.deepEqual([...positions].sort(),['aboveLeft','aboveRight','belowLeft','belowRight']);
+for(let lesson=1;lesson<=3;lesson++)for(let seed=1;seed<=100;seed++)assert.equal(measurement7Question(7,lesson,seed,'apply_create').measurementVisual.task,'parallel');
+console.log('PASS rail and railway diagrams: all four target positions and visible givens.');

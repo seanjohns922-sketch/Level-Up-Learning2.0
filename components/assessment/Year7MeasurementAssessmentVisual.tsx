@@ -32,9 +32,11 @@ function Sector({x,y,start,end,label}:{x:number;y:number;start:number;end:number
  const a=point(start,42),b=point(end,42),t=point((start+end)/2,74);
  return <><path d={`M${x} ${y}L${a.join(' ')}A42 42 0 ${end-start>180?1:0} 1 ${b.join(' ')}Z`} fill="#ead9f3" stroke={purple} strokeWidth="2"/>{text(t[0],t[1]+7,label)}</>;
 }
-function Parallel({a,relation,labels}:{a:number;relation:Measurement7Visual['relation'];labels?:[string,string]}){
+function Parallel({a,relation,labels,positions}:{a:number;relation:Measurement7Visual['relation'];labels?:[string,string];positions?:Measurement7Visual['anglePositions']}){
  const upper=350,lower=upper-140/Math.tan(rad(a));
- return <Frame><path d="M60 105H580M60 245H580" stroke={edge} strokeWidth="4"/><path d={`M${lower-70/Math.tan(rad(a))} 315L${upper+65/Math.tan(rad(a))} 40`} stroke={edge} strokeWidth="4"/>{[105,245].map(y=><path key={y} d={`M490 ${y-7}l12 7-12 7m12-14l12 7-12 7`} fill="none" stroke={edge} strokeWidth="3"/>)}<Sector x={upper} y={105} start={relation==='corresponding'?360-a:180-a} end={relation==='corresponding'?360:180} label={labels?.[0]??`${a}°`}/><Sector x={lower} y={245} start={relation==='cointerior'?180:360-a} end={relation==='cointerior'?360-a:360} label={labels?.[1]??'x'}/></Frame>;
+ const sectors={aboveRight:[360-a,360],aboveLeft:[180,360-a],belowLeft:[180-a,180],belowRight:[0,180-a]};
+ const places=positions??[relation==='corresponding'?'aboveRight':'belowLeft',relation==='cointerior'?'aboveLeft':'aboveRight'];
+ return <Frame><path d="M60 105H580M60 245H580" stroke={edge} strokeWidth="4"/><path d={`M${lower-70/Math.tan(rad(a))} 315L${upper+65/Math.tan(rad(a))} 40`} stroke={edge} strokeWidth="4"/>{[105,245].map(y=><path key={y} d={`M490 ${y-7}l12 7-12 7m12-14l12 7-12 7`} fill="none" stroke={edge} strokeWidth="3"/>)}{places.map((place,i)=><Sector key={i} x={i?lower:upper} y={i?245:105} start={sectors[place][0]} end={sectors[place][1]} label={labels?.[i]??(i?'x°':`${a}°`)}/>)}</Frame>;
 }
 function AnglePolygon({n,iso=false,quad=false,angleSumModel=false}:{n:number[];iso?:boolean;quad?:boolean;angleSumModel?:boolean}){
  let points:number[][];
@@ -50,7 +52,7 @@ export function measurement7Speech(v:Measurement7Visual){
  if(v.task==='triPrism')detail=`Triangular end: base ${n[0]} ${u}, perpendicular height ${n[1]} ${u}. Prism length ${n[2]} ${u}.`;
  if(v.task==='circle')detail=v.labels?.includes('symbolic')?(v.circleMeasure==='radius'?'Radius r.':'Diameter d.'):`${v.circleMeasure} ${n[0]} ${u}.`;
  // Describe positions (what a sighted student sees) without naming the relationship.
- if(v.task==='parallel'){const [first,second]=v.angleLabels??[`${n[0]} degrees`,'x'],place=v.relation==='corresponding'?['above the top line, right of the transversal','above the bottom line, right of the transversal']:v.relation==='alternate'?['below the top line, left of the transversal','above the bottom line, right of the transversal']:['below the top line, left of the transversal','above the bottom line, left of the transversal'];detail=`One marked angle, ${first}, is ${place[0]}. The other marked angle, ${second}, is ${place[1]}. Matching arrow marks identify the parallel lines.`;}
+ if(v.task==='parallel'){const [first,second]=v.angleLabels??[`${n[0]} degrees`,'x'],place=v.anglePositions?v.anglePositions.map((p,i)=>`${p.startsWith('above')?'above':'below'} the ${i?'bottom':'top'} line, ${p.endsWith('Right')?'right':'left'} of the transversal`):v.relation==='corresponding'?['above the top line, right of the transversal','above the bottom line, right of the transversal']:v.relation==='alternate'?['below the top line, left of the transversal','above the bottom line, right of the transversal']:['below the top line, left of the transversal','above the bottom line, left of the transversal'];detail=`One marked angle, ${first}, is ${place[0]}. The other marked angle, ${second}, is ${place[1]}. Matching arrow marks identify the parallel lines.`;}
  if(v.task==='triangleAngles')detail=v.labels?.includes('isosceles')?`Top angle ${n[2]} degrees. The left base angle is x. The two sloping sides have matching ticks.`:`Given angles ${n[0]} and ${n[1]} degrees. The top angle is x.`;
  if(v.task==='quadAngles')detail=v.angleSumModel?'A quadrilateral with one dashed diagonal joining opposite corners.':`Three interior angles are ${n.slice(0,3).join(', ')} degrees. The remaining angle is x.`;
  if(v.task==='pairTriangles')detail=`Sail A: base ${n[0]} metres, perpendicular height ${n[1]} metres. Sail B: base ${n[2]} metres, perpendicular height ${n[3]} metres.`;
@@ -64,7 +66,7 @@ export default function Year7MeasurementAssessmentVisual({visual:v}:{visual:Meas
  case 'rectPrism':content=<RectPrism dims={n} unit={u} unknown={v.unknown==='length'}/>;break;
  case 'triPrism':content=<TriPrism n={n} unit={u}/>;break;
  case 'circle':content=<Frame><circle cx="320" cy="185" r="135" fill="#f1e6cd" stroke={edge} strokeWidth="4"/><circle cx="320" cy="185" r="5" fill={edge}/><path d={`M${v.circleMeasure==='diameter'?185:320} 185H455`} stroke={purple} strokeWidth="4"/>{text(v.circleMeasure==='diameter'?320:390,220,v.labels?.includes('symbolic')?(v.circleMeasure==='radius'?'r':'d'):`${n[0]} ${u}`)}</Frame>;break;
- case 'parallel':content=<Parallel a={n[0]} relation={v.relation} labels={v.angleLabels}/>;break;
+ case 'parallel':content=<Parallel a={n[0]} relation={v.relation} labels={v.angleLabels} positions={v.anglePositions}/>;break;
  case 'triangleAngles':case 'quadAngles':content=<AnglePolygon n={n} iso={v.labels?.includes('isosceles')} quad={v.task==='quadAngles'} angleSumModel={v.angleSumModel}/>;break;
  case 'pairTriangles':case 'pairPrisms':content=<div className="[&_text]:text-[34px]" style={{display:'flex',flexWrap:'wrap',gap:12}}>{[0,1].map(i=><div key={i} style={{flex:'1 1 180px',minWidth:0}}><p className="text-center font-bold">{v.task==='pairTriangles'?'Sail':'Box'} {i===0?'A':'B'}</p>{v.task==='pairTriangles'?<Area b={n[i*2]} h={n[i*2+1]} unit={u}/>:i===0?<RectPrism dims={n.slice(0,3)} unit={u}/>:<TriPrism n={n.slice(3)} unit={u}/>}</div>)}</div>;break;
  case 'ratio':content=<div className="flex flex-col items-center gap-4"><Year7ContextArt kind={v.labels?.[0].includes('Concentrate')?'drink':'paint'}/>{v.labels?.map(label=><p key={label} className="text-center text-xl font-bold">{label}</p>)}</div>;break;
