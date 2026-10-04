@@ -26,10 +26,11 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   let task: Task | undefined;
   let paintContext: MultipleChoiceQuestion["paintContext"];
   let visual: MultipleChoiceQuestion["visual"], diagramSpeech: string | undefined;
-  const numberLine = (u:number,d:number) => {
+  const numberLine = (u:number,d:number,direction?:number) => {
     const min=Math.min(0,Math.floor(u/d)-1),max=Math.max(1,Math.ceil(u/d)+1);
     visual={type:"fraction_number_line",title:"Read point P",leftLabel:"",rightLabel:"",leftPosition:min,rightPosition:max,min,max,subdivisions:d,markers:[{label:"P",position:u/d}]};
-    diagramSpeech=`Number line from ${min} to ${max}. Each whole has ${d} equal spaces. P is ${Math.abs(u)} spaces to the ${u<0?'left':'right'} of zero.`;
+    if (direction) visual.jumps={start:u/d,step:direction/d,count:1,label:`1/${d}`};
+    diagramSpeech=`Number line from ${min} to ${max}. Each whole has ${d} equal spaces. P is ${Math.abs(u)} spaces to the ${u<0?'left':'right'} of zero.${direction?` One jump ${direction>0?'right':'left'}, of 1/${d}. The destination is marked with a question mark.`:''}`;
   };
   const choice = (prompt: string, answer: string, wrong: string[], explanation: string) => {
     const options = [...new Set([answer, ...wrong])];
@@ -283,8 +284,8 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     case 10: { const den=pick([8,12,16]),used=den/4,total=n*den; numeric(`A tank holds ${total} L. ${used}/${den} of its capacity is used. How many litres remain?`,total*3/4,[total/4,total-used,total*used],`${used}/${den} simplifies to 1/4. One quarter of ${total} L is ${total} ÷ 4 = ${total/4} L used, so ${total} − ${total/4} = ${total*3/4} L remain.`); break; }
     case 11: { const q=pick([1,3]),length=n+a+.75,cut=a+q/4; numeric(`A rope is ${length} m long. A piece of ${a} ${q}/4 m is cut off. How many metres remain?`,length-cut,[length+cut,length-a,length-a-q/10],`Convert ${a} ${q}/4 to ${fmt(cut)} m, then subtract from ${length} m to get ${fmt(length-cut)} m.`); break; }
     case 12: { const percent=pick([15,35,45,60,65,85]),whole=pick([20,40,60,80]),part=whole*percent/100; numeric(`${part} of a club's ${whole} members attend. What percentage attend?`,percent,[part,100-percent,whole-part],`Attendance as a fraction is ${part}/${whole} = ${frac(part,whole)}. Scale to hundredths: ${percent}/100 = ${percent}%.`); break; }
-    case 13: { const d=pick([2,4,5]),u=d+a+(a%d===0?1:0);numberLine(u,d);numeric(`Start at P. Move 1/${d} to the right. What decimal do you reach?`,(u+1)/d,[(u-1)/d,u/d,(u+d)/d],`P is ${fmt(u/d)}. Move one space right: ${fmt(u/d)} + ${fmt(1/d)} = ${fmt((u+1)/d)}.`); break; }
-    case 14: { const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0)),direction=seed%2===0?1:-1;numberLine(u,d);numeric(`Move 1/${d} ${direction>0?'right':'left'} from P. Give the new decimal.`,(u+direction)/d,[(u-direction)/d,u/d,-(u+direction)/d],`P is ${fmt(u/d)}. Moving ${direction>0?'right adds':'left subtracts'} ${fmt(1/d)}. You reach ${fmt((u+direction)/d)}.`); break; }
+    case 13: { const d=pick([2,4,5]),u=d+a+(a%d===0?1:0);numberLine(u,d,1);numeric(`Start at P. Move 1/${d} to the right. What decimal do you reach?`,(u+1)/d,[(u-1)/d,u/d,(u+d)/d],`P is ${fmt(u/d)}. Move one space right: ${fmt(u/d)} + ${fmt(1/d)} = ${fmt((u+1)/d)}.`); break; }
+    case 14: { const d=pick([2,4,5]),u=-(d+a+(a%d===0?1:0)),direction=seed%2===0?1:-1;numberLine(u,d,direction);numeric(`Move 1/${d} ${direction>0?'right':'left'} from P. Give the new decimal.`,(u+direction)/d,[(u-direction)/d,u/d,-(u+direction)/d],`P is ${fmt(u/d)}. Moving ${direction>0?'right adds':'left subtracts'} ${fmt(1/d)}. You reach ${fmt((u+direction)/d)}.`); break; }
     case 15: { const q=pick([1,3]),low=-(Math.floor(a/2)+q/4),high=b/2; numeric(`At dawn it is −${mixed(-low*4,4)} °C. At noon it is ${high} °C. By how many degrees has the temperature risen?`,high-low,[high+low,high,Math.abs(low)],`Use comparable decimals: dawn ${fmt(low)} °C. Rise = ${high} − (${fmt(low)}) = ${fmt(high-low)} °C.`); break; }
     case 16: { const unit=(n*1000+345)/1000,count=b; const exactCents=Math.round((n*1000+345)*count/10); numeric(`Fabric: ${count} m at $${unit.toFixed(3)} per metre. Find the total cost, rounded to cents.`,exactCents/100,[Math.round(unit*100)/100*count,Math.floor(unit*count*100)/100,exactCents/100+.1,exactCents/100+1],`Multiply before rounding: ${count} × ${unit.toFixed(3)} = ${(unit*count).toFixed(3)}. Round that total once to $${(exactCents/100).toFixed(2)}.`); break; }
     case 17: { const need=n+.4,price=a*5; paintContext={need,capacity:3,price}; numeric(`What is the cheapest total cost in dollars?`,Math.ceil(need/3)*price,[Math.floor(need/3)*price,need/3*price,Math.ceil(need)*price],`At least ${Math.ceil(need/3)} whole tins are needed. Multiply by $${price}: $${Math.ceil(need/3)*price}.`); break; }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FractionText } from "@/components/FractionText";
 import type { FractionNumberLineVisualData } from "@/data/activities/year2/lessonEngine";
+import { getRealmTheme } from "@/lib/useRealmTheme";
 
 function parseFractionValue(label: string) {
   const trimmed = label.trim();
@@ -118,6 +119,42 @@ export default function FractionNumberLineVisual({
         }
       }
     }
+  }
+
+  if (visual.jumps) {
+    const jump = visual.jumps;
+    const theme = getRealmTheme('number');
+    const x = (value: number) => 40 + (value - min) / (max - min) * 640;
+    const end = jump.start + jump.step * jump.count;
+    const direction = Math.sign(jump.step);
+    const ticks = Math.round((max - min) * (subdivisions ?? 1));
+    return <figure className="my-5 rounded-2xl border p-4" style={{ background: theme.surfaceTint, borderColor: theme.borderRing, color: theme.ctaFrom }}>
+      <figcaption className="text-center text-lg font-bold">{jump.count} {jump.count === 1 ? 'jump' : 'jumps'} {direction > 0 ? 'right' : 'left'} · each <FractionText value={jump.label} size="sm" /></figcaption>
+      <div className="overflow-x-auto">
+        <svg viewBox="0 0 720 180" className="mx-auto w-full min-w-[520px] max-w-4xl" role="img" aria-label={`Number line from ${min} to ${max}. Start at P. ${jump.count} equal jumps ${direction > 0 ? 'right' : 'left'}, each ${jump.label}. The destination is marked with a question mark.`}>
+          <path d="M 30 90 H 690 M 36 85 L 30 90 L 36 95 M 684 85 L 690 90 L 684 95" fill="none" stroke="currentColor" strokeWidth="2" />
+          {Array.from({ length: ticks + 1 }, (_, index) => {
+            const value = min + index / (subdivisions ?? 1);
+            const whole = Math.abs(value - Math.round(value)) < 1e-8;
+            return <g key={index}>
+              <path d={`M ${x(value)} ${whole ? 81 : 85} V ${whole ? 99 : 95}`} stroke="currentColor" strokeWidth={whole ? 2 : 1} />
+              {whole && <text x={x(value)} y="120" textAnchor="middle" fill="currentColor" fontSize="17">{Math.round(value)}</text>}
+            </g>;
+          })}
+          {Array.from({ length: jump.count }, (_, index) => {
+            const from = x(jump.start + index * jump.step), to = x(jump.start + (index + 1) * jump.step);
+            return <g key={index} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d={`M ${from} 84 C ${from} 34, ${to} 34, ${to} 80`} />
+              <path d={`M ${to - 4} 73 L ${to} 81 L ${to + 4} 73`} />
+            </g>;
+          })}
+          <circle cx={x(jump.start)} cy="90" r="5" fill="currentColor" />
+          <text x={x(jump.start)} y="150" textAnchor="middle" fontWeight="bold" fontSize="20" fill="currentColor">P</text>
+          <circle cx={x(end)} cy="90" r="5" fill="white" stroke="currentColor" strokeWidth="2" />
+          <text x={x(end)} y="150" textAnchor="middle" fontWeight="bold" fontSize="22" fill="currentColor">?</text>
+        </svg>
+      </div>
+    </figure>;
   }
 
   return (

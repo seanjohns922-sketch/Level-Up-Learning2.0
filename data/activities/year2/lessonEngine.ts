@@ -159,6 +159,7 @@ export type FractionNumberLineVisualData = {
   max?: number;
   maxValue?: number;
   subdivisions?: number;
+  jumps?: { start: number; step: number; count: number; label: string };
   markers?: Array<{
     label: string;
     value?: number;

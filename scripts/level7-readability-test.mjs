@@ -10,6 +10,16 @@ for(const [realm,generate] of Object.entries(generators))for(let week=1;week<=({
  assert.ok(q.prompt.split(/\s+/).length<=50,`${context}: long prompt: ${q.prompt}`);
  for(const option of q.options)assert.ok(option.split(/\s+/).length<=25,`${context}: long choice: ${option}`);
  assert.ok(!q.prompt.includes('Which explanation correctly justifies the result'),context);
+ if(realm==='number'&&week===6&&(lesson===1||lesson===2)&&role==='apply_create'){
+  const v=q.visual,j=v.jumps;
+  assert.ok(j,`${context}: missing movement diagram`);
+  assert.equal(j.start,v.markers[0].position);
+  assert.ok(Math.abs(j.start+j.step*j.count-Number(q.answer))<1e-8,`${context}: jump must land on the correct answer`);
+  assert.ok(j.start+j.step*j.count>=v.min&&j.start+j.step*j.count<=v.max);
+  assert.equal(Math.abs(j.step),1/v.subdivisions);
+  assert.ok(q.diagramSpeech.includes('question mark'));
+  assert.ok(q.diagramSpeech.includes(j.step>0?'jump right':'jump left'));
+ }
  if(realm==='number'&&week===7&&(lesson===1||lesson===2)){
   assert.ok(q.prompt.split(/\s+/).length<=20,context);
   assert.ok(q.options.every(o=>o.split(/\s+/).length===1),context);
