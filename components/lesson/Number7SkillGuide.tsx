@@ -1,5 +1,7 @@
 'use client';
 import Number7DecimalExample, {DECIMAL_EXAMPLES,type DecimalExampleMode} from './Number7DecimalExample';
+import Number7RatioVisual from '@/components/activities/Number7RatioVisual';
+import {number7RatioVisual} from '@/lib/number7-ratio-visual';
 import Number7ContextArt from '@/components/activities/Number7ContextArt';
 import Number7FractionExample, {FRACTION_EXAMPLES,type FractionExampleMode} from './Number7FractionExample';
 import PaintTinsVisual from '@/components/activities/PaintTinsVisual';
@@ -52,7 +54,8 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
    {furtherExamples.map((example,index)=><div key={example.tier} className="mt-4 border-t border-teal-100 pt-3">
     <div className="flex items-start justify-between gap-3"><h4 className="font-bold text-teal-900">{index===0?'Explain the method':'Apply the skill'}</h4><ReadAloudBtn text={`${example.prompt} ${example.diagramSpeech??''} Worked solution. ${example.answer}. ${example.explanation}`} label="Read example"/></div>
     <p className="mt-2 leading-relaxed"><MathFormattedText text={example.prompt}/></p>
-    {!example.visual&&!example.paintContext&&<Number7ContextArt prompt={example.prompt}/>}
+    {number7RatioVisual(example)&&<Number7RatioVisual model={number7RatioVisual(example)!}/>}
+    {!number7RatioVisual(example)&&!example.visual&&!example.paintContext&&<Number7ContextArt prompt={example.prompt}/>}
     {example.paintContext&&<PaintTinsVisual {...example.paintContext}/>}
     {example.visual?.type==='fraction_number_line'&&<FractionNumberLineVisual visual={example.visual}/>}
     <p className="mt-2 font-bold"><MathFormattedText text={example.answer}/></p>

@@ -1,5 +1,7 @@
 "use client";
 
+import Number7RatioVisual from './Number7RatioVisual';
+import {number7RatioVisual} from '@/lib/number7-ratio-visual';
 import Number7ContextArt from './Number7ContextArt';
 import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
@@ -170,6 +172,7 @@ export default function MultipleChoiceActivity({
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
   const isSpace = realmId === "space";
+  const ratioVisual=number7RatioVisual(questionData as MultipleChoiceQuestion & {lessonId?:string});
   const answerSpec=level7Answer(questionData as MultipleChoiceQuestion & {lessonId?:string});
   const questionReadAloudText = answerSpec?.prompt ?? (isPattern
     ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
@@ -315,7 +318,7 @@ export default function MultipleChoiceActivity({
         {isCoreHunt ? "Core challenge" : constructed ? "Your answer" : "Multiple Choice"}
       </div>
       <div data-number7-question-heading={isNumber7Question || undefined} className="flex items-start gap-2.5 mt-2">
-        {isNumber7Question && !questionData.visual && !questionData.paintContext && <Number7ContextArt prompt={questionData.prompt}/>}
+        {isNumber7Question && !ratioVisual && !questionData.visual && !questionData.paintContext && <Number7ContextArt prompt={questionData.prompt}/>}
 
         <h2 className="min-w-0 flex-1 text-[1.65rem] md:text-[1.85rem] font-bold text-slate-900 leading-[1.15] tracking-[-0.02em]">
           <MathFormattedText text={answerSpec?.prompt??questionData.prompt} />
@@ -346,6 +349,7 @@ export default function MultipleChoiceActivity({
       {questionData.visual?.type === "decimal_shift" ? (
         <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
+      {ratioVisual && <Number7RatioVisual model={ratioVisual}/>}
       {questionData.paintContext && <PaintTinsVisual {...questionData.paintContext} />}
       {questionData.visual?.type === "fraction_number_line" ? (
         <div data-core-number-line={isCoreHunt || undefined}>
