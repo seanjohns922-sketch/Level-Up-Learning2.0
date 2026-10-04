@@ -52,7 +52,7 @@ export default function PlatformAdminShell({
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-emerald-950 bg-[#082f2b] text-white lg:flex lg:flex-col">
         <div className="border-b border-white/10 px-6 py-6">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
-            Level Up Learning
+            RELIQ
           </p>
           <p className="mt-2 text-xl font-semibold">Platform Admin</p>
         </div>

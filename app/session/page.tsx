@@ -9503,7 +9503,7 @@ function SessionPage({
                 {/* Motivation banner */}
                 <div className="rounded-2xl border border-primary/20 bg-primary-light p-6 mb-8">
                   <div className="flex items-center gap-2 font-bold text-primary mb-2"><Sparkles className="h-4 w-4" /> Keep going!</div>
-                  <div className="text-sm text-foreground/80">Keep working to unlock your Level Up Legend.</div>
+                  <div className="text-sm text-foreground/80">Keep working to unlock your Relic.</div>
                 </div>
 
                 <button

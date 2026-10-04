@@ -13,7 +13,7 @@ import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
 
 const CentralWorld = dynamic(() => import("@/components/world3d/CentralWorld"), {
   ssr: false,
-  loading: () => <div className="grid min-h-screen place-items-center bg-[#263225] font-bold text-amber-100">Entering Level Up World...</div>,
+  loading: () => <div className="grid min-h-screen place-items-center bg-[#263225] font-bold text-amber-100">Entering RELIQ World...</div>,
 });
 
 export default function CentralWorld3DEntry({ teacherPreview = false }: { teacherPreview?: boolean }) {
@@ -62,7 +62,7 @@ export default function CentralWorld3DEntry({ teacherPreview = false }: { teache
   }, [access.canExplore3D, preview, router]);
 
   if (!access.canExplore3D && !preview) {
-    return <main className="grid min-h-screen place-items-center bg-[#263225] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Level Up World is not available</h1><p className="mt-2 text-white/70">Your normal learning experience is still ready.</p><button type="button" onClick={() => router.push("/home-base")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-black text-stone-900">Open My Home</button></div></main>;
+    return <main className="grid min-h-screen place-items-center bg-[#263225] p-6 text-center text-white"><div><h1 className="text-2xl font-black">RELIQ World is not available</h1><p className="mt-2 text-white/70">Your normal learning experience is still ready.</p><button type="button" onClick={() => router.push("/home-base")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-black text-stone-900">Open My Home</button></div></main>;
   }
   if (status === "loading") return <div className="grid min-h-screen place-items-center bg-[#263225] font-bold text-amber-100">Restoring your journey...</div>;
   if (status === "error") return <main className="grid min-h-screen place-items-center bg-[#263225] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Your world could not load</h1><p className="mt-2 text-white/70">Your standard learning experience is still available.</p><button type="button" onClick={() => router.push("/realms")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-black text-stone-900">Open 2D Experience</button></div></main>;

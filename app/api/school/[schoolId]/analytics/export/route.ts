@@ -98,7 +98,7 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="level-up-${type}-${stamp}.csv"`,
+        "Content-Disposition": `attachment; filename="reliq-${type}-${stamp}.csv"`,
         "Cache-Control": "private, no-store",
       },
     });

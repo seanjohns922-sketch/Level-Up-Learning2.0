@@ -362,7 +362,7 @@ function resolveCurrentActivityRow(
       last_active_at: dailyActivity.updated_at,
       updated_at: dailyActivity.updated_at,
       progress_label: resolved.progress_label ?? "Active today",
-      last_event_text: resolved.last_event_text ?? "Active in Level Up Learning today",
+      last_event_text: resolved.last_event_text ?? "Active in RELIQ today",
     };
   }
 

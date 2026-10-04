@@ -62,7 +62,7 @@ export default function StudentPrintCard({ studentName, className, classCode, pi
       </head>
       <body>
         <div class="card">
-          <div class="brand">Level Up Learning</div>
+          <div class="brand">RELIQ</div>
           <div class="name">${studentName}</div>
           <div class="class">${className}</div>
           <div class="qr">

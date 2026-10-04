@@ -302,7 +302,7 @@ export async function POST(
             p_class_id: stringValue(payload.classId) || null,
             p_reason:
               stringValue(payload.reason) ||
-              "Linked existing Level Up Learning identity",
+              "Linked existing RELIQ identity",
           },
           accessToken,
         );

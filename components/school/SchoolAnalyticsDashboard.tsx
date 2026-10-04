@@ -203,7 +203,7 @@ function buildJourneyHtml(data: StudentLearningJourney): string {
     .btn{margin-top:20px;padding:9px 16px;border:0;border-radius:8px;background:#0f9d6b;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
     @media print{body{padding:12mm}.noprint{display:none}}
   </style></head><body>
-    <div class="head"><div><div class="eyebrow">Level Up Learning · Learning Journey</div><h1>${esc(data.student.name)}</h1><p class="meta">${esc(data.student.yearLevel ?? "Year not recorded")} · ${esc(data.student.className)} · Generated ${generated}</p></div></div>
+    <div class="head"><div><div class="eyebrow">RELIQ · Learning Journey</div><h1>${esc(data.student.name)}</h1><p class="meta">${esc(data.student.yearLevel ?? "Year not recorded")} · ${esc(data.student.className)} · Generated ${generated}</p></div></div>
     <div class="stats"><div class="stat"><b>${mastered}</b><span>Levels mastered</span></div><div class="stat"><b>${realmIds.length}</b><span>Realms active</span></div><div class="stat"><b>${milestones.length}</b><span>Post-tests passed</span></div></div>
     <h2>Realm progression</h2>${sections || '<p style="color:#8a988f;font-size:13px">No realm progress recorded yet.</p>'}
     <h2>Milestones</h2><div class="timeline">${mileHtml}</div>
@@ -481,7 +481,7 @@ export default function SchoolAnalyticsDashboard({
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(11, 111, 76);
     pdf.setFontSize(9);
-    text("LEVEL UP LEARNING · STUDENT PROGRESS", margin, y);
+    text("RELIQ · STUDENT PROGRESS", margin, y);
     pdf.setTextColor(14, 21, 18);
     pdf.setFontSize(22);
     text(student.name, margin, y + 9);
@@ -741,7 +741,7 @@ export default function SchoolAnalyticsDashboard({
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(9, 18, 35);
       pdf.setFontSize(firstPage ? 18 : 11);
-      pdf.text("Level Up Learning", margin, firstPage ? 15 : 12);
+      pdf.text("RELIQ", margin, firstPage ? 15 : 12);
       if (firstPage) {
         pdf.setFontSize(21);
         pdf.text("Placement baseline by AC9 strand", margin, 28);

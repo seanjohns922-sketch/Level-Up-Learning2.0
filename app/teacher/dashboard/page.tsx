@@ -220,7 +220,7 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
       .detail-value{font-size:16px;font-weight:800;color:#111827;font-family:monospace;letter-spacing:0.15em}
       @media print{body{padding:0}.card{border:2px solid #d1d5db}}</style></head>
       <body><div class="card">
-      <div class="brand">Level Up Learning</div>
+      <div class="brand">RELIQ</div>
       <div class="name">${student.display_name}</div>
       <div class="class">${className2}</div>
       <div class="qr"><img src="${qrDataUrl}" alt="QR Code"/></div>
@@ -623,7 +623,7 @@ export default function TeacherDashboardPage() {
         .map(
           (s) => `
       <div class="card">
-        <div class="brand">Level Up Learning</div>
+        <div class="brand">RELIQ</div>
         <div class="student-name">${s.display_name}</div>
         <div class="class-name">${selectedClass.name} · Code: <strong>${selectedClass.class_code}</strong></div>
         <img class="qr" src="${s.qrSrc}" alt="QR Code" />
@@ -668,7 +668,7 @@ export default function TeacherDashboardPage() {
       </style>
     </head><body>
       <h1>Student Login Details — ${selectedClass.name}</h1>
-      <div class="subtitle">Class Code: ${selectedClass.class_code} · ${classStudents.length} student${classStudents.length !== 1 ? "s" : ""} · Level Up Learning</div>
+      <div class="subtitle">Class Code: ${selectedClass.class_code} · ${classStudents.length} student${classStudents.length !== 1 ? "s" : ""} · RELIQ</div>
       <div class="grid">${cardHtml}</div>
       <script>window.onload = function(){ window.print(); }</script>
       </body></html>`;
@@ -722,7 +722,7 @@ export default function TeacherDashboardPage() {
         pdf.setTextColor(0, 151, 136);
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(8);
-        pdf.text("LEVEL UP LEARNING", centreX, y + 8, { align: "center" });
+        pdf.text("RELIQ", centreX, y + 8, { align: "center" });
 
         pdf.setTextColor(15, 23, 42);
         pdf.setFontSize(14);

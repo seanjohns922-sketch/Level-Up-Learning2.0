@@ -1487,7 +1487,7 @@ function StudentDirectory({
             <div>
               <h3 className="font-bold text-slate-900">Find their existing account</h3>
               <p className="mt-1 text-sm text-slate-600">
-                Enter the student&apos;s Level Up Learning Explorer Code. Their
+                Enter the student&apos;s RELIQ Explorer Code. Their
                 progress, rewards and home access will stay with them.
               </p>
             </div>
@@ -3291,7 +3291,7 @@ export default function SchoolHomeClient({
               <EmptyState
                 icon={ShieldCheck}
                 title="No licence for this academic year"
-                detail="Contact Level Up Learning to configure school access for the selected academic year."
+                detail="Contact RELIQ to configure school access for the selected academic year."
               />
             )
           ) : null}
@@ -3308,7 +3308,7 @@ export default function SchoolHomeClient({
             <EmptyState
               icon={HelpCircle}
               title="Support"
-              detail="Level Up Learning support options will appear here. No classroom data is changed from this page."
+              detail="RELIQ support options will appear here. No classroom data is changed from this page."
             />
           ) : null}
         </main>

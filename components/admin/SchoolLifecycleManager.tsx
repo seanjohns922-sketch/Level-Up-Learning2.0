@@ -20,18 +20,18 @@ async function command(payload: Record<string, unknown>) {
 
 function schoolAdminInviteMailto(email: string, schoolName: string, schoolCode: string) {
   const loginUrl = typeof window === "undefined" ? "/login" : `${window.location.origin}/login`;
-  const subject = `Level Up Learning school admin access for ${schoolName}`;
+  const subject = `RELIQ school admin access for ${schoolName}`;
   const body = [
     `Hi,`,
     ``,
-    `Your Level Up Learning school administrator access is ready for ${schoolName}.`,
+    `Your RELIQ school administrator access is ready for ${schoolName}.`,
     ``,
     `Go to: ${loginUrl}`,
     `Choose: Activate Invite`,
     `Email: ${email}`,
     `School Code: ${schoolCode}`,
     ``,
-    `If this is your first time using Level Up Learning, create your own password on that screen. The School Code is only used to connect your invited email to the school.`,
+    `If this is your first time using RELIQ, create your own password on that screen. The School Code is only used to connect your invited email to the school.`,
     ``,
     `After activation, use Log In with the same email and password.`,
   ].join("\n");
@@ -180,7 +180,7 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
           <input type="hidden" name="transition" value={archived ? "restore" : paused ? "reactivate" : "archive"} />
           {archived || paused ? <label className="text-sm font-semibold">Access after {archived ? "restoration" : "reactivation"}<select name="restoreStatus" defaultValue={detail.school.previousLicenceStatus === "trial" ? "trial" : "active"} className="mt-2 h-11 w-full rounded-md border border-slate-300 bg-white px-3 font-normal"><option value="active">Active</option><option value="trial">Trial</option></select></label> : null}
           {archived || paused ? <><label className="text-sm font-semibold">Licence start<input name="startDate" type="date" defaultValue={detail.licence.startDate} required className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /></label><label className="text-sm font-semibold">Licence end<input name="endDate" type="date" defaultValue={detail.licence.endDate} required className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /></label></> : null}
-          {!archived && !paused ? <><label className="text-sm font-semibold sm:col-span-2">Archive reason<select name="reasonChoice" required defaultValue="" className="mt-2 h-11 w-full rounded-md border border-slate-300 bg-white px-3 font-normal"><option value="" disabled>Select a reason</option>{["School no longer using Level Up Learning","Trial ended","School merged/closed","Duplicate school record","Administrative decision","Other"].map((reason) => <option key={reason}>{reason}</option>)}</select></label><label className="text-sm font-semibold sm:col-span-2">Notes <span className="font-normal text-slate-500">(required for Other)</span><textarea name="reasonNotes" rows={3} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" /></label></> : <label className="text-sm font-semibold sm:col-span-2">Reason<textarea name="reason" required rows={3} defaultValue={archived ? "Restore operational school access" : "Reactivate operational school access"} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" placeholder={archived ? "Why is this school being restored?" : "Why is this school being reactivated?"} /></label>}
+          {!archived && !paused ? <><label className="text-sm font-semibold sm:col-span-2">Archive reason<select name="reasonChoice" required defaultValue="" className="mt-2 h-11 w-full rounded-md border border-slate-300 bg-white px-3 font-normal"><option value="" disabled>Select a reason</option>{["School no longer using Level Up Learning","Trial ended","School merged/closed","Duplicate school record","Administrative decision","Other"].map((reason) => <option key={reason} value={reason}>{reason === "School no longer using Level Up Learning" ? "School no longer using RELIQ" : reason}</option>)}</select></label><label className="text-sm font-semibold sm:col-span-2">Notes <span className="font-normal text-slate-500">(required for Other)</span><textarea name="reasonNotes" rows={3} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" /></label></> : <label className="text-sm font-semibold sm:col-span-2">Reason<textarea name="reason" required rows={3} defaultValue={archived ? "Restore operational school access" : "Reactivate operational school access"} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" placeholder={archived ? "Why is this school being restored?" : "Why is this school being reactivated?"} /></label>}
           <div className="flex flex-wrap justify-end gap-3 sm:col-span-2">
             {!archived && !paused ? <button type="button" disabled={busy} onClick={() => {
               const reason = window.prompt("Reason for pausing this school");

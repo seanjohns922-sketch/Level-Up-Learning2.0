@@ -195,7 +195,7 @@ export function buildParentReportHtml(report: ParentProgressReport, activity: Pa
   </style></head><body>
     <div class="head">
       <div>
-        <div class="eyebrow">Level Up Learning · Learning Report</div>
+        <div class="eyebrow">RELIQ · Learning Report</div>
         <h1>${escapeHtml(report.student.name)}</h1>
         <p class="meta">${escapeHtml(report.student.yearLevel ?? "Year level not recorded")} · ${escapeHtml(report.student.schoolName ?? "Home learner")} · Generated ${escapeHtml(generated)}</p>
       </div>

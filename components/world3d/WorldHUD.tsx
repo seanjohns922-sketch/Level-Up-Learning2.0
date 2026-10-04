@@ -123,7 +123,7 @@ export function WorldHUD({
     context === "central"
       ? {
           eyebrow: "CENTRAL HUB",
-          title: "Level Up World",
+          title: "RELIQ World",
           detail: `Next up: ${journey.realmName} · ${journey.activityLabel}`,
         }
       : {

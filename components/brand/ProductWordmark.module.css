@@ -1,0 +1,11 @@
+.wordmark {
+  display: inline-block;
+  /* Reference direction only; the exact brand font is still to be supplied. */
+  font-family: var(--reliq-wordmark-font, "Arial Black"), "Nunito", sans-serif;
+  font-size: clamp(3.5rem, 8vw, 5.25rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  color: #fff;
+  text-shadow: 0 4px 20px rgb(0 0 0 / 50%);
+}

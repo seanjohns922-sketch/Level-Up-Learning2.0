@@ -246,7 +246,7 @@ export function ParentShell({ children }: { children: ReactNode }) {
       <aside className="hidden min-h-screen flex-col bg-gradient-to-b from-[#123a55] to-[#0d2438] px-4 py-6 text-white lg:flex">
         <Link href="/parent" className="flex items-center gap-3 px-2">
           <span className="grid h-11 w-11 place-items-center rounded-md bg-[#dceeff] text-[#173b68]"><Home className="h-6 w-6" /></span>
-          <span><span className="block text-xs font-bold uppercase tracking-[0.18em] text-[#9fc9ff]">Level Up Learning</span><span className="text-lg font-black">Parent Home</span></span>
+          <span><span className="block text-xs font-bold uppercase tracking-[0.18em] text-[#9fc9ff]">RELIQ</span><span className="text-lg font-black">Parent Home</span></span>
         </Link>
         <nav className="mt-10 space-y-2" aria-label="Parent navigation">
           <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
@@ -371,7 +371,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
         <section className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm">
           <KeyRound className="h-8 w-8 text-blue-700" />
           <h2 className="mt-4 text-xl font-black">Add your child to get started</h2>
-          <p className="mt-2 max-w-xl text-slate-600">Create a new Home learner, or link a child who already uses Level Up Learning at school.</p>
+          <p className="mt-2 max-w-xl text-slate-600">Create a new Home learner, or link a child who already uses RELIQ at school.</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href="/parent/add-child" className="inline-flex min-h-11 items-center rounded-md bg-blue-600 px-4 font-bold text-white">Add new child</Link>
             <Link href="/parent/link-child" className="inline-flex min-h-11 items-center rounded-md border border-slate-300 px-4 font-bold">Link existing child</Link>
@@ -777,8 +777,8 @@ function printHomeAccessCards(cards: readonly HomeAccessCardDetails[]) {
     const safeName = escapeHtml(details.displayName);
     const safeUsername = escapeHtml(details.username || "Not available");
     const safeExplorerCode = escapeHtml(details.explorerCode || "Not available");
-    return `<section class="card" aria-label="Level Up Learning home access card for ${safeName}">
-      <div class="eyebrow">Level Up Learning · Home Access</div>
+    return `<section class="card" aria-label="RELIQ home access card for ${safeName}">
+      <div class="eyebrow">RELIQ · Home Access</div>
       <h1>${safeName}</h1>
       <p class="subtitle">Use these details to sign in from home.</p>
       <div class="row"><div class="label">Website</div><div class="value">${safeWebsiteUrl}</div></div>

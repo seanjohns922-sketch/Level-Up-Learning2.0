@@ -19,7 +19,7 @@ export async function buildStudentRosterTemplate(classes: StudentRosterTemplateC
   const excelModule = await import("exceljs");
   const ExcelJS = excelModule.default ?? excelModule;
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "Level Up Learning";
+  workbook.creator = "RELIQ";
   workbook.title = "Student import template";
   workbook.subject = "School student roster import";
 
@@ -87,7 +87,7 @@ export async function buildStudentRosterTemplate(classes: StudentRosterTemplateC
 
   const instructions = workbook.addWorksheet("Instructions");
   instructions.columns = [{ width: 24 }, { width: 78 }];
-  instructions.addRow(["Level Up Learning", "Student import template"]);
+  instructions.addRow(["RELIQ", "Student import template"]);
   instructions.addRow([]);
   instructions.addRow(["Required", "First Name and Year Level"]);
   instructions.addRow(["Optional", "Last Name, Class, Student Code and Access Code"]);
@@ -120,7 +120,7 @@ export async function downloadStudentRosterTemplate(classes: StudentRosterTempla
   );
   const link = document.createElement("a");
   link.href = url;
-  link.download = "level-up-learning-student-import-template.xlsx";
+  link.download = "reliq-student-import-template.xlsx";
   document.body.appendChild(link);
   link.click();
   link.remove();

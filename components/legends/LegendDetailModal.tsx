@@ -127,7 +127,7 @@ export default function LegendDetailModal({
                 <div className="aspect-video w-full bg-black">
                   {videoFailed ? (
                     <div className="flex h-full items-center justify-center px-6 text-center text-sm font-semibold text-white/80">
-                      Video unavailable right now. You can still view the card.
+                      Video unavailable right now. You can still view the Relic.
                     </div>
                   ) : (
                     <video
@@ -161,18 +161,18 @@ export default function LegendDetailModal({
               type="button"
               onClick={() => setShowBack((current) => !current)}
               className="relative block rounded-xl focus:outline-none"
-              aria-label={showBack ? `Show ${legend.name} card front` : `Show ${legend.name} card back`}
+              aria-label={showBack ? `Show ${legend.name} Relic front` : `Show ${legend.name} Relic back`}
             >
               <LegendCardArtwork
                 src={showBack ? backImage : frontImage}
-                alt={showBack ? `${legend.name} card back` : `${legend.name} card front`}
+                alt={showBack ? `${legend.name} Relic back` : `${legend.name} Relic front`}
                 className="relative h-56 max-w-full rounded-xl border-2 border-white/60 shadow-lg"
               />
             </button>
             <button
               type="button"
               onClick={() => setEnlarged(true)}
-              aria-label="Enlarge card"
+              aria-label="Enlarge Relic"
               className="absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white shadow-md backdrop-blur-sm transition hover:bg-black/75"
             >
               <Maximize2 className="h-4 w-4" />
@@ -209,7 +209,7 @@ export default function LegendDetailModal({
               onClick={() => setShowBack((current) => !current)}
               className={t.pill}
             >
-              Flip Card
+              Flip Relic
             </button>
             <button
               type="button"
@@ -285,19 +285,19 @@ export default function LegendDetailModal({
         <button
           type="button"
           onClick={() => setEnlarged(false)}
-          aria-label="Close enlarged card"
+          aria-label="Close enlarged Relic"
           className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-white/30"
         >
           <X className="h-6 w-6" />
         </button>
         <LegendCardArtwork
           src={showBack ? backImage : frontImage}
-          alt={showBack ? `${legend.name} card back` : `${legend.name} card front`}
+          alt={showBack ? `${legend.name} Relic back` : `${legend.name} Relic front`}
           onClick={(e) => { e.stopPropagation(); setShowBack((c) => !c); }}
           className="max-h-[90vh] max-w-[calc(100vw-2rem)] cursor-pointer rounded-2xl border-2 border-white/40 shadow-2xl"
         />
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold text-white/80">
-          Tap the card to flip &middot; Tap anywhere to close
+          Tap the Relic to flip &middot; Tap anywhere to close
         </div>
       </div>
     ) : null}

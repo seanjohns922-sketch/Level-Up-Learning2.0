@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ProductWordmark from "@/components/brand/ProductWordmark";
 import { useRouter } from "next/navigation";
 import { getAuthErrorMessage, isServiceUnavailableError, recoverAuthSessionError, supabase } from "@/lib/supabase";
 import { clearActiveStudentSession, getActiveStudentIdentity, getActiveStudentProfile, hasActiveStudentSeenIntro, setActiveStudentProfile, setStudentSessionToken } from "@/lib/studentIdentity";
@@ -951,22 +952,12 @@ export default function LoginPage() {
       >
         {/* Title */}
         <div className="mb-8">
-          <h1
-            className="text-4xl md:text-5xl font-black text-white leading-[1.1] tracking-tight"
-            style={{
-              fontFamily: "'Nunito', sans-serif",
-              textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-            }}
-          >
-            Level Up
-            <br />
-            Learning
-          </h1>
+          <h1><ProductWordmark /></h1>
           <p
-            className="text-white/40 mt-3 text-sm font-medium tracking-wide"
+            className="text-white/70 mt-3 text-xs font-bold tracking-[0.16em]"
             style={{ fontFamily: "'Quicksand', sans-serif" }}
           >
-            Begin your journey to the Tower
+            EXPLORE LEARN COLLECT
           </p>
         </div>
 
@@ -1415,7 +1406,7 @@ export default function LoginPage() {
           className="mt-6 text-[10px] tracking-[0.06em] uppercase font-medium"
           style={{ color: "rgba(255,200,100,0.3)", fontFamily: "'Quicksand', sans-serif" }}
         >
-          Unlock your Level Up Legend by mastering your skills
+          Discover Relics by mastering your skills
         </p>
       </div>
 

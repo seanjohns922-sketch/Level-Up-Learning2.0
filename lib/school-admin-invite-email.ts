@@ -26,7 +26,7 @@ export async function sendSchoolAdminInviteEmail({
   baseUrl,
 }: InviteEmailInput): Promise<InviteEmailDelivery> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim() || "Level Up Learning <schools@level-uplearning.com.au>";
+  const from = process.env.EMAIL_FROM?.trim() || "RELIQ <schools@level-uplearning.com.au>";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || baseUrl;
   const email = to.trim().toLowerCase();
 
@@ -39,7 +39,7 @@ export async function sendSchoolAdminInviteEmail({
 
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.5;color:#0f172a">
-      <h1 style="font-size:22px;margin:0 0 16px">Your Level Up Learning school admin access is ready</h1>
+      <h1 style="font-size:22px;margin:0 0 16px">Your RELIQ school admin access is ready</h1>
       <p>You have been invited as a school administrator for <strong>${safeSchoolName}</strong>.</p>
       <ol>
         <li>Go to <a href="${loginUrl}">${loginUrl}</a></li>
@@ -54,7 +54,7 @@ export async function sendSchoolAdminInviteEmail({
   `;
 
   const text = [
-    "Your Level Up Learning school admin access is ready.",
+    "Your RELIQ school admin access is ready.",
     "",
     `School: ${schoolName}`,
     `Go to: ${loginUrl}`,
@@ -78,7 +78,7 @@ export async function sendSchoolAdminInviteEmail({
       body: JSON.stringify({
         from,
         to: [email],
-        subject: `Level Up Learning school admin access for ${schoolName}`,
+        subject: `RELIQ school admin access for ${schoolName}`,
         html,
         text,
       }),
@@ -111,7 +111,7 @@ export async function sendSchoolStaffInviteEmail({
   baseUrl,
 }: StaffInviteEmailInput): Promise<InviteEmailDelivery> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim() || "Level Up Learning <schools@level-uplearning.com.au>";
+  const from = process.env.EMAIL_FROM?.trim() || "RELIQ <schools@level-uplearning.com.au>";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || baseUrl;
   const email = to.trim().toLowerCase();
 
@@ -126,7 +126,7 @@ export async function sendSchoolStaffInviteEmail({
 
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.5;color:#0f172a">
-      <h1 style="font-size:22px;margin:0 0 16px">You have been invited to Level Up Learning</h1>
+      <h1 style="font-size:22px;margin:0 0 16px">You have been invited to RELIQ</h1>
       <p>You have been invited to join <strong>${safeSchoolName}</strong> as a <strong>${safeRoleLabel}</strong>.</p>
       <ol>
         <li>Go to <a href="${loginUrl}">${loginUrl}</a></li>
@@ -141,7 +141,7 @@ export async function sendSchoolStaffInviteEmail({
   `;
 
   const text = [
-    "You have been invited to Level Up Learning.",
+    "You have been invited to RELIQ.",
     "",
     `School: ${schoolName}`,
     `Role: ${roleLabel}`,
@@ -166,7 +166,7 @@ export async function sendSchoolStaffInviteEmail({
       body: JSON.stringify({
         from,
         to: [email],
-        subject: `Your Level Up Learning invitation for ${schoolName}`,
+        subject: `Your RELIQ invitation for ${schoolName}`,
         html,
         text,
       }),
@@ -190,7 +190,7 @@ export async function sendSchoolAdminAccessEmail({
   baseUrl,
 }: Omit<InviteEmailInput, "schoolCode">): Promise<InviteEmailDelivery> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const from = process.env.EMAIL_FROM?.trim() || "Level Up Learning <schools@level-uplearning.com.au>";
+  const from = process.env.EMAIL_FROM?.trim() || "RELIQ <schools@level-uplearning.com.au>";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || baseUrl;
   const email = to.trim().toLowerCase();
 
@@ -201,7 +201,7 @@ export async function sendSchoolAdminAccessEmail({
 
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.5;color:#0f172a">
-      <h1 style="font-size:22px;margin:0 0 16px">Your Level Up Learning school admin access is active</h1>
+      <h1 style="font-size:22px;margin:0 0 16px">Your RELIQ school admin access is active</h1>
       <p>You now have school administrator access for <strong>${safeSchoolName}</strong>.</p>
       <p>Go to <a href="${loginUrl}">${loginUrl}</a> and choose <strong>Log In</strong> with your existing email and password.</p>
       <p>You do not need to activate an invite because your existing account has been linked directly.</p>
@@ -209,7 +209,7 @@ export async function sendSchoolAdminAccessEmail({
   `;
 
   const text = [
-    "Your Level Up Learning school admin access is active.",
+    "Your RELIQ school admin access is active.",
     "",
     `School: ${schoolName}`,
     `Go to: ${loginUrl}`,
@@ -228,7 +228,7 @@ export async function sendSchoolAdminAccessEmail({
       body: JSON.stringify({
         from,
         to: [email],
-        subject: `Level Up Learning school admin access for ${schoolName}`,
+        subject: `RELIQ school admin access for ${schoolName}`,
         html,
         text,
       }),
