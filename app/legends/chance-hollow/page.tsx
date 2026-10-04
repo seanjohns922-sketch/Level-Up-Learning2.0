@@ -77,7 +77,7 @@ export default function ChanceHollowCollectionPage() {
             onClick={() => router.push("/legends")}
             className="flex items-center gap-1 text-sm font-bold text-rose-100 transition hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" /> My Legends
+            <ArrowLeft className="h-4 w-4" /> My RELIQS
           </button>
           <div className="inline-flex items-center gap-2 border border-rose-300/30 bg-[#301b27]/85 px-4 py-2 text-sm font-bold text-rose-50 backdrop-blur-md">
             <Dices className="h-4 w-4 text-[#fbbf24]" /> Chance Hollow
@@ -110,7 +110,7 @@ export default function ChanceHollowCollectionPage() {
         </header>
 
         <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-rose-100">
-          CARD BINDER
+          RELIQS BINDER
         </h2>
         <section className="relative overflow-hidden border border-rose-300/20 bg-[#211421]/85 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-5 md:p-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(251,191,36,0.14),transparent_42%)]" />
@@ -132,7 +132,7 @@ export default function ChanceHollowCollectionPage() {
           <div>
             <p className="font-bold text-white">How to collect Chanzia</p>
             <p className="mt-1 text-sm text-white/65">
-              Complete Chance Hollow Level 3 to unlock the first Chanzia card and video.
+              Complete Chance Hollow Level 3 to unlock the first Chanzia RELIQ card and video.
             </p>
           </div>
         </div>

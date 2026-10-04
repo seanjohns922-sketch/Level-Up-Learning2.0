@@ -116,13 +116,13 @@ export default function LegendUnlockReveal({
   const showButtons = past("ready");
   const hasUnlockVideo = Boolean(unlockVideoUrl);
   const revealSpeech = [
-    `${headerTitle}. Legend unlocked.`,
+    `${headerTitle}. RELIQ card unlocked.`,
     `You unlocked ${legend.name}.`,
     `${legend.strand}, ${legend.yearLabel}.`,
     scorePercent !== undefined ? `Your score was ${scorePercent} percent. ${scoreLabel}.` : "",
     legend.description,
     hasUnlockVideo ? "A Legend cinematic is available." : "",
-    "You can choose View My Legends or Continue.",
+    "You can choose View My RELIQS or Continue.",
   ].filter(Boolean).join(" ");
 
   useEffect(() => {
@@ -488,7 +488,7 @@ export default function LegendUnlockReveal({
             }}
           >
             <Library className="h-5 w-5" aria-hidden />
-            View My Legends
+            View My RELIQS
           </button>
           <button
             onClick={() => {

@@ -111,7 +111,7 @@ export default function MeasurelandsCollectionPage() {
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(44, 60%, 84%)" }}
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> My Legends
+                <ArrowLeft className="h-3.5 w-3.5" /> My RELIQS
               </button>
               <div
                 className="inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full shadow-sm"
@@ -122,7 +122,7 @@ export default function MeasurelandsCollectionPage() {
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(46, 90%, 70%)" }} /> Legend Vault
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(46, 90%, 70%)" }} /> RELIQS Vault
               </div>
             </div>
 
@@ -176,7 +176,7 @@ export default function MeasurelandsCollectionPage() {
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
             style={{ color: "hsl(40, 22%, 74%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
           >
-            CARD BINDER
+            RELIQS BINDER
           </h2>
 
           <section

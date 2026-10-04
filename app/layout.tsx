@@ -11,18 +11,18 @@ import VercelClientInsights from "@/components/VercelClientInsights";
 
 export const metadata: Metadata = {
   title: "RELIQ — Explore. Learn. Collect.",
-  description: "Explore curriculum Realms, learn at your own pace and collect Relics. RELIQ by BrightUp Education.",
+  description: "Explore curriculum Realms, learn at your own pace and collect RELIQS. RELIQ by BrightUp Education.",
   applicationName: "RELIQ",
   openGraph: {
     title: "RELIQ — Explore. Learn. Collect.",
-    description: "Explore curriculum Realms, learn at your own pace and collect Relics. RELIQ by BrightUp Education.",
+    description: "Explore curriculum Realms, learn at your own pace and collect RELIQS. RELIQ by BrightUp Education.",
     siteName: "RELIQ",
     type: "website",
   },
   twitter: {
     card: "summary",
     title: "RELIQ — Explore. Learn. Collect.",
-    description: "Explore curriculum Realms, learn at your own pace and collect Relics. RELIQ by BrightUp Education.",
+    description: "Explore curriculum Realms, learn at your own pace and collect RELIQS. RELIQ by BrightUp Education.",
   },
 };
 

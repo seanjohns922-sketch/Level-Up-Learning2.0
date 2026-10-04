@@ -85,7 +85,7 @@ export default function HallOfLegendsWidget() {
     <button
       type="button"
       onClick={() => router.push("/legends")}
-      aria-label={`Enter the Hall of Legends. ${count} of ${total} legends earned.`}
+      aria-label={`Enter the Hall of Legends. ${count} of ${total} RELIQS earned.`}
       className="group relative block w-full overflow-hidden rounded-2xl border border-white/12 text-left transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/70"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-[#15171d] via-[#111318] to-[#0e1014]" aria-hidden="true" />
@@ -104,15 +104,15 @@ export default function HallOfLegendsWidget() {
             <Trophy className="h-5 w-5" aria-hidden="true" />
             <span className="text-xs font-black uppercase tracking-[0.18em]">Hall of Legends</span>
           </div>
-          <h2 className="mt-2 text-2xl font-black text-white md:text-3xl">Your Legends</h2>
-          <p className="mt-1 text-sm font-semibold text-white/70">Legends you&rsquo;ve earned across every realm.</p>
+          <h2 className="mt-2 text-2xl font-black text-white md:text-3xl">Your RELIQS</h2>
+          <p className="mt-1 text-sm font-semibold text-white/70">RELIQS you&rsquo;ve earned across every realm.</p>
 
           <div className="mt-4 flex items-center gap-3">
             <div className="h-2 w-40 overflow-hidden rounded-full bg-white/15">
               <div className="h-full rounded-full bg-amber-300 transition-[width] duration-500" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-sm font-black text-white">
-              {unlocked ? count : "—"} of {total} <span className="font-bold text-white/60">Legends</span>
+              {unlocked ? count : "—"} of {total} <span className="font-bold text-white/60">RELIQS</span>
             </span>
           </div>
 

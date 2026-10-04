@@ -56,7 +56,7 @@ export default function StarpathCollectionPage() {
   if (!demoResolved || !demoPreview) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#09091f] text-cyan-100">
-        <p className="font-semibold">Opening the Legend Vault...</p>
+        <p className="font-semibold">Opening the RELIQS Vault...</p>
       </main>
     );
   }
@@ -122,7 +122,7 @@ export default function StarpathCollectionPage() {
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(188, 76%, 84%)" }}
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> My Legends
+                <ArrowLeft className="h-3.5 w-3.5" /> My RELIQS
               </button>
               <div
                 className="inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full shadow-sm"
@@ -133,7 +133,7 @@ export default function StarpathCollectionPage() {
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(188, 92%, 72%)" }} /> Legend Vault
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(188, 92%, 72%)" }} /> RELIQS Vault
               </div>
             </div>
 
@@ -187,7 +187,7 @@ export default function StarpathCollectionPage() {
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
             style={{ color: "hsl(214, 26%, 76%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
           >
-            CARD BINDER
+            RELIQS BINDER
           </h2>
 
           <section

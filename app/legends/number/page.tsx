@@ -169,7 +169,7 @@ export default function NumbotCollectionPage() {
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(160, 62%, 72%)" }}
               >
-                <ArrowLeft className="h-3.5 w-3.5" /> My Legends
+                <ArrowLeft className="h-3.5 w-3.5" /> My RELIQS
               </button>
               <div
                 className="inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full shadow-sm"
@@ -180,7 +180,7 @@ export default function NumbotCollectionPage() {
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 58%, 62%)" }} /> Card Archive
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "hsl(160, 58%, 62%)" }} /> RELIQS Archive
               </div>
             </div>
 
@@ -235,7 +235,7 @@ export default function NumbotCollectionPage() {
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
             style={{ color: "hsl(160, 24%, 66%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
           >
-            CARD BINDER
+            RELIQS BINDER
           </h2>
 
           <section

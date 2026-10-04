@@ -1406,7 +1406,7 @@ export default function LoginPage() {
           className="mt-6 text-[10px] tracking-[0.06em] uppercase font-medium"
           style={{ color: "rgba(255,200,100,0.3)", fontFamily: "'Quicksand', sans-serif" }}
         >
-          Discover Relics by mastering your skills
+          Discover RELIQS by mastering your skills
         </p>
       </div>
 

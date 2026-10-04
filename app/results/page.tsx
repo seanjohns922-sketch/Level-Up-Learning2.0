@@ -480,7 +480,7 @@ function ResultsPage() {
         : "Number Nexus";
   const resultActions = passed
     ? isPostTest || passedByProgram
-      ? "You can choose View My Legends or Go to Levels."
+      ? "You can choose View My RELIQS or Go to Levels."
       : nextYear
         ? `You can choose Start ${formatStudentLevelLabel(nextYear)} Pre-Test or Go to Levels.`
         : "You can choose Enter the Tower or Go to Levels."
@@ -948,7 +948,7 @@ function ResultsPage() {
                     className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
                     style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
                   >
-                    View My Legends
+                    View My RELIQS
                   </button>
                 ) : (
                   <button

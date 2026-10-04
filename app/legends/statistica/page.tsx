@@ -71,7 +71,7 @@ export default function StatisticaCollectionPage() {
             onClick={() => router.push("/legends")}
             className="flex items-center gap-1 text-sm font-bold text-[#f4dca2] transition hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" /> My Legends
+            <ArrowLeft className="h-4 w-4" /> My RELIQS
           </button>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d5a42f]/35 bg-[#123629]/80 px-4 py-2 text-sm font-bold text-[#ffe7ae] backdrop-blur-md">
             <BarChart3 className="h-4 w-4 text-[#ff6b67]" /> Data Guardian Archive
@@ -101,7 +101,7 @@ export default function StatisticaCollectionPage() {
           </div>
         </header>
 
-        <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-[#f0dca9]">CARD BINDER</h2>
+        <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-[#f0dca9]">RELIQS BINDER</h2>
         <section className="relative overflow-hidden rounded-[28px] border border-[#d5a42f]/25 bg-[#0c2b21]/80 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:p-5 md:p-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,107,103,0.12),transparent_42%)]" />
           <div className="relative grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">

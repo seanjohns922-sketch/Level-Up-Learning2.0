@@ -77,7 +77,7 @@ export default function PatternPeaksCollectionPage() {
             onClick={() => router.push("/legends")}
             className="flex items-center gap-1 text-sm font-bold text-emerald-100 transition hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" /> My Legends
+            <ArrowLeft className="h-4 w-4" /> My RELIQS
           </button>
           <div className="inline-flex items-center gap-2 border border-emerald-300/30 bg-[#16252a]/85 px-4 py-2 text-sm font-bold text-emerald-50 backdrop-blur-md">
             <Mountain className="h-4 w-4 text-[#39d9a0]" /> Patternox Summit
@@ -111,7 +111,7 @@ export default function PatternPeaksCollectionPage() {
         </header>
 
         <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-emerald-100">
-          CARD BINDER
+          RELIQS BINDER
         </h2>
         <section className="relative overflow-hidden border border-emerald-300/20 bg-[#101b22]/85 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-5 md:p-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.14),transparent_42%)]" />
@@ -133,7 +133,7 @@ export default function PatternPeaksCollectionPage() {
           <div>
             <p className="font-bold text-white">How to collect Patternox</p>
             <p className="mt-1 text-sm text-white/65">
-              Complete each Pattern Peaks level to unlock its Patternox card and video.
+              Complete each Pattern Peaks level to unlock its Patternox RELIQ card and video.
             </p>
           </div>
         </div>

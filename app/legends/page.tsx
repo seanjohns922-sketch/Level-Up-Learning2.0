@@ -255,7 +255,7 @@ export default function LegendsPage() {
                 textShadow: "0 1px 3px rgba(0,0,0,0.3)",
               }}
             >
-              My Legends
+              My RELIQS
             </div>
           </div>
 
@@ -266,7 +266,7 @@ export default function LegendsPage() {
               textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 0 40px rgba(245,180,50,0.3)",
             }}
           >
-            Relics
+            RELIQS
           </h1>
           <p
             className="text-center mt-1.5 text-base max-w-md mx-auto"
