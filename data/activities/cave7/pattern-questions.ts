@@ -128,10 +128,11 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   else num(`A pizza is shared equally by ${a} people. Each person also pays $${b} for a drink and pays $${x+b} in total. How much did the pizza cost in dollars?`,a*x,`Each share of the pizza is $${x+b} − $${b} = $${x}; ${a} shares cost $${a*x}.`,[a*(x+b),x,(x+b)*a-b]);
   break;}
  case 16:{
-  const P=2*x+2*b;
-  if(F)num(`A rectangle has length x cm, width ${b} cm and perimeter ${P} cm. Find the length x in cm.`,x,`2x + ${2*b} = ${P}. Subtract ${2*b}, then divide by 2: x = ${x}.`,[(P-b)/2,P/2,P-2*b]);
-  else if(R)choose(`A rectangle has length x cm, width ${b} cm and perimeter ${P} cm. Which equation matches?`,`2x + ${2*b} = ${P}`,[`x + ${b} = ${P}`,`2x + ${b} = ${P}`,`x + ${2*b} = ${P}`],`Two lengths and two widths: 2x + 2 × ${b} = ${P}.`);
-  else num(`An isosceles triangle has two equal sides of x cm and a base of ${b} cm. Its perimeter is ${2*x+b} cm. Find x in cm.`,x,`2x + ${b} = ${2*x+b}. Subtract ${b}, then divide by 2: x = ${x}.`,[(2*x+b)/2,x+b,(x*2+b)-b]);
+  const width=F||R?b:Math.min(b,2*x-1),P=2*x+2*width;
+  if(F)num(`A rectangle has length x cm, width ${width} cm and perimeter ${P} cm. Find the length x in cm.`,x,`2x + ${2*width} = ${P}. Subtract ${2*width}, then divide by 2: x = ${x}.`,[(P-width)/2,P/2,P-2*width]);
+  else if(R)choose(`A rectangle has length x cm, width ${width} cm and perimeter ${P} cm. Which equation matches?`,`2x + ${2*width} = ${P}`,[`x + ${width} = ${P}`,`2x + ${width} = ${P}`,`x + ${2*width} = ${P}`],`Two lengths and two widths: 2x + 2 × ${width} = ${P}.`);
+  else num(`An isosceles triangle has two equal sides of x cm and a base of ${width} cm. Its perimeter is ${2*x+width} cm. Find x in cm.`,x,`2x + ${width} = ${2*x+width}. Subtract ${width}, then divide by 2: x = ${x}.`,[(2*x+width)/2,x+width,(x*2+width)-width]);
+  visual={kind:'perimeter',title:'Perimeter model',shape:F||R?'rectangle':'triangle',sideLabels:F||R?['x cm',`${width} cm`,'x cm',`${width} cm`]:['x cm','x cm',`${width} cm`],perimeter:F||R?P:2*x+width,unit:'cm'};
   break;}
  case 17:{
   const total=x*a+b;

@@ -161,3 +161,15 @@ for(const [realm,weeks] of Object.entries(CAVE7_CURRICULA)){
  console.log(`PASS Statistics: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, no fixed answers.`);
 }
 console.log(`PASS ${count} generated Algebra/Statistics/Probability questions and ${quizzes} quiz items: independent calculations, balanced weekly coverage and inequivalent numeric choices.`);
+
+// Perimeter examples must show every side without revealing x.
+for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){
+ const q=CAVE7_GENERATORS.pattern(6,1,seed,role),v=q.cave7Visual;
+ assert.equal(v?.kind,'perimeter');
+ assert.equal(v.sideLabels.filter(s=>s==='x cm').length,2);
+ assert.equal(v.sideLabels.length,role==='apply_create'?3:4);
+ const given=v.sideLabels.filter(s=>s!=='x cm').map(parseFloat),x=(v.perimeter-given.reduce((a,b)=>a+b,0))/2;
+ if(role!=='reasoning')assert.equal(scalar(q.answer),x);
+ if(v.shape==='triangle')assert.ok(given[0]<2*x,'Triangle must have positive area');
+}
+console.log('PASS 600 perimeter visuals: all sides, matching totals, valid triangles, hidden x.');
