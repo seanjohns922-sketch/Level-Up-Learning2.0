@@ -3,12 +3,12 @@ import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {MathFormattedText} from '@/components/FractionText';
 import Year7MeasurementAssessmentVisual from '@/components/assessment/Year7MeasurementAssessmentVisual';
-import {measurement7Guide} from '@/data/activities/year7Measurement/curriculum';
+import {measurement7Guide,measurement7IntroExample} from '@/data/activities/year7Measurement/curriculum';
 import {measurement7Question} from '@/data/activities/year7Measurement/questions';
 import layout from './Measurement7LessonLayout.module.css';
 export default function Measurement7SkillGuide({week,lesson,onContinue,review=false}:{week:number;lesson:number;onContinue:()=>void;review?:boolean}){
  const guide=measurement7Guide(week,lesson);if(!guide)return null;
- const example=measurement7Question(week,lesson,7007);
+ const example=measurement7IntroExample(week,lesson)??measurement7Question(week,lesson,7007);
  const further=(['reasoning','apply_create'] as const).map(role=>measurement7Question(week,lesson,7007,role));
  return <section className={`${layout.guide} rounded-2xl border border-amber-200 bg-[#fffdf5] p-5 text-[#422e15] shadow-xl sm:p-8`} aria-label="Learn the skill">
   <div className="text-xs font-bold uppercase tracking-widest text-amber-800">Learn the skill · Week {week} · Lesson {lesson}</div>

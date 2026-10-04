@@ -18,7 +18,7 @@ export const MEASUREMENT7_WEEKS = [
  ['Compare storage designs','compare rectangular and triangular prism volumes','Use the correct cross-section for each design before comparing their volumes.','Comparing just one length cannot determine which prism holds more.']]},
  {title:'Circles and pi',code:'AC9M7M03',lessons:[
  ['Connect radius and diameter','use the relationship between radius and diameter','The centre is the middle point; a radius joins the centre to the circle; a diameter runs through the centre and contains two radii; the circumference is the distance around.','A radius is half a diameter.'],
- ['Investigate the circle ratio','explain why circumference divided by diameter is pi','Every circle has the same circumference-to-diameter ratio, pi, approximately 3.14. Measuring real circles gives values close to pi; ancient approximations include 3 1/8 (Babylon), 22/7 (Greece), 3.1416 (India) and 355/113 (China).','Pi is a ratio, not a fixed length.'],
+ ['Understand pi','connect pi, diameter and circumference','Circumference is the distance around a circle. Diameter is the distance across its centre. The distance around is about 3.14 times the distance across. We call this number pi (π).','Use the diameter: all the way across the circle through its centre.'],
  ['Find circumference from diameter','use circumference equals pi times diameter','Circumference is the distance around the circle. Multiply its diameter by pi.','Circumference uses length units, not square units.']]},
  {title:'Circle measurements in context',code:'AC9M7M03',lessons:[
  ['Find circumference from radius','use circumference equals twice pi times radius','Double the radius to obtain the diameter, then multiply by pi.','Do not use pi times radius as the circumference.'],
@@ -53,3 +53,15 @@ export const MEASUREMENT7_WEEKS = [
 export const MEASUREMENT7_READABILITY_REVISION = 2;
 export function measurement7Guide(week:number,lesson:number){const w=MEASUREMENT7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const MEASUREMENT7_PROGRAM:WeekPlan[]=MEASUREMENT7_WEEKS.map((w,i)=>({id:`y7-measurement-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code] as WeekPlan['curriculum'],lessons:w.lessons.map((l,j)=>({id:`y7-measurement-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/measurement/lesson?realm_id=measurement&year=Year%207&week=${i+1}&lessonId=y7-measurement-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[w.code] as WeekPlan['curriculum'],activityIdeas:[l[1],'explain my method and check units and reasonableness'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{mode:`m7_w${i+1}_l${j+1}_${role}`,rotationRole:role,rotationLabel:role==='fast_thinking'?'Fluency':role==='reasoning'?'Reasoning':'Apply',lessonStructure:'8_minute_rotation'}}))}))}));
+
+// A short introduction before investigating measured circle ratios in practice.
+export function measurement7IntroExample(week:number,lesson:number){
+ if(week!==5||lesson!==2)return undefined;
+ return {
+  prompt:'A circle has a diameter of 10 cm. Find its circumference using π ≈ 3.14.',
+  answer:'31.4 cm',
+  explanation:'Circumference ≈ 3.14 × 10 = 31.4 cm.',
+  steps:['Use 3.14 for pi (π).','Multiply the diameter by 3.14.','3.14 × 10 = 31.4 cm around the circle.'],
+  measurementVisual:{type:'measurement_year7_panel' as const,task:'circle' as const,values:[10],unit:'cm',circleMeasure:'diameter' as const,description:'The line across the centre is the diameter. The curved edge is the circumference.'},
+ };
+}
