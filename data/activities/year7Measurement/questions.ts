@@ -4,7 +4,7 @@ import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngin
 import type { Measurement7Visual } from '@/data/assessments/revisions/year7MeasurementFiveForms';
 import { measurement7Guide, MEASUREMENT7_READABILITY_REVISION } from './curriculum';
 export type Measurement7Role='fast_thinking'|'reasoning'|'apply_create';
-export type Measurement7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Measurement7Role;steps:string[]};
+export type Measurement7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Measurement7Role;steps:string[];answerUnit?:string};
 type Relation='corresponding'|'alternate'|'cointerior';
 const fmt=(n:number)=>String(Math.round(n*100)/100);
 const NAME:Record<Relation,string>={corresponding:'corresponding',alternate:'alternate',cointerior:'co-interior'};
@@ -164,7 +164,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
  if(!prompt||options.length!==4||new Set(options).size!==4)throw Error(`Invalid question ${key}/${role}`);
  for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
  const steps=role==='reasoning'?[guide.idea,reasonAnswer,'Check that the stated relationship applies to the given measurements.']:[guide.idea,`${formula} = ${fmt(answer)}${unit?' '+unit:''}.`,explanation];
- return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt,options,answer:result,explanation:role==='reasoning'?explanation:`${formula} = ${fmt(answer)} ${unit}. ${explanation}`,measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps};
+ return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt,options,answer:result,explanation:role==='reasoning'?explanation:`${formula} = ${fmt(answer)} ${unit}. ${explanation}`,measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
 }
 export function generateMeasurement7Question(_level:unknown,lesson:Lesson,activity:LessonActivity) {
  if(!/^y7-measurement-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw Error('Unsupported Measurement Level 7 lesson');

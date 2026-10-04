@@ -113,6 +113,10 @@ for(let w=1;w<=11;w++){
  for(const q of quiz)if(q.tier!=='reasoning')assert.equal(Number(q.answer),Math.round(expected((w-1)*3+q.lessonTag,q)*100)/100);
 }
 assert.throws(()=>measurement7Quiz(12));
+// Typed answers show the unit next to the box (e.g. L, cm, m², °, $).
+{const {loadCave7}=await import('./cave7-loader.mjs');const {level7Answer}=loadCave7('lib/level7-answer.ts');const units=new Set();
+ for(let w=1;w<=12;w++)for(let l=1;l<=3;l++)for(let seed=1;seed<=40;seed++)for(const role of ['fast_thinking','apply_create']){const q=measurement7Question(w,l,seed*7919,role),spec=level7Answer(q);if(!spec||!q.answerUnit)continue;assert.equal(spec.unit,q.answerUnit==='dollars'?'$':q.answerUnit,JSON.stringify(q.prompt));units.add(spec.unit);}
+ for(const u of ['L','cm','m','cm²','m²','cm³','mL','°','$'])assert.ok(units.has(u),`unit ${u} shown`);}
 // Regression guards: Week 8 is not a copy of Week 7, Week 7 prompts never name the relationship,
 // non-reasoning answers vary, and every reasoning item has more than one prompt.
 for(let l=1;l<=3;l++)for(const role of ['fast_thinking','apply_create'])assert.notEqual(measurement7Question(7,l,4242,role).prompt,measurement7Question(8,l,4242,role).prompt);

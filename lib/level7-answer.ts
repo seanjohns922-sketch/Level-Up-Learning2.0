@@ -1,6 +1,7 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
 export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[]};
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[]};
+// answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -17,7 +18,7 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(legacyIntegers&&(!q.options||q.options.length<2||q.options.some(value=>!/^[-−]?\d+$/.test(value))))return null;
  const p=legacyIntegers?`Which integer is smallest: ${q.options!.join(', ')}?`:q.prompt;
  const prompt=p.replace(/Which list is the complete sample space\?/,'List every outcome in the sample space.').replace(/Which fraction is at P\?/,'What fraction is at P?').replace(/Which expression matches\?/,'Write an expression.').replace(/Which expression gives/g,'Write an expression for').replace(/Which ordered pair/g,'What ordered pair');
- const unit=/percentage|percent(?!age)/i.test(p)&&!p.includes('decimal')?'%':/in cm³/.test(p)?'cm³':/in m³/.test(p)?'m³':/in cm²/.test(p)?'cm²':/in m²/.test(p)?'m²':/in degrees/.test(p)?'°':/in dollars/.test(p)?'$':/in mL/.test(p)?'mL':undefined;
+ const unit=q.answerUnit?(q.answerUnit==='dollars'?'$':q.answerUnit):/percentage|percent(?!age)/i.test(p)&&!p.includes('decimal')?'%':/in cm³/.test(p)?'cm³':/in m³/.test(p)?'m³':/in cm²/.test(p)?'cm²':/in m²/.test(p)?'m²':/in degrees/.test(p)?'°':/in dollars/.test(p)?'$':/in mL/.test(p)?'mL':/in g\/cm³/.test(p)?'g/cm³':/\bin (?:litres|L)\b|How many litres/.test(p)?'L':/\bin km\b/.test(p)?'km':/\bin kg\b/.test(p)?'kg':/\bin cm\b(?![²³])/.test(p)?'cm':/\bin (?:metres|m)\b(?![²³])/.test(p)?'m':undefined;
  const base={expected,prompt,unit};
  if(/prime factorisation|expanded form/i.test(p))return null;
  if(expected.includes('=')&&!/^[a-zA-Z]\s*=/.test(expected))return null;
