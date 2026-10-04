@@ -6,7 +6,7 @@ const {number7Quiz}=load('data/activities/year7Number/questions.ts');
 const {measurement7Quiz}=load('data/activities/year7Measurement/questions.ts');
 const {space7Quiz}=load('data/activities/year7Space/questions.ts');
 const {cave7Quiz}=load('data/activities/cave7/questions.ts');
-const quizzes={number:[11,(w,a)=>number7Quiz(w,a)],measurement:[11,(w,a)=>measurement7Quiz(w,a)],space:[9,(w,a)=>space7Quiz(w,a)],pattern:[11,(w,a)=>cave7Quiz('pattern',w,a)],statistics:[9,(w,a)=>cave7Quiz('statistics',w,a)]};
+const quizzes={number:[11,(w,a)=>number7Quiz(w,a)],measurement:[11,(w,a)=>measurement7Quiz(w,a)],space:[9,(w,a)=>space7Quiz(w,a)],pattern:[11,(w,a)=>cave7Quiz('pattern',w,a)],statistics:[9,(w,a)=>cave7Quiz('statistics',w,a)],chance:[7,(w,a)=>cave7Quiz('chance',w,a)]};
 const key=q=>q.prompt+'|'+q.answer+'|'+JSON.stringify(q.measurementVisual??q.spaceVisual??q.cave7Visual??q.visual??null);
 let checked=0;
 for(const [realm,[weeks,build]] of Object.entries(quizzes))for(let w=1;w<=weeks;w++){

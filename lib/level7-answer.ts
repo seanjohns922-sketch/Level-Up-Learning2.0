@@ -27,6 +27,9 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(/sample space/.test(p)&&/^\d+(?:,\s*\d+)+$/.test(expected))return {...base,kind:'set'};
  if(/^\(-?[\d.]+,\s*-?[\d.]+\)(?:;\s*\(-?[\d.]+,\s*-?[\d.]+\)){1,3}$/.test(expected))return {...base,kind:'points',labels:expected.split(';').flatMap((_,i)=>[`${String.fromCharCode(65+i)}: x`,`${String.fromCharCode(65+i)}: y`])};
  if(q.lessonId.startsWith('y7-chance-')){
+  // One-word judgements (colour, player, group) and word sample spaces are typed.
+  if(/^(Red|Blue|Green|Yellow|A|B|C|D|E|Equal)$/.test(expected))return {...base,unit:undefined,kind:'text'};
+  if(/sample space/i.test(p)&&/^[A-Za-z]+(?:,\s*[A-Za-z]+)+$/.test(expected))return {...base,unit:undefined,kind:'set'};
   const missing=expected.match(/^Add the missing outcome (\d+)\.$/);
   if(missing)return {...base,kind:'number',expected:missing[1],prompt:p.replace('What needs changing?','Which outcome is missing?')};
   if(/probability of tails next/.test(p)&&expected.startsWith('1/2,'))return {...base,kind:'fraction',expected:'1/2'};
@@ -81,7 +84,10 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  }
  // Two- or three-part ratios: every part must scale by the same factor.
  if(spec.kind==='ratio'){const x=a.split(':').map(scalarAnswer),y=b.split(':').map(scalarAnswer);if(x.length!==y.length||x.some(v=>v===null)||!x[0])return false;if(spec.format==='simplest'&&x.some((v,i)=>v!==y[i]))return false;return x.every((v,i)=>near(v!/x[0]!,y[i]!/y[0]!));}
- if(spec.kind==='set'){const x=a.split(',').map(scalarAnswer),y=b.split(',').map(scalarAnswer);return x.every(v=>v!==null)&&new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
+ if(spec.kind==='set'){
+  // Word outcomes (colours, letters) compare as case-insensitive sets; numbers compare by value.
+  if(b.split(',').some(t=>scalarAnswer(t)===null)){const tok=(t:string)=>t.split(',').map(w=>w.trim().toLowerCase()).filter(Boolean),x=tok(a),y=tok(b);return new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
+  const x=a.split(',').map(scalarAnswer),y=b.split(',').map(scalarAnswer);return x.every(v=>v!==null)&&new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
  if(spec.kind==='points'){const x=a.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer),y=b.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
  if(spec.kind==='coordinates'||spec.kind==='list'){const parts=(s:string)=>s.replace(/[()]/g,'').split(',').map(scalarAnswer),x=parts(a),y=parts(b);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
  if(spec.kind==='expression'){

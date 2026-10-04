@@ -159,20 +159,40 @@ function verify(q){
   if(/^[A-Za-z]+$/.test(q.answer))assert.ok(!q.answerUnit);
  }
  if(realm==='chance'){
-  const wedges=v?.kind==='chance'?v.apparatus.wedges:null,red=wedges?.filter(c=>c==='#e5484d').length;
-  if(key===2)expected=n[1]-n[2]+(A?1:0);
-  if(key===4||key===11)expected=red/wedges.length;
-  if(key===6)expected=1-red/wedges.length;
-  if(key===7)expected=Number(v.rows[0][0])/Number(v.rows[0][1]);
-  if(key===8)expected=1-Number(v.rows[0][1])-Number(v.rows[1][1]);
-  if(key===10)expected=n[0]*red/wedges.length;
-  if(key===12)expected=Number(v.rows[0][1])/Number(v.rows[0][0]);
-  if(key===13)expected=v.rows.reduce((s,r)=>s+Number(r[1]),0);
-  if(key===14)expected=Number(v.rows[0][0])/Number(v.rows[0][1]);
-  if(key===15)expected=Math.abs(n[1]-n[0]*red/wedges.length);
-  if(key===17)expected=n[2]/n[1];
-  if(key===18)expected=Number(v.rows[0][0])/(Number(v.rows[0][0])+Number(v.rows[0][1]));
-  if(key===20){const [a,b]=v.rows;assert.ok(Math.abs(Number(b[1])/Number(b[2])-.5)<Math.abs(Number(a[1])/Number(a[2])-.5));}
+  // Independent Probability checks from the prompt and the visual only.
+  const pr=q.prompt,N=t=>(t.replaceAll('−','-').match(/-?\d+(?:\.\d+)?/g)||[]).map(Number),P=N(pr),F=!A&&!R;
+  const HEX={'#e5484d':'red','#3b82f6':'blue','#22a06b':'green','#f5b301':'yellow'},app=v?.kind==='chance'?v.apparatus:null;
+  const items=app?.type==='spinner'?app.wedges:app?.type==='bag'?app.counters:[],cnt=c=>items.filter(x=>HEX[x]===c).length,tot=items.length;
+  const rows=v?.kind==='table'?v.rows:null,val=s=>scalar(String(s));
+  const setIs=xs=>{const got=q.answer.split(',').map(x=>x.trim().toLowerCase()).sort(),exp=xs.map(x=>String(x).toLowerCase()).sort();assert.deepEqual(got,exp,JSON.stringify(q));};
+  const colours=()=>['red','blue','green','yellow'].filter(c=>cnt(c)>0);
+  const cell=label=>Number(rows.find(r=>r[0]===label)[1]);
+  switch(key){
+   case 1:if(/Tiles numbered 1 to/.test(pr))setIs(Array.from({length:P[1]},(_,i)=>i+1));else if(/die is rolled once/.test(pr))setIs([1,2,3,4,5,6]);else if(/section numbers/.test(pr))expected=new Set(rows[0][0].split(', ')).size;else if(/from the word/.test(pr))setIs([...new Set(pr.match(/word ([A-Z]+)/)[1])]);else setIs(colours());break;
+   case 2:if(/Raffle tickets/.test(pr))expected=Math.floor(P[1]/P[2]);else if(/NOT pick a blue/.test(pr))expected=tot-cnt('blue');else{const t=P[1],ev=pr.match(/are (even|odd|a multiple of 3|greater than \d+)\?/)?.[1];if(/really/.test(pr))expected=t-P[2];else if(ev?.startsWith('greater'))expected=t-P[2];else expected=Array.from({length:t},(_,i)=>i+1).filter(x=>ev==='even'?x%2===0:ev==='odd'?x%2===1:x%3===0).length;}break;
+   case 3:if(F){const t=P[0],shown=P.slice(3);expected=Array.from({length:t},(_,i)=>i+1).find(x=>!shown.includes(x));}else if(R){const xs=P.slice(1);expected=xs.find((x,i)=>xs.indexOf(x)!==i);}else if(/Two new sections/.test(pr))expected=P[2];else expected=colours().length;break;
+   case 4:if(/raffle/.test(pr))expected=P[1]/P[0];else if(/captain/.test(pr))expected=(P[0]-P[1])/P[0];else expected=cnt('red')/tot;break;
+   case 5:if(F)assert.equal(q.answer,cnt('red')>cnt('blue')?'Red':'Blue');else if(R)expected=cnt('red')/tot;else if(rows){const [ra,na]=rows[0].slice(1).map(Number),[rb,nb]=rows[1].slice(1).map(Number);assert.equal(q.answer,ra/na>rb/nb?'A':'B');}else expected=cnt('blue')-cnt('red');break;
+   case 6:if(F)expected=(tot-cnt('red'))/tot;else if(R)expected=1-P[0];else if(/greater than/.test(pr))expected=P[0]/6;else expected=P[0]-P[1];break;
+   case 7:if(/forecast/.test(pr)){expected=P[0]/100;const [x,y]=q.answer.split('/').map(Number);let g=x,h=y;while(h)[g,h]=[h,g%h];assert.equal(g,1);}else if(/more likely/.test(pr))expected=Math.max(P[0],P[1]/P[2]);else{const m=pr.match(/probability (\d+)\/(\d+)/);expected=Number(m[1])/Number(m[2]);}break;
+   case 8:if(rows)expected=1-cell('A')-cell('B');else if(/P\(red\) = 1\//.test(pr))expected=1-1/P[1]-1/P[3];else expected=100-P[0]-P[1];break;
+   case 9:if(F)assert.equal(q.answer,cnt('red')===cnt('blue')?'Equal':cnt('red')>cnt('blue')?'A':'B');else if(R)expected=cnt('blue')/tot;else if(/recoloured/.test(pr))expected=(cnt('blue')-cnt('red'))/2;else expected=3-(/1 or 2/.test(pr)?2:1);break;
+   case 10:if(/die is rolled/.test(pr))expected=P[0]/6;else if(/bus is late/.test(pr))expected=P[0]*P[1];else{const T=Number(pr.match(/in (\d+) spins/)[1]);expected=T*cnt('red')/tot;}break;
+   case 11:if(/greater than/.test(pr))expected=(6-P[0])/6;else if(/percentage of picks/.test(pr))expected=cnt('red')/tot*100;else expected=cnt('red')/tot;break;
+   case 12:if(rows&&/prediction/i.test(v.title))expected=Number(rows[0][1])/Number(rows[0][0]);else if(/bag holds/.test(pr))expected=P[0]*P[2]/P[1];else expected=P[0]*P[1]/P[2];break;
+   case 13:if(app?.type==='frequency')expected=app.counts[1]+app.counts[3]+app.counts[5];else if(v?.kind==='frequency')expected=v.counts.reduce((t,c)=>t+c,0);else expected=P[0]-cell('Red')-cell('Green');break;
+   case 14:if(/Class A tossed/.test(pr))expected=(P[1]+P[3])/(P[0]+P[2]);else if(/percentage/.test(pr))expected=Number(rows[0][0])/Number(rows[0][1])*100;else if(rows[0].length===2&&v.headers[1]==='Losses')expected=Number(rows[0][0])/(Number(rows[0][0])+Number(rows[0][1]));else expected=Number(rows[0][0])/Number(rows[0][1]);break;
+   case 15:if(F)expected=P[1]-P[0]*cnt('red')/tot;else if(/die is unfair/.test(pr))expected=Number(pr.match(/in (\d+) rolls/)[1])/6;else if(/coin tosses/.test(pr))expected=Math.abs(P[1]/P[0]-0.5);else expected=(P[1]-P[0])/P[0]*100;break;
+   case 16:if(R){const m=Number(pr.match(/integers 1 to (\d+)/)[1]),h=/1 to (\d+) mean heads/.test(pr)?Number(pr.match(/1 to (\d+) mean heads/)[1]):1;expected=h/m;}else if(A){if(/chance of rain/.test(pr))expected=P[0]*P[2]/100;else expected=P[0]/P[1]*P[2];}break;
+   case 17:if(/decimal between 0 and 1/.test(pr))expected=Math.round(P[2]*100);else if(/multiples of/.test(pr))expected=Math.floor(100/P[2])/100;else if(R)expected=(P[2]-1)/P[1];else expected=P[2]/P[1];break;
+   case 18:if(F)expected=Number(rows[0][0])/(Number(rows[0][0])+Number(rows[0][1]));else if(R)expected=app.counts.reduce((t,c)=>t+c,0)/6;else if(/predicted probability/.test(pr))expected=P[0]*P[1];else expected=(Number(rows[0][1])+Number(rows[1][1]))/200;break;
+   case 19:if(R)expected=Math.abs(P[2]-P[1])/P[0];else if(A){const hs=rows.map(r=>Number(r[1]));if(/combined/.test(pr))expected=hs.reduce((t,h)=>t+h,0)/100;else{const d=hs.map(h=>Math.abs(h-10));assert.equal(q.answer,rows[d.indexOf(Math.max(...d))][0]);}}break;
+   case 20:{const rs=rows.map(r=>Number(r[1])/Number(r[0]));if(F)expected=rs[rows.findIndex(r=>Number(r[0])===P[0])];else if(R){const pp=P[0],g=rs.map(x=>Math.abs(x-pp));expected=Number(rows[g.indexOf(Math.min(...g))][0]);}else if(/Estimate/.test(pr))assert.ok(Math.abs(value-rs[4])<=0.06&&Math.abs(value*10-Math.round(value*10))<1e-9,JSON.stringify(q));else expected=Math.abs(rs[4]-rs[0]);break;}
+   case 21:if(/lottery/.test(pr))expected=1/P[0];else if(/How many 6s/.test(pr))expected=Number(pr.match(/next (\d+) rolls/)[1])/6;else if(/coin/.test(pr))expected=1/2;else if(/die/.test(pr))expected=1/6;else expected=cnt('red')/tot;break;
+   case 22:if(A)expected=/test a die/.test(pr)?6*P[0]:P[1]*P[2];break;
+   case 23:{const pA=cell('Model A: P(win)'),pB=cell('Model B: P(win)'),W=cell('Observed wins'),T=cell('Trials');if(F)assert.equal(q.answer,Math.abs(W/T-pA)<Math.abs(W/T-pB)?'A':'B');else if(R)expected=Math.abs(W/T-pA);else if(/Using Model A/.test(pr))expected=pA*T;else expected=Math.abs(W-pB*T);break;}
+   case 24:if(R)expected=Number(rows[0][0])/Number(rows[0][1]);else if(/relative frequency of heads was/.test(pr))expected=Math.round(P[0]*P[1]);else if(A)expected=P[3]-P[2]/2;break;
+  }
   // Fractions and decimals that mean the same probability cannot both be choices.
   const scalars=q.options.map(scalar).filter(n=>n!==null);assert.equal(new Set(scalars.map(n=>n.toFixed(8))).size,scalars.length);
  }
@@ -216,6 +236,24 @@ for(const [realm,weeks] of Object.entries(CAVE7_CURRICULA)){
  }
  assert.ok(typed/total>=0.8,`Statistics typed share ${typed}/${total}`);
  console.log(`PASS Statistics: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, no fixed answers.`);
+}
+// Probability regression guards: separate reasoning tasks, mostly typed answers, varied answers
+// and two application forms in every lesson.
+{
+ const {level7Answer}=loadCave7('lib/level7-answer.ts'),{promptTemplate}=loadCave7('lib/level7-quiz.ts'),gen=CAVE7_GENERATORS.chance;let typed=0,total=0;
+ for(let w=1;w<=8;w++)for(let l=1;l<=3;l++){
+  const answers={fast_thinking:new Set(),reasoning:new Set(),apply_create:new Set()},forms=new Set();
+  for(let seed=1;seed<=100;seed++){
+   const f=gen(w,l,seed*7919,'fast_thinking'),r=gen(w,l,seed*7919,'reasoning'),a=gen(w,l,seed*7919,'apply_create');
+   assert.ok(f.prompt!==r.prompt&&f.prompt!==a.prompt,`Probability W${w}L${l}: reasoning or application repeats fluency`);
+   for(const q of [f,r,a]){total++;if(level7Answer(q))typed++;answers[q.tier].add(q.answer);}
+   forms.add(promptTemplate(a.prompt));
+  }
+  for(const [role,set] of Object.entries(answers))assert.ok(set.size>=2,`Probability W${w}L${l} ${role}: answer never changes`);
+  assert.ok(forms.size>=2,`Probability W${w}L${l}: only one application form`);
+ }
+ assert.ok(typed/total>=0.85,`Probability typed share ${typed}/${total}`);
+ console.log(`PASS Probability: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, no fixed answers, two application forms per lesson.`);
 }
 console.log(`PASS ${count} generated Algebra/Statistics/Probability questions and ${quizzes} quiz items: independent calculations, balanced weekly coverage and inequivalent numeric choices.`);
 

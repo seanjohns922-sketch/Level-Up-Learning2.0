@@ -12,7 +12,7 @@ const curriculum = [
       {
         "title": "Identify a favourable event",
         "goal": "count the outcomes that satisfy an event",
-        "idea": "Check each elementary outcome against the stated condition.",
+        "idea": "An event is a set of outcomes. Check each outcome against the condition; the ones that fit are the favourable outcomes.",
         "caution": "Words such as above and at least include different boundary values."
       },
       {
@@ -102,7 +102,7 @@ const curriculum = [
       {
         "title": "Record trial totals",
         "goal": "organise results of repeated single-stage trials",
-        "idea": "Each trial contributes one outcome; all outcome counts must sum to the number of trials.",
+        "idea": "An experiment is repeated as trials. Each trial gives one outcome, so all the outcome counts add up to the number of trials.",
         "caution": "A result can repeat many times."
       },
       {
