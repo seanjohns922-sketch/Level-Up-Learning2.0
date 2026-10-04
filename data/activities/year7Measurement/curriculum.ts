@@ -38,7 +38,7 @@ export const MEASUREMENT7_WEEKS = [
  ['Connect interior and exterior angles','derive an exterior angle using the triangle angle sum','An exterior angle on a straight line equals the sum of the two non-adjacent interior angles.','The exterior angle is not one of the three interior angles.']]},
  {title:'Polygon angle sums',code:'AC9M7M05',lessons:[
  ['Split a quadrilateral','derive a quadrilateral’s 360-degree interior angle sum','One diagonal splits a simple quadrilateral into two triangles: two lots of 180 degrees.','The diagonal does not create extra polygon corners.'],
- ['Generalise polygon sums','use triangulation to find a polygon’s interior angle sum','A simple n-sided polygon can be divided into n minus two triangles, giving (n − 2) × 180 degrees.','The number of triangles is two fewer than the number of sides.'],
+ ['Generalise polygon sums','use triangulation to find a polygon’s interior angle sum','Split the shape into triangles from one corner. Each triangle adds 180° to the total.','The number of triangles is two fewer than the number of sides.'],
  ['Find missing polygon angles','use an angle sum to determine a missing angle','Subtract the sum of the known interior angles from the whole polygon’s interior angle sum.','Only regular polygons have all interior angles equal.']]},
  {title:'Ratio models for measurement',code:'AC9M7M06',lessons:[
  ['Scale a recipe','scale capacity quantities while preserving a ratio','Multiply each part of a recipe by the same scale factor.','Adding the same amount to each ingredient does not preserve a ratio.'],
@@ -54,8 +54,15 @@ export const MEASUREMENT7_READABILITY_REVISION = 3;
 export function measurement7Guide(week:number,lesson:number){const w=MEASUREMENT7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const MEASUREMENT7_PROGRAM:WeekPlan[]=MEASUREMENT7_WEEKS.map((w,i)=>({id:`y7-measurement-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code] as WeekPlan['curriculum'],lessons:w.lessons.map((l,j)=>({id:`y7-measurement-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/measurement/lesson?realm_id=measurement&year=Year%207&week=${i+1}&lessonId=y7-measurement-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[w.code] as WeekPlan['curriculum'],activityIdeas:[l[1],'explain my method and check units and reasonableness'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{mode:`m7_w${i+1}_l${j+1}_${role}`,rotationRole:role,rotationLabel:role==='fast_thinking'?'Fluency':role==='reasoning'?'Reasoning':'Apply',lessonStructure:'8_minute_rotation'}}))}))}));
 
-// A short introduction before investigating measured circle ratios in practice.
+// Concrete opening examples before the more varied practice questions.
 export function measurement7IntroExample(week:number,lesson:number){
+ if(week===10&&lesson===2)return {
+  prompt:'A pentagon has 5 sides. Find its interior angle sum.',
+  answer:'540°',
+  explanation:'3 triangles × 180° = 540°.',
+  steps:['Split the pentagon into 3 triangles.','Multiply: 3 × 180° = 540°.','The pattern: angle sum = (number of sides − 2) × 180°.'],
+  measurementVisual:undefined,
+ };
  if(week!==5||lesson!==2)return undefined;
  return {
   prompt:'A circle has a diameter of 10 cm. Find its circumference using π ≈ 3.14.',
