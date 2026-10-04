@@ -30,7 +30,7 @@ function valid(key,q,option){const p=q.prompt,ns=nums(p);let e;
  case 18:e=Math.round(ns[0]/10)*10*Math.round(ns[1]);break;
  case 19:case 20:case 21:case 22:case 23:case 27:e=calc(p.replace('Calculate ','').replace(/\.$/,''));break;
  case 24:e=ns[0]*ns[1]/100;break;
- case 25:e=Math.min(...q.options.map(Number));break;
+ case 25:assert.equal(ns.length,4);e=Math.min(...ns);break;
  case 26:e=ns[0]+ns[1];break;
  case 28:{const [a,b]=option.split(':').map(Number);return approx(a/b,ns[0]/ns[1])&&Array.from({length:Math.min(a,b)-1},(_,i)=>i+2).every(n=>a%n!==0||b%n!==0);}
  case 29:e=ns[0]*ns[1]/(ns[1]+ns[2]);break;

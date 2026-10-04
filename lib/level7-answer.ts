@@ -1,6 +1,6 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
 export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[]};
-type Question={prompt:string;answer:string;lessonId?:string};
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[]};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -10,7 +10,12 @@ export function scalarAnswer(s:string):number|null{
 }
 export function level7Answer(q:Question):Level7Answer|null{
  if(!q.lessonId?.startsWith('y7-'))return null;
- const expected=clean(q.answer),p=q.prompt;
+ const expected=clean(q.answer);
+ // Older saved integer questions stored their givens only in the answer choices.
+ // Keep those values visible when restoring a question as a typed response.
+ const legacyIntegers=q.lessonId==='y7-w9-l1'&&q.prompt==='Which integer is smallest?';
+ if(legacyIntegers&&(!q.options||q.options.length<2||q.options.some(value=>!/^[-−]?\d+$/.test(value))))return null;
+ const p=legacyIntegers?`Which integer is smallest: ${q.options!.join(', ')}?`:q.prompt;
  const prompt=p.replace(/Which list is the complete sample space\?/,'List every outcome in the sample space.').replace(/Which fraction is at P\?/,'What fraction is at P?').replace(/Which expression matches\?/,'Write an expression.').replace(/Which expression gives/g,'Write an expression for').replace(/Which ordered pair/g,'What ordered pair');
  const unit=/percentage|percent(?!age)/i.test(p)&&!p.includes('decimal')?'%':/in cm³/.test(p)?'cm³':/in m³/.test(p)?'m³':/in cm²/.test(p)?'cm²':/in m²/.test(p)?'m²':/in degrees/.test(p)?'°':/in dollars/.test(p)?'$':/in mL/.test(p)?'mL':undefined;
  const base={expected,prompt,unit};

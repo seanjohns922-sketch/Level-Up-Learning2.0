@@ -15,3 +15,16 @@ let checked=0;
 for(const [realm,generate] of Object.entries(gs)){let typed=0,total=0;for(let w=1;w<=({space:10,statistics:10,chance:8}[realm]??12);w++)for(let l=1;l<=3;l++)for(let seed=1;seed<=20;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){const q=generate(w,l,seed*7919,role),s=level7Answer(q);total++;if(!s)continue;typed++;assert.ok(mark(s,s.expected),JSON.stringify({realm,w,l,role,s}));assert.ok(!mark(s,'this is not an answer'));checked++;}console.log(`${realm}: ${typed}/${total} constructed-response variants; remaining questions retain choices.`);}
 assert.equal(level7Answer({lessonId:'y6-w1-l1',prompt:'1+1?',answer:'2'}),null);
 console.log(`PASS ${checked} generated answer contracts; equivalent fractions, signs, ratios, coordinate order, expressions, sets, invalid input and lower-level isolation.`);
+
+// Comparison inputs must retain all givens, including previously saved questions.
+for(let seed=1;seed<=500;seed++){
+ const q=gs.number(9,1,seed,'fast_thinking'),s=level7Answer(q);
+ const values=s.prompt.match(/-?\d+/g).map(Number);
+ assert.equal(values.length,4);assert.equal(Number(q.answer),Math.min(...values));
+ for(const value of new Set(values))assert.equal(mark(s,String(value)),value===Math.min(...values));
+}
+const restored=level7Answer({lessonId:'y7-w9-l1',prompt:'Which integer is smallest?',answer:'-12',options:['0','5','-12','-3']});
+assert.equal(restored.prompt,'Which integer is smallest: 0, 5, -12, -3?');
+assert.ok(mark(restored,'-12'));assert.ok(!mark(restored,'-3'));
+assert.equal(level7Answer({lessonId:'y7-w9-l1',prompt:'Which integer is smallest?',answer:'-12'}),null);
+console.log('PASS integer comparison givens remain visible in generated and restored typed questions.');
