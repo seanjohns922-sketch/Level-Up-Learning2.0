@@ -156,7 +156,7 @@ for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
  for(const role of ['fast_thinking','apply_create']){const answers=new Set();for(let seed=1;seed<=200;seed++)answers.add(measurement7Question(w,l,seed*7919,role).answer);assert.ok(answers.size>=5,`W${w}L${l} ${role}: only ${answers.size} distinct answers`);}
  const prompts=new Set();for(let seed=1;seed<=200;seed++){const r=measurement7Question(w,l,seed*7919,'reasoning');prompts.add(r.prompt+JSON.stringify(r.measurementVisual??null));}assert.ok(prompts.size>=2,`W${w}L${l} reasoning has a single prompt`);
 }
-const csv=fs.readFileSync('public/curriculum/measurement-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,50);assert.ok(csv.includes('Modelling Task')&&!csv.includes('..'));
+const csv=fs.readFileSync('public/curriculum/measurement-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,49);assert.ok(!csv.includes('Modelling Task')&&!csv.includes('..'));
 console.log(`PASS ${count} Measurement practice variants, 165 weekly quiz items, 36 skill guides, 12-week curriculum and export.`);
 // Exercise shared authenticated route handlers with Measurement URLs, rather
 // than granting access via teacher_preview query parameters alone.

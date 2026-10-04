@@ -82,7 +82,7 @@ for(let w=1;w<=11;w++){
  if(w<12)assert.equal(rules.number7WeekUnlocked(store,w+1),true);
 }
 store[4].quizBestCorrect=11;assert.equal(rules.number7WeekUnlocked(store,12),false,'No jumping over an earlier failed week');
-const csv=fs.readFileSync('public/curriculum/number-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,50);assert.ok(csv.includes('Modelling Task')&&!csv.includes('..'));for(const w of NUMBER7_WEEKS)for(const l of w.lessons)assert.ok(csv.includes(l.title)&&csv.includes(l.code));
+const csv=fs.readFileSync('public/curriculum/number-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,49);assert.ok(!csv.includes('Modelling Task')&&!csv.includes('..'));for(const w of NUMBER7_WEEKS)for(const l of w.lessons)assert.ok(csv.includes(l.title)&&csv.includes(l.code));
 console.log(`PASS ${checked} independently scored practice variants, 165 quiz items, 36 guides, exact 80% gates, no week skipping, and 49 curriculum export rows.`);
 // Execute the real protected route modules with access outcomes and tampered queries.
 for(const kind of ['lesson','quiz']){

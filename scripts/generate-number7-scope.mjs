@@ -30,9 +30,6 @@ for(const [i,week] of NUMBER7_WEEKS.entries()) {
     example(number7Challenge(i+1,j+1,seedFor(i,j),'reasoning')),example(number7Challenge(i+1,j+1,seedFor(i,j),'apply_create')),
     i===11?'Existing Level 7 post-test':'5 from this lesson: 2 fluency, 1 reasoning, 2 application',
   ]);
-  if(i===11)rows.push(['7','Number',12,week.title,'Modelling Task','Sausage sizzle fundraiser','I am learning to formulate, solve and justify a mathematical model of a real situation','AC9M7N09; AC9M7N06; AC9M7N05',
-    'Teacher-marked extended task with a four-criterion rubric (formulate, represent and calculate, interpret, justify). Students may use a spreadsheet. Task and rubric: docs/lessons/number7-modelling-task.md',
-    'Teacher-marked; does not gate the post-test','Demo review only; every demo activity is unlocked','','','Rubric out of 12; not part of a weekly quiz']);
   if(i===11)rows.push(['7','Number',12,week.title,'Post-Test','Level 7 Post-Test','Demonstrate Level 7 Number mastery','AC9M7N01–AC9M7N09','Existing Level 7 post-test','Complete all three lessons; existing post-test pass threshold is 85%','Demo review only; every demo activity is unlocked','','','Existing post-test; no weekly quiz']);
   else rows.push(['7','Number',i+1,week.title,'Weekly Quiz','Weekly Quiz','Apply all three lesson skills independently',[...new Set(week.lessons.map(l=>l.code))].join('; '),
     '15 questions; 5 from each lesson','Complete all three lessons; score at least 12/15 (80%)','Demo review only; every demo activity is unlocked','','','15 total: 6 fluency, 3 reasoning, 6 application']);
