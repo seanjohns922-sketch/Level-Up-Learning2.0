@@ -5,7 +5,7 @@ const generators={number:number7Question,measurement:load('data/activities/year7
 let count=0;
 for(const [realm,generate] of Object.entries(generators))for(let week=1;week<=({space:10,statistics:10,chance:8}[realm]??12);week++)for(let lesson=1;lesson<=3;lesson++)for(let seed=1;seed<=20;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){
  const q=generate(week,lesson,seed*7919,role),context=`${realm} ${week}/${lesson} ${role}`;
- assert.equal(q.readabilityRevision,realm==='number'?5:realm==='measurement'?5:realm==='pattern'?4:realm==='space'?4:realm==='statistics'?3:1,context);
+ assert.equal(q.readabilityRevision,realm==='number'?6:realm==='measurement'?5:realm==='pattern'?4:realm==='space'?4:realm==='statistics'?3:1,context);
  if(realm==='number'&&week===6&&(lesson===1||lesson===2)){assert.equal(q.visual.type,'fraction_number_line');assert.ok(q.diagramSpeech);if(role==='reasoning')assert.ok(q.answer.includes('/'));assert.ok(q.prompt.split(/\s+/).length<=16);assert.ok(q.options.every(o=>o.split(/\s+/).length===1));}
  assert.ok(q.prompt.split(/\s+/).length<=50,`${context}: long prompt: ${q.prompt}`);
  for(const option of q.options)assert.ok(option.split(/\s+/).length<=25,`${context}: long choice: ${option}`);
@@ -29,6 +29,8 @@ for(const [realm,generate] of Object.entries(generators))for(let week=1;week<=({
 }
 for(let seed=1;seed<=100;seed++){
  const q=number7Question(2,3,seed,'apply_create'),[a,b]=q.prompt.match(/\d+/g).map(Number);
+ // Two application forms: flashing lights (lowest common multiple) or bead bags (highest common factor).
+ if(q.prompt.includes('beads')){let h=Math.min(a,b);while(a%h||b%h)h--;assert.equal(Number(q.answer),h);continue;}
  assert.ok(q.prompt.endsWith('How many seconds until they next flash together?'));
  let lcm=Math.max(a,b);while(lcm%a||lcm%b)lcm++;
  assert.equal(Number(q.answer),lcm);

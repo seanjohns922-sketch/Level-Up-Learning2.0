@@ -11,6 +11,42 @@ const eq=(x,y)=>Math.abs(x-y)<1e-7;
 export function validChallenge(key,q,option) {
   const p=q.prompt,v=numbers(p),o=numbers(option);let answer;
   if(q.tier==='apply_create') {
+    // Second application forms, recognised by their wording.
+    const gcdv=(x,y)=>y?gcdv(y,x%y):x;
+    const alt=(()=>{
+      if(/square patio uses/.test(p))return Math.sqrt(v[0]);
+      if(/Two square rooms have areas/.test(p))return Math.sqrt(v[1])-Math.sqrt(v[0]);
+      if(/square field has a perimeter/.test(p))return (v[0]/4)**2;
+      if(/Both side lengths are prime/.test(p)){let f=2;while(v[0]%f)f++;return 2*(f+v[0]/f);}
+      if(/bacteria count doubles/.test(p))return Math.log2(v[1]);
+      if(/red beads and \d+ blue beads/.test(p))return gcdv(v[0],v[1]);
+      if(/stadium holds/.test(p)){const m=p.match(/holds (.*?) people\. How many stadiums of that size would hold (.*?) people/);return calculate(m[2])/calculate(m[1]);}
+      if(/ten-thousands, \d+ hundreds and \d+ ones/.test(p))return v[0]*10000+v[1]*100+v[2];
+      if(/value of the digit in the thousands place/.test(p))return Math.floor(v[0]/1000)%10*1000;
+      if(/students walk to school/.test(p))return v[2]/v[1]*v[0];
+      if(/Three ribbons are/.test(p))return v[0]+v[1]/v[2]+v[3]+v[4]/v[5];
+      if(/jacket is reduced by/.test(p))return v[0]*(100-v[1])/100;
+      if(/Which is colder/.test(p))return v[0]-v[1]/v[2];
+      if(/friends share a \$/.test(p))return Math.round(v[1]/v[0]*100)/100;
+      if(/How much is left after buying/.test(p))return v[0]-Math.ceil(q.paintContext.need/q.paintContext.capacity)*q.paintContext.price;
+      if(/by rounding each number to the nearest whole number/.test(p))return Math.round(v[0])*Math.round(v[1]);
+      if(/poured into a third jug/.test(p))return v[0]/v[1]+v[2]/v[3];
+      if(/play sport, and 1\/4 of those/.test(p))return v[0]*v[1]/v[2]*v[3]/v[4];
+      if(/cut into pieces 2\/3 m long/.test(p))return Math.floor(v[0]*v[2]/v[1]+1e-9);
+      if(/You buy \d+ items at/.test(p))return v[0]*v[1];
+      if(/pipe is cut into/.test(p))return v[0]/v[1];
+      if(/discounted by 20%, then a further 10%/.test(p))return v[0]*.8*.9;
+      if(/at 6 am and/.test(p))return v[2]-v[0];
+      if(/How much must she deposit/.test(p))return v[0]+v[1];
+      if(/Five daily temperature changes/.test(p))return v.slice(0,5).reduce((t,x)=>t+x,0);
+      if(/ratio of boys to girls/.test(p))return v[2]/(v[0]+v[1])*v[1];
+      if(/How much more does Mia get than Leo/.test(p))return v[0]/(v[1]+v[2])*(v[1]-v[2]);
+      if(/map has a scale of/.test(p))return v[2]*v[1]/100000;
+      if(/game is 15% off/.test(p))return v[0]*v[1]/100;
+      if(/A shop buys a toy for/.test(p))return (v[1]-v[0])/v[0]*100;
+      if(/bag of rice costs/.test(p))return v[1]/(v[0]/100);
+    })();
+    if(alt!==undefined)return eq(calculate(option),alt);
     switch(key) {
       case 1: answer=v[2]*v[3]-v[0]*v[1];break;
       case 2: answer=Math.sqrt(v[0])*(Math.sqrt(v[0])+v[1]);break;
