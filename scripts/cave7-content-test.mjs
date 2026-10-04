@@ -17,7 +17,36 @@ function verify(q){
   const sameExpr=(fn,vars=['n'])=>{for(const z of [1,3,7]){const env=Object.fromEntries(vars.map((name,i)=>[name,i?20:z]));assert.ok(Math.abs(evaluate(rhs(q.answer),env)-fn(z,20))<1e-9,JSON.stringify({key,q}));}};
   const point=()=>N(q.answer);const at=x=>v.points.find(p=>p[0]===x)[1];const F=!A&&!R;
   const pick1=(cond,yes,no)=>assert.ok(q.answer.startsWith(cond?yes:no),JSON.stringify({key,q}));
-  switch(key){
+  // Second application forms, recognised by their wording.
+  const pr=q.prompt;let palt=A;
+  if(!A){}
+  else if(/Plan B charges \$\d+ per ride with no entry fee/.test(pr))sameExpr(z=>P[2]*z);
+  else if(/How much more does a \d+ km trip cost than/.test(pr))expected=Fm[0]*(P[0]-P[1]);
+  else if(/gives away \d+ muffins/.test(pr))sameExpr(z=>P[0]*z-P[1]);
+  else if(/loses \d+ L each hour/.test(pr))sameExpr(z=>P[0]-P[1]*z,['h']);
+  else if(/has width \d+ cm and length \(n \+ \d+\) cm/.test(pr))sameExpr(z=>P[0]*(z+P[1]));
+  else if(/= \d+\(n \+ □\)/.test(pr))expected=P[1]/P[0];
+  else if(/2 child tickets that are \$\d+ cheaper/.test(pr))sameExpr((z,pp)=>z*pp+2*(pp-P[1]),['n','p']);
+  else if(/After spending \$\d+, Mia has/.test(pr))expected=P[0]+P[1];
+  else if(/identical boxes weigh/.test(pr))expected=P[1]/P[0];
+  else if(/value of n that makes/.test(pr))expected=P[2]/P[0]-P[1];
+  else if(/call-out fee plus/.test(pr))expected=(P[2]-P[0])/P[1];
+  else if(/length \(x \+ \d+\) cm\. Its area/.test(pr))expected=P[2]/P[0]-P[1];
+  else if(/Think of a number, add \d+, then multiply by \d+\. The result/.test(pr))expected=P[2]/P[1]-P[0];
+  else if(/burns down \d+ cm each hour/.test(pr))expected=(P[0]-P[2])/P[1];
+  else if(/What does each side equal/.test(pr)){const [xv,k1,c1,k2,c2]=P;assert.equal(k1*xv+c1,k2*xv+c2);expected=k1*xv+c1;}
+  else if(/Stages 1, 2 and 3 are each built separately/.test(pr))expected=6*Fm[0]+3*Fm[1];
+  else if(/which input x gives the output y = /.test(pr))expected=(P.at(-1)-Fm[1])/Fm[0];
+  else if(/A function machine multiplies by/.test(pr))expected=(P[2]+P[1])/P[0];
+  else if(/outputs go down as x goes up/.test(pr)){for(const [xv,yv] of v.rows.map(r=>r.map(Number)))assert.ok(Math.abs(evaluate(rhs(q.answer),{x:xv})-yv)<1e-9,JSON.stringify(q));}
+  else if(/The point \(\d+, k\) lies on/.test(pr))expected=Fm[0]*P[0]+Fm[1];
+  else if(/A straight line passes through/.test(pr)){const slope=(P[3]-P[1])/(P[2]-P[0]);expected=P[1]+slope*P[4];}
+  else if(/Notebooks now cost \$1 more/.test(pr))expected=(Fm[0]+P[0])*P[1]+Fm[1];
+  else if(/travels at a constant \d+ km\/h\. How many hours/.test(pr))expected=P[1]/P[0];
+  else if(/Every edge is doubled/.test(pr))expected=8*P[0]*P[1]*P[2];
+  else if(/Its height is doubled\. What length/.test(pr))expected=P[0]/2;
+  else palt=false;
+  if(!palt)switch(key){
    case 1:if(F)expected=q.prompt.includes('fixed amount')?Fm[1]:Fm[0];else if(R){const sym=q.prompt.match(/what does (\w) represent/)[1];assert.ok(q.answer.includes({n:'tickets',h:'hours',g:'goals',k:'kilometres',d:'gigabytes'}[sym]));}else sameExpr(z=>P[0]*z+P[1]);break;
    case 2:if(F)expected=Fm[0]*P[0]+Fm[1];else if(R)expected=Fm[0]*P[0]+Fm[1];else expected=Fm[0]*P[0]+Fm[1];break;
    case 3:if(!A)expected=P[0]*P[1]+P[2];else if(v.formula.startsWith('d'))expected=P[0]/P[1];else expected=P[0]+1.5*P[1]*P[2];break;

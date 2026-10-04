@@ -259,5 +259,38 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   else num(`If n doubles from ${x} to ${2*x}, by how much does C increase?`,a*x,`C rises from ${a*x+b} to ${2*a*x+b}: an increase of ${a} × ${x} = ${a*x}.`,[a*x+b,2*(a*x+b),2*a*x]);
   break;}
  }
+ // Second application forms: half of the application questions ask a structurally different
+ // question about the same skill, so a quiz's two application questions are not twins.
+ if(role==='apply_create'&&int(0,1)===1){
+  const before=visual;visual=undefined;
+  switch(key){
+  case 1:choose(`Plan A: C = ${a}n + ${b}. Plan B charges $${a+1} per ride with no entry fee. Write a formula for the cost C of n rides on Plan B.`,`C = ${a+1}n`,[`C = ${a+1}n + ${b}`,`C = n + ${a+1}`,`C = ${a}n`],`With no entry fee there is no added amount: C = ${a+1}n.`);break;
+  case 2:{const rate=pick([1.5,2.5,3.2]);formula(`F = ${rate}d + ${b}`,'F is the taxi fare in dollars; d is the distance in km.');num(`How much more does a ${x+2} km trip cost than a ${x} km trip, in dollars?`,2*rate,`The flag fall is paid on both trips, so only the 2 extra km count: 2 × ${rate} = ${round(2*rate)}.`,[2*rate+b,rate,rate*(x+2)+b]);break;}
+  case 4:choose(`A baker makes n trays of ${a} muffins and then gives away ${b} muffins. Write an expression for the number of muffins left.`,`${a}n − ${b}`,[`${a}(n − ${b})`,`${b} − ${a}n`,`${a}n + ${b}`],`n trays of ${a} make ${a}n muffins; giving away ${b} leaves ${a}n − ${b}.`);break;
+  case 5:choose(`A water tank holds ${b*10} L and loses ${a} L each hour. Write a formula for the water left, V litres, after h hours.`,`V = ${b*10} − ${a}h`,[`V = ${a}h − ${b*10}`,`V = ${b*10}h − ${a}`,`V = ${b*10} + ${a}h`],`Start with ${b*10} L and take away ${a} L for every hour: V = ${b*10} − ${a}h.`);break;
+  case 7:choose(`A rectangle has width ${a} cm and length (n + ${b}) cm. Write an expression for its area in cm².`,`${a}(n + ${b})`,[`${a}n + ${b}`,`n + ${a*b}`,`${a+b}n`],`Area = width × length = ${a}(n + ${b}), which expands to ${a}n + ${a*b}.`);break;
+  case 8:num(`${a}n + ${a*b} = ${a}(n + □). What number goes in the box?`,b,`Factorise: ${a*b} ÷ ${a} = ${b}, so ${a}n + ${a*b} = ${a}(n + ${b}).`,[a*b,a*b-a,a+b]);break;
+  case 9:choose(`An adult ticket costs p dollars. A family buys n adult tickets and 2 child tickets that are $${b} cheaper each. Write an expression for the total cost.`,`np + 2(p − ${b})`,[`np + 2p − ${b}`,`(n + 2)p`,`n(p − ${b}) + 2p`],`Adults cost np. Each child ticket costs p − ${b}, and there are 2: np + 2(p − ${b}).`);break;
+  case 10:num(`After spending $${b}, Mia has $${x} left. How much money did she start with?`,x+b,`If she started with m dollars, m − ${b} = ${x}. Add ${b}: m = ${x+b}.`,[x-b>0?x-b:x+2*b,x,b]);break;
+  case 11:num(`${a} identical boxes weigh ${a*x} kg altogether. How much does one box weigh in kg?`,x,`${a}m = ${a*x}. Divide both sides by ${a}: m = ${x}.`,[a*x-a,a*x+a,a]);break;
+  case 12:num(`Test whole numbers to find the value of n that makes ${a}(n + ${b}) = ${a*(x+b)} true.`,x,`Try n = ${x}: ${a} × (${x} + ${b}) = ${a*(x+b)}.`,[x+b,a*(x+b)/a,x-1]);break;
+  case 13:num(`A plumber charges a $${b*10} call-out fee plus $${a*10} per hour. A job cost $${b*10+a*10*x}. How many hours did the job take?`,x,`${a*10}h + ${b*10} = ${b*10+a*10*x}. Subtract ${b*10}, then divide by ${a*10}: h = ${x}.`,[(b*10+a*10*x)/(a*10),x+1,x+b]);break;
+  case 14:num(`A rectangle has width ${a} cm and length (x + ${b}) cm. Its area is ${a*(x+b)} cm². Find x.`,x,`${a}(x + ${b}) = ${a*(x+b)}. Divide by ${a}: x + ${b} = ${x+b}, so x = ${x}.`,[x+b,a*(x+b)/a-b+1,(a*(x+b)-b)/a]);break;
+  case 15:num(`Think of a number, add ${b}, then multiply by ${a}. The result is ${a*(x+b)}. What was the number?`,x,`Undo the last step first: ${a*(x+b)} ÷ ${a} = ${x+b}. Then subtract ${b}: ${x}.`,[a*(x+b)/a,(a*(x+b)-b)/a,x+b]);break;
+  case 17:num(`A candle is ${b+a*x} cm tall and burns down ${a} cm each hour. After how many hours is it ${b} cm tall?`,x,`${b+a*x} − ${a}h = ${b}. The candle must lose ${a*x} cm: ${a*x} ÷ ${a} = ${x} hours.`,[(b+a*x)/a,b,x+1]);break;
+  case 18:num(`Check x = ${x} in ${a+c}x + ${b} = ${c}x + ${a*x+b}. What does each side equal?`,(a+c)*x+b,`Left: ${a+c} × ${x} + ${b} = ${(a+c)*x+b}. Right: ${c} × ${x} + ${a*x+b} = ${c*x+a*x+b}. Both sides match, so x = ${x} is a solution.`,[(a+c)*x,c*x,a*x+b]);break;
+  case 24:{const group=int(2,4),fixed=int(1,5);formula(`T = ${group}n + ${fixed}`,'T counts tiles; n is the whole-number stage.');num('Stages 1, 2 and 3 are each built separately. How many tiles are needed altogether?',6*group+3*fixed,`T(1) + T(2) + T(3) = ${group+fixed} + ${2*group+fixed} + ${3*group+fixed} = ${6*group+3*fixed}.`,[3*group+fixed,6*group+fixed,9*group+3*fixed]);break;}
+  case 25:formula(`y = ${a}x + ${b}`,'Apply the rule, or work backwards from y.');num(`Work backwards: which input x gives the output y = ${signed(b-a*x)}?`,-x,`${a}x + ${b} = ${signed(b-a*x)}. Subtract ${b}: ${a}x = ${signed(-a*x)}. Divide by ${a}: x = ${signed(-x)}.`,[x,(b-a*x)/a,-x-b]);break;
+  case 26:num(`A function machine multiplies by ${a}, then subtracts ${b}. The output is ${a*x-b}. What was the input?`,x,`Work backwards: add ${b} to get ${a*x}, then divide by ${a}: ${x}.`,[(a*x-b)/a,(a*x-b+b)/a+1,a*x]);break;
+  case 27:{const top=b+a*5,inputs=[1,2,3,4];table('Function table',['x','y'],inputs.map(n=>[n,top-a*n]));choose('The outputs go down as x goes up. Write a rule for y in terms of x that matches every pair.',`y = ${top} − ${a}x`,[`y = ${a}x + ${top}`,`y = ${top-a} − ${a}x`,`y = ${top} − x`],`Each step in x lowers y by ${a}, and at x = 0 the value would be ${top}: y = ${top} − ${a}x.`);break;}
+  case 28:formula(`y = ${a}x + ${b}`,'Write points as (x, y).');num(`The point (${x}, k) lies on the graph of y = ${a}x + ${b}. What is k?`,a*x+b,`Substitute x = ${x}: ${a} × ${x} + ${b} = ${a*x+b}.`,[a+x+b,a*(x+b),a*x]);break;
+  case 29:num(`A straight line passes through (0, ${b}) and (2, ${b+2*a}). What is y when x = 5?`,b+5*a,`y rises ${2*a} over 2, which is ${a} per 1. From (0, ${b}): y = ${b} + 5 × ${a} = ${b+5*a}.`,[b+10*a,b+2*a+5,5*a]);break;
+  case 30:formula(`C = ${a}n + ${b}`,'C is the cost in dollars of n notebooks, including delivery.');num(`Notebooks now cost $1 more each and delivery stays the same. How much do ${x} notebooks cost now, in dollars?`,(a+1)*x+b,`The new model is C = ${a+1}n + ${b}: ${a+1} × ${x} + ${b} = ${(a+1)*x+b}.`,[a*x+b+1,(a+1)*(x+b),a*x+b]);break;
+  case 31:{const v=pick([60,70,80,90]);num(`A car travels at a constant ${v} km/h. How many hours does it take to travel ${v*x} km?`,x,`d = ${v}t, so ${v*x} = ${v}t and t = ${v*x} ÷ ${v} = ${x}.`,[v*x-v,x+1,v]);break;}
+  case 32:num(`A box is ${a} cm by ${b} cm by ${c} cm. Every edge is doubled. What is the new volume in cm³?`,8*a*b*c,`Each of the three lengths doubles, so the volume is multiplied by 2 × 2 × 2 = 8: ${a*b*c} × 8 = ${8*a*b*c}.`,[2*a*b*c,4*a*b*c,a*b*c+8]);break;
+  case 33:num(`A box has length ${2*a} cm, width ${b} cm and height ${c} cm. Its height is doubled. What length in cm keeps the volume the same?`,a,`Doubling the height doubles the volume, so halve the length: ${2*a} ÷ 2 = ${a} cm.`,[4*a,2*a,a+c]);break;
+  default:visual=before;
+  }
+ }
  return makeQuestion({realm:'pattern',week,lesson,seed,role,prompt,answer,wrong,explanation,idea:g.idea,visual});
 }
