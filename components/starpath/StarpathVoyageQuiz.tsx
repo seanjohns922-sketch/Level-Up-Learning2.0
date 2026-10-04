@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {useDemoPreviewMode} from "@/lib/demo-mode";
+import {newLevel7QuizAttempt} from "@/lib/level7-quiz";
 import {markQuizComplete} from "@/lib/program-progress";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -48,6 +49,7 @@ type QuizPhase = "home" | "quiz" | "results" | "review";
 
 type SavedVoyageQuiz = {
   version: 2;
+  attempt?: number;
   order: number[];
   index: number;
   answers: Record<string, boolean>;
@@ -131,11 +133,14 @@ function newCompletionKey() {
 
 export default function StarpathVoyageQuiz({
   quiz,
-  tasks,
+  tasks: fixedTasks,
+  buildTasks,
   realm = "space",
 }: {
   quiz: StarpathVoyageQuizMeta;
-  tasks: PracticeTask[];
+  tasks?: PracticeTask[];
+  /** Builds a fresh quiz for an attempt number; attempt 0 is the fixed quiz. */
+  buildTasks?: (attempt: number) => PracticeTask[];
   realm?: VoyageQuizRealm;
 }) {
   const router = useRouter();
@@ -151,9 +156,12 @@ export default function StarpathVoyageQuiz({
   const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `${realm}-weekly-quiz:${cave7?"v5":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:${cave7?"v6":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
+  // Each new attempt gets its own questions; the attempt number is saved so a resume shows the same ones.
+  const [attempt, setAttempt] = useState(0);
+  const tasks = useMemo(() => (buildTasks ? buildTasks(attempt) : fixedTasks ?? []), [buildTasks, attempt, fixedTasks]);
   // Level 7 diagram questions need room to show the diagram beside the answer.
   const wideLevel7Quiz = tasks.some((task) => task.kind === "space7Question" || task.kind === "cave7Question");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
@@ -247,6 +255,7 @@ export default function StarpathVoyageQuiz({
         return;
       }
       setOrder(saved.order);
+      setAttempt(saved.attempt ?? 0);
       setIndex(Math.min(saved.index, tasks.length - 1));
       setAnswers(saved.answers);
       setResponses(saved.responses ?? {});
@@ -259,9 +268,9 @@ export default function StarpathVoyageQuiz({
 
   useEffect(() => {
     if (phase !== "quiz") return;
-    const saved: SavedVoyageQuiz = { version: 2, order, index, answers, responses };
+    const saved: SavedVoyageQuiz = { version: 2, attempt, order, index, answers, responses };
     localStorage.setItem(storageKey, JSON.stringify(saved));
-  }, [answers, index, order, phase, responses, storageKey]);
+  }, [answers, attempt, index, order, phase, responses, storageKey]);
 
   function answer(ok: boolean, response?: string) {
     if (!task || (!answersAreEditable && currentAnswer !== undefined)) return;
@@ -296,6 +305,7 @@ export default function StarpathVoyageQuiz({
 
   function beginQuiz() {
     if (!hasResume) {
+      if (buildTasks) setAttempt(newLevel7QuizAttempt());
       setOrder(lessonOrder(tasks.length));
       setIndex(0);
       setAnswers({});
@@ -394,6 +404,7 @@ export default function StarpathVoyageQuiz({
   }
 
   function restart() {
+    if (buildTasks) setAttempt(newLevel7QuizAttempt());
     setOrder(lessonOrder(tasks.length));
     setAnswers({});
     setResponses({});

@@ -93,17 +93,14 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
         `Use the highest common factor: ${a}. Each pack has 3 blue and 4 gold crystals.`); break;
     }
     case 7: {
-      const e = int(3,6);
-      choice(`Why is ${power(10,e+1)} ten times ${power(10,e)}?`,
-        'It contains one additional factor of 10.',
-        ['It contains one additional term of 10 to add.','The exponents must be multiplied together.','The base increases from 10 to 100.'],
-        `Write out the repeated factors: the next power adds one multiplication by 10. ${power(10,e)} × 10 = ${power(10,e+1)}.`); break;
+      const e = int(2,4), k = int(2,3);
+      numeric(`A student says ${power(10,e+k)} is ${k} times as large as ${power(10,e)} because the exponent went up by ${k}. How many times as large is it really?`,10**k,[k,10*k,e+k],
+        `Each step up in the exponent multiplies by another 10. Going up by ${k} multiplies by ${Array(k).fill(10).join(' × ')} = ${10**k}.`); break;
     }
     case 8: {
-      const value = a*100000+b*1000+c*10;
-      model(`Which expanded form equals ${value.toLocaleString('en-AU')}?`,
-        [`${a} × 10⁵ + ${b} × 10³ + ${c} × 10`,value], [[`${a} × 10⁴ + ${b} × 10² + ${c}`,value/10],[`${a} × 10⁵ + ${b} × 10⁴ + ${c} × 10`,a*100000+b*10000+c*10],[`${a} × 10⁵ + ${b} × 10³ + ${c}`,a*100000+b*1000+c]],
-        `The nonzero places are hundred-thousands, thousands and tens. The empty places still need zero placeholders.`); break;
+      const value = a*100000+b*1000+c*10, written = a*10000+b*100+c;
+      numeric(`To write ${value.toLocaleString('en-AU')} using powers of ten, a student wrote ${a} × 10⁴ + ${b} × 10² + ${c}. What number does the student's expanded form actually equal?`,written,[value,value/10+c,a*100000+b*1000+c],
+        `The student shifted every digit one place: ${a} × 10 000 + ${b} × 100 + ${c} = ${written}. The correct form is ${a} × 10⁵ + ${b} × 10³ + ${c} × 10.`); break;
     }
     case 9: {
       const value = a*10000+b*100+c, moved = a*1000+b*100+c;
@@ -154,14 +151,14 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     }
     case 16: {
       const value=n+0.249;
-      numeric(`Round ${value.toFixed(3)} to 1 decimal place.`,n+.2,[n+.3,n,n+.25],
-        `Check the hundredths digit: 4. Keep the tenths digit unchanged: ${fmt(n+.2)}.`); break;
+      numeric(`Ana rounded ${value.toFixed(3)} → ${(n+.25).toFixed(2)} → ${(n+.3).toFixed(1)}. What is ${value.toFixed(3)} to 1 decimal place?`,n+.2,[n+.3,n+.25,n],
+        `Round once, looking only at the hundredths digit: 4 is less than 5, so the tenths digit stays. ${value.toFixed(3)} → ${fmt(n+.2)}. Rounding in steps changes the answer.`); break;
     }
     case 17: {
-      const need=n+.4,capacity=3, tins=Math.ceil(need/capacity);
+      const need=n+.4,capacity=3, tins=Math.ceil(need/capacity), down=Math.floor(need/capacity);
       paintContext={need,capacity};
-      numeric('How many whole tins are needed?',tins,[Math.floor(need/capacity),need,tins+1],
-        `${need} ÷ ${capacity} = ${fmt(need/capacity)}. Round up: ${tins} tins hold enough paint.`); break;
+      numeric(`Sam bought ${down} ${down===1?'tin':'tins'}. How many are actually needed?`,tins,[down,need,tins+1],
+        `${down} ${down===1?'tin holds':'tins hold'} only ${down*capacity} L, which is less than ${need} L. Always round up to cover the whole amount: ${tins} tins.`); break;
     }
     case 18: {
       const x=n*10-.2,y=b+.1;

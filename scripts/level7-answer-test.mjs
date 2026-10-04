@@ -29,3 +29,14 @@ assert.equal(restored.prompt,'Which integer is smallest: 0, 5, -12, -3?');
 assert.ok(mark(restored,'-12'));assert.ok(!mark(restored,'-3'));
 assert.equal(level7Answer({lessonId:'y7-w9-l1',prompt:'Which integer is smallest?',answer:'-12'}),null);
 console.log('PASS integer comparison givens remain visible in generated and restored typed questions.');
+// Mixed numbers: accepted wherever the value is right, including simplest-form answers.
+{
+ const spec=level7Answer({lessonId:'y7-w8-l1',prompt:'Calculate 2 2/3 + 1 3/4.',answer:'4 5/12'});
+ assert.equal(spec.kind,'fraction');
+ for(const r of ['4 5/12','53/12'])assert.ok(mark(spec,r),r);
+ for(const r of ['4 5','4 6/12x','5 5/12'])assert.ok(!mark(spec,r),r);
+ const simplest={...spec,format:'simplest',expected:'4 1/2'};
+ assert.ok(mark(simplest,'4 1/2'));assert.ok(mark(simplest,'9/2'));
+ assert.ok(!mark(simplest,'4 2/4'));assert.ok(!mark(simplest,'3 3/2'));
+ console.log('PASS mixed-number answers: 4 5/12 and 53/12 both accepted; simplest form still enforced.');
+}

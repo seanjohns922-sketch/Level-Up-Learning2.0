@@ -4,6 +4,7 @@ import type {MultipleChoiceQuestion} from '@/data/activities/year2/lessonEngine'
 import type {Task7,P7,Polygon7,Flow7} from '@/data/assessments/revisions/level7StarpathFiveForms';
 import {HEXOMINOES,VALID_NET_IDS,foldNet,relationBetween} from '@/data/activities/starpath/level5/nets';
 import {space7Guide,space7SourceGuide,SPACE7_SKILL_GROUPS,SPACE7_READABILITY_REVISION} from './curriculum';
+import {pickLevel7LessonQuiz} from '@/lib/level7-quiz';
 export type Space7Role='fast_thinking'|'reasoning'|'apply_create';
 export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[]};
 const pair=(p:P7)=>`(${p.x}, ${p.y})`;
@@ -94,7 +95,10 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   break;}
  case 9:{const context=int(0,2),requests=['cut connected faces from one sheet for a box','find exact stack heights and occupied floor positions','show the overall three-dimensional appearance'],answers=['A labelled net','A height plan','An isometric drawing'];
   if(R){const q=pick([['What can a height plan show that an isometric drawing might hide?','Cubes hidden behind taller stacks.',['The colour of every cube.','The total area of the floor only.','Nothing; they always show the same information.']],['What does a footprint NOT tell you?','How tall each stack is.',['Which ground positions are used.','How many ground positions are used.','The shape of the base.']],['Why might an isometric drawing be less useful than a height plan for counting cubes?','Some cubes can be hidden from view.',['Isometric drawings never show cubes.','Height plans show colour.','Isometric drawings are always too small.']]] as const);choose(q[0],q[1],[...q[2]],guide.idea);}
-  else choose(`${A?'A design team needs to':'Choose a representation to'} ${requests[context]}. Which representation is best?`,answers[context],answers.filter((_,i)=>i!==context).concat('An unlabelled shadow'),context===0?'A net lays out faces and shared folding edges.':context===1?'A height plan records every ground position and its stack height.':'An isometric drawing communicates overall form but can hide cubes behind others.');
+  else{const why={Net:'A net lays out every face and the shared folding edges.','Height plan':'A height plan records every ground position and its exact stack height.','Isometric drawing':'An isometric drawing shows the overall three-dimensional form, though it can hide cubes.'},names=Object.keys(why) as (keyof typeof why)[];
+   // Fluency names the representation for a stated purpose; application reads a real job.
+   const [job,best]=A?pick([['A packaging company will cut a cereal box from one sheet of cardboard.','Net'],['A builder must order exactly the right number of blocks for a stepped wall.','Height plan'],['An architect wants to show a client what the finished building will look like.','Isometric drawing'],['A gift shop prints a design that customers fold into a box.','Net'],['A teacher wants students to rebuild a cube model exactly from a worksheet.','Height plan'],['A museum poster shows what a block sculpture looks like.','Isometric drawing']] as const):[`You need to ${requests[context]}.`,(['Net','Height plan','Isometric drawing'] as const)[context]];
+   choose(`${job} Which representation is best? Type net, height plan or isometric drawing.`,best,[...names.filter(n=>n!==best),'Footprint'],why[best]);}
   break;}
  // ── Triangles and quadrilaterals (AC9M7SP02)
  case 10:{const v=int(0,2),lengths=v===0?[a,a,a]:v===1?[a,a,a+1]:[a,a+1,a+2],label=['Equilateral','Isosceles','Scalene'][v];
@@ -191,8 +195,20 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   else if(R)choose(`A student skipped the first question for side lengths ${a}, ${a}, ${a} cm and went straight to “Exactly 2 sides equal?”. Type the output the classifier should give.`,'Equilateral',['Isosceles','Scalene','No output'],'Every decision is checked in order; the first question already sends this triangle to Equilateral.');
   else{const ang=pick([[30,60,90],[25,45,110],[50,60,70]]),name=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';flow({question:'Any angle equal to 90°?',yes:'Right-angled',no:{question:'Any angle greater than 90°?',yes:'Obtuse',no:'Acute'}});choose(`Trace this angle classifier for a triangle with angles ${ang.join('°, ')}°. Type the output.`,name,['Acute','Right-angled','Obtuse','No output'].filter(s=>s!==name),'Follow each decision in order.');}
   break;}
- case 29:{const v=int(0,2),out=['Equilateral','Right-angled triangle','Obtuse triangle'][v],condition=['Are all three sides equal?','Does one interior angle equal 90°?','Does one interior angle exceed 90°?'][v];flow({question:'?',yes:out,no:'Another triangle group'});
-  choose(`${A?'A programmer is checking the Yes branch. ':R?'Choose the defining property. ':''}Only ${out.toLowerCase()}s should follow Yes. Which decision belongs in the empty box?`,condition,['Does at least one angle measure less than 90°?','Does the shape have three sides?','Are all side lengths positive?'],`Test the defining property: ${condition}`);break;}
+ case 29:{
+  // Fluency chooses the defining decision; reasoning finds a faulty decision; application runs a decision on a set.
+  const rows=[['equilateral triangles','Equilateral','Are all three sides equal?'],['right-angled triangles','Right-angled','Does one interior angle equal 90°?'],['obtuse triangles','Obtuse','Does one interior angle exceed 90°?'],['isosceles triangles','Isosceles','Are exactly two sides equal?'],['rectangles','Rectangle','Does it have four right angles?'],['rhombuses','Rhombus','Are all four sides equal?']] as const;
+  if(F){const v=int(0,rows.length-1),[group,out,condition]=rows[v];flow({question:'?',yes:out,no:'Another group'});
+   choose(`Only ${group} should follow Yes. Which decision belongs in the empty box?`,condition,rows.filter((_,i)=>i!==v).map(r=>r[2]).slice(0,3),`Test the defining property: ${condition}`);break;}
+  const v=int(0,2),out=rows[v][1],angles=v>0;
+  if(R){const faulty=[['Are at least two sides equal?',`${a}, ${a}, ${a+3} cm`],['Is one angle less than 90°?','50°, 60°, 70°'],['Is one angle more than 60°?','50°, 60°, 70°']][v];flow({question:faulty[0],yes:out,no:'Another triangle group'});
+   choose(`A student wants only ${rows[v][0]} to follow Yes, but used the decision “${faulty[0]}”. A triangle with ${angles?'angles':'side lengths'} ${faulty[1]} goes through the student's classifier. Type the output it wrongly gives.`,out,rows.filter((_,i)=>i!==v).slice(0,3).map(r=>r[1]),`${faulty[1]} passes the student's test, so it is labelled ${out} even though it is not. The defining test is “${rows[v][2]}”.`);break;}
+  const pool=angles?[[30,60,90],[45,45,90],[50,60,70],[20,70,90],[40,60,80],[35,55,90],[100,40,40],[25,45,110],[120,30,30]]:[[a,a,a],[a,a,a+2],[a,a+1,a+2],[a+1,a+1,a+1],[a,a+2,a+2],[a+2,a+2,a+2]],order=pool.map((_,i)=>i);
+  for(let i=order.length-1;i>0;i--){const j=int(0,i);[order[i],order[j]]=[order[j],order[i]];}
+  const four=order.slice(0,4).map(i=>pool[i]),yes=four.filter(t=>v===0?t[0]===t[1]&&t[1]===t[2]:v===1?t.includes(90):Math.max(...t)>90).length;
+  flow({question:rows[v][2],yes:out,no:'Another triangle group'});
+  numeric(`A sorting machine uses the decision “${rows[v][2]}”. These triangles go through, with ${angles?'angles':'side lengths in cm'}: ${four.map(t=>t.join(angles?'°, ':', ')+(angles?'°':'')).join('; ')}. How many follow Yes?`,yes,`Check each triangle against “${rows[v][2]}”: ${yes} ${yes===1?'does':'do'}.`,[4-yes,yes+1]);
+  break;}
  case 30:{flow({question:'Four right angles?',yes:{question:'Four equal sides?',yes:'Square',no:'Non-square rectangle'},no:{question:'Four equal sides?',yes:'Non-square rhombus',no:'Other quadrilateral'}});
   const v=int(0,3),facts=[`four right angles and four sides of ${a} cm`,`four right angles and side lengths ${2*a}, ${a}, ${2*a}, ${a} cm`,`four sides of ${a} cm and angles 60°, 120°, 60°, 120°`,`side lengths ${2*a}, ${a}, ${2*a}, ${a} cm and angles 60°, 120°, 60°, 120°`],names=['Square','Non-square rectangle','Non-square rhombus','Other quadrilateral'];
   if(R)choose(`A shorter classifier asks only “Four right angles?” and outputs “Rectangle” on Yes. Which group can it not tell apart from rectangles?`,'Squares',['Rhombuses','Kites','Triangles'],'Squares and non-square rectangles both have four right angles; a second test of equal sides separates them.');
@@ -226,10 +242,9 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
 }
 export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:LessonActivity){return space7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Space7Role);}
-export function space7Quiz(week:number){
+export function space7Quiz(week:number,attempt=0){
  if(!Number.isInteger(week)||week<1||week>9)throw Error('Unknown Space Level 7 quiz');
- return [1,2,3].flatMap(lesson=>{const seen=new Set<string>();return (['fast_thinking','reasoning','apply_create','fast_thinking','apply_create'] as const).map((role,i)=>{
-  for(let attempt=0;attempt<200;attempt++){const q=space7Question(week,lesson,970001+week*10007+lesson*101+i*7919+attempt*104729,role);const fingerprint=q.prompt+JSON.stringify(q.spaceVisual)+q.options.slice().sort().join('|');if(seen.has(fingerprint))continue;seen.add(fingerprint);return {...q,id:`y7-space-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3};}
-  throw Error(`Insufficient Space quiz variations: ${week}/${lesson}/${role}`);
- });});
+ const taken=new Set<string>();
+ return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>space7Question(week,lesson,seed,role),970001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.spaceVisual)+q.options.slice().sort().join('|'),`Space ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,id:`y7-space-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3})));
 }

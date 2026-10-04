@@ -3,6 +3,7 @@ import type { Lesson } from '@/data/programs/year1';
 import type { LessonActivity } from '@/data/programs/types';
 import { number7Guide, number7ContentKey, NUMBER7_READABILITY_REVISION } from './curriculum';
 import { number7Challenge, type Number7Role } from './challenges';
+import { pickLevel7LessonQuiz } from '@/lib/level7-quiz';
 export type Number7Question = MultipleChoiceQuestion & { skill:string; seed:number; lessonId:string; version:2; tier:Number7Role; diagramSpeech?:string; expectedValue?:number };
 export const gcd=(a:number,b:number):number=>b?gcd(b,a%b):Math.abs(a);
 export const fraction=(n:number,d:number)=>{const f=gcd(n,d);return d/f===1?String(n/f):`${n/f}/${d/f}`;};
@@ -78,15 +79,9 @@ export function generateNumber7Question(_level:unknown,lesson:Lesson,activity:Le
  if(!/^y7-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw new Error('Unsupported Level 7 lesson');
  return number7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),String(activity.config.rotationRole));
 }
-export function number7Quiz(week:number) {
+export function number7Quiz(week:number,attempt=0) {
  if(!Number.isInteger(week)||week<1||week>11)throw new Error('Unknown Level 7 quiz');
- return [1,2,3].flatMap(lesson=>{
-  const questions:Array<Number7Question & {lessonTag:1|2|3;id:string}>=[],seen=new Set<string>();
-  for(let i=0;questions.length<5&&i<300;i++){
-   const q=number7Question(week,lesson,700001+week*10007+lesson*101+i*7919,(['fast_thinking','reasoning','apply_create','fast_thinking','apply_create'] as const)[questions.length]);
-   const fingerprint=q.prompt+q.options.slice().sort().join("|");if(seen.has(fingerprint))continue;seen.add(fingerprint);
-   questions.push({...q,lessonTag:lesson as 1|2|3,id:`y7-w${week}-quiz-l${lesson}-${questions.length+1}`});
-  }
-  if(questions.length!==5)throw new Error('Insufficient unique quiz questions');return questions;
- });
+ const taken=new Set<string>();
+ return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>number7Question(week,lesson,seed,role),700001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+q.options.slice().sort().join('|'),`Number ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,lessonTag:lesson as 1|2|3,id:`y7-w${week}-quiz-l${lesson}-${i+1}`})));
 }

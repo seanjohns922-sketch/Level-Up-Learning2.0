@@ -28,7 +28,7 @@ for(let week=1;week<=12;week++)for(let lesson=1;lesson<=3;lesson++)for(const rol
  const art=number7ContextArt(q.prompt);if(art)kinds.add(art);
  if(week===8&&lesson===1){
   const spec=level7Answer(q);assert.equal(spec.kind,'fraction');assert.ok(markLevel7Answer(spec,q.answer));
-  assert.ok(!/decimal|then/.test(q.prompt));assert.equal(q.readabilityRevision,4);
+  assert.ok(!/decimal|then/.test(q.prompt));assert.equal(q.readabilityRevision,5);
   if(role==='apply_create'){
    assert.equal(art,'jug');assert.equal((q.prompt.match(/\d+\/\d+/g)||[]).length,2);
    const [n,d]=q.answer.split('/').map(Number);assert.ok(markLevel7Answer(spec,`${n*2}/${d*2}`));

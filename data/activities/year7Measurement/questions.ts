@@ -4,6 +4,7 @@ import type { LessonActivity } from '@/data/programs/types';
 import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngine';
 import type { Measurement7Visual } from '@/data/assessments/revisions/year7MeasurementFiveForms';
 import { measurement7Guide, MEASUREMENT7_READABILITY_REVISION } from './curriculum';
+import { pickLevel7LessonQuiz } from '@/lib/level7-quiz';
 export type Measurement7Role='fast_thinking'|'reasoning'|'apply_create';
 export type Measurement7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Measurement7Role;steps:string[];answerUnit?:string};
 type Relation='corresponding'|'alternate'|'cointerior';
@@ -59,7 +60,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
   // Naming the parts of a circle (AC9M7M03 elaboration).
   if(variant%3===1)why('Which part of a circle is the curved distance all the way around it?','The circumference.',['The diameter.','The radius.','The centre.']);
   else if(variant%3===2)why('A straight line joins the centre of a circle to a point on the circle. What is it called?','A radius.',['A diameter.','The circumference.','An arc.']);
-  else why('Why is a diameter twice a radius?','It joins two points on the circle through the centre, covering two radii.',['It is the curved distance all around the circle.','Every chord is twice a radius.','Pi is exactly two.']);break;
+  else why(`A student says a circle with diameter ${2*a} cm has radius ${4*a} cm. What is the radius in cm?`,String(a),[String(4*a),String(2*a),String(a+2)]);break;
  case 14: {
   if(apply)task(`Circle A has diameter ${a} cm and circumference ${fmt(3.14*a)} cm. Circle B has diameter ${2*a} cm. Using the same ratio, what is B’s circumference in cm?`,6.28*a,'cm',`${fmt(3.14*a)} × 2`,'Circumference and diameter scale together. Their constant ratio is pi, approximated here by 3.14.',[3.14*a,12.56*a,3.14*a+a]);
   else {const d=int(8,25),C=Math.round((Math.PI*d+(int(0,6)-3)/10)*10)/10;task(`Students wrap string around a circular lid. Circumference: ${C} cm. Diameter: ${d} cm. Calculate circumference ÷ diameter, rounded to 2 decimal places.`,C/d,'',`${C} ÷ ${d}`,'Measured circles give a ratio close to pi. Measurements are estimates, so the result is not exactly pi.',[d/C,C-d,C/(2*d)]);}
@@ -174,18 +175,10 @@ export function generateMeasurement7Question(_level:unknown,lesson:Lesson,activi
  if(!/^y7-measurement-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw Error('Unsupported Measurement Level 7 lesson');
  return measurement7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Measurement7Role);
 }
-export function measurement7Quiz(week:number){
+export function measurement7Quiz(week:number,attempt=0){
  if(!Number.isInteger(week)||week<1||week>11)throw Error('Unknown Measurement Level 7 quiz');
- // Skip repeats: two questions match when both the wording and the diagram match.
- return [1,2,3].flatMap(lesson=>{
-  const seen=new Set<string>();
-  return (['fast_thinking','reasoning','apply_create','fast_thinking','apply_create'] as const).map((role,i)=>{
-   for(let attempt=0;attempt<200;attempt++){
-    const q=measurement7Question(week,lesson,770001+week*10007+lesson*101+i*7919+attempt*104729,role),fingerprint=q.prompt+JSON.stringify(q.measurementVisual??null);
-    if(seen.has(fingerprint))continue;seen.add(fingerprint);
-    return {...q,id:`y7-measurement-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3};
-   }
-   throw Error('Insufficient unique Measurement quiz questions');
-  });
- });
+ // Two questions match when both the wording and the diagram match.
+ const taken=new Set<string>();
+ return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>measurement7Question(week,lesson,seed,role),770001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.measurementVisual??null),`Measurement ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,id:`y7-measurement-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3})));
 }

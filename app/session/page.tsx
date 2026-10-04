@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
 import { number7Quiz } from "@/data/activities/year7Number/questions";
+import { newLevel7QuizAttempt } from "@/lib/level7-quiz";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -8230,10 +8231,12 @@ function SessionPage({
   // QUIZ: 15-question mix from 3 lessons
   // Uses YEAR1_WEEKLY_QUIZZES config: 5 questions per lesson, 80% pass
   // ---------------------------
+  // Level 7 quizzes get fresh questions on every visit; attempt 0 is the fixed quiz used for teacher review.
+  const [year7QuizAttempt, setYear7QuizAttempt] = useState(0);
   const buildQuizQuestions = useCallback(() => {
     const questionsPerLesson = WEEKLY_QUIZ_QUESTIONS_PER_LESSON;
     const weekPlan = quizWeekPlan;
-    if(year==='Year 7')return (isMeasurementRealm?measurement7Quiz(Number(week)):number7Quiz(Number(week))).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:q.lessonId,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...({kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q})}));
+    if(year==='Year 7')return (isMeasurementRealm?measurement7Quiz(Number(week),year7QuizAttempt):number7Quiz(Number(week),year7QuizAttempt)).map(q=>({id:q.id,lessonTag:q.lessonTag,sourceLessonId:q.lessonId,activityType:'multiple_choice' as const,prompt:q.prompt,feedbackCorrect:q.explanation??'Correct.',feedbackIncorrect:'Review this skill and try again.',...({kind:'lessonActivity' as const,activity:{activityType:'multiple_choice' as const,weight:1,config:{}},questionData:q})}));
 
     if (isMeasurementRealm && year === "Year 1" && Number(week) === 1) {
       return buildY1MeasurelandsWeek1WeeklyQuizQuestions(questionsPerLesson);
@@ -8672,7 +8675,7 @@ function SessionPage({
     }
 
     return base;
-  }, [isMeasurementRealm, quizWeekPlan, week, year]);
+  }, [isMeasurementRealm, quizWeekPlan, week, year, year7QuizAttempt]);
 
   const buildSafeQuizQuestions = useCallback(() => {
     for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -9132,6 +9135,16 @@ function SessionPage({
       )
     );
   }, [currentQuiz]);
+
+  useEffect(() => {
+    if (year !== 'Year 7' || isTeacherReview) return;
+    setYear7QuizAttempt(newLevel7QuizAttempt());
+  }, [quizAttemptKey, year, isTeacherReview]);
+
+  // A new attempt number rebuilds the quiz before the student has answered anything.
+  useEffect(() => {
+    if (year7QuizAttempt) setQuizQuestions(buildSafeQuizQuestions());
+  }, [year7QuizAttempt, buildSafeQuizQuestions]);
 
   const lastAutoReadQuizIdRef = useRef<string | null>(null);
 

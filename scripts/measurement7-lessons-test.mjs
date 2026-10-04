@@ -63,7 +63,7 @@ function reasonOk(key,q){
  case 10:return has('Divide volume by cross-sectional area')||ans===`${n[0]} ÷ ${n[1]}`;
  case 11:return has('1000 cm³ equals 1 L');
  case 12:return has('holds half as much')||ans.startsWith(`${n[0]/2} cm³`);
- case 13:return q.prompt.includes('curved distance')?ans==='The circumference.':q.prompt.includes('centre of a circle to a point')?ans==='A radius.':has('through the centre');
+ case 13:return q.prompt.includes('curved distance')?ans==='The circumference.':q.prompt.includes('centre of a circle to a point')?ans==='A radius.':Number(ans)===Number(q.prompt.match(/diameter (\d+) cm/)[1])/2;
  case 14:{if(q.prompt.startsWith('Ancient')){const best=q.options.reduce((x,y)=>Math.abs(PI_TABLE[y]-Math.PI)<Math.abs(PI_TABLE[x]-Math.PI)?y:x);return ans===best;}return has('Circumference divided by diameter','Measurements are estimates');}
  case 15:return ans===`${n[0]} × π`;
  case 16:return has('needs diameter');

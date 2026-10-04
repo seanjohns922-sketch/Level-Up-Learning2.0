@@ -23,7 +23,12 @@ function check(key,q){
   case 6:if(A){const nx=h.slice();nx[3]+=1;answer=[Math.max(...nx.slice(0,3)),Math.max(...nx.slice(3))].join(', ');}else answer=side.join(', ');break;
   case 7:answer=String(A?6*Math.max(...h)-total:total);break;
   case 8:answer=String(F?n[0]:R?n[0]*n[2]-n[0]+1:n[0]*n[2]);break;
-  case 9:if(!R)answer=p.includes('sheet')?'A labelled net':p.includes('stack heights')?'A height plan':'An isometric drawing';break;
+  case 9:if(!R)answer=/stack heights|number of blocks|rebuild/.test(p)?'Height plan':/sheet|fold|cut/.test(p)?'Net':'Isometric drawing';break;
+  case 29:{const def={'equilateral triangles':'Are all three sides equal?','right-angled triangles':'Does one interior angle equal 90°?','obtuse triangles':'Does one interior angle exceed 90°?','isosceles triangles':'Are exactly two sides equal?','rectangles':'Does it have four right angles?','rhombuses':'Are all four sides equal?'},name={'equilateral triangles':'Equilateral','right-angled triangles':'Right-angled','obtuse triangles':'Obtuse'};
+   if(F)answer=def[p.match(/Only (.*?) should follow/)[1]];
+   else if(R)answer=name[p.match(/wants only (.*?) to follow/)[1]];
+   else{const rule=p.match(/decision “(.*?)”/)[1],tris=p.split(': ').slice(1).join(': ').split('. How')[0].split('; ').map(t=>(t.match(/\d+/g)||[]).map(Number));answer=String(tris.filter(t=>rule.includes('three sides')?t[0]===t[1]&&t[1]===t[2]:rule.includes('equal 90')?t.includes(90):Math.max(...t)>90).length);}
+   break;}
   case 10:if(F){const d=new Set(n.slice(0,3)).size;answer=d===1?'Equilateral':d===2?'Isosceles':'Scalene';}else if(R)answer='Isosceles';else{answer=String(n[1]-2*n[0]);assert.notEqual(n[1]-2*n[0],n[0],'isosceles, not equilateral');}break;
   case 11:{const ang=A?[n[0],n[1],180-n[0]-n[1]]:n.slice(0,3);answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';break;}
   case 12:if(!R)answer=String(A?Math.abs(n[0]-n[1])+1:n[0]+n[1]-1);break;

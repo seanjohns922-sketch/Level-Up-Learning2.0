@@ -60,8 +60,8 @@ export function validChallenge(key,q,option) {
     case 4: return option.includes('each exponent counts')&&eq(calculate(option.split(';')[0]),v[0]);
     case 5: answer=calculate(p.match(/writes (.*?) =/)[1]);break;
     case 6: return option==='Find the highest common factor.';
-    case 7: return option==='It contains one additional factor of 10.';
-    case 8: answer=v[0];break;
+    case 7: {const [big,small]=[...p.matchAll(/10([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g)].map(m=>calculate(`10${m[1]}`));answer=big/small;break;}
+    case 8: answer=calculate(p.match(/wrote (.*?)\. What/)[1]);break;
     case 9: answer=v[0]-v[1]*9000;break;
     case 10: return option.startsWith('Divide the top and bottom')&&o[0]===v[0]/v[2]&&eq(v[0]/v[1],v[2]/v[3]);
     case 11: answer=v[0]/v[1];break;
@@ -69,7 +69,7 @@ export function validChallenge(key,q,option) {
     case 13: return eq(calculate(option),q.visual.markers[0].position);
     case 14: return eq(calculate(option),q.visual.markers[0].position);
     case 15: return option.includes(' < ')&&o[0]<o[1]&&option.includes('farther left');
-    case 16: return eq(Number(option),Math.round(v[0]*10)/10);
+    case 16: {const x=Number(p.match(/What is (\d+\.\d+) to 1 decimal/)[1]);return eq(Number(option),Math.round(x*10)/10);}
     case 17: return Number(option)===Math.ceil(q.paintContext.need/q.paintContext.capacity);
     case 18: answer=Math.round(v[0])*Math.round(v[1]);break;
     case 19: answer=v[0]/v[1]+v[2]/v[3];break;

@@ -51,7 +51,7 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(/^-?[\d./]+(?:,\s*-?[\d./]+){1,5}$/.test(expected))return {...base,kind:'list',labels:q.answerLabels??expected.split(',').map((_,i)=>`Value ${i+1}`)};
  if(/^[\d\s.nxpyThVClw+*/()=−²³⁴⁵⁶⁷⁸⁹⁰¹-]+$/.test(expected)&&/[a-zA-Z+*()/=²³⁴⁵⁶⁷⁸⁹-]/.test(expected)&&!expected.includes(';'))return {...base,kind:'expression'};
  // Short shape names are recalled; explanatory and yes/no judgements remain choices.
- if(q.lessonId.startsWith('y7-space-')&&/^(Acute|Obtuse|Right-angled|Equilateral|Isosceles|Scalene|Square|Rectangle|Rhombus|Parallelogram|Trapezium|Kite|Concave|Convex|Regular convex|Irregular convex|Non-square rectangle|Non-square rhombus|Other quadrilateral|Cube|Square pyramid|Triangular pyramid|Triangular prism|Rectangular prism|Pentagonal prism)$/i.test(expected))return {...base,kind:'text'};
+ if(q.lessonId.startsWith('y7-space-')&&/^(Acute|Obtuse|Right-angled|Equilateral|Isosceles|Scalene|Square|Rectangle|Rhombus|Parallelogram|Trapezium|Kite|Concave|Convex|Regular convex|Irregular convex|Non-square rectangle|Non-square rhombus|Other quadrilateral|Cube|Square pyramid|Triangular pyramid|Triangular prism|Rectangular prism|Pentagonal prism|Net|Height plan|Isometric drawing)$/i.test(expected))return {...base,kind:'text'};
  return null;
 }
 // Restricted arithmetic parser: no eval, function calls or arbitrary identifiers.
@@ -74,8 +74,9 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  const near=(x:number|null,y:number|null)=>x!==null&&y!==null&&Math.abs(x-y)<=1e-8*Math.max(1,Math.abs(y));
  if(spec.kind==='number'||spec.kind==='fraction'){
   if(spec.format==='decimal'&&a.includes('/'))return false;
-  if((spec.format==='fraction'||spec.format==='simplest')&&!/^-?\d+(?:\s*\/\s*\d+)?$/.test(a))return false;
-  if(spec.format==='simplest'){const [n,d=1]=a.split('/').map(Number);let x=Math.abs(n),y=d;if(y<=0)return false;while(y){[x,y]=[y,x%y];}if(x!==1)return false;}
+  // Fractions may also be written as mixed numbers, such as 4 5/12.
+  if((spec.format==='fraction'||spec.format==='simplest')&&!/^-?(?:\d+\s+)?\d+(?:\s*\/\s*\d+)?$/.test(a))return false;
+  if(spec.format==='simplest'){const m=a.match(/^-?(?:(\d+)\s+)?(\d+)(?:\s*\/\s*(\d+))?$/)!,n=Number(m[2]),d=Number(m[3]??1);let x=n,y=d;if(y<=0||(m[1]&&n>=d))return false;while(y){[x,y]=[y,x%y];}if(x!==1&&n!==0)return false;}
   return near(scalarAnswer(a),scalarAnswer(b));
  }
  // Two- or three-part ratios: every part must scale by the same factor.
