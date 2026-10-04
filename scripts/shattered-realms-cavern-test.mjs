@@ -1,17 +1,22 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
-const module={exports:{}};
-new Function('module','exports',ts.transpileModule(fs.readFileSync('lib/world3d/shattered-realms.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(module,module.exports);
+import {loadCave7} from './cave7-loader.mjs';
+// shattered-realms.ts imports cave7-config, so load it through the shared resolver.
+const module={exports:loadCave7('lib/world3d/shattered-realms.ts')};
+const {cave7WeekCount}=loadCave7('lib/cave7-config.ts');
 const {CAVERN_REALMS,cavernRealm,cavernWeek,cavernDoor,cavernSpawn,cavernFloor,cavernNearest,cavernDarkness,cavernHref,cavernWeekHref}=module.exports;
 assert.equal(Object.keys(CAVERN_REALMS).length,6);
 for(const realm of Object.keys(CAVERN_REALMS)){
  assert.equal(cavernRealm(realm),realm);
- for(let week=1;week<=12;week++){
+ // Realms have different lengths (e.g. Chance has 8 weeks); later weeks fall back to week 1.
+ const count=cave7WeekCount(realm);assert.ok(count>=8&&count<=12);
+ assert.equal(new URL(cavernWeekHref(realm,count+1),'https://example.test').searchParams.get('week'),'1');
+ for(let week=1;week<=count;week++){
   const door=cavernDoor(week),spawn=cavernSpawn(week);
-  assert.equal(cavernFloor(door[0],door[2]),0);
-  assert.equal(cavernFloor(spawn[0],spawn[2]),0);
-  assert.equal(cavernNearest(door[0],door[2]),week);
+  assert.equal(cavernFloor(door[0],door[2],realm),0);
+  assert.equal(cavernFloor(spawn[0],spawn[2],realm),0);
+  assert.equal(cavernNearest(door[0],door[2],realm),week);
   const href=new URL(cavernWeekHref(realm,week),'https://example.test');
   assert.equal(href.pathname,`/demo-review/shattered-realms/${realm}/week`);assert.equal(href.searchParams.get('realm_id'),realm);
   assert.equal(href.searchParams.get('year'),'Year 7');assert.equal(href.searchParams.get('week'),String(week));
@@ -31,7 +36,7 @@ const program=fs.readFileSync('app/program/page.tsx','utf8');
 assert.match(program,/if\(\(isExpeditionWeek && !isNumber7\) \|\| item.comingSoon\) return/);
 assert.match(program,/isStarpathRealm && !isExpeditionWeek \? getStarpathWeekProgram/);
 assert.match(program,/if \(isExpeditionWeek \|\| isStarpathRealm \|\| !previewMode\) return/);
-console.log('PASS all 72 week destinations, return links, continuous cavern floor, darkness, input validation, preview guards and unavailable lesson isolation');
+console.log('PASS all 64 realm-length week destinations, return links, continuous cavern floor, darkness, input validation, preview guards and unavailable lesson isolation');
 
 const weekRoute=fs.readFileSync('app/demo-review/shattered-realms/[realm]/week/page.tsx','utf8');
 assert.match(weekRoute,/if\(!access.allowed\)redirect\('\/login'\)/);
@@ -56,5 +61,6 @@ const request=(realm,week=1,overrides={})=>({params:Promise.resolve({realm}),sea
 await assert.rejects(()=>loadWeekRoute(false)(request('number')),/redirect:\/login/);
 await assert.rejects(()=>loadWeekRoute(true)(request('unknown')),/not-found/);
 await assert.rejects(()=>loadWeekRoute(true)(request('space',1,{realm_id:'number',year:'Year 1'})),/redirect:\/demo-review\/shattered-realms\/space\/week/);
-for(const realm of Object.keys(CAVERN_REALMS))for(const week of [1,12])assert.equal((await loadWeekRoute(true)(request(realm,week))).type,'SharedProgramPage');
+for(const realm of Object.keys(CAVERN_REALMS))for(const week of [1,cave7WeekCount(realm)])assert.equal((await loadWeekRoute(true)(request(realm,week))).type,'SharedProgramPage');
+await assert.rejects(()=>loadWeekRoute(true)(request('chance',12)),/redirect:.*chance\/week.*week=1&/,'Weeks past a realm\'s end are canonicalised');
 console.log('PASS unauthorised sessions rejected, invalid realms rejected, query tampering canonicalised, all six realms render the shared week page');
