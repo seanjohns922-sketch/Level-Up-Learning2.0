@@ -1,4 +1,5 @@
 'use client';
+import Number7DecimalExample, {DECIMAL_EXAMPLES,type DecimalExampleMode} from './Number7DecimalExample';
 import Number7ContextArt from '@/components/activities/Number7ContextArt';
 import Number7FractionExample, {FRACTION_EXAMPLES,type FractionExampleMode} from './Number7FractionExample';
 import PaintTinsVisual from '@/components/activities/PaintTinsVisual';
@@ -12,11 +13,14 @@ import { number7Guide } from '@/data/activities/year7Number/curriculum';
 import { number7Challenge } from '@/data/activities/year7Number/challenges';
 
 export default function Number7SkillGuide({week,lesson,onContinue,review=false}:{week:number;lesson:number;onContinue:()=>void;review?:boolean}) {
+ const [decimalMode,setDecimalMode]=useState<DecimalExampleMode>('division');
  const [fractionMode,setFractionMode]=useState<FractionExampleMode>('addition');
  const guide=number7Guide(week,lesson);if(!guide)return null;
  const furtherExamples=(['reasoning','apply_create'] as const).map(role=>number7Challenge(week,lesson,7007,role));
  const fractionAddition=week===7&&lesson===1;
- const steps=fractionAddition?FRACTION_EXAMPLES[fractionMode].steps:guide.steps;
+ const decimals=week===8&&lesson===2;
+ const steps=decimals?DECIMAL_EXAMPLES[decimalMode].steps:fractionAddition?FRACTION_EXAMPLES[fractionMode].steps:guide.steps;
+ const caution=decimals?DECIMAL_EXAMPLES[decimalMode].caution:guide.caution;
  const square=week===1&&lesson===1;
  const line=week===9&&lesson===2;
  const fractionModel=week===4&&lesson===1?{total:24,shaded:18,label:'18 of 24 equal parts = 3/4'}:week===7&&lesson===2?{total:12,shaded:6,label:'2/3 of 3/4 = 6/12 = 1/2'}:week===7&&lesson===3?{total:8,shaded:6,label:'3/4 contains 6 eighths'}:null;
@@ -27,7 +31,8 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
   <div className="mt-3 flex items-start justify-between gap-3"><h2 className="text-2xl font-black sm:text-3xl">{guide.title}</h2><ReadAloudBtn text={`${guide.title}. I am learning to ${guide.goal}. ${guide.idea}`} /></div>
   <p className="mt-3 text-lg leading-relaxed">{guide.idea}</p>
   <div data-guide-example className="my-5 rounded-xl border border-teal-200 bg-white p-5">
-   <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-teal-900">Worked example</h3>{!fractionAddition&&<ReadAloudBtn text={visualSpeech} label="Read diagram" /> }</div>
+   <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-teal-900">Worked example</h3>{!fractionAddition&&!decimals&&<ReadAloudBtn text={visualSpeech} label="Read diagram" /> }</div>
+   {decimals&&<Number7DecimalExample mode={decimalMode} onModeChange={setDecimalMode}/>}
    {fractionAddition&&<Number7FractionExample mode={fractionMode} onModeChange={setFractionMode}/>}
    {square&&<div aria-hidden="true" className="mx-auto mb-4 grid w-44 grid-cols-4 gap-3">{Array.from({length:16},(_,i)=><span key={i} className="h-7 w-7 rotate-45 rounded-sm border-2 border-teal-700 bg-gradient-to-br from-teal-100 to-teal-500 shadow-sm"/>)}</div>}
    {fractionModel&&<div className="mx-auto mb-4 max-w-md"><div aria-hidden="true" className="grid gap-1" style={{gridTemplateColumns:`repeat(${fractionModel.total===24?8:4},1fr)`}}>{Array.from({length:fractionModel.total},(_,i)=><div key={i} className={`h-8 border border-teal-700 ${i<fractionModel.shaded?'bg-teal-500':'bg-white'}`}/>)}</div><p className="mt-2 text-center font-semibold">{fractionModel.label}</p></div>}
@@ -35,11 +40,11 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
    {week===5&&lesson===1&&<FractionNumberLineVisual visual={{type:"fraction_number_line",title:"Seven quarter-steps",leftLabel:"",rightLabel:"",leftPosition:0,rightPosition:2,min:0,max:2,subdivisions:4,markers:[{label:"P",position:1.75}]}}/>}
    {week===5&&lesson===2&&<FractionNumberLineVisual visual={{type:"fraction_number_line",title:"Halfway between −2 and −1",leftLabel:"",rightLabel:"",leftPosition:-3,rightPosition:0,min:-3,max:0,subdivisions:2,markers:[{label:"P",position:-1.5}]}}/>}
    {line&&<IntegerNumberLineVisual visual={{type:'integer_number_line',min:-6,max:8,start:-4,jump:7,end:3}}/>}
-   {!fractionAddition&&<div className="text-center text-xl font-bold leading-relaxed sm:text-2xl"><MathFormattedText text={guide.example}/></div>}
+   {!fractionAddition&&!decimals&&<div className="text-center text-xl font-bold leading-relaxed sm:text-2xl"><MathFormattedText text={guide.example}/></div>}
   </div>
   <div data-guide-steps><div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-teal-800">How to solve it</h3><ReadAloudBtn text={steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')} /></div>
   <ol className="mt-3 space-y-3">{steps.map((s,i)=><li key={s} className="flex gap-3 text-base leading-relaxed sm:text-lg"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-800 font-bold text-white">{i+1}</span><MathFormattedText text={s}/></li>)}</ol>
-  <div data-guide-caution className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`} /></div>
+  <div data-guide-caution className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4"><p><strong>Watch out: </strong>{caution}</p><ReadAloudBtn text={`Watch out. ${caution}`} /></div>
   <details className="mt-3 rounded-xl border border-teal-200 bg-white p-3">
    <summary className="cursor-pointer font-bold text-teal-900">Worked examples: reasoning and application</summary>
    {furtherExamples.map((example,index)=><div key={example.tier} className="mt-4 border-t border-teal-100 pt-3">
