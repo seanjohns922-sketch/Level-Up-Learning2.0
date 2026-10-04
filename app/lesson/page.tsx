@@ -617,7 +617,7 @@ function LessonPage() {
       lessonNumber,
       lessonId: effectiveLessonId,
     });
-    router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
+    router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}${previewMode ? "&teacher_preview=1" : ""}`);
   }
 
   const showWeek12Lesson3Summary = !isCave7 && week === 12 && lessonNumber === 3;
