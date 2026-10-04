@@ -154,7 +154,7 @@ function VisualAnswerLayout({visual,children}:{visual?:ReactNode;children:ReactN
   if(!visual)return <>{children}</>;
   // Container query, not viewport: the card narrows when the feedback panel opens beside it.
   return <div className="@container mt-4"><div data-visual-answer-layout className="grid items-start gap-5 @3xl:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)]">
-    <div className="min-w-0">{visual}</div>
+    <div className="min-w-0 [&>*:first-child]:mt-0">{visual}</div>
     <div className="min-w-0 [&>*:first-child]:mt-0">{children}</div>
   </div></div>;
 }
@@ -348,7 +348,6 @@ export default function MultipleChoiceActivity({
           <MathFormattedText text={questionData.instruction} />
         </p>
       ) : null}
-      {questionData.cave7Visual && <Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>}
       {questionData.spaceVisual && <Space7LessonVisual visual={questionData.spaceVisual}/>}
       {questionData.visual?.type === "mab" ? (
         <PlaceValueMABVisual questionData={questionData.visual} title="MAB model" />
@@ -477,8 +476,8 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      <VisualAnswerLayout visual={questionData.measurementVisual&&<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>}>
-      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", questionData.measurementVisual && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
+      <VisualAnswerLayout visual={questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:undefined}>
+      {constructed?<Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>onWrong?.(''):undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", (questionData.measurementVisual||questionData.cave7Visual) && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect
             ? selected.includes(option)

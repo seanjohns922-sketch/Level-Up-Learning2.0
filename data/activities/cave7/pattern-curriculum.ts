@@ -6,7 +6,7 @@ const curriculum = [
       {
         "title": "Understand a variable",
         "goal": "interpret variables and constants in a formula",
-        "idea": "A variable represents a quantity that can change; a constant stays fixed.",
+        "idea": "A variable represents a quantity that can change; a constant stays fixed. In C = 4n + 7, n changes, 4 is the amount for each item and 7 is a fixed amount.",
         "caution": "Read what each symbol represents before calculating."
       },
       {
@@ -18,7 +18,7 @@ const curriculum = [
       {
         "title": "Substitute several values",
         "goal": "evaluate a formula with more than one variable",
-        "idea": "Label each value, substitute it into the matching position, then calculate.",
+        "idea": "Label each value, substitute it into the matching position, then calculate. Everyday formulas can include division and decimals, such as density d = m ÷ v or pay W = b + 1.5 × h × r.",
         "caution": "Do not exchange values belonging to different variables."
       }
     ]
@@ -30,7 +30,7 @@ const curriculum = [
       {
         "title": "Translate words into symbols",
         "goal": "write an expression for a stated calculation",
-        "idea": "An expression describes a calculation without claiming that two sides are equal.",
+        "idea": "An expression describes a calculation without claiming that two sides are equal. Repeated addition becomes multiplication: n + n + n = 3n, just as 7 + 7 + 7 = 3 × 7.",
         "caution": "More than and less than can change the order of subtraction."
       },
       {
@@ -78,7 +78,7 @@ const curriculum = [
       {
         "title": "Undo addition and subtraction",
         "goal": "solve a one-step equation using inverse operations",
-        "idea": "Keep both sides equal by applying the same inverse operation.",
+        "idea": "Keep both sides equal by applying the same inverse operation, like removing the same mass from both pans of a balance.",
         "caution": "The equals sign means both sides have the same value."
       },
       {
@@ -124,10 +124,10 @@ const curriculum = [
     "code": "AC9M7A03",
     "lessons": [
       {
-        "title": "Balance variable terms",
-        "goal": "solve a linear equation with variables on both sides",
-        "idea": "Remove the same variable term from each side, then solve the remaining equation.",
-        "caution": "Removing a term from only one side breaks the balance."
+        "title": "Solve perimeter equations",
+        "goal": "write and solve an equation for an unknown length",
+        "idea": "Write the perimeter as an expression, set it equal to the given total, then backtrack to find the unknown length.",
+        "caution": "A rectangle has two lengths and two widths; include every side once."
       },
       {
         "title": "Form an equation from a story",
@@ -150,13 +150,13 @@ const curriculum = [
       {
         "title": "Read a graph value",
         "goal": "interpret values and units on a graph",
-        "idea": "Read the horizontal input, locate its point, then read the vertical quantity.",
+        "idea": "Read the horizontal value, go up to the line, then across to the vertical axis. Use the gridline values; points are not labelled.",
         "caution": "A graph value depends on its axis labels and scale."
       },
       {
         "title": "Describe a journey graph",
         "goal": "explain increasing, horizontal and decreasing segments",
-        "idea": "On a distance-from-home graph, a horizontal segment keeps distance constant and a falling segment approaches home.",
+        "idea": "On a graph over time, a rising segment means the quantity increases, a horizontal segment means it stays the same and a falling segment means it decreases. Match these changes to the story.",
         "caution": "Distance from home is different from total distance travelled."
       },
       {
@@ -174,7 +174,7 @@ const curriculum = [
       {
         "title": "Extend a visual pattern",
         "goal": "connect repeated groups to stage values",
-        "idea": "Identify what changes each stage and what stays fixed.",
+        "idea": "Identify what changes each stage and what stays fixed. In the picture, the separate column is the fixed part and each stage adds one more group.",
         "caution": "Do not multiply the fixed part by the stage number."
       },
       {
@@ -246,7 +246,7 @@ const curriculum = [
       {
         "title": "Vary one input",
         "goal": "describe the effect of changing one input while holding others fixed",
-        "idea": "Change one input systematically and record each output in a table.",
+        "idea": "In a spreadsheet, change one input systematically, keep the others fixed and record each output in a table. Equal input steps give equal output steps in a linear formula.",
         "caution": "State which quantities are held fixed."
       },
       {

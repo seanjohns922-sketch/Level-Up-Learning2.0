@@ -11,29 +11,51 @@ function verify(q){
  assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert.ok(q.options.includes(q.answer));assert.equal(q.steps.length,3);assert.ok(q.explanation);
  const {realm,skillKey:key,cave7Visual:v}=q,A=q.tier==='apply_create',R=q.tier==='reasoning',n=nums(q.prompt),first=q.answer.split(': ')[0],value=scalar(first);let expected;
  if(realm==='pattern'){
-  if([10,11,13,14,15,16].includes(key)){const [left,right]=v.formula.split('=');assert.equal(evaluate(left,{x:value}),evaluate(right,{x:value}));}
-  if(key===2){const [coef,constant]=nums(v.formula),input=n[0]+(A?n[1]:0);expected=coef*input+constant;}
-  if(key===3)expected=n[0]*(n[1]+(A?n[3]:0))+n[2];
-  if([4,5,6,7,9,23,27,29].includes(key)){
-   const optionValue=(s,z)=>evaluate(s.includes('=')?s.split('=')[1]:s,{n:z,x:z,p:20});
-   for(const z of [1,3,7]){let y;if(key===4)y=n[0]*z+(A?-n[1]:n[1]);if(key===5)y=n[1]*(z+(A?1:0))+n[0];if(key===6)y=2*z+2*n[0];if(key===7)y=n[1]*(z+n[0]);if(key===9)y=(z+(A?2:0))*(20-n[0]);if(key===23||key===27){const pairs=v.rows.map(r=>r.map(Number));const slope=(pairs[1][1]-pairs[0][1])/(pairs[1][0]-pairs[0][0]);y=pairs[0][1]+slope*(z-pairs[0][0]);}if(key===29){const pairs=v.points;y=pairs[0][1]+(pairs[1][1]-pairs[0][1])*z;}assert.equal(optionValue(q.answer,z),y,JSON.stringify(q));}
+  // Independent Algebra checks from the student-facing prompt and visual only.
+  const N=t=>(t.replaceAll('−','-').match(/-?\d+(?:\.\d+)?/g)||[]).map(Number),P=N(q.prompt),Fm=v?.kind==='formula'?N(v.formula):[],M=v?.kind==='formula'?N(v.meaning):[];
+  const rhs=t=>t.includes('=')?t.slice(t.indexOf('=')+1):t;
+  const sameExpr=(fn,vars=['n'])=>{for(const z of [1,3,7]){const env=Object.fromEntries(vars.map((name,i)=>[name,i?20:z]));assert.ok(Math.abs(evaluate(rhs(q.answer),env)-fn(z,20))<1e-9,JSON.stringify({key,q}));}};
+  const point=()=>N(q.answer);const at=x=>v.points.find(p=>p[0]===x)[1];const F=!A&&!R;
+  const pick1=(cond,yes,no)=>assert.ok(q.answer.startsWith(cond?yes:no),JSON.stringify({key,q}));
+  switch(key){
+   case 1:if(F)expected=q.prompt.includes('fixed amount')?Fm[1]:Fm[0];else if(R){const sym=q.prompt.match(/what does (\w) represent/)[1];assert.ok(q.answer.includes({n:'tickets',h:'hours',g:'goals',k:'kilometres',d:'gigabytes'}[sym]));}else sameExpr(z=>P[0]*z+P[1]);break;
+   case 2:if(F)expected=Fm[0]*P[0]+Fm[1];else if(R)expected=Fm[0]*P[0]+Fm[1];else expected=Fm[0]*P[0]+Fm[1];break;
+   case 3:if(!A)expected=P[0]*P[1]+P[2];else if(v.formula.startsWith('d'))expected=P[0]/P[1];else expected=P[0]+1.5*P[1]*P[2];break;
+   case 4:if(F&&q.prompt.includes('product')){const k=(q.prompt.split('Write')[1].match(/\bn\b/g)||[]).length;sameExpr(z=>k*z);}else if(F)sameExpr(z=>P[0]*z+P[1]);else if(R)sameExpr(z=>P[1]*z-P[0]);else sameExpr(z=>P[1]*(2*z+P[0]));break;
+   case 5:if(F)sameExpr(z=>P[1]*z+P[0]);else if(R)expected=P[1]*P[0]-P[0];else sameExpr(z=>P[1]*z+P[0],['w']);break;
+   case 6:if(F)sameExpr(z=>2*z+2*P[0]);else if(R)expected=P[2]+P[0];else if(q.prompt.includes('isosceles'))sameExpr(z=>2*z+P[0]);else sameExpr(z=>4*(z+P[0]));break;
+   case 7:if(R)expected=(P[0]-1)*P[1];else sameExpr(z=>(F?P[1]:P[0])*(z+(F?P[0]:P[1])));break;
+   case 8:if(F)expected=(Fm[0]*(P[0]+Fm[1]))-(Fm[2]*P[0]+Fm[3]);else if(R){const [left,right]=q.prompt.match(/Are (.*) and (.*) always equal/).slice(1);const eq=[1,3].every(z=>evaluate(left,{n:z})===evaluate(right,{n:z}));pick1(eq,'Yes','No');}else expected=P[0]*P[1];break;
+   case 9:if(R)expected=(P[0]-1)*P[2];else sameExpr((z,p)=>(z+(A?2:0))*(p-P[0]),['n','p']);break;
+   case 10:case 11:case 13:if(F){assert.equal(evaluate(v.left,{x:value}),Number(v.right));}else if(key===10)expected=P[1]-P[0];else if(key===11)expected=R?P[1]/P[0]:P[0]*P[1];else expected=(P[2]-P[1])/P[0];break;
+   case 12:if(F)expected=P[1]*P[0]+P[2];else if(R)pick1(P[1]*P[0]+P[2]===P[3],'Yes','No');else expected=(P[2]-P[1])/P[0];break;
+   case 14:{const G=F?Fm:P;expected=G[2]/G[0]-G[1];break;}
+   case 15:{const G=F?Fm:P;expected=G[0]*(G[2]-G[1]);break;}
+   case 16:if(F)expected=(P[1]-2*P[0])/2;else if(R)assert.equal(q.answer,`2x + ${2*P[0]} = ${P[1]}`);else expected=(P[1]-P[0])/2;break;
+   case 17:if(F)expected=(P[2]-P[1])/P[0];else if(R)assert.equal(q.answer,`${P[0]}p + ${P[1]} = ${P[2]}`);else expected=(P[2]-P[0])/P[1];break;
+   case 18:if(F)expected=(Fm[2]-Fm[1])/Fm[0];else if(R)assert.ok(q.answer.startsWith(`Subtract ${Fm[1]} from ${Fm[2]} first`));else expected=P[1]*P[0]+P[2]-P[3];break;
+   case 19:if(F)expected=at(P[0]);else if(R)expected=v.points.find(p=>p[1]===P[0])[0];else expected=at(P[1])-at(P[0]);break;
+   case 20:{const moves=v.points.slice(1).map((p,i)=>Math.sign(p[1]-v.points[i][1])),word=m=>m>0?'increases':m===0?'stays the same':'decreases';
+    if(F){const i=v.points.findIndex(p=>p[0]===P[0]);assert.equal(q.answer,`It ${word(moves[i])}.`);}
+    else if(R)assert.equal(q.answer,moves.map((m,i)=>(i?'then ':'')+word(m)).join(', ').replace(/^./,c=>c.toUpperCase())+'.');
+    else expected=moves.filter(m=>m===0).length*2;break;}
+   case 21:if(F)expected=Math.max(...v.points.slice(1).map((p,i)=>p[1]-v.points[i][1]));else if(R)assert.ok(q.answer.startsWith('Only an estimate'));else expected=(at(P[1])-at(P[0]))/(P[1]-P[0]);break;
+   case 22:if(A)expected=P[1]+P[2]*(P[3]-1);else expected=v.group*P.at(-1)+v.fixed;break;
+   case 23:if(F)sameExpr(z=>v.group*z+v.fixed);else if(R)assert.ok(q.answer.startsWith('The tiles in the separate column'));else sameExpr(z=>P[2]*z+P[1]-P[2]);break;
+   case 24:if(F)expected=(P[0]-Fm[1])/Fm[0];else if(R)pick1((P[0]-Fm[1])%Fm[0]===0,'Yes','No');else expected=Math.floor((P[0]-Fm[1])/Fm[0]);break;
+   case 25:if(R)expected=2*Fm[0]+Fm[1];else expected=Fm[0]*P[0]+Fm[1];break;
+   case 26:if(A)expected=(P[2]-P[0])/P[1];else expected=(P[0]-Fm[1])/Fm[0];break;
+   case 27:{const rows=v.rows.map(r=>r.map(Number)),slope=(rows[1][1]-rows[0][1])/(rows[1][0]-rows[0][0]),start=rows[0][1]-slope*rows[0][0];if(R)expected=slope*10+start;else{for(const [x,y] of rows)assert.equal(evaluate(rhs(q.answer),{x}),y);}break;}
+   case 28:{const [px,py]=point(),[a,b]=Fm;assert.equal(py,a*px+b);if(F)assert.equal(px,P[2]);if(R)assert.equal(px,P[0]);if(A)assert.equal(py,P[2]);break;}
+   case 29:{const [p0,p1]=v.points,slope=p1[1]-p0[1],start=p0[1];if(F){for(const [x,y] of v.points)assert.equal(evaluate(rhs(q.answer),{x}),y);}else if(R)pick1(slope*P[0]+start===P[1],'Yes','No');else expected=slope*10+start;break;}
+   case 30:if(F)expected=Fm[0]*P[0]+Fm[1];else if(R)assert.ok(q.answer.startsWith('A shop may give a bulk discount'));else expected=Math.floor((P[0]-Fm[1])/Fm[0]);break;
+   case 31:{const rows=v.rows.map(r=>r.map(Number)),speed=rows[0][1]/rows[0][0];if(F)expected=rows[1][1]-rows[0][1];else if(R)expected=speed;else expected=speed*P[0];break;}
+   case 32:if(F)expected=P[0]*P[1];else if(R)assert.equal(q.answer,`The volume is multiplied by ${P[0]*P[0]}.`);else expected=M[0]*M[1]*M[2]*P[0]*P[1];break;
+   case 33:if(F)expected=M[1]/P[0];else if(R)assert.equal(q.answer,`1/${P[0]}`);else expected=P[0]*P[1]/P[2];break;
+   case 34:{const [a,fa,b,e]=Fm,meet=(fa-e)/(b-a);if(F)expected=Math.abs((a*P[0]+fa)-(b*P[0]+e));else if(R)expected=meet;else expected=meet+1;break;}
+   case 35:if(A)expected=Math.floor((P[0]-Fm[1])/Fm[0]);else expected=P[0]/(M[0]*M[1]);break;
+   case 36:if(F)expected=Fm[0]*P[0];else if(R)assert.ok(q.answer.startsWith('It is added once'));else expected=Fm[0]*P[0];break;
   }
-  if(key===8){const [left,right]=v.formula.split(';');expected=evaluate(left.split('=')[1],{n:n[0]})-evaluate(right.split('=')[1],{n:n[0]});}
-  if(key===17)expected=(n[2]-n[1])/n[0];
-  if(key===19)expected=v.points.find(p=>p[0]===n[0])[1];
-  if(key===21&&value!==null)expected=Math.max(...v.points.slice(1).map((p,i)=>p[1]-v.points[i][1]));
-  if(key===22)expected=n[0]*n[2]+n[1];
-  if(key===24)assert.equal(evaluate(v.formula.split('=')[1],{n:value}),n[0]);
-  if(key===25)expected=evaluate(v.formula.split('=')[1],{x:n[0]});
-  if(key===26)assert.equal(evaluate(v.formula.split('=')[1],{x:value}),n[0]);
-  if(key===28){const pair=nums(first);assert.equal(pair[0],n[0]);assert.equal(pair[1],evaluate(v.formula.split('=')[1],{x:n[0]}));}
-  if(key===30)expected=evaluate(v.formula.split('=')[1],{n:n[0]});
-  if(key===31)expected=nums(v.meaning)[0]*(n[1]-n[0]);
-  if(key===32)expected=n[0]*n[1];
-  if(key===33)expected=nums(v.meaning)[1]/n[0];
-  if(key===34){const [left,right]=v.formula.split(';');expected=evaluate(right.split('=')[1],{n:n[0]})-evaluate(left.split('=')[1],{n:n[0]});}
-  if(key===35){const [l,w]=nums(v.meaning);expected=n[0]/(l*w);}
-  if(key===36){const [coef]=nums(v.formula);expected=coef*n[0];}
  }
  if(realm==='statistics'){
   const observations=v?.kind==='table'&&v.headers[0]==='Observation'?v.rows.map(r=>Number(r[1])):null;
@@ -77,5 +99,22 @@ for(const [realm,weeks] of Object.entries(CAVE7_CURRICULA)){
  for(let w=1;w<=weeks.length;w++)for(let l=1;l<=3;l++){assert.equal(NEW_CAVE7_PROGRAMS[realm][w-1].lessons.length,3);for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){verify(CAVE7_GENERATORS[realm](w,l,seed*7919,role));count++;}}
  for(let w=1;w<weeks.length;w++){const qs=cave7Quiz(realm,w);assert.equal(qs.length,15);for(let l=1;l<=3;l++){const rows=qs.filter(q=>q.lessonTag===l);assert.equal(rows.length,5);assert.equal(rows.filter(q=>q.tier==='reasoning').length,1);assert.equal(rows.filter(q=>q.tier==='apply_create').length,2);assert.equal(new Set(rows.map(q=>q.prompt+JSON.stringify(q.cave7Visual)+q.options.slice().sort().join('|'))).size,5);}qs.forEach(verify);quizzes+=qs.length;}
  assert.throws(()=>cave7Quiz(realm,weeks.length));
+}
+// Algebra regression guards: separate reasoning tasks, mostly typed answers, varied answers,
+// and graph-reading questions that do not print the values on the points.
+{
+ const {level7Answer}=loadCave7('lib/level7-answer.ts');const gen=CAVE7_GENERATORS.pattern;let typed=0,total=0;
+ for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
+  const answers={fast_thinking:new Set(),apply_create:new Set()};
+  for(let seed=1;seed<=100;seed++){
+   const f=gen(w,l,seed*7919,'fast_thinking'),r=gen(w,l,seed*7919,'reasoning'),a=gen(w,l,seed*7919,'apply_create');
+   assert.ok(!(f.prompt===r.prompt&&f.answer===r.answer),`Algebra W${w}L${l}: reasoning repeats fluency`);
+   for(const q of [f,r,a]){total++;if(level7Answer(q))typed++;if(w===7&&q.cave7Visual?.kind==='plot')assert.ok(!q.cave7Visual.showValues,'Week 7 graphs must not label point values');}
+   answers.fast_thinking.add(f.answer);answers.apply_create.add(a.answer);
+  }
+  for(const [role,set] of Object.entries(answers))if(!(w===7&&l===2&&role==='fast_thinking'))assert.ok(set.size>=3,`Algebra W${w}L${l} ${role}: only ${set.size} distinct answers`);
+ }
+ assert.ok(typed/total>=0.8,`Algebra typed share ${typed}/${total}`);
+ console.log(`PASS Algebra: reasoning distinct from fluency, ${Math.round(typed/total*100)}% typed answers, varied answers, unlabelled graph points.`);
 }
 console.log(`PASS ${count} generated Algebra/Statistics/Probability questions and ${quizzes} quiz items: independent calculations, balanced weekly coverage and inequivalent numeric choices.`);
