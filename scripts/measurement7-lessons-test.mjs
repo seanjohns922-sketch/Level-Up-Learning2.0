@@ -5,8 +5,10 @@ const {MEASUREMENT7_WEEKS,MEASUREMENT7_PROGRAM}=loadMeasurement7('curriculum');
 const {measurement7Question,measurement7Quiz}=loadMeasurement7('questions');
 // Independent calculations use numbers in the displayed prompt, not generator
 // intermediates, explanations, formulas or stored answers.
+const lin=s=>{const m=s.match(/\((\d*)y(?: ([+−]) (\d+))?\)/);return [Number(m[1]||1),m[2]?(m[2]==='+'?1:-1)*Number(m[3]):0];};
+const PI_TABLE={'3 (early Babylon)':3,'3 1/8 (Babylon)':3.125,'256/81 (Egypt, Rhind papyrus)':256/81,'22/7 (Archimedes, Greece)':22/7,'3.1416 (Aryabhata, India)':3.1416,'355/113 (Zu Chongzhi, China)':355/113};
 function expected(key,q){
- const n=(q.prompt.match(/\d+(?:\.\d+)?/g)||[]).map(Number),[a,b,c,d,e,f,g,h]=n,A=q.tier==='apply_create';
+ const n=(q.prompt.match(/\d+(?:\.\d+)?/g)||[]).map(Number),[a,b,c,d,e,f,g,h]=n,A=q.tier==='apply_create',vis=q.measurementVisual,p=q.prompt;
  switch(key){
  case 1:return a*b/2*(A?c:1);
  case 2:return a*b/(A?200:2);
@@ -26,24 +28,66 @@ function expected(key,q){
  case 16:return 6.28*a*(A?b:1);
  case 17:return a/(A?6.28:3.14);
  case 18:return 3.14*a*b/(A?100:1);
- case 19:case 20:case 22:case 23:return a;
- case 21:case 24:return 180-a;
+ // Week 7 prompts never name the relationship: read it from the diagram or the described positions.
+ case 19:case 20:case 21:if(A)return p.includes('angle above the first track')||/second track, on the left/.test(p)?a:180-a;return vis.relation==='cointerior'?180-vis.values[0]:vis.values[0];
+ case 22:{if(A){const [k1,m1]=lin(vis.angleLabels[0]),[k2,m2]=lin(vis.angleLabels[1]);return vis.relation==='cointerior'?(180-m1-m2)/(k1+k2):(m2-m1)/(k1-k2);}const [k,m]=lin(vis.angleLabels[1]),t=vis.relation==='cointerior'?180-vis.values[0]:vis.values[0];return (t-m)/k;}
+ case 23:return A?(p.includes('co-interior')?180-a-b:a-b):(p.includes('co-interior')?180-a:a);
+ case 24:return A?(/below the bottom rail on the left/.test(p)?180-a:a):(/inside the rails on the left of the brace\?/.test(p)?a:180-a);
  case 25:return A?a+b:180-a-b;
  case 26:return A?180-(180-a)/2:(180-a)/2;
  case 27:return A?a-b:a+b;
  case 28:return A?180-(360-a-b-c):360-a-b-c;
  case 29:return A?a/180+2:(a-2)*180;
- case 30:return (720-a)/(A?2:1);
+ case 30:{if(A){const sides=a+b;return ((sides-2)*180-90*a)/b;}const sides=p.includes('pentagon')?5:6;return (sides-2)*180-b;}
  case 31:return c*(A?a+b:b)/a;
- case 32:return c/5*(A?1:2);
- case 33:return A?d-c/a*b:(a+b)*Math.min(c/a,d/b);
- case 34:return A?e/4:e*4; // ratio precedes quantities, repeated ratio follows
+ case 32:return c/(a+b)*(A?b-a:a);
+ case 33:{const s=Math.min(c/a,d/b);return A?c+d-(a+b)*s:(a+b)*s;}
+ case 34:return A?e/b:e*b; // 1 : r, concentrate, water, extra
  case 35:return A?c*100/b:c*b/100;
- case 36:return A?f-(c/5*2*d+c/5*3*e):c/5*2*d+c/5*3*e;
+ case 36:{const cost=c/(a+b)*(a*d+b*e);return A?f-cost:cost;}
  default:throw Error(key);
  }
 }
-const reasonFragments={1:'Two copies',2:'because it is perpendicular',3:'Move one end triangle',4:'Double the area',5:'It stays the same',6:'Add half base',7:'layers contains',8:' × ',9:'cross-section is a triangle',10:'Divide volume by cross-sectional area',11:'1000 cm³ equals 1 L',12:'holds half as much',13:'through the centre',14:'Circumference divided by diameter',15:' × π',16:'needs diameter',17:'Divide circumference by twice pi',18:'Circumference × number',19:'corresponding angles are equal',20:'alternate angles are equal',21:'co-interior angles sum to 180',22:'corresponding angles are equal',23:'alternate angles are equal',24:'co-interior angles sum to 180',25:'sum to 180',26:'divide by 2',27:'after subtracting the adjacent',28:'two triangles',29:'− 2',30:'Only if',31:'',32:'five equal ratio parts',33:'smaller scale',34:'Four times the extra',35:'cm in reality',36:'cost of each share'};
+function reasonOk(key,q){
+ const ans=q.answer,n=(q.prompt.match(/\d+(?:\.\d+)?/g)||[]).map(Number),vis=q.measurementVisual,has=(...xs)=>xs.some(x=>typeof x==='string'?ans.includes(x):x.test(ans));
+ switch(key){
+ case 1:return has('Two copies');
+ case 2:return has('because it is perpendicular');
+ case 3:return has('Move one end triangle')||ans===`${n[0]} × ${n[2]}`;
+ case 4:return has('Double the area');
+ case 5:{if(has('It stays the same'))return true;const m=ans.match(/Base (\d+(?:\.\d+)?) cm and perpendicular height (\d+(?:\.\d+)?) cm/);return !!m&&Number(m[1])*Number(m[2])===n[0]*n[1];}
+ case 6:return has('Add half base',/^\(\d+ × \d+ ÷ 2 \+ \d+ × \d+ ÷ 2\) × \d+$/);
+ case 7:return has('layers contains');
+ case 8:return ans===`${n[0]} × ${n[1]}`;
+ case 9:return has('cross-section is a triangle',/^\d+ × \d+ ÷ 2 × \d+$/);
+ case 10:return has('Divide volume by cross-sectional area')||ans===`${n[0]} ÷ ${n[1]}`;
+ case 11:return has('1000 cm³ equals 1 L');
+ case 12:return has('holds half as much')||ans.startsWith(`${n[0]/2} cm³`);
+ case 13:return q.prompt.includes('curved distance')?ans==='The circumference.':q.prompt.includes('centre of a circle to a point')?ans==='A radius.':has('through the centre');
+ case 14:{if(q.prompt.startsWith('Ancient')){const best=q.options.reduce((x,y)=>Math.abs(PI_TABLE[y]-Math.PI)<Math.abs(PI_TABLE[x]-Math.PI)?y:x);return ans===best;}return has('Circumference divided by diameter','Measurements are estimates');}
+ case 15:return ans===`${n[0]} × π`;
+ case 16:return has('needs diameter');
+ case 17:return has('Divide circumference by twice pi')||ans===`${n[0]} ÷ (2 × 3.14)`;
+ case 18:return has('Circumference × number')||ans===`3.14 × ${n[0]} × ${n[1]}`;
+ case 19:case 20:case 21:{const r=vis.relation,x=r==='cointerior'?180-vis.values[0]:vis.values[0];return ans===`${x}°, because ${r==='corresponding'?'corresponding angles are equal':r==='alternate'?'alternate angles are equal':'co-interior angles sum to 180°'}.`;}
+ case 22:{const [k,m]=lin(vis.angleLabels[1]),y=((vis.relation==='cointerior'?180-vis.values[0]:vis.values[0])-m)/k;const [l,r]=ans.replace(/(\d*)y/,(_,c)=>`(${c||1}*${y})`).replaceAll('−','-').split('=').map(x=>Function(`return ${x}`)());return Math.abs(l-r)<1e-9;}
+ case 23:{const equal=!q.prompt.includes('co-interior'),par=equal?n[0]===n[1]:n[0]+n[1]===180;return ans.startsWith(par?'Yes':'No')&&ans.includes(equal?'equal':'sum to 180°');}
+ case 24:return (has('because the rails are still parallel')&&ans.includes(`${n[0]}°`))||has('not parallel, because alternate angles would be equal');
+ case 25:return has('sum to 180')||ans===`180 − ${n[0]} − ${n[1]}`;
+ case 26:return has('divide by 2');
+ case 27:return has('after subtracting the adjacent')||ans===`${n[0]} − ${n[1]}`;
+ case 28:return has('two triangles')||ans===`360 − ${n[0]} − ${n[1]} − ${n[2]}`;
+ case 29:return has('− 2');
+ case 30:{if(q.prompt.startsWith('What is each')){const sides={pentagon:5,hexagon:6,octagon:8}[q.prompt.match(/regular (\w+)/)[1]];return ans.startsWith(`${(sides-2)*180/sides}°`);}return has('Only if its interior angles are all equal');}
+ case 31:return ans===`1/${n[1]+1}`;
+ case 32:return ans===`${n[0]} + ${n[1]} gives ${n[0]+n[1]} equal ratio parts.`;
+ case 33:return ans.startsWith(n[2]/n[0]<n[3]/n[1]?'Blue':'Yellow')&&ans.includes('smaller scale');
+ case 34:return q.prompt.startsWith('Extra water')?ans.startsWith(`One ${{3:'third',4:'quarter',5:'fifth'}[n[2]]} of the extra water`):ans.startsWith(`${n[1]} times the extra concentrate`);
+ case 35:return has('cm in reality');
+ case 36:return has('cost of each share')||ans===`${n[2]} ÷ ${n[0]+n[1]} × ${n[0]} × ${n[3]} + ${n[2]} ÷ ${n[0]+n[1]} × ${n[1]} × ${n[4]}`;
+ default:throw Error(key);
+ }
+}
 let count=0;
 assert.equal(MEASUREMENT7_WEEKS.length,12);
 for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
@@ -56,11 +100,8 @@ for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
    assert.equal(Number(q.answer),value,JSON.stringify({key,seed,q,n:q.prompt.match(/\d+(?:\.\d+)?/g)}));
    assert.equal(q.options.filter(x=>Number(x)===value).length,1);
   } else {
-   assert.ok(q.answer.includes(reasonFragments[key]),`${key}: ${q.answer}`);
-   const n=(q.prompt.match(/\d+(?:\.\d+)?/g)||[]).map(Number);
-   if(key===8)assert.equal(q.answer,`${n[0]} × ${n[1]}`);
-   if(key>=19&&key<=24)assert.equal(Number(q.answer.match(/^\d+/)[0]),[21,24].includes(key)?180-n[0]:n[0]);
-   if(key===31)assert.equal(q.answer,`1/${n[1]+1}`);
+   assert.ok(reasonOk(key,q),`${key}: ${q.prompt} → ${q.answer}`);
+   assert.equal(q.options.filter(o=>reasonOk(key,{...q,answer:o})).length,1,`${key}: exactly one valid reason: ${JSON.stringify(q.options)}`);
   }
   if(q.measurementVisual){assert.ok(q.measurementVisual.description);assert.ok(q.measurementVisual.values.every(Number.isFinite));}
   count++;
@@ -68,11 +109,19 @@ for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
 }
 for(let w=1;w<=11;w++){
  const quiz=measurement7Quiz(w);assert.equal(quiz.length,15);assert.equal(new Set(quiz.map(q=>q.id)).size,15);
- for(let l=1;l<=3;l++){const qs=quiz.filter(q=>q.lessonTag===l);assert.equal(qs.length,5);assert.equal(qs.filter(q=>q.tier==='reasoning').length,1);assert.equal(qs.filter(q=>q.tier==='apply_create').length,2);assert.equal(new Set(qs.map(q=>q.prompt)).size,5,'Quiz questions must be distinct');}
+ for(let l=1;l<=3;l++){const qs=quiz.filter(q=>q.lessonTag===l);assert.equal(qs.length,5);assert.equal(qs.filter(q=>q.tier==='reasoning').length,1);assert.equal(qs.filter(q=>q.tier==='apply_create').length,2);assert.equal(new Set(qs.map(q=>q.prompt+JSON.stringify(q.measurementVisual??null))).size,5,'Quiz questions must be distinct');}
  for(const q of quiz)if(q.tier!=='reasoning')assert.equal(Number(q.answer),Math.round(expected((w-1)*3+q.lessonTag,q)*100)/100);
 }
 assert.throws(()=>measurement7Quiz(12));
-const csv=fs.readFileSync('public/curriculum/measurement-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,49);
+// Regression guards: Week 8 is not a copy of Week 7, Week 7 prompts never name the relationship,
+// non-reasoning answers vary, and every reasoning item has more than one prompt.
+for(let l=1;l<=3;l++)for(const role of ['fast_thinking','apply_create'])assert.notEqual(measurement7Question(7,l,4242,role).prompt,measurement7Question(8,l,4242,role).prompt);
+for(let l=1;l<=3;l++)for(let seed=1;seed<=50;seed++)for(const role of ['fast_thinking','reasoning','apply_create'])assert.ok(!/corresponding|alternate|co-interior/.test(measurement7Question(7,l,seed*7919,role).prompt),'Week 7 must not name the relationship');
+for(let w=1;w<=12;w++)for(let l=1;l<=3;l++){
+ for(const role of ['fast_thinking','apply_create']){const answers=new Set();for(let seed=1;seed<=200;seed++)answers.add(measurement7Question(w,l,seed*7919,role).answer);assert.ok(answers.size>=5,`W${w}L${l} ${role}: only ${answers.size} distinct answers`);}
+ const prompts=new Set();for(let seed=1;seed<=200;seed++){const r=measurement7Question(w,l,seed*7919,'reasoning');prompts.add(r.prompt+JSON.stringify(r.measurementVisual??null));}assert.ok(prompts.size>=2,`W${w}L${l} reasoning has a single prompt`);
+}
+const csv=fs.readFileSync('public/curriculum/measurement-level7-scope-and-sequence.csv','utf8');assert.equal(csv.trim().split('\n').length,50);assert.ok(csv.includes('Modelling Task')&&!csv.includes('..'));
 console.log(`PASS ${count} Measurement practice variants, 165 weekly quiz items, 36 skill guides, 12-week curriculum and export.`);
 // Exercise shared authenticated route handlers with Measurement URLs, rather
 // than granting access via teacher_preview query parameters alone.

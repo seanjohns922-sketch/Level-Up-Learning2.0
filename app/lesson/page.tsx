@@ -118,6 +118,7 @@ import Space7SkillGuide from "@/components/lesson/Space7SkillGuide";
 import {generateSpace7Question} from "@/data/activities/year7Space/questions";
 import Measurement7SkillGuide from "@/components/lesson/Measurement7SkillGuide";
 import { generateMeasurement7Question } from "@/data/activities/year7Measurement/questions";
+import { MEASUREMENT7_READABILITY_REVISION } from "@/data/activities/year7Measurement/curriculum";
 import Number7SkillGuide from "@/components/lesson/Number7SkillGuide";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { generateNumber7Question } from "@/data/activities/year7Number/questions";
@@ -273,8 +274,8 @@ function LessonPage() {
   const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
-    return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
-  }:undefined,[effectiveLessonId,isCave7,isNumber7,isSpace7,week,lessonNumber]);
+    return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:isMeasurement7?MEASUREMENT7_READABILITY_REVISION:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
+  }:undefined,[effectiveLessonId,isCave7,isNumber7,isMeasurement7,isSpace7]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
   const lessonStrand = newCaveRealm === "pattern" ? "Algebra" : newCaveRealm === "statistics" ? "Statistics" : newCaveRealm === "chance" ? "Probability" : isSpace7 ? "Space" : isMeasurement ? "Measurement" : "Number";
