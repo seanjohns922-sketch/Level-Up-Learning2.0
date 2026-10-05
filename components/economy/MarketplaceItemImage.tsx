@@ -1,5 +1,6 @@
 "use client";
 
+import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import Image from "next/image";
 import { useState } from "react";
 import { ImageOff } from "lucide-react";
@@ -66,13 +67,13 @@ export default function MarketplaceItemImage({ item, context, avatarOutfit, onAr
   if (visual.type === "unavailable" || imageFailed) return <UnavailableArtwork />;
 
   if (visual.type === "avatar-layer") {
-    if (!large) return <MarketplaceAvatarItemArt item={item} />;
+    if (!large && !realmOutfit(String(item.metadata?.top ?? ""))) return <MarketplaceAvatarItemArt item={item} />;
     const metadata = { ...item.metadata };
     delete metadata.slot;
     const outfit = avatarOutfit ?? (metadata as AvatarOutfit);
     return (
       <div role="img" aria-label={visual.alt}>
-        <StudentAvatar height={large ? 220 : 112} outfit={outfit} alive={large} floatAnimation={large ? undefined : "none"} glowColor={large ? item.accent : "transparent"} />
+        <StudentAvatar height={large ? 220 : 140} outfit={outfit} alive={large} floatAnimation={large ? undefined : "none"} glowColor={large ? item.accent : "transparent"} />
       </div>
     );
   }
