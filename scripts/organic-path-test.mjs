@@ -38,8 +38,8 @@ for(const item of [...catalogue,...rewards]){
   assert.ok(size.x*scale<=w*2+1e-6&&size.z*scale<=d*2+1e-6,'Art stays within reserved footprint: '+item.name);
  }
 }
-assert.equal(Object.keys(WORLD_ITEM_PRESENTATION).length,138);
-console.log('138 item size targets validated; three bounding-box shapes each remain inside their reserved footprints.');
+assert.equal(Object.keys(WORLD_ITEM_PRESENTATION).length,147);
+console.log('147 item size targets validated; three bounding-box shapes each remain inside their reserved footprints.');
 
 const { measureLocalModel } = await import('../lib/world3d/world-model-bounds.ts');
 const parent=new THREE.Group(),model=new THREE.Group();
@@ -84,16 +84,16 @@ const rewardRenderers=new Set([
 ]);
 for(const item of catalogue)assert.ok(freeRenderers.has(item.metadata.worldAssetKey),'Dedicated scenery renderer: '+item.name);
 for(const item of rewards)assert.ok(rewardRenderers.has(item.metadata.worldAssetKey),'Dedicated reward renderer: '+item.name);
-console.log('All 138 catalogue items route to an upgraded renderer; no generic tree/building fallbacks.');
-const migration=fs.readFileSync(new URL('../supabase/migrations/20260925090000_world_collection_expansion.sql',import.meta.url),'utf8');
-assert.equal(rewards.length,33);
+console.log('All 147 catalogue items route to an upgraded renderer; no generic tree/building fallbacks.');
+const migration=['20260925090000_world_collection_expansion.sql','20261005120000_village_building_collection.sql'].map(file=>fs.readFileSync(new URL('../supabase/migrations/'+file,import.meta.url),'utf8')).join('\n');
+assert.equal(rewards.length,42);
 for(const addition of WORLD_REWARD_ADDITIONS){
  const item=rewards.find(item=>item.metadata.worldAssetKey===addition.key);
  assert.ok(item&&migration.includes("'"+item.item_key+"'"),'New reward registered for live release');
  assert.ok(fs.existsSync(new URL('../public'+item.metadata.marketplace_visual.src,import.meta.url)),'Reward preview exists: '+addition.key);
 }
 assert.ok(!/update\s+public\.economy_items|delete\s+from|create\s+(or\s+replace\s+)?function/i.test(migration),'Expansion is additive and does not change RPCs');
-console.log('33 rewards, new preview assets and additive release registration validated.');
+console.log('42 rewards, new preview assets and additive release registration validated.');
 
 const {buildWorldWater,waterBrushCells}=await import('../lib/world3d/world-water.ts');
 assert.equal(waterBrushCells(0,0,1).length,1);
@@ -171,12 +171,12 @@ const savedTree={itemId:birch.item_key,placementId:'scale-tree',gridX:-10,gridZ:
 assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'next-tree',gridX:-4},birch,[savedTree],treeItems),false,'Larger canopies reserve space when placing a second tree');
 console.log('Expanded tree footprint blocks formerly clear but now overlapping placements.');
 
-// Captured from all 138 actual React/Three models using the review page's
+// Captured from all 147 actual React/Three models using the review page's
 // sequential measurement run. Re-capture native bounds after changing geometry;
 // fitted sizes are reprojected from those bounds when presentation targets change.
 const measurements=JSON.parse(fs.readFileSync(new URL('../docs/world3d/item-scale-measurements.json',import.meta.url),'utf8'));
-assert.equal(measurements.length,138);
-assert.equal(new Set(measurements.map(row=>row.key)).size,138);
+assert.equal(measurements.length,147);
+assert.equal(new Set(measurements.map(row=>row.key)).size,147);
 const measuredItems=new Map(measurements.map(row=>[row.key,row]));
 const {CENTRAL_WORLD_GRID,rotatedGridSize}=await import('../lib/world3d/central-world-layout.ts');
 for(const item of [...catalogue,...rewards]){
@@ -218,4 +218,4 @@ assert.ok(areaOf('pony_paddock')>areaOf('puppy_yard')*10,'Horse paddock is not a
 assert.ok(sizeOf('castle_gate')[1]>sizeOf('castle_wall')[1],'Measured gate, not just its target, rises above ramparts');
 assert.ok(sizeOf('cinema')[1]<10,'Widening the drive-in does not create a giant screen and cars');
 assert.ok(sizeOf('railway_station')[1]<6,'Extending the platform does not inflate the station building');
-console.log('All 138 measured models reach their size anchor, fit their land, rotate correctly and are placeable; oval/pool, paddock/yard and building proportions passed.');
+console.log('All 147 measured models reach their size anchor, fit their land, rotate correctly and are placeable; oval/pool, paddock/yard and building proportions passed.');

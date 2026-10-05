@@ -1,5 +1,6 @@
 "use client";
 
+import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
 import { WORLD_COLLECTIONS, worldCollectionFor } from "@/lib/world3d/world-expansion";
@@ -40,6 +41,7 @@ import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoi
 import { speak } from "@/lib/speak";
 import { CENTRAL_WORLD_STARTER_SCENERY, type WorldSceneryGroup } from "@/lib/world3d/central-world-editor-catalog";
 import {
+  selectCentralWorldInventoryPlacement,
   CENTRAL_WORLD_GRID,
   CENTRAL_WORLD_HOME_KEY,
   CENTRAL_WORLD_HOME_ITEM,
@@ -408,8 +410,13 @@ export default function CentralWorld() {
         setOwnedItemKeys(ownedKeys);
 
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
-          const existing = nextPlacements.find((placement) => placement.itemId === requestedBuildItemKey);
-          const nextBuildPlacement = existing ?? { placementId: newWorldPlacementId(requestedBuildItemKey), itemId: requestedBuildItemKey, gridX: -5, gridZ: 5, rotation: 0 };
+          const requestedItem = nextItemsById.get(requestedBuildItemKey)!;
+          const nextBuildPlacement = selectCentralWorldInventoryPlacement(requestedItem, nextPlacements, { gridX: -5, gridZ: 5 });
+          if (isVillageBuilding(requestedItem.metadata.worldAssetKey)) {
+            setEditorOpen(true);
+            setLibrarySection("owned");
+            setSelectedInventoryItemKey(requestedBuildItemKey);
+          }
           const [worldX, , worldZ] = gridToWorld(nextBuildPlacement.gridX, nextBuildPlacement.gridZ);
           setBuildPlacement(nextBuildPlacement);
           setEditCursor({ gridX: nextBuildPlacement.gridX, gridZ: nextBuildPlacement.gridZ });
@@ -551,9 +558,7 @@ export default function CentralWorld() {
   function chooseInventoryItem(item: EconomyItem) {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
-    const existing = placedCustomisations.find((placement) => placement.itemId === item.item_key);
-
-    setBuildPlacement(existing ?? { placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...cameraFocus, rotation: 0 });
+    setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, cameraFocus));
     void speak(`${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
@@ -936,7 +941,19 @@ export default function CentralWorld() {
           <div className="worldLibrarySelection">
           {buildPreview && CONNECTED_BOUNDARY_KEYS.has(String(buildItem?.metadata.worldAssetKey)) && <p style={{color:"#e3ece3",fontSize:12}}>Matching fences and walls join automatically in neighbouring squares, including corners. Drag to build a row.</p>}
           {paletteTab === "ground" && (editTool === "path" || editTool === "road") && <p style={{color:"#e3ece3",fontSize:12}}>Drag to draw. Matching routes join and form corners and junctions automatically.</p>}
-          {buildPreview && buildItem?.metadata.marketplaceCategory === "world_basic" ? (
+          {buildPreview && isVillageBuilding(buildItem?.metadata.worldAssetKey) && <div style={{marginTop:10,color:"#fff7e7"}}>
+            <p style={{fontSize:12,margin:"0 0 8px"}}>Design unlocked · place as many copies as you like.</p>
+            {buildItem?.metadata.worldAssetKey !== "village_apartments" && <label>Building style
+              <select aria-label="Building style" value={villageStyle(buildPlacement?.buildingStyle)} onChange={event=>{
+                const style=villageStyle(event.target.value);
+                setBuildPlacement(current=>current?{...current,buildingStyle:style}:current);
+                void speak(VILLAGE_STYLES[style],undefined,"manual",{rate:.9});
+              }} style={{display:"block",width:"100%",padding:8,marginTop:5,background:"#22382e",color:"#fff7e7",border:"1px solid #607b62",borderRadius:6}}>
+                {Object.entries(VILLAGE_STYLES).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+              </select>
+            </label>}
+          </div>}
+          {buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey)) ? (
             <div style={{ marginTop: 10 }}>
               <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>COLOUR</div>
               <div aria-label="Recolour item" style={{ marginTop: 5, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
@@ -1026,7 +1043,7 @@ export default function CentralWorld() {
         .worldLibraryItemGrid,.worldOwnedItems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:start}
         .worldLibraryItemGrid>button{min-width:0;width:100%;min-height:64px!important;box-sizing:border-box;padding:10px 8px!important;align-items:center!important;white-space:normal}
         .worldOwnedItems>button{min-width:0;width:100%;height:80px!important}.worldOwnedItems>div{grid-column:1/-1;padding:12px;text-align:center}
-        .worldLibrarySelection{max-height:140px;overflow:auto}.worldLibrarySelection:empty{display:none}
+        .worldLibrarySelection{max-height:220px;overflow:auto}.worldLibrarySelection:empty{display:none}
         .worldLibrarySaved{color:#c8d1bd;font-size:10px;margin:8px 0 0;padding-top:8px;border-top:1px solid #ffffff20}
         @media(max-height:650px){.centralWorldEditor{top:86px!important;bottom:8px!important}.centralWorldEditor h2{font-size:16px!important}.centralWorldEditor button{min-height:34px}.centralWorldEditor .worldBuilderLibraryTabs{margin-top:4px}.centralWorldEditor .worldLibrarySelection{max-height:72px}.worldLibrarySaved{display:none}}
         .worldBuilderReset{inset:0;margin:auto;max-width:440px;width:calc(100vw - 48px);padding:24px;border:1px solid #65765d;border-radius:20px;background:#182b22;color:#fff7e7;box-shadow:0 20px 90px #0008}.worldBuilderReset::backdrop{background:#071610b8}.worldBuilderReset h2{margin:0 0 12px;font-size:24px;font-weight:900}.worldBuilderReset p{line-height:1.6;color:#d1dac8}.worldBuilderResetActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.worldBuilderResetActions button:last-child{background:#efbd61;color:#302618}

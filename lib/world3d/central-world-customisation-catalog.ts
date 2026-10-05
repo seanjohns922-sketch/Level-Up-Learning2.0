@@ -1,3 +1,4 @@
+import { isVillageBuilding } from "./village-buildings";
 import { WORLD_REWARD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import type { EconomyItem, EconomyState } from "@/lib/economy";
 
@@ -86,7 +87,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
     tier: entry.tier,
     marketplace_visual: {
       type: "asset",
-      src: `/marketplace/central-world/${entry.assetKey}.${WORLD_REWARD_ADDITIONS.some(item=>item.key===entry.assetKey)?"svg":"webp"}`,
+      src: `/marketplace/central-world/${entry.assetKey}.${isVillageBuilding(entry.assetKey)?"png":WORLD_REWARD_ADDITIONS.some(item=>item.key===entry.assetKey)?"svg":"webp"}`,
       alt: `${entry.name} central world customisation preview`,
       previewMode: "background",
     },

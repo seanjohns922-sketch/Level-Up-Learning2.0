@@ -1,3 +1,5 @@
+import { newWorldPlacementId } from "./world-connections";
+import { isVillageBuilding, type VillageStyle } from "./village-buildings";
 import { getItemPresentation } from "./world-item-presentation";
 import type { EconomyItem } from "@/lib/economy";
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
@@ -11,10 +13,17 @@ export type CentralWorldPlacement = {
   // Optional recolour applied to the item's paint surface. Persisted alongside
   // the placement; undefined means the item's default colours.
   tint?: string;
+  buildingStyle?: VillageStyle;
   // Interactive open/closed state (e.g. a drawbridge). Persisted; undefined
   // means the item's default (down/closed).
   state?: "up" | "down";
 };
+
+/** Inventory picks create new village copies; the Move tool still selects by placement ID. */
+export function selectCentralWorldInventoryPlacement(item: EconomyItem, placements: CentralWorldPlacement[], focus: { gridX: number; gridZ: number }): CentralWorldPlacement {
+  const existing = isVillageBuilding(item.metadata.worldAssetKey) ? undefined : placements.find(p => p.itemId === item.item_key);
+  return existing ?? { placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focus, rotation: 0 };
+}
 
 export type CentralWorldGroundType = "path" | "road" | "stone" | "water";
 export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };

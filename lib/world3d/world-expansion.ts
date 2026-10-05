@@ -1,3 +1,4 @@
+import { VILLAGE_BUILDINGS } from "./village-buildings";
 export type WorldCollection = "coastal" | "bush" | "country" | "castle";
 export const WORLD_COLLECTIONS: Record<WorldCollection,string> = {
   coastal: "Coastal village", bush: "Bush retreat", country: "Country town", castle: "Castle garden",
@@ -51,6 +52,7 @@ export const FREE_WORLD_ADDITIONS:FreeAddition[] = [
 ];
 type RewardAddition={key:string;name:string;description:string;collection:WorldCollection;area:"buildings"|"animals"|"special";plot:number;price:number;tier:1|2|3;grid:`${number}x${number}`;height:number;icon:string};
 export const WORLD_REWARD_ADDITIONS:RewardAddition[]=[
+ ...VILLAGE_BUILDINGS.map(item=>({key:item.key,name:item.name,description:item.kind==="apartments"?"Build a city neighbourhood with a ten-storey apartment tower. Unlock once, place multiple copies and choose your colours. Exterior only.":"Build your village in castle, country or coastal style. All three styles and repeat placements included in one unlock. Exterior only.",collection:"country" as const,area:"buildings" as const,plot:1,price:item.price,tier:item.tier,grid:item.grid,height:item.height,icon:item.icon})),
  {key:"opera_house",name:"Sydney Opera House",description:"Sculptural sail-shaped roofs overlooking your own harbour.",collection:"coastal",area:"special",plot:7,price:2500,tier:3,grid:"5x4",height:7,icon:"landmark"},
  {key:"harbour_bridge",name:"Harbour Bridge",description:"A steel arch bridge with sandstone pylons and a timber promenade.",collection:"coastal",area:"special",plot:7,price:2300,tier:3,grid:"6x2",height:6,icon:"landmark"},
  {key:"lighthouse",name:"Coastal Lighthouse",description:"A coastal lookout with a lantern room and keeper’s cottage.",collection:"coastal",area:"buildings",plot:2,price:1100,tier:2,grid:"3x3",height:8,icon:"lamp"},

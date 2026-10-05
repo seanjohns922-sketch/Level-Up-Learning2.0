@@ -12,6 +12,8 @@ import {
 import type { EconomyItem } from "@/lib/economy";
 import { LandmarkDetails, Tree, DetailedScenery, DETAILED_SCENERY_KEYS, DetailedReward, DETAILED_REWARD_KEYS, SceneryFinish } from "@/components/world3d/DetailedScenery";
 import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery";
+import { VillageBuilding } from "./VillageBuildings";
+import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
 import { CollectionReward, COLLECTION_REWARD_KEYS } from "./CollectionRewards";
 import { FortressScenery, FORTRESS_SCENERY_KEYS } from "@/components/world3d/FortressScenery";
 import { WildlifeScenery, WILDLIFE_KEYS, AustralianHabitat } from "@/components/world3d/WildlifeScenery";
@@ -305,10 +307,11 @@ function RewardSpecialPlace({ assetKey, accent, tier }: { assetKey: string; acce
   return <RewardBuilding assetKey="party_house" accent={accent} tier={tier} />;
 }
 
-export function RewardPlotObject({ item, accent, tier, tint }: { item: EconomyItem; accent: string; tier: number; tint?: string }) {
+export function RewardPlotObject({ item, accent, tier, tint, buildingStyle }: { item: EconomyItem; accent: string; tier: number; tint?: string; buildingStyle?: VillageStyle }) {
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
   if (category === "world_basic") return <StarterScenery assetKey={assetKey} tint={tint} />;
+  if (isVillageBuilding(assetKey)) return <VillageBuilding assetKey={assetKey} style={buildingStyle} tint={tint} />;
   if (COLLECTION_REWARD_KEYS.has(assetKey)) return <CollectionReward assetKey={assetKey} tint={tint} />;
   if (["wildlife_habitat", "bunny_garden", "puppy_yard", "pet_sanctuary"].includes(assetKey)) return <AustralianHabitat assetKey={assetKey} />;
   if (AUSTRALIAN_PLACE_KEYS.has(assetKey)) return <AustralianPlace assetKey={assetKey} />;
@@ -791,7 +794,7 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
         material.depthWrite = false;
       });
     });
-  }, [preview]);
+  }, [preview, placement.buildingStyle]);
 
   return (
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
@@ -801,18 +804,18 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>}
       {CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
-        <group ref={groupRef}><SizedWorldModel item={item}>
+        <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>
       ) : gait ? (
         <AnimalRoamer gait={gait}>
-          <group ref={groupRef}><SizedWorldModel item={item}>
-            <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} /></SceneryFinish>
+          <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
+            <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish>
           </SizedWorldModel></group>
         </AnimalRoamer>
       ) : (
-        <group ref={groupRef}><SizedWorldModel item={item}>
-          <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} /></SceneryFinish>
+        <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
+          <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish>
         </SizedWorldModel></group>
       )}
       {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, getItemPresentation(item).height + .5, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}

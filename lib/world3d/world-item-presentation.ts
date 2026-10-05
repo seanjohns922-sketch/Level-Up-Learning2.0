@@ -1,3 +1,4 @@
+import { VILLAGE_BUILDINGS } from "./village-buildings";
 import type { EconomyItem } from "@/lib/economy";
 
 /** World metres. The avatar is 2.2 m tall. Every item has its own land reservation.
@@ -18,6 +19,7 @@ export const CASTLE_WALL_HEIGHT = 7.436;
 // Native mesh stays fixed; presentation fitting controls its world height.
 export const CASTLE_WALL_NATIVE_HEIGHT = 26;
 export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
+  ...Object.fromEntries(VILLAGE_BUILDINGS.map(item=>[item.key,{height:item.height,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   // Small free props: target sizes relative to the 2.2 m avatar.
   fruit_tree: {height:5.5, footprint:[6,6], theme:"garden"},
   flower_pots: {height:0.85, footprint:[2,2], theme:"garden"},
