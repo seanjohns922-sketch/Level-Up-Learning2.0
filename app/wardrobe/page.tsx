@@ -1,5 +1,7 @@
 "use client";
 
+import RealmItemFilter from "@/components/economy/RealmItemFilter";
+import { matchesItemRealm, type ItemRealmFilter } from "@/lib/marketplace-realm-filter";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, Plus, Shuffle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -126,6 +128,7 @@ function Heading({ title }: { title: string }) {
 export default function ExplorerOutfitPage() {
   const router = useRouter();
   const student = useMemo(() => getActiveStudentProfile(), []);
+  const [realmFilter, setRealmFilter] = useState<ItemRealmFilter>("all");
   const [state, setState] = useState<EconomyState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(0);
@@ -176,6 +179,7 @@ export default function ExplorerOutfitPage() {
   const itemsBySlot = useMemo(() => {
     const map = new Map<string, EconomyItem[]>();
     for (const item of state?.items ?? []) {
+      if (!matchesItemRealm(item, realmFilter)) continue;
       const slot = (item.metadata as { slot?: string })?.slot ?? item.category;
       const list = map.get(slot) ?? [];
       list.push(item);
@@ -183,7 +187,7 @@ export default function ExplorerOutfitPage() {
     }
     for (const list of map.values()) list.sort((a, b) => a.sort_order - b.sort_order);
     return map;
-  }, [state?.items]);
+  }, [state?.items, realmFilter]);
 
   const bump = () => setCelebrate((c) => c + 1);
   function showState(next: EconomyState) {
@@ -333,7 +337,7 @@ export default function ExplorerOutfitPage() {
   // tile to take it off, then the earned items for that slot.
   function accessorySlot(title: string, equipSlot: string) {
     const items = itemsBySlot.get(equipSlot) ?? [];
-    if (items.length === 0) return null;
+    if (items.length === 0 && !state?.equipped[equipSlot]) return null;
     const equippedKey = state?.equipped[equipSlot];
     return (
       <section className={PANEL}>
@@ -404,6 +408,7 @@ export default function ExplorerOutfitPage() {
 
           {/* Free customisation */}
           <div className="flex flex-col gap-4">
+            <section className={PANEL}><RealmItemFilter value={realmFilter} onChange={setRealmFilter}/><p className="mt-2 text-xs text-slate-500">Filters shop clothing and accessories. Your free choices and saved looks stay available.</p>{state && realmFilter !== 'all' && itemsBySlot.size === 0 ? <p role="status" className="mt-2 text-sm text-slate-600">No collection items match this realm yet.</p> : null}</section>
             {/* My Outfits (presets) */}
             <section className={PANEL}>
               <Heading title="My Outfits" />

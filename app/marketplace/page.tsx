@@ -1,5 +1,7 @@
 "use client";
 
+import RealmItemFilter from "@/components/economy/RealmItemFilter";
+import { matchesItemRealm, type ItemRealmFilter } from "@/lib/marketplace-realm-filter";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
@@ -21,6 +23,7 @@ export default function MarketplacePage() {
   const student = useMemo(() => getActiveStudentProfile(), []);
   const preview = useDemoPreviewMode() || student?.studentId === DEMO_PREVIEW_SCOPE;
   const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
+  const [realmFilter, setRealmFilter] = useState<ItemRealmFilter>("all");
   const [state, setState] = useState<EconomyState | null>(null);
   const [department, setDepartment] = useState<MarketplaceDepartment>("world");
   const [category, setCategory] = useState("all");
@@ -45,7 +48,7 @@ export default function MarketplacePage() {
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
   const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
-  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && marketplaceDepartment(item) === department && (category === "all" || marketplaceCategory(item) === category)), [category, department, state?.items]);
+  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && matchesItemRealm(item, realmFilter) && marketplaceDepartment(item) === department && (category === "all" || marketplaceCategory(item) === category)), [category, department, realmFilter, state?.items]);
   useEffect(() => {
     if (!items.some((item) => item.item_key === selected?.item_key)) setSelected(items[0] ?? null);
   }, [items, selected?.item_key]);
@@ -101,6 +104,7 @@ export default function MarketplacePage() {
               <Icon className="h-6 w-6 shrink-0"/><span><span className="block text-lg font-black">{id==="world"?"World":"Avatar"}</span><span className={`mt-0.5 block text-xs ${active?"text-[#ced8c7]":"text-slate-500"}`}>{id==="world"?"Buildings, wildlife & places":"Outfits, companions & effects"}</span></span>
             </button>;})}
           </div>
+          <div className="mt-5"><RealmItemFilter value={realmFilter} onChange={setRealmFilter}/></div>
           <div className="mt-5 flex gap-2 overflow-x-auto pb-2" aria-label="Marketplace categories">{MARKETPLACE_CATEGORIES[department].map(item=><button type="button" key={item.id} onClick={()=>setCategory(item.id)} aria-pressed={category===item.id} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold ${category===item.id?"border-[#c5a96b] bg-[#f0dfb5] text-[#4b3b1f]":"border-[#d8dbce] bg-white text-slate-600 hover:border-[#84947b]"}`}>{item.label}</button>)}</div>
         </header>
         {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div> : null}
@@ -115,7 +119,7 @@ export default function MarketplacePage() {
                 <div className="mt-2 flex items-center justify-between gap-2"><span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span><span className={`text-xs font-black ${unavailable ? "text-slate-400" : isEquipped ? "text-emerald-700" : "text-amber-700"}`}>{unavailable ? "Unavailable" : isEquipped ? "Equipped" : isOwned ? "Owned" : `${item.price} XP`}</span></div>
               </button>
             ); })}
-            {state && items.length === 0 ? <div className="col-span-full rounded-md border border-dashed border-slate-300 bg-white p-10 text-center text-sm font-bold text-slate-500">No items in this category yet.</div> : null}
+            {state && items.length === 0 ? <div className="col-span-full rounded-md border border-dashed border-slate-300 bg-white p-10 text-center text-sm font-bold text-slate-500">No items match this realm and category. Try All realms or another category.</div> : null}
           </section>
           <aside className="h-fit rounded-2xl border border-[#d8dbce] bg-white p-4 shadow-sm lg:sticky lg:top-20">
             {selected ? <>
