@@ -1,4 +1,6 @@
 "use client";
+import { RailTrack, StarterTrain, WorldRailway } from "./Railway";
+import { RAIL_KEYS } from "@/lib/world3d/railway";
 import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
 
 import { Edges, Html, RoundedBox, useTexture } from "@react-three/drei";
@@ -332,6 +334,7 @@ function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
 // foliage, canopy, cloth, cap, water, glow…). Structural parts — trunks, poles,
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
 function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string }) {
+  if (RAIL_KEYS.has(assetKey)) return <group><RailTrack asset={assetKey}/>{assetKey === "rail_train" && <StarterTrain/>}</group>;
   if (COLLECTION_SCENERY_KEYS.has(assetKey)) return <CollectionScenery assetKey={assetKey} tint={tint} />;
   if (FORTRESS_SCENERY_KEYS.has(assetKey)) return <FortressScenery assetKey={assetKey} tint={tint} />;
   if (WILDLIFE_KEYS.has(assetKey)) return <WildlifeScenery assetKey={assetKey} tint={tint} />;
@@ -803,7 +806,7 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>}
-      {CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}><RailTrack asset={assetKey}/>{preview && assetKey === "rail_train" && <StarterTrain/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>
@@ -1203,6 +1206,7 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, h
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
+      <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
         return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
