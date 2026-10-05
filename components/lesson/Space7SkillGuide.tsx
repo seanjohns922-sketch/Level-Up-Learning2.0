@@ -5,8 +5,8 @@ import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {MathFormattedText} from '@/components/FractionText';
 import Space7LessonVisual from '@/components/starpath/Space7LessonVisual';
 import {solutionSteps} from '@/lib/level7-guide-steps';
-import type {Task7} from '@/data/assessments/revisions/level7StarpathFiveForms';
-import type {Level7Plane} from '@/lib/level7-answer';
+import type {Task7,Flow7} from '@/data/assessments/revisions/level7StarpathFiveForms';
+import {SORTER7_QUESTIONS,SORTER7_TEMPLATES,type Level7Plane,type Level7Sorter,type Sorter7Node,type Sorter7Question} from '@/lib/level7-answer';
 import {space7Guide} from '@/data/activities/year7Space/curriculum';
 import {space7Question} from '@/data/activities/year7Space/questions';
 import layout from './Space7LessonLayout.module.css';
@@ -41,6 +41,11 @@ export function Space7SkillGuideDialog({week,lesson,onClose}:{week:number;lesson
  return <dialog ref={ref} onCancel={e=>{e.preventDefault();onClose();}} className="fixed inset-0 m-auto max-h-[90vh] w-[min(95vw,1100px)] overflow-y-auto rounded-2xl border-0 p-0 backdrop:bg-slate-950/85" aria-label="Skill guide"><Space7SkillGuide week={week} lesson={lesson} review onContinue={onClose}/></dialog>;
 }
 // A built model reads as back row and front row; everything else is shown as stored.
-function answerText(q:{answer:string;build?:unknown;place?:Level7Plane}){if(q.place){const ps=q.answer.split(';');return ps.map((p,i)=>`${q.place!.labels[i]}′ ${p.trim()}`).join(', ');}if(!q.build)return q.answer;const h=q.answer.split(',');return `back row ${h.slice(0,3).join(', ')}; front row ${h.slice(3).join(', ')}`;}
+function answerText(q:{answer:string;build?:unknown;place?:Level7Plane;sorter?:Level7Sorter}){if(q.sorter)return q.sorter.mode==='sort'?q.sorter.shapes.map((sh,i)=>`${sh.id} ${q.sorter!.target[i]}`).join(', '):q.sorter.mode==='tree'?'the completed tree shown':'the sorter shown';if(q.place){const ps=q.answer.split(';');return ps.map((p,i)=>`${q.place!.labels[i]}′ ${p.trim()}`).join(', ');}if(!q.build)return q.answer;const h=q.answer.split(',');return `back row ${h.slice(0,3).join(', ')}; front row ${h.slice(3).join(', ')}`;}
 // Place-the-image questions draw their grid in the answer box, so the guide draws it here with the worked image.
-function guideVisual(q:{spaceVisual?:Task7;place?:Level7Plane}):Task7|undefined{return q.spaceVisual??(q.place?{mode:'choice',diagram:'none',instruction:'Triangle and its image.',plane7:q.place}:undefined);}
+function guideVisual(q:{spaceVisual?:Task7;place?:Level7Plane;sorter?:Level7Sorter;answer:string}):Task7|undefined{
+ const s=q.sorter;
+ if(s?.mode==='tree')return {mode:'choice',diagram:'none',instruction:'The completed family tree.',familyTree7:s.target};
+ if(s?.mode==='flow'){const values=q.answer.split('|'),toFlow=(n:Sorter7Node):Flow7=>n.yes&&n.no?{question:SORTER7_QUESTIONS[values[n.slot] as Sorter7Question],yes:toFlow(n.yes),no:toFlow(n.no)}:values[n.slot];return {mode:'choice',diagram:'flow',instruction:'One sorter that works, and the shapes it was tested on.',trees:[{title:'Sorter',root:toFlow(SORTER7_TEMPLATES[s.template!])}],shapes7:s.shapes};}
+ if(s?.mode==='sort'){const values=s.flow?.values??[],toFlow=(n:Sorter7Node):Flow7=>n.yes&&n.no?{question:SORTER7_QUESTIONS[values[n.slot] as Sorter7Question],yes:toFlow(n.yes),no:toFlow(n.no)}:values[n.slot];return {mode:'choice',diagram:s.flow?'flow':'none',instruction:'The shapes to sort.',trees:s.flow?[{title:s.flow.title,root:toFlow(SORTER7_TEMPLATES[s.flow.template])}]:undefined,shapes7:s.shapes};}
+ return q.spaceVisual??(q.place?{mode:'choice',diagram:'none',instruction:'Triangle and its image.',plane7:q.place}:undefined);}

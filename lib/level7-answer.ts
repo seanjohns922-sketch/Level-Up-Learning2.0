@@ -1,5 +1,5 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
-export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build'|'place';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build;place?:Level7Plane};
+export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build'|'place'|'sorter';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
 type P={x:number;y:number};
 /** A lettered shape on the −6 to 6 coordinate grid, with an optional mirror, centre and worked image. */
 export type Level7Plane={shape:P[];labels:string[];mirror?:'x'|'y';mirrorX?:number[];centre?:P;image?:P[];solution?:P[];turn?:{centre:P;clockwise:boolean;degrees:90|180|270}};
@@ -24,7 +24,7 @@ export function buildMeets(b:Level7Build,h:number[]){
  return b.mode==='views'||(b.mode==='fewest'?total===fewestCubes(b.front!,b.side!):total===b.cubes);
 }
 // answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build;place?:Level7Plane};
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -36,6 +36,7 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(!q.lessonId?.startsWith('y7-'))return null;
  if(q.build)return {kind:'build',expected:q.answer,prompt:q.prompt,build:q.build};
  if(q.place)return {kind:'place',expected:q.answer,prompt:q.prompt,place:q.place};
+ if(q.sorter)return {kind:'sorter',expected:q.answer,prompt:q.prompt,sorter:q.sorter};
  const expected=clean(q.answer);
  // Older saved integer questions stored their givens only in the answer choices.
  // Keep those values visible when restoring a question as a typed response.
@@ -72,6 +73,7 @@ export function level7Answer(q:Question):Level7Answer|null{
   if(/\bmodes?\b/i.test(p)&&/^-?[\d.]+(?:,\s*-?[\d.]+)+$/.test(expected))return {...base,kind:'set'};
  }
  if(q.lessonId.startsWith('y7-space-')&&/^[A-F]$/.test(expected))return {...base,kind:'text'};
+ if(q.lessonId.startsWith('y7-space-')&&/^(Regular|Irregular|Concave) (pentagon|hexagon)$|^Quadrilateral$/.test(expected))return {...base,kind:'text'};
 
  if(/^\(?\s*-?[\d.]+\s*,\s*-?[\d.]+\s*\)?$/.test(expected)&&/point|coordinate|pair|image|P =/i.test(p))return {...base,kind:'coordinates',labels:['x','y']};
  if(/^\d+(?:\.\d+)?(?:\s*:\s*\d+(?:\.\d+)?){1,2}$/.test(expected))return {...base,kind:'ratio',format:/simplif/i.test(p)?'simplest':undefined,labels:['First amount','Second amount','Third amount'].slice(0,expected.split(':').length)};
@@ -99,6 +101,7 @@ function expressionValue(source:string,variables:Record<string,number>):number|n
 export function stripAnswerUnit(spec:Level7Answer,value:string){const s=value.trim();return spec.unit==='$'?s.replace(/^\$\s*/,''):spec.unit&&s.endsWith(spec.unit)?s.slice(0,-spec.unit.length).trim():s;}
 export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  if(spec.kind==='build')return buildMeets(spec.build!,response.split(',').map(Number));
+ if(spec.kind==='sorter')return sorterMeets(spec.sorter!,response.split('|'));
  const a=clean(stripAnswerUnit(spec,response)),b=clean(spec.expected);if(!a)return false;
  const near=(x:number|null,y:number|null)=>x!==null&&y!==null&&Math.abs(x-y)<=1e-8*Math.max(1,Math.abs(y));
  if(spec.kind==='number'||spec.kind==='fraction'){
@@ -148,3 +151,60 @@ export function level7SimplificationTip(spec:Level7Answer,response:string):Simpl
  const top=n/x,bottom=d/x,simplified=ratio?`${top}:${bottom}`:bottom===1?String(top):`${top}/${bottom}`;
  return {original,simplified,divisor:x,required,instruction:ratio?`Divide both amounts by ${x}: ${n} ÷ ${x} = ${top} and ${d} ÷ ${x} = ${bottom}.`:`Divide the top and bottom by ${x}: ${n} ÷ ${x} = ${top} and ${d} ÷ ${x} = ${bottom}.`};
 }
+
+// ── Shape sorters (Space Weeks 9–10) ─────────────────────────────────────────────
+// Shapes are real drawn polygons; their properties come from the geometry, so a sorter is
+// marked by running every test shape through it. Any design that sorts every shape works.
+export type Sorter7Shape={id:string;points:P[];show:'sides'|'angles'|'all'};
+export type Sorter7Question='all3'|'exactly2'|'atLeast2'|'rightTri'|'obtuseTri'|'acuteTri'|'fourRight'|'fourEqual'|'twoParallel'|'oneParallel'|'kite'|'concave'|'regular'|'equalSides'|'fiveSides';
+export const SORTER7_QUESTIONS:Record<Sorter7Question,string>={all3:'All 3 sides equal?',exactly2:'Exactly 2 sides equal?',atLeast2:'At least 2 sides equal?',rightTri:'Any angle equal to 90°?',obtuseTri:'Any angle greater than 90°?',acuteTri:'All angles less than 90°?',fourRight:'Four right angles?',fourEqual:'Four equal sides?',twoParallel:'Two pairs of parallel sides?',oneParallel:'Exactly one pair of parallel sides?',kite:'Two pairs of equal adjacent sides?',concave:'Any interior angle greater than 180°?',regular:'All sides and all angles equal?',equalSides:'All sides equal?',fiveSides:'Exactly 5 sides?'};
+export type Sorter7Node={slot:number;yes?:Sorter7Node;no?:Sorter7Node};
+export const SORTER7_TEMPLATES:Record<'single'|'chain'|'full',Sorter7Node>={
+ single:{slot:0,yes:{slot:1},no:{slot:2}},
+ chain:{slot:0,yes:{slot:1},no:{slot:2,yes:{slot:3},no:{slot:4}}},
+ full:{slot:0,yes:{slot:1,yes:{slot:2},no:{slot:3}},no:{slot:4,yes:{slot:5},no:{slot:6}}},
+};
+/** Quadrilateral family tree boxes, left to right and top to bottom. A rhombus is also a kite. */
+export const FAMILY7_SLOTS=['Trapezium','Parallelogram','Kite','Rectangle','Rhombus','Square'];
+export type Level7Sorter={
+ mode:'sort'|'flow'|'tree';shapes:Sorter7Shape[];
+ /** The correct group for each shape (sort, flow) or the name in each box (tree). */
+ target:string[];
+ bins?:string[];template?:'single'|'chain'|'full';questions?:Sorter7Question[];outputs?:string[];
+ /** Starting values for each box; locked boxes cannot be changed. Empty string means blank. */
+ start?:string[];locked?:boolean[];
+ /** The sorter to follow, drawn above the shapes in a sort task. */
+ flow?:{title:string;template:'single'|'chain'|'full';values:string[]};
+};
+export function sorterSlots(t:Sorter7Node){const qs:number[]=[],outs:number[]=[];const walk=(n:Sorter7Node)=>{if(n.yes&&n.no){qs.push(n.slot);walk(n.yes);walk(n.no);}else outs.push(n.slot);};walk(t);return {questions:qs,outputs:outs,count:qs.length+outs.length};}
+export function shapeFacts(ps:P[]){
+ const n=ps.length,area=ps.reduce((s,p,i)=>{const q=ps[(i+1)%n];return s+p.x*q.y-q.x*p.y;},0),dir=area<0?-1:1;
+ const near=(a:number,b:number,tol=1e-6)=>Math.abs(a-b)<=tol*Math.max(1,Math.abs(a),Math.abs(b));
+ const sides=ps.map((p,i)=>Math.hypot(ps[(i+1)%n].x-p.x,ps[(i+1)%n].y-p.y));
+ const angles=ps.map((p,i)=>{const a=ps[(i+n-1)%n],b=ps[(i+1)%n],u={x:a.x-p.x,y:a.y-p.y},v={x:b.x-p.x,y:b.y-p.y};let t=Math.atan2(dir*(v.x*u.y-v.y*u.x),v.x*u.x+v.y*u.y)*180/Math.PI;if(t<0)t+=360;return t;});
+ let equalPairs=0;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(near(sides[i],sides[j]))equalPairs++;
+ const dirs=ps.map((p,i)=>({x:ps[(i+1)%n].x-p.x,y:ps[(i+1)%n].y-p.y})),parallel=(i:number,j:number)=>Math.abs(dirs[i].x*dirs[j].y-dirs[i].y*dirs[j].x)<=1e-6*sides[i]*sides[j];
+ const parallelPairs=n===4?[parallel(0,2),parallel(1,3)].filter(Boolean).length:0;
+ const allSides=sides.every(x=>near(x,sides[0])),allAngles=angles.every(x=>Math.abs(x-angles[0])<1e-4);
+ return {n,sides,angles,equalPairs,allSides,allAngles,rightAngles:angles.filter(x=>Math.abs(x-90)<1e-4).length,maxAngle:Math.max(...angles),parallelPairs,
+  kite:n===4&&((near(sides[0],sides[1])&&near(sides[2],sides[3]))||(near(sides[1],sides[2])&&near(sides[3],sides[0]))),concave:angles.some(x=>x>180+1e-4)};
+}
+export function sorterYes(q:Sorter7Question,ps:P[]){const f=shapeFacts(ps);switch(q){
+ case 'all3':return f.n===3&&f.allSides;case 'exactly2':return f.n===3&&f.equalPairs===1;case 'atLeast2':return f.n===3&&f.equalPairs>=1;
+ case 'rightTri':return f.rightAngles>0;case 'obtuseTri':return f.maxAngle>90+1e-4&&f.maxAngle<180;case 'acuteTri':return f.maxAngle<90-1e-4;
+ case 'fourRight':return f.n===4&&f.rightAngles===4;case 'fourEqual':return f.n===4&&f.allSides;case 'twoParallel':return f.parallelPairs===2;case 'oneParallel':return f.parallelPairs===1;case 'kite':return f.kite;
+ case 'concave':return f.concave;case 'regular':return f.allSides&&f.allAngles;case 'equalSides':return f.allSides;case 'fiveSides':return f.n===5;}}
+/** Runs one shape through a built sorter; null if a box on its route is blank or invalid. */
+export function runSorter(t:Sorter7Node,values:string[],ps:P[]):string|null{let node=t;while(node.yes&&node.no){const q=values[node.slot] as Sorter7Question;if(!(q in SORTER7_QUESTIONS))return null;node=sorterYes(q,ps)?node.yes:node.no;}return values[node.slot]||null;}
+export function sorterMeets(s:Level7Sorter,values:string[]){
+ if(s.mode==='sort'||s.mode==='tree')return values.length===s.target.length&&values.every((v,i)=>v.trim().toLowerCase()===s.target[i].toLowerCase());
+ const t=SORTER7_TEMPLATES[s.template!],slots=sorterSlots(t);if(values.length!==slots.count)return false;
+ if(slots.questions.some(i=>!s.questions!.includes(values[i] as Sorter7Question))||slots.outputs.some(i=>!s.outputs!.includes(values[i])))return false;
+ return s.shapes.every((sh,i)=>runSorter(t,values,sh.points)===s.target[i]);
+}
+/** Plain-language description of a drawn shape's markings, for read-aloud. */
+export function sorterShapeSpeech(sh:Sorter7Shape){const f=shapeFacts(sh.points),name=f.n===3?'triangle':f.n===4?'quadrilateral':f.n===5?'pentagon':'hexagon';
+ if(sh.show==='angles')return `Shape ${sh.id}: a triangle with angles ${f.angles.map(a=>Math.round(a)+'°').join(', ')}.`;
+ const parts=[f.allSides?'all sides equal':f.equalPairs?`${f.equalPairs===1?'two sides':'some sides'} marked equal`:'no equal sides'];
+ if(sh.show==='all'){if(f.rightAngles)parts.push(`${f.rightAngles} right angle${f.rightAngles>1?'s':''}`);if(f.allAngles&&!f.rightAngles)parts.push('all angles marked equal');if(f.n===4)parts.push(f.parallelPairs===2?'two pairs of parallel sides':f.parallelPairs===1?'one pair of parallel sides':'no parallel sides');if(f.concave)parts.push('one angle greater than 180°');}
+ return `Shape ${sh.id}: a ${name} with ${parts.join(', ')}.`;}

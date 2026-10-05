@@ -3,10 +3,11 @@ import {useState} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import Level7BuildInput from './Level7BuildInput';
 import Level7PlaceInput from './Level7PlaceInput';
+import Level7SorterInput from './Level7SorterInput';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {markLevel7Answer,scalarAnswer,stripAnswerUnit,level7SimplificationTip,type SimplificationTip,type Level7Answer} from '@/lib/level7-answer';
 // Building tasks use their own input; every other answer kind uses the typed boxes below.
-export default function Level7AnswerInput(props:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){return props.spec.kind==='build'?<Level7BuildInput {...props} realm={props.realm??'space'}/>:props.spec.kind==='place'?<Level7PlaceInput {...props} realm={props.realm??'space'}/>:<Level7TypedInput {...props}/>;}
+export default function Level7AnswerInput(props:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){return props.spec.kind==='build'?<Level7BuildInput {...props} realm={props.realm??'space'}/>:props.spec.kind==='place'?<Level7PlaceInput {...props} realm={props.realm??'space'}/>:props.spec.kind==='sorter'?<Level7SorterInput {...props} realm={props.realm??'space'}/>:<Level7TypedInput {...props}/>;}
 function Level7TypedInput({spec,onAnswer,realm='number',disabled=false,initialValue='',onEditing}:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){
  const t=getRealmTheme(realm),[alternate,setAlternate]=useState(spec.kind==='fraction'&&!spec.format&&!!initialValue&&!initialValue.includes('/')),[error,setError]=useState('');
  const [tip,setTip]=useState<SimplificationTip|null>(null),[showHow,setShowHow]=useState(false);

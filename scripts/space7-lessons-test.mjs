@@ -23,7 +23,40 @@ function checkBuild(q){
  const spec=level7AnswerFn(q);assert.equal(spec.kind,'build');assert.ok(markFn(spec,q.answer));
  assert.ok(!markFn(spec,'0,0,0,0,0,0'));
 }
+// Shape sorters: classify drawn shapes with geometry written independently of the app.
+const QTEXT={all3:'All 3 sides equal?',exactly2:'Exactly 2 sides equal?',atLeast2:'At least 2 sides equal?',rightTri:'Any angle equal to 90°?',obtuseTri:'Any angle greater than 90°?',acuteTri:'All angles less than 90°?',fourRight:'Four right angles?',fourEqual:'Four equal sides?',twoParallel:'Two pairs of parallel sides?',oneParallel:'Exactly one pair of parallel sides?',kite:'Two pairs of equal adjacent sides?',concave:'Any interior angle greater than 180°?',regular:'All sides and all angles equal?',equalSides:'All sides equal?',fiveSides:'Exactly 5 sides?'};
+const TEMPLATES={single:{s:0,y:{s:1},n:{s:2}},chain:{s:0,y:{s:1},n:{s:2,y:{s:3},n:{s:4}}},full:{s:0,y:{s:1,y:{s:2},n:{s:3}},n:{s:4,y:{s:5},n:{s:6}}}};
+const FAMILY=['Trapezium','Parallelogram','Kite','Rectangle','Rhombus','Square'];
+function geo(ps){const n=ps.length;let area=0;for(let i=0;i<n;i++){const a=ps[i],b=ps[(i+1)%n];area+=a.x*b.y-b.x*a.y;}const sg=Math.sign(area);
+ const L=ps.map((p,i)=>Math.hypot(ps[(i+1)%n].x-p.x,ps[(i+1)%n].y-p.y)),eq=(a,b)=>Math.abs(a-b)<1e-5*Math.max(1,a,b);
+ const ang=ps.map((p,i)=>{const a=ps[(i+n-1)%n],b=ps[(i+1)%n],u=[a.x-p.x,a.y-p.y],w=[b.x-p.x,b.y-p.y];let d=Math.acos(Math.max(-1,Math.min(1,(u[0]*w[0]+u[1]*w[1])/(Math.hypot(...u)*Math.hypot(...w)))))*180/Math.PI;const turn=(p.x-a.x)*(b.y-p.y)-(p.y-a.y)*(b.x-p.x);if(turn*sg<0)d=360-d;return d;});
+ let pairs=0;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(eq(L[i],L[j]))pairs++;
+ const d=ps.map((p,i)=>[ps[(i+1)%n].x-p.x,ps[(i+1)%n].y-p.y]),par=(i,j)=>Math.abs(d[i][0]*d[j][1]-d[i][1]*d[j][0])<1e-5*L[i]*L[j];
+ const g={n,pairs,allSides:L.every(x=>eq(x,L[0])),allAngles:ang.every(x=>Math.abs(x-ang[0])<1e-3),right:ang.filter(x=>Math.abs(x-90)<1e-3).length,max:Math.max(...ang),reflex:ang.some(x=>x>180.001),parallel:n===4?[par(0,2),par(1,3)].filter(Boolean).length:0,kite:n===4&&((eq(L[0],L[1])&&eq(L[2],L[3]))||(eq(L[1],L[2])&&eq(L[3],L[0])))};return g;}
+const YES={[QTEXT.all3]:g=>g.n===3&&g.pairs===3,[QTEXT.exactly2]:g=>g.n===3&&g.pairs===1,[QTEXT.atLeast2]:g=>g.n===3&&g.pairs>=1,[QTEXT.rightTri]:g=>g.right>0,[QTEXT.obtuseTri]:g=>g.max>90.001&&g.max<180,[QTEXT.acuteTri]:g=>g.max<89.999,[QTEXT.fourRight]:g=>g.n===4&&g.right===4,[QTEXT.fourEqual]:g=>g.n===4&&g.allSides,[QTEXT.twoParallel]:g=>g.parallel===2,[QTEXT.oneParallel]:g=>g.parallel===1,[QTEXT.kite]:g=>g.kite,[QTEXT.concave]:g=>g.reflex,[QTEXT.regular]:g=>g.allSides&&g.allAngles,[QTEXT.equalSides]:g=>g.allSides,[QTEXT.fiveSides]:g=>g.n===5};
+function category(ps,groups){const g=geo(ps),has=x=>groups.includes(x);
+ if(has('Equilateral'))return g.pairs===3?'Equilateral':g.pairs===1?'Isosceles':'Scalene';
+ if(has('Right-angled'))return g.right?'Right-angled':g.max>90?'Obtuse':'Acute';
+ if(has('Non-square rectangle'))return g.right===4?(g.allSides?'Square':'Non-square rectangle'):g.allSides?'Non-square rhombus':'Other quadrilateral';
+ if(has('Rhombus')&&has('Square'))return g.right===4?(g.allSides?'Square':'Rectangle'):g.allSides?'Rhombus':g.parallel===2?'Parallelogram':g.parallel===1?'Trapezium':g.kite?'Kite':'?';
+ if(has('Trapezium'))return g.parallel===2?'Parallelogram':g.parallel===1?'Trapezium':g.kite?'Kite':'?';
+ const type=g.reflex?'Concave':g.allSides&&g.allAngles?'Regular':'Irregular';
+ if(has('Concave'))return type==='Regular'?'Regular convex':type==='Irregular'?'Irregular convex':'Concave';
+ return `${type} ${g.n===5?'pentagon':'hexagon'}`;}
+const runFlow7=(node,ps)=>typeof node==='string'?node:runFlow7(YES[node.question](geo(ps))?node.yes:node.no,ps);
+const runValues=(t,values,ps)=>{let node=t;while(node.y){const f=YES[QTEXT[values[node.s]]];if(!f)return null;node=f(geo(ps))?node.y:node.n;}return values[node.s];};
+function checkSorter(q){const s=q.sorter;
+ if(s.mode==='tree'){assert.deepEqual(s.target,FAMILY);assert.equal(q.answer,FAMILY.join('|'));s.start.forEach((v,i)=>{if(v)assert.equal(v,FAMILY[i]);});return;}
+ const groups=s.mode==='sort'?s.bins:s.outputs;assert.deepEqual(s.target,s.shapes.map(sh=>category(sh.points,groups)),q.prompt);
+ for(const g of new Set(s.target))assert.ok(groups.includes(g));
+ if(s.mode==='sort'){assert.equal(q.answer,s.target.join('|'));return;}
+ const t=TEMPLATES[s.template],ans=q.answer.split('|');assert.ok(s.shapes.every((sh,i)=>runValues(t,ans,sh.points)===s.target[i]),'model sorter works');
+ s.start.forEach((v,i)=>{if(s.locked[i])assert.equal(v,ans[i]);});
+ if(/puts some shapes in the wrong group/.test(q.prompt))assert.ok(s.shapes.some((sh,i)=>runValues(t,s.start,sh.points)!==s.target[i]),'broken sorter is broken');
+ assert.ok(new Set(s.target).size>=2,'test shapes cover several groups');
+}
 function check(key,q){
+ if(q.sorter)return checkSorter(q);
  if(q.build)return checkBuild(q);
  const A=q.tier==='apply_create',R=q.tier==='reasoning',F=!A&&!R,v=q.spaceVisual,p=q.prompt,n=(p.replaceAll('−','-').match(/-?\d+/g)||[]).map(Number);
  let answer;
@@ -68,6 +101,19 @@ function check(key,q){
   if(q.place){assert.ok(!v,'place questions draw their own grid');assert.deepEqual(q.place.shape,tri);assert.ok([...q.place.shape,...q.place.solution].every(c=>Math.abs(c.x)<=5&&Math.abs(c.y)<=5),'place stays on grid');}
   else{const pl=v.plane7;assert.ok(pl,'transformations show a triangle');for(const c of [...pl.shape,...(pl.image??[]),...(pl.solution??[])])assert.ok(Math.abs(c.x)<=5&&Math.abs(c.y)<=5,'on grid '+p);}
  }
+ else if(key>=28&&key<=35&&key!==34){
+  const shapes=v?.shapes7,flows=v?.trees;
+  if(key===28&&F)answer=category(shapes[0].points,flows[0].root.question.includes('sides')?['Equilateral']:['Right-angled']);
+  if(key===28&&R){const o=p.match(/reach “(.*?)”/)[1],groups=flows[0].root.question.includes('sides')?['Equilateral']:['Right-angled'];answer=String(shapes.filter(sh=>category(sh.points,groups)===o).length);}
+  if(key===29&&R)answer={[QTEXT.all3]:'Equilateral',[QTEXT.exactly2]:'Isosceles',[QTEXT.rightTri]:'Right-angled',[QTEXT.obtuseTri]:'Obtuse',[QTEXT.acuteTri]:'Acute'}[p.match(/asks “(.*?)” first/)[1]];
+  if(key===30&&F)answer=category(shapes[0].points,['Rhombus','Square']);
+  if(key===30&&R)answer={'Which family is directly above Rectangle in the tree?':'Parallelogram','Which family is directly below both Rectangle and Rhombus?':'Square','Rhombus is joined to Parallelogram and to which other family above it?':'Kite','Which family on the second row has no families below it?':'Trapezium','Which family is directly below Kite?':'Rhombus'}[p.replace(' Type the family name.','')];
+  if(key===31&&F)answer=category(shapes[0].points,[]);
+  if(key===31&&R){const what=p.match(/are (\w+)\?/)[1];answer=String(shapes.filter(sh=>{const c=category(sh.points,[]);return what==='concave'?c.startsWith('Concave'):what==='regular'?c.startsWith('Regular'):sh.points.length===6;}).length);}
+  if(key===32){const wrong=shapes.filter(sh=>{const groups=[flows[0].root.yes,flows[0].root.no?.yes,flows[0].root.no?.no].filter(x=>typeof x==='string');const all=JSON.stringify(flows[0].root).match(/"(?:yes|no)":"(.*?)"/g).map(x=>x.split('":"')[1].slice(0,-1));return runFlow7(flows[0].root,sh.points)!==category(sh.points,all.concat(groups));});if(F){assert.equal(wrong.length,1);answer=wrong[0].id;}else answer=String(wrong.length);}
+  if(key===35&&F)answer=String(n[0]-1);
+  if(key===35&&R){answer=category(shapes[0].points,['Non-square rectangle']);for(const t of flows)assert.equal(runFlow7(t.root,shapes[0].points),answer);}
+ }
  else if(!alt)switch(key){
   case 1:if(A){const solids={'one square and four triangles':'Square pyramid','two triangles and three rectangles':'Triangular prism','six rectangles in three matching pairs':'Rectangular prism','four triangles':'Triangular pyramid','two pentagons and five rectangles':'Pentagonal prism'};answer=solids[p.match(/made from (.*)\. What/)[1]];}break;
   case 2:if(true){const cells=v.cells,fold=foldNet(cells),target=cells.findIndex(c=>relationBetween(fold,cells[v.marked],c)==='opposite');answer=String.fromCharCode(65+target);}break;
@@ -78,22 +124,13 @@ function check(key,q){
   case 7:answer=String(A?6*Math.max(...h)-total:total);break;
   case 8:answer=String(F?n[0]:R?n[0]*n[2]-n[0]+1:n[0]*n[2]);break;
   case 9:if(!R)answer=/stack heights|number of blocks|rebuild/.test(p)?'Height plan':/sheet|fold|cut/.test(p)?'Net':'Isometric drawing';break;
-  case 29:{const def={'equilateral triangles':'Are all three sides equal?','right-angled triangles':'Does one interior angle equal 90°?','obtuse triangles':'Does one interior angle exceed 90°?','isosceles triangles':'Are exactly two sides equal?','rectangles':'Does it have four right angles?','rhombuses':'Are all four sides equal?'},name={'equilateral triangles':'Equilateral','right-angled triangles':'Right-angled','obtuse triangles':'Obtuse'};
-   if(F)answer=def[p.match(/Only (.*?) should follow/)[1]];
-   else if(R)answer=name[p.match(/wants only (.*?) to follow/)[1]];
-   else{const rule=p.match(/decision “(.*?)”/)[1],tris=p.split(': ').slice(1).join(': ').split('. How')[0].split('; ').map(t=>(t.match(/\d+/g)||[]).map(Number));answer=String(tris.filter(t=>rule.includes('three sides')?t[0]===t[1]&&t[1]===t[2]:rule.includes('equal 90')?t.includes(90):Math.max(...t)>90).length);}
-   break;}
   case 10:if(F){const d=new Set(n.slice(0,3)).size;answer=d===1?'Equilateral':d===2?'Isosceles':'Scalene';}else if(R)answer='Isosceles';else{answer=String(n[1]-2*n[0]);assert.notEqual(n[1]-2*n[0],n[0],'isosceles, not equilateral');}break;
   case 11:{const ang=A?[n[0],n[1],180-n[0]-n[1]]:n.slice(0,3);answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';break;}
   case 12:if(/braces are needed/.test(p))answer=String(n[0]-3);else if(/diagonal brace/.test(p))answer='Triangle';else if(!R)answer=String(A?Math.abs(n[0]-n[1])+1:n[0]+n[1]-1);break;
   case 15:if(/top angle of/.test(p))answer=String((360-n[0]-n[1])/2);else if(/bottom-left angle/.test(p))answer=String(180-n[0]);else if(/perimeter of/.test(p))answer=String((n[0]-2*n[1])/2);else if(/is a parallelogram because/.test(p))answer='Kite';else if(F)answer=p.includes('no parallel sides')?'Kite':p.includes('exactly one pair')&&!p.includes('two pairs')?'Trapezium':'Parallelogram';break;
   case 13:if(A)answer=String(n[0]/(p.includes('triangle')?3:4));else if(R)answer='Rhombus';break;
   case 16:if(A)answer=String(n[0]/({pentagon:5,hexagon:6,octagon:8}[p.match(/regular (\w+)/)[1]]));break;
-  case 31:if(F&&v.polygons)answer=v.polygons[0].caption.includes('dent')?'Concave':'Regular convex';else if(/hexagon has interior angles/.test(p)){const ang=n.slice(0,6);answer=ang.some(x=>x>180)?'Concave':'Irregular convex';}break;
-  case 28:if(F){const d=new Set(n.slice(0,3)).size;answer=d===1?'Equilateral':d===2?'Isosceles':'Scalene';}else if(R)answer='Equilateral';else{const ang=n.slice(0,3);answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';}break;
-  case 30:if(!R){const right=p.includes('four right angles'),equal=/four sides of/.test(p);answer=right?(equal?'Square':'Non-square rectangle'):(equal?'Non-square rhombus':'Other quadrilateral');}break;
   case 34:if(F)answer=String(n[0]);break;
-  case 36:if(!R){const names=['Square','Non-square rectangle','Non-square rhombus','Other quadrilateral'];answer=names.find(x=>!p.split('Type')[0].includes(x+',')&&!p.split('Type')[0].includes(x+'.')&&!new RegExp(x+'(,|\\.)').test(p));}break;
  }
  if(answer!==undefined)assert.equal(q.answer,answer,JSON.stringify({key,q}));
  if(v?.polygons)for(const pg of v.polygons){assert.ok(pg.points.length>=3);assert.ok(pg.caption);}
@@ -101,7 +138,7 @@ function check(key,q){
  assert.ok(!/\b1 units\b/.test(p),'Grammar: 1 unit');
  assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert.ok(q.options.includes(q.answer));assert.equal(q.steps.length,3);
 }
-let count=0;assert.equal(SPACE7_WEEKS.length,10);assert.deepEqual([...new Set(SPACE7_SKILL_GROUPS.flat(2))].sort((a,b)=>a-b),Array.from({length:36},(_,i)=>i+1).filter(k=>k!==17&&k!==18));
+let count=0;assert.equal(SPACE7_WEEKS.length,10);assert.deepEqual([...new Set(SPACE7_SKILL_GROUPS.flat(2))].sort((a,b)=>a-b),Array.from({length:36},(_,i)=>i+1).filter(k=>![17,18,33,36].includes(k)));
 for(let w=1;w<=10;w++)for(let l=1;l<=3;l++)for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){{const q=space7Question(w,l,seed*7919,role);check(q.skillKey,q)};count++;}
 for(let w=1;w<=9;w++){
  const qs=space7Quiz(w);assert.equal(qs.length,15);assert.equal(new Set(qs.map(q=>q.id)).size,15);

@@ -13,13 +13,13 @@ pre/post-test blueprint. Existing assessment questions and marking are unchanged
 - Week 4: classifying triangles by sides and angles, the triangle inequality, triangle rigidity, and quadrilateral properties (SP02).
 - Week 5: the quadrilateral family tree, kites and trapeziums (side and angle properties), and regular polygons (SP02).
 - Weeks 6–8: translations, reflections, rotations about a specified centre, composition/order, and properties preserved by moves (SP03).
-- Weeks 9–10: trace, complete, test and justify classification algorithms, including the concave/convex and regular/irregular polygon scheme (SP04). Proof-style counterexample claims are Year 8 and are not taught.
+- Weeks 9–10 (SP04): shape sorters with real drawn shapes. Students sort sets of triangles, quadrilaterals and polygons (by sides, angles, concavity, regularity and number of sides), build and fix sorter flowcharts that the program tests on every shape, and complete the quadrilateral family tree. Proof-style counterexample claims are Year 8 and are not taught.
 
 The teacher curriculum explorer and demo week page provide the scope-and-sequence
 CSV. Guides reuse controlled Starpath net, cube-model, polygon, coordinate-plane
 and flowchart renderers. Diagrams and answer choices have shared read-aloud controls.
 Untimed explorations let learners construct cube nets, edit cube models, place
-transformed vertices and complete classification decisions. The 30 lessons use 34 of
+transformed vertices and complete classification decisions. The 30 lessons use 32 of
 the 36 original skills; standalone concavity and counterexample-claim lessons were
 removed after checking ACARA v9 (concavity is taught inside the Week 10 classifier).
 Reopening the guide pauses the practice timer. The normal lesson HUD, feedback,

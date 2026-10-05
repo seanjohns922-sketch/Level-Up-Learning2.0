@@ -221,22 +221,22 @@ const SPACE7_SOURCE_WEEKS = [
   "code": "AC9M7SP04",
   "lessons": [
    [
-    "Trace a triangle sorter",
-    "follow decisions to classify a triangle",
-    "Evaluate each condition in order and follow exactly one branch at every decision. Here isosceles means exactly two equal sides.",
-    "Do not skip an earlier condition just because a later one looks familiar."
+    "Sort a set of triangles",
+    "use a triangle sorter to sort a set of drawn triangles",
+    "A sorter asks one question at a time. Answer each question from the markings on the drawing and follow the Yes or No branch until you reach a group. Here isosceles means exactly two equal sides.",
+    "Read the markings, not the orientation: a turned triangle keeps its properties."
    ],
    [
-    "Choose a decision rule",
-    "choose a condition which sends the intended shapes down each branch",
-    "A useful decision question separates the intended categories using a defining property.",
-    "A condition can be too broad even if some examples work."
+    "Build a triangle sorter",
+    "choose the questions and groups that make a sorter work",
+    "Each question should split off one group. Put a question first whose Yes branch is a single group, then use the No branch to separate the rest. Test it on every shape.",
+    "A question can sound sensible but send the wrong shapes down a branch, so always run the test shapes."
    ],
    [
-    "Separate overlapping families",
-    "design a tree that distinguishes squares, rectangles and rhombuses",
-    "Test both right angles and equal sides to separate overlapping families into exclusive output groups.",
-    "Testing for rectangles first and stopping can hide all squares."
+    "Quadrilateral family tree",
+    "place quadrilateral families in a hierarchy and sort quadrilaterals",
+    "Each family has every property of the families joined above it: a square is a rectangle and a rhombus, and a rhombus is a parallelogram and a kite. Here a trapezium has exactly one pair of parallel sides.",
+    "A shape belongs to every family above its most specific name."
    ]
   ]
  },
@@ -245,16 +245,16 @@ const SPACE7_SOURCE_WEEKS = [
   "code": "AC9M7SP04",
   "lessons": [
    [
-    "Sort polygon attributes",
-    "combine decisions about concavity and regularity",
-    "A polygon is concave if one interior angle is greater than 180° (an inward dent); otherwise it is convex. Check for that angle first, then test both equal sides and equal angles on the convex branch.",
+    "Sort polygons",
+    "sort polygons by number of sides, concavity and regularity",
+    "A polygon is concave if one interior angle is greater than 180° (an inward dent); otherwise it is convex. A convex polygon is regular only if all sides and all angles are equal. Name it by its number of sides.",
     "Equal sides alone are not enough for regularity."
    ],
    [
-    "Test a classifier",
-    "test a classifier with a shape that it sorts wrongly",
-    "Trace a carefully chosen boundary case through the algorithm and compare its output with the definition.",
-    "The test shape must actually reach the faulty output."
+    "Fix a broken sorter",
+    "find the shapes a sorter puts in the wrong group and fix it",
+    "Run every test shape through the sorter and compare its group with the correct one. A shape in the wrong group shows which question or branch to change.",
+    "Fixing one shape must not break another, so run them all again."
    ],
    [
     "Complete a classification algorithm",
@@ -275,10 +275,10 @@ const SPACE7_SOURCE_WEEKS = [
     "Position and orientation can change while shape classification stays the same."
    ],
    [
-    "Compare decision trees",
-    "explain how different decision orders can give the same outputs",
-    "Two algorithms can test properties in different orders yet classify every input consistently.",
-    "Compare all input categories, not just one example."
+    "Design your own sorter",
+    "design a complete sorter for a set of shapes and justify it",
+    "List the groups you need. A yes/no sorter needs one question fewer than the number of groups. Choose questions that use defining properties, then test every shape.",
+    "Check every group, including shapes that belong to two families."
    ],
    [
     "Justify a complete classifier",
@@ -292,22 +292,22 @@ const SPACE7_SOURCE_WEEKS = [
 
 // Related skills share a lesson. Skills 17 (concave/convex) and 18 (counterexample claims) are
 // not taught on their own: ACARA places concavity in SP04 classifiers (skill 31, Week 10) and
-// counterexamples in Year 8.
-export const SPACE7_UNUSED_SKILLS = [17, 18];
+// counterexamples in Year 8. Skills 33 and 36 were folded into the Week 9–10 shape sorters.
+export const SPACE7_UNUSED_SKILLS = [17, 18, 33, 36];
 export const SPACE7_SKILL_GROUPS = [
  [[1],[2],[3]], [[4],[5],[6]], [[7],[8],[9]],
  [[10,11],[12],[13]], [[14],[15],[16]],
  [[19],[20],[21]], [[22,23],[24],[27]], [[25],[26],[34]],
- [[28],[29],[30]], [[31],[32,33],[35,36]],
+ [[28],[29],[30]], [[31],[32],[35]],
 ];
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const SPACE7_READABILITY_REVISION = 9;
+export const SPACE7_READABILITY_REVISION = 10;
 // Rotations preserving shape properties belong with transformations (SP03), not classifiers.
 const CODE_OVERRIDES:Record<number,(typeof SPACE7_SOURCE_WEEKS)[number]['code']|undefined>={34:'AC9M7SP03'};
 export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:CODE_OVERRIDES[key]??w.code};}
 // One clear title for lessons that combine two skills.
-const LESSON_TITLES:Record<string,string>={'4-1':'Classify triangles by sides and angles','7-1':'Reflect in an axis','10-2':'Test and complete a classifier','10-3':'Compare and justify classifiers'};
-const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Quadrilateral families and regular polygons','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Trace and repair classifiers','Create and justify classifiers'];
+const LESSON_TITLES:Record<string,string>={'4-1':'Classify triangles by sides and angles','7-1':'Reflect in an axis'};
+const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Quadrilateral families and regular polygons','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Shape sorters','Fix and design shape sorters'];
 export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map((keys,j)=>{const gs=keys.map(space7SourceGuide);return [LESSON_TITLES[`${i+1}-${j+1}`]??gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));
 export function space7Guide(week:number,lesson:number){const w=SPACE7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const SPACE7_PROGRAM:WeekPlan[]=SPACE7_WEEKS.map((w,i)=>({id:`y7-space-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code],lessons:w.lessons.map((l,j)=>({id:`y7-space-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/space/lesson?realm_id=space&year=Year%207&week=${i+1}&lessonId=y7-space-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[...new Set(SPACE7_SKILL_GROUPS[i][j].map(key=>space7SourceGuide(key).code))],activityIdeas:[l[1],'justify my answer using the given spatial properties'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{rotationRole:role,mode:`space7_v2_w${i+1}_l${j+1}_${role}`}}))}))}));

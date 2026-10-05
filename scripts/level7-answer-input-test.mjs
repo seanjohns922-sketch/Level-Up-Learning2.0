@@ -7,8 +7,9 @@ const require=createRequire(import.meta.url),contract=loadCave7('lib/level7-answ
 let state=[],cursor=0;
 const react={...require('react'),useState(initial){const i=cursor++;if(!(i in state))state[i]=typeof initial==='function'?initial():initial;return [state[i],v=>{state[i]=typeof v==='function'?v(state[i]):v;}];}};
 const module={exports:{}};
-new Function('require','module','exports',ts.transpileModule(fs.readFileSync('components/activities/Level7AnswerInput.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(name=>name==='react'?react:name==='@/lib/level7-answer'?contract:name==='@/lib/useRealmTheme'?{getRealmTheme:()=>({borderRing:'#345',ctaFrom:'#456'})}:name==='@/components/ReadAloudBtn'?{default:()=>null}:require(name),module,module.exports);
-const Component=module.exports.default;
+new Function('require','module','exports',ts.transpileModule(fs.readFileSync('components/activities/Level7AnswerInput.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(name=>name==='react'?react:name==='@/lib/level7-answer'?contract:name==='@/lib/useRealmTheme'?{getRealmTheme:()=>({borderRing:'#345',ctaFrom:'#456'})}:name==='@/components/ReadAloudBtn'?{default:()=>null}:/^\.\/Level7(Build|Place|Sorter)Input$/.test(name)?{default:()=>null}:require(name),module,module.exports);
+// The default export routes to the typed input; render that element directly.
+const Component=props=>{const e=module.exports.default(props);return typeof e.type==='function'?e.type(e.props):e;};
 const walk=(e,p)=>!e?[]:Array.isArray(e)?e.flatMap(x=>walk(x,p)):typeof e!=='object'?[]:[...(p(e)?[e]:[]),...walk(e.props?.children,p)];
 let answers=[],edits=0,props;
 function render(){cursor=0;return Component(props);}
