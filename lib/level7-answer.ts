@@ -1,5 +1,8 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
-export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build};
+export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build'|'place';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build;place?:Level7Plane};
+type P={x:number;y:number};
+/** A lettered shape on the −6 to 6 coordinate grid, with an optional mirror, centre and worked image. */
+export type Level7Plane={shape:P[];labels:string[];mirror?:'x'|'y';mirrorX?:number[];centre?:P;image?:P[];solution?:P[];turn?:{centre:P;clockwise:boolean;degrees:90|180|270}};
 /** A cube model the student builds on a 2 by 3 height plan (back row first, left to right, 0 to 4 cubes per stack). */
 export type Level7Build = {mode:'plan'|'views'|'fewest'|'exact';plan?:number[];front?:number[];side?:number[];cubes?:number};
 export const BUILD_MAX_HEIGHT = 4;
@@ -21,7 +24,7 @@ export function buildMeets(b:Level7Build,h:number[]){
  return b.mode==='views'||(b.mode==='fewest'?total===fewestCubes(b.front!,b.side!):total===b.cubes);
 }
 // answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build};
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build;place?:Level7Plane};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -32,6 +35,7 @@ export function scalarAnswer(s:string):number|null{
 export function level7Answer(q:Question):Level7Answer|null{
  if(!q.lessonId?.startsWith('y7-'))return null;
  if(q.build)return {kind:'build',expected:q.answer,prompt:q.prompt,build:q.build};
+ if(q.place)return {kind:'place',expected:q.answer,prompt:q.prompt,place:q.place};
  const expected=clean(q.answer);
  // Older saved integer questions stored their givens only in the answer choices.
  // Keep those values visible when restoring a question as a typed response.
@@ -46,7 +50,7 @@ export function level7Answer(q:Question):Level7Answer|null{
  if(expected.includes('=')&&!/^[a-zA-Z]\s*=/.test(expected))return null;
 
  if(/sample space/.test(p)&&/^\d+(?:,\s*\d+)+$/.test(expected))return {...base,kind:'set'};
- if(/^\(-?[\d.]+,\s*-?[\d.]+\)(?:;\s*\(-?[\d.]+,\s*-?[\d.]+\)){1,3}$/.test(expected))return {...base,kind:'points',labels:expected.split(';').flatMap((_,i)=>[`${String.fromCharCode(65+i)}: x`,`${String.fromCharCode(65+i)}: y`])};
+ if(/^\(-?[\d.]+,\s*-?[\d.]+\)(?:;\s*\(-?[\d.]+,\s*-?[\d.]+\)){1,3}$/.test(expected)){const names=q.answerLabels?.length===expected.split(';').length?q.answerLabels:expected.split(';').map((_,i)=>String.fromCharCode(65+i));return {...base,kind:'points',labels:names.flatMap(n=>[`${n}: x`,`${n}: y`])};}
  if(q.lessonId.startsWith('y7-chance-')){
   // One-word judgements (colour, player, group) and word sample spaces are typed.
   if(/^(Red|Blue|Green|Yellow|A|B|C|D|E|Equal)$/.test(expected))return {...base,unit:undefined,kind:'text'};
@@ -110,7 +114,7 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
   // Word outcomes (colours, letters) compare as case-insensitive sets; numbers compare by value.
   if(b.split(',').some(t=>scalarAnswer(t)===null)){const tok=(t:string)=>t.split(',').map(w=>w.trim().toLowerCase()).filter(Boolean),x=tok(a),y=tok(b);return new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
   const x=a.split(',').map(scalarAnswer),y=b.split(',').map(scalarAnswer);return x.every(v=>v!==null)&&new Set(x).size===x.length&&x.length===y.length&&x.every(v=>y.includes(v));}
- if(spec.kind==='points'){const x=a.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer),y=b.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
+ if(spec.kind==='points'||spec.kind==='place'){const x=a.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer),y=b.replace(/[()]/g,'').split(/[;,]/).map(scalarAnswer);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
  if(spec.kind==='coordinates'||spec.kind==='list'){const parts=(s:string)=>s.replace(/[()]/g,'').split(',').map(scalarAnswer),x=parts(a),y=parts(b);return x.length===y.length&&x.every((v,i)=>near(v,y[i]));}
  if(spec.kind==='expression'){
   if(/model|expression|calculation/i.test(spec.prompt)&&!/[a-zA-Z+*/()^=-]/.test(a))return false;

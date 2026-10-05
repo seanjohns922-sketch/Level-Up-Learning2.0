@@ -2,10 +2,11 @@
 import {useState} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import Level7BuildInput from './Level7BuildInput';
+import Level7PlaceInput from './Level7PlaceInput';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {markLevel7Answer,scalarAnswer,stripAnswerUnit,level7SimplificationTip,type SimplificationTip,type Level7Answer} from '@/lib/level7-answer';
 // Building tasks use their own input; every other answer kind uses the typed boxes below.
-export default function Level7AnswerInput(props:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){return props.spec.kind==='build'?<Level7BuildInput {...props} realm={props.realm??'space'}/>:<Level7TypedInput {...props}/>;}
+export default function Level7AnswerInput(props:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){return props.spec.kind==='build'?<Level7BuildInput {...props} realm={props.realm??'space'}/>:props.spec.kind==='place'?<Level7PlaceInput {...props} realm={props.realm??'space'}/>:<Level7TypedInput {...props}/>;}
 function Level7TypedInput({spec,onAnswer,realm='number',disabled=false,initialValue='',onEditing}:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){
  const t=getRealmTheme(realm),[alternate,setAlternate]=useState(spec.kind==='fraction'&&!spec.format&&!!initialValue&&!initialValue.includes('/')),[error,setError]=useState('');
  const [tip,setTip]=useState<SimplificationTip|null>(null),[showHow,setShowHow]=useState(false);
@@ -26,7 +27,7 @@ function Level7TypedInput({spec,onAnswer,realm='number',disabled=false,initialVa
  return <form onSubmit={submit} className="mt-6 max-w-2xl rounded-2xl border-2 bg-white p-5 text-slate-900" style={{borderColor:t.borderRing}}>
  <div className="flex items-center justify-between gap-3"><p className="font-semibold">{help}</p><ReadAloudBtn text={`${help} ${labels.join('. ')}.${spec.unit?` Unit: ${spec.unit}.`:''}`} label="Read answer instructions"/></div>
  <div className="mt-5 flex flex-wrap items-center gap-4">{spec.unit==='$'&&<span className="text-2xl font-bold">$</span>}{showWhole&&<label className="flex flex-col gap-1"><span className="text-sm">Whole number</span><input aria-label="Whole number" type="text" autoComplete="off" disabled={disabled} value={whole} onChange={e=>{setWhole(e.target.value);setError('');setTip(null);setShowHow(false);onEditing?.();}} className="min-h-14 w-24 rounded-xl border-2 p-3 text-center text-2xl font-bold outline-offset-2" style={{borderColor:t.ctaFrom,outlineColor:t.ctaFrom}}/></label>}
- {pairs?<div className="flex flex-col gap-3">{Array.from({length:count/2},(_,p)=><div key={p} className="flex items-center gap-2 text-2xl font-bold">{spec.kind==='points'&&<span className="w-7">{String.fromCharCode(65+p)}</span>}<span>(</span>{field(2*p,'w-20','x')}<span>,</span>{field(2*p+1,'w-20','y')}<span>)</span></div>)}</div>
+ {pairs?<div className="flex flex-col gap-3">{Array.from({length:count/2},(_,p)=><div key={p} className="flex items-center gap-2 text-2xl font-bold">{spec.kind==='points'&&<span className="w-8">{labels[2*p]?.split(':')[0]??String.fromCharCode(65+p)}</span>}<span>(</span>{field(2*p,'w-20','x')}<span>,</span>{field(2*p+1,'w-20','y')}<span>)</span></div>)}</div>
  :<div className={spec.kind==='fraction'&&!alternate?'flex w-44 flex-col gap-2':'flex flex-wrap items-center gap-3'}>
  {Array.from({length:alternate?1:count},(_,i)=><div key={i} className="flex items-center gap-3">
  {i>0&&spec.kind==='ratio'&&<span className="text-3xl">:</span>}

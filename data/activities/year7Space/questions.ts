@@ -5,9 +5,9 @@ import type {Task7,P7,Polygon7,Flow7} from '@/data/assessments/revisions/level7S
 import {HEXOMINOES,VALID_NET_IDS,foldNet,relationBetween} from '@/data/activities/starpath/level5/nets';
 import {space7Guide,space7SourceGuide,SPACE7_SKILL_GROUPS,SPACE7_READABILITY_REVISION} from './curriculum';
 import {pickLevel7LessonQuiz} from '@/lib/level7-quiz';
-import {buildViews,fewestCubes,BUILD_MAX_HEIGHT,type Level7Build} from '@/lib/level7-answer';
+import {buildViews,fewestCubes,BUILD_MAX_HEIGHT,type Level7Build,type Level7Plane} from '@/lib/level7-answer';
 export type Space7Role='fast_thinking'|'reasoning'|'apply_create';
-export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[];build?:Level7Build};
+export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[];build?:Level7Build;place?:Level7Plane};
 const pair=(p:P7)=>`(${p.x}, ${p.y})`;
 const pts=(ps:P7[])=>ps.map(pair).join('; ');
 const units=(n:number)=>`${n} unit${Math.abs(n)===1?'':'s'}`;
@@ -21,14 +21,13 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  const key=groups[(seed>>>0)%groups.length],guide=space7SourceGuide(key);
  let state=(seed>>>0)||1;const int=(lo:number,hi:number)=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return lo+Math.floor(state/4294967296*(hi-lo+1));};
  const pick=<T,>(xs:readonly T[])=>xs[int(0,xs.length-1)];
- const a=int(3,8),b=int(2,5),k=int(2,4),x=int(-4,-1),y=int(1,4),dx=int(1,3),dy=-int(1,3),A=role==='apply_create',R=role==='reasoning',F=!A&&!R,variant=int(0,5);
+ const a=int(3,8),b=int(2,5),k=int(2,4),dx=int(1,3),dy=-int(1,3),A=role==='apply_create',R=role==='reasoning',F=!A&&!R,variant=int(0,5);
  let prompt='',answer='',wrong:string[]=[],explanation='',visual:Task7|undefined,answerLabels:string[]|undefined;
  const choose=(p:string,right:string,wrongs:string[],e:string)=>{prompt=p;answer=right;wrong=wrongs;explanation=e;};
  // Wrong choices come from real errors first; simple shifts only fill gaps.
  const numeric=(p:string,n:number,e:string,errors:number[]=[])=>choose(p,String(n),[...errors,n+1,n-1,n+2,n*2,n+3].filter(v=>v!==n&&v>=0).map(String),e);
  const point=(p:string,q:P7,e:string,errors:P7[]=[])=>choose(p,pair(q),[...errors,{x:q.y,y:q.x},{x:-q.x,y:q.y},{x:q.x,y:-q.y},{x:q.x+1,y:q.y},{x:q.x,y:q.y+1}].map(pair).filter(s=>s!==pair(q)),e);
  const list=(p:string,values:number[],e:string,errors:number[][]=[])=>{answerLabels=values.length===3?['Left','Middle','Right']:['Back row','Front row'];choose(p,values.join(', '),[...errors,values.map(n=>n+1),values.slice().reverse(),values.map(n=>n+2),values.map(n=>n+3),values.map(n=>Math.max(0,n-1))].map(v=>v.join(', ')).filter(s=>s!==values.join(', ')),e);};
- const plane=(shape:P7[],extra:Partial<Task7>={})=>{visual={mode:'choice',diagram:'plane',instruction:'Use the labelled coordinates.',shape,...extra};};
  const polygon=(p:Polygon7)=>{visual={mode:'choice',diagram:'polygons',instruction:'Use the stated side and angle properties.',polygons:[p]};};
  const flow=(root:Flow7)=>{visual={mode:'choice',diagram:'flow',instruction:'Follow each decision in order.',trees:[{title:'Shape classifier',root}]};};
  const heights=Array.from({length:6},()=>int(0,3));if(heights.filter(Boolean).length<3){for(const i of [0,2,4])heights[i]=int(1,3);}if(Math.max(...heights)<2)heights[2]=2;
@@ -45,6 +44,26 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  // A 3 by 3 footprint with n shaded positions in random places.
  const footprint=(n:number)=>{const cells=Array.from({length:9},(_,i)=>i);for(let i=8;i>0;i--){const j=int(0,i);[cells[i],cells[j]]=[cells[j],cells[i]];}visual={mode:'choice',diagram:'none',instruction:'Footprint (top view): shaded squares are occupied positions. Stack heights are not shown.',footprint:{cols:3,rows:3,occupied:cells.slice(0,n)}};};
  const sideTriangle=(lengths:number[])=>{const [base,left,right]=lengths,apexX=(base*base+left*left-right*right)/(2*base);polygon({points:[{x:0,y:0},{x:base,y:0},{x:apexX,y:Math.sqrt(left*left-apexX*apexX)}],sideLabels:[String(base)+' cm',String(right)+' cm',String(left)+' cm'],caption:'Triangle with the stated side lengths.'});};
+ // ── Transformations use a lettered, lopsided triangle (a set of points): a single dot cannot
+ // show a turn or a flip. Every shape and image stays on the −5 to 5 part of the grid.
+ const TRI=['P','Q','R'];
+ const vtx=(ps:P7[],names=TRI)=>ps.map((p,i)=>`${names[i]}${pair(p)}`).join(', ');
+ const onGrid=(ps:P7[])=>ps.every(p=>Math.abs(p.x)<=5&&Math.abs(p.y)<=5);
+ const triangle=(...moves:((ps:P7[])=>P7[])[])=>{const base=pick([[{x:0,y:0},{x:2,y:0},{x:0,y:3}],[{x:0,y:0},{x:3,y:0},{x:0,y:2}],[{x:0,y:0},{x:3,y:0},{x:1,y:2}],[{x:0,y:0},{x:2,y:0},{x:2,y:3}]]);
+  for(let t=0;t<200;t++){const ox=int(-5,4),oy=int(-5,4),sh=base.map(p=>({x:p.x+ox,y:p.y+oy}));if(!sh.some(p=>p.x===0||p.y===0)&&onGrid(sh)&&moves.every(m=>onGrid(m(sh))))return sh;}
+  throw Error('No triangle fits the grid');};
+ const z=(n:number)=>n===0?0:n;
+ const shift=(a:number,b:number)=>(ps:P7[])=>ps.map(p=>({x:p.x+a,y:p.y+b}));
+ const flipX=(ps:P7[])=>ps.map(p=>({x:p.x,y:z(-p.y)})),flipY=(ps:P7[])=>ps.map(p=>({x:z(-p.x),y:p.y})),flipAt=(m:number)=>(ps:P7[])=>ps.map(p=>({x:2*m-p.x,y:p.y}));
+ const turn=(c:P7,deg:90|180|270,cw:boolean)=>(ps:P7[])=>ps.map(p=>{let rx=p.x-c.x,ry=p.y-c.y;for(let i=0;i<((cw?deg:360-deg)/90)%4;i++)[rx,ry]=[ry,-rx];return {x:z(c.x+rx),y:z(c.y+ry)};});
+ const O={x:0,y:0};
+ const grid=(shape:P7[],extra:Partial<Level7Plane>={})=>{visual={mode:'choice',diagram:'none',instruction:'Triangle PQR on the coordinate grid.',plane7:{shape,labels:TRI,...extra}};};
+ let placeSpec:Level7Plane|undefined;
+ // The student places every corner of the image; the grid is drawn in the answer box.
+ const place=(p:string,shape:P7[],image:P7[],e:string,extra:Partial<Level7Plane>={})=>{placeSpec={shape,labels:TRI,solution:image,...extra};visual=undefined;choose(p,pts(image),[pts(shape),pts(shift(1,0)(image)),pts(shift(0,1)(image)),pts(shift(-1,-1)(image))],e);};
+ // Identify the single move from a triangle and its dashed image (interpretation, so choices).
+ const identify=(shape:P7[],image:P7[],right:string,wrongs:string[],e:string)=>{grid(shape,{image});choose(`Triangle ${vtx(shape)} is mapped to the dashed triangle ${vtx(image,TRI.map(l=>l+'′'))}. Which single move does this?`,right,wrongs,e);};
+ const moveText=(a:number,b:number)=>[a?`${units(Math.abs(a))} ${a>0?'right':'left'}`:'',b?`${units(Math.abs(b))} ${b>0?'up':'down'}`:''].filter(Boolean).join(' and ');
  const triangleSorter:Flow7={question:'All 3 sides equal?',yes:'Equilateral',no:{question:'Exactly 2 sides equal?',yes:'Isosceles',no:'Scalene'}};
  const letter=(i:number)=>String.fromCharCode(65+i);
  switch(key){
@@ -152,47 +171,54 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   else{const side=a;polygon({...regular(n),sideLabels:Array(n).fill('?')});numeric(`A regular ${name} has a perimeter of ${n*side} cm. How long is each side in cm?`,side,`All ${n} sides are equal: ${n*side} ÷ ${n} = ${side}.`,[n*side/2,n*side-n]);}
   break;}
  // ── Translations (AC9M7SP03)
- case 19:{const p={x,y},q={x:x+dx,y:y+dy};plane([p]);
-  if(F)point(`P = ${pair(p)}. Translate it ${units(dx)} right and ${units(-dy)} down. Type the image of P.`,q,'Add the horizontal change to x and the vertical change to y.',[{x:x-dx,y:y-dy},{x:x+dx,y:y-dy}]);
-  else if(R)point(`P = ${pair(p)} is translated ${units(dx)} right and ${units(-dy)} down. A student wrote ${pair({x:x-dx,y:y-dy})}. Type the correct image of P.`,q,'Right adds to x; down subtracts from y. The student moved in the opposite directions.',[{x:x-dx,y:y-dy}]);
-  else point(`P = ${pair(p)}. Translate it ${units(dx)} right and ${units(-dy)} down, then repeat the same translation. Type the final position of P.`,{x:x+2*dx,y:y+2*dy},'Apply the same changes to the current point each time.',[q,{x:x+dx,y:y+2*dy}]);
+ case 19:{const T=shift(dx,dy),sh=triangle(T,ps=>T(T(ps))),img=T(sh),vi=int(0,2),L=TRI[vi],move=moveText(dx,dy);
+  if(A)place(`Translate triangle ${vtx(sh)} ${move}, then repeat the same translation. Place the final image.`,sh,T(img),`Two translations of ${move} move every corner ${moveText(2*dx,2*dy)}.`);
+  else{grid(sh,{solution:img});
+   if(F)point(`Triangle ${vtx(sh)} is translated ${move}. Type the image of ${L}.`,img[vi],'Add the horizontal change to x and the vertical change to y.',[{x:sh[vi].x-dx,y:sh[vi].y-dy},{x:sh[vi].x+dx,y:sh[vi].y-dy}]);
+   else point(`Triangle ${vtx(sh)} is translated ${move}. A student says ${L} moves to ${pair({x:sh[vi].x-dx,y:sh[vi].y-dy})}. Type the correct image of ${L}.`,img[vi],'Right adds to x; down subtracts from y. The student moved in the opposite directions.',[{x:sh[vi].x-dx,y:sh[vi].y-dy}]);}
   break;}
- case 20:{const shape=[{x,y:1},{x:x+2,y:1},{x,y:3}],q=shape.map(p=>({x:p.x+dx,y:p.y-2}));plane(shape);
-  if(F)choose(`Triangle vertices are ${pts(shape)}. Translate ${units(dx)} right and 2 units down. Type the image vertices in the same order, as points (x, y).`,pts(q),[pts(shape),pts(q.map(p=>({x:p.x+1,y:p.y+1}))),pts(shape.map(p=>({x:p.x-dx,y:p.y+2})))],'Add the full translation to every vertex, keeping the listed order.');
-  else if(R){const vi=int(0,2);point(`Triangle vertices are ${pts(shape)}. A student translated only one vertex ${units(dx)} right and 2 units down. Type the correct image of vertex ${pair(shape[vi])} as a point.`,q[vi],'Every vertex moves by the same vector, so the shape keeps its side lengths and angles.',[shape[vi]]);}
-  else choose(`Triangle vertices are ${pts(shape)}. Translate ${units(dx)} right and 2 units down, then 1 unit left. Type the image vertices in the same order, as points (x, y).`,pts(q.map(p=>({x:p.x-1,y:p.y}))),[pts(q),pts(shape),pts(q.map(p=>({x:p.x+1,y:p.y})))],`Combine the moves: ${dx-1} right and 2 down in total.`);
+ case 20:{const T=shift(dx,-2),back=shift(-1,0),sh=triangle(T,ps=>back(T(ps))),img=T(sh),vi=1+int(0,1);
+  if(A)place(`Translate triangle ${vtx(sh)} ${units(dx)} right and 2 units down, then 1 unit left. Place the final image.`,sh,back(img),`Altogether every corner moves ${moveText(dx-1,-2)}.`);
+  else{grid(sh,{solution:img});
+   if(F){answerLabels=['P′','Q′','R′'];choose(`Translate triangle ${vtx(sh)} ${units(dx)} right and 2 units down. Type the image of each corner.`,pts(img),[pts(sh),pts(shift(1,1)(img)),pts(shift(-dx,2)(sh))],`Every corner moves the same way: add ${dx} to x and subtract 2 from y.`);}
+   else point(`Triangle ${vtx(sh)} is translated ${units(dx)} right and 2 units down. A student moved only P and left Q and R where they were. Type the correct image of ${TRI[vi]}.`,img[vi],'Every corner moves by the same amount, or the shape changes.',[sh[vi]]);}
   break;}
- case 21:{const p={x,y},q={x:x+dx,y:y+dy};plane([p],{image:[q]});
-  if(F)point(`P = ${pair(p)} maps to B = ${pair(q)}. Type the translation vector from P to B as a pair (right, up).`,{x:dx,y:dy},'Subtract the start coordinates from the end coordinates.',[{x:-dx,y:-dy}]);
-  else if(R)point(`P = ${pair(p)} maps to B = ${pair(q)}. A student subtracted the image from the original and wrote ${pair({x:-dx,y:-dy})}. Type the correct translation vector from P to B as a pair.`,{x:dx,y:dy},'Image minus original gives the vector from the original to the image.',[{x:-dx,y:-dy}]);
-  else point(`P = ${pair(p)} maps to B = ${pair(q)}. Type the translation vector that takes B back to P as a pair.`,{x:-dx,y:-dy},'Going back reverses both components.',[{x:dx,y:dy}]);
+ case 21:{const T=shift(dx,dy),sh=triangle(T,ps=>T(T(ps))),img=T(sh),both=`Triangle ${vtx(sh)} is translated to the dashed triangle ${vtx(img,TRI.map(l=>l+'′'))}.`;grid(sh,{image:img});
+  if(F)point(`${both} Type the translation vector as a pair (right, up).`,{x:dx,y:dy},'Image minus original for any corner: subtract P from P′.',[{x:-dx,y:-dy}]);
+  else if(R)point(`${both} A student subtracted the image from the original and wrote ${pair({x:-dx,y:-dy})}. Type the correct translation vector as a pair (right, up).`,{x:dx,y:dy},'Image minus original gives the vector from the original to the image.',[{x:-dx,y:-dy}]);
+  else point(`${both} Type the translation vector that takes the image back to the original, as a pair (right, up).`,{x:-dx,y:-dy},'Going back reverses both components.',[{x:dx,y:dy}]);
   break;}
  // ── Reflections (AC9M7SP03)
- case 22:case 23:{const reflectX=key===22,p={x,y};plane([p]);
-  if(F)point(`P = ${pair(p)} is reflected in the ${reflectX?'x':'y'}-axis. Type the image of P.`,reflectX?{x,y:-y}:{x:-x,y},'The reflection keeps the distance from the mirror line.',[reflectX?{x:-x,y}:{x,y:-y}]);
-  else if(R)point(`P = ${pair(p)} is reflected in the ${reflectX?'x':'y'}-axis. A student wrote ${pair(reflectX?{x:-x,y}:{x,y:-y})}. Type the correct image of P.`,reflectX?{x,y:-y}:{x:-x,y},`Reflecting in the ${reflectX?'x':'y'}-axis changes the sign of ${reflectX?'y':'x'}, not ${reflectX?'x':'y'}.`,[reflectX?{x:-x,y}:{x,y:-y}]);
-  else point(`P = ${pair(p)} is reflected in the ${reflectX?'x':'y'}-axis, then in the other axis. Type the final image of P.`,{x:-x,y:-y},'Reflecting in both axes reverses both signs.',[reflectX?{x,y:-y}:{x:-x,y}]);
+ case 22:case 23:{const rx=key===22,M=rx?flipX:flipY,axis=rx?'x':'y',sh=triangle(M),img=M(sh),vi=int(0,2),L=TRI[vi],keep=rx?'x':'y',change=rx?'y':'x';
+  if(A)place(`Reflect triangle ${vtx(sh)} in the ${axis}-axis. Place the image.`,sh,img,`Each corner keeps its ${keep}-coordinate and its ${change}-coordinate changes sign, so the image is the same distance from the mirror on the other side.`,{mirror:axis});
+  else if(R&&int(0,1)===1)identify(sh,img,`Reflection in the ${axis}-axis`,[`Reflection in the ${rx?'y':'x'}-axis`,'Rotation of 180° about the origin','Rotation of 90° clockwise about the origin'],`Each corner and its image are the same distance from the ${axis}-axis on opposite sides, and the triangle is flipped over.`);
+  else{grid(sh,{mirror:axis,solution:img});
+   if(F)point(`Reflect triangle ${vtx(sh)} in the ${axis}-axis. Type the image of ${L}.`,img[vi],`Reflecting in the ${axis}-axis keeps the ${keep}-coordinate and changes the sign of the ${change}-coordinate.`,[(rx?flipY:flipX)(sh)[vi]]);
+   else point(`Triangle ${vtx(sh)} is reflected in the ${axis}-axis. A student says ${L} moves to ${pair((rx?flipY:flipX)(sh)[vi])}. Type the correct image of ${L}.`,img[vi],`Reflecting in the ${axis}-axis changes the sign of the ${change}-coordinate, not the ${keep}-coordinate.`,[(rx?flipY:flipX)(sh)[vi]]);}
   break;}
- case 24:{const first=int(-2,0),second=first+int(1,3);plane([{x,y}],{mirrorX:[first,second]});
-  if(F)point(`P = ${pair({x,y})}. Reflect first in x = ${first}, then in x = ${second}. Type the final image of P.`,{x:2*second-(2*first-x),y},'For a mirror x = a, replace x by 2a − x. Repeat with the second mirror.',[{x:2*first-x,y},{x:2*first-(2*second-x),y}]);
-  else if(R)numeric(`Reflecting in x = ${first} and then in x = ${second} is the same as one translation. How many units right is that translation? (Use a negative number for left.)`,2*(second-first),`Two reflections in parallel lines translate by twice the gap: 2 × (${second} − (${first})) = ${2*(second-first)}.`,[second-first,-2*(second-first)]);
-  else point(`P = ${pair({x,y})}. Reflect first in x = ${second}, then in x = ${first}. Type the final image of P.`,{x:2*first-(2*second-x),y},'Reversing the order reverses the direction of the overall translation.',[{x:2*second-(2*first-x),y}]);
+ case 24:{const first=int(-2,0),second=first+int(1,3),M1=flipAt(first),M2=flipAt(second),fwd=(ps:P7[])=>M2(M1(ps)),rev=(ps:P7[])=>M1(M2(ps)),sh=A?triangle(M2,rev):triangle(M1,fwd),vi=int(0,2),L=TRI[vi],gap=second-first;
+  if(A)place(`Reflect triangle ${vtx(sh)} in x = ${second} first, then reflect that image in x = ${first}. Place the final image.`,sh,rev(sh),`Reversing the order reverses the direction: every corner ends ${units(2*gap)} to the left.`,{mirrorX:[first,second]});
+  else if(R){grid(sh,{mirrorX:[first,second]});numeric(`Triangle ${vtx(sh)} is reflected in x = ${first}, then in x = ${second}. The two reflections are the same as one translation. How many units right is that translation? (Use a negative number for left.)`,2*gap,`Two reflections in parallel lines translate by twice the gap between them: 2 × ${gap} = ${2*gap}.`,[gap,second+first,4*gap]);}
+  else{grid(sh,{mirrorX:[first,second],solution:fwd(sh)});point(`Reflect triangle ${vtx(sh)} in x = ${first}, then reflect that image in x = ${second}. Type the final image of ${L}.`,fwd(sh)[vi],'For a mirror x = a, replace x by 2a − x. Repeat with the second mirror.',[M1(sh)[vi],rev(sh)[vi]]);}
   break;}
  // ── Rotations and combinations (AC9M7SP03)
- case 25:{plane([{x,y}]);
-  if(F)point(`P = ${pair({x,y})}. Rotate it 90° clockwise about the origin. Type the image of P.`,{x:y,y:-x},'A clockwise quarter-turn maps (x, y) to (y, −x).',[{x:-y,y:x},{x:-x,y:-y}]);
-  else if(R)point(`P = ${pair({x,y})} is rotated 90° clockwise about the origin. A student used (−y, x) and wrote ${pair({x:-y,y:x})}. Type the correct image of P.`,{x:y,y:-x},'(−y, x) is the anticlockwise rule. Clockwise uses (y, −x).',[{x:-y,y:x}]);
-  else point(`P = ${pair({x,y})}. Rotate it 180° about the origin. Type the image of P.`,{x:-x,y:-y},'A half-turn reverses both coordinates.',[{x:y,y:-x},{x:-x,y}]);
+ case 25:{const cw=turn(O,90,true),acw=turn(O,90,false),half=turn(O,180,true),sh=triangle(),vi=int(0,2),L=TRI[vi];
+  if(A){const h=int(0,1)===1;place(`Rotate triangle ${vtx(sh)} ${h?'180°':'90° anticlockwise'} about the origin. Place the image.`,sh,(h?half:acw)(sh),h?'A half-turn about the origin maps (x, y) to (−x, −y).':'A quarter-turn anticlockwise about the origin maps (x, y) to (−y, x).',{turn:{centre:O,clockwise:false,degrees:h?180:90}});}
+  else if(R&&int(0,1)===1)identify(sh,cw(sh),'Rotation of 90° clockwise about the origin',['Rotation of 90° anticlockwise about the origin','Rotation of 180° about the origin','Reflection in the y-axis'],'The triangle has turned a quarter-turn the way clock hands move, and it is not flipped: (x, y) → (y, −x).');
+  else{grid(sh,{solution:cw(sh),turn:{centre:O,clockwise:true,degrees:90}});
+   if(F)point(`Rotate triangle ${vtx(sh)} 90° clockwise about the origin. Type the image of ${L}.`,cw(sh)[vi],'A clockwise quarter-turn about the origin maps (x, y) to (y, −x).',[acw(sh)[vi],half(sh)[vi]]);
+   else point(`Triangle ${vtx(sh)} is rotated 90° clockwise about the origin. A student used (−y, x) and says ${L} moves to ${pair(acw(sh)[vi])}. Type the correct image of ${L}.`,cw(sh)[vi],'(−y, x) is the anticlockwise rule. Clockwise uses (y, −x).',[acw(sh)[vi]]);}
   break;}
- case 26:{const centre={x:int(-1,1),y:int(-1,1)},p={x:centre.x+2,y:centre.y+1};plane([p],{centre});
-  if(F)point(`P = ${pair(p)}, centre C = ${pair(centre)}. Rotate P 90° clockwise about C. Type the image of P.`,{x:centre.x+1,y:centre.y-2},'Relative to C, P is (2, 1). Rotate that to (1, −2), then add C back.',[{x:p.y,y:-p.x}]);
-  else if(R)point(`P = ${pair(p)} is rotated 90° clockwise about C = ${pair(centre)}. A student rotated about the origin instead and wrote ${pair({x:p.y,y:-p.x})}. Type the correct image of P.`,{x:centre.x+1,y:centre.y-2},'Subtract C, rotate the relative coordinates, then add C back.',[{x:p.y,y:-p.x}]);
-  else point(`P = ${pair(p)}, centre C = ${pair(centre)}. Rotate P 90° anticlockwise about C. Type the image of P.`,{x:centre.x-1,y:centre.y+2},'Relative to C, P is (2, 1); anticlockwise gives (−1, 2); add C back.',[{x:centre.x+1,y:centre.y-2}]);
+ case 26:{const c={x:pick([-1,1]),y:int(-1,1)},cw=turn(c,90,true),acw=turn(c,90,false),sh=triangle(cw,acw),vi=int(0,2),L=TRI[vi],rel={x:sh[vi].x-c.x,y:sh[vi].y-c.y};
+  if(A)place(`Rotate triangle ${vtx(sh)} 90° anticlockwise about C${pair(c)}. Place the image.`,sh,acw(sh),'For each corner: subtract C, turn (x, y) to (−y, x), then add C back.',{centre:c,turn:{centre:c,clockwise:false,degrees:90}});
+  else{grid(sh,{centre:c,solution:cw(sh),turn:{centre:c,clockwise:true,degrees:90}});
+   if(F)point(`Rotate triangle ${vtx(sh)} 90° clockwise about C${pair(c)}. Type the image of ${L}.`,cw(sh)[vi],`Relative to C, ${L} is ${pair(rel)}. Turn that to ${pair({x:rel.y,y:z(-rel.x)})}, then add C back.`,[turn(O,90,true)(sh)[vi],acw(sh)[vi]]);
+   else point(`Triangle ${vtx(sh)} is rotated 90° clockwise about C${pair(c)}. A student rotated about the origin instead and says ${L} moves to ${pair(turn(O,90,true)(sh)[vi])}. Type the correct image of ${L}.`,cw(sh)[vi],'Subtract C, rotate the relative coordinates, then add C back.',[turn(O,90,true)(sh)[vi]]);}
   break;}
- case 27:{plane([{x,y}]);
-  if(F)point(`Start P = ${pair({x,y})}. Translate ${units(dx)} right, then reflect in the y-axis. Type the final image of P.`,{x:-(x+dx),y},'Work in order: translate first, then reflect the new point.',[{x:-x+dx,y}]);
-  else if(R)numeric(`P = ${pair({x,y})}. Route 1: translate ${units(dx)} right, then reflect in the y-axis. Route 2: reflect in the y-axis, then translate ${units(dx)} right. How many units apart are the two final points?`,2*dx,`Route 1 ends at ${pair({x:-(x+dx),y})}; route 2 at ${pair({x:-x+dx,y})}. They are ${2*dx} units apart, so order matters.`,[dx,0]);
-  else point(`Start P = ${pair({x,y})}. Reflect in the y-axis, then translate ${units(dx)} right. Type the final image of P.`,{x:-x+dx,y},'Apply the second move to the first image.',[{x:-(x+dx),y}]);
+ case 27:{const T=shift(dx,0),r1=(ps:P7[])=>flipY(T(ps)),r2=(ps:P7[])=>T(flipY(ps)),sh=triangle(T,r1,flipY,r2),vi=int(0,2),L=TRI[vi];
+  if(A)place(`Reflect triangle ${vtx(sh)} in the y-axis, then translate it ${units(dx)} right. Place the final image.`,sh,r2(sh),'Apply the second move to the first image, not to the original triangle.',{mirror:'y'});
+  else if(R){grid(sh,{mirror:'y'});numeric(`Route 1: translate triangle ${vtx(sh)} ${units(dx)} right, then reflect it in the y-axis. Route 2: reflect it in the y-axis, then translate it ${units(dx)} right. How many units apart are the two final images of ${L}?`,2*dx,`Route 1 sends ${L} to ${pair(r1(sh)[vi])}; route 2 sends it to ${pair(r2(sh)[vi])}. They are ${2*dx} units apart, so order matters.`,[dx,0,4*dx]);}
+  else{grid(sh,{mirror:'y',solution:r1(sh)});point(`Translate triangle ${vtx(sh)} ${units(dx)} right, then reflect it in the y-axis. Type the final image of ${L}.`,r1(sh)[vi],'Work in order: translate first, then reflect the new triangle.',[r2(sh)[vi]]);}
   break;}
  // ── Classifiers (AC9M7SP04)
  case 28:{const v=int(0,2),lengths=v===0?[a,a,a]:v===1?[a,a,a+1]:[a,a+1,a+2],out=['Equilateral','Isosceles','Scalene'][v];flow(triangleSorter);
@@ -248,7 +274,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  // Second application forms: half of the application questions ask a structurally different
  // question about the same skill, so a quiz's two application questions are not twins.
  if(A&&int(0,1)===1){
-  const before={visual,answerLabels};answerLabels=undefined;
+  const before={visual,answerLabels,place:placeSpec};answerLabels=undefined;placeSpec=undefined;
   switch(key){
   case 4:plan();numeric(planText+'Every cube costs $2. How much does it cost to build this model, in dollars?',2*total,`There are ${heights.join(' + ')} = ${total} cubes: ${total} × $2 = $${2*total}.`,[total,2*occupied]);break;
   case 5:{const next=heights.slice();next[3]=0;const view=[0,1,2].map(i=>Math.max(next[i],next[i+3]));plan();list(planText+'The front-left stack is removed completely. Type the new front-view heights, left to right.',view,'A stack behind can now be seen in that column; take the tallest remaining stack in each column.',[front,[0,front[1],front[2]]]);break;}
@@ -258,13 +284,13 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   case 12:tri([a,b,(Math.abs(a-b)+a+b)/2],[`${a} cm`,'?',`${b} cm`]);numeric(`A triangle has sides of ${a} cm and ${b} cm. How many different whole-number lengths could the third side be?`,2*Math.min(a,b)-1,`The third side is strictly between ${Math.abs(a-b)} and ${a+b}: from ${Math.abs(a-b)+1} to ${a+b-1}, which is ${2*Math.min(a,b)-1} lengths.`,[2*Math.min(a,b),a+b-1,Math.abs(a-b)]);break;
   case 14:{const [what,n,which]=pick([['always parallelograms',4,'square, rectangle, rhombus and parallelogram'],['always have four right angles',2,'square and rectangle'],['always have four equal sides',2,'square and rhombus'],['always have at least one pair of parallel sides',5,'every family except the kite']] as const);visual=undefined;numeric(`Of these six families (square, rectangle, rhombus, parallelogram, kite, trapezium), how many are ${what}? Here a trapezium has exactly one pair of parallel sides.`,n,`Check each definition: ${which}.`,[6,3,1]);break;}
   case 16:{const n2=pick([5,6,8]);visual=undefined;numeric(`A regular polygon has a perimeter of ${n2*a} cm and each side is ${a} cm. How many sides does it have?`,n2,`All sides are equal: ${n2*a} ÷ ${a} = ${n2} sides.`,[n2+1,n2-1,n2*a-a]);break;}
-  case 21:{const p={x,y};plane([p]);point(`P = ${pair(p)} is translated by the vector (${dx}, ${dy}) three times in a row. Type the final position of P.`,{x:x+3*dx,y:y+3*dy},`Three translations add up to (${3*dx}, ${3*dy}).`,[{x:x+dx,y:y+dy}]);break;}
-  case 22:case 23:{const reflectX=key===22,p={x,y};plane([p]);point(`P = ${pair(p)} is reflected in the ${reflectX?'x':'y'}-axis to give Q. Type the point halfway between P and Q.`,reflectX?{x,y:0}:{x:0,y},`P and its image are the same distance either side of the mirror line, so the midpoint lies on the ${reflectX?'x':'y'}-axis.`,[reflectX?{x:0,y}:{x,y:0}]);break;}
-  case 24:{const line=int(1,3),p={x,y};plane([p]);point(`P = ${pair(p)}. Reflect it in the vertical line x = ${line}. Type the image of P.`,{x:2*line-x,y},`P is ${line-x} units left of x = ${line}, so the image is ${line-x} units to the right: x = ${2*line-x}.`,[{x:-x,y},{x:line-x,y}]);break;}
-  case 25:{const p={x,y};plane([p]);point(`P = ${pair(p)} is rotated 270° clockwise about the origin. Type the image of P.`,{x:-y,y:x},'270° clockwise is the same as 90° anticlockwise: (x, y) → (−y, x).',[{x:y,y:-x}]);break;}
-  case 26:{const centre={x:int(-1,1),y:int(-1,1)},p={x:centre.x+2,y:centre.y+1};plane([p],{centre});point(`P = ${pair(p)} is rotated 180° about C = ${pair(centre)}. Type the image of P.`,{x:centre.x-2,y:centre.y-1},'A half-turn about C puts the image the same distance from C on the opposite side.',[{x:-p.x,y:-p.y}]);break;}
+  case 21:{const T=shift(dx,dy),sh=triangle(T,ps=>T(T(ps))),vi=int(0,2);grid(sh,{solution:T(T(sh))});point(`Triangle ${vtx(sh)} is translated by the vector (${dx}, ${dy}) twice in a row. Type the final image of ${TRI[vi]}.`,T(T(sh))[vi],`Two translations add up to (${2*dx}, ${2*dy}).`,[T(sh)[vi]]);break;}
+  case 22:case 23:{const rx=key===22,M=rx?flipX:flipY,sh=triangle(M),vi=int(0,2),L=TRI[vi],q=sh[vi];grid(sh,{mirror:rx?'x':'y',solution:M(sh)});point(`Triangle ${vtx(sh)} is reflected in the ${rx?'x':'y'}-axis. Type the point halfway between ${L} and its image ${L}′.`,rx?{x:q.x,y:0}:{x:0,y:q.y},`${L} and ${L}′ are the same distance either side of the mirror, so the halfway point lies on the ${rx?'x':'y'}-axis.`,[rx?{x:0,y:q.y}:{x:q.x,y:0}]);break;}
+  case 24:{const line=int(1,3),M=flipAt(line),sh=triangle(M),vi=int(0,2),L=TRI[vi];grid(sh,{mirrorX:[line],solution:M(sh)});point(`Reflect triangle ${vtx(sh)} in the vertical line x = ${line}. Type the image of ${L}.`,M(sh)[vi],`${L} is ${Math.abs(line-sh[vi].x)} units from x = ${line}, so its image is the same distance on the other side: x = ${2*line-sh[vi].x}.`,[flipY(sh)[vi],{x:line-sh[vi].x,y:sh[vi].y}]);break;}
+  case 25:{const r=turn(O,270,true),sh=triangle(),vi=int(0,2);grid(sh,{solution:r(sh),turn:{centre:O,clockwise:true,degrees:270}});point(`Rotate triangle ${vtx(sh)} 270° clockwise about the origin. Type the image of ${TRI[vi]}.`,r(sh)[vi],'270° clockwise is the same as 90° anticlockwise: (x, y) → (−y, x).',[turn(O,90,true)(sh)[vi]]);break;}
+  case 26:{const c={x:pick([-1,1]),y:int(-1,1)},r=turn(c,180,true),sh=triangle(r),vi=int(0,2);grid(sh,{centre:c,solution:r(sh),turn:{centre:c,clockwise:true,degrees:180}});point(`Rotate triangle ${vtx(sh)} 180° about C${pair(c)}. Type the image of ${TRI[vi]}.`,r(sh)[vi],'A half-turn about C puts each image the same distance from C on the opposite side.',[turn(O,180,true)(sh)[vi]]);break;}
   case 28:{const [p1,p2]=pick([[30,60],[25,45],[50,60],[35,55],[20,40],[40,70]]),third=180-p1-p2,ang=[p1,p2,third],name=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';flow({question:'Any angle equal to 90°?',yes:'Right-angled',no:{question:'Any angle greater than 90°?',yes:'Obtuse',no:'Acute'}});choose(`A triangle has angles of ${p1}° and ${p2}°. Find the third angle, then trace this classifier. Type the output.`,name,['Acute','Right-angled','Obtuse','No output'].filter(s=>s!==name),`The third angle is 180° − ${p1}° − ${p2}° = ${third}°. Then follow each decision in order.`);break;}
-  default:visual=before.visual;answerLabels=before.answerLabels;
+  default:visual=before.visual;answerLabels=before.answerLabels;placeSpec=before.place;
   }
  }
  // Build tasks (Weeks 2–3): in about a third of these slots the student builds the model from
@@ -284,7 +310,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  }
  const options=[...new Set([answer,...wrong])].slice(0,4);if(!prompt||options.length!==4)throw Error(`Invalid options ${key}/${role}: ${prompt}`);
  for(let i=3;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,build,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
+ return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,build,place:placeSpec,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
 }
 export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:LessonActivity){return space7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Space7Role);}
 export function space7Quiz(week:number,attempt=0){

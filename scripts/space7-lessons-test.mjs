@@ -41,14 +41,34 @@ function check(key,q){
  else if(/Of these six families/.test(p)){const fam={square:[1,1,1,1],rectangle:[1,1,0,1],rhombus:[1,0,1,1],parallelogram:[1,0,0,1],kite:[0,0,0,0],trapezium:[0,0,0,1]},col=p.includes('always parallelograms')?0:p.includes('right angles')?1:p.includes('equal sides')?2:3;answer=String(Object.values(fam).filter(f=>f[col]).length);}
  else if(/regular polygon has a perimeter of \d+ cm and each side/.test(p))answer=String(n[0]/n[1]);
  else if(/How many different whole-number lengths/.test(p))answer=String(n[0]+n[1]-1-Math.abs(n[0]-n[1]));
- else if(/three times in a row/.test(p)){const {x,y}=P();answer=pt(x+3*n[2],y+3*n[3]);}
- else if(/halfway between P and Q/.test(p)){const {x,y}=P();answer=p.includes('x-axis')?pt(x,0):pt(0,y);}
- else if(/Reflect it in the vertical line x = /.test(p)){const {x,y}=P(),line=n.at(-1);answer=pt(2*line-x,y);}
- else if(/rotated 270° clockwise about the origin/.test(p)){const {x,y}=P();answer=pt(-y,x);}
- else if(/rotated 180° about C = /.test(p)){const {x,y}=P(),m=p.match(/C = \((-?\d+), (-?\d+)\)/),cx=+m[1],cy=+m[2];answer=pt(2*cx-x,2*cy-y);}
  else if(/Find the third angle, then trace/.test(p)){const t=180-n[0]-n[1],ang=[n[0],n[1],t];answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';}
  else alt=false;
- if(!alt)switch(key){
+ // Transformations: read the triangle and moves from the prompt and apply them independently.
+ if(key>=19&&key<=27){
+  const tri=[...p.matchAll(/\b([PQR])\((-?\d+), (-?\d+)\)/g)].slice(0,3).map(m=>({x:+m[2],y:+m[3]}));assert.equal(tri.length,3,p);
+  const vi='PQR'.indexOf((p.match(/(?:image|images) of ([PQR])\b/)||p.match(/between ([PQR]) and/)||[])[1]);
+  const ts=(ps,a,b)=>ps.map(q=>({x:q.x+a,y:q.y+b})),rx=ps=>ps.map(q=>({x:q.x,y:-q.y})),ry=ps=>ps.map(q=>({x:-q.x,y:q.y})),at=(ps,m)=>ps.map(q=>({x:2*m-q.x,y:q.y}));
+  const rot=(ps,c,deg)=>ps.map(q=>{const t=((deg%360)+360)%360,x=q.x-c.x,y=q.y-c.y,[a,b]=t===90?[y,-x]:t===180?[-x,-y]:t===270?[-y,x]:[x,y];return {x:c.x+a,y:c.y+b};});
+  const C=(()=>{const m=p.match(/C\((-?\d+), (-?\d+)\)/);return m?{x:+m[1],y:+m[2]}:{x:0,y:0};})();
+  const clockwiseDeg=()=>{const m=p.match(/(\d+)° (clockwise|anticlockwise)?/);const d=+m[1];return m[2]==='anticlockwise'?-d:d;};
+  const mv=()=>{const r=+(p.match(/(\d+) units? right/)?.[1]??0),d=+(p.match(/(\d+) units? down/)?.[1]??0),l=+(p.match(/then (\d+) units? left/)?.[1]??0);return [r-l,-d];};
+  const fmt=ps=>ps.map(pair).join('; ');let img;
+  if(/Which single move/.test(p)){
+   const shown=v.plane7.image,opts={'Reflection in the x-axis':rx(tri),'Reflection in the y-axis':ry(tri),'Rotation of 180° about the origin':rot(tri,{x:0,y:0},180),'Rotation of 90° clockwise about the origin':rot(tri,{x:0,y:0},90),'Rotation of 90° anticlockwise about the origin':rot(tri,{x:0,y:0},-90)};
+   const matches=q.options.filter(o=>opts[o]&&fmt(opts[o])===fmt(shown));assert.deepEqual(matches,[q.answer],p);answer=q.answer;
+  }else if(key===21&&!/twice in a row/.test(p)){const im=v.plane7.image,d={x:im[0].x-tri[0].x,y:im[0].y-tri[0].y};answer=pair(/back to the original/.test(p)?{x:-d.x,y:-d.y}:d);}
+  else if(key===21){const m=p.match(/vector \((-?\d+), (-?\d+)\) twice/);img=ts(tri,2*m[1],2*m[2]);}
+  else if(key===19){const [a,b]=mv();img=/repeat the same translation/.test(p)?ts(tri,2*a,2*b):ts(tri,a,b);}
+  else if(key===20){const [a,b]=mv();img=ts(tri,a,b);}
+  else if(key===22||key===23){img=/in the x-axis/.test(p)?rx(tri):ry(tri);if(/halfway between/.test(p))answer=pair(/x-axis/.test(p)?{x:tri[vi].x,y:0}:{x:0,y:tri[vi].y});}
+  else if(key===24){const mirrors=[...p.matchAll(/x = (-?\d+)/g)].map(m=>+m[1]);if(/How many units right/.test(p))answer=String(2*(mirrors[1]-mirrors[0]));else img=mirrors.reduce((ps,m)=>at(ps,m),tri);}
+  else if(key===25||key===26){img=rot(tri,C,clockwiseDeg());}
+  else if(key===27){const d=+p.match(/(\d+) units? right/)[1];if(/How many units apart/.test(p))answer=String(2*d);else img=/^Reflect/.test(p)?ts(ry(tri),d,0):ry(ts(tri,d,0));}
+  if(img&&answer===undefined)answer=q.place||/image of each corner/.test(p)?fmt(img):pair(img[vi]);
+  if(q.place){assert.ok(!v,'place questions draw their own grid');assert.deepEqual(q.place.shape,tri);assert.ok([...q.place.shape,...q.place.solution].every(c=>Math.abs(c.x)<=5&&Math.abs(c.y)<=5),'place stays on grid');}
+  else{const pl=v.plane7;assert.ok(pl,'transformations show a triangle');for(const c of [...pl.shape,...(pl.image??[]),...(pl.solution??[])])assert.ok(Math.abs(c.x)<=5&&Math.abs(c.y)<=5,'on grid '+p);}
+ }
+ else if(!alt)switch(key){
   case 1:if(A){const solids={'one square and four triangles':'Square pyramid','two triangles and three rectangles':'Triangular prism','six rectangles in three matching pairs':'Rectangular prism','four triangles':'Triangular pyramid','two pentagons and five rectangles':'Pentagonal prism'};answer=solids[p.match(/made from (.*)\. What/)[1]];}break;
   case 2:if(true){const cells=v.cells,fold=foldNet(cells),target=cells.findIndex(c=>relationBetween(fold,cells[v.marked],c)==='opposite');answer=String.fromCharCode(65+target);}break;
   case 3:if(F)answer=String(n[0]);else if(R)answer=String(n[0]+2);else{const s=n[0];answer=String(p.includes('faces')?s+2:p.includes('edges')?3*s:2*s);}break;
@@ -70,14 +90,6 @@ function check(key,q){
   case 13:if(A)answer=String(n[0]/(p.includes('triangle')?3:4));else if(R)answer='Rhombus';break;
   case 16:if(A)answer=String(n[0]/({pentagon:5,hexagon:6,octagon:8}[p.match(/regular (\w+)/)[1]]));break;
   case 31:if(F&&v.polygons)answer=v.polygons[0].caption.includes('dent')?'Concave':'Regular convex';else if(/hexagon has interior angles/.test(p)){const ang=n.slice(0,6);answer=ang.some(x=>x>180)?'Concave':'Irregular convex';}break;
-  case 19:{const s=P(),[d1,d2]=[n[2],n[3]],k=A?2:1;answer=pair({x:s.x+d1*k,y:s.y-d2*k});break;}
-  case 20:{const right=n[6],shift=A?-1:0;if(R){const vx=n.slice(-2);answer=pair({x:vx[0]+right,y:vx[1]-2});}else answer=v.shape.map(pt=>pair({x:pt.x+right+shift,y:pt.y-2})).join('; ');break;}
-  case 21:{const s=P(),img=v.image[0],d={x:img.x-s.x,y:img.y-s.y};answer=pair(A?{x:-d.x,y:-d.y}:d);break;}
-  case 22:case 23:{const s=P(),both=A,rx=key===22;answer=pair(both?{x:-s.x,y:-s.y}:rx?{x:s.x,y:-s.y}:{x:-s.x,y:s.y});break;}
-  case 24:{const [m1,m2]=v.mirrorX;if(R)answer=String(2*(m2-m1));else{const s=P(),[first,second]=A?[m2,m1]:[m1,m2];answer=pair({x:2*second-(2*first-s.x),y:s.y});}break;}
-  case 25:{const s=P();answer=pair(A?{x:-s.x,y:-s.y}:{x:s.y,y:-s.x});break;}
-  case 26:{const s=P(),c=v.centre,rx=s.x-c.x,ry=s.y-c.y;answer=pair(A?{x:c.x-ry,y:c.y+rx}:{x:c.x+ry,y:c.y-rx});break;}
-  case 27:{const s=P(),d=+p.match(/translate (\d+) units? right/i)[1];answer=R?String(2*d):pair({x:A?-s.x+d:-(s.x+d),y:s.y});break;}
   case 28:if(F){const d=new Set(n.slice(0,3)).size;answer=d===1?'Equilateral':d===2?'Isosceles':'Scalene';}else if(R)answer='Equilateral';else{const ang=n.slice(0,3);answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';}break;
   case 30:if(!R){const right=p.includes('four right angles'),equal=/four sides of/.test(p);answer=right?(equal?'Square':'Non-square rectangle'):(equal?'Non-square rhombus':'Other quadrilateral');}break;
   case 34:if(F)answer=String(n[0]);break;
