@@ -14,7 +14,7 @@ function compile(file){
   if(name==='@/lib/avatar-appearance')return {useCanonicalAvatarAppearance:()=>reviewOutfit};
   if(name==='three')return THREE;
   if(name==='@react-three/drei')return {useGLTF:()=>gltf,useTexture:path=>hairTextures[path]};
-  if(name==='@react-three/fiber')return {useFrame:()=>{},useThree:()=>({})};
+  if(name==='@react-three/fiber')return {useFrame:()=>{},useThree:()=>({}),createPortal:(children,container)=>({type:'review-portal',props:{children,container}})};
   if(name==='react')return {...React,useRef:()=>({current:null}),useMemo:fn=>fn(),useEffect:()=>{}};
   if(name.startsWith('.')||name.startsWith('@/')){const base=name.startsWith('@/')?path.resolve(name.slice(2)):path.resolve(path.dirname(file),name);const found=[base,base+'.tsx',base+'.ts'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile());if(found)return compile(found);}
   return require(name);
@@ -29,13 +29,14 @@ const gltf=await new Promise((resolve,reject)=>new GLTFLoader().parse(bytes.buff
 const hairTextures={};
 for(const style of ['swept','sidepart','short','fade','locs','twists','waves','curlyPony','spaceBuns','long','tuft','spiky','curls','bob','ponytail','braids','pigtails','bun','afro']){const image=await sharp(`public/avatars/hair/hair_${style}.png`).ensureAlpha().raw().toBuffer({resolveWithObject:true});hairTextures[`/avatars/hair/hair_${style}.png`]=new THREE.DataTexture(image.data,image.info.width,image.info.height);}
 const {DEFAULT_OUTFIT}=compile('components/avatar/StudentAvatar.tsx');
-const reviewOutfit={...DEFAULT_OUTFIT,top:'realm_codemaster',shirt:'#30263f',shirtTrim:'#b79860',pants:'#292536',shoes:'#494052',shoeStyle:'boots',hairStyle:process.env.REVIEW_HAIR??'sidepart',held:'flame_blade'};
+const reviewOutfit={...DEFAULT_OUTFIT,top:'realm_codemaster',shirt:'#30263f',shirtTrim:'#b79860',pants:'#292536',shoes:'#494052',shoeStyle:'boots',hairStyle:process.env.REVIEW_HAIR??'sidepart',held:'flame_blade',...JSON.parse(process.env.REVIEW_OUTFIT??'{}')};
 const {TrialStudentAvatar}=compile('components/world3d/SharedWorldPlayer.tsx');
-const {ExplorerAvatarHead}=compile('components/world3d/ExplorerAvatarDetails.tsx');
+const {ExplorerAvatarHead,ExplorerCharacterGear}=compile('components/world3d/ExplorerAvatarDetails.tsx');
 function attach(element,parent){
  if(element==null||typeof element==='boolean')return;
  if(Array.isArray(element)){element.forEach(child=>attach(child,parent));return;}
  const {type,props}=element;if(type===React.Fragment||type===React.Suspense){attach(props.children,parent);return;}if(typeof type==='function'){attach(type(props),parent);return;}
+ if(type==='review-portal'){attach(props.children,props.container);return;}
  if(type==='primitive'){parent.add(props.object);return;}
  if(type.endsWith('Geometry')){const C=THREE[type[0].toUpperCase()+type.slice(1)];parent.geometry=new C(...(props.args??[]));return;}
  if(type==='meshStandardMaterial'||type==='meshBasicMaterial'){parent.material=new THREE.MeshStandardMaterial(props);return;}
@@ -44,7 +45,7 @@ function attach(element,parent){
  if(props.geometry)object.geometry=props.geometry;parent.add(object);attach(props.children,object);
 }
 
-for(const view of ['front','angle','side','back']){const root=new THREE.Group();attach(process.env.REVIEW_HEAD?ExplorerAvatarHead({o:reviewOutfit}):TrialStudentAvatar({movingRef:{current:false}}),root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
+for(const view of ['front','angle','side','back']){const root=new THREE.Group();attach(process.env.REVIEW_GEAR?ExplorerCharacterGear({held:reviewOutfit.held}):process.env.REVIEW_HEAD?ExplorerAvatarHead({o:reviewOutfit}):TrialStudentAvatar({movingRef:{current:false}}),root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
   const centre=bounds.getCenter(new THREE.Vector3()),extent=Math.max(...size.toArray());
   const camera=new THREE.OrthographicCamera(-extent,extent,extent*.8,-extent*.8,.01,1000);
   camera.position.copy(centre).add(new THREE.Vector3(view==='front'?0:view==='side'?1:view==='back'?0:.65,.1,view==='side'?0:view==='back'?-1:1).normalize().multiplyScalar(extent*4));camera.lookAt(centre);camera.updateMatrixWorld();
@@ -53,7 +54,7 @@ for(const view of ['front','angle','side','back']){const root=new THREE.Group();
   half*=1.15;camera.left=-half*1.25;camera.right=half*1.25;camera.top=half;camera.bottom=-half;camera.updateProjectionMatrix();
   const faces=[],light=new THREE.Vector3(-.6,1,.8).normalize();
   root.traverse(o=>{
-   if(!o.isMesh||!o.visible)return;
+   if(!o.isMesh)return;let visible=true;for(let p=o;p;p=p.parent)if(!p.visible)visible=false;if(!visible)return;
    const g=o.geometry,position=g.getAttribute('position'),indices=g.index?.array;
    for(let i=0;i<(indices?.length??position.count);i+=3){
     const vertices=[0,1,2].map(j=>new THREE.Vector3().fromBufferAttribute(position,indices?indices[i+j]:i+j).applyMatrix4(o.matrixWorld));
@@ -63,12 +64,13 @@ for(const view of ['front','angle','side','back']){const root=new THREE.Group();
     const shade=.64+.36*Math.max(0,normal.dot(light)),colour=o.material.color.clone().multiplyScalar(shade).getStyle();
     const points=vertices.map(v=>v.project(camera));
     const uv=g.getAttribute('uv');const texcoords=uv?[0,1,2].map(j=>new THREE.Vector2().fromBufferAttribute(uv,indices?indices[i+j]:i+j)):null;
-    faces.push({texture:o.material.map?.image,texcoords,linear:o.material.color.clone().multiplyScalar(shade),points:points.map(v=>({x:(v.x+1)*250,y:(1-v.y)*200,z:v.z})),rgb:o.material.color.clone().multiplyScalar(shade).convertLinearToSRGB().toArray().map(v=>Math.round(v*255)),depth:points.reduce((n,v)=>n+v.z,0)/3,svg:`<polygon points="${points.map(v=>`${((v.x+1)*250).toFixed(2)},${((1-v.y)*200).toFixed(2)}`).join(' ')}" fill="${colour}" stroke="${colour}" stroke-width=".3"/>`});
+    faces.push({opacity:o.material.transparent?o.material.opacity:1,texture:o.material.map?.image,texcoords,linear:o.material.color.clone().multiplyScalar(shade),points:points.map(v=>({x:(v.x+1)*250,y:(1-v.y)*200,z:v.z})),rgb:o.material.color.clone().multiplyScalar(shade).convertLinearToSRGB().toArray().map(v=>Math.round(v*255)),depth:points.reduce((n,v)=>n+v.z,0)/3,svg:`<polygon points="${points.map(v=>`${((v.x+1)*250).toFixed(2)},${((1-v.y)*200).toFixed(2)}`).join(' ')}" fill="${colour}" stroke="${colour}" stroke-width=".3"/>`});
    }
   });
   const pixels=Buffer.alloc(500*400*4),depths=new Float64Array(500*400).fill(Infinity);
   for(let i=0;i<500*400;i++){pixels[i*4]=233;pixels[i*4+1]=230;pixels[i*4+2]=220;pixels[i*4+3]=255;}
   const cross=(a,b,x,y)=>(b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x);
+  faces.sort((a,b)=>(a.opacity<1)-(b.opacity<1)||(a.opacity<1?b.depth-a.depth:0));
   for(const face of faces){
    const [a,b,c]=face.points,area=cross(a,b,c.x,c.y);if(Math.abs(area)<1e-9)continue;
    const minX=Math.max(0,Math.floor(Math.min(a.x,b.x,c.x))),maxX=Math.min(499,Math.ceil(Math.max(a.x,b.x,c.x)));
@@ -76,12 +78,12 @@ for(const view of ['front','angle','side','back']){const root=new THREE.Group();
    for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
     const u=cross(b,c,x+.5,y+.5)/area,v=cross(c,a,x+.5,y+.5)/area,w=1-u-v;
     if(u<0||v<0||w<0)continue;
-    const z=u*a.z+v*b.z+w*c.z,index=y*500+x;if(z>=depths[index])continue;depths[index]=z;
+    const z=u*a.z+v*b.z+w*c.z,index=y*500+x;if(z>=depths[index])continue;if(face.opacity===1)depths[index]=z;
     let rgb=face.rgb;
     if(face.texture&&face.texcoords){const tx=Math.max(0,Math.min(face.texture.width-1,Math.round((u*face.texcoords[0].x+v*face.texcoords[1].x+w*face.texcoords[2].x)*face.texture.width)));const ty=Math.max(0,Math.min(face.texture.height-1,Math.round((1-(u*face.texcoords[0].y+v*face.texcoords[1].y+w*face.texcoords[2].y))*face.texture.height)));const k=(ty*face.texture.width+tx)*4;const data=face.texture.data;const light=(data[k]*.55+data[k+1]*1.85+data[k+2]*.2)/255;rgb=face.linear.clone().multiplyScalar(light).convertLinearToSRGB().toArray().map(n=>Math.min(255,Math.round(n*255)));}
-    for(let j=0;j<3;j++)pixels[index*4+j]=rgb[j];
+    for(let j=0;j<3;j++)pixels[index*4+j]=Math.round(rgb[j]*face.opacity+pixels[index*4+j]*(1-face.opacity));
    }
   }
 
-fs.mkdirSync('output/world3d-audit',{recursive:true});await sharp(pixels,{raw:{width:500,height:400,channels:4}}).png().toFile(`output/world3d-audit/${process.env.REVIEW_HEAD?reviewOutfit.hairStyle+"-head":"avatar-3d"}-${view}.png`);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
+fs.mkdirSync('output/world3d-audit',{recursive:true});await sharp(pixels,{raw:{width:500,height:400,channels:4}}).png().toFile(`output/world3d-audit/${process.env.REVIEW_NAME??(process.env.REVIEW_HEAD?reviewOutfit.hairStyle+"-head":"avatar-3d")}-${view}.png`);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
 console.log('Rendered production avatar geometry from front, angle, side and back.');

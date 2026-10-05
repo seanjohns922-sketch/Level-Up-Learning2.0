@@ -4,10 +4,11 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { PremiumExplorerAvatar, PremiumExplorerHead, supportsPremiumExplorer } from "./PremiumExplorerAvatar";
+import { ExplorerBodyAccessories } from "./ExplorerWearables";
 import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import { RealmOutfitDetails } from "./RealmOutfitDetails";
 import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
-import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
+import { DEFAULT_OUTFIT, type AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
 export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number; sprint?: boolean };
@@ -23,20 +24,23 @@ type AvatarMotionProps = { movingRef: React.MutableRefObject<boolean>; sprinting
 export function TrialStudentAvatar(props: AvatarMotionProps) {
   const appearance = useCanonicalAvatarAppearance();
   const avatar = appearance ?? DEFAULT_OUTFIT;
-  const fallback = <ProceduralStudentAvatar {...props} />;
+  return <ExplorerAvatarModel avatar={avatar} {...props}/>;
+}
+
+export function ExplorerAvatarModel({avatar,...props}:AvatarMotionProps & {avatar:Required<AvatarOutfit>}) {
+  const fallback = <ProceduralStudentAvatar avatar={avatar} {...props} />;
   return supportsPremiumExplorer(avatar)
     ? <Suspense fallback={fallback}><PremiumExplorerAvatar avatar={avatar} {...props} /></Suspense>
     : fallback;
 }
 
-function ProceduralStudentAvatar({ movingRef, sprintingRef }: { movingRef: React.MutableRefObject<boolean>; sprintingRef?: React.MutableRefObject<boolean> }) {
+function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: AvatarMotionProps & {avatar:Required<AvatarOutfit>}) {
   const bodyRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Group>(null);
   const rightArmRef = useRef<THREE.Group>(null);
-  const appearance = useCanonicalAvatarAppearance();
-  const avatar = appearance ?? DEFAULT_OUTFIT;
+
   const skin = avatar.skin;
   const top = avatar.shirt;
   const topTrim = avatar.shirtTrim;
@@ -53,7 +57,7 @@ function ProceduralStudentAvatar({ movingRef, sprintingRef }: { movingRef: React
     if (leftLegRef.current) leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, stride, smoothing);
     if (rightLegRef.current) rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, -stride, smoothing);
     if (leftArmRef.current) leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -stride * 0.72, smoothing);
-    if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, stride * 0.72, smoothing);
+    if (rightArmRef.current) rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, stride * (avatar.held!=="none"?.3:.72), smoothing);
     if (bodyRef.current) {
       const targetY = movingRef.current ? Math.abs(Math.sin(gaitPhase.current * 2)) * (sprinting ? 0.05 : 0.035) : 0;
       bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, targetY, smoothing);
@@ -81,11 +85,12 @@ function ProceduralStudentAvatar({ movingRef, sprintingRef }: { movingRef: React
           <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
             <mesh position={[0, -0.38, 0]}><capsuleGeometry args={[.12,.5,6,12]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>
             <mesh position={[0, -0.85, 0]}><sphereGeometry args={[.105,16,12]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
-            {side===1&&<group position={[0,-.85,.14]}><ExplorerCharacterGear held={avatar.held}/></group>}
+            {side===1&&<group position={[0,-.85,avatar.held==="patternox_codemaster_gauntlet"?0:.08]} rotation={avatar.held==="patternox_codemaster_gauntlet"?[0,0,0]:[.25,0,-.17]}><ExplorerCharacterGear held={avatar.held} colour={avatar.heldColor||undefined}/></group>}
           </group>
         ))}
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
         <RealmOutfitDetails top={avatar.top}/>
+        <ExplorerBodyAccessories o={avatar} movingRef={movingRef}/>
         <group scale={[1.1,1.1,1.1]} position={[0,-.078,0]}>{avatar.hairStyle === 'swept' && avatar.face === 'smile'
           ? <Suspense fallback={<ExplorerAvatarHead o={avatar}/>}><PremiumExplorerHead avatar={avatar}/></Suspense>
           : <ExplorerAvatarHead o={avatar}/>}</group>

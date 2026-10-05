@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { AvatarOutfit } from '@/components/avatar/StudentAvatar';
 import { createPremiumExplorerHead } from '@/lib/avatar/premium-explorer-head';
+import { ExplorerHeadAccessories, ExplorerBodyAccessories } from './ExplorerWearables';
 import { ExplorerSweptHair } from './ExplorerSweptHair';
 import { ExplorerCharacterGear } from './ExplorerAvatarDetails';
 
@@ -63,7 +64,7 @@ export function PremiumExplorerAvatar({ avatar, movingRef, sprintingRef }: {
     phase.current += Math.min(delta, .05) * (sprinting ? 13.5 : 8.5);
     const stride = movingRef.current ? Math.sin(phase.current) * (sprinting ? .65 : .45) : 0;
     const smoothing = 1 - Math.exp(-delta * 14);
-    const targets = [stride, -stride, -stride * .72, stride * .5];
+    const targets = [stride, -stride, -stride * .72, stride * (avatar.held!=="none"?.3:.5)];
     limbs.forEach((limb, index) => { limb.rotation.x = THREE.MathUtils.lerp(limb.rotation.x, targets[index], smoothing); });
     if (bodyRef.current) bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, movingRef.current ? Math.abs(Math.sin(phase.current * 2)) * .025 : 0, smoothing);
   });
@@ -73,8 +74,9 @@ export function PremiumExplorerAvatar({ avatar, movingRef, sprintingRef }: {
       <meshBasicMaterial color="#02090c" transparent opacity={.3} depthWrite={false} />
     </mesh>
     <group ref={bodyRef}><primitive object={root} dispose={null} /></group>
-    {createPortal(<group position={[0, -.8, 0]}><ExplorerSweptHair colour={avatar.hair}/></group>, root.getObjectByName("Head")!)}
-    {createPortal(<group position={[.05, -.69, .1]}><ExplorerCharacterGear held={avatar.held} /></group>, rightArm)}
+    {createPortal(<group position={[0, -.8, 0]}><ExplorerSweptHair colour={avatar.hair} hat={avatar.hat}/><ExplorerHeadAccessories o={avatar}/></group>, root.getObjectByName("Head")!)}
+    {createPortal(<group position={[0,-.39,0]}><ExplorerBodyAccessories o={avatar} movingRef={movingRef}/></group>, root.getObjectByName("Torso")!)}
+    {createPortal(<group position={[.05, -.69, avatar.held==='patternox_codemaster_gauntlet'?.02:.08]} rotation={avatar.held==='patternox_codemaster_gauntlet'?[0,0,0]:[.25,0,-.17]}><ExplorerCharacterGear held={avatar.held} colour={avatar.heldColor||undefined} /></group>, rightArm)}
   </group>;
 }
 
@@ -84,5 +86,5 @@ export function PremiumExplorerHead({ avatar }: { avatar: Outfit }) {
   const { root, dispose } = useMemo(() => createPremiumExplorerHead(scene, avatar),
     [scene, avatar]);
   useEffect(() => dispose, [dispose]);
-  return <group><primitive object={root} dispose={null} /><ExplorerSweptHair colour={avatar.hair}/></group>;
+  return <group><primitive object={root} dispose={null} /><ExplorerSweptHair colour={avatar.hair} hat={avatar.hat}/><ExplorerHeadAccessories o={avatar}/></group>;
 }
