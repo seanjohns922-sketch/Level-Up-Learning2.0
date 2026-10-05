@@ -103,11 +103,16 @@ function check(key,q){
  }
  else if(key>=28&&key<=35&&key!==34){
   const shapes=v?.shapes7,flows=v?.trees;
-  if(key===28&&F)answer=category(shapes[0].points,flows[0].root.question.includes('sides')?['Equilateral']:['Right-angled']);
-  if(key===28&&R){const o=p.match(/reach “(.*?)”/)[1],groups=flows[0].root.question.includes('sides')?['Equilateral']:['Right-angled'];answer=String(shapes.filter(sh=>category(sh.points,groups)===o).length);}
-  if(key===29&&R)answer={[QTEXT.all3]:'Equilateral',[QTEXT.exactly2]:'Isosceles',[QTEXT.rightTri]:'Right-angled',[QTEXT.obtuseTri]:'Obtuse',[QTEXT.acuteTri]:'Acute'}[p.match(/asks “(.*?)” first/)[1]];
-  if(key===30&&F)answer=category(shapes[0].points,['Rhombus','Square']);
-  if(key===30&&R)answer={'Which family is directly above Rectangle in the tree?':'Parallelogram','Which family is directly below both Rectangle and Rhombus?':'Square','Rhombus is joined to Parallelogram and to which other family above it?':'Kite','Which family on the second row has no families below it?':'Trapezium','Which family is directly below Kite?':'Rhombus'}[p.replace(' Type the family name.','')];
+  // Week 9: classify with reasons.
+  if(key===28&&F){const two=n.slice(0,2),t=[...two,180-two[0]-two[1]];answer=`${new Set(t).size===2?'Isosceles':'Scalene'} ${Math.max(...t)>90?'obtuse':Math.max(...t)===90?'right-angled':'acute'}`;}
+  if(key===28&&R){const t=n.slice(0,3);assert.equal(t[0]+t[1]+t[2],180);const kind=p.match(/shows it is ([\w-]+)\?/)[1],ok={isosceles:new Set(t).size===2,'right-angled':t.includes(90),obtuse:Math.max(...t)>90,scalene:new Set(t).size===3,acute:Math.max(...t)<90}[kind];assert.ok(ok,p);}
+  if(key===28&&A)answer=String(/between its two equal sides\. What size/.test(p)?(180-n[0])/2:180-2*n[0]);
+  if(key===29&&F)answer=category(shapes[0].points,['Rhombus','Square']);
+  if(key===29&&R){const m=p.match(/is a (\w+), not a (\w+)/),c=category(shapes[0].points,['Rhombus','Square']);assert.equal(c.toLowerCase(),m[1]);}
+  if(key===29&&A){const X=n[0];answer=[180-X,X,180-X].join(', ');}
+  if(key===30&&F)answer=category(shapes[0].points,[]);
+  if(key===30&&R){const c=category(shapes[0].points,[]);if(/concave\?/.test(p))assert.ok(c.startsWith('Concave'));if(/is polygon A regular\?/.test(p))assert.ok(c.startsWith('Regular'));if(/not regular\?/.test(p))assert.ok(c.startsWith('Irregular'));}
+  if(key===30&&A){const name=p.match(/regular (\w+), in degrees/);if(name){const k={pentagon:5,hexagon:6,octagon:8,decagon:10}[name[1]];answer=String((k-2)*180/k);}else answer=String(540-n.slice(0,4).reduce((t,x)=>t+x,0));}
   if(key===31&&F)answer=category(shapes[0].points,[]);
   if(key===31&&R){const what=p.match(/are (\w+)\?/)[1];answer=String(shapes.filter(sh=>{const c=category(sh.points,[]);return what==='concave'?c.startsWith('Concave'):what==='regular'?c.startsWith('Regular'):sh.points.length===6;}).length);}
   if(key===32){const wrong=shapes.filter(sh=>{const groups=[flows[0].root.yes,flows[0].root.no?.yes,flows[0].root.no?.no].filter(x=>typeof x==='string');const all=JSON.stringify(flows[0].root).match(/"(?:yes|no)":"(.*?)"/g).map(x=>x.split('":"')[1].slice(0,-1));return runFlow7(flows[0].root,sh.points)!==category(sh.points,all.concat(groups));});if(F){assert.equal(wrong.length,1);answer=wrong[0].id;}else answer=String(wrong.length);}

@@ -30,7 +30,7 @@ export default function Space7LessonVisual({visual:v,reveal=false}:{visual:Task7
   {v.solidNet&&v.diagram!=='plans'&&<SolidNetDrawing net={v.solidNet}/>}
   {v.footprint&&<FootprintDrawing {...v.footprint}/>}
   {v.shapes7&&v.familyTree7?<div className="flex flex-wrap items-center justify-center gap-3"><div className="[&_svg]:!max-h-44"><ShapeCard shape={v.shapes7[0]} size={170}/></div><div className="min-w-[240px] flex-1 [&_svg]:!max-h-72"><FamilyTree values={v.familyTree7}/></div></div>:<>
-  {v.shapes7&&<div className="flex flex-wrap justify-center gap-2 [&_svg]:!max-h-44">{v.shapes7.map(sh=><ShapeCard key={sh.id} shape={sh} size={v.shapes7!.length>3?130:170}/>)}</div>}
+  {v.shapes7&&<div className={`flex flex-wrap justify-center gap-2 ${v.shapes7.length===1?'[&_svg]:!max-h-64':'[&_svg]:!max-h-44'}`}>{v.shapes7.map(sh=><ShapeCard key={sh.id} shape={sh} size={v.shapes7!.length>3?130:v.shapes7!.length===1?280:170}/>)}</div>}
   {v.familyTree7&&<div className="[&_svg]:!max-h-80"><FamilyTree values={v.familyTree7}/></div>}</>}
   {v.shapes7?.some(sh=>sh.show!=='angles')&&<p className="mt-2 text-center text-xs" data-shape-key>Key: | equal sides · ⌒ equal angles · ∟ right angle · &gt; parallel sides</p>}
   {v.trees?.map((t,i)=><section key={i}><h3 className="text-center font-bold">{t.title}</h3><Level7Flowchart tree={t.root}/></section>)}

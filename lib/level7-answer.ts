@@ -73,7 +73,7 @@ export function level7Answer(q:Question):Level7Answer|null{
   if(/\bmodes?\b/i.test(p)&&/^-?[\d.]+(?:,\s*-?[\d.]+)+$/.test(expected))return {...base,kind:'set'};
  }
  if(q.lessonId.startsWith('y7-space-')&&/^[A-F]$/.test(expected))return {...base,kind:'text'};
- if(q.lessonId.startsWith('y7-space-')&&/^(Regular|Irregular|Concave) (pentagon|hexagon)$|^Quadrilateral$/.test(expected))return {...base,kind:'text'};
+ if(q.lessonId.startsWith('y7-space-')&&/^(Regular|Irregular|Concave) (pentagon|hexagon)$|^Quadrilateral$|^(Isosceles|Scalene) (acute|right-angled|obtuse)$/.test(expected))return {...base,kind:'text'};
 
  if(/^\(?\s*-?[\d.]+\s*,\s*-?[\d.]+\s*\)?$/.test(expected)&&/point|coordinate|pair|image|P =/i.test(p))return {...base,kind:'coordinates',labels:['x','y']};
  if(/^\d+(?:\.\d+)?(?:\s*:\s*\d+(?:\.\d+)?){1,2}$/.test(expected))return {...base,kind:'ratio',format:/simplif/i.test(p)?'simplest':undefined,labels:['First amount','Second amount','Third amount'].slice(0,expected.split(':').length)};
@@ -129,7 +129,7 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  if(SHAPE_WORDS.has(y)&&!SHAPE_WORDS.has(x))return typoDistance(x,y)<=(y.length>=8?2:y.length>=5?1:0);
  return false;
 }
-const SHAPE_WORDS=new Set(['acute','obtuse','rightangled','equilateral','isosceles','scalene','square','rectangle','rhombus','parallelogram','trapezium','kite','quadrilateral','concave','convex','regularconvex','irregularconvex','nonsquarerectangle','nonsquarerhombus','otherquadrilateral','triangle','pentagon','hexagon','octagon','cube','squarepyramid','triangularpyramid','triangularprism','rectangularprism','pentagonalprism','regularpentagon','regularhexagon','irregularpentagon','irregularhexagon','concavepentagon','concavehexagon']);
+const SHAPE_WORDS=new Set(['acute','obtuse','rightangled','equilateral','isosceles','scalene','square','rectangle','rhombus','parallelogram','trapezium','kite','quadrilateral','concave','convex','regularconvex','irregularconvex','nonsquarerectangle','nonsquarerhombus','otherquadrilateral','triangle','pentagon','hexagon','octagon','cube','squarepyramid','triangularpyramid','triangularprism','rectangularprism','pentagonalprism','regularpentagon','regularhexagon','irregularpentagon','irregularhexagon','concavepentagon','concavehexagon','isoscelesacute','isoscelesrightangled','isoscelesobtuse','scaleneacute','scalenerightangled','scaleneobtuse']);
 /** Edit distance where swapping two neighbouring letters counts as one slip. */
 function typoDistance(s:string,t:string){const d=Array.from({length:s.length+1},(_,i)=>Array.from({length:t.length+1},(_,j)=>i||j?(i?(j?0:i):j):0));
  for(let i=1;i<=s.length;i++)for(let j=1;j<=t.length;j++){d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(s[i-1]===t[j-1]?0:1));if(i>1&&j>1&&s[i-1]===t[j-2]&&s[i-2]===t[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}

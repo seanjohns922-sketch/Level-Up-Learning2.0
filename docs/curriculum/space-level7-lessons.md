@@ -13,7 +13,8 @@ pre/post-test blueprint. Existing assessment questions and marking are unchanged
 - Week 4: classifying triangles by sides and angles, the triangle inequality, triangle rigidity, and quadrilateral properties (SP02).
 - Week 5: the quadrilateral family tree, kites and trapeziums (side and angle properties), and regular polygons (SP02).
 - Weeks 6–8: translations, reflections, rotations about a specified centre, composition/order, and properties preserved by moves (SP03).
-- Weeks 9–10 (SP04): shape sorters with real drawn shapes. Students sort sets of triangles, quadrilaterals and polygons (by sides, angles, concavity, regularity and number of sides), build and fix sorter flowcharts that the program tests on every shape, and complete the quadrilateral family tree. Proof-style counterexample claims are Year 8 and are not taught.
+- Week 9 (SP02, SP04 groundwork): classify triangles, quadrilaterals and polygons with reasons — full triangle names from angle facts, exact quadrilateral names from markings, regular/irregular and convex/concave polygons, and the property that decides each one. No flowcharts.
+- Week 10 (SP04): shape sorters — sort polygons, fix a broken sorter and design a sorter, all tested on real drawn shapes. Proof-style counterexample claims are Year 8 and are not taught.
 
 The teacher curriculum explorer and demo week page provide the scope-and-sequence
 CSV. Guides reuse controlled Starpath net, cube-model, polygon, coordinate-plane

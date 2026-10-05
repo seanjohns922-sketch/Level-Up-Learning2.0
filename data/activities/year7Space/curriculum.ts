@@ -221,22 +221,22 @@ const SPACE7_SOURCE_WEEKS = [
   "code": "AC9M7SP04",
   "lessons": [
    [
-    "Sort a set of triangles",
-    "use a triangle sorter to sort a set of drawn triangles",
-    "A sorter asks one question at a time. Answer each question from the markings on the drawing and follow the Yes or No branch until you reach a group. Here isosceles means exactly two equal sides.",
-    "Read the markings, not the orientation: a turned triangle keeps its properties."
+    "Classify triangles with reasons",
+    "classify triangles by sides and angles and give the property that decides",
+    "Equal angles sit opposite equal sides, and the angles of a triangle add to 180°. Name a triangle by its sides, then its angles, for example isosceles acute.",
+    "Every triangle has at least two acute angles, so look at the largest angle."
    ],
    [
-    "Build a triangle sorter",
-    "choose the questions and groups that make a sorter work",
-    "Each question should split off one group. Put a question first whose Yes branch is a single group, then use the No branch to separate the rest. Test it on every shape.",
-    "A question can sound sensible but send the wrong shapes down a branch, so always run the test shapes."
+    "Classify quadrilaterals with reasons",
+    "name quadrilaterals exactly and use their properties",
+    "Read the markings: right-angle squares, equal-side ticks and parallel arrows. Use the most exact name. In a parallelogram, opposite angles are equal and neighbouring angles add to 180°.",
+    "A square is also a rectangle, but square is the most exact name."
    ],
    [
-    "Quadrilateral family tree",
-    "place quadrilateral families in a hierarchy and sort quadrilaterals",
-    "Each family has every property of the families joined above it: a square is a rectangle and a rhombus, and a rhombus is a parallelogram and a kite. Here a trapezium has exactly one pair of parallel sides.",
-    "A shape belongs to every family above its most specific name."
+    "Classify polygons with reasons",
+    "classify polygons as regular or irregular and convex or concave, giving reasons",
+    "A polygon is concave if one interior angle is more than 180°. It is regular only if all sides and all angles are equal. The interior angles of an n-sided polygon add to (n − 2) × 180°.",
+    "Equal sides alone do not make a polygon regular."
    ]
   ]
  },
@@ -301,13 +301,13 @@ export const SPACE7_SKILL_GROUPS = [
  [[28],[29],[30]], [[31],[32],[35]],
 ];
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const SPACE7_READABILITY_REVISION = 10;
+export const SPACE7_READABILITY_REVISION = 11;
 // Rotations preserving shape properties belong with transformations (SP03), not classifiers.
 const CODE_OVERRIDES:Record<number,(typeof SPACE7_SOURCE_WEEKS)[number]['code']|undefined>={34:'AC9M7SP03'};
 export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:CODE_OVERRIDES[key]??w.code};}
 // One clear title for lessons that combine two skills.
 const LESSON_TITLES:Record<string,string>={'4-1':'Classify triangles by sides and angles','7-1':'Reflect in an axis'};
-const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Quadrilateral families and regular polygons','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Shape sorters','Fix and design shape sorters'];
+const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Quadrilateral families and regular polygons','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Classify shapes with reasons','Fix and design shape sorters'];
 export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map((keys,j)=>{const gs=keys.map(space7SourceGuide);return [LESSON_TITLES[`${i+1}-${j+1}`]??gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));
 export function space7Guide(week:number,lesson:number){const w=SPACE7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const SPACE7_PROGRAM:WeekPlan[]=SPACE7_WEEKS.map((w,i)=>({id:`y7-space-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code],lessons:w.lessons.map((l,j)=>({id:`y7-space-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/space/lesson?realm_id=space&year=Year%207&week=${i+1}&lessonId=y7-space-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[...new Set(SPACE7_SKILL_GROUPS[i][j].map(key=>space7SourceGuide(key).code))],activityIdeas:[l[1],'justify my answer using the given spatial properties'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{rotationRole:role,mode:`space7_v2_w${i+1}_l${j+1}_${role}`}}))}))}));
