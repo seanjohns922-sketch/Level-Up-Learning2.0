@@ -19,10 +19,10 @@ export const CENTRAL_WORLD_CONFIG = {
   myHomeRotationY: Math.PI / 2,
   myHomeEntrance: [-54.8, 0.75, 24] as [number, number, number],
   myHomeExitSpawn: [-52.8, 0.75, 25.5] as [number, number, number],
-  // Reaches well behind the tower (base back ~z -53) and far enough left to reach
-  // the relocated My Home, while staying inside the 135-unit meadow / backdrop.
-  playableBounds: { minX: -64, maxX: 54, minZ: -60, maxZ: 54 },
-  roamEllipse: { centerZ: -4, radiusX: 66, radiusZ: 59 },
+  // Walking extends beyond every build-grid edge, including room for doorways.
+  playableBounds: { minX: -100, maxX: 96, minZ: -94, maxZ: 92 },
+  roamEllipse: { centerZ: -2, radiusX: 150, radiusZ: 150 },
+  meadow: { radius: 190, fadeStart: 160, rimInnerRadius: 150, rimOuterRadius: 189 },
   pathPoints: [
     [2.5, 52],
     [3.4, 43],

@@ -874,7 +874,7 @@ function MeadowGround() {
     const result = sourceTexture.clone();
     result.wrapS = THREE.RepeatWrapping;
     result.wrapT = THREE.RepeatWrapping;
-    result.repeat.set(20, 20);
+    result.repeat.set(20 * CENTRAL_WORLD_CONFIG.meadow.radius / 135, 20 * CENTRAL_WORLD_CONFIG.meadow.radius / 135);
     result.colorSpace = THREE.SRGBColorSpace;
     result.anisotropy = 4;
     result.needsUpdate = true;
@@ -883,10 +883,10 @@ function MeadowGround() {
   useEffect(() => () => texture.dispose(), [texture]);
   // Large enough that the ground always reaches the horizon panorama — no void
   // is ever visible around the Tower or the playable edge.
-  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[135, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.025} color="#edfacb" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
+  return <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 96]} /><meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.025} color="#edfacb" roughness={1} transparent depthWrite={false} onBeforeCompile={shader=>{
    shader.fragmentShader=shader.fragmentShader.replace("#include <common>", "#include <common>\n" + CENTRAL_MEADOW_SHADER_COMMON).replace("#include <map_fragment>",CENTRAL_MEADOW_MAP_FRAGMENT);
     shader.vertexShader="varying float meadowRadius;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nmeadowRadius=length(position.xy);");
-    shader.fragmentShader="varying float meadowRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>","#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(106.0,135.0,meadowRadius);");
+    shader.fragmentShader="varying float meadowRadius;\n"+shader.fragmentShader.replace("#include <alphamap_fragment>",`#include <alphamap_fragment>\ndiffuseColor.a *= 1.0-smoothstep(${CENTRAL_WORLD_CONFIG.meadow.fadeStart.toFixed(1)},${CENTRAL_WORLD_CONFIG.meadow.radius.toFixed(1)},meadowRadius);`);
   }} /></mesh>;
 }
 
@@ -1185,18 +1185,15 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-// A few permanent Aussie gum trees framing the meadow. Positioned just outside
-// the build grid (|x| > 42, or z < -26 / z > 50) so they never collide with a
-// student's placed items, and clear of the Tower and My Home.
 export function CentralWorldEnvironment({ quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   return (
     <group>
       <Suspense fallback={null}>
         <CentralValleyPanorama quality={quality} />
       </Suspense>
-      <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[135, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
+      <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
         <MeadowGround />
-        <CentralMeadowRim quality={quality} />
+        <CentralMeadowRim />
       </Suspense>
       <PaintedGround tiles={groundTiles} />
       <GrassTufts quality={quality} groundTiles={groundTiles} />

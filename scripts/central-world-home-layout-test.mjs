@@ -1,6 +1,7 @@
 import { newWorldPlacementId } from "../lib/world3d/world-connections.ts";
 import assert from 'node:assert/strict';
 import {
+  CENTRAL_WORLD_GRID as grid,
   CENTRAL_WORLD_HOME_ITEM as homeItem, CENTRAL_WORLD_HOME_KEY as homeKey,
   DEFAULT_HOME_PLACEMENT as original, getCentralWorldHome, getCentralWorldHomeAnchors,
   validateCentralWorldPlacement as fits, validateCentralWorldGroundCell as paintable,
@@ -8,6 +9,7 @@ import {
   readCentralWorldGroundTiles, writeCentralWorldGroundTiles, centralWorldStarterPaths,
 } from '../lib/world3d/central-world-layout.ts';
 
+import { CENTRAL_WORLD_CONFIG as config } from '../lib/world3d/central-world-config.ts';
 const storage = new Map();
 globalThis.window = { localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) } };
 const tree = { ...homeItem, item_key: 'tree', metadata: { gridSize: '1x1' } };
@@ -23,8 +25,8 @@ for (const rotation of [0, 90, 180, 270]) {
 }
 assert.equal(fits({ ...moved, gridX: 0, gridZ: -23 }, homeItem, [], items), false, 'Protect tower');
 assert.equal(fits({ ...moved, gridX: 0, gridZ: 9 }, homeItem, [], items), false, 'Protect central arrival');
-assert.equal(fits({ ...moved, gridX: 29 }, homeItem, [], items), false, 'Footprint must fit grid');
-assert.equal(fits({ ...moved, gridX: 26, gridZ: 22 }, homeItem, [], items), false, 'Doorstep must be reachable inside roam ellipse');
+assert.equal(fits({ ...moved, gridX: grid.maxX }, homeItem, [], items), false, 'Footprint must fit grid');
+assert.equal(fits({ ...moved, gridX: 26, gridZ: 22 }, homeItem, [], items), true, 'Previously restricted land is now reachable');
 const obstruction = { itemId: 'tree', placementId: 'tree-1', gridX: 12, gridZ: 8, rotation: 0 };
 assert.equal(fits(moved, homeItem, [obstruction], items), false, 'Do not place exit on an existing item');
 assert.equal(fits(moved, homeItem, [], items, [{ gridX: 12, gridZ: 8, tileType: 'water' }]), false, 'No water at doorstep');
@@ -81,5 +83,23 @@ const reloaded=readCentralWorldPlacements('fence-session');
 assert.equal(reloaded.filter(p=>p.itemId===firstFence.itemId).length,2,'New copies after reload preserve earlier placements');
 assert.notEqual(firstFence.placementId,secondFence.placementId);
 assert.deepEqual(reloaded.find(p=>p.placementId===firstFence.placementId),firstFence,'Rotation and colour survive reload');
+// Exercise all four new corners: paint, items, home entry and saved transforms.
+for (const x of [grid.minX, grid.maxX]) for (const z of [grid.minZ, grid.maxZ]) {
+  assert(paintable(x, z), 'Expanded corner can be painted');
+  assert(fits({ ...obstruction, gridX: x, gridZ: z }, tree, [], items), 'Expanded corner accepts scenery');
+  const wx=x*grid.cellSize, wz=z*grid.cellSize, e=config.roamEllipse, b=config.playableBounds;
+  assert(wx>=b.minX && wx<=b.maxX && wz>=b.minZ && wz<=b.maxZ);
+  assert((wx/e.radiusX)**2+((wz-e.centerZ)/e.radiusZ)**2<1, 'Avatar can reach every corner');
+  assert(Math.hypot(wx,wz)+5<config.meadow.rimInnerRadius, 'Rim scenery stays outside build area');
+  const home={...original,gridX:x+(x<0?4:-4),gridZ:z+(z<0?4:-4)};
+  for (const rotation of [0,90,180,270]) {
+    const candidate={...home,rotation};
+    assert(fits(candidate,homeItem,[],items), 'Home and doorway fit on expanded land');
+    writeCentralWorldPlacements('expanded',[candidate]);
+    assert.deepEqual(getCentralWorldHome(readCentralWorldPlacements('expanded')),candidate);
+  }
+}
+assert(!paintable(grid.maxX+1,0), 'Outside expanded grid remains blocked');
+assert(!fits({...obstruction,gridX:grid.minX-1},tree,[],items));
 delete globalThis.window;
 console.log('Movable home, rotation, reachable entry, collision, scope isolation, undo storage and path migration checks passed.');
