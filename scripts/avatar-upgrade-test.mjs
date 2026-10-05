@@ -8,9 +8,10 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import sharp from 'sharp';
 const require=createRequire(import.meta.url),cache=new Map();
 function compile(file){
- file=path.resolve(file);if(cache.has(file))return cache.get(file).exports;
+ file=path.resolve(file);if(file.endsWith('.json'))return {default:JSON.parse(fs.readFileSync(file,'utf8'))};if(cache.has(file))return cache.get(file).exports;
  const module=new Module(file);cache.set(file,module);
  module.require=(name)=>{
+  if(name==='@react-three/drei')return {useTexture:()=>null};
   if(name.startsWith('.')||name.startsWith('@/')){const base=name.startsWith('@/')?path.resolve(name.slice(2)):path.resolve(path.dirname(file),name);const found=[base,base+'.tsx',base+'.ts'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile());if(found)return compile(found);}
   return require(name);
  };
@@ -56,12 +57,12 @@ const {DEFAULT_OUTFIT}=compile('components/avatar/StudentAvatar.tsx');
 function attach(element,parent){
  if(element==null||typeof element==='boolean')return;
  if(Array.isArray(element)){element.forEach(child=>attach(child,parent));return;}
- const {type,props}=element;if(type===React.Fragment){attach(props.children,parent);return;}if(typeof type==='function'){attach(type(props),parent);return;}
+ const {type,props}=element;if(type===React.Fragment||type===React.Suspense){attach(props.children,parent);return;}if(typeof type==='function'){attach(type(props),parent);return;}
  if(type.endsWith('Geometry')){const C=THREE[type[0].toUpperCase()+type.slice(1)];parent.geometry=new C(...(props.args??[]));return;}
  if(type==='meshStandardMaterial'){parent.material=new THREE.MeshStandardMaterial(props);return;}
  assert.ok(type==='mesh'||type==='group','Known 3D element '+type);
  const object=type==='mesh'?new THREE.Mesh():new THREE.Group();for(const name of ['position','rotation','scale'])if(props[name])object[name].set(...props[name]);
- parent.add(object);attach(props.children,object);
+ if(props.geometry)object.geometry=props.geometry;parent.add(object);attach(props.children,object);
 }
 for(const item of REALM_OUTFITS){const root=new THREE.Group();attach(RealmOutfitDetails({top:`realm_${item.key}`}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty());root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
 for(const hairStyle of ['bald','short','long','ponytail','bun','afro',...ADVANCED_HAIR]){

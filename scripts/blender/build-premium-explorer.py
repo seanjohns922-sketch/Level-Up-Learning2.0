@@ -105,6 +105,10 @@ for side in [-1,1]:
  uv('Cheek',(side*.21,-.208,1.897),(.065,.008,.028),inner)
 uv('Nose bridge',(0,-.244,1.946),(.031,.041,.065),skin);uv('Nose tip',(0,-.282,1.922),(.04,.04,.03),skin)
 line('Smile',[(-.082,-.229,1.84),(-.043,-.26,1.813),(0,-.268,1.805),(.047,-.259,1.814),(.083,-.226,1.842)],.008,lip,[.5,1,1,1,.5])
+# Keep hair separate from eyebrows so the runtime can use wardrobe-matched artwork.
+head_parent=parent
+parent=group('WardrobeHair',(0,0,0));parent.parent=head_parent
+bpy.context.view_layer.update();parent.matrix_parent_inverse=head_parent.matrix_world.inverted()
 # Swept scalp surface. Strand ridges follow the same surface, never floating ribbons.
 def scalp(a,t,lift=0):
  front=max(0,-math.sin(a));theta=(1.48-.42*front+.32*front*math.cos(a))*t
@@ -169,6 +173,7 @@ for (par,mats),members in buckets.items():
 bpy.ops.object.select_all(action='SELECT')
 bpy.context.view_layer.update()
 bpy.ops.export_scene.gltf(filepath=os.path.join(ROOT,'public/avatars/models/codemaster-premium.glb'),export_format='GLB',use_selection=True,export_apply=True)
+if os.environ.get('RELIQ_EXPORT_ONLY')=='1': raise SystemExit(0)
 # Neutral studio preview: real geometry/materials, no painted mock-up.
 bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,-.014));floor=bpy.context.object;floor.name='Studio floor';floor.data.materials.append(mat('Studio',(.115,.13,.15),rough=.85))
 def area(name,loc,energy,size,color):

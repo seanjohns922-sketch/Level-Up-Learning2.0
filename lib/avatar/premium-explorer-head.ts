@@ -6,6 +6,8 @@ export function createPremiumExplorerHead(scene: THREE.Object3D, avatar: Require
   const source = scene.getObjectByName('Head');
   if (!source) throw new Error('Premium explorer asset is missing its Head pivot');
   const root = source.clone(true);
+  const oldHair = root.getObjectByName("WardrobeHair");
+  if (oldHair) oldHair.visible = false;
   // The asset face is centred .32 above its pivot; the explorer face is at 1.12.
   root.position.set(0, .8, 0);
   const materials = new Map<THREE.Material, THREE.MeshStandardMaterial>();

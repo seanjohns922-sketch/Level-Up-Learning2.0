@@ -1,11 +1,13 @@
 "use client";
-import { Suspense, useMemo, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { PremiumExplorerAvatar } from '@/components/world3d/PremiumExplorerAvatar';
+import { DEFAULT_OUTFIT } from '@/components/avatar/StudentAvatar';
+const REVIEW_OUTFIT = {...DEFAULT_OUTFIT,top:'realm_codemaster' as const,shirt:'#30263f',shirtTrim:'#b79860',pants:'#292536',shoes:'#494052',shoeStyle:'boots' as const,held:'flame_blade'};
 function Character({walking}:{walking:boolean}){
- const {scene}=useGLTF('/avatars/models/codemaster-premium.glb');
- const copy=useMemo(()=>{const root=scene.clone(true);root.traverse(o=>{o.castShadow=true;o.receiveShadow=true;});return root;},[scene]);
- useFrame(({clock})=>{const phase=clock.elapsedTime*7;for(const [name,side] of [['ArmL',1],['ArmR',-1],['LegL',-1],['LegR',1]] as const){const node=copy.getObjectByName(name)??copy.getObjectByName(name.replace(/([LR])$/,'.$1'));if(node)node.rotation.x=walking?Math.sin(phase)*.3*side:0;}});
- return <primitive object={copy}/>;
+ const moving=useRef(walking);
+ useEffect(()=>{moving.current=walking;},[walking]);
+ return <group position={[0,.73,0]}><PremiumExplorerAvatar avatar={REVIEW_OUTFIT} movingRef={moving}/></group>;
 }
 export default function Page(){const [walking,setWalking]=useState(false);return <main className="min-h-screen bg-[#151923] p-6 text-[#f3ead6]"><div className="mx-auto max-w-5xl"><h1 className="text-3xl font-bold">Codemaster — 3D character review</h1><p className="mt-2 text-sm text-slate-300">Drag to rotate. Scroll to zoom. This is the actual game model, with neutral studio lighting.</p><button className="my-4 rounded-lg bg-[#e2bf73] px-5 py-2 font-bold text-slate-900" onClick={()=>setWalking(!walking)}>{walking?'Stop walking':'Preview walking'}</button><div className="h-[75vh] min-h-[450px] overflow-hidden rounded-3xl border border-white/10"><Canvas shadows camera={{position:[3,2.2,5],fov:35}} dpr={[1,1.5]}><color attach="background" args={['#242a36']}/><ambientLight intensity={.7}/><directionalLight position={[-3,5,4]} intensity={2.4} castShadow shadow-mapSize={[1024,1024]}/><directionalLight position={[3,2,-3]} intensity={1.3} color="#bac8ff"/><Suspense fallback={null}><Character walking={walking}/></Suspense><mesh rotation={[-Math.PI/2,0,0]} position={[0,-.015,0]} receiveShadow><planeGeometry args={[20,20]}/><meshStandardMaterial color="#343943" roughness={.9}/></mesh><OrbitControls target={[0,1.2,0]} minDistance={2.5} maxDistance={7} maxPolarAngle={Math.PI/2}/></Canvas></div><p className="mt-4 text-sm text-slate-300">Body and armour benchmark. Hand equipment remains a separate slot. Available in the world with the Codemaster outfit, swept hair, smile and boots.</p></div></main>;}

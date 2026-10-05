@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { AvatarOutfit } from '@/components/avatar/StudentAvatar';
 import { createPremiumExplorerHead } from '@/lib/avatar/premium-explorer-head';
+import { ExplorerSweptHair } from './ExplorerSweptHair';
 import { ExplorerCharacterGear } from './ExplorerAvatarDetails';
 
 type Outfit = Required<AvatarOutfit>;
@@ -20,9 +21,11 @@ export function PremiumExplorerAvatar({ avatar, movingRef, sprintingRef }: {
   movingRef: React.MutableRefObject<boolean>;
   sprintingRef?: React.MutableRefObject<boolean>;
 }) {
-  const { scene } = useGLTF('/avatars/models/codemaster-premium.glb');
+  const { scene } = useGLTF('/avatars/models/codemaster-premium.glb?v=wardrobe-hair-2');
   const { root, materials, limbs, rightArm } = useMemo(() => {
     const root = scene.clone(true);
+    const oldHair = root.getObjectByName("WardrobeHair");
+    if (oldHair) oldHair.visible = false;
     const materials: THREE.MeshStandardMaterial[] = [];
     const palette: Record<string, string> = {
       Skin: avatar.skin, 'Ear blush': avatar.skinShade, Smile: avatar.hairShade,
@@ -70,15 +73,16 @@ export function PremiumExplorerAvatar({ avatar, movingRef, sprintingRef }: {
       <meshBasicMaterial color="#02090c" transparent opacity={.3} depthWrite={false} />
     </mesh>
     <group ref={bodyRef}><primitive object={root} dispose={null} /></group>
+    {createPortal(<group position={[0, -.8, 0]}><ExplorerSweptHair colour={avatar.hair}/></group>, root.getObjectByName("Head")!)}
     {createPortal(<group position={[.05, -.69, .1]}><ExplorerCharacterGear held={avatar.held} /></group>, rightArm)}
   </group>;
 }
 
 /** Independent head upgrade: changing clothing must not downgrade swept hair. */
 export function PremiumExplorerHead({ avatar }: { avatar: Outfit }) {
-  const { scene } = useGLTF('/avatars/models/codemaster-premium.glb');
+  const { scene } = useGLTF('/avatars/models/codemaster-premium.glb?v=wardrobe-hair-2');
   const { root, dispose } = useMemo(() => createPremiumExplorerHead(scene, avatar),
     [scene, avatar]);
   useEffect(() => dispose, [dispose]);
-  return <primitive object={root} dispose={null} />;
+  return <group><primitive object={root} dispose={null} /><ExplorerSweptHair colour={avatar.hair}/></group>;
 }

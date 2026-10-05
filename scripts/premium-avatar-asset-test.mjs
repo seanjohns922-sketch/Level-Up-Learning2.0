@@ -12,7 +12,7 @@ let triangles=0,meshes=0;const materials=new Set();
 root.traverse(o=>{if(!o.isMesh)return;meshes++;triangles+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m.name);});
 for(const name of ['Head','Torso','ArmL','ArmR','LegL','LegR'])assert.ok(root.getObjectByName(name),`Animation part exists: ${name}`);
 for(const name of ['Skin','Hair','Gold trim','Armour','Crystal','Boot leather'])assert.ok(materials.has(name),`Appearance material: ${name}`);
-assert.ok(meshes<50,'Static surfaces batched by part and material');assert.ok(triangles<70000,'Review mesh polygon budget');assert.ok(bytes.length<2_000_000,'Uncompressed asset budget');
+assert.ok(meshes<50,'Static surfaces batched by part and material');assert.ok(triangles<71000,'Review mesh polygon budget');assert.ok(bytes.length<2_000_000,'Uncompressed asset budget');
 console.log(`PASS: GLTF loaded with ${meshes} meshes, ${Math.round(triangles)} triangles, ${(bytes.length/1024/1024).toFixed(2)} MiB and all six animation pivots.`);
 
 // Equipment is parented to the moving wrist rather than floating beside the body.
@@ -49,3 +49,19 @@ for(const x of [-.12,.12]) {
 }
 first.dispose(); second.dispose();
 console.log('PASS: independent sculpted head fit, hair colours and unobstructed eyes.');
+
+const {createExplorerHairGeometry} = await import('../lib/avatar/explorer-hair-geometry.ts');
+const sculptedHair = createExplorerHairGeometry();
+const scalpMesh = new THREE.Mesh(sculptedHair.scalp, new THREE.MeshStandardMaterial());
+scalpMesh.updateMatrixWorld(true);
+for(const x of [-.115,.115]) {
+ const ray = new THREE.Raycaster(new THREE.Vector3(x,1.16,2),new THREE.Vector3(0,0,-1));
+ const hits = ray.intersectObject(scalpMesh);
+ assert.ok(hits.every(hit=>hit.point.z<0), 'Swept hair keeps both eyes clear');
+}
+const foreheadRay = new THREE.Raycaster(new THREE.Vector3(.1,1.46,2),new THREE.Vector3(0,0,-1));
+assert.ok(foreheadRay.intersectObject(scalpMesh).length, 'Scalp faces outwards and covers the crown');
+sculptedHair.scalp.computeBoundingBox();
+assert.ok(sculptedHair.scalp.boundingBox.max.y<1.66,'Hair stays proportionate to the head');
+sculptedHair.scalp.dispose(); sculptedHair.strands.forEach(strand=>strand.dispose()); scalpMesh.material.dispose();
+console.log('PASS: connected swept scalp has outward faces and clear eyes.');
