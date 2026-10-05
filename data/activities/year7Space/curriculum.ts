@@ -298,7 +298,7 @@ export const SPACE7_SKILL_GROUPS = [
  [[28],[29],[30]], [[31],[32,33],[35,36]],
 ];
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const SPACE7_READABILITY_REVISION = 5;
+export const SPACE7_READABILITY_REVISION = 6;
 export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code};}
 const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Polygon families and relationships','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Trace and repair classifiers','Create and justify classifiers'];
 export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map(keys=>{const gs=keys.map(space7SourceGuide);return [gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));

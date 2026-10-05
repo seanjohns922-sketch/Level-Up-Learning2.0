@@ -1,7 +1,27 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
-export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[]};
+export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build};
+/** A cube model the student builds on a 2 by 3 height plan (back row first, left to right, 0 to 4 cubes per stack). */
+export type Level7Build = {mode:'plan'|'views'|'fewest'|'exact';plan?:number[];front?:number[];side?:number[];cubes?:number};
+export const BUILD_MAX_HEIGHT = 4;
+/** Front view = tallest stack in each column; side view = tallest stack in each row, back row first. */
+export function buildViews(h:number[]){return {front:[0,1,2].map(i=>Math.max(h[i],h[i+3])),side:[Math.max(h[0],h[1],h[2]),Math.max(h[3],h[4],h[5])]};}
+const sameList=(x:number[],y:number[])=>x.length===y.length&&x.every((v,i)=>v===y[i]);
+/** The least number of cubes in any model with these front and side views (searches every model). */
+export function fewestCubes(front:number[],side:number[]){
+ let best=Infinity;
+ for(let code=0;code<(BUILD_MAX_HEIGHT+1)**6;code++){const h=Array.from({length:6},(_,i)=>Math.floor(code/(BUILD_MAX_HEIGHT+1)**i)%(BUILD_MAX_HEIGHT+1)),v=buildViews(h);if(sameList(v.front,front)&&sameList(v.side,side))best=Math.min(best,h.reduce((t,n)=>t+n,0));}
+ return best;
+}
+/** Whether a built model meets the instructions. View tasks accept any model with the right views. */
+export function buildMeets(b:Level7Build,h:number[]){
+ if(h.length!==6||h.some(n=>!Number.isInteger(n)||n<0||n>BUILD_MAX_HEIGHT))return false;
+ if(b.mode==='plan')return sameList(h,b.plan!);
+ const v=buildViews(h);if(!sameList(v.front,b.front!)||!sameList(v.side,b.side!))return false;
+ const total=h.reduce((t,n)=>t+n,0);
+ return b.mode==='views'||(b.mode==='fewest'?total===fewestCubes(b.front!,b.side!):total===b.cubes);
+}
 // answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[]};
+type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -11,6 +31,7 @@ export function scalarAnswer(s:string):number|null{
 }
 export function level7Answer(q:Question):Level7Answer|null{
  if(!q.lessonId?.startsWith('y7-'))return null;
+ if(q.build)return {kind:'build',expected:q.answer,prompt:q.prompt,build:q.build};
  const expected=clean(q.answer);
  // Older saved integer questions stored their givens only in the answer choices.
  // Keep those values visible when restoring a question as a typed response.
@@ -73,6 +94,7 @@ function expressionValue(source:string,variables:Record<string,number>):number|n
 }
 export function stripAnswerUnit(spec:Level7Answer,value:string){const s=value.trim();return spec.unit==='$'?s.replace(/^\$\s*/,''):spec.unit&&s.endsWith(spec.unit)?s.slice(0,-spec.unit.length).trim():s;}
 export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
+ if(spec.kind==='build')return buildMeets(spec.build!,response.split(',').map(Number));
  const a=clean(stripAnswerUnit(spec,response)),b=clean(spec.expected);if(!a)return false;
  const near=(x:number|null,y:number|null)=>x!==null&&y!==null&&Math.abs(x-y)<=1e-8*Math.max(1,Math.abs(y));
  if(spec.kind==='number'||spec.kind==='fraction'){

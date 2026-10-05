@@ -40,3 +40,17 @@ console.log('PASS integer comparison givens remain visible in generated and rest
  assert.ok(!mark(simplest,'4 2/4'));assert.ok(!mark(simplest,'3 3/2'));
  console.log('PASS mixed-number answers: 4 5/12 and 53/12 both accepted; simplest form still enforced.');
 }
+// Build tasks: any model with the right views is accepted; fewest and exact also check the cube count.
+{
+ const spec=(build)=>level7Answer({lessonId:'y7-space-w2-l2',prompt:'Build a model.',answer:'0,0,0,0,0,0',build});
+ const views=spec({mode:'views',front:[2,1,3],side:[3,2]});
+ assert.equal(views.kind,'build');
+ for(const r of ['2,1,3,0,0,2','0,0,3,2,1,0','2,1,3,1,1,2'])assert.ok(mark(views,r),r);
+ for(const r of ['2,1,3,0,0,0','3,1,2,0,0,1','2,1,3,0,0,5'])assert.ok(!mark(views,r),r);
+ const fewest=spec({mode:'fewest',front:[2,1,3],side:[3,2]});
+ assert.ok(mark(fewest,'0,0,3,2,1,0'));assert.ok(!mark(fewest,'2,1,3,0,0,2'));
+ const exact=spec({mode:'exact',front:[2,1,3],side:[3,2],cubes:8});
+ assert.ok(mark(exact,'2,1,3,0,0,2'));assert.ok(!mark(exact,'0,0,3,2,1,0'));
+ assert.ok(mark(spec({mode:'plan',plan:[1,0,2,3,1,0]}),'1,0,2,3,1,0'));assert.ok(!mark(spec({mode:'plan',plan:[1,0,2,3,1,0]}),'1,0,2,3,0,1'));
+ console.log('PASS build tasks: alternative models accepted; fewest and exact cube counts enforced.');
+}

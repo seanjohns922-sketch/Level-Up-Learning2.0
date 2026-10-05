@@ -1,9 +1,12 @@
 'use client';
 import {useState} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
+import Level7BuildInput from './Level7BuildInput';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {markLevel7Answer,scalarAnswer,stripAnswerUnit,level7SimplificationTip,type SimplificationTip,type Level7Answer} from '@/lib/level7-answer';
-export default function Level7AnswerInput({spec,onAnswer,realm='number',disabled=false,initialValue='',onEditing}:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){
+// Building tasks use their own input; every other answer kind uses the typed boxes below.
+export default function Level7AnswerInput(props:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){return props.spec.kind==='build'?<Level7BuildInput {...props} realm={props.realm??'space'}/>:<Level7TypedInput {...props}/>;}
+function Level7TypedInput({spec,onAnswer,realm='number',disabled=false,initialValue='',onEditing}:{spec:Level7Answer;onAnswer:(correct:boolean,response:string)=>void;realm?:string;disabled?:boolean;initialValue?:string;onEditing?:()=>void}){
  const t=getRealmTheme(realm),[alternate,setAlternate]=useState(spec.kind==='fraction'&&!spec.format&&!!initialValue&&!initialValue.includes('/')),[error,setError]=useState('');
  const [tip,setTip]=useState<SimplificationTip|null>(null),[showHow,setShowHow]=useState(false);
  const separator=spec.kind==='ratio'?':':spec.kind==='fraction'?'/':',';

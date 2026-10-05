@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {loadCave7 as loadAnswer} from './cave7-loader.mjs';
+const {level7Answer:level7AnswerFn,markLevel7Answer:markFn}=loadAnswer('lib/level7-answer.ts');
 import fs from 'node:fs';
 import {loadSpace7} from './space7-loader.mjs';
 import {loadCave7} from './cave7-loader.mjs';
@@ -8,7 +10,21 @@ const {space7Question,space7Quiz}=loadSpace7('questions');
 const pair=p=>`(${p.x}, ${p.y})`;
 // Calculate from displayed coordinates and properties, independently of the
 // generator's answer/explanation. Direction and order are deliberately tested.
+// Build tasks: check the stored model independently from the prompt, and that the marker agrees.
+function checkBuild(q){
+ const h=q.answer.split(',').map(Number),p=q.prompt,num=t=>(t.match(/\d+/g)||[]).map(Number);
+ assert.equal(h.length,6);assert.ok(h.every(n=>n>=0&&n<=4));
+ const front=[0,1,2].map(i=>Math.max(h[i],h[i+3])),side=[Math.max(...h.slice(0,3)),Math.max(...h.slice(3))];
+ if(q.build.mode==='plan'){const m=p.match(/Back row: ([\d, ]+)\. Front row: ([\d, ]+)\./);assert.deepEqual(h,[...num(m[1]),...num(m[2])]);}
+ else{const m=p.match(/front view ([\d, ]+) \(left to right\) and side view ([\d, ]+) \(back row first\)/);assert.deepEqual(front,num(m[1]));assert.deepEqual(side,num(m[2]));
+  const total=h.reduce((t,n)=>t+n,0);
+  if(q.build.mode==='exact')assert.equal(total,num(p.match(/exactly (\d+) cubes/)[1])[0]);
+  if(q.build.mode==='fewest'){let least=99;for(let c=0;c<5**6;c++){const g=Array.from({length:6},(_,i)=>Math.floor(c/5**i)%5);if([0,1,2].every(i=>Math.max(g[i],g[i+3])===front[i])&&Math.max(...g.slice(0,3))===side[0]&&Math.max(...g.slice(3))===side[1])least=Math.min(least,g.reduce((t,n)=>t+n,0));}assert.equal(total,least);}}
+ const spec=level7AnswerFn(q);assert.equal(spec.kind,'build');assert.ok(markFn(spec,q.answer));
+ assert.ok(!markFn(spec,'0,0,0,0,0,0'));
+}
 function check(key,q){
+ if(q.build)return checkBuild(q);
  const A=q.tier==='apply_create',R=q.tier==='reasoning',F=!A&&!R,v=q.spaceVisual,p=q.prompt,n=(p.replaceAll('−','-').match(/-?\d+/g)||[]).map(Number);
  let answer;
  const h=v?.heights,front=h&&[0,1,2].map(i=>Math.max(h[i],h[i+3])),side=h&&[Math.max(...h.slice(0,3)),Math.max(...h.slice(3))],total=h&&h.reduce((s,x)=>s+x,0),occ=h&&h.filter(Boolean).length;

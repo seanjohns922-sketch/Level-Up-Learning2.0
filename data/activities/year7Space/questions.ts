@@ -5,8 +5,9 @@ import type {Task7,P7,Polygon7,Flow7} from '@/data/assessments/revisions/level7S
 import {HEXOMINOES,VALID_NET_IDS,foldNet,relationBetween} from '@/data/activities/starpath/level5/nets';
 import {space7Guide,space7SourceGuide,SPACE7_SKILL_GROUPS,SPACE7_READABILITY_REVISION} from './curriculum';
 import {pickLevel7LessonQuiz} from '@/lib/level7-quiz';
+import {buildViews,fewestCubes,BUILD_MAX_HEIGHT,type Level7Build} from '@/lib/level7-answer';
 export type Space7Role='fast_thinking'|'reasoning'|'apply_create';
-export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[]};
+export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[];build?:Level7Build};
 const pair=(p:P7)=>`(${p.x}, ${p.y})`;
 const pts=(ps:P7[])=>ps.map(pair).join('; ');
 const units=(n:number)=>`${n} unit${Math.abs(n)===1?'':'s'}`;
@@ -265,9 +266,24 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
   default:visual=before.visual;answerLabels=before.answerLabels;
   }
  }
+ // Build tasks (Weeks 2–3): in about a third of these slots the student builds the model from
+ // instructions. The target is not drawn; view tasks accept any model with the right views.
+ let build:Level7Build|undefined;
+ const buildMode=key===4&&F?'plan':(key===5||key===6)&&A?'views':key===7&&R?'fewest':key===7&&A?'exact':null;
+ if(buildMode&&((Math.imul(seed>>>0,40503)>>>13)%3)===0){
+  const v=buildViews(heights),total=heights.reduce((t,n)=>t+n,0),views=`front view ${v.front.join(', ')} (left to right) and side view ${v.side.join(', ')} (back row first)`;
+  let target=heights;
+  if(buildMode==='fewest'){const least=fewestCubes(v.front,v.side);for(let code=0;code<(BUILD_MAX_HEIGHT+1)**6;code++){const h=Array.from({length:6},(_,i)=>Math.floor(code/(BUILD_MAX_HEIGHT+1)**i)%(BUILD_MAX_HEIGHT+1)),w=buildViews(h);if(h.reduce((t,n)=>t+n,0)===least&&w.front.join()===v.front.join()&&w.side.join()===v.side.join()){target=h;break;}}}
+  build=buildMode==='plan'?{mode:'plan',plan:heights}:buildMode==='views'?{mode:'views',front:v.front,side:v.side}:buildMode==='fewest'?{mode:'fewest',front:v.front,side:v.side}:{mode:'exact',front:v.front,side:v.side,cubes:total};
+  visual=undefined;answerLabels=undefined;
+  prompt=buildMode==='plan'?`Build this model. Back row: ${heights.slice(0,3).join(', ')}. Front row: ${heights.slice(3).join(', ')}. Each number is the cubes in that stack.`:`Build a model with ${views}.${buildMode==='fewest'?' Use the fewest cubes possible.':buildMode==='exact'?` Use exactly ${total} cubes.`:''}`;
+  answer=target.join(',');
+  wrong=[heights.map(n=>Math.min(BUILD_MAX_HEIGHT,n+1)).join(','),[...heights.slice(3),...heights.slice(0,3)].join(','),heights.map(()=>1).join(','),heights.map(n=>n?0:1).join(',')];
+  explanation=buildMode==='plan'?'Set each stack to the number in the plan, back row first, left to right.':buildMode==='views'?'The front view is the tallest stack in each column; the side view is the tallest stack in each row. Many models can match.':buildMode==='fewest'?`Put each tallest stack where its column and row maxima meet and reuse stacks where you can. The fewest is ${target.reduce((t,n)=>t+n,0)} cubes.`:`Match both views first, then add or remove hidden cubes until there are ${total}.`;
+ }
  const options=[...new Set([answer,...wrong])].slice(0,4);if(!prompt||options.length!==4)throw Error(`Invalid options ${key}/${role}: ${prompt}`);
  for(let i=3;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
+ return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,build,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
 }
 export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:LessonActivity){return space7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Space7Role);}
 export function space7Quiz(week:number,attempt=0){
