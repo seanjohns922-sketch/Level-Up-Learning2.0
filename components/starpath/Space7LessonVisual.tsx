@@ -1,9 +1,9 @@
 'use client';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {CubeNet} from './Level5StarpathAssessmentCard';
-import {Polygon,Plans,Plane} from './Level7StarpathAssessmentCard';
+import {Plans,Plane} from './Level7StarpathAssessmentCard';
 import Level7Flowchart from './Level7Flowchart';
-import {PrismDrawing,SolidNetDrawing,FootprintDrawing} from './Space7Solids';
+import {PrismDrawing,SolidNetDrawing,FootprintDrawing,LessonPolygon} from './Space7Solids';
 import {narrateFlow7,type Task7} from '@/data/assessments/revisions/level7StarpathFiveForms';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 const theme=getRealmTheme('space');
@@ -18,7 +18,7 @@ export default function Space7LessonVisual({visual:v}:{visual:Task7}){
   {v.diagram==='net'&&<CubeNet cells={v.cells!} marked={v.marked} labels/>}
   {v.diagram==='plans'&&(v.solidNet?<div className="flex items-center gap-2"><div className="min-w-0 flex-[2] [&_svg]:!max-h-40"><Plans t={v}/></div><figure className="min-w-0 flex-1 text-center text-sm [&_svg]:!max-h-40"><SolidNetDrawing net={v.solidNet}/><figcaption>Net</figcaption></figure></div>:<Plans t={v}/>)}
   {v.diagram==='plane'&&<div className="[&_svg]:!max-h-80"><Plane t={{...v,mode:'choice'}} a={{selected:[],value:"",pair:{x:"",y:""},points:[],commands:[],assignments:{},decisions:[]}} onChange={()=>{}}/></div>}
-  {v.polygons?.map((p,i)=><Polygon key={i} spec={p}/>)}
+  {v.polygons?.map((p,i)=><LessonPolygon key={i} spec={p}/>)}
   {v.prism&&<PrismDrawing sides={v.prism}/>}
   {v.solidNet&&v.diagram!=='plans'&&<SolidNetDrawing net={v.solidNet}/>}
   {v.footprint&&<FootprintDrawing {...v.footprint}/>}

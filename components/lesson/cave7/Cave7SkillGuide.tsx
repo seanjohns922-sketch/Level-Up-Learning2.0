@@ -5,6 +5,7 @@ import {cave7Guide,type NewCave7Realm} from '@/data/activities/cave7/curriculum'
 import {CAVE7_GENERATORS} from '@/data/activities/cave7/questions';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {level7Answer} from '@/lib/level7-answer';
+import {solutionSteps} from '@/lib/level7-guide-steps';
 import type {Cave7Question} from '@/data/activities/cave7/shared';
 import Cave7Visual from './Cave7Visual';
 import Cave7LearningLab from './Cave7LearningLab';
@@ -31,12 +32,6 @@ export default function Cave7SkillGuide({realm,week,lesson,onContinue,review=fal
   </div>
   <div className="mt-5 text-center"><button type="button" onClick={onContinue} className="min-h-12 rounded-xl px-8 py-3 text-lg font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-4" style={{background:t.ctaGradientCss}}>{review?'Back to practice':'Let’s practise'} →</button><p className="mt-2 text-sm">{review?'Your practice timer is paused.':'Read at your own pace. Your timer starts when practice begins.'}</p></div>
  </section>;
-}
-// One step per sentence or clause of the worked explanation. A calculation after a
-// colon becomes its own step; decimals such as 2.5 never split.
-function solutionSteps(explanation=''){
- const tidy=(x:string)=>{const t=x.trim().replace(/^then\s+/i,'').replace(/[,;]$/,'');if(!t)return '';const cap=/^[a-z]{2,}\b/.test(t)?t[0].toUpperCase()+t.slice(1):t;return cap+(/[.!?]$/.test(cap)?'':'.');};
- return explanation.split(/(?<=[.!?])\s+(?=[A-Z(])|;\s+|,\s+then\s+|\s+then\s+(?=[a-z]+\s)/).flatMap(part=>{const m=part.match(/^(\S+(?:\s+\S+)+?):\s+(?=[-\d(a-zA-Z]\S*\s*[=×÷+−-])(.*)$/);return m?[m[1],m[2]]:[part];}).map(tidy).filter(Boolean);
 }
 // Show the same unit the typed answer box shows.
 function answerText(q:Cave7Question){const u=level7Answer(q)?.unit;return !u?q.answer:u==='$'?`$${q.answer}`:u==='%'||u==='°'?`${q.answer}${u}`:`${q.answer} ${u}`;}

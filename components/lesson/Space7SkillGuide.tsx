@@ -4,6 +4,7 @@ import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {MathFormattedText} from '@/components/FractionText';
 import Space7LessonVisual from '@/components/starpath/Space7LessonVisual';
+import {solutionSteps} from '@/lib/level7-guide-steps';
 import {space7Guide} from '@/data/activities/year7Space/curriculum';
 import {space7Question} from '@/data/activities/year7Space/questions';
 import layout from './Space7LessonLayout.module.css';
@@ -11,19 +12,21 @@ export default function Space7SkillGuide({week,lesson,onContinue,review=false}:{
  const guide=space7Guide(week,lesson);if(!guide)return null;
  const example=space7Question(week,lesson,7007);
  const further=(['reasoning','apply_create'] as const).map(role=>space7Question(week,lesson,7007,role));
+ // Skip steps that only repeat the lesson's opening idea, which is already shown above.
+ const all=solutionSteps(example.explanation),fresh=all.filter(x=>!guide.idea.includes(x.replace(/\.$/,''))),steps=fresh.length?fresh:all,answer=answerText(example);
  return <section className={`${layout.guide} rounded-2xl border border-violet-200 bg-[#faf8ff] p-5 text-[#25133f] shadow-xl sm:p-8`} aria-label="Learn the skill">
   <div className="text-xs font-bold uppercase tracking-widest text-violet-800">Learn the skill · Week {week} · Lesson {lesson}</div>
   <div className="mt-3 flex items-start justify-between gap-3"><h2 className="text-2xl font-black sm:text-3xl">{guide.title}</h2><ReadAloudBtn text={`${guide.title}. I am learning to ${guide.goal}. ${guide.idea}`}/></div>
   <p className="mt-3 text-lg leading-relaxed">{guide.idea}</p>
   <div data-guide-example className="my-5 rounded-xl border border-violet-200 bg-white p-5">
-   <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-violet-900">Worked example</h3><ReadAloudBtn text={`${example.prompt} Answer: ${example.answer}. ${example.explanation}`}/></div>
+   <div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold text-violet-900">Worked example</h3><ReadAloudBtn text={`${example.prompt} ${steps.join(' ')} Answer: ${answer}.`}/></div>
    <p className="mb-3 font-semibold"><MathFormattedText text={example.prompt}/></p>
    {example.spaceVisual&&<Space7LessonVisual visual={example.spaceVisual}/>}
-   <p className="mt-3 text-xl font-bold"><MathFormattedText text={example.explanation??''}/></p>
+   <p className="mt-3 rounded-lg bg-violet-50 px-4 py-3 text-lg"><span className="font-semibold">Answer: </span><strong><MathFormattedText text={answer}/></strong></p>
   </div>
   <div data-guide-steps>
-   <div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-violet-800">How to solve it</h3><ReadAloudBtn text={example.steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')}/></div>
-   <ol className="mt-3 space-y-3">{example.steps.map((s,i)=><li key={i} className="flex gap-3 leading-relaxed"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-800 font-bold text-white">{i+1}</span><MathFormattedText text={s}/></li>)}</ol>
+   <div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-violet-800">How to solve it</h3><ReadAloudBtn text={steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')}/></div>
+   <ol className="mt-3 space-y-3">{steps.map((s,i)=><li key={i} className="flex gap-3 leading-relaxed"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-800 font-bold text-white">{i+1}</span><MathFormattedText text={s}/></li>)}</ol>
    <div data-guide-caution className="mt-5 flex items-start justify-between gap-3 rounded-xl border border-violet-200 bg-violet-50 p-4"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`}/></div>
    <details className="mt-3 rounded-xl border border-violet-200 bg-white p-3"><summary className="cursor-pointer font-bold">Worked examples: reasoning and application</summary>{further.map((q,i)=><div key={q.tier} className="mt-4 border-t border-violet-100 pt-3"><div className="flex justify-between gap-3"><h4 className="font-bold">{i===0?'Explain the method':'Apply the skill'}</h4><ReadAloudBtn text={`${q.prompt} Worked solution: ${q.answer}. ${q.explanation}`}/></div><p className="mt-2"><MathFormattedText text={q.prompt}/></p>{q.spaceVisual&&<Space7LessonVisual visual={q.spaceVisual}/>}<p className="mt-2 font-bold"><MathFormattedText text={q.answer}/></p><p className="mt-2"><MathFormattedText text={q.explanation??''}/></p></div>)}</details>
   </div>
@@ -35,3 +38,5 @@ export function Space7SkillGuideDialog({week,lesson,onClose}:{week:number;lesson
  const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{const d=ref.current;d?.showModal();return()=>d?.close();},[]);
  return <dialog ref={ref} onCancel={e=>{e.preventDefault();onClose();}} className="fixed inset-0 m-auto max-h-[90vh] w-[min(95vw,1100px)] overflow-y-auto rounded-2xl border-0 p-0 backdrop:bg-slate-950/85" aria-label="Skill guide"><Space7SkillGuide week={week} lesson={lesson} review onContinue={onClose}/></dialog>;
 }
+// A built model reads as back row and front row; everything else is shown as stored.
+function answerText(q:{answer:string;build?:unknown}){if(!q.build)return q.answer;const h=q.answer.split(',');return `back row ${h.slice(0,3).join(', ')}; front row ${h.slice(3).join(', ')}`;}

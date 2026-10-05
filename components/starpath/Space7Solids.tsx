@@ -62,3 +62,39 @@ export function FootprintDrawing({ cols, rows, occupied }: { cols: number; rows:
     </svg>
   );
 }
+
+type LessonPoint = { x: number; y: number };
+/** Lesson polygon: angle arcs (a square for 90°) with labels inside the corners, side labels outside the edges, framed tightly. */
+export function LessonPolygon({ spec }: { spec: { points: LessonPoint[]; sideLabels?: string[]; angles?: string[]; caption: string } }) {
+  const pad = 40, ps = spec.points;
+  const minX = Math.min(...ps.map(p => p.x)), maxX = Math.max(...ps.map(p => p.x)), minY = Math.min(...ps.map(p => p.y)), maxY = Math.max(...ps.map(p => p.y));
+  const scale = Math.min(260 / (maxX - minX || 1), 180 / (maxY - minY || 1));
+  // Maths coordinates have y up; flip so the drawing is not upside down.
+  const pts = ps.map(p => ({ x: pad + (p.x - minX) * scale, y: pad + (maxY - p.y) * scale }));
+  const width = (maxX - minX) * scale + 2 * pad, height = (maxY - minY) * scale + 2 * pad;
+  const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length, cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+  const unit = (x: number, y: number) => { const l = Math.hypot(x, y) || 1; return { x: x / l, y: y / l }; };
+  const text = { fontSize: 16, fontWeight: 700, fill: '#2c1f4a', paintOrder: 'stroke' as const, stroke: 'white', strokeWidth: 5, strokeLinejoin: 'round' as const };
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={spec.caption} style={{ maxWidth: Math.min(width * 1.2, 420) }}>
+      <polygon points={pts.map(p => `${p.x},${p.y}`).join(' ')} fill={FILL} stroke={STROKE} strokeWidth="3" strokeLinejoin="round" />
+      {spec.angles?.map((label, i) => {
+        if (!label) return null;
+        const v = pts[i], a = unit(pts[(i + pts.length - 1) % pts.length].x - v.x, pts[(i + pts.length - 1) % pts.length].y - v.y), b = unit(pts[(i + 1) % pts.length].x - v.x, pts[(i + 1) % pts.length].y - v.y);
+        const theta = Math.acos(Math.max(-1, Math.min(1, a.x * b.x + a.y * b.y))), bis = unit(a.x + b.x, a.y + b.y);
+        const right = label === '90°', r = 18, dist = Math.min(64, (r + 16) / Math.max(0.35, Math.sin(theta / 2)) * 0.62);
+        const mark = right
+          ? <path d={`M${v.x + a.x * 13} ${v.y + a.y * 13} L${v.x + (a.x + b.x) * 13} ${v.y + (a.y + b.y) * 13} L${v.x + b.x * 13} ${v.y + b.y * 13}`} fill="none" stroke={STROKE} strokeWidth="2" />
+          : <path d={`M${v.x + a.x * r} ${v.y + a.y * r} A${r} ${r} 0 0 ${a.x * b.y - a.y * b.x > 0 ? 1 : 0} ${v.x + b.x * r} ${v.y + b.y * r}`} fill="none" stroke={STROKE} strokeWidth="2" />;
+        return <g key={`a${i}`}>{mark}<text x={v.x + bis.x * dist} y={v.y + bis.y * dist + 5} textAnchor="middle" {...text}>{label}</text></g>;
+      })}
+      {spec.sideLabels?.map((label, i) => {
+        if (!label) return null;
+        const p = pts[i], q = pts[(i + 1) % pts.length], mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+        let n = unit(-(q.y - p.y), q.x - p.x);
+        if ((mx + n.x - cx) * n.x + (my + n.y - cy) * n.y < (mx - cx) * n.x + (my - cy) * n.y) n = { x: -n.x, y: -n.y };
+        return <text key={`s${i}`} x={mx + n.x * 20} y={my + n.y * 20 + 5} textAnchor="middle" {...text}>{label}</text>;
+      })}
+    </svg>
+  );
+}
