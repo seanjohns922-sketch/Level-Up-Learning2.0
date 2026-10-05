@@ -1,11 +1,13 @@
 "use client";
 import { Suspense } from 'react';
 import { useTexture } from '@react-three/drei';
-import { createExplorerHairGeometry, type ReferenceHairStyle } from '@/lib/avatar/explorer-hair-geometry';
+import { createExplorerHairGeometry, createBuzzHairGeometry, REFERENCE_HAIR_STYLES, type ReferenceHairStyle } from '@/lib/avatar/explorer-hair-geometry';
 
-const geometries = Object.fromEntries(['swept','sidepart','short','fade'].map(style => [style,createExplorerHairGeometry(style as ReferenceHairStyle)])) as Record<ReferenceHairStyle, ReturnType<typeof createExplorerHairGeometry>>;
+const geometries = new Map<ReferenceHairStyle, ReturnType<typeof createExplorerHairGeometry>>();
+function geometryFor(style:ReferenceHairStyle){let geometry=geometries.get(style);if(!geometry){geometry=createExplorerHairGeometry(style);geometries.set(style,geometry);}return geometry;}
+export function hasReferenceHair(style:string):style is ReferenceHairStyle{return REFERENCE_HAIR_STYLES.includes(style as ReferenceHairStyle);}
 function HairArtwork({colour,style}:{colour:string;style:ReferenceHairStyle}) {
-  const geometry = geometries[style];
+  const geometry = geometryFor(style);
   const texture = useTexture(`/avatars/hair/hair_${style}.png`);
   return <mesh geometry={geometry.scalp} castShadow receiveShadow>
     <meshStandardMaterial color={colour} map={texture} roughness={.78}
@@ -23,11 +25,16 @@ function HairArtwork({colour,style}:{colour:string;style:ReferenceHairStyle}) {
   </mesh>;
 }
 export function ExplorerSweptHair({colour,style="swept"}:{colour:string;style?:ReferenceHairStyle}) {
-  const geometry = geometries[style];
+  const geometry = geometryFor(style);
   return <group name="wardrobe-reference-hair" dispose={null}>
+    {geometry.strands.map((strand,i)=><mesh key={i} geometry={strand} castShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>)}
+    <mesh geometry={geometry.rearScalp} castShadow receiveShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>
     <mesh geometry={geometry.rear} castShadow receiveShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>
     <Suspense fallback={<mesh geometry={geometry.scalp}><meshStandardMaterial color={colour} roughness={.78}/></mesh>}>
       <HairArtwork colour={colour} style={style}/>
     </Suspense>
   </group>;
 }
+
+const buzzGeometry=createBuzzHairGeometry();
+export function ExplorerBuzzHair({colour}:{colour:string}){return <mesh geometry={buzzGeometry} dispose={null} castShadow><meshStandardMaterial color={colour} roughness={.95}/></mesh>;}

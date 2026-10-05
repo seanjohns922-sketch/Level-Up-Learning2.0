@@ -27,10 +27,11 @@ const {GLTFLoader}=await import('three/examples/jsm/loaders/GLTFLoader.js');
 const bytes=fs.readFileSync('public/avatars/models/codemaster-premium.glb');
 const gltf=await new Promise((resolve,reject)=>new GLTFLoader().parse(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'',resolve,reject));
 const hairTextures={};
-for(const style of ['swept','sidepart','short','fade']){const image=await sharp(`public/avatars/hair/hair_${style}.png`).ensureAlpha().raw().toBuffer({resolveWithObject:true});hairTextures[`/avatars/hair/hair_${style}.png`]=new THREE.DataTexture(image.data,image.info.width,image.info.height);}
+for(const style of ['swept','sidepart','short','fade','locs','twists','waves','curlyPony','spaceBuns','long','tuft','spiky','curls','bob','ponytail','braids','pigtails','bun','afro']){const image=await sharp(`public/avatars/hair/hair_${style}.png`).ensureAlpha().raw().toBuffer({resolveWithObject:true});hairTextures[`/avatars/hair/hair_${style}.png`]=new THREE.DataTexture(image.data,image.info.width,image.info.height);}
 const {DEFAULT_OUTFIT}=compile('components/avatar/StudentAvatar.tsx');
-const reviewOutfit={...DEFAULT_OUTFIT,top:'realm_codemaster',shirt:'#30263f',shirtTrim:'#b79860',pants:'#292536',shoes:'#494052',shoeStyle:'boots',hairStyle:'sidepart',held:'flame_blade'};
+const reviewOutfit={...DEFAULT_OUTFIT,top:'realm_codemaster',shirt:'#30263f',shirtTrim:'#b79860',pants:'#292536',shoes:'#494052',shoeStyle:'boots',hairStyle:process.env.REVIEW_HAIR??'sidepart',held:'flame_blade'};
 const {TrialStudentAvatar}=compile('components/world3d/SharedWorldPlayer.tsx');
+const {ExplorerAvatarHead}=compile('components/world3d/ExplorerAvatarDetails.tsx');
 function attach(element,parent){
  if(element==null||typeof element==='boolean')return;
  if(Array.isArray(element)){element.forEach(child=>attach(child,parent));return;}
@@ -43,16 +44,16 @@ function attach(element,parent){
  if(props.geometry)object.geometry=props.geometry;parent.add(object);attach(props.children,object);
 }
 
-for(const view of ['front','angle']){const root=new THREE.Group();attach(TrialStudentAvatar({movingRef:{current:false}}),root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
+for(const view of ['front','angle','side','back']){const root=new THREE.Group();attach(process.env.REVIEW_HEAD?ExplorerAvatarHead({o:reviewOutfit}):TrialStudentAvatar({movingRef:{current:false}}),root);root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
   const centre=bounds.getCenter(new THREE.Vector3()),extent=Math.max(...size.toArray());
   const camera=new THREE.OrthographicCamera(-extent,extent,extent*.8,-extent*.8,.01,1000);
-  camera.position.copy(centre).add(new THREE.Vector3(view==='front'?0:.65,.1,1).normalize().multiplyScalar(extent*4));camera.lookAt(centre);camera.updateMatrixWorld();
+  camera.position.copy(centre).add(new THREE.Vector3(view==='front'?0:view==='side'?1:view==='back'?0:.65,.1,view==='side'?0:view==='back'?-1:1).normalize().multiplyScalar(extent*4));camera.lookAt(centre);camera.updateMatrixWorld();
   const inverse=camera.quaternion.clone().invert();let half=0;
   for(const x of [-size.x/2,size.x/2])for(const y of [-size.y/2,size.y/2])for(const z of [-size.z/2,size.z/2]){const v=new THREE.Vector3(x,y,z).applyQuaternion(inverse);half=Math.max(half,Math.abs(v.y),Math.abs(v.x)/1.25);}
   half*=1.15;camera.left=-half*1.25;camera.right=half*1.25;camera.top=half;camera.bottom=-half;camera.updateProjectionMatrix();
   const faces=[],light=new THREE.Vector3(-.6,1,.8).normalize();
   root.traverse(o=>{
-   if(!o.isMesh)return;
+   if(!o.isMesh||!o.visible)return;
    const g=o.geometry,position=g.getAttribute('position'),indices=g.index?.array;
    for(let i=0;i<(indices?.length??position.count);i+=3){
     const vertices=[0,1,2].map(j=>new THREE.Vector3().fromBufferAttribute(position,indices?indices[i+j]:i+j).applyMatrix4(o.matrixWorld));
@@ -82,5 +83,5 @@ for(const view of ['front','angle']){const root=new THREE.Group();attach(TrialSt
    }
   }
 
-fs.mkdirSync('output/world3d-audit',{recursive:true});await sharp(pixels,{raw:{width:500,height:400,channels:4}}).png().toFile(`output/world3d-audit/avatar-3d-${view}.png`);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
-console.log('Rendered production avatar geometry from two angles.');
+fs.mkdirSync('output/world3d-audit',{recursive:true});await sharp(pixels,{raw:{width:500,height:400,channels:4}}).png().toFile(`output/world3d-audit/${process.env.REVIEW_HEAD?reviewOutfit.hairStyle+"-head":"avatar-3d"}-${view}.png`);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
+console.log('Rendered production avatar geometry from front, angle, side and back.');

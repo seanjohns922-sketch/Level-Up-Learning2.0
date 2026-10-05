@@ -65,3 +65,16 @@ sculptedHair.scalp.computeBoundingBox();
 assert.ok(sculptedHair.scalp.boundingBox.max.y<1.66,'Hair stays proportionate to the head');
 sculptedHair.scalp.dispose(); sculptedHair.strands.forEach(strand=>strand.dispose()); scalpMesh.material.dispose();
 console.log('PASS: connected swept scalp has outward faces and clear eyes.');
+
+const {REFERENCE_HAIR_STYLES} = await import('../lib/avatar/explorer-hair-geometry.ts');
+assert.equal(REFERENCE_HAIR_STYLES.length,19,'All nineteen wardrobe artwork styles are supported');
+for(const style of REFERENCE_HAIR_STYLES){
+ const hair=createExplorerHairGeometry(style);
+ for(const geometry of [hair.scalp,hair.rear,hair.rearScalp,...hair.strands]){
+  const position=geometry.getAttribute('position');
+  assert.ok(Array.from(position.array).every(Number.isFinite),`${style}: finite geometry`);
+  if(geometry===hair.rear){const index=geometry.index;for(let i=0;i<index.count;i+=3){const points=[0,1,2].map(j=>new THREE.Vector3().fromBufferAttribute(position,index.getX(i+j)));for(let j=0;j<3;j++)assert.ok(points[j].distanceTo(points[(j+1)%3])<.4,`${style}: no tall extrusion walls`);}}
+  geometry.dispose();
+ }
+}
+console.log('PASS: all 19 hairstyles have valid scalp, rounded rear and bounded edge geometry.');

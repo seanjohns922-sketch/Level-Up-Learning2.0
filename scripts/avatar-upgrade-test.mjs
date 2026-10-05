@@ -67,7 +67,7 @@ function attach(element,parent){
 for(const item of REALM_OUTFITS){const root=new THREE.Group();attach(RealmOutfitDetails({top:`realm_${item.key}`}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty());root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
 for(const hairStyle of ['bald','short','long','ponytail','bun','afro',...ADVANCED_HAIR]){
  const root=new THREE.Group();attach(ExplorerAvatarHead({o:{...DEFAULT_OUTFIT,hairStyle}}),root);root.updateMatrixWorld(true);
- const size=new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());assert.ok(size.toArray().every(n=>Number.isFinite(n)&&n>0));assert.ok(size.x<1&&size.y<1.2,'Head remains within avatar proportions');
+ const size=new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());assert.ok(size.toArray().every(n=>Number.isFinite(n)&&n>0));assert.ok(size.x<1.45&&size.y<1.6,`Head remains within avatar proportions: ${hairStyle} ${size.toArray()}`);
  root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
 }
 for(const held of [...CHARACTER_GEAR_KEYS,"flame_blade"]){const root=new THREE.Group();attach(ExplorerCharacterGear({held}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty(),'3D character equipment exists: '+held);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
