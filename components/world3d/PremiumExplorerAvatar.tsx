@@ -5,6 +5,7 @@ import { createPortal, useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { AvatarOutfit } from '@/components/avatar/StudentAvatar';
+import { createPremiumExplorerHead } from '@/lib/avatar/premium-explorer-head';
 import { ExplorerCharacterGear } from './ExplorerAvatarDetails';
 
 type Outfit = Required<AvatarOutfit>;
@@ -71,4 +72,13 @@ export function PremiumExplorerAvatar({ avatar, movingRef, sprintingRef }: {
     <group ref={bodyRef}><primitive object={root} dispose={null} /></group>
     {createPortal(<group position={[.05, -.69, .1]}><ExplorerCharacterGear held={avatar.held} /></group>, rightArm)}
   </group>;
+}
+
+/** Independent head upgrade: changing clothing must not downgrade swept hair. */
+export function PremiumExplorerHead({ avatar }: { avatar: Outfit }) {
+  const { scene } = useGLTF('/avatars/models/codemaster-premium.glb');
+  const { root, dispose } = useMemo(() => createPremiumExplorerHead(scene, avatar),
+    [scene, avatar]);
+  useEffect(() => dispose, [dispose]);
+  return <primitive object={root} dispose={null} />;
 }

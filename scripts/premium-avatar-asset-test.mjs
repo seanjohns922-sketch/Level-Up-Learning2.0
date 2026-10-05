@@ -29,3 +29,23 @@ isolated.getObjectByName('ArmR').rotation.x = -.2;
 assert.ok(Math.abs(arm.rotation.x-.4)<1e-9, 'Cloned avatars animate independently');
 arm.rotation.x=0; arm.remove(grip);
 console.log('PASS: wrist anchor and articulated equipment motion.');
+
+const {createPremiumExplorerHead} = await import('../lib/avatar/premium-explorer-head.ts');
+const appearance = {skin:'#f1c8a6',skinShade:'#d6a07a',hair:'#4a2e1c',hairShade:'#2e1a0e'};
+const first = createPremiumExplorerHead(root, appearance);
+const second = createPremiumExplorerHead(root, {...appearance,hair:'#267bc4'});
+const headBounds = new THREE.Box3().setFromObject(first.root);
+assert.ok(headBounds.min.y>.6 && headBounds.max.y<1.6, 'Head fits the existing explorer neck and height');
+const hairMesh = head => {let found; head.traverse(o=>{if(o.isMesh && o.material.name==='Hair')found=o;}); return found;};
+assert.notEqual(hairMesh(first.root).material,hairMesh(second.root).material,'Per-avatar hair materials are independent');
+assert.equal(hairMesh(second.root).material.color.getHexString(),'267bc4','Hair picker colour reaches the sculpted hair');
+assert.equal(hairMesh(first.root).material.color.getHexString(),'4a2e1c','Recolouring another avatar preserves the first');
+// A forward ray through each pupil must reach the face before the scalp.
+first.root.updateMatrixWorld(true);
+for(const x of [-.12,.12]) {
+ const hits = new THREE.Raycaster(new THREE.Vector3(x,1.171,2),new THREE.Vector3(0,0,-1)).intersectObject(first.root,true);
+ assert.ok(hits.length,'Eye is visible');
+ assert.notEqual(hits[0].object.material.name,'Hair','Hair does not cover the eyes');
+}
+first.dispose(); second.dispose();
+console.log('PASS: independent sculpted head fit, hair colours and unobstructed eyes.');

@@ -3,7 +3,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { PremiumExplorerAvatar, supportsPremiumExplorer } from "./PremiumExplorerAvatar";
+import { PremiumExplorerAvatar, PremiumExplorerHead, supportsPremiumExplorer } from "./PremiumExplorerAvatar";
 import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import { RealmOutfitDetails } from "./RealmOutfitDetails";
 import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
@@ -86,7 +86,9 @@ function ProceduralStudentAvatar({ movingRef, sprintingRef }: { movingRef: React
         ))}
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
         <RealmOutfitDetails top={avatar.top}/>
-        <group scale={[1.1,1.1,1.1]} position={[0,-.078,0]}><ExplorerAvatarHead o={avatar}/></group>
+        <group scale={[1.1,1.1,1.1]} position={[0,-.078,0]}>{avatar.hairStyle === 'swept' && avatar.face === 'smile'
+          ? <Suspense fallback={<ExplorerAvatarHead o={avatar}/>}><PremiumExplorerHead avatar={avatar}/></Suspense>
+          : <ExplorerAvatarHead o={avatar}/>}</group>
 
       </group>
     </group>
