@@ -3,6 +3,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { RealmOutfitDetails } from "./RealmOutfitDetails";
 import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
 import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
@@ -71,6 +72,7 @@ export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: Rea
           </group>
         ))}
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
+        <RealmOutfitDetails top={avatar.top}/>
         <ExplorerAvatarHead o={avatar}/>
 
       </group>

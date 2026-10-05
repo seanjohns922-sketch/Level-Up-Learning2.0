@@ -1,5 +1,7 @@
 "use client";
 
+import { RealmOutfitArt } from "./RealmOutfitArt";
+import { realmOutfit, type RealmTopStyle } from "@/lib/avatar/realm-outfits";
 import { type AdvancedHairStyle } from "./AdvancedHair";
 import { createContext, useContext, useEffect, useId, useRef } from "react";
 import { WeaponShapes, isWeaponKey } from "@/components/avatar/WeaponArt";
@@ -56,7 +58,7 @@ export type BodyType = "neutral" | "dress";
 /** Free face expression (eyes + mouth, plus freckles / rosy cheeks add-ons). */
 export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy" | "wink" | "calm" | "confident";
 /** Clothing garment shapes (each occupies one equipment slot). */
-export type TopStyle = "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
+export type TopStyle = RealmTopStyle | "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
 export type BottomStyle = "joggers" | "shorts" | "jeans" | "trackpants" | "skirt" | "leggings";
 export type ShoeStyle = "sneakers" | "boots" | "sandals" | "hightops";
 
@@ -288,6 +290,7 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
 // ── Torso (Top slot). "dress" also renders its own skirt. ───────────────────
 function TopLayer({ o }: { o: Outfit }) {
   const p = useGradPrefix();
+  if(realmOutfit(o.top)) return <g data-layer="shirt"><LongSleeves o={o} cuff/><RealmOutfitArt top={o.top} fill={`url(#${p}lul-shirt)`} trim={o.shirtTrim}/></g>;
   switch (o.top) {
     case "tshirt":
       return (

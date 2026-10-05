@@ -20,7 +20,9 @@ const {default:Avatar}=compile('components/avatar/StudentAvatar.tsx');
 const {ADVANCED_HAIR}=compile('components/avatar/AdvancedHair.tsx');
 const {CHARACTER_GEAR_KEYS}=compile('components/avatar/CharacterRelicGear.tsx');
 const render=outfit=>renderToStaticMarkup(React.createElement(Avatar,{outfit,height:320,alive:false,floatAnimation:'none'}));
+const {REALM_OUTFITS}=compile('lib/avatar/realm-outfits.ts');
 const variations=[...ADVANCED_HAIR.map(hairStyle=>({name:hairStyle,outfit:{hairStyle}})),...CHARACTER_GEAR_KEYS.map((held,i)=>({name:['Meazurex’s staff','Equationator’s calculator','Starweaver’s orb','Codemaster’s gauntlet','Insightkeeper’s tablet','Chanzia’s die'][i],outfit:{held,hairStyle:ADVANCED_HAIR[i],shirt:['#51347e','#287f9b','#7344bb','#372546','#e2d3bd','#392148'][i],shirtTrim:'#e5c577'}})),...['wink','calm','confident'].map(face=>({name:face,outfit:{face,hairStyle:'fade'}}))];
+for(const item of REALM_OUTFITS){const outfit={top:`realm_${item.key}`,shirt:item.colour,shirtTrim:item.trim,pants:item.pants,shoes:item.shoes,shoeStyle:'boots',held:item.held,hairStyle:'fade'};assert.ok(render(outfit).includes(`data-realm-outfit="${item.key}"`));variations.unshift({name:item.name,outfit});}
 const markup=renderToStaticMarkup(React.createElement('div',null,variations.map(({outfit},i)=>React.createElement(Avatar,{key:i,outfit,alive:false}))));
 const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length,'Avatar gradients remain unique when rendered together');
 for(const held of CHARACTER_GEAR_KEYS)assert.ok(render({held}).includes(`data-character-gear="${held}"`),'Recognisable held art: '+held);
@@ -39,18 +41,20 @@ for(let i=0;i<variations.length;i++){
 await sharp({create:{width:900,height:Math.ceil(variations.length/3)*370,channels:4,background:'#f3f0e7'}}).composite(layers).png().toFile(destination);
 console.log('PASS: new hair and character gear render, coloured image hair changes pixels, and multi-avatar gradient IDs stay unique. Review sheet: '+destination);
 const THREE=await import('three');
+const {RealmOutfitDetails}=compile('components/world3d/RealmOutfitDetails.tsx');
 const {ExplorerAvatarHead,ExplorerCharacterGear}=compile('components/world3d/ExplorerAvatarDetails.tsx');
 const {DEFAULT_OUTFIT}=compile('components/avatar/StudentAvatar.tsx');
 function attach(element,parent){
  if(element==null||typeof element==='boolean')return;
  if(Array.isArray(element)){element.forEach(child=>attach(child,parent));return;}
- const {type,props}=element;if(typeof type==='function'){attach(type(props),parent);return;}
+ const {type,props}=element;if(type===React.Fragment){attach(props.children,parent);return;}if(typeof type==='function'){attach(type(props),parent);return;}
  if(type.endsWith('Geometry')){const C=THREE[type[0].toUpperCase()+type.slice(1)];parent.geometry=new C(...(props.args??[]));return;}
  if(type==='meshStandardMaterial'){parent.material=new THREE.MeshStandardMaterial(props);return;}
  assert.ok(type==='mesh'||type==='group','Known 3D element '+type);
  const object=type==='mesh'?new THREE.Mesh():new THREE.Group();for(const name of ['position','rotation','scale'])if(props[name])object[name].set(...props[name]);
  parent.add(object);attach(props.children,object);
 }
+for(const item of REALM_OUTFITS){const root=new THREE.Group();attach(RealmOutfitDetails({top:`realm_${item.key}`}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty());root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
 for(const hairStyle of ['bald','short','long','ponytail','bun','afro',...ADVANCED_HAIR]){
  const root=new THREE.Group();attach(ExplorerAvatarHead({o:{...DEFAULT_OUTFIT,hairStyle}}),root);root.updateMatrixWorld(true);
  const size=new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());assert.ok(size.toArray().every(n=>Number.isFinite(n)&&n>0));assert.ok(size.x<1&&size.y<1.2,'Head remains within avatar proportions');
