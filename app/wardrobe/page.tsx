@@ -9,6 +9,7 @@ import EconomyHeader from "@/components/economy/EconomyHeader";
 import StudentAvatar, { type AvatarOutfit, type BodyType, type BottomStyle, type FaceType, type HairStyle, type ShoeStyle, type TopStyle } from "@/components/avatar/StudentAvatar";
 import {
   AVATAR_BASE_KEYS,
+  AVATAR_LAYER_SLOTS,
   economyErrorMessage,
   equipEconomyItem,
   fetchStudentEconomy,
@@ -103,7 +104,7 @@ function layerPreview(base: AvatarOutfit, item: EconomyItem): AvatarOutfit {
 }
 
 // ── Outfit presets (saved looks) ────────────────────────────────────────────
-type OutfitPreset = { id: string; name: string; outfit: AvatarOutfit };
+type OutfitPreset = { id: string; name: string; outfit: AvatarOutfit; base?: AvatarOutfit; equipped?: Record<string, string> };
 const MAX_PRESETS = 5;
 const CLOTHING_SLOTS = ["avatar_outfit", "top", "bottom", "footwear"] as const;
 const presetsKey = (studentId: string) => `lul:${studentId}:outfit_presets_v1`;
@@ -309,7 +310,11 @@ export default function ExplorerOutfitPage() {
   }
   function savePreset() {
     if (!state || presets.length >= MAX_PRESETS) return;
-    persistPresets([...presets, { id: crypto.randomUUID(), name: `Outfit ${presets.length + 1}`, outfit: merged }]);
+    persistPresets([...presets, {
+      id: crypto.randomUUID(), name: `Outfit ${presets.length + 1}`, outfit: merged,
+      base: baseFieldsOf(state.avatarBase),
+      equipped: Object.fromEntries(AVATAR_LAYER_SLOTS.filter(slot => state.equipped[slot]).map(slot => [slot, state.equipped[slot]])),
+    }]);
     bump();
   }
   function deletePreset(id: string) {
@@ -320,10 +325,19 @@ export default function ExplorerOutfitPage() {
     setBusy(true);
     setMessage(null);
     try {
-      let next = await saveAvatarBase(student.studentId, baseFieldsOf(p.outfit));
-      // Take off any equipped premium clothing so the saved base look shows.
-      for (const slot of CLOTHING_SLOTS) {
-        if (next.equipped[slot]) next = await unequipEconomySlot(student.studentId, slot);
+      let next = await saveAvatarBase(student.studentId, baseFieldsOf(p.base ?? p.outfit));
+      commit(next);
+      // New looks retain item identities, so equipment still goes through ownership checks.
+      // Older saved looks have no equipment snapshot; preserve their original behaviour.
+      for (const slot of p.equipped ? AVATAR_LAYER_SLOTS : CLOTHING_SLOTS) {
+        const wanted = p.equipped?.[slot];
+        if (wanted && next.equipped[slot] !== wanted) {
+          next = await equipEconomyItem(student.studentId, wanted);
+          commit(next);
+        } else if (!wanted && next.equipped[slot]) {
+          next = await unequipEconomySlot(student.studentId, slot);
+          commit(next);
+        }
       }
       commit(next);
       bump();

@@ -2,15 +2,22 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';import path from 'node:path';import Module,{createRequire} from 'node:module';import ts from 'typescript';
 import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';
 const require=createRequire(import.meta.url),cache=new Map(),calls=[];
-let fixture,hookIndex=0,server,captureEffects=false,delayFetch=false;
+let fixture,hookIndex=0,server,captureEffects=false,delayFetch=false,presetFixtures=[];
 const effects=[],updates=[],refs=[],pendingFetch=[];
 function compile(file){file=path.resolve(file);if(cache.has(file))return cache.get(file).exports;const m=new Module(file);cache.set(file,m);m.require=name=>{
- if(name==='react')return {...React,useMemo:fn=>fn(),useRef:v=>{const ref={current:v};if(captureEffects)refs.push(ref);return ref;},useEffect:fn=>{if(captureEffects)effects.push(fn);},useState:initial=>{const index=hookIndex++;return [index===1?fixture:typeof initial==='function'?initial():initial,v=>{if(index===1)updates.push(v);}];}};
+ if(name==='react')return {...React,useMemo:fn=>fn(),useRef:v=>{const ref={current:v};if(captureEffects)refs.push(ref);return ref;},useEffect:fn=>{if(captureEffects)effects.push(fn);},useState:initial=>{const index=hookIndex++;return [index===1?fixture:index===5?presetFixtures:typeof initial==='function'?initial():initial,v=>{if(index===1)updates.push(v);}];}};
  if(name==='next/navigation')return {useRouter:()=>({push:()=>{}})};
  if(name==='@/lib/studentIdentity')return {getActiveStudentProfile:()=>({studentId:'test-student',displayName:'Test'})};
  if(name==='@/lib/avatar-appearance')return {persistCanonicalAvatarAppearance:()=>{}};
  if(name==='@/lib/demo-mode')return {isDemoPreviewMode:()=>false};
- if(name==='@/lib/supabase')return {supabase:{rpc:async(name,args)=>{calls.push({name,args});if(name==='get_student_economy_secure'&&delayFetch)return new Promise(resolve=>pendingFetch.push(resolve));if(name==='purchase_economy_item_secure'){server={...server,inventory:[...server.inventory,{item_key:args.p_item_key,acquired_at:'2026-10-06',acquisition_type:'purchase'}]};}return {data:server,error:null};}}};
+ if(name==='@/lib/supabase')return {supabase:{rpc:async(name,args)=>{calls.push({name,args});if(name==='get_student_economy_secure'&&delayFetch)return new Promise(resolve=>pendingFetch.push(resolve));if(name==='purchase_economy_item_secure'){server={...server,inventory:[...server.inventory,{item_key:args.p_item_key,acquired_at:'2026-10-06',acquisition_type:'purchase'}]};}if(name==='set_student_avatar_base_secure')server={...server,avatarBase:args.p_base};
+ if(name==='equip_economy_item_secure'){
+  if(!server.inventory.some(i=>i.item_key===args.p_item_key))return {data:null,error:new Error('Not owned')};
+  const slot=server.items.find(i=>i.item_key===args.p_item_key).metadata.slot;
+  server={...server,equipped:{...server.equipped,[slot]:args.p_item_key}};
+ }
+ if(name==='unequip_economy_slot_secure'){const equipped={...server.equipped};delete equipped[args.p_slot];server={...server,equipped};}
+ return {data:server,error:null};}}};
  if(name==='@/components/avatar/StudentAvatar')return {default:({outfit})=>React.createElement('span',{'data-preview':JSON.stringify(outfit)})};
  if(name==='@/components/economy/EconomyHeader'||name==='@/components/economy/RealmItemFilter')return {default:()=>null};
  if(name.startsWith('.')||name.startsWith('@/')){const base=name.startsWith('@/')?path.resolve(name.slice(2)):path.resolve(path.dirname(file),name);return compile([base,base+'.tsx',base+'.ts'].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile()));}
@@ -51,3 +58,27 @@ pendingFetch[1]({data:latest,error:null});await tick();pendingFetch[0]({data:ser
 const count=updates.length;listeners.get('focus')();refs[0].current={...refs[0].current,avatarBase:{hairStyle:'bun'}};pendingFetch[2]({data:server,error:null});await tick();assert.equal(updates.length,count,'Refresh cannot overwrite a newer local outfit edit');
 cleanup();assert.equal(listeners.size,0,'Refresh listeners are removed on navigation');delete globalThis.window;delete globalThis.document;
 console.log('PASS: focus refresh, stale-response protection and edit preservation.');
+
+// Exercise the real Saved looks click handlers, including equipment identities.
+captureEffects=false;delayFetch=false;
+let saved;
+globalThis.window={localStorage:{setItem:(_key,value)=>{saved=JSON.parse(value);}}};
+function buttons(node,result=[]){if(!node||typeof node!=='object')return result;if(node.type==='button')result.push(node);for(const child of [node.props?.children].flat(Infinity))buttons(child,result);return result;}
+function pageButtons(){fixture=server;hookIndex=0;return buttons(Page());}
+server={...server,avatarBase:{hairStyle:'swept',top:'hoodie'},equipped:{avatar_outfit:'test_avatar_outfit',avatar_hand:'test_avatar_hand'}};
+pageButtons().find(b=>b.props.onClick?.name==='savePreset').props.onClick();
+assert.deepEqual(saved[0].equipped,server.equipped,'Saved look retains purchased item identities');
+assert.equal(saved[0].base.top,'hoodie','Free base is saved independently of the paid outfit');
+presetFixtures=saved;
+server={...server,avatarBase:{hairStyle:'bun'},equipped:{avatar_hat:'test_avatar_hat'}};
+await pageButtons().find(b=>b.props.title==='Wear Outfit 1').props.onClick();
+assert.deepEqual(server.equipped,saved[0].equipped,'Applying a look restores outfit/hand and removes later accessories');
+assert.equal(server.avatarBase.hairStyle,'swept');
+presetFixtures=[{id:'free',name:'Free',outfit:{top:'tshirt'},base:{top:'tshirt'},equipped:{}}];
+await pageButtons().find(b=>b.props.title==='Wear Free').props.onClick();
+assert.deepEqual(server.equipped,{},'Free saved look clears purchased wearables');
+presetFixtures=[{id:'missing',name:'Missing',outfit:{},base:{},equipped:{avatar_hand:'not_owned'}}];
+await pageButtons().find(b=>b.props.title==='Wear Missing').props.onClick();
+assert.deepEqual(server.equipped,{},'Unowned saved equipment cannot bypass the equip RPC');
+delete globalThis.window;
+console.log('PASS: saved looks restore purchased outfits and gear through ownership-checked RPCs, preserve free base and clear obsolete accessories.');

@@ -71,7 +71,7 @@ requirePattern(
 );
 requirePattern(
   "app/wardrobe/page.tsx",
-  /if \(cancelled \|\| stateRef\.current\) return;/,
+  /if \(cancelled \|\| request !== requestId \|\| stateRef\.current !== snapshot\) return;/,
   "a delayed initial economy response must not overwrite an avatar selection",
 );
 requirePattern(
