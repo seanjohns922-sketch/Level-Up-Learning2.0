@@ -1,5 +1,6 @@
 "use client";
 
+import { type AdvancedHairStyle } from "./AdvancedHair";
 import { createContext, useContext, useEffect, useId, useRef } from "react";
 import { WeaponShapes, isWeaponKey } from "@/components/avatar/WeaponArt";
 
@@ -30,7 +31,7 @@ const useGradPrefix = () => useContext(GradientIdContext);
  * to be present.
  */
 
-export type HairStyle =
+export type HairStyle = AdvancedHairStyle
   | "short"
   | "tuft"
   | "swept"
@@ -53,7 +54,7 @@ export type BackpackStyle = "none" | "explorer" | "rocket";
 /** Base body silhouette. "neutral" = trousers look, "dress" = flared skirt look. */
 export type BodyType = "neutral" | "dress";
 /** Free face expression (eyes + mouth, plus freckles / rosy cheeks add-ons). */
-export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy";
+export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy" | "wink" | "calm" | "confident";
 /** Clothing garment shapes (each occupies one equipment slot). */
 export type TopStyle = "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
 export type BottomStyle = "joggers" | "shorts" | "jeans" | "trackpants" | "skirt" | "leggings";
@@ -469,6 +470,12 @@ function WeaponLayer({ o }: { o: Outfit }) {
 // flip it to true in IMAGE_HAIR_READY. Until then it falls back to the SVG
 // HairLayer, so nothing breaks while assets are still being produced.
 const IMAGE_HAIR_READY: Partial<Record<HairStyle, boolean>> = {
+  fade: true,
+  locs: true,
+  twists: true,
+  waves: true,
+  curlyPony: true,
+  spaceBuns: true,
   long: true,
   short: true,
   swept: true,
@@ -496,10 +503,19 @@ const HAIR_IMAGE_DY: Partial<Record<HairStyle, number>> = {
   bun: -5,
 };
 
-function HairImageLayer({ style }: { style: HairStyle }) {
-  const { x, y, w, h } = HAIR_IMAGE_BOX;
+function HairImageLayer({ style, color }: { style: HairStyle; color:string }) {
+  const id=useGradPrefix()+"hair-tint";
+  const safeColor=/^#[0-9a-f]{6}$/i.test(color)?color:/^#[0-9a-f]{3}$/i.test(color)?"#"+color.slice(1).split("").map(c=>c+c).join(""):"#4a2e1c";
+  const rgb=[1,3,5].map(offset=>parseInt(safeColor.slice(offset,offset+2),16)/255);
+  const boxes: Partial<Record<HairStyle, typeof HAIR_IMAGE_BOX>> = {
+    locs: { x: -5, y: 5, w: 130, h: 130 },
+    waves: { x: 4, y: -8, w: 112, h: 112 },
+    curlyPony: { x: 0, y: 0, w: 115, h: 115 },
+    spaceBuns: { x: -1, y: -6, w: 122, h: 122 },
+  };
+  const { x, y, w, h } = boxes[style] ?? HAIR_IMAGE_BOX;
   return (
-    <image
+    <g><defs><filter id={id} colorInterpolationFilters="sRGB"><feColorMatrix type="matrix" values={`${rgb[0]*.55} ${rgb[0]*1.85} ${rgb[0]*.2} 0 0 ${rgb[1]*.55} ${rgb[1]*1.85} ${rgb[1]*.2} 0 0 ${rgb[2]*.55} ${rgb[2]*1.85} ${rgb[2]*.2} 0 0 0 0 0 1 0`}/></filter></defs><image filter={`url(#${id})`}
       href={`/avatars/hair/hair_${style}.png`}
       x={x}
       y={y + (HAIR_IMAGE_DY[style] ?? 0)}
@@ -507,7 +523,7 @@ function HairImageLayer({ style }: { style: HairStyle }) {
       height={h}
       preserveAspectRatio="xMidYMid meet"
       data-layer="hair-image"
-    />
+    /></g>
   );
 }
 
@@ -712,8 +728,8 @@ function FaceLayer({ o }: { o: Outfit }) {
     <g className="lul-eyes">
       <ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
       <ellipse cx="71" cy="60" rx="3.6" ry="4.6" fill="#ffffff" />
-      <ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
-      <ellipse cx="71" cy="61" rx="2.4" ry="3.2" fill="#2c1810" />
+      <ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#513d2b" />
+      <ellipse cx="71" cy="61" rx="2.4" ry="3.2" fill="#513d2b" />
       <circle cx="50" cy="59.5" r="1.1" fill="#ffffff" />
       <circle cx="72" cy="59.5" r="1.1" fill="#ffffff" />
       <circle cx="48.2" cy="62.4" r="0.5" fill="#ffffff" opacity="0.8" />
@@ -730,8 +746,8 @@ function FaceLayer({ o }: { o: Outfit }) {
     <g className="lul-eyes">
       <ellipse cx="49" cy="61" rx="3.4" ry="3.8" fill="#ffffff" />
       <ellipse cx="71" cy="61" rx="3.4" ry="3.8" fill="#ffffff" />
-      <ellipse cx="49" cy="62" rx="2.3" ry="2.8" fill="#2c1810" />
-      <ellipse cx="71" cy="62" rx="2.3" ry="2.8" fill="#2c1810" />
+      <ellipse cx="49" cy="62" rx="2.3" ry="2.8" fill="#513d2b" />
+      <ellipse cx="71" cy="62" rx="2.3" ry="2.8" fill="#513d2b" />
       {/* focused lids */}
       <path d="M45 57.5 L53.5 59" stroke={o.hairShade} strokeWidth="1.6" strokeLinecap="round" />
       <path d="M75 57.5 L66.5 59" stroke={o.hairShade} strokeWidth="1.6" strokeLinecap="round" />
@@ -745,8 +761,9 @@ function FaceLayer({ o }: { o: Outfit }) {
     </g>
   );
 
-  const eyes = o.face === "happy" ? happyEyes : o.face === "determined" ? determinedEyes : openEyes;
-  const mouth = o.face === "bigSmile" ? bigSmile : smallSmile;
+  const winkEyes=<g><ellipse cx="49" cy="60" rx="3.6" ry="4.6" fill="white"/><ellipse cx="49" cy="61" rx="2.4" ry="3.2" fill="#3e322a"/><circle cx="50" cy="59.5" r="1.1" fill="white"/><path d="M67 61q4-4 8 0" stroke={o.hairShade} strokeWidth="2" strokeLinecap="round" fill="none"/></g>;
+  const eyes = o.face === "wink" ? winkEyes : o.face === "happy" ? happyEyes : o.face === "determined" ? determinedEyes : openEyes;
+  const mouth = o.face === "bigSmile" ? bigSmile : o.face === "calm" ? <path d="M55 76q5 1 10 0" stroke="#59352b" strokeWidth="1.5" fill="none" strokeLinecap="round"/> : o.face === "confident" ? <path d="M53 76q8 3 15-3" stroke="#59352b" strokeWidth="1.7" fill="none" strokeLinecap="round"/> : smallSmile;
   const cheekOpacity = o.face === "rosy" ? 0.9 : 0.55;
   const cheekR = o.face === "rosy" ? 5.6 : 4.5;
 
@@ -765,6 +782,7 @@ function FaceLayer({ o }: { o: Outfit }) {
       )}
 
       {eyes}
+      {o.face!=="happy"&&o.face!=="wink"&&<g fill="#111b26"><ellipse cx="49" cy={o.face==="determined"?62:61} rx="1.2" ry="2"/><ellipse cx="71" cy={o.face==="determined"?62:61} rx="1.2" ry="2"/><circle cx="50" cy="59.5" r=".8" fill="white"/><circle cx="72" cy="59.5" r=".8" fill="white"/></g>}
 
       {/* Nose hint */}
       <path d="M60 64 Q61 68 60 70" stroke={o.skinShade} strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6" />
@@ -1040,7 +1058,7 @@ export default function StudentAvatar({
         </g>
 
         {/* ── HAIR + HEADWEAR + EYEWEAR ────────────────── */}
-        {IMAGE_HAIR_READY[o.hairStyle] ? <HairImageLayer style={o.hairStyle} /> : <HairLayer o={o} />}
+        {IMAGE_HAIR_READY[o.hairStyle] ? <HairImageLayer style={o.hairStyle} color={o.hair} /> : <HairLayer o={o} />}
         <HatLayer o={o} />
         <GlassesLayer o={o} />
 

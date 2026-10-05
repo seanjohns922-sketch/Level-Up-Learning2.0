@@ -99,6 +99,7 @@ if (!latestEconomyFunctionMigration) {
 }
 
 const allowedDirectRenderers = new Set([
+  "app/demo-review/avatar-upgrade/page.tsx", // Deliberate prop-driven design specimens; no student identity.
   "components/avatar/CanonicalStudentAvatar.tsx",
   "components/economy/MarketplaceItemImage.tsx",
   "app/wardrobe/page.tsx",

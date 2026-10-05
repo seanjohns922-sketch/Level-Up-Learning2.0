@@ -39,7 +39,7 @@ const SHOE_STYLES: Array<[ShoeStyle, string]> = [
 ];
 const FACES: Array<[FaceType, string]> = [
   ["smile", "Smile"], ["bigSmile", "Big Smile"], ["happy", "Happy Eyes"],
-  ["determined", "Determined"], ["freckles", "Freckles"], ["rosy", "Rosy Cheeks"],
+  ["determined", "Determined"], ["freckles", "Freckles"], ["rosy", "Rosy Cheeks"], ["wink", "Wink"], ["calm", "Calm"], ["confident", "Confident"],
 ];
 const SKINS: Array<[string, string]> = [
   ["#ffe0bd", "#eec39a"], ["#f7d9bf", "#e2b58f"], ["#f4c2c2", "#dd9a9a"], ["#f1c8a6", "#d6a07a"],
@@ -51,6 +51,7 @@ const HAIRSTYLES: Array<[HairStyle, string]> = [
   ["short", "Short"], ["swept", "Swept"], ["sidepart", "Side Part"], ["tuft", "Tuft"],
   ["spiky", "Spiky"], ["curls", "Curly"], ["afro", "Afro"], ["buzz", "Buzz"],
   ["long", "Long"], ["bob", "Bob"], ["ponytail", "Ponytail"], ["pigtails", "Pigtails"],
+  ["fade", "Textured Fade"], ["locs", "Locs"], ["twists", "Twists"], ["waves", "Waves"], ["curlyPony", "Curly Ponytail"], ["spaceBuns", "Double Buns"],
   ["bun", "Top Knot"], ["braids", "Braids"], ["bald", "Bald"],
 ];
 const HAIRCOLORS: Array<[string, string, string]> = [

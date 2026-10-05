@@ -76,7 +76,8 @@ function BackpackArt({ meta }: { meta: ItemMeta }) {
 function HandArt({ meta }: { meta: ItemMeta }) {
   const held = value(meta, "held", "");
   const color = typeof meta.heldColor === "string" ? meta.heldColor : undefined;
-  return <g transform="translate(80 118) scale(1.3)"><WeaponShapes held={held} color={color} /></g>;
+  const transform=held==="meazurex_timewielder_staff"?"translate(80 96) scale(.7)":held==="geospin_starweaver_orb"?"translate(80 112) scale(1.65)":held==="numbot_equationator_calculator"?"translate(80 120) scale(1.6)":"translate(80 118) scale(1.3)";
+  return <g transform={transform}><WeaponShapes held={held} color={color} /></g>;
 }
 
 function OutfitArt({ meta }: { meta: ItemMeta }) {

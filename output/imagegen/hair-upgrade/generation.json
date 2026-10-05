@@ -1,0 +1,22 @@
+{
+  "tool": "Built-in image generation",
+  "reference": "public/avatars/hair/hair_swept.png",
+  "promptBrief": "Hair-only transparent PNG game-avatar overlays. Premium shaded 3D illustration, chestnut brown textured strand groups, front-facing on a square transparent canvas. No face, skin, body, text or background. Keep the central face opening transparent and eyes unobscured.",
+  "styles": [
+    "fade",
+    "locs",
+    "twists",
+    "waves",
+    "curlyPony",
+    "spaceBuns"
+  ],
+  "assets": [
+    "public/avatars/hair/hair_fade.png",
+    "public/avatars/hair/hair_locs.png",
+    "public/avatars/hair/hair_twists.png",
+    "public/avatars/hair/hair_waves.png",
+    "public/avatars/hair/hair_curlyPony.png",
+    "public/avatars/hair/hair_spaceBuns.png"
+  ],
+  "preparation": "512 x 512 PNG, alpha preserved. Each style positioned independently on the existing avatar; runtime colour tint retained."
+}

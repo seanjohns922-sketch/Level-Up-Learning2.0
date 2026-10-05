@@ -3,6 +3,7 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
 import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
@@ -24,9 +25,6 @@ export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: Rea
   const appearance = useCanonicalAvatarAppearance();
   const avatar = appearance ?? DEFAULT_OUTFIT;
   const skin = avatar.skin;
-  const skinShade = avatar.skinShade;
-  const hair = avatar.hair;
-  const hairShade = avatar.hairShade;
   const top = avatar.shirt;
   const topTrim = avatar.shirtTrim;
   const pants = avatar.pants;
@@ -58,26 +56,23 @@ export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: Rea
       <group ref={bodyRef}>
         {[-1, 1].map((side) => (
           <group key={`leg-${side}`} ref={side === -1 ? leftLegRef : rightLegRef} position={[side * 0.18, 0.02, 0]}>
-            <mesh position={[0, -0.32, 0]}><boxGeometry args={[0.27, 0.62, 0.3]} /><meshStandardMaterial color={pants} roughness={0.74} /></mesh>
-            <mesh position={[0, -0.66, 0.08]}><boxGeometry args={[0.31, 0.18, 0.48]} /><meshStandardMaterial color={shoes} roughness={0.62} /></mesh>
+            <mesh position={[0, -0.32, 0]}><capsuleGeometry args={[.135,.35,6,12]} /><meshStandardMaterial color={pants} roughness={0.74} /></mesh>
+            <mesh position={[0, -0.66, 0.08]} scale={[.16,.09,.24]}><sphereGeometry args={[1,16,12]} /><meshStandardMaterial color={shoes} roughness={0.62} /></mesh>
           </group>
         ))}
-        <mesh position={[0, 0.4, 0]}><boxGeometry args={[0.78, 0.82, 0.4]} /><meshStandardMaterial color={top} roughness={0.66} /></mesh>
+        <mesh position={[0, 0.4, 0]} scale={[1,1,.55]}><capsuleGeometry args={[.38,.12,8,20]} /><meshStandardMaterial color={top} roughness={0.66} /></mesh>
         <mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
         <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color={topTrim} emissive={topTrim} emissiveIntensity={0.16} /></mesh>
         {[-1, 1].map((side) => (
           <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
-            <mesh position={[0, -0.38, 0]}><boxGeometry args={[0.23, 0.76, 0.28]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>
-            <mesh position={[0, -0.85, 0]}><boxGeometry args={[0.24, 0.2, 0.29]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
+            <mesh position={[0, -0.38, 0]}><capsuleGeometry args={[.12,.5,6,12]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>
+            <mesh position={[0, -0.85, 0]}><sphereGeometry args={[.13,16,12]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
+            {side===1&&<group position={[0,-.85,.14]}><ExplorerCharacterGear held={avatar.held}/></group>}
           </group>
         ))}
-        <mesh position={[0, 1.1, 0]}><boxGeometry args={[0.58, 0.58, 0.54]} /><meshStandardMaterial color={skin} roughness={0.8} /></mesh>
-        <mesh position={[0, 1.36, -0.02]}><boxGeometry args={[0.62, 0.16, 0.58]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
-        <mesh position={[0, 1.22, -0.28]}><boxGeometry args={[0.62, 0.3, 0.1]} /><meshStandardMaterial color={hairShade} roughness={0.86} /></mesh>
-        <mesh position={[-0.18, 1.34, 0.24]} rotation={[0, 0, -0.22]}><boxGeometry args={[0.18, 0.18, 0.12]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
-        <mesh position={[0.08, 1.38, 0.24]} rotation={[0, 0, 0.16]}><boxGeometry args={[0.24, 0.17, 0.12]} /><meshStandardMaterial color={hair} roughness={0.86} /></mesh>
-        {[-0.14, 0.14].map((x) => <mesh key={x} position={[x, 1.15, 0.276]}><boxGeometry args={[0.055, 0.075, 0.025]} /><meshBasicMaterial color="#17212b" /></mesh>)}
-        <mesh position={[0, 1.01, 0.279]}><boxGeometry args={[0.18, 0.035, 0.025]} /><meshBasicMaterial color={skinShade} /></mesh>
+        {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
+        <ExplorerAvatarHead o={avatar}/>
+
       </group>
     </group>
   );

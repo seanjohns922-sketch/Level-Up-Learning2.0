@@ -1,3 +1,4 @@
+import { CharacterRelicGear, CHARACTER_GEAR_KEYS, type CharacterGearKey } from "./CharacterRelicGear";
 import type { CSSProperties, ReactNode } from "react";
 
 // Held gear for the explorer avatar (avatar_hand slot). Weapons are drawn in a
@@ -12,6 +13,9 @@ export type WeaponType =
 export type WeaponDef = { type: WeaponType; color: string; glow?: boolean; fire?: boolean };
 
 export const WEAPONS: Record<string, WeaponDef> = {
+  meazurex_timewielder_staff:{type:"staff",color:"#a78bfa",glow:true},
+  numbot_equationator_calculator:{type:"shield",color:"#40a9c5"},
+  geospin_starweaver_orb:{type:"wand",color:"#a78bfa",glow:true},
   wooden_sword: { type: "sword", color: "#cbd5e1" },
   knights_sword: { type: "sword", color: "#e2e8f0" },
   flame_blade: { type: "sword", color: "#fb7185", fire: true, glow: true },
@@ -57,6 +61,7 @@ function Flame({ x, y, h, delay }: { x: number; y: number; h: number; delay: num
 
 /** Weapon paths in a grip-relative frame (grip at 0,0, blade up). */
 export function WeaponShapes({ held, color }: { held: string; color?: string }) {
+  if(CHARACTER_GEAR_KEYS.includes(held as CharacterGearKey))return <CharacterRelicGear held={held as CharacterGearKey}/>;
   const def = WEAPONS[held];
   if (!def) return null;
   const c = color ?? def.color;
