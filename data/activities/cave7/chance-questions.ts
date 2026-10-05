@@ -70,10 +70,10 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   else{const N=int(20,30),girls=int(8,N-8);fr(`A class has ${N} students and ${girls} are girls. A captain is chosen at random. What is the probability the captain is a boy? Give a fraction.`,N-girls,N,`There are ${N-girls} boys out of ${N} students.`,[[girls,N],[N-girls,girls]]);}
   break;}
  case 5:{
-  const r=int(1,5),bl=r+int(1,4)*(int(0,1)?1:-1);const red=Math.max(1,r),blue=Math.max(1,bl===red?red+1:bl);
-  if(F){bag({red,blue});choose('Which colour is more likely to be picked? Type red or blue.',red>blue?'Red':'Blue',[red>blue?'Blue':'Red','Equal','Neither'],`There are ${red} red and ${blue} blue counters; more counters means more likely.`);}
-  else if(R){bag({red,blue});fr('A student says red and blue each have probability 1/2 because there are two colours. What is the probability of red? Give a fraction.',red,red+blue,`There are ${red} red counters out of ${red+blue}.`,[[1,2],[red,blue]]);}
-  else if(!alt){for(;;){const [r1,n1,r2,n2]=[int(1,5),int(6,10),int(1,5),int(6,10)];if(r1*n2===r2*n1)continue;table('Two bags',['Bag','Red counters','Total counters'],[['A',r1,n1],['B',r2,n2]]);const best=r1/n1>r2/n2?'A':'B';choose('Which bag gives the better chance of picking red? Type A or B.',best,[best==='A'?'B':'A','Equal','Neither'],`Compare probabilities: A = ${frac(r1,n1)}, B = ${frac(r2,n2)}. ${best} is larger.`);break;}}
+  const red=int(3,9),blue=pick([-3,-2,-1,1,2,3].map(d=>red+d).filter(x=>x>=2)),green=int(1,4);
+  if(F){bag({red,blue,green});choose('Which colour is more likely to be picked? Type red or blue.',red>blue?'Red':'Blue',[red>blue?'Blue':'Red','Equal','Neither'],`There are ${red} red and ${blue} blue counters; the colour with more counters is more likely.`);}
+  else if(R){bag({red,blue,green});fr('A student says each colour is equally likely because each colour is one outcome. What is the probability of red? Give a fraction.',red,red+blue+green,`There are ${red} red counters out of ${red+blue+green} altogether.`,[[1,3],[red,blue+green]]);}
+  else if(!alt){for(;;){const [r1,n1,r2,n2]=[int(2,9),int(10,20),int(2,9),int(10,20)];if(r1*n2===r2*n1)continue;table('Two bags',['Bag','Red counters','Total counters'],[['A',r1,n1],['B',r2,n2]]);const best=r1/n1>r2/n2?'A':'B';choose('Which bag gives the better chance of picking red? Type A or B.',best,[best==='A'?'B':'A','Equal','Neither'],`Compare probabilities: A = ${frac(r1,n1)}, B = ${frac(r2,n2)}. ${best} is larger.`);break;}}
   else{const rr=Math.min(red,blue),bb=Math.max(red,blue)+1;bag({red:rr,blue:bb});num('How many red counters must be added so that red and blue are equally likely?',bb-rr,`Red needs to match blue: ${bb} − ${rr} = ${bb-rr}.`,[bb,rr]);}
   break;}
  case 6:{
@@ -84,22 +84,22 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   break;}
  // ── Week 3: probability representations and fairness
  case 7:{
-  if(F){const d=pick([2,4,5,10,20,25]),w=int(1,d-1);num(`Write the probability ${w}/${d} as a decimal.`,w/d,`${w} ÷ ${d} = ${round(w/d)}.`,[Number(`0.${w}`),d/w]);}
-  else if(R){for(;;){const d=pick([4,5,20,25]),w=int(1,d-1),bad=Number(`0.${w}${d}`);if(Math.abs(bad-w/d)<1e-9||bad>=1)continue;num(`A student wrote the probability ${w}/${d} as ${bad}. What is it as a decimal?`,w/d,`Divide the numerator by the denominator: ${w} ÷ ${d} = ${round(w/d)}.`,[bad]);break;}}
+  if(F){const d=pick([8,20,25,40,50]),w=pick(range(d-1).filter(x=>x*2!==d));num(`Write the probability ${w}/${d} as a decimal.`,w/d,`${w} ÷ ${d} = ${round(w/d)}.`,[Number(`0.${w}`),d/w]);}
+  else if(R){for(;;){const d=pick([8,20,25,40,50]),w=int(1,d-1),bad=Number(`0.${w}${d}`);if(Math.abs(bad-w/d)<1e-9||bad>=1)continue;num(`A student wrote the probability ${w}/${d} as ${bad}. What is it as a decimal?`,w/d,`Divide the numerator by the denominator: ${w} ÷ ${d} = ${round(w/d)}.`,[bad]);break;}}
   else if(!alt){const pct=pick([5,15,25,35,45,55,65,75,85,95]);fr(`The forecast gives a ${pct}% chance of rain. Write this probability as a fraction in simplest form.`,pct,100,`${pct}% = ${pct}/100 = ${frac(pct,100)}.`,[[pct,10]]);}
   else{for(;;){const x=int(10,90)/100,d=pick([4,5,8,10]),w=int(1,d-1);if(Math.abs(x-w/d)<.02)continue;num(`Which is more likely: a probability of ${x} or a probability of ${w}/${d}? Type the larger probability as a decimal.`,Math.max(x,w/d),`${w}/${d} = ${round(w/d)}, so the larger is ${round(Math.max(x,w/d))}.`,[Math.min(x,w/d)]);break;}}
   break;}
  case 8:{
-  const p=int(1,4)/10,q=int(1,3)/10;
-  if(F){table('Exactly one of A, B or C happens',['Outcome','Probability'],[['A',p],['B',q],['C','?']]);num('What is the missing probability for C?',1-p-q,`The probabilities add to 1: 1 − ${p} − ${q} = ${round(1-p-q)}.`,[p+q]);}
-  else if(R){table('Exactly one of A, B or C happens',['Outcome','Probability'],[['A',p],['B',q],['C','?']]);num(`A student added A and B and wrote P(C) = ${round(p+q)}. What is the correct P(C)?`,1-p-q,`All three must add to 1, so subtract: 1 − ${p} − ${q} = ${round(1-p-q)}.`,[p+q]);}
-  else if(!alt){const [d1,d2]=shuffle([3,4,5,6]).slice(0,2),top=d1*d2-d2-d1;fr(`A spinner is red, blue or yellow. P(red) = 1/${d1} and P(blue) = 1/${d2}. What is P(yellow)? Give a fraction.`,top,d1*d2,`Use a common denominator of ${d1*d2}: 1 − ${d2}/${d1*d2} − ${d1}/${d1*d2} = ${frac(top,d1*d2)}.`,[[d1+d2,d1*d2],[1,d1+d2]]);}
+  const p=int(5,30)/100,q=int(5,30)/100,r3=int(5,25)/100,known=round(p+q+r3),model=()=>table('Exactly one of A, B, C or D happens',['Outcome','Probability'],[['A',p],['B',q],['C',r3],['D','?']]);
+  if(F){model();num('What is the missing probability for D?',1-known,`The probabilities add to 1: 1 − ${p} − ${q} − ${r3} = ${round(1-known)}.`,[known]);}
+  else if(R){model();num(`A student added A, B and C and wrote P(D) = ${known}. What is the correct P(D)?`,1-known,`All four must add to 1, so subtract: 1 − ${known} = ${round(1-known)}.`,[known]);}
+  else if(!alt){const [d1,d2]=shuffle([3,4,5,6,8,10]).slice(0,2),top=d1*d2-d2-d1;fr(`A spinner is red, blue or yellow. P(red) = 1/${d1} and P(blue) = 1/${d2}. What is P(yellow)? Give a fraction.`,top,d1*d2,`Use a common denominator of ${d1*d2}: 1 − ${d2}/${d1*d2} − ${d1}/${d1*d2} = ${frac(top,d1*d2)}.`,[[d1+d2,d1*d2],[1,d1+d2]]);}
   else{const w=int(3,6)*10,d=int(1,3)*10;num(`A team’s model gives P(win) = ${w}% and P(draw) = ${d}%. What is P(lose) as a percentage?`,100-w-d,`Win, draw and lose add to 100%: 100 − ${w} − ${d} = ${100-w-d}.`,[w+d,100-w]);}
   break;}
  case 9:{
-  if(F){const ra=int(2,6),rb=int(0,2)===0?ra:ra+pick([-1,1,2,3]);spinner({red:ra,blue:Math.max(1,rb)},'Game spinner');const blue=Math.max(1,rb),ans=ra===blue?'Equal':ra>blue?'A':'B';choose('Player A wins on red and player B wins on blue. Who is more likely to win? Type A, B or equal.',ans,['A','B','Equal','Neither'].filter(x=>x!==ans),ra===blue?'Both colours have the same number of equal sections, so the game is fair.':`Red has ${ra} sections and blue has ${blue}; the player with more sections is more likely to win.`);}
+  if(F){const ra=int(4,8),rb=int(0,2)===0?ra:ra+pick([-2,-1,1,2,3]);spinner({red:ra,blue:Math.max(1,rb)},'Game spinner');const blue=Math.max(1,rb),ans=ra===blue?'Equal':ra>blue?'A':'B';choose('Player A wins on red and player B wins on blue. Who is more likely to win? Type A, B or equal.',ans,['A','B','Equal','Neither'].filter(x=>x!==ans),ra===blue?'Both colours have the same number of equal sections, so the game is fair.':`Red has ${ra} sections and blue has ${blue}; the player with more sections is more likely to win.`);}
   else if(R){spinner({red:a,blue:b},'Game spinner');fr('Player A wins on red and player B wins on blue. A student says the game is fair because each player has one colour. What is player B’s probability of winning? Give a fraction.',b,n,`Blue has ${b} of the ${n} sections, which is more than half.`,[[1,2],[a,n]]);}
-  else if(!alt){const ra=int(1,4),rb=ra+2*int(1,3);spinner({red:ra,blue:rb},'Game spinner');num('Player A wins on red and player B wins on blue. How many blue sections must be recoloured red to make the game fair?',(rb-ra)/2,`The total stays ${ra+rb}; each colour needs ${(ra+rb)/2} sections, so recolour ${(rb-ra)/2}.`,[rb-ra,(ra+rb)/2]);}
+  else if(!alt){const ra=int(2,5),rb=ra+2*int(1,4);spinner({red:ra,blue:rb},'Game spinner');num('Player A wins on red and player B wins on blue. How many blue sections must be recoloured red to make the game fair?',(rb-ra)/2,`The total stays ${ra+rb}; each colour needs ${(ra+rb)/2} sections, so recolour ${(rb-ra)/2}.`,[rb-ra,(ra+rb)/2]);}
   else{const k=int(1,2);die();num(`A die game: player A wins on ${k===1?'a 1':'a 1 or 2'}; player B wins on any other number. How many of B’s numbers must be given to A to make the game fair?`,3-k,`A fair game gives each player 3 numbers. A has ${k}, so A needs ${3-k} more.`,[6-2*k,6-k]);}
   break;}
  // ── Week 4: predict frequencies
@@ -112,8 +112,8 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
  case 11:{
   if(F){spinner({red:a,blue:b});fr('In a very long run of spins, what fraction of spins would you expect to be red? Give a fraction.',a,n,`Over many trials the relative frequency is expected to be close to the probability, ${frac(a,n)}.`,[[1,2],[a,b]]);}
   else if(R){const k=int(1,4);die();fr(`A student predicts the relative frequency of rolling a number greater than ${k} is ${k}/6. What should it be? Give a fraction.`,6-k,6,`Greater than ${k} means ${k+1} to 6: ${6-k} outcomes, so ${frac(6-k,6)}.`,[[k,6]]);}
-  else if(!alt){const N=pick([4,5,10]),r=int(1,N-1);bag({red:r,blue:N-r});num('Counters are picked and replaced many times. What percentage of picks would you expect to be red?',r/N*100,`P(red) = ${r}/${N} = ${r/N*100}%.`,[r*10,(N-r)/N*100]);}
-  else{const s=pick([4,5,8,10]),r=int(1,s-1);spinner({red:r,blue:s-r});num('Predict the relative frequency of red over 1000 spins. Give a decimal.',r/s,`The relative frequency is expected to be near P(red) = ${r}/${s} = ${round(r/s)}.`,[r/1000,(s-r)/s]);}
+  else if(!alt){const N=pick([10,16,20]),r=int(2,N-2);bag({red:r,blue:N-r});num('Counters are picked and replaced many times. What percentage of picks would you expect to be red?',r/N*100,`P(red) = ${r}/${N} = ${r/N*100}%.`,[r*10,(N-r)/N*100]);}
+  else{const s=pick([8,10,12,16]),r=int(1,s-1);spinner({red:r,blue:s-r});num('Predict the relative frequency of red over 1000 spins. Give a decimal.',r/s,`The relative frequency is expected to be near P(red) = ${r}/${s} = ${round(r/s)}.`,[r/1000,(s-r)/s]);}
   break;}
  case 12:{
   const p=pick([[1,4],[1,5],[2,5],[3,10],[3,8],[1,3]] as const),T=p[1]*int(10,40),E=T*p[0]/p[1];
