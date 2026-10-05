@@ -104,7 +104,7 @@ function verify(q){
   else if(/households like these/.test(pr))expected=wf()*P[0];
   else if(/Two more values are added/.test(pr))expected=med(D);
   else if(/winner’s time/.test(pr))expected=med([...D].sort((a,b)=>a-b).slice(1));
-  else if(/exactly two modes/.test(pr)){const c=new Map();D.forEach(x=>c.set(x,(c.get(x)??0)+1));expected=[...c].find(([,k])=>k===2)[0];}
+  else if(/exactly two modes/.test(pr)){const c=new Map();D.forEach(x=>c.set(x,(c.get(x)??0)+1));const top=Math.max(...c.values()),next=[...c].filter(([,k])=>k===top-1);assert.equal(next.length,1,'exactly one value can tie the mode');assert.equal([...c].filter(([,k])=>k===top).length,1);expected=next[0][0];}
   else if(/By how much does the range increase/.test(pr))expected=Math.max(P[0],...D)-Math.min(P[0],...D)-rng(D);
   else if(/one-off bonus/.test(pr))expected=P[1]-P[2]/P[0];
   else if(/two largest values were recording errors/.test(pr))expected=med([...D].sort((a,b)=>a-b).slice(0,-2));
