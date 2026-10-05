@@ -145,5 +145,13 @@
   {"key":"village_cafe","name":"Village Café","native":[10.600000381469727,6.84999999165535,10.05],"size":[12.379562504388456,8,11.737226291670519],"footprint":[14,14]},
   {"key":"village_library","name":"Village Library","native":[12.399999618530273,7.057309884110878,10],"size":[12.299303665995602,7,9.918793584167378],"footprint":[14,12]},
   {"key":"village_town_hall","name":"Town Hall","native":[14,10.400000027418136,10],"size":[13.46153842604901,10,9.615384590035008],"footprint":[16,14]},
-  {"key":"village_apartments","name":"City Apartment Tower","native":[11.800000190734863,32.59999998539686,11.600000381469727],"size":[12.668711866893348,35,12.453988145193488],"footprint":[14,14]}
+  {"key":"village_apartments","name":"City Apartment Tower","native":[11.800000190734863,32.59999998539686,11.600000381469727],"size":[12.668711866893348,35,12.453988145193488],"footprint":[14,14]},
+  {"key":"village_plaza","name":"Village Paving Square","native":[2,0.08000000074505806,2],"size":[2,0.08000000074505806,2],"footprint":[2,2]},
+  {"key":"canal_straight","name":"Canal — Straight","native":[2.000000011920929,0.22000000067055225,2.0000000000000004],"size":[2,0.21999999935925005,1.9999999880790713],"footprint":[2,2]},
+  {"key":"canal_corner","name":"Canal — Corner","native":[2.000000011920929,0.22000000067055225,2.000000011920929],"size":[2,0.21999999935925005,2],"footprint":[2,2]},
+  {"key":"canal_junction","name":"Canal — Junction","native":[2.000000011920929,0.22000000067055225,2.000000011920929],"size":[2,0.21999999935925005,2],"footprint":[2,2]},
+  {"key":"village_footbridge","name":"Stone Footbridge","native":[4.000000009934107,0.922150012667358,1.999999994635582],"size":[4,0.9221500103771738,1.9999999896685285],"footprint":[6,4]},
+  {"key":"garden_gate","name":"Village Garden Gate","native":[2.06,1.1999999809265138,0.2],"size":[2,1.1650485251713727,0.19417475728155342],"footprint":[2,2]},
+  {"key":"corner_flower_bed","name":"Corner Flower Bed","native":[2.000000011920929,0.5849999973177911,2.000000011920929],"size":[2,0.5849999938309193,2],"footprint":[2,2]},
+  {"key":"double_street_lantern","name":"Double Street Lantern","native":[1.584264085570668,2.999999997317791,0.44999998807907104],"size":[1.5842640869871105,3,0.4499999884814024],"footprint":[2,2]}
 ]

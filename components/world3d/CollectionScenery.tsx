@@ -1,4 +1,6 @@
 "use client";
+import { VillageInfrastructure } from "./VillageInfrastructure";
+import { VILLAGE_INFRASTRUCTURE_KEYS } from "@/lib/world3d/village-infrastructure";
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Box, Ball, Pole, Ring, Leaves, Flower } from "./DetailedScenery";
@@ -18,6 +20,7 @@ function Wheel({x=0,z=0,r=.22}:{x?:number;z?:number;r?:number}){
  return <group position={[x,r,z]} rotation={[Math.PI/2,0,0]}><Ring p={[0,0,0]} radius={r} tube={.027}/>{[0,1,2,3].map(i=>{const a=i*Math.PI/4;return <Pole key={i} a={[-Math.cos(a)*r,0,-Math.sin(a)*r]} b={[Math.cos(a)*r,0,Math.sin(a)*r]} radius={.007} c="#a9afa1"/>;})}</group>;
 }
 export function CollectionScenery({assetKey,tint}:{assetKey:string;tint?:string}){
+ if(VILLAGE_INFRASTRUCTURE_KEYS.has(assetKey))return <VillageInfrastructure assetKey={assetKey} tint={tint}/>;
  if(FREE_PLAY_SCENERY_KEYS.has(assetKey))return <FreePlayScenery assetKey={assetKey} tint={tint}/>;
  const c=tint??green;
  if(["fern","native_grass","reeds","bottlebrush"].includes(assetKey))return <group>

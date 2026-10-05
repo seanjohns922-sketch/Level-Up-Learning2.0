@@ -1,12 +1,17 @@
 "use client";
+import Image from "next/image";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as items } from "@/lib/world3d/central-world-customisation-catalog";
+import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as shopItems } from "@/lib/world3d/central-world-customisation-catalog";
 import { RewardPlotObject } from "./CentralWorldEnvironment";
 import { SceneryFinish } from "./DetailedScenery";
 import { SizedWorldModel, type ModelMeasurement } from "./SizedWorldModel";
 import type { EconomyItem } from "@/lib/economy";
+import { CENTRAL_WORLD_STARTER_SCENERY } from "@/lib/world3d/central-world-editor-catalog";
+import { VILLAGE_INFRASTRUCTURE_KEYS } from "@/lib/world3d/village-infrastructure";
+import { VillageInfrastructure } from "./VillageInfrastructure";
+const infrastructureItems = CENTRAL_WORLD_STARTER_SCENERY.filter(item=>VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey)));
 type Exported = { key: string; name: string; png: string };
 function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void}) {
  const {camera,gl,scene}=useThree(),sent=useRef(false);
@@ -34,18 +39,20 @@ function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void})
   <directionalLight position={[-extent,extent*2,extent*1.5]} intensity={2.3} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-extent} shadow-camera-right={extent} shadow-camera-top={extent} shadow-camera-bottom={-extent} shadow-camera-far={extent*6} shadow-normalBias={.035}/>
   <directionalLight position={[extent,extent*.7,-extent]} intensity={.7} color="#d5eaff"/>
   <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.015,0]} receiveShadow><planeGeometry args={[1000,1000]}/><meshStandardMaterial color="#e9e6dc" roughness={1}/></mesh>
-  <SizedWorldModel item={item} onMeasured={measure}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}><RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/></SceneryFinish></SizedWorldModel>
+  <SizedWorldModel item={item} onMeasured={measure}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}>{VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey))?<VillageInfrastructure assetKey={String(item.metadata.worldAssetKey)}/>:<RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/>}</SceneryFinish></SizedWorldModel>
  </>;
 }
-export default function MarketplaceArtReview(){
+export default function MarketplaceArtReview({infrastructure=false}:{infrastructure?:boolean}){
+ const items=infrastructure?infrastructureItems:shopItems;
  const [rows,setRows]=useState<Exported[]>([]),[running,setRunning]=useState(false);
  const capture=useCallback((row:Exported)=>setRows(previous=>previous.some(r=>r.key===row.key)?previous:[...previous,row]),[]);
  const current=items[rows.length];
  return <main style={{padding:24,background:"#f5f2e9",color:"#263a32",minHeight:"100vh"}}>
-  <h1>World shop photography</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
+  <h1>{infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
   <button onClick={()=>{setRows([]);setRunning(true);}}>Render all shop images</button>
   <p role="status">{rows.length} / {items.length} captured {running&&current?`· ${current.name}`:""}</p>
   {running&&current&&<div style={{width:800,height:640}}><Canvas orthographic dpr={1} shadows gl={{antialias:true,preserveDrawingBuffer:true}} camera={{near:.1,far:2000,position:[20,15,24]}}><Suspense fallback={null}><Product key={current.item_key} item={current} onReady={capture}/></Suspense></Canvas></div>}
-  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
+  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=infrastructure?"reliq-village-infrastructure.json":"reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
+ <div style={{display:"grid",gridTemplateColumns:"repeat(4, 1fr)",gap:16}}>{rows.map(row=><figure key={row.key}><Image unoptimized src={row.png} alt={row.name} width={800} height={640} style={{width:"100%",height:"auto"}}/><figcaption>{row.name}</figcaption></figure>)}</div>
  </main>;
 }

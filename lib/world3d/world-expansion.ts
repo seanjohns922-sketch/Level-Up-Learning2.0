@@ -1,3 +1,4 @@
+import { VILLAGE_INFRASTRUCTURE } from "./village-infrastructure";
 import { VILLAGE_BUILDINGS } from "./village-buildings";
 export type WorldCollection = "coastal" | "bush" | "country" | "castle";
 export const WORLD_COLLECTIONS: Record<WorldCollection,string> = {
@@ -5,6 +6,7 @@ export const WORLD_COLLECTIONS: Record<WorldCollection,string> = {
 };
 type FreeAddition = { key:string;name:string;group:"trees_plants"|"rocks_water"|"furniture_fun"|"fortress";collection:WorldCollection;grid:string;height:number; width?:number };
 export const FREE_WORLD_ADDITIONS:FreeAddition[] = [
+ ...VILLAGE_INFRASTRUCTURE,
  // Free garden, play, castle and waterfront props. No purchase or unlock required.
  {key:"fruit_tree",name:"Fruit Tree",group:"trees_plants",collection:"country",grid:"3x3",height:5.5},
  {key:"flower_pots",name:"Flower Pots",group:"trees_plants",collection:"country",grid:"1x1",height:0.85},
