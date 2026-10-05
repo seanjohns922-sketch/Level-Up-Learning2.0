@@ -1,7 +1,29 @@
 /** Character equipment traced in shape and palette from the existing character artwork. */
-export const CHARACTER_GEAR_KEYS = ["meazurex_timewielder_staff","numbot_equationator_calculator","geospin_starweaver_orb"] as const;
+export const CHARACTER_GEAR_KEYS = ["meazurex_timewielder_staff","numbot_equationator_calculator","geospin_starweaver_orb","patternox_codemaster_gauntlet","datara_insightkeeper_tablet","chanzia_master_die"] as const;
 export type CharacterGearKey=typeof CHARACTER_GEAR_KEYS[number];
 export function CharacterRelicGear({held}:{held:CharacterGearKey}){
+ if(held==="patternox_codemaster_gauntlet")return <g data-character-gear={held}>
+  <path d="M-12 8-17-30-11-50 12-53 19-31 12 8Z" fill="#1c1930" stroke="#be9654" strokeWidth="1.5"/>
+  {[-38,-26,-14,0].map(y=><path key={y} d={`M-13 ${y} 0 ${y+6} 14 ${y-2}`} fill="none" stroke="#927b55" strokeWidth="2"/>)}
+  {[-1,0,1].map((i)=><g key={i} transform={`translate(${i*11} ${-36-Math.abs(i)*4}) rotate(${i*23})`}><path d="M0-30 7-10 0 6-7-10Z" fill="#873bcc" stroke="#e2b3ff"/><path d="M0-30 0 6 7-10Z" fill="#c88aff"/><path d="M0-30-7-10 0-5Z" fill="#6731a2"/><path d="M0-25 3-12" stroke="#fff2ff"/></g>)}
+  <path d="M0-28 9-17 0-5-9-17Z" fill="#bd7bfd" stroke="#f0d28b"/><path d="M0-25v17l6-9Z" fill="#ead3ff"/>
+ </g>;
+ if(held==="datara_insightkeeper_tablet")return <g data-character-gear={held} transform="translate(0 -29) rotate(-9)">
+  <path d="M-20-33 17-33 21-28 21 23-17 23-21 18-21-28Z" fill="#122e45" stroke="#dcc184" strokeWidth="1.5"/>
+  <path d="M-17-28H17V18H-17Z" fill="#1a315b" stroke="#89d5f3"/>
+  {[-10,0,10].map((x,i)=><path key={x} d={`M${x-2} 11v${-12-i*7}h4v${12+i*7}Z`} fill={['#66e4e8','#a599ff','#e7baff'][i]}/>)}
+  <path d="M-14-17-5-23 5-16 13-25M-14 14H14" stroke="#a8eef8" strokeWidth=".8" fill="none"/>
+  {[-14,-5,5,13].map((x,i)=><path key={x} d={`M${x} ${[-20,-26,-19,-28][i]}l2 3-2 3-2-3Z`} fill="#d3bcff"/>)}
+  <path d="M-20-29 17 22M-17-32 21 18" stroke="#c4f6ff" strokeOpacity=".25"/>
+  <circle cy="20.5" r="1" fill="#eed28a"/>
+ </g>;
+ if(held==="chanzia_master_die")return <g data-character-gear={held} transform="translate(0 -31)">
+  <ellipse rx="26" ry="9" cy="8" fill="none" stroke="#d969ee" strokeWidth="1" transform="rotate(-25)"/>
+  <path d="M0-27 21-16 21 9 0 22-21 9-21-16Z" fill="#291336" stroke="#d791ff" strokeWidth="1.5"/>
+  <path d="M0-27 21-16 0-4-21-16Z" fill="#6c2587" stroke="#d791ff"/><path d="M0-4V22L21 9V-16Z" fill="#3f1759" stroke="#c778f4"/>
+  {[[-10,-16],[10,-16],[0,-10],[-13,-5],[-7,7],[7,0],[15,-5],[7,11],[15,7]].map(([x,y],i)=><g key={i}><ellipse cx={x} cy={y} rx="3.2" ry="3.6" fill="#a23fcb"/><ellipse cx={x} cy={y} rx="1.9" ry="2.3" fill="#f4baff"/></g>)}
+  <path d="M-27-12h6m-3-3v6M23-25h6m-3-3v6M20 22h5m-2.5-2.5v5" stroke="#f6caff" strokeWidth="1"/>
+ </g>;
  if(held==="meazurex_timewielder_staff")return <g data-character-gear={held}>
   <path d="M0 28V-72" stroke="#624025" strokeWidth="5"/><path d="M-1 28V-72" stroke="#e6bb50" strokeWidth="1.3"/>
   {[-60,-44,-28,-12,7,21].map(y=><g key={y}><path d={`M-4 ${y}h8m-8 3h8`} stroke="#e4b657" strokeWidth="1.5"/><path d={`M-3 ${y+4}l6 9`} stroke="#8b5bc6" strokeWidth="2"/></g>)}

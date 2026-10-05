@@ -20,7 +20,7 @@ const {default:Avatar}=compile('components/avatar/StudentAvatar.tsx');
 const {ADVANCED_HAIR}=compile('components/avatar/AdvancedHair.tsx');
 const {CHARACTER_GEAR_KEYS}=compile('components/avatar/CharacterRelicGear.tsx');
 const render=outfit=>renderToStaticMarkup(React.createElement(Avatar,{outfit,height:320,alive:false,floatAnimation:'none'}));
-const variations=[...ADVANCED_HAIR.map(hairStyle=>({name:hairStyle,outfit:{hairStyle}})),...CHARACTER_GEAR_KEYS.map((held,i)=>({name:['Meazurex’s staff','Equationator’s calculator','Starweaver’s orb'][i],outfit:{held,hairStyle:ADVANCED_HAIR[i],shirt:['#51347e','#287f9b','#7344bb'][i],shirtTrim:'#e5c577'}})),...['wink','calm','confident'].map(face=>({name:face,outfit:{face,hairStyle:'fade'}}))];
+const variations=[...ADVANCED_HAIR.map(hairStyle=>({name:hairStyle,outfit:{hairStyle}})),...CHARACTER_GEAR_KEYS.map((held,i)=>({name:['Meazurex’s staff','Equationator’s calculator','Starweaver’s orb','Codemaster’s gauntlet','Insightkeeper’s tablet','Chanzia’s die'][i],outfit:{held,hairStyle:ADVANCED_HAIR[i],shirt:['#51347e','#287f9b','#7344bb','#372546','#e2d3bd','#392148'][i],shirtTrim:'#e5c577'}})),...['wink','calm','confident'].map(face=>({name:face,outfit:{face,hairStyle:'fade'}}))];
 const markup=renderToStaticMarkup(React.createElement('div',null,variations.map(({outfit},i)=>React.createElement(Avatar,{key:i,outfit,alive:false}))));
 const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length,'Avatar gradients remain unique when rendered together');
 for(const held of CHARACTER_GEAR_KEYS)assert.ok(render({held}).includes(`data-character-gear="${held}"`),'Recognisable held art: '+held);
@@ -36,7 +36,7 @@ for(let i=0;i<variations.length;i++){
  const caption=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="40"><text x="150" y="25" text-anchor="middle" fill="#24392f" font-family="Arial" font-weight="bold" font-size="15">${item.name}</text></svg>`);
  layers.push({input:caption,left:i%3*300,top:Math.floor(i/3)*370+325});
 }
-await sharp({create:{width:900,height:1480,channels:4,background:'#f3f0e7'}}).composite(layers).png().toFile(destination);
+await sharp({create:{width:900,height:Math.ceil(variations.length/3)*370,channels:4,background:'#f3f0e7'}}).composite(layers).png().toFile(destination);
 console.log('PASS: new hair and character gear render, coloured image hair changes pixels, and multi-avatar gradient IDs stay unique. Review sheet: '+destination);
 const THREE=await import('three');
 const {ExplorerAvatarHead,ExplorerCharacterGear}=compile('components/world3d/ExplorerAvatarDetails.tsx');
@@ -57,7 +57,7 @@ for(const hairStyle of ['bald','short','long','ponytail','bun','afro',...ADVANCE
  root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
 }
 for(const held of CHARACTER_GEAR_KEYS){const root=new THREE.Group();attach(ExplorerCharacterGear({held}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty(),'3D character equipment exists: '+held);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
-const migration=fs.readFileSync('supabase/migrations/20261005150000_character_equipment_collection.sql','utf8');
+const migration=['20261005150000_character_equipment_collection.sql','20261005163000_remaining_realm_character_equipment.sql'].map(file=>fs.readFileSync('supabase/migrations/'+file,'utf8')).join('\n');
 for(const held of CHARACTER_GEAR_KEYS)assert.ok(migration.includes(`"held":"${held}"`));
 assert.ok(!/create\s+(or\s+replace\s+)?function|grant|revoke/i.test(migration.replace(/^--.*$/gm,'')),'Catalogue release does not alter RPC permissions');
-console.log('PASS: rounded 3D heads and all three held items render; migration is additive catalogue data only.');
+console.log('PASS: rounded 3D heads and all six held items render; migration is additive catalogue data only.');

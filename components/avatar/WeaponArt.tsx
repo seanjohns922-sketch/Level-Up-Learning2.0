@@ -13,6 +13,9 @@ export type WeaponType =
 export type WeaponDef = { type: WeaponType; color: string; glow?: boolean; fire?: boolean };
 
 export const WEAPONS: Record<string, WeaponDef> = {
+  patternox_codemaster_gauntlet:{type:"shield",color:"#bc7cf4",glow:true},
+  datara_insightkeeper_tablet:{type:"shield",color:"#8bdcfa"},
+  chanzia_master_die:{type:"wand",color:"#df83ec",glow:true},
   meazurex_timewielder_staff:{type:"staff",color:"#a78bfa",glow:true},
   numbot_equationator_calculator:{type:"shield",color:"#40a9c5"},
   geospin_starweaver_orb:{type:"wand",color:"#a78bfa",glow:true},
