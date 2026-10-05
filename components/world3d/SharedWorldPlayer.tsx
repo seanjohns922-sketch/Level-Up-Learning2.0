@@ -1,8 +1,10 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { PremiumExplorerAvatar, supportsPremiumExplorer } from "./PremiumExplorerAvatar";
+import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import { RealmOutfitDetails } from "./RealmOutfitDetails";
 import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
 import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
@@ -17,7 +19,17 @@ export type WorldInteractionTarget = { id: string; position: [number, number, nu
 export const EMPTY_WORLD_MOVE_INPUT: WorldMoveInput = { up: false, down: false, left: false, right: false, analogX: 0, analogY: 0, magnitude: 0 };
 export const EMPTY_WORLD_LOOK_INPUT: WorldLookInput = { x: 0, y: 0, magnitude: 0 };
 
-export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: React.MutableRefObject<boolean>; sprintingRef?: React.MutableRefObject<boolean> }) {
+type AvatarMotionProps = { movingRef: React.MutableRefObject<boolean>; sprintingRef?: React.MutableRefObject<boolean> };
+export function TrialStudentAvatar(props: AvatarMotionProps) {
+  const appearance = useCanonicalAvatarAppearance();
+  const avatar = appearance ?? DEFAULT_OUTFIT;
+  const fallback = <ProceduralStudentAvatar {...props} />;
+  return supportsPremiumExplorer(avatar)
+    ? <Suspense fallback={fallback}><PremiumExplorerAvatar avatar={avatar} {...props} /></Suspense>
+    : fallback;
+}
+
+function ProceduralStudentAvatar({ movingRef, sprintingRef }: { movingRef: React.MutableRefObject<boolean>; sprintingRef?: React.MutableRefObject<boolean> }) {
   const bodyRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
@@ -58,22 +70,23 @@ export function TrialStudentAvatar({ movingRef, sprintingRef }: { movingRef: Rea
         {[-1, 1].map((side) => (
           <group key={`leg-${side}`} ref={side === -1 ? leftLegRef : rightLegRef} position={[side * 0.18, 0.02, 0]}>
             <mesh position={[0, -0.32, 0]}><capsuleGeometry args={[.135,.35,6,12]} /><meshStandardMaterial color={pants} roughness={0.74} /></mesh>
+            {avatar.shoeStyle==='boots'&&<group name="boot-shaft"><mesh position={[0,-.48,.025]}><cylinderGeometry args={[.16,.17,.3,12]}/><meshStandardMaterial color={shoes}/></mesh>{[-.46,-.53].map(y=><mesh key={y} position={[0,y,.185]} rotation={[0,0,-.1]}><boxGeometry args={[.18,.016,.018]}/><meshStandardMaterial color={new THREE.Color(shoes).lerp(new THREE.Color('#ffffff'),.3)}/></mesh>)}<mesh position={[0,-.72,.08]}><boxGeometry args={[.33,.035,.44]}/><meshStandardMaterial color="#35291f"/></mesh></group>}
             <mesh position={[0, -0.66, 0.08]} scale={[.16,.09,.24]}><sphereGeometry args={[1,16,12]} /><meshStandardMaterial color={shoes} roughness={0.62} /></mesh>
           </group>
         ))}
         <mesh position={[0, 0.4, 0]} scale={[1,1,.55]}><capsuleGeometry args={[.38,.12,8,20]} /><meshStandardMaterial color={top} roughness={0.66} /></mesh>
-        <mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
-        <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color={topTrim} emissive={topTrim} emissiveIntensity={0.16} /></mesh>
+        {!realmOutfit(avatar.top)&&<><mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
+        <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color={topTrim} emissive={topTrim} emissiveIntensity={0.16} /></mesh></>}
         {[-1, 1].map((side) => (
           <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
             <mesh position={[0, -0.38, 0]}><capsuleGeometry args={[.12,.5,6,12]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>
-            <mesh position={[0, -0.85, 0]}><sphereGeometry args={[.13,16,12]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
+            <mesh position={[0, -0.85, 0]}><sphereGeometry args={[.105,16,12]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
             {side===1&&<group position={[0,-.85,.14]}><ExplorerCharacterGear held={avatar.held}/></group>}
           </group>
         ))}
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
         <RealmOutfitDetails top={avatar.top}/>
-        <ExplorerAvatarHead o={avatar}/>
+        <group scale={[1.1,1.1,1.1]} position={[0,-.078,0]}><ExplorerAvatarHead o={avatar}/></group>
 
       </group>
     </group>

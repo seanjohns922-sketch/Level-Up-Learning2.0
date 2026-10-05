@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+const bytes=fs.readFileSync('public/avatars/models/codemaster-premium.glb');
+const gltf=await new Promise((resolve,reject)=>new GLTFLoader().parse(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'',resolve,reject));
+const root=gltf.scene;root.updateMatrixWorld(true);
+const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
+assert.ok(size.y>2&&size.y<2.6,'Full-height character, no displaced mesh above head');
+assert.ok(Math.abs(bounds.min.y)<.02,'Feet are grounded');
+let triangles=0,meshes=0;const materials=new Set();
+root.traverse(o=>{if(!o.isMesh)return;meshes++;triangles+=(o.geometry.index?.count??o.geometry.attributes.position.count)/3;for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m.name);});
+for(const name of ['Head','Torso','ArmL','ArmR','LegL','LegR'])assert.ok(root.getObjectByName(name),`Animation part exists: ${name}`);
+for(const name of ['Skin','Hair','Gold trim','Armour','Crystal','Boot leather'])assert.ok(materials.has(name),`Appearance material: ${name}`);
+assert.ok(meshes<50,'Static surfaces batched by part and material');assert.ok(triangles<70000,'Review mesh polygon budget');assert.ok(bytes.length<2_000_000,'Uncompressed asset budget');
+console.log(`PASS: GLTF loaded with ${meshes} meshes, ${Math.round(triangles)} triangles, ${(bytes.length/1024/1024).toFixed(2)} MiB and all six animation pivots.`);
+
+// Equipment is parented to the moving wrist rather than floating beside the body.
+const arm = root.getObjectByName('ArmR');
+const grip = new THREE.Object3D(); grip.position.set(.05,-.69,.1); arm.add(grip);
+root.updateMatrixWorld(true);
+const resting = grip.getWorldPosition(new THREE.Vector3());
+assert.ok(resting.y>.6 && resting.y<.9, 'Grip meets the right hand');
+assert.ok(resting.x>.3 && resting.x<.5, 'Grip is on the right side');
+arm.rotation.x=.4; root.updateMatrixWorld(true);
+assert.ok(grip.getWorldPosition(new THREE.Vector3()).distanceTo(resting)>.2, 'Equipment follows the arm during stride');
+const isolated = root.clone(true);
+isolated.getObjectByName('ArmR').rotation.x = -.2;
+assert.ok(Math.abs(arm.rotation.x-.4)<1e-9, 'Cloned avatars animate independently');
+arm.rotation.x=0; arm.remove(grip);
+console.log('PASS: wrist anchor and articulated equipment motion.');

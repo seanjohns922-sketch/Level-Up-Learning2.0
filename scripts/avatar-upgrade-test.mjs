@@ -69,7 +69,7 @@ for(const hairStyle of ['bald','short','long','ponytail','bun','afro',...ADVANCE
  const size=new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());assert.ok(size.toArray().every(n=>Number.isFinite(n)&&n>0));assert.ok(size.x<1&&size.y<1.2,'Head remains within avatar proportions');
  root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
 }
-for(const held of CHARACTER_GEAR_KEYS){const root=new THREE.Group();attach(ExplorerCharacterGear({held}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty(),'3D character equipment exists: '+held);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
+for(const held of [...CHARACTER_GEAR_KEYS,"flame_blade"]){const root=new THREE.Group();attach(ExplorerCharacterGear({held}),root);root.updateMatrixWorld(true);assert.ok(!new THREE.Box3().setFromObject(root).isEmpty(),'3D character equipment exists: '+held);root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
 const migration=['20261005150000_character_equipment_collection.sql','20261005163000_remaining_realm_character_equipment.sql'].map(file=>fs.readFileSync('supabase/migrations/'+file,'utf8')).join('\n');
 for(const held of CHARACTER_GEAR_KEYS)assert.ok(migration.includes(`"held":"${held}"`));
 assert.ok(!/create\s+(or\s+replace\s+)?function|grant|revoke/i.test(migration.replace(/^--.*$/gm,'')),'Catalogue release does not alter RPC permissions');
