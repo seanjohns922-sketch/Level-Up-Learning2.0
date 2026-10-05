@@ -23,14 +23,23 @@ const render=outfit=>renderToStaticMarkup(React.createElement(Avatar,{outfit,hei
 const {REALM_OUTFITS}=compile('lib/avatar/realm-outfits.ts');
 const variations=[...ADVANCED_HAIR.map(hairStyle=>({name:hairStyle,outfit:{hairStyle}})),...CHARACTER_GEAR_KEYS.map((held,i)=>({name:['Meazurex’s staff','Equationator’s calculator','Starweaver’s orb','Codemaster’s gauntlet','Insightkeeper’s tablet','Chanzia’s die'][i],outfit:{held,hairStyle:ADVANCED_HAIR[i],shirt:['#51347e','#287f9b','#7344bb','#372546','#e2d3bd','#392148'][i],shirtTrim:'#e5c577'}})),...['wink','calm','confident'].map(face=>({name:face,outfit:{face,hairStyle:'fade'}}))];
 for(const item of REALM_OUTFITS){const outfit={top:`realm_${item.key}`,shirt:item.colour,shirtTrim:item.trim,pants:item.pants,shoes:item.shoes,shoeStyle:'boots',held:item.held,hairStyle:'fade'};assert.ok(render(outfit).includes(`data-realm-outfit="${item.key}"`));variations.unshift({name:item.name,outfit});}
+if(process.env.AVATAR_FIT_REVIEW){
+ variations.splice(0,variations.length,...['hoodie','tshirt','polo','jumper','jacket','dress'].flatMap(top=>['sneakers','boots','sandals','hightops'].map((shoeStyle,i)=>({name:`${top} / ${shoeStyle}`,outfit:{top,shoeStyle,bottom:['joggers','jeans','shorts','skirt'][i],hairStyle:'fade'}}))),...REALM_OUTFITS.map(item=>({name:item.name,outfit:{top:`realm_${item.key}`,shirt:item.colour,shirtTrim:item.trim,pants:item.pants,shoes:item.shoes,shoeStyle:'boots',hairStyle:'fade'}})));
+}
 const markup=renderToStaticMarkup(React.createElement('div',null,variations.map(({outfit},i)=>React.createElement(Avatar,{key:i,outfit,alive:false}))));
 const ids=[...markup.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(new Set(ids).size,ids.length,'Avatar gradients remain unique when rendered together');
 for(const held of CHARACTER_GEAR_KEYS)assert.ok(render({held}).includes(`data-character-gear="${held}"`),'Recognisable held art: '+held);
 for(const hairStyle of ADVANCED_HAIR)assert.ok(render({hairStyle}).includes('data-layer="hair-image"'));
 function svgOf(html){return html.match(/<svg[\s\S]*?<\/svg>/)[0].replace(/href="(\/avatars\/[^\"]+)"/g,(_,src)=>`href="data:image/png;base64,${fs.readFileSync('public'+src).toString('base64')}"`);}
+// Transparent gaps at the neckline made heads appear detached from clothing.
+for(const top of ['hoodie','tshirt','polo','jumper','jacket','dress',...REALM_OUTFITS.map(item=>`realm_${item.key}`)]){
+ const {data,info}=await sharp(Buffer.from(svgOf(render({top})))).resize(120,220).ensureAlpha().raw().toBuffer({resolveWithObject:true});
+ assert.ok(data[(94*info.width+60)*4+3]>200,`Neck meets collar: ${top}`);
+ if(top!=='dress')assert.ok(data[(104*info.width+30)*4+3]>200,`Shoulder seam is filled: ${top}`);
+}
 const hairSamples=await Promise.all(['#4a2e1c','#267bc4'].map(hair=>sharp(Buffer.from(svgOf(render({hairStyle:'swept',hair})))).png().toBuffer()));
 assert.notDeepEqual(hairSamples[0],hairSamples[1],'Rendered PNG hair responds to the colour picker');
-const destination='output/world3d-audit/avatar-upgrade.png';fs.mkdirSync(path.dirname(destination),{recursive:true});
+const destination=process.env.AVATAR_FIT_REVIEW ? `output/world3d-audit/clothing-fit-${process.env.AVATAR_FIT_REVIEW}.png` : 'output/world3d-audit/avatar-upgrade.png';fs.mkdirSync(path.dirname(destination),{recursive:true});
 const layers=[];
 for(let i=0;i<variations.length;i++){
  const item=variations[i],input=await sharp(Buffer.from(svgOf(render(item.outfit)))).resize({height:320}).png().toBuffer();

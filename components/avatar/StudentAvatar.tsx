@@ -184,8 +184,8 @@ function LongSleeves({ o, cuff }: { o: Outfit; cuff?: boolean }) {
   const p = useGradPrefix();
   return (
     <g>
-      <path d="M22 100 Q14 112 18 150 Q24 158 32 154 Q34 128 34 108 Z" fill={`url(#${p}lul-shirt)`} />
-      <path d="M98 100 Q106 112 102 150 Q96 158 88 154 Q86 128 86 108 Z" fill={`url(#${p}lul-shirt)`} />
+      <path d="M34 99 Q20 95 18 110 Q15 127 18 150 Q24 156 32 152 L35 108 Z" fill={`url(#${p}lul-shirt)`} />
+      <path d="M86 99 Q100 95 102 110 Q105 127 102 150 Q96 156 88 152 L85 108 Z" fill={`url(#${p}lul-shirt)`} />
       {cuff ? (
         <>
           <path d="M18 147 Q25 153 32 149 L31 156 Q24 161 18 154 Z" fill={o.shirtTrim} />
@@ -224,7 +224,7 @@ function skinLegs(fromY: number, p: string) {
 }
 function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
   const p = useGradPrefix();
-  const waistband = <path d="M38 148 Q60 154 82 148 L82 157 Q60 163 38 157 Z" fill="#000" opacity="0.28" />;
+  const waistband = <><path d="M39 149H81L77 157 65 164H55L43 157Z" fill={`url(#${p}lul-pants)`}/><path d="M38 148 Q60 154 82 148 L82 157 Q60 163 38 157 Z" fill="#000" opacity="0.28" /></>;
   switch (style) {
     case "shorts":
       return (
@@ -404,10 +404,10 @@ function ShoeLayer({ o }: { o: Outfit }) {
     case "hightops":
       return (
         <g data-layer="shoes">
-          <path d="M32 195 Q32 190 40 190 L58 190 Q60 196 60 208 Q60 213 55 213 L34 213 Q30 213 30 208 Z" fill={`url(#${p}lul-shoe)`} />
-          <path d="M88 195 Q88 190 80 190 L62 190 Q60 196 60 208 Q60 213 65 213 L86 213 Q90 213 90 208 Z" fill={`url(#${p}lul-shoe)`} />
-          <rect x="28" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
-          <rect x="60" y="210" width="32" height="4.5" rx="2" fill="#f8fafc" />
+          <path d="M32 195 Q32 190 40 190 L58 190 Q58 196 58 208 Q58 213 55 213 L34 213 Q30 213 30 208 Z" fill={`url(#${p}lul-shoe)`} />
+          <path d="M88 195 Q88 190 80 190 L62 190 Q62 196 62 208 Q62 213 65 213 L86 213 Q90 213 90 208 Z" fill={`url(#${p}lul-shoe)`} />
+          <rect x="28" y="210" width="30" height="4.5" rx="2" fill="#f8fafc" />
+          <rect x="62" y="210" width="30" height="4.5" rx="2" fill="#f8fafc" />
           <path d="M40 198 L54 200 M40 203 L54 205" stroke="#f8fafc" strokeWidth="1.3" />
           <path d="M80 198 L66 200 M80 203 L66 205" stroke="#f8fafc" strokeWidth="1.3" />
         </g>
@@ -431,10 +431,10 @@ function ShoeLayer({ o }: { o: Outfit }) {
     default: // sneakers
       return (
         <g data-layer="shoes">
-          <path d="M30 206 Q30 198 42 198 L58 198 Q60 204 60 210 Q60 214 56 214 L32 214 Q28 214 28 210 Z" fill={`url(#${p}lul-shoe)`} />
-          <path d="M90 206 Q90 198 78 198 L62 198 Q60 204 60 210 Q60 214 64 214 L88 214 Q92 214 92 210 Z" fill={`url(#${p}lul-shoe)`} />
-          <rect x="28" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
-          <rect x="60" y="210" width="32" height="4" rx="2" fill="#f8fafc" />
+          <path d="M30 206 Q30 198 42 198 L58 198 Q58 204 58 210 Q58 214 56 214 L32 214 Q28 214 28 210 Z" fill={`url(#${p}lul-shoe)`} />
+          <path d="M90 206 Q90 198 78 198 L62 198 Q62 204 62 210 Q62 214 64 214 L88 214 Q92 214 92 210 Z" fill={`url(#${p}lul-shoe)`} />
+          <rect x="28" y="210" width="30" height="4" rx="2" fill="#f8fafc" />
+          <rect x="62" y="210" width="30" height="4" rx="2" fill="#f8fafc" />
           <path d="M34 205 Q44 202 56 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
           <path d="M64 205 Q76 202 86 205" stroke={o.shirt} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.7" />
         </g>
@@ -1037,6 +1037,9 @@ export default function StudentAvatar({
         {/* ── SHOES (Shoe slot) — over the pant hem so boots read ── */}
         <ShoeLayer o={o} />
 
+        {/* Neck joins the head to the collar, behind garment details. */}
+        <rect x="54" y="82" width="12" height="23" rx="4" fill={`url(#${p}lul-skin)`} />
+
         {/* ── TORSO (Top slot) ─────────────────────────── */}
         <TopLayer o={o} />
 
@@ -1045,7 +1048,6 @@ export default function StudentAvatar({
 
         {/* ── NECK + HEAD ──────────────────────────────── */}
         <g data-layer="head">
-          <rect x="54" y="82" width="12" height="10" rx="4" fill={o.skinShade} />
           {/* Head — softly rounded */}
           <path
             d="M32 50 Q32 18 60 18 Q88 18 88 50 L88 62 Q88 86 60 90 Q32 86 32 62 Z"
