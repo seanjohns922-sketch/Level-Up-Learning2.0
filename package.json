@@ -273,6 +273,7 @@
     "qa:chance-level7-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-level7-five-forms.ts",
     "qa:chance-level8-five-forms": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-level8-five-forms.ts",
     "qa:chance-full-release": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/audit-chance-full-release.ts",
+    "qa:free-world-items": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/free-world-items-test.mjs",
     "qa:world-scenery": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/organic-path-test.mjs"
   },
   "dependencies": {

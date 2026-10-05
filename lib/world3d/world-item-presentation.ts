@@ -18,6 +18,24 @@ export const CASTLE_WALL_HEIGHT = 7.436;
 // Native mesh stays fixed; presentation fitting controls its world height.
 export const CASTLE_WALL_NATIVE_HEIGHT = 26;
 export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
+  // Small free props: target sizes relative to the 2.2 m avatar.
+  fruit_tree: {height:5.5, footprint:[6,6], theme:"garden"},
+  flower_pots: {height:0.85, footprint:[2,2], theme:"garden"},
+  mushroom_cluster: {height:0.7, footprint:[2,2], theme:"garden"},
+  hedge_arch: {height:3.4, footprint:[4,4], theme:"garden"},
+  hopscotch: {height:0.08, footprint:[2,4], width:1.5, resizeHeight:true, theme:"garden"},
+  sandpit: {height:0.7, footprint:[4,4], width:3, theme:"garden"},
+  seesaw: {height:1.3, footprint:[4,2], width:3.8, theme:"garden"},
+  small_slide: {height:2.4, footprint:[2,4], theme:"garden"},
+  shield_decoration: {height:1.5, footprint:[2,2], theme:"fortress"},
+  supply_wagon: {height:1.4, footprint:[4,4], theme:"fortress"},
+  training_dummy: {height:1.9, footprint:[2,2], theme:"fortress"},
+  stone_steps: {height:1, footprint:[2,2], theme:"fortress"},
+  small_jetty: {height:1.2, footprint:[4,4], width:2, theme:"garden"},
+  rowboat: {height:0.7, footprint:[4,4], width:2.1, theme:"garden"},
+  fishing_rod_stand: {height:2.1, footprint:[2,2], theme:"garden"},
+  lifebuoy: {height:1.7, footprint:[2,2], theme:"garden"},
+
   tree: {height:14, footprint:[16,16], theme:"garden"},
   pine_tree: {height:18, footprint:[14,14], theme:"garden"},
   palm_tree: {height:16, footprint:[16,16], theme:"garden"},

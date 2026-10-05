@@ -4,6 +4,24 @@ export const WORLD_COLLECTIONS: Record<WorldCollection,string> = {
 };
 type FreeAddition = { key:string;name:string;group:"trees_plants"|"rocks_water"|"furniture_fun"|"fortress";collection:WorldCollection;grid:string;height:number; width?:number };
 export const FREE_WORLD_ADDITIONS:FreeAddition[] = [
+ // Free garden, play, castle and waterfront props. No purchase or unlock required.
+ {key:"fruit_tree",name:"Fruit Tree",group:"trees_plants",collection:"country",grid:"3x3",height:5.5},
+ {key:"flower_pots",name:"Flower Pots",group:"trees_plants",collection:"country",grid:"1x1",height:0.85},
+ {key:"mushroom_cluster",name:"Mushroom Cluster",group:"trees_plants",collection:"bush",grid:"1x1",height:0.7},
+ {key:"hedge_arch",name:"Hedge Arch",group:"trees_plants",collection:"castle",grid:"2x2",height:3.4},
+ {key:"hopscotch",name:"Hopscotch",group:"furniture_fun",collection:"country",grid:"1x2",height:0.08,width:1.5},
+ {key:"sandpit",name:"Sandpit",group:"furniture_fun",collection:"country",grid:"2x2",height:0.7,width:3},
+ {key:"seesaw",name:"Seesaw",group:"furniture_fun",collection:"country",grid:"2x1",height:1.3,width:3.8},
+ {key:"small_slide",name:"Small Slide",group:"furniture_fun",collection:"country",grid:"1x2",height:2.4},
+ {key:"shield_decoration",name:"Shield Decoration",group:"fortress",collection:"castle",grid:"1x1",height:1.5},
+ {key:"supply_wagon",name:"Supply Wagon",group:"fortress",collection:"castle",grid:"2x2",height:1.4},
+ {key:"training_dummy",name:"Training Dummy",group:"fortress",collection:"castle",grid:"1x1",height:1.9},
+ {key:"stone_steps",name:"Stone Steps",group:"fortress",collection:"castle",grid:"1x1",height:1},
+ {key:"small_jetty",name:"Small Jetty",group:"rocks_water",collection:"coastal",grid:"2x2",height:1.2,width:2},
+ {key:"rowboat",name:"Rowboat",group:"rocks_water",collection:"coastal",grid:"2x2",height:0.7,width:2.1},
+ {key:"fishing_rod_stand",name:"Fishing Rod Stand",group:"rocks_water",collection:"coastal",grid:"1x1",height:2.1},
+ {key:"lifebuoy",name:"Lifebuoy",group:"rocks_water",collection:"coastal",grid:"1x1",height:1.7},
+
  {key:"fern",name:"Fern",group:"trees_plants",collection:"bush",grid:"1x1",height:1.2},
  {key:"native_grass",name:"Native Grass",group:"trees_plants",collection:"bush",grid:"1x1",height:.75},
  {key:"reeds",name:"Creek Reeds",group:"trees_plants",collection:"bush",grid:"1x1",height:1.1},

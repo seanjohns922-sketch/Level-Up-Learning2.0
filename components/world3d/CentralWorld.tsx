@@ -91,6 +91,10 @@ const SCENERY_ICON: Record<string, LucideIcon> = {
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
   lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
   kangaroo: Rabbit, koala: PawPrint, wombat: PawPrint, emu: Bird, kookaburra: Feather, echidna: Shell, cockatoo: Bird,
+  fruit_tree: Cherry, flower_pots: Flower2, mushroom_cluster: Sprout, hedge_arch: Shrub,
+  hopscotch: Grid2x2, sandpit: Shell, seesaw: Logs, small_slide: Route,
+  shield_decoration: Shield, supply_wagon: PackageOpen, training_dummy: Hand, stone_steps: BrickWall,
+  small_jetty: Anchor, rowboat: Waves, fishing_rod_stand: Anchor, lifebuoy: Waves,
   castle_wall: BrickWall, castle_corner: Grid2x2, castle_gate: DoorOpen, castle_turret: Castle, castle_keep: Shield, castle_banner: Flag,
   drawbridge: Anchor, torch: Flame, chest: Gem, well: Droplets,
 };

@@ -2,6 +2,7 @@
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Box, Ball, Pole, Ring, Leaves, Flower } from "./DetailedScenery";
+import { FreePlayScenery, FREE_PLAY_SCENERY_KEYS } from "./FreePlayScenery";
 import { FREE_WORLD_ADDITIONS } from "@/lib/world3d/world-expansion";
 const wood="#96744e",iron="#4c5c51",stone="#aaa48c",green="#6d8650";
 export const COLLECTION_SCENERY_KEYS=new Set(FREE_WORLD_ADDITIONS.map(i=>i.key));
@@ -17,6 +18,7 @@ function Wheel({x=0,z=0,r=.22}:{x?:number;z?:number;r?:number}){
  return <group position={[x,r,z]} rotation={[Math.PI/2,0,0]}><Ring p={[0,0,0]} radius={r} tube={.027}/>{[0,1,2,3].map(i=>{const a=i*Math.PI/4;return <Pole key={i} a={[-Math.cos(a)*r,0,-Math.sin(a)*r]} b={[Math.cos(a)*r,0,Math.sin(a)*r]} radius={.007} c="#a9afa1"/>;})}</group>;
 }
 export function CollectionScenery({assetKey,tint}:{assetKey:string;tint?:string}){
+ if(FREE_PLAY_SCENERY_KEYS.has(assetKey))return <FreePlayScenery assetKey={assetKey} tint={tint}/>;
  const c=tint??green;
  if(["fern","native_grass","reeds","bottlebrush"].includes(assetKey))return <group>
   {assetKey==="bottlebrush"?<group><Pole a={[0,0,0]} b={[0,1.1,0]} radius={.04}/><Leaves centers={[[0,.8,0],[-.3,.6,0],[.3,.65,0]]} count={60} color={c}/>{[-1,0,1].map(i=><group key={i} position={[i*.3,.85-Math.abs(i)*.1,0]}><Cylinder p={[0,0,0]} r={.045} h={.22} c={tint??"#ae6754"}/>{Array.from({length:8},(_,j)=><Ring key={j} p={[0,-.1+j*.028,0]} radius={.065} tube={.014} c={tint??"#ae6754"}/>)}</group>)}</group>:Array.from({length:assetKey==="fern"?9:18},(_,i)=>{const a=i*2.39996,r=.16+(i%3)*.05,h=.4+(i%5)*.11;return <group key={i}>
