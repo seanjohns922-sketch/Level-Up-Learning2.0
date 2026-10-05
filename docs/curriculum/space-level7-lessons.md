@@ -10,16 +10,18 @@ AC9M7SP01–04, cross-checked with `level7StarpathFiveForms.ts` and its existing
 pre/post-test blueprint. Existing assessment questions and marking are unchanged.
 
 - Weeks 1–3: nets, opposite faces, plans/elevations, hidden cubes and representation limitations (SP01).
-- Weeks 4–5: triangle and polygon properties, triangle inequality, overlapping quadrilateral families, regularity and concavity (SP02).
-- Weeks 6–8: translations, reflections, rotations about a specified centre, and composition/order (SP03).
-- Weeks 9–10: trace, complete, debug and justify classification algorithms; counterexamples and classification after transformations (SP04).
+- Week 4: classifying triangles by sides and angles, the triangle inequality, triangle rigidity, and quadrilateral properties (SP02).
+- Week 5: the quadrilateral family tree, kites and trapeziums (side and angle properties), and regular polygons (SP02).
+- Weeks 6–8: translations, reflections, rotations about a specified centre, composition/order, and properties preserved by moves (SP03).
+- Weeks 9–10: trace, complete, test and justify classification algorithms, including the concave/convex and regular/irregular polygon scheme (SP04). Proof-style counterexample claims are Year 8 and are not taught.
 
 The teacher curriculum explorer and demo week page provide the scope-and-sequence
 CSV. Guides reuse controlled Starpath net, cube-model, polygon, coordinate-plane
 and flowchart renderers. Diagrams and answer choices have shared read-aloud controls.
 Untimed explorations let learners construct cube nets, edit cube models, place
-transformed vertices and complete classification decisions. The 30 lessons retain
-all 36 original skill groups, with related skills combined rather than omitted.
+transformed vertices and complete classification decisions. The 30 lessons use 34 of
+the 36 original skills; standalone concavity and counterexample-claim lessons were
+removed after checking ACARA v9 (concavity is taught inside the Week 10 classifier).
 Reopening the guide pauses the practice timer. The normal lesson HUD, feedback,
 resume, scoring and result-review components are reused.
 

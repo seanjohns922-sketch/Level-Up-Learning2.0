@@ -38,6 +38,8 @@ function check(key,q){
  else if(/back row is moved to stand in front/.test(p))answer=[side[1],side[0]].join(', ');
  else if(/no stack is taller than 1 cube/.test(p))answer=String(total-occ);
  else if(/uses exactly \d+ cubes\. Every stack is at least 1/.test(p))answer=String(n[1]-(n[0]-1));
+ else if(/Of these six families/.test(p)){const fam={square:[1,1,1,1],rectangle:[1,1,0,1],rhombus:[1,0,1,1],parallelogram:[1,0,0,1],kite:[0,0,0,0],trapezium:[0,0,0,1]},col=p.includes('always parallelograms')?0:p.includes('right angles')?1:p.includes('equal sides')?2:3;answer=String(Object.values(fam).filter(f=>f[col]).length);}
+ else if(/regular polygon has a perimeter of \d+ cm and each side/.test(p))answer=String(n[0]/n[1]);
  else if(/How many different whole-number lengths/.test(p))answer=String(n[0]+n[1]-1-Math.abs(n[0]-n[1]));
  else if(/three times in a row/.test(p)){const {x,y}=P();answer=pt(x+3*n[2],y+3*n[3]);}
  else if(/halfway between P and Q/.test(p)){const {x,y}=P();answer=p.includes('x-axis')?pt(x,0):pt(0,y);}
@@ -63,10 +65,11 @@ function check(key,q){
    break;}
   case 10:if(F){const d=new Set(n.slice(0,3)).size;answer=d===1?'Equilateral':d===2?'Isosceles':'Scalene';}else if(R)answer='Isosceles';else{answer=String(n[1]-2*n[0]);assert.notEqual(n[1]-2*n[0],n[0],'isosceles, not equilateral');}break;
   case 11:{const ang=A?[n[0],n[1],180-n[0]-n[1]]:n.slice(0,3);answer=Math.max(...ang)>90?'Obtuse':ang.includes(90)?'Right-angled':'Acute';break;}
-  case 12:if(!R)answer=String(A?Math.abs(n[0]-n[1])+1:n[0]+n[1]-1);break;
+  case 12:if(/braces are needed/.test(p))answer=String(n[0]-3);else if(/diagonal brace/.test(p))answer='Triangle';else if(!R)answer=String(A?Math.abs(n[0]-n[1])+1:n[0]+n[1]-1);break;
+  case 15:if(/top angle of/.test(p))answer=String((360-n[0]-n[1])/2);else if(/bottom-left angle/.test(p))answer=String(180-n[0]);else if(/perimeter of/.test(p))answer=String((n[0]-2*n[1])/2);else if(/is a parallelogram because/.test(p))answer='Kite';else if(F)answer=p.includes('no parallel sides')?'Kite':p.includes('exactly one pair')&&!p.includes('two pairs')?'Trapezium':'Parallelogram';break;
   case 13:if(A)answer=String(n[0]/(p.includes('triangle')?3:4));else if(R)answer='Rhombus';break;
   case 16:if(A)answer=String(n[0]/({pentagon:5,hexagon:6,octagon:8}[p.match(/regular (\w+)/)[1]]));break;
-  case 17:if(!R)answer=F?(v.polygons[0].points.length===5&&v.polygons[0].caption.includes('dent')?'Concave':'Convex'):'Concave';break;
+  case 31:if(F&&v.polygons)answer=v.polygons[0].caption.includes('dent')?'Concave':'Regular convex';else if(/hexagon has interior angles/.test(p)){const ang=n.slice(0,6);answer=ang.some(x=>x>180)?'Concave':'Irregular convex';}break;
   case 19:{const s=P(),[d1,d2]=[n[2],n[3]],k=A?2:1;answer=pair({x:s.x+d1*k,y:s.y-d2*k});break;}
   case 20:{const right=n[6],shift=A?-1:0;if(R){const vx=n.slice(-2);answer=pair({x:vx[0]+right,y:vx[1]-2});}else answer=v.shape.map(pt=>pair({x:pt.x+right+shift,y:pt.y-2})).join('; ');break;}
   case 21:{const s=P(),img=v.image[0],d={x:img.x-s.x,y:img.y-s.y};answer=pair(A?{x:-d.x,y:-d.y}:d);break;}
@@ -86,7 +89,7 @@ function check(key,q){
  assert.ok(!/\b1 units\b/.test(p),'Grammar: 1 unit');
  assert.equal(q.options.length,4);assert.equal(new Set(q.options).size,4);assert.ok(q.options.includes(q.answer));assert.equal(q.steps.length,3);
 }
-let count=0;assert.equal(SPACE7_WEEKS.length,10);assert.deepEqual([...new Set(SPACE7_SKILL_GROUPS.flat(2))].sort((a,b)=>a-b),Array.from({length:36},(_,i)=>i+1));
+let count=0;assert.equal(SPACE7_WEEKS.length,10);assert.deepEqual([...new Set(SPACE7_SKILL_GROUPS.flat(2))].sort((a,b)=>a-b),Array.from({length:36},(_,i)=>i+1).filter(k=>k!==17&&k!==18));
 for(let w=1;w<=10;w++)for(let l=1;l<=3;l++)for(let seed=1;seed<=200;seed++)for(const role of ['fast_thinking','reasoning','apply_create']){{const q=space7Question(w,l,seed*7919,role);check(q.skillKey,q)};count++;}
 for(let w=1;w<=9;w++){
  const qs=space7Quiz(w);assert.equal(qs.length,15);assert.equal(new Set(qs.map(q=>q.id)).size,15);

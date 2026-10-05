@@ -90,8 +90,8 @@ const SPACE7_SOURCE_WEEKS = [
    ],
    [
     "Test possible triangles",
-    "use the triangle inequality to test three lengths",
-    "The sum of the two shorter sides must be greater than the longest side to enclose a triangle.",
+    "use the triangle inequality to test three lengths; explain why triangles are rigid",
+    "The sum of the two shorter sides must be greater than the longest side to enclose a triangle. Three fixed lengths can only make one triangle, so a triangle is rigid; a four-sided frame can lean into new shapes.",
     "Equality creates a straight line, not a triangle."
    ]
   ]
@@ -107,16 +107,16 @@ const SPACE7_SOURCE_WEEKS = [
     "Opposite equal sides do not imply all four sides are equal."
    ],
    [
-    "Place squares in families",
-    "explain why squares belong to several shape families",
-    "A square is both a rectangle and a rhombus, so it is also a parallelogram.",
+    "Build the quadrilateral family tree",
+    "explain how squares, rectangles, rhombuses, parallelograms and kites are related",
+    "A square is both a rectangle and a rhombus, so it is also a parallelogram. Each family lower in the tree has every property of the families above it.",
     "The most specific name does not erase broader family membership."
    ],
    [
     "Compare kites and trapeziums",
-    "classify using adjacent equal sides and parallel sides",
-    "State the definitions before sorting. Here a trapezium has exactly one pair of parallel sides, and a kite has two pairs of equal adjacent sides.",
-    "Inclusive and exclusive definitions must not be silently mixed."
+    "classify kites and trapeziums and use their side and angle properties",
+    "Here a trapezium has exactly one pair of parallel sides, and a kite has two pairs of equal adjacent sides. In a kite the two angles between unequal sides are equal; in a trapezium the two angles along a slanted side add to 180°.",
+    "A parallelogram has two pairs of parallel sides, so it is not a trapezium under this definition."
    ]
   ]
  },
@@ -127,7 +127,7 @@ const SPACE7_SOURCE_WEEKS = [
    [
     "Test regularity",
     "use both side and angle conditions for regular polygons",
-    "A regular polygon has all sides equal and all interior angles equal. Both conditions are needed.",
+    "A regular polygon has all sides equal and all interior angles equal. Both conditions are needed. Its perimeter is the number of sides times the side length.",
     "An equal-sided rhombus need not be regular."
    ],
    [
@@ -247,14 +247,14 @@ const SPACE7_SOURCE_WEEKS = [
    [
     "Sort polygon attributes",
     "combine decisions about concavity and regularity",
-    "Check for an inward angle first, then test both equal sides and equal angles on the convex branch.",
+    "A polygon is concave if one interior angle is greater than 180° (an inward dent); otherwise it is convex. Check for that angle first, then test both equal sides and equal angles on the convex branch.",
     "Equal sides alone are not enough for regularity."
    ],
    [
-    "Find a counterexample",
-    "test a classifier with a shape that exposes an incorrect branch",
+    "Test a classifier",
+    "test a classifier with a shape that it sorts wrongly",
     "Trace a carefully chosen boundary case through the algorithm and compare its output with the definition.",
-    "A counterexample must actually reach the faulty output."
+    "The test shape must actually reach the faulty output."
    ],
    [
     "Complete a classification algorithm",
@@ -290,17 +290,24 @@ const SPACE7_SOURCE_WEEKS = [
  }
 ] as const;
 
-// Every original skill is retained; related skills now share a lesson.
+// Related skills share a lesson. Skills 17 (concave/convex) and 18 (counterexample claims) are
+// not taught on their own: ACARA places concavity in SP04 classifiers (skill 31, Week 10) and
+// counterexamples in Year 8.
+export const SPACE7_UNUSED_SKILLS = [17, 18];
 export const SPACE7_SKILL_GROUPS = [
  [[1],[2],[3]], [[4],[5],[6]], [[7],[8],[9]],
- [[10,11],[12],[13]], [[14,15],[16],[17,18]],
+ [[10,11],[12],[13]], [[14],[15],[16]],
  [[19],[20],[21]], [[22,23],[24],[27]], [[25],[26],[34]],
  [[28],[29],[30]], [[31],[32,33],[35,36]],
 ];
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const SPACE7_READABILITY_REVISION = 7;
-export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code};}
-const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Polygon families and relationships','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Trace and repair classifiers','Create and justify classifiers'];
-export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map(keys=>{const gs=keys.map(space7SourceGuide);return [gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));
+export const SPACE7_READABILITY_REVISION = 8;
+// Rotations preserving shape properties belong with transformations (SP03), not classifiers.
+const CODE_OVERRIDES:Record<number,(typeof SPACE7_SOURCE_WEEKS)[number]['code']|undefined>={34:'AC9M7SP03'};
+export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:CODE_OVERRIDES[key]??w.code};}
+// One clear title for lessons that combine two skills.
+const LESSON_TITLES:Record<string,string>={'4-1':'Classify triangles by sides and angles','7-1':'Reflect in an axis','10-2':'Test and complete a classifier','10-3':'Compare and justify classifiers'};
+const titles=['Nets and solid objects','Read plans and views','Choose useful representations','Triangles and quadrilateral properties','Quadrilateral families and regular polygons','Translations on the plane','Reflections and transformation order','Rotations and preserved properties','Trace and repair classifiers','Create and justify classifiers'];
+export const SPACE7_WEEKS=SPACE7_SKILL_GROUPS.map((groups,i)=>({title:titles[i],code:space7SourceGuide(groups[0][0]).code,lessons:groups.map((keys,j)=>{const gs=keys.map(space7SourceGuide);return [LESSON_TITLES[`${i+1}-${j+1}`]??gs.map(g=>g.title).join(' and '),gs.map(g=>g.goal).join('; '),gs.map(g=>g.idea).join(' '),gs.map(g=>g.caution).join(' ')] as const;})}));
 export function space7Guide(week:number,lesson:number){const w=SPACE7_WEEKS[week-1],l=w?.lessons[lesson-1];return l?{title:l[0],goal:l[1],idea:l[2],caution:l[3],code:w.code}:undefined;}
 export const SPACE7_PROGRAM:WeekPlan[]=SPACE7_WEEKS.map((w,i)=>({id:`y7-space-w${i+1}`,week:i+1,topic:w.title,curriculum:[w.code],lessons:w.lessons.map((l,j)=>({id:`y7-space-w${i+1}-l${j+1}`,week:i+1,lesson:j+1,title:l[0],focus:l[1],config:{teacherPreviewHref:`/demo-review/shattered-realms/space/lesson?realm_id=space&year=Year%207&week=${i+1}&lessonId=y7-space-w${i+1}-l${j+1}&expedition=1&teacher_preview=1&review=1`},curriculum:[...new Set(SPACE7_SKILL_GROUPS[i][j].map(key=>space7SourceGuide(key).code))],activityIdeas:[l[1],'justify my answer using the given spatial properties'],quizSafe:true,activities:['fast_thinking','reasoning','apply_create'].map(role=>({activityType:'multiple_choice' as const,weight:role==='fast_thinking'?4:1,config:{rotationRole:role,mode:`space7_v2_w${i+1}_l${j+1}_${role}`}}))}))}));
