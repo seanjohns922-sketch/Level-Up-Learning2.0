@@ -3,12 +3,13 @@
 import RealmItemFilter from "@/components/economy/RealmItemFilter";
 import { matchesItemRealm, type ItemRealmFilter } from "@/lib/marketplace-realm-filter";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
 import { centralWorldCategory, marketplaceDepartment, marketplaceCategory, MARKETPLACE_CATEGORIES, type MarketplaceDepartment } from "@/lib/marketplace-categories";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
-import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyItem, type EconomyState } from "@/lib/economy";
+import { AVATAR_LAYER_SLOTS, economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
 import { DEMO_PREVIEW_SCOPE, useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
@@ -31,6 +32,7 @@ export default function MarketplacePage() {
   const [brokenArtworkIds, setBrokenArtworkIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [outfitDestination, setOutfitDestination] = useState<string | null>(null);
   const sessionMessage = studentId ? null : "Log in as a student to open the Marketplace.";
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function MarketplacePage() {
 
   async function act() {
     if (!studentId || !selected || busy || selectedUnavailable) return;
-    setBusy(true); setMessage(null);
+    setBusy(true); setMessage(null); setOutfitDestination(null);
     try {
       if (selectedOwned && selectedIsWorldReward) {
         router.push(`/world?${preview ? "teacher_preview=1&" : ""}build=${encodeURIComponent(selected.item_key)}`);
@@ -81,7 +83,10 @@ export default function MarketplacePage() {
       const merged = mergeCentralWorldCatalogue(next);
       setState(merged);
       persistCanonicalAvatarAppearance(studentId, merged);
-      setMessage(selectedOwned ? `${selected.name} is now equipped.` : `${selected.name} added to your collection.`);
+      const avatarSlot = String(selected.metadata?.slot ?? '');
+      const isAvatarLayer = AVATAR_LAYER_SLOTS.some(slot => slot === avatarSlot);
+      if (isAvatarLayer) setOutfitDestination(`/wardrobe#wardrobe-${avatarSlot}`);
+      setMessage(selectedOwned ? `${selected.name} is now equipped.` : `${selected.name} added to your ${isAvatarLayer ? 'outfit collection' : 'collection'}.`);
     } catch (error) { setMessage(economyErrorMessage(error)); }
     finally { setBusy(false); }
   }
@@ -107,7 +112,7 @@ export default function MarketplacePage() {
           <div className="mt-5"><RealmItemFilter value={realmFilter} onChange={setRealmFilter}/></div>
           <div className="mt-5 flex gap-2 overflow-x-auto pb-2" aria-label="Marketplace categories">{MARKETPLACE_CATEGORIES[department].map(item=><button type="button" key={item.id} onClick={()=>setCategory(item.id)} aria-pressed={category===item.id} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold ${category===item.id?"border-[#c5a96b] bg-[#f0dfb5] text-[#4b3b1f]":"border-[#d8dbce] bg-white text-slate-600 hover:border-[#84947b]"}`}>{item.label}</button>)}</div>
         </header>
-        {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div> : null}
+        {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}{outfitDestination ? <Link href={outfitDestination} className="ml-3 underline underline-offset-2">Open Outfit</Link> : null}</div> : null}
         <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
           <section id="shop-products" role="tabpanel" aria-labelledby={`shop-${department}-tab`} className="grid content-start grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-3" aria-label="Marketplace items">
             {items.map((item) => { const rarity = RARITY_STYLES[item.rarity]; const isOwned = owned.has(item.item_key); const isEquipped = equipped.has(item.item_key); const unavailable = !isMarketplaceItemAvailable(item) || brokenArtworkIds.has(item.item_key); return (

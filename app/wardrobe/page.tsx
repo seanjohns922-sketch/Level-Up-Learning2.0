@@ -105,7 +105,7 @@ function layerPreview(base: AvatarOutfit, item: EconomyItem): AvatarOutfit {
 // ── Outfit presets (saved looks) ────────────────────────────────────────────
 type OutfitPreset = { id: string; name: string; outfit: AvatarOutfit };
 const MAX_PRESETS = 5;
-const CLOTHING_SLOTS = ["top", "bottom", "footwear"] as const;
+const CLOTHING_SLOTS = ["avatar_outfit", "top", "bottom", "footwear"] as const;
 const presetsKey = (studentId: string) => `lul:${studentId}:outfit_presets_v1`;
 /** Keep only the free-base fields of a look (drops equipped-only extras). */
 function baseFieldsOf(outfit: AvatarOutfit): AvatarOutfit {
@@ -144,19 +144,32 @@ export default function ExplorerOutfitPage() {
   useEffect(() => {
     if (!student?.studentId) return;
     let cancelled = false;
-    fetchStudentEconomy(student.studentId)
-      .then((next) => {
-        if (cancelled || stateRef.current) return;
-        stateRef.current = next;
-        confirmedStateRef.current = next;
-        setState(next);
-        persistCanonicalAvatarAppearance(student.studentId, next);
-      })
-      .catch((error) => {
-        if (!cancelled) setMessage(economyErrorMessage(error));
-      });
+    let requestId = 0;
+    const refresh = () => {
+      // Never replace an in-flight local edit with an older inventory response.
+      if (pendingBaseRef.current || baseSaveLoopRef.current) return;
+      const snapshot = stateRef.current;
+      const request = ++requestId;
+      fetchStudentEconomy(student.studentId)
+        .then((next) => {
+          if (cancelled || request !== requestId || stateRef.current !== snapshot) return;
+          stateRef.current = next;
+          confirmedStateRef.current = next;
+          setState(next);
+          persistCanonicalAvatarAppearance(student.studentId, next);
+        })
+        .catch((error) => {
+          if (!cancelled && request === requestId) setMessage(economyErrorMessage(error));
+        });
+    };
+    const onVisible = () => { if (document.visibilityState === 'visible') refresh(); };
+    refresh();
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       cancelled = true;
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [student?.studentId]);
 
@@ -174,7 +187,7 @@ export default function ExplorerOutfitPage() {
   const merged = state ? mergeAvatarOutfit(state) : {};
   // Effective top (honours the legacy body:"dress" avatars); a dress owns Bottom.
   const effTop: TopStyle = base.top ?? (base.body === "dress" ? "dress" : "hoodie");
-  const isDress = effTop === "dress";
+  const isDress = merged.top === "dress" || (!merged.top && effTop === "dress");
   const owned = useMemo(() => new Set(state?.inventory.map((e) => e.item_key) ?? []), [state?.inventory]);
   const itemsBySlot = useMemo(() => {
     const map = new Map<string, EconomyItem[]>();
@@ -185,9 +198,9 @@ export default function ExplorerOutfitPage() {
       list.push(item);
       map.set(slot, list);
     }
-    for (const list of map.values()) list.sort((a, b) => a.sort_order - b.sort_order);
+    for (const list of map.values()) list.sort((a, b) => Number(owned.has(b.item_key)) - Number(owned.has(a.item_key)) || a.sort_order - b.sort_order);
     return map;
-  }, [state?.items, realmFilter]);
+  }, [state?.items, realmFilter, owned]);
 
   const bump = () => setCelebrate((c) => c + 1);
   function showState(next: EconomyState) {
@@ -259,12 +272,14 @@ export default function ExplorerOutfitPage() {
   // Pick a free garment style; take off any equipped premium in that slot first.
   async function pickFreeStyle(patch: Partial<AvatarOutfit>, equipSlot: string) {
     if (!student?.studentId || busy) return;
-    if (state?.equipped[equipSlot]) {
+    const slots = ["avatar_outfit", equipSlot].filter(slot => stateRef.current?.equipped[slot]);
+    if (slots.length) {
       setBusy(true);
       try {
-        commit(await unequipEconomySlot(student.studentId, equipSlot));
+        for (const slot of slots) commit(await unequipEconomySlot(student.studentId, slot));
       } catch (error) {
         setMessage(economyErrorMessage(error));
+        return;
       } finally {
         setBusy(false);
       }
@@ -340,7 +355,7 @@ export default function ExplorerOutfitPage() {
     if (items.length === 0 && !state?.equipped[equipSlot]) return null;
     const equippedKey = state?.equipped[equipSlot];
     return (
-      <section className={PANEL}>
+      <section id={`wardrobe-${equipSlot}`} className={`${PANEL} scroll-mt-24`}>
         <Heading title={title} />
         <div className="flex flex-wrap gap-2.5">
           <button type="button" onClick={() => clearSlot(equipSlot)} disabled={busy} className={`${optBase} flex h-[116px] w-[82px] flex-col items-center justify-center disabled:opacity-60 ${ring(!equippedKey)}`}>
@@ -368,7 +383,7 @@ export default function ExplorerOutfitPage() {
           ) : null}
           <div className={`h-[67px] ${!isOwned ? "opacity-45" : ""}`}><Thumb outfit={layerPreview(base, item)} height={64} /></div>
           <span className="w-full truncate text-center text-[9px] font-bold text-slate-600">{item.name}</span>
-          <span className="mb-1 mt-auto rounded px-1.5 py-0.5 text-[7px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span>
+          <span className="mb-1 mt-auto rounded px-1.5 py-0.5 text-[7px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{isOwned ? (isOn ? "Equipped" : "Owned") : rarity.label}</span>
         </button>
       );
     });
@@ -381,7 +396,7 @@ export default function ExplorerOutfitPage() {
         <div className="mb-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">My Home</p>
           <h1 className="text-3xl font-black md:text-4xl">Explorer Outfit</h1>
-          <p className="mt-1 text-sm text-slate-600">Get your explorer ready for the next adventure. Everything here is free — mix and match as much as you like.</p>
+          <p className="mt-1 text-sm text-slate-600">Get your explorer ready for the next adventure. Mix your free styles with outfits and accessories you’ve bought or earned.</p>
         </div>
         {message || sessionMessage ? (
           <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div>
@@ -411,7 +426,7 @@ export default function ExplorerOutfitPage() {
             <section className={PANEL}><RealmItemFilter value={realmFilter} onChange={setRealmFilter}/><p className="mt-2 text-xs text-slate-500">Filters shop clothing and accessories. Your free choices and saved looks stay available.</p>{state && realmFilter !== 'all' && itemsBySlot.size === 0 ? <p role="status" className="mt-2 text-sm text-slate-600">No collection items match this realm yet.</p> : null}</section>
             {/* My Outfits (presets) */}
             <section className={PANEL}>
-              <Heading title="My Outfits" />
+              <Heading title="Saved looks" />
               <div className="flex flex-wrap gap-2.5">
                 {presets.map((p) => (
                   <div key={p.id} className="relative">
@@ -504,11 +519,11 @@ export default function ExplorerOutfitPage() {
             </section>
 
             {/* Top */}
-            <section className={PANEL}>
+            <section id="wardrobe-top" className={PANEL}>
               <Heading title="Top" />
               <div className="mb-3 flex flex-wrap gap-2.5">
                 {TOP_STYLES.map(([value, label]) => {
-                  const on = !state?.equipped.top && effTop === value;
+                  const on = !state?.equipped.avatar_outfit && !state?.equipped.top && effTop === value;
                   return (
                     <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ top: value }, "top")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                       <Thumb outfit={{ ...merged, top: value }} />
@@ -526,7 +541,7 @@ export default function ExplorerOutfitPage() {
             </section>
 
             {/* Bottoms — disabled while a dress is worn (it covers both slots) */}
-            <section className={`${PANEL} ${isDress ? "opacity-55" : ""}`}>
+            <section id="wardrobe-bottom" className={`${PANEL} ${isDress ? "opacity-55" : ""}`}>
               <Heading title="Bottoms" />
               {isDress ? (
                 <p className="text-xs font-semibold text-slate-400">Your dress covers this — pick a different Top to choose bottoms.</p>
@@ -534,7 +549,7 @@ export default function ExplorerOutfitPage() {
                 <>
                   <div className="mb-3 flex flex-wrap gap-2.5">
                     {BOTTOM_STYLES.map(([value, label]) => {
-                      const on = !state?.equipped.bottom && (base.bottom ?? "joggers") === value;
+                      const on = !state?.equipped.avatar_outfit && !state?.equipped.bottom && (base.bottom ?? "joggers") === value;
                       return (
                         <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ bottom: value }, "bottom")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                           <Thumb outfit={{ ...merged, bottom: value }} />
@@ -554,11 +569,11 @@ export default function ExplorerOutfitPage() {
             </section>
 
             {/* Shoes */}
-            <section className={PANEL}>
+            <section id="wardrobe-footwear" className={PANEL}>
               <Heading title="Shoes" />
               <div className="mb-3 flex flex-wrap gap-2.5">
                 {SHOE_STYLES.map(([value, label]) => {
-                  const on = !state?.equipped.footwear && (base.shoeStyle ?? "sneakers") === value;
+                  const on = !state?.equipped.avatar_outfit && !state?.equipped.footwear && (base.shoeStyle ?? "sneakers") === value;
                   return (
                     <button key={value} type="button" aria-label={label} title={label} onClick={() => pickFreeStyle({ shoeStyle: value }, "footwear")} disabled={busy} className={`${optBase} flex h-[84px] w-16 flex-col items-center overflow-hidden pt-1 disabled:opacity-60 ${ring(on)}`}>
                       <Thumb outfit={{ ...merged, shoeStyle: value }} />
@@ -575,6 +590,9 @@ export default function ExplorerOutfitPage() {
               </div>
             </section>
 
+            {/* All purchased avatar layers must have a place to equip and remove them. */}
+            {accessorySlot("Outfit collection", "avatar_outfit")}
+            {accessorySlot("Held items", "avatar_hand")}
             {/* Worn accessories (earned) */}
             {accessorySlot("Head", "avatar_hat")}
             {accessorySlot("Face Accessory", "avatar_glasses")}
