@@ -1,8 +1,9 @@
 "use client";
 
-import { type ComponentType, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
+import { centralWorldCategory, marketplaceDepartment, marketplaceCategory, MARKETPLACE_CATEGORIES, type MarketplaceDepartment } from "@/lib/marketplace-categories";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import { type AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
@@ -16,35 +17,14 @@ import {
   mergeCentralWorldCatalogue,
 } from "@/lib/world3d/central-world-customisation-catalog";
 
-type LaunchMarketplaceCategory = "buildings" | "animals" | "pools_play" | "special";
-type MarketplaceCategory = LaunchMarketplaceCategory | "more_rewards";
-
-const CATEGORIES: Array<{ id: MarketplaceCategory; label: string; tabIcon: keyof typeof Icons }> = [
-  { id: "buildings", label: "Buildings", tabIcon: "House" },
-  { id: "animals", label: "Animals", tabIcon: "PawPrint" },
-  { id: "pools_play", label: "Pools & Play", tabIcon: "Waves" },
-  { id: "special", label: "Special", tabIcon: "Star" },
-  { id: "more_rewards", label: "More Rewards", tabIcon: "Gift" },
-];
-
-function centralWorldCategory(item: EconomyItem): LaunchMarketplaceCategory | null {
-  const category = item.metadata?.marketplaceCategory;
-  return category === "buildings" || category === "animals" || category === "pools_play" || category === "special"
-    ? category
-    : null;
-}
-
-function itemMarketplaceCategory(item: EconomyItem): MarketplaceCategory {
-  return centralWorldCategory(item) ?? "more_rewards";
-}
-
 export default function MarketplacePage() {
   const router = useRouter();
   const student = useMemo(() => getActiveStudentProfile(), []);
   const preview = useDemoPreviewMode() || student?.studentId === DEMO_PREVIEW_SCOPE;
   const studentId = student?.studentId ?? (preview ? "demo-preview" : null);
   const [state, setState] = useState<EconomyState | null>(null);
-  const [category, setCategory] = useState<MarketplaceCategory>("buildings");
+  const [department, setDepartment] = useState<MarketplaceDepartment>("world");
+  const [category, setCategory] = useState("all");
   const [selected, setSelected] = useState<EconomyItem | null>(null);
   const [brokenArtworkIds, setBrokenArtworkIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -66,9 +46,9 @@ export default function MarketplacePage() {
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
   const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
-  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && itemMarketplaceCategory(item) === category), [category, state?.items]);
+  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && marketplaceDepartment(item) === department && (category === "all" || marketplaceCategory(item) === category)), [category, department, state?.items]);
   useEffect(() => {
-    if (items.length > 0 && !items.some((item) => item.item_key === selected?.item_key)) setSelected(items[0]);
+    if (!items.some((item) => item.item_key === selected?.item_key)) setSelected(items[0] ?? null);
   }, [items, selected?.item_key]);
   const selectedOwned = selected ? owned.has(selected.item_key) : false;
   const selectedEquipped = selected ? equipped.has(selected.item_key) : false;
@@ -107,37 +87,49 @@ export default function MarketplacePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#eef2f6] text-slate-900">
+    <main className="min-h-screen bg-[#f5f3ed] text-slate-900">
       <EconomyHeader xp={state?.wallet.xp_balance} essence={state?.wallet.essence} rankLevel={getExplorerRank(state?.wallet.xp_earned ?? 0).level} />
-      <div className="mx-auto max-w-[1440px] px-4 py-6 md:px-6">
-        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-          <div><p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">Rewards for learning</p><h1 className="text-3xl font-black md:text-4xl">Marketplace</h1><p className="mt-1 text-sm text-slate-600">Unlock awesome places for your world.</p></div>
-          <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Marketplace categories">{CATEGORIES.map((item) => { const Icon = Icons[item.tabIcon] as ComponentType<{ className?: string }>; return <button type="button" key={item.id} onClick={() => setCategory(item.id)} className={`inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-xs font-extrabold ${category === item.id ? "border-sky-500 bg-sky-500 text-white shadow-sm" : "border-slate-200 bg-white text-slate-600"}`}><Icon className="h-4 w-4" />{item.label}</button>; })}</div>
-        </div>
+      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
+        <header className="mb-7">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#6c765f]">Made possible by your learning</p>
+          <h1 className="mt-2 text-4xl font-black tracking-tight md:text-5xl">Make it yours.</h1>
+          <p className="mt-3 text-sm text-slate-600">Spend your earned XP on a world to build and a look of your own.</p>
+          <div className="mt-6 grid max-w-2xl grid-cols-2 gap-3" role="tablist" aria-label="Marketplace departments">
+            {(["world","avatar"] as const).map(id=>{const active=department===id;const Icon=id==="world"?Icons.House:Icons.Shirt;return <button key={id} id={`shop-${id}-tab`} role="tab" aria-selected={active} aria-controls="shop-products" tabIndex={active?0:-1} type="button" onKeyDown={event=>{
+              if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+              event.preventDefault();const next=event.key==="Home"?"world":event.key==="End"?"avatar":department==="world"?"avatar":"world";
+              setDepartment(next);setCategory("all");setSelected(null);
+              event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#shop-${next}-tab`)?.focus();
+            }} onClick={()=>{setDepartment(id);setCategory("all");setSelected(null);}} className={`flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${active?"border-[#293f34] bg-[#293f34] text-[#fff8e8] shadow-md":"border-[#d8dbce] bg-white text-[#405144] hover:border-[#84947b]"}`}>
+              <Icon className="h-6 w-6 shrink-0"/><span><span className="block text-lg font-black">{id==="world"?"World":"Avatar"}</span><span className={`mt-0.5 block text-xs ${active?"text-[#ced8c7]":"text-slate-500"}`}>{id==="world"?"Buildings, wildlife & places":"Outfits, companions & effects"}</span></span>
+            </button>;})}
+          </div>
+          <div className="mt-5 flex gap-2 overflow-x-auto pb-2" aria-label="Marketplace categories">{MARKETPLACE_CATEGORIES[department].map(item=><button type="button" key={item.id} onClick={()=>setCategory(item.id)} aria-pressed={category===item.id} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold ${category===item.id?"border-[#c5a96b] bg-[#f0dfb5] text-[#4b3b1f]":"border-[#d8dbce] bg-white text-slate-600 hover:border-[#84947b]"}`}>{item.label}</button>)}</div>
+        </header>
         {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}</div> : null}
-        <div className="grid gap-5 lg:grid-cols-[1fr_390px]">
-          <section className="grid content-start grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" aria-label="Marketplace items">
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+          <section id="shop-products" role="tabpanel" aria-labelledby={`shop-${department}-tab`} className="grid content-start grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-3" aria-label="Marketplace items">
             {items.map((item) => { const rarity = RARITY_STYLES[item.rarity]; const isOwned = owned.has(item.item_key); const isEquipped = equipped.has(item.item_key); const unavailable = !isMarketplaceItemAvailable(item) || brokenArtworkIds.has(item.item_key); return (
-              <button type="button" key={item.item_key} onClick={() => setSelected(item)} className={`min-h-[220px] overflow-hidden rounded-md border bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${selected?.item_key === item.item_key ? "border-slate-900 ring-2 ring-slate-900/10" : "border-slate-200"}`}>
-                <div className="relative mb-4 flex h-28 items-center justify-center overflow-hidden rounded-md" style={{ background: `${item.accent}18` }}>
+              <button type="button" key={item.item_key} onClick={() => setSelected(item)} className={`min-h-[260px] overflow-hidden rounded-2xl border bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${selected?.item_key === item.item_key ? "border-[#667d5e] ring-2 ring-[#667d5e]/20" : "border-slate-200"}`}>
+                <div className="relative mb-4 flex aspect-[5/4] items-center justify-center overflow-hidden rounded-xl" style={{ background: "#e9e6dc" }}>
                   <MarketplaceItemImage item={item} context="card" onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
                 </div>
-                <div className="flex items-start justify-between gap-2"><h2 className="text-sm font-black leading-tight">{item.name}</h2>{isOwned ? <Icons.Check className="h-4 w-4 shrink-0 text-emerald-600" /> : null}</div>
+                <div className="flex items-start justify-between gap-2"><h2 className="text-base font-black leading-tight">{item.name}</h2>{isOwned ? <Icons.Check className="h-4 w-4 shrink-0 text-emerald-600" /> : null}</div>
                 <div className="mt-2 flex items-center justify-between gap-2"><span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ color: rarity.color, background: rarity.background }}>{rarity.label}</span><span className={`text-xs font-black ${unavailable ? "text-slate-400" : isEquipped ? "text-emerald-700" : "text-amber-700"}`}>{unavailable ? "Unavailable" : isEquipped ? "Equipped" : isOwned ? "Owned" : `${item.price} XP`}</span></div>
               </button>
             ); })}
             {state && items.length === 0 ? <div className="col-span-full rounded-md border border-dashed border-slate-300 bg-white p-10 text-center text-sm font-bold text-slate-500">No items in this category yet.</div> : null}
           </section>
-          <aside className="h-fit rounded-md border border-slate-200 bg-white p-5 lg:sticky lg:top-20">
+          <aside className="h-fit rounded-2xl border border-[#d8dbce] bg-white p-4 shadow-sm lg:sticky lg:top-20">
             {selected ? <>
-              <div className="relative flex h-64 items-center justify-center overflow-hidden rounded-md bg-slate-950" style={{ background: `linear-gradient(160deg, ${selected.accent}35, #0f172a 65%)` }}>
+              <div className="relative flex aspect-[5/4] items-center justify-center overflow-hidden rounded-xl" style={{ background: "#e9e6dc" }}>
                 <MarketplaceItemImage key={selected.item_key} item={selected} context="preview" avatarOutfit={previewOutfit} onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
-                <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">Preview</span>
+                <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">{selectedIsWorldReward ? "World item" : "Try the look"}</span>
               </div>
               <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{centralWorldCategory(selected)?.replace("_", " & ") ?? selected.category.replace("_", " ")}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{selected.description}</p>
               {typeof selected.metadata?.gridSize === "string" ? <p className="mt-3 inline-flex items-center gap-2 rounded bg-slate-100 px-2 py-1 text-[11px] font-black uppercase text-slate-600"><Icons.Grid3X3 className="h-3.5 w-3.5" /> {selected.metadata.gridSize}</p> : null}
-              <button type="button" disabled={busy || selectedUnavailable || (!selectedIsWorldReward && selectedEquipped) || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
+              <button type="button" disabled={busy || selectedUnavailable || (!selectedIsWorldReward && selectedEquipped) || (!selectedOwned && (state?.wallet.xp_balance ?? 0) < (selected.price ?? 0))} onClick={act} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500">
                 {selectedUnavailable ? "Artwork unavailable" : selectedOwned && selectedIsWorldReward ? <><Icons.Move3D className="h-4 w-4" /> Place in world</> : selectedEquipped ? <><Icons.Check className="h-4 w-4" /> Equipped</> : selectedOwned ? "Equip item" : <><Icons.Zap className="h-4 w-4" /> Buy for {selected.price} XP</>}
               </button>
             </> : <div className="py-16 text-center text-sm font-bold text-slate-500">Select an item to preview it.</div>}

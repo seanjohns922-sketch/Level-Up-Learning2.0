@@ -1,11 +1,12 @@
+import { WORLD_SHOP_ART } from "./world3d/world-shop-art";
 import type { EconomyItem } from "@/lib/economy";
 
-export type MarketplacePreviewMode = "avatar" | "pet" | "room" | "background" | "effect" | "title";
+export type MarketplacePreviewMode = "avatar" | "pet" | "room" | "background" | "effect" | "title" | "world";
 
 export type MarketplaceVisual =
   | { type: "avatar-layer"; alt: string; previewMode: "avatar" }
   | { type: "pet"; alt: string; previewMode: "pet" }
-  | { type: "asset"; src: string; alt: string; previewMode: "background" | "room" | "effect" | "title"; placement?: "desk" | "floor" }
+  | { type: "asset"; src: string; alt: string; previewMode: "background" | "room" | "effect" | "title" | "world"; placement?: "desk" | "floor" }
   | { type: "unavailable"; alt: string; reason: "missing-marketplace-artwork" };
 
 const PET_SPECIES = new Set([
@@ -28,8 +29,10 @@ function unavailable(item: EconomyItem): MarketplaceVisual {
   };
 }
 
-/** The economy item record is the only source used by cards, previews and actions. */
+/** Preserve server economics; known world models use reviewed, versioned product art. */
 export function resolveMarketplaceVisual(item: EconomyItem): MarketplaceVisual {
+  const worldArt = WORLD_SHOP_ART[item.item_key];
+  if (worldArt) return { type: "asset", ...worldArt, previewMode: "world" };
   const metadata = item.metadata ?? {};
   if (metadata.marketplace_status === "artwork_unavailable") return unavailable(item);
   const explicitVisual = metadata.marketplace_visual && typeof metadata.marketplace_visual === "object"
@@ -65,7 +68,7 @@ export function resolveMarketplaceVisual(item: EconomyItem): MarketplaceVisual {
     typeof explicitVisual.src === "string" &&
     explicitVisual.src.startsWith("/") &&
     typeof explicitVisual.alt === "string" &&
-    (explicitMode === "background" || explicitMode === "room" || explicitMode === "effect" || explicitMode === "title")
+    (explicitMode === "background" || explicitMode === "room" || explicitMode === "effect" || explicitMode === "title" || explicitMode === "world")
   ) {
     return {
       type: "asset",

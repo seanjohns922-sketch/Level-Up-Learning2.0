@@ -45,7 +45,7 @@ function ProductAsset({
       src={visual.src}
       alt={visual.alt}
       fill
-      sizes={priority ? "390px" : "(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 240px"}
+      sizes={priority ? "(max-width: 1024px) 90vw, 360px" : "(max-width: 480px) 90vw, (max-width: 1280px) 45vw, 340px"}
       priority={priority}
       className={className}
       onError={() => onError(item.item_key, visual.src)}
@@ -90,6 +90,7 @@ export default function MarketplaceItemImage({ item, context, avatarOutfit, onAr
   }
 
   if (visual.type === "asset") {
+    if (visual.previewMode === "world") return <ProductAsset item={item} visual={visual} priority={large} className="object-contain" onError={reportArtworkError} />;
     if (!large) {
       return <ProductAsset item={item} visual={visual} priority={false} className={visual.previewMode === "background" ? "object-cover" : "object-contain p-2"} onError={reportArtworkError} />;
     }

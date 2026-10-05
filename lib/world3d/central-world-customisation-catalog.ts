@@ -1,3 +1,4 @@
+import { WORLD_SHOP_ART } from "./world-shop-art";
 import { isVillageBuilding } from "./village-buildings";
 import { WORLD_REWARD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import type { EconomyItem, EconomyState } from "@/lib/economy";
@@ -97,7 +98,9 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
 export function mergeCentralWorldCatalogue(state: EconomyState): EconomyState {
   const existing = new Map(state.items.map((item) => [item.item_key, item]));
   for (const item of CENTRAL_WORLD_CUSTOMISATION_CATALOG) {
-    if (!existing.has(item.item_key)) existing.set(item.item_key, item);
+    const current = existing.get(item.item_key) ?? item;
+    const art = WORLD_SHOP_ART[item.item_key];
+    existing.set(item.item_key, art ? { ...current, metadata: { ...current.metadata, marketplace_visual: { type: "asset", ...art, previewMode: "world" } } } : current);
   }
   return { ...state, items: Array.from(existing.values()) };
 }
