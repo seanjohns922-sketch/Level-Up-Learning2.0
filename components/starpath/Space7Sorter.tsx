@@ -22,7 +22,7 @@ export function ShapeCard({shape, size, caption}: {shape: Sorter7Shape; size?: n
   const unit = (x: number, y: number) => { const l = Math.hypot(x, y) || 1; return {x: x / l, y: y / l}; };
   const sideMarks = shape.show === 'angles' ? ps.map(() => 0) : groups(f.sides, (a, b) => Math.abs(a - b) <= 1e-6 * Math.max(1, a, b));
   const angleMarks = shape.show === 'all' ? groups(f.angles.map(a => Math.abs(a - 90) < 1e-4 ? -1 : a), (a, b) => a > 0 && Math.abs(a - b) < 1e-4) : ps.map(() => 0);
-  const parallel = n === 4 && shape.show === 'all' ? (() => { const d = pt.map((p, i) => ({x: pt[(i + 1) % n].x - p.x, y: pt[(i + 1) % n].y - p.y})), par = (i: number, j: number) => Math.abs(d[i].x * d[j].y - d[i].y * d[j].x) <= 1e-6 * Math.hypot(d[i].x, d[i].y) * Math.hypot(d[j].x, d[j].y); const m = [0, 0, 0, 0]; if (par(0, 2)) { m[0] = 1; m[2] = 1; } if (par(1, 3)) { m[1] = 2; m[3] = 2; } return m; })() : [0, 0, 0, 0];
+  const parallel = n === 4 && shape.show === 'all' && f.rightAngles < 4 ? (() => { const d = pt.map((p, i) => ({x: pt[(i + 1) % n].x - p.x, y: pt[(i + 1) % n].y - p.y})), par = (i: number, j: number) => Math.abs(d[i].x * d[j].y - d[i].y * d[j].x) <= 1e-6 * Math.hypot(d[i].x, d[i].y) * Math.hypot(d[j].x, d[j].y); const m = [0, 0, 0, 0]; if (par(0, 2)) { m[0] = 1; m[2] = 1; } if (par(1, 3)) { m[1] = 2; m[3] = 2; } return m; })() : [0, 0, 0, 0];
   return <figure className="m-0 flex min-w-0 flex-col items-center rounded-xl border border-violet-200 bg-white p-1" style={{width: size ?? '100%'}}>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Shape ${shape.id}`} className="w-full">
       <text x="8" y="18" fontSize="16" fontWeight="900" fill={MARK}>{shape.id}</text>
@@ -72,13 +72,13 @@ const TREE_EDGES: [number, number][] = [[-1, 0], [-1, 1], [-1, 2], [1, 3], [1, 4
 /** The quadrilateral family tree; each family has every property of the families above it. */
 export function FamilyTree({values, active, onSlot, editable}: {values: string[]; active?: number | null; onSlot?: (slot: number) => void; editable?: boolean[]}) {
   const at = (i: number) => i < 0 ? {x: 260, y: 30} : TREE_POS[i];
-  return <svg viewBox="0 0 520 310" className="mx-auto w-full max-w-[520px]" role={onSlot ? 'group' : 'img'} aria-label={`Quadrilateral family tree: ${values.map((v, i) => v || `blank box ${i + 1}`).join(', ')}`}>
+  return <svg viewBox="0 -6 520 316" className="mx-auto w-full max-w-[520px]" role={onSlot ? 'group' : 'img'} aria-label={`Quadrilateral family tree: ${values.map((v, i) => v || `blank box ${i + 1}`).join(', ')}`}>
     {TREE_EDGES.map(([a, b]) => <path key={`${a}-${b}`} d={`M${at(a).x} ${at(a).y + 18}L${at(b).x} ${at(b).y - 18}`} stroke="#9b86bd" strokeWidth="2.5" />)}
     {[-1, ...TREE_POS.map((_, i) => i)].map(i => {
       const p = at(i), v = i < 0 ? 'Quadrilateral' : values[i], can = i >= 0 && !!onSlot && (editable?.[i] ?? true);
       return <g key={i} data-slot={can ? i : undefined} onClick={can ? () => onSlot!(i) : undefined} className={can ? 'cursor-pointer' : ''} role={can ? 'button' : undefined} aria-label={can ? `Box ${i + 1}: ${v || 'blank'}` : undefined} tabIndex={can ? 0 : undefined} onKeyDown={can ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSlot!(i); } } : undefined}>
-        <rect x={p.x - 70} y={p.y - 18} width="140" height="36" rx="12" fill={i < 0 ? '#5b3a8c' : v ? '#f3edfc' : 'white'} stroke={active === i ? '#f59e0b' : '#7c5cb0'} strokeWidth={active === i ? 4 : 2} strokeDasharray={!v && i >= 0 ? '6 4' : undefined} />
-        <text x={p.x} y={p.y + 5} textAnchor="middle" fontSize="15" fontWeight="700" fill={i < 0 ? 'white' : v ? '#2c1f4a' : '#7c5cb0'}>{v || '?'}</text>
+        <rect x={p.x - 78} y={p.y - 20} width="156" height="40" rx="12" fill={i < 0 ? '#5b3a8c' : v ? '#f3edfc' : 'white'} stroke={active === i ? '#f59e0b' : '#7c5cb0'} strokeWidth={active === i ? 4 : 2} strokeDasharray={!v && i >= 0 ? '6 4' : undefined} />
+        <text x={p.x} y={p.y + 6} textAnchor="middle" fontSize="19" fontWeight="700" fill={i < 0 ? 'white' : v ? '#2c1f4a' : '#7c5cb0'}>{v || '?'}</text>
       </g>;
     })}
   </svg>;

@@ -124,8 +124,16 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
   const variables=[...new Set(b.replace(/^[a-zA-Z]\s*=/,'').match(/[a-zA-Z]/g)??[])];if((a.replace(/^[a-zA-Z]\s*=/,'').match(/[a-zA-Z]/g)??[]).some(v=>!variables.includes(v)))return false;
   return [0,1,2,3,5,7,11,13,17].every(n=>{const vals=Object.fromEntries(variables.map((v,i)=>[v,((n+1)**(i+1))%19-7]));return near(expressionValue(a,vals),expressionValue(b,vals));});
  }
- return a.toLowerCase().replace(/[ .-]/g,'')===b.toLowerCase().replace(/[ .-]/g,'');
+ const norm=(s:string)=>s.toLowerCase().replace(/[ .-]/g,''),x=norm(a),y=norm(b);if(x===y)return true;
+ // Shape names forgive a small slip (sqaure, rectagle) but never accept a different shape name.
+ if(SHAPE_WORDS.has(y)&&!SHAPE_WORDS.has(x))return typoDistance(x,y)<=(y.length>=8?2:y.length>=5?1:0);
+ return false;
 }
+const SHAPE_WORDS=new Set(['acute','obtuse','rightangled','equilateral','isosceles','scalene','square','rectangle','rhombus','parallelogram','trapezium','kite','quadrilateral','concave','convex','regularconvex','irregularconvex','nonsquarerectangle','nonsquarerhombus','otherquadrilateral','triangle','pentagon','hexagon','octagon','cube','squarepyramid','triangularpyramid','triangularprism','rectangularprism','pentagonalprism','regularpentagon','regularhexagon','irregularpentagon','irregularhexagon','concavepentagon','concavehexagon']);
+/** Edit distance where swapping two neighbouring letters counts as one slip. */
+function typoDistance(s:string,t:string){const d=Array.from({length:s.length+1},(_,i)=>Array.from({length:t.length+1},(_,j)=>i||j?(i?(j?0:i):j):0));
+ for(let i=1;i<=s.length;i++)for(let j=1;j<=t.length;j++){d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(s[i-1]===t[j-1]?0:1));if(i>1&&j>1&&s[i-1]===t[j-2]&&s[i-2]===t[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}
+ return d[s.length][t.length];}
 
 export type SimplificationTip = {original:string;simplified:string;divisor:number;instruction:string;required:boolean};
 /** Offer a hint only when the value is right and a common whole-number factor exists. */
