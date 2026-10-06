@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { readProgress } from "@/data/progress";
+
 import { getLastRealm } from "@/lib/last-realm";
-import { getWeekProgress, isWeekComplete, readProgramStore } from "@/lib/program-progress";
+import { profileRealmSummary } from "@/lib/profile-realm-summary";
+import { getLiveRealmDefinitions, tryCanonicalRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
 import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
-import { fetchNumberCompatProgressForStudent } from "@/lib/realm-progress-compat";
+import { fetchRealmCompatProgressForStudent, type CompatProgressRow } from "@/lib/realm-progress-compat";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { supabase } from "@/lib/supabase";
@@ -38,47 +39,16 @@ import {
 
 const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
+const REALM_IMAGES: Record<string, string> = {
+  number: "/images/number-nexus-tile.jpg", measurement: "/images/measurelands-home-bg.png",
+  space: "/images/starpath-home-bg-y3.png", statistics: "/images/statistica-home-y3.png",
+  pattern: "/images/patternpeaks-home-bg-y3.jpeg", chance: "/images/chancehollow-home-y3.jpeg",
+};
 const REALMS = [
-  { name: "Number Nexus", icon: BookOpen, status: "active" as const, route: "/number-nexus", image: "/images/number-nexus-tile.jpg" },
-  { name: "Measurelands", icon: BookOpen, status: "active" as const, route: "/measurelands", image: "/images/measurelands-home-bg.png" },
-  { name: "Starpath Realm", icon: BookOpen, status: "active" as const, route: "/starpath", image: "/images/starpath-home-bg-y3.png" },
-  { name: "Statistica", icon: BookOpen, status: "active" as const, route: "/statistica", image: "/images/statistica-home-y3.jpeg" },
-  { name: "Pattern Peaks", icon: BookOpen, status: "active" as const, route: "/pattern-peaks", image: "/images/patternpeaks-home-bg-y3.jpeg" },
-  { name: "Chance Hollow", icon: BookOpen, status: "coming-soon" as const },
-  { name: "Reading Ridge", icon: BookOpen, status: "coming-soon" as const },
-  { name: "Inkwell Wilds", icon: BookOpen, status: "locked" as const },
-  { name: "Runehaven Peaks", icon: BookOpen, status: "locked" as const },
+  ...getLiveRealmDefinitions().map(realm => ({ id: realm.realmId as string, name: realm.name, icon: BookOpen, status: "active", route: `/${realm.slug}`, image: REALM_IMAGES[realm.realmId] })),
+  ...["Reading Ridge", "Inkwell Wilds", "Runehaven Peaks"].map(name => ({ id: name, name, icon: BookOpen, status: "coming-soon", route: "", image: "" })),
 ];
-
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
-
-// Realm-first: the dashboard "Continue" offers the realm the student last played.
-const REALM_LABELS: Record<string, string> = {
-  "number-nexus": "Number Nexus",
-  measurelands: "Measurelands",
-  space: "Starpath Realm",
-  starpath: "Starpath Realm",
-  "starpath-realm": "Starpath Realm",
-  statistics: "Statistica",
-  statistica: "Statistica",
-  pattern: "Pattern Peaks",
-  "pattern-peaks": "Pattern Peaks",
-  chance: "Chance Hollow",
-  "chance-hollow": "Chance Hollow",
-};
-const REALM_ROUTES: Record<string, string> = {
-  "number-nexus": "/number-nexus",
-  measurelands: "/measurelands",
-  space: "/starpath",
-  starpath: "/starpath",
-  "starpath-realm": "/starpath",
-  statistics: "/statistica",
-  statistica: "/statistica",
-  pattern: "/pattern-peaks",
-  "pattern-peaks": "/pattern-peaks",
-  chance: "/chance-hollow",
-  "chance-hollow": "/chance-hollow",
-};
 
 const SOCIAL_TEASERS = [
   {
@@ -265,8 +235,7 @@ function formatActivitySummary(row: StudentActivityDailyRow) {
 export default function ProfilePage() {
   const router = useRouter();
   const { autoReadEnabled, setAutoReadEnabled } = useAutoReadSetting();
-  const [progress] = useState<ReturnType<typeof readProgress>>(() => readProgress());
-  const [store] = useState<ReturnType<typeof readProgramStore>>(() => readProgramStore());
+  const [realmRows, setRealmRows] = useState<CompatProgressRow[]>([]);
   const [studentName, setStudentName] = useState(readStudentNameFromStorage);
   const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
   const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
@@ -278,7 +247,7 @@ export default function ProfilePage() {
   const [lastRealm, setLastRealmState] = useState("number-nexus");
 
   useEffect(() => {
-    setLastRealmState(getLastRealm() ?? "number-nexus");
+    queueMicrotask(() => setLastRealmState(getLastRealm() ?? "number-nexus"));
   }, []);
 
   useEffect(() => {
@@ -290,11 +259,10 @@ export default function ProfilePage() {
     }).catch((error) => console.warn("[Profile] Failed to load global XP", error));
     return () => { cancelled = true; };
   }, []);
-  const lastRealmLabel = REALM_LABELS[lastRealm] ?? "Number Nexus";
-  const lastRealmRoute = REALM_ROUTES[lastRealm] ?? "/number-nexus";
-
-  const year = progress?.year ?? "Year 1";
-  const levelNum = parseInt(year.replace(/\D/g, ""), 10) || 1;
+  const realmSummaries = useMemo(() => Object.fromEntries(getLiveRealmDefinitions().map(realm => [realm.realmId, profileRealmSummary(realm.realmId, realmRows)])), [realmRows]);
+  const currentRealm = realmSummaries[tryCanonicalRealmId(lastRealm) ?? "number"];
+  const lastRealmLabel = currentRealm?.name ?? "realm";
+  const lastRealmRoute = currentRealm?.route ?? "/world";
 
   useEffect(() => {
     const profile = getActiveStudentProfile();
@@ -329,13 +297,14 @@ export default function ProfilePage() {
       try {
         const [daily, snapshotResponse] = await Promise.all([
           fetchStudentActivityDaily(profile.studentId),
-          fetchNumberCompatProgressForStudent(profile.studentId),
+          Promise.all(getLiveRealmDefinitions().map(realm => fetchRealmCompatProgressForStudent(realm.realmId, profile.studentId))),
         ]);
 
         if (cancelled) return;
 
         setActivityRows(daily);
-        setPersistedAccuracy(computeOverallLessonAccuracy((snapshotResponse ?? []) as SnapshotRow[]));
+        setRealmRows(snapshotResponse.flat());
+        setPersistedAccuracy(computeOverallLessonAccuracy(snapshotResponse.flat() as SnapshotRow[]));
       } catch (error) {
         console.warn("[Profile] Failed to load activity stats:", error);
       }
@@ -346,31 +315,12 @@ export default function ProfilePage() {
     };
   }, []);
 
-  const stats = useMemo(() => {
-    let completedLessons = 0;
-    let weeksCompleted = 0;
-    let quizCount = 0;
-    let quizTotal = 0;
-
-    for (let week = 1; week <= 12; week += 1) {
-      const weekProgress = getWeekProgress(store, year, week);
-      const done = weekProgress.lessonsCompleted.filter(Boolean).length;
-      completedLessons += done;
-      if (weekProgress.quizScore !== undefined) {
-        quizCount += 1;
-        quizTotal += weekProgress.quizScore;
-      }
-      if (isWeekComplete(weekProgress)) weeksCompleted += 1;
-    }
-
-    const accuracy =
-      quizCount > 0 ? Math.round(quizTotal / quizCount) : (progress?.scorePercent ?? 0);
-    const realmProgress = Math.round((weeksCompleted / 12) * 100);
-    const xp = globalXp?.balance ?? 0;
-    const lifetimeXp = globalXp?.lifetime ?? 0;
-
-    return { xp, lifetimeXp, completedLessons, accuracy, weeksCompleted, realmProgress };
-  }, [globalXp, progress, store, year]);
+  const stats = useMemo(() => ({
+    xp: globalXp?.balance ?? 0, lifetimeXp: globalXp?.lifetime ?? 0,
+    completedLessons: Object.values(realmSummaries).reduce((sum, realm) => sum + (realm?.completedLessons ?? 0), 0),
+    weeksCompleted: Object.values(realmSummaries).reduce((sum, realm) => sum + (realm?.weeksCompleted ?? 0), 0),
+    accuracy: 0,
+  }), [globalXp, realmSummaries]);
 
   const initials = studentName.charAt(0).toUpperCase();
   const explorerRank = useMemo(() => getExplorerRank(stats.lifetimeXp), [stats.lifetimeXp]);
@@ -509,7 +459,7 @@ export default function ProfilePage() {
                 Welcome back, {studentName}!
               </h1>
               <p className="mt-1.5 max-w-md text-sm text-[#CBD5E1]">
-                Your {lastRealmLabel} journey continues. {stats.realmProgress}% through Level {levelNum}.
+                {currentRealm ? `Your ${lastRealmLabel} journey continues. ${currentRealm.percent}% through ${currentRealm.year === "Prep" ? "Ground Level" : currentRealm.year.replace("Year", "Level")}.` : "Your learning journey continues."}
               </p>
               <button
                 onClick={() => router.push(lastRealmRoute)}
@@ -638,7 +588,8 @@ export default function ProfilePage() {
                 {REALMS.map((realm) => {
                   const isActive = realm.status === "active";
                   const isComingSoon = realm.status === "coming-soon";
-                  const realmRoute = realm.route ?? "/number-nexus";
+                  const summary = realmSummaries[realm.id as LiveRealmId];
+                  const realmRoute = summary?.route ?? realm.route;
                   return (
                     <div
                       key={realm.name}
@@ -662,16 +613,17 @@ export default function ProfilePage() {
                       <div className="min-w-0 flex-1">
                         <div className={`truncate text-xs font-bold ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
                           {realm.name}
+                          {summary && <span className="ml-2 text-[10px] font-normal text-[#64748B]">{summary.year === "Prep" ? "Ground Level" : summary.year.replace("Year", "Level")}</span>}
                         </div>
                         {isActive ? (
                           <div className="mt-1 flex items-center gap-1.5">
                             <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#E5E7EB]">
                               <div
                                 className="h-full rounded-full bg-[#0EA5A4] transition-all duration-700"
-                                style={{ width: `${stats.realmProgress}%` }}
+                                style={{ width: `${summary?.percent ?? 0}%` }}
                               />
                             </div>
-                            <span className="text-[9px] font-extrabold text-[#0EA5A4]">{stats.realmProgress}%</span>
+                            <span className="text-[9px] font-extrabold text-[#0EA5A4]">{summary ? `${summary.percent}%` : "—"}</span>
                           </div>
                         ) : (
                           <div className="mt-0.5 inline-flex items-center gap-1">

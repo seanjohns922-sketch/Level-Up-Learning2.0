@@ -253,7 +253,8 @@ function resolveCurrentActivityRow(
   let resolved: LiveStudentActivityRow = row
     ? { ...row }
     : { student_id: student.id, class_id: student.class_id };
-  let resolvedAt = timestampMs(row?.updated_at, row?.last_active_at, row?.completed_at);
+  // Presence is independent of the most recent learning event.
+  let resolvedAt = timestampMs(row?.updated_at ?? row?.completed_at);
 
   if (latestEvent && timestampMs(latestEvent.created_at) >= resolvedAt) {
     const payload = parseEventPayload(latestEvent.payload);
@@ -297,7 +298,7 @@ function resolveCurrentActivityRow(
       attempt_number: positiveNumberOrNull(payload.attemptNumber) ?? resolved.attempt_number ?? null,
       skill_tag: stringOrNull(payload.skillTag) ?? (changedLesson ? null : resolved.skill_tag ?? null),
       misconception_tag: stringOrNull(payload.misconceptionTag) ?? (changedLesson ? null : resolved.misconception_tag ?? null),
-      last_active_at: eventAt,
+      last_active_at: timestampMs(resolved.last_active_at) > timestampMs(eventAt) ? resolved.last_active_at : eventAt,
       updated_at: eventAt,
     };
     resolvedAt = timestampMs(eventAt);
@@ -351,7 +352,7 @@ function resolveCurrentActivityRow(
       ai_issue: null,
       ai_likely_gap: null,
       ai_suggested_action: null,
-      last_active_at: latestAttempt.completed_at,
+      last_active_at: timestampMs(resolved.last_active_at) > timestampMs(latestAttempt.completed_at) ? resolved.last_active_at : latestAttempt.completed_at,
       updated_at: latestAttempt.completed_at,
     };
   }
