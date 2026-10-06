@@ -126,11 +126,14 @@ import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { generateNumber7Question } from "@/data/activities/year7Number/questions";
 import { NUMBER7_READABILITY_REVISION } from "@/data/activities/year7Number/curriculum";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
+import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
 
 function LessonRouteGate() {
  const q=useSearchParams(),pathname=usePathname();
  if(normalizeStudentYearLabel(q.get('year')??'')==='Year 7') {
   const realm=q.get('realm_id')??'number';
+  // Live Level 7: real students use the normal lesson page; it checks their placement and week access.
+  if(LEVEL7_LIVE&&cave7Realm(realm)&&pathname==='/lesson')return <LessonPage/>;
   if(!cave7Realm(realm)||!pathname.startsWith(`/demo-review/shattered-realms/${realm}/lesson`))return <main className="p-20">Level 7 lessons are available in demo review only.</main>;
   const week=Number(q.get('week')),lesson=Number(q.get('lessonId')?.match(/-l([1-3])$/)?.[1]);
   return <Number7AccessGate realm={realm as Cave7Realm} key={`${realm}-${week}-${lesson}-${q.get("review")}`} week={week} lesson={lesson}><LessonPage/></Number7AccessGate>;
@@ -280,6 +283,8 @@ function LessonPage() {
   }:undefined,[effectiveLessonId,isCave7,isNumber7,isMeasurement7,isSpace7,isNewCave7,newCaveRealm]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
+  // Level 7 lessons return to the demo week page in review, or the student's week page when live.
+  const level7WeekHome = isCave7 && !previewMode ? level7LiveHref(lessonRealmId as Cave7Realm, week, "week") : cavernWeekHref(lessonRealmId, week);
   const lessonStrand = newCaveRealm === "pattern" ? "Algebra" : newCaveRealm === "statistics" ? "Statistics" : newCaveRealm === "chance" ? "Probability" : isSpace7 ? "Space" : isMeasurement ? "Measurement" : "Number";
   const lessonCompletionActivityKey = buildLessonCompletionActivityKey({
     realmId: lessonRealmId,
@@ -610,7 +615,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    if(isCave7){router.push(cavernWeekHref(lessonRealmId,week));return;}
+    if(isCave7){router.push(level7WeekHome);return;}
     const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     const world3DReturnPath = getWorld3DReturnPathForLesson({
       realmId: lessonRealmId,
@@ -1009,7 +1014,7 @@ function LessonPage() {
                 ? "https://player.vimeo.com/video/1183966051?h=ff99ab69f7"
                 : undefined
             }
-            onBack={isCave7 ? () => router.push(cavernWeekHref(lessonRealmId,week)) : goBackToProgram}
+            onBack={isCave7 ? () => router.push(level7WeekHome) : goBackToProgram}
             onStart={() => {
               void trackLiveLearningEvent({
                 eventType: "lesson_started",

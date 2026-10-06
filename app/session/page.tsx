@@ -6,6 +6,7 @@ import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
 import { number7Quiz } from "@/data/activities/year7Number/questions";
 import { newLevel7QuizAttempt } from "@/lib/level7-quiz";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
+import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
 import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress } from "@/data/progress";
@@ -7973,7 +7974,8 @@ function SessionPageRouteInstance() {
   const routeKey = `${year}|${week}|${type}|${n}|${realmId}`;
 
   if(year==='Year 7') {
-    if(!['number','measurement'].includes(realmId)||!pathname.startsWith(`/demo-review/shattered-realms/${realmId}/quiz`))return <main className="p-20">Level 7 quizzes are available in demo review only.</main>;
+    const liveQuiz=LEVEL7_LIVE&&pathname==='/level7/quiz';
+    if(!['number','measurement'].includes(realmId)||(!liveQuiz&&!pathname.startsWith(`/demo-review/shattered-realms/${realmId}/quiz`)))return <main className="p-20">Level 7 quizzes are available in demo review only.</main>;
     return <Number7AccessGate realm={realmId as "number"|"measurement"} key={`${routeKey}-${sp.get("review")}`} week={Number(week)} lesson="quiz"><SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId}/></Number7AccessGate>;
   }
   return <SessionPage key={routeKey} year={year} week={week} type={type} n={n} realmId={realmId} />;
@@ -8075,8 +8077,11 @@ function SessionPage({
 
   const realmParam = isMeasurementRealm ? `&realm_id=${encodeURIComponent(realmId)}` : "";
 
+  // Level 7 quizzes return to the demo week page in review, or the student's week page when live.
+  const level7Realm = quizRealmId === "measurement" ? "measurement" : "number";
+  const level7WeekHome = (w: number) => previewMode ? cavernWeekHref(level7Realm, w) : level7LiveHref(level7Realm, w, "week");
   function backToWeek() {
-    if(isNumber7){router.push(cavernWeekHref(quizRealmId === "measurement" ? "measurement" : "number",Number(week)));return;}
+    if(isNumber7){router.push(level7WeekHome(Number(week)));return;}
     const world3DReturnPath = getWorld3DReturnPathForQuiz({
       realmId: quizRealmId,
       level: year,
@@ -10506,7 +10511,7 @@ function SessionPage({
                     <button
                       onClick={() =>
                         router.push(isNumber7
-                          ? isFinalQuizWeek ? `/posttest?year=Year%207&realm_id=${quizRealmId}&teacher_preview=1` : cavernWeekHref(isMeasurementRealm?'measurement':'number',Number(week)+1)
+                          ? isFinalQuizWeek ? (previewMode ? `/posttest?year=Year%207&realm_id=${quizRealmId}&teacher_preview=1` : level7LiveHref(level7Realm, Number(week), "posttest")) : level7WeekHome(Number(week)+1)
                           : isFinalQuizWeek
                           ? `/posttest?year=${encodeURIComponent(year)}${realmParam}`
                           : `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Number(week) + 1))}&legacy=1${realmParam}`)

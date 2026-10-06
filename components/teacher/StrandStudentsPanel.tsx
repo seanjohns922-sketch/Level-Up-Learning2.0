@@ -1,5 +1,6 @@
 "use client";
 
+import { getProgramWeekCount } from "@/lib/program-weeks";
 import { comparableAssessmentGrowth, hasComparableAssessmentGrowth, isGroundBaseline } from "@/lib/assessment-growth";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BarChart3, ChevronDown, ChevronUp, Eye } from "lucide-react";
@@ -1170,7 +1171,7 @@ function StudentStrandDetail({
   const latestPost = getLatestPosttestProfile(prog.quiz_scores);
   const teacherAdvancedWeeks = prog.teacher_advanced_weeks ?? [];
   const teacherOverrides = prog.teacher_overrides ?? [];
-  const maxWeek = getRealmDefinition(supportedRealmId).totalWeeks ?? plan.length;
+  const maxWeek = getRealmDefinition(supportedRealmId).totalWeeks == null ? plan.length : getProgramWeekCount(supportedRealmId, prog.year);
   const studentName = resolveStudentNameParts(student).displayName;
 
   useEffect(() => {

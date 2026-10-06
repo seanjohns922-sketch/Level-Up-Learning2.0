@@ -50,6 +50,7 @@ import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
 import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
 import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
+import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
@@ -103,7 +104,8 @@ function ProgramPage() {
 
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
-  const isExpeditionWeek = year === "Year 7" && sp.get("expedition") === "1";
+  // Live Level 7 students always get the Level 7 week view; demo review keeps the expedition flag.
+  const isExpeditionWeek = year === "Year 7" && (sp.get("expedition") === "1" || (LEVEL7_LIVE && cave7WeekCount(realmId) > 0));
   const isNumber7 = isExpeditionWeek && cave7Realm(realmId);
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
@@ -460,6 +462,8 @@ function ProgramPage() {
   // Every live realm uses canonical student progression. Only an authorised
   // Demo Review session may bypass it.
   const previewMode = teacherPreview || demoPreviewMode;
+  // A real student on a live Level 7 week page (not demo or teacher review).
+  const liveLevel7 = LEVEL7_LIVE && !previewMode && isNumber7 && pathname === "/program";
   const canonicalRealmId = realmId as LiveRealmId;
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
@@ -638,13 +642,13 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : isNumber7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1);
+    unrestrictedMode ? true : isNumber7 && !liveLevel7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1, year);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
     let allowed = 1;
     for (let w = 2; w <= lastWeek; w++) {
-      if (isWeekCompleteForRealm(getWeekProgress(store, year, w - 1, realmId), realmId, w - 1)) allowed = w;
+      if (isWeekCompleteForRealm(getWeekProgress(store, year, w - 1, realmId), realmId, w - 1, year)) allowed = w;
       else break;
     }
     return allowed;
@@ -735,7 +739,7 @@ function ProgramPage() {
       }
     }
 
-    if(isNumber7){router.push(number7ActivityHref(weekNum,item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz',realmId));return;}
+    if(isNumber7){const activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';router.push(liveLevel7?level7LiveHref(realmId,weekNum,activity):number7ActivityHref(weekNum,activity,realmId));return;}
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
@@ -838,7 +842,7 @@ function ProgramPage() {
 
   const lessonsDoneCount = progress.lessonsCompleted.filter(Boolean).length;
   const hasWeeklyQuizThisWeek = !((isChanceRealm || isNumber7) && weekNum === lastWeek);
-  const weekComplete = isWeekCompleteForRealm(progress, realmId, weekNum);
+  const weekComplete = isWeekCompleteForRealm(progress, realmId, weekNum, year);
 
   useEffect(() => {
     if (isExpeditionWeek || isStarpathRealm || !previewMode) return;
@@ -880,7 +884,7 @@ function ProgramPage() {
     router.push(world3DReturnPath ?? realmHomeRoute);
   }
 
-  if ((isExpeditionWeek || (year === "Year 7" && cave7Realm(realmId))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
+  if (!liveLevel7 && (isExpeditionWeek || (year === "Year 7" && cave7Realm(realmId))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
 
   if (canonicalStatus !== "ready") {
     return (
@@ -1202,7 +1206,7 @@ function ProgramPage() {
                         const isUnlocked = unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
                         const isCurrent = targetWeek === weekNum;
                         const isRequiredWeek = requiredWeeks.includes(targetWeek);
-                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId, targetWeek);
+                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId, targetWeek, year);
                         const status = hasPersonalizedPlan
                           ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
                           : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
@@ -1465,7 +1469,7 @@ function ProgramPage() {
                           </div>
                           <div className="mt-3 flex flex-wrap gap-2">
                             {requiredWeeks.map((requiredWeek) => {
-                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, requiredWeek, realmId), realmId, requiredWeek);
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, requiredWeek, realmId), realmId, requiredWeek, year);
                               const unlocked = playableWeeks.includes(requiredWeek) || done || requiredWeek === weekNum;
                               return (
                                 <button
@@ -1516,7 +1520,7 @@ function ProgramPage() {
                                 No optional weeks in this pathway.
                               </div>
                             ) : optionalWeeks.map((optionalWeek) => {
-                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, optionalWeek, realmId), realmId, optionalWeek);
+                              const done = isWeekCompleteForRealm(getWeekProgress(store, year, optionalWeek, realmId), realmId, optionalWeek, year);
                               const optionalPlayable = requiredWeeksComplete || done;
                               return (
                                 <button

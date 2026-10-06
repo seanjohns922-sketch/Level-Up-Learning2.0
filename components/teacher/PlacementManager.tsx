@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, ChevronRight, Lock, MoreHorizontal, Users, X } from "lucide-react";
-import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import { LEVEL_CATALOG as BASE_LEVEL_CATALOG } from "@/lib/level-catalog";
+import { LEVEL7_LIVE } from "@/lib/level7-release";
+import { cave7Realm } from "@/lib/cave7-config";
+
+// Once Level 7 is live, teachers can also place students at Level 7 in its six realms.
+const LEVEL_CATALOG = LEVEL7_LIVE ? [...BASE_LEVEL_CATALOG, { ...BASE_LEVEL_CATALOG[BASE_LEVEL_CATALOG.length - 1], id: "Year 7", label: "Level 7" }] : BASE_LEVEL_CATALOG;
 import { getLiveRealmDefinitions, isFirstLevelPretestEnabled, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import {
   fetchRealmCompatProgressForClass,
@@ -34,7 +39,7 @@ const PLACEMENT_REALMS = getLiveRealmDefinitions()
   .map((realm) => ({
     id: realm.realmId,
     label: `${realm.name} (${realm.strand})`,
-    levelLabels: realm.levelLabels,
+    levelLabels: LEVEL7_LIVE && cave7Realm(realm.realmId) ? [...realm.levelLabels, "Year 7"] : realm.levelLabels,
     active: true,
   }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);

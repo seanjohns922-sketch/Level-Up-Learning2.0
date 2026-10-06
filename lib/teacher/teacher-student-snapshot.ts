@@ -1,4 +1,5 @@
 import type { CompatProgressRow } from "@/lib/realm-progress-compat";
+import { getProgramWeekCount } from "@/lib/program-weeks";
 import {
   getRealmDefinition,
   requireCanonicalRealmId,
@@ -132,24 +133,27 @@ export function buildTeacherStudentSnapshot(input: {
     };
   }
 
-  const requiredWeeks = parseWeekList(progress.required_weeks, realm.totalWeeks);
-  const optionalWeeks = parseWeekList(progress.optional_weeks, realm.totalWeeks);
+  // Level 7 has its own week count per realm; the snapshot's realm carries the student's length.
+  const currentLevel = normalizeWorkingLevelLabel(progress.year) ?? progress.year ?? null;
+  const levelRealm = { ...realm, totalWeeks: realm.totalWeeks == null ? null : getProgramWeekCount(realmId, currentLevel) };
+  const requiredWeeks = parseWeekList(progress.required_weeks, levelRealm.totalWeeks);
+  const optionalWeeks = parseWeekList(progress.optional_weeks, levelRealm.totalWeeks);
   const currentWeek =
     Number.isInteger(progress.week) &&
     (progress.week ?? 0) > 0 &&
-    (realm.totalWeeks == null || (progress.week ?? 0) <= realm.totalWeeks)
+    (levelRealm.totalWeeks == null || (progress.week ?? 0) <= levelRealm.totalWeeks)
       ? progress.week
       : null;
 
   return {
     studentId: input.studentId,
     realmId,
-    realm,
+    realm: levelRealm,
     placementState: "placed",
     progress,
-    currentLevel: normalizeWorkingLevelLabel(progress.year) ?? progress.year ?? null,
+    currentLevel,
     currentWeek,
-    pathway: resolvePathway(progress, requiredWeeks, realm.totalWeeks),
+    pathway: resolvePathway(progress, requiredWeeks, levelRealm.totalWeeks),
     requiredWeeks,
     optionalWeeks,
     lessonAttempts: progress.lesson_attempts ?? null,
@@ -159,8 +163,8 @@ export function buildTeacherStudentSnapshot(input: {
   };
 }
 
-export function getRealmWeekNumbers(realmId: string): number[] {
-  const totalWeeks = getRealmDefinition(realmId).totalWeeks;
+export function getRealmWeekNumbers(realmId: string, year?: string | null): number[] {
+  const totalWeeks = getRealmDefinition(realmId).totalWeeks == null ? null : getProgramWeekCount(realmId, year);
   return totalWeeks == null
     ? []
     : Array.from({ length: totalWeeks }, (_, index) => index + 1);

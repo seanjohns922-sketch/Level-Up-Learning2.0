@@ -1,5 +1,6 @@
 "use client";
 
+import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, Download, Printer, Lock, LockOpen } from "lucide-react";
 import Image from "next/image";
@@ -804,7 +805,7 @@ export default function TeacherDashboardPage() {
   /* ── segment bar for a student's level ─── */
   function renderWeekBar(prog: ProgressRow | undefined) {
     const realmDefinition = getRealmDefinition(analyticsRealmId);
-    const realmWeeks = getRealmWeekNumbers(analyticsRealmId);
+    const realmWeeks = getRealmWeekNumbers(analyticsRealmId, prog?.year);
     const lessonsPerWeek = realmDefinition.lessonsPerWeek;
     if (!prog || lessonsPerWeek == null || realmWeeks.length === 0) {
       return <span className="text-xs font-semibold text-slate-400">Progress unavailable</span>;
@@ -898,7 +899,7 @@ export default function TeacherDashboardPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Week</span>
-              <span className="font-bold text-gray-900">{currentWeek} / {realmDefinition.totalWeeks ?? "—"}</span>
+              <span className="font-bold text-gray-900">{currentWeek} / {realmDefinition.totalWeeks == null ? "—" : getProgramWeekCount(analyticsRealmId, prog.year)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Pre-test</span>

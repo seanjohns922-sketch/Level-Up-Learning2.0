@@ -370,7 +370,7 @@ function StudentInsightsPageInner() {
     const currentAccuracy = calculateAccuracy(totalCorrect, totalQuestions);
     const lessonsCompleted = completedAttempts.length;
 
-    const weekNumbers = getRealmWeekNumbers(snapshot.realmId);
+    const weekNumbers = getRealmWeekNumbers(snapshot.realmId, snapshot.currentLevel);
     const lessonsPerWeek = snapshot.realm.lessonsPerWeek;
     const weeksPassed = lessonsPerWeek == null ? 0 : progressRows.reduce((sum, row) => {
       const completedIds = parseCompleted(row.completed_lesson_ids);

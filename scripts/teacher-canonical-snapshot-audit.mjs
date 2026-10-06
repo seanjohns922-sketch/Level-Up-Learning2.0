@@ -27,8 +27,13 @@ function loadTypeScriptModule(relativePath, mocks = {}) {
 }
 
 const realmRegistry = loadTypeScriptModule("lib/realms/realm-registry.ts");
+const programWeeks = loadTypeScriptModule("lib/program-weeks.ts", {
+  "./realms/realm-registry": realmRegistry,
+  "./cave7-config": loadTypeScriptModule("lib/cave7-config.ts"),
+});
 const snapshotModule = loadTypeScriptModule("lib/teacher/teacher-student-snapshot.ts", {
   "@/lib/realms/realm-registry": realmRegistry,
+  "@/lib/program-weeks": programWeeks,
   "@/lib/studentLevelLabel": {
     normalizeWorkingLevelLabel: (value) => value ?? null,
   },
