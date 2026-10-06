@@ -13,3 +13,7 @@ export function buildLevel7AssessmentPlan(realm:string,form:'pretest'|'posttest'
  const assigned=form==='pretest'?(required[0]??1):(prev.assignedWeek??1);
  return {profile,passed,required,optional,assigned};
 }
+
+export function canStartLevel7Assessment(progress:StudentProgress|null|undefined,form:'pretest'|'posttest'){
+ return progress?.year==='Year 7'||(form==='pretest'&&progress?.year==='Year 6'&&progress.status==='PASSED');
+}

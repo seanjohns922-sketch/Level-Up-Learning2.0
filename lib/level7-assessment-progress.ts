@@ -1,5 +1,5 @@
 import type { AssessmentQuestion } from '@/data/assessments/api';
-import { buildLevel7AssessmentPlan } from '@/lib/level7-assessment-plan';
+import { buildLevel7AssessmentPlan, canStartLevel7Assessment } from '@/lib/level7-assessment-plan';
 import { assessmentEvidenceMetadata } from '@/lib/assessment-growth';
 import { LEVEL7_LIVE } from '@/lib/level7-release';
 import { getProgramWeeks, getWeekProgress, hasCompletedRequiredWeeks, readProgramStore } from '@/lib/program-progress';
@@ -9,7 +9,7 @@ import { restoreStudentStateFromServer, saveRealmAssessment, type StudentProgres
 export async function loadLevel7Assessment(studentId:string,realm:StudentProgressRealmId,form:'pretest'|'posttest') {
  if(!LEVEL7_LIVE)throw new Error('Level 7 is not available yet.');
  const {progress}=await restoreStudentStateFromServer(studentId,realm);
- if(!progress||progress.year!=='Year 7')throw new Error('Open the assessment for your current level.');
+ if(!progress||!canStartLevel7Assessment(progress,form))throw new Error('Open the assessment for your current level.');
  if(form==='posttest'){
   const weeks=getProgramWeeks(realm,'Year 7'),store=readProgramStore();
   const complete=progress.requiredWeeks?.length

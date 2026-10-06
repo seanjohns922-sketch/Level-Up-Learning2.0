@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {buildLevel7AssessmentPlan} from '../lib/level7-assessment-plan.ts';
+import {buildLevel7AssessmentPlan,canStartLevel7Assessment} from '../lib/level7-assessment-plan.ts';
 for(const [realm,n] of Object.entries({number:12,measurement:12,space:10,pattern:12,statistics:10,chance:8})){
  const questions=Array.from({length:20},(_,i)=>({id:`q${i}`,correctAnswer:'1',skillId:`skill${i}`,linkedWeeks:[i% n+1]}));
  const prev={year:'Year 7',status:'ASSIGNED_PROGRAM',placementComplete:true,assignedWeek:n,requiredWeeks:Array.from({length:n},(_,i)=>i+1),optionalWeeks:[],unlockedLegends:[]};
@@ -24,3 +24,11 @@ for(const name of ['Number','Measurement','Space','Pattern','Statistics','Chance
 console.log('PASS all six Level 7 assessment plans: full/targeted/pass thresholds, failed post-test practice, canonical save integration.');
 
 assert.match(fs.readFileSync('app/program/page.tsx','utf8'), /if \(!legacyProgramMode && !isExpeditionWeek\)/, 'Live cavern week links must render without the old legacy query parameter');
+
+assert.match(fs.readFileSync('components/world3d/ShatteredRealmCavern.tsx','utf8'), /if\(p\?\.year!=='Year 7'\|\|!p.placementComplete\)/, 'Never use another level’s week state for Level 7 cavern doors');
+
+assert.equal(canStartLevel7Assessment({year:'Year 6',status:'PASSED'},'pretest'),true);
+assert.equal(canStartLevel7Assessment({year:'Year 6',status:'ASSIGNED_PROGRAM'},'pretest'),false);
+assert.equal(canStartLevel7Assessment({year:'Year 6',status:'PASSED'},'posttest'),false);
+assert.equal(canStartLevel7Assessment({year:'Year 7',status:'ASSIGNED_PROGRAM'},'pretest'),true);
+assert.equal(canStartLevel7Assessment(null,'pretest'),false);

@@ -67,9 +67,10 @@ export default function ShatteredRealmCavern({realm,week,live=false}:{realm:Expe
  const [playable,setPlayable]=useState<number[]>(live?[]:realmWeeks(realm)),[restoreError,setRestoreError]=useState(false),[liveCurrent,setLiveCurrent]=useState(week);
  useEffect(()=>{if(!live)return;let active=true;const id=getActiveStudentIdentity().studentId;if(!id)return;
   restoreStudentStateFromServer(id,realm).then(()=>{if(!active)return;const p=readProgress(realm),store=readProgramStore();
+   if(p?.year!=='Year 7'||!p.placementComplete){router.replace(p?.year==='Year 8'?'/world/expedition/coming-soon':`/pretest?year=Year%207&realm_id=${realm}`);return;}
    setPlayable(getPlayableWeeks(store,'Year 7',p?.requiredWeeks,p?.optionalWeeks,realm,p?.teacherAdvancedWeeks,p?.assignedWeek));
    setLiveCurrent(cavernWeek(getRecommendedAssignedWeek(store,'Year 7',p?.assignedWeek,p?.requiredWeeks,realm,p?.teacherAdvancedWeeks),realm));
-  }).catch(()=>{if(active)setRestoreError(true);});return()=>{active=false;};},[live,realm]);
+  }).catch(()=>{if(active)setRestoreError(true);});return()=>{active=false;};},[live,realm,router]);
  const [reviewWeek,setReviewWeek]=useState(week);
  const [spawn,setSpawn]=useState(()=>cavernSpawn(week)),[spawnKey,setSpawnKey]=useState(0),[nearest,setNearest]=useState<number|null>(null),[help,setHelp]=useState(false),[demoCurrent]=useState(()=>{try{return cavernWeek(sessionStorage.getItem(storageKey)??week,realm);}catch{return week;}});
  const [move,setMove]=useState(EMPTY_WORLD_MOVE_INPUT),[look,setLook]=useState(EMPTY_WORLD_LOOK_INPUT);
