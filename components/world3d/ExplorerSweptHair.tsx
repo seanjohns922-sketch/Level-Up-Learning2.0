@@ -6,7 +6,7 @@ import { createExplorerHairGeometry, createBuzzHairGeometry, REFERENCE_HAIR_STYL
 
 const fittedGeometries = new Map<string, ReturnType<typeof createExplorerHairGeometry>>();
 function geometryFor(style:ReferenceHairStyle,hat:HatStyle='none'){
- const covered=hat!=='none'&&hat!=='crown';
+ const covered=hat!=='none'&&hat!=='crown'&&hat!=='astronaut';
  const key=`${style}:${covered?'fitted':'loose'}`;
  let geometry=fittedGeometries.get(key);
  if(!geometry){

@@ -1,4 +1,5 @@
 "use client";
+import { ADVENTURE_OUTFIT_CATALOGUE, adventureOutfit } from "@/lib/avatar/adventure-outfits";
 
 import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import { REALM_OUTFIT_CATALOGUE } from "@/lib/avatar/realm-outfit-catalogue";
@@ -193,7 +194,7 @@ function buildDemoEconomyState(items: EconomyItem[]): EconomyState {
 }
 
 function mergeEconomyItems(items: EconomyItem[], fallbackItems: EconomyItem[]) {
-  const merged = new Map([...REALM_OUTFIT_CATALOGUE, ...fallbackItems].map((item) => [item.item_key, item]));
+  const merged = new Map([...REALM_OUTFIT_CATALOGUE, ...ADVENTURE_OUTFIT_CATALOGUE, ...fallbackItems].map((item) => [item.item_key, item]));
   for (const item of items) merged.set(item.item_key, item);
   return Array.from(merged.values());
 }
@@ -217,7 +218,7 @@ export async function fetchDemoEconomy(fallbackItems: EconomyItem[] = []): Promi
 export function mergeAvatarOutfit(state: EconomyState): AvatarOutfit {
   const out: Record<string, unknown> = { ...(state.avatarBase ?? {}) };
   // Premium garment shapes must come from equipped catalogue layers, not the free base.
-  if (realmOutfit(String(out.top ?? ""))) out.top = "hoodie";
+  if (realmOutfit(String(out.top ?? "")) || adventureOutfit(out.top)) out.top = "hoodie";
   const byKey = new Map(state.items.map((i) => [i.item_key, i]));
   for (const slot of AVATAR_LAYER_SLOTS) {
     const key = state.equipped[slot];

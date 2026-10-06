@@ -48,12 +48,23 @@ for(const style of REFERENCE_HAIR_STYLES){
  const loose=render(React.createElement(ExplorerSweptHair,{style,colour:o.hair}));const before=bounds(loose).clone();
  const crownRay=new THREE.Raycaster(new THREE.Vector3(0,2,0),new THREE.Vector3(0,-1,0));
  const crownHit=crownRay.intersectObject(loose,true)[0];assert.ok(crownHit&&crownHit.point.y>=1.49,`${style}: uncovered crown is still hair, not scalp`);
- for(const hat of ['beanie','cap','explorer','wizard','crown']){
+ for(const hat of ['beanie','cap','explorer','wizard','crown','knight','astronaut']){
   const fitted=render(React.createElement(ExplorerSweptHair,{style,colour:o.hair,hat}));
-  if(hat==='crown')assert.deepEqual(bounds(fitted).getSize(new THREE.Vector3()).toArray(),before.getSize(new THREE.Vector3()).toArray(),'Open crown never flattens hair');
+  if(hat==='crown'||hat==='astronaut')assert.deepEqual(bounds(fitted).getSize(new THREE.Vector3()).toArray(),before.getSize(new THREE.Vector3()).toArray(),'Open crown never flattens hair');
   else {const ray=new THREE.Raycaster(new THREE.Vector3(0,2,0),new THREE.Vector3(0,-1,0));const hit=ray.intersectObject(fitted,true)[0];assert.ok(hit&&hit.point.y>=1.495,`${style}/${hat}: hair covers the skin dome`);}
  }
  assert.deepEqual(bounds(loose).getSize(new THREE.Vector3()).toArray(),before.getSize(new THREE.Vector3()).toArray(),'Hat fitting does not mutate loose hair');
 }
 const buzz=render(React.createElement(ExplorerBuzzHair,{colour:o.hair}));assert.ok(new THREE.Raycaster(new THREE.Vector3(0,2,0),new THREE.Vector3(0,-1,0)).intersectObject(buzz,true)[0].point.y>=1.49,'Buzz cut covers the crown');
-console.log(`PASS: ${Object.keys(WEAPONS).length} held items, 5 hats, 3 glasses, all cape/backpack combinations, colours, walking motion and 95 hair/hat fits.`);
+console.log(`PASS: ${Object.keys(WEAPONS).length} held items, 7 hats, 3 glasses, all cape/backpack combinations, colours, walking motion and 133 hair/hat fits.`);
+
+for(const hat of ['knight','astronaut']){
+ const root=render(React.createElement(ExplorerHeadAccessories,{o:{...o,hat}})),box=bounds(root);
+ assert.ok(box.min.y>.7&&box.max.y<1.9,'Helmet fits the head and neck');
+ for(const x of [-.115,.115]){
+  const hits=new THREE.Raycaster(new THREE.Vector3(x,1.16,1),new THREE.Vector3(0,0,-1)).intersectObject(root,true);
+  if(hat==='astronaut')assert.ok(hits.length&&hits[0].object.name==='astronaut-visor'&&hits[0].object.material.opacity<=.12,'Eyes remain visible through clear helmet');
+  else assert.ok(hits.every(h=>h.point.z<0),'Knight eye opening is unobstructed');
+ }
+}
+console.log('PASS: new helmet fit and unobstructed eyes; clear space helmet preserves full hairstyle.');

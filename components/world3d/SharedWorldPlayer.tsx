@@ -5,6 +5,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { PremiumExplorerAvatar, PremiumExplorerHead, supportsPremiumExplorer } from "./PremiumExplorerAvatar";
 import { ExplorerBodyAccessories } from "./ExplorerWearables";
+import { adventureOutfit } from "@/lib/avatar/adventure-outfits";
+import { AdventureOutfitDetails } from "./AdventureOutfitDetails";
 import { realmOutfit } from "@/lib/avatar/realm-outfits";
 import { RealmOutfitDetails } from "./RealmOutfitDetails";
 import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetails";
@@ -74,12 +76,14 @@ function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: AvatarMoti
         {[-1, 1].map((side) => (
           <group key={`leg-${side}`} ref={side === -1 ? leftLegRef : rightLegRef} position={[side * 0.18, 0.02, 0]}>
             <mesh position={[0, -0.32, 0]}><capsuleGeometry args={[.135,.35,6,12]} /><meshStandardMaterial color={pants} roughness={0.74} /></mesh>
+            {avatar.top==='adventure_champion'&&<mesh position={[side*.127,-.33,.01]}><boxGeometry args={[.025,.48,.06]}/><meshStandardMaterial color={topTrim}/></mesh>}
+            {avatar.top==='adventure_guardian'&&<mesh position={[0,-.22,.14]} scale={[.13,.14,.045]}><sphereGeometry args={[1,16,12]}/><meshStandardMaterial color="#b9cad7" metalness={.5} roughness={.4}/></mesh>}
             {avatar.shoeStyle==='boots'&&<group name="boot-shaft"><mesh position={[0,-.48,.025]}><cylinderGeometry args={[.16,.17,.3,12]}/><meshStandardMaterial color={shoes}/></mesh>{[-.46,-.53].map(y=><mesh key={y} position={[0,y,.185]} rotation={[0,0,-.1]}><boxGeometry args={[.18,.016,.018]}/><meshStandardMaterial color={new THREE.Color(shoes).lerp(new THREE.Color('#ffffff'),.3)}/></mesh>)}<mesh position={[0,-.72,.08]}><boxGeometry args={[.33,.035,.44]}/><meshStandardMaterial color="#35291f"/></mesh></group>}
             <mesh position={[0, -0.66, 0.08]} scale={[.16,.09,.24]}><sphereGeometry args={[1,16,12]} /><meshStandardMaterial color={shoes} roughness={0.62} /></mesh>
           </group>
         ))}
         <mesh position={[0, 0.4, 0]} scale={[1,1,.55]}><capsuleGeometry args={[.38,.12,8,20]} /><meshStandardMaterial color={top} roughness={0.66} /></mesh>
-        {!realmOutfit(avatar.top)&&<><mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
+        {!realmOutfit(avatar.top)&&!adventureOutfit(avatar.top)&&<><mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
         <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color={topTrim} emissive={topTrim} emissiveIntensity={0.16} /></mesh></>}
         {[-1, 1].map((side) => (
           <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
@@ -89,7 +93,7 @@ function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: AvatarMoti
           </group>
         ))}
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
-        <RealmOutfitDetails top={avatar.top}/>
+        <RealmOutfitDetails top={avatar.top}/><AdventureOutfitDetails top={avatar.top}/>
         <ExplorerBodyAccessories o={avatar} movingRef={movingRef}/>
         <group scale={[1.1,1.1,1.1]} position={[0,-.078,0]}>{avatar.hairStyle === 'swept' && avatar.face === 'smile'
           ? <Suspense fallback={<ExplorerAvatarHead o={avatar}/>}><PremiumExplorerHead avatar={avatar}/></Suspense>

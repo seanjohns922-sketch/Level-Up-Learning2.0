@@ -1,5 +1,7 @@
 "use client";
 
+import { AdventureOutfitArt } from "./AdventureOutfitArt";
+import { adventureOutfit, type AdventureTopStyle } from "@/lib/avatar/adventure-outfits";
 import { RealmOutfitArt } from "./RealmOutfitArt";
 import { realmOutfit, type RealmTopStyle } from "@/lib/avatar/realm-outfits";
 import { type AdvancedHairStyle } from "./AdvancedHair";
@@ -49,7 +51,7 @@ export type HairStyle = AdvancedHairStyle
   | "bob"
   | "spiky"
   | "bald";
-export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizard";
+export type HatStyle = "none" | "beanie" | "cap" | "explorer" | "crown" | "wizard" | "knight" | "astronaut";
 export type GlassesStyle = "none" | "round" | "shades" | "visor";
 export type CapeStyle = "none" | "hero" | "royal";
 export type BackpackStyle = "none" | "explorer" | "rocket";
@@ -58,7 +60,7 @@ export type BodyType = "neutral" | "dress";
 /** Free face expression (eyes + mouth, plus freckles / rosy cheeks add-ons). */
 export type FaceType = "smile" | "bigSmile" | "happy" | "determined" | "freckles" | "rosy" | "wink" | "calm" | "confident";
 /** Clothing garment shapes (each occupies one equipment slot). */
-export type TopStyle = RealmTopStyle | "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
+export type TopStyle = AdventureTopStyle | RealmTopStyle | "hoodie" | "tshirt" | "jumper" | "polo" | "jacket" | "dress";
 export type BottomStyle = "joggers" | "shorts" | "jeans" | "trackpants" | "skirt" | "leggings";
 export type ShoeStyle = "sneakers" | "boots" | "sandals" | "hightops";
 
@@ -290,6 +292,7 @@ function BottomLayer({ o, style }: { o: Outfit; style: BottomStyle }) {
 // ── Torso (Top slot). "dress" also renders its own skirt. ───────────────────
 function TopLayer({ o }: { o: Outfit }) {
   const p = useGradPrefix();
+  if(adventureOutfit(o.top)) return <g data-layer="shirt"><LongSleeves o={o} cuff/><AdventureOutfitArt top={o.top} fill={`url(#${p}lul-shirt)`} trim={o.shirtTrim}/></g>;
   if(realmOutfit(o.top)) return <g data-layer="shirt"><LongSleeves o={o} cuff/><RealmOutfitArt top={o.top} fill={`url(#${p}lul-shirt)`} trim={o.shirtTrim}/></g>;
   switch (o.top) {
     case "tshirt":
@@ -810,6 +813,9 @@ function FaceLayer({ o }: { o: Outfit }) {
 function HatLayer({ o }: { o: Outfit }) {
   const p = useGradPrefix();
   switch (o.hat) {
+    case "astronaut": return <g data-layer="hat"><ellipse cx="60" cy="48" rx="43" ry="48" fill="#bdefff" fillOpacity=".10" stroke={o.hatColor} strokeWidth="5"/><path d="M29 29Q35 12 52 10" fill="none" stroke="#fff" strokeWidth="3" opacity=".7"/><path d="M27 85Q60 105 93 85L90 97Q60 108 30 97Z" fill={o.hatColor} stroke="#ed813e" strokeWidth="2"/>{[15,97].map(x=><rect key={x} x={x} y="48" width="8" height="20" rx="3" fill={o.hatColor}/>)}</g>;
+    case "knight": return <g data-layer="hat"><path d="M23 46Q21 7 60 4Q99 7 97 46L86 41Q60 27 34 41Z" fill={`url(#${p}lul-hat)`} stroke="#536b80"/><path d="M23 39 33 39 29 81 20 72ZM87 39 97 39 100 72 91 81Z" fill={o.hatColor} stroke="#536b80"/><path d="M60 5V32" stroke="#dfb760" strokeWidth="4"/><path d="M42 13Q54 7 66 11" stroke="#fff" strokeWidth="2" fill="none" opacity=".6"/></g>;
+
     case "beanie":
       return (
         <g data-layer="hat">

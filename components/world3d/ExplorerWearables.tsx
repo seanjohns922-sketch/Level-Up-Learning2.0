@@ -20,7 +20,19 @@ const visorLens=makeVisorLens();
 export function ExplorerHeadAccessories({o}:{o:Outfit}){
  const c=o.hatColor,dark=new THREE.Color(c).multiplyScalar(.6).getStyle();
  return <group name="head-accessories">
-  {o.hat!=='none'&&<group name={`hat-${o.hat}`} position={[0,o.hat==='crown'?0:-.1,0]}>
+  {o.hat!=='none'&&<group name={`hat-${o.hat}`} position={[0,['crown','knight','astronaut'].includes(o.hat)?0:-.1,0]}>
+   {o.hat==='astronaut'&&<>
+    <mesh name="astronaut-visor" position={[0,1.2,0]} scale={[.51,.55,.49]}><sphereGeometry args={[1,40,28,0,Math.PI*2,0,2.3]}/><meshStandardMaterial color="#c3f1ff" transparent opacity={.1} depthWrite={false} roughness={.16}/></mesh>
+    <mesh position={[0,.83,0]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.32,.065,12,40]}/><meshStandardMaterial color={c}/></mesh>
+    <AccessoryTube points={[[-.37,1.55,.2],[-.25,1.68,.21],[-.1,1.73,.19]]} radius={.012} colour="#ffffff"/>
+    {[-1,1].map(side=><group key={side} position={[side*.46,1.15,0]}><AccessoryBox width={.09} height={.23} depth={.22} colour={c}/><group position={[side*.05,0,0]}><AccessoryBox width={.015} height={.08} depth={.12} colour="#ed813e"/></group></group>)}
+   </>}
+   {o.hat==='knight'&&<>
+    <mesh position={[0,1.42,0]} scale={[.415,.29,.375]} castShadow><sphereGeometry args={[1,36,24,0,Math.PI*2,0,Math.PI/2]}/><meshStandardMaterial color={c} metalness={.55} roughness={.38}/></mesh>
+    <mesh position={[0,1.42,0]} scale={[.415,.44,.375]} castShadow><sphereGeometry args={[1,32,18,Math.PI,Math.PI,Math.PI/2,1.15]}/><meshStandardMaterial color={c} metalness={.55} roughness={.38} side={THREE.DoubleSide}/></mesh>
+    <AccessoryTube points={[[0,1.44,.375],[0,1.62,.27],[0,1.71,0],[0,1.6,-.29]]} radius={.019} colour="#dfb760"/>
+    {[-1,1].map(side=><group key={side} position={[side*.37,1.23,-.03]}><AccessoryBox width={.085} height={.4} depth={.34} colour={c}/></group>)}
+   </>}
    {['beanie','cap'].includes(o.hat)&&<mesh position={[0,1.4,0]} scale={[.406,.28,.365]} castShadow><sphereGeometry args={[1,36,24,0,Math.PI*2,0,Math.PI/2]}/><meshStandardMaterial color={c} roughness={o.hat==='beanie'?.95:.7}/></mesh>}
    {o.hat==='beanie'&&<><mesh position={[0,1.415,0]} castShadow><cylinderGeometry args={[.407,.4,.105,40]}/><meshStandardMaterial color={c} roughness={.95}/></mesh>{Array.from({length:32},(_,i)=>{const a=i/32*Math.PI*2;return <AccessoryTube key={i} points={[[Math.cos(a)*.409,1.37,Math.sin(a)*.409],[Math.cos(a)*.409,1.46,Math.sin(a)*.409]]} radius={.003} colour={dark}/>;})}<mesh position={[0,1.71,0]} castShadow><sphereGeometry args={[.063,20,16]}/><meshStandardMaterial color={c} roughness={1}/></mesh></>}
    {o.hat==='cap'&&<><mesh position={[0,1.405,.26]} scale={[.34,.022,.3]} castShadow><sphereGeometry args={[1,32,16]}/><meshStandardMaterial color={dark}/></mesh><AccessoryTube points={[[0,1.68,0],[0,1.62,.22],[0,1.43,.365]]} radius={.004} colour={dark}/><mesh position={[0,1.685,0]}><sphereGeometry args={[.022,12,8]}/><meshStandardMaterial color={dark}/></mesh></>}

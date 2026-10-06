@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const exports={};new Function('exports',ts.transpileModule(fs.readFileSync('lib/avatar/adventure-outfits.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports);
+const sqlValue=v=>v===null?'null':typeof v==='boolean'||typeof v==='number'?String(v):"'"+String(v).replaceAll("'","''")+"'";
+const keys=['item_key','name','description','category','realm_id','rarity','price','icon','accent','active','purchasable','discoverable','sort_order','metadata'];
+const rows=exports.ADVENTURE_OUTFIT_CATALOGUE.map(item=>'('+keys.map(k=>sqlValue(k==='metadata'?JSON.stringify(item[k]):item[k])).join(', ')+')');
+const sql='-- Five complete avatar bundles. Uses existing outfit slot and guarded purchase/equip RPCs.\n-- Headwear and accessories are included in outfit metadata; independent equipped layers retain precedence.\nbegin;\ninsert into public.economy_items ('+keys.join(', ')+') values\n'+rows.join(',\n')+'\non conflict (item_key) do nothing;\ncommit;\n';
+const file='supabase/migrations/20261006200000_adventure_outfit_collection.sql';
+if(process.argv.includes('--write'))fs.writeFileSync(file,sql);else assert.equal(fs.readFileSync(file,'utf8'),sql,'Migration matches the outfit catalogue and prices');
+console.log('PASS: five outfit bundle rows, prices and metadata match the additive migration.');
