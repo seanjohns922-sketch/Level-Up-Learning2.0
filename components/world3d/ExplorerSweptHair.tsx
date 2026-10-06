@@ -28,18 +28,9 @@ function HairArtwork({colour,style,hat}:{colour:string;style:ReferenceHairStyle;
   const geometry = geometryFor(style,hat);
   const texture = useTexture(`/avatars/hair/hair_${style}.png`);
   return <mesh geometry={geometry.scalp} castShadow receiveShadow>
-    <meshStandardMaterial color={colour} map={texture} roughness={.78}
-      onBeforeCompile={shader => {
-        // Same tint weights as the SVG wardrobe. Preserve the original painted strands.
-        shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
-          #ifdef USE_MAP
-            vec4 hairSample = texture2D(map, vMapUv);
-            float hairLight = dot(hairSample.rgb, vec3(.55, 1.85, .2));
-            diffuseColor.rgb *= hairLight;
-            diffuseColor.a *= hairSample.a;
-          #endif
-        `);
-      }} customProgramCacheKey={()=>'wardrobe-hair-tint-v1'}/>
+    {/* The artwork supplies strand relief, never a second pigment colour.
+        All hair surfaces use the student's selected colour and roughness. */}
+    <meshStandardMaterial color={colour} bumpMap={texture} bumpScale={.004} roughness={.82}/>
   </mesh>;
 }
 export function ExplorerSweptHair({colour,style="swept",hat="none"}:{colour:string;style?:ReferenceHairStyle;hat?:HatStyle}) {
@@ -48,7 +39,7 @@ export function ExplorerSweptHair({colour,style="swept",hat="none"}:{colour:stri
     {geometry.strands.map((strand,i)=><mesh key={i} geometry={strand} castShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>)}
     <mesh geometry={geometry.rearScalp} castShadow receiveShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>
     <mesh geometry={geometry.rear} castShadow receiveShadow><meshStandardMaterial color={colour} roughness={.82}/></mesh>
-    <Suspense fallback={<mesh geometry={geometry.scalp}><meshStandardMaterial color={colour} roughness={.78}/></mesh>}>
+    <Suspense fallback={<mesh geometry={geometry.scalp}><meshStandardMaterial color={colour} roughness={.82}/></mesh>}>
       <HairArtwork colour={colour} style={style} hat={hat}/>
     </Suspense>
   </group>;
