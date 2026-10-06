@@ -126,20 +126,20 @@ const curriculum = [
       {
         "title": "Map random outcomes fairly",
         "goal": "design a simulation with the intended probabilities",
-        "idea": "Assign equally likely random outcomes in the same proportions as the model.",
-        "caution": "One random label per colour misrepresents unequal colour probabilities."
+        "idea": "A simulation copies a chance situation using random numbers. Give each outcome the same share of the random numbers as its probability. For a spinner with 6 red sections out of 16, let 6 of the numbers 1 to 16 mean red and the other 10 mean blue.",
+        "caution": "Giving each colour just one number makes the colours equally likely, even when they are not."
       },
       {
         "title": "Check a simulation rule",
         "goal": "test whether a digital rule matches a chance model",
-        "idea": "Count which random inputs trigger the event and compare that share with the target.",
-        "caution": "An inclusive endpoint adds another possible input."
+        "idea": "To check a simulation rule, list the random numbers that count as a win, count them, and write that count over the total. Then compare it with the probability you wanted. Read the words carefully: “at most 6” includes 6, but “less than 6” does not.",
+        "caution": "Check whether the end number is included."
       },
       {
         "title": "Run and summarise trials",
         "goal": "use digital trials and summarise the actual outcomes",
-        "idea": "Run the stated trials, record the results and calculate the observed share.",
-        "caution": "Report the generated results rather than replacing them with the prediction."
+        "idea": "After running a simulation, count what actually happened. The observed share is the number of wins divided by the total number of trials. Report that real result, even if it is different from the prediction.",
+        "caution": "Report the results you got, not the prediction."
       }
     ]
   },
@@ -150,20 +150,20 @@ const curriculum = [
       {
         "title": "Explain variation between runs",
         "goal": "explain why repeated experiments produce different results",
-        "idea": "Random variation makes different runs differ even when their probability model is unchanged.",
-        "caution": "A fair process does not force each short run to be balanced."
+        "idea": "Random results vary. Toss a fair coin 50 times, then do it again, and you will usually get a different number of heads, even though the chance of heads is 1/2 on every toss. The expected count (25 heads) is what happens on average, not in every run.",
+        "caution": "A fair coin does not have to give exactly half heads in every run."
       },
       {
         "title": "Compare small and large runs",
         "goal": "compare relative frequencies across different trial totals",
-        "idea": "Compare proportions, not raw counts, when sample sizes differ.",
-        "caution": "A larger run often gives a more stable proportion, but closeness is not guaranteed every time."
+        "idea": "Relative frequency = count ÷ number of trials. Small runs jump around a lot. As the number of trials grows, the relative frequency usually settles close to the true probability. When runs have different sizes, compare relative frequencies, not raw counts.",
+        "caution": "A larger run usually settles closer to the probability, but not every single time."
       },
       {
         "title": "Challenge chance misconceptions",
         "goal": "explain why past independent outcomes do not force the next result",
-        "idea": "With a reset independent process, the next trial keeps the same probability.",
-        "caution": "A run of one outcome does not make the opposite outcome due."
+        "idea": "Each toss, roll or spin is independent: the coin, die or spinner has no memory. After 5 heads in a row, the chance of tails on the next toss is still 1/2. No outcome is ever “due”.",
+        "caution": "A run of one outcome does not make the other outcome more likely next time."
       }
     ]
   },
