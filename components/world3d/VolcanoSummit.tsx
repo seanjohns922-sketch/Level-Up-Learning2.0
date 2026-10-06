@@ -1,9 +1,11 @@
 'use client';
-import {useEffect,useMemo} from 'react';
+import {useEffect,useMemo,useRef} from 'react';
+import {useFrame} from '@react-three/fiber';
 import * as THREE from 'three';
 import {Beam} from './ExpeditionCrossroads';
-import {Brazier,Embers,Instances,LavaMaterial,StoneArch,basaltTextures,rand,softDotTexture,type InstanceItem} from './VolcanicKit';
+import {Brazier,Embers,Instances,LavaMaterial,StoneArch,basaltTextures,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
 import {VOLCANO_GATE,VOLCANO_ROUTE} from '@/lib/world3d/volcano-expedition';
+import {SEA_LEVEL} from '@/lib/world3d/expedition-crossroads';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
 // The Level 8 volcano: the Final Battle gate, the ascent and the summit crater. Walkable floors
@@ -87,4 +89,42 @@ export function SummitDressing({doorAngles}:{doorAngles:number[]}){
  const braziers=useMemo(()=>[1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return [CX+Math.sin(a)*21.5,CY,CZ+Math.cos(a)*21.5] as SummitPoint;}).concat([-.3,.3].map(a=>[CX+Math.sin(a)*24,CY,CZ+Math.cos(a)*24] as SummitPoint)),[]);
  useEffect(()=>()=>{rock.dispose();material.dispose();},[rock,material]);
  return <><Instances geometry={rock} material={material} items={spires} obstacle/>{braziers.map((p,i)=><Brazier key={i} at={p} scale={1.2} light={i<5}/>)}</>;
+}
+
+/** Tileable ripple normals built from whole-number sine waves, so the pattern wraps seamlessly. */
+function rippleNormals(){
+ const size=256,data=new Uint8Array(size*size*4),waves=[[3,1,.5],[1,4,.35],[5,-3,.22],[-7,2,.15],[9,7,.08]] as const;
+ for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+  const u=x/size,v=y/size;let dx=0,dy=0;
+  for(const [kx,ky,a] of waves){const phase=Math.PI*2*(kx*u+ky*v)+kx;dx+=a*kx*Math.cos(phase);dy+=a*ky*Math.cos(phase);}
+  const n=new THREE.Vector3(-dx*.05,-dy*.05,1).normalize(),k=(y*size+x)*4;
+  data[k]=(n.x*.5+.5)*255;data[k+1]=(n.y*.5+.5)*255;data[k+2]=(n.z*.5+.5)*255;data[k+3]=255;
+ }
+ const t=new THREE.DataTexture(data,size,size);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(60,60);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.needsUpdate=true;return t;
+}
+function radialGlow(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d')!,r=g.createRadialGradient(128,128,70,128,128,128);r.addColorStop(0,'#ff7a32ff');r.addColorStop(.35,'#ff5a1a66');r.addColorStop(1,'#ff5a1a00');g.fillStyle=r;g.fillRect(0,0,256,256);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
+
+/** The sea around the volcano: dark water with moving ripples, lit orange where it meets the island. */
+export function VolcanoSea(){
+ const reduced=useReducedMotion(),water=useRef<THREE.MeshStandardMaterial>(null);
+ const normals=useMemo(()=>rippleNormals(),[]),glow=useMemo(()=>radialGlow(),[]);
+ useFrame((_,delta)=>{const n=water.current?.normalMap;if(n&&!reduced.current){const d=Math.min(delta,.05);n.offset.x+=d*.004;n.offset.y+=d*.0025;}});
+ useEffect(()=>()=>{normals.dispose();glow.dispose();},[normals,glow]);
+ return <group>
+  <mesh position={[CX,SEA_LEVEL,CZ]} rotation={[-Math.PI/2,0,0]} receiveShadow><circleGeometry args={[340,96]}/><meshStandardMaterial ref={water} color="#1f5262" roughness={.12} metalness={.3} normalMap={normals} normalScale={new THREE.Vector2(.7,.7)}/></mesh>
+  <mesh position={[CX,SEA_LEVEL+.03,CZ]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[260,260]}/><meshBasicMaterial map={glow} transparent opacity={.38} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false}/></mesh>
+ </group>;
+}
+
+/** Stone edging, boulders and braziers along the causeway from the gate to the island. */
+export function Causeway(){
+ const rock=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[]),block=useMemo(()=>new THREE.BoxGeometry(1,1,1),[]),material=useMemo(()=>new THREE.MeshStandardMaterial({roughness:.95,flatShading:true}),[]);
+ const {walls,boulders}=useMemo(()=>{const walls:InstanceItem[]=[],boulders:InstanceItem[]=[];let i=1200;
+  for(let z=6;z>-38;z-=1.6)for(const side of [-1,1]){i++;walls.push({p:[side*3.6,-.2,z],s:[.7,1.1+rand(i)*.3,1.5],r:[0,(rand(i+1)-.5)*.1,0],c:BASALT[i%3]});
+   if(rand(i+2)>.35){const s=.7+rand(i+3)*1.1;boulders.push({p:[side*(4.6+rand(i+4)*1.4),SEA_LEVEL-.2,z+(rand(i+5)-.5)*1.4],s:[s*1.3,s,s],r:[rand(i+6)*3,rand(i+7)*3,0],c:BASALT[(i+1)%3]});}}
+  return {walls,boulders};},[]);
+ useEffect(()=>()=>{rock.dispose();block.dispose();material.dispose();},[rock,block,material]);
+ return <><Instances geometry={block} material={material} items={walls}/><Instances geometry={rock} material={material} items={boulders}/>
+  {[-4,-20,-34].flatMap(z=>[-1,1].map(side=><Brazier key={`${z}${side}`} at={[side*3.6,.35,z]} scale={.9}/>))}
+ </>;
 }

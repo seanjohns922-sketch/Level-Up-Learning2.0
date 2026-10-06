@@ -7,7 +7,7 @@ import ExpeditionForest from './ExpeditionForest';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
 import * as THREE from 'three';
 import { DetailedScenery } from './DetailedScenery';
-import { EXPEDITION_TRAILS,TRAIL_SAMPLES,crossroadsTerrain,nearestTrail,trailThreat } from '@/lib/world3d/expedition-crossroads';
+import { EXPEDITION_TRAILS,SEA_LEVEL,TRAIL_SAMPLES,crossroadsTerrain,nearestTrail,trailThreat } from '@/lib/world3d/expedition-crossroads';
 import type { SummitPoint } from '@/lib/world3d/number-summit';
 
 export function Box({at,size,colour='#6b5945',rotation=0}:{at:SummitPoint;size:SummitPoint;colour?:string;rotation?:number}){
@@ -99,7 +99,7 @@ function Scenery(){
  </>;
 }
 export default function ExpeditionCrossroads({openTrails=EXPEDITION_TRAILS.map(t=>t.id)}:{openTrails?:readonly string[]}){
- const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours:number[]=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const volcanic=z<-25&&x>-65,y=p.getY(i);const c=new THREE.Color(volcanic?'#3a3332':nearestTrail(x,z).distance>8?'#59634e':'#687352');if(volcanic){c.lerp(new THREE.Color('#251f20'),Math.min(1,y/60)*.8).lerp(new THREE.Color('#5a3a2e'),Math.max(0,Math.sin(x*.21+z*.17)*Math.sin(y*.35))*.35);}else c.lerp(new THREE.Color('#62666a'),trailThreat(x,z)*.55);c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours.push(c.r,c.g,c.b);}g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
+ const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours:number[]=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const volcanic=z<-25&&x>-65,y=p.getY(i);const c=new THREE.Color(volcanic?'#3a3332':nearestTrail(x,z).distance>8?'#59634e':'#687352');if(volcanic){c.lerp(new THREE.Color('#251f20'),Math.min(1,y/60)*.8).lerp(new THREE.Color('#5a3a2e'),Math.max(0,Math.sin(x*.21+z*.17)*Math.sin(y*.35))*.35);}else c.lerp(new THREE.Color('#62666a'),trailThreat(x,z)*.55);if(y<SEA_LEVEL+.5)c.set(y<SEA_LEVEL-.4?'#2b2a28':'#4d463c');c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours.push(c.r,c.g,c.b);}g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
  return <group>
  <mesh geometry={ground} receiveShadow><meshLambertMaterial vertexColors/></mesh>
  {TRAIL_SAMPLES.map((p,i)=><Trail key={i} points={p} layer={i+1}/>)}<Trail points={[[0,0,102],[0,0,84],[0,0,74],[0,0,65]]}/>

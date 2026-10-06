@@ -58,7 +58,20 @@ export function crossroadsTerrain(x:number,z:number){
  const v=volcanoProjection(x,z);
  if(v.distance<11){const blend=Math.max(0,Math.min(1,(v.distance-4)/7));h=v.height-.09+(h-v.height+.09)*blend;}
  if(x<-80&&z<-18)h=-.12;
- return h;
+ const sea=volcanoSea(x,z,n.distance);
+ return h+(SEA_BED-h)*sea;
+}
+
+/** The volcano is an island: sea fills the plain around it, crossed by the causeway from the Final Battle gate. */
+export const SEA_LEVEL=-1.4,SEA_BED=-5;
+const ramp=(edge0:number,edge1:number,x:number)=>{const t=Math.max(0,Math.min(1,(x-edge0)/(edge1-edge0)));return t*t*(3-2*t);};
+export function volcanoSea(x:number,z:number,trailDistance=nearestTrail(x,z).distance){
+ const offIsland=ramp(95,101,Math.hypot(x,z+130));
+ const offMainland=ramp(4,-7,z);
+ const offTrails=ramp(9,15,trailDistance);
+ const offHeadland=ramp(26,34,Math.hypot(x+90,z+25));
+ const route=volcanoProjection(x,z),offCauseway=route.segment<=5?ramp(3.4,4.8,route.distance):1;
+ return offIsland*offMainland*offTrails*offHeadland*offCauseway;
 }
 
 // Shared by terrain colour, vegetation and the smoothly changing scene lighting.

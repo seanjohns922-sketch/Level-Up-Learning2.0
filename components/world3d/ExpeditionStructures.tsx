@@ -7,7 +7,7 @@ import { EXPEDITION_TRAILS,crossroadsTerrain } from '@/lib/world3d/expedition-cr
 import { VOLCANO_ROUTE,VOLCANO_DOORS,VOLCANO_GATE,volcanoProjection } from '@/lib/world3d/volcano-expedition';
 import Plaque from './WorldPlaque';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
-import { AscentMarkers,FinalBattleGate,SummitCrater,SummitDressing,SummitFloor,SummitGateway } from './VolcanoSummit';
+import { AscentMarkers,Causeway,FinalBattleGate,SummitCrater,SummitDressing,SummitFloor,SummitGateway,VolcanoSea } from './VolcanoSummit';
 import { LavaMaterial } from './VolcanicKit';
 import type { SummitPoint } from '@/lib/world3d/number-summit';
 
@@ -63,13 +63,13 @@ function CraterFortress(){
  <pointLight position={[0,69,-130]} color="#f69b4b" intensity={85} distance={45} decay={1.5}/>
  </>;
 }
+const SEAM_ANGLES=[.06,.49,1.08,1.68,2.04,2.67,3.11,3.7,4.12,4.77,5.24,5.83];
 /** Lava flows down the volcano's flanks, following its real surface. */
 function LavaSeams(){
  const geometry=useMemo(()=>{
   const vertices:number[]=[],uv:number[]=[],indices:number[]=[];
   // Uneven spacing and winding channels follow the volcano's actual surface.
-  const angles=[.06,.49,1.08,1.68,2.04,2.67,3.11,3.7,4.12,4.77,5.24,5.83];
-  angles.forEach((angle,river)=>{for(let r=27;r<94;r+=1.25){
+  SEAM_ANGLES.forEach((angle,river)=>{for(let r=27;r<94;r+=1.25){
    const point=(radius:number,lateral:number)=>{
     const a=angle+Math.sin(radius*.085+river*2)*.065+Math.sin(radius*.19+river)*.018;
     const halfWidth=2.1+Math.sin(radius*.13+river)*.8+Math.sin(radius*.31+river*4)*.25+(radius-27)*.015;
@@ -90,6 +90,9 @@ function LavaSeams(){
 }
 export function VolcanoExpedition({open,unlockedRealms,recoveredRealms=[]}:{open:boolean;unlockedRealms:string[];recoveredRealms?:string[]}){return <group>
  <Trail points={VOLCANO_ROUTE} colour="#6a605c" layer={8}/><LavaSeams/>
+ <VolcanoSea/><Causeway/>
+ {/* Steam rises where the lava flows meet the sea. */}
+ {SEAM_ANGLES.slice(1).map(a=><Steam key={a} at={[Math.sin(a)*96,-1.2,-130+Math.cos(a)*96]} count={6} scale={1.3}/>)}
  <FinalBattleGate open={open}/>
  <group position={VOLCANO_GATE}>
  <Plaque at={[0,18.2,1.4]} title="THE FINAL BATTLE" subtitle={open?'LEVEL 8 · GATE OPEN':'SEALED · FINISH ANY LEVEL 7'} width={9} colour={open?'#ffc76b':'#d5a176'}/>
