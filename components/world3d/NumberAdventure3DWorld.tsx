@@ -48,7 +48,7 @@ export default function NumberAdventure3DWorld({access}:{access?:ExpeditionAcces
  const lessonUnlocked=!lesson||preview||access[lesson.level===7?'level7':'level8'].includes(EXPEDITION_TRAILS[lesson.realm].id as ExpeditionRealm);
  return <main data-world3d-root data-summit-altitude={altitude} className="summit-world">
  <SummitErrorBoundary><Canvas dpr={1} camera={{position:[60,42,80],fov:52,near:.1,far:360}} gl={{antialias:false,alpha:false,powerPreference:'high-performance'}}>
- <Suspense fallback={null}><NumberSummitEnvironment recoveredStrongholds={recoveredStrongholds} volcanoOpen={volcanoOpen} unlockedStrongholds={access?.level8??(previewVolcano?['number']:[])} position={position}/></Suspense>
+ <Suspense fallback={null}><NumberSummitEnvironment openTrails={access?.level7} recoveredStrongholds={recoveredStrongholds} volcanoOpen={volcanoOpen} unlockedStrongholds={access?.level8??(previewVolcano?['number']:[])} position={position}/></Suspense>
  <NumberSummitPlayer move={move} look={look} unlocked={1} volcanoOpen={volcanoOpen} spawn={spawn} spawnKey={spawnKey} paused={dialog!==null} overview={!started} position={position} onNearest={setNearest} onAltitude={setAltitude}/>
  </Canvas></SummitErrorBoundary>
  {!started?<div className="summit-intro"><div className="summit-intro-top"><span>{preview?'THE SHATTERED REALMS / WORLD PREVIEW':'THE SHATTERED REALMS'}</span><Link href={exitHref}>{preview?'Exit preview':'Return to tower'} <X size={16}/></Link></div>

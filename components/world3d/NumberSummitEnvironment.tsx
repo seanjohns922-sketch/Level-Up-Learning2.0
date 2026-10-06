@@ -6,8 +6,8 @@ import ExpeditionAtmosphere from './ExpeditionAtmosphere';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
 import ExpeditionCrossroads from './ExpeditionCrossroads';
 import { ExpeditionOutpost, NumberCavernEntrance, VolcanoExpedition } from './ExpeditionStructures';
-export default function NumberSummitEnvironment({volcanoOpen,unlockedStrongholds=[],recoveredStrongholds=[],position}:{volcanoOpen:boolean;unlockedStrongholds?:string[];recoveredStrongholds?:string[];position:MutableRefObject<THREE.Vector3>}){
- return <><ExpeditionAtmosphere position={position}/><ExpeditionCrossroads/><ExpeditionOutpost/>
+export default function NumberSummitEnvironment({volcanoOpen,openTrails,unlockedStrongholds=[],recoveredStrongholds=[],position}:{volcanoOpen:boolean;openTrails?:readonly string[];unlockedStrongholds?:string[];recoveredStrongholds?:string[];position:MutableRefObject<THREE.Vector3>}){
+ return <><ExpeditionAtmosphere position={position}/><ExpeditionCrossroads openTrails={openTrails}/><ExpeditionOutpost/>
  <ExpeditionDistanceDetail x={-90} z={-25} distance={100}><NumberCavernEntrance/></ExpeditionDistanceDetail>
  <VolcanoStorm/><VolcanoExpedition open={volcanoOpen} unlockedRealms={unlockedStrongholds} recoveredRealms={recoveredStrongholds}/></>;
 }

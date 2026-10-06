@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import WorldPlaque from './WorldPlaque';
+import {Brazier,StoneArch} from './VolcanicKit';
 import ExpeditionForest from './ExpeditionForest';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
 import * as THREE from 'three';
@@ -44,13 +45,13 @@ function Waymark({index}:{index:number}){
   {[0,Math.PI].map(a=><mesh key={a} rotation={[0,a,0]} position={[0,3,a===0?.15:-.15]}><planeGeometry args={[4.5,1.12]}/><meshBasicMaterial map={label} toneMapped={false} fog={false}/></mesh>)}
  </group>;
 }
-function Barrier({index}:{index:number}){
- const path=TRAIL_SAMPLES[index],p=path[58],n=path[60],angle=Math.atan2(n[0]-p[0],n[2]-p[2]);
- return <group position={p} rotation={[0,angle,0]}>
-  {[-2.8,2.8].map(x=><group key={x}><Beam a={[x,0,0]} b={[x,2.1,0]} width={.17}/><Lantern at={[x,2.1,0]}/></group>)}
-  <Beam a={[-2.8,.6,0]} b={[2.8,1.6,0]} width={.14}/><Beam a={[-2.8,1.6,0]} b={[2.8,.6,0]} width={.14}/>
-  <WorldPlaque at={[0,4,0]} title={EXPEDITION_TRAILS[index].name.toUpperCase()} subtitle="LEVEL 7 · WEEKLY LESSONS" width={8} colour={EXPEDITION_TRAILS[index].colour}/>
-
+/** The Level 7 lesson gate at the end of each trail: a stone archway that opens in the realm's colour. */
+function Barrier({index,open}:{index:number;open:boolean}){
+ const path=TRAIL_SAMPLES[index],p=path[58],n=path[60],angle=Math.atan2(n[0]-p[0],n[2]-p[2]),t=EXPEDITION_TRAILS[index];
+ return <group position={p} rotation={[0,angle+Math.PI,0]}>
+  <StoneArch colour={t.colour} open={open} seed={index} brightness={1.3}/>
+  <Brazier at={[-4.4,0,1.2]} colour={t.colour}/><Brazier at={[4.4,0,1.2]} colour={t.colour}/>
+  <WorldPlaque at={[0,10.4,.4]} title={t.name.toUpperCase()} subtitle={open?'LEVEL 7 · WEEKLY LESSONS':'LEVEL 7 · LOCKED'} width={8} colour={t.colour}/>
  </group>;
 }
 function Quarry(){return <group position={[-123,3,108]}>
@@ -97,13 +98,13 @@ function Scenery(){
  {TRAIL_SAMPLES.map((path,k)=>path.filter((_,i)=>i%7===0).map((p,i)=>{const side=i%2?1:-1;return <Stone key={`${k}-${i}`} at={[p[0]+side*3.8,p[1]-.1,p[2]+.6]} scale={[.45+i%3*.2,.3,.5]} colour={k===1?'#98959e':'#969889'}/>;}))}
  </>;
 }
-export default function ExpeditionCrossroads(){
- const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours:number[]=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const c=new THREE.Color(z<-25&&x>-65?'#41494a':nearestTrail(x,z).distance>8?'#59634e':'#687352');c.lerp(new THREE.Color('#62666a'),trailThreat(x,z)*.55);c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours.push(c.r,c.g,c.b);}g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
+export default function ExpeditionCrossroads({openTrails=EXPEDITION_TRAILS.map(t=>t.id)}:{openTrails?:readonly string[]}){
+ const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours:number[]=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const volcanic=z<-25&&x>-65,y=p.getY(i);const c=new THREE.Color(volcanic?'#3a3332':nearestTrail(x,z).distance>8?'#59634e':'#687352');if(volcanic){c.lerp(new THREE.Color('#251f20'),Math.min(1,y/60)*.8).lerp(new THREE.Color('#5a3a2e'),Math.max(0,Math.sin(x*.21+z*.17)*Math.sin(y*.35))*.35);}else c.lerp(new THREE.Color('#62666a'),trailThreat(x,z)*.55);c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours.push(c.r,c.g,c.b);}g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
  return <group>
  <mesh geometry={ground} receiveShadow><meshLambertMaterial vertexColors/></mesh>
  {TRAIL_SAMPLES.map((p,i)=><Trail key={i} points={p} layer={i+1}/>)}<Trail points={[[0,0,102],[0,0,84],[0,0,74],[0,0,65]]}/>
  <mesh position={[0,.085,65]} rotation={[-Math.PI/2,0,0]} receiveShadow><circleGeometry args={[12.6,48]}/><meshStandardMaterial color="#b7a786" roughness={1}/></mesh>
- {EXPEDITION_TRAILS.map((_,i)=><Waymark key={i} index={i}/>)}{[0,1,2,3,4,5].map(i=><Barrier key={i} index={i}/>)}
+ {EXPEDITION_TRAILS.map((_,i)=><Waymark key={i} index={i}/>)}{[0,1,2,3,4,5].map(i=><Barrier key={i} index={i} open={openTrails.includes(EXPEDITION_TRAILS[i].id)}/>)}
  <Arrival/><Campfire/>
  <group position={[10,0,77]} scale={1.4}><DetailedScenery assetKey="flower_bed" tint="#c3ae71"/></group>
  <group position={[-11,0,69]} rotation={[0,1,0]} scale={1.6}><DetailedScenery assetKey="bench"/></group>

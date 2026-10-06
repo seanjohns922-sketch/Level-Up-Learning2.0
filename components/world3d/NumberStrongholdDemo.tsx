@@ -1,53 +1,28 @@
 'use client';
 import {Suspense,useEffect,useRef,useState} from 'react';
-import {Canvas,useFrame} from '@react-three/fiber';
+import {Canvas} from '@react-three/fiber';
 import * as THREE from 'three';
 import Link from 'next/link';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import NumberSummitPlayer from './NumberSummitPlayer';
-import WorldPlaque from './WorldPlaque';
+import NumberStrongholdScene from './NumberStrongholdScene';
 import {WorldJoystick,WorldLookJoystick,EMPTY_WORLD_MOVE_INPUT,EMPTY_WORLD_LOOK_INPUT} from './SharedWorldPlayer';
 import {STRONGHOLD_PORTALS,STRONGHOLD_STORY,STRONGHOLD_SUMMIT_RETURN,strongholdFloor,strongholdNearest,type StrongholdStory} from '@/lib/world3d/number-stronghold';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
-function Rock({at,size}:{at:SummitPoint;size:SummitPoint}){return <mesh position={at} userData={{cameraObstacle:true}}><boxGeometry args={size}/><meshStandardMaterial color="#26383a" roughness={.9}/></mesh>;}
-function Crystal({at,scale=1,recovered=false}:{at:SummitPoint;scale?:number;recovered?:boolean}){
- const ref=useRef<THREE.Mesh>(null);
- useFrame(({clock})=>{if(ref.current){ref.current.rotation.y=clock.elapsedTime*.35;ref.current.position.y=at[1]+Math.sin(clock.elapsedTime)*.12;}});
- return <mesh ref={ref} position={at} scale={[scale,scale*1.8,scale]}><octahedronGeometry args={[1,0]}/><meshStandardMaterial color={recovered?'#d4fff3':'#52d9c0'} emissive="#37c6a6" emissiveIntensity={recovered?2:1}/></mesh>;
-}
-function Portal({week,at,available}:{week:number;at:SummitPoint;available:boolean}){
- const surface=useRef<THREE.Mesh>(null);
- useFrame(({clock})=>{if(surface.current){const m=surface.current.material as THREE.MeshStandardMaterial;m.emissiveIntensity=available?.65+Math.sin(clock.elapsedTime*1.6+week)*.2:0;}});
- return <group position={at}>
- {[-2.8,2.8].map(x=><Rock key={x} at={[x,3,0]} size={[1,6,1.5]}/>)}
- <Rock at={[0,6,0]} size={[6.8,1,1.8]}/>
- <mesh ref={surface} position={[0,2.8,0]}><planeGeometry args={[4.5,5.3]}/><meshStandardMaterial color={available?'#4ed8c2':'#354347'} emissive="#24c7ae" transparent opacity={available?.76:1} side={THREE.DoubleSide}/></mesh>
- <WorldPlaque at={[0,7.6,.1]} title={`WEEK ${week}`} subtitle={available?'ENTER WEEK':'PASS THE PREVIOUS WEEK'} width={7} colour={available?'#74e6cf':'#92a2a0'}/>
- <Crystal at={[-3.4,1.2,1]} scale={.5}/><Crystal at={[3.4,1.2,1]} scale={.5}/>
- </group>;
-}
-function Scene({unlocked,recovered}:{unlocked:number;recovered:boolean}){
- return <>
- <color attach="background" args={['#0b1c21']}/><fog attach="fog" args={['#0b1c21',25,recovered?125:95]}/>
- <ambientLight intensity={.85}/><hemisphereLight args={['#c1ece4','#4a302a',1.8]}/><directionalLight position={[6,16,4]} intensity={2} color="#b2e2d6"/>
- <Rock at={[0,-.55,-32]} size={[29,1,104]}/>
- {[-1,1].map(side=><group key={side}>
- <Rock at={[side*16,6,-32]} size={[3,13,104]}/>
- <mesh position={[side*13,-.01,-32]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[1.2,98]}/><meshStandardMaterial color="#f69749" emissive="#ff6727" emissiveIntensity={2} side={THREE.DoubleSide}/></mesh>
- {Array.from({length:9},(_,i)=><group key={i}><Rock at={[side*14,5,-i*11+12]} size={[2,10,2]}/><Crystal at={[side*12,1.8,-i*11+12]} scale={.65+(i%3)*.15}/></group>)}
- </group>)}
- {[5,-20,-43,-66].map(z=><group key={z}><Rock at={[0,11,z]} size={[31,1.5,2]}/><pointLight position={[0,6,z]} color="#ff9d54" intensity={24} distance={25} decay={2}/></group>)}
- {STRONGHOLD_PORTALS.map(p=><Portal key={p.week} week={p.week} at={p.position} available={p.week<=unlocked}/>)}
- {Array.from({length:16},(_,i)=><mesh key={i} position={[0,.02,12-i*5.5]} rotation={[-Math.PI/2,0,Math.PI/4]}><planeGeometry args={[.3,.3]}/><meshBasicMaterial color="#9de8d4"/></mesh>)}
- <Rock at={[0,6,-83]} size={[30,13,2]}/>
- <mesh position={[0,.4,-74]}><cylinderGeometry args={[4,5,.8,8]}/><meshStandardMaterial color="#50676a" metalness={.45} roughness={.4}/></mesh>
- <Crystal at={[0,4,-74]} scale={2} recovered={recovered}/><pointLight position={[0,4,-72]} color="#5effce" intensity={recovered?100:35} distance={30}/>
- {!recovered&&[0,1,2].map(i=><mesh key={i} position={[0,4,-74]} rotation={[i*.65,.4+i*.8,.2]}><torusGeometry args={[3.2,.09,8,48]}/><meshStandardMaterial color="#ae82dc" emissive="#8763b4" emissiveIntensity={.6}/></mesh>)}
- <WorldPlaque at={[0,9,-79]} title={recovered?'NUMBER CORE RESTORED':'THE CORE CHAMBER'} subtitle={recovered?'THE FOG IS CLEARING':'CONFUSION CREEPER’S SEAL'} width={12} colour="#87e6d2"/>
- </>;
-}
-function StoryArt({recovery=false}:{recovery?:boolean}){return <svg viewBox="0 0 400 180" role="img" aria-label={recovery?'The Number Core shines as the Fog clears.':'A glowing Number Core inside Confusion Creeper’s purple seal.'}><path d="M0 180 55 70 105 150 160 25 220 160 285 65 330 140 400 40V180" fill="#253d41"/><ellipse cx="200" cy="155" rx="90" ry="15" fill="#173c3e"/>{!recovery&&<g fill="none" stroke="#ae86de" strokeWidth="4"><ellipse cx="200" cy="90" rx="86" ry="32" transform="rotate(-25 200 90)"/><ellipse cx="200" cy="90" rx="86" ry="32" transform="rotate(50 200 90)"/></g>}<path d="m200 25 38 62-38 66-38-66Z" fill="#5ae2c3"/><path d="m200 25 0 128-38-66Z" fill="#b1ffeb"/>{recovery&&<g stroke="#a5ffe7" strokeWidth="3"><path d="m130 40-18-18m158 18 18-18M105 100H75m220 0h30M200 12V0"/></g>}</svg>;}
+function StoryArt({recovery=false}:{recovery?:boolean}){return <svg viewBox="0 0 400 180" role="img" aria-label={recovery?'The Number Core shines as the Fog clears.':'A glowing Number Core trapped by Confusion Creeper’s purple vines.'}>
+ <defs><radialGradient id="sa-glow" cx="50%" cy="48%" r="45%"><stop offset="0" stopColor={recovery?'#bffff0':'#5fe6c9'} stopOpacity=".75"/><stop offset="1" stopColor="#5fe6c9" stopOpacity="0"/></radialGradient><linearGradient id="sa-lava" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#ff8a3d" stopOpacity="0"/><stop offset="1" stopColor="#ff6a2a" stopOpacity=".55"/></linearGradient></defs>
+ <rect width="400" height="180" fill={recovery?'#0d2423':'#160d10'}/><rect y="110" width="400" height="70" fill="url(#sa-lava)" opacity={recovery?.35:1}/>
+ <path d="M0 0h400v18l-14 26-10-22-16 34-12-30-18 20-14-28-20 40-12-34-16 24-14-30-22 36-10-26-18 30-14-34-16 28-12-22-20 38-14-30-18 26-16-34-14 22-12-30-18 40-14-28-16 22L0 30Z" fill="#0a0708"/>
+ <path d="M0 180V96l30-12 22 20 18-30 26 18 6 88Zm400 0V90l-28-10-20 22-22-26-24 20-6 84Z" fill="#231a1b"/>
+ <ellipse cx="200" cy="162" rx="92" ry="12" fill={recovery?'#1d4a44':'#2a1a33'}/>
+ <circle cx="200" cy="88" r="80" fill="url(#sa-glow)"/>
+ {recovery&&<g stroke="#a5ffe7" strokeWidth="3" strokeLinecap="round" opacity=".9"><path d="m138 40-16-16m124 16 16-16M112 92H86m202 0h26M200 14V2M150 140l-14 12m114-12 14 12"/></g>}
+ <path d="m200 26 34 60-34 66-34-66Z" fill={recovery?'#c8fff2':'#5ae2c3'}/><path d="m200 26v126l-34-66Z" fill={recovery?'#ffffff':'#b1ffeb'}/>
+ {!recovery&&<><g fill="none" stroke="#a463ff" strokeWidth="3" opacity=".85"><ellipse cx="200" cy="88" rx="74" ry="24" transform="rotate(-22 200 88)"/><ellipse cx="200" cy="88" rx="74" ry="24" transform="rotate(38 200 88)"/></g>
+ <g fill="none" stroke="#5b2490" strokeWidth="7" strokeLinecap="round"><path d="M110 168c20-34 50-20 62-54s-6-38 14-56"/><path d="M292 168c-20-30-56-16-64-52s10-40-12-58"/><path d="M160 172c8-26 30-30 34-46"/></g>
+ <g fill="#e48bff"><ellipse cx="184" cy="12" rx="7" ry="3.5" transform="rotate(10 184 12)"/><ellipse cx="216" cy="12" rx="7" ry="3.5" transform="rotate(-10 216 12)"/></g></>}
+</svg>;}
 
 export default function NumberStrongholdDemo(){
  const [move,setMove]=useState(EMPTY_WORLD_MOVE_INPUT),[look,setLook]=useState(EMPTY_WORLD_LOOK_INPUT);
@@ -67,11 +42,11 @@ export default function NumberStrongholdDemo(){
  function resume(){let target=unlocked;try{target=Number(sessionStorage.getItem('reliq:demo:number-stronghold:week'))||unlocked;}catch{}travel(Math.min(unlocked,Math.max(1,target)));}
  const panel=story?STRONGHOLD_STORY[story]:null;
  return <main className="summit-world stronghold-world" data-world3d-root data-stronghold="number-demo">
- <Canvas dpr={1} camera={{position:[0,5,18],fov:55,near:.1,far:150}} gl={{antialias:false}} fallback={<p>Use the week buttons to explore without 3D.</p>}><Suspense fallback={null}><Scene unlocked={unlocked} recovered={recovered}/><NumberSummitPlayer move={move} look={look} unlocked={1} volcanoOpen={false} spawn={spawn} spawnKey={spawnKey} paused={paused} overview={false} position={position} onNearest={setNearest} onAltitude={()=>{}} floorResolver={strongholdFloor} nearestResolver={strongholdNearest}/></Suspense></Canvas>
- <header className="stronghold-header"><div><small>THE FINAL BATTLE · LEVEL 8</small><h1>Number Nexus stronghold</h1></div><nav aria-label="Journey"><Link href={STRONGHOLD_SUMMIT_RETURN}>Back to summit</Link><Link href="/demo-review">Back to review</Link><Link href="/world">Central hub</Link></nav></header>
- <aside className="stronghold-objective"><small>RECOVER THE NUMBER CORE</small><h2>{recovered?'The Fog is clearing.':'Break Confusion Creeper’s seal.'}</h2><button ref={continueButton} onClick={resume}>Continue my mission →</button><button onClick={()=>{stop();setHelp(true);}}>Story & controls</button></aside>
- <aside className="stronghold-review"><strong>DEMO PROTOTYPE</strong><p>Three sample portals—not the final curriculum length. No student progress or rewards are changed.</p><label>Preview progression<select value={unlocked} onChange={e=>setUnlocked(Number(e.target.value))}><option value={1}>Week 1 open</option><option value={2}>Week 1 complete · Week 2 open</option><option value={3}>All sample weeks open</option></select></label><div className="stronghold-week-buttons">{STRONGHOLD_PORTALS.map(p=><button key={p.week} onClick={()=>travel(p.week)}>Visit W{p.week}</button>)}<button onClick={()=>travel(4)}>Core chamber</button></div><button onClick={()=>{stop();setStory('opening');}}>Replay volcano opening</button></aside>
- {!paused&&<><WorldJoystick input={move} onChange={setMove}/><WorldLookJoystick onChange={setLook}/>{nearest!==null&&<div className="summit-action"><button className="summit-primary" onClick={()=>enter(nearest)}>{nearest===4?'Inspect the Core':`Enter Week ${nearest}${nearest>unlocked?' · Locked':''}`} <kbd>E</kbd></button></div>}</>}
+ <Canvas dpr={1} camera={{position:[0,5,18],fov:58,near:.1,far:160}} gl={{antialias:false,powerPreference:'high-performance'}} fallback={<p>Use the week buttons to explore without 3D.</p>}><Suspense fallback={null}><NumberStrongholdScene unlocked={unlocked} recovered={recovered}/><NumberSummitPlayer move={move} look={look} unlocked={1} volcanoOpen={false} spawn={spawn} spawnKey={spawnKey} paused={paused} overview={false} position={position} onNearest={setNearest} onAltitude={()=>{}} floorResolver={strongholdFloor} nearestResolver={strongholdNearest}/></Suspense></Canvas>
+ <header className="stronghold-header"><small>THE FINAL BATTLE · LEVEL 8</small><h1>Number Nexus stronghold</h1><p>{recovered?'The Core is free. The Fog is clearing.':'Break Confusion Creeper’s seal.'}</p><div className="stronghold-header-actions"><button ref={continueButton} onClick={resume}>Continue my mission →</button><button onClick={()=>{stop();setHelp(true);}}>Story & controls</button></div></header>
+ <nav className="stronghold-nav" aria-label="Journey"><Link href={STRONGHOLD_SUMMIT_RETURN}>Back to summit</Link><Link href="/world">Central hub</Link><Link href="/demo-review">Back to review</Link></nav>
+ <details className="stronghold-review"><summary>Demo controls</summary><p>Three sample portals—not the final curriculum length. No student progress or rewards are changed.</p><label>Preview progression<select value={unlocked} onChange={e=>setUnlocked(Number(e.target.value))}><option value={1}>Week 1 open</option><option value={2}>Week 1 complete · Week 2 open</option><option value={3}>Weeks 1–2 complete · Week 3 open</option></select></label><div className="stronghold-week-buttons">{STRONGHOLD_PORTALS.map(p=><button key={p.week} onClick={()=>travel(p.week)}>Visit W{p.week}</button>)}<button onClick={()=>travel(4)}>Core chamber</button></div><button onClick={()=>{stop();setStory('opening');}}>Replay volcano opening</button></details>
+ {!paused&&<><WorldJoystick input={move} onChange={setMove}/><WorldLookJoystick onChange={setLook}/>{nearest!==null&&<div className="summit-action"><button className="summit-primary" onClick={()=>enter(nearest)}>{nearest===4?'Inspect the Core':nearest>unlocked?`Week ${nearest} · Locked`:nearest<unlocked?`Revisit Week ${nearest}`:`Enter Week ${nearest}`} <kbd>E</kbd></button></div>}</>}
  {notice&&<div className="stronghold-notice" role="status">{notice}<ReadAloudBtn text={notice}/><button onClick={()=>setNotice('')}>Dismiss</button></div>}
  {paused&&<div className="stronghold-backdrop" onKeyDown={e=>{if(e.key==='Escape'){close();return;}if(e.key!=='Tab')return;const elements=dialog.current?.querySelectorAll<HTMLElement>('button,a[href],select');if(!elements?.length)return;const first=elements[0],last=elements[elements.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}><section ref={dialog} className={`stronghold-panel ${week?'stronghold-week-panel':''}`} role="dialog" aria-modal="true" aria-labelledby="stronghold-panel-title">
  {panel?<><StoryArt recovery={story==='recovery'}/><small>THE FOG OF FORGETFULNESS</small><h2 id="stronghold-panel-title">{panel.title}</h2><p>{panel.text}</p><ReadAloudBtn text={`${panel.title}. ${panel.text} ${story==='recovery'?'The Number Core shines as the Fog clears.':'A glowing Number Core inside Confusion Creeper’s purple seal.'} ${story==='battle'?'The final post-test will use the familiar assessment screen. Score 85 percent or more to recover the Core. Below that, practise and return. This prototype previews the story only.':''}`}/>{story==='battle'&&<p className="stronghold-note">The final post-test will use the familiar assessment screen. Score 85% or more to recover the Core. Below that, practise and return. This prototype previews the story only.</p>}<div className="stronghold-actions"><button onClick={close}>Continue →</button><button onClick={close}>Skip story</button>{story==='battle'&&<button onClick={recover}>Preview Core recovery</button>}</div></>:week?<><small>NUMBER NEXUS · LEVEL 8 · WEEK {week}</small><h2 id="stronghold-panel-title">Your weekly mission</h2><p>The familiar three-lesson structure, inside the volcanic stronghold.</p><ReadAloudBtn text={`Number Nexus. Level 8. Week ${week}. Three lessons and a weekly quiz. Video coming soon. Learn, practise, reflect. Lesson content is awaiting curriculum review. The weekly quiz has 15 questions, five per lesson. Score 80 percent or more to open the next week. Navigation preview only. No sample lesson scores are saved.`}/><div className="stronghold-video">Video coming soon</div><div className="stronghold-lessons">{[1,2,3].map(l=><article key={l}><small>LESSON {l}</small><h3>Learn · practise · reflect</h3><p>Content awaiting curriculum review.</p></article>)}<article><small>WEEKLY QUIZ</small><h3>15 questions</h3><p>Five per lesson. Score 80%+ to open the next week.</p></article></div><p className="stronghold-note">Navigation preview only. No sample lesson scores are saved.</p><div className="stronghold-actions"><button onClick={close}>Back to stronghold</button><Link href={STRONGHOLD_SUMMIT_RETURN}>Back to summit</Link><Link href="/world">Central hub</Link></div></>:<><h2 id="stronghold-panel-title">Explore the stronghold</h2><p>Walk with WASD or arrow keys. Drag to look. Use the touch joysticks on a tablet. Press E near a doorway to enter.</p><p>Confusion Creeper guards the Number Core for the Fog of Forgetfulness. Each completed week brings you closer to breaking its seal.</p><ReadAloudBtn text="Walk with WASD or arrow keys. Drag to look. Use touch joysticks on a tablet. Press E near a doorway. Confusion Creeper guards the Number Core for the Fog of Forgetfulness."/><div className="stronghold-actions"><button onClick={close}>Return to the path</button><button onClick={()=>{setHelp(false);setStory('entrance');}}>Replay introduction</button></div><div className="stronghold-week-buttons">{STRONGHOLD_PORTALS.map(p=><button key={p.week} disabled={p.week>unlocked} onClick={()=>{setHelp(false);enter(p.week);}}>Open Week {p.week}{p.week>unlocked?' · Locked':''}</button>)}</div></>}

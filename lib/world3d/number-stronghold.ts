@@ -16,7 +16,7 @@ export const STRONGHOLD_STORY = {
 } as const;
 export type StrongholdStory = keyof typeof STRONGHOLD_STORY;
 export function strongholdFloor(x:number,z:number):number|null {
-  return Math.abs(x)<14 && z>-82 && z<18 ? 0 : null;
+  return Math.abs(x)<12.3 && z>-82 && z<18 ? 0 : null;
 }
 export function strongholdNearest(x:number,z:number):number|null {
   if(Math.hypot(x,z+72)<7)return 4;
