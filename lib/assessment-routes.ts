@@ -21,7 +21,7 @@ export type AssessmentReturnOptions = {
  * (Measurelands → Week 8, Number Nexus → Week 12).
  */
 export function buildAssessmentReturnRoute({ year, realmId, week, legacy = true }: AssessmentReturnOptions): string {
-  const targetWeek = week ?? getLastProgramWeek(realmId);
+  const targetWeek = week ?? getLastProgramWeek(realmId, year);
   const legacyParam = legacy ? "&legacy=1" : "";
   const realmParam = realmId ? `&realm_id=${encodeURIComponent(realmId)}` : "";
   return `/program?year=${encodeURIComponent(year)}&week=${targetWeek}${legacyParam}${realmParam}`;

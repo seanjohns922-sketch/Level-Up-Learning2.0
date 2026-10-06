@@ -8004,7 +8004,7 @@ function SessionPage({
   const isTeacherReview = useSearchParams().get("review")==="1";
   const isNumber7 = (quizRealmId === "number" || quizRealmId === "measurement") && year === "Year 7";
   const isModernNumberQuiz = (isNumber7 && !isMeasurementRealm) || isGroundNumberQuiz || isLevelTwoNumberQuiz || isLevelThreeNumberQuiz || isLevelFourNumberQuiz || isLevelFiveNumberQuiz || isLevelSixNumberQuiz;
-  const finalProgramWeek = isNumber7 ? 12 : getLastProgramWeek(quizRealmId);
+  const finalProgramWeek = getLastProgramWeek(quizRealmId, year);
   const isFinalQuizWeek = Number(week) >= finalProgramWeek;
   const quizStrand = isMeasurementRealm ? "Measurement" : "Number";
   const quizLessonId = `${year}-${quizRealmId}-w${week}-weekly-quiz`;

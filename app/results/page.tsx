@@ -411,10 +411,10 @@ function ResultsPage() {
   const isFailedPretest = !isPostTest && !passedByPretest;
   const requiresFullPathway = baselineOnly || (isFailedPretest && scorePercent < 50);
   const diagnosticRequiredWeeks = !isPostTest
-    ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId)
+    ? normalizeWeekList(storedPretestProfile?.recommendedWeeks, progressRealmId, year)
     : [];
   // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
-  const allProgramWeeks = getProgramWeeks(progressRealmId);
+  const allProgramWeeks = getProgramWeeks(progressRealmId, year);
   const requiredWeeks = (() => {
     if (isPostTest) return [];
     if (!isFailedPretest) return [];

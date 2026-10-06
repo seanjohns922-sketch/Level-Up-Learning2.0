@@ -582,18 +582,18 @@ function ProgramPage() {
       ? studentProgress
       : null;
   const requiredWeeks = useMemo(
-    () => normalizeWeekList(assignedProgram?.requiredWeeks, realmId),
-    [assignedProgram?.requiredWeeks, realmId]
+    () => normalizeWeekList(assignedProgram?.requiredWeeks, realmId, year),
+    [assignedProgram?.requiredWeeks, realmId, year]
   );
   const explicitOptionalWeeks = useMemo(
-    () => normalizeWeekList(assignedProgram?.optionalWeeks, realmId),
-    [assignedProgram?.optionalWeeks, realmId]
+    () => normalizeWeekList(assignedProgram?.optionalWeeks, realmId, year),
+    [assignedProgram?.optionalWeeks, realmId, year]
   );
   const optionalWeeks = useMemo(() => {
-    return explicitOptionalWeeks.length > 0 ? explicitOptionalWeeks : getOptionalWeeks(requiredWeeks, realmId);
-  }, [explicitOptionalWeeks, realmId, requiredWeeks]);
+    return explicitOptionalWeeks.length > 0 ? explicitOptionalWeeks : getOptionalWeeks(requiredWeeks, realmId, year);
+  }, [explicitOptionalWeeks, realmId, requiredWeeks, year]);
   const hasPersonalizedPlan = requiredWeeks.length > 0;
-  const allRealmWeeks = useMemo(() => getProgramWeeks(realmId), [realmId]);
+  const allRealmWeeks = useMemo(() => getProgramWeeks(realmId, year), [realmId, year]);
   const hasOpenPracticePlan =
     assignedProgram !== null &&
     requiredWeeks.length === 0 &&
@@ -601,8 +601,8 @@ function ProgramPage() {
     allRealmWeeks.every((week) => explicitOptionalWeeks.includes(week));
   const hasAssignedWeekAccess = hasPersonalizedPlan || hasOpenPracticePlan;
   const fullRequiredPath = useMemo(
-    () => isFullRequiredPath(requiredWeeks, optionalWeeks, realmId),
-    [optionalWeeks, realmId, requiredWeeks]
+    () => isFullRequiredPath(requiredWeeks, optionalWeeks, realmId, year),
+    [optionalWeeks, realmId, requiredWeeks, year]
   );
   const requiredWeeksComplete = useMemo(
     () => hasCompletedRequiredWeeks(store, curriculumYear, requiredWeeks, realmId, studentProgress?.teacherAdvancedWeeks),

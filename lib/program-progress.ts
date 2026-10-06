@@ -34,7 +34,7 @@ export {
   getProgramWeeks,
   getLastProgramWeek,
 } from "./program-weeks";
-import { getProgramWeeks } from "./program-weeks";
+import { getLastProgramWeek, getProgramWeeks } from "./program-weeks";
 
 export const PROGRAM_STORE_KEY = "lul_program_progress_v1";
 
@@ -117,8 +117,13 @@ export function isWeekCompleteForRealm(
   p: WeekProgress,
   realmId: string = "number",
   week?: number,
+  year?: string | null,
 ): boolean {
-  if (normalizeRealmId(realmId) === "chance") {
+  // Level 7's final week in every realm ends with the post-test instead of a weekly quiz.
+  if (year === "Year 7" && week != null && week === getLastProgramWeek(realmId, year)) {
+    return p.lessonsCompleted.slice(0, 3).every(Boolean);
+  }
+  if (year !== "Year 7" && normalizeRealmId(realmId) === "chance") {
     const lessonsComplete = p.lessonsCompleted.slice(0, 3).every(Boolean);
     if (!lessonsComplete) return false;
     return week === 6 || weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);
@@ -126,9 +131,9 @@ export function isWeekCompleteForRealm(
   return isWeekComplete(p);
 }
 
-export function normalizeWeekList(weeks: number[] | undefined | null, realmId?: string | null): number[] {
+export function normalizeWeekList(weeks: number[] | undefined | null, realmId?: string | null, year?: string | null): number[] {
   if (!Array.isArray(weeks)) return [];
-  const totalWeeks = getProgramWeeks(realmId).length;
+  const totalWeeks = getProgramWeeks(realmId, year).length;
   return [...new Set(weeks.map((week) => Number(week)).filter((week) => Number.isInteger(week) && week >= 1 && week <= totalWeeks))].sort(
     (a, b) => a - b
   );
@@ -137,19 +142,21 @@ export function normalizeWeekList(weeks: number[] | undefined | null, realmId?: 
 export function getOptionalWeeks(
   requiredWeeks: number[] | undefined | null,
   realmId?: string | null,
+  year?: string | null,
 ): number[] {
-  const required = new Set(normalizeWeekList(requiredWeeks, realmId));
-  return getProgramWeeks(realmId).filter((week) => !required.has(week));
+  const required = new Set(normalizeWeekList(requiredWeeks, realmId, year));
+  return getProgramWeeks(realmId, year).filter((week) => !required.has(week));
 }
 
 export function isFullRequiredPath(
   requiredWeeks: number[] | undefined | null,
   optionalWeeks: number[] | undefined | null,
   realmId?: string | null,
+  year?: string | null,
 ): boolean {
-  const required = normalizeWeekList(requiredWeeks, realmId);
-  const optional = normalizeWeekList(optionalWeeks, realmId);
-  return required.length === getProgramWeeks(realmId).length && optional.length === 0;
+  const required = normalizeWeekList(requiredWeeks, realmId, year);
+  const optional = normalizeWeekList(optionalWeeks, realmId, year);
+  return required.length === getProgramWeeks(realmId, year).length && optional.length === 0;
 }
 
 export function getCompletedRequiredWeeks(
@@ -159,8 +166,8 @@ export function getCompletedRequiredWeeks(
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
 ): number[] {
-  return normalizeWeekList(requiredWeeks, realmId).filter(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week),
+  return normalizeWeekList(requiredWeeks, realmId, year).filter(
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week, year),
   );
 }
 
@@ -171,10 +178,10 @@ export function hasCompletedRequiredWeeks(
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
 ): boolean {
-  const normalized = normalizeWeekList(requiredWeeks, realmId);
+  const normalized = normalizeWeekList(requiredWeeks, realmId, year);
   if (!normalized.length) return false;
   return normalized.every(
-    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week),
+    (week) => teacherAdvancedWeeks.includes(week) || isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week, year),
   );
 }
 
@@ -185,11 +192,11 @@ export function getFirstIncompleteRequiredWeek(
   realmId: string = "number",
   teacherAdvancedWeeks: number[] = [],
 ): number | null {
-  const normalized = normalizeWeekList(requiredWeeks, realmId);
+  const normalized = normalizeWeekList(requiredWeeks, realmId, year);
   if (!normalized.length) return null;
   for (const week of normalized) {
     if (teacherAdvancedWeeks.includes(week)) continue;
-    if (!isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week)) return week;
+    if (!isWeekCompleteForRealm(getWeekProgress(store, year, week, realmId), realmId, week, year)) return week;
   }
   return null;
 }
@@ -204,7 +211,7 @@ export function getRecommendedAssignedWeek(
 ): number {
   const canonicalAssignedWeek = Math.max(
     1,
-    Math.min(getProgramWeeks(realmId).length, currentAssignedWeek ?? 1),
+    Math.min(getProgramWeeks(realmId, year).length, currentAssignedWeek ?? 1),
   );
   const firstIncompleteRequired = getFirstIncompleteRequiredWeek(store, year, requiredWeeks, realmId, teacherAdvancedWeeks);
   if (firstIncompleteRequired != null) {
@@ -224,9 +231,9 @@ export function getPlayableWeeks(
   teacherAdvancedWeeks: number[] = [],
   currentAssignedWeek?: number,
 ): number[] {
-  const normalizedRequired = normalizeWeekList(requiredWeeks, realmId);
-  const allProgramWeeks = getProgramWeeks(realmId);
-  const normalizedOptional = normalizeWeekList(optionalWeeks, realmId);
+  const normalizedRequired = normalizeWeekList(requiredWeeks, realmId, year);
+  const allProgramWeeks = getProgramWeeks(realmId, year);
+  const normalizedOptional = normalizeWeekList(optionalWeeks, realmId, year);
   if (!normalizedRequired.length) {
     const hasExplicitOpenPracticePlan =
       normalizedOptional.length === allProgramWeeks.length &&
@@ -237,7 +244,7 @@ export function getPlayableWeeks(
   }
 
   if (hasCompletedRequiredWeeks(store, year, normalizedRequired, realmId, teacherAdvancedWeeks)) {
-    return getProgramWeeks(realmId);
+    return getProgramWeeks(realmId, year);
   }
 
   const completedRequired = getCompletedRequiredWeeks(store, year, normalizedRequired, realmId, teacherAdvancedWeeks);
@@ -245,7 +252,7 @@ export function getPlayableWeeks(
   const canonicalAssignedWeek =
     currentAssignedWeek == null
       ? null
-      : Math.max(1, Math.min(getProgramWeeks(realmId).length, currentAssignedWeek));
+      : Math.max(1, Math.min(getProgramWeeks(realmId, year).length, currentAssignedWeek));
   const canonicallyReachedWeeks =
     canonicalAssignedWeek == null
       ? []
@@ -255,7 +262,7 @@ export function getPlayableWeeks(
     ...completedRequired,
     ...canonicallyReachedWeeks,
     ...(firstIncompleteRequired != null ? [firstIncompleteRequired] : []),
-  ], realmId);
+  ], realmId, year);
 }
 
 export function isWeekPlayable(

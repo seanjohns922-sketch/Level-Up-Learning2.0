@@ -382,7 +382,7 @@ function PostTestPage() {
   const localProgressRealmId = progressRealmId as ProgressRealmScope;
   // Final week is realm-specific: Measurelands = 8, Number Nexus = 12. Never
   // hardcode 12 for a realm-aware assessment (that leaks a Number assumption).
-  const lastWeek = getLastProgramWeek(progressRealmId);
+  const lastWeek = getLastProgramWeek(progressRealmId, year);
   const legendRealmId = normalizeLegendRealmId(realmId);
   const theme = getRealmTheme(realmId);
   const studentLevelLabel = formatStudentLevelLabel(year);
@@ -720,7 +720,7 @@ function PostTestPage() {
 
     const legend = getLegendForYear(year, legendRealmId);
     const didPass = posttestPassed(percent);
-    const allPracticeWeeks = getProgramWeeks(progressRealmId);
+    const allPracticeWeeks = getProgramWeeks(progressRealmId, year);
     const nextUnlocked = didPass
       ? Array.from(new Set([...unlockedLegends, legend.id]))
       : unlockedLegends;

@@ -746,10 +746,10 @@ function PretestPage() {
     const nextYear = getNextYearLabel(year);
     const baselineOnly = isGroundBaseline(progressRealmId, year);
     const passed = !baselineOnly && profile.percentage >= PRETEST_PASS_THRESHOLD;
-    const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId);
+    const diagnosticRequiredWeeks = normalizeWeekList(profile.recommendedWeeks, progressRealmId, year);
     const requiresFullPathway = baselineOnly || pretestPathwayForPercent(profile.percentage) === "full";
     // Full-pathway weeks are realm-specific (Measurelands = 8, Number = 12).
-    const allProgramWeeks = getProgramWeeks(progressRealmId);
+    const allProgramWeeks = getProgramWeeks(progressRealmId, year);
     const requiredWeeks = passed
       ? []
       : requiresFullPathway || diagnosticRequiredWeeks.length === 0
@@ -759,7 +759,7 @@ function PretestPage() {
       ? allProgramWeeks
       : requiresFullPathway
         ? []
-        : getOptionalWeeks(requiredWeeks, progressRealmId);
+        : getOptionalWeeks(requiredWeeks, progressRealmId, year);
     const completedAt = new Date().toISOString();
     const durationSeconds = Math.max(0, Math.round((Date.now() - assessmentStartedAt) / 1000));
     const replayQuestions = questions.map((question) => ({

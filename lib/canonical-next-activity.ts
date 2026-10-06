@@ -33,7 +33,7 @@ export function resolveCanonicalNextActivity(input: {
   }
 
   const requiredWeeks = progress.requiredWeeks ?? [];
-  const lastWeek = getLastProgramWeek(realmId);
+  const lastWeek = getLastProgramWeek(realmId, year);
   const requiredComplete = requiredWeeks.length > 0 && hasCompletedRequiredWeeks(
     store,
     year,
