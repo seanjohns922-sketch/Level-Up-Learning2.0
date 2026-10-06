@@ -10,6 +10,8 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
  const group=useRef<THREE.Group>(null),keys=useRef(new Set<string>()),moving=useRef(false),sprinting=useRef(false),yaw=useRef(0),pitch=useRef(.04),nearest=useRef<number|null>(null),lastHeight=useRef(-1),snapCamera=useRef(true);
  const {camera,gl}=useThree();
  const nextMetrics=useRef(0);
+ const cameraRay=useRef(new THREE.Raycaster());
+ const cameraObstacles=useRef<THREE.Object3D[]>([]),nextObstacleScan=useRef(0);
  useEffect(()=>{const g=group.current;if(g){g.position.set(spawn[0],spawn[1]+.75,spawn[2]);position.current.copy(g.position);}const trail=nearestTrail(spawn[0],spawn[2]);if(trail.distance<6&&trail.progress>.7&&spawn[1]<5){const p=TRAIL_SAMPLES[trail.trail][60];yaw.current=Math.atan2(spawn[0]-p[0],spawn[2]-p[2]);}else yaw.current=0;if(g)g.rotation.y=yaw.current+Math.PI;nearest.current=null;pitch.current=.04;keys.current.clear();snapCamera.current=true;},[spawn,spawnKey,position]);
  useEffect(()=>{
   const down=(e:KeyboardEvent)=>{if((e.target as HTMLElement)?.closest('button,input,select,[role="dialog"]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.current.add(e.key.toLowerCase());};
@@ -20,7 +22,7 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
  useEffect(()=>{if(paused||overview)keys.current.clear();},[paused,overview]);
  useEffect(()=>{
   let drag=false,x=0,y=0;const canvas=gl.domElement;
-  const down=(e:PointerEvent)=>{if(e.pointerType==='touch'||paused||overview)return;drag=true;x=e.clientX;y=e.clientY;canvas.setPointerCapture(e.pointerId);};
+  const down=(e:PointerEvent)=>{if(e.pointerType==='touch'||paused||overview)return;(document.activeElement as HTMLElement)?.blur();drag=true;x=e.clientX;y=e.clientY;canvas.setPointerCapture(e.pointerId);};
   const move=(e:PointerEvent)=>{if(!drag)return;yaw.current-=(e.clientX-x)*.005;pitch.current=THREE.MathUtils.clamp(pitch.current-(e.clientY-y)*.004,-.65,.65);x=e.clientX;y=e.clientY;};
   const up=()=>{drag=false;};canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);window.addEventListener('blur',up);
   return()=>{canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);window.removeEventListener('blur',up);};
@@ -42,7 +44,21 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
   position.current.copy(g.position);
   if(process.env.NODE_ENV==='development'&&state.clock.elapsedTime>nextMetrics.current){nextMetrics.current=state.clock.elapsedTime+1;const root=document.querySelector('[data-world3d-root]');root?.setAttribute('data-render-stats',JSON.stringify({calls:gl.info.render.calls,triangles:gl.info.render.triangles,geometries:gl.info.memory.geometries}));}
   const desired=new THREE.Vector3(g.position.x+Math.sin(yaw.current)*10,g.position.y+4.4-pitch.current*7,g.position.z+Math.cos(yaw.current)*10);
-  if(snapCamera.current){camera.position.copy(desired);snapCamera.current=false;}else camera.position.lerp(desired,1-Math.exp(-delta*5));camera.lookAt(g.position.x,g.position.y+1.6,g.position.z);
+  const target=new THREE.Vector3(g.position.x,g.position.y+1.6,g.position.z);
+  if(state.clock.elapsedTime>=nextObstacleScan.current){
+   cameraObstacles.current=[];
+   state.scene.traverse(object=>{if(object.userData.cameraObstacle===true)cameraObstacles.current.push(object);});
+   nextObstacleScan.current=state.clock.elapsedTime+.5;
+  }
+  const safeCamera=(candidate:THREE.Vector3)=>{
+   const direction=candidate.clone().sub(target),distance=direction.length();
+   cameraRay.current.set(target,direction.normalize());cameraRay.current.far=distance+.5;
+   const hit=cameraRay.current.intersectObjects(cameraObstacles.current,false)[0];
+   return hit&&hit.distance<distance+.4?target.clone().addScaledVector(direction,Math.max(.25,hit.distance-.5)):candidate;
+  };
+  const safeDesired=safeCamera(desired);
+  if(snapCamera.current){camera.position.copy(safeDesired);snapCamera.current=false;}else camera.position.lerp(safeDesired,1-Math.exp(-delta*5));
+  camera.position.copy(safeCamera(camera.position.clone()));camera.lookAt(target);
   let close:number|null=nearestResolver?nearestResolver(g.position.x,g.position.z):null;if(!nearestResolver)TRAIL_SAMPLES.forEach((path,i)=>{const p=path[58];if(Math.hypot(g.position.x-p[0],g.position.z-p[2])<6&&Math.abs(g.position.y-.75-p[1])<2)close=i;});
   if(close!==nearest.current){nearest.current=close;onNearest(close);}
   const altitude=Math.max(0,Math.round(g.position.y-.75));if(altitude!==lastHeight.current){lastHeight.current=altitude;onAltitude(altitude);}

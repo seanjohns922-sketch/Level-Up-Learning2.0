@@ -37,3 +37,16 @@ assert.equal(summitFloor(0,-130,4,true,70),null,'Central lava pit is not walkabl
 assert.equal(VOLCANO_DOORS.length,6);
 for(const [x,y,z] of VOLCANO_DOORS)assert.equal(summitFloor(x,z,1,true,y),70);
 console.log('PASS six Level 7 approaches, sealed/open pass, complete volcano ascent, uniform realm routes, six strongholds, protected crater');
+
+const {STRONGHOLD_PORTALS,strongholdFloor,strongholdNearest,NUMBER_STRONGHOLD_DEMO}=load('number-stronghold');
+for(const p of STRONGHOLD_PORTALS){
+ const [x,,z]=p.position;
+ assert.equal(strongholdFloor(x,z+4),0,'Portal approach must be walkable');
+ assert.equal(strongholdNearest(x,z+4),p.week,'Review shortcut must land inside interaction range');
+}
+for(let z=10;z>=-78;z--)assert.equal(strongholdFloor(0,z),0,'Core chamber path must stay connected');
+assert.equal(strongholdNearest(0,-66),4,'Core chamber shortcut is reachable');
+assert.equal(strongholdFloor(16,-30),null,'Walls block player movement');
+assert.equal(strongholdFloor(0,-84),null,'Back wall blocks player movement');
+assert(NUMBER_STRONGHOLD_DEMO.startsWith('/demo-review/'));
+console.log('PASS stronghold sample portal approaches, connected Core chamber and wall boundaries');

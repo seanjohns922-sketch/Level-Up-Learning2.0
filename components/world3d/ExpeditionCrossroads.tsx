@@ -10,7 +10,7 @@ import { EXPEDITION_TRAILS,TRAIL_SAMPLES,crossroadsTerrain,nearestTrail,trailThr
 import type { SummitPoint } from '@/lib/world3d/number-summit';
 
 export function Box({at,size,colour='#6b5945',rotation=0}:{at:SummitPoint;size:SummitPoint;colour?:string;rotation?:number}){
- return <mesh position={at} rotation={[0,rotation,0]} castShadow receiveShadow><boxGeometry args={size}/><meshLambertMaterial color={colour}/></mesh>;
+ return <mesh userData={{cameraObstacle:true}} position={at} rotation={[0,rotation,0]} castShadow receiveShadow><boxGeometry args={size}/><meshLambertMaterial color={colour}/></mesh>;
 }
 export function Beam({a,b,width=.12,colour='#77634b'}:{a:SummitPoint;b:SummitPoint;width?:number;colour?:string}){
  const x=new THREE.Vector3(...a),y=new THREE.Vector3(...b),d=y.clone().sub(x);

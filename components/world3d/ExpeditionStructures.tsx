@@ -57,7 +57,7 @@ function CraterFortress(){
  dummy.position.set(Math.sin(a)*26,70+row*1.3+.65,-130+Math.cos(a)*26);dummy.rotation.set(0,a,0);dummy.scale.set(3.7,1.22,1.8);dummy.updateMatrix();matrices.push(dummy.matrix.clone());
  }for(let i=0;i<32;i++){const a=i*Math.PI/16;if(Math.cos(a)>.96)continue;dummy.position.set(Math.sin(a)*26,80,-130+Math.cos(a)*26);dummy.rotation.set(0,a,0);dummy.scale.set(2.4,2,2);dummy.updateMatrix();matrices.push(dummy.matrix.clone());}return matrices;},[]);
  useEffect(()=>{if(!ref.current)return;bricks.forEach((m,i)=>{ref.current!.setMatrixAt(i,m);ref.current!.setColorAt(i,new THREE.Color(i%3===0?'#556064':'#414e52'));});ref.current.instanceMatrix.needsUpdate=true;if(ref.current.instanceColor)ref.current.instanceColor.needsUpdate=true;},[bricks]);
- return <><instancedMesh ref={ref} args={[undefined,undefined,bricks.length]} frustumCulled={false} castShadow receiveShadow><boxGeometry/><meshStandardMaterial roughness={.95}/></instancedMesh>
+ return <><instancedMesh ref={ref} userData={{cameraObstacle:true}} args={[undefined,undefined,bricks.length]} frustumCulled={false} castShadow receiveShadow><boxGeometry/><meshStandardMaterial roughness={.95}/></instancedMesh>
  <pointLight position={[0,69,-130]} color="#f69b4b" intensity={85} distance={45} decay={1.5}/>
  {Array.from({length:24},(_,i)=>{const a=i*Math.PI/12;return <mesh key={i} position={[Math.sin(a)*15,70.03,-130+Math.cos(a)*15]} rotation={[-Math.PI/2,0,-a]} receiveShadow><planeGeometry args={[.09,12]}/><meshStandardMaterial color="#303d40"/></mesh>;})}
  </>;
@@ -110,7 +110,7 @@ function LavaSeams(){
  useEffect(()=>()=>{texture.dispose();geometry.dispose();},[texture,geometry]);
  return <mesh geometry={geometry}><meshStandardMaterial ref={material} map={texture} emissiveMap={texture} emissive="#ffffff" emissiveIntensity={.52} roughness={.95} side={THREE.DoubleSide}/></mesh>;
 }
-export function VolcanoExpedition({open,unlockedRealms}:{open:boolean;unlockedRealms:string[]}){return <group>
+export function VolcanoExpedition({open,unlockedRealms,recoveredRealms=[]}:{open:boolean;unlockedRealms:string[];recoveredRealms?:string[]}){return <group>
  <Trail points={VOLCANO_ROUTE} colour="#777269" layer={8}/><LavaSeams/>
  <group position={VOLCANO_GATE}>
  {[-4.3,4.3].map(x=><group key={x}><Box at={[x,3.5,0]} size={[2,7,3]} colour="#465050"/><Box at={[x,7.2,0]} size={[2.6,.6,3.6]} colour="#68716d"/><Lantern at={[x,7.6,0]}/></group>)}
@@ -124,16 +124,18 @@ export function VolcanoExpedition({open,unlockedRealms}:{open:boolean;unlockedRe
  {VOLCANO_ROUTE.filter((_,i)=>i>7&&i%6===0).map((p,i)=>{const a=Math.atan2(p[0],p[2]+130),outside:SummitPoint=[p[0]+Math.sin(a)*3.7,p[1],p[2]+Math.cos(a)*3.7];return <group key={i}><Box at={[outside[0],outside[1]+.6,outside[2]]} size={[.7,1.2,.7]} colour="#535b58"/>{i%3===0&&<Lantern at={[outside[0],outside[1]+1.3,outside[2]]}/>}</group>;})}
  {Array.from({length:12},(_,i)=>{const a=i*Math.PI/6,r=72;return <group key={i}><Stone at={[Math.sin(a)*r,15,-130+Math.cos(a)*r]} scale={[5,10+i%3*3,5]} colour="#384345"/>{i%3===0&&<Steam at={[Math.sin(a)*r,23,-130+Math.cos(a)*r]} count={7} scale={1.4}/>}</group>;})}
  {/* The central lava pit is physically excluded from the summit walking floor. */}
- <mesh position={[0,62.4,-130]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[8,48]}/><meshStandardMaterial color="#f1893d" emissive="#ef652b" emissiveIntensity={2}/></mesh>
+ <mesh position={[0,69,-130]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[8,48]}/><meshStandardMaterial color="#f1893d" emissive="#ef652b" emissiveIntensity={2}/></mesh>
+ <pointLight position={[0,73,-130]} color="#ff8c3c" intensity={220} distance={65} decay={2}/>
  <mesh position={[0,70,-130]} rotation={[-Math.PI/2,0,0]} receiveShadow><ringGeometry args={[8.5,25,64]}/><meshStandardMaterial color="#555c58" roughness={.95}/></mesh>
- {Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return <Box key={i} at={[Math.sin(a)*8.7,70.7,-130+Math.cos(a)*8.7]} size={[1.5,1.4,1.5]} colour="#333f41"/>;})}
+ {Array.from({length:32},(_,i)=>{const a=i*Math.PI/16;return <Box key={i} at={[Math.sin(a)*8.7,70.35,-130+Math.cos(a)*8.7]} size={[1.3,.7,1.3]} colour="#333f41"/>;})}
  {VOLCANO_DOORS.map((p,i)=>{const angle=(i+.5)*Math.PI/3,t=EXPEDITION_TRAILS[i],active=unlockedRealms.includes(t.id);return <group key={t.id} position={p} rotation={[0,angle+Math.PI,0]}>
  {[-3.1,3.1].map(x=><group key={x}><Box at={[x,4,0]} size={[1.6,8,2.2]} colour="#303c42"/><Box at={[x,8.4,0]} size={[2.1,1,2.7]} colour="#505d5e"/></group>)}
  <Box at={[0,7.5,0]} size={[7.2,1.6,2]} colour="#404d51"/>
- <mesh position={[0,3.5,0]}><planeGeometry args={[4.7,6.4]}/><meshStandardMaterial color={t.colour} emissive={t.colour} emissiveIntensity={active?1:.15} transparent opacity={active?.7:.18} side={THREE.DoubleSide}/></mesh>
+ <mesh position={[0,3.5,0]}><planeGeometry args={[4.7,6.4]}/><meshStandardMaterial color={t.colour} emissive={t.colour} emissiveIntensity={active?1:0} transparent opacity={active?.7:1} side={THREE.DoubleSide}/></mesh>
  {!active&&[-1.7,-.85,0,.85,1.7].map(x=><Beam key={x} a={[x,.2,.1]} b={[x,6.7,.1]} width={.09} colour="#4a5052"/>)}
- <Plaque at={[0,9.7,.8]} title={t.name.toUpperCase()} subtitle={active?'CORE STRONGHOLD · PREVIEW':'LEVEL 8 · FINISH THIS REALM’S LEVEL 7'} width={7} colour={t.colour}/>
+ <Plaque at={[0,9.7,.8]} title={t.name.toUpperCase()} subtitle={active?'ENTER STRONGHOLD':'LOCKED · COMPLETE LEVEL 7'} width={8.5} colour={t.colour}/>
  <Banner at={[4,0,0]} colour={t.colour}/>
+ {recoveredRealms.includes(t.id)&&<mesh position={[0,11.8,0]} scale={[.8,1.4,.8]}><octahedronGeometry/><meshStandardMaterial color={t.colour} emissive={t.colour} emissiveIntensity={2}/></mesh>}
  </group>;})}
  <CraterFortress/><Steam at={[0,63,-130]} count={12} scale={2}/>
  </ExpeditionDistanceDetail>
