@@ -43,6 +43,7 @@ import {
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { TrialStudentAvatar, WorldMovePad } from "@/components/world3d/SharedWorldPlayer";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
+import RealmGuide from "@/components/world3d/RealmGuide";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import { resolveWorldJourney } from "@/lib/world3d/world-journey";
 import { WORLD3D_CANONICAL_RESTORED_EVENT } from "@/lib/world3d/canonical-bootstrap";
@@ -886,6 +887,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
         }}
         onQuickStart={quickStart}
       />
+      <RealmGuide realmId="number" level={level} realmName="Number Nexus" accent={theme.energyAccent} world={worldState} />
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
 

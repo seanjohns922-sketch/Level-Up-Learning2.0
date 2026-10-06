@@ -21,6 +21,7 @@ import {
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
+import RealmGuide from "@/components/world3d/RealmGuide";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import { getMeasurelandsLevelTheme } from "@/lib/measurelands-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
@@ -299,6 +300,7 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
         primaryAction={selectedDistrict ? { label: "DISTRICTS", icon: "map", onClick: () => { setSelectedDistrictId(null); setActiveId(null); } } : { label: "RETURN TO TOWER", icon: "door", onClick: () => router.push(towerPath) }}
         onQuickStart={quickStart}
       />
+      <RealmGuide realmId="measurement" level={level} realmName="Measurelands" accent={theme.accent} world={worldState} />
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
       {activeInteraction ? (
         <WorldInteractionPrompt

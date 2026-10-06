@@ -12,6 +12,7 @@ import {
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
+import RealmGuide from "@/components/world3d/RealmGuide";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
@@ -223,6 +224,7 @@ export default function SharedRealmWorld3D({ config }: { config: SharedRealmWorl
         <SharedRealmScene config={liveConfig} activeId={activeId} selectedDistrictId={selectedDistrictId} moveInput={moveInput} quality={quality} onNearest={setActiveId} />
       </Canvas>
       <WorldHUD context="realm" preview={config.preview} accent={config.accent} fallbackHref={config.fallbackHref} mission={{ eyebrow: "CURRENT MISSION", title: `${config.realmName} · ${config.level === "Prep" ? "Ground" : config.level.replace("Year", "Level")}`, detail: worldState.nextActivity.label }} primaryAction={selectedDistrict ? { label: "DISTRICTS", icon: "map", onClick: () => { setSelectedDistrictId(null); setActiveId(null); } } : { label: "RETURN TO TOWER", icon: "door", onClick: () => router.push(config.towerHref) }} onQuickStart={quickStart} />
+      <RealmGuide realmId={config.realmId} level={config.level} realmName={config.realmName} accent={config.accent} world={worldState} />
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
       {activeInteraction ? <WorldInteractionPrompt location={activeInteraction.label} status={interactionStatus(activeInteraction.state)} actionLabel={activeInteraction.kind === "adventure" ? "START ADVENTURE" : activeInteraction.kind === "district" ? "ENTER DISTRICT" : activeInteraction.kind === "week" ? "ENTER WEEK" : activeInteraction.kind === "return" ? "RETURN TO REALM" : "ENTER TOWER"} disabled={activeInteraction.state === "locked"} onAction={() => runInteraction(activeInteraction)} /> : null}
       <KeyboardWorldAction enabled={Boolean(activeInteraction)} onAction={() => runInteraction(activeInteraction)} />
