@@ -7,6 +7,13 @@ import { getChanceHollowLevel5TaskSet } from "@/data/activities/chanceHollow/lev
 import { getChanceHollowLevel6TaskSet } from "@/data/activities/chanceHollow/level6";
 import { CHANCE_HOLLOW_PROGRAMS } from "@/data/programs/chanceHollow";
 
+// Reproducible samples keep production builds from failing by random chance.
+let auditSeed = 20261007;
+Math.random = () => {
+  auditSeed = (Math.imul(1664525, auditSeed) + 1013904223) >>> 0;
+  return auditSeed / 4294967296;
+};
+
 const sourceFiles = [
   new URL("../data/activities/chanceHollow/level3.ts", import.meta.url),
   new URL("../data/activities/chanceHollow/level4.ts", import.meta.url),
@@ -63,7 +70,7 @@ for (const { level, getTaskSet } of levels) {
         let previous = generate();
         if (previous.kind !== "mcq") interactiveGenerators += 1;
         const fingerprints = new Set([semanticFingerprint(previous)]);
-        for (let sample = 0; sample < 25; sample += 1) {
+        for (let sample = 0; sample < 100; sample += 1) {
           const task = generate();
           assert.doesNotMatch(JSON.stringify(task), /\bcyan\b/i, `${id} activity ${index + 1} must call the colour blue`);
           if (level === 6 && "prompt" in task) {

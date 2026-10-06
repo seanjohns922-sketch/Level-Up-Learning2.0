@@ -5,6 +5,14 @@ do $$
 declare
  sid uuid; supplied text := encode(extensions.gen_random_bytes(32),'hex'); got integer;
 begin
+ if exists (
+  select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+  where n.nspname='public'
+    and p.proname in ('get_student_realm_levels_secure','get_student_expedition_placements_secure')
+    and p.provolatile <> 'v'
+ ) then
+  raise exception 'Session-validating RPCs must be VOLATILE for PostgREST';
+ end if;
  select s.id into strict sid from public.students s
  where lower(coalesce(to_jsonb(s)->>'first_name','') || ' ' || coalesce(to_jsonb(s)->>'last_name',''))='boden johns'
     or lower(coalesce(to_jsonb(s)->>'display_name',''))='boden johns';

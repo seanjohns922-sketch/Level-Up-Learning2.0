@@ -9,14 +9,17 @@ import { cavernWeekHref } from '@/lib/world3d/shattered-realms';
 import { LEVEL7_LIVE, level7LiveHref } from '@/lib/level7-release';
 import { getActiveStudentIdentity } from '@/lib/studentIdentity';
 import { restoreStudentStateFromServer, type StudentProgressRealmId } from '@/lib/student-progress-sync';
-import { getWeekProgress, readProgramStore } from '@/lib/program-progress';
+import { getWeekProgress, readProgramStore, isWeekPlayable } from '@/lib/program-progress';
 
 /** Live students may take a week's quiz once that week's three lessons are saved. */
 async function liveActivityAllowed(week:number,lesson:number|'quiz',realm:Cave7Realm){
  const studentId=getActiveStudentIdentity().studentId;
  if(!studentId)return false;
- try{await restoreStudentStateFromServer(studentId,realm as StudentProgressRealmId);}catch{/* fall back to the saved local copy */}
- if(lesson!=='quiz')return true;
+ let progress;
+ try{({progress}=await restoreStudentStateFromServer(studentId,realm as StudentProgressRealmId));}catch{return false;}
+ if(!progress||progress.year!=='Year 7'||!progress.placementComplete||!Number.isInteger(week))return false;
+ if(!isWeekPlayable(readProgramStore(),'Year 7',week,progress.requiredWeeks,progress.optionalWeeks,realm,progress.teacherAdvancedWeeks,progress.assignedWeek))return false;
+ if(lesson!=='quiz')return lesson>=1&&lesson<=3;
  return week>=1&&week<cave7WeekCount(realm)&&getWeekProgress(readProgramStore(),'Year 7',week,realm).lessonsCompleted.slice(0,3).every(Boolean);
 }
 

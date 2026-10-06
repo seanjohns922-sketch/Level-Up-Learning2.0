@@ -12,6 +12,7 @@ import {isAssessmentAnswerCorrect} from '@/data/assessments/analysis';
 import {buildAssessmentQuestionSnapshots} from '@/lib/assessment-replay';
 import {ACTIVE_STUDENT_KEY} from '@/data/progress';
 import {isDemoPreviewMode} from '@/lib/demo-mode';
+import {loadLevel7Assessment,saveLevel7Assessment} from '@/lib/level7-assessment-progress';
 import {supabase} from '@/lib/supabase';
 import {restoreStudentStateFromServer} from '@/lib/student-progress-sync';
 
@@ -27,11 +28,14 @@ export default function PatternExtensionAssessment({form,level=7}:{form:'pretest
   const id=localStorage.getItem(ACTIVE_STUDENT_KEY);
   if(isDemoPreviewMode()){router.replace(`/demo-review/pattern-level${level}?form=${form}`);return;}
   if(!id){router.replace('/login');return;}
+  if(level===7)await loadLevel7Assessment(id,'pattern',form);
+  else{
   const restored=await restoreStudentStateFromServer(id,'pattern');
   if(!['Year 6','Year 7','Year 8'].includes(restored.progress?.year??''))throw new Error('Extension assessments are available from Level 6 Pattern.');
   if(form==='posttest'){
    const {data,error}=await supabase.rpc('get_student_realm_assessments_secure',{p_student_id:id,p_realm_id:'pattern',p_working_level:year});
    if(error)throw error;if(!data?.some((a:{assessment_type:string})=>a.assessment_type==='pretest'))throw new Error('Complete this level’s pre-test before its post-test.');
+  }
   }
   let saved:Draft|null=null;try{saved=JSON.parse(localStorage.getItem(draftKey(id,form,level))??'null');}catch{/* Start a fresh draft if browser storage is invalid. */}
   const valid=saved&&typeof saved.answers==='object'&&saved.answers!==null&&typeof saved.completionId==='string'&&typeof saved.startedAt==='string'&&Number.isInteger(saved.index)&&saved.index>=0&&saved.index<30;
@@ -44,8 +48,11 @@ export default function PatternExtensionAssessment({form,level=7}:{form:'pretest
   const completedAt=new Date().toISOString();
   const snapshots=buildAssessmentQuestionSnapshots(questions,q=>next.answers[q.id],(q,a)=>isAssessmentAnswerCorrect({...q,correctAnswer:String(q.correctAnswer)},String(a)),completedAt);
   try{
+   if(level===7)await saveLevel7Assessment(studentId,'pattern',form,next.completionId,questions,next.answers,snapshots,next.startedAt,completedAt);
+   else{
    const {error}=await supabase.rpc('complete_pattern_extension_assessment',{p_student_id:studentId,p_assessment_type:form,p_completion_key:next.completionId,p_attempt:{working_level:year,correct_count:snapshots.filter(q=>q.correct).length,total_questions:questions.length,question_results:snapshots,placement_result:{replay_metadata:{started_at:next.startedAt,completed_at:completedAt}}}});
-   if(error)throw error;if(key)localStorage.removeItem(key);setDone(true);
+   if(error)throw error;}
+   if(key)localStorage.removeItem(key);setDone(true);
   }catch(e){setError(e instanceof Error?e.message:'Your answers could not be saved. Please retry.');}finally{setSaving(false);}
  }
  if(done)return <main style={{background:theme.cardSurface,color:theme.accentTextSoft}} className="grid min-h-screen place-items-center  p-6 text-white"><div className="max-w-lg text-center"><h1 className="text-3xl font-black">Level {level} {form==='pretest'?'pre-test':'post-test'} saved</h1><p className="my-5">Your teacher can review your answers and progress.</p><button style={{background:theme.ctaGradientCss}} className="rounded-xl  px-5 py-3 font-bold text-stone-950" onClick={()=>router.push('/world')}>Back to my world</button></div></main>;
