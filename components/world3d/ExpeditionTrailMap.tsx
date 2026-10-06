@@ -17,5 +17,5 @@ export default function ExpeditionTrailMap({position,volcanoOpen}:{position:[num
  </svg>
  <small className="expedition-map-location">White marker: you are here · Dashed route: sealed pass</small>
  <div className="expedition-map-key">{EXPEDITION_TRAILS.map((t,i)=><div key={t.id}><b style={{color:t.colour}}>{i+1}</b><span><strong>{t.name}</strong><small>{'Level 7 · Weekly lesson entrance'}</small></span></div>)}</div>
- <p className="summit-disclaimer">The volcano and six stronghold entrances are explorable scenery. Level 8 lessons and boss encounters are not implemented in this preview.</p>
+ <p className="summit-disclaimer">Level 8 lessons and boss encounters are coming soon.</p>
  </>;}
