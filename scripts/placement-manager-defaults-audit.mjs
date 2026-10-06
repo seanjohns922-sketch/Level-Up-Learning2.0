@@ -27,8 +27,8 @@ assert.match(
 );
 assert.match(
   source,
-  /levelLabels: realm\.levelLabels/,
-  "Placement level choices must come from each realm's supported curriculum levels.",
+  /levelLabels: LEVEL7_LIVE && cave7Realm\(realm\.realmId\) \? \[\.\.\.realm\.levelLabels, "Year 7"\] : realm\.levelLabels/,
+  "Placement choices must preserve supported realm levels and add Level 7 only for released cavern realms.",
 );
 assert.match(
   source,
