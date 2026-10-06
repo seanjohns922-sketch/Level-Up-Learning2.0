@@ -552,11 +552,11 @@ export default function WholeMathsDiagnosticPanel({
               <button type="button" onClick={() => setScoringOpen(false)} aria-label="Close scoring information" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-5 p-5 text-sm leading-6 text-slate-600">
-              <p>All six maths strand engines are connected. Each starting-level strand test has 20 questions. An official overall result appears only when all six strands are complete.</p>
+              <p>All six maths strand engines are connected. Levels G–6 have 20 questions per strand test; Levels 7–8 have 30. An official overall result appears only when all six strands are complete.</p>
               <div className="grid gap-2 sm:grid-cols-2">{DIAGNOSTIC_STRANDS.map((definition) => <div key={definition.strand} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"><span className="font-bold text-slate-800">{AC_STRANDS[definition.strand].label}</span><span>{AC_STRANDS[definition.strand].weight}/{WHOLE_MATHS_WEIGHT_TOTAL}</span></div>)}</div>
               <p><strong className="text-slate-900">Adaptive testing:</strong> {DIAGNOSTIC_MASTERY}% or higher probes the next level. A very low result may probe down to produce a more accurate measurement. Existing placements are never automatically lowered.</p>
               <p><strong className="text-slate-900">Trial schools:</strong> End can be the first official checkpoint. It produces a valid achievement result; diagnostic growth appears only when two formal checkpoints exist.</p>
-              <p><strong className="text-slate-900">Instructional band:</strong> {DIAGNOSTIC_FLOOR}% to {DIAGNOSTIC_MASTERY - 1}% indicates learning within the tested level.</p>
+              <p><strong className="text-slate-900">Follow-up placement:</strong> After mastering a level, {DIAGNOSTIC_FLOOR}% or more on the next level earns placement there. Below {DIAGNOSTIC_FLOOR}%, the student stays at the last mastered level. Live lesson placement currently extends to Level 7.</p>
             </div>
           </section>
         </div>

@@ -27,7 +27,7 @@ const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), "utf8");
 
 assert.equal(DIAGNOSTIC_MASTERY, 85, "Diagnostic mastery must remain a named 85% threshold.");
-assert.equal(DIAGNOSTIC_FLOOR, 40, "Diagnostic floor must remain a named 40% threshold.");
+assert.equal(DIAGNOSTIC_FLOOR, 20, "Follow-up diagnostic placement starts at 20%.");
 assert.equal(DIAGNOSTIC_DOWNWARD_PROBE, 25, "A 25% starting result must remain the named downward-probe threshold.");
 assert.equal(DIAGNOSTIC_QUESTIONS_PER_LEVEL, 20, "Every diagnostic level probe must contain exactly 20 questions.");
 assert.equal(DIAGNOSTIC_REUSE_WINDOW_DAYS, 21, "Recent realm evidence may be reused only inside the named 21-day window.");
@@ -145,10 +145,22 @@ assert.equal(leapfrog.shouldProbeNext, true, "A mastered level must probe upward
 
 const cliff = decideDiagnosticPlacement("Year 4", [
   { level: "Year 4", score: 18, total: 20, percent: 90 },
-  { level: "Year 5", score: 7, total: 20, percent: 35 },
+  { level: "Year 5", score: 3, total: 20, percent: 15 },
 ]);
 assert.equal(cliff.recommendedLevel, "Year 4");
 assert.equal(cliff.flag, "extension_ready_to_bridge");
+
+// Follow-up placement must use the same inclusive 20% boundary as the server.
+for (const [score, expected] of [[5, "Year 6"], [6, "Year 7"], [25, "Year 7"]] as const) {
+  const decision = decideDiagnosticPlacement("Year 6", [
+    { level: "Year 6", score: 17, total: 20, percent: 85 },
+    { level: "Year 7", score, total: 30, percent: score / 30 * 100 },
+  ], 1, 8);
+  assert.equal(decision.recommendedLevel, expected);
+  assert.equal(decision.shouldProbeNext, false);
+}
+assert.equal(decideDiagnosticPlacement("Year 6", [{ level: "Year 6", score: 17, total: 20, percent: 85 }], 1, 8).shouldProbeNext, true);
+assert.equal(decideDiagnosticPlacement("Year 6", [{ level: "Year 6", score: 16, total: 20, percent: 80 }], 1, 8).shouldProbeNext, false);
 
 const noDemotion = decideDiagnosticPlacement("Year 4", [
   { level: "Year 4", score: 6, total: 20, percent: 30 },

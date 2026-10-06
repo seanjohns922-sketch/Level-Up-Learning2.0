@@ -8,7 +8,9 @@ import {
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export const DIAGNOSTIC_MASTERY = 85;
-export const DIAGNOSTIC_FLOOR = 40;
+export const DIAGNOSTIC_FLOOR = 20;
+// Preserve the established reporting scale; placement eligibility is separate.
+const DIAGNOSTIC_MEASUREMENT_FLOOR = 40;
 export const DIAGNOSTIC_QUESTIONS_PER_LEVEL = 20;
 export function diagnosticQuestionCount(strand: string, level: string): number {
   return ["number","measurement","space","statistics","algebra","probability"].includes(strand) && ["Year 7", "Year 8"].includes(level) ? 30 : DIAGNOSTIC_QUESTIONS_PER_LEVEL;
@@ -101,11 +103,11 @@ export function diagnosticLevelLabel(level: number): string {
 function measuredLevelForProbe(level: number, percent: number): number {
   let measured: number;
   if (percent >= DIAGNOSTIC_MASTERY) measured = Math.min(8, level);
-  else if (percent >= DIAGNOSTIC_FLOOR) {
-    const fraction = (percent - DIAGNOSTIC_FLOOR) / (DIAGNOSTIC_MASTERY - DIAGNOSTIC_FLOOR);
+  else if (percent >= DIAGNOSTIC_MEASUREMENT_FLOOR) {
+    const fraction = (percent - DIAGNOSTIC_MEASUREMENT_FLOOR) / (DIAGNOSTIC_MASTERY - DIAGNOSTIC_MEASUREMENT_FLOOR);
     measured = Math.min(8, level - 1 + fraction);
   } else {
-    const fractionBelow = (DIAGNOSTIC_FLOOR - percent) / DIAGNOSTIC_FLOOR;
+    const fractionBelow = (DIAGNOSTIC_MEASUREMENT_FLOOR - percent) / DIAGNOSTIC_MEASUREMENT_FLOOR;
     measured = Math.max(0, level - 1 - Math.min(0.9, fractionBelow));
   }
   return Math.round(Math.max(0, measured) * 100) / 100;
@@ -142,7 +144,7 @@ export function decideDiagnosticPlacement(
     };
   }
 
-  if (firstPercent < DIAGNOSTIC_FLOOR) {
+  if (firstPercent < DIAGNOSTIC_MEASUREMENT_FLOOR) {
     return {
       measuredLevel: measuredLevelForProbe(current, firstPercent),
       recommendedLevel: currentLevel,
