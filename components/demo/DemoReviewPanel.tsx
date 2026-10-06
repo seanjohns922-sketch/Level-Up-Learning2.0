@@ -36,6 +36,8 @@ import { fetchDemoGemVault } from "@/lib/gems";
 import {cave7Realm,cave7WeekCount} from "@/lib/cave7-config";
 import { number7ActivityHref } from "@/lib/number7-demo";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
+import { EXPEDITION_TRAILS } from "@/lib/world3d/expedition-crossroads";
+import { strongholdDemoHref } from "@/lib/world3d/number-stronghold";
 import { buildLessonRoute } from "@/lib/lesson-routing";
 import { clearScopedProgramStore } from "@/lib/program-progress";
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
@@ -493,6 +495,15 @@ export default function DemoReviewPanel() {
           <p className="mb-3 text-xs text-white/60">Explore six Level 7 realm trails and the separate volcano route to Level 8. This design preview does not change student progress.</p>
           <button type="button" onClick={() => router.push("/demo-review/number-adventure/3d")} className={actionClass()}><Eye size={17} /> Explore 3D Adventure Preview</button>
         </section>}
+
+        <section className="border-t border-white/10 py-6">
+          <h2 className="mb-3 text-base font-black">The Final Battle · Level 8 Preview</h2>
+          <p className="mb-3 text-xs text-white/60">The volcano gate and all six summit gateways are open in demo review, and each gateway leads to its realm’s stronghold prototype. Weekly portals are samples until the Level 8 curriculum is written. Nothing here changes student progress.</p>
+          <div className="grid gap-2">
+            <button type="button" onClick={() => router.push("/demo-review/number-adventure/3d?summit=1")} className={actionClass()}><Eye size={17} /> Open the volcano summit</button>
+            {EXPEDITION_TRAILS.map(trail => <button key={trail.id} type="button" onClick={() => router.push(strongholdDemoHref(trail.id))} className={actionClass()}><Eye size={17} /> {trail.name} stronghold</button>)}
+          </div>
+        </section>
 
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><Eye size={18} className="text-blue-300" /><h2 className="text-base font-black">Parent Dashboard</h2></div>

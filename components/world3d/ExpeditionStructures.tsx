@@ -8,6 +8,7 @@ import { VOLCANO_ROUTE,VOLCANO_DOORS,VOLCANO_GATE,volcanoProjection } from '@/li
 import Plaque from './WorldPlaque';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
 import { AscentMarkers,FinalBattleGate,SummitCrater,SummitDressing,SummitFloor,SummitGateway } from './VolcanoSummit';
+import { LavaMaterial } from './VolcanicKit';
 import type { SummitPoint } from '@/lib/world3d/number-summit';
 
 function Crate({at,size=1}:{at:SummitPoint;size?:number}){return <group position={at} scale={size}><Box at={[0,.65,0]} size={[1.4,1.3,1.2]} colour="#766047"/>{[-.5,.5].map(x=><Box key={x} at={[x,.66,.62]} size={[.1,1.32,.08]} colour="#383e3d"/>)}<Beam a={[-.6,.1,.66]} b={[.6,1.2,.66]} width={.045} colour="#b29870"/></group>;}
@@ -62,30 +63,8 @@ function CraterFortress(){
  <pointLight position={[0,69,-130]} color="#f69b4b" intensity={85} distance={45} decay={1.5}/>
  </>;
 }
+/** Lava flows down the volcano's flanks, following its real surface. */
 function LavaSeams(){
- const material=useRef<THREE.MeshStandardMaterial>(null);
- const texture=useMemo(()=>{
-  const width=256,height=512,data=new Uint8Array(width*height*4);
-  const hash=(x:number,y:number)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
-  const noise=(x:number,y:number)=>{const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy);return THREE.MathUtils.lerp(THREE.MathUtils.lerp(hash(ix,iy),hash(ix+1,iy),sx),THREE.MathUtils.lerp(hash(ix,iy+1),hash(ix+1,iy+1),sx),sy);};
-  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
-   const u=x/(width-1),v=y/height;
-   // Stretched, uneven cooled plates with narrow hot cracks between them.
-   const px=u*4+noise(u*5,v*12)*.8,py=v*14;let first=10,second=10;
-   for(let iy=-1;iy<=1;iy++)for(let ix=-1;ix<=1;ix++){const cx=Math.floor(px)+ix,cy=Math.floor(py)+iy;const d=Math.hypot(px-cx-hash(cx,cy),py-cy-hash(cx+51,cy+17));if(d<first){second=first;first=d;}else if(d<second)second=d;}
-   const cracks=1-THREE.MathUtils.smoothstep(second-first,.035,.2);
-   const pools=THREE.MathUtils.smoothstep(noise(u*4,v*10),.32,.76);
-   const edge=THREE.MathUtils.smoothstep(Math.min(u,1-u),.015,.2);
-   const heat=Math.min(1,(cracks*.38+pools*1.1)*edge);
-   const crust=new THREE.Color('#282322').lerp(new THREE.Color('#593328'),noise(u*29,v*63));
-   const molten=new THREE.Color('#af3010').lerp(new THREE.Color('#ef711b'),THREE.MathUtils.smoothstep(heat,.2,.75));
-   molten.lerp(new THREE.Color('#ffc16b'),THREE.MathUtils.smoothstep(heat,.85,1)*.65);
-   crust.lerp(molten,THREE.MathUtils.smoothstep(heat,.12,.68));
-   const grain=.9+noise(u*90,v*170)*.1;crust.multiplyScalar(grain).convertLinearToSRGB();
-   const k=(y*width+x)*4;data[k]=Math.round(crust.r*255);data[k+1]=Math.round(crust.g*255);data[k+2]=Math.round(crust.b*255);data[k+3]=255;
-  }
-  const map=new THREE.DataTexture(data,width,height);map.colorSpace=THREE.SRGBColorSpace;map.wrapT=THREE.RepeatWrapping;map.minFilter=THREE.LinearMipmapLinearFilter;map.magFilter=THREE.LinearFilter;map.generateMipmaps=true;map.anisotropy=4;map.needsUpdate=true;return map;
- },[]);
  const geometry=useMemo(()=>{
   const vertices:number[]=[],uv:number[]=[],indices:number[]=[];
   // Uneven spacing and winding channels follow the volcano's actual surface.
@@ -106,9 +85,8 @@ function LavaSeams(){
   }});
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
  },[]);
- useFrame(({clock},delta)=>{texture.offset.y-=Math.min(delta,.05)*.018;if(material.current)material.current.emissiveIntensity=.52+Math.sin(clock.elapsedTime*.35)*.04;});
- useEffect(()=>()=>{texture.dispose();geometry.dispose();},[texture,geometry]);
- return <mesh geometry={geometry}><meshStandardMaterial ref={material} map={texture} emissiveMap={texture} emissive="#ffffff" emissiveIntensity={.52} roughness={.95} side={THREE.DoubleSide}/></mesh>;
+ useEffect(()=>()=>geometry.dispose(),[geometry]);
+ return <mesh geometry={geometry}><LavaMaterial scale={[1.4,7]} flow={.035} edge={1} bright={1.35} side={THREE.DoubleSide}/></mesh>;
 }
 export function VolcanoExpedition({open,unlockedRealms,recoveredRealms=[]}:{open:boolean;unlockedRealms:string[];recoveredRealms?:string[]}){return <group>
  <Trail points={VOLCANO_ROUTE} colour="#6a605c" layer={8}/><LavaSeams/>

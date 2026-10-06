@@ -38,15 +38,21 @@ assert.equal(VOLCANO_DOORS.length,6);
 for(const [x,y,z] of VOLCANO_DOORS)assert.equal(summitFloor(x,z,1,true,y),70);
 console.log('PASS six Level 7 approaches, sealed/open pass, complete volcano ascent, uniform realm routes, six strongholds, protected crater');
 
-const {STRONGHOLD_PORTALS,strongholdFloor,strongholdNearest,NUMBER_STRONGHOLD_DEMO}=load('number-stronghold');
-for(const p of STRONGHOLD_PORTALS){
- const [x,,z]=p.position;
- assert.equal(strongholdFloor(x,z+4),0,'Portal approach must be walkable');
- assert.equal(strongholdNearest(x,z+4),p.week,'Review shortcut must land inside interaction range');
+const {LEVEL8_WEEK_COUNTS,strongholdLayout,strongholdFloor,strongholdNearest,strongholdDemoHref,NUMBER_STRONGHOLD_DEMO}=load('number-stronghold');
+for(const [realm,weeks] of Object.entries(LEVEL8_WEEK_COUNTS)){
+ const layout=strongholdLayout(realm);
+ assert.equal(layout.portals.length,weeks,`${realm}: one portal per Level 8 week`);
+ for(const p of layout.portals){
+  const [x,,z]=p.position;
+  assert.equal(strongholdFloor(x,z+4,realm),0,`${realm}: portal approach must be walkable`);
+  assert.equal(strongholdNearest(x,z+4,realm),p.week,`${realm}: week shortcut must land inside interaction range`);
+ }
+ for(let z=10;z>=layout.coreZ;z--)assert.equal(strongholdFloor(0,z,realm),0,`${realm}: Core chamber path must stay connected`);
+ assert.equal(strongholdNearest(0,layout.coreZ+8,realm),layout.coreId,`${realm}: Core chamber shortcut is reachable`);
+ assert.equal(strongholdFloor(16,-30,realm),null,`${realm}: walls block player movement`);
+ assert.equal(strongholdFloor(0,layout.backZ,realm),null,`${realm}: back wall blocks player movement`);
+ assert(strongholdDemoHref(realm).startsWith('/demo-review/volcano/'));
 }
-for(let z=10;z>=-78;z--)assert.equal(strongholdFloor(0,z),0,'Core chamber path must stay connected');
-assert.equal(strongholdNearest(0,-66),4,'Core chamber shortcut is reachable');
-assert.equal(strongholdFloor(16,-30),null,'Walls block player movement');
-assert.equal(strongholdFloor(0,-84),null,'Back wall blocks player movement');
+assert.equal(LEVEL8_WEEK_COUNTS.chance,10,'Level 8 Probability has 10 weeks');
 assert(NUMBER_STRONGHOLD_DEMO.startsWith('/demo-review/'));
-console.log('PASS stronghold sample portal approaches, connected Core chamber and wall boundaries');
+console.log('PASS six strongholds: one portal per Level 8 week, walkable approaches, connected Core chamber and wall boundaries');

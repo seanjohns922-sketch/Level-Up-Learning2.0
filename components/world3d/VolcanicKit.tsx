@@ -51,6 +51,44 @@ export function lavaTexture(repeat:[number,number]){
  const t=new THREE.DataTexture(data,w,h);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.LinearFilter;t.needsUpdate=true;return t;
 }
 
+const LAVA_VERTEX=`#include <fog_pars_vertex>
+varying vec2 vUv;
+void main(){vUv=uv;vec4 mvPosition=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mvPosition;
+#include <fog_vertex>
+}`;
+// Domain-warped noise gives cooled crust broken by irregular glowing cracks and slowly churning hot
+// pools. The surface drifts along v at uFlow; uEdge darkens the banks of channels and falls.
+const LAVA_FRAGMENT=`uniform float uTime;uniform vec2 uScale;uniform float uFlow;uniform float uEdge;uniform float uBright;
+varying vec2 vUv;
+#include <fog_pars_fragment>
+float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+ return mix(mix(hash(i),hash(i+vec2(1.,0.)),u.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),u.x),u.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*noise(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}
+void main(){
+ vec2 p=vUv*uScale;p.y-=uTime*uFlow;
+ vec2 q=vec2(fbm(p+vec2(0.,uTime*.04)),fbm(p+vec2(5.2,1.3)-uTime*.03));
+ float n=fbm(p+2.4*q);
+ float pools=smoothstep(.5,.78,n);
+ float cracks=1.-smoothstep(0.,.045,abs(fbm(p*1.7+q*1.4)-.5));
+ float heat=max(pools,cracks*.75);
+ float edge=abs(vUv.x-.5)*2.;heat*=1.-uEdge*smoothstep(.5,1.,edge);
+ vec3 col=mix(vec3(.035,.012,.008),vec3(.32,.04,.01),smoothstep(0.,.3,heat)*.85+.1*noise(p*9.));
+ col=mix(col,vec3(.95,.24,.02),smoothstep(.25,.6,heat));
+ col=mix(col,vec3(1.,.6,.12),smoothstep(.6,.88,heat));
+ col=mix(col,vec3(1.,.9,.55),smoothstep(.9,1.,heat));
+ gl_FragColor=vec4(col*uBright,1.);
+ #include <fog_fragment>
+}`;
+/** Animated molten lava. Use as a mesh's material; uv.y runs along the flow and uv.x across it. */
+export function LavaMaterial({scale=[1,1],flow=.05,edge=0,bright=1.2,side=THREE.FrontSide}:{scale?:[number,number];flow?:number;edge?:number;bright?:number;side?:THREE.Side}){
+ const reduced=useReducedMotion(),material=useRef<THREE.ShaderMaterial>(null);
+ const [sx,sy]=scale;
+ const uniforms=useMemo(()=>THREE.UniformsUtils.merge([THREE.UniformsLib.fog,{uTime:{value:0},uScale:{value:new THREE.Vector2(sx,sy)},uFlow:{value:flow},uEdge:{value:edge},uBright:{value:bright}}]),[sx,sy,flow,edge,bright]);
+ useFrame((_,delta)=>{const u=material.current?.uniforms;if(u&&!reduced.current)u.uTime.value+=Math.min(delta,.05);});
+ return <shaderMaterial ref={material} attach="material" vertexShader={LAVA_VERTEX} fragmentShader={LAVA_FRAGMENT} uniforms={uniforms} fog toneMapped={false} side={side}/>;
+}
+
 /** Six-sided crystal with a pointed tip, standing on its base. */
 export function crystalGeometry(){
  const prism=new THREE.CylinderGeometry(.2,.25,1.5,6,1).translate(0,.75,0),tip=new THREE.ConeGeometry(.2,.55,6).translate(0,1.775,0);
@@ -95,11 +133,12 @@ export function Brazier({at,colour='#ff7a2a',scale=1,light=false}:{at:SummitPoin
 const ARCH_RADIUS=2.25,ARCH_SPRING=5.05;
 function archShape(){const s=new THREE.Shape();s.moveTo(-ARCH_RADIUS,0);s.lineTo(-ARCH_RADIUS,ARCH_SPRING);s.absarc(0,ARCH_SPRING,ARCH_RADIUS,Math.PI,0,true);s.lineTo(ARCH_RADIUS,0);s.closePath();return new THREE.ShapeGeometry(s,24);}
 const PORTAL_VERTEX=`varying vec2 vPos;void main(){vPos=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+// A dark, still doorway with a faint drift of the realm's colour: no glow, no bloom.
 const PORTAL_FRAGMENT=`uniform float uTime;uniform vec3 uA;uniform vec3 uB;varying vec2 vPos;
-void main(){vec2 p=(vPos-vec2(0.,3.4))/3.2;float r=length(p),a=atan(p.y,p.x);
-float swirl=sin(a*3.+r*9.-uTime*1.5)*.5+.5,ripple=sin(r*16.-uTime*2.4)*.5+.5;
-vec3 col=mix(uA,uB,swirl*.65+ripple*.35)+uB*smoothstep(.85,0.,r)*.9;
-col*=.75+.25*sin(uTime*1.1);gl_FragColor=vec4(col,.94);}`;
+void main(){vec2 p=(vPos-vec2(0.,3.))/3.2;float r=length(p);
+float depth=smoothstep(1.3,0.,r),ripple=.5+.5*sin(r*9.-uTime*.7);
+vec3 col=vec3(.016,.018,.024)+uB*(depth*.09+depth*ripple*.03);
+gl_FragColor=vec4(col,1.);}`;
 
 /**
  * Carved stone archway. Open archways hold a swirling portal in `colour`; sealed ones are a stone
@@ -113,7 +152,7 @@ export function StoneArch({colour,open,seed=0,brightness=1.6,rim}:{colour:string
  useEffect(()=>{uniforms.uA.value.set(colour).multiplyScalar(.12);uniforms.uB.value.set(colour).multiplyScalar(brightness);},[colour,brightness,uniforms]);
  useFrame(({clock})=>{const u=surface.current?.uniforms;if(u&&!reduced.current)u.uTime.value=clock.elapsedTime+seed*2;});
  useEffect(()=>()=>{shape.dispose();block.dispose();},[shape,block]);
- const rimColour=new THREE.Color(rim??colour).multiplyScalar(open?2.2:.55);
+ const rimColour=new THREE.Color(rim??colour).multiplyScalar(open?.75:.4);
  const stones:[number,number,number,number][]=[[-2.95,.95,1.3,1.9],[-2.9,2.8,1.15,1.8],[-2.85,4.4,1.1,1.5],[2.95,.95,1.3,1.9],[2.9,2.8,1.15,1.8],[2.85,4.4,1.1,1.5]];
  return <group>
   <mesh geometry={block} position={[0,.18,0]} scale={[7.6,.36,2.8]}><meshStandardMaterial color="#3e3739" roughness={.9} flatShading/></mesh>
@@ -124,8 +163,7 @@ export function StoneArch({colour,open,seed=0,brightness=1.6,rim}:{colour:string
   <mesh position={[0,ARCH_SPRING+.35,.02]}><torusGeometry args={[ARCH_RADIUS+.05,.07,6,40,Math.PI]}/><meshBasicMaterial color={rimColour} toneMapped={false}/></mesh>
   {[-1,1].map(s=><mesh key={s} geometry={block} position={[s*(ARCH_RADIUS+.05),.35+ARCH_SPRING/2,.02]} scale={[.14,ARCH_SPRING,.14]}><meshBasicMaterial color={rimColour} toneMapped={false}/></mesh>)}
   {open?<>
-   <mesh geometry={shape} position={[0,.35,0]}><shaderMaterial ref={surface} vertexShader={PORTAL_VERTEX} fragmentShader={PORTAL_FRAGMENT} uniforms={uniforms} transparent toneMapped={false} side={THREE.DoubleSide}/></mesh>
-   <mesh position={[0,.04,2.6]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[2.6,32]}/><meshBasicMaterial color={new THREE.Color(colour).multiplyScalar(.55)} transparent opacity={.45} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false}/></mesh>
+   <mesh geometry={shape} position={[0,.35,0]}><shaderMaterial ref={surface} vertexShader={PORTAL_VERTEX} fragmentShader={PORTAL_FRAGMENT} uniforms={uniforms} toneMapped={false} side={THREE.DoubleSide}/></mesh>
   </>:<>
    <mesh geometry={shape} position={[0,.35,0]}><meshStandardMaterial color="#252022" roughness={.95} flatShading side={THREE.DoubleSide}/></mesh>
    {[1,-1].map(side=><group key={side} position={[0,3.3,side*.03]} rotation={[0,side>0?0:Math.PI,0]}>

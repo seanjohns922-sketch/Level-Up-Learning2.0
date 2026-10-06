@@ -1,9 +1,8 @@
 'use client';
-import {useEffect,useMemo,useRef} from 'react';
-import {useFrame} from '@react-three/fiber';
+import {useEffect,useMemo} from 'react';
 import * as THREE from 'three';
 import {Beam} from './ExpeditionCrossroads';
-import {Brazier,Embers,Instances,StoneArch,basaltTextures,lavaTexture,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
+import {Brazier,Embers,Instances,LavaMaterial,StoneArch,basaltTextures,rand,softDotTexture,type InstanceItem} from './VolcanicKit';
 import {VOLCANO_GATE,VOLCANO_ROUTE} from '@/lib/world3d/volcano-expedition';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
@@ -55,21 +54,18 @@ export function AscentMarkers(){
 export function SummitFloor(){
  const {map,glow}=useMemo(()=>basaltTextures([7,7]),[]);
  useEffect(()=>()=>{map.dispose();glow.dispose();},[map,glow]);
- return <mesh position={[CX,CY+.01,CZ]} rotation={[-Math.PI/2,0,0]} receiveShadow><ringGeometry args={[8.5,25,72,4]}/><meshStandardMaterial map={map} emissiveMap={glow} emissive="#ffffff" emissiveIntensity={1.2} roughness={.9}/></mesh>;
+ return <mesh position={[CX,CY+.01,CZ]} rotation={[-Math.PI/2,0,0]} receiveShadow><ringGeometry args={[8.5,25,72,4]}/><meshStandardMaterial map={map} emissiveMap={glow} emissive="#ffffff" emissiveIntensity={.45} roughness={.9}/></mesh>;
 }
 
 const craterEmber=(i:number):SummitPoint=>{const a=rand(i+40)*Math.PI*2,r=Math.sqrt(rand(i+41))*7;return [CX+Math.cos(a)*r,CY-.7,CZ+Math.sin(a)*r];};
 /** Molten crater with a jagged rim, a heat glow and rising embers. */
 export function SummitCrater(){
- const reduced=useReducedMotion();
- const lava=useMemo(()=>lavaTexture([3,3]),[]),dot=useMemo(()=>softDotTexture(),[]);
+ const dot=useMemo(()=>softDotTexture(),[]);
  const rock=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[]),material=useMemo(()=>new THREE.MeshStandardMaterial({roughness:.95,flatShading:true}),[]);
- const lavaMaterial=useRef<THREE.MeshBasicMaterial>(null);
  const rim=useMemo(()=>{const out:InstanceItem[]=[];for(let i=0;i<44;i++){const a=i/44*Math.PI*2+rand(i)*.05,r=8.9+(rand(i+1)-.5)*.5,h=.5+rand(i+2)*1.1;out.push({p:[CX+Math.sin(a)*r,CY+h*.35,CZ+Math.cos(a)*r],s:[.6+rand(i+3)*.4,h,.6+rand(i+4)*.35],r:[rand(i+5)*.4,a,rand(i+6)*.3],c:BASALT[i%3]});}return out;},[]);
- useFrame((_,delta)=>{const m=lavaMaterial.current?.map;if(m&&!reduced.current){const d=Math.min(delta,.05);m.offset.x+=d*.01;m.offset.y-=d*.018;}});
- useEffect(()=>()=>{lava.dispose();dot.dispose();rock.dispose();material.dispose();},[lava,dot,rock,material]);
+ useEffect(()=>()=>{dot.dispose();rock.dispose();material.dispose();},[dot,rock,material]);
  return <group>
-  <mesh position={[CX,CY-.75,CZ]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[8.5,48]}/><meshBasicMaterial ref={lavaMaterial} map={lava} color={new THREE.Color(1.5,1.2,1.05)} toneMapped={false}/></mesh>
+  <mesh position={[CX,CY-.75,CZ]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[8.5,48]}/><LavaMaterial scale={[5,5]} flow={.03} bright={1.2}/></mesh>
   <mesh position={[CX,CY-.3,CZ]}><cylinderGeometry args={[8.6,8.5,1,40,1,true]}/><meshStandardMaterial color="#231d1e" roughness={.95} side={THREE.BackSide} flatShading/></mesh>
   <Instances geometry={rock} material={material} items={rim}/>
   <sprite position={[CX,CY+3,CZ]} scale={[30,14,1]}><spriteMaterial map={dot} color={new THREE.Color('#ff7a2e').multiplyScalar(1.3)} transparent opacity={.55} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false}/></sprite>
