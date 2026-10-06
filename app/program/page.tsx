@@ -922,7 +922,7 @@ function ProgramPage() {
     );
   }
 
-  if (!legacyProgramMode) {
+  if (!legacyProgramMode && !isExpeditionWeek) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#f6f2ec]">
         <p className="text-gray-400">Opening your adventure…</p>

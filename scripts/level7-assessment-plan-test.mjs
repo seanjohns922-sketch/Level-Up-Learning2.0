@@ -22,3 +22,5 @@ for(const name of ['Number','Measurement','Space','Pattern','Statistics','Chance
  assert.match(source,/if\(level===7\)await saveLevel7Assessment/);
 }
 console.log('PASS all six Level 7 assessment plans: full/targeted/pass thresholds, failed post-test practice, canonical save integration.');
+
+assert.match(fs.readFileSync('app/program/page.tsx','utf8'), /if \(!legacyProgramMode && !isExpeditionWeek\)/, 'Live cavern week links must render without the old legacy query parameter');
