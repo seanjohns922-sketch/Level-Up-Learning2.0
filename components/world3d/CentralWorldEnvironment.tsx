@@ -806,7 +806,10 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>}
-      {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}><RailTrack asset={assetKey}/>{preview && assetKey === "rail_train" && <StarterTrain/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      {assetKey === "railway_station" ? <group ref={groupRef}>
+        {/* Grid connectors must retain their exact origin and scale, including in previews. */}
+        <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint}/>
+      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}><RailTrack asset={assetKey}/>{preview && assetKey === "rail_train" && <StarterTrain/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>

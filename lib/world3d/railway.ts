@@ -1,6 +1,12 @@
 import type { CentralWorldPlacement } from './central-world-layout';
 import type { EconomyItem } from '../economy';
 export const RAIL_KEYS = new Set(['rail_straight','rail_corner','rail_train']);
+// Five fixed two-metre cells across the station's front row (inside its 5x3 plot).
+export const STATION_TRACK_CENTRES = [-4,-2,0,2,4] as const;
+export const STATION_TRACK_Z = 2;
+export function stationRailPlacements(station:CentralWorldPlacement):CentralWorldPlacement[]{
+ return STATION_TRACK_CENTRES.map(x=>{const [dx,dz]=rotateRail([x,STATION_TRACK_Z],station.rotation);return {...station,gridX:station.gridX+dx/2,gridZ:station.gridZ+dz/2};});
+}
 type Point=[number,number];
 export type RailSegment={placement:CentralWorldPlacement;asset:string;reverse:boolean};
 export function rotateRail([x,z]:Point,degrees:number):Point {const a=degrees*Math.PI/180;return [Math.round((x*Math.cos(a)+z*Math.sin(a))*1e6)/1e6,Math.round((-x*Math.sin(a)+z*Math.cos(a))*1e6)/1e6];}
@@ -12,7 +18,10 @@ export function railPoint(asset:string,t:number):Point {
 function ports(p:CentralWorldPlacement,asset:string){return [railPoint(asset,0),railPoint(asset,1)].map(v=>{const [x,z]=rotateRail(v,p.rotation);return [p.gridX*2+x,p.gridZ*2+z] as Point;});}
 const key=(p:Point)=>p.map(n=>n.toFixed(4)).join(':');
 export function railwayRoute(start:CentralWorldPlacement,placements:CentralWorldPlacement[],items:Map<string,EconomyItem>):RailSegment[]{
- const rails=placements.map(placement=>({placement,asset:String(items.get(placement.itemId)?.metadata.worldAssetKey??'')})).filter(r=>RAIL_KEYS.has(r.asset));
+ const rails=placements.flatMap(placement=>{
+  const asset=String(items.get(placement.itemId)?.metadata.worldAssetKey??'');
+  return asset==='railway_station'?stationRailPlacements(placement).map(placement=>({placement,asset:'rail_straight'})):RAIL_KEYS.has(asset)?[{placement,asset}]:[];
+ });
  const endpoints=new Map<string,Array<{index:number;end:number}>>();
  rails.forEach((r,index)=>ports(r.placement,r.asset).forEach((point,end)=>{const k=key(point);endpoints.set(k,[...(endpoints.get(k)??[]),{index,end}]);}));
  const first=rails.findIndex(r=>r.placement===start);if(first<0)return [];
@@ -41,7 +50,7 @@ export function stationStopDistances(route:RailSegment[],placements:CentralWorld
   let distance=0,best:{offset:number;gap:number}|null=null;
   for(const segment of route){const length=segmentLength(segment),mid=routePosition([segment],length/2);
    const [x,z]=rotateRail([mid.x-station.gridX*2,mid.z-station.gridZ*2],-station.rotation);
-   if(segment.asset!=='rail_corner' && (segment.placement.rotation-station.rotation)%180===0 && Math.abs(z-(depth+1))<.2 && Math.abs(x)<=width && (!best||Math.abs(x)<best.gap))best={offset:distance+length/2,gap:Math.abs(x)};
+   if(segment.asset!=='rail_corner' && (segment.placement.rotation-station.rotation)%180===0 && (Math.abs(z-(depth+1))<.2 || (segment.placement.itemId===station.itemId && Math.abs(z-STATION_TRACK_Z)<.2)) && Math.abs(x)<=width && (!best||Math.abs(x)<best.gap))best={offset:distance+length/2,gap:Math.abs(x)};
    distance+=length;
   }
   if(best&&!stops.includes(best.offset))stops.push(best.offset);

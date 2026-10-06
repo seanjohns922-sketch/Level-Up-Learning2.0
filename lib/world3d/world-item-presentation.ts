@@ -154,7 +154,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   harbour_bridge: {height:20, footprint:[46,16], width:44, theme:"australian_reward"},
   lighthouse: {height:24, footprint:[18,12], theme:"australian_reward"},
   beach_huts: {height:3.5, footprint:[12,6], theme:"australian_reward"},
-  railway_station: {height:5, footprint:[16,14], width:14, theme:"australian_reward"},
+  railway_station: {height:4.3, footprint:[10,6], width:10, theme:"australian_reward"},
   country_bakery: {height:4.5, footprint:[8,8], theme:"australian_reward"},
   platypus_creek: {height:2, footprint:[14,10], width:12, theme:"australian_reward"},
   wombat_burrows: {height:1.5, footprint:[8,6], width:6, theme:"australian_reward"},
