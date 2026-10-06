@@ -1,4 +1,5 @@
 "use client";
+import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import { useEffect, useState, type ComponentType } from "react";
 import { Frown, Meh, Smile, Zap, Star, Flame, Bot, Ruler, Orbit } from "lucide-react";
@@ -330,6 +331,7 @@ export default function LessonReflection({
           </div>
 
           <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
+        {levelNumber === 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks realm={realmId} week={week}/></div>}
 
           {copy?.reflectionPrompt ? (
             <div className="mt-6">
@@ -393,6 +395,7 @@ export default function LessonReflection({
         <div className="mt-1 text-sm" style={{ color: optionTextColor }}>{lessonTitle}</div>
 
         <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
+        {levelNumber === 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks realm={realmId} week={week}/></div>}
 
         <div className="mt-7 text-base font-bold text-white">
           How confident do you feel now?

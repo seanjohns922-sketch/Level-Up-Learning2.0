@@ -1,5 +1,6 @@
 "use client";
 
+import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -1142,6 +1143,7 @@ function ProgramPage() {
               >
                 ← {isExpeditionWeek ? "Back to the cavern" : isStarpathRealm ? "Back to Starpath" : "Back to Map"}
               </button>
+              {isExpeditionWeek && <Level7JourneyLinks realm={realmId} week={weekNum} demo={previewMode} showCave={false} />}
               <div ref={weekMenuRef} className="relative">
                 <button
                   type="button"

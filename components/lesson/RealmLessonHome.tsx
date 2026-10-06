@@ -1,5 +1,7 @@
 "use client";
 
+import Level7JourneyLinks from "./Level7JourneyLinks";
+
 import {getRealmTheme} from "@/lib/useRealmTheme";
 import layout from "./Number7LessonLayout.module.css";
 import caveLayout from "./cave7/Cave7LessonLayout.module.css";
@@ -527,6 +529,7 @@ export function RealmLessonHome({
         >
           <ArrowLeft className="h-4 w-4" /> Back to Week {week}
         </button>
+        {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} />}
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accent }}>
           <theme.ThemeIcon className="h-5 w-5" /> {theme.realmName}
         </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import Level7JourneyLinks from "./Level7JourneyLinks";
+
 import layout from "./Number7LessonLayout.module.css";
 import caveLayout from "./cave7/Cave7LessonLayout.module.css";
 import spaceLayout from "./Space7LessonLayout.module.css";
@@ -77,7 +79,7 @@ export function RealmActiveLessonShell({
       </div>
 
       <header
-        className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border px-3 py-3 backdrop-blur-md sm:px-5"
+        className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border px-3 py-3 backdrop-blur-md sm:px-5 ${isCoreHunt ? "sticky top-0 z-40" : ""}`}
         style={{ background: theme.shellBg, borderColor: theme.panelBorder }}
       >
         <button
@@ -88,6 +90,7 @@ export function RealmActiveLessonShell({
         >
           <ArrowLeft className="h-4 w-4" /> Back to Week {week}
         </button>
+        {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} demo={demoMode} />}
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
           <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
           {isCoreHunt ? `Hunt for the ${theme.realmName} Core · Level 7` : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
