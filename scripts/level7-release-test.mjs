@@ -70,3 +70,21 @@ step = next.resolveCanonicalNextActivity({ realmId: 'statistics', progress: prog
 assert.equal(step.type, 'lesson');
 assert.equal(step.week, 7);
 console.log('PASS Level 7 release: week counts, final-week completion, live routes and next-activity path.');
+
+// Every cavern uses the same canonical week gates as the earlier realm maps.
+const entry = await import('../lib/realm-entry.ts');
+for (const [realm, n] of Object.entries(LEVEL7)) {
+  const required = weeks.getProgramWeeks(realm, 'Year 7');
+  const playable = (store, assigned = 1, advanced = []) => progress.getPlayableWeeks(store, 'Year 7', required, [], realm, advanced, assigned);
+  assert.deepEqual(playable({}), [1], `${realm}: later cavern doors start locked`);
+  const key = progress.makeProgramProgressKey('Year 7', 1, realm);
+  assert.deepEqual(playable({ [key]: { ...passed, quizScore: 79, quizBestScore: 79 } }), [1]);
+  assert.deepEqual(playable({ [key]: { ...passed, quizScore: 80, quizBestScore: 80 } }), [1, 2]);
+  assert.deepEqual(playable({}, 3, [1, 2]), [1, 2, 3], `${realm}: teacher advancement is retained`);
+  assert.deepEqual(progress.getPlayableWeeks({}, 'Year 7', [], required, realm), required, `${realm}: explicit open practice`);
+  const completed = Object.fromEntries(required.map(w => [progress.makeProgramProgressKey('Year 7', w, realm), w === n ? lessonsOnly : passed]));
+  assert.deepEqual(playable(completed), required);
+  assert.equal(entry.resolveRealmEntryRoute({ realmId: realm, progress: progressFor(1), fallbackYear: 'Year 7', introSeen: true }), `/world/expedition?realm=${realm}`);
+  assert.equal(entry.resolveRealmEntryRoute({ realmId: realm, progress: { ...progressFor(1), placementComplete: false }, fallbackYear: 'Year 7', introSeen: true }), `/pretest?year=Year%207&realm_id=${realm}`);
+}
+console.log('PASS cavern portals: 80% weekly pass, teacher advancement, open practice, final week and expedition entry in all six realms.');

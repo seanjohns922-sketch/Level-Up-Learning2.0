@@ -1,11 +1,9 @@
-'use client';
-import {supabase} from '@/lib/supabase';
-import {EXPEDITION_REALMS,expeditionAccessFromAssessments,type ExpeditionAssessment} from './expedition-access';
-export async function fetchExpeditionAccess(studentId:string){
- const results=await Promise.all(EXPEDITION_REALMS.map(async realm=>{
-  const {data,error}=await supabase.rpc('get_student_realm_assessments_secure',{p_student_id:studentId,p_realm_id:realm,p_working_level:null});
-  if(error)throw error;
-  return (data??[]) as ExpeditionAssessment[];
- }));
- return expeditionAccessFromAssessments(studentId,results.flat());
+"use client";
+import {getStudentSessionToken} from '@/lib/studentIdentity';
+import type {ExpeditionAccess,ExpeditionRealm} from './expedition-access';
+export async function fetchExpeditionAccess(studentId:string,realm?:ExpeditionRealm):Promise<ExpeditionAccess>{
+ const token=getStudentSessionToken();if(!token)throw new Error('Student sign-in required');
+ const response=await fetch('/api/world/expedition-access',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json','x-student-session':token},body:JSON.stringify({studentId,...(realm?{realm}:{})})});
+ if(!response.ok)throw new Error('Expedition access could not be verified');
+ return response.json();
 }

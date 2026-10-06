@@ -1,5 +1,8 @@
 "use client";
 
+import {LEVEL7_LIVE} from '@/lib/level7-release';
+import {fetchExpeditionAccess} from '@/lib/world3d/expedition-access-client';
+import {getActiveStudentIdentity} from '@/lib/studentIdentity';
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -179,7 +182,15 @@ export default function TowerRealmChamber() {
   }, [searchParams]);
 
   const progressByRealm = useMemo(() => buildProgressMap(progressVersion, preview), [preview, progressVersion]);
-  const atExpedition=preview && activeInteractionId==='core-expedition';
+  const [earnedExpedition,setEarnedExpedition]=useState(false);
+  useEffect(()=>{let active=true;
+    if(!LEVEL7_LIVE||preview)return;
+    const id=getActiveStudentIdentity().studentId;if(!id)return;
+    fetchExpeditionAccess(id).then(access=>{if(active)setEarnedExpedition(access.level7.length>0);}).catch(()=>{if(active)setEarnedExpedition(false);});
+    return()=>{active=false;};
+  },[preview,progressVersion]);
+  const expeditionUnlocked=preview||(LEVEL7_LIVE&&earnedExpedition);
+  const atExpedition=expeditionUnlocked && activeInteractionId==='core-expedition';
   const activePortal = getTowerPortalByInteractionId(activeInteractionId);
   const atExit = activeInteractionId === TOWER_CHAMBER_CONFIG.exitInteractionId;
 
@@ -235,7 +246,7 @@ export default function TowerRealmChamber() {
   }, [busyRealmId, preview, router]);
 
   const runActiveAction = useCallback(() => {
-    if(atExpedition){router.push('/demo-review/number-adventure/3d');return;}
+    if(atExpedition){router.push(preview?'/demo-review/number-adventure/3d':'/world/expedition');return;}
     if (activePortal) {
       void enterRealm(activePortal.realmId);
       return;
@@ -244,10 +255,10 @@ export default function TowerRealmChamber() {
   }, [activePortal, atExit, atExpedition, enterRealm, preview, router]);
 
   return (
-    <main data-world3d-root data-expedition-unlocked={preview} data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
+    <main data-world3d-root data-expedition-unlocked={expeditionUnlocked} data-tower-realm-chamber style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", background: "#211815" }}>
       <Canvas camera={{ position: [0, 6, 22], fov: 56 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance" }} shadows={false}>
         <TowerScene
-          expeditionUnlocked={preview}
+          expeditionUnlocked={expeditionUnlocked}
           quality={quality}
           reducedMotion={reducedMotion}
           moveInput={moveInput}

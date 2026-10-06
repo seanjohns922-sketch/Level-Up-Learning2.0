@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { ACTIVE_STUDENT_KEY, isPlacementComplete, readProgress, updateProgress, writeProgress } from "@/data/progress";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
 import { LEVEL_CATALOG } from "@/lib/level-catalog";
+import { LEVEL7_LIVE } from "@/lib/level7-release";
+import { resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { buildDefaultStudentProgress } from "@/lib/student-destination";
 import { enterReviewMode, exitReviewMode } from "@/lib/review-mode";
 import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
@@ -76,6 +78,15 @@ export default function NumberNexusPage() {
         const restored = await restoreStudentStateFromServer(studentId!, "number");
         if (!restored.progress) throw new Error("Canonical Number Nexus progress was not found");
         if (!cancelled) {
+          if (LEVEL7_LIVE && ["Year 7", "Year 8"].includes(restored.progress.year)) {
+            router.replace(resolveRealmEntryRoute({
+              realmId: "number",
+              progress: restored.progress,
+              fallbackYear: restored.progress.year,
+              introSeen: restored.introSeen,
+            }));
+            return;
+          }
           setProgressVersion((version) => version + 1);
           setCanonicalStatus("ready");
         }
@@ -90,7 +101,7 @@ export default function NumberNexusPage() {
       cancelled = true;
       window.removeEventListener("focus", refreshCanonicalProgress);
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (canonicalStatus !== "ready") return;

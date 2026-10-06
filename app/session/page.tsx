@@ -8081,7 +8081,7 @@ function SessionPage({
   const level7Realm = quizRealmId === "measurement" ? "measurement" : "number";
   const level7WeekHome = (w: number) => previewMode ? cavernWeekHref(level7Realm, w) : level7LiveHref(level7Realm, w, "week");
   function backToWeek() {
-    if(isNumber7){router.push(level7WeekHome(Number(week)));return;}
+    if(isNumber7){router.push(!previewMode?getWorld3DReturnPathForQuiz({realmId:quizRealmId,level:year,week:Number(week)})??level7WeekHome(Number(week)):level7WeekHome(Number(week)));return;}
     const world3DReturnPath = getWorld3DReturnPathForQuiz({
       realmId: quizRealmId,
       level: year,

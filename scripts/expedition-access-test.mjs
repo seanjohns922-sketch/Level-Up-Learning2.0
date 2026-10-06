@@ -23,3 +23,11 @@ for(const realm of EXPEDITION_REALMS){
  assert.equal(access('learner',[prior,result({realm_id:realm,working_level:'Year 7',correct_count:84,total_questions:100,score_percent:85})]).level8.length,0);
 }
 console.log('PASS Level 8 exact >=85 threshold across all six realms, independent of legacy passed flag');
+for(const realm of EXPEDITION_REALMS){
+ const placed={student_id:'learner',realm_id:realm,assigned_start_level:'Year 7'};
+ assert.deepEqual(access('learner',[],[placed]),{level7:[realm],level8:[]});
+ assert.deepEqual(access('learner',[],[{student_id:'learner',realm_id:realm,working_level:'Year 7',is_current:true}]).level7,[realm]);
+ assert.deepEqual(access('learner',[result({realm_id:realm,working_level:'Year 7',score_percent:85})],[placed]).level8,[realm]);
+ for(const bad of [{...placed,student_id:'other'},{...placed,assigned_start_level:'Year 6'},{...placed,assigned_start_level:'Year 8'},{student_id:'learner',realm_id:realm,working_level:'Year 7',is_current:false}])assert.equal(access('learner',[],[bad]).level7.length,0);
+}
+console.log('PASS teacher placement and current Level 7 progress, realm isolation, no automatic Level 8 unlock.');

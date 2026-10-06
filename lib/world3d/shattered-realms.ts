@@ -28,3 +28,5 @@ export function cavernNearest(x:number,z:number,realm:ExpeditionRealm="number"):
 export function cavernDarkness(z:number,realm:ExpeditionRealm="number"){return Math.max(0,Math.min(1,(-z-8)/(16*(cave7WeekCount(realm)-1))));}
 export function cavernHref(realm:ExpeditionRealm,week=1){return `/demo-review/shattered-realms/${realm}?week=${cavernWeek(week,realm)}`;}
 export function cavernWeekHref(realm:ExpeditionRealm,week=1){return `/demo-review/shattered-realms/${realm}/week?realm_id=${realm}&year=Year%207&week=${cavernWeek(week,realm)}&legacy=1&teacher_preview=1&expedition=1`;}
+
+export function studentCavernHref(realm:ExpeditionRealm,week=1){return `/world/expedition/${realm}?week=${cavernWeek(week,realm)}`;}

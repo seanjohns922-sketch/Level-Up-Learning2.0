@@ -1,5 +1,6 @@
 import { isPlacementComplete, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { realmEntryLevel } from "@/lib/realm-unlock";
+import { LEVEL7_LIVE } from "@/lib/level7-release";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import {
@@ -48,6 +49,13 @@ export function resolveRealmEntryRoute(args: {
   if (!args.introSeen) return "/home";
 
   const year = args.progress?.year?.trim() || args.fallbackYear.trim() || "Year 1";
+  if (LEVEL7_LIVE && (year === "Year 7" || year === "Year 8")) {
+    if (year === "Year 8") return "/world/expedition/coming-soon";
+    if (!isPlacementComplete(args.progress)) {
+      return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;
+    }
+    return `/world/expedition?realm=${args.realmId}`;
+  }
   if (args.realmId === STARPATH_REALM_ID) {
     const starpathYear = (year === "Foundation" ? "Prep" : year) as StarpathLevelDefinition["yearLabel"];
     const level = getStarpathLevelForYear(starpathYear);

@@ -34,7 +34,6 @@ import type {
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
 import { isLiveRealmId } from "@/lib/realms/realm-registry";
-import { isLiveLevel7, level7LiveHref } from "@/lib/level7-release";
 
 function useWorldCanvas(colors: readonly string[], ringColor: string) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -265,12 +264,6 @@ export default function RealmDashboardShell({
     config.storageRealmId,
     progress?.teacherAdvancedWeeks,
   );
-  // Live Level 7 students go straight to their Level 7 week page; this map is built for Years 1–6.
-  const level7Realm = config.storageRealmId;
-  const liveLevel7 = !previewMode && isLiveLevel7(resolvedYear, level7Realm);
-  useEffect(() => {
-    if (liveLevel7 && isLiveLevel7(resolvedYear, level7Realm)) router.replace(level7LiveHref(level7Realm, currentWeek, "week"));
-  }, [currentWeek, level7Realm, liveLevel7, resolvedYear, router]);
   const currentZone =
     world.zones.find((zone) => currentWeek >= zone.weekStart && currentWeek <= zone.weekEnd) ?? world.zones[0];
   const completedByWeek = useMemo(() => {

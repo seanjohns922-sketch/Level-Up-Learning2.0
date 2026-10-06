@@ -521,7 +521,7 @@ function LessonPage() {
         lessonNumber,
         lessonId: effectiveLessonId,
       });
-      router.push(world3DReturnPath ?? `/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`);
+      router.push(world3DReturnPath ?? (isCave7?level7WeekHome:`/program?year=${encodeURIComponent(year)}&week=${week}&legacy=1${realmParam}`));
       return;
     }
     lessonFinalizedRef.current = true;
@@ -615,7 +615,7 @@ function LessonPage() {
   }
 
   function goBackToProgram() {
-    if(isCave7){router.push(level7WeekHome);return;}
+    if(isCave7){router.push(!previewMode?getWorld3DReturnPathForLesson({realmId:lessonRealmId,level:year,week,lessonNumber,lessonId:effectiveLessonId})??level7WeekHome:level7WeekHome);return;}
     const realmParam = realmId === "measurement" ? `&realm_id=${encodeURIComponent(realmId)}` : "";
     const world3DReturnPath = getWorld3DReturnPathForLesson({
       realmId: lessonRealmId,

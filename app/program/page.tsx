@@ -50,7 +50,7 @@ import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
 import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
 import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
-import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
+import { LEVEL7_LIVE, level7LiveHref, level7LessonId } from "@/lib/level7-release";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
@@ -60,7 +60,7 @@ import {
   preserveWorld3DReturnContextForQuiz,
 } from "@/lib/world3d/return-context";
 
-import { CAVERN_WEEK_COUNT, cavernRealm, cavernWeek, cavernHref, cavernWeekHref } from "@/lib/world3d/shattered-realms";
+import { CAVERN_WEEK_COUNT, cavernRealm, cavernWeek, cavernHref, studentCavernHref, cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import type { WeekPlan } from "@/data/programs/year1";
 
 const CAVERN_PREVIEW_WEEKS: WeekPlan[] = Array.from({length:CAVERN_WEEK_COUNT}, (_,i)=>({
@@ -739,7 +739,14 @@ function ProgramPage() {
       }
     }
 
-    if(isNumber7){const activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';router.push(liveLevel7?level7LiveHref(realmId,weekNum,activity):number7ActivityHref(weekNum,activity,realmId));return;}
+    if(isNumber7){
+      const activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';
+      if(liveLevel7){
+        if(typeof activity==='number')preserveWorld3DReturnContextForLesson({realmId,level:year,week:weekNum,lessonNumber:activity,lessonId:level7LessonId(realmId,weekNum,activity)});
+        else if(activity==='quiz')preserveWorld3DReturnContextForQuiz({realmId,level:year,week:weekNum});
+      }
+      router.push(liveLevel7?level7LiveHref(realmId,weekNum,activity):number7ActivityHref(weekNum,activity,realmId));return;
+    }
     const realmParam = realmId === "number" ? "" : `&realm_id=${encodeURIComponent(realmId)}`;
 
     if (item.type === "lesson") {
@@ -875,7 +882,7 @@ function ProgramPage() {
       : "/number-nexus";
 
   function goBackToMap() {
-    if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm)router.push(cavernHref(realm,weekNum));return;}
+    if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm)router.push(liveLevel7?studentCavernHref(realm,weekNum):cavernHref(realm,weekNum));return;}
     const world3DReturnPath = getWorld3DReturnPathForWeek({
       realmId,
       level: curriculumYear,
