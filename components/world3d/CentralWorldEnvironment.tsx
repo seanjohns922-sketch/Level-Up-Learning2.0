@@ -1,6 +1,6 @@
 "use client";
-import { RailTrack, StarterTrain, WorldRailway } from "./Railway";
-import { RAIL_KEYS } from "@/lib/world3d/railway";
+import { RailTrack, StarterTrain, ParkedTrain, WorldRailway } from "./Railway";
+import { RAIL_KEYS, trainTrackSupport } from "@/lib/world3d/railway";
 import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
 
 import { Edges, Html, RoundedBox, useTexture } from "@react-three/drei";
@@ -775,12 +775,13 @@ function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: s
   );
 }
 
-function PlacedWorldObject({ item, placement, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
+function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
   const [width, depth] = parseGridSize(item);
   const position = gridToWorld(placement.gridX, placement.gridZ);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
+  const trainSupport = assetKey === "rail_train" ? trainTrackSupport(placement, neighbours, items) : null;
   const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
   // In roam mode the drawbridge is interactive (tap to raise/lower); in edit mode
   // it's static so the build surface can pick it up.
@@ -801,7 +802,7 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
 
   return (
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
-      {preview && <mesh position={[0, 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {preview && <mesh position={[0, RAIL_KEYS.has(assetKey) ? 0.005 : 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[width * CENTRAL_WORLD_GRID.cellSize - 0.18, depth * CENTRAL_WORLD_GRID.cellSize - 0.18]} />
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
@@ -809,7 +810,7 @@ function PlacedWorldObject({ item, placement, neighbours = [], preview = false, 
       {assetKey === "railway_station" ? <group ref={groupRef}>
         {/* Grid connectors must retain their exact origin and scale, including in previews. */}
         <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint}/>
-      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}><RailTrack asset={assetKey}/>{preview && assetKey === "rail_train" && <StarterTrain/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{!trainSupport && <RailTrack asset={assetKey}/>} {preview && assetKey === "rail_train" && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>
@@ -1212,9 +1213,9 @@ export function CentralWorldEnvironment({ quality, entranceActive, homeActive, h
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
-        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
+        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} items={itemsById} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
       })}
-      {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} neighbours={placedCustomisations} preview valid={buildPreview.valid} /> : null}
+      {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview valid={buildPreview.valid} /> : null}
       {groundPreview ? groundPreview.cells?.map(cell => <GroundTile key={cell.gridX+":"+cell.gridZ} tile={{...groundPreview.tile,...cell}} preview valid={cell.valid}/>) ?? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>
   );

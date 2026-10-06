@@ -6,7 +6,8 @@ const p=(x,z,rotation,itemId)=>({gridX:x,gridZ:z,rotation,itemId,placementId:`${
 const loop=[p(0,0,180,'rail_corner'),p(1,0,0,'rail_train'),p(2,0,90,'rail_corner'),p(2,1,0,'rail_corner'),p(1,1,0,'rail_straight'),p(0,1,270,'rail_corner')];
 const route=railwayRoute(loop[1],loop,items);assert.equal(route.length,6);
 assert.equal(railwayRoute(loop[1],loop.slice(0,-1),items).length,0,'Gap prevents running');
-assert.equal(railwayRoute(loop[1],[...loop,p(1,0,0,'rail_straight')],items).length,0,'Overlapping track rejected');
+assert.equal(railwayRoute(loop[1],[...loop,p(1,0,0,'rail_straight')],items).length,6,'Train overlays existing track without duplicating route');
+assert.equal(railwayRoute(loop[1],[...loop,p(1,0,0,'rail_straight'),p(1,0,0,'rail_straight')],items).length,0,'Duplicate track still rejected');
 const wrong=loop.map((v,i)=>i===3?{...v,rotation:90}:v);assert.equal(railwayRoute(wrong[1],wrong,items).length,0);
 const length=route.reduce((s,r)=>s+segmentLength(r),0);let previous=routePosition(route,0);
 for(let d=.01;d<=length+.01;d+=.01){const point=routePosition(route,d);assert.ok(Math.hypot(point.x-previous.x,point.z-previous.z)<.011,'Continuous path through every join');previous=point;}
@@ -34,3 +35,18 @@ for(const angle of [0,90,180,270]){
  assert.equal(railwayRoute(train,placed.filter(v=>v!==placed[1]),items).length,0,'Missing end connection keeps train stopped');
 }
 console.log('PASS: built-in station track connects, runs continuously and docks at all four rotations.');
+
+for(const rotation of [0,90,180,270]){
+ for(const target of ['rail_straight','rail_corner','railway_station']){
+  const tracks=stationLoop.map(v=>v.itemId==='rail_train'?{...v,itemId:'rail_straight'}:v);
+  const cell=target==='railway_station'?{gridX:0,gridZ:1}:tracks.find(v=>v.itemId===target);
+  const train=p(cell.gridX,cell.gridZ,0,'rail_train');
+  const placed=[...tracks,train].map(v=>{const [gridX,gridZ]=exports.rotateRail([v.gridX,v.gridZ],rotation);return {...v,gridX,gridZ,rotation:v.itemId==='rail_train'?0:(v.rotation+rotation)%360};});
+  const start=placed.at(-1),support=exports.trainTrackSupport(start,placed,items);
+  assert.ok(support,'Train has support on '+target);
+  const route=railwayRoute(start,placed,items);assert.equal(route.length,16,'Overlay train runs without duplicate segments on '+target);
+  assert.equal(stationStopDistances(route,placed,items).length,1);
+  const pose=routePosition([support],segmentLength(support)/2);assert.ok(Number.isFinite(pose.yaw),'Parked train follows track orientation');
+ }
+}
+console.log('PASS: trains placed on existing straight, curved and station rails use the original route at all rotations.');

@@ -1,4 +1,5 @@
 import { newWorldPlacementId } from "./world-connections";
+import { trainTrackSupport } from "./railway";
 import { isVillageBuilding, type VillageStyle } from "./village-buildings";
 import { getItemPresentation } from "./world-item-presentation";
 import type { EconomyItem } from "@/lib/economy";
@@ -164,10 +165,12 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
     if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(x, z)) return false;
   }
   const occupied = new Set<string>();
+  const support = item.metadata.worldAssetKey === "rail_train" ? trainTrackSupport(placement, placements, itemsById) : null;
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
     for (const tile of groundTiles) if (tile.tileType === "water") occupied.add(`${tile.gridX}:${tile.gridZ}`);
   }
   for (const existing of normaliseHomes(placements)) {
+    if (support?.source === existing) continue;
     if (placement.itemId === CENTRAL_WORLD_HOME_KEY && existing.itemId === CENTRAL_WORLD_HOME_KEY) continue;
     const existingItem = existing.itemId === CENTRAL_WORLD_HOME_KEY ? CENTRAL_WORLD_HOME_ITEM : itemsById.get(existing.itemId);
     // Do not guess an unloaded reward footprint when deciding where a home fits.

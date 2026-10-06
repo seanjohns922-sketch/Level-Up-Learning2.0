@@ -8,7 +8,7 @@ import * as railway from '../lib/world3d/railway.ts';
 import { WORLD_REWARD_ADDITIONS } from '../lib/world3d/world-expansion.ts';
 import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as catalogue } from '../lib/world3d/central-world-customisation-catalog.ts';
 import { CENTRAL_WORLD_STARTER_SCENERY } from '../lib/world3d/central-world-editor-catalog.ts';
-import {parseGridSize,validateCentralWorldPlacement} from '../lib/world3d/central-world-layout.ts';
+import {parseGridSize,validateCentralWorldPlacement,writeCentralWorldPlacements,readCentralWorldPlacements} from '../lib/world3d/central-world-layout.ts';
 const require = createRequire(import.meta.url);
 function compile(relativePath, dependencies = {}) {
  const filename=path.resolve(relativePath);
@@ -60,3 +60,23 @@ for(const rotation of [0,90,180,270]){
  }
 }
 console.log('PASS: actual station rail geometry matches route cells and adjacent tracks can be placed at every rotation.');
+
+const trainItem=CENTRAL_WORLD_STARTER_SCENERY.find(i=>i.metadata.worldAssetKey==='rail_train');
+const cornerItem=CENTRAL_WORLD_STARTER_SCENERY.find(i=>i.metadata.worldAssetKey==='rail_corner');
+items.set(trainItem.item_key,trainItem);items.set(cornerItem.item_key,cornerItem);
+for(const rotation of [0,90,180,270]){
+ for(const supportItem of [straight,cornerItem,item]){
+  const support={itemId:supportItem.item_key,placementId:'support',gridX:25,gridZ:25,rotation};
+  const [dx,dz]=supportItem===item?railway.rotateRail([0,2],rotation):[0,0];
+  const train={itemId:trainItem.item_key,placementId:'train',gridX:25+dx/2,gridZ:25+dz/2,rotation:0};
+  assert.ok(validateCentralWorldPlacement(train,trainItem,[support],items),'Train allowed on '+supportItem.name);
+  assert.ok(!validateCentralWorldPlacement(train,trainItem,[support,train],items),'Second train in same cell rejected');
+  if(supportItem===item)assert.ok(!validateCentralWorldPlacement({...train,gridX:25,gridZ:25},trainItem,[support],items),'Train cannot overlap station building');
+  const storage=new Map();globalThis.window={localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v)}};
+  writeCentralWorldPlacements('train-test',[support,train]);const restored=readCentralWorldPlacements('train-test');
+  assert.ok(railway.trainTrackSupport(restored.find(p=>p.placementId==='train'),restored,items),'Track association survives reload');
+  assert.ok(restored.some(p=>p.placementId==='support'),'Original track retained');
+  delete globalThis.window;
+ }
+}
+console.log('PASS: editor allows trains on existing rails, rejects occupied trains/buildings and retains tracks after reload.');

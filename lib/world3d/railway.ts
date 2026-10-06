@@ -9,6 +9,16 @@ export function stationRailPlacements(station:CentralWorldPlacement):CentralWorl
 }
 type Point=[number,number];
 export type RailSegment={placement:CentralWorldPlacement;asset:string;reverse:boolean};
+/** Existing track beneath a train; the train must not add a second route segment. */
+export function trainTrackSupport(train:CentralWorldPlacement,placements:CentralWorldPlacement[],items:Map<string,EconomyItem>){
+ for(const source of placements){
+  const asset=String(items.get(source.itemId)?.metadata.worldAssetKey??'');
+  const candidates=asset==='railway_station'?stationRailPlacements(source):asset==='rail_straight'||asset==='rail_corner'?[source]:[];
+  const placement=candidates.find(p=>p.gridX===train.gridX&&p.gridZ===train.gridZ);
+  if(placement)return {source,placement,asset:asset==='railway_station'?'rail_straight':asset,reverse:false};
+ }
+ return null;
+}
 export function rotateRail([x,z]:Point,degrees:number):Point {const a=degrees*Math.PI/180;return [Math.round((x*Math.cos(a)+z*Math.sin(a))*1e6)/1e6,Math.round((-x*Math.sin(a)+z*Math.cos(a))*1e6)/1e6];}
 export function railPoint(asset:string,t:number):Point {
  if(asset!=='rail_corner')return [-1+2*t,0];
@@ -20,11 +30,13 @@ const key=(p:Point)=>p.map(n=>n.toFixed(4)).join(':');
 export function railwayRoute(start:CentralWorldPlacement,placements:CentralWorldPlacement[],items:Map<string,EconomyItem>):RailSegment[]{
  const rails=placements.flatMap(placement=>{
   const asset=String(items.get(placement.itemId)?.metadata.worldAssetKey??'');
+  if(asset==='rail_train'&&trainTrackSupport(placement,placements,items))return [];
   return asset==='railway_station'?stationRailPlacements(placement).map(placement=>({placement,asset:'rail_straight'})):RAIL_KEYS.has(asset)?[{placement,asset}]:[];
  });
  const endpoints=new Map<string,Array<{index:number;end:number}>>();
  rails.forEach((r,index)=>ports(r.placement,r.asset).forEach((point,end)=>{const k=key(point);endpoints.set(k,[...(endpoints.get(k)??[]),{index,end}]);}));
- const first=rails.findIndex(r=>r.placement===start);if(first<0)return [];
+ const support=trainTrackSupport(start,placements,items);
+ const first=rails.findIndex(r=>support?r.placement.gridX===support.placement.gridX&&r.placement.gridZ===support.placement.gridZ:r.placement===start);if(first<0)return [];
  const route:RailSegment[]=[],seen=new Set<number>();let index=first,entry=0;
  while(!seen.has(index)){
   seen.add(index);const r=rails[index];route.push({...r,reverse:entry===1});
