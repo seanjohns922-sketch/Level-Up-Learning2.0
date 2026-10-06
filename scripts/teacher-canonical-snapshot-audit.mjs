@@ -30,6 +30,7 @@ const realmRegistry = loadTypeScriptModule("lib/realms/realm-registry.ts");
 const programWeeks = loadTypeScriptModule("lib/program-weeks.ts", {
   "./realms/realm-registry": realmRegistry,
   "./cave7-config": loadTypeScriptModule("lib/cave7-config.ts"),
+  "./level8-config": loadTypeScriptModule("lib/level8-config.ts"),
 });
 const snapshotModule = loadTypeScriptModule("lib/teacher/teacher-student-snapshot.ts", {
   "@/lib/realms/realm-registry": realmRegistry,
@@ -301,3 +302,13 @@ assert.doesNotMatch(liveSource, /realm.*\?\?.*["']number["']/i);
 console.log("Teacher canonical snapshot audit passed.");
 console.log("Realm isolation, 12/8-week journeys, targeted pathways, missing placement,");
 console.log("teacher overrides, assessment identity, telemetry isolation, and coaching confidence verified.");
+
+for(const [realmId,weeks] of Object.entries({number:12,measurement:12,space:10,pattern:12,statistics:10,chance:10})){
+ const snapshot=buildTeacherStudentSnapshot({studentId:'student-1',realmId,progressRows:[progressRow({realm_id:realmId,year:'Year 8',week:weeks,required_weeks:[1,weeks],optional_weeks:[weeks+1]})]});
+ assert.equal(snapshot.currentLevel,'Year 8');
+ assert.equal(snapshot.currentWeek,weeks);
+ assert.equal(snapshot.realm.totalWeeks,weeks);
+ assert.deepEqual(snapshot.requiredWeeks,[1,weeks]);
+ assert.deepEqual(snapshot.optionalWeeks,[]);
+}
+console.log('PASS Year 8 teacher snapshots retain the final week and correct realm-specific lengths.');

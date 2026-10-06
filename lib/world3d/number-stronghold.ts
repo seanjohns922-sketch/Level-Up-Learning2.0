@@ -1,7 +1,9 @@
+import { LEVEL8_WEEK_COUNTS } from '../level8-config';
+export { LEVEL8_WEEK_COUNTS } from '../level8-config';
 import type { SummitPoint } from './number-summit';
 import type { ExpeditionRealm } from './expedition-access';
 
-// Navigation samples only. Level 8 curriculum lengths are deliberately not set here.
+// Demo navigation; curriculum lengths come from the shared Year 8 configuration.
 export const NUMBER_STRONGHOLD_DEMO = '/demo-review/volcano/number';
 export const STRONGHOLD_SUMMIT_RETURN = '/demo-review/number-adventure/3d?summit=1';
 /**
@@ -28,11 +30,6 @@ export function strongholdStory(realm:ExpeditionRealm){
 }
 export const STRONGHOLD_STORY = strongholdStory('number');
 export type StrongholdStory = keyof typeof STRONGHOLD_STORY;
-/**
- * Level 8 week counts. These follow Level 7 except Probability, which gains two weeks for Year 8
- * content (two-way tables, Venn diagrams, complementary events). Confirm against the Level 8 curriculum map.
- */
-export const LEVEL8_WEEK_COUNTS: Record<ExpeditionRealm,number> = {number:12,measurement:12,space:10,pattern:12,statistics:10,chance:10};
 /** Stronghold layout: portals alternate sides down the hall and the Core chamber follows the final week. */
 export const STRONGHOLD_PORTAL_SPACING = 14;
 export function strongholdLayout(realm:ExpeditionRealm='number'){

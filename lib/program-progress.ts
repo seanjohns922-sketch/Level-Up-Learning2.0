@@ -119,11 +119,11 @@ export function isWeekCompleteForRealm(
   week?: number,
   year?: string | null,
 ): boolean {
-  // Level 7's final week in every realm ends with the post-test instead of a weekly quiz.
-  if (year === "Year 7" && week != null && week === getLastProgramWeek(realmId, year)) {
+  // Levels 7 and 8: the final week in every realm ends with the post-test instead of a weekly quiz.
+  if ((year === "Year 7" || year === "Year 8") && week != null && week === getLastProgramWeek(realmId, year)) {
     return p.lessonsCompleted.slice(0, 3).every(Boolean);
   }
-  if (year !== "Year 7" && normalizeRealmId(realmId) === "chance") {
+  if (year !== "Year 7" && year !== "Year 8" && normalizeRealmId(realmId) === "chance") {
     const lessonsComplete = p.lessonsCompleted.slice(0, 3).every(Boolean);
     if (!lessonsComplete) return false;
     return week === 6 || weeklyQuizPassed(p.quizBestScore ?? p.quizScore ?? 0);

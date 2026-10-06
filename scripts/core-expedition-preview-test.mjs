@@ -9,7 +9,7 @@ function load(name){
  if(modules.has(filename))return modules.get(filename).exports;
  const module={exports:{}};modules.set(filename,module);
  const code=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
- new Function('require','module','exports',code)(name=>load(name.replace('./','')),module,module.exports);
+ new Function('require','module','exports',code)(name=>load(path.resolve(path.dirname(filename),name)),module,module.exports);
  return module.exports;
 }
 const {summitFloor}=load('number-summit');

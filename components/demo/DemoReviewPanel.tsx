@@ -498,7 +498,8 @@ export default function DemoReviewPanel() {
 
         <section className="border-t border-white/10 py-6">
           <h2 className="mb-3 text-base font-black">The Final Battle · Level 8 Preview</h2>
-          <p className="mb-3 text-xs text-white/60">The volcano gate and all six summit gateways are open in demo review, and each gateway leads to its realm’s stronghold prototype. Weekly portals are samples until the Level 8 curriculum is written. Nothing here changes student progress.</p>
+          <button type="button" onClick={() => router.push("/demo-review/level8-curriculum")} className={actionClass()}><Eye size={17} /> Level 8 scope and sequence</button>
+          <p className="mb-3 text-xs text-white/60">The volcano gate and all six summit gateways are open in demo review, and each gateway leads to its realm’s stronghold prototype. Weekly portals now show the planned lesson sequence; playable lessons are still being prepared. Nothing here changes student progress.</p>
           <div className="grid gap-2">
             <button type="button" onClick={() => router.push("/demo-review/number-adventure/3d?summit=1")} className={actionClass()}><Eye size={17} /> Open the volcano summit</button>
             {EXPEDITION_TRAILS.map(trail => <button key={trail.id} type="button" onClick={() => router.push(strongholdDemoHref(trail.id))} className={actionClass()}><Eye size={17} /> {trail.name} stronghold</button>)}
