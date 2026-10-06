@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoPreviewMode } from "@/lib/demo-mode";
+
 import { BookOpen, Rocket, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -21,6 +23,7 @@ type QuizMetadata = {
 
 export default function StarpathDevelopmentQuiz({ quiz }: { quiz: QuizMetadata }) {
   const router = useRouter();
+  const demoMode = useDemoPreviewMode();
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const theme = REALM_QUIZ_THEMES.space;
 
@@ -39,7 +42,7 @@ export default function StarpathDevelopmentQuiz({ quiz }: { quiz: QuizMetadata }
           week={quiz.week}
           questionCount={15}
           focus={quiz.coverage}
-          demoMode
+          demoMode={demoMode}
           onBack={() => router.push(quiz.weekHref)}
         />
 

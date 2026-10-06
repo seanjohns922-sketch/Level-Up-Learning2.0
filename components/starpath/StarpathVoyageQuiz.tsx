@@ -428,7 +428,7 @@ export default function StarpathVoyageQuiz({
           week={quiz.week}
           questionCount={total || 15}
           focus={quiz.coverage}
-          demoMode
+          demoMode={demoMode}
           onBack={() => router.push(backHref)}
         />
 

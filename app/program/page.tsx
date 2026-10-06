@@ -833,7 +833,18 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
-    if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm){try{sessionStorage.setItem(`lul:shattered-realms:demo-week:${realm}`,String(clamped));}catch{/* optional demo resume */}router.push(cavernWeekHref(realm,clamped));}return;}
+    if (isExpeditionWeek) {
+      const realm = cavernRealm(realmId);
+      if (!realm) return;
+      if (liveLevel7) {
+        if (!playableWeeks.includes(clamped)) return;
+        router.push(level7LiveHref(realm, clamped, "week"));
+      } else {
+        try { sessionStorage.setItem(`lul:shattered-realms:demo-week:${realm}`, String(clamped)); } catch { /* optional demo resume */ }
+        router.push(cavernWeekHref(realm, clamped));
+      }
+      return;
+    }
     if (!unrestrictedMode && hasAssignedWeekAccess && !playableWeeks.includes(clamped)) return;
     if (isStarpathRealm && starpathProgram) {
       const level = starpathProgram.definition.yearLabel as RealmLevelId;
@@ -921,7 +932,15 @@ function ProgramPage() {
 
   return (
     <main className="min-h-screen relative">
-      {isExpeditionWeek && <div className="relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 pt-16 text-center text-sm text-white"><span>{isNumber7 ? `Level 7 demo · All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%.` : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span><>{isNumber7&&<a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download className="shrink-0 underline">Download scope and sequence</a>}</><ReadAloudBtn text={isNumber7 ? `Level 7 demo. All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/></div>}
+      {isExpeditionWeek && (
+        <div className={`relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 text-center text-sm text-white ${previewMode ? "pt-16" : "pt-3"}`}>
+          {previewMode && <>
+            <span>{isNumber7 ? `Level 7 demo · All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%.` : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span>
+            <ReadAloudBtn text={isNumber7 ? `Level 7 demo. All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/>
+          </>}
+          {isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download className="shrink-0 underline">Download scope and sequence</a>}
+        </div>
+      )}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
       {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} /> : <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}

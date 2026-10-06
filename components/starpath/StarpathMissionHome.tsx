@@ -1,5 +1,7 @@
 "use client";
 
+import { useDemoPreviewMode } from "@/lib/demo-mode";
+
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -40,6 +42,7 @@ export default function StarpathMissionHome({
   content?: StarpathLessonContent;
   onStart?: () => void;
 }) {
+  const demoMode = useDemoPreviewMode();
   const available = lesson.status === "implemented" && Boolean(content) && Boolean(onStart);
   const criteria = content?.successCriteria ?? [lesson.focus];
   const artworkSrc = content?.artworkSrc ?? "/images/starpath-home-bg-ground.png";
@@ -70,7 +73,7 @@ export default function StarpathMissionHome({
             <ArrowLeft className="h-4 w-4" /> Back to Week {lesson.week}
           </Link>
           <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-violet-200">
-            <Orbit className="h-5 w-5 text-cyan-300" /> Starpath · Demo Mode
+            <Orbit className="h-5 w-5 text-cyan-300" /> Starpath{demoMode ? " · Demo Mode" : ""}
           </div>
         </header>
 
