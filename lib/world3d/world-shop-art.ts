@@ -1,5 +1,7 @@
+import { TRAIN_DESIGNS } from "./train-catalogue";
 // Generated from the actual models via /demo-review/marketplace-art.
 export const WORLD_SHOP_ART: Record<string, {src:string;alt:string}> = {
+  ...Object.fromEntries(TRAIN_DESIGNS.map(d=>[d.key,{src:`/marketplace/world-renders/${d.key}.webp`,alt:d.name+" — actual world model"}])),
   "central_world_plot_1_clubhouse": {
     "src": "/marketplace/world-renders/clubhouse.webp",
     "alt": "Queenslander — actual world model"

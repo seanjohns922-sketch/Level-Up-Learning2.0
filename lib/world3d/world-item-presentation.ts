@@ -1,3 +1,4 @@
+import { isTrainAsset } from "./train-catalogue";
 import { VILLAGE_INFRASTRUCTURE } from "./village-infrastructure";
 import { VILLAGE_BUILDINGS } from "./village-buildings";
 import type { EconomyItem } from "@/lib/economy";
@@ -164,6 +165,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   bush_camp: {height:2.8, footprint:[8,8], theme:"australian_reward"},
 };
 export function getItemPresentation(item: EconomyItem): ItemPresentation {
+  if (isTrainAsset(item.metadata.worldAssetKey)) return {height:1.5,footprint:[2,2],theme:"garden"};
   return WORLD_ITEM_PRESENTATION[String(item.metadata.worldAssetKey)] ?? {height:3, theme:"garden"};
 }
 

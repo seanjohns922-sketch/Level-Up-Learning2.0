@@ -80,3 +80,25 @@ for(const rotation of [0,90,180,270]){
  }
 }
 console.log('PASS: editor allows trains on existing rails, rejects occupied trains/buildings and retains tracks after reload.');
+const trainCatalogue=await import('../lib/world3d/train-catalogue.ts');
+const {TrainUnit}=compile('components/world3d/TrainModels.tsx',{'./DetailedScenery':primitives,'@/lib/world3d/train-catalogue':trainCatalogue});
+const geometrySignatures=new Set();
+for(const entry of trainCatalogue.TRAIN_CATALOGUE){
+ items.set(entry.item_key,entry);assert.ok(entry.price>0&&entry.purchasable);
+ const track={itemId:straight.item_key,placementId:'track',gridX:25,gridZ:25,rotation:90};
+ const train={...track,itemId:entry.item_key,placementId:'paid-train',rotation:0};
+ assert.ok(validateCentralWorldPlacement(train,entry,[track],items),entry.name+' can be placed on rails');
+ assert.ok(!validateCentralWorldPlacement(train,entry,[],items),entry.name+' cannot be placed on bare ground');
+ const design=trainCatalogue.trainDesign(entry.item_key);
+ for(let car=0;car<=design.cars;car++){
+  const root=new THREE.Group();attach(TrainUnit({asset:entry.item_key,car}),root);root.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(root),size=box.getSize(new THREE.Vector3());
+  assert.ok(size.x<1.2&&size.z<1.85&&size.y<1.7,'Train units stay within safe rail dimensions');
+  const geometry=[];root.traverse(o=>{if(o.isMesh)geometry.push([o.geometry.type,o.geometry.attributes.position.count,...o.matrixWorld.elements]);});
+  if(car===0)geometrySignatures.add(JSON.stringify(geometry));
+ }
+ assert.ok(fs.existsSync('public'+entry.metadata.marketplace_visual.src),'Product artwork exists');
+}
+assert.equal(geometrySignatures.size,10,'All ten engines have distinct geometry, not just recolours');
+assert.deepEqual(trainCatalogue.TRAIN_CATALOGUE.map(i=>i.price),[400,900,1400,2200,3000,3000,3000,3000,3000,3000]);
+console.log('PASS: ten distinct engine models, bounded carriages, XP prices, artwork and track-only placement.');

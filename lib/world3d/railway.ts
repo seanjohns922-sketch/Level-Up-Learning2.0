@@ -1,6 +1,7 @@
+import { TRAIN_DESIGNS, isTrainAsset } from "./train-catalogue";
 import type { CentralWorldPlacement } from './central-world-layout';
 import type { EconomyItem } from '../economy';
-export const RAIL_KEYS = new Set(['rail_straight','rail_corner','rail_train']);
+export const RAIL_KEYS = new Set(['rail_straight','rail_corner','rail_train',...TRAIN_DESIGNS.map(d=>d.key)]);
 // Five fixed two-metre cells across the station's front row (inside its 5x3 plot).
 export const STATION_TRACK_CENTRES = [-4,-2,0,2,4] as const;
 export const STATION_TRACK_Z = 2;
@@ -30,12 +31,13 @@ const key=(p:Point)=>p.map(n=>n.toFixed(4)).join(':');
 export function railwayRoute(start:CentralWorldPlacement,placements:CentralWorldPlacement[],items:Map<string,EconomyItem>):RailSegment[]{
  const rails=placements.flatMap(placement=>{
   const asset=String(items.get(placement.itemId)?.metadata.worldAssetKey??'');
-  if(asset==='rail_train'&&trainTrackSupport(placement,placements,items))return [];
+  if(isTrainAsset(asset) && (asset!=='rail_train'||trainTrackSupport(placement,placements,items)))return [];
   return asset==='railway_station'?stationRailPlacements(placement).map(placement=>({placement,asset:'rail_straight'})):RAIL_KEYS.has(asset)?[{placement,asset}]:[];
  });
  const endpoints=new Map<string,Array<{index:number;end:number}>>();
  rails.forEach((r,index)=>ports(r.placement,r.asset).forEach((point,end)=>{const k=key(point);endpoints.set(k,[...(endpoints.get(k)??[]),{index,end}]);}));
  const support=trainTrackSupport(start,placements,items);
+ if(isTrainAsset(items.get(start.itemId)?.metadata.worldAssetKey)&&items.get(start.itemId)?.metadata.worldAssetKey!=='rail_train'&&!support)return [];
  const first=rails.findIndex(r=>support?r.placement.gridX===support.placement.gridX&&r.placement.gridZ===support.placement.gridZ:r.placement===start);if(first<0)return [];
  const route:RailSegment[]=[],seen=new Set<number>();let index=first,entry=0;
  while(!seen.has(index)){

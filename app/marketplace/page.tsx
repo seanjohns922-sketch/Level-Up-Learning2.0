@@ -106,11 +106,12 @@ export default function MarketplacePage() {
               setDepartment(next);setCategory("all");setSelected(null);
               event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#shop-${next}-tab`)?.focus();
             }} onClick={()=>{setDepartment(id);setCategory("all");setSelected(null);}} className={`flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${active?"border-[#293f34] bg-[#293f34] text-[#fff8e8] shadow-md":"border-[#d8dbce] bg-white text-[#405144] hover:border-[#84947b]"}`}>
-              <Icon className="h-6 w-6 shrink-0"/><span><span className="block text-lg font-black">{id==="world"?"World":"Avatar"}</span><span className={`mt-0.5 block text-xs ${active?"text-[#ced8c7]":"text-slate-500"}`}>{id==="world"?"Buildings, wildlife & places":"Outfits, companions & effects"}</span></span>
+              <Icon className="h-6 w-6 shrink-0"/><span><span className="block text-lg font-black">{id==="world"?"World":"Avatar"}</span><span className={`mt-0.5 block text-xs ${active?"text-[#ced8c7]":"text-slate-500"}`}>{id==="world"?"Buildings, trains & wildlife":"Outfits, companions & effects"}</span></span>
             </button>;})}
           </div>
           <div className="mt-5"><RealmItemFilter value={realmFilter} onChange={setRealmFilter}/></div>
           <div className="mt-5 flex gap-2 overflow-x-auto pb-2" aria-label="Marketplace categories">{MARKETPLACE_CATEGORIES[department].map(item=><button type="button" key={item.id} onClick={()=>setCategory(item.id)} aria-pressed={category===item.id} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-bold ${category===item.id?"border-[#c5a96b] bg-[#f0dfb5] text-[#4b3b1f]":"border-[#d8dbce] bg-white text-slate-600 hover:border-[#84947b]"}`}>{item.label}</button>)}</div>
+          {department === "world" && category === "trains" ? <p className="mt-3 text-sm text-slate-600">Build your tracks for free in Edit World → Décor. Unlock a train with XP, then place it on your rails. Carriages shown are included.</p> : null}
         </header>
         {message || sessionMessage ? <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900" role="status">{message ?? sessionMessage}{outfitDestination ? <Link href={outfitDestination} className="ml-3 underline underline-offset-2">Open Outfit</Link> : null}</div> : null}
         <div className="grid gap-5 lg:grid-cols-[1fr_360px]">

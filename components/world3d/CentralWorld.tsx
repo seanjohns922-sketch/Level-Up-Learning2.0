@@ -1,5 +1,6 @@
 "use client";
 
+import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
@@ -369,12 +370,13 @@ export default function CentralWorld() {
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
   const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
   const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
-  const activeBuildItemKey = requestedBuildItemKey ?? editorItemKey;
+  const activeBuildItemKey = editorItemKey ?? requestedBuildItemKey;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
   // Exclude the item currently in hand by its unique placementId (not itemId),
   // so moving one of several identical scenery items leaves the others intact.
   const heldPlacementId = buildPlacement?.placementId ?? null;
   const placementsWithoutBuildItem = heldPlacementId ? placedCustomisations.filter((placement) => placement.placementId !== heldPlacementId) : placedCustomisations;
+  const buildingTrain = isTrainAsset(buildItem?.metadata.worldAssetKey);
   const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles));
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
@@ -388,7 +390,7 @@ export default function CentralWorld() {
   } : null;
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special"].includes(String(item.metadata.marketplaceCategory))))
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains"].includes(String(item.metadata.marketplaceCategory))))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   useEffect(() => {
@@ -412,7 +414,7 @@ export default function CentralWorld() {
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
           const requestedItem = nextItemsById.get(requestedBuildItemKey)!;
           const nextBuildPlacement = selectCentralWorldInventoryPlacement(requestedItem, nextPlacements, { gridX: -5, gridZ: 5 });
-          if (isVillageBuilding(requestedItem.metadata.worldAssetKey)) {
+          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
             setEditorOpen(true);
             setLibrarySection("owned");
             setSelectedInventoryItemKey(requestedBuildItemKey);
@@ -559,7 +561,7 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
     setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, cameraFocus));
-    void speak(`${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
+    void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Tap an empty railway track to place it. The train follows the track direction.` : `${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
   function closeBuildMode() {
@@ -859,7 +861,7 @@ export default function CentralWorld() {
             <button type="button" onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}><RotateCw size={18} /> Rotate</button>
             <div style={{ display: "grid", gap: 6 }}><button type="button" disabled={!buildValid} onClick={confirmBuildPlacement} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: buildValid ? "#22c55e" : "#64748b", color: "white", opacity: buildValid ? 1 : .65 }}><Check size={19} /> Place</button><button type="button" onClick={closeBuildMode} style={{ ...debugButton, minHeight: 36, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}><X size={17} /> Cancel</button></div>
           </div>
-          <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildValid ? "This space is ready." : "This space is protected or already occupied."}</div>
+          <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildValid ? "This space is ready." : buildingTrain ? "Choose an empty railway track or the station’s rails." : "This space is protected or already occupied."}</div>
         </section>
       ) : null}
       {editorOpen ? (
@@ -913,7 +915,7 @@ export default function CentralWorld() {
           </div>
 
           {paletteTab !== "ground" && <select aria-label="Scenery collection" value={sceneryCollection} onChange={event => setSceneryCollection(event.target.value)} style={{width:"100%",marginTop:8,padding:8,background:"#22382e",color:"#fff7e7",border:"1px solid #607b62",borderRadius:6}}><option value="all">All collections · mix freely</option>{Object.entries(WORLD_COLLECTIONS).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>}
-          {paletteTab !== "ground" && <input aria-label="Search scenery" placeholder={`Search ${CENTRAL_WORLD_STARTER_SCENERY.filter(item => item.metadata.worldSceneryGroup === paletteTab).length} items…`} value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} style={{ width: "100%", boxSizing: "border-box", marginTop: 8, padding: "9px 10px", background: "#22382e", color: "#fff7e7", border: "1px solid #607b62", borderRadius: 6 }} />}
+          {paletteTab !== "ground" && <input aria-label="Search scenery" placeholder={`Search ${CENTRAL_WORLD_STARTER_SCENERY.filter(item => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab).length} items…`} value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} style={{ width: "100%", boxSizing: "border-box", marginTop: 8, padding: "9px 10px", background: "#22382e", color: "#fff7e7", border: "1px solid #607b62", borderRadius: 6 }} />}
           {/* Only results scroll: categories and search stay in reach. */}
           <div key={paletteTab} className="worldLibraryResults" aria-label="Available building items" tabIndex={0}>
           <div className="worldLibraryItemGrid">
@@ -922,7 +924,7 @@ export default function CentralWorld() {
                   const selected = !heldItemKey && editTool === tool;
                   return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", fontSize: 12, fontWeight: 900, background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border }}><Icon size={18} style={{ flex: "0 0 auto" }} />{label}</button>;
                 })
-              : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)).map((item) => {
+              : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)).map((item) => {
                   const selected = selectedSceneryItemKey === item.item_key;
                   const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? PALETTE_TABS.find(tab => tab.key === paletteTab)?.Icon ?? Sprout;
                   return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ minWidth: 0, whiteSpace: "normal", overflowWrap: "anywhere", textAlign: "left", lineHeight: 1.3, fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
@@ -935,7 +937,7 @@ export default function CentralWorld() {
             <p>Add a bridge from Rocks or a drawbridge from Fortress.</p>
             <p>Use Erase on clear ground to remove one water square and reshape the banks. Undo restores your last edit. Your home and doorway stay clear.</p>
           </div>}
-          {paletteTab !== "ground" && !CENTRAL_WORLD_STARTER_SCENERY.some(item => item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)) && <p role="status" style={{ color: "#e1ddce", fontSize: 12 }}>No matching items in this category.</p>}
+          {paletteTab !== "ground" && !CENTRAL_WORLD_STARTER_SCENERY.some(item => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)) && <p role="status" style={{ color: "#e1ddce", fontSize: 12 }}>No matching items in this category.</p>}
           </div>
           </>}
           <div className="worldLibrarySelection">
@@ -984,7 +986,7 @@ export default function CentralWorld() {
       {editorOpen ? (
         <>
           <div className="centralWorldBuildControls" style={{ position: "absolute", left: "calc(50% + 165px)", bottom: 16, transform: "translateX(-50%)", zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, pointerEvents: "none" }}>
-            <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? (buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "House and doorway fit · choose Place to save" : "Arrows move it · tap the grass to drop it") : "Choose clear, reachable ground with room for the doorway") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
+            <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? (buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "House and doorway fit · choose Place to save" : buildingTrain ? "Track ready · tap to place your train" : "Arrows move it · tap the grass to drop it") : buildingTrain ? "Choose an empty railway track or the station’s rails" : "Choose clear, reachable ground with room for the doorway") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
             <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
                 <button type="button" aria-label={buildPreview ? "Move item forward" : "Pan view forward"} onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>

@@ -1,5 +1,6 @@
 import fs from 'node:fs';import ts from 'typescript';import assert from 'node:assert/strict';
-const exports={};new Function('exports',ts.transpileModule(fs.readFileSync('lib/world3d/railway.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports);
+const catalogue={};new Function('exports',ts.transpileModule(fs.readFileSync('lib/world3d/train-catalogue.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(catalogue);
+const exports={};new Function('exports','require',ts.transpileModule(fs.readFileSync('lib/world3d/railway.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports,()=>catalogue);
 const {railwayRoute,routePosition,segmentLength,stationStopDistances}=exports;
 const items=new Map(['rail_corner','rail_straight','rail_train','railway_station'].map(asset=>[asset,{metadata:{worldAssetKey:asset,gridSize:asset==='railway_station'?'5x3':'1x1'}}]));
 const p=(x,z,rotation,itemId)=>({gridX:x,gridZ:z,rotation,itemId,placementId:`${x}:${z}`});
@@ -50,3 +51,16 @@ for(const rotation of [0,90,180,270]){
  }
 }
 console.log('PASS: trains placed on existing straight, curved and station rails use the original route at all rotations.');
+for(const design of catalogue.TRAIN_DESIGNS){
+ items.set(design.key,{metadata:{worldAssetKey:design.key,gridSize:'1x1'}});
+ const tracks=loop.map(p=>p.itemId==='rail_train'?{...p,itemId:'rail_straight'}:p);
+ const train=p(1,0,0,design.key),placed=[...tracks,train];
+ const route=railwayRoute(train,placed,items);assert.equal(route.length,6,design.name+' uses underlying rails');
+ assert.equal(railwayRoute(train,[train],items).length,0,'Paid train never supplies free track');
+ const total=route.reduce((sum,s)=>sum+segmentLength(s),0);
+ for(let car=1;car<=design.cars;car++){
+  let previous=routePosition(route,-car*1.85);
+  for(let d=.02;d<=total;d+=.02){const pose=routePosition(route,d-car*1.85);assert.ok(Math.hypot(pose.x-previous.x,pose.z-previous.z)<.021,'Carriage follows curves and wraps smoothly');previous=pose;}
+ }
+}
+console.log('PASS: all ten paid trains require existing rails and their carriages follow continuous paths.');

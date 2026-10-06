@@ -1,4 +1,7 @@
 "use client";
+import { isTrainAsset } from "@/lib/world3d/train-catalogue";
+import { TrainUnit } from "./TrainModels";
+
 import { RailTrack, StarterTrain, ParkedTrain, WorldRailway } from "./Railway";
 import { RAIL_KEYS, trainTrackSupport } from "@/lib/world3d/railway";
 import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
@@ -314,6 +317,7 @@ export function RewardPlotObject({ item, accent, tier, tint, buildingStyle }: { 
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
   if (category === "world_basic") return <StarterScenery assetKey={assetKey} tint={tint} />;
   if (isVillageBuilding(assetKey)) return <VillageBuilding assetKey={assetKey} style={buildingStyle} tint={tint} />;
+  if (isTrainAsset(assetKey) && assetKey !== "rail_train") return <TrainUnit asset={assetKey}/>;
   if (COLLECTION_REWARD_KEYS.has(assetKey)) return <CollectionReward assetKey={assetKey} tint={tint} />;
   if (["wildlife_habitat", "bunny_garden", "puppy_yard", "pet_sanctuary"].includes(assetKey)) return <AustralianHabitat assetKey={assetKey} />;
   if (AUSTRALIAN_PLACE_KEYS.has(assetKey)) return <AustralianPlace assetKey={assetKey} />;
@@ -781,7 +785,7 @@ function PlacedWorldObject({ item, placement, items, neighbours = [], preview = 
   const [width, depth] = parseGridSize(item);
   const position = gridToWorld(placement.gridX, placement.gridZ);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
-  const trainSupport = assetKey === "rail_train" ? trainTrackSupport(placement, neighbours, items) : null;
+  const trainSupport = isTrainAsset(assetKey) ? trainTrackSupport(placement, neighbours, items) : null;
   const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
   // In roam mode the drawbridge is interactive (tap to raise/lower); in edit mode
   // it's static so the build surface can pick it up.
@@ -810,7 +814,7 @@ function PlacedWorldObject({ item, placement, items, neighbours = [], preview = 
       {assetKey === "railway_station" ? <group ref={groupRef}>
         {/* Grid connectors must retain their exact origin and scale, including in previews. */}
         <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint}/>
-      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{!trainSupport && <RailTrack asset={assetKey}/>} {preview && assetKey === "rail_train" && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>

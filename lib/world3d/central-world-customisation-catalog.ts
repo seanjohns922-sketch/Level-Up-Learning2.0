@@ -1,3 +1,4 @@
+import { TRAIN_CATALOGUE } from "./train-catalogue";
 import { WORLD_SHOP_ART } from "./world-shop-art";
 import { isVillageBuilding } from "./village-buildings";
 import { WORLD_REWARD_ADDITIONS, worldCollectionFor } from "./world-expansion";
@@ -63,7 +64,7 @@ const ENTRIES: CatalogueEntry[] = [
   ...WORLD_REWARD_ADDITIONS.map(item => ({plot:item.plot, area:item.area, name:item.name, description:item.description, assetKey:item.key, rarity:(item.tier===3?"legendary":item.tier===2?"rare":"common") as EconomyItem["rarity"],tier:item.tier,price:item.price,accent:"#8b9972",icon:item.icon,gridSize:item.grid})),
 ];
 
-export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((entry) => ({
+export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.map<EconomyItem>((entry) => ({
   item_key: `central_world_plot_${entry.plot}_${entry.assetKey}`,
   name: entry.name,
   description: entry.description,
@@ -93,7 +94,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = ENTRIES.map((e
       previewMode: "background",
     },
   },
-}));
+})), ...TRAIN_CATALOGUE];
 
 export function mergeCentralWorldCatalogue(state: EconomyState): EconomyState {
   const existing = new Map(state.items.map((item) => [item.item_key, item]));

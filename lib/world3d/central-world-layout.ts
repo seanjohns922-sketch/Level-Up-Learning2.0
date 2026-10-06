@@ -1,3 +1,4 @@
+import { isTrainAsset } from "./train-catalogue";
 import { newWorldPlacementId } from "./world-connections";
 import { trainTrackSupport } from "./railway";
 import { isVillageBuilding, type VillageStyle } from "./village-buildings";
@@ -165,7 +166,8 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
     if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(x, z)) return false;
   }
   const occupied = new Set<string>();
-  const support = item.metadata.worldAssetKey === "rail_train" ? trainTrackSupport(placement, placements, itemsById) : null;
+  const support = isTrainAsset(item.metadata.worldAssetKey) ? trainTrackSupport(placement, placements, itemsById) : null;
+  if (isTrainAsset(item.metadata.worldAssetKey) && item.metadata.worldAssetKey !== "rail_train" && !support) return false;
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
     for (const tile of groundTiles) if (tile.tileType === "water") occupied.add(`${tile.gridX}:${tile.gridZ}`);
   }

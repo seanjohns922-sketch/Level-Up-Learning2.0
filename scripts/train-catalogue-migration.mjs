@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const exports={};new Function('exports',ts.transpileModule(fs.readFileSync('lib/world3d/train-catalogue.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports);
+const sqlValue=v=>v===null?'null':typeof v==='boolean'||typeof v==='number'?String(v):"'"+String(v).replaceAll("'","''")+"'";
+const keys=['item_key','name','description','category','realm_id','rarity','price','icon','accent','active','purchasable','discoverable','sort_order','metadata'];
+const rows=exports.TRAIN_CATALOGUE.map(item=>'('+keys.map(k=>sqlValue(k==='metadata'?JSON.stringify(item[k]):item[k])).join(', ')+')');
+const sql='-- Additive XP train catalogue. Existing inventories, balances and student RPC guards are unchanged.\n-- Existing placed free starter trains remain compatible in the client.\nbegin;\ninsert into public.economy_items ('+keys.join(', ')+') values\n'+rows.join(',\n')+'\non conflict (item_key) do nothing;\ncommit;\n';
+const file='supabase/migrations/20261006190000_train_collection.sql';
+if(process.argv.includes('--write'))fs.writeFileSync(file,sql);else assert.equal(fs.readFileSync(file,'utf8'),sql,'Migration matches the train catalogue and prices');
+console.log('PASS: ten train catalogue rows, prices and metadata match the additive migration.');
