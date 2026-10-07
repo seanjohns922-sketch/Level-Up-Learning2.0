@@ -202,6 +202,7 @@ export default function StatisticaLessonShell({ level, levelNumber, week, lesson
         startDisabled={!getTask}
         startDisabledLabel="Activity Preview Coming Soon"
         onBack={back}
+        hasNativeStartGuide={["y5-statistics-w3-l1", "y5-statistics-w5-l1", "y5-statistics-w5-l2", "y5-statistics-w5-l3", "y6-statistics-w2-l2"].includes(lessonId)}
         onStart={() => { if (getTask) setStarted(true); }}
       />
     </main>

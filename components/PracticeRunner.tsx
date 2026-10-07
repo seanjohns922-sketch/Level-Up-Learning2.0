@@ -1,5 +1,8 @@
 "use client";
 
+import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
+import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
+import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { Volume2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -475,6 +478,7 @@ export function PracticeRunner({
   showMistakeReview = true,
   activityNoun = "Question",
   requireManualCorrectAdvance = false,
+  lessonHelp,
 }: {
   minutes?: number;
   getTask: (ctx?: {
@@ -506,6 +510,7 @@ export function PracticeRunner({
   showMistakeReview?: boolean;
   activityNoun?: string;
   requireManualCorrectAdvance?: boolean;
+  lessonHelp?: ReactNode;
 }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
@@ -608,6 +613,11 @@ export function PracticeRunner({
     safeTask.difficulty = ctx.difficulty;
     return safeTask;
   });
+  const lowerGuide = getLowerLessonGuide(realmId ?? "number", levelNumber, liveContext?.week, lessonNumberFromId(liveContext?.lessonId));
+  const [nativeGuide] = useState(() => levelNumber && levelNumber >= 1 && levelNumber <= 6 && isNativeLessonIntro(task) ? task : null);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpOpenRef = useRef(false);
+  const closeHelp = () => { helpOpenRef.current = false; setHelpOpen(false); };
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const pauseLessonClockRef = useRef(false);
   const [isAdvancingTask, setIsAdvancingTask] = useState(false);
@@ -628,7 +638,7 @@ export function PracticeRunner({
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
-  const isIntroTask = isStructuredRealm && "scene" in task && task.scene === "intro";
+  const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
     ? "transition_error"
     : isIntroTask
@@ -713,7 +723,7 @@ export function PracticeRunner({
     const t = setInterval(
       () =>
         setSecondsLeft((s) =>
-          brainBreakActiveRef.current || showLessonResumeRef.current || pauseLessonClockRef.current ? s : s - 1
+          brainBreakActiveRef.current || showLessonResumeRef.current || helpOpenRef.current || pauseLessonClockRef.current ? s : s - 1
         ),
       1000
     );
@@ -830,10 +840,10 @@ export function PracticeRunner({
   }, [finished, onComplete, resumeLessonKey]);
 
   useEffect(() => {
-    if (task.kind !== "numberHunt") return;
+    if (helpOpen || task.kind !== "numberHunt") return;
     if (!speechInteractionReady) return;
     void speak(String(task.targetNumber), undefined, "auto");
-  }, [speechInteractionReady, task]);
+  }, [helpOpen, speechInteractionReady, task]);
 
   const buildProgressMeta = useCallback((questionNumber: number) => {
     if (completionMode === "time_only") {
@@ -849,7 +859,7 @@ export function PracticeRunner({
   }, [activityNoun, completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
-    if (!autoReadEnabled || !speechInteractionReady) return;
+    if (helpOpen || !autoReadEnabled || !speechInteractionReady) return;
     if (!autoReadPrompt) return;
 
     const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
@@ -857,7 +867,7 @@ export function PracticeRunner({
 
     lastAutoReadTaskKeyRef.current = currentTaskKey;
     void speak(autoReadPrompt, undefined, "auto");
-  }, [autoReadEnabled, autoReadPrompt, speechInteractionReady, task.kind, taskNonce]);
+  }, [helpOpen, autoReadEnabled, autoReadPrompt, speechInteractionReady, task.kind, taskNonce]);
 
   const correctOrder = useMemo(() => {
     if (task.kind !== "order3") return [];
@@ -1456,6 +1466,12 @@ export function PracticeRunner({
       className="relative"
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
     >
+      {helpOpen && <LessonHelpDialog onClose={closeHelp}>
+        {nativeGuide || lessonHelp ? <div className="bg-white p-5 text-slate-900">
+          <NarratedLessonGuide title={lessonTitle}>{lessonHelp ?? (nativeGuide && <TaskRenderer task={nativeGuide} taskNonce={-1} callbacks={{markCorrect: closeHelp, markCorrectSoft: () => {}, markWrong: () => {}, advanceIntro: closeHelp}} />)}</NarratedLessonGuide>
+          <div className="mt-5 flex flex-wrap items-center gap-3"><button type="button" onClick={closeHelp} className={`rounded-xl px-5 py-3 font-bold text-white ${primaryActionClass}`}>Back to practice</button><ReadAloudBtn text="Your practice timer is paused. Choose Back to practice when ready." label="Read instructions" /></div>
+        </div> : lowerGuide ? <LowerLessonGuide guide={lowerGuide} title={lessonTitle ?? "Learn the skill"} realm={realmId ?? "number"} review onContinue={closeHelp} /> : null}
+      </LessonHelpDialog>}
       {showLessonResume && (
         <LessonResumeGate
           lessonTitle={lessonTitle ?? liveContext?.lessonTitle}
@@ -1496,6 +1512,7 @@ export function PracticeRunner({
       {/* Two-column landscape: sticky HUD rail + question workspace */}
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
+          {(lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
             levelNumber={levelNumber}
             week={liveContext?.week}
@@ -1749,7 +1766,7 @@ export function PracticeRunner({
 
         {/* Delegate to TaskRenderer for complex component-based task kinds */}
         {!isBuiltinKind && (
-          <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
+          isIntroTask && levelNumber && levelNumber >= 1 && levelNumber <= 6 ? <NarratedLessonGuide title={lessonTitle}><TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} /></NarratedLessonGuide> : <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
         )}
         {awaitingWrongNext ? (
           <div className="mt-5 flex justify-end">

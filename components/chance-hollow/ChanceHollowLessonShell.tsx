@@ -1,5 +1,6 @@
 "use client";
 
+import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PracticeRunner } from "@/components/PracticeRunner";
@@ -584,6 +585,7 @@ export default function ChanceHollowLessonShell({
               onPerformanceSummary={(summary) => { summaryRef.current = summary; }}
               lessonTitle={lesson.title}
               liveContext={{ level, strand: "Probability", week, lessonId: lesson.id, lessonTitle: lesson.title }}
+              lessonHelp={<LessonConceptIntro realm="chance" conceptIntro={conceptIntro} />}
               realmId="chance"
               levelNumber={levelNumber}
               practisedSkills={successCriteria}
@@ -619,7 +621,7 @@ export default function ChanceHollowLessonShell({
             <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">{lesson.title}</h1>
             <p className="mt-2 max-w-3xl text-base font-semibold text-white/70">{lesson.focus}</p>
           </div>
-          <LessonConceptIntro realm="chance" conceptIntro={conceptIntro} />
+          <NarratedLessonGuide title={`${lesson.title}. ${lesson.focus}`}><LessonConceptIntro realm="chance" conceptIntro={conceptIntro} /></NarratedLessonGuide>
           <div className="flex justify-end">
             <button
               type="button"

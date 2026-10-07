@@ -1,0 +1,1281 @@
+{
+  "count": {
+    "idea": "Say one number for each object. The last number tells you how many.",
+    "example": "● ● ● ● ● → 5",
+    "steps": [
+      "Touch each dot once.",
+      "Say 1, 2, 3, 4, 5.",
+      "There are 5 dots."
+    ],
+    "tip": "Do not count the same object twice."
+  },
+  "order": {
+    "idea": "Compare place values to put numbers in order.",
+    "example": "24 < 42 < 46",
+    "steps": [
+      "Compare tens: 2 tens comes before 4 tens.",
+      "For 42 and 46, compare ones: 2 comes before 6."
+    ],
+    "tip": "Start with the largest place value."
+  },
+  "place": {
+    "idea": "A digit’s position tells you its value.",
+    "example": "346 = 300 + 40 + 6",
+    "steps": [
+      "3 is in the hundreds place.",
+      "4 is in the tens place.",
+      "6 is in the ones place."
+    ],
+    "tip": "A zero holds a place even when there are none of that unit."
+  },
+  "tens": {
+    "idea": "Ten ones make one ten.",
+    "example": "34 = 3 tens + 4 ones",
+    "steps": [
+      "Make groups of 10.",
+      "Count 3 tens: 10, 20, 30.",
+      "Add the 4 ones to get 34."
+    ],
+    "tip": "Keep tens and ones separate while counting."
+  },
+  "partition": {
+    "idea": "You can split the same number in different ways.",
+    "example": "346 = 300 + 46 = 200 + 146",
+    "steps": [
+      "Start with 300 + 46.",
+      "Move 100 from the first part to the second.",
+      "200 + 146 still totals 346."
+    ],
+    "tip": "The parts must add back to the original number."
+  },
+  "partitionSmall": {
+    "idea": "Split a number into parts without changing its total.",
+    "example": "34 = 30 + 4 = 20 + 14",
+    "steps": [
+      "Start with 3 tens and 4 ones.",
+      "Exchange one ten for 10 ones.",
+      "Now there are 2 tens and 14 ones."
+    ],
+    "tip": "Check by adding the two parts."
+  },
+  "line": {
+    "idea": "A number line shows numbers in order with equal steps.",
+    "example": "0 — 10 — 20 — 30 — 40",
+    "steps": [
+      "Each gap is worth 10.",
+      "30 is three jumps of 10 from zero.",
+      "Numbers increase as you move right."
+    ],
+    "tip": "Check the size of one step before reading a point."
+  },
+  "round": {
+    "idea": "Look at the next digit to decide which nearby ten is closer.",
+    "example": "67 rounds to 70",
+    "steps": [
+      "67 is between 60 and 70.",
+      "Its ones digit is 7, so round up.",
+      "The nearest ten is 70."
+    ],
+    "tip": "Digits 5 to 9 round up; 0 to 4 round down."
+  },
+  "roundHundred": {
+    "idea": "Round to the nearest hundred by checking the tens digit.",
+    "example": "347 rounds to 300",
+    "steps": [
+      "347 is between 300 and 400.",
+      "Its tens digit is 4.",
+      "Round down to 300."
+    ],
+    "tip": "Rounding gives an estimate, not an exact answer."
+  },
+  "even": {
+    "idea": "Even numbers can be put into pairs with none left over.",
+    "example": "8 = 2 + 2 + 2 + 2",
+    "steps": [
+      "Pair the objects.",
+      "8 makes 4 pairs, so it is even.",
+      "9 would leave one unpaired, so it is odd."
+    ],
+    "tip": "Even numbers end in 0, 2, 4, 6 or 8."
+  },
+  "parity": {
+    "idea": "You can predict whether an answer will be odd or even.",
+    "example": "7 + 5 = 12; odd + odd = even",
+    "steps": [
+      "Each odd group has one unpaired object.",
+      "Those two leftovers make another pair.",
+      "The total is even."
+    ],
+    "tip": "Even + odd is odd; even + even is even."
+  },
+  "parityProduct": {
+    "idea": "An even factor makes a product even.",
+    "example": "3 × 4 = 12",
+    "steps": [
+      "Think of 3 groups of 4.",
+      "Every group of 4 can be paired.",
+      "All 12 objects can be paired."
+    ],
+    "tip": "Odd × odd is odd."
+  },
+  "skip": {
+    "idea": "Skip counting adds the same amount each time.",
+    "example": "5, 10, 15, 20",
+    "steps": [
+      "Start at 5.",
+      "Add 5 to reach 10.",
+      "Keep adding 5: 15, then 20."
+    ],
+    "tip": "Check every gap follows the same rule."
+  },
+  "add": {
+    "idea": "Adding joins parts to find a total.",
+    "example": "8 + 5 = 13",
+    "steps": [
+      "Start at 8.",
+      "Add 2 to reach 10.",
+      "Add the remaining 3 to reach 13."
+    ],
+    "tip": "You can split a number to make 10 first."
+  },
+  "subtract": {
+    "idea": "Subtract to find how many are left or how far apart numbers are.",
+    "example": "13 − 5 = 8",
+    "steps": [
+      "Start at 13.",
+      "Take away 3 to reach 10.",
+      "Take away 2 more to reach 8."
+    ],
+    "tip": "Check: 8 + 5 = 13."
+  },
+  "splitAdd": {
+    "idea": "Add tens and ones separately, then join the parts.",
+    "example": "34 + 25 = 59",
+    "steps": [
+      "30 + 20 = 50.",
+      "4 + 5 = 9.",
+      "50 + 9 = 59."
+    ],
+    "tip": "Keep place values lined up."
+  },
+  "splitSubtract": {
+    "idea": "Subtract in parts to make the calculation easier.",
+    "example": "56 − 23 = 33",
+    "steps": [
+      "56 − 20 = 36.",
+      "36 − 3 = 33.",
+      "Check: 33 + 23 = 56."
+    ],
+    "tip": "Subtract both the tens and the ones."
+  },
+  "compensate": {
+    "idea": "Use a nearby friendly number, then adjust.",
+    "example": "48 + 19 = 67",
+    "steps": [
+      "Add 20 instead: 48 + 20 = 68.",
+      "That added 1 too many.",
+      "Subtract 1: 68 − 1 = 67."
+    ],
+    "tip": "Remember to undo your adjustment."
+  },
+  "doubles": {
+    "idea": "Use a known double to work out a nearby sum.",
+    "example": "7 + 8 = 15",
+    "steps": [
+      "7 + 7 = 14.",
+      "8 is one more than 7.",
+      "Add one more: 14 + 1 = 15."
+    ],
+    "tip": "Near doubles differ by one."
+  },
+  "facts": {
+    "idea": "Addition and subtraction facts belong to the same family.",
+    "example": "6 + 4 = 10; 10 − 4 = 6",
+    "steps": [
+      "The parts are 6 and 4; the whole is 10.",
+      "Swap the parts: 4 + 6 = 10.",
+      "Subtract either part to find the other: 10 − 6 = 4."
+    ],
+    "tip": "Subtraction starts with the whole in this fact family."
+  },
+  "writtenAdd": {
+    "idea": "Line up place values and regroup when a column totals 10 or more.",
+    "example": "267 + 158 = 425",
+    "steps": [
+      "Ones: 7 + 8 = 15; write 5, carry 1 ten.",
+      "Tens: 6 + 5 + 1 = 12; write 2, carry 1 hundred.",
+      "Hundreds: 2 + 1 + 1 = 4."
+    ],
+    "tip": "A carried 1 means one unit of the next place."
+  },
+  "writtenSubtract": {
+    "idea": "Regroup when there are not enough units to subtract.",
+    "example": "432 − 158 = 274",
+    "steps": [
+      "Exchange 1 ten: 12 − 8 = 4 ones.",
+      "Exchange 1 hundred: 12 − 5 = 7 tens.",
+      "3 − 1 = 2 hundreds."
+    ],
+    "tip": "After exchanging, update both place values."
+  },
+  "zeros": {
+    "idea": "Regroup across zero by exchanging a larger unit first.",
+    "example": "402 − 156 = 246",
+    "steps": [
+      "Exchange 1 hundred: 3 hundreds and 10 tens.",
+      "Exchange 1 ten: 9 tens and 12 ones.",
+      "12 − 6 = 6; 9 − 5 = 4; 3 − 1 = 2."
+    ],
+    "tip": "An exchange changes the grouping, not the number’s value."
+  },
+  "model": {
+    "idea": "Choose an operation that matches what is happening.",
+    "example": "12 passengers + 5 getting on = 17 passengers",
+    "steps": [
+      "Identify the starting amount: 12.",
+      "5 more join, so add.",
+      "12 + 5 = 17."
+    ],
+    "tip": "A drawing can help you decide whether to add or subtract."
+  },
+  "twoStep": {
+    "idea": "Solve a multi-step problem one part at a time.",
+    "example": "24 stickers + 8 stickers − 5 stickers = 27 stickers",
+    "steps": [
+      "Start with 24 and add 8: 32.",
+      "Give away 5: 32 − 5 = 27.",
+      "Check that the answer fits the story."
+    ],
+    "tip": "Write the result of each step before continuing."
+  },
+  "groups": {
+    "idea": "Multiplication counts equal groups.",
+    "example": "3 × 4 = 12",
+    "steps": [
+      "There are 3 groups.",
+      "Each group has 4 objects.",
+      "4 + 4 + 4 = 12."
+    ],
+    "tip": "Every group must have the same number."
+  },
+  "array": {
+    "idea": "An array arranges equal groups in rows and columns.",
+    "example": "3 rows × 4 in each row = 12",
+    "steps": [
+      "Count the rows: 3.",
+      "Count the objects in one row: 4.",
+      "Multiply: 3 × 4 = 12."
+    ],
+    "tip": "Turning the array gives 4 × 3, with the same total."
+  },
+  "share": {
+    "idea": "Division can share a total equally.",
+    "example": "12 ÷ 3 = 4",
+    "steps": [
+      "Start with 12 objects.",
+      "Share them into 3 equal groups.",
+      "Each group has 4."
+    ],
+    "tip": "Check: 3 × 4 = 12."
+  },
+  "groupDivide": {
+    "idea": "Division can find how many equal groups fit.",
+    "example": "12 ÷ 4 = 3",
+    "steps": [
+      "Start with 12 objects.",
+      "Make groups of 4.",
+      "You can make 3 groups."
+    ],
+    "tip": "Sharing asks how many in each group; grouping asks how many groups."
+  },
+  "mulFacts": {
+    "idea": "Multiplication and division undo each other.",
+    "example": "6 × 4 = 24; 24 ÷ 4 = 6",
+    "steps": [
+      "Use the known product 24.",
+      "Split it into groups of 4.",
+      "There are 6 groups."
+    ],
+    "tip": "The same three numbers form related facts."
+  },
+  "multiply": {
+    "idea": "Split a large multiplication into smaller products.",
+    "example": "23 × 4 = 92",
+    "steps": [
+      "20 × 4 = 80.",
+      "3 × 4 = 12.",
+      "80 + 12 = 92."
+    ],
+    "tip": "Multiply every part, then add the products."
+  },
+  "remainders": {
+    "idea": "Sometimes division leaves an amount that cannot make another full group.",
+    "example": "17 ÷ 5 = 3 remainder 2",
+    "steps": [
+      "3 × 5 = 15.",
+      "17 − 15 = 2.",
+      "There are 3 full groups and 2 left over."
+    ],
+    "tip": "The remainder must be smaller than the divisor."
+  },
+  "remainderContext": {
+    "idea": "What you do with a remainder depends on the problem.",
+    "example": "17 people; 5 seats per car → 4 cars",
+    "steps": [
+      "3 cars hold 15 people.",
+      "2 people still need seats.",
+      "Use one more car: 4 cars altogether."
+    ],
+    "tip": "For full groups only, do not count an incomplete group."
+  },
+  "money": {
+    "idea": "Add money amounts using the same units.",
+    "example": "$2 + $1 + 50c = $3.50",
+    "steps": [
+      "Add the dollars: $2 + $1 = $3.",
+      "Add 50 cents.",
+      "The total is $3.50."
+    ],
+    "tip": "100 cents makes 1 dollar."
+  },
+  "change": {
+    "idea": "Change is the amount paid minus the cost.",
+    "example": "$10 − $6.50 = $3.50",
+    "steps": [
+      "Count from $6.50 to $7: 50 cents.",
+      "Count from $7 to $10: $3.",
+      "Change is $3.50."
+    ],
+    "tip": "Check: cost + change = amount paid."
+  },
+  "budget": {
+    "idea": "A budget compares money available with planned spending.",
+    "example": "$20 − ($8 + $5) = $7",
+    "steps": [
+      "Add the costs: $8 + $5 = $13.",
+      "Subtract from the budget: $20 − $13.",
+      "There is $7 left."
+    ],
+    "tip": "Check all costs before deciding what you can afford."
+  },
+  "pattern": {
+    "idea": "A repeating pattern repeats the same unit.",
+    "example": "red, blue, red, blue, red, blue",
+    "steps": [
+      "Find the smallest unit: red, blue.",
+      "Repeat that unit in the same order.",
+      "The next colour is red."
+    ],
+    "tip": "A repeating pattern is different from a growing pattern."
+  },
+  "fraction": {
+    "idea": "A fraction describes equal parts of a whole.",
+    "example": "1/4 means 1 of 4 equal parts",
+    "steps": [
+      "Split one whole into 4 equal parts.",
+      "Choose 1 part.",
+      "That part is one quarter."
+    ],
+    "tip": "The parts must be equal in size."
+  },
+  "fractionSet": {
+    "idea": "Find a fraction of a set by sharing it equally.",
+    "example": "1/4 of 12 = 3",
+    "steps": [
+      "Share 12 into 4 equal groups.",
+      "12 ÷ 4 = 3.",
+      "One group is one quarter: 3."
+    ],
+    "tip": "The denominator tells you how many equal groups."
+  },
+  "whole": {
+    "idea": "Unit fractions can join to make one whole.",
+    "example": "1/4 + 1/4 + 1/4 + 1/4 = 1",
+    "steps": [
+      "Each piece is one quarter.",
+      "Four quarters cover the whole.",
+      "4/4 equals 1."
+    ],
+    "tip": "Keep the whole the same size when comparing parts."
+  },
+  "fractionLine": {
+    "idea": "Split each whole-number interval into equal parts.",
+    "example": "0, 1/4, 2/4, 3/4, 1",
+    "steps": [
+      "Split the gap from 0 to 1 into 4 equal steps.",
+      "Each step is one quarter.",
+      "The third step is 3/4."
+    ],
+    "tip": "Count intervals, not tick marks."
+  },
+  "equivalent": {
+    "idea": "Multiply or divide both parts of a fraction by the same number.",
+    "example": "1/2 = 2/4",
+    "steps": [
+      "Multiply the numerator by 2: 1 × 2 = 2.",
+      "Multiply the denominator by 2: 2 × 2 = 4.",
+      "The fraction has the same value."
+    ],
+    "tip": "Changing only one part changes the fraction’s value."
+  },
+  "compareFractions": {
+    "idea": "Use equal denominators to compare fractions.",
+    "example": "2/3 = 8/12; 3/4 = 9/12; so 2/3 < 3/4",
+    "steps": [
+      "Rewrite both fractions in twelfths.",
+      "Compare the numerators: 8 < 9.",
+      "Three quarters is greater."
+    ],
+    "tip": "Use fractions of the same whole."
+  },
+  "mixed": {
+    "idea": "An improper fraction can contain whole numbers and a fraction.",
+    "example": "7/4 = 1 3/4",
+    "steps": [
+      "4 quarters make 1 whole.",
+      "7 quarters leave 3 quarters after that whole.",
+      "So 7/4 = 1 3/4."
+    ],
+    "tip": "The denominator stays the same."
+  },
+  "fractionAdd": {
+    "idea": "With equal denominators, add or subtract the numerators.",
+    "example": "2/7 + 3/7 = 5/7",
+    "steps": [
+      "Both fractions use sevenths.",
+      "Add 2 + 3 = 5.",
+      "Keep the denominator 7."
+    ],
+    "tip": "Do not add the denominators."
+  },
+  "commonDenominator": {
+    "idea": "Use a common denominator before adding or subtracting unlike fractions.",
+    "example": "1/2 + 1/4 = 2/4 + 1/4 = 3/4",
+    "steps": [
+      "Rewrite 1/2 as 2/4.",
+      "Add the numerators: 2 + 1 = 3.",
+      "The answer is 3/4."
+    ],
+    "tip": "Equivalent fractions keep the original values."
+  },
+  "tenths": {
+    "idea": "One tenth is one of ten equal parts of a whole.",
+    "example": "3/10 = 0.3",
+    "steps": [
+      "Split the whole into 10 equal parts.",
+      "Take 3 parts.",
+      "Write 3 in the tenths place: 0.3."
+    ],
+    "tip": "The tenths place is immediately after the decimal point."
+  },
+  "hundredths": {
+    "idea": "One hundredth is one of one hundred equal parts.",
+    "example": "27/100 = 0.27",
+    "steps": [
+      "27 hundredths contains 2 tenths.",
+      "There are 7 hundredths left.",
+      "Write 0.27."
+    ],
+    "tip": "0.27 means 27 hundredths, not 27 tenths."
+  },
+  "decimal": {
+    "idea": "Read decimal digits using their place values.",
+    "example": "2.345 = 2 + 0.3 + 0.04 + 0.005",
+    "steps": [
+      "2 is the whole-number part.",
+      "3 is tenths; 4 is hundredths.",
+      "5 is thousandths."
+    ],
+    "tip": "Zeros can hold empty places."
+  },
+  "compareDecimals": {
+    "idea": "Compare decimals one place at a time.",
+    "example": "0.6 = 0.60 > 0.57",
+    "steps": [
+      "Write the numbers with the same number of decimal places.",
+      "Compare tenths: 6 > 5.",
+      "So 0.6 is greater."
+    ],
+    "tip": "More digits does not always mean a larger decimal."
+  },
+  "decimalRound": {
+    "idea": "Check the digit immediately after the place you are rounding to.",
+    "example": "3.47 rounds to 3.5 to 1 decimal place",
+    "steps": [
+      "Keep the tenths digit, 4.",
+      "The next digit is 7, so round up.",
+      "The answer is 3.5."
+    ],
+    "tip": "Round the original number, not an already rounded version."
+  },
+  "decimalAdd": {
+    "idea": "Line up decimal points to add or subtract matching place values.",
+    "example": "2.35 + 1.40 = 3.75",
+    "steps": [
+      "Write 1.4 as 1.40.",
+      "Add hundredths, then tenths, then ones.",
+      "The result is 3.75."
+    ],
+    "tip": "Adding a trailing zero does not change a decimal’s value."
+  },
+  "timesTen": {
+    "idea": "Multiplying by 10 makes each digit worth ten times as much.",
+    "example": "34 × 10 = 340",
+    "steps": [
+      "3 tens becomes 3 hundreds.",
+      "4 ones becomes 4 tens.",
+      "The answer is 340."
+    ],
+    "tip": "Multiplying by 100 scales each place by 100."
+  },
+  "divideTen": {
+    "idea": "Dividing by 10 makes each digit worth one tenth as much.",
+    "example": "340 ÷ 10 = 34",
+    "steps": [
+      "3 hundreds becomes 3 tens.",
+      "4 tens becomes 4 ones.",
+      "The answer is 34."
+    ],
+    "tip": "Dividing by 100 scales each place by one hundredth."
+  },
+  "decimalScale": {
+    "idea": "Powers of ten change the value of every digit.",
+    "example": "2.35 × 100 = 235; 235 ÷ 100 = 2.35",
+    "steps": [
+      "Multiplying by 100 makes 2 ones into 2 hundreds.",
+      "3 tenths becomes 3 tens; 5 hundredths becomes 5 ones.",
+      "Dividing by 100 reverses the change."
+    ],
+    "tip": "Track place values rather than just adding zeros."
+  },
+  "factors": {
+    "idea": "A factor divides a number with no remainder.",
+    "example": "12 = 1 × 12 = 2 × 6 = 3 × 4",
+    "steps": [
+      "Find pairs that multiply to 12.",
+      "List both numbers in each pair.",
+      "The factors are 1, 2, 3, 4, 6 and 12."
+    ],
+    "tip": "Stop once the pairs begin to repeat."
+  },
+  "multiples": {
+    "idea": "Multiples are the results of multiplying by whole numbers.",
+    "example": "6, 12, 18, 24, 30",
+    "steps": [
+      "Start with 6 × 1 = 6.",
+      "Continue with 6 × 2 = 12.",
+      "Keep adding 6 to find the next multiple."
+    ],
+    "tip": "Factors divide a number; multiples grow from it."
+  },
+  "divisibility": {
+    "idea": "Divisibility rules help you test for factors.",
+    "example": "246 is divisible by 3",
+    "steps": [
+      "Add the digits: 2 + 4 + 6 = 12.",
+      "12 is divisible by 3.",
+      "So 246 is divisible by 3."
+    ],
+    "tip": "For divisibility by 2, check whether the last digit is even."
+  },
+  "prime": {
+    "idea": "A prime number has exactly two positive factors: 1 and itself.",
+    "example": "13 is prime; 12 is composite",
+    "steps": [
+      "13 has only factors 1 and 13.",
+      "12 also has factors 2, 3, 4 and 6.",
+      "So 12 is composite."
+    ],
+    "tip": "1 is neither prime nor composite."
+  },
+  "square": {
+    "idea": "A square number comes from a whole number multiplied by itself.",
+    "example": "5² = 5 × 5 = 25",
+    "steps": [
+      "Think of a square with 5 rows.",
+      "Each row contains 5 objects.",
+      "The total is 25."
+    ],
+    "tip": "5 squared does not mean 5 × 2."
+  },
+  "fdp": {
+    "idea": "Fractions, decimals and percentages can show the same amount.",
+    "example": "1/2 = 0.5 = 50%",
+    "steps": [
+      "One half is 5 tenths: 0.5.",
+      "It is also 50 hundredths.",
+      "50 out of 100 is 50%."
+    ],
+    "tip": "Percent means out of 100."
+  },
+  "percent": {
+    "idea": "Find a percentage by using easy parts of 100%.",
+    "example": "25% of 80 = 20",
+    "steps": [
+      "25% is one quarter.",
+      "Divide 80 by 4.",
+      "The answer is 20."
+    ],
+    "tip": "10% is one tenth and 50% is one half."
+  },
+  "discount": {
+    "idea": "A discount is taken off the original price.",
+    "example": "20% off $50 → $40",
+    "steps": [
+      "10% of $50 is $5.",
+      "20% is $10.",
+      "Subtract the discount: $50 − $10 = $40."
+    ],
+    "tip": "The discount amount and the sale price are different."
+  },
+  "unitRate": {
+    "idea": "Compare costs for the same quantity.",
+    "example": "4 pens for $8 → $2 per pen",
+    "steps": [
+      "Divide the total cost by the number of pens.",
+      "$8 ÷ 4 = $2.",
+      "Compare this with other prices per pen."
+    ],
+    "tip": "The cheapest packet may not be the best value per item."
+  },
+  "integers": {
+    "idea": "Negative integers are left of zero on a number line.",
+    "example": "−5 < −2 < 0 < 3",
+    "steps": [
+      "Numbers increase as you move right.",
+      "−5 is left of −2.",
+      "So −5 is smaller than −2."
+    ],
+    "tip": "A negative number with a larger distance from zero is smaller."
+  },
+  "integerAdd": {
+    "idea": "Use direction on a number line to add or subtract.",
+    "example": "−3 + 5 = 2",
+    "steps": [
+      "Start at −3.",
+      "Adding 5 means move 5 steps right.",
+      "You finish at 2."
+    ],
+    "tip": "Subtracting a positive number moves you left."
+  },
+  "coordinates": {
+    "idea": "A coordinate pair gives horizontal position first, then vertical position.",
+    "example": "(−2, 3)",
+    "steps": [
+      "Start at the origin, (0, 0).",
+      "Move 2 units left.",
+      "Move 3 units up."
+    ],
+    "tip": "Read the x-coordinate before the y-coordinate."
+  },
+  "estimate": {
+    "idea": "Use rounded numbers to check whether an answer is sensible.",
+    "example": "198 + 304 is about 200 + 300 = 500",
+    "steps": [
+      "Round each number to a friendly value.",
+      "Add the rounded numbers.",
+      "The exact answer, 502, is close to 500."
+    ],
+    "tip": "An estimate helps check an answer; it is not always the final answer."
+  },
+  "algorithm": {
+    "idea": "An algorithm is a set of steps followed in order.",
+    "example": "Start 6 → add 3 → double → 18",
+    "steps": [
+      "6 + 3 = 9.",
+      "9 × 2 = 18.",
+      "Test each step in the stated order."
+    ],
+    "tip": "Changing the order can change the answer."
+  },
+  "rule": {
+    "idea": "A rule connects each input to its output.",
+    "example": "2 → 7; 3 → 8; 4 → 9",
+    "steps": [
+      "Compare each input with its output.",
+      "Each output is 5 more.",
+      "The rule is add 5."
+    ],
+    "tip": "Check the rule works for every pair."
+  },
+  "inverse": {
+    "idea": "Undo an operation using its inverse.",
+    "example": "□ + 7 = 19 → □ = 12",
+    "steps": [
+      "The unknown has 7 added to it.",
+      "Undo addition by subtracting 7.",
+      "19 − 7 = 12."
+    ],
+    "tip": "Substitute the answer to check: 12 + 7 = 19."
+  },
+  "balance": {
+    "idea": "The equals sign means both sides have the same value.",
+    "example": "8 + 4 = 7 + 5",
+    "steps": [
+      "Work out the left side: 12.",
+      "Work out the right side: 12.",
+      "Both sides are equal."
+    ],
+    "tip": "Equals does not mean “write the answer next”."
+  },
+  "unknownFactor": {
+    "idea": "Use division to find a missing factor.",
+    "example": "6 × □ = 42 → □ = 7",
+    "steps": [
+      "The total is 42.",
+      "Divide by the known factor: 42 ÷ 6.",
+      "Check: 6 × 7 = 42."
+    ],
+    "tip": "Use multiplication to check the missing factor."
+  },
+  "commutative": {
+    "idea": "You can swap the order when adding or multiplying.",
+    "example": "4 × 7 = 7 × 4 = 28",
+    "steps": [
+      "Picture 4 rows of 7.",
+      "Turn the array to see 7 rows of 4.",
+      "The total stays 28."
+    ],
+    "tip": "You cannot generally swap numbers in subtraction or division."
+  },
+  "associative": {
+    "idea": "When adding or multiplying, you can regroup without changing the order.",
+    "example": "(2 × 5) × 3 = 2 × (5 × 3) = 30",
+    "steps": [
+      "Left grouping: 10 × 3 = 30.",
+      "Right grouping: 2 × 15 = 30.",
+      "Both groupings give the same result."
+    ],
+    "tip": "This regrouping rule does not generally work for subtraction or division."
+  },
+  "distributive": {
+    "idea": "Split one factor and multiply both parts.",
+    "example": "7 × 6 = (5 × 6) + (2 × 6) = 42",
+    "steps": [
+      "Split 7 into 5 + 2.",
+      "Calculate 30 and 12.",
+      "Add the products: 42."
+    ],
+    "tip": "Both parts must be multiplied by the other factor."
+  },
+  "sequence": {
+    "idea": "Find the change between neighbouring terms.",
+    "example": "3, 7, 11, 15, … → 19",
+    "steps": [
+      "7 − 3 = 4.",
+      "11 − 7 = 4, so the rule is add 4.",
+      "15 + 4 = 19."
+    ],
+    "tip": "Check more than one gap before deciding on a rule."
+  },
+  "fractionSequence": {
+    "idea": "Use the same fractional step each time.",
+    "example": "1/4, 2/4, 3/4, 4/4, …",
+    "steps": [
+      "Each term increases by 1/4.",
+      "After 3/4 comes 4/4.",
+      "4/4 is 1 whole."
+    ],
+    "tip": "Keep the denominator the same when counting equal parts."
+  },
+  "decimalSequence": {
+    "idea": "Decimal sequences follow a repeated change.",
+    "example": "0.2, 0.5, 0.8, 1.1, …",
+    "steps": [
+      "Each step adds 0.3.",
+      "0.8 + 0.3 = 1.1.",
+      "The next term is 1.4."
+    ],
+    "tip": "Crossing a whole number does not change the step size."
+  },
+  "growth": {
+    "idea": "A table helps connect a stage number with its total.",
+    "example": "Stage 1: 3; stage 2: 5; stage 3: 7",
+    "steps": [
+      "The total grows by 2 each stage.",
+      "Double the stage number, then add 1.",
+      "Stage 4 has 2 × 4 + 1 = 9."
+    ],
+    "tip": "Test a rule against all the known stages."
+  },
+  "brackets": {
+    "idea": "Brackets tell you which calculation to do first.",
+    "example": "(4 + 2) × 3 = 18",
+    "steps": [
+      "First calculate 4 + 2 = 6.",
+      "Then multiply 6 × 3.",
+      "The result is 18."
+    ],
+    "tip": "Without brackets, 4 + 2 × 3 is 10."
+  },
+  "twoUnknown": {
+    "idea": "Use both conditions to find a pair of unknown numbers.",
+    "example": "a + b = 10; a − b = 2 → a = 6, b = 4",
+    "steps": [
+      "The numbers total 10.",
+      "6 and 4 have a difference of 2.",
+      "Check both equations."
+    ],
+    "tip": "A pair must satisfy every condition, not just one."
+  },
+  "categories": {
+    "idea": "Categorical data sorts answers into named groups.",
+    "example": "Pets: cat, dog, cat → cat: 2; dog: 1",
+    "steps": [
+      "Choose the categories.",
+      "Place every response in its matching category.",
+      "Count how many are in each group."
+    ],
+    "tip": "Count each response once."
+  },
+  "numerical": {
+    "idea": "Numerical data records a number that counts or measures something.",
+    "example": "Number of pets: 0, 2, 1, 3",
+    "steps": [
+      "Ask how many pets each person has.",
+      "Record the numbers.",
+      "These are counts, so the data is numerical."
+    ],
+    "tip": "A number used as a label, such as a shirt number, is not a measurement or count."
+  },
+  "question": {
+    "idea": "A useful data question tells you what information to collect.",
+    "example": "Which fruit does our class prefer?",
+    "steps": [
+      "Ask everyone the same question.",
+      "Record one choice per person.",
+      "Count the choices in each category."
+    ],
+    "tip": "Avoid questions that encourage a particular answer."
+  },
+  "tally": {
+    "idea": "Tallies record one mark for each response.",
+    "example": "6 responses = one group of 5 tallies + 1 tally",
+    "steps": [
+      "Make one mark per response.",
+      "Group every five marks.",
+      "Count groups of five, then leftover marks."
+    ],
+    "tip": "A completed tally group represents five, not four."
+  },
+  "table": {
+    "idea": "A frequency table shows how often each value or category occurs.",
+    "example": "Red: 4; Blue: 3; Total: 7",
+    "steps": [
+      "Read the category names.",
+      "Read each frequency.",
+      "Add 4 + 3 to check the total."
+    ],
+    "tip": "Frequency means the number of times something occurs."
+  },
+  "picture": {
+    "idea": "A picture graph uses symbols to show counts.",
+    "example": "Apples: ● ● ●; Bananas: ● ●; each ● = 1 vote",
+    "steps": [
+      "Read the key: each symbol means 1.",
+      "Count 3 votes for apples.",
+      "Count 2 votes for bananas."
+    ],
+    "tip": "Read the key before counting symbols."
+  },
+  "column": {
+    "idea": "A column graph shows counts using bar heights.",
+    "example": "Cats: 4; Dogs: 6",
+    "steps": [
+      "Read the category beneath each bar.",
+      "Follow its top across to the scale.",
+      "Dogs have 6 votes and cats have 4."
+    ],
+    "tip": "Check whether the scale counts in ones, twos or another step."
+  },
+  "most": {
+    "idea": "Compare frequencies to find the most and least common categories.",
+    "example": "Red: 5; Blue: 2; Green: 4",
+    "steps": [
+      "Compare 5, 2 and 4.",
+      "5 is greatest, so red is most common.",
+      "2 is smallest, so blue is least common."
+    ],
+    "tip": "Two categories can tie for most or least."
+  },
+  "difference": {
+    "idea": "Subtract frequencies to find how many more or fewer.",
+    "example": "6 votes − 4 votes = 2 more votes",
+    "steps": [
+      "Read the two counts: 6 and 4.",
+      "Subtract the smaller from the larger.",
+      "The difference is 2."
+    ],
+    "tip": "State which category has more."
+  },
+  "evidence": {
+    "idea": "Use the displayed data to check a claim.",
+    "example": "Cats: 4; Dogs: 6. “Dogs got more votes.” → true",
+    "steps": [
+      "Read both counts.",
+      "Compare: 6 > 4.",
+      "The data supports the claim."
+    ],
+    "tip": "Do not make a claim about information that was not collected."
+  },
+  "display": {
+    "idea": "Choose a display that makes the data easy to compare.",
+    "example": "Favourite fruit → column graph",
+    "steps": [
+      "The categories are fruit names.",
+      "One column can show the count for each fruit.",
+      "A common scale makes counts easy to compare."
+    ],
+    "tip": "A different display of the same data must keep the same counts."
+  },
+  "key": {
+    "idea": "A picture graph key tells you how much each symbol represents.",
+    "example": "Each ● = 4 votes; ● ● ● = 12 votes",
+    "steps": [
+      "Read the key: 4 votes per symbol.",
+      "Count 3 symbols.",
+      "Multiply: 3 × 4 = 12."
+    ],
+    "tip": "A half-symbol would represent 2 votes with this key."
+  },
+  "variation": {
+    "idea": "Variation describes how much the data values differ.",
+    "example": "Set A: 4, 4, 5. Set B: 1, 4, 8.",
+    "steps": [
+      "Set A is closely grouped.",
+      "Set B is more spread out.",
+      "Set B shows more variation."
+    ],
+    "tip": "Look at all the values, not just the largest."
+  },
+  "shape": {
+    "idea": "Look for clusters, gaps and spread in a distribution.",
+    "example": "Scores: 2, 4, 4, 5, 5, 5, 9",
+    "steps": [
+      "Most scores are between 4 and 5.",
+      "There are gaps between 5 and 9.",
+      "9 is far from the main cluster."
+    ],
+    "tip": "Describe what the data shows without guessing why."
+  },
+  "ordinal": {
+    "idea": "Ordinal categories have a meaningful order.",
+    "example": "Small → Medium → Large",
+    "steps": [
+      "These are category names.",
+      "They can be put in a meaningful order.",
+      "So they are ordinal data."
+    ],
+    "tip": "Nominal categories, such as colours, have no natural ranking."
+  },
+  "validate": {
+    "idea": "Check data for missing, impossible or inconsistent values.",
+    "example": "Ages in years: 10, 11, −3, 10",
+    "steps": [
+      "−3 cannot be a person’s age.",
+      "Check the original response.",
+      "Correct it only if you can verify the intended value."
+    ],
+    "tip": "Do not silently guess or delete unusual values."
+  },
+  "mode": {
+    "idea": "The mode is the value that occurs most often.",
+    "example": "2, 3, 3, 5 → mode 3",
+    "steps": [
+      "Count how often each value occurs.",
+      "3 occurs twice; the others occur once.",
+      "The mode is 3."
+    ],
+    "tip": "A data set can have more than one mode."
+  },
+  "multiMode": {
+    "idea": "Two values can tie for the highest frequency.",
+    "example": "1, 1, 2, 3, 3 → modes 1 and 3",
+    "steps": [
+      "1 occurs twice.",
+      "3 also occurs twice.",
+      "Both are modes."
+    ],
+    "tip": "A mode need not be the greatest numerical value."
+  },
+  "lineGraph": {
+    "idea": "A line graph shows how a value changes over time.",
+    "example": "9 am: 12°C; 10 am: 15°C; 11 am: 14°C",
+    "steps": [
+      "Read the time on the horizontal axis.",
+      "Read the value on the vertical axis.",
+      "Temperature rose by 3°C, then fell by 1°C."
+    ],
+    "tip": "Use the scale to measure change; do not rely only on the slope’s appearance."
+  },
+  "continuous": {
+    "idea": "Continuous data comes from measuring and can include values between whole numbers.",
+    "example": "Lengths: 12.3 cm, 12.5 cm, 12.8 cm",
+    "steps": [
+      "Length is measured.",
+      "A length can fall between these values.",
+      "So length is continuous data."
+    ],
+    "tip": "The number of pencils is a count: discrete data."
+  },
+  "range": {
+    "idea": "Range measures the gap between the greatest and smallest values.",
+    "example": "3, 4, 6, 9 → range 6",
+    "steps": [
+      "Find the greatest value: 9.",
+      "Find the smallest value: 3.",
+      "Subtract: 9 − 3 = 6."
+    ],
+    "tip": "Range uses the extremes, not the most frequent value."
+  },
+  "compareData": {
+    "idea": "Compare groups using the same measures and scales.",
+    "example": "A: 2, 3, 4; B: 5, 6, 7",
+    "steps": [
+      "Group B has higher values overall.",
+      "Both ranges are 2.",
+      "Describe both typical values and spread."
+    ],
+    "tip": "A larger sample can have more responses without a larger typical value."
+  },
+  "misleading": {
+    "idea": "Graph scales can make small differences look large.",
+    "example": "Values 98 and 100 differ by only 2",
+    "steps": [
+      "Read where the vertical scale starts.",
+      "A scale starting at 97 exaggerates the visual gap.",
+      "Compare the actual values: 100 − 98 = 2."
+    ],
+    "tip": "Check labels, units, scale intervals and any breaks in the axis."
+  },
+  "units": {
+    "idea": "Choose a unit that suits what you are measuring.",
+    "example": "A pencil: centimetres. A road: kilometres.",
+    "steps": [
+      "Identify the quantity: length.",
+      "Think about the size of the object.",
+      "Choose a unit that gives a useful measurement."
+    ],
+    "tip": "Use litres for capacity and grams or kilograms for mass."
+  },
+  "turn": {
+    "idea": "A turn describes how far something rotates.",
+    "example": "Quarter turn = 90°; half turn = 180°",
+    "steps": [
+      "A full turn returns to the starting direction.",
+      "A half turn faces the opposite direction.",
+      "A quarter turn is halfway to a half turn."
+    ],
+    "tip": "Check whether the turn is clockwise or anticlockwise."
+  },
+  "areaPerimeter": {
+    "idea": "Area measures the surface; perimeter measures the boundary.",
+    "example": "3 × 4 rectangle: area 12 square units; perimeter 14 units",
+    "steps": [
+      "Multiply length by width: 3 × 4 = 12.",
+      "Add all sides: 3 + 4 + 3 + 4 = 14.",
+      "Use square units for area."
+    ],
+    "tip": "Shapes with the same area can have different perimeters."
+  },
+  "area": {
+    "idea": "A rectangle’s area is the number of unit squares covering it.",
+    "example": "4 rows of 6 squares → area 24 square units",
+    "steps": [
+      "Count 4 rows.",
+      "Each row has 6 squares.",
+      "Multiply: 4 × 6 = 24."
+    ],
+    "tip": "Area uses square units, such as cm²."
+  },
+  "composite": {
+    "idea": "Split a composite shape into rectangles without gaps or overlaps.",
+    "example": "Rectangle areas 12 cm² and 8 cm² → total 20 cm²",
+    "steps": [
+      "Choose a split that makes rectangles.",
+      "Calculate each rectangle’s area.",
+      "Add: 12 + 8 = 20 square centimetres."
+    ],
+    "tip": "Do not count an overlapping area twice."
+  },
+  "protractor": {
+    "idea": "Place a protractor carefully before reading or drawing an angle.",
+    "example": "To draw 60°, mark 60 on the correct scale",
+    "steps": [
+      "Put the centre on the vertex.",
+      "Line up zero with the starting ray.",
+      "Mark 60° and draw a ray through the mark."
+    ],
+    "tip": "Use the scale that starts at zero on your starting ray."
+  },
+  "angleEstimate": {
+    "idea": "Compare an angle with familiar benchmarks.",
+    "example": "An angle smaller than 90° is acute",
+    "steps": [
+      "Use a right angle as a benchmark.",
+      "An angle near half a right angle is about 45°.",
+      "Estimate first, then measure if needed."
+    ],
+    "tip": "An obtuse angle is greater than 90° and less than 180°."
+  },
+  "metric": {
+    "idea": "Convert units using their relationship.",
+    "example": "1.25 kg = 1250 g",
+    "steps": [
+      "1 kg = 1000 g.",
+      "0.25 kg = 250 g.",
+      "Add: 1000 + 250 = 1250 g."
+    ],
+    "tip": "Smaller units need a larger numerical count for the same amount."
+  },
+  "time": {
+    "idea": "Break a time interval into manageable jumps.",
+    "example": "9:45 am to 11:10 am = 1 hour 25 minutes",
+    "steps": [
+      "9:45 to 10:00 is 15 minutes.",
+      "10:00 to 11:00 is 1 hour.",
+      "Add 10 more minutes to reach 11:10."
+    ],
+    "tip": "An hour has 60 minutes, not 100."
+  },
+  "timetable": {
+    "idea": "Use departure and arrival times to check a journey.",
+    "example": "Depart 9:20 am; arrive 10:05 am → 45 minutes",
+    "steps": [
+      "Read the correct service row.",
+      "9:20 to 10:00 is 40 minutes.",
+      "Add 5 minutes to reach 10:05."
+    ],
+    "tip": "Leave enough time between connecting services."
+  },
+  "anglesPoint": {
+    "idea": "Angles around a point add to 360°.",
+    "example": "90° + 120° + x = 360° → x = 150°",
+    "steps": [
+      "Add the known angles: 210°.",
+      "Subtract from 360°.",
+      "The missing angle is 150°."
+    ],
+    "tip": "Angles on a straight line add to 180° instead."
+  },
+  "design": {
+    "idea": "A measurement design must meet every given condition.",
+    "example": "A 6 m by 4 m garden needs 20 m of edging",
+    "steps": [
+      "Identify what is needed: the boundary.",
+      "Add all sides: 6 + 4 + 6 + 4 = 20.",
+      "Check the available edging is at least 20 m."
+    ],
+    "tip": "List the conditions and units before choosing a design."
+  },
+  "placeLarge": {
+    "idea": "Each place is ten times the value of the place to its right.",
+    "example": "24 306 = 20 000 + 4 000 + 300 + 6",
+    "steps": [
+      "2 is in the ten-thousands place.",
+      "4 is thousands; 3 is hundreds.",
+      "There are no tens and 6 ones."
+    ],
+    "tip": "The zero keeps the tens place."
+  },
+  "partitionLarge": {
+    "idea": "Rename a number by exchanging place-value units.",
+    "example": "24 306 = 24 000 + 306 = 23 000 + 1 306",
+    "steps": [
+      "Start with 24 thousands and 306.",
+      "Exchange one thousand for 1000 ones.",
+      "23 000 + 1 306 still equals 24 306."
+    ],
+    "tip": "Add the parts to check the total."
+  },
+  "decimalLine": {
+    "idea": "Read the interval between labelled points before locating a decimal.",
+    "example": "0.0 — 0.1 — 0.2 — 0.3 — 0.4",
+    "steps": [
+      "Each step is one tenth.",
+      "Three steps from zero reaches 0.3.",
+      "0.35 would be halfway between 0.3 and 0.4."
+    ],
+    "tip": "Equal distances on the line represent equal differences."
+  },
+  "friendlyMultiply": {
+    "idea": "Use a nearby easy multiplication, then adjust.",
+    "example": "9 × 8 = (10 × 8) − 8 = 72",
+    "steps": [
+      "Ten groups of 8 make 80.",
+      "Nine groups need one fewer group.",
+      "80 − 8 = 72."
+    ],
+    "tip": "Subtract one whole group, not just one."
+  },
+  "sixes": {
+    "idea": "Double a known three-times fact to find a six-times fact.",
+    "example": "6 × 8 = 2 × (3 × 8) = 48",
+    "steps": [
+      "3 × 8 = 24.",
+      "Six groups are twice as many as three.",
+      "Double 24 to get 48."
+    ],
+    "tip": "Doubling the number of groups doubles the total."
+  },
+  "sevens": {
+    "idea": "Split seven groups into five groups and two groups.",
+    "example": "7 × 8 = (5 × 8) + (2 × 8) = 56",
+    "steps": [
+      "5 × 8 = 40.",
+      "2 × 8 = 16.",
+      "40 + 16 = 56."
+    ],
+    "tip": "Keep the group size the same when splitting."
+  },
+  "nestedUnknown": {
+    "idea": "Undo the outside operation first, then the operation inside the brackets.",
+    "example": "(□ + 3) × 2 = 14 → □ = 4",
+    "steps": [
+      "Undo multiplying by 2: 14 ÷ 2 = 7.",
+      "Now □ + 3 = 7, so subtract 3.",
+      "Check: (4 + 3) × 2 = 14."
+    ],
+    "tip": "Keep the bracketed part together while undoing the outside operation."
+  },
+  "eitherSide": {
+    "idea": "An equation works the same way with the unknown on either side.",
+    "example": "19 = 3 × □ + 4 → □ = 5",
+    "steps": [
+      "Subtract 4 from both sides: 15 = 3 × □.",
+      "Divide both sides by 3: 5 = □.",
+      "Check: 3 × 5 + 4 = 19."
+    ],
+    "tip": "The equals sign means both sides have the same value."
+  },
+  "pairsUnknown": {
+    "idea": "An equation with two unknowns can have several pairs of solutions.",
+    "example": "a + b = 10: (1, 9), (2, 8), (3, 7)",
+    "steps": [
+      "Choose a value for a, such as 3.",
+      "Find b: 10 − 3 = 7.",
+      "Check: 3 + 7 = 10."
+    ],
+    "tip": "Follow any limits on which numbers are allowed."
+  },
+  "lists": {
+    "idea": "A list records each response before you organise the data.",
+    "example": "Responses: cat, dog, cat",
+    "steps": [
+      "Record one response per person.",
+      "Keep both cat responses: they came from different people.",
+      "There are 3 responses altogether."
+    ],
+    "tip": "Repeated answers are still separate pieces of data."
+  },
+  "doubleHalve": {
+    "idea": "Doubling makes two equal copies. Halving splits a total into two equal parts.",
+    "example": "8 × 2 = 16; 16 ÷ 2 = 8",
+    "steps": [
+      "Double 8: 8 + 8 = 16.",
+      "Halve 16: share it into 2 equal groups.",
+      "Each group has 8, so halving undoes doubling."
+    ],
+    "tip": "Check the direction of the rule: double or halve."
+  }
+}

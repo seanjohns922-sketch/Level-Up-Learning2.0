@@ -1,5 +1,6 @@
 "use client";
 
+import { isNativeLessonIntro } from "@/data/lesson-guides/lower-level";
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { PatternPeaksQuestionCard } from "@/components/pattern-peaks/PatternPeaksQuestionCard";
@@ -359,7 +360,7 @@ function TaskRendererInner({
   assessmentAnswer?: string;
 }) {
   const { markCorrect, markCorrectSoft, markWrong, advanceIntro, markAttempted, recordAssessmentAnswer } = callbacks;
-  const isIntroTask = "scene" in task && task.scene === "intro";
+  const isIntroTask = isNativeLessonIntro(task);
   const onC = (response?: unknown) => setTimeout(() => {
     if (assessmentMode && recordAssessmentAnswer && typeof response === "string") {
       recordAssessmentAnswer(true, response); return;

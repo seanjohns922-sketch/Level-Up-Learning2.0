@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import LowerLessonGuide from "./LowerLessonGuide";
+import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
 import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import {getRealmTheme} from "@/lib/useRealmTheme";
@@ -48,6 +51,7 @@ type RealmLessonHomeProps = {
   successCriteria: readonly string[];
   conceptIntro?: LessonConceptIntroData;
   embeddedVideoSrc?: string;
+  hasNativeStartGuide?: boolean;
   startDisabled?: boolean;
   startDisabledLabel?: string;
   onBack: () => void;
@@ -465,11 +469,18 @@ export function RealmLessonHome({
   successCriteria,
   conceptIntro,
   embeddedVideoSrc,
+  hasNativeStartGuide = false,
   startDisabled = false,
   startDisabledLabel,
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
+  const [guideOpen, setGuideOpen] = useState(false);
+  const lowerGuide = getLowerLessonGuide(realm, levelNumber, week, lessonNumber);
+  const startLesson = () => {
+    if (lowerGuide && !hasNativeStartGuide) setGuideOpen(true);
+    else onStart();
+  };
   const isCave=levelNumber >= 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:levelNumber===8?"Stronghold Mission":"Cave Mission",startLabel:"Learn the skill",intro:levelNumber===8?"Enter the stronghold, learn the skill, and work towards recovering the Core.":"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
   const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
@@ -490,6 +501,11 @@ export function RealmLessonHome({
     ? `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation}`
     : "";
   const readAllText = `${lessonTitle}. ${theme.intro} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
+
+  if (guideOpen && lowerGuide) return <div className="mx-auto max-w-6xl py-4">
+    <button type="button" onClick={() => setGuideOpen(false)} className="mb-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900">Back to lesson overview</button>
+    <LowerLessonGuide guide={lowerGuide} title={lessonTitle} realm={realm} onContinue={onStart} />
+  </div>;
 
   return (
     <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${levelNumber === 7 ? (realm === "pattern" || realm === "statistics" || realm === "chance" ? caveLayout.home : realm === "space" ? spaceLayout.home : realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
@@ -669,7 +685,7 @@ export function RealmLessonHome({
                 </div>
                 <button
                   type="button"
-                  onClick={onStart}
+                  onClick={startLesson}
                   disabled={startDisabled}
                   className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg px-10 text-lg font-black text-white transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:saturate-50 disabled:opacity-65 sm:w-auto"
                   style={{ background: theme.buttonBg, boxShadow: theme.buttonShadow }}

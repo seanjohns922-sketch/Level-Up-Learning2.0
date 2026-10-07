@@ -1,4 +1,7 @@
 "use client";
+import NarratedLessonGuide from "./NarratedLessonGuide";
+import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "./LowerLessonGuide";
+import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
 import {level7Answer} from '@/lib/level7-answer';
 
 import { number7Guide } from "@/data/activities/year7Number/curriculum";
@@ -629,6 +632,7 @@ export function Year2LessonEngine({
   brainBreakFrequency = "normal",
   questionGenerator = generateQuestion,
   isQuestionCompatible,
+  lessonHelp,
 }: {
   lesson: Lesson;
   onTimedComplete: () => void;
@@ -644,6 +648,7 @@ export function Year2LessonEngine({
   brainBreakFrequency?: BrainBreakFrequency;
   questionGenerator?: LessonQuestionGenerator;
   isQuestionCompatible?: (question: unknown) => boolean;
+  lessonHelp?: ReactNode;
 }) {
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
@@ -659,6 +664,7 @@ export function Year2LessonEngine({
   const newCaveRealm = realmId === "pattern" || realmId === "statistics" || realmId === "chance" ? realmId : null;
   const isLevel8 = levelNumber === 8;
   const isCave7 = levelNumber === 7 || isLevel8;
+  const lowerGuide = getLowerLessonGuide(realmId ?? "number", levelNumber, lesson.week, lesson.lesson);
   const [skillGuideOpen, setSkillGuideOpen] = useState(false);
   const skillGuideOpenRef = useRef(false);
   const isModernNumber = isNumber7 || isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
@@ -1592,6 +1598,7 @@ export function Year2LessonEngine({
         }`}
       />
 
+      {(lowerGuide || lessonHelp) && skillGuideOpen && <LessonHelpDialog onClose={() => { skillGuideOpenRef.current = false; setSkillGuideOpen(false); }}>{lessonHelp ? <div className="p-5"><NarratedLessonGuide title={lesson.title}>{lessonHelp}</NarratedLessonGuide><LessonHelpButton realm={realmId ?? "pattern"} label="Back to practice" onClick={() => { skillGuideOpenRef.current = false; setSkillGuideOpen(false); }} /></div> : lowerGuide ? <LowerLessonGuide guide={lowerGuide} realm={realmId ?? "number"} title={lesson.title} review onContinue={() => { skillGuideOpenRef.current = false; setSkillGuideOpen(false); }} /> : null}</LessonHelpDialog>}
       {!isLevel8 && isCave7 && newCaveRealm && skillGuideOpen && <Cave7SkillGuideDialog realm={newCaveRealm} week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isSpace7 && skillGuideOpen && <Space7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isMeasurement7 && skillGuideOpen && <Measurement7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
@@ -1613,6 +1620,7 @@ export function Year2LessonEngine({
 
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
+          {(lowerGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { skillGuideOpenRef.current = true; setSkillGuideOpen(true); }} />}
           {isCave7 && <button type="button" className={`mb-3 w-full rounded-lg border px-4 py-3 font-bold text-white ${newCaveRealm ? "border-white/30 bg-slate-900" : isSpace7 ? "border-violet-200 bg-violet-950" : isMeasurement7 ? "border-amber-200 bg-amber-950" : "border-teal-200 bg-teal-950"}`} onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
           <LessonHUDRail
             levelNumber={levelNumber}

@@ -1,5 +1,6 @@
 "use client";
 
+import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
@@ -130,6 +131,7 @@ export default function PatternPeaksLessonShell({
               onTimedComplete={completeLesson}
               onExit={completeLesson}
               onPerformanceSummary={(summary) => { summaryRef.current = summary; }}
+              lessonHelp={conceptIntro ? <LessonConceptIntro realm="pattern" conceptIntro={conceptIntro} /> : undefined}
               realmId="pattern"
               levelNumber={levelNumber}
               practisedSkills={successCriteria}
@@ -173,7 +175,7 @@ export default function PatternPeaksLessonShell({
             <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">{lesson.title}</h1>
             <p className="mt-2 max-w-3xl text-base font-semibold text-white/70">{lesson.focus}</p>
           </div>
-          <LessonConceptIntro realm="pattern" conceptIntro={conceptIntro} />
+          <NarratedLessonGuide title={`${lesson.title}. ${lesson.focus}`}><LessonConceptIntro realm="pattern" conceptIntro={conceptIntro} /></NarratedLessonGuide>
           <div className="flex justify-end">
             <button
               type="button"
@@ -201,6 +203,7 @@ export default function PatternPeaksLessonShell({
         focus={lesson.focus}
         successCriteria={successCriteria}
         onBack={back}
+        hasNativeStartGuide={Boolean(conceptIntro)}
         onStart={() => setPhase(conceptIntro ? "concept" : "active")}
       />
     </main>
