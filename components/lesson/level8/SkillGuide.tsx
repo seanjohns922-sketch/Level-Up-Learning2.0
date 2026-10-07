@@ -8,6 +8,7 @@ import { LEVEL8_CURRICULUM } from "@/data/activities/level8/curriculum";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import type { Level8Realm } from "@/lib/level8-config";
 import SpaceVisual from "./SpaceVisual";
+import NumberVisual from "./NumberVisual";
 import Investigation from "./Investigation";
 export default function SkillGuide({
   realm,
@@ -49,6 +50,7 @@ export default function SkillGuide({
               <Year8MeasurementAssessmentVisual visual={q.measurement8Visual} />
             )}
             {q.space8Visual && <SpaceVisual visual={q.space8Visual} />}
+            {q.number8Visual && <NumberVisual visual={q.number8Visual} />}
           </div>
         </div>
         <div

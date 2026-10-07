@@ -63,6 +63,7 @@ for (const [realm, factories] of Object.entries(LEVEL8_FACTORIES)) {
               q.prompt,
               q.cave7Visual,
               q.measurement8Visual,
+              q.number8Visual,
               q.space8Visual,
             ]),
           ),
@@ -103,10 +104,13 @@ for (let seed = 1; seed <= 40; seed++) {
   const parts = fractionQuestion.prompt.match(
     /Calculate (\d+)\/(\d+) ([−+]) (\d+)\/(\d+)/,
   );
-  const [, a, b, op, c, d] = parts;
-  const expected =
-    Number(a) / Number(b) + ((op === "−" ? -1 : 1) * Number(c)) / Number(d);
-  assert(markLevel7Answer(level7Answer(fractionQuestion), String(expected)));
+  // Week 6 Lesson 1 mixes several question forms; recompute the plain a/b ± c/d ones.
+  if (parts && /^Calculate \d+\/\d+ [−+] \d+\/\d+\.$/.test(fractionQuestion.prompt)) {
+    const [, a, b, op, c, d] = parts;
+    const expected =
+      Number(a) / Number(b) + ((op === "−" ? -1 : 1) * Number(c)) / Number(d);
+    assert(markLevel7Answer(level7Answer(fractionQuestion), String(expected)));
+  }
   const missing = level8Question("space", 3, 3, seed);
   const [small, large] = missing.space8Visual.polygons;
   assert.equal(large.sideLabels[2], "x");

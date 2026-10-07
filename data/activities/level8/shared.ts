@@ -14,6 +14,7 @@ export type QuestionDraft = {
     space?: import("@/data/assessments/revisions/level8StarpathFiveForms").Space8;
   };
   measurementVisual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual;
+  numberVisual?: import("./number-visual").Number8Visual;
   unit?: string;
   choices?: string[];
   input?: Level7Answer["kind"];
@@ -121,6 +122,7 @@ export function question(
     cave7Visual: draft.visual,
     space8Visual: draft.spaceVisual,
     measurement8Visual: draft.measurementVisual,
+    number8Visual: draft.numberVisual,
     ...(choices
       ? {}
       : {

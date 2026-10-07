@@ -1,6 +1,7 @@
 "use client";
 
 import Space8Visual from '@/components/lesson/level8/SpaceVisual';
+import Number8Visual from '@/components/lesson/level8/NumberVisual';
 import Number7RatioVisual from './Number7RatioVisual';
 import {number7RatioVisual} from '@/lib/number7-ratio-visual';
 import Number7ContextArt from './Number7ContextArt';
@@ -220,7 +221,7 @@ export default function MultipleChoiceActivity({
         ? "lg:grid-cols-3"
         : "md:grid-cols-2 xl:grid-cols-4"
     : "";
-  const missingRelationshipVisual = !questionData.cave7Visual && !questionData.spaceVisual && !questionData.space8Visual && !questionData.measurement8Visual && !hasRequiredRelationshipVisual(
+  const missingRelationshipVisual = !questionData.cave7Visual && !questionData.spaceVisual && !questionData.space8Visual && !questionData.measurement8Visual && !questionData.number8Visual && !hasRequiredRelationshipVisual(
     questionData.prompt,
     questionData.visual?.type,
     "multiple_choice",
@@ -479,7 +480,7 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      <VisualAnswerLayout visual={questionData.space8Visual?<Space8Visual visual={questionData.space8Visual}/>:questionData.measurement8Visual?<Year8MeasurementAssessmentVisual visual={questionData.measurement8Visual}/>:questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:questionData.spaceVisual?<Space7LessonVisual visual={questionData.spaceVisual}/>:undefined}>
+      <VisualAnswerLayout visual={questionData.number8Visual?<Number8Visual visual={questionData.number8Visual}/>:questionData.space8Visual?<Space8Visual visual={questionData.space8Visual}/>:questionData.measurement8Visual?<Year8MeasurementAssessmentVisual visual={questionData.measurement8Visual}/>:questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:questionData.spaceVisual?<Space7LessonVisual visual={questionData.spaceVisual}/>:undefined}>
       {constructed?<><Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>{setQuizRecorded(false);onWrong?.('');}:undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);else setQuizRecorded(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>{renderMode==='quiz'&&quizRecorded&&<p role="status" className="mt-3 rounded-lg border-2 border-emerald-300 bg-emerald-50 px-4 py-2 font-bold text-emerald-900">✓ Answer recorded. You can change it before you submit.</p>}</>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", (questionData.measurementVisual||questionData.cave7Visual||questionData.spaceVisual) && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect

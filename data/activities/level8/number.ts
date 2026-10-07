@@ -1,499 +1,412 @@
-import {
-  fraction,
-  formula,
-  random,
-  rounded,
-  table,
-  type LessonFactory,
-  type QuestionDraft,
-} from "./shared";
-// Each factory targets one lesson; the seed varies its values without changing the skill.
-export const numberLessons: LessonFactory[] = [
-  (seed) => {
-    const r = random(seed),
-      n = r(2, 15),
-      square = seed % 2 === 0;
-    return {
-      prompt: `Is √${square ? n * n : n * n + 1} rational or irrational?`,
-      answer: square ? "Rational" : "Irrational",
-      steps: [
-        square
-          ? `${n * n} is a perfect square: its square root is ${n}.`
-          : `${n * n + 1} lies between ${n * n} and ${(n + 1) ** 2}; it is not a perfect square.`,
-        square
-          ? "An integer can be written as a fraction."
-          : "The square root of a positive integer that is not a perfect square is irrational.",
-      ],
-    };
+import { fraction, formula, random, rounded, table, type LessonFactory, type QuestionDraft } from "./shared";
+import type { Number8Visual } from "./number-visual";
+
+// Level 8 Number (AC9M8N01–N05). Each lesson draws from several question forms covering fluency,
+// reasoning and application, modelled on the Year 8 Victorian Curriculum textbook exercises
+// (Essential Mathematics VCE 8, Ch 1, 3 and 5J–5K). The seed picks the form and its values.
+
+type R = (min: number, max: number) => number;
+type Form = (r: R) => QuestionDraft;
+const pickForm = (forms: Form[]): LessonFactory => (seed) => { const r = random(seed); return forms[r(0, forms.length - 1)](r); };
+const choose = <T,>(r: R, items: readonly T[]) => items[r(0, items.length - 1)];
+
+// ── Display helpers ──────────────────────────────────────────────────────────
+const SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+const sup = (n: number) => String(n).split("").map((c) => SUP[Number(c)]).join("");
+/** Signed number, minus sign in front. */
+const S = (n: number) => (n < 0 ? `−${fmt(-n)}` : fmt(n));
+/** Signed number in brackets when negative, for use after an operator. */
+const B = (n: number) => (n < 0 ? `(−${fmt(-n)})` : fmt(n));
+function fmt(n: number) { return String(rounded(n, 6)); }
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : Math.abs(a));
+/** Simplified fraction for display, with a proper minus sign. */
+const F = (n: number, d: number) => fraction(n, d).replace("-", "−");
+const BF = (n: number, d: number) => (n < 0 ? `(${F(n, d)})` : F(n, d));
+/** Mixed number for display, such as 2 1/3 or −1 1/2. */
+function M(n: number, d: number) {
+  const g = gcd(n, d), a = Math.abs(n / g), dd = d / g, w = Math.floor(a / dd), rem = a % dd, sign = n < 0 ? "−" : "";
+  return rem === 0 ? `${sign}${w}` : w === 0 ? `${sign}${rem}/${dd}` : `${sign}${w} ${rem}/${dd}`;
+}
+const money = (n: number) => `$${Number.isInteger(n) ? n.toLocaleString("en-AU") : n.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const coprime = (r: R, d: number) => { let n = r(1, d - 1); while (gcd(n, d) !== 1) n = r(1, d - 1); return n; };
+const nonZero = (r: R, lo: number, hi: number) => { const n = r(lo, hi); return (r(0, 1) ? 1 : -1) * n; };
+const factorsVisual = (title: string, groups: Number8Visual & { kind: "factors" } extends { groups: infer G } ? G : never): Number8Visual => ({ kind: "factors", title, groups });
+
+// ── Week 1: numbers beyond fractions (N01) ─────────────────────────────────────
+const w1l1: Form[] = [
+  (r) => {
+    const n = r(2, 15), square = r(0, 1) === 0, k = square ? n * n : n * n + r(1, 2 * n);
+    return { prompt: `Is √${k} rational or irrational?`, answer: square ? "Rational" : "Irrational", steps: square ? [`${k} = ${n}², so √${k} = ${n}.`, "A whole number can be written as a fraction, so it is rational."] : [`${n}² = ${n * n} and ${n + 1}² = ${(n + 1) ** 2}, so ${k} is not a perfect square.`, "The square root of a whole number that is not a perfect square is irrational: its decimal never ends and never repeats."] };
   },
-  (seed) => {
-    const n = random(seed)(2, 14),
-      a = n * n + 1;
-    return {
-      prompt: `√${a} lies between which two consecutive integers? Enter the smaller, then the larger.`,
-      answer: `${n}, ${n + 1}`,
-      input: "list",
-      labels: ["Smaller integer", "Larger integer"],
-      steps: [
-        `${n}² = ${n * n}.`,
-        `${n + 1}² = ${(n + 1) ** 2}.`,
-        `So ${n} < √${a} < ${n + 1}.`,
-      ],
-      visual: table(
-        "Neighbouring squares",
-        ["Integer", "Square"],
-        [
-          [n, n * n],
-          [n + 1, (n + 1) ** 2],
-        ],
-      ),
-    };
+  (r) => {
+    const [x, answer, why] = choose(r, [["0.75", "Rational", "0.75 = 3/4."], ["3/7", "Rational", "It is already a fraction of two integers."], ["π", "Irrational", "π’s decimal never ends and never repeats."], ["√49", "Rational", "√49 = 7 = 7/1."], ["0.333…", "Rational", "0.333… = 1/3."], ["√12", "Irrational", "12 is not a perfect square."], ["−5", "Rational", "−5 = −5/1."], ["√2", "Irrational", "2 is not a perfect square."], ["0.121212…", "Rational", "A repeating decimal can be written as a fraction: 12/99 = 4/33."], ["√0.25", "Rational", "√0.25 = 0.5 = 1/2."]] as const);
+    return { prompt: `Is ${x} rational or irrational?`, answer, steps: ["A rational number can be written as a fraction a/b, where a and b are integers and b ≠ 0.", why] };
   },
-  (seed) => {
-    const d = random(seed)(3, 24);
-    return {
-      prompt: `A circle has diameter ${d} cm. Its exact circumference is kπ cm. What is k?`,
-      answer: d,
-      steps: [
-        "Circumference = π × diameter.",
-        `The exact answer is ${d}π cm. A decimal approximation would lose accuracy.`,
-      ],
-      visual: formula("Circle", `diameter = ${d} cm`),
-    };
+  (r) => {
+    const d = choose(r, [4, 5, 8, 20, 25, 40]), n = coprime(r, d), dec = fmt(n / d);
+    return { prompt: `${dec} is rational. Write it as a fraction in simplest form.`, answer: fraction(n, d), steps: [`${dec} = ${Math.round((n / d) * 1000)}/1000.`, `Simplify by dividing by the highest common factor: ${F(n, d)}.`] };
   },
-  (seed) => power(seed, "multiply"),
-  (seed) => power(seed, "divide"),
-  (seed) => {
-    const n = random(seed)(2, 30);
-    return {
-      prompt: `Calculate ${n}⁰.`,
-      answer: 1,
-      steps: [
-        `${n}³ ÷ ${n}³ = 1.`,
-        `Subtracting exponents gives ${n}⁰, so ${n}⁰ = 1.`,
-      ],
-    };
+  (r) => {
+    const n = r(3, 9), ns = n * n + r(1, n), sq = choose(r, [16, 25, 36, 64, 81].filter((v) => v !== n * n));
+    const choices = [`√${ns}`, `√${sq}`, "2.5", "4/9"];
+    return { prompt: "Which of these numbers is irrational?", answer: `√${ns}`, choices, steps: [`√${sq} = ${Math.sqrt(sq)}, 2.5 = 5/2 and 4/9 are all rational.`, `${ns} is not a perfect square, so √${ns} is irrational.`] };
   },
-  (seed) => power(seed, "power"),
-  (seed) => power(seed, "combined"),
-  (seed) => {
-    const n = random(seed)(2, 9),
-      negative = seed % 2 === 0;
-    return {
-      prompt: `Calculate ${negative ? `(−${n})²` : `−${n}²`}.`,
-      answer: negative ? n * n : -n * n,
-      steps: [
-        negative
-          ? `The brackets make −${n} the base.`
-          : `The power applies to ${n}; the minus sign stays outside.`,
-        negative
-          ? `(−${n}) × (−${n}) = ${n * n}.`
-          : `−(${n} × ${n}) = ${-n * n}.`,
-      ],
-    };
+  (r) => {
+    const block = choose(r, ["12", "45", "3", "142857", "27"]);
+    return { prompt: `Mia says 0.${block.repeat(Math.max(2, Math.ceil(6 / block.length)))}… is irrational because its digits never end. Is she correct?`, answer: "No", steps: ["The digits never end, but they repeat in a fixed block.", "Every repeating decimal can be written as a fraction, so it is rational. Irrational decimals never end and never repeat."] };
   },
-  (seed) => {
-    const r = random(seed),
-      d = [8, 16, 20, 25, 40, 50, 80, 125][r(0, 7)],
-      n = r(1, d - 1);
-    return {
-      prompt: `Write ${n}/${d} as a decimal.`,
-      answer: rounded(n / d, 6),
-      steps: [
-        `Divide ${n} by ${d}.`,
-        `${n}/${d} = ${n / d}; the decimal terminates.`,
-      ],
-    };
+  (r) => {
+    const d = choose(r, [2, 4, 5]), n = coprime(r, d) + d * r(1, 3);
+    return { prompt: `Write −${fmt(n / d)} as a fraction in simplest form.`, answer: fraction(-n, d), steps: [`${fmt(n / d)} = ${F(n, d)}.`, `Keep the negative sign: ${F(-n, d)}.`] };
   },
-  (seed) => {
-    const n = random(seed)(1, 8);
-    return {
-      prompt: `Write 0.${String(n).repeat(6)}… as a fraction. The digit ${n} repeats forever.`,
-      answer: `${n}/9`,
-      steps: [
-        `Let x = 0.${n}${n}${n}…`,
-        `10x − x = ${n}, so 9x = ${n}.`,
-        `x = ${n}/9.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      d = [6, 8, 12, 15, 20, 24, 25, 35, 40, 45, 50][r(0, 10)],
-      g = d;
-    return {
-      prompt: `Does 1/${g} have a terminating or recurring decimal?`,
-      answer: [8, 20, 25, 40, 50].includes(d) ? "Terminating" : "Recurring",
-      steps: [
-        "This fraction is already in simplest form.",
-        "A denominator with only factors 2 and 5 gives a terminating decimal. Other prime factors give a recurring decimal.",
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(-30, -3),
-      b = r(-20, 20),
-      subtract = seed % 2 === 0;
-    return {
-      prompt: `Calculate ${a} ${subtract ? "−" : "+"} (${b}).`,
-      answer: subtract ? a - b : a + b,
-      steps: [
-        subtract ? `Subtracting ${b} means adding ${-b}.` : `Add ${b} to ${a}.`,
-        `The result is ${subtract ? a - b : a + b}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(-12, -2),
-      b = r(2, 12),
-      divide = seed % 2 === 0;
-    return {
-      prompt: `Calculate ${divide ? a * b : a} ${divide ? "÷" : "×"} ${b}.`,
-      answer: divide ? a : a * b,
-      steps: [
-        "Different signs give a negative result.",
-        `Calculate the magnitudes: ${divide ? `${-a * b} ÷ ${b} = ${-a}` : `${-a} × ${b} = ${-a * b}`}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(2, 12),
-      b = r(-10, -1),
-      c = r(2, 9);
-    return {
-      prompt: `Calculate ${a} × (${b} + ${c}).`,
-      answer: a * (b + c),
-      steps: [
-        `Brackets first: ${b} + ${c} = ${b + c}.`,
-        `Then ${a} × ${b + c} = ${a * (b + c)}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(1, 5),
-      b = r(2, 7),
-      d = r(2, 6),
-      e = r(3, 8),
-      minus = seed % 2 === 0;
-    return {
-      prompt: `Calculate ${a}/${d} ${minus ? "−" : "+"} ${b}/${e}.`,
-      answer: fraction(a * e + (minus ? -1 : 1) * b * d, d * e),
-      steps: [
-        `Use denominator ${d * e}.`,
-        `The numerators become ${a * e} and ${b * d}.`,
-        `${minus ? "Subtract" : "Add"} the numerators and simplify.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(1, 8),
-      b = r(2, 9),
-      c = r(1, 7),
-      d = r(2, 10),
-      div = seed % 2 === 0;
-    return {
-      prompt: `Calculate ${a}/${b} ${div ? "÷" : "×"} ${c}/${d}.`,
-      answer: div ? fraction(a * d, b * c) : fraction(a * c, b * d),
-      steps: [
-        div
-          ? `Multiply by the reciprocal: ${a}/${b} × ${d}/${c}.`
-          : "Multiply the numerators and multiply the denominators.",
-        "Simplify the fraction.",
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(1, 6),
-      d = r(3, 10);
-    return {
-      prompt: `Calculate ${a}/${d} + ${d - a}/${d} − 1/${d}.`,
-      answer: fraction(d - 1, d),
-      steps: [
-        `The first two fractions total ${d}/${d} = 1.`,
-        `Subtract 1/${d}: the result is ${fraction(d - 1, d)}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(-990, -100) / 100,
-      b = r(100, 990) / 100;
-    return {
-      prompt: `Calculate ${a} + ${b}.`,
-      answer: rounded(a + b),
-      steps: [
-        "Align the decimal points.",
-        `Subtract the smaller magnitude from the larger; keep the larger magnitude’s sign. Result: ${rounded(a + b)}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(12, 99),
-      b = r(2, 9);
-    return {
-      prompt: `Calculate ${(a * b) / 10} ÷ ${b / 10}.`,
-      answer: a,
-      steps: [
-        `Multiply both numbers by 10: ${a * b} ÷ ${b}.`,
-        `The quotient is ${a}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const n = random(seed)(2, 18) * 4;
-    return {
-      prompt: `Calculate 0.25 × ${n}.`,
-      answer: n / 4,
-      steps: ["0.25 = 1/4.", `One quarter of ${n} is ${n / 4}.`],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(20, 90),
-      b = r(2, 9);
-    return {
-      prompt: `Calculate ${a} + ${b} + ${100 - a}.`,
-      answer: 100 + b,
-      steps: [`Regroup ${a} + ${100 - a} = 100.`, `Then add ${b}: ${100 + b}.`],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(11, 89),
-      b = r(11, 89),
-      x = a / 10,
-      y = b / 10;
-    return {
-      prompt: `Estimate ${x} × ${y}. Round each number to the nearest whole number first.`,
-      answer: Math.round(x) * Math.round(y),
-      steps: [
-        `${x} rounds to ${Math.round(x)}; ${y} rounds to ${Math.round(y)}.`,
-        `Multiply: ${Math.round(x) * Math.round(y)}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(10, 50),
-      b = r(2, 9),
-      c = r(2, 8);
-    return {
-      prompt: `Calculate (${a} − ${b}) ÷ ${c}. Give a fraction or exact decimal.`,
-      answer: fraction(a - b, c),
-      steps: [
-        `Subtract inside the brackets: ${a - b}.`,
-        `Divide by ${c}: ${fraction(a - b, c)}.`,
-      ],
-    };
-  },
-  (seed) => percentage(seed, 1),
-  (seed) => percentage(seed, -1),
-  (seed) => {
-    const r = random(seed),
-      a = r(5, 30) * 10,
-      p = r(1, 8) * 5,
-      b = a * (1 + p / 100);
-    return {
-      prompt: `A quantity rises from ${a} to ${rounded(b)}. What is the percentage increase?`,
-      answer: p,
-      unit: "%",
-      steps: [
-        `Increase: ${rounded(b - a)}.`,
-        `Divide by the original ${a}, then multiply by 100: ${p}%.`,
-      ],
-    };
-  },
-  (seed) => percentage(seed, seed % 2 ? 1 : -1, true),
-  (seed) => {
-    const r = random(seed),
-      base = r(10, 80) * 10,
-      add = seed % 2 === 0;
-    return {
-      prompt: add
-        ? `A price is $${base} before 10% tax. What is the price including tax?`
-        : `A price is $${rounded(base * 1.1)} including 10% tax. What was its price before tax?`,
-      answer: add ? rounded(base * 1.1) : base,
-      unit: "$",
-      steps: [
-        add
-          ? "Multiply the original price by 1.10."
-          : "Divide the tax-inclusive price by 1.10.",
-        `The result is $${add ? rounded(base * 1.1) : base}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      n = r(10, 50) * 10,
-      p = r(1, 5) * 5;
-    return {
-      prompt: `$${n} rises by ${p}%, then falls by ${p}%. What is the final amount?`,
-      answer: rounded(n * (1 + p / 100) * (1 - p / 100)),
-      unit: "$",
-      steps: [
-        `First multiply by ${1 + p / 100}.`,
-        `Then multiply the new amount by ${1 - p / 100}.`,
-        `The result is $${rounded(n * (1 + p / 100) * (1 - p / 100))}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      h = r(5, 20),
-      rate = r(15, 30),
-      cost = r(2, 6) * 10;
-    return {
-      prompt: `You earn $${rate} an hour for ${h} hours and spend $${cost}. How much remains?`,
-      answer: h * rate - cost,
-      unit: "$",
-      steps: [
-        `Income: ${h} × ${rate} = $${h * rate}.`,
-        `Subtract spending: $${h * rate - cost}.`,
-      ],
-      visual: table(
-        "Weekly budget",
-        ["Item", "Amount"],
-        [
-          ["Hours", h],
-          ["Pay per hour", `$${rate}`],
-          ["Spending", `$${cost}`],
-        ],
-      ),
-    };
-  },
-  (seed) => {
-    const income = random(seed)(21, 50) * 1000;
-    return {
-      prompt: `Use this fictional annual tax rule. What tax is due on $${income}?`,
-      answer: (income - 20000) * 0.2,
-      unit: "$",
-      steps: [
-        "The first $20,000 is not taxed.",
-        `Tax the remaining $${income - 20000} at 20%: $${(income - 20000) * 0.2}.`,
-      ],
-      visual: table(
-        "Fictional tax schedule",
-        ["Income portion", "Rate"],
-        [
-          ["First $20,000", "0%"],
-          ["Above $20,000", "20%"],
-        ],
-      ),
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      n = r(4, 15),
-      a = r(3, 8),
-      fixed = r(2, 8) * 5;
-    return {
-      prompt: `Plan A costs $${a} per visit. Plan B costs $${fixed} plus $${a - 2} per visit. How much cheaper is the cheaper plan for ${n} visits?`,
-      answer: Math.abs(a * n - (fixed + (a - 2) * n)),
-      unit: "$",
-      steps: [
-        `Plan A: $${a * n}.`,
-        `Plan B: $${fixed + (a - 2) * n}.`,
-        `Compare costs: difference $${Math.abs(2 * n - fixed)}.`,
-      ],
-      visual: table(
-        "Two plans",
-        ["Plan", "Initial cost", "Per visit"],
-        [
-          ["A", "$0", `$${a}`],
-          ["B", `$${fixed}`, `$${a - 2}`],
-        ],
-      ),
-    };
-  },
-  (seed) => {
-    const n = random(seed)(2, 20);
-    return {
-      prompt: `Round √${n * n + 1} to 2 decimal places.`,
-      answer: rounded(Math.sqrt(n * n + 1)),
-      steps: [
-        `√${n * n + 1} = ${Math.sqrt(n * n + 1).toFixed(5)}…`,
-        "Use the third decimal digit to round to two decimal places.",
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      total = r(3, 9),
-      n = r(1, 4),
-      d = r(5, 10);
-    return {
-      prompt: `A jug holds ${total} L. You pour out ${n}/${d} L. How many litres remain?`,
-      answer: fraction(total * d - n, d),
-      unit: "L",
-      steps: [
-        `Write ${total} as ${total * d}/${d}.`,
-        `Subtract ${n}/${d}: ${fraction(total * d - n, d)} L.`,
-      ],
-    };
-  },
-  (seed) => percentage(seed, -1, true),
 ];
-function power(
-  seed: number,
-  mode: "multiply" | "divide" | "power" | "combined",
-): QuestionDraft {
-  const r = random(seed),
-    base = r(2, 9),
-    a = r(2, 6),
-    b = r(2, 5),
-    c = r(1, 3);
-  const expression =
-    mode === "multiply"
-      ? `${base}^${a} × ${base}^${b}`
-      : mode === "divide"
-        ? `${base}^${a + b} ÷ ${base}^${b}`
-        : mode === "power"
-          ? `(${base}^${a})^${b}`
-          : `${base}^${a} × ${base}^${b} ÷ ${base}^${c}`;
-  const n =
-    mode === "multiply"
-      ? a + b
-      : mode === "divide"
-        ? a
-        : mode === "power"
-          ? a * b
-          : a + b - c;
-  return {
-    prompt: `Write ${expression} as ${base}^n. What is n?`,
-    answer: n,
-    steps: [
-      mode === "power"
-        ? "Multiply the exponents when raising a power to a power."
-        : "For the same base, add exponents when multiplying and subtract when dividing.",
-      `n = ${n}.`,
-    ],
-  };
+
+const w1l2: Form[] = [
+  (r) => {
+    const n = r(3, 12), a = n * n + r(1, 2 * n);
+    return { prompt: `The middle square has area ${a} cm². Its side length is √${a} cm. Between which two consecutive whole numbers does √${a} lie? Enter the smaller, then the larger.`, answer: `${n}, ${n + 1}`, input: "list", labels: ["Smaller", "Larger"], steps: [`${n}² = ${n * n} and ${n + 1}² = ${(n + 1) ** 2}.`, `${n * n} < ${a} < ${(n + 1) ** 2}, so ${n} < √${a} < ${n + 1}.`], numberVisual: { kind: "squares", title: "Three squares", squares: [{ area: n * n, label: `${n * n} cm²` }, { area: a, label: `${a} cm²`, highlight: true }, { area: (n + 1) ** 2, label: `${(n + 1) ** 2} cm²` }] } };
+  },
+  (r) => {
+    let a = 0, n = 0;
+    do { n = r(2, 9); a = n * n + r(1, 2 * n); } while (Math.abs(((Math.sqrt(a) * 10) % 1) - 0.5) < 0.12);
+    const k = Math.floor(Math.sqrt(a) * 10) / 10, rows = [-1, 0, 1, 2].map((s) => rounded(k + s / 10, 1));
+    return { prompt: `Use the table to write √${a} correct to one decimal place.`, answer: rounded(Math.sqrt(a), 1), steps: [`${a} lies between ${rounded(k * k, 2)} and ${rounded((k + 0.1) ** 2, 2)}, so √${a} is between ${k} and ${rounded(k + 0.1, 1)}.`, `√${a} = ${Math.sqrt(a).toFixed(3)}…, which rounds to ${rounded(Math.sqrt(a), 1)}.`], visual: table("Squares of decimals", ["x", "x²"], rows.map((x) => [x, rounded(x * x, 2)])) };
+  },
+  (r) => {
+    let a = 0, n = 0;
+    do { n = r(2, 11); a = n * n + r(1, 2 * n); } while (Math.abs(Math.sqrt(a) - n - 0.5) < 0.15);
+    const near = Math.round(Math.sqrt(a));
+    return { prompt: `Point P is at √${a}. Which whole number is P closest to?`, answer: near, steps: [`${n}² = ${n * n} and ${n + 1}² = ${(n + 1) ** 2}.`, `${a} is closer to ${near * near}, so √${a} is closest to ${near}.`], numberVisual: { kind: "numberline", title: "Locate P", min: n - 1, max: n + 2, step: 1, points: [{ value: Math.sqrt(a), label: "P" }] } };
+  },
+  (r) => {
+    const n = r(4, 12), a = n * n + r(2, 2 * n - 1), s = Math.sqrt(a), b = rounded(s + (r(0, 1) ? 0.1 : -0.1) * r(1, 3), 1);
+    return { prompt: `Which is larger: √${a} or ${b}?`, answer: s > b ? `√${a}` : String(b), choices: [`√${a}`, String(b)], steps: [`Square both: (√${a})² = ${a} and ${b}² = ${rounded(b * b, 2)}.`, `The larger square belongs to the larger number: ${s > b ? `√${a}` : b}.`] };
+  },
+  (r) => {
+    const n = r(4, 15), a = n * n + r(1, 2 * n);
+    return { prompt: `A square garden bed has an area of ${a} m². Its side length is between which two consecutive whole numbers of metres? Enter the smaller, then the larger.`, answer: `${n}, ${n + 1}`, input: "list", labels: ["Smaller", "Larger"], unit: "m", steps: ["Side length = √area.", `${n}² = ${n * n} < ${a} < ${(n + 1) ** 2} = ${n + 1}², so the side is between ${n} m and ${n + 1} m.`] };
+  },
+];
+
+const PI_DIGITS = "3.14159265358979";
+const w1l3: Form[] = [
+  (r) => { const k = r(1, 5); return { prompt: `π = ${PI_DIGITS}… Round π to ${k} decimal place${k > 1 ? "s" : ""}.`, answer: rounded(Math.PI, k), steps: [`Look at decimal place ${k + 1}: it is ${PI_DIGITS[k + 2]}.`, `${Number(PI_DIGITS[k + 2]) >= 5 ? "It is 5 or more, so round up" : "It is less than 5, so keep the digit"}: ${rounded(Math.PI, k)}.`] }; },
+  (r) => {
+    const area = r(0, 1) === 0, v = r(2, 12);
+    return area
+      ? { prompt: `A circle has radius ${v} cm. Its exact area is kπ cm². What is k?`, answer: v * v, steps: ["Area = πr².", `π × ${v}² = ${v * v}π cm². Leaving π in the answer keeps it exact.`], visual: formula("Circle", `radius = ${v} cm`) }
+      : { prompt: `A circle has diameter ${v} cm. Its exact circumference is kπ cm. What is k?`, answer: v, steps: ["Circumference = π × diameter.", `The exact answer is ${v}π cm. A decimal would only approximate it, because π is irrational.`], visual: formula("Circle", `diameter = ${v} cm`) };
+  },
+  () => ({ prompt: "22/7 is often used as an approximation for π. Is 22/7 rational or irrational?", answer: "Rational", steps: ["22/7 is a fraction of two integers, so it is rational.", "π is irrational, so 22/7 can only be an approximation of π."] }),
+  (r) => { const d = r(3, 40); return { prompt: `Use π ≈ 3.14 to find the circumference of a circle with diameter ${d} cm.`, answer: rounded(3.14 * d, 2), unit: "cm", steps: ["C = πd ≈ 3.14 × d.", `3.14 × ${d} = ${rounded(3.14 * d, 2)} cm. This is an approximation because π is irrational.`] }; },
+  (r) => { const d = 7 * r(1, 6); return { prompt: `A circle has diameter ${d} cm. How much larger is the circumference using π ≈ 22/7 than using π ≈ 3.14?`, answer: rounded((22 * d) / 7 - 3.14 * d, 2), unit: "cm", steps: [`22/7 × ${d} = ${(22 * d) / 7} cm.`, `3.14 × ${d} = ${rounded(3.14 * d, 2)} cm.`, `Difference: ${rounded((22 * d) / 7 - 3.14 * d, 2)} cm. Neither value is exact.`] }; },
+  () => ({ prompt: "Is π exactly equal to 3.14?", answer: "No", steps: ["π = 3.14159…, and its digits never end or repeat.", "3.14 is a rounded value of π, not its exact value."] }),
+];
+
+// ── Weeks 2–3: index laws (N02) ───────────────────────────────────────────────
+const w2l1: Form[] = [
+  (r) => { const b = r(2, 9), a = r(2, 5), c = r(2, 4); return { prompt: `Write ${b}${sup(a)} × ${b}${sup(c)} as ${b}ⁿ. What is n?`, answer: a + c, steps: ["When the bases are the same, keep the base and add the indices.", `${a} + ${c} = ${a + c}, so ${b}${sup(a)} × ${b}${sup(c)} = ${b}${sup(a + c)}.`], numberVisual: factorsVisual("Expanded form", [{ base: String(b), count: a }, { base: String(b), count: c, operator: "×" }]) }; },
+  (r) => { const b = r(2, 9), a = r(2, 8), c = r(2, 8); return { prompt: `Write ${b}${sup(a)} × ${b}${sup(c)} × ${b} as ${b}ⁿ. What is n?`, answer: a + c + 1, steps: [`${b} on its own is ${b}¹.`, `Add the indices: ${a} + ${c} + 1 = ${a + c + 1}.`] }; },
+  (r) => { const b = r(0, 1) ? 2 : 3, a = r(1, b === 2 ? 4 : 2), c = r(1, b === 2 ? 3 : 2); return { prompt: `Evaluate ${b}${sup(a)} × ${b}${sup(c)}.`, answer: b ** (a + c), steps: [`${b}${sup(a)} × ${b}${sup(c)} = ${b}${sup(a + c)}.`, `${b}${sup(a + c)} = ${b ** (a + c)}.`] }; },
+  (r) => { const b = r(2, 9), a = r(2, 9), c = r(2, 9); return { prompt: `${b}${sup(a)} × ${b}^? = ${b}${sup(a + c)}. What is the missing index?`, answer: c, steps: ["Multiplying powers of the same base adds the indices.", `${a} + ? = ${a + c}, so the missing index is ${c}.`] }; },
+  (r) => { const b = r(2, 5), a = r(2, 4), c = r(2, 4); return { prompt: `Kai writes ${b}${sup(a)} × ${b}${sup(c)} = ${b * b}${sup(a + c)}. The correct answer is ${b}ⁿ. What is n?`, answer: a + c, steps: [`Kai multiplied the bases. The base must stay ${b}.`, `${b}${sup(a)} × ${b}${sup(c)} = ${b}${sup(a + c)}, so n = ${a + c}.`], numberVisual: factorsVisual("Count the factors", [{ base: String(b), count: a }, { base: String(b), count: c, operator: "×" }]) }; },
+  (r) => { const v = choose(r, ["m", "x", "a", "k"]), a = r(2, 12), c = r(2, 12); return { prompt: `Simplify ${v}${sup(a)} × ${v}${sup(c)} to ${v}ⁿ. What is n?`, answer: a + c, steps: ["Same base: add the indices.", `${a} + ${c} = ${a + c}.`] }; },
+];
+
+const w2l2: Form[] = [
+  (r) => { const b = r(2, 9), a = r(1, 6), c = r(2, 6); return { prompt: `Write ${b}${sup(a + c)} ÷ ${b}${sup(c)} as ${b}ⁿ. What is n?`, answer: a, steps: ["When dividing powers of the same base, subtract the indices.", `${a + c} − ${c} = ${a}.`], numberVisual: factorsVisual("Cancel matching factors", [{ base: String(b), count: a + c }, { base: String(b), count: c, operator: "÷" }]) }; },
+  (r) => { const p = r(6, 12), k = r(1, 4); return { prompt: `Evaluate 10${sup(p)} ÷ 10${sup(p - k)}.`, answer: 10 ** k, steps: [`10${sup(p)} ÷ 10${sup(p - k)} = 10${sup(k)}.`, `10${sup(k)} = ${10 ** k}.`] }; },
+  (r) => { const b = r(2, 9), a = r(2, 7), c = r(2, 7); return { prompt: `${b}^? ÷ ${b}${sup(c)} = ${b}${sup(a)}. What is the missing index?`, answer: a + c, steps: ["Dividing subtracts the indices.", `? − ${c} = ${a}, so the missing index is ${a + c}.`] }; },
+  (r) => { const b = choose(r, [2, 3, 5]), big = r(500, 9000), k = r(1, b === 5 ? 3 : 4); return { prompt: `A calculator shows an error for ${b}${sup(big)} because it is too large. Use the index laws to evaluate ${b}${sup(big)} ÷ ${b}${sup(big - k)}.`, answer: b ** k, steps: [`${b}${sup(big)} ÷ ${b}${sup(big - k)} = ${b}${sup(k)}.`, `${b}${sup(k)} = ${b ** k}.`] }; },
+  (r) => { const b = r(2, 9), a = r(3, 8), c = r(2, 6), e = r(2, a + c - 1); return { prompt: `Write (${b}${sup(a)} × ${b}${sup(c)}) ÷ ${b}${sup(e)} as ${b}ⁿ. What is n?`, answer: a + c - e, steps: [`Multiply first: ${b}${sup(a + c)}.`, `Then divide: ${a + c} − ${e} = ${a + c - e}.`] }; },
+  (r) => { const v = choose(r, ["x", "y", "p", "t"]), a = r(8, 20), c = r(2, 7); return { prompt: `Simplify ${v}${sup(a)} ÷ ${v}${sup(c)} to ${v}ⁿ. What is n?`, answer: a - c, steps: ["Same base: subtract the indices.", `${a} − ${c} = ${a - c}.`] }; },
+];
+
+const w2l3: Form[] = [
+  (r) => { const a = r(2, 30), b = r(2, 30), kind = r(0, 2); return kind === 0 ? { prompt: `Evaluate ${a}⁰ + ${b}⁰.`, answer: 2, steps: ["Any non-zero number to the power 0 equals 1.", "1 + 1 = 2."] } : kind === 1 ? { prompt: `Evaluate ${a} × ${b}⁰.`, answer: a, steps: [`${b}⁰ = 1.`, `${a} × 1 = ${a}.`] } : { prompt: `Evaluate ${a}⁰ − ${b}⁰.`, answer: 0, steps: ["Both powers equal 1.", "1 − 1 = 0."] }; },
+  (r) => { const b = r(2, 9), a = r(2, 6); return { prompt: `${b}${sup(a)} ÷ ${b}${sup(a)} = ${b}ⁿ. What is n?`, answer: 0, steps: [`Subtract the indices: ${a} − ${a} = 0.`, `Any number divided by itself is 1, so ${b}⁰ = 1.`] }; },
+  (r) => { const b = r(0, 1) ? 2 : 3; return { prompt: `Each line of the table is divided by ${b}. Use the pattern to find ${b}⁰.`, answer: 1, steps: [`${b}¹ = ${b}. Divide by ${b} again.`, `${b} ÷ ${b} = 1, so ${b}⁰ = 1.`], visual: table(`Powers of ${b}`, ["Power", "Value"], [[`${b}³`, b ** 3], [`${b}²`, b ** 2], [`${b}¹`, b], [`${b}⁰`, "?"]]) }; },
+  (r) => { const n = r(2, 9), bracket = r(0, 1) === 0; return { prompt: `Evaluate ${bracket ? `(−${n})⁰` : `−${n}⁰`}.`, answer: bracket ? 1 : -1, steps: bracket ? [`The brackets make −${n} the base.`, `(−${n})⁰ = 1.`] : [`The index applies to ${n} only; the minus sign stays outside.`, `−${n}⁰ = −1.`] }; },
+  (r) => { const a = r(2, 9), b = r(2, 9), c = r(2, 4); return { prompt: `Evaluate ${a} × ${b}⁰ + ${c}³.`, answer: a + c ** 3, steps: [`${b}⁰ = 1, so ${a} × 1 = ${a}.`, `${c}³ = ${c ** 3}. Total: ${a + c ** 3}.`] }; },
+  (r) => { const k = r(2, 12); return { prompt: `Evaluate (${k}x)⁰, where x is not zero.`, answer: 1, steps: [`The whole bracket, ${k}x, is the base.`, "Any non-zero base to the power 0 equals 1."] }; },
+];
+
+const w3l1: Form[] = [
+  (r) => { const b = r(2, 9), a = r(2, 6), c = r(2, 5); return { prompt: `Write (${b}${sup(a)})${sup(c)} as ${b}ⁿ. What is n?`, answer: a * c, steps: [`(${b}${sup(a)})${sup(c)} means ${c} lots of ${b}${sup(a)} multiplied together.`, `Multiply the indices: ${a} × ${c} = ${a * c}.`] }; },
+  (r) => { const b = r(2, 9), a = r(2, 6), c = r(2, 5); return { prompt: `(${b}^?)${sup(c)} = ${b}${sup(a * c)}. What is the missing index?`, answer: a, steps: ["A power of a power multiplies the indices.", `? × ${c} = ${a * c}, so the missing index is ${a}.`] }; },
+  (r) => { const a = r(2, 3), c = r(2, 4), e = r(2, 3); return { prompt: `Write ((2${sup(a)})${sup(c)})${sup(e)} as 2ⁿ. What is n?`, answer: a * c * e, steps: ["Work from the inside out, multiplying the indices.", `${a} × ${c} × ${e} = ${a * c * e}.`] }; },
+  (r) => { const b = r(0, 1) ? 2 : 3, a = r(1, 2), c = r(2, b === 2 ? 4 : 2); return { prompt: `Evaluate (${b}${sup(a)})${sup(c)}.`, answer: b ** (a * c), steps: [`(${b}${sup(a)})${sup(c)} = ${b}${sup(a * c)}.`, `${b}${sup(a * c)} = ${b ** (a * c)}.`] }; },
+  (r) => { const a = r(2, 6), c = r(2, 6), same = r(0, 1) === 0, divisors = [2, 3, 4, 6].filter((v) => (a * c) % v === 0 && v !== a && v !== c), e = divisors.length ? choose(r, divisors) : a === c ? 1 : c, f = same ? (a * c) / e : (a * c) / e + choose(r, [-1, 1]); const equal = e * f === a * c; return { prompt: `Is (2${sup(a)})${sup(c)} equal to (2${sup(e)})${sup(f)}?`, answer: equal ? "Yes" : "No", steps: [`(2${sup(a)})${sup(c)} = 2${sup(a * c)} and (2${sup(e)})${sup(f)} = 2${sup(e * f)}.`, equal ? "The indices match, so they are equal." : "The indices differ, so they are not equal."] }; },
+  (r) => { const b = r(2, 9), a = r(2, 5), c = r(2, 5); return { prompt: `Sam simplifies (${b}${sup(a)})${sup(c)} as ${b}${sup(a + c)}. The correct answer is ${b}ⁿ. What is n?`, answer: a * c, steps: ["Sam added the indices. That rule is for multiplying powers.", `For a power of a power, multiply: ${a} × ${c} = ${a * c}.`] }; },
+];
+
+const w3l2: Form[] = [
+  (r) => { const b = r(2, 9), a = r(2, 4), c = r(2, 3), e = r(1, 5), f = r(1, a * c + e - 1); return { prompt: `Write (${b}${sup(a)})${sup(c)} × ${b}${e === 1 ? "" : sup(e)} ÷ ${b}${sup(f)} as ${b}ⁿ. What is n?`, answer: a * c + e - f, steps: [`(${b}${sup(a)})${sup(c)} = ${b}${sup(a * c)}.`, `Then ${a * c} + ${e} − ${f} = ${a * c + e - f}.`] }; },
+  (r) => { const b = r(2, 9), a = r(3, 8), c = r(3, 8), e = r(1, Math.floor((a + c - 1) / 2)); return { prompt: `Write (${b}${sup(a)} × ${b}${sup(c)}) ÷ (${b}${sup(e)})² as ${b}ⁿ. What is n?`, answer: a + c - 2 * e, steps: [`Numerator: ${b}${sup(a + c)}. Denominator: ${b}${sup(2 * e)}.`, `${a + c} − ${2 * e} = ${a + c - 2 * e}.`] }; },
+  (r) => { const s = r(2, 5), k = r(2, 4); return { prompt: `A large cube has side length ${s * k} cm. How many small cubes with side length ${k} cm fit inside it?`, answer: s ** 3, steps: [`Large volume: ${s * k}³ cm³. Small volume: ${k}³ cm³.`, `${s * k}³ ÷ ${k}³ = (${s * k} ÷ ${k})³ = ${s}³ = ${s ** 3}.`] }; },
+  (r) => { const nine = r(0, 1) === 1, a = r(2, 5), c = r(2, 6); return { prompt: `Write ${nine ? 9 : 4}${sup(a)} × ${nine ? 3 : 2}${sup(c)} as a power of ${nine ? 3 : 2}. What is the index?`, answer: 2 * a + c, steps: [`${nine ? "9 = 3²" : "4 = 2²"}, so ${nine ? 9 : 4}${sup(a)} = (${nine ? 3 : 2}²)${sup(a)} = ${nine ? 3 : 2}${sup(2 * a)}.`, `${2 * a} + ${c} = ${2 * a + c}.`] }; },
+  (r) => { const a = r(2, 4), c = r(3, 5); return { prompt: `Lena simplifies (3${sup(a)})${sup(c)} × 3 as 3${sup(a + c + 1)}. The correct answer is 3ⁿ. What is n?`, answer: a * c + 1, steps: [`(3${sup(a)})${sup(c)} = 3${sup(a * c)}: multiply the indices.`, `Then × 3¹: ${a * c} + 1 = ${a * c + 1}.`] }; },
+  (r) => { const a = r(2, 5), c = r(2, 5), e = a + c - r(1, 3); return { prompt: `Evaluate (2${sup(a)} × 2${sup(c)}) ÷ 2${sup(e)}.`, answer: 2 ** (a + c - e), steps: [`Combine the indices: ${a} + ${c} − ${e} = ${a + c - e}.`, `2${sup(a + c - e)} = ${2 ** (a + c - e)}.`] }; },
+];
+
+const w3l3: Form[] = [
+  (r) => { const n = r(2, 9), bracket = r(0, 1) === 0; return { prompt: `Evaluate ${bracket ? `(−${n})²` : `−${n}²`}.`, answer: bracket ? n * n : -n * n, steps: bracket ? [`The brackets make −${n} the base.`, `(−${n}) × (−${n}) = ${n * n}.`] : [`The index applies to ${n} only.`, `−(${n} × ${n}) = ${-n * n}.`] }; },
+  (r) => { const b = r(0, 1) ? -2 : -3, k = r(2, b === -2 ? 6 : 4); return { prompt: `Evaluate (${S(b)})${sup(k)}.`, answer: b ** k, steps: [`${k} factors of ${S(b)}: ${k % 2 === 0 ? "an even number of negatives gives a positive" : "an odd number of negatives gives a negative"}.`, `(${S(b)})${sup(k)} = ${S(b ** k)}.`] }; },
+  (r) => { const n = r(51, 999); return { prompt: `Evaluate (−1)${sup(n)}.`, answer: n % 2 === 0 ? 1 : -1, steps: ["(−1) to an even power is 1; to an odd power it is −1.", `${n} is ${n % 2 === 0 ? "even" : "odd"}, so the answer is ${n % 2 === 0 ? 1 : "−1"}.`] }; },
+  (r) => { const [a, b] = choose(r, [[2, 3], [2, 5], [3, 5], [5, 7]] as const), x = r(2, 4), y = r(2, 3); return { prompt: `Can ${a}${sup(x)} × ${b}${sup(y)} be written as a single power using the index laws?`, answer: "No", steps: ["The index laws only combine powers with the same base.", `${a} and ${b} are different bases, so the indices cannot be added.`] }; },
+  (r) => { const x = r(2, 4), y = r(1, 3); return { prompt: `Evaluate 2${sup(x)} × 3${sup(y)}.`, answer: 2 ** x * 3 ** y, steps: [`The bases differ, so evaluate each power first: 2${sup(x)} = ${2 ** x} and 3${sup(y)} = ${3 ** y}.`, `${2 ** x} × ${3 ** y} = ${2 ** x * 3 ** y}.`] }; },
+  (r) => { const kind = r(0, 2), k = r(2, 5); return kind === 0 ? { prompt: `Evaluate ${k} × (−2)².`, answer: 4 * k, steps: ["(−2)² = 4.", `${k} × 4 = ${4 * k}.`] } : kind === 1 ? { prompt: `Evaluate −${k} × (−2)³.`, answer: 8 * k, steps: ["(−2)³ = −8.", `−${k} × (−8) = ${8 * k}.`] } : { prompt: `Evaluate −${16 * k} ÷ (−2)³.`, answer: 2 * k, steps: ["(−2)³ = −8.", `−${16 * k} ÷ (−8) = ${2 * k}.`] }; },
+];
+
+// ── Week 4: terminating and recurring decimals (N03) ─────────────────────────
+const TERMINATING = [8, 16, 20, 25, 40, 50, 80, 125];
+const w4l1: Form[] = [
+  (r) => { const d = choose(r, TERMINATING), n = coprime(r, d); return { prompt: `Write ${n}/${d} as a decimal.`, answer: rounded(n / d, 6), steps: [`Divide ${n} by ${d}, adding zeros after the decimal point.`, `${n}/${d} = ${fmt(n / d)}. The division ends, so the decimal terminates.`] }; },
+  (r) => { const d = choose(r, [4, 5, 8, 20, 25]), n = coprime(r, d), w = r(1, 9); return { prompt: `Write ${w} ${n}/${d} as a decimal.`, answer: rounded(w + n / d, 6), steps: [`${n}/${d} = ${fmt(n / d)}.`, `${w} + ${fmt(n / d)} = ${fmt(w + n / d)}.`] }; },
+  (r) => { const d = choose(r, [4, 8, 20, 25, 40, 50, 125, 200]), n = coprime(r, d); return { prompt: `Write ${fmt(n / d)} as a fraction in simplest form.`, answer: fraction(n, d), steps: [`${fmt(n / d)} = ${Math.round((n / d) * 1000)}/1000.`, `Divide the numerator and denominator by their highest common factor: ${F(n, d)}.`] }; },
+  (r) => { const d = choose(r, [4, 5, 8, 20, 25]), n = coprime(r, d); return { prompt: `A recipe uses ${n}/${d} kg of flour. Write this mass as a decimal number of kilograms.`, answer: rounded(n / d, 6), unit: "kg", steps: [`${n} ÷ ${d} = ${fmt(n / d)}.`, `The flour has a mass of ${fmt(n / d)} kg.`] }; },
+  (r) => { let a = 0, b = 0, c = 0, d = 0; do { b = choose(r, [4, 5, 8, 20]); a = coprime(r, b); d = choose(r, [4, 5, 8, 20, 25]); c = coprime(r, d); } while (Math.abs(a / b - c / d) < 1e-9); return { prompt: `Which is larger: ${a}/${b} or ${c}/${d}?`, answer: a / b > c / d ? `${a}/${b}` : `${c}/${d}`, choices: [`${a}/${b}`, `${c}/${d}`], steps: [`${a}/${b} = ${fmt(a / b)} and ${c}/${d} = ${fmt(c / d)}.`, `${fmt(Math.max(a / b, c / d))} is larger.`] }; },
+  (r) => { const d = choose(r, [4, 8, 20, 25, 40]), n = coprime(r, d); return { prompt: `Write −${n}/${d} as a decimal.`, answer: rounded(-n / d, 6), steps: [`${n}/${d} = ${fmt(n / d)}.`, `Keep the sign: −${fmt(n / d)}.`] }; },
+];
+
+const REPEAT_BLOCKS: [number, number, string][] = [[1, 7, "142857"], [2, 7, "285714"], [3, 7, "428571"], [4, 7, "571428"], [5, 7, "714285"], [6, 7, "857142"], [2, 11, "18"], [3, 11, "27"], [4, 11, "36"], [5, 11, "45"], [6, 11, "54"], [7, 11, "63"], [8, 11, "72"], [1, 3, "3"], [2, 3, "6"]];
+const w4l2: Form[] = [
+  (r) => { const n = r(1, 8); return { prompt: `Write 0.${String(n).repeat(6)}… as a fraction in simplest form. The digit ${n} repeats forever.`, answer: fraction(n, 9), steps: [`Let x = 0.${n}${n}${n}… Then 10x = ${n}.${n}${n}${n}…`, `10x − x = ${n}, so 9x = ${n} and x = ${n}/9${gcd(n, 9) > 1 ? ` = ${F(n, 9)}` : ""}.`] }; },
+  (r) => { let ab = 0; do ab = r(10, 98); while (ab % 11 === 0); const s = String(ab); return { prompt: `Write 0.${s.repeat(4)}… as a fraction in simplest form. The block ${s} repeats forever.`, answer: fraction(ab, 99), steps: [`Let x = 0.${s}${s}… Then 100x = ${s}.${s}${s}…`, `100x − x = ${ab}, so x = ${ab}/99${gcd(ab, 99) > 1 ? ` = ${F(ab, 99)}` : ""}.`] }; },
+  (r) => { const [n, d, block] = choose(r, REPEAT_BLOCKS); return { prompt: `Write ${n}/${d} as a recurring decimal. What block of digits repeats? Type the digits only.`, answer: block, input: "text", steps: [`Divide ${n} by ${d}: ${fmt(n / d)}…`, `The digits ${block} repeat, so ${n}/${d} = 0.${block}${block}…`] }; },
+  (r) => { const n = r(1, 6), k = r(10, 30), block = REPEAT_BLOCKS.find((b) => b[0] === n && b[1] === 7)![2]; return { prompt: `${n}/7 = 0.${block}${block}… What digit is in decimal place ${k}?`, answer: Number(block[(k - 1) % 6]), steps: [`The block ${block} has 6 digits and repeats.`, `${k} ÷ 6 leaves remainder ${k % 6 || 6 === 6 ? (k % 6 === 0 ? 6 : k % 6) : 0}, so the digit is digit ${(k - 1) % 6 + 1} of the block: ${block[(k - 1) % 6]}.`], numberVisual: { kind: "division", title: `Dividing ${n} by 7`, numerator: n, denominator: 7, places: 7 } }; },
+  (r) => { const d = choose(r, [3, 6, 7, 9, 11, 12]), n = coprime(r, d); return { prompt: `Write ${n}/${d} as a decimal correct to two decimal places.`, answer: rounded(n / d, 2), steps: [`${n} ÷ ${d} = ${(n / d).toFixed(4)}…`, `The third decimal place is ${(n / d).toFixed(4)[4]}, so round to ${rounded(n / d, 2).toFixed(2)}.`] }; },
+  (r) => { let a = 0, b = 0; do { a = r(0, 9); b = r(1, 9); } while (a === b); return { prompt: `Write 0.${a}${String(b).repeat(5)}… as a fraction in simplest form. Only the digit ${b} repeats.`, answer: fraction(9 * a + b, 90), steps: [`Let x = 0.${a}${b}${b}… Then 10x = ${a}.${b}${b}… and 100x = ${a}${b}.${b}${b}…`, `100x − 10x = ${10 * a + b} − ${a} = ${9 * a + b}, so x = ${9 * a + b}/90 = ${F(9 * a + b, 90)}.`] }; },
+];
+
+const w4l3: Form[] = [
+  (r) => { const d = choose(r, [6, 8, 12, 15, 16, 20, 24, 25, 30, 35, 40, 45, 50, 60]), n = coprime(r, d); const term = [8, 16, 20, 25, 40, 50].includes(d); return { prompt: `Does ${n}/${d} have a terminating or recurring decimal?`, answer: term ? "Terminating" : "Recurring", steps: [`${n}/${d} is in simplest form. ${d} = ${primeFactors(d)}.`, term ? "The denominator has no prime factors other than 2 and 5, so the decimal terminates." : "The denominator has a prime factor other than 2 or 5, so the decimal recurs."] }; },
+  (r) => { const m = r(0, 4), n = r(0, 3) || (m === 0 ? 1 : 0), d = 2 ** m * 5 ** n; return { prompt: `Write ${d} in the form 2ᵃ × 5ᵇ. Enter a, then b.`, answer: `${m}, ${n}`, input: "list", labels: ["a", "b"], steps: [`${d} = ${primeFactors(d)}.`, `So a = ${m} and b = ${n}.`] }; },
+  (r) => { const [n, d, s, t] = choose(r, [[6, 15, 2, 5], [9, 12, 3, 4], [7, 14, 1, 2], [3, 30, 1, 10], [4, 18, 2, 9], [5, 15, 1, 3], [14, 35, 2, 5], [10, 24, 5, 12]] as const); const term = [2, 4, 5, 10].includes(t); return { prompt: `Does ${n}/${d} have a terminating or recurring decimal?`, answer: term ? "Terminating" : "Recurring", steps: [`Simplify first: ${n}/${d} = ${s}/${t}.`, `${t} = ${primeFactors(t)}. ${term ? "Only 2s and 5s: it terminates." : "It has a factor other than 2 or 5: it recurs."}`] }; },
+  (r) => { const good = choose(r, [16, 20, 25, 40, 32, 50]); const others = [12, 15, 18, 21, 24, 30, 36, 45].sort(() => 0.5 - Math.random()).slice(0, 3); others.sort((a, b) => a - b); const options = [good, ...others].map(String); return { prompt: "Which denominator makes 1/■ a terminating decimal?", answer: String(good), choices: options, steps: ["A fraction in simplest form terminates when its denominator has only 2 and 5 as prime factors.", `${good} = ${primeFactors(good)}.`] }; },
+  (r) => { const m = r(0, 5), n = r(0, 3) || (m === 0 ? 2 : 0), d = 2 ** m * 5 ** n; return { prompt: `Without dividing, how many decimal places does 1/${d} have?`, answer: Math.max(m, n), steps: [`${d} = ${primeFactors(d)}.`, `Multiply to make a power of 10: 1/${d} = ${(10 ** Math.max(m, n)) / d}/${10 ** Math.max(m, n)}, which has ${Math.max(m, n)} decimal places.`] }; },
+  () => ({ prompt: "Andrew says every fraction of two integers is either a terminating or a recurring decimal. Is he correct?", answer: "Yes", steps: ["When you divide by d, there are only d possible remainders.", "Either a remainder is 0 (it terminates) or a remainder repeats (it recurs)."] }),
+];
+function primeFactors(n: number) {
+  const parts: string[] = [];
+  for (let p = 2, m = n; m > 1; p++) { let k = 0; while (m % p === 0) { m /= p; k++; } if (k) parts.push(k > 1 ? `${p}${sup(k)}` : String(p)); }
+  return parts.join(" × ") || "1";
 }
-function percentage(
-  seed: number,
-  direction: 1 | -1,
-  money = false,
-): QuestionDraft {
-  const r = random(seed),
-    a = r(5, 60) * 10,
-    p = r(1, 9) * 5,
-    n = rounded(a * (1 + (direction * p) / 100));
-  return {
-    prompt: money
-      ? `A $${a} price ${direction === 1 ? "increases" : "decreases"} by ${p}%. What is the new price?`
-      : `${direction === 1 ? "Increase" : "Decrease"} ${a} by ${p}%.`,
-    answer: n,
-    unit: money ? "$" : undefined,
-    steps: [
-      `${p}% of ${a} = ${(a * p) / 100}.`,
-      `${direction === 1 ? "Add" : "Subtract"} this change: ${n}.`,
-    ],
-  };
-}
+
+// ── Week 5: integers (N04) ───────────────────────────────────────────────────
+const w5l1: Form[] = [
+  (r) => { const a = nonZero(r, 3, 40), b = nonZero(r, 2, 30), sub = r(0, 1) === 1; return { prompt: `Calculate ${S(a)} ${sub ? "−" : "+"} ${B(b)}.`, answer: sub ? a - b : a + b, steps: [sub ? `Subtracting ${B(b)} is the same as adding ${B(-b)}.` : b < 0 ? `Adding ${B(b)} is the same as subtracting ${-b}.` : `Add ${b}.`, `${S(a)} ${sub ? "+" : "+"} ${B(sub ? -b : b)} = ${S(sub ? a - b : a + b)}.`] }; },
+  (r) => { const x = nonZero(r, 2, 20), b = nonZero(r, 2, 15), sub = r(0, 1) === 1, c = sub ? x - b : x + b; return { prompt: `${sub ? `? − ${B(b)}` : `? + ${B(b)}`} = ${S(c)}. What is the missing number?`, answer: x, steps: [`Undo the ${sub ? "subtraction" : "addition"}: ${S(c)} ${sub ? "+" : "−"} ${B(b)}.`, `The missing number is ${S(x)}.`] }; },
+  (r) => { const max = r(4, 36), min = -r(2, 18); return { prompt: `The maximum temperature was ${max}°C and the minimum was ${S(min)}°C. What was the temperature range?`, answer: max - min, unit: "°C", steps: ["Range = maximum − minimum.", `${max} − ${B(min)} = ${max} + ${-min} = ${max - min}°C.`] }; },
+  (r) => { const s = r(5, 30) * 10, spent = r(10, 40) * 10, debt = r(5, 30) * 10, repaid = r(5, 25) * 10, fee = r(1, 6) * 5, end = s - spent - debt + repaid - fee; return { prompt: `A bank account starts at ${money(s)}. Use the transactions in the table. What is the final balance in dollars? (Write a negative number if the account is overdrawn.)`, answer: end, unit: "$", steps: [`${s} − ${spent} − ${debt} + ${repaid} − ${fee}.`, `Final balance: ${end < 0 ? "−" : ""}${money(Math.abs(end))}.`], visual: table("Transactions", ["Transaction", "Change"], [["Shoes", `−${money(spent)}`], ["Cash advance (debt)", `−${money(debt)}`], ["Debt repaid", `+${money(repaid)}`], ["Bank fee", `−${money(fee)}`]]) }; },
+  (r) => { const a = r(2, 20), b = r(2, 20); return { prompt: `Jo writes ${a} − (−${b}) = ${S(a - b)}. What is the correct answer?`, answer: a + b, steps: [`Jo subtracted ${b}. Subtracting a negative means adding its opposite.`, `${a} − (−${b}) = ${a} + ${b} = ${a + b}.`] }; },
+  (r) => { const start = nonZero(r, 1, 12), left = r(3, 15), right = r(2, 12); return { prompt: `Start at ${S(start)} on a number line. Move ${left} to the left, then ${right} to the right. Where do you finish?`, answer: start - left + right, steps: [`Left is subtraction: ${S(start)} − ${left} = ${S(start - left)}.`, `Right is addition: ${S(start - left)} + ${right} = ${S(start - left + right)}.`] }; },
+];
+
+const w5l2: Form[] = [
+  (r) => { const a = nonZero(r, 2, 12), b = nonZero(r, 2, 12), div = r(0, 1) === 1; return { prompt: div ? `Calculate ${S(a * b)} ÷ ${B(b)}.` : `Calculate ${S(a)} × ${B(b)}.`, answer: div ? a : a * b, steps: [(div ? a * b * b : a * b) > 0 ? "The signs are the same, so the answer is positive." : "The signs are different, so the answer is negative.", div ? `${Math.abs(a * b)} ÷ ${Math.abs(b)} = ${Math.abs(a)}, so the answer is ${S(a)}.` : `${Math.abs(a)} × ${Math.abs(b)} = ${Math.abs(a * b)}, so the answer is ${S(a * b)}.`] }; },
+  (r) => { const a = nonZero(r, 2, 12), b = nonZero(r, 2, 9), c = choose(r, [1, 2, 3, 4, 6, 8, 12].filter((v) => (a * b) % v === 0)) * (r(0, 1) ? 1 : -1); return { prompt: `Calculate ${S(a)} × ${B(b)} ÷ ${B(c)}.`, answer: (a * b) / c, steps: [`Work left to right: ${S(a)} × ${B(b)} = ${S(a * b)}.`, `${S(a * b)} ÷ ${B(c)} = ${S((a * b) / c)}.`] }; },
+  (r) => { const x = nonZero(r, 2, 12), b = nonZero(r, 2, 12), mult = r(0, 1) === 1; return { prompt: mult ? `? × ${B(b)} = ${S(x * b)}. What is the missing number?` : `? ÷ ${B(b)} = ${S(x)}. What is the missing number?`, answer: mult ? x : x * b, steps: [mult ? `Undo the multiplication: ${S(x * b)} ÷ ${B(b)}.` : `Undo the division: ${S(x)} × ${B(b)}.`, `The missing number is ${S(mult ? x : x * b)}.`] }; },
+  (r) => { const m = -r(2, 12), d1 = r(-6, 6), d2 = r(-6, 6), vals = [m + d1, m + d2, m - d1 - d2]; return { prompt: `Find the average of ${vals.map(S).join(", ")}.`, answer: m, steps: [`Add them: ${vals.map(B).join(" + ")} = ${S(3 * m)}.`, `Divide by 3: ${S(3 * m)} ÷ 3 = ${S(m)}.`] }; },
+  (r) => { const t = r(-4, 10), d = r(2, 5), h = r(3, 8); return { prompt: `At midnight the temperature was ${S(t)}°C. It fell by ${d}°C every hour for ${h} hours. What was the temperature then?`, answer: t - d * h, unit: "°C", steps: [`Total change: ${h} × (−${d}) = −${d * h}°C.`, `${S(t)} − ${d * h} = ${S(t - d * h)}°C.`] }; },
+  (r) => { const p = r(2, 9), q = r(2, 9); if (p === q) return { prompt: `The product of two integers is −${p * p} and their sum is 0. Enter the smaller, then the larger.`, answer: `${-p}, ${p}`, input: "list", labels: ["Smaller", "Larger"], steps: [`Product negative: one number is negative.`, `−${p} × ${p} = −${p * p} and −${p} + ${p} = 0.`] }; return { prompt: `The product of two integers is −${p * q} and their sum is ${S(q - p)}. Enter the smaller number, then the larger.`, answer: `${-p}, ${q}`, input: "list", labels: ["Smaller", "Larger"], steps: ["The product is negative, so one number is negative and one is positive.", `−${p} × ${q} = −${p * q} and −${p} + ${q} = ${S(q - p)}.`] }; },
+];
+
+const w5l3: Form[] = [
+  (r) => { const a = nonZero(r, 2, 15), b = r(2, 9), c = nonZero(r, 2, 9), plus = r(0, 1) === 1; return { prompt: `Calculate ${S(a)} ${plus ? "+" : "−"} ${b} × ${B(c)}.`, answer: plus ? a + b * c : a - b * c, steps: [`Multiply first: ${b} × ${B(c)} = ${S(b * c)}.`, `${S(a)} ${plus ? "+" : "−"} ${B(b * c)} = ${S(plus ? a + b * c : a - b * c)}.`] }; },
+  (r) => { const c = nonZero(r, 2, 6), q = nonZero(r, 2, 9), a = nonZero(r, 2, 15), b = q * c - a; return { prompt: `Calculate (${S(a)} + ${B(b)}) ÷ ${B(c)}.`, answer: q, steps: [`Brackets first: ${S(a)} + ${B(b)} = ${S(a + b)}.`, `${S(a + b)} ÷ ${B(c)} = ${S(q)}.`] }; },
+  (r) => { const kind = r(0, 2), n = r(2, 5), k = choose(r, [2, 3, 5, 6, 7].filter((v) => v !== n * n)); return kind === 0 ? { prompt: `Calculate (−2)³ − ${3 * k} ÷ (−3).`, answer: -8 + k, steps: ["Indices first: (−2)³ = −8.", `Then division: ${3 * k} ÷ (−3) = −${k}. −8 − (−${k}) = ${S(-8 + k)}.`] } : kind === 1 ? { prompt: `Calculate ${k} × (−${n})².`, answer: k * n * n, steps: [`(−${n})² = ${n * n}.`, `${k} × ${n * n} = ${k * n * n}.`] } : { prompt: `Calculate (${k} − ${n}²) × (−2).`, answer: (k - n * n) * -2, steps: [`Inside the brackets: ${n}² = ${n * n}, so ${k} − ${n * n} = ${S(k - n * n)}.`, `${B(k - n * n)} × (−2) = ${S((k - n * n) * -2)}.`] }; },
+  (r) => { const a = -r(2, 6), b = r(2, 7), [expr, value, how] = choose(r, [["a² − b", a * a - b, `${B(a)}² − ${b} = ${a * a} − ${b}`], ["3a + 2b", 3 * a + 2 * b, `3 × ${B(a)} + 2 × ${b} = ${3 * a} + ${2 * b}`], ["ab − 4a", a * b - 4 * a, `${B(a)} × ${b} − 4 × ${B(a)} = ${a * b} + ${-4 * a}`], ["b − 2a", b - 2 * a, `${b} − 2 × ${B(a)} = ${b} + ${-2 * a}`], ["a² − b²", a * a - b * b, `${a * a} − ${b * b}`]] as const); return { prompt: `Evaluate ${expr} when a = ${S(a)} and b = ${b}.`, answer: value, steps: [`Substitute, keeping brackets around the negative: ${how}.`, `= ${S(value)}.`] }; },
+  (r) => { const t = r(8, 18), d = r(2, 3), h1 = r(6, 11), u = r(1, 2), h2 = r(3, 5), end = t - d * h1 + u * h2; return { prompt: `A mountain hut is ${t}°C at 9 pm. The temperature drops ${d}°C per hour for ${h1} hours, then rises ${u}°C per hour for ${h2} hours. What is the final temperature?`, answer: end, unit: "°C", steps: [`${t} − ${d} × ${h1} = ${S(t - d * h1)}°C.`, `${S(t - d * h1)} + ${u} × ${h2} = ${S(end)}°C.`] }; },
+  (r) => { const a = nonZero(r, 2, 5), b = r(5, 12), c = r(2, 7), d = nonZero(r, 2, 5), inner = b - c * d; return { prompt: `Calculate ${S(a)} × (${b} − ${c} × ${B(d)}).`, answer: a * inner, steps: [`Inside the brackets, multiply first: ${c} × ${B(d)} = ${S(c * d)}, so ${b} − ${B(c * d)} = ${S(inner)}.`, `${S(a)} × ${B(inner)} = ${S(a * inner)}.`] }; },
+];
+
+// ── Weeks 6–8: rational numbers (N04) ─────────────────────────────────────────
+const frac = (r: R, maxD = 9) => { const d = r(2, maxD); return [coprime(r, d), d] as const; };
+const w6l1: Form[] = [
+  (r) => { const [a, b] = frac(r), [c, d] = frac(r), minus = r(0, 1) === 1; return { prompt: `Calculate ${a}/${b} ${minus ? "−" : "+"} ${c}/${d}.`, answer: fraction(a * d + (minus ? -1 : 1) * c * b, b * d), steps: [`Use a common denominator of ${(b * d) / gcd(b, d)}.`, `${minus ? "Subtract" : "Add"} the numerators and simplify: ${F(a * d + (minus ? -1 : 1) * c * b, b * d)}.`] }; },
+  (r) => { const [a, b] = frac(r), [c, d] = frac(r), kind = r(0, 1); return kind === 0 ? { prompt: `Calculate ${F(a, b)} + ${BF(-c, d)}.`, answer: fraction(a * d - c * b, b * d), steps: [`Adding ${BF(-c, d)} is the same as subtracting ${F(c, d)}.`, `${F(a, b)} − ${F(c, d)} = ${F(a * d - c * b, b * d)}.`] } : { prompt: `Calculate ${F(-a, b)} − ${BF(-c, d)}.`, answer: fraction(-a * d + c * b, b * d), steps: [`Subtracting ${BF(-c, d)} is the same as adding ${F(c, d)}.`, `${F(-a, b)} + ${F(c, d)} = ${F(-a * d + c * b, b * d)}.`] }; },
+  (r) => { const d1 = choose(r, [2, 3, 4, 5]), d2 = choose(r, [3, 4, 6, 8]), w1 = r(1, 4), w2 = r(2, 6), n1 = coprime(r, d1), n2 = coprime(r, d2), x = w1 * d1 + n1, y = w2 * d2 + n2; return { prompt: `Calculate ${M(x, d1)} − ${M(y, d2)}.`, answer: fraction(x * d2 - y * d1, d1 * d2), steps: [`Write as improper fractions: ${F(x, d1)} − ${F(y, d2)}.`, `Use a common denominator: ${F(x * d2 - y * d1, d1 * d2)} = ${M(x * d2 - y * d1, d1 * d2)}.`] }; },
+  (r) => { const hi = r(10, 25) * 4 + choose(r, [1, 2, 3]), lo = -(r(1, 8) * 4 + choose(r, [1, 2, 3])); return { prompt: `A town’s average maximum temperature is ${M(hi, 4)}°C and its average minimum is ${M(lo, 4)}°C. What is the average temperature range?`, answer: fraction(hi - lo, 4), unit: "°C", steps: ["Range = maximum − minimum.", `${M(hi, 4)} − (${M(lo, 4)}) = ${M(hi, 4)} + ${M(-lo, 4)} = ${M(hi - lo, 4)}°C.`] }; },
+  (r) => { const nights = Array.from({ length: 4 }, () => r(5, 8) * 12 + choose(r, [0, 3, 4, 6, 8, 9])), total = nights.reduce((s, v) => s + v, 0), diff = total - 4 * 8 * 12; return { prompt: `Xaio aims for 8 hours of sleep each night. Over four nights he slept ${nights.map((v) => M(v, 12)).join(", ")} hours. How many hours ahead (+) or behind (−) his goal is he?`, answer: fraction(diff, 12), unit: "hours", steps: [`Total sleep: ${M(total, 12)} hours. Goal: 32 hours.`, `${M(total, 12)} − 32 = ${M(diff, 12)} hours.`] }; },
+  (r) => { const [a, b] = frac(r), [c, d] = frac(r); return { prompt: `${a}/${b} + ? = ${c}/${d}. What is the missing fraction?`, answer: fraction(c * b - a * d, b * d), steps: [`Subtract: ${c}/${d} − ${a}/${b}.`, `= ${F(c * b - a * d, b * d)}.`] }; },
+];
+
+const w6l2: Form[] = [
+  (r) => { const [a, b] = frac(r), [c, d] = frac(r), sa = r(0, 1) ? 1 : -1, sc = r(0, 1) ? 1 : -1; return { prompt: `Calculate ${F(sa * a, b)} × ${BF(sc * c, d)}.`, answer: fraction(sa * sc * a * c, b * d), steps: [`${sa * sc > 0 ? "Same signs: positive." : "Different signs: negative."}`, `Multiply numerators and denominators, then simplify: ${F(sa * sc * a * c, b * d)}.`] }; },
+  (r) => { const [a, b] = frac(r), [c, d] = frac(r), sa = r(0, 1) ? 1 : -1, sc = r(0, 1) ? 1 : -1; return { prompt: `Calculate ${F(sa * a, b)} ÷ ${BF(sc * c, d)}.`, answer: fraction(sa * sc * a * d, b * c), steps: [`Multiply by the reciprocal: ${F(sa * a, b)} × ${BF(sc * d, c)}.`, `= ${F(sa * sc * a * d, b * c)}.`] }; },
+  (r) => { const d1 = choose(r, [2, 3, 4, 5]), n1 = coprime(r, d1), x = d1 + n1, [c, d] = frac(r, 8), div = r(0, 1) === 1, s = r(0, 1) ? -1 : 1; return div ? { prompt: `Calculate ${M(-x, d1)} ÷ ${BF(s * c, d)}.`, answer: fraction(-x * d * s, d1 * c), steps: [`${M(-x, d1)} = ${F(-x, d1)}. Multiply by the reciprocal of ${BF(s * c, d)}.`, `${F(-x, d1)} × ${BF(s * d, c)} = ${F(-x * d * s, d1 * c)}.`] } : { prompt: `Calculate ${M(-x, d1)} × ${BF(s * c, d)}.`, answer: fraction(-x * c * s, d1 * d), steps: [`${M(-x, d1)} = ${F(-x, d1)}.`, `${F(-x, d1)} × ${BF(s * c, d)} = ${F(-x * c * s, d1 * d)}.`] }; },
+  (r) => { const [n, d] = choose(r, [[3, 4], [2, 3], [1, 2], [3, 8], [2, 5]] as const), serves = r(4, 16) * d, total = (serves * n) / d; return { prompt: `A jug holds ${M(total * d, d)} cups. How many ${n}/${d}-cup serves can be poured from it?`, answer: serves, steps: [`Divide: ${F(total * d, d)} ÷ ${n}/${d}.`, `= ${F(total * d, d)} × ${d}/${n} = ${serves} serves.`] }; },
+  (r) => { const count = r(3, 4), negs = r(1, count); const parts = Array.from({ length: count }, (_, i) => { const [a, b] = frac(r, 9); return BF(i < negs ? -a : a, b); }).sort(() => 0.5 - Math.random()); return { prompt: `Without calculating, is ${parts.join(" × ")} positive or negative?`, answer: negs % 2 === 0 ? "Positive" : "Negative", choices: ["Positive", "Negative"], steps: [`Count the negative factors: ${negs}.`, `${negs % 2 === 0 ? "An even number of negatives gives a positive" : "An odd number of negatives gives a negative"} answer.`] }; },
+  (r) => { const d = choose(r, [2, 3, 4, 5, 7]), w = r(1, 4), n = coprime(r, d), x = w * d + n; return { prompt: `What is the reciprocal of ${M(-x, d)}?`, answer: fraction(-d, x), steps: [`Write it as an improper fraction: ${F(-x, d)}.`, `Flip it, keeping the sign: ${F(-d, x)}.`] }; },
+];
+
+const w6l3: Form[] = [
+  (r) => { const d = choose(r, [5, 7, 9]), a = r(1, d - 1), [c, e] = frac(r, 8); return { prompt: `Calculate ${a}/${d} + ${c}/${e} + ${d - a}/${d}.`, answer: fraction(e + c, e), steps: [`Regroup: ${a}/${d} + ${d - a}/${d} = 1.`, `1 + ${c}/${e} = ${M(e + c, e)}.`] }; },
+  (r) => { const [a, b, c, d] = choose(r, [[1, 3, 1, 2], [3, 4, 2, 3], [2, 5, 1, 2], [5, 8, 3, 4], [1, 4, 1, 5], [4, 9, 1, 2]] as const); const first = `−${a}/${b}`, second = `−${c}/${d}`; return { prompt: `Which is greater: ${first} or ${second}?`, answer: a / b < c / d ? first : second, choices: [first, second], steps: [`Compare sizes: ${a}/${b} = ${fmt(rounded(a / b, 3))} and ${c}/${d} = ${fmt(rounded(c / d, 3))}.`, "For negative numbers, the one closer to zero is greater."] }; },
+  (r) => { const vals = Array.from({ length: 4 }, () => r(-8, 12)), total = vals.reduce((s, v) => s + v, 0); return { prompt: `Find the mean of ${vals.map((v) => M(v, 4)).join(", ")}.`, answer: fraction(total, 16), steps: [`Sum: ${M(total, 4)}.`, `Divide by 4: ${M(total, 4)} ÷ 4 = ${F(total, 16)}.`] }; },
+  (r) => { const k = r(5, 9), piece = 2 * 5 + r(1, 4), have = (k * piece) / 5 - r(1, 3) - choose(r, [0.25, 0.5, 0.75]); const need = (k * piece) / 5; return { prompt: `${k} curtains each need ${M(piece, 5)} m of fabric. There are ${M(Math.round(have * 4), 4)} m available. How much more fabric is needed?`, answer: fraction(Math.round((need - have) * 20), 20), unit: "m", steps: [`Needed: ${k} × ${M(piece, 5)} = ${M(k * piece, 5)} m.`, `${M(k * piece, 5)} − ${M(Math.round(have * 4), 4)} = ${M(Math.round((need - have) * 20), 20)} m.`] }; },
+  (r) => { const [a, b] = choose(r, [[3, 4], [2, 3], [3, 5], [5, 6]] as const), [c, d] = choose(r, [[2, 3], [1, 2], [3, 4], [4, 5]] as const), amount = b * d * r(2, 8); return { prompt: `Find ${a}/${b} of ${c}/${d} of ${amount}.`, answer: (amount * a * c) / (b * d), steps: [`${c}/${d} of ${amount} = ${(amount * c) / d}.`, `${a}/${b} of ${(amount * c) / d} = ${(amount * a * c) / (b * d)}.`] }; },
+  (r) => { let a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, value = 0; do { [a, b] = frac(r, 6); [c, d] = frac(r, 6); [e, f] = frac(r, 6); value = a / b - (c * e) / (d * f); } while (Math.abs(value) < 1e-9); return { prompt: `Calculate ${a}/${b} + ${c}/${d} × (−${e}/${f}).`, answer: fraction(a * d * f - c * e * b, b * d * f), steps: [`Multiply first: ${c}/${d} × (−${e}/${f}) = ${F(-c * e, d * f)}.`, `${a}/${b} + ${BF(-c * e, d * f)} = ${F(a * d * f - c * e * b, b * d * f)}.`] }; },
+];
+
+const dp = (r: R, lo: number, hi: number, places = 2) => r(lo * 10 ** places, hi * 10 ** places) / 10 ** places;
+const w7l1: Form[] = [
+  (r) => { const a = -dp(r, 1, 9.99), b = dp(r, 1, 9.99), swap = r(0, 1) === 1; const [x, y] = swap ? [b, a] : [a, b]; return { prompt: `Calculate ${S(x)} + ${B(y)}.`, answer: rounded(x + y, 2), steps: ["The signs differ: subtract the smaller size from the larger.", `Keep the sign of the number with the larger size: ${S(rounded(x + y, 2))}.`] }; },
+  (r) => { const a = nonZero(r, 1, 9) + r(1, 9) / 10, b = nonZero(r, 1, 9) + r(1, 9) / 10, c = nonZero(r, 1, 9) + r(1, 9) / 10; const A = rounded(a, 1), Bv = rounded(b, 1), C = rounded(c, 1); return { prompt: `Calculate ${S(A)} − ${B(Bv)} + ${B(C)}.`, answer: rounded(A - Bv + C, 1), steps: [`${S(A)} − ${B(Bv)} = ${S(rounded(A - Bv, 1))}.`, `${S(rounded(A - Bv, 1))} + ${B(C)} = ${S(rounded(A - Bv + C, 1))}.`] }; },
+  (r) => { const start = -dp(r, 5, 60), dep = dp(r, 20, 90), spend = dp(r, 10, 70), end = rounded(start + dep - spend, 2); return { prompt: `An account balance is −${money(-start)}. Then ${money(dep)} is deposited and ${money(spend)} is spent. What is the new balance in dollars?`, answer: end, unit: "$", steps: [`−${(-start).toFixed(2)} + ${dep.toFixed(2)} = ${rounded(start + dep, 2).toFixed(2)}.`, `${rounded(start + dep, 2).toFixed(2)} − ${spend.toFixed(2)} = ${end.toFixed(2)}.`] }; },
+  (r) => { const hs = [dp(r, 0.7, 1.95), dp(r, 0.7, 1.95), dp(r, 0.7, 1.95, 1), dp(r, 0.7, 1.95)]; return { prompt: `Four children are ${hs.map((h) => `${fmt(h)} m`).join(", ")} tall. What is their combined height?`, answer: rounded(hs.reduce((s, h) => s + h, 0), 2), unit: "m", steps: ["Line up the decimal points before adding.", `Total: ${fmt(rounded(hs.reduce((s, h) => s + h, 0), 2))} m.`] }; },
+  (r) => { const x = nonZero(r, 1, 9) + r(1, 9) / 10, y = nonZero(r, 1, 9) + r(1, 9) / 10, X = rounded(x, 1), Y = rounded(y, 1); return { prompt: `${S(X)} + ? = ${S(Y)}. What is the missing number?`, answer: rounded(Y - X, 1), steps: [`Subtract: ${S(Y)} − ${B(X)}.`, `= ${S(rounded(Y - X, 1))}.`] }; },
+  (r) => { const t = r(5, 60) / 10, fall = r(t * 10 + 5, 140) / 10; return { prompt: `The temperature is ${fmt(t)}°C. It falls by ${fmt(fall)}°C overnight. What is the new temperature?`, answer: rounded(t - fall, 1), unit: "°C", steps: [`${fmt(t)} − ${fmt(fall)}.`, `= ${S(rounded(t - fall, 1))}°C.`] }; },
+];
+
+const w7l2: Form[] = [
+  (r) => { const d = choose(r, [0.2, 0.4, 0.5, 0.03, 0.05, 0.25]), q = r(12, 99), n = rounded(q * d, 4), scale = d < 0.1 ? 100 : d === 0.25 ? 100 : 10; return { prompt: `Calculate ${fmt(n)} ÷ ${fmt(d)}.`, answer: q, steps: [`Multiply both numbers by ${scale} so the divisor is a whole number: ${fmt(rounded(n * scale, 4))} ÷ ${fmt(rounded(d * scale, 4))}.`, `= ${q}.`] }; },
+  (r) => { const a = r(11, 99) / 10, b = r(0, 1) ? r(11, 99) / 10 : r(11, 99) / 100; return { prompt: `Calculate ${fmt(a)} × ${fmt(b)}.`, answer: rounded(a * b, 4), steps: [`Multiply without the decimal points, then count the decimal places in the question.`, `${fmt(a)} × ${fmt(b)} = ${fmt(rounded(a * b, 4))}.`] }; },
+  (r) => { const a = -r(11, 99) / 10, b = choose(r, [0.5, 0.2, 0.4, 1.5, 2.5]), div = r(0, 1) === 1; return div ? { prompt: `Calculate ${S(rounded(a * b, 4))} ÷ ${fmt(b)}.`, answer: a, steps: ["Different signs: the answer is negative.", `${fmt(rounded(-a * b, 4))} ÷ ${fmt(b)} = ${fmt(-a)}, so the answer is ${S(a)}.`] } : { prompt: `Calculate ${S(a)} × ${fmt(b)}.`, answer: rounded(a * b, 4), steps: ["Different signs: the answer is negative.", `${fmt(-a)} × ${fmt(b)} = ${fmt(rounded(-a * b, 4))}, so the answer is ${S(rounded(a * b, 4))}.`] }; },
+  (r) => { const len = choose(r, [1.5, 1.2, 2.5, 1.6]), count = r(40, 160) * 100, km = rounded((count * len) / 1000, 3); return { prompt: `Skis that are ${len} m long are laid end to end along a ${fmt(km)} km ski run. How many skis are needed?`, answer: count, steps: [`${fmt(km)} km = ${fmt(km * 1000)} m.`, `${fmt(km * 1000)} ÷ ${len} = ${count} skis.`] }; },
+  (r) => { const d = choose(r, [0.2, 0.25, 0.5, 0.125, 0.1, 0.05]); return { prompt: `Dividing by ${d} gives the same result as multiplying by what number?`, answer: rounded(1 / d, 4), steps: [`${d} = 1/${rounded(1 / d, 4)}.`, `Dividing by 1/${rounded(1 / d, 4)} is the same as multiplying by ${rounded(1 / d, 4)}.`] }; },
+  (r) => { const pace = choose(r, [0.8, 0.75, 0.6, 0.9]), paces = r(4, 40) * 2000; return { prompt: `A pedometer records ${paces.toLocaleString("en-AU")} paces. Each pace is ${pace} m. How many kilometres is that?`, answer: rounded((paces * pace) / 1000, 3), unit: "km", steps: [`${paces.toLocaleString("en-AU")} × ${pace} = ${fmt(paces * pace)} m.`, `÷ 1000 = ${fmt(rounded((paces * pace) / 1000, 3))} km.`] }; },
+];
+
+const w7l3: Form[] = [
+  (r) => { const [dec, n, d] = choose(r, [[0.25, 1, 4], [0.75, 3, 4], [0.2, 1, 5], [0.125, 1, 8], [0.4, 2, 5]] as const), k = d * r(3, 24); return { prompt: `Calculate ${dec} × ${k}. Use a fraction to make it easier.`, answer: (k * n) / d, steps: [`${dec} = ${n}/${d}.`, `${n}/${d} of ${k} = ${(k * n) / d}.`] }; },
+  (r) => { const a = r(1, 9), b = r(1, 9); return { prompt: `Calculate 0.${a} × 0.${b} by writing each decimal as a fraction.`, answer: rounded((a * b) / 100, 4), steps: [`${a}/10 × ${b}/10 = ${a * b}/100.`, `${a * b}/100 = ${fmt((a * b) / 100)}.`] }; },
+  (r) => { const [n, d] = choose(r, [[3, 8], [1, 4], [3, 5], [7, 20], [5, 8]] as const), x = choose(r, [0.25, 0.5, 0.15, 0.6, 0.125]); return { prompt: `Calculate ${n}/${d} + ${x}. Give your answer as a decimal.`, answer: rounded(n / d + x, 4), steps: [`${n}/${d} = ${fmt(n / d)}.`, `${fmt(n / d)} + ${x} = ${fmt(rounded(n / d + x, 4))}.`] }; },
+  (r) => { const [n, d] = choose(r, [[1, 3], [2, 3], [1, 6], [5, 6], [2, 9]] as const), [x, xn, xd] = choose(r, [[0.5, 1, 2], [0.25, 1, 4], [0.2, 1, 5], [0.75, 3, 4]] as const); return { prompt: `Calculate ${n}/${d} + ${x}. Give an exact answer as a fraction.`, answer: fraction(n * xd + xn * d, d * xd), steps: [`${n}/${d} is a recurring decimal, so convert ${x} to a fraction instead: ${xn}/${xd}.`, `${n}/${d} + ${xn}/${xd} = ${F(n * xd + xn * d, d * xd)}.`] }; },
+  (r) => { const [n, d] = choose(r, [[5, 8], [3, 5], [7, 12], [2, 3], [4, 7]] as const), x = rounded(n / d + (r(0, 1) ? 0.03 : -0.03) * r(1, 2), 2); return { prompt: `Which is larger: ${n}/${d} or ${x}?`, answer: n / d > x ? `${n}/${d}` : String(x), choices: [`${n}/${d}`, String(x)], steps: [`${n}/${d} = ${(n / d).toFixed(3)}…`, `${n / d > x ? `${n}/${d}` : x} is larger.`] }; },
+  (r) => { const [x, xn, xd] = choose(r, [[1.5, 3, 2], [2.5, 5, 2], [0.75, 3, 4], [1.25, 5, 4]] as const), [n, d] = choose(r, [[2, 3], [4, 5], [1, 3], [5, 6]] as const); return { prompt: `Calculate ${x} × ${n}/${d}. Give an exact answer.`, answer: fraction(xn * n, xd * d), steps: [`${x} = ${xn}/${xd}.`, `${xn}/${xd} × ${n}/${d} = ${F(xn * n, xd * d)}.`] }; },
+];
+
+const w8l1: Form[] = [
+  (r) => { const [x, y] = choose(r, [[4, 25], [2, 50], [5, 20], [8, 125]] as const), a = r(13, 97); return { prompt: `Calculate ${x} × ${a} × ${y} by regrouping.`, answer: x * a * y, steps: [`Regroup: ${x} × ${y} = ${x * y}.`, `${x * y} × ${a} = ${x * y * a}.`] }; },
+  (r) => { const a = rounded(r(11, 99) / 10, 1), b = rounded(r(101, 999) / 100, 2); return { prompt: `Calculate −${fmt(a)} + ${fmt(b)} + ${fmt(a)}.`, answer: b, steps: [`Regroup: −${fmt(a)} + ${fmt(a)} = 0.`, `So the answer is ${fmt(b)}.`] }; },
+  (r) => { const a = r(11, 89) / 10, c = rounded(10 - a, 1), b = r(101, 999) / 100; return { prompt: `Calculate ${fmt(a)} + ${fmt(b)} + ${fmt(c)}.`, answer: rounded(a + b + c, 2), steps: [`Regroup: ${fmt(a)} + ${fmt(c)} = 10.`, `10 + ${fmt(b)} = ${fmt(rounded(10 + b, 2))}.`] }; },
+  (r) => { const n = r(3, 12), [m, base, adj] = choose(r, [[9.9, 10, -0.1], [99, 100, -1], [1.01, 1, 0.01], [19.9, 20, -0.1]] as const); return { prompt: `Calculate ${n} × ${m} using ${n} × ${base} ${adj < 0 ? "−" : "+"} ${n} × ${Math.abs(adj)}.`, answer: rounded(n * m, 4), steps: [`${n} × ${base} = ${n * base}. ${n} × ${Math.abs(adj)} = ${fmt(rounded(n * Math.abs(adj), 4))}.`, `${n * base} ${adj < 0 ? "−" : "+"} ${fmt(rounded(n * Math.abs(adj), 4))} = ${fmt(rounded(n * m, 4))}.`] }; },
+  (r) => { const [x, y] = choose(r, [[0.5, 4], [0.25, 8], [0.2, 15], [0.125, 16]] as const), a = r(13, 97); return { prompt: `Calculate ${x} × ${a} × ${y}.`, answer: rounded(x * y * a, 4), steps: [`Regroup: ${x} × ${y} = ${rounded(x * y, 4)}.`, `${rounded(x * y, 4)} × ${a} = ${rounded(x * y * a, 4)}.`] }; },
+  (r) => { const a = r(2, 9) + 0.99, b = r(2, 9) + 0.99, c = r(2, 9) + 0.02; return { prompt: `Calculate ${fmt(a)} + ${fmt(b)} + ${fmt(c)} by rounding and adjusting.`, answer: rounded(a + b + c, 2), steps: [`Round: ${Math.round(a)} + ${Math.round(b)} + ${Math.round(c)} = ${Math.round(a) + Math.round(b) + Math.round(c)}.`, `Adjust: −0.01 − 0.01 + 0.02 = 0, so the answer is ${fmt(rounded(a + b + c, 2))}.`] }; },
+];
+
+const w8l2: Form[] = [
+  (r) => { const a = dp(r, 1, 15, 3), b = dp(r, 1, 15, 3), c = dp(r, 1, 9, 3), est = rounded(rounded(a, 1) + rounded(b, 1) - rounded(c, 1), 1); return { prompt: `Estimate ${fmt(a)} + ${fmt(b)} − ${fmt(c)} by first rounding each number to one decimal place.`, answer: est, steps: [`${fmt(a)} ≈ ${rounded(a, 1)}, ${fmt(b)} ≈ ${rounded(b, 1)}, ${fmt(c)} ≈ ${rounded(c, 1)}.`, `${rounded(a, 1)} + ${rounded(b, 1)} − ${rounded(c, 1)} = ${est}.`] }; },
+  (r) => { let x = 0, y = 0; do { x = dp(r, 2, 20, 1); y = dp(r, 2, 12, 1); } while (Math.abs((x % 1) - 0.5) < 0.05 || Math.abs((y % 1) - 0.5) < 0.05); return { prompt: `Estimate ${fmt(x)} × ${fmt(y)} by rounding each number to the nearest whole number.`, answer: Math.round(x) * Math.round(y), steps: [`${fmt(x)} ≈ ${Math.round(x)} and ${fmt(y)} ≈ ${Math.round(y)}.`, `${Math.round(x)} × ${Math.round(y)} = ${Math.round(x) * Math.round(y)}.`] }; },
+  (r) => { const div = r(2, 9), q = r(3, 12), a = rounded(div * q + choose(r, [-0.3, -0.2, 0.2, 0.3]), 1), b = rounded(div + choose(r, [-0.1, 0.1, 0.2]), 1), wrong = rounded((a / b) * 10, 1); return { prompt: `Ana says ${fmt(a)} ÷ ${fmt(b)} = ${fmt(wrong)}. Estimate the answer by rounding each number to the nearest whole number to check her.`, answer: q, steps: [`${fmt(a)} ≈ ${div * q} and ${fmt(b)} ≈ ${div}.`, `${div * q} ÷ ${div} = ${q}, so Ana’s answer is about 10 times too large.`] }; },
+  (r) => { const k = r(1, 4), x = dp(r, 1, 99, k + 2); return { prompt: `Round ${fmt(x)} to ${k} decimal place${k > 1 ? "s" : ""}.`, answer: rounded(x, k), steps: [`The critical digit is decimal place ${k + 1}.`, `${fmt(x)} rounds to ${rounded(x, k).toFixed(k)}.`] }; },
+  (r) => { const a = dp(r, 12, 14, 2), b = rounded(a + r(3, 9) / 100, 2), place = Math.round(a) === Math.round(b) ? 1 : r(0, 1); const ra = rounded(a, place), rb = rounded(b, place); return { prompt: `Two sprinters run 100 m in ${a.toFixed(2)} s and ${b.toFixed(2)} s. If the timer could only show times to the nearest ${place ? "tenth of a second" : "second"}, what time difference would it show?`, answer: rounded(rb - ra, 1), unit: "s", steps: [`Rounded times: ${ra.toFixed(place)} s and ${rb.toFixed(place)} s.`, `Difference: ${rounded(rb - ra, 1)} s.`] }; },
+  (r) => { const [x, k, wrong] = choose(r, [[0.543, 2, "0.50"], [6.7215, 3, "6.721"], [11.54582, 2, "11.54"], [8.2143, 3, "8.210"], [3.0965, 2, "3.09"], [7.4951, 1, "7.4"]] as const); return { prompt: `A student rounds ${x} to ${k} decimal place${k > 1 ? "s" : ""} and writes ${wrong}. What is the correct answer?`, answer: rounded(x, k), steps: [`Look only at the digit in decimal place ${k + 1}.`, `${x} rounds to ${rounded(x, k).toFixed(k)}.`] }; },
+];
+
+const w8l3: Form[] = [
+  (r) => { const start = dp(r, 50, 200), a = dp(r, 60, 180), b = dp(r, 20, 120), c = dp(r, 10, 60), end = rounded(start - a - b + c, 2); return { prompt: `Jamal’s account has ${money(start)}. He spends ${money(a)} on a jacket and ${money(b)} on shoes, then gets a refund of ${money(c)}. What is his balance in dollars? (Write a negative number if he is overdrawn.)`, answer: end, unit: "$", steps: [`${start.toFixed(2)} − ${a.toFixed(2)} − ${b.toFixed(2)} + ${c.toFixed(2)}.`, `= ${end.toFixed(2)} dollars.`] }; },
+  (r) => { const m = rounded(r(-60, 20) / 10, 1), d1 = r(-30, 30) / 10, d2 = r(-30, 30) / 10, d3 = r(-30, 30) / 10, vals = [m + d1, m + d2, m + d3, m - d1 - d2 - d3].map((v) => rounded(v, 1)); return { prompt: `Daily minimum temperatures were ${vals.map((v) => `${S(v)}°C`).join(", ")}. What was the mean minimum temperature?`, answer: rounded(vals.reduce((s, v) => s + v, 0) / 4, 3), unit: "°C", steps: [`Sum: ${S(rounded(vals.reduce((s, v) => s + v, 0), 1))}.`, `Divide by 4: ${S(rounded(vals.reduce((s, v) => s + v, 0) / 4, 3))}°C.`] }; },
+  (r) => { const k = r(3, 5), piece = r(1200, 2400) / 1000, len = rounded(k * piece + (k - 1) * 0.002, 3); return { prompt: `A ${fmt(len)} m steel pipe is cut into ${k} equal lengths. Each cut removes 2 mm. How long is each piece?`, answer: rounded(piece, 3), unit: "m", steps: [`${k} pieces need ${k - 1} cuts: ${k - 1} × 0.002 = ${fmt(rounded((k - 1) * 0.002, 3))} m.`, `(${fmt(len)} − ${fmt(rounded((k - 1) * 0.002, 3))}) ÷ ${k} = ${fmt(piece)} m.`] }; },
+  (r) => { const a = r(10, 50), b = r(2, 9), c = r(3, 8); return { prompt: `Calculate (${a} − ${b}) ÷ ${c}. Give an exact answer.`, answer: fraction(a - b, c), steps: [`Brackets first: ${a - b}.`, `${a - b} ÷ ${c} = ${F(a - b, c)}.`] }; },
+  (r) => { const total = r(80, 250) * 0.4, spend = rounded(dp(r, 2, 9) * (total / 100), 2); return { prompt: `Lucy spends 3/4 of ${money(rounded(total, 2))} on a game, then ${money(spend)} on snacks from the remainder. How much money is left?`, answer: rounded(total / 4 - spend, 2), unit: "$", steps: [`She has 1/4 left: ${money(rounded(total, 2))} ÷ 4 = ${money(rounded(total / 4, 2))}.`, `${money(rounded(total / 4, 2))} − ${money(spend)} = ${rounded(total / 4 - spend, 2) < 0 ? "−" : ""}${money(Math.abs(rounded(total / 4 - spend, 2)))}.`] }; },
+  (r) => { const t = r(30, 60) / 10, rate = choose(r, [1.5, 1.2, 2.5]), mins = choose(r, [10, 15, 20]), hours = r(1, 2), steps = (60 * hours) / mins; return { prompt: `A freezer is at ${fmt(t)}°C. It cools by ${rate}°C every ${mins} minutes. What is its temperature after ${hours} hour${hours > 1 ? "s" : ""}?`, answer: rounded(t - rate * steps, 2), unit: "°C", steps: [`${hours * 60} minutes is ${steps} lots of ${mins} minutes: a fall of ${steps} × ${rate} = ${fmt(rounded(rate * steps, 2))}°C.`, `${fmt(t)} − ${fmt(rounded(rate * steps, 2))} = ${S(rounded(t - rate * steps, 2))}°C.`] }; },
+];
+
+// ── Weeks 9–11: percentages and financial maths (N05) ─────────────────────────
+const bar = (base: number, percent: number, direction: 1 | -1, unit = "", caption = ""): Number8Visual => ({ kind: "percentbar", title: direction > 0 ? "Percentage increase" : "Percentage decrease", base, percent, direction, unit, caption });
+const w9l1: Form[] = [
+  (r) => { const a = r(5, 60) * 10, p = r(1, 9) * 5; return { prompt: `Increase ${a} by ${p}%.`, answer: rounded(a * (1 + p / 100), 2), steps: [`${p}% of ${a} = ${rounded((a * p) / 100, 2)}.`, `${a} + ${rounded((a * p) / 100, 2)} = ${rounded(a * (1 + p / 100), 2)}.`], numberVisual: bar(a, p, 1, "", "Find the new total.") }; },
+  (r) => { const p = r(2, 45); return { prompt: `What single number do you multiply by to increase an amount by ${p}%?`, answer: rounded(1 + p / 100, 2), steps: [`The new amount is 100% + ${p}% = ${100 + p}% of the original.`, `${100 + p}% = ${rounded(1 + p / 100, 2)}.`] }; },
+  (r) => { const c = r(10, 90) * 5, p = choose(r, [10, 12, 15, 20, 25, 30, 40]); return { prompt: `A shop buys a microwave for ${money(c)} and marks it up by ${p}%. What is the selling price?`, answer: rounded(c * (1 + p / 100), 2), unit: "$", steps: [`Mark-up: ${p}% of ${money(c)} = ${money(rounded((c * p) / 100, 2))}.`, `Selling price: ${money(rounded(c * (1 + p / 100), 2))}.`], numberVisual: bar(c, p, 1, "$", "Cost price plus the mark-up.") }; },
+  (r) => { const p = choose(r, [1.5, 2, 2.5, 3, 3.5, 4]), pop = r(10, 90) * 1000; return { prompt: `A town of ${pop.toLocaleString("en-AU")} people grows by ${p}% in a year. What is the new population?`, answer: Math.round(pop * (1 + p / 100)), steps: [`Multiply by ${rounded(1 + p / 100, 3)}.`, `${pop.toLocaleString("en-AU")} × ${rounded(1 + p / 100, 3)} = ${Math.round(pop * (1 + p / 100)).toLocaleString("en-AU")}.`] }; },
+  (r) => { const base = r(30, 60) * 10, p = choose(r, [2, 3, 4, 5, 2.5]), sales = r(10, 80) * 1000; return { prompt: `A salesperson earns ${money(base)} a week plus ${p}% commission on sales. This week the sales were ${money(sales)}. What is the total pay?`, answer: rounded(base + (sales * p) / 100, 2), unit: "$", steps: [`Commission: ${p}% of ${money(sales)} = ${money(rounded((sales * p) / 100, 2))}.`, `Total: ${money(base)} + ${money(rounded((sales * p) / 100, 2))} = ${money(rounded(base + (sales * p) / 100, 2))}.`] }; },
+];
+
+const w9l2: Form[] = [
+  (r) => { const a = r(5, 60) * 10, p = r(1, 9) * 5; return { prompt: `Decrease ${a} by ${p}%.`, answer: rounded(a * (1 - p / 100), 2), steps: [`${p}% of ${a} = ${rounded((a * p) / 100, 2)}.`, `${a} − ${rounded((a * p) / 100, 2)} = ${rounded(a * (1 - p / 100), 2)}.`], numberVisual: bar(a, p, -1, "", "Find what remains.") }; },
+  (r) => { const p = r(2, 45); return { prompt: `What single number do you multiply by to decrease an amount by ${p}%?`, answer: rounded(1 - p / 100, 2), steps: [`The new amount is 100% − ${p}% = ${100 - p}% of the original.`, `${100 - p}% = ${rounded(1 - p / 100, 2)}.`] }; },
+  (r) => { const price = r(20, 180) * 5, p = choose(r, [10, 15, 20, 25, 30, 40]); return { prompt: `A ${money(price)} television is discounted by ${p}%. What is the sale price?`, answer: rounded(price * (1 - p / 100), 2), unit: "$", steps: [`Discount: ${p}% of ${money(price)} = ${money(rounded((price * p) / 100, 2))}.`, `Sale price: ${money(rounded(price * (1 - p / 100), 2))}.`], numberVisual: bar(price, p, -1, "$", "Original price less the discount.") }; },
+  (r) => { const car = r(12, 45) * 1000, p = choose(r, [10, 12, 15, 18, 20]); return { prompt: `A ${money(car)} car loses ${p}% of its value in its first year. What is it worth after one year?`, answer: rounded(car * (1 - p / 100), 2), unit: "$", steps: [`Multiply by ${rounded(1 - p / 100, 2)}.`, `${money(car)} × ${rounded(1 - p / 100, 2)} = ${money(rounded(car * (1 - p / 100), 2))}.`] }; },
+  (r) => { const price = r(30, 150) * 2, p = choose(r, [5, 10, 15, 20, 25, 35]); return { prompt: `Shoes priced at ${money(price)} are reduced by ${p}%. How much money is saved?`, answer: rounded((price * p) / 100, 2), unit: "$", steps: [`The saving is the discount: ${p}% of ${money(price)}.`, `${p}/100 × ${price} = ${money(rounded((price * p) / 100, 2))}.`] }; },
+];
+
+const w9l3: Form[] = [
+  (r) => { const a = r(4, 40) * 5, p = r(1, 12) * 5, up = r(0, 1) === 1, b = rounded(a * (1 + ((up ? 1 : -1) * p) / 100), 2); return { prompt: `A quantity changes from ${a} to ${b}. What is the percentage ${up ? "increase" : "decrease"}?`, answer: p, unit: "%", steps: [`Change: ${rounded(Math.abs(b - a), 2)}.`, `${rounded(Math.abs(b - a), 2)} ÷ ${a} × 100 = ${p}%. Always divide by the original amount.`] }; },
+  (r) => { const buy = r(4, 30) * 10, p = choose(r, [10, 15, 20, 25, 40, 50]), profit = r(0, 1) === 1, sell = rounded(buy * (1 + ((profit ? 1 : -1) * p) / 100), 2); return { prompt: `Gari buys a concert ticket for ${money(buy)} and sells it for ${money(sell)}. What is the percentage ${profit ? "profit" : "loss"}?`, answer: p, unit: "%", steps: [`${profit ? "Profit" : "Loss"}: ${money(rounded(Math.abs(sell - buy), 2))}.`, `${money(rounded(Math.abs(sell - buy), 2))} ÷ ${money(buy)} × 100 = ${p}%.`] }; },
+  (r) => { const [measured, actual, unit] = choose(r, [[24, 25, "cm"], [150, 160, "g"], [48, 50, "kg"], [190, 200, "mL"], [9.6, 10, "m"], [76, 80, "cm"]] as const); const thing = unit === "g" || unit === "kg" ? "mass" : unit === "mL" ? "volume" : "length"; return { prompt: `Albert measures a ${thing} as ${measured} ${unit}. The actual ${thing} is ${actual} ${unit}. What is the percentage error?`, answer: rounded((Math.abs(actual - measured) / actual) * 100, 2), unit: "%", steps: ["Percentage error = error ÷ actual value × 100.", `${rounded(Math.abs(actual - measured), 2)} ÷ ${actual} × 100 = ${rounded((Math.abs(actual - measured) / actual) * 100, 2)}%.`] }; },
+  (r) => { const [a, b] = choose(r, [[40, 50], [60, 80], [30, 40], [80, 100], [90, 120], [150, 200], [75, 100]] as const); return { prompt: `$${a} rising to $${b} is a ${rounded(((b - a) / a) * 100, 2)}% increase. What percentage decrease takes $${b} back to $${a}?`, answer: rounded(((b - a) / b) * 100, 2), unit: "%", steps: [`The decrease is $${b - a}, but now the original amount is $${b}.`, `${b - a} ÷ ${b} × 100 = ${rounded(((b - a) / b) * 100, 2)}%.`] }; },
+  (r) => { const a1 = r(6, 18) * 10, p1 = choose(r, [10, 15, 20, 25]), a2 = r(6, 18) * 10 + 4, p2 = choose(r, [12.5, 15, 20, 30].filter((p) => p !== p1)); const s1 = rounded(a1 * (1 - p1 / 100), 2), s2 = rounded(a2 * (1 - p2 / 100), 2); return { prompt: `Store A sells jeans for ${money(a1)}, now ${money(s1)}. Store B sells jeans for ${money(a2)}, now ${money(s2)}. What is the larger percentage discount?`, answer: Math.max(p1, p2), unit: "%", steps: [`Store A: ${rounded(a1 - s1, 2)} ÷ ${a1} × 100 = ${p1}%.`, `Store B: ${rounded(a2 - s2, 2)} ÷ ${a2} × 100 = ${p2}%. The larger is ${Math.max(p1, p2)}%.`] }; },
+  (r) => { const p1 = r(4, 30) * 1000, p = choose(r, [5, 8, 10, 12, 15, 20, 25]), up = r(0, 1) === 1, p2 = Math.round(p1 * (1 + ((up ? 1 : -1) * p) / 100)); return { prompt: `A town’s population changed from ${p1.toLocaleString("en-AU")} to ${p2.toLocaleString("en-AU")}. What was the percentage ${up ? "increase" : "decrease"}?`, answer: p, unit: "%", steps: [`Change: ${Math.abs(p2 - p1).toLocaleString("en-AU")}.`, `${Math.abs(p2 - p1).toLocaleString("en-AU")} ÷ ${p1.toLocaleString("en-AU")} × 100 = ${p}%.`] }; },
+];
+
+const w10l1: Form[] = [
+  (r) => { const price = rounded(r(1000, 20000) / 20, 2), p = choose(r, [15, 20, 25, 30, 35]); return { prompt: `A ${money(price)} jacket is discounted by ${p}%. What is the sale price?`, answer: rounded(price * (1 - p / 100), 2), unit: "$", steps: [`Pay ${100 - p}% of the price: ${rounded(1 - p / 100, 2)} × ${money(price)}.`, `= ${money(rounded(price * (1 - p / 100), 2))}.`] }; },
+  (r) => { const p = choose(r, [10, 20, 25, 30, 40]), orig = r(3, 40) * 20, sale = rounded(orig * (1 - p / 100), 2); return { prompt: `A pair of shoes is discounted by ${p}%. The sale price is ${money(sale)}. What was the original price?`, answer: orig, unit: "$", steps: [`The sale price is ${100 - p}% of the original, so 1% = ${money(sale)} ÷ ${100 - p} = ${money(rounded(sale / (100 - p), 4))}.`, `100% = ${money(orig)}.`], numberVisual: bar(orig, p, -1, "$", `The remaining ${100 - p}% costs ${money(sale)}.`) }; },
+  (r) => { const rrp = r(8, 40) * 25, p1 = choose(r, [10, 20, 25]), p2 = choose(r, [20, 40, 50]); const after = rounded(rrp * (1 - p1 / 100) * (1 - p2 / 100), 2); return { prompt: `Ski goggles have a price of ${money(rrp)}. They are discounted by ${p1}%, then a further ${p2}% is taken off the reduced price. What is the final price?`, answer: after, unit: "$", steps: [`After ${p1}% off: ${money(rounded(rrp * (1 - p1 / 100), 2))}.`, `After a further ${p2}% off: ${money(after)}. The discounts are not simply added.`] }; },
+  (r) => { const base = r(20, 30) * 100, deals = [[base, 0], [base + r(3, 6) * 100, 20], [base + r(2, 5) * 100, 15]] as const, prices = deals.map(([p, d]) => rounded(p * (1 - d / 100), 2)); return { prompt: `Store A sells a bike for ${money(deals[0][0])} with no discount. Store B sells it for ${money(deals[1][0])} with 20% off. Store C sells it for ${money(deals[2][0])} with 15% off. What is the cheapest price?`, answer: Math.min(...prices), unit: "$", steps: [`A: ${money(prices[0])}. B: ${money(prices[1])}. C: ${money(prices[2])}.`, `The cheapest is ${money(Math.min(...prices))}.`] }; },
+  (r) => { const p = choose(r, [2.5, 3, 4, 5, 6]), sales = r(8, 60) * 1000; return { prompt: `Ben sells cars and is paid ${p}% commission. This week he sold ${money(sales)} worth of cars. What is his pay?`, answer: rounded((sales * p) / 100, 2), unit: "$", steps: [`${p}% = ${p / 100}.`, `${p / 100} × ${money(sales)} = ${money(rounded((sales * p) / 100, 2))}.`] }; },
+];
+
+const w10l2: Form[] = [
+  (r) => { const ex = rounded(r(500, 30000) / 20, 2); return { prompt: `A cricket bat costs ${money(ex)} before GST. Add 10% GST. What is the price including GST?`, answer: rounded(ex * 1.1, 2), unit: "$", steps: ["Price including GST = 110% of the price.", `${money(ex)} × 1.1 = ${money(rounded(ex * 1.1, 2))}.`] }; },
+  (r) => { const ex = r(6, 40) * 5, inc = rounded(ex * 1.1, 2); return { prompt: `A hair dryer costs ${money(inc)} including 10% GST. What was its price before GST?`, answer: ex, unit: "$", steps: ["The GST-inclusive price is 110% of the original.", `${money(inc)} ÷ 1.1 = ${money(ex)}.`] }; },
+  (r) => { const ex = r(3, 24) * 5, inc = rounded(ex * 1.1, 2); return { prompt: `A meal costs ${money(inc)} including GST. How much of that is GST?`, answer: rounded(inc / 11, 2), unit: "$", steps: ["The GST is 10 parts out of 110, which is 1/11 of the inclusive price.", `${money(inc)} ÷ 11 = ${money(rounded(inc / 11, 2))}.`] }; },
+  (r) => { const items = [r(3, 30) * 5, r(2, 20) * 5, r(1, 10) * 5], total = items.reduce((s, v) => s + v, 0); return { prompt: "Prices in the table do not include GST. What is the total bill including 10% GST?", answer: rounded(total * 1.1, 2), unit: "$", steps: [`Total before GST: ${money(total)}.`, `× 1.1 = ${money(rounded(total * 1.1, 2))}.`], visual: table("Shopping list (before GST)", ["Item", "Price"], [["Backpack", money(items[0])], ["T-shirt", money(items[1])], ["Water bottle", money(items[2])]]) }; },
+  (r) => { const ex = r(4, 90) * 10, inc = rounded(ex * 1.1, 2); return { prompt: `Tom says the pre-GST price of a ${money(inc)} item is 90% of ${money(inc)}. What is the correct pre-GST price?`, answer: ex, unit: "$", steps: ["GST was added to the pre-GST price, so the inclusive price is 110% of it, not 100%.", `${money(inc)} ÷ 1.1 = ${money(ex)}.`] }; },
+];
+
+const w10l3: Form[] = [
+  (r) => { const n = r(10, 50) * 10, p = r(1, 6) * 5; return { prompt: `${money(n)} rises by ${p}%, then the new amount falls by ${p}%. What is the final amount?`, answer: rounded(n * (1 + p / 100) * (1 - p / 100), 2), unit: "$", steps: [`× ${rounded(1 + p / 100, 2)} then × ${rounded(1 - p / 100, 2)}.`, `${money(n)} × ${rounded((1 + p / 100) * (1 - p / 100), 4)} = ${money(rounded(n * (1 + p / 100) * (1 - p / 100), 2))}. It is less than the start because the fall is taken from a larger amount.`] }; },
+  (r) => { const p = choose(r, [10, 20, 30, 40, 50]); return { prompt: `A price is increased by ${p}% and the new price is then decreased by ${p}%. What is the overall percentage decrease?`, answer: rounded((p * p) / 100, 2), unit: "%", steps: [`Overall multiplier: ${rounded(1 + p / 100, 2)} × ${rounded(1 - p / 100, 2)} = ${rounded(1 - (p * p) / 10000, 4)}.`, `That is ${rounded((p * p) / 100, 2)}% less than the original.`] }; },
+  (r) => { const p1 = choose(r, [10, 20, 25, 50]), p2 = choose(r, [10, 20, 30, 40]), overall = rounded(((1 + p1 / 100) * (1 + p2 / 100) - 1) * 100, 2); return { prompt: `A savings balance grows by ${p1}%, then the new balance grows by ${p2}%. What is the overall percentage increase?`, answer: overall, unit: "%", steps: [`Multiply: ${rounded(1 + p1 / 100, 2)} × ${rounded(1 + p2 / 100, 2)} = ${rounded(1 + overall / 100, 4)}.`, `That is an increase of ${overall}%, more than ${p1}% + ${p2}%.`] }; },
+  (r) => { const pop = r(20, 90) * 1000, p = choose(r, [1.5, 2, 2.5, 3, 4, 5]); return { prompt: `A city of ${pop.toLocaleString("en-AU")} people grows by ${p}% each year. What will the population be after 2 years? Round to the nearest whole number.`, answer: Math.round(pop * (1 + p / 100) ** 2), steps: [`After 1 year: ${pop.toLocaleString("en-AU")} × ${rounded(1 + p / 100, 3)} = ${rounded(pop * (1 + p / 100), 2).toLocaleString("en-AU")}.`, `After 2 years: × ${rounded(1 + p / 100, 3)} again ≈ ${Math.round(pop * (1 + p / 100) ** 2).toLocaleString("en-AU")}.`] }; },
+  (r) => { const p1 = choose(r, [10, 20, 25, 30]), p2 = choose(r, [10, 15, 20, 40]); return { prompt: `Increasing by ${p1}% and then decreasing by ${p2}% is the same as multiplying by what single number?`, answer: rounded((1 + p1 / 100) * (1 - p2 / 100), 4), steps: [`Increase by ${p1}%: × ${rounded(1 + p1 / 100, 2)}. Decrease by ${p2}%: × ${rounded(1 - p2 / 100, 2)}.`, `${rounded(1 + p1 / 100, 2)} × ${rounded(1 - p2 / 100, 2)} = ${rounded((1 + p1 / 100) * (1 - p2 / 100), 4)}.`] }; },
+];
+
+const TAX: [number, number, number, number][] = [[0, 18200, 0, 0], [18200, 45000, 0, 0.19], [45000, 120000, 5092, 0.325], [120000, 180000, 29467, 0.37], [180000, Infinity, 51667, 0.45]];
+const taxOn = (income: number) => { const b = TAX.find(([lo, hi]) => income > lo && income <= hi)!; return rounded(b[2] + (income - b[0]) * b[3], 2); };
+const taxTable = () => table("Income tax table", ["Taxable income", "Tax on this income"], [["$0 – $18,200", "Nil"], ["$18,201 – $45,000", "19c for each $1 over $18,200"], ["$45,001 – $120,000", "$5,092 plus 32.5c for each $1 over $45,000"], ["$120,001 – $180,000", "$29,467 plus 37c for each $1 over $120,000"], ["$180,001 and over", "$51,667 plus 45c for each $1 over $180,000"]]);
+const w11l1: Form[] = [
+  (r) => { const rate = r(20, 38), ot = r(2, 8); return { prompt: `Priya works 38 hours at ${money(rate)} an hour, plus ${ot} hours of overtime at time-and-a-half. What is her total pay?`, answer: rounded(38 * rate + ot * rate * 1.5, 2), unit: "$", steps: [`Normal pay: 38 × ${money(rate)} = ${money(38 * rate)}. Overtime rate: ${money(rate * 1.5)} an hour.`, `Overtime: ${ot} × ${money(rate * 1.5)} = ${money(ot * rate * 1.5)}. Total: ${money(rounded(38 * rate + ot * rate * 1.5, 2))}.`] }; },
+  (r) => { const income = r(60, 140) * 10, rent = r(20, 45) * 10, food = r(8, 20) * 10, transport = r(3, 8) * 10; return { prompt: "Use the weekly budget. How much money is left after these expenses?", answer: income - rent - food - transport, unit: "$", steps: [`Expenses: ${money(rent)} + ${money(food)} + ${money(transport)} = ${money(rent + food + transport)}.`, `${money(income)} − ${money(rent + food + transport)} = ${money(income - rent - food - transport)}.`], visual: table("Weekly budget", ["Item", "Amount"], [["Income", money(income)], ["Rent", money(rent)], ["Food", money(food)], ["Transport", money(transport)]]) }; },
+  (r) => { const income = r(4, 16) * 100, p = choose(r, [20, 25, 30, 35, 40]), rent = (income * p) / 100; return { prompt: `Sam earns ${money(income)} a week and pays ${money(rent)} rent. What percentage of the income is spent on rent?`, answer: p, unit: "%", steps: ["Percentage = part ÷ whole × 100.", `${rent} ÷ ${income} × 100 = ${p}%.`] }; },
+  (r) => { const goal = r(30, 120) * 10, save = r(15, 60); return { prompt: `Mei saves ${money(save)} a week towards a ${money(goal)} bike. How many weeks will it take to have enough?`, answer: Math.ceil(goal / save), unit: "weeks", steps: [`${goal} ÷ ${save} = ${rounded(goal / save, 2)}.`, `She needs a whole number of weeks, so round up: ${Math.ceil(goal / save)} weeks.`] }; },
+  (r) => { const salary = r(40, 110) * 1000; return { prompt: `An annual salary is ${money(salary)}. What is the weekly pay, to the nearest cent? (Use 52 weeks in a year.)`, answer: rounded(salary / 52, 2), unit: "$", steps: [`${money(salary)} ÷ 52.`, `= ${money(rounded(salary / 52, 2))} per week.`] }; },
+  (r) => { const rate = r(22, 40), p = choose(r, [2, 2.5, 3, 4, 5]), h = r(15, 38); return { prompt: `Dylan earns ${money(rate)} an hour. He gets a ${p}% pay rise and works ${h} hours a week. What is his new weekly pay?`, answer: rounded(rate * (1 + p / 100) * h, 2), unit: "$", steps: [`New rate: ${money(rate)} × ${rounded(1 + p / 100, 3)} = ${money(rounded(rate * (1 + p / 100), 4))}.`, `× ${h} hours = ${money(rounded(rate * (1 + p / 100) * h, 2))}.`] }; },
+];
+
+const w11l2: Form[] = [
+  (r) => { const income = r(20, 44) * 1000; return { prompt: `Use the tax table. How much tax is payable on a taxable income of ${money(income)}?`, answer: taxOn(income), unit: "$", steps: [`${money(income)} is in the $18,201 – $45,000 bracket.`, `(${income} − 18,200) × 0.19 = ${money(taxOn(income))}.`], visual: taxTable() }; },
+  (r) => { const income = r(46, 119) * 1000; return { prompt: `Use the tax table. How much tax is payable on a taxable income of ${money(income)}?`, answer: taxOn(income), unit: "$", steps: [`${money(income)} is in the $45,001 – $120,000 bracket.`, `5,092 + (${income} − 45,000) × 0.325 = ${money(taxOn(income))}.`], visual: taxTable() }; },
+  (r) => { const income = r(30, 150) * 1000; return { prompt: `Use the tax table. What percentage of a ${money(income)} income is paid as tax? Round to one decimal place.`, answer: rounded((taxOn(income) / income) * 100, 1), unit: "%", steps: [`Tax: ${money(taxOn(income))}.`, `${money(taxOn(income))} ÷ ${money(income)} × 100 ≈ ${rounded((taxOn(income) / income) * 100, 1)}%.`], visual: taxTable() }; },
+  (r) => { const income = r(30, 170) * 1000; return { prompt: `Use the tax table. A worker’s taxable income is ${money(income)}. How much do they keep after tax?`, answer: rounded(income - taxOn(income), 2), unit: "$", steps: [`Tax: ${money(taxOn(income))}.`, `${money(income)} − ${money(taxOn(income))} = ${money(rounded(income - taxOn(income), 2))}.`], visual: taxTable() }; },
+  (r) => { const income = choose(r, [r(20, 43), r(46, 118), r(121, 178)]) * 1000, rate = TAX.find(([lo, hi]) => income > lo && income <= hi)![3]; return { prompt: `Use the tax table. A worker earning ${money(income)} gets a $1,000 raise. How much extra tax will they pay?`, answer: rounded(1000 * rate, 2), unit: "$", steps: [`Both incomes are in the same bracket, so each extra dollar is taxed at ${rate * 100} cents.`, `1,000 × ${rate} = ${money(rounded(1000 * rate, 2))}.`], visual: taxTable() }; },
+];
+
+const w11l3: Form[] = [
+  (r) => { const a = r(4, 9), d = r(1, 3), fixed = r(2, 8) * 5, n = r(4, 15); const A = a * n, Bc = fixed + (a - d) * n; return { prompt: `Plan A costs ${money(a)} per visit. Plan B costs ${money(fixed)} plus ${money(a - d)} per visit. For ${n} visits, how much cheaper is the cheaper plan?`, answer: Math.abs(A - Bc), unit: "$", steps: [`Plan A: ${n} × ${money(a)} = ${money(A)}. Plan B: ${money(fixed)} + ${n} × ${money(a - d)} = ${money(Bc)}.`, `Difference: ${money(Math.abs(A - Bc))}.`], visual: table("Two plans", ["Plan", "Joining fee", "Per visit"], [["A", "$0", money(a)], ["B", money(fixed), money(a - d)]]) }; },
+  (r) => { const d = r(2, 5), visits = r(4, 15), b = r(3, 9), a = b + d, fixed = d * visits; return { prompt: `Gym A charges ${money(a)} per visit. Gym B charges a ${money(fixed)} membership plus ${money(b)} per visit. After how many visits do the two gyms cost the same?`, answer: visits, unit: "visits", steps: [`Gym B saves ${money(d)} each visit compared with Gym A.`, `${money(fixed)} ÷ ${money(d)} = ${visits} visits.`] }; },
+  (r) => { const price = r(15, 60) * 10, rent = r(12, 40); return { prompt: `A drum kit costs ${money(price)} to buy or ${money(rent)} a week to hire. After how many weeks of hiring would buying have been cheaper?`, answer: Math.floor(price / rent) + 1, unit: "weeks", steps: [`${price} ÷ ${rent} = ${rounded(price / rent, 2)} weeks of hire costs the same as buying.`, `Buying is cheaper from week ${Math.floor(price / rent) + 1}.`] }; },
+  (r) => { const g1 = choose(r, [250, 400, 500]), p1 = rounded(r(30, 80) / 10, 2), g2 = choose(r, [750, 1000, 1200]), p2 = rounded((p1 * g2) / g1 + choose(r, [-0.8, -0.5, 0.5, 0.9]), 2); const u1 = rounded((p1 / g1) * 100, 4), u2 = rounded((p2 / g2) * 100, 4); return { prompt: `A ${g1} g box of cereal costs ${money(p1)} and a ${g2} g box costs ${money(p2)}. What is the lower price per 100 g? Round to the nearest cent.`, answer: rounded(Math.min(u1, u2), 2), unit: "$", steps: [`Small box: ${money(p1)} ÷ ${g1 / 100} = ${money(rounded(u1, 2))} per 100 g. Large box: ${money(p2)} ÷ ${g2 / 100} = ${money(rounded(u2, 2))} per 100 g.`, `The lower price is ${money(rounded(Math.min(u1, u2), 2))} per 100 g.`] }; },
+  (r) => { const cash = r(40, 150) * 10, months = choose(r, [6, 10, 12, 18, 24]), pay = Math.ceil((cash * (1 + choose(r, [0.08, 0.12, 0.15, 0.2]))) / months); return { prompt: `A laptop costs ${money(cash)} cash, or ${months} monthly payments of ${money(pay)}. How much more does the payment plan cost?`, answer: pay * months - cash, unit: "$", steps: [`Plan total: ${months} × ${money(pay)} = ${money(pay * months)}.`, `${money(pay * months)} − ${money(cash)} = ${money(pay * months - cash)}.`] }; },
+];
+
+// ── Week 12: apply and review (N01–N05) ──────────────────────────────────────
+const w12l1: Form[] = [
+  (r) => { const n = r(2, 20), k = n * n + r(1, 2 * n); return { prompt: `Round √${k} to 2 decimal places.`, answer: rounded(Math.sqrt(k), 2), steps: [`√${k} = ${Math.sqrt(k).toFixed(5)}…`, `The third decimal place decides the rounding: ${rounded(Math.sqrt(k), 2).toFixed(2)}. The exact value is √${k}; the decimal is an approximation.`] }; },
+  w1l3[1],
+  (r) => { const [a, b, c, d, op] = choose(r, [[1, 3, 1, 6, "+"], [2, 3, 1, 6, "−"], [1, 4, 1, 12, "+"], [5, 6, 1, 3, "−"], [2, 9, 1, 3, "+"]] as const); const num = op === "+" ? a * d + c * b : a * d - c * b; return { prompt: `Calculate ${a}/${b} ${op} ${c}/${d}. Give an exact answer.`, answer: fraction(num, b * d), steps: ["These thirds, sixths and ninths are recurring decimals, so keep them as fractions to stay exact.", `${a}/${b} ${op} ${c}/${d} = ${F(num, b * d)}.`] }; },
+  w1l2[4],
+  () => ({ prompt: "Round 22/7 to 3 decimal places. How much larger is it than π rounded to 3 decimal places?", answer: 0.001, steps: ["22/7 = 3.142857… ≈ 3.143. π = 3.14159… ≈ 3.142.", "3.143 − 3.142 = 0.001."] }),
+];
+
+const w12l2: Form[] = [
+  (r) => { const total = r(3, 9), n = r(1, 4), d = r(5, 10); return { prompt: `A jug holds ${total} L. You pour out ${n}/${d} L, then another ${n}/${d} L. How many litres remain?`, answer: fraction(total * d - 2 * n, d), unit: "L", steps: [`You pour out 2 × ${n}/${d} = ${F(2 * n, d)} L.`, `${total} − ${F(2 * n, d)} = ${M(total * d - 2 * n, d)} L.`] }; },
+  (r) => { const [n, d] = choose(r, [[3, 4], [2, 3], [1, 2], [5, 8]] as const), from = choose(r, [4, 6]), to = choose(r, [10, 9, 15, 3]); return { prompt: `A recipe for ${from} people uses ${n}/${d} cup of oil. How much oil is needed for ${to} people?`, answer: fraction(n * to, d * from), unit: "cups", steps: [`Scale factor: ${to}/${from} = ${F(to, from)}.`, `${n}/${d} × ${F(to, from)} = ${M(n * to, d * from)} cups.`] }; },
+  w8l3[1],
+  w6l1[3],
+  w7l1[2],
+];
+
+const w12l3: Form[] = [
+  (r) => { const ex = r(10, 80) * 10, p = choose(r, [10, 20, 25]); const sale = rounded(ex * (1 - p / 100), 2); return { prompt: `An item is ${money(ex)} before GST. It is discounted by ${p}%, then 10% GST is added. What is the final price?`, answer: rounded(sale * 1.1, 2), unit: "$", steps: [`After the discount: ${money(sale)}.`, `Add GST: ${money(sale)} × 1.1 = ${money(rounded(sale * 1.1, 2))}.`] }; },
+  w10l1[1],
+  w10l3[2],
+  w9l3[5],
+  w11l2[2],
+];
+
+export const numberLessons: LessonFactory[] = [w1l1, w1l2, w1l3, w2l1, w2l2, w2l3, w3l1, w3l2, w3l3, w4l1, w4l2, w4l3, w5l1, w5l2, w5l3, w6l1, w6l2, w6l3, w7l1, w7l2, w7l3, w8l1, w8l2, w8l3, w9l1, w9l2, w9l3, w10l1, w10l2, w10l3, w11l1, w11l2, w11l3, w12l1, w12l2, w12l3].map(pickForm);

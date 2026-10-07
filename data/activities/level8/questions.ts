@@ -63,6 +63,7 @@ export function level8Quiz(realm: Level8Realm, week: number, attempt = 0) {
           q.prompt,
           q.cave7Visual,
           q.measurement8Visual,
+          q.number8Visual,
           q.space8Visual,
         ]),
       `Level 8 ${realm} ${week}/${lesson}`,
