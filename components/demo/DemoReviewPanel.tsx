@@ -533,7 +533,7 @@ export default function DemoReviewPanel() {
           )}
         </section>
 
-        {levelNumber <= 6 || isNumber7 ? <>
+        {levelNumber <= 6 || isNumber7 || isLevel8 ? <>
         <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><BookOpen size={18} className="text-amber-300" /><h2 className="text-base font-black">Weekly Content</h2></div>
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_2fr]">
@@ -550,7 +550,7 @@ export default function DemoReviewPanel() {
             <div className="grid gap-2 sm:grid-cols-3 md:self-end">
               <button type="button" disabled={!weeklyProgramAvailable} onClick={() => weeklyProgramAvailable && open(programHref())} className={actionClass(weeklyProgramAvailable)}><Route size={16} /> Week</button>
               <button type="button" disabled={!weeklyContentAvailable} onClick={() => weeklyContentAvailable && open(lessonHref())} className={actionClass(weeklyContentAvailable)}><BookOpen size={16} /> Lesson</button>
-              <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> {isNumber7 && week === maxWeek ? "Post-Test" : "Quiz"}</button>
+              <button type="button" disabled={!weeklyQuizAvailable} onClick={() => weeklyQuizAvailable && open(quizHref())} className={actionClass(weeklyQuizAvailable)}><ClipboardCheck size={16} /> {(isNumber7 || isLevel8) && week === maxWeek ? "Post-Test" : "Quiz"}</button>
             </div>
           </div>
         </section>
