@@ -1,3 +1,4 @@
+import { isRealmBuilding } from "./realm-building-collections";
 import { isTrainAsset } from "./train-catalogue";
 import { newWorldPlacementId } from "./world-connections";
 import { trainTrackSupport } from "./railway";
@@ -23,7 +24,7 @@ export type CentralWorldPlacement = {
 
 /** Inventory picks create new village copies; the Move tool still selects by placement ID. */
 export function selectCentralWorldInventoryPlacement(item: EconomyItem, placements: CentralWorldPlacement[], focus: { gridX: number; gridZ: number }): CentralWorldPlacement {
-  const existing = isVillageBuilding(item.metadata.worldAssetKey) ? undefined : placements.find(p => p.itemId === item.item_key);
+  const existing = (isVillageBuilding(item.metadata.worldAssetKey) || isRealmBuilding(item.metadata.worldAssetKey)) ? undefined : placements.find(p => p.itemId === item.item_key);
   return existing ?? { placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focus, rotation: 0 };
 }
 

@@ -51,7 +51,7 @@ export default function MarketplaceArtReview({infrastructure=false,realms=false}
  const current=items[rows.length];
  return <main style={{padding:24,background:"#f5f2e9",color:"#263a32",minHeight:"100vh"}}>
   <h1>{realms?"Realm collection — design review":infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
-  {realms&&<p>Six signature buildings, one from each realm. Artwork and pricing are in review; these designs are not yet in the student shop.</p>}
+  {realms&&<p>Six signature buildings, one from each realm. Available in the Buildings shop with XP.</p>}
   <button onClick={()=>{setRows([]);setRunning(true);}}>Render all shop images</button>
   <p role="status">{rows.length} / {items.length} captured {running&&current?`· ${current.name}`:""}</p>
   {running&&current&&<div style={{width:800,height:640}}><Canvas orthographic dpr={1} shadows gl={{antialias:true,preserveDrawingBuffer:true}} camera={{near:.1,far:2000,position:[20,15,24]}}><Suspense fallback={null}><Product key={current.item_key} item={current} onReady={capture}/></Suspense></Canvas></div>}

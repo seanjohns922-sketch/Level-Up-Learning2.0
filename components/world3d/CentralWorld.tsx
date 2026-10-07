@@ -1,5 +1,6 @@
 "use client";
 
+import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
@@ -414,7 +415,7 @@ export default function CentralWorld() {
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
           const requestedItem = nextItemsById.get(requestedBuildItemKey)!;
           const nextBuildPlacement = selectCentralWorldInventoryPlacement(requestedItem, nextPlacements, { gridX: -5, gridZ: 5 });
-          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
+          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isRealmBuilding(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
             setEditorOpen(true);
             setLibrarySection("owned");
             setSelectedInventoryItemKey(requestedBuildItemKey);
@@ -955,7 +956,7 @@ export default function CentralWorld() {
               </select>
             </label>}
           </div>}
-          {buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey)) ? (
+          {buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey) || isRealmBuilding(buildItem?.metadata.worldAssetKey)) ? (
             <div style={{ marginTop: 10 }}>
               <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>COLOUR</div>
               <div aria-label="Recolour item" style={{ marginTop: 5, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>

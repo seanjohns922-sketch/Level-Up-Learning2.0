@@ -1,4 +1,6 @@
 "use client";
+import { REALM_BUILDING_KEYS } from "@/lib/world3d/realm-building-collections";
+import { RealmBuildingModel } from "./RealmBuildingModels";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { TrainUnit } from "./TrainModels";
 
@@ -316,6 +318,7 @@ export function RewardPlotObject({ item, accent, tier, tint, buildingStyle }: { 
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
   if (category === "world_basic") return <StarterScenery assetKey={assetKey} tint={tint} />;
+  if (REALM_BUILDING_KEYS.has(assetKey)) return <RealmBuildingModel assetKey={assetKey} tint={tint} />;
   if (isVillageBuilding(assetKey)) return <VillageBuilding assetKey={assetKey} style={buildingStyle} tint={tint} />;
   if (isTrainAsset(assetKey) && assetKey !== "rail_train") return <TrainUnit asset={assetKey}/>;
   if (COLLECTION_REWARD_KEYS.has(assetKey)) return <CollectionReward assetKey={assetKey} tint={tint} />;

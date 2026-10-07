@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { REALM_BUILDING_SHOP_ITEMS } from '../lib/world3d/realm-building-collections.ts';
+const sqlValue=v=>v===null?'null':typeof v==='boolean'||typeof v==='number'?String(v):"'"+String(v).replaceAll("'","''")+"'";
+const keys=['item_key','name','description','category','realm_id','rarity','price','icon','accent','active','purchasable','discoverable','sort_order','metadata'];
+const rows=REALM_BUILDING_SHOP_ITEMS.map(item=>'('+keys.map(k=>sqlValue(k==='metadata'?JSON.stringify(item[k]):item[k])).join(', ')+')');
+const sql='-- Additive realm building XP catalogue. Existing inventories, balances and student RPC guards are unchanged.\nbegin;\ninsert into public.economy_items ('+keys.join(', ')+') values\n'+rows.join(',\n')+'\non conflict (item_key) do nothing;\ncommit;\n';
+const file='supabase/migrations/20261007190000_realm_building_shop.sql';
+if(process.argv.includes('--write'))fs.writeFileSync(file,sql);else assert.equal(fs.readFileSync(file,'utf8'),sql,'Migration matches the realm building catalogue and prices');
+console.log('PASS: six realm building catalogue rows, prices and metadata match the additive migration.');

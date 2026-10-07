@@ -1,6 +1,8 @@
+import { REALM_BUILDING_SHOP_ITEMS } from "./realm-building-collections";
 import { TRAIN_DESIGNS } from "./train-catalogue";
 // Generated from the actual models via /demo-review/marketplace-art.
 export const WORLD_SHOP_ART: Record<string, {src:string;alt:string}> = {
+  ...Object.fromEntries(REALM_BUILDING_SHOP_ITEMS.map(item=>[item.item_key,{src:`/marketplace/world-renders/${item.metadata.worldAssetKey}.webp`,alt:`${item.name} — actual world model`}])),
   ...Object.fromEntries(TRAIN_DESIGNS.map(d=>[d.key,{src:`/marketplace/world-renders/${d.key}.webp`,alt:d.name+" — actual world model"}])),
   "central_world_plot_1_clubhouse": {
     "src": "/marketplace/world-renders/clubhouse.webp",

@@ -6,7 +6,9 @@ import ts from 'typescript';
 import * as THREE from 'three';
 import { CENTRAL_WORLD_STARTER_SCENERY } from '../lib/world3d/central-world-editor-catalog.ts';
 import { WORLD_ITEM_PRESENTATION, fitWorldItemScale } from '../lib/world3d/world-item-presentation.ts';
-import { parseGridSize } from '../lib/world3d/central-world-layout.ts';
+import { CENTRAL_WORLD_CUSTOMISATION_CATALOG, mergeCentralWorldCatalogue } from '../lib/world3d/central-world-customisation-catalog.ts';
+import { matchesItemRealm } from '../lib/marketplace-realm-filter.ts';
+import { selectCentralWorldInventoryPlacement, writeCentralWorldPlacements, readCentralWorldPlacements, parseGridSize } from '../lib/world3d/central-world-layout.ts';
 
 // Evaluate the actual stateless JSX models in a Three scene without a GPU.
 // Unsupported elements fail rather than silently omitting geometry from bounds.
@@ -50,6 +52,30 @@ for(const realm of ['number','measurement','pattern','statistics','chance','spac
  const set=REALM_BUILDING_DESIGNS.filter(item=>item.realm===realm);
  assert.deepEqual(set.map(item=>item.kind).sort(),['building','decoration','landmark']);
  assert.equal(set.filter(item=>item.price>0).length,1);
+}
+const storage=new Map();
+globalThis.window={localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)}};
+assert.equal(designs.REALM_BUILDING_SHOP_ITEMS.length, 6);
+const emptyEconomy={items:[],inventory:[],equipped:{},wallet:{xp_balance:0}};
+const pending=mergeCentralWorldCatalogue(emptyEconomy);
+assert(!pending.items.some(item=>designs.REALM_BUILDING_SHOP_ITEMS.some(row=>row.item_key===item.item_key)), 'No broken purchase buttons before catalogue migration');
+const serverBuilding={...designs.REALM_BUILDING_SHOP_ITEMS[0],price:1234,purchasable:false};
+const published=mergeCentralWorldCatalogue({...emptyEconomy,items:[serverBuilding]});
+const retained=published.items.find(item=>item.item_key===serverBuilding.item_key);
+assert.equal(retained.price,1234);assert.equal(retained.purchasable,false, 'Server remains authoritative');
+
+for (const item of designs.REALM_BUILDING_SHOP_ITEMS) {
+ assert(CENTRAL_WORLD_CUSTOMISATION_CATALOG.some(row=>row.item_key===item.item_key));
+ assert(item.active && item.purchasable && item.discoverable && item.price > 0);
+ assert.equal(item.metadata.marketplaceCategory, 'buildings');
+ assert(matchesItemRealm(item, item.metadata.realmCollection));
+ assert(fs.existsSync('public'+item.metadata.marketplace_visual.src), 'Actual model thumbnail exists');
+ assert.deepEqual(WORLD_ITEM_PRESENTATION[item.metadata.worldAssetKey], REALM_DESIGN_PRESENTATIONS[item.metadata.worldAssetKey]);
+ const first={placementId:item.item_key+'-a',itemId:item.item_key,gridX:20,gridZ:20,rotation:90,tint:'#a855f7'};
+ const second=selectCentralWorldInventoryPlacement(item,[first],{gridX:-20,gridZ:20});
+ assert.notEqual(second.placementId,first.placementId);
+ writeCentralWorldPlacements(item.item_key,[first,second]);
+ assert.deepEqual(readCentralWorldPlacements(item.item_key).filter(row=>row.itemId===item.item_key),[first,second], 'Copies and colours survive reload');
 }
 for(const item of REALM_BUILDING_REVIEW_ITEMS){
  assert.ok(!item.active&&!item.purchasable&&!item.discoverable,'Designs stay outside the live economy');
@@ -119,4 +145,4 @@ if(render){
  }
  await sharp({create:{width:1500,height:920,channels:3,background:'#f5f2e9'}}).composite(layers).png().toFile('output/world3d-audit/realm-collection-designs.png');
 }
-console.log('PASS: 18 distinct realm designs, six complete collections, true mesh geometry, intended footprints, recolouring and review-only catalogue isolation.');
+console.log('PASS: 18 distinct realm designs, six complete collections, true mesh geometry, intended footprints, recolouring and six purchasable buildings, thumbnails, realm filters and saved repeat placements.');

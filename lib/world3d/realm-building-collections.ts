@@ -4,7 +4,7 @@ export type RealmBuildingDesign = {
  key:string; name:string; realm:CanonicalRealmId; kind:"decoration"|"building"|"landmark";
  description:string; price:number; width:number; grid:`${number}x${number}`; accent:string;
 };
-/** Design-review catalogue only. Release requires server-enforced learning unlocks. */
+/** Full design collection. Only the six signature buildings are released to the XP shop. */
 export const REALM_BUILDING_DESIGNS:RealmBuildingDesign[] = [
  {key:"nexus_abacus",name:"Counting Garden",realm:"number",kind:"decoration",description:"A brass-framed garden abacus with five rows of colourful counting beads.",price:0,width:2.5,grid:"3x3",accent:"#39adb2"},
  {key:"nexus_workshop",name:"Inventor’s Workshop",realm:"number",kind:"building",description:"Sawtooth copper roofs, a gear sign and a sheltered invention bench.",price:650,width:8,grid:"5x5",accent:"#39adb2"},
@@ -37,3 +37,30 @@ export const REALM_BUILDING_REVIEW_ITEMS:EconomyItem[]=REALM_BUILDING_DESIGNS.ma
 export const REALM_DESIGN_PRESENTATIONS=Object.fromEntries(REALM_BUILDING_DESIGNS.map(item=>[item.key,{height:3,width:item.width,theme:"garden" as const}]));
 
 export const SIGNATURE_REALM_BUILDING_KEYS=["nexus_tower","measure_lodge","pattern_loom","stats_station","chance_games","star_habitat"];
+
+/** Standard XP purchases: ownership, balance checks and placement use the existing economy. */
+export const REALM_BUILDING_SHOP_ITEMS: EconomyItem[] = REALM_BUILDING_DESIGNS
+ .filter(item => SIGNATURE_REALM_BUILDING_KEYS.includes(item.key))
+ .map((item, index) => ({
+  item_key: `central_world_plot_1_${item.key}`,
+  name: item.name,
+  description: `${item.description} Unlock once, place multiple copies and choose your colours. Exterior only.`,
+  category: "decoration", realm_id: null,
+  rarity: item.kind === "landmark" ? "legendary" : "rare",
+  price: item.key === "nexus_tower" ? 2800 : item.price,
+  icon: "house", accent: item.accent,
+  active: true, purchasable: true, discoverable: true, sort_order: 14 + index,
+  metadata: {
+   slot: "world_plot_1", worldPlotId: "customisation-plot-1",
+   worldAssetKey: item.key, worldArea: "buildings", marketplaceCategory: "buildings",
+   worldCollection: "country", realmCollection: item.realm,
+   realmName: REALM_REGISTRY[item.realm].name,
+   gridSize: item.grid, tier: item.kind === "landmark" ? 3 : 2,
+   marketplace_visual: { type: "asset", src: `/marketplace/world-renders/${item.key}.webp`,
+    alt: `${item.name} — actual world model`, previewMode: "world" },
+  },
+ }));
+
+export function isRealmBuilding(assetKey: unknown): boolean {
+ return typeof assetKey === "string" && SIGNATURE_REALM_BUILDING_KEYS.includes(assetKey);
+}

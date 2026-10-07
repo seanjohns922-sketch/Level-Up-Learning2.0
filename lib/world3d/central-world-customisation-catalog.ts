@@ -1,3 +1,4 @@
+import { REALM_BUILDING_SHOP_ITEMS } from "./realm-building-collections";
 import { TRAIN_CATALOGUE } from "./train-catalogue";
 import { WORLD_SHOP_ART } from "./world-shop-art";
 import { isVillageBuilding } from "./village-buildings";
@@ -94,11 +95,14 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
       previewMode: "background",
     },
   },
-})), ...TRAIN_CATALOGUE];
+})), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS];
 
 export function mergeCentralWorldCatalogue(state: EconomyState): EconomyState {
   const existing = new Map(state.items.map((item) => [item.item_key, item]));
   for (const item of CENTRAL_WORLD_CUSTOMISATION_CATALOG) {
+    // A live shop must not offer a new building before its database row exists.
+    // Demo economy already supplies these rows through its explicit fallback catalogue.
+    if (REALM_BUILDING_SHOP_ITEMS.some(building => building.item_key === item.item_key) && !existing.has(item.item_key)) continue;
     const current = existing.get(item.item_key) ?? item;
     const art = WORLD_SHOP_ART[item.item_key];
     existing.set(item.item_key, art ? { ...current, metadata: { ...current.metadata, marketplace_visual: { type: "asset", ...art, previewMode: "world" } } } : current);
