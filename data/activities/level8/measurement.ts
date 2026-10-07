@@ -1,482 +1,319 @@
-import {
-  random,
-  rounded,
-  table,
-  type LessonFactory,
-  type QuestionDraft,
-} from "./shared";
+import { random, rounded, table, type LessonFactory, type QuestionDraft } from "./shared";
 import type { Measurement8Visual } from "@/data/assessments/revisions/year8MeasurementFiveForms";
-const diagram = (
-  task: Measurement8Visual["task"],
-  values: number[],
-  extra: Partial<Measurement8Visual> = {},
-): Measurement8Visual => ({
-  type: "measurement_year8_panel",
-  task,
-  values,
-  description: "Use the labelled dimensions. Diagram not to scale.",
-  unit: "cm",
-  ...extra,
-});
-const answer = (
-  prompt: string,
-  value: number,
-  unit: string,
-  steps: string[],
-  measurementVisual?: Measurement8Visual,
-): QuestionDraft => ({
-  prompt,
-  answer: rounded(value),
-  unit,
-  steps,
-  measurementVisual,
-});
-export const measurementLessons: LessonFactory[] = [
-  (seed) => {
-    const r = random(seed),
-      w = r(12, 24),
-      cut = r(3, 8);
-    return answer(
-      `The full width is ${w} m and the notch is ${cut} m wide. How long is the remaining top edge?`,
-      w - cut,
-      "m",
-      [`Subtract the notch width: ${w} − ${cut} = ${w - cut}.`],
-      diagram("composite", [w, 12, cut, 4]),
-    );
-  },
-  (seed) => composite(seed, false),
-  (seed) => composite(seed, true),
-  (seed) => grid(seed, 1),
-  (seed) => grid(seed, 0.25),
-  (seed) => {
-    const r = random(seed),
-      w = r(8, 20),
-      h = r(5, 12);
-    return answer(
-      `A rectangular garden is ${w} m by ${h} m. How much fencing encloses it?`,
-      2 * (w + h),
-      "m",
-      [
-        "Fencing measures the boundary, so use perimeter.",
-        `2 × (${w} + ${h}) = ${2 * (w + h)} m.`,
-      ],
-    );
-  },
-  (seed) => {
-    const n = random(seed)(2, 30) * 250;
-    return answer(`Convert ${n} cm³ to litres.`, n / 1000, "L", [
-      "1000 cm³ = 1 litre.",
-      `${n} ÷ 1000 = ${n / 1000} L.`,
-    ]);
-  },
-  (seed) => prism(seed, false),
-  (seed) => prism(seed, true),
-  (seed) => {
-    const r = random(seed),
-      a = r(3, 12),
-      b = r(3, 9),
-      h = r(4, 15);
-    return answer(
-      `A prism has cross-sectional area ${a * b} cm² and volume ${a * b * h} cm³. Find its length.`,
-      h,
-      "cm",
-      [
-        `Length = volume ÷ cross-sectional area.`,
-        `${a * b * h} ÷ ${a * b} = ${h}.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(2, 6),
-      b = r(2, 5),
-      c = r(2, 4);
-    return answer(
-      "How many 10 cm cubes fit in this box? Keep their edges parallel to the box.",
-      a * b * c,
-      "cubes",
-      [
-        `${a} cubes fit along the length, ${b} along the width and ${c} along the height.`,
-        `Multiply: ${a} × ${b} × ${c} = ${a * b * c}.`,
-      ],
-      diagram("packing", [a * 10, b * 10, c * 10, 10, 10, 10]),
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      rate = r(2, 12),
-      time = r(3, 20);
-    return answer(
-      `An empty ${rate * time} L tank fills at ${rate} L/min. How many minutes does it take?`,
-      time,
-      "min",
-      [
-        `Time = capacity ÷ rate.`,
-        `${rate * time} ÷ ${rate} = ${time} minutes.`,
-      ],
-      diagram("rate", [rate * time, rate], {
-        labels: [`Capacity: ${rate * time} L`, `Rate: ${rate} L/min`],
-      }),
-    );
-  },
-  (seed) => {
-    const r = random(seed)(3, 18);
-    return answer(
-      "Find the diameter.",
-      2 * r,
-      "cm",
-      [`Diameter is twice the radius: 2 × ${r} = ${2 * r}.`],
-      diagram("circle", [r], { variant: "radius" }),
-    );
-  },
-  (seed) => circle(seed, "circumference"),
-  (seed) => circle(seed, "area"),
-  (seed) => {
-    const r = random(seed)(2, 18),
-      a = rounded(3.14 * r * r);
-    return answer(
-      `A circle has area ${a} cm². Use π = 3.14. Find its radius.`,
-      r,
-      "cm",
-      [
-        `Radius squared = ${a} ÷ 3.14 = ${r * r}.`,
-        `Take the positive square root: ${r} cm.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed)(3, 15);
-    return answer(
-      "Find the complete perimeter of this semicircle. Use π = 3.14.",
-      3.14 * r + 2 * r,
-      "cm",
-      [
-        `Curved edge = πr = ${rounded(3.14 * r)} cm.`,
-        `Add the diameter ${2 * r} cm.`,
-      ],
-      diagram("circle", [2 * r], { variant: "semicircle" }),
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      outer = r(8, 16),
-      inner = r(2, 6);
-    return answer(
-      "Find the area of the ring. Use π = 3.14.",
-      3.14 * (outer * outer - inner * inner),
-      "m²",
-      [
-        `Outer area: 3.14 × ${outer}².`,
-        `Subtract inner area: 3.14 × ${inner}².`,
-        `Ring area = ${rounded(3.14 * (outer * outer - inner * inner))} m².`,
-      ],
-      diagram("circle", [outer, inner], { variant: "ring" }),
-    );
-  },
-  (seed) => {
-    const k = random(seed)(1, 8);
-    return answer(
-      "What is the length of the hypotenuse?",
-      5 * k,
-      "cm",
-      [
-        "The hypotenuse is opposite the right angle.",
-        "It is the longest side.",
-      ],
-      diagram("rightTriangle", [3 * k, 4 * k, 5 * k], { unknown: "height" }),
-    );
-  },
-  (seed) => {
-    const k = random(seed)(1, 8);
-    return answer(
-      `A right triangle has shorter sides ${3 * k} cm and ${4 * k} cm. What is the area of the square on its hypotenuse?`,
-      25 * k * k,
-      "cm²",
-      [`Add the two smaller squares: ${3 * k}² + ${4 * k}² = ${25 * k * k}.`],
-      diagram("rightTriangle", [3 * k, 4 * k, 5 * k], {
-        unknown: "hypotenuse",
-      }),
-    );
-  },
-  (seed) => triangle(seed, false),
-  (seed) => triangle(seed, true),
-  (seed) => {
-    const k = random(seed)(1, 5);
-    return answer(
-      `A ladder reaches ${4 * k} m up a wall; its foot is ${3 * k} m from the wall. How long is it?`,
-      5 * k,
-      "m",
-      [
-        `Ladder² = ${3 * k}² + ${4 * k}² = ${25 * k * k}.`,
-        `Take the square root: ${5 * k} m.`,
-      ],
-      diagram("rightTriangle", [3 * k, 4 * k, 5 * k], {
-        unknown: "hypotenuse",
-        unit: "m",
-        variant: "ladder",
-      }),
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      k = r(1, 8),
-      valid = seed % 2 === 0,
-      c = 5 * k + (valid ? 0 : 1);
-    return {
-      prompt: `Can ${3 * k}, ${4 * k} and ${c} be the sides of a right triangle? Type yes or no.`,
-      answer: valid ? "Yes" : "No",
-      steps: [
-        `Compare ${3 * k}² + ${4 * k}² = ${25 * k * k} with ${c}² = ${c * c}.`,
-        valid
-          ? "They match, so these form a right triangle."
-          : "They differ, so these do not form a right triangle.",
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(-8, 5),
-      b = a + r(1, 6),
-      time = r(5, 15);
-    return answer(
-      `It is ${time}:00 in zone A (UTC${a >= 0 ? "+" : ""}${a}). What hour is it in zone B (UTC${b >= 0 ? "+" : ""}${b})? Use 24-hour time; enter the hour only.`,
-      time + b - a,
-      "h",
-      [
-        `Zone B is ${b - a} hours ahead.`,
-        `Add ${b - a} hours: ${time + b - a}:00.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      depart = r(4, 10),
-      duration = r(2, 6),
-      offset = r(1, 5),
-      arrive = depart + duration + offset;
-    return answer(
-      `Depart at ${depart}:00 in A. Arrive at ${arrive}:00 in B, ${offset} hours ahead. Same date. How long was the flight?`,
-      duration,
-      "h",
-      [
-        `Convert arrival to A time: ${arrive - offset}:00.`,
-        `Subtract departure: ${duration} hours.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      hour = r(18, 23),
-      offset = r(3, 8),
-      total = hour + offset;
-    return answer(
-      `At Monday ${hour}:00 in A, B is ${offset} hours ahead. How many hours after midnight is it in B?`,
-      total % 24,
-      "h",
-      [
-        `Add the offset: ${hour} + ${offset} = ${total}.`,
-        total >= 24
-          ? `Subtract 24: Tuesday ${total % 24}:00.`
-          : `It is still Monday, ${total}:00.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      n = r(3, 15),
-      t = r(2, 8);
-    return answer(
-      `A tap supplies ${n * t} L in ${t} minutes. What is its flow rate?`,
-      n,
-      "L/min",
-      [`Divide volume by time: ${n * t} ÷ ${t} = ${n} L/min.`],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      speed = r(4, 12) * 10,
-      time = r(2, 6);
-    return answer(
-      `Travel at ${speed} km/h for ${time} hours. How far do you travel?`,
-      speed * time,
-      "km",
-      [`Distance = speed × time.`, `${speed} × ${time} = ${speed * time} km.`],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      fuel = r(4, 12),
-      distance = r(2, 8) * 100;
-    return answer(
-      `A vehicle uses ${(fuel * distance) / 100} L over ${distance} km. What is its consumption in L per 100 km?`,
-      fuel,
-      "L/100 km",
-      [
-        `Divide by ${distance / 100}, the number of 100 km blocks.`,
-        `Consumption = ${fuel} L/100 km.`,
-      ],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      scale = r(2, 8) * 10000,
-      length = r(2, 12);
-    return answer(
-      `A map uses scale 1:${scale}. A route is ${length} cm on the map. What is its real length in km?`,
-      (scale * length) / 100000,
-      "km",
-      [
-        `Real centimetres: ${length} × ${scale}.`,
-        "Divide by 100,000 to convert cm to km.",
-      ],
-      diagram("model", [scale, length], {
-        variant: "map",
-        labels: [`Scale 1:${scale}`, `Map route ${length} cm`],
-      }),
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      a = r(1, 5),
-      b = r(2, 7),
-      k = r(2, 8);
-    return answer(
-      `Mix A and B in ratio ${a}:${b}. You use ${a * k} L of A. How much B is needed?`,
-      b * k,
-      "L",
-      [`Scale factor: ${a * k} ÷ ${a} = ${k}.`, `B: ${b} × ${k} = ${b * k} L.`],
-    );
-  },
-  (seed) => {
-    const r = random(seed),
-      rate = r(2, 8),
-      target = r(10, 50);
-    return answer(
-      `One tile covers ${rate} m². How many whole tiles cover at least ${target} m²? Ignore cutting waste.`,
-      Math.ceil(target / rate),
-      "tiles",
-      [
-        `Divide: ${target} ÷ ${rate} = ${rounded(target / rate)}.`,
-        `Round up to ${Math.ceil(target / rate)} whole tiles so coverage is sufficient.`,
-      ],
-    );
-  },
-  (seed) => composite(seed, true),
-  (seed) => {
-    const r = random(seed),
-      speed = r(3, 10) * 10,
-      time = r(2, 8) * 15;
-    return answer(
-      `Travel for ${time} minutes at ${speed} km/h. How far do you travel?`,
-      (speed * time) / 60,
-      "km",
-      [
-        `Convert time: ${time}/60 hours.`,
-        `Distance = ${speed} × ${time}/60 = ${(speed * time) / 60} km.`,
-      ],
-    );
-  },
-  (seed) => triangle(seed, true),
+
+// Level 8 Measurement (AC9M8M01–M07). Each lesson draws from several question forms covering
+// fluency, reasoning and problem-solving, modelled on the Year 8 Victorian Curriculum textbook
+// (Essential Mathematics VCE 8, Ch 4 and Ch 6). The seed picks the form and its values.
+
+type R = (min: number, max: number) => number;
+type Form = (r: R) => QuestionDraft;
+const pickForm = (forms: Form[]): LessonFactory => (seed) => { const r = random(seed); return forms[r(0, forms.length - 1)](r); };
+const choose = <T,>(r: R, items: readonly T[]) => items[r(0, items.length - 1)];
+const fmt = (n: number) => String(rounded(n, 6));
+const money = (n: number) => `$${Number.isInteger(n) ? n.toLocaleString("en-AU") : n.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const PI = Math.PI;
+/** “a” or “an” before a number, by how it is said (an 8, an 11, an 18, an 80). */
+const an = (n: number | string) => (/^(8|11|18|8\d|8\d\d)(\D|$)/.test(String(n)) ? "an" : "a");
+const coprimeTo = (a: number, b: number) => { let x = a, y = b; while (y) [x, y] = [y, x % y]; return x === 1; };
+const An = (n: number | string) => (an(n) === "an" ? "An" : "A");
+
+const diagram = (task: Measurement8Visual["task"], values: number[], extra: Partial<Measurement8Visual> = {}): Measurement8Visual => ({ type: "measurement_year8_panel", task, values, description: "Use the labelled measurements. Diagram not to scale.", unit: "cm", ...extra });
+const q = (prompt: string, answer: number | string, unit: string | undefined, steps: string[], extra: Partial<QuestionDraft> = {}): QuestionDraft => ({ prompt, answer: typeof answer === "number" ? rounded(answer, 4) : answer, unit, steps, ...extra });
+const withVisual = (v: Measurement8Visual): Partial<QuestionDraft> => ({ measurementVisual: v });
+
+// ── Week 1: composite perimeter and area (M01) ────────────────────────────────
+const LENGTH_UNITS = [["mm", 1], ["cm", 10], ["m", 1000], ["km", 1000000]] as const;
+const AREA_UNITS = [["mm²", 1], ["cm²", 100], ["m²", 1000000], ["ha", 10000000000], ["km²", 1000000000000]] as const;
+const w1l1: Form[] = [
+  (r) => { const l = r(6, 20), w = r(3, l - 1), P = 2 * (l + w); return q(`A rectangle has a perimeter of ${P} m and a length of ${l} m. What is its width?`, w, "m", [`Two lengths: 2 × ${l} = ${2 * l} m.`, `The two widths share the rest: (${P} − ${2 * l}) ÷ 2 = ${w} m.`]); },
+  (r) => { const base = r(4, 14), side = r(Math.ceil(base / 2) + 1, 18), P = 2 * side + base; return q(`An isosceles triangle has a base of ${base} cm and a perimeter of ${P} cm. How long is each equal side?`, side, "cm", [`Take away the base: ${P} − ${base} = ${P - base} cm.`, `Two equal sides share it: ${P - base} ÷ 2 = ${side} cm.`]); },
+  (r) => { const [from, f] = choose(r, LENGTH_UNITS), others = LENGTH_UNITS.filter(([u]) => u !== from && Math.abs(Math.log10(f) - Math.log10(LENGTH_UNITS.find(([x]) => x === u)![1])) <= 3), [to, t] = choose(r, others), v = rounded(r(11, 9999) / (r(0, 1) ? 10 : 100), 2); return q(`Convert ${fmt(v)} ${from} to ${to}.`, rounded((v * f) / t, 6), to, [`1 ${f > t ? from : to} = ${fmt(Math.max(f, t) / Math.min(f, t))} ${f > t ? to : from}.`, `${f > t ? "Multiply" : "Divide"} by ${fmt(Math.max(f, t) / Math.min(f, t))}: ${fmt(rounded((v * f) / t, 6))} ${to}.`]); },
+  (r) => { const pairs = [[0, 1], [1, 2], [2, 3]] as const, [i, j] = choose(r, pairs), big = r(0, 1) === 1, [u1, f1] = AREA_UNITS[big ? j : i], [u2, f2] = AREA_UNITS[big ? i : j], ratio = AREA_UNITS[j][1] / AREA_UNITS[i][1], v = big ? rounded(r(2, 90) / (r(0, 1) ? 10 : 1), 1) : r(2, 90) * ratio / (r(0, 1) ? 10 : 1); return q(`Convert ${fmt(v)} ${u1} to ${u2}.`, rounded((v * f1) / f2, 6), u2, [`1 ${AREA_UNITS[j][0]} = ${(AREA_UNITS[j][1] / AREA_UNITS[i][1]).toLocaleString("en-AU")} ${AREA_UNITS[i][0]}. Area conversions use the square of the length factor.`, `${big ? "Multiply" : "Divide"}: ${fmt(rounded((v * f1) / f2, 6))} ${u2}.`]); },
+  (r) => { const s = rounded(r(11, 95) / 10, 1); return q(`A square has an area of ${fmt(rounded(s * s, 2))} m². What is its side length?`, s, "m", ["Side length = √area.", `√${fmt(rounded(s * s, 2))} = ${s} m.`]); },
+  (r) => { const tri = r(0, 1) === 1, b = r(4, 16), h = r(3, 14), A = tri ? (b * h) / 2 : b * h; return tri ? q(`A triangle has an area of ${fmt(A)} cm² and a base of ${b} cm. What is its perpendicular height?`, h, "cm", ["Area = ½ × base × height, so height = 2 × area ÷ base.", `2 × ${fmt(A)} ÷ ${b} = ${h} cm.`]) : q(`A parallelogram has an area of ${A} m² and a base of ${b} m. What is its perpendicular height?`, h, "m", ["Area = base × height, so height = area ÷ base.", `${A} ÷ ${b} = ${h} m.`]); },
 ];
-function composite(seed: number, area: boolean): QuestionDraft {
-  const r = random(seed),
-    w = r(12, 24),
-    h = r(9, 16),
-    a = r(3, 7),
-    b = r(2, 6);
-  return answer(
-    area
-      ? "Find the area of this L-shaped garden."
-      : "Find its perimeter; include every outside edge.",
-    area ? w * h - a * b : 2 * (w + h),
-    area ? "m²" : "m",
-    area
-      ? [
-          `Start with ${w} × ${h} = ${w * h}.`,
-          `Remove the missing rectangle ${a} × ${b} = ${a * b}.`,
-        ]
-      : [
-          "The horizontal edges total twice the full width.",
-          "The vertical edges total twice the full height.",
-          `Perimeter = 2 × (${w} + ${h}) = ${2 * (w + h)}.`,
-        ],
-    diagram("composite", [w, h, a, b]),
-  );
-}
-function grid(seed: number, cell: number): QuestionDraft {
-  const r = random(seed),
-    full = r(15, 40),
-    partial = r(4, 16) * 2;
-  return {
-    prompt: `An outline covers ${full} full grid squares and ${partial} partial squares. Count each partial square as half. Each square is ${cell} m². Estimate the area.`,
-    answer: (full + partial / 2) * cell,
-    unit: "m²",
-    steps: [
-      `Equivalent full squares: ${full} + ${partial} ÷ 2 = ${full + partial / 2}.`,
-      `Multiply by ${cell} m² per square.`,
-    ],
-    visual: table(
-      "Grid count",
-      ["Squares", "Count", "Area each"],
-      [
-        ["Full", full, `${cell} m²`],
-        ["Partial", partial, `estimate ${cell / 2} m²`],
-      ],
-    ),
-  };
-}
-function prism(seed: number, litres: boolean): QuestionDraft {
-  const r = random(seed),
-    a = r(2, 8) * 10,
-    b = r(2, 6) * 10,
-    c = r(2, 8) * 10;
-  return answer(
-    litres
-      ? "Find the capacity of this rectangular tank in litres."
-      : "Find the volume of this rectangular prism.",
-    (a * b * c) / (litres ? 1000 : 1),
-    litres ? "L" : "cm³",
-    [
-      `Volume = ${a} × ${b} × ${c} = ${a * b * c} cm³.`,
-      litres
-        ? "Divide by 1000 to find litres."
-        : "Write the volume in cubic centimetres.",
-    ],
-    diagram("prism", [a, b, c]),
-  );
-}
-function circle(seed: number, mode: "area" | "circumference"): QuestionDraft {
-  const r = random(seed)(2, 20),
-    n = mode === "area" ? 3.14 * r * r : 2 * 3.14 * r;
-  return answer(
-    `Find the ${mode}. Use π = 3.14.`,
-    n,
-    mode === "area" ? "cm²" : "cm",
-    [
-      mode === "area"
-        ? `Area = πr² = 3.14 × ${r}².`
-        : `Circumference = 2πr = 2 × 3.14 × ${r}.`,
-    ],
-    diagram("circle", [r], { variant: "radius" }),
-  );
-}
-function triangle(seed: number, short: boolean): QuestionDraft {
-  const k = random(seed)(1, 9);
-  return answer(
-    short ? "Find the missing shorter side." : "Find the hypotenuse.",
-    (short ? 4 : 5) * k,
-    "cm",
-    short
-      ? [
-          `Missing side² = ${5 * k}² − ${3 * k}² = ${16 * k * k}.`,
-          `Take its square root: ${4 * k} cm.`,
-        ]
-      : [
-          `Hypotenuse² = ${3 * k}² + ${4 * k}² = ${25 * k * k}.`,
-          `Take its square root: ${5 * k} cm.`,
-        ],
-    diagram("rightTriangle", [3 * k, 4 * k, 5 * k], {
-      unknown: short ? "height" : "hypotenuse",
-    }),
-  );
-}
+
+const lshape = (r: R) => { const w = r(12, 24), h = r(9, 16), cw = r(3, 7), ch = r(2, 6); return { w, h, cw, ch }; };
+const w1l2: Form[] = [
+  (r) => { const { w, h, cw, ch } = lshape(r); return q("Find the perimeter of this L-shaped garden.", 2 * (w + h), "m", ["The two top steps add up to the full width, and the two right steps add up to the full height.", `Perimeter = 2 × (${w} + ${h}) = ${2 * (w + h)} m.`], withVisual(diagram("composite", [w, h, cw, ch]))); },
+  (r) => { const w = 2 * r(7, 12), h = r(8, 14), cw = 2 * r(2, 4), ch = r(2, 5); return q("Find the perimeter of this shape with a notch cut into the top.", 2 * w + 2 * h + 2 * ch, "m", ["Add every outside edge, including the two inward edges of the notch.", `2 × ${w} + 2 × ${h} + 2 × ${ch} = ${2 * w + 2 * h + 2 * ch} m.`], withVisual(diagram("composite", [w, h, cw, ch], { variant: "notch" }))); },
+  (r) => { const l = r(4, 9) * 10 + 5, w = r(2, 6) * 10 + 5, f = r(3, 8); return q(`${An(l)} ${l} cm by ${w} cm picture has a frame ${f} cm wide all the way around. What is the outside perimeter of the frame?`, 2 * (l + 2 * f + w + 2 * f), "cm", [`Outside length: ${l} + 2 × ${f} = ${l + 2 * f} cm. Outside width: ${w} + 2 × ${f} = ${w + 2 * f} cm.`, `Perimeter = 2 × (${l + 2 * f} + ${w + 2 * f}) = ${2 * (l + 2 * f + w + 2 * f)} cm.`]); },
+  (r) => { const l = r(20, 60), w = r(15, 45), c = r(9, 24); return q(`A rectangular block is ${l} m by ${w} m. Fencing costs ${money(c)} per metre. What is the cost to fence the whole block?`, 2 * (l + w) * c, "$", [`Perimeter: 2 × (${l} + ${w}) = ${2 * (l + w)} m.`, `${2 * (l + w)} × ${money(c)} = ${money(2 * (l + w) * c)}.`]); },
+  (r) => { const h = r(140, 190), kind = r(0, 1); return q(`A height is recorded as ${h} cm, measured to the nearest centimetre. What is the ${kind ? "largest" : "smallest"} the actual height could be?`, kind ? h + 0.5 : h - 0.5, "cm", ["A measurement to the nearest centimetre could be up to 0.5 cm either side.", `${kind ? "Largest" : "Smallest"}: ${h} ${kind ? "+" : "−"} 0.5 = ${kind ? h + 0.5 : h - 0.5} cm (the upper limit itself would round up).`]); },
+];
+
+const w1l3: Form[] = [
+  (r) => { const { w, h, cw, ch } = lshape(r); return q("Find the area of this L-shaped garden.", w * h - cw * ch, "m²", [`Whole rectangle: ${w} × ${h} = ${w * h} m².`, `Subtract the missing corner: ${cw} × ${ch} = ${cw * ch} m². Area = ${w * h - cw * ch} m².`], withVisual(diagram("composite", [w, h, cw, ch]))); },
+  (r) => { const w = 2 * r(3, 7), h = r(3, 6), rf = r(2, 5); return q("Find the area of the front of this shed.", w * h + (w * rf) / 2, "m²", [`Rectangle: ${w} × ${h} = ${w * h} m². Triangle: ½ × ${w} × ${rf} = ${(w * rf) / 2} m².`, `Total: ${w * h + (w * rf) / 2} m².`], withVisual(diagram("house", [w, h, rf]))); },
+  (r) => { const L = r(10, 25), W = r(6, 15), p = choose(r, [1, 1.5, 2]); return q(`${An(L)} ${L} m by ${W} m lawn has a path ${p} m wide built all around its outside. What is the area of the path?`, rounded((L + 2 * p) * (W + 2 * p) - L * W, 2), "m²", [`Outer rectangle: ${fmt(L + 2 * p)} × ${fmt(W + 2 * p)} = ${fmt(rounded((L + 2 * p) * (W + 2 * p), 2))} m².`, `Subtract the lawn ${L * W} m²: ${fmt(rounded((L + 2 * p) * (W + 2 * p) - L * W, 2))} m².`]); },
+  (r) => { const w = 2 * r(7, 12), h = r(8, 14), cw = 2 * r(2, 4), ch = r(2, 5); return q("Find the area of this shape with a notch cut into the top.", w * h - cw * ch, "m²", [`Whole rectangle: ${w} × ${h} = ${w * h} m².`, `Subtract the notch: ${cw} × ${ch} = ${cw * ch} m². Area = ${w * h - cw * ch} m².`], withVisual(diagram("composite", [w, h, cw, ch], { variant: "notch" }))); },
+  (r) => { const l = rounded(r(40, 80) / 10, 1), h = choose(r, [2.4, 2.7, 3]), cover = 10, price = r(10, 18), litres = Math.ceil((2 * l * h) / cover); return q(`A wall is ${l} m long and ${h} m high and needs two coats of paint. One litre covers ${cover} m² and paint is sold in whole litres at ${money(price)} each. What is the cost of the paint?`, litres * price, "$", [`Area for two coats: 2 × ${l} × ${h} = ${fmt(rounded(2 * l * h, 2))} m², needing ${fmt(rounded((2 * l * h) / cover, 3))} L.`, `Round up to ${litres} L: ${litres} × ${money(price)} = ${money(litres * price)}.`], withVisual(diagram("rate", [l, h], { variant: "paint", labels: [`Wall: ${l} m × ${h} m`, "Two coats"] }))); },
+];
+
+// ── Week 2: irregular areas and practical plans (M01) ─────────────────────────
+const w2l1: Form[] = [
+  (r) => { const cell = choose(r, [1, 4, 0.25, 100]), unit = cell === 100 ? "m²" : "m²", full = r(15, 40), partial = r(4, 16) * 2; return q(`An outline on a grid covers ${full} full squares and ${partial} partial squares. Count each partial square as half. Each square is ${fmt(cell)} ${unit}. Estimate the area.`, (full + partial / 2) * cell, unit, [`Equivalent full squares: ${full} + ${partial} ÷ 2 = ${full + partial / 2}.`, `× ${fmt(cell)} ${unit} = ${fmt((full + partial / 2) * cell)} ${unit}.`], { visual: table("Grid count", ["Squares", "Count", "Counts as"], [["Full", full, "1 each"], ["Partial", partial, "½ each"]]) }); },
+  (r) => { const full = r(6, 20), partial = r(2, 8) * 2, ha = full + partial / 2; return q(`A map of a paddock uses grid squares that each represent 100 m × 100 m (1 hectare). The paddock covers ${full} full squares and ${partial} partial squares. Estimate its area in hectares.`, ha, "ha", ["Each square is 1 ha. Count partial squares as half.", `${full} + ${partial} ÷ 2 = ${ha} ha.`]); },
+  (r) => { const widths = Array.from({ length: 5 }, () => r(8, 30)), gap = choose(r, [5, 10, 20]); return q(`A lake is measured with five strips, each ${gap} m wide. The strip lengths are in the table. Estimate the lake’s area.`, widths.reduce((s, v) => s + v, 0) * gap, "m²", ["Each strip is about a rectangle: length × strip width.", `(${widths.join(" + ")}) × ${gap} = ${widths.reduce((s, v) => s + v, 0) * gap} m².`], { visual: table("Strip measurements", ["Strip", "Length (m)"], widths.map((v, i) => [String(i + 1), v])) }); },
+  () => q("A shape is estimated with a 1 cm grid and again with a 1 mm grid. Which grid gives the more accurate area estimate?", "1 mm grid", undefined, ["Smaller squares fit the curved edge more closely.", "Fewer part squares are guessed, so the 1 mm grid is more accurate."], { choices: ["1 cm grid", "1 mm grid"] }),
+  (r) => { const ha = rounded(r(15, 90) / 10, 1), rate = choose(r, [20, 25, 40, 50]); return q(`A paddock has an area of ${ha} ha. Seed is spread at ${rate} kg per hectare. How much seed is needed?`, rounded(ha * rate, 2), "kg", ["Seed needed = area × rate.", `${ha} × ${rate} = ${fmt(rounded(ha * rate, 2))} kg.`]); },
+];
+
+const w2l2: Form[] = [
+  (r) => { const fullC = r(10, 20), partC = r(4, 10) * 2, fullF = 4 * fullC + r(4, 12), partF = r(4, 10) * 2; return q(`A garden bed is estimated on two grids. A 1 m grid gives ${fullC} full and ${partC} partial squares. A 0.5 m grid (0.25 m² squares) gives ${fullF} full and ${partF} partial squares. Using half for partial squares, what is the estimate from the finer grid?`, (fullF + partF / 2) * 0.25, "m²", [`Finer grid: ${fullF} + ${partF} ÷ 2 = ${fullF + partF / 2} squares.`, `× 0.25 m² = ${fmt((fullF + partF / 2) * 0.25)} m². The finer grid is the better estimate.`]); },
+  (r) => { const a = rounded(r(300, 900) / 10, 1), b = rounded(a - r(5, 40) / 10, 1); return q(`A coarse grid estimates an area as ${a} m². A finer grid estimates it as ${b} m². By how much did the estimate change?`, rounded(a - b, 1), "m²", [`${a} − ${b}.`, `= ${fmt(rounded(a - b, 1))} m².`]); },
+  (r) => { const mm2 = r(500, 9999); return q(`An area is estimated as ${mm2.toLocaleString("en-AU")} mm². Write it in cm².`, rounded(mm2 / 100, 2), "cm²", ["1 cm² = 10 mm × 10 mm = 100 mm².", `${mm2} ÷ 100 = ${fmt(rounded(mm2 / 100, 2))} cm².`]); },
+  (r) => { const segs = Array.from({ length: 5 }, () => rounded(r(15, 95) / 10, 1)), mmSeg = r(12, 60); return q(`The boundary of an irregular shape is measured in pieces: ${segs.join(" cm, ")} cm and ${mmSeg} mm. What is its perimeter in centimetres?`, rounded(segs.reduce((s, v) => s + v, 0) + mmSeg / 10, 2), "cm", [`Convert ${mmSeg} mm to ${fmt(mmSeg / 10)} cm.`, `Add every piece: ${fmt(rounded(segs.reduce((s, v) => s + v, 0) + mmSeg / 10, 2))} cm.`]); },
+  (r) => { const widths = Array.from({ length: 8 }, () => r(6, 24)), gap = 5; return q(`A pond is measured with eight strips, each ${gap} m wide. Use the table to estimate its area.`, widths.reduce((s, v) => s + v, 0) * gap, "m²", ["More, narrower strips give a closer estimate.", `(${widths.join(" + ")}) × ${gap} = ${widths.reduce((s, v) => s + v, 0) * gap} m².`], { visual: table("Strip measurements", ["Strip", "Length (m)"], widths.map((v, i) => [String(i + 1), v])) }); },
+];
+
+const PERIM_OR_AREA = [["edging around a garden bed", "Perimeter"], ["carpet for a bedroom floor", "Area"], ["skirting board around a room", "Perimeter"], ["turf to cover a backyard", "Area"], ["fencing for a paddock", "Perimeter"], ["tiles for a bathroom wall", "Area"], ["lace for the edge of a tablecloth", "Perimeter"], ["fertiliser for a sports oval", "Area"]] as const;
+const w2l3: Form[] = [
+  (r) => { const [task, answer] = choose(r, PERIM_OR_AREA); return q(`To work out the ${task}, do you need the perimeter or the area?`, answer, undefined, [answer === "Perimeter" ? "It runs along the edge, so it is a length." : "It covers the surface, so it is an area.", `Use the ${answer.toLowerCase()}.`], { choices: ["Perimeter", "Area"] }); },
+  (r) => { const l = rounded(r(30, 70) / 10, 1), w = rounded(r(25, 50) / 10, 1), c = r(35, 80); return q(`A bedroom floor is ${l} m by ${w} m. Carpet costs ${money(c)} per m². What does it cost to carpet the floor?`, rounded(l * w * c, 2), "$", [`Area: ${l} × ${w} = ${fmt(rounded(l * w, 2))} m².`, `× ${money(c)} = ${money(rounded(l * w * c, 2))}.`]); },
+  (r) => { const l = rounded(r(30, 70) / 10, 1), w = rounded(r(25, 50) / 10, 1), door = 0.9; return q(`Skirting board goes around a ${l} m by ${w} m room, except across a ${door} m doorway. How much skirting board is needed?`, rounded(2 * (l + w) - door, 2), "m", [`Perimeter: 2 × (${l} + ${w}) = ${fmt(rounded(2 * (l + w), 2))} m.`, `Leave out the doorway: ${fmt(rounded(2 * (l + w) - door, 2))} m.`]); },
+  (r) => { const l = r(8, 20), w = r(5, 14), roll = choose(r, [1, 1.5, 2]); return q(`${An(l)} ${l} m by ${w} m backyard is to be covered with turf. Each roll covers ${roll} m². How many whole rolls are needed?`, Math.ceil((l * w) / roll), "rolls", [`Area: ${l * w} m². ${l * w} ÷ ${roll} = ${fmt(rounded((l * w) / roll, 3))}.`, `Round up so the whole yard is covered: ${Math.ceil((l * w) / roll)} rolls.`]); },
+  (r) => { const post = choose(r, [2, 3, 4]), l = post * r(4, 10), w = post * r(3, 7); return q(`${An(l)} ${l} m by ${w} m garden is to be fenced with a post every ${post} m around the edge, including one at each corner. How many posts are needed?`, (2 * (l + w)) / post, "posts", [`Perimeter: 2 × (${l} + ${w}) = ${2 * (l + w)} m.`, `Around a closed loop the number of posts equals the number of gaps: ${2 * (l + w)} ÷ ${post} = ${(2 * (l + w)) / post}.`]); },
+];
+
+// ── Weeks 3–4: volume and capacity of right prisms (M02) ──────────────────────
+const VOL_CONV = [["cm³", "L", 0.001], ["L", "cm³", 1000], ["mL", "cm³", 1], ["L", "mL", 1000], ["kL", "L", 1000], ["m³", "L", 1000], ["m³", "kL", 1], ["L", "kL", 0.001]] as const;
+const w3l1: Form[] = [
+  (r) => { const [a, b, f] = choose(r, VOL_CONV), v = f < 1 ? r(2, 90) * 50 : rounded(r(5, 95) / 10, 1); return q(`Convert ${fmt(v)} ${a} to ${b}.`, rounded(v * f, 6), b, [a === "m³" ? "1 m³ = 1000 L = 1 kL." : a === "mL" || b === "mL" ? "1 mL = 1 cm³ and 1 L = 1000 mL." : "1 L = 1000 cm³ and 1 kL = 1000 L.", `${fmt(v)} ${a} = ${fmt(rounded(v * f, 6))} ${b}.`]); },
+  (r) => { const l = r(2, 8) * 10, w = r(2, 6) * 10, h = r(2, 8) * 10; return q("Find the capacity of this rectangular container in litres.", (l * w * h) / 1000, "L", [`Volume: ${l} × ${w} × ${h} = ${(l * w * h).toLocaleString("en-AU")} cm³.`, `1000 cm³ = 1 L, so ${fmt((l * w * h) / 1000)} L.`], withVisual(diagram("prism", [l, w, h]))); },
+  (r) => { const s = choose(r, [0.5, 1, 1.2, 1.5, 2]); return q(`A cube-shaped tank has side length ${s} m and is full of water. 1 L of water has a mass of 1 kg. What is the mass of the water?`, rounded(s ** 3 * 1000, 2), "kg", [`Volume: ${s}³ = ${fmt(rounded(s ** 3, 3))} m³ = ${fmt(rounded(s ** 3 * 1000, 2))} L.`, `Each litre is 1 kg, so ${fmt(rounded(s ** 3 * 1000, 2))} kg.`]); },
+  () => q("How many cubic centimetres are in 1 cubic metre?", 1000000, "cm³", ["1 m = 100 cm, so 1 m³ = 100 × 100 × 100 cm³.", "= 1 000 000 cm³."]),
+  (r) => { const l = r(2, 6), w = r(2, 5), h = choose(r, [0.5, 1, 1.5, 2]); return q(`A pool is ${l} m long, ${w} m wide and ${h} m deep. What is its capacity in kilolitres?`, rounded(l * w * h, 3), "kL", [`Volume: ${l} × ${w} × ${h} = ${fmt(rounded(l * w * h, 3))} m³.`, `1 m³ = 1 kL, so ${fmt(rounded(l * w * h, 3))} kL.`]); },
+];
+
+const w3l2: Form[] = [
+  (r) => { const l = r(3, 15), w = r(2, 10), h = r(2, 12), unit = choose(r, ["cm", "m"]); return q("Find the volume of this rectangular prism.", l * w * h, `${unit}³`, ["V = length × width × height.", `${l} × ${w} × ${h} = ${l * w * h} ${unit}³.`], withVisual(diagram("prism", [l, w, h], { unit }))); },
+  (r) => { const b = 2 * r(2, 7), ht = r(3, 10), len = r(5, 20); return q("Find the volume of this triangular prism.", (b * ht * len) / 2, "cm³", [`Area of the triangular end: ½ × ${b} × ${ht} = ${(b * ht) / 2} cm².`, `V = A × length = ${(b * ht) / 2} × ${len} = ${(b * ht * len) / 2} cm³.`], withVisual(diagram("prism", [b, ht, len], { variant: "triangular" }))); },
+  (r) => { const A = r(6, 60), h = r(3, 20), unit = choose(r, ["cm", "m", "mm"]); return q(`A prism has a cross-sectional area of ${A} ${unit}² and a length of ${h} ${unit}. Find its volume.`, A * h, `${unit}³`, ["For any right prism, V = area of cross-section × length.", `${A} × ${h} = ${A * h} ${unit}³.`]); },
+  (r) => { const { w, h, cw, ch } = lshape(r), len = r(4, 9); return q(`This L-shape is the floor plan of a warehouse with walls ${len} m high. Find the volume of air inside.`, (w * h - cw * ch) * len, "m³", [`Cross-section: ${w} × ${h} − ${cw} × ${ch} = ${w * h - cw * ch} m².`, `× ${len} m = ${(w * h - cw * ch) * len} m³.`], withVisual(diagram("composite", [w, h, cw, ch]))); },
+  (r) => { const w = 2 * r(2, 4), h = r(2, 4), rf = r(1, 3), len = r(4, 10); return q(`This shape is the front of a shed that is ${len} m long. Find the volume of air inside the shed.`, (w * h + (w * rf) / 2) * len, "m³", [`Front area: ${w} × ${h} + ½ × ${w} × ${rf} = ${w * h + (w * rf) / 2} m².`, `× ${len} m = ${(w * h + (w * rf) / 2) * len} m³.`], withVisual(diagram("house", [w, h, rf]))); },
+];
+
+const w3l3: Form[] = [
+  w3l1[1],
+  (r) => { const b = 2 * r(10, 25), ht = r(10, 30), len = r(5, 15) * 10; return q("This trough is a triangular prism. Find its capacity in litres.", (b * ht * len) / 2000, "L", [`Volume: ½ × ${b} × ${ht} × ${len} = ${((b * ht * len) / 2).toLocaleString("en-AU")} cm³.`, `÷ 1000 = ${fmt((b * ht * len) / 2000)} L.`], withVisual(diagram("prism", [b, ht, len], { variant: "triangular" }))); },
+  (r) => { const a = [r(2, 6) * 10, r(2, 5) * 10, r(2, 6) * 10], b = [r(2, 6) * 10, r(2, 5) * 10, r(2, 6) * 10], va = a[0] * a[1] * a[2], vb = b[0] * b[1] * b[2]; if (va === vb) b[2] += 10; const vb2 = b[0] * b[1] * b[2]; return q(`Container A is ${a.join(" cm × ")} cm. Container B is ${b.join(" cm × ")} cm. How many more litres does the larger container hold?`, Math.abs(va - vb2) / 1000, "L", [`A: ${fmt(va / 1000)} L. B: ${fmt(vb2 / 1000)} L.`, `Difference: ${fmt(Math.abs(va - vb2) / 1000)} L.`]); },
+  w3l1[4],
+  (r) => { const tank = r(3, 12) * 10, bottle = choose(r, [250, 375, 500, 600, 750]); return q(`${An(tank)} ${tank} L tank is used to fill ${bottle} mL bottles. How many bottles can be completely filled?`, Math.floor((tank * 1000) / bottle), "bottles", [`${tank} L = ${(tank * 1000).toLocaleString("en-AU")} mL. ${tank * 1000} ÷ ${bottle} = ${fmt(rounded((tank * 1000) / bottle, 3))}.`, `Only full bottles count: ${Math.floor((tank * 1000) / bottle)}.`]); },
+];
+
+const w4l1: Form[] = [
+  (r) => { const l = r(4, 15), w = r(3, 10), h = r(2, 12); return q(`A rectangular prism has a volume of ${l * w * h} cm³, a length of ${l} cm and a width of ${w} cm. What is its height?`, h, "cm", [`Base area: ${l} × ${w} = ${l * w} cm².`, `Height = ${l * w * h} ÷ ${l * w} = ${h} cm.`]); },
+  (r) => { const A = r(8, 60), h = r(3, 15); return q(`A prism has a cross-sectional area of ${A} cm² and a volume of ${A * h} cm³. What is its length?`, h, "cm", ["Length = volume ÷ cross-sectional area.", `${A * h} ÷ ${A} = ${h} cm.`]); },
+  (r) => { const l = r(3, 8) * 10, w = r(2, 5) * 10, depth = r(5, 30), L = (l * w * depth) / 1000; return q(`A fish tank has a base ${l} cm by ${w} cm. It holds ${fmt(L)} L of water. How deep is the water?`, depth, "cm", [`${fmt(L)} L = ${(L * 1000).toLocaleString("en-AU")} cm³.`, `Depth = ${(L * 1000).toLocaleString("en-AU")} ÷ (${l} × ${w}) = ${depth} cm.`]); },
+  (r) => { const s = r(2, 12); return q(`A cube has a volume of ${s ** 3} cm³. What is its side length?`, s, "cm", ["Volume of a cube = side³.", `∛${s ** 3} = ${s} cm, because ${s} × ${s} × ${s} = ${s ** 3}.`]); },
+  (r) => { const b = 2 * r(2, 6), ht = r(3, 9), len = r(4, 15); return q(`A triangular prism has a triangular end with base ${b} cm and height ${ht} cm. Its volume is ${(b * ht * len) / 2} cm³. How long is the prism?`, len, "cm", [`End area: ½ × ${b} × ${ht} = ${(b * ht) / 2} cm².`, `Length = ${(b * ht * len) / 2} ÷ ${(b * ht) / 2} = ${len} cm.`]); },
+];
+
+const w4l2: Form[] = [
+  (r) => { const a = r(2, 6), b = r(2, 5), c = r(2, 4), s = choose(r, [5, 10]); return q(`How many ${s} cm cubes fit in this box? Keep the cubes’ edges parallel to the box.`, a * b * c, "cubes", [`${a} along the length, ${b} along the width, ${c} up the height.`, `${a} × ${b} × ${c} = ${a * b * c} cubes.`], withVisual(diagram("packing", [a * s, b * s, c * s, s, s, s]))); },
+  (r) => { const s = choose(r, [4, 5, 6]), L = r(4, 9) * s + r(1, s - 1), W = r(3, 7) * s + r(1, s - 1), H = r(2, 5) * s + r(1, s - 1); const n = Math.floor(L / s) * Math.floor(W / s) * Math.floor(H / s); return q(`A carton measures ${L} cm × ${W} cm × ${H} cm inside. How many ${s} cm cubes fit, edges parallel to the carton?`, n, "cubes", [`Only whole cubes fit: ${Math.floor(L / s)} × ${Math.floor(W / s)} × ${Math.floor(H / s)}.`, `= ${n} cubes. Dividing the volumes would overcount, because part-cubes do not fit.`]); },
+  (r) => { const a = r(2, 5), b = r(2, 4), c = r(2, 4), s = 10, extra = r(1, 4) * 5; const L = a * s + extra; return q(`A box is ${L} cm × ${b * s} cm × ${c * s} cm. It is packed with as many ${s} cm cubes as fit. How much empty space is left?`, L * b * s * c * s - a * b * c * s ** 3, "cm³", [`Box: ${(L * b * s * c * s).toLocaleString("en-AU")} cm³. Cubes: ${a} × ${b} × ${c} = ${a * b * c}, using ${(a * b * c * s ** 3).toLocaleString("en-AU")} cm³.`, `Empty space: ${(L * b * s * c * s - a * b * c * s ** 3).toLocaleString("en-AU")} cm³.`]); },
+  (r) => { const shelf = r(150, 260), h = choose(r, [18, 22, 24, 30, 35]); return q(`Boxes ${h} cm tall are stacked in a storeroom ${shelf} cm high. How many layers fit?`, Math.floor(shelf / h), "layers", [`${shelf} ÷ ${h} = ${fmt(rounded(shelf / h, 3))}.`, `Only whole layers fit: ${Math.floor(shelf / h)}.`]); },
+  (r) => { const L = 2 * r(4, 7), W = 2 * r(3, 5), H = 2 * r(3, 6), n = r(Math.floor((L * W * H) / 16), (L * W * H) / 8 - 2); return q(`${An(L)} ${L} cm × ${W} cm × ${H} cm jar holds ${n} cubes with side length 2 cm. How much air space is left in the jar?`, L * W * H - n * 8, "cm³", [`Jar: ${L * W * H} cm³. Each cube is 2³ = 8 cm³, so the cubes take ${n} × 8 = ${n * 8} cm³.`, `Air space: ${L * W * H} − ${n * 8} = ${L * W * H - n * 8} cm³.`]); },
+];
+
+const w4l3: Form[] = [
+  (r) => { const rate = r(2, 12), time = r(3, 20); return q(`An empty ${rate * time} L tank fills at ${rate} L/min. How many minutes does it take to fill?`, time, "min", ["Time = capacity ÷ flow rate.", `${rate * time} ÷ ${rate} = ${time} minutes.`], withVisual(diagram("rate", [rate * time, rate], { labels: [`Capacity: ${rate * time} L`, `Flow: ${rate} L/min`] }))); },
+  (r) => { const l = r(4, 10), w = r(2, 5), d = choose(r, [1, 1.2, 1.5]), rate = choose(r, [100, 200, 250, 500]), kl = rounded(l * w * d, 3); return q(`A pool is ${l} m × ${w} m × ${d} m deep. A hose fills it at ${rate} L/min. How many hours does it take to fill? Round to one decimal place.`, rounded((kl * 1000) / rate / 60, 1), "h", [`Capacity: ${fmt(kl)} m³ = ${(kl * 1000).toLocaleString("en-AU")} L.`, `${(kl * 1000).toLocaleString("en-AU")} ÷ ${rate} = ${fmt(rounded((kl * 1000) / rate, 2))} min ≈ ${rounded((kl * 1000) / rate / 60, 1)} h.`]); },
+  (r) => { const leak = r(2, 9), hours = r(8, 40), V = leak * hours; return q(`A full ${V} L tank leaks at ${leak} L per hour. How many hours until it is empty?`, hours, "h", ["Time = volume ÷ rate.", `${V} ÷ ${leak} = ${hours} hours.`]); },
+  (r) => { const t = r(5, 30), rate = r(3, 20); return q(`${An(t * rate)} ${t * rate} L tank must be filled in ${t} minutes. What flow rate is needed?`, rate, "L/min", ["Rate = volume ÷ time.", `${t * rate} ÷ ${t} = ${rate} L/min.`]); },
+  (r) => { const l = choose(r, [1, 1.2, 1.5]), w = choose(r, [0.5, 0.8, 1]), h = choose(r, [0.5, 0.6, 0.8]), add = choose(r, [2, 3, 5]), every = choose(r, [10, 15, 20]), L = rounded(l * w * h * 1000, 2); return q(`A fish tank is ${l} m × ${w} m × ${h} m. Water is poured in at ${add} L every ${every} seconds. How many minutes does it take to fill? Round to one decimal place.`, rounded(((L / add) * every) / 60, 1), "min", [`Capacity: ${fmt(L)} L. That needs ${fmt(rounded(L / add, 2))} pours.`, `${fmt(rounded(L / add, 2))} × ${every} s = ${fmt(rounded((L / add) * every, 1))} s ≈ ${rounded(((L / add) * every) / 60, 1)} min.`]); },
+];
+
+// ── Weeks 5–6: circles (M03) ──────────────────────────────────────────────────
+const w5l1: Form[] = [
+  (r) => { const rad = r(3, 18), toD = r(0, 1) === 1; return toD ? q("Find the diameter of this circle.", 2 * rad, "cm", [`Diameter = 2 × radius = 2 × ${rad} = ${2 * rad} cm.`], withVisual(diagram("circle", [rad], { variant: "radius" }))) : q("Find the radius of this circle.", rad, "cm", [`Radius = diameter ÷ 2 = ${2 * rad} ÷ 2 = ${rad} cm.`], withVisual(diagram("circle", [2 * rad], { variant: "diameter" }))); },
+  (r) => { const C = r(20, 200); return q(`A circle has a circumference of ${C} cm. Find its radius, correct to one decimal place.`, rounded(C / (2 * PI), 1), "cm", ["C = 2πr, so r = C ÷ (2π).", `${C} ÷ (2π) = ${(C / (2 * PI)).toFixed(3)}… ≈ ${rounded(C / (2 * PI), 1)} cm.`]); },
+  (r) => { const C = r(20, 300); return q(`A circular water tank has a circumference of ${C} cm. Find its diameter, correct to one decimal place.`, rounded(C / PI, 1), "cm", ["C = πd, so d = C ÷ π.", `${C} ÷ π = ${(C / PI).toFixed(3)}… ≈ ${rounded(C / PI, 1)} cm.`]); },
+  (r) => { const d = r(4, 30); return q(`A circle has a circumference of exactly ${d}π cm. What is its diameter?`, d, "cm", ["C = πd.", `πd = ${d}π, so d = ${d} cm.`]); },
+  (r) => { const rad = r(2, 15); return q(`A circle has an area of exactly ${rad * rad}π m². What is its radius?`, rad, "m", ["A = πr².", `r² = ${rad * rad}, so r = ${rad} m.`]); },
+];
+
+const w5l2: Form[] = [
+  (r) => { const rad = r(2, 20); return q("Find the circumference of this circle. Use π = 3.14.", rounded(2 * 3.14 * rad, 2), "cm", ["C = 2πr.", `2 × 3.14 × ${rad} = ${fmt(rounded(2 * 3.14 * rad, 2))} cm.`], withVisual(diagram("circle", [rad], { variant: "radius" }))); },
+  (r) => { const d = r(3, 40); return q("Find the circumference of this circle, correct to two decimal places.", rounded(PI * d, 2), "cm", ["C = πd. Use the π button on your calculator.", `π × ${d} = ${(PI * d).toFixed(4)}… ≈ ${rounded(PI * d, 2).toFixed(2)} cm.`], withVisual(diagram("circle", [d], { variant: "diameter" }))); },
+  (r) => { const d = 7 * r(1, 10); return q(`Use π ≈ 22/7 to find the circumference of a circle with diameter ${d} m.`, (22 * d) / 7, "m", ["C = πd ≈ 22/7 × d.", `22/7 × ${d} = ${(22 * d) / 7} m.`]); },
+  (r) => { const rad = r(2, 25); return q(`A circle has radius ${rad} cm. Its exact circumference is kπ cm. What is k?`, 2 * rad, undefined, ["C = 2πr.", `2 × π × ${rad} = ${2 * rad}π cm.`]); },
+  (r) => { const rad = r(30, 60), laps = r(4, 12), days = r(3, 6); return q(`An athlete jogs ${laps} laps of a circular track with radius ${rad} m, ${days} days a week. How far is that each week? Round to the nearest metre.`, Math.round(2 * PI * rad * laps * days), "m", [`One lap: 2π × ${rad} = ${(2 * PI * rad).toFixed(2)} m.`, `× ${laps} × ${days} = ${Math.round(2 * PI * rad * laps * days).toLocaleString("en-AU")} m.`]); },
+];
+
+const w5l3: Form[] = [
+  (r) => { const rad = r(2, 18); return q("Find the area of this circle. Use π = 3.14.", rounded(3.14 * rad * rad, 2), "cm²", ["A = πr².", `3.14 × ${rad}² = ${fmt(rounded(3.14 * rad * rad, 2))} cm².`], withVisual(diagram("circle", [rad], { variant: "radius" }))); },
+  (r) => { const d = 2 * r(2, 15); return q("Find the area of this circle, correct to two decimal places.", rounded(PI * (d / 2) ** 2, 2), "cm²", [`The radius is half the diameter: ${d / 2} cm.`, `π × ${d / 2}² = ${(PI * (d / 2) ** 2).toFixed(4)}… ≈ ${rounded(PI * (d / 2) ** 2, 2).toFixed(2)} cm².`], withVisual(diagram("circle", [d], { variant: "diameter" }))); },
+  (r) => { const rad = r(2, 15); return q(`A circle has radius ${rad} m. Its exact area is kπ m². What is k?`, rad * rad, undefined, ["A = πr².", `π × ${rad}² = ${rad * rad}π m².`]); },
+  (r) => { const d = choose(r, [24, 28, 30, 32, 36, 40]); return q(`A pizza tray has a diameter of ${d} cm. What is its area, to the nearest square centimetre?`, Math.round(PI * (d / 2) ** 2), "cm²", [`Radius: ${d / 2} cm.`, `π × ${d / 2}² = ${(PI * (d / 2) ** 2).toFixed(2)} ≈ ${Math.round(PI * (d / 2) ** 2)} cm².`]); },
+  (r) => { const k = r(2, 4); return q(`If the radius of a circle is multiplied by ${k}, its area is multiplied by what number?`, k * k, undefined, [`A = πr². Replace r with ${k}r: π(${k}r)² = ${k * k}πr².`, `The area is ${k * k} times as large.`]); },
+];
+
+const w6l1: Form[] = [
+  (r) => { const rad = r(2, 18), A = rounded(3.14 * rad * rad, 2); return q(`A circle has an area of ${fmt(A)} cm². Use π = 3.14 to find its radius.`, rad, "cm", [`r² = ${fmt(A)} ÷ 3.14 = ${rad * rad}.`, `r = √${rad * rad} = ${rad} cm.`]); },
+  w5l1[1],
+  (r) => { const A = r(10, 400); return q(`A circular rug has an area of ${A} m². Find its diameter, correct to one decimal place.`, rounded(2 * Math.sqrt(A / PI), 1), "m", [`r = √(A ÷ π) = √(${A} ÷ π) = ${Math.sqrt(A / PI).toFixed(3)}… m.`, `d = 2r ≈ ${rounded(2 * Math.sqrt(A / PI), 1)} m.`]); },
+  (r) => { const A = rounded(r(50, 300) / 100, 2); return q(`A round tabletop has an area of ${A} m². How much edging is needed to go around it? Round to one decimal place.`, rounded(2 * PI * Math.sqrt(A / PI), 1), "m", [`Radius: √(${A} ÷ π) = ${Math.sqrt(A / PI).toFixed(3)} m.`, `Edging = circumference = 2πr ≈ ${rounded(2 * PI * Math.sqrt(A / PI), 1)} m.`]); },
+  (r) => { const rad = r(2, 15); return q(`A circle has an exact area of ${rad * rad}π cm². Its exact circumference is kπ cm. What is k?`, 2 * rad, undefined, [`r² = ${rad * rad}, so r = ${rad} cm.`, `C = 2πr = ${2 * rad}π cm.`]); },
+];
+
+const w6l2: Form[] = [
+  (r) => { const d = 2 * r(3, 15); return q("Find the perimeter of this semicircle, including the straight edge. Round to two decimal places.", rounded((PI * d) / 2 + d, 2), "cm", [`Curved edge: ½ × π × ${d} = ${((PI * d) / 2).toFixed(3)} cm.`, `Add the diameter ${d} cm: ${rounded((PI * d) / 2 + d, 2).toFixed(2)} cm.`], withVisual(diagram("circle", [d], { variant: "semicircle" }))); },
+  (r) => { const outer = r(8, 16), inner = r(2, 6); return q("Find the area of the shaded ring. Use π = 3.14.", rounded(3.14 * (outer * outer - inner * inner), 2), "m²", [`Outer circle: 3.14 × ${outer}² = ${fmt(rounded(3.14 * outer * outer, 2))} m². Inner circle: 3.14 × ${inner}² = ${fmt(rounded(3.14 * inner * inner, 2))} m².`, `Ring: ${fmt(rounded(3.14 * (outer * outer - inner * inner), 2))} m².`], withVisual(diagram("circle", [outer, inner], { variant: "ring", unit: "m" }))); },
+  (r) => { const rad = r(2, 16); return q(`Find the area of a quadrant (quarter circle) with radius ${rad} cm, correct to two decimal places.`, rounded((PI * rad * rad) / 4, 2), "cm²", ["A quadrant is ¼ of a circle.", `¼ × π × ${rad}² = ${rounded((PI * rad * rad) / 4, 2).toFixed(2)} cm².`]); },
+  (r) => { const d = 2 * r(3, 15); return q(`Find the area of a semicircle with diameter ${d} m, correct to two decimal places.`, rounded((PI * (d / 2) ** 2) / 2, 2), "m²", [`Radius: ${d / 2} m.`, `½ × π × ${d / 2}² = ${rounded((PI * (d / 2) ** 2) / 2, 2).toFixed(2)} m².`]); },
+  (r) => { const R0 = r(60, 120), w = r(15, 40); return q(`An archway is the region between two semicircles with radii ${R0} cm and ${R0 - w} cm. What is the area of the arch, to the nearest cm²?`, Math.round((PI * (R0 * R0 - (R0 - w) ** 2)) / 2), "cm²", [`½π × ${R0}² − ½π × ${R0 - w}².`, `= ${Math.round((PI * (R0 * R0 - (R0 - w) ** 2)) / 2).toLocaleString("en-AU")} cm².`]); },
+];
+
+const w6l3: Form[] = [
+  (r) => { const s = r(8, 20), d = r(2, s - 3); return q(`A square of side ${s} cm has a circular hole of diameter ${d} cm. What area remains? Round to the nearest whole number.`, Math.round(s * s - PI * (d / 2) ** 2), "cm²", [`Square: ${s * s} cm². Hole: π × ${fmt(d / 2)}² = ${(PI * (d / 2) ** 2).toFixed(2)} cm².`, `Remaining: ${Math.round(s * s - PI * (d / 2) ** 2)} cm².`]); },
+  (r) => { const a = r(3, 6), b = a + r(1, 3), c = b + r(1, 3), areas = [PI * a * a, (PI * b * b) / 2, (PI * c * c) / 4]; return q(`Which has the largest area: a circle of radius ${a} m, a semicircle of radius ${b} m or a quadrant of radius ${c} m? Give that area, correct to two decimal places.`, rounded(Math.max(...areas), 2), "m²", [`Circle: ${areas[0].toFixed(2)} m². Semicircle: ${areas[1].toFixed(2)} m². Quadrant: ${areas[2].toFixed(2)} m².`, `The largest is ${rounded(Math.max(...areas), 2).toFixed(2)} m².`]); },
+  (r) => { const straight = r(6, 12) * 10, d = r(4, 8) * 10; return q(`A running track has two straights of ${straight} m joined by two semicircles with diameter ${d} m. What is the length of one lap, to the nearest metre?`, Math.round(2 * straight + PI * d), "m", [`Two semicircles make one circle: π × ${d} = ${(PI * d).toFixed(2)} m.`, `Lap: 2 × ${straight} + ${(PI * d).toFixed(2)} ≈ ${Math.round(2 * straight + PI * d)} m.`]); },
+  (r) => { const d = rounded(r(10, 25) / 10, 1), c = r(8, 20); return q(`Edging for a round table of diameter ${d} m costs ${money(c)} per metre. What is the cost, to the nearest cent?`, rounded(PI * d * c, 2), "$", [`Circumference: π × ${d} = ${(PI * d).toFixed(4)} m.`, `× ${money(c)} = ${money(rounded(PI * d * c, 2))}.`]); },
+  (r) => { const rad = r(2, 12); return q(`A circle of radius ${rad} cm fits exactly inside a square, touching all four sides. Using π = 3.14, what percentage of the square does the circle cover?`, 78.5, "%", [`Circle: 3.14 × ${rad}² = ${fmt(rounded(3.14 * rad * rad, 2))} cm². Square: ${2 * rad}² = ${4 * rad * rad} cm².`, `${fmt(rounded(3.14 * rad * rad, 2))} ÷ ${4 * rad * rad} × 100 = 78.5%. It is the same for every radius.`]); },
+];
+
+// ── Weeks 7–8: Pythagoras’ theorem (M06) ──────────────────────────────────────
+const TRIPLES = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [6, 8, 10], [9, 12, 15], [9, 40, 41], [20, 21, 29]] as const;
+const triple = (r: R) => { const [a, b, c] = choose(r, TRIPLES), k = choose(r, [1, 1, 2, 3]); return [a * k, b * k, c * k] as const; };
+const w7l1: Form[] = [
+  (r) => { const [a, b, c] = triple(r), start = r(0, 2), sides = [a, b, c].map((_, i, s) => s[(i + start) % 3]); return q(`A right-angled triangle has sides ${sides.join(", ")} cm. How long is the hypotenuse?`, c, "cm", ["The hypotenuse is opposite the right angle.", `It is always the longest side: ${c} cm.`]); },
+  (r) => { const [x, y, z] = choose(r, [[3, 4, 5], [5, 7, 9], [4, 6, 8], [6, 8, 10], [9, 10, 14], [15, 20, 25], [3, 5, 6], [5, 6, 7], [7, 8, 9], [8, 15, 17], [2, 3, 4], [6, 7, 8], [10, 12, 18]] as const), t = z * z === x * x + y * y ? "Right-angled" : z * z < x * x + y * y ? "Acute" : "Obtuse"; return q(`A triangle has sides ${x}, ${y} and ${z}. Is it acute, right-angled or obtuse?`, t, undefined, [`Compare the longest side squared with the sum of the other two squares: ${z}² = ${z * z} and ${x}² + ${y}² = ${x * x + y * y}.`, z * z === x * x + y * y ? "They are equal, so it is right-angled." : z * z < x * x + y * y ? "The longest side squared is smaller, so every angle is acute." : "The longest side squared is larger, so it has an obtuse angle."], { choices: ["Acute", "Right-angled", "Obtuse"] }); },
+  (r) => { const [a, b, c] = triple(r), fake = r(0, 1) === 1, z = fake ? c + choose(r, [-1, 1]) : c; return q(`Is (${a}, ${b}, ${z}) a Pythagorean triple?`, fake ? "No" : "Yes", undefined, [`${a}² + ${b}² = ${a * a + b * b}, and ${z}² = ${z * z}.`, fake ? "They are not equal, so it is not a Pythagorean triple." : "They are equal, so it is a Pythagorean triple."]); },
+  (r) => { const a = r(2, 15), b = r(2, 15); return q(`A right-angled triangle has shorter sides ${a} cm and ${b} cm. What is c², the square of the hypotenuse?`, a * a + b * b, "cm²", ["c² = a² + b².", `${a}² + ${b}² = ${a * a} + ${b * b} = ${a * a + b * b}.`]); },
+  (r) => { const [a, b, c] = triple(r); return q(`A student finds the hypotenuse of a right triangle with shorter sides ${a} and ${b} by writing c = ${a} + ${b} = ${a + b}. What is the correct length of the hypotenuse?`, c, undefined, ["√(a² + b²) is not the same as a + b.", `c² = ${a * a} + ${b * b} = ${c * c}, so c = ${c}.`]); },
+];
+
+const w7l2: Form[] = [
+  (r) => { const [a, b, c] = triple(r); return q("What is the area of the square drawn on the hypotenuse of this triangle?", c * c, "cm²", ["The square on the hypotenuse equals the sum of the squares on the other two sides.", `${a}² + ${b}² = ${a * a} + ${b * b} = ${c * c} cm².`], withVisual(diagram("rightTriangle", [a, b, c], { unknown: "hypotenuse" }))); },
+  (r) => { const [a, b, c] = triple(r); return q(`The square on the hypotenuse of a right triangle has area ${c * c} cm². The square on one shorter side has area ${a * a} cm². What is the area of the square on the third side?`, b * b, "cm²", ["Square on hypotenuse = sum of the other two squares.", `${c * c} − ${a * a} = ${b * b} cm².`]); },
+  (r) => { const [a, b, c] = triple(r); return q(`The squares on the two shorter sides of a right triangle have areas ${a * a} cm² and ${b * b} cm². How long is the hypotenuse?`, c, "cm", [`Square on hypotenuse: ${a * a} + ${b * b} = ${c * c} cm².`, `Its side: √${c * c} = ${c} cm.`]); },
+  (r) => { let k = 0; do k = r(20, 200); while (Number.isInteger(Math.sqrt(k))); return q(`For a right triangle, c² = ${k}. Find c, correct to two decimal places.`, rounded(Math.sqrt(k), 2), undefined, [`c = √${k}.`, `√${k} = ${Math.sqrt(k).toFixed(4)}… ≈ ${rounded(Math.sqrt(k), 2).toFixed(2)}. This is a surd, an irrational number.`]); },
+  (r) => { const [a, b, c] = triple(r), fake = r(0, 1) === 1, C = fake ? c * c + choose(r, [-4, 3, 5]) : c * c; return q(`Squares with areas ${a * a}, ${b * b} and ${C} square units are joined at their corners to make a triangle. Is it right-angled?`, fake ? "No" : "Yes", undefined, [`${a * a} + ${b * b} = ${a * a + b * b}.`, fake ? `That does not equal ${C}, so the triangle is not right-angled.` : `That equals ${C}, so the triangle is right-angled.`]); },
+];
+
+const w7l3: Form[] = [
+  (r) => { const [a, b, c] = triple(r); return q("Find the length of the hypotenuse marked x.", c, "cm", [`x² = ${a}² + ${b}² = ${a * a + b * b}.`, `x = √${a * a + b * b} = ${c} cm.`], withVisual(diagram("rightTriangle", [a, b, c], { unknown: "hypotenuse" }))); },
+  (r) => { let a = 0, b = 0; do { a = r(2, 14); b = r(2, 14); } while (Number.isInteger(Math.sqrt(a * a + b * b))); const c = Math.sqrt(a * a + b * b); return q("Find the length of the hypotenuse marked x, correct to two decimal places.", rounded(c, 2), "cm", [`x² = ${a}² + ${b}² = ${a * a + b * b}.`, `x = √${a * a + b * b} ≈ ${rounded(c, 2).toFixed(2)} cm.`], withVisual(diagram("rightTriangle", [a, b, rounded(c, 2)], { unknown: "hypotenuse" }))); },
+  (r) => { const w = r(80, 160), h = r(45, 95), d = Math.sqrt(w * w + h * h); return q(`A TV screen is ${w} cm wide and ${h} cm high. Screens are sized by their diagonal. What is this screen’s diagonal, to the nearest centimetre?`, Math.round(d), "cm", [`d² = ${w}² + ${h}² = ${w * w + h * h}.`, `d = √${w * w + h * h} ≈ ${Math.round(d)} cm.`]); },
+  (r) => { const w = rounded(r(6, 15) / 10, 1), h = rounded(r(18, 32) / 10, 1), d = Math.sqrt(w * w + h * h); return q(`A rectangular board ${w} m wide and ${h} m high is cut along a diagonal. How long is the cut, correct to two decimal places?`, rounded(d, 2), "m", [`d² = ${w}² + ${h}² = ${fmt(rounded(w * w + h * h, 4))}.`, `d ≈ ${rounded(d, 2).toFixed(2)} m.`]); },
+  (r) => { const a = rounded(r(15, 60) / 10, 1), b = rounded(r(15, 60) / 10, 1), c = Math.sqrt(a * a + b * b); return q(`A right triangle has shorter sides ${a} cm and ${b} cm. Find the hypotenuse, correct to two decimal places.`, rounded(c, 2), "cm", [`c² = ${a}² + ${b}² = ${fmt(rounded(a * a + b * b, 4))}.`, `c ≈ ${rounded(c, 2).toFixed(2)} cm.`]); },
+];
+
+const w8l1: Form[] = [
+  (r) => { const [a, b, c] = triple(r); return q("Find the length of the shorter side marked x.", b, "cm", [`x² = ${c}² − ${a}² = ${c * c} − ${a * a} = ${b * b}.`, `x = √${b * b} = ${b} cm.`], withVisual(diagram("rightTriangle", [a, b, c], { unknown: "height" }))); },
+  (r) => { let a = 0, c = 0; do { a = r(3, 15); c = a + r(2, 10); } while (Number.isInteger(Math.sqrt(c * c - a * a))); const b = Math.sqrt(c * c - a * a); return q("Find the length of the side marked x, correct to two decimal places.", rounded(b, 2), "cm", [`x² = ${c}² − ${a}² = ${c * c - a * a}.`, `x = √${c * c - a * a} ≈ ${rounded(b, 2).toFixed(2)} cm.`], withVisual(diagram("rightTriangle", [a, rounded(b, 2), c], { unknown: "height" }))); },
+  (r) => { const L = r(4, 9), foot = rounded(r(10, 25) / 10, 1), h = Math.sqrt(L * L - foot * foot); return q(`${An(L)} ${L} m ladder leans against a wall with its foot ${foot} m from the wall. How high up the wall does it reach? Round to two decimal places.`, rounded(h, 2), "m", [`h² = ${L}² − ${foot}² = ${fmt(rounded(L * L - foot * foot, 4))}.`, `h ≈ ${rounded(h, 2).toFixed(2)} m.`], withVisual(diagram("rightTriangle", [foot, rounded(h, 2), L], { unknown: "height", unit: "m", variant: "ladder" }))); },
+  (r) => { const half = r(2, 8), s = half + r(2, 8), h = Math.sqrt(s * s - half * half); return q(`An isosceles triangle has a base of ${2 * half} cm and two equal sides of ${s} cm. Find its perpendicular height, correct to two decimal places.`, rounded(h, 2), "cm", [`The height splits the base in half, making a right triangle with sides ${half} cm and ${s} cm (hypotenuse).`, `h = √(${s}² − ${half}²) = √${s * s - half * half} ≈ ${rounded(h, 2).toFixed(2)} cm.`]); },
+  (r) => { const [a, b, c] = triple(r); return q(`To find a shorter side, Noor writes x² = ${c}² + ${a}². What is the correct value of x?`, b, undefined, ["When the hypotenuse is known, subtract: x² = c² − a².", `x² = ${c * c} − ${a * a} = ${b * b}, so x = ${b}.`]); },
+];
+
+const w8l2: Form[] = [
+  (r) => { const up = rounded(r(30, 80) / 10, 1), foot = rounded(r(10, 25) / 10, 1), L = Math.sqrt(up * up + foot * foot); return q(`A ladder reaches ${up} m up a wall. Its foot is ${foot} m from the wall. How long is the ladder, correct to two decimal places?`, rounded(L, 2), "m", [`L² = ${up}² + ${foot}² = ${fmt(rounded(up * up + foot * foot, 4))}.`, `L ≈ ${rounded(L, 2).toFixed(2)} m.`], withVisual(diagram("rightTriangle", [foot, up, rounded(L, 2)], { unknown: "hypotenuse", unit: "m", variant: "ladder" }))); },
+  (r) => { const w = r(4, 15), h = r(3, 10), d = Math.sqrt(w * w + h * h); return q("A cable runs diagonally across this rectangular floor. How long is it, correct to two decimal places?", rounded(d, 2), "m", [`x² = ${w}² + ${h}² = ${w * w + h * h}.`, `x ≈ ${rounded(d, 2).toFixed(2)} m.`], withVisual(diagram("diagonal", [w, h], { unit: "m" }))); },
+  (r) => { const e = rounded(r(10, 50) / 10, 1), n = rounded(r(10, 50) / 10, 1), d = Math.sqrt(e * e + n * n); return q(`A bushwalker walks ${e} km east and then ${n} km north. How far are they from the start in a straight line? Round to one decimal place.`, rounded(d, 1), "km", ["The two legs are at right angles, so use Pythagoras.", `√(${e}² + ${n}²) ≈ ${rounded(d, 1)} km.`]); },
+  (r) => { const d = r(4, 8), h = r(10, 16), straw = r(18, 24), inside = Math.sqrt(d * d + h * h); return q(`${An(straw)} ${straw} cm straw leans in a cylindrical glass ${d} cm wide and ${h} cm tall, touching the bottom edge. How much of the straw sticks out of the glass? Round to two decimal places.`, rounded(straw - inside, 2), "cm", [`Length inside the glass: √(${d}² + ${h}²) = ${inside.toFixed(3)} cm.`, `Sticking out: ${straw} − ${inside.toFixed(3)} ≈ ${rounded(straw - inside, 2).toFixed(2)} cm.`]); },
+  (r) => { const h = r(12, 40), g = r(8, 30), c = Math.sqrt(h * h + g * g); return q(`A cable runs from the top of a ${h} m mast to a point on the ground ${g} m from its base. How long is the cable, correct to one decimal place?`, rounded(c, 1), "m", [`c² = ${h}² + ${g}² = ${h * h + g * g}.`, `c ≈ ${rounded(c, 1)} m.`]); },
+];
+
+const w8l3: Form[] = [
+  w7l1[2],
+  (r) => { const [a, b, c] = triple(r), hide = r(0, 2); return q(`(${hide === 0 ? "?" : a}, ${hide === 1 ? "?" : b}, ${hide === 2 ? "?" : c}) is a Pythagorean triple. What is the missing number?`, [a, b, c][hide], undefined, [hide === 2 ? `c² = ${a * a} + ${b * b} = ${c * c}.` : `The missing side² = ${c * c} − ${(hide === 0 ? b : a) ** 2} = ${[a, b, c][hide] ** 2}.`, `So the missing number is ${[a, b, c][hide]}.`]); },
+  (r) => { const [a, b, c] = triple(r); return q(`A right triangle has shorter sides ${a} cm and ${b} cm. What is its perimeter?`, a + b + c, "cm", [`Hypotenuse: √(${a}² + ${b}²) = ${c} cm.`, `Perimeter: ${a} + ${b} + ${c} = ${a + b + c} cm.`]); },
+  (r) => { const k = choose(r, [20, 30, 40]), fake = r(0, 1) === 1, diag = 5 * k + (fake ? choose(r, [-3, 2, 4]) : 0); return q(`A builder marks ${3 * k} cm along one wall and ${4 * k} cm along the other from a corner. The diagonal between the marks is ${diag} cm. Is the corner a right angle?`, fake ? "No" : "Yes", undefined, [`For a right angle the diagonal should be √(${3 * k}² + ${4 * k}²) = ${5 * k} cm.`, fake ? `${diag} cm is not ${5 * k} cm, so the corner is not square.` : "It matches, so the corner is a right angle."]); },
+  w7l1[1],
+];
+
+// ── Week 9: time zones and duration (M04) ─────────────────────────────────────
+const ZONES = [["Hobart", 10, "AEST"], ["Perth", 8, "AWST"], ["Adelaide", 9.5, "ACST"], ["Darwin", 9.5, "ACST"], ["Brisbane", 10, "AEST"], ["Sydney", 10, "AEST"], ["Tokyo", 9, ""], ["Delhi", 5.5, ""], ["London", 0, "GMT"], ["Los Angeles", -8, ""], ["Auckland", 12, ""], ["Singapore", 8, ""]] as const;
+type Zone = (typeof ZONES)[number];
+const off = (o: number) => `UTC${o >= 0 ? "+" : "−"}${Math.floor(Math.abs(o))}${Math.abs(o) % 1 ? ":30" : ""}`;
+const clock = (m: number) => { const t = ((m % 1440) + 1440) % 1440; return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; };
+const ampm = (m: number) => { const t = ((m % 1440) + 1440) % 1440, h = Math.floor(t / 60), mm = String(t % 60).padStart(2, "0"); return `${h % 12 === 0 ? 12 : h % 12}:${mm} ${h < 12 ? "am" : "pm"}`; };
+const hm = (m: number) => { const t = ((m % 1440) + 1440) % 1440; return `${Math.floor(t / 60)}, ${t % 60}`; };
+const HM = { input: "list" as const, labels: ["Hours (24-hour time)", "Minutes"] };
+const DUR = { input: "list" as const, labels: ["Hours", "Minutes"] };
+const zonePair = (r: R, pool: readonly Zone[]) => { const a = choose(r, pool); let b = choose(r, pool); while (b[1] === a[1]) b = choose(r, pool); return [a, b] as const; };
+const zoneVisual = (a: Zone, aTime: string, b: Zone) => diagram("timezone", [], { description: "Use the UTC offsets to convert the time.", rows: [{ label: a[0], offset: a[1], detail: aTime }, { label: b[0], offset: b[1], detail: "?" }] });
+const w9l1: Form[] = [
+  (r) => { const [a, b] = zonePair(r, ZONES.filter((z) => z[1] % 1 === 0 && z[1] >= 8)), t = r(6, 20) * 60 + choose(r, [0, 15, 30, 45]), ans = t + (b[1] - a[1]) * 60; return q(`It is ${clock(t)} in ${a[0]} (${off(a[1])}). What time is it in ${b[0]} (${off(b[1])})? Enter the time in 24-hour time.`, hm(ans), undefined, [`${b[0]} is ${Math.abs(b[1] - a[1])} hour${Math.abs(b[1] - a[1]) === 1 ? "" : "s"} ${b[1] > a[1] ? "ahead of" : "behind"} ${a[0]}.`, `${clock(t)} ${b[1] > a[1] ? "+" : "−"} ${Math.abs(b[1] - a[1])} h = ${clock(ans)}.`], { ...HM, measurementVisual: zoneVisual(a, clock(t), b) }); },
+  (r) => { const a = choose(r, ZONES.filter((z) => ["Brisbane", "Sydney", "Perth"].includes(z[0]))), b = choose(r, ZONES.filter((z) => ["Adelaide", "Darwin"].includes(z[0]))), flip = r(0, 1) === 1, [from, to] = flip ? [b, a] : [a, b], t = r(6, 21) * 60 + choose(r, [0, 15, 30, 45]), ans = t + (to[1] - from[1]) * 60; return q(`It is ${clock(t)} in ${from[0]} (${off(from[1])}). What time is it in ${to[0]} (${off(to[1])})? Enter the time in 24-hour time.`, hm(ans), undefined, [`The difference is ${fmt(Math.abs(to[1] - from[1]))} hours, which includes a half hour.`, `${clock(t)} ${to[1] > from[1] ? "+" : "−"} ${Math.floor(Math.abs(to[1] - from[1]))} h ${Math.abs(to[1] - from[1]) % 1 ? "30 min" : ""} = ${clock(ans)}.`], { ...HM, measurementVisual: zoneVisual(from, clock(t), to) }); },
+  (r) => { const a = choose(r, ZONES.filter((z) => ["Sydney", "Brisbane", "Perth"].includes(z[0]))), b = choose(r, ZONES.filter((z) => ["London", "Tokyo", "Delhi", "Singapore"].includes(z[0]) && z[1] !== a[1])), t = r(9, 20) * 60 + choose(r, [0, 30]), ans = t + (b[1] - a[1]) * 60; return q(`It is ${ampm(t)} in ${a[0]} (${off(a[1])}). What time is it in ${b[0]} (${off(b[1])})? Enter the time in 24-hour time.`, hm(ans), undefined, [`Convert to 24-hour time: ${clock(t)}. ${b[0]} is ${fmt(Math.abs(b[1] - a[1]))} hours ${b[1] > a[1] ? "ahead" : "behind"}.`, `${b[0]} time: ${clock(ans)}${ans < 0 || ans >= 1440 ? (ans < 0 ? " on the previous day" : " on the next day") : ""}.`], { ...HM, measurementVisual: zoneVisual(a, ampm(t), b) }); },
+  (r) => { const t = r(0, 23) * 60 + choose(r, [0, 5, 15, 23, 30, 45, 50]); return q(`Write ${ampm(t)} in 24-hour time.`, hm(t), undefined, [t >= 780 ? "For pm times from 1 pm onwards, add 12 to the hour." : t >= 720 ? "12 pm is midday, so the hour stays 12." : t < 60 ? "12 am is midnight, so the hour becomes 00." : "For am times, the hour stays the same.", `${ampm(t)} = ${clock(t)}.`], HM); },
+  (r) => { const t = r(7, 20) * 60 + choose(r, [0, 30]), toSydney = r(0, 1) === 1; return q(`In summer Sydney uses daylight saving time (AEDT, UTC+11), but Brisbane stays on AEST (UTC+10). It is ${clock(t)} in ${toSydney ? "Brisbane" : "Sydney"}. What time is it in ${toSydney ? "Sydney" : "Brisbane"}? Enter the time in 24-hour time.`, hm(t + (toSydney ? 60 : -60)), undefined, ["During daylight saving, Sydney is 1 hour ahead of Brisbane.", `${clock(t)} ${toSydney ? "+" : "−"} 1 h = ${clock(t + (toSydney ? 60 : -60))}.`], HM); },
+];
+
+const w9l2: Form[] = [
+  (r) => { const [a, b] = zonePair(r, ZONES.filter((z) => z[1] >= 5)), dep = r(6, 14) * 60 + choose(r, [0, 15, 30, 45]), dur = r(2, 9) * 60 + choose(r, [0, 15, 30, 45]), arr = dep + dur + (b[1] - a[1]) * 60; return q(`A flight leaves ${a[0]} (${off(a[1])}) at ${clock(dep)} local time and lands in ${b[0]} (${off(b[1])}) at ${clock(arr)} local time${arr >= 1440 ? " the next day" : ""}. How long was the flight?`, `${Math.floor(dur / 60)}, ${dur % 60}`, undefined, [`Change the landing time to ${a[0]} time: ${clock(arr - (b[1] - a[1]) * 60)}.`, `Flight time: ${Math.floor(dur / 60)} h ${dur % 60} min.`], DUR); },
+  (r) => { const [a, b] = zonePair(r, ZONES.filter((z) => z[1] >= 5)), dep = r(6, 14) * 60 + choose(r, [0, 30]), dur = r(2, 9) * 60 + choose(r, [0, 15, 30, 45]), arr = dep + dur + (b[1] - a[1]) * 60; return q(`A flight leaves ${a[0]} (${off(a[1])}) at ${clock(dep)} local time and takes ${Math.floor(dur / 60)} h ${dur % 60} min. What is the local time when it lands in ${b[0]} (${off(b[1])})? Enter the time in 24-hour time.`, hm(arr), undefined, [`Landing in ${a[0]} time: ${clock(dep + dur)}.`, `Adjust by ${fmt(b[1] - a[1])} h: ${clock(arr)}${arr >= 1440 ? " the next day" : ""}.`], HM); },
+  (r) => { const s = r(6, 12) * 60 + r(0, 59), e = s + r(2, 9) * 60 + r(1, 59), d = e - s; return q(`Adrian arrives at school at ${ampm(s)} and leaves at ${ampm(e)}. How long is he at school?`, `${Math.floor(d / 60)}, ${d % 60}`, undefined, [`In 24-hour time: ${clock(s)} to ${clock(e)}.`, `Difference: ${Math.floor(d / 60)} h ${d % 60} min.`], DUR); },
+  (r) => { const parts = Array.from({ length: 3 }, () => r(2, 8) * 60 + r(5, 55)), total = parts.reduce((x, y) => x + y, 0); return q(`Three essays take ${parts.map((p) => `${Math.floor(p / 60)} min ${p % 60} s`).join(", ")} to mark. What is the total time?`, `${Math.floor(total / 60)}, ${total % 60}`, undefined, ["Add the minutes and seconds separately, then regroup 60 seconds as 1 minute.", `Total: ${Math.floor(total / 60)} min ${total % 60} s.`], { input: "list", labels: ["Minutes", "Seconds"] }); },
+  (r) => { const [v, from, to, f] = choose(r, [[r(2, 9) * 3600, "s", "h", 3600], [r(2, 9) * 1440, "min", "days", 1440], [r(2, 6) * 168, "h", "weeks", 168], [r(2, 9) * 60, "s", "min", 60], [r(3, 12) * 90, "min", "h", 60]] as const); return q(`Convert ${v.toLocaleString("en-AU")} ${from} to ${to}.`, rounded(v / f, 4), to, [`1 ${to.replace(/s$/, "")} = ${f.toLocaleString("en-AU")} ${from}.`, `${v.toLocaleString("en-AU")} ÷ ${f.toLocaleString("en-AU")} = ${fmt(rounded(v / f, 4))} ${to}.`]); },
+];
+
+const w9l3: Form[] = [
+  (r) => { const dep = r(13, 22) * 60, dur = r(18, 24) * 60, bris = 10, arr = dep + dur - bris * 60, days = ["Monday", "Tuesday", "Wednesday"], idx = Math.floor(arr / 1440); return q(`Monty leaves Brisbane (UTC+10) at ${ampm(dep)} on Monday on ${an(dur / 60)} ${dur / 60}-hour flight to London (UTC+0). On what day does he land, London time?`, days[idx], undefined, [`Landing in Brisbane time: ${clock(dep + dur)} on ${days[Math.floor((dep + dur) / 1440)]}.`, `London is 10 hours behind: ${clock(arr)} on ${days[idx]}.`], { choices: days }); },
+  (r) => { const dep = r(13, 22) * 60, dur = r(18, 24) * 60, arr = dep + dur - 600; return q(`Monty leaves Brisbane (UTC+10) at ${ampm(dep)} on ${an(dur / 60)} ${dur / 60}-hour flight to London (UTC+0). What is the London time when he lands? Enter the time in 24-hour time.`, hm(arr), undefined, [`Landing in Brisbane time: ${clock(dep + dur)}.`, `Subtract 10 hours: ${clock(arr)} London time.`], HM); },
+  (r) => { const t = r(7, 11) * 60, b = choose(r, ZONES.filter((z) => ["London", "Los Angeles", "Delhi"].includes(z[0]))), hob = 10, ans = t + (b[1] - hob) * 60; return q(`An online meeting starts at ${ampm(t)} in Hobart (UTC+10). What time is it in ${b[0]} (${off(b[1])})? Enter the time in 24-hour time.`, hm(ans), undefined, [`${b[0]} is ${fmt(hob - b[1])} hours behind Hobart.`, `${clock(t)} − ${fmt(hob - b[1])} h = ${clock(ans)}${ans < 0 ? " on the previous day" : ""}.`], { ...HM, measurementVisual: zoneVisual(ZONES[0], ampm(t), b) }); },
+  (r) => { const [a, b] = zonePair(r, ZONES); return q(`How many hours ahead of ${a[1] < b[1] ? a[0] : b[0]} (${off(Math.min(a[1], b[1]))}) is ${a[1] < b[1] ? b[0] : a[0]} (${off(Math.max(a[1], b[1]))})?`, Math.abs(a[1] - b[1]), "h", ["Subtract the UTC offsets.", `${fmt(Math.max(a[1], b[1]))} − ${fmt(Math.min(a[1], b[1]))} = ${fmt(Math.abs(a[1] - b[1]))} hours.`]); },
+  (r) => { const dep = r(5, 10) * 60 + choose(r, [0, 30]), dur = r(10, 14) * 60, per = 8, arr = dep + dur + (8 - 2) * 60; return q(`Elsa leaves Johannesburg (UTC+2) at ${ampm(dep)} on ${an(dur / 60)} ${dur / 60}-hour flight to Perth (UTC+${per}). What is the Perth time when she lands? Enter the time in 24-hour time.`, hm(arr), undefined, [`Landing in Johannesburg time: ${clock(dep + dur)}.`, `Perth is 6 hours ahead: ${clock(arr)}${arr >= 1440 ? " the next day" : ""}.`], HM); },
+];
+
+// ── Week 10: rates (M05) ──────────────────────────────────────────────────────
+const w10l1: Form[] = [
+  (r) => { const [what, unit, per] = choose(r, [["$", "$/kg", "kg"], ["laps", "laps/h", "hours"], ["mm of rain", "mm/day", "days"], ["cans", "cans/h", "hours"]] as const), rate = r(3, 40), n = r(2, 12); return q(`${what === "$" ? `${money(rate * n)} is paid for ${n} ${per}` : `${rate * n} ${what} in ${n} ${per}`}. Write this as a simplified rate.`, rate, unit, ["Divide so the second quantity is 1.", `${rate * n} ÷ ${n} = ${rate} ${unit}.`]); },
+  (r) => { const n = r(3, 15), t = r(2, 8); return q(`A tap supplies ${n * t} L in ${t} minutes. What is its flow rate?`, n, "L/min", ["Rate = volume ÷ time.", `${n * t} ÷ ${t} = ${n} L/min.`], withVisual(diagram("rate", [n * t, t], { labels: [`${n * t} L`, `${t} minutes`] }))); },
+  (r) => { const kmL = r(6, 18), L = r(20, 60); return q(`A car uses ${L} L of petrol to travel ${kmL * L} km. What is its rate in kilometres per litre?`, kmL, "km/L", ["km/L = distance ÷ fuel.", `${kmL * L} ÷ ${L} = ${kmL} km/L.`], withVisual(diagram("rate", [kmL * L, L], { variant: "fuel", labels: [`${kmL * L} km`, `${L} L`] }))); },
+  (r) => { const bpm = r(60, 150), mins = r(10, 45); return q(`A rower’s heart beats at ${bpm} beats per minute. How many times does it beat in ${mins} minutes?`, bpm * mins, "beats", ["Total = rate × time.", `${bpm} × ${mins} = ${(bpm * mins).toLocaleString("en-AU")} beats.`]); },
+  (r) => { const a = r(4, 6), b = a + r(1, 2); return q(`Shohini runs at ${a} minutes per kilometre. Marc runs at ${b} minutes per kilometre. Who is faster?`, "Shohini", undefined, ["Minutes per kilometre is time for each kilometre.", `Shohini takes less time for each kilometre (${a} min < ${b} min), so she is faster.`], { choices: ["Shohini", "Marc"] }); },
+];
+
+const w10l2: Form[] = [
+  (r) => { const speed = r(3, 12) * 10, time = choose(r, [30, 45, 75, 90, 105, 150]); return q(`Travel for ${time} minutes at ${speed} km/h. How far do you travel?`, (speed * time) / 60, "km", [`${time} minutes = ${fmt(time / 60)} hours.`, `Distance = ${speed} × ${fmt(time / 60)} = ${fmt((speed * time) / 60)} km.`]); },
+  (r) => { const speed = r(4, 11) * 10, mins = r(5, 14) * 15, d = (speed * mins) / 60; return q(`How long does it take to travel ${fmt(d)} km at ${speed} km/h?`, `${Math.floor(mins / 60)}, ${mins % 60}`, undefined, [`Time = ${fmt(d)} ÷ ${speed} = ${fmt(mins / 60)} hours.`, `= ${Math.floor(mins / 60)} h ${mins % 60} min.`], DUR); },
+  (r) => { const speed = r(4, 11) * 10, mins = choose(r, [30, 45, 90, 120, 150]); return q(`A train travels ${fmt((speed * mins) / 60)} km in ${[Math.floor(mins / 60) ? `${Math.floor(mins / 60)} h` : "", mins % 60 ? `${mins % 60} min` : ""].filter(Boolean).join(" ")}. What is its average speed?`, speed, "km/h", [`Time in hours: ${fmt(mins / 60)}.`, `Speed = ${fmt((speed * mins) / 60)} ÷ ${fmt(mins / 60)} = ${speed} km/h.`], withVisual(diagram("rate", [], { variant: "train", labels: [`Distance: ${fmt((speed * mins) / 60)} km`, `Time: ${Math.floor(mins / 60)} h ${mins % 60} min`] }))); },
+  (r) => { const ms = r(5, 30), toMs = r(0, 1) === 1; return toMs ? q(`Convert ${fmt(ms * 3.6)} km/h to metres per second.`, ms, "m/s", ["1 km/h = 1000 m ÷ 3600 s, so divide by 3.6.", `${fmt(ms * 3.6)} ÷ 3.6 = ${ms} m/s.`]) : q(`Convert ${ms} m/s to kilometres per hour.`, rounded(ms * 3.6, 2), "km/h", ["Multiply by 3600 s and divide by 1000 m: × 3.6.", `${ms} × 3.6 = ${fmt(rounded(ms * 3.6, 2))} km/h.`]); },
+  (r) => { const d1 = r(5, 15) * 10, t1 = r(1, 3), d2 = r(3, 12) * 10, t2 = r(1, 2); return q(`A coach travels ${d1} km in ${t1} h, then ${d2} km in ${t2} h. What is its average speed for the whole trip? Round to one decimal place.`, rounded((d1 + d2) / (t1 + t2), 1), "km/h", [`Total distance: ${d1 + d2} km. Total time: ${t1 + t2} h.`, `${d1 + d2} ÷ ${t1 + t2} ≈ ${rounded((d1 + d2) / (t1 + t2), 1)} km/h.`], withVisual(diagram("rate", [], { variant: "coach", labels: [`Leg 1: ${d1} km in ${t1} h`, `Leg 2: ${d2} km in ${t2} h`] }))); },
+];
+
+const w10l3: Form[] = [
+  (r) => { const fuel = r(4, 12), distance = r(2, 8) * 100; return q(`A car uses ${(fuel * distance) / 100} L over ${distance} km. What is its fuel use in L/100 km?`, fuel, "L/100 km", [`${distance} km is ${distance / 100} lots of 100 km.`, `${(fuel * distance) / 100} ÷ ${distance / 100} = ${fuel} L/100 km.`]); },
+  (r) => { const s1 = choose(r, [0.6, 1.25, 2]), p1 = rounded(r(15, 35) / 10, 2), s2 = choose(r, [3.75, 6, 10].filter((v) => v !== s1)), p2 = rounded(r(50, 120) / 10, 2), u1 = p1 / s1, u2 = p2 / s2; return q(`A ${s1} L bottle costs ${money(p1)} and a ${s2} L pack costs ${money(p2)}. What is the lower price per litre, to the nearest cent?`, rounded(Math.min(u1, u2), 2), "$", [`${money(p1)} ÷ ${s1} = ${money(rounded(u1, 2))}/L. ${money(p2)} ÷ ${s2} = ${money(rounded(u2, 2))}/L.`, `The lower price is ${money(rounded(Math.min(u1, u2), 2))} per litre.`]); },
+  (r) => { const use = rounded(r(55, 110) / 10, 1), d = r(2, 9) * 50, price = rounded(r(170, 215) / 100, 2); return q(`A car uses ${use} L/100 km. Petrol costs ${money(price)} per litre. What is the fuel cost for a ${d} km trip?`, rounded((use * d * price) / 100, 2), "$", [`Fuel: ${use} × ${d / 100} = ${fmt(rounded((use * d) / 100, 3))} L.`, `Cost: ${fmt(rounded((use * d) / 100, 3))} × ${money(price)} = ${money(rounded((use * d * price) / 100, 2))}.`], withVisual(diagram("rate", [], { variant: "fuel", labels: [`${use} L/100 km`, `Trip: ${d} km`] }))); },
+  (r) => { const a = r(12, 40), t1 = r(2, 6), b = r(12, 40), t2 = r(2, 6), ra = a / t1, rb = b / t2; return q(`Tap A fills ${a} L in ${t1} minutes. Tap B fills ${b} L in ${t2} minutes. What is the flow rate of the faster tap? Round to one decimal place.`, rounded(Math.max(ra, rb), 1), "L/min", [`A: ${a} ÷ ${t1} = ${fmt(rounded(ra, 2))} L/min. B: ${b} ÷ ${t2} = ${fmt(rounded(rb, 2))} L/min.`, `Faster: ${rounded(Math.max(ra, rb), 1)} L/min.`]); },
+  (r) => { const students = choose(r, [120, 150, 180, 200]), days = r(4, 6), fewer = choose(r, [60, 75, 90, 100, 120].filter((v) => (students * days) % v === 0 && v < students)); return q(`A camp has enough food for ${students} students for ${days} days. How many days would it last for ${fewer} students?`, (students * days) / fewer, "days", [`Total food: ${students} × ${days} = ${students * days} student-days.`, `${students * days} ÷ ${fewer} = ${fmt((students * days) / fewer)} days. Fewer students make the food last longer.`]); },
+];
+
+// ── Week 11: ratios, scales and models (M07) ──────────────────────────────────
+const w11l1: Form[] = [
+  (r) => { const scale = r(2, 8) * 10000, length = r(2, 12); return q(`A map has a scale of 1:${scale.toLocaleString("en-AU")}. A route is ${length} cm on the map. What is its real length in kilometres?`, (scale * length) / 100000, "km", [`Real length: ${length} × ${scale.toLocaleString("en-AU")} = ${(length * scale).toLocaleString("en-AU")} cm.`, `÷ 100 000 = ${fmt((scale * length) / 100000)} km.`], withVisual(diagram("model", [scale, length], { variant: "map", labels: [`Scale 1:${scale.toLocaleString("en-AU")}`, `Map route: ${length} cm`] }))); },
+  (r) => { const scale = choose(r, [10000, 20000, 25000, 50000]), km = rounded(r(5, 60) / 10, 1); return q(`On a map with scale 1:${scale.toLocaleString("en-AU")}, how long is a real distance of ${km} km?`, rounded((km * 100000) / scale, 3), "cm", [`${km} km = ${(km * 100000).toLocaleString("en-AU")} cm.`, `÷ ${scale.toLocaleString("en-AU")} = ${fmt(rounded((km * 100000) / scale, 3))} cm on the map.`]); },
+  (r) => { const drawn = r(2, 8), real = choose(r, [10, 20, 25, 50]), factor = (real * 100) / drawn; return Number.isInteger(factor) ? q(`On a plan, ${drawn} cm represents ${real} m. The scale is 1:n. What is n?`, factor, undefined, [`${real} m = ${real * 100} cm.`, `${drawn} : ${real * 100} = 1 : ${factor}.`]) : q(`On a plan, 2 cm represents ${real} m. The scale is 1:n. What is n?`, real * 50, undefined, [`${real} m = ${real * 100} cm.`, `2 : ${real * 100} = 1 : ${real * 50}.`]); },
+  (r) => { const scale = choose(r, [18, 24, 43, 64]), real = rounded(r(35, 52) / 10, 1); return q(`A model car is built at a scale of 1:${scale}. The real car is ${real} m long. How long is the model, correct to one decimal place?`, rounded((real * 100) / scale, 1), "cm", [`${real} m = ${real * 100} cm.`, `${real * 100} ÷ ${scale} ≈ ${rounded((real * 100) / scale, 1)} cm.`]); },
+  (r) => { const scale = choose(r, [10000, 20000, 25000]), a = r(3, 8), b = r(2, 6); return q(`On this map (scale 1:${scale.toLocaleString("en-AU")}), the route goes from A to B to C. What is the total real distance in kilometres?`, ((a + b) * scale) / 100000, "km", [`Map distance: ${a} + ${b} = ${a + b} cm.`, `× ${scale.toLocaleString("en-AU")} ÷ 100 000 = ${fmt(((a + b) * scale) / 100000)} km.`], withVisual(diagram("model", [a, b], { variant: "mapRoute", labels: [`Scale 1:${scale.toLocaleString("en-AU")}`] }))); },
+];
+
+const w11l2: Form[] = [
+  (r) => { const a = r(1, 5), b = choose(r, [2, 3, 4, 5, 6, 7].filter((v) => v !== a && coprimeTo(a, v))), k = r(2, 8); return q(`Cordial and water are mixed in the ratio ${a}:${b}. You use ${a * k} L of cordial. How much water is needed?`, b * k, "L", [`Scale factor: ${a * k} ÷ ${a} = ${k}.`, `Water: ${b} × ${k} = ${b * k} L.`]); },
+  (r) => { const [a, b, c] = choose(r, [[1, 2, 3], [1, 2, 4], [2, 3, 5], [1, 3, 4]] as const), parts = a + b + c, unit = r(5, 20), total = parts * unit, which = choose(r, [["cement", a], ["sand", b], ["gravel", c]] as const); return q(`Concrete is mixed as cement : sand : gravel = ${a} : ${b} : ${c}. How much ${which[0]} is in ${total} kg of concrete?`, which[1] * unit, "kg", [`Total parts: ${parts}. One part = ${total} ÷ ${parts} = ${unit} kg.`, `${which[0][0].toUpperCase() + which[0].slice(1)}: ${which[1]} × ${unit} = ${which[1] * unit} kg.`]); },
+  (r) => { const from = choose(r, [4, 6]), to = choose(r, [10, 9, 15, 3]), amount = choose(r, [150, 180, 240, 300]); return q(`A recipe for ${from} people uses ${amount} g of flour. How much flour is needed for ${to} people?`, (amount * to) / from, "g", [`For 1 person: ${amount} ÷ ${from} = ${fmt(amount / from)} g.`, `For ${to}: × ${to} = ${fmt((amount * to) / from)} g.`]); },
+  (r) => { const a = r(1, 4), b = choose(r, [3, 5, 7].filter((v) => v !== a)), total = (a + b) * r(2, 6) * 0.5; return q(`Blue and white paint are mixed in the ratio ${a}:${b} to make ${fmt(total)} L. How much blue paint is used?`, rounded((total * a) / (a + b), 3), "L", [`Total parts: ${a + b}.`, `Blue: ${a}/${a + b} × ${fmt(total)} = ${fmt(rounded((total * a) / (a + b), 3))} L.`]); },
+  (r) => { const a = r(2, 5), b = choose(r, [3, 5, 7, 9].filter((v) => v !== a && coprimeTo(a, v))), total = (a + b) * r(20, 90); return q(`${money(total)} is shared between Amir and Bella in the ratio ${a}:${b}. How much does Bella get?`, (total * b) / (a + b), "$", [`Total parts: ${a + b}. One part = ${money(total / (a + b))}.`, `Bella: ${b} × ${money(total / (a + b))} = ${money((total * b) / (a + b))}.`]); },
+];
+
+const w11l3: Form[] = [
+  (r) => { const kw = choose(r, [1.2, 1.5, 2, 2.4, 3]), hrs = r(2, 6), days = 30, c = rounded(r(25, 38) / 100, 2); return q(`A heater uses ${kw} kW. It runs ${hrs} hours a day for ${days} days. Electricity costs ${Math.round(c * 100)}c per kWh. What is the cost?`, rounded(kw * hrs * days * c, 2), "$", [`Energy: ${kw} × ${hrs} × ${days} = ${fmt(rounded(kw * hrs * days, 2))} kWh.`, `Cost: ${fmt(rounded(kw * hrs * days, 2))} × ${money(c)} = ${money(rounded(kw * hrs * days * c, 2))}.`]); },
+  (r) => { const d = r(4, 12) * 100, a = rounded(r(75, 115) / 10, 1), b = rounded(a - r(15, 30) / 10, 1), price = rounded(r(170, 215) / 100, 2); return q(`For a ${d} km trip, car A uses ${a} L/100 km and car B uses ${b} L/100 km. Petrol is ${money(price)} per litre. How much cheaper is the trip in car B?`, rounded(((a - b) * d * price) / 100, 2), "$", [`Extra fuel for car A: (${a} − ${b}) × ${d / 100} = ${fmt(rounded(((a - b) * d) / 100, 3))} L.`, `× ${money(price)} = ${money(rounded(((a - b) * d * price) / 100, 2))}.`]); },
+  (r) => { const rate = choose(r, [92.4, 96.8, 101.5, 88.6]), aud = r(2, 20) * 50, toYen = r(0, 1) === 1; return toYen ? q(`The exchange rate is A$1 = ¥${rate}. How many yen do you get for A$${aud}?`, rounded(aud * rate, 2), "¥", ["Multiply by the rate.", `${aud} × ${rate} = ¥${fmt(rounded(aud * rate, 2))}.`]) : q(`The exchange rate is A$1 = ¥${rate}. How many Australian dollars is ¥${fmt(rounded(aud * rate, 2))} worth?`, aud, "$", ["Divide by the rate.", `${fmt(rounded(aud * rate, 2))} ÷ ${rate} = A$${aud}.`]); },
+  (r) => { const opts = [[0.6, rounded(r(25, 32) / 10, 2)], [1.25, rounded(r(30, 40) / 10, 2)], [2, rounded(r(30, 45) / 10, 2)], [3.75, rounded(r(55, 80) / 10, 2)]] as const, units = opts.map(([s, p]) => p / s); return q("Soft drink is sold in the sizes shown. What is the cheapest price per litre, to the nearest cent?", rounded(Math.min(...units), 2), "$", ["Price per litre = price ÷ litres for each size.", `${opts.map(([size], i) => `${size} L: ${money(rounded(units[i], 2))}/L`).join("; ")}. Cheapest: ${money(rounded(Math.min(...units), 2))}/L.`], { visual: table("Soft drink prices", ["Size", "Price"], opts.map(([size, price]) => [`${size} L`, money(price)])) }); },
+  (r) => { const d = r(3, 9) * 100, use = rounded(r(60, 100) / 10, 1), price = rounded(r(170, 215) / 100, 2), people = r(2, 5); const cost = (use * d * price) / 100; return q(`${people} friends share the fuel cost of a ${d} km trip. The car uses ${use} L/100 km and petrol is ${money(price)} per litre. How much does each person pay, to the nearest cent?`, rounded(cost / people, 2), "$", [`Fuel cost: ${use} × ${d / 100} × ${money(price)} = ${money(rounded(cost, 2))}.`, `÷ ${people} = ${money(rounded(cost / people, 2))} each.`]); },
+];
+
+// ── Week 12: apply and review (M01–M07) ───────────────────────────────────────
+const w12l1: Form[] = [w1l3[0], w3l3[1], w5l3[1], w6l3[0], w3l2[4]];
+const w12l2: Form[] = [w4l3[1], w9l2[1], w10l2[1], w10l3[2], w9l1[1]];
+const w12l3: Form[] = [w8l2[0], w11l1[0], w11l2[1], w11l3[0], w6l2[1]];
+
+export const measurementLessons: LessonFactory[] = [w1l1, w1l2, w1l3, w2l1, w2l2, w2l3, w3l1, w3l2, w3l3, w4l1, w4l2, w4l3, w5l1, w5l2, w5l3, w6l1, w6l2, w6l3, w7l1, w7l2, w7l3, w8l1, w8l2, w8l3, w9l1, w9l2, w9l3, w10l1, w10l2, w10l3, w11l1, w11l2, w11l3, w12l1, w12l2, w12l3].map(pickForm);
