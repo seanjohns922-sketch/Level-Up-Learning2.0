@@ -1,374 +1,285 @@
-import {
-  triangle8,
-  type Polygon8,
-} from "@/data/assessments/revisions/level8StarpathFiveForms";
-import { random, type LessonFactory, type QuestionDraft } from "./shared";
-const rectangle = (w: number, h: number, caption: string): Polygon8 => ({
-  points: [
-    { x: 0, y: 0 },
-    { x: w, y: 0 },
-    { x: w, y: h },
-    { x: 0, y: h },
-  ],
-  sideLabels: [String(w), String(h), String(w), String(h)],
-  caption,
-});
-export const spaceLessons: LessonFactory[] = [
-  (seed) => pair(seed, "length"),
-  (seed) => pair(seed, "congruent"),
-  (seed) => pair(seed, "overlay"),
-  (seed) => pair(seed, "sss"),
-  (seed) => {
-    const n = random(seed)(30, 100);
-    return {
-      prompt: `Two triangles each have sides 5 cm and 8 cm with ${n}° between those sides. Which congruence test applies?`,
-      answer: "SAS",
-      steps: [
-        "Two corresponding sides and their included angle match.",
-        "This is side–angle–side (SAS).",
-      ],
-    };
-  },
-  (seed) => {
-    const k = random(seed)(1, 8);
-    return {
-      prompt: `Two right triangles have hypotenuse ${5 * k} cm and one shorter side ${3 * k} cm. Which congruence test applies?`,
-      answer: "RHS",
-      steps: [
-        "The right angle, hypotenuse and a corresponding shorter side match.",
-        "This is RHS congruence.",
-      ],
-      spaceVisual: {
-        polygons: [
-          triangle8([3 * k, 4 * k, 5 * k], "Right triangle A"),
-          triangle8([3 * k, 4 * k, 5 * k], "Right triangle B"),
-        ],
-      },
-    };
-  },
-  (seed) => pair(seed, "similar"),
-  (seed) => pair(seed, "scale"),
-  (seed) => pair(seed, "missing"),
-  (seed) => {
-    const r = random(seed),
-      a = r(30, 70),
-      b = r(30, 70);
-    return {
-      prompt: `Both triangles have angles ${a}° and ${b}°. Are they necessarily similar? Type yes or no.`,
-      answer: "Yes",
-      steps: [
-        "Two corresponding angles match.",
-        "Their third angles also match, so AA similarity applies.",
-      ],
-    };
-  },
-  (seed) => pair(seed, "distinguish"),
-  (seed) => {
-    const r = random(seed),
-      n = r(3, 15);
-    return {
-      prompt: `A ${n} cm segment is reflected. How long is its image?`,
-      answer: n,
-      unit: "cm",
-      steps: [
-        "Reflection preserves all lengths.",
-        `The reflected segment is ${n} cm long.`,
-      ],
-    };
-  },
-  (seed) => {
-    const n = random(seed)(3, 15);
-    return {
-      prompt: `A rhombus has one side ${n} cm long. What is its perimeter?`,
-      answer: n * 4,
-      unit: "cm",
-      steps: [
-        "All four sides of a rhombus are equal.",
-        `4 × ${n} = ${4 * n} cm.`,
-      ],
-    };
-  },
-  (seed) => {
-    const n = random(seed)(3, 20);
-    return {
-      prompt: `A rectangle’s diagonals meet at O. One vertex is ${n} cm from O. How long is a complete diagonal?`,
-      answer: 2 * n,
-      unit: "cm",
-      steps: [
-        "Rectangle diagonals are equal and bisect one another.",
-        `A full diagonal is twice a half: ${2 * n} cm.`,
-      ],
-      spaceVisual: {
-        polygons: [
-          {
-            ...rectangle(8, 5, "Rectangle ABCD; diagonals meet at O."),
-            diagonals: true,
-            centreLabel: "O",
-          },
-        ],
-      },
-    };
-  },
-  (seed) => {
-    const n = random(seed)(3, 20);
-    return {
-      prompt: `A quadrilateral has four equal ${n} cm sides and four right angles. Name its most specific type.`,
-      answer: "Square",
-      steps: [
-        "Four equal sides make it a rhombus.",
-        "Four right angles also make it a rectangle. Together these define a square.",
-      ],
-      spaceVisual: {
-        polygons: [rectangle(n, n, "All corners are right angles.")],
-      },
-    };
-  },
-  (seed) => {
-    const k = random(seed)(2, 12);
-    return {
-      prompt: `A diagonal splits a parallelogram into two congruent triangles. One has area ${k * 5} cm². What is the parallelogram’s area?`,
-      answer: k * 10,
-      unit: "cm²",
-      steps: [
-        "Congruent triangles have equal areas.",
-        `Add two copies: ${k * 5} × 2 = ${k * 10}.`,
-      ],
-    };
-  },
-  (seed) => {
-    const n = random(seed)(40, 130);
-    return {
-      prompt: `One interior angle of a parallelogram is ${n}°. Find an adjacent angle.`,
-      answer: 180 - n,
-      unit: "°",
-      steps: [
-        "Adjacent angles in a parallelogram sum to 180°.",
-        `180 − ${n} = ${180 - n}°.`,
-      ],
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      w = r(6, 15),
-      h = r(2, 5);
-    return {
-      prompt: `This ${w} by ${h} rectangle has equal diagonals. Does that prove it is a square? Type yes or no.`,
-      answer: "No",
-      steps: [
-        "A non-square rectangle also has equal diagonals.",
-        `Its adjacent sides ${w} and ${h} are unequal; this is a counterexample.`,
-      ],
-      spaceVisual: {
-        polygons: [
-          { ...rectangle(w, h, "Non-square rectangle"), diagonals: true },
-        ],
-      },
-    };
-  },
-  (seed) => point(seed, "read"),
-  (seed) => point(seed, "coordinate"),
-  (seed) => point(seed, "rotate"),
-  (seed) => {
-    const r = random(seed),
-      x = r(0, 2),
-      y = r(0, 2),
-      z = r(0, 2);
-    return {
-      prompt: `Start at (${x}, ${y}, ${z}). Move +2 in x, +1 in y and +1 in z. Give the final coordinates in x, y, z order.`,
-      answer: `${x + 2}, ${y + 1}, ${z + 1}`,
-      input: "list",
-      labels: ["x", "y", "z"],
-      steps: [
-        "Add each movement to its matching coordinate.",
-        `Final point: (${x + 2}, ${y + 1}, ${z + 1}).`,
-      ],
-      spaceVisual: {
-        space: {
-          point: { x, y, z },
-          caption: "Start point P; each grid interval is 1.",
-        },
-      },
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      x = r(1, 4),
-      y = r(1, 4),
-      z = r(1, 3);
-    return {
-      prompt: `Point A is (${x}, ${y}, ${z}). Point B is directly above A at height 4. Give B in x, y, z order.`,
-      answer: `${x}, ${y}, 4`,
-      input: "list",
-      labels: ["x", "y", "z"],
-      steps: [
-        "Directly above means x and y stay the same.",
-        "Change only z to 4.",
-      ],
-      spaceVisual: {
-        space: {
-          point: { x, y, z },
-          caption: "A vertical column keeps the same x and y.",
-        },
-      },
-    };
-  },
-  (seed) => {
-    const r = random(seed),
-      x = r(1, 4),
-      y = r(1, 4),
-      z = r(1, 4);
-    return {
-      prompt: `A drone is ${x} units east, ${y} units north and ${z} units above the origin. East is x, north is y, up is z. Give its coordinates.`,
-      answer: `${x}, ${y}, ${z}`,
-      input: "list",
-      labels: ["x", "y", "z"],
-      steps: [
-        "Write x, then y, then z.",
-        `The position is (${x}, ${y}, ${z}).`,
-      ],
-    };
-  },
-  (seed) => pair(seed, "algorithm"),
-  (seed) => {
-    const n = random(seed)(2, 8);
-    return {
-      prompt: `An algorithm says “same angles ⇒ congruent”. Triangles have sides 3, 4, 5 and ${3 * n}, ${4 * n}, ${5 * n}. What should it return: congruent or similar?`,
-      answer: "Similar",
-      steps: [
-        `The scale factor is ${n}, not 1.`,
-        "Matching angles prove similarity, not necessarily congruence.",
-      ],
-      spaceVisual: {
-        polygons: [
-          triangle8([3, 4, 5], "A"),
-          triangle8([3 * n, 4 * n, 5 * n], "B"),
-        ],
-      },
-    };
-  },
-  (seed) => {
-    const k = random(seed)(2, 9);
-    return {
-      prompt: `A sorting rule first checks matching side ratios. Which scale factor should its next test require for congruence: 1 or ${k}?`,
-      answer: 1,
-      steps: [
-        "Similar figures are congruent when their sizes also match.",
-        "That requires scale factor 1.",
-      ],
-    };
-  },
-  (seed) => pair(seed, "scale"),
-  (seed) => point(seed, "read"),
-  (seed) => pair(seed, "algorithm"),
+import { triangle8, type Polygon8 } from "@/data/assessments/revisions/level8StarpathFiveForms";
+import { random, rounded, table, type LessonFactory, type QuestionDraft } from "./shared";
+
+// Level 8 Space (AC9M8SP01–SP04). Each lesson draws from several question forms covering
+// fluency, reasoning and problem-solving, modelled on the Year 8 Victorian Curriculum textbook
+// (Essential Mathematics VCE 8, 2D, 2G and 10D–10I). The seed picks the form and its values.
+
+type R = (min: number, max: number) => number;
+type Form = (r: R) => QuestionDraft;
+type Pt = { x: number; y: number };
+const pickForm = (forms: Form[]): LessonFactory => (seed) => { const r = random(seed); return forms[r(0, forms.length - 1)](r); };
+const choose = <T,>(r: R, items: readonly T[]) => items[r(0, items.length - 1)];
+const fmt = (n: number) => String(rounded(n, 4));
+const deg = (d: number) => (d * Math.PI) / 180;
+/** “A” or “An” before a number or word, by how it is said. */
+const An = (w: number | string) => (/^(8|11|18|8\d|[aeiou])/i.test(String(w)) ? "An" : "A");
+const an = (w: number | string) => An(w).toLowerCase();
+const nonZeroMove = (r: R, lo: number, hi: number) => { const v = r(lo, hi - 1); return v >= 0 ? v + 1 : v; };
+
+// ── Diagram helpers ───────────────────────────────────────────────────────────
+const shapes = (...polygons: Polygon8[]): Partial<QuestionDraft> => ({ spaceVisual: { polygons } });
+const space = (s: NonNullable<NonNullable<QuestionDraft["spaceVisual"]>["space"]>): Partial<QuestionDraft> => ({ spaceVisual: { space: s } });
+/** Triangle from three sides, labelled AB, BC, CA. */
+const tri = (sides: number[], caption: string, vertices = ["A", "B", "C"], labels?: string[]): Polygon8 => ({ ...triangle8(sides, caption, vertices), sideLabels: labels ?? sides.map(String) });
+/** Triangle from two sides and the angle at A between them (SAS). Side labels AB, BC, CA. */
+function sasTri(ab: number, ca: number, angle: number, caption: string, vertices = ["A", "B", "C"], angleAt = 0, labels?: string[]): Polygon8 {
+  const c = { x: ca * Math.cos(deg(angle)), y: ca * Math.sin(deg(angle)) }, bc = Math.hypot(ab - c.x, c.y), angles = ["", "", ""];
+  angles[angleAt] = angleAt === 0 ? `${angle}°` : `${Math.round((Math.acos((ab * ab + bc * bc - ca * ca) / (2 * ab * bc)) * 180) / Math.PI)}°`;
+  return { points: [{ x: 0, y: 0 }, { x: ab, y: 0 }, c], sideLabels: labels ?? [String(ab), "", String(ca)], angles, vertices, caption };
+}
+/** Triangle from base AB and the angles at A and B. */
+function aasTri(ab: number, a: number, b: number, caption: string, vertices = ["A", "B", "C"], labels?: string[]): Polygon8 {
+  const t = Math.tan(deg(a)), u = Math.tan(deg(b)), x = (ab * u) / (t + u);
+  return { points: [{ x: 0, y: 0 }, { x: ab, y: 0 }, { x, y: x * t }], sideLabels: labels ?? [String(ab), "", ""], angles: [`${a}°`, `${b}°`, ""], vertices, caption };
+}
+const rightTri = (a: number, b: number, caption: string, vertices = ["A", "B", "C"], labels?: string[]): Polygon8 => ({ points: [{ x: 0, y: 0 }, { x: a, y: 0 }, { x: 0, y: b }], sideLabels: labels ?? [String(a), String(rounded(Math.hypot(a, b), 2)), String(b)], angles: ["90°", "", ""], vertices, caption });
+const quad = (points: [number, number][], caption: string, extra: Partial<Polygon8> = {}): Polygon8 => ({ points: points.map(([x, y]) => ({ x, y })), caption, ...extra });
+/** Move a shape without changing its size: turn by quarter turns, and optionally reflect. */
+function transform(p: Polygon8, turns: number, reflect = false, caption = p.caption, vertices = p.vertices): Polygon8 {
+  const turn = (q: Pt): Pt => { let { x, y } = q; for (let i = 0; i < ((turns % 4) + 4) % 4; i++) [x, y] = [-y, x]; return { x: reflect ? -x : x, y }; };
+  return { ...p, points: p.points.map(turn), caption, vertices };
+}
+const scale = (p: Polygon8, k: number, caption: string, vertices = p.vertices, labels?: string[]): Polygon8 => ({ ...p, points: p.points.map((v) => ({ x: v.x * k, y: v.y * k })), sideLabels: labels ?? p.sideLabels?.map((s) => (s ? fmt(Number(s) * k) : s)), caption, vertices });
+
+// A scalene triangle that draws clearly.
+const scalene = (r: R) => { const a = r(4, 9), b = a + r(1, 3), c = b + r(1, 2); return [a, b, Math.min(c, a + b - 1)]; };
+const VLETTERS = [["A", "B", "C"], ["P", "Q", "R"], ["D", "E", "F"], ["X", "Y", "Z"], ["L", "M", "N"]] as const;
+const TESTS = ["SSS", "SAS", "AAS", "RHS"];
+
+// ── Week 1: same shape and size (SP01) ────────────────────────────────────────
+const w1l1: Form[] = [
+  (r) => { const s = scalene(r), hide = r(0, 2), labels = s.map(String); labels[hide] = "x"; const b = transform(tri(s, "Triangle B", ["D", "E", "F"], labels), r(1, 3), r(0, 1) === 1); return { prompt: "These triangles are congruent. Find the length x.", answer: s[hide], unit: "cm", steps: ["Congruent shapes have equal corresponding sides.", `x matches the side of length ${s[hide]} cm in triangle A, so x = ${s[hide]} cm.`], ...shapes(tri(s, "Triangle A", ["A", "B", "C"]), b) }; },
+  (r) => { const p = choose(r, VLETTERS), q = choose(r, VLETTERS.filter((v) => v !== p)), i = r(0, 2); return { prompt: `△${p.join("")} ≡ △${q.join("")}. Which vertex corresponds to ${p[i]}?`, answer: q[i], input: "text", steps: ["In a congruence statement, vertices are listed in matching order.", `${p[i]} is in position ${i + 1}, so it matches ${q[i]}.`] }; },
+  (r) => { const [p, q] = [["A", "B", "C"], choose(r, VLETTERS.slice(1))], s = scalene(r), pairs = [[0, 1], [1, 2], [0, 2]] as const, [i, j] = choose(r, pairs); return { prompt: `△ABC ≡ △${q.join("")}. In △ABC, side ${p[i]}${p[j]} is ${s[i === 0 && j === 1 ? 0 : i === 1 ? 1 : 2]} cm. How long is side ${q[i]}${q[j]}?`, answer: s[i === 0 && j === 1 ? 0 : i === 1 ? 1 : 2], unit: "cm", steps: [`${p[i]} matches ${q[i]} and ${p[j]} matches ${q[j]}, so ${p[i]}${p[j]} corresponds to ${q[i]}${q[j]}.`, "Corresponding sides of congruent triangles are equal."] }; },
+  (r) => { const a = r(60, 110), b = r(60, 100), c = r(70, 110), d = 360 - a - b - c, base: [number, number][] = [[0, 0], [6, 0], [7, 4], [1, 5]], angles = [a, b, c, d].map((v) => `${v}°`), shown = [...angles]; const hide = r(0, 3); shown[hide] = "a°"; return { prompt: "These quadrilaterals are congruent. Find the angle marked a°.", answer: [a, b, c, d][hide], unit: "°", steps: ["Congruent shapes have equal corresponding angles.", `a° matches the angle of ${[a, b, c, d][hide]}° in shape A.`], ...shapes(quad(base, "Shape A", { angles, vertices: ["A", "B", "C", "D"] }), transform(quad(base, "Shape B", { angles: shown, vertices: ["E", "F", "G", "H"] }), 2)) }; },
+  (r) => { const s = scalene(r); return { prompt: `△ABC ≡ △XYZ. AB = ${s[0]} cm, BC = ${s[1]} cm and CA = ${s[2]} cm. What is the perimeter of △XYZ?`, answer: s[0] + s[1] + s[2], unit: "cm", steps: ["Congruent triangles have equal corresponding sides, so their perimeters are equal.", `${s[0]} + ${s[1]} + ${s[2]} = ${s[0] + s[1] + s[2]} cm.`] }; },
 ];
-function pair(seed: number, mode: string): QuestionDraft {
-  const r = random(seed),
-    a = r(3, 9),
-    b = a + 1,
-    c = a + 2,
-    k =
-      mode === "congruent" ||
-      mode === "overlay" ||
-      mode === "sss" ||
-      mode === "length"
-        ? 1
-        : r(2, 5),
-    polygons = [
-      triangle8([a, b, c], "Triangle A"),
-      triangle8([a * k, b * k, c * k], "Triangle B"),
-    ];
-  const common = { spaceVisual: { polygons } };
-  if (mode === "length")
-    return {
-      ...common,
-      prompt: `Triangle B is congruent to A. Which length corresponds to the ${b} cm side?`,
-      answer: b,
-      unit: "cm",
-      steps: [
-        "Corresponding sides of congruent triangles have equal lengths.",
-        `The matching side is ${b} cm.`,
-      ],
-    };
-  if (mode === "missing")
-    return {
-      spaceVisual: {
-        polygons: [
-          polygons[0],
-          { ...polygons[1], sideLabels: [String(a * k), String(b * k), "x"] },
-        ],
-      },
-      prompt:
-        "The triangles are similar. Find side x in triangle B. All lengths are in centimetres.",
-      answer: c * k,
-      unit: "cm",
-      steps: [
-        `Scale factor: ${a * k} ÷ ${a} = ${k}.`,
-        `Multiply the matching side: ${c} × ${k} = ${c * k} cm.`,
-      ],
-    };
-  if (mode === "scale")
-    return {
-      ...common,
-      prompt: "What is the scale factor from triangle A to triangle B?",
-      answer: k,
-      steps: [
-        `Divide matching lengths: ${a * k} ÷ ${a} = ${k}.`,
-        "Check that the same factor works for every side.",
-      ],
-    };
-  if (mode === "sss")
-    return {
-      ...common,
-      prompt:
-        "Which congruence test is established by the three matching side lengths?",
-      answer: "SSS",
-      steps: [
-        "All three corresponding side lengths are equal.",
-        "This is side–side–side congruence.",
-      ],
-    };
-  return {
-    ...common,
-    prompt:
-      mode === "overlay"
-        ? "Will these triangles overlap exactly after moving or turning one? Type yes or no."
-        : mode === "algorithm"
-          ? `Use this rule: matching ratios → similar; ratio 1 → congruent. Classify this pair as congruent or similar.`
-          : "Classify this pair as congruent or similar.",
-    answer: mode === "overlay" ? "Yes" : k === 1 ? "Congruent" : "Similar",
-    steps: [
-      `All corresponding sides have ratio ${k}.`,
-      k === 1
-        ? "Their shape and size match."
-        : "Their shape matches but their sizes differ.",
-    ],
-  };
-}
-function point(seed: number, mode: string): QuestionDraft {
-  const r = random(seed),
-    x = r(0, 4),
-    y = r(0, 4),
-    z = r(1, 4);
-  return {
-    prompt:
-      mode === "rotate"
-        ? "Rotate the view. What is the point’s height?"
-        : mode === "coordinate"
-          ? "Give P’s coordinates in x, y, z order."
-          : "Read P’s coordinates in x, y, z order.",
-    answer: mode === "rotate" ? z : `${x}, ${y}, ${z}`,
-    input: mode === "rotate" ? "number" : "list",
-    labels: ["x", "y", "z"],
-    steps:
-      mode === "rotate"
-        ? ["Turning the view does not move P.", `Its height stays ${z}.`]
-        : [`Follow the projection lines: x = ${x}, y = ${y}, z = ${z}.`],
-    spaceVisual: {
-      space: {
-        point: { x, y, z },
-        caption: "Each axis runs from 0 to 4. Read x, then y, then height z.",
-        readCoordinates: true,
-      },
-    },
-  };
-}
+
+const w1l2: Form[] = [
+  (r) => { const s = scalene(r), congruent = r(0, 1) === 1, t = congruent ? s : [s[0], s[1], s[2] + choose(r, [-1, 1])]; return { prompt: "Triangle B is triangle A after a turn or flip. Are the triangles congruent?", answer: congruent ? "Congruent" : "Not congruent", choices: ["Congruent", "Not congruent"], steps: ["Compare each pair of corresponding sides.", congruent ? "All three pairs match, so they are congruent." : `One side differs (${s[2]} cm and ${t[2]} cm), so they are not congruent.`], ...shapes(tri(s, "Triangle A"), transform(tri(t, "Triangle B", ["D", "E", "F"]), r(1, 3), r(0, 1) === 1)) }; },
+  (r) => { const kind = choose(r, ["Reflection", "Rotation"] as const), base: [number, number][] = [[0, 0], [5, 0], [4, 2], [1, 3]]; return { prompt: "Which transformation moves shape A onto shape B?", answer: kind, choices: ["Reflection", "Rotation", "Translation"], steps: [kind === "Reflection" ? "Shape B is a mirror image: the order of the corners is reversed." : "Shape B has been turned: the corners keep their order around the shape.", `It is a ${kind.toLowerCase()}.`], ...shapes(quad(base, "Shape A", { vertices: ["A", "B", "C", "D"] }), kind === "Reflection" ? transform(quad(base, "Shape B", { vertices: ["A′", "B′", "C′", "D′"] }), 0, true) : transform(quad(base, "Shape B", { vertices: ["A′", "B′", "C′", "D′"] }), choose(r, [1, 2]))) }; },
+  (r) => { const P = r(14, 40), k = r(2, 4), enlarge = r(0, 1) === 1; return { prompt: enlarge ? `A shape with perimeter ${P} cm is enlarged by a scale factor of ${k}. What is the perimeter of the image?` : `A shape with perimeter ${P} cm is reflected and then translated. What is the perimeter of the image?`, answer: enlarge ? P * k : P, unit: "cm", steps: enlarge ? ["An enlargement multiplies every length by the scale factor.", `${P} × ${k} = ${P * k} cm.`] : ["Reflections and translations keep every length the same.", `The perimeter stays ${P} cm.`] }; },
+  (r) => { const a = r(25, 140), k = r(2, 5); return { prompt: `A shape has an angle of ${a}°. It is reflected and then enlarged by a scale factor of ${k}. What is the size of the matching angle in the image?`, answer: a, unit: "°", steps: ["Reflections and enlargements keep angle sizes.", `The angle is still ${a}°.`] }; },
+  (r) => { const x = r(1, 6) * (r(0, 1) ? 1 : -1), y = r(1, 6) * (r(0, 1) ? 1 : -1), kind = choose(r, ["y-axis", "x-axis", "origin"] as const), img = kind === "y-axis" ? [-x, y] : kind === "x-axis" ? [x, -y] : [-x, -y]; return { prompt: kind === "origin" ? `Point (${x}, ${y}) is rotated 180° about the origin. What are the coordinates of its image?` : `Point (${x}, ${y}) is reflected in the ${kind}. What are the coordinates of its image?`, answer: `${img[0]}, ${img[1]}`, input: "list", labels: ["x", "y"], steps: [kind === "y-axis" ? "Reflecting in the y-axis changes the sign of x." : kind === "x-axis" ? "Reflecting in the x-axis changes the sign of y." : "A half-turn about the origin changes the sign of both coordinates.", `The image is (${img[0]}, ${img[1]}).`] }; },
+];
+
+const w1l3: Form[] = [
+  (r) => { const s = scalene(r), same = r(0, 1) === 1, order = [s[1], s[2], s[0]], t = same ? order : [order[0], order[1] + 1, order[2]]; return { prompt: `Triangle A has sides ${s.join(", ")} cm. Triangle B has sides ${t.join(", ")} cm. Would they overlap exactly after moving one of them?`, answer: same ? "Yes" : "No", steps: ["Shapes overlap exactly only if every corresponding side matches.", same ? "The same three lengths appear in a different order, so they are congruent." : "The side lengths are not the same set, so they cannot overlap exactly."] }; },
+  (r) => { const s = r(3, 9); return { prompt: `A square and a rhombus both have four sides of ${s} cm. Are they congruent?`, answer: "No", steps: ["Matching sides are not enough for quadrilaterals: the angles can change.", "The rhombus has angles that are not 90°, so it cannot overlap the square."] }; },
+  (r) => { const w = r(5, 12), h = r(3, 8), k = r(2, 6), pts: [number, number][] = [[0, 0], [w, 0], [w + k, h], [k, h]], labels = [String(w), String(rounded(Math.hypot(k, h), 1)), String(w), String(rounded(Math.hypot(k, h), 1))], shown = [...labels]; shown[1] = "x"; return { prompt: "These parallelograms are congruent. Find x.", answer: rounded(Math.hypot(k, h), 1), unit: "cm", steps: ["Corresponding sides of congruent shapes are equal.", `x matches the slanted side of ${rounded(Math.hypot(k, h), 1)} cm.`], ...shapes(quad(pts, "Shape A", { sideLabels: labels }), transform(quad(pts, "Shape B", { sideLabels: shown }), 2)) }; },
+  (r) => { const [name, cut, yes] = choose(r, [["parallelogram", "one of its diagonals", true], ["rectangle", "one of its diagonals", true], ["rhombus", "one of its diagonals", true], ["kite", "its line of symmetry", true], ["kite", "the diagonal that is not its line of symmetry", false], ["trapezium", "one of its diagonals", false]] as const); return { prompt: `A ${name} is cut along ${cut}. Are the two triangles congruent?`, answer: yes ? "Yes" : "No", steps: [yes ? "The two triangles have three pairs of equal sides (one side is shared)." : "The two triangles have different side lengths.", yes ? "By SSS they are congruent." : "So they are not congruent."] }; },
+  (r) => { const x = r(1, 5), y = r(1, 5), dx = r(-5, 5) || 2, dy = r(-5, 5) || -3; return { prompt: `Point (${x}, ${y}) is translated ${Math.abs(dx)} units ${dx > 0 ? "right" : "left"} and ${Math.abs(dy)} units ${dy > 0 ? "up" : "down"}. What are the coordinates of its image?`, answer: `${x + dx}, ${y + dy}`, input: "list", labels: ["x", "y"], steps: [`x: ${x} ${dx > 0 ? "+" : "−"} ${Math.abs(dx)} = ${x + dx}. y: ${y} ${dy > 0 ? "+" : "−"} ${Math.abs(dy)} = ${y + dy}.`, "A translation slides the shape without turning or resizing it."] }; },
+];
+
+// ── Week 2: congruence tests (SP01) ──────────────────────────────────────────
+const w2l1: Form[] = [
+  (r) => { const s = scalene(r); return { prompt: "Which test shows that these triangles are congruent?", answer: "SSS", choices: TESTS, steps: ["All three pairs of corresponding sides are equal.", "This is the side–side–side (SSS) test."], ...shapes(tri(s, "Triangle A"), transform(tri(s, "Triangle B", ["D", "E", "F"]), r(1, 3), r(0, 1) === 1)) }; },
+  (r) => { const s = scalene(r), same = r(0, 1) === 1, t = same ? [s[2], s[0], s[1]] : [s[2], s[0], s[1] + 1]; return { prompt: `△ABC has sides ${s.join(" cm, ")} cm. △DEF has sides ${t.join(" cm, ")} cm. Are they congruent?`, answer: same ? "Yes" : "No", steps: ["Compare the sets of side lengths.", same ? "The same three lengths appear, so the triangles are congruent by SSS." : "One length differs, so they are not congruent."] }; },
+  (r) => { const s = scalene(r), labels = ["x", "y", String(s[2])]; return { prompt: "These triangles are congruent by SSS. Find x and y.", answer: `${s[0]}, ${s[1]}`, input: "list", labels: ["x", "y"], steps: ["Match the sides using the equal side and the shape’s position.", `x = ${s[0]} cm and y = ${s[1]} cm.`], ...shapes(tri(s, "Triangle A"), transform(tri(s, "Triangle B", ["D", "E", "F"], labels), 2)) }; },
+  (r) => { const s = scalene(r); return { prompt: `Can a triangle with sides ${s.join(" cm, ")} cm be drawn in more than one shape?`, answer: "No", steps: ["Three side lengths fix a triangle completely.", "Any two triangles with these sides are congruent (SSS), so there is only one shape."] }; },
+  (r) => { const k = r(2, 4); return { prompt: `Ben says triangles with sides 3, 4, 5 and ${3 * k}, ${4 * k}, ${5 * k} are congruent because their angles match. Is he correct?`, answer: "No", steps: ["Matching angles show the triangles have the same shape.", `But the sides are ${k} times as long, so they are similar, not congruent.`] }; },
+];
+
+const w2l2: Form[] = [
+  (r) => { const a = r(4, 9), b = r(5, 10), ang = r(40, 110); return { prompt: "Which test shows that these triangles are congruent?", answer: "SAS", choices: TESTS, steps: [`Two sides (${a} cm and ${b} cm) and the angle between them (${ang}°) match.`, "This is the side–angle–side (SAS) test."], ...shapes(sasTri(a, b, ang, "Triangle A"), transform(sasTri(a, b, ang, "Triangle B", ["D", "E", "F"]), 2, true)) }; },
+  (r) => { const a = r(4, 9), b = r(5, 10), ang = r(40, 100), inc = r(0, 1) === 1; return { prompt: "In this triangle, is the marked angle between the two labelled sides?", answer: inc ? "Yes" : "No", steps: [inc ? "The angle sits at the corner where the two labelled sides meet." : "The angle sits at a corner where only one labelled side meets.", inc ? "It is the included angle, so SAS can be used." : "It is not the included angle, so SAS cannot be used."], ...shapes(sasTri(a, b, ang, "Triangle", ["A", "B", "C"], inc ? 0 : 1)) }; },
+  (r) => { const a = r(4, 9), b = r(5, 10), ang = r(40, 110), c = rounded(Math.sqrt(a * a + b * b - 2 * a * b * Math.cos(deg(ang))), 1); return { prompt: "These triangles are congruent by SAS. Find x.", answer: c, unit: "cm", steps: ["Congruent triangles have all corresponding sides equal, including the third side.", `x matches the third side of triangle A: ${c} cm.`], ...shapes(sasTri(a, b, ang, "Triangle A", ["A", "B", "C"], 0, [String(a), String(c), String(b)]), transform(sasTri(a, b, ang, "Triangle B", ["D", "E", "F"], 0, [String(a), "x", String(b)]), 1)) }; },
+  (r) => { const ang = r(40, 110), q = choose(r, VLETTERS.slice(1)); return { prompt: `In △ABC, AB = ${r(4, 8)} cm, ∠B = ${ang}° and BC = ${r(5, 9)} cm. △${q.join("")} has the same two side lengths in matching positions. At which vertex of △${q.join("")} must the ${ang}° angle be for SAS?`, answer: q[1], input: "text", steps: ["For SAS the angle must be between the two sides.", `In △ABC it is at B, so in △${q.join("")} it must be at the matching vertex, ${q[1]}.`] }; },
+  () => ({ prompt: "Two triangles have two pairs of equal sides and an equal angle that is NOT between those sides. Is that enough to prove they are congruent?", answer: "No", steps: ["Side–side–angle (SSA) is not a congruence test.", "With the angle not between the sides, two different triangles can sometimes be drawn."] }),
+];
+
+const w2l3: Form[] = [
+  (r) => { const [a, b] = choose(r, [[3, 4], [5, 12], [8, 15], [6, 8], [7, 24]] as const); return { prompt: "Which test shows that these right-angled triangles are congruent?", answer: "RHS", choices: TESTS, steps: ["Each triangle has a right angle, the same hypotenuse and one matching shorter side.", "This is the right angle–hypotenuse–side (RHS) test."], ...shapes(rightTri(a, b, "Triangle A", ["A", "B", "C"], [String(a), String(Math.hypot(a, b)), ""]), transform(rightTri(a, b, "Triangle B", ["D", "E", "F"], [String(a), String(Math.hypot(a, b)), ""]), 1, true)) }; },
+  (r) => { const a = r(35, 70), b = r(40, 80), s = r(5, 10); return { prompt: "Which test shows that these triangles are congruent?", answer: "AAS", choices: TESTS, steps: [`Two angles (${a}° and ${b}°) and a corresponding side (${s} cm) match.`, "This is the angle–angle–side (AAS) test."], ...shapes(aasTri(s, a, b, "Triangle A"), transform(aasTri(s, a, b, "Triangle B", ["D", "E", "F"]), 2, true)) }; },
+  (r) => { const a = r(35, 70), b = r(40, 80); return { prompt: `Two triangles both have angles of ${a}°, ${b}° and ${180 - a - b}°. Must they be congruent?`, answer: "No", steps: ["Matching angles (AAA) give the same shape but not necessarily the same size.", "AAA is a test for similarity, not congruence."] }; },
+  (r) => { const [a, b, c] = choose(r, [[3, 4, 5], [5, 12, 13], [8, 15, 17], [6, 8, 10], [9, 12, 15], [7, 24, 25]] as const); return { prompt: `Two right-angled triangles are congruent by RHS. Each has a hypotenuse of ${c} cm and a shorter side of ${a} cm. How long is the third side?`, answer: b, unit: "cm", steps: [`Use Pythagoras: ${c}² − ${a}² = ${c * c - a * a}.`, `√${c * c - a * a} = ${b} cm.`] }; },
+  (r) => { const a = r(35, 75), b = r(40, 80); return { prompt: `Two triangles each have angles of ${a}° and ${b}°. What is the third angle in each triangle?`, answer: 180 - a - b, unit: "°", steps: ["The angles in a triangle add to 180°.", `180 − ${a} − ${b} = ${180 - a - b}°. So two matching angles always make the third match too.`] }; },
+];
+
+// ── Week 3: similar shapes and scale factors (SP01) ───────────────────────────
+const w3l1: Form[] = [
+  (r) => { const s = scalene(r), kind = choose(r, ["Congruent", "Similar", "Neither"] as const), k = kind === "Congruent" ? 1 : choose(r, [1.5, 2, 2.5, 3]), t = kind === "Neither" ? [s[0] * 2, s[1] * 2, s[2] * 2 + 1] : s.map((v) => v * k); return { prompt: "Are these triangles congruent, similar but not congruent, or neither?", answer: kind, choices: ["Congruent", "Similar", "Neither"], steps: [`Compare matching sides: ${t.map((v, i) => `${fmt(v)} ÷ ${s[i]} = ${fmt(v / s[i])}`).join(", ")}.`, kind === "Congruent" ? "Every ratio is 1, so they are congruent." : kind === "Similar" ? `Every ratio is ${k}, so they are similar.` : "The ratios are not all equal, so they are neither."], ...shapes(tri(s, "Triangle A"), transform(tri(t, "Triangle B", ["D", "E", "F"]), r(0, 3))) }; },
+  (r) => { const w = r(2, 6) * 2, h = w + r(1, 3) * 2, k = choose(r, [1.5, 2, 2.5]), yes = r(0, 1) === 1, W = w * k, H = yes ? h * k : h * k + choose(r, [-1, 1]) * 2; return { prompt: `Rectangle A is ${w} cm by ${h} cm. Rectangle B is ${fmt(W)} cm by ${fmt(H)} cm. Are they similar?`, answer: yes ? "Yes" : "No", steps: [`Ratios: ${fmt(W)} ÷ ${w} = ${fmt(W / w)} and ${fmt(H)} ÷ ${h} = ${fmt(rounded(H / h, 3))}.`, yes ? "The ratios are equal, so the rectangles are similar." : "The ratios differ, so they are not similar."] }; },
+  (r) => { const [claim, truth, why] = choose(r, [["All squares are similar.", "True", "Every square has 90° angles and sides in the ratio 1 : 1."], ["All rectangles are similar.", "False", "A 1 by 2 rectangle and a 1 by 5 rectangle have different side ratios."], ["All equilateral triangles are similar.", "True", "Every equilateral triangle has three 60° angles."], ["All isosceles triangles are similar.", "False", "Their equal angles can be any size, so their shapes differ."], ["All circles are similar.", "True", "Any circle is an enlargement of another."], ["All rhombuses are similar.", "False", "Their angles can differ even with equal sides."], ["All right-angled triangles are similar.", "False", "Their other two angles can differ."]] as const); return { prompt: `True or false? ${claim}`, answer: truth, choices: ["True", "False"], steps: [why, `So the statement is ${truth.toLowerCase()}.`] }; },
+  (r) => { const a = r(30, 150), k = r(2, 5); return { prompt: `A shape is enlarged by a scale factor of ${k}. One of its angles is ${a}°. What is the matching angle in the enlarged shape?`, answer: a, unit: "°", steps: ["An enlargement changes lengths but not angles.", `The angle stays ${a}°.`] }; },
+  (r) => { const s = r(2, 6), k = r(2, 4), sameShape = r(0, 1) === 1; const a: [number, number][] = [[0, 0], [s * 2, 0], [s * 2, s], [0, s]], b: [number, number][] = sameShape ? a.map(([x, y]) => [x * k, y * k]) : [[0, 0], [s * 2 * k, 0], [s * 2 * k, s * k + 2], [0, s * k + 2]]; return { prompt: "Are these rectangles similar?", answer: sameShape ? "Yes" : "No", steps: [`Length ratio: ${b[1][0]} ÷ ${a[1][0]} = ${fmt(b[1][0] / a[1][0])}. Width ratio: ${b[2][1]} ÷ ${a[2][1]} = ${fmt(rounded(b[2][1] / a[2][1], 3))}.`, sameShape ? "Both ratios are equal, so they are similar." : "The ratios differ, so they are not similar."], ...shapes(quad(a, "Rectangle A", { sideLabels: [String(a[1][0]), String(a[2][1]), "", ""] }), quad(b, "Rectangle B", { sideLabels: [String(b[1][0]), String(b[2][1]), "", ""] })) }; },
+];
+
+const w3l2: Form[] = [
+  (r) => { const s = scalene(r), k = choose(r, [1.5, 2, 2.5, 3, 4]); return { prompt: "What is the scale factor from triangle A to triangle B?", answer: k, steps: [`Divide a side of B by the matching side of A: ${fmt(s[0] * k)} ÷ ${s[0]} = ${k}.`, "Check another pair gives the same factor."], ...shapes(tri(s, "Triangle A"), transform(scale(tri(s, "Triangle B", ["D", "E", "F"]), k, "Triangle B"), r(0, 3))) }; },
+  (r) => { const s = scalene(r).map((v) => v * 2), k = 0.5; return { prompt: "Triangle B is a reduction of triangle A. What is the scale factor from A to B?", answer: k, steps: [`${fmt(s[0] * k)} ÷ ${s[0]} = ${k}.`, "A scale factor less than 1 makes the shape smaller."], ...shapes(tri(s, "Triangle A"), scale(tri(s, "Triangle B", ["D", "E", "F"]), k, "Triangle B")) }; },
+  (r) => { const side = r(5, 15), k = r(2, 4); return { prompt: `A square photo with an area of ${side * side} cm² is enlarged to an area of ${side * side * k * k} cm². What is the scale factor of the side lengths?`, answer: k, steps: [`Side lengths: √${side * side} = ${side} cm and √${side * side * k * k} = ${side * k} cm.`, `${side * k} ÷ ${side} = ${k}.`] }; },
+  (r) => { const d1 = r(2, 8) * 4, d2 = d1 * choose(r, [1.25, 1.5, 2, 2.5]); return { prompt: `One circle has a circumference of ${d1}π cm. Another has a circumference of ${d2}π cm. What is the scale factor from the first circle to the second?`, answer: rounded(d2 / d1, 4), steps: [`Diameters: ${d1} cm and ${d2} cm.`, `${d2} ÷ ${d1} = ${fmt(rounded(d2 / d1, 4))}.`] }; },
+  (r) => { const a = r(4, 8) * 10, k = choose(r, [1.5, 2, 2.5]), b = r(5, 9) * 10; return { prompt: `Two rectangular frames are similar. The smaller frame is ${a} cm by ${b} cm. The longer side of the larger frame is ${fmt(Math.max(a, b) * k)} cm. What is the perimeter of the larger frame?`, answer: rounded(2 * (a + b) * k, 2), unit: "cm", steps: [`Scale factor: ${fmt(Math.max(a, b) * k)} ÷ ${Math.max(a, b)} = ${k}.`, `Perimeter: 2 × (${a} + ${b}) × ${k} = ${fmt(rounded(2 * (a + b) * k, 2))} cm.`] }; },
+];
+
+const w3l3: Form[] = [
+  (r) => { const s = scalene(r), k = choose(r, [1.5, 2, 2.5, 3]), hide = r(1, 2), labels = s.map((v) => fmt(v * k)); labels[hide] = "x"; return { prompt: "The triangles are similar. Find x.", answer: rounded(s[hide] * k, 2), unit: "cm", steps: [`Scale factor: ${fmt(s[0] * k)} ÷ ${s[0]} = ${k}.`, `x = ${s[hide]} × ${k} = ${fmt(s[hide] * k)} cm.`], ...shapes(tri(s, "Triangle A"), transform(scale(tri(s, "Triangle B", ["D", "E", "F"]), k, "Triangle B", undefined, labels), r(0, 3))) }; },
+  (r) => { const w = r(3, 8), h = r(2, 6), k = choose(r, [1.5, 2, 3]); const a: [number, number][] = [[0, 0], [w, 0], [w + 1, h], [0, h]]; return { prompt: "The shapes are similar. Find x.", answer: rounded(h * k, 2), unit: "cm", steps: [`Scale factor: ${fmt(w * k)} ÷ ${w} = ${k}.`, `x = ${h} × ${k} = ${fmt(h * k)} cm.`], ...shapes(quad(a, "Shape A", { sideLabels: [String(w), "", "", String(h)] }), quad(a.map(([x, y]) => [x * k, y * k]), "Shape B", { sideLabels: [fmt(w * k), "", "", "x"] })) }; },
+  (r) => { const [p, q] = choose(r, [[7, 3], [5, 2], [4, 3], [9, 4], [5, 3]] as const), big = p * r(2, 6); return { prompt: `Two similar triangles have a scale factor of ${p}/${q} from the smaller to the larger. A side of the larger triangle is ${big} cm. How long is the matching side of the smaller triangle?`, answer: rounded((big * q) / p, 3), unit: "cm", steps: [`Divide by the scale factor: ${big} ÷ ${p}/${q} = ${big} × ${q}/${p}.`, `= ${fmt(rounded((big * q) / p, 3))} cm.`] }; },
+  (r) => { const stick = choose(r, [1, 1.2, 1.5, 2]), shadow = choose(r, [0.8, 1.5, 2, 2.5, 3]), tree = r(4, 20); return { prompt: `At the same time of day, a ${stick} m stick casts a ${shadow} m shadow and a tree casts a ${fmt(rounded((tree * shadow) / stick, 2))} m shadow. How tall is the tree?`, answer: tree, unit: "m", steps: ["The stick and tree make similar triangles with their shadows.", `Scale factor: ${fmt(rounded((tree * shadow) / stick, 2))} ÷ ${shadow} = ${fmt(rounded(tree / stick, 4))}. Height: ${stick} × ${fmt(rounded(tree / stick, 4))} = ${tree} m.`] }; },
+  (r) => { const k = choose(r, [1.5, 2, 2.5, 3]), base = [60, 80, 100]; return { prompt: `A junior running track is a triangle with sides 60 m, 80 m and 100 m. The open track is similar, with sides ${base.map((v) => fmt(v * k)).join(" m, ")} m. How many laps of the junior track cover the same distance as one lap of the open track?`, answer: k, unit: "laps", steps: [`Scale factor: ${fmt(60 * k)} ÷ 60 = ${k}.`, `Perimeters scale by the same factor, so it takes ${k} junior laps.`] }; },
+];
+
+// ── Week 4: explain similarity and transformations (SP01) ─────────────────────
+const w4l1: Form[] = [
+  (r) => { const a = r(30, 80), b = r(30, 80), yes = r(0, 1) === 1, c = 180 - a - b, given2 = yes ? [c, a] : [c, a + choose(r, [-5, 5])]; return { prompt: `Triangle A has angles ${a}° and ${b}°. Triangle B has angles ${given2[0]}° and ${given2[1]}°. Are they similar?`, answer: yes ? "Yes" : "No", steps: [`Triangle A’s third angle is 180 − ${a} − ${b} = ${c}°, so its angles are ${a}°, ${b}°, ${c}°.`, yes ? "Triangle B has the same angles, so they are similar (AAA)." : "Triangle B’s angles do not all match, so they are not similar."] }; },
+  (r) => { const a = r(25, 80), b = r(30, 85); return { prompt: `Two similar triangles each have angles of ${a}° and ${b}°. What is the third angle?`, answer: 180 - a - b, unit: "°", steps: ["Angles in a triangle add to 180°.", `180 − ${a} − ${b} = ${180 - a - b}°.`] }; },
+  (r) => { const a = r(35, 70), b = r(40, 75), s = r(4, 8), k = choose(r, [1.5, 2, 3]); return { prompt: `Two triangles both have angles ${a}°, ${b}° and ${180 - a - b}°. Their shortest sides are ${s} cm and ${fmt(s * k)} cm. Are they congruent, similar but not congruent, or neither?`, answer: "Similar", choices: ["Congruent", "Similar", "Neither"], steps: ["Equal angles make them similar (AAA).", `The sides are ${k} times as long, not equal, so they are not congruent.`] }; },
+  (r) => { const near = choose(r, [4, 5, 6, 8]), far = choose(r, [10, 12, 15]), k = choose(r, [2, 2.5, 3, 4]); return { prompt: `To find the width of a river, two similar triangles are marked out with trees. The small triangle has sides ${near} m and ${far} m. The matching side of ${far} m in the large triangle is ${fmt(far * k)} m. How long is the side matching ${near} m, which is the river’s width?`, answer: rounded(near * k, 2), unit: "m", steps: [`Scale factor: ${fmt(far * k)} ÷ ${far} = ${k}.`, `Width: ${near} × ${k} = ${fmt(near * k)} m.`] }; },
+  (r) => { const [info, ans] = choose(r, [["all three pairs of angles are equal", "AAA"], ["all three pairs of sides are in the same ratio", "SSS"], ["two pairs of sides are in the same ratio and the angles between them are equal", "SAS"], ["both have a right angle and the hypotenuses and one other pair of sides are in the same ratio", "RHS"]] as const); return { prompt: `Two triangles are similar because ${info}. Which similarity test is this?`, answer: ans, choices: ["AAA", "SSS", "SAS", "RHS"], steps: ["Similarity tests use equal angles or equal ratios of sides.", `This is the ${ans} test for similarity.`] }; },
+];
+
+const w4l2: Form[] = [
+  w3l1[0],
+  (r) => { const [claim, truth] = choose(r, [["All congruent shapes are similar.", "True"], ["All similar shapes are congruent.", "False"]] as const); return { prompt: `True or false? ${claim}`, answer: truth, choices: ["True", "False"], steps: [truth === "True" ? "Congruent shapes have the same shape (scale factor 1), so they are also similar." : "Similar shapes can be different sizes, so they need not be congruent.", `The statement is ${truth.toLowerCase()}.`] }; },
+  () => ({ prompt: "Two similar shapes have a scale factor of 1. What else can you say about them? Are they congruent?", answer: "Yes", steps: ["A scale factor of 1 means every length is the same.", "Same shape and same size: they are congruent."] }),
+  (r) => { const k = r(2, 5), A = r(3, 20); return { prompt: `A shape with an area of ${A} cm² is enlarged by a scale factor of ${k}. What is the area of the image?`, answer: A * k * k, unit: "cm²", steps: [`Area scales by the square of the scale factor: ${k}² = ${k * k}.`, `${A} × ${k * k} = ${A * k * k} cm².`] }; },
+  (r) => { const k = choose(r, [1.5, 2, 2.5, 3]), P = r(12, 40); return { prompt: `Two similar triangles have a scale factor of ${k}. The smaller has a perimeter of ${P} cm. What is the perimeter of the larger?`, answer: rounded(P * k, 2), unit: "cm", steps: ["Every length, including the perimeter, is multiplied by the scale factor.", `${P} × ${k} = ${fmt(P * k)} cm.`] }; },
+];
+
+const w4l3: Form[] = [
+  (r) => { const len = r(3, 15), kind = choose(r, ["reflected", "rotated 90°", "translated", "enlarged by a scale factor of 2", "enlarged by a scale factor of 3"] as const), k = kind.includes("factor of 2") ? 2 : kind.includes("factor of 3") ? 3 : 1; return { prompt: `${An(len)} ${len} cm side of a shape is ${kind}. How long is its image?`, answer: len * k, unit: "cm", steps: [k === 1 ? "Reflections, rotations and translations keep lengths the same." : `An enlargement multiplies lengths by the scale factor, ${k}.`, `${len} × ${k} = ${len * k} cm.`] }; },
+  w1l2[3],
+  w4l2[3],
+  () => ({ prompt: "Which transformation does NOT always produce a congruent image?", answer: "Enlargement", choices: ["Reflection", "Rotation", "Translation", "Enlargement"], steps: ["Reflections, rotations and translations keep the same size and shape.", "An enlargement changes the size, so the image is similar, not congruent (unless the factor is 1)."] }),
+  w1l2[4],
+];
+
+// ── Weeks 5–6: quadrilaterals (SP02) ──────────────────────────────────────────
+const QUAD_FACTS: [string, number, number][] = [["square", 4, 4], ["rectangle", 2, 2], ["rhombus", 2, 2], ["parallelogram", 0, 2], ["kite", 1, 1], ["isosceles trapezium", 1, 1]];
+const w5l1: Form[] = [
+  (r) => { const a = r(60, 120), b = r(60, 120), c = r(60, 130), d = 360 - a - b - c; const shown = [`${a}°`, `${b}°`, `${c}°`, "a°"], rot = r(0, 3), angles = shown.map((_, i) => shown[(i + rot) % 4]); return { prompt: "Find the angle marked a°.", answer: d, unit: "°", steps: ["The angles in a quadrilateral add to 360°.", `360 − ${a} − ${b} − ${c} = ${d}°.`], ...shapes(quad([[0, 0], [7, 0], [8, 4], [1, 5]], "Quadrilateral", { angles })) }; },
+  (r) => { const a = r(50, 85), opp = r(0, 1) === 1; return { prompt: `One angle of a parallelogram is ${a}°. Find the size of ${opp ? "the opposite angle" : "an angle next to it"}.`, answer: opp ? a : 180 - a, unit: "°", steps: [opp ? "Opposite angles of a parallelogram are equal." : "Next-door (co-interior) angles of a parallelogram add to 180°.", opp ? `${a}°.` : `180 − ${a} = ${180 - a}°.`] }; },
+  (r) => { const a = r(60, 120), b = r(40, 100), c = (360 - a - b) / 2; if (!Number.isInteger(c)) return { prompt: `A kite has angles of ${a + 1}° and ${b}° at the ends of its line of symmetry. The other two angles are equal. Find one of them.`, answer: (360 - a - 1 - b) / 2, unit: "°", steps: ["The two angles off the line of symmetry are equal.", `(360 − ${a + 1} − ${b}) ÷ 2 = ${(360 - a - 1 - b) / 2}°.`] }; return { prompt: `A kite has angles of ${a}° and ${b}° at the ends of its line of symmetry. The other two angles are equal. Find one of them.`, answer: c, unit: "°", steps: ["The two angles off the line of symmetry are equal.", `(360 − ${a} − ${b}) ÷ 2 = ${c}°.`] }; },
+  (r) => { const s = r(4, 15), toP = r(0, 1) === 1; return toP ? { prompt: `A rhombus has a side of ${s} cm. What is its perimeter?`, answer: 4 * s, unit: "cm", steps: ["All four sides of a rhombus are equal.", `4 × ${s} = ${4 * s} cm.`] } : { prompt: `A rhombus has a perimeter of ${4 * s} cm. How long is each side?`, answer: s, unit: "cm", steps: ["All four sides of a rhombus are equal.", `${4 * s} ÷ 4 = ${s} cm.`] }; },
+  (r) => { const a = r(50, 130); return { prompt: `A trapezium has one pair of parallel sides. One angle between them is ${a}°. Find the co-interior angle on the same slanted side.`, answer: 180 - a, unit: "°", steps: ["Co-interior angles between parallel lines add to 180°.", `180 − ${a} = ${180 - a}°.`] }; },
+];
+
+const w5l2: Form[] = [
+  (r) => { const [name, yes] = choose(r, [["parallelogram", true], ["rectangle", true], ["rhombus", true], ["square", true], ["kite", false], ["trapezium", false]] as const); return { prompt: `Do the diagonals of a ${name} always bisect each other (cut each other in half)?`, answer: yes ? "Yes" : "No", steps: [yes ? "Every parallelogram (including rectangles, rhombuses and squares) has diagonals that bisect each other." : `A ${name} is not a parallelogram, so its diagonals do not always bisect each other.`, yes ? "Yes." : "No."] }; },
+  (r) => { const w = r(4, 15), h = r(3, 10); return { prompt: `A rectangle is ${w} cm by ${h} cm. How long is each diagonal, correct to two decimal places?`, answer: rounded(Math.hypot(w, h), 2), unit: "cm", steps: [`Each diagonal is the hypotenuse of a right triangle with sides ${w} cm and ${h} cm.`, `√(${w}² + ${h}²) ≈ ${rounded(Math.hypot(w, h), 2).toFixed(2)} cm. The two diagonals of a rectangle are equal.`], ...shapes(quad([[0, 0], [w, 0], [w, h], [0, h]], "Rectangle", { sideLabels: [String(w), String(h), "", ""], diagonals: true })) }; },
+  (r) => { const [a, b, c] = choose(r, [[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 15, 17], [9, 12, 15]] as const); return { prompt: `The diagonals of a rhombus are ${2 * a} cm and ${2 * b} cm. How long is each side?`, answer: c, unit: "cm", steps: [`The diagonals bisect each other at right angles, making right triangles with sides ${a} cm and ${b} cm.`, `Side = √(${a}² + ${b}²) = ${c} cm.`], ...shapes(quad([[0, b], [a, 0], [0, -b], [-a, 0]], "Rhombus", { diagonals: true, centreLabel: "O" })) }; },
+  (r) => { const [name, lines] = choose(r, QUAD_FACTS); return { prompt: `How many lines of symmetry does ${an(name)} ${name} have?`, answer: lines, steps: [`A ${name} can be folded onto itself along ${lines === 0 ? "no lines" : `${lines} line${lines > 1 ? "s" : ""}`}.`, `${lines}.`] }; },
+  (r) => { const [name, , order] = choose(r, QUAD_FACTS); return { prompt: `What is the order of rotational symmetry of ${an(name)} ${name}?`, answer: order, steps: [`Count how many times the ${name} looks the same in one full turn.`, `Order ${order}.`] }; },
+];
+
+const QUAD_PROPS: [string, string][] = [["four equal sides and four right angles", "Square"], ["two pairs of parallel sides and four right angles, with adjacent sides not equal", "Rectangle"], ["four equal sides and no right angles", "Rhombus"], ["two pairs of parallel sides, no right angles and adjacent sides not equal", "Parallelogram"], ["two pairs of equal adjacent sides and one line of symmetry", "Kite"], ["exactly one pair of parallel sides", "Trapezium"]];
+const w5l3: Form[] = [
+  (r) => { const [props, name] = choose(r, QUAD_PROPS); return { prompt: `A quadrilateral has ${props}. What is its most specific name?`, answer: name, input: "text", steps: ["Match the properties to the special quadrilaterals.", `It is a ${name.toLowerCase()}.`] }; },
+  (r) => { const [claim, truth] = choose(r, [["A square is a type of rectangle.", "True"], ["A rectangle is a type of square.", "False"], ["A square is a type of rhombus.", "True"], ["A rectangle is a type of parallelogram.", "True"], ["A parallelogram is a type of square.", "False"], ["A rhombus is a type of parallelogram.", "True"], ["A kite is a type of parallelogram.", "False"]] as const); return { prompt: `True or false? ${claim}`, answer: truth, choices: ["True", "False"], steps: [truth === "True" ? "Every shape of the first kind has all the properties of the second." : "Not every shape of the first kind has the properties of the second.", `${truth}.`] }; },
+  (r) => { const w = r(4, 9), kind = choose(r, ["Square", "Rhombus", "Rectangle", "Parallelogram"] as const), h = kind === "Square" || kind === "Rhombus" ? w : w - r(1, 3), slant = kind === "Rhombus" || kind === "Parallelogram" ? r(2, 3) : 0, side = kind === "Rhombus" ? w : kind === "Parallelogram" ? h : h, rise = slant ? Math.sqrt(Math.max(1, side * side - slant * slant)) : h; const pts: [number, number][] = [[0, 0], [w, 0], [w + slant, rise], [slant, rise]], sideLen = slant ? side : h; return { prompt: "Name this quadrilateral using its most specific name.", answer: kind, input: "text", steps: [slant ? "No right angles, and opposite sides are parallel." : "It has four right angles.", `Sides of ${w} cm and ${sideLen} cm${w === sideLen ? " are all equal" : " differ"}, so it is a ${kind.toLowerCase()}.`], ...shapes(quad(pts, "Quadrilateral", { sideLabels: [String(w), String(sideLen), String(w), String(sideLen)], angles: slant ? ["", "", "", ""] : ["90°", "90°", "90°", "90°"] })) }; },
+  () => ({ prompt: "Which special quadrilateral has exactly one pair of parallel sides?", answer: "Trapezium", input: "text", steps: ["Parallelograms have two pairs of parallel sides; kites have none.", "A trapezium has exactly one pair."] }),
+  () => ({ prompt: "How many of these are parallelograms: square, rectangle, rhombus, kite, trapezium?", answer: 3, steps: ["A parallelogram has two pairs of parallel sides.", "Square, rectangle and rhombus do; kite and trapezium do not. So 3."] }),
+];
+
+const w6l1: Form[] = [
+  (r) => { const A = r(8, 40); return { prompt: `A diagonal splits a parallelogram into two congruent triangles. One triangle has an area of ${A} cm². What is the area of the parallelogram?`, answer: 2 * A, unit: "cm²", steps: ["The two triangles are congruent, so they have equal areas.", `2 × ${A} = ${2 * A} cm².`] }; },
+  (r) => { const e = r(3, 12); return { prompt: `The diagonals of parallelogram ABCD meet at E. AE = ${e} cm. How long is the diagonal AC?`, answer: 2 * e, unit: "cm", steps: ["△ABE ≡ △CDE (AAS), so AE = CE: the diagonals bisect each other.", `AC = 2 × ${e} = ${2 * e} cm.`], ...shapes(quad([[0, 0], [7, 0], [9, 4], [2, 4]], "Parallelogram ABCD", { vertices: ["A", "B", "C", "D"], diagonals: true, centreLabel: "E" })) }; },
+  (r) => { const [shape, tris, ans] = choose(r, [["parallelogram ABCD", "△ABD and △CDB", "SSS"], ["kite ABCD with AB = AD and CB = CD", "△ABC and △ADC", "SSS"], ["rectangle ABCD", "△ABC and △CDA", "SSS"]] as const); return { prompt: `In ${shape}, which test shows that ${tris} are congruent?`, answer: ans, choices: TESTS, steps: ["The triangles share the diagonal, and the other two pairs of sides are equal.", "Three pairs of equal sides: SSS."] }; },
+  () => ({ prompt: "The diagonals of a rhombus meet at O. What is the size of the angle between them at O?", answer: 90, unit: "°", steps: ["The four triangles formed are congruent (SSS), so the four angles at O are equal.", "360 ÷ 4 = 90°: the diagonals are perpendicular."] }),
+  () => ({ prompt: "Kite ABCD has AB = AD and CB = CD. Which pair of angles is equal?", answer: "∠B and ∠D", choices: ["∠A and ∠C", "∠B and ∠D"], steps: ["Diagonal AC splits the kite into △ABC ≡ △ADC (SSS).", "So the matching angles ∠B and ∠D are equal."] }),
+];
+
+const w6l2: Form[] = [
+  (r) => { const [m, k] = choose(r, [[[1, 2, 3, 4], 36], [[2, 3, 3, 4], 30], [[1, 1, 2, 2], 60], [[2, 2, 3, 3], 36], [[1, 3, 5, 3], 30]] as const); return { prompt: `The angles of a quadrilateral are ${m.map((v) => (v === 1 ? "x°" : `${v}x°`)).join(", ")}. Find x.`, answer: k, steps: [`Add the angles: ${m.reduce((s, v) => s + v, 0)}x = 360.`, `x = 360 ÷ ${m.reduce((s, v) => s + v, 0)} = ${k}.`] }; },
+  (r) => { const x = r(20, 40), a = r(2, 4), b = a + 1, c = (b - a) * x, opp = a * x + c; return { prompt: `Opposite angles of a parallelogram are (${a}x + ${c})° and ${b}x°. Find x.`, answer: x, steps: ["Opposite angles of a parallelogram are equal.", `${a}x + ${c} = ${b}x, so x = ${c}. (Each angle is ${opp}°.)`] }; },
+  (r) => { const a = r(40, 140); return { prompt: `One angle of a rhombus is ${a}°. A diagonal is drawn from that corner. What angle does it make with each side at that corner?`, answer: a / 2, unit: "°", steps: ["The diagonals of a rhombus bisect its angles.", `${a} ÷ 2 = ${a / 2}°.`] }; },
+  (r) => { const [w, l, d] = choose(r, [[5, 12, 13], [6, 8, 10], [8, 15, 17], [9, 12, 15], [7, 24, 25]] as const); return { prompt: `A rectangle has diagonals of ${d} cm and a width of ${w} cm. How long is it?`, answer: l, unit: "cm", steps: ["A diagonal and two sides make a right triangle.", `√(${d}² − ${w}²) = ${l} cm.`] }; },
+  (r) => { const base = r(55, 80); return { prompt: `An isosceles trapezium has base angles of ${base}°. Find each of its top angles.`, answer: 180 - base, unit: "°", steps: ["Each top angle is co-interior with a base angle on the same slanted side.", `180 − ${base} = ${180 - base}°.`] }; },
+];
+
+const w6l3: Form[] = [
+  (r) => { const [claim, shape, why] = choose(r, [["A quadrilateral with equal diagonals is a rectangle.", "Isosceles trapezium", "An isosceles trapezium has equal diagonals but is not a rectangle."], ["A quadrilateral with four equal sides is a square.", "Rhombus", "A rhombus has four equal sides but its angles need not be 90°."], ["A quadrilateral with perpendicular diagonals is a rhombus.", "Kite", "A kite’s diagonals are perpendicular, but its sides are not all equal."], ["A quadrilateral with two pairs of equal sides is a parallelogram.", "Kite", "A kite has two pairs of equal sides, but they are next to each other, not opposite."]] as const); return { prompt: `Claim: “${claim}” Which shape is a counterexample?`, answer: shape, choices: ["Isosceles trapezium", "Rhombus", "Kite", "Square"], steps: [why, "One counterexample is enough to show the claim is false."] }; },
+  (r) => { const w = r(6, 12), h = r(2, w - 2); return { prompt: `${An(w)} ${w} cm by ${h} cm rectangle has equal diagonals. Does having equal diagonals prove it is a square?`, answer: "No", steps: ["Every rectangle has equal diagonals.", `This one has unequal sides (${w} cm and ${h} cm), so equal diagonals alone do not make a square.`], ...shapes(quad([[0, 0], [w, 0], [w, h], [0, h]], "Rectangle", { sideLabels: [String(w), String(h), "", ""], diagonals: true })) }; },
+  () => ({ prompt: "A quadrilateral’s diagonals are equal, bisect each other and meet at right angles. Must it be a square?", answer: "Yes", steps: ["Bisecting diagonals make it a parallelogram; equal diagonals make it a rectangle.", "Perpendicular diagonals make it a rhombus too. A rectangle that is a rhombus is a square."] }),
+  (r) => { const a = r(60, 120); return { prompt: `Mia says a parallelogram with one ${a}° angle has all four angles equal to ${a}°. What is the size of an angle next to the ${a}° angle?`, answer: 180 - a, unit: "°", steps: ["Next-door angles of a parallelogram are co-interior, so they add to 180°.", `180 − ${a} = ${180 - a}°. Only opposite angles are equal.`] }; },
+  (r) => { const ext = choose(r, [[90, 90, 90, 90], [70, 110, 70, 110], [80, 95, 100, 85]] as const), i = r(0, 3), shown = ext.map((v, k) => (k === i ? "?" : `${v}°`)); return { prompt: `The exterior angles of a quadrilateral are ${shown.join(", ")}. Find the missing exterior angle.`, answer: ext[i], unit: "°", steps: ["The exterior angles of any polygon add to 360°.", `360 − ${ext.filter((_, k) => k !== i).join(" − ")} = ${ext[i]}°.`] }; },
+];
+
+// ── Weeks 7–8: three-dimensional position (SP03) ─────────────────────────────
+const p3 = (r: R, zMin = 1) => ({ x: r(0, 4), y: r(0, 4), z: r(zMin, 4) });
+const triple = (p: { x: number; y: number; z: number }) => `${p.x}, ${p.y}, ${p.z}`;
+const XYZ = { input: "list" as const, labels: ["x", "y", "z"] };
+const w7l1: Form[] = [
+  (r) => { const p = p3(r); return { prompt: "What are the coordinates of P? Enter x, then y, then z.", answer: triple(p), ...XYZ, steps: ["Follow the dashed lines from P to each axis.", `x = ${p.x}, y = ${p.y}, z = ${p.z}.`], ...space({ point: p, caption: "Each axis runs from 0 to 4. Read x, then y, then the height z.", readCoordinates: true }) }; },
+  (r) => { const p = p3(r); return { prompt: `Point P is at (${triple(p)}). How many units is it above the floor (the x–y plane)?`, answer: p.z, steps: ["The third coordinate, z, is the height.", `P is ${p.z} unit${p.z === 1 ? "" : "s"} above the floor.`] }; },
+  () => ({ prompt: "How many coordinates are needed to describe the position of a drone flying above a city?", answer: 3, steps: ["A map position needs two coordinates (east and north).", "The drone also has a height, so it needs a third coordinate: 3."] }),
+  (r) => { const p = { x: r(1, 4), y: r(1, 4), z: 0 }; return { prompt: "Point P is on the floor. What are its coordinates? Enter x, then y, then z.", answer: triple(p), ...XYZ, steps: ["A point on the floor has height z = 0.", `P = (${triple(p)}).`], ...space({ point: p, caption: "Each axis runs from 0 to 4.", readCoordinates: true }) }; },
+  (r) => { const axis = choose(r, ["x", "y", "z"] as const), n = r(1, 4), pt = { x: axis === "x" ? n : 0, y: axis === "y" ? n : 0, z: axis === "z" ? n : 0 }; return { prompt: `On which axis does the point (${triple(pt)}) lie? Type x, y or z.`, answer: axis, input: "text", steps: ["Two of its coordinates are zero.", `Only the ${axis}-coordinate is non-zero, so it lies on the ${axis}-axis.`] }; },
+];
+
+const w7l2: Form[] = [
+  (r) => { const p = p3(r), q = { x: r(0, 4), y: r(0, 4), z: r(0, 4) }; return { prompt: "What are the coordinates of point Q? Enter x, then y, then z.", answer: triple(q), ...XYZ, steps: ["Q’s position is shown by the second marked point.", `Q = (${triple(q)}).`], ...space({ extraPoints: [{ point: q, label: "Q" }], point: p, pointLabel: "P", caption: `P is at (${triple(p)}). Find Q using the grid.` }) }; },
+  (r) => { const p = { x: r(1, 4), y: r(1, 4), z: r(1, 4) }; return { prompt: `A box has one corner at the origin and the opposite corner at P(${triple(p)}). What is its volume?`, answer: p.x * p.y * p.z, unit: "cubic units", steps: [`Its length, width and height are ${p.x}, ${p.y} and ${p.z} units.`, `${p.x} × ${p.y} × ${p.z} = ${p.x * p.y * p.z} cubic units.`], ...space({ box: { min: { x: 0, y: 0, z: 0 }, max: p }, point: p, caption: "The box runs from the origin to P." }) }; },
+  (r) => { const a = p3(r), b = { ...p3(r), z: a.z === 4 ? 2 : a.z + 1 }; return { prompt: `Which point is higher: A(${triple(a)}) or B(${triple(b)})? Type A or B.`, answer: b.z > a.z ? "B" : "A", input: "text", steps: ["Compare the z-coordinates.", `A has z = ${a.z} and B has z = ${b.z}, so ${b.z > a.z ? "B" : "A"} is higher.`] }; },
+  (r) => { const p = { x: r(1, 9) * 2, y: r(1, 9) * 3, z: r(1, 9) * 2 }; return { prompt: `A drone can only fly east (x), north (y) or up (z). What is the shortest distance it can travel from the origin to (${triple(p)}) metres?`, answer: p.x + p.y + p.z, unit: "m", steps: ["Moving only along the axes, add the three distances.", `${p.x} + ${p.y} + ${p.z} = ${p.x + p.y + p.z} m.`] }; },
+  (r) => { const p = p3(r); return { prompt: `What are the coordinates of the point on the floor directly below P(${triple(p)})?`, answer: `${p.x}, ${p.y}, 0`, ...XYZ, steps: ["Directly below keeps x and y the same.", `On the floor z = 0, so the point is (${p.x}, ${p.y}, 0).`] }; },
+];
+
+const w7l3: Form[] = [
+  (r) => { const p = p3(r); return { prompt: "Turn the view using the rotate button. What is P’s height, z?", answer: p.z, steps: ["Turning the view does not move the point.", `Its height stays z = ${p.z}.`], ...space({ point: p, caption: "Use the rotate button to look from different sides." }) }; },
+  () => ({ prompt: "When you rotate the view of a 3D grid, do the coordinates of a point change?", answer: "No", steps: ["Rotating the view changes how you see the grid, not where the point is.", "Its coordinates stay the same."] }),
+  (r) => { const max = { x: r(2, 4), y: r(2, 4), z: r(2, 4) }; return { prompt: "A box sits with one corner at the origin. What are the coordinates of the top corner furthest from the origin?", answer: triple(max), ...XYZ, steps: ["The furthest corner has the largest x, y and z.", `(${triple(max)}).`], ...space({ box: { min: { x: 0, y: 0, z: 0 }, max }, caption: "The box’s edges run along the grid lines." }) }; },
+  (r) => { const x = r(1, 9), y = r(1, 9), floor = r(2, 8); return { prompt: `On a street map, a building is at (${x}, ${y}). An office is on level ${floor} of that building. Using z for the level, what are the office’s 3D coordinates?`, answer: `${x}, ${y}, ${floor}`, ...XYZ, steps: ["The map gives x and y.", `Add the level as z: (${x}, ${y}, ${floor}).`] }; },
+  (r) => { const p = p3(r); return { prompt: `P is at (${triple(p)}). After the view is rotated a quarter turn, what is P’s x-coordinate?`, answer: p.x, steps: ["Rotating the view does not move P.", `Its x-coordinate is still ${p.x}.`], ...space({ point: p, caption: "Rotate the view and check that P’s coordinates do not change." }) }; },
+];
+
+const w8l1: Form[] = [
+  (r) => { const s = p3(r, 1), dx = nonZeroMove(r, -2, 2), dy = nonZeroMove(r, -2, 2), dz = nonZeroMove(r, -1, 2), e = { x: s.x + dx, y: s.y + dy, z: s.z + dz }; return { prompt: `Start at (${triple(s)}). Move ${dx >= 0 ? "+" : "−"}${Math.abs(dx)} in x, ${dy >= 0 ? "+" : "−"}${Math.abs(dy)} in y and ${e.z - s.z >= 0 ? "+" : "−"}${Math.abs(e.z - s.z)} in z. Where do you finish?`, answer: triple(e), ...XYZ, steps: ["Add each move to the matching coordinate.", `(${s.x} + ${dx}, ${s.y} + ${dy}, ${s.z} + ${e.z - s.z}) = (${triple(e)}).`] }; },
+  (r) => { const s = p3(r, 0), e = p3(r, 0); return { prompt: `A robot moves from (${triple(s)}) to (${triple(e)}). How far does it move in x, in y and in z? Use negative numbers for backwards or down.`, answer: `${e.x - s.x}, ${e.y - s.y}, ${e.z - s.z}`, input: "list", labels: ["x move", "y move", "z move"], steps: ["Subtract the start from the finish for each coordinate.", `(${e.x} − ${s.x}, ${e.y} − ${s.y}, ${e.z} − ${s.z}) = (${e.x - s.x}, ${e.y - s.y}, ${e.z - s.z}).`] }; },
+  (r) => { const a = { x: r(0, 30), y: r(0, 30), z: r(0, 20) }, b = { x: r(0, 30), y: r(0, 30), z: r(0, 20) }; const d = Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z); return { prompt: `A drone moves only east–west, north–south or up–down. What is the shortest distance from (${triple(a)}) to (${triple(b)}) metres?`, answer: d, unit: "m", steps: ["Find the change along each axis, ignoring direction.", `${Math.abs(a.x - b.x)} + ${Math.abs(a.y - b.y)} + ${Math.abs(a.z - b.z)} = ${d} m.`] }; },
+  (r) => { const col = r(2, 4), row = r(2, 3), lev = r(2, 4), dc = nonZeroMove(r, -1, 1), dr = nonZeroMove(r, -1, 1), dl = nonZeroMove(r, -1, 1); return { prompt: `In a car park, a bay is given as (column, row, level). A car in bay (${col}, ${row}, ${lev}) moves ${Math.abs(dc)} column${Math.abs(dc) > 1 ? "s" : ""} ${dc > 0 ? "east" : "west"}, ${Math.abs(dr)} row${Math.abs(dr) > 1 ? "s" : ""} ${dr > 0 ? "north" : "south"} and ${Math.abs(dl)} level${Math.abs(dl) > 1 ? "s" : ""} ${dl > 0 ? "up" : "down"}. What are its new coordinates?`, answer: `${col + dc}, ${row + dr}, ${lev + dl}`, input: "list", labels: ["Column", "Row", "Level"], steps: ["East, north and up add; west, south and down subtract.", `(${col} ${dc > 0 ? "+" : "−"} ${Math.abs(dc)}, ${row} ${dr > 0 ? "+" : "−"} ${Math.abs(dr)}, ${lev} ${dl > 0 ? "+" : "−"} ${Math.abs(dl)}) = (${col + dc}, ${row + dr}, ${lev + dl}).`] }; },
+  (r) => { const a = { x: r(-5, 5), y: r(0, 20), z: r(0, 15) }, b = { x: r(-5, 5), y: r(0, 20), z: r(0, 15) }; const d = Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z); return { prompt: `A drone flies along the axes from (${triple(a)}) to (${triple(b)}) metres. What is the total distance flown?`, answer: d, unit: "m", steps: ["Find the distance along each axis; negative coordinates still count as positive distances.", `${Math.abs(a.x - b.x)} + ${Math.abs(a.y - b.y)} + ${Math.abs(a.z - b.z)} = ${d} m.`] }; },
+];
+
+const w8l2: Form[] = [
+  (r) => { const a = p3(r, 0), h = r(a.z + 1, a.z + 4); return { prompt: `Point A is (${triple(a)}). Point B is directly above A at a height of ${h}. What are B’s coordinates?`, answer: `${a.x}, ${a.y}, ${h}`, ...XYZ, steps: ["Directly above means the same x and y.", `B = (${a.x}, ${a.y}, ${h}).`] }; },
+  (r) => { const max = { x: r(2, 4), y: r(2, 4), z: r(2, 4) }; return { prompt: `A cuboid has one corner at the origin and the opposite corner at (${triple(max)}). How many of its corners have z = ${max.z}?`, answer: 4, steps: ["The top face of the cuboid is at height z = " + max.z + ".", "The top face has 4 corners."], ...space({ box: { min: { x: 0, y: 0, z: 0 }, max }, caption: "A cuboid on the 3D grid." }) }; },
+  (r) => { const max = { x: r(2, 4), y: r(2, 4), z: r(2, 4) }, axis = choose(r, ["x", "y", "z"] as const); return { prompt: `A cuboid runs from (0, 0, 0) to (${triple(max)}). How long are its edges parallel to the ${axis}-axis?`, answer: max[axis], unit: "units", steps: [`Edges parallel to the ${axis}-axis change only the ${axis}-coordinate.`, `From 0 to ${max[axis]}: ${max[axis]} units.`] }; },
+  (r) => { const x = r(0, 4), y = r(0, 4), z = r(1, 4), good = `(${x}, ${y}, ${z})`, opts = [good, `(${y === x ? (x + 1) % 5 : y}, ${x}, ${z})`, `(${x}, ${z}, ${y})`, `(${z}, ${y}, ${x})`].filter((v, i, a) => a.indexOf(v) === i); return { prompt: `Which point is directly above (${x}, ${y}, 0)?`, answer: good, choices: opts.length > 1 ? opts : [good, `(${x}, ${y + 1}, ${z})`], steps: ["Directly above keeps the same x and y; only z changes.", `${good}.`] }; },
+  (r) => { const x = r(0, 4), y = r(0, 4), top = 2 * r(1, 2); return { prompt: `A vertical pole stands from (${x}, ${y}, 0) to (${x}, ${y}, ${top}). What are the coordinates of its midpoint?`, answer: `${x}, ${y}, ${top / 2}`, ...XYZ, steps: ["The pole is vertical, so x and y stay the same.", `Halfway up: z = ${top} ÷ 2 = ${top / 2}.`] }; },
+];
+
+const w8l3: Form[] = [
+  (r) => { const e = r(1, 9), n = r(1, 9), u = r(1, 9); return { prompt: `A drone is ${e} m east, ${n} m north and ${u} m above its launch point. East is x, north is y and up is z. What are its coordinates?`, answer: `${e}, ${n}, ${u}`, ...XYZ, steps: ["Write the distances in x, y, z order.", `(${e}, ${n}, ${u}).`] }; },
+  (r) => { const s = r(0, 1), dir = choose(r, [[1, 1, 1], [1, 0, 1], [0, 1, 1], [1, 1, 0]] as const), a = [s, s, s], b = a.map((v, i) => v + dir[i]), c = b.map((v, i) => v + dir[i]); return { prompt: `In 3D noughts and crosses, counters are at (${a.join(", ")}) and (${b.join(", ")}). Where must the next counter go to make a straight line of three?`, answer: c.join(", "), ...XYZ, steps: [`Each step adds (${dir.join(", ")}).`, `(${b.join(", ")}) + (${dir.join(", ")}) = (${c.join(", ")}).`] }; },
+  (r) => { const lv = r(2, 6), col = r(1, 8), row = r(1, 6); return { prompt: `A car park uses (column, row, level). A car is in column ${col}, row ${row} on level ${lv}. It drives down ${lv - 1} level${lv - 1 === 1 ? "" : "s"}. What are its new coordinates?`, answer: `${col}, ${row}, 1`, input: "list", labels: ["Column", "Row", "Level"], steps: ["Driving down changes only the level.", `${lv} − ${lv - 1} = 1, so (${col}, ${row}, 1).`] }; },
+  (r) => { const pts = [p3(r, 0), p3(r, 0), p3(r, 0)], legs = [0, 1].map((i) => Math.abs(pts[i].x - pts[i + 1].x) + Math.abs(pts[i].y - pts[i + 1].y) + Math.abs(pts[i].z - pts[i + 1].z)); return { prompt: `A 3D printer nozzle moves along the axes from (${triple(pts[0])}) to (${triple(pts[1])}) and then to (${triple(pts[2])}) cm. How far does it move in total?`, answer: legs[0] + legs[1], unit: "cm", steps: [`First leg: ${legs[0]} cm. Second leg: ${legs[1]} cm.`, `Total: ${legs[0] + legs[1]} cm.`] }; },
+  (r) => { const a = { x: r(0, 4), y: r(0, 4) }, b = { x: r(0, 4), y: r(0, 4) }, z = r(1, 4); if (a.x === b.x && a.y === b.y) b.x = (b.x + 2) % 5; const d = Math.hypot(a.x - b.x, a.y - b.y); return { prompt: `Two lights hang at the same height: (${a.x}, ${a.y}, ${z}) and (${b.x}, ${b.y}, ${z}) m. What is the straight-line distance between them, correct to two decimal places?`, answer: rounded(d, 2), unit: "m", steps: [`They are on the same level, so use Pythagoras with the x and y changes: ${Math.abs(a.x - b.x)} and ${Math.abs(a.y - b.y)}.`, `√(${Math.abs(a.x - b.x)}² + ${Math.abs(a.y - b.y)}²) ≈ ${rounded(d, 2).toFixed(2)} m.`] }; },
+];
+
+// ── Week 9: shape-sorting algorithms (SP04) ───────────────────────────────────
+const ALGO = table("Sorting algorithm", ["Step", "Instruction"], [["1", "Divide each side of B by the matching side of A."], ["2", "If every ratio is 1, output Congruent."], ["3", "Otherwise, if every ratio is the same, output Similar."], ["4", "Otherwise, output Neither."]]);
+const pairData = (r: R) => { const s = scalene(r), kind = choose(r, ["Congruent", "Similar", "Neither"] as const), k = kind === "Congruent" ? 1 : choose(r, [2, 3]), t = kind === "Neither" ? [s[0] * 2, s[1] * 2, s[2] * 2 + 1] : s.map((v) => v * k); return { s, t, kind, k }; };
+const w9l1: Form[] = [
+  (r) => { const { s, t, kind } = pairData(r); return { prompt: `Run the algorithm. Triangle A has sides ${s.join(", ")}. Triangle B has matching sides ${t.join(", ")}. What does it output?`, answer: kind, choices: ["Congruent", "Similar", "Neither"], steps: [`Ratios: ${t.map((v, i) => fmt(rounded(v / s[i], 3))).join(", ")}.`, kind === "Congruent" ? "All ratios are 1: Congruent." : kind === "Similar" ? "All ratios are equal but not 1: Similar." : "The ratios are not all equal: Neither."], visual: ALGO }; },
+  (r) => { const { s, t, kind } = pairData(r); return { prompt: `Run the algorithm on triangles with sides ${s.join(", ")} and ${t.join(", ")}. At which step does it give its output?`, answer: kind === "Congruent" ? 2 : kind === "Similar" ? 3 : 4, steps: [`Ratios: ${t.map((v, i) => fmt(rounded(v / s[i], 3))).join(", ")}.`, `It outputs ${kind} at step ${kind === "Congruent" ? 2 : kind === "Similar" ? 3 : 4}.`], visual: ALGO }; },
+  (r) => { const s = scalene(r), k = choose(r, [2, 2.5, 3]); return { prompt: `Step 1 of the algorithm is run on triangles with sides ${s.join(", ")} and ${s.map((v) => fmt(v * k)).join(", ")}. What ratio does it find for each pair of sides?`, answer: k, steps: ["Divide each side of B by the matching side of A.", `${fmt(s[0] * k)} ÷ ${s[0]} = ${k}, and the other pairs give ${k} too.`], visual: ALGO }; },
+  (r) => { const a = r(35, 55), b = r(60, 80), same = r(0, 1) === 1, side = r(4, 9), side2 = same ? side : side * 2; return { prompt: `An angles-first algorithm says: “If two pairs of angles match, the triangles are similar. Then, if one pair of matching sides is equal, they are congruent.” Both triangles have angles ${a}° and ${b}°. Their matching shortest sides are ${side} cm and ${side2} cm. What does it output?`, answer: same ? "Congruent" : "Similar", choices: ["Congruent", "Similar", "Neither"], steps: ["Two matching angles: similar.", same ? "A matching side is also equal, so they are congruent (AAS)." : "The matching sides differ, so they are similar but not congruent."] }; },
+  (r) => { const { s, t, kind } = pairData(r); return { prompt: `Triangle A: ${s.join(", ")}. Triangle B: ${t.join(", ")}. Use the algorithm to classify the pair.`, answer: kind, choices: ["Congruent", "Similar", "Neither"], steps: [`Ratios: ${t.map((v, i) => fmt(rounded(v / s[i], 3))).join(", ")}.`, `Output: ${kind}.`], visual: ALGO }; },
+];
+
+const w9l2: Form[] = [
+  (r) => { const k = r(2, 6); return { prompt: `A faulty algorithm says “matching angles ⇒ congruent”. It is given triangles with sides 3, 4, 5 and ${3 * k}, ${4 * k}, ${5 * k}. What should the correct output be?`, answer: "Similar", choices: ["Congruent", "Similar", "Neither"], steps: [`The angles match, but the sides are ${k} times as long.`, "The correct output is Similar. The rule should check a side length too."], ...shapes(tri([3, 4, 5], "A"), tri([3 * k, 4 * k, 5 * k], "B", ["D", "E", "F"])) }; },
+  (r) => { const k = r(2, 3); return { prompt: `A faulty rule only checks that two pairs of sides have the same ratio. Which pair of triangles breaks it? A: 4, 6, 8 and ${4 * k}, ${6 * k}, ${8 * k + 3}  B: 4, 6, 8 and ${4 * k}, ${6 * k}, ${8 * k}`, answer: "A", input: "text", steps: [`Pair A has two sides in ratio ${k} but the third is not, so the rule wrongly says similar.`, "Pair A is the counterexample."] }; },
+  () => ({ prompt: "A rule says: “Two pairs of equal sides and any equal angle ⇒ congruent.” Does this rule always work?", answer: "No", steps: ["If the angle is not between the sides (SSA), two different triangles can be drawn.", "The rule must require the included angle (SAS)."] }),
+  (r) => { const [a, b] = choose(r, [[[3, 4, 5], [2, 5, 5]], [[4, 4, 6], [3, 5, 6]], [[5, 6, 7], [4, 6, 8]]] as const); return { prompt: `A rule says “same perimeter ⇒ congruent”. Triangles with sides ${a.join(", ")} and ${b.join(", ")} both have a perimeter of ${a.reduce((s, v) => s + v, 0)}. Are they congruent?`, answer: "No", steps: ["Their side lengths are different.", "Same perimeter is not a congruence test, so the rule is faulty."] }; },
+  () => ({ prompt: "An algorithm outputs “Similar” for a pair whose scale factor is 1. What should it output?", answer: "Congruent", choices: ["Congruent", "Similar", "Neither"], steps: ["A scale factor of 1 means the shapes are the same size.", "The algorithm should check for 1 first and output Congruent."] }),
+];
+
+const w9l3: Form[] = [
+  () => ({ prompt: "You are testing a sorting algorithm. What scale factor should a test pair have so that the correct output is Congruent?", answer: 1, steps: ["Congruent shapes are the same size.", "Every ratio of matching sides must be 1."] }),
+  (r) => { const s = scalene(r), k = r(2, 4); return { prompt: `To test the “Similar” output, you need a triangle similar to one with sides ${s.join(", ")} using a scale factor of ${k}. What should its longest side be?`, answer: s[2] * k, steps: ["Multiply every side by the scale factor.", `${s[2]} × ${k} = ${s[2] * k}.`] }; },
+  (r) => { const rows = Array.from({ length: 4 }, () => pairData(r)), n = rows.filter((p) => p.kind === "Congruent").length; return { prompt: "The algorithm is run on the four pairs in the table. How many outputs are Congruent?", answer: n, steps: ["Only pairs with every ratio equal to 1 are congruent.", `${n} pair${n === 1 ? "" : "s"}.`], visual: table("Test pairs", ["Pair", "Triangle A", "Triangle B"], rows.map((p, i) => [String(i + 1), p.s.join(", "), p.t.join(", ")])) }; },
+  (r) => { const rows = Array.from({ length: 3 }, () => pairData(r)), i = r(0, 2); return { prompt: `Use the algorithm to classify pair ${i + 1} in the table.`, answer: rows[i].kind, choices: ["Congruent", "Similar", "Neither"], steps: [`Ratios: ${rows[i].t.map((v, j) => fmt(rounded(v / rows[i].s[j], 3))).join(", ")}.`, `Output: ${rows[i].kind}.`], visual: table("Test pairs", ["Pair", "Triangle A", "Triangle B"], rows.map((p, j) => [String(j + 1), p.s.join(", "), p.t.join(", ")])) }; },
+  () => ({ prompt: "An algorithm outputs “Similar” for every pair of squares it is given. Is it always correct?", answer: "Yes", steps: ["Every square has four 90° angles and equal sides.", "Any two squares are similar, so the output is always correct."] }),
+];
+
+// ── Week 10: apply and review (SP01–SP04) ─────────────────────────────────────
+const w10l1: Form[] = [w3l3[0], w2l2[0], w4l1[0], w1l1[0], w3l1[0]];
+const w10l2: Form[] = [w6l2[3], w5l2[2], w7l1[0], w8l1[2], w6l2[0]];
+const w10l3: Form[] = [w9l1[0], w9l2[0], w9l3[1], w9l2[3], w8l1[0]];
+
+export const spaceLessons: LessonFactory[] = [w1l1, w1l2, w1l3, w2l1, w2l2, w2l3, w3l1, w3l2, w3l3, w4l1, w4l2, w4l3, w5l1, w5l2, w5l3, w6l1, w6l2, w6l3, w7l1, w7l2, w7l3, w8l1, w8l2, w8l3, w9l1, w9l2, w9l3, w10l1, w10l2, w10l3].map(pickForm);

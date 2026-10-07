@@ -15,7 +15,7 @@ export default function SpaceVisual({
     <div className="rounded-xl border border-violet-300 bg-white p-4 text-slate-900">
       {visual.polygons && (
         <>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mx-auto grid max-w-xs grid-cols-1 gap-3 sm:max-w-none sm:grid-cols-2">
             {visual.polygons.map((p, i) => (
               <Polygon key={i} p={p} />
             ))}
