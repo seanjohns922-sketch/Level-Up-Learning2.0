@@ -12,6 +12,8 @@ import { CENTRAL_WORLD_STARTER_SCENERY } from "@/lib/world3d/central-world-edito
 import { VILLAGE_INFRASTRUCTURE_KEYS } from "@/lib/world3d/village-infrastructure";
 import { VillageInfrastructure } from "./VillageInfrastructure";
 const infrastructureItems = CENTRAL_WORLD_STARTER_SCENERY.filter(item=>VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey)));
+import { REALM_BUILDING_REVIEW_ITEMS, SIGNATURE_REALM_BUILDING_KEYS, REALM_BUILDING_KEYS, REALM_DESIGN_PRESENTATIONS } from "@/lib/world3d/realm-building-collections";
+import { RealmBuildingModel } from "./RealmBuildingModels";
 type Exported = { key: string; name: string; png: string };
 function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void}) {
  const {camera,gl,scene}=useThree(),sent=useRef(false);
@@ -39,20 +41,21 @@ function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void})
   <directionalLight position={[-extent,extent*2,extent*1.5]} intensity={2.3} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-extent} shadow-camera-right={extent} shadow-camera-top={extent} shadow-camera-bottom={-extent} shadow-camera-far={extent*6} shadow-normalBias={.035}/>
   <directionalLight position={[extent,extent*.7,-extent]} intensity={.7} color="#d5eaff"/>
   <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.015,0]} receiveShadow><planeGeometry args={[1000,1000]}/><meshStandardMaterial color="#e9e6dc" roughness={1}/></mesh>
-  <SizedWorldModel item={item} onMeasured={measure}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}>{VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey))?<VillageInfrastructure assetKey={String(item.metadata.worldAssetKey)}/>:<RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/>}</SceneryFinish></SizedWorldModel>
+  <SizedWorldModel item={item} onMeasured={measure} presentation={REALM_DESIGN_PRESENTATIONS[String(item.metadata.worldAssetKey)]}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}>{REALM_BUILDING_KEYS.has(String(item.metadata.worldAssetKey))?<RealmBuildingModel assetKey={String(item.metadata.worldAssetKey)}/>:VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey))?<VillageInfrastructure assetKey={String(item.metadata.worldAssetKey)}/>:<RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/>}</SceneryFinish></SizedWorldModel>
  </>;
 }
-export default function MarketplaceArtReview({infrastructure=false}:{infrastructure?:boolean}){
- const items=infrastructure?infrastructureItems:shopItems;
+export default function MarketplaceArtReview({infrastructure=false,realms=false}:{infrastructure?:boolean;realms?:boolean}){
+ const items=realms?REALM_BUILDING_REVIEW_ITEMS.filter(item=>SIGNATURE_REALM_BUILDING_KEYS.includes(String(item.metadata.worldAssetKey))):infrastructure?infrastructureItems:shopItems;
  const [rows,setRows]=useState<Exported[]>([]),[running,setRunning]=useState(false);
  const capture=useCallback((row:Exported)=>setRows(previous=>previous.some(r=>r.key===row.key)?previous:[...previous,row]),[]);
  const current=items[rows.length];
  return <main style={{padding:24,background:"#f5f2e9",color:"#263a32",minHeight:"100vh"}}>
-  <h1>{infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
+  <h1>{realms?"Realm collection — design review":infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
+  {realms&&<p>Six signature buildings, one from each realm. Artwork and pricing are in review; these designs are not yet in the student shop.</p>}
   <button onClick={()=>{setRows([]);setRunning(true);}}>Render all shop images</button>
   <p role="status">{rows.length} / {items.length} captured {running&&current?`· ${current.name}`:""}</p>
   {running&&current&&<div style={{width:800,height:640}}><Canvas orthographic dpr={1} shadows gl={{antialias:true,preserveDrawingBuffer:true}} camera={{near:.1,far:2000,position:[20,15,24]}}><Suspense fallback={null}><Product key={current.item_key} item={current} onReady={capture}/></Suspense></Canvas></div>}
-  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=infrastructure?"reliq-village-infrastructure.json":"reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
- <div style={{display:"grid",gridTemplateColumns:"repeat(4, 1fr)",gap:16}}>{rows.map(row=><figure key={row.key}><Image unoptimized src={row.png} alt={row.name} width={800} height={640} style={{width:"100%",height:"auto"}}/><figcaption>{row.name}</figcaption></figure>)}</div>
+  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=realms?"reliq-realm-designs.json":infrastructure?"reliq-village-infrastructure.json":"reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
+ <div style={{display:"grid",gridTemplateColumns:realms?"repeat(3, 1fr)":"repeat(4, 1fr)",gap:16}}>{rows.map(row=><figure key={row.key}><Image unoptimized src={row.png} alt={row.name} width={800} height={640} style={{width:"100%",height:"auto"}}/><figcaption><strong>{row.name}</strong>{realms&&<p>{String(items.find(item=>item.metadata.worldAssetKey===row.key)?.metadata.realmName)} · Signature building · design preview</p>}</figcaption></figure>)}</div>
  </main>;
 }

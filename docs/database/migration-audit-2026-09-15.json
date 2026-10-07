@@ -1,0 +1,1716 @@
+{
+  "local_count": 182,
+  "live_history_count": 51,
+  "missing_history_count": 131,
+  "function_body_differences": [
+    [
+      "find_class_by_code",
+      "20260523103000_add_find_class_by_code_rpc.sql",
+      []
+    ],
+    [
+      "save_pretest_progress",
+      "20260526120000_progress_snapshot_rpcs.sql",
+      [
+        "20260525090001_student_write_rpcs.sql"
+      ]
+    ],
+    [
+      "save_lesson_completion",
+      "20260526120000_progress_snapshot_rpcs.sql",
+      []
+    ],
+    [
+      "get_student_progress_snapshot",
+      "20260526143000_unify_student_progress_snapshot.sql",
+      []
+    ],
+    [
+      "mark_student_intro_seen",
+      "20260526143000_unify_student_progress_snapshot.sql",
+      []
+    ],
+    [
+      "save_student_progress_state",
+      "20260526143000_unify_student_progress_snapshot.sql",
+      []
+    ],
+    [
+      "save_lesson_progress",
+      "20260528091500_fix_lesson_completion_persistence.sql",
+      []
+    ],
+    [
+      "save_weekly_quiz_progress",
+      "20260526143000_unify_student_progress_snapshot.sql",
+      []
+    ],
+    [
+      "save_posttest_progress",
+      "20260526143000_unify_student_progress_snapshot.sql",
+      []
+    ],
+    [
+      "normalize_progress_year_label",
+      "20260528110000_backfill_progress_snapshot_from_live_events.sql",
+      []
+    ],
+    [
+      "backfill_progress_snapshot_from_live_events",
+      "20260528110000_backfill_progress_snapshot_from_live_events.sql",
+      []
+    ]
+  ],
+  "absent_function_names": [
+    [
+      "generate_qr_token",
+      "20260303063612_4d267154-713f-4a0f-ae28-b7daafe53c7e.sql"
+    ],
+    [
+      "lookup_student_by_qr",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "verify_student_pin",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "regenerate_student_qr",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "generate_class_code",
+      "20260303232837_d75c9223-dbeb-4d7c-897c-5c909cc37e2b.sql"
+    ],
+    [
+      "generate_student_claim_code",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "create_student_for_class",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "claim_student_profile",
+      "20260420090000_account_linking_foundation.sql"
+    ],
+    [
+      "grant_standard_realmie_for_canonical_posttest",
+      "20260731100000_realmies_secure_data_foundation.sql"
+    ],
+    [
+      "backfill_standard_realmies_internal",
+      "20260731101000_integrate_realmie_posttest_unlocks.sql"
+    ],
+    [
+      "award_brain_break_xp_secure",
+      "20260809120000_brain_break_xp.sql"
+    ]
+  ],
+  "migrations": [
+    {
+      "migration": "20260302092558_ef7c5740-d1d0-4b0f-bf24-c4545fffea96.sql",
+      "version": "20260302092558",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303010145_a8560a26-71ac-47d9-9857-0f6db386548d.sql",
+      "version": "20260303010145",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303054758_e893bee7-9d84-4251-8872-705e7d5c61e8.sql",
+      "version": "20260303054758",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303062709_123c4a4b-a06d-4cf5-a042-980a42c6c939.sql",
+      "version": "20260303062709",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303063612_4d267154-713f-4a0f-ae28-b7daafe53c7e.sql",
+      "version": "20260303063612",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303063654_3df9a7af-2474-4fc3-93e9-47034f90829b.sql",
+      "version": "20260303063654",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303063944_401590ec-4c37-41d8-9c58-4bed54978a1f.sql",
+      "version": "20260303063944",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303232755_ce1b8c17-0da5-4da4-be2d-a7b3d95491c7.sql",
+      "version": "20260303232755",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260303232837_d75c9223-dbeb-4d7c-897c-5c909cc37e2b.sql",
+      "version": "20260303232837",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260304115930_add_students_class_pin_unique.sql",
+      "version": "20260304115930",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260304145519_fix_teachers_profile_schema.sql",
+      "version": "20260304145519",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260304204308_sync_classes_canonical_columns.sql",
+      "version": "20260304204308",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260306015443_4b8f298f-1133-451f-b9ac-9e3d28a941e5.sql",
+      "version": "20260306015443",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260420090000_account_linking_foundation.sql",
+      "version": "20260420090000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260503120000_add_lesson_attempts_to_progress.sql",
+      "version": "20260503120000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260506110000_add_live_class_activity.sql",
+      "version": "20260506110000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260514093000_mvp_safe_rls_policies.sql",
+      "version": "20260514093000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "teacher_belongs_to_auth",
+        "student_belongs_to_auth"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260523093000_restore_public_class_lookup.sql",
+      "version": "20260523093000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260523103000_add_find_class_by_code_rpc.sql",
+      "version": "20260523103000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260523120000_add_student_management_fields.sql",
+      "version": "20260523120000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260523130000_fix_rls_infinite_recursion.sql",
+      "version": "20260523130000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_class_teacher_id"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260525090000_add_class_archive_and_rls_delete.sql",
+      "version": "20260525090000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260525090001_student_write_rpcs.sql",
+      "version": "20260525090001",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_live_student_activity",
+        "insert_live_activity_event"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260525113000_restore_students_user_id_column.sql",
+      "version": "20260525113000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260526090000_add_student_delete_policy.sql",
+      "version": "20260526090000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260526120000_progress_snapshot_rpcs.sql",
+      "version": "20260526120000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260526143000_unify_student_progress_snapshot.sql",
+      "version": "20260526143000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260527101500_live_activity_completion_sync.sql",
+      "version": "20260527101500",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260527121500_add_student_school_and_working_levels.sql",
+      "version": "20260527121500",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260528091500_fix_lesson_completion_persistence.sql",
+      "version": "20260528091500",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260528110000_backfill_progress_snapshot_from_live_events.sql",
+      "version": "20260528110000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260528120000_lesson_started_at.sql",
+      "version": "20260528120000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260529103000_add_student_first_last_names.sql",
+      "version": "20260529103000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260529133000_repair_seeded_onboarding_state.sql",
+      "version": "20260529133000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260531100000_lesson_reflections.sql",
+      "version": "20260531100000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "save_lesson_reflection"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260531113000_student_activity_daily.sql",
+      "version": "20260531113000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "touch_student_activity_daily_updated_at",
+        "upsert_student_activity_daily",
+        "get_student_activity_daily"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601134000_create_student_realm_tables.sql",
+      "version": "20260601134000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "touch_student_realm_progress_updated_at"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601135000_student_realm_rpcs.sql",
+      "version": "20260601135000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_student_realm_progress",
+        "save_student_realm_progress",
+        "set_current_student_realm_level",
+        "save_realm_lesson_attempt",
+        "get_student_realm_lesson_attempts",
+        "save_realm_weekly_quiz_attempt",
+        "get_student_realm_weekly_quiz_attempts",
+        "save_realm_assessment",
+        "get_student_realm_assessments",
+        "get_student_realm_progress_compat"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601140000_backfill_number_progress_snapshot_to_realm_tables.sql",
+      "version": "20260601140000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601150000_student_runtime_context_rpc.sql",
+      "version": "20260601150000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601154000_fix_number_backfill_completed_lessons.sql",
+      "version": "20260601154000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "backfill_number_progress_snapshot_to_realm_tables"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260601161000_extend_student_runtime_context_name_fields.sql",
+      "version": "20260601161000",
+      "recorded_live": true,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260605120000_repair_live_score_persistence.sql",
+      "version": "20260605120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260618120000_brain_break_frequency.sql",
+      "version": "20260618120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_student_runtime_context"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260714120000_teacher_placement_rpcs.sql",
+      "version": "20260714120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "teacher_reset_week",
+        "teacher_reset_realm"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260717190000_school_foundation_and_class_cleanup.sql",
+      "version": "20260717190000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260717213000_secure_student_completions.sql",
+      "version": "20260717213000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "request_student_session_token",
+        "teacher_owns_class",
+        "mark_student_intro_seen_secure",
+        "upsert_student_activity_daily_secure",
+        "upsert_live_student_activity_secure",
+        "insert_live_activity_event_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718100000_fix_teacher_placement_persistence.sql",
+      "version": "20260718100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718100500_fix_student_session_pgcrypto_resolution.sql",
+      "version": "20260718100500",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "student_login_lookup"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718103000_fix_student_access_legacy_user_id.sql",
+      "version": "20260718103000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718104500_guard_optional_parent_student_links.sql",
+      "version": "20260718104500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718110000_student_economy_foundation.sql",
+      "version": "20260718110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "award_student_economy_xp",
+        "purchase_economy_item_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718111500_backfill_existing_global_xp.sql",
+      "version": "20260718111500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260718113000_harden_global_xp_foundation.sql",
+      "version": "20260718113000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "apply_completion_xp"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719120000_expand_avatar_catalog_and_reprice.sql",
+      "version": "20260719120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719130000_layered_avatar_slots.sql",
+      "version": "20260719130000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "unequip_economy_slot_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719140000_home_themes.sql",
+      "version": "20260719140000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719150000_avatar_body_type.sql",
+      "version": "20260719150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719160000_economy_catalog_rpc.sql",
+      "version": "20260719160000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_economy_catalog_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719170000_avatar_face_expression.sql",
+      "version": "20260719170000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719180000_avatar_clothing_styles.sql",
+      "version": "20260719180000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "set_student_avatar_base_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719190000_earnable_clothing_styles.sql",
+      "version": "20260719190000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719193000_fix_class_creation_pgcrypto_resolution.sql",
+      "version": "20260719193000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260719200000_clothing_items_shape_only.sql",
+      "version": "20260719200000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720120000_gem_vault_foundation.sql",
+      "version": "20260720120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "set_favourite_gem_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720130000_gem_milestone_evaluator.sql",
+      "version": "20260720130000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "gem_student_totals",
+        "gem_current_value"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720140000_gem_catalog_rpc.sql",
+      "version": "20260720140000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_gem_catalog_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720150000_gem_backfill_existing_students.sql",
+      "version": "20260720150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "evaluate_gems_secure",
+        "gem_award_core"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720160000_pet_roster.sql",
+      "version": "20260720160000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720170000_marketplace_artwork_integrity.sql",
+      "version": "20260720170000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720180000_marketplace_artwork_assets.sql",
+      "version": "20260720180000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720190000_prevent_completion_reward_farming.sql",
+      "version": "20260720190000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260720191000_repair_impossible_lesson_totals.sql",
+      "version": "20260720191000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260721100000_reconcile_placeholder_teacher_placements.sql",
+      "version": "20260721100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260722100000_prevent_stale_live_activity_overwrites.sql",
+      "version": "20260722100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "upsert_live_student_activity"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260722110000_restore_unbounded_timed_lesson_totals.sql",
+      "version": "20260722110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260722110500_canonical_teacher_progress_reads.sql",
+      "version": "20260722110500",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_class_realm_progress",
+        "get_class_realm_lesson_attempts",
+        "get_class_realm_weekly_quiz_attempts",
+        "get_class_realm_progress_compat"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260722113000_teacher_progress_overrides.sql",
+      "version": "20260722113000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260722114500_fix_progress_override_policy_permission.sql",
+      "version": "20260722114500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260723100000_materialize_saved_teacher_placements.sql",
+      "version": "20260723100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260724100000_enable_starpath_space_realm.sql",
+      "version": "20260724100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260725100000_enable_starpath_space_posttest.sql",
+      "version": "20260725100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260728100000_fix_full_path_pretest_start_week.sql",
+      "version": "20260728100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729100000_restore_remaining_uncapped_lesson_totals.sql",
+      "version": "20260729100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729110000_school_authorisation_tenancy_foundation.sql",
+      "version": "20260729110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "is_school_member",
+        "is_platform_admin",
+        "has_school_role",
+        "can_view_school",
+        "can_manage_school",
+        "can_view_class",
+        "can_view_student",
+        "can_manage_student",
+        "can_view_student_learning",
+        "can_create_school_student"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729111000_school_authorisation_commands.sql",
+      "version": "20260729111000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "create_class_for_teacher",
+        "write_school_audit",
+        "get_school_access_context",
+        "record_school_access",
+        "create_school",
+        "activate_school",
+        "invite_school_staff",
+        "accept_school_invitation",
+        "change_school_member_role",
+        "assign_class_staff",
+        "revoke_class_staff"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729120000_school_home_preview.sql",
+      "version": "20260729120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "create_class",
+        "can_create_school_class",
+        "get_my_school_contexts",
+        "get_school_home_snapshot",
+        "invite_school_staff_with_class",
+        "apply_invited_class_assignment",
+        "resend_school_invitation",
+        "revoke_school_invitation",
+        "deactivate_school_member"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729121000_link_cobram_primary_classes.sql",
+      "version": "20260729121000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729122000_configure_cobram_school_roles.sql",
+      "version": "20260729122000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "can_view_school_administration"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729123000_final_school_login_admin_model.sql",
+      "version": "20260729123000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "activate_school_membership_with_code"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260729124000_normalize_miranda_display_name.sql",
+      "version": "20260729124000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730100000_explorer_code_identity_foundation.sql",
+      "version": "20260730100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "normalise_explorer_code",
+        "generate_explorer_code_candidate",
+        "ensure_student_explorer_code_internal",
+        "ensure_student_explorer_code",
+        "assign_explorer_code_after_student_insert",
+        "get_student_explorer_codes",
+        "lookup_student_by_explorer_code",
+        "reset_student_explorer_code"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730101000_reconcile_cobram_class_students.sql",
+      "version": "20260730101000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730102000_repair_school_student_directory.sql",
+      "version": "20260730102000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730103000_school_student_directory_and_import.sql",
+      "version": "20260730103000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730110000_canonical_school_student_pool.sql",
+      "version": "20260730110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "assign_school_student_to_class"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730111000_restore_student_access_credentials.sql",
+      "version": "20260730111000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730150000_repair_equivalent_partition_quiz_answers.sql",
+      "version": "20260730150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260730151000_canonical_educator_full_names.sql",
+      "version": "20260730151000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "handle_new_user",
+        "canonical_educator_display_name"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260731100000_realmies_secure_data_foundation.sql",
+      "version": "20260731100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "assert_realmie_student_self_access",
+        "acknowledge_student_realmie_unlocks_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260731101000_integrate_realmie_posttest_unlocks.sql",
+      "version": "20260731101000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260731102000_register_realmie_production_assets.sql",
+      "version": "20260731102000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260731103000_correct_realmies_to_discovery_model.sql",
+      "version": "20260731103000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_active_realmie_catalogue_secure",
+        "get_student_realmies_secure",
+        "get_student_realmie_display_secure",
+        "set_student_realmie_favourite_secure",
+        "set_student_realmie_display_slot_secure",
+        "get_teacher_student_realmie_summary_secure",
+        "get_realmie_collection_availability_secure",
+        "realmie_attempt_is_canonical",
+        "get_parent_student_realmie_summary_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260731120000_release_live_realmie_collection_assets.sql",
+      "version": "20260731120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260803100000_fix_school_student_creation.sql",
+      "version": "20260803100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "create_school_student"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260803101000_restore_legacy_class_owner_management.sql",
+      "version": "20260803101000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "can_manage_class"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260803102000_repair_jordan_historical_lesson_attribution.sql",
+      "version": "20260803102000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260806100000_sync_archived_student_enrolments.sql",
+      "version": "20260806100000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_school_student_directory",
+        "sync_archived_student_enrolments"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260809120000_brain_break_xp.sql",
+      "version": "20260809120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260809130000_align_inactive_future_realm_gems.sql",
+      "version": "20260809130000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260810123000_fix_live_class_school_staff_access.sql",
+      "version": "20260810123000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811100000_platform_admin_pa1.sql",
+      "version": "20260811100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "is_platform_owner",
+        "reject_platform_audit_mutation",
+        "sync_school_access_entitlement",
+        "revoke_archived_student_access",
+        "write_platform_admin_audit",
+        "get_platform_admin_access_context",
+        "get_platform_admin_overview",
+        "get_platform_admin_school_summaries",
+        "platform_owner_update_school_licence",
+        "platform_owner_create_school"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811113000_restore_parent_student_links.sql",
+      "version": "20260811113000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811130000_platform_admin_pa2_school_lifecycle.sql",
+      "version": "20260811130000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "guard_school_enrolment_lifecycle",
+        "guard_school_invitation_lifecycle",
+        "platform_owner_provision_school",
+        "platform_owner_update_school",
+        "platform_owner_update_school_access",
+        "platform_owner_transition_school",
+        "platform_owner_assign_school_admin",
+        "platform_owner_manage_school_admin",
+        "get_platform_admin_school_summaries_pa2"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811150000_school_licence_visibility.sql",
+      "version": "20260811150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_school_licence_summaries"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811160000_school_student_lifecycle.sql",
+      "version": "20260811160000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "archive_school_student",
+        "restore_school_student",
+        "delete_school_student"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811170000_platform_admin_pa3_operations_growth.sql",
+      "version": "20260811170000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_platform_admin_operations_snapshot",
+        "get_platform_admin_growth_snapshot",
+        "get_platform_admin_engagement_snapshot",
+        "get_platform_admin_home_only_snapshot",
+        "search_platform_admin_users",
+        "get_platform_admin_student_detail",
+        "get_platform_admin_adult_detail"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260811190000_school_student_editing.sql",
+      "version": "20260811190000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "update_school_student"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260812100000_platform_admin_pa4_identity_parent_home.sql",
+      "version": "20260812100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "reject_identity_audit_mutation",
+        "assert_parent_role",
+        "activate_free_home_access",
+        "get_platform_identity_centre",
+        "preview_school_student_link",
+        "link_existing_student_to_school",
+        "preview_school_student_creation",
+        "approve_school_student_creation_override"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260812110000_platform_admin_pa4_safety_hardening.sql",
+      "version": "20260812110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "preview_parent_child_link",
+        "confirm_parent_child_link",
+        "request_student_identity_merge",
+        "resolve_student_identity_merge",
+        "get_student_identity_merge_conflicts",
+        "student_belonged_to_school_at"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260812120000_platform_admin_pa4_parent_read_write_boundary.sql",
+      "version": "20260812120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "can_access_student",
+        "assert_student_access",
+        "get_student_runtime_context_secure",
+        "get_student_realm_lesson_attempts_secure",
+        "get_student_realm_weekly_quiz_attempts_secure",
+        "get_student_activity_daily_secure",
+        "get_student_progress_snapshot_secure",
+        "get_live_student_activity_secure",
+        "get_student_global_xp_secure",
+        "get_gem_vault_secure",
+        "get_student_progress_overrides_secure",
+        "can_access_student_read",
+        "can_write_student",
+        "assert_student_read",
+        "assert_student_write"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260812133000_fix_school_activity_rollup.sql",
+      "version": "20260812133000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260812140000_include_assessments_in_live_class.sql",
+      "version": "20260812140000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_live_class_activity_today"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813060000_fix_platform_admin_audit_order.sql",
+      "version": "20260813060000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_platform_admin_audit"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813070000_home_family_onboarding.sql",
+      "version": "20260813070000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "parent_can_manage_home_student",
+        "generate_home_student_username",
+        "get_parent_home_student_management",
+        "parent_reset_home_student_pin",
+        "parent_reset_home_pretest",
+        "home_student_login_lookup",
+        "get_student_explorer_code_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813080000_parent_achievement_gem_artwork.sql",
+      "version": "20260813080000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813090000_parent_weekly_journey_activity.sql",
+      "version": "20260813090000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_parent_child_realm_snapshot"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813100000_parent_realm_lesson_progress.sql",
+      "version": "20260813100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813110000_parent_unlocked_collection.sql",
+      "version": "20260813110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813120000_parent_realm_starting_levels.sql",
+      "version": "20260813120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "parent_set_home_starting_levels"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813130000_ground_level_skips_pretest.sql",
+      "version": "20260813130000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813133000_parent_snapshot_home_access_usernames.sql",
+      "version": "20260813133000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_parent_home_snapshot"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813143000_platform_admin_home_users.sql",
+      "version": "20260813143000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813150000_fix_school_activity_active_usage.sql",
+      "version": "20260813150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260813171000_fix_platform_admin_home_users_parent_link_date.sql",
+      "version": "20260813171000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_platform_admin_home_users"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260814120000_avatar_hand_weapons.sql",
+      "version": "20260814120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260814143000_enable_starpath_teacher_placements.sql",
+      "version": "20260814143000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260817100000_platform_admin_school_recent_activity.sql",
+      "version": "20260817100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260817113000_backfill_historical_pretest_pass_transitions.sql",
+      "version": "20260817113000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260818183000_restore_avatar_base_economy_contract.sql",
+      "version": "20260818183000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_student_economy_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260818193000_live_class_presence_heartbeat.sql",
+      "version": "20260818193000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "touch_live_student_presence_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260825110000_school_analytics_sa1.sql",
+      "version": "20260825110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826120000_school_analytics_realm_curriculum.sql",
+      "version": "20260826120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826140000_student_learning_journey.sql",
+      "version": "20260826140000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826150000_school_analytics_assessment_bands.sql",
+      "version": "20260826150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826152000_central_world_customisation_catalogue.sql",
+      "version": "20260826152000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "equip_economy_item_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826165000_central_world_marketplace_item_visuals.sql",
+      "version": "20260826165000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260826173500_central_world_launch_rewards_catalogue.sql",
+      "version": "20260826173500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260830120000_central_world_aussie_reskin.sql",
+      "version": "20260830120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260831160000_teacher_school_insights.sql",
+      "version": "20260831160000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_student_learning_journey"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260901120000_class_realm_focus.sql",
+      "version": "20260901120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "class_realm_focus_json",
+        "set_class_focus",
+        "set_class_engaged",
+        "clear_class_focus",
+        "get_class_focus",
+        "get_student_focus_lock"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260902071500_enable_statistica_realm_in_database.sql",
+      "version": "20260902071500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903121500_harden_live_realm_teacher_placements.sql",
+      "version": "20260903121500",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903133000_enforce_statistica_pretest_pathways.sql",
+      "version": "20260903133000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903150000_enforce_live_realm_activity_sequence.sql",
+      "version": "20260903150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903170000_whole_maths_diagnostic_foundation.sql",
+      "version": "20260903170000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903180000_live_maths_progression_tracker.sql",
+      "version": "20260903180000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "maths_progression_level_number",
+        "refresh_live_maths_progression_trigger",
+        "refresh_live_maths_progression_from_sitting_trigger",
+        "get_teacher_live_maths_progression"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903190000_enforce_live_quiz_snapshot_totals.sql",
+      "version": "20260903190000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "enforce_live_weekly_quiz_snapshot_total"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903200000_correct_live_progression_level_band.sql",
+      "version": "20260903200000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260903210000_bypass_pretest_for_each_realm_first_level.sql",
+      "version": "20260903210000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260906120000_prepare_pattern_peaks_live_realm.sql",
+      "version": "20260906120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260907120000_central_world_price_ladder.sql",
+      "version": "20260907120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260909120000_enable_entry_level_pretests.sql",
+      "version": "20260909120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "normalise_first_realm_level_placement",
+        "normalise_first_realm_level_progress"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260909150000_prepare_chance_hollow_reporting.sql",
+      "version": "20260909150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260910150000_platform_admin_active_today_drilldown.sql",
+      "version": "20260910150000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_platform_admin_school_detail"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260910170000_release_chance_hollow_live_realm.sql",
+      "version": "20260910170000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "realm_program_key",
+        "teacher_change_starting_level",
+        "get_student_realm_progress_compat_secure",
+        "save_student_realm_progress_secure",
+        "complete_realm_lesson",
+        "complete_realm_quiz",
+        "teacher_change_starting_levels",
+        "discover_realm_collectible_secure",
+        "teacher_advance_student_week",
+        "record_realmie_product_event_secure",
+        "evaluate_realmie_discoveries_internal",
+        "evaluate_realmie_lesson_attempt_trigger",
+        "evaluate_realmie_quiz_attempt_trigger",
+        "backfill_realmie_discoveries_internal",
+        "realm_week_is_playable",
+        "enforce_realm_lesson_sequence",
+        "enforce_realm_quiz_sequence",
+        "refresh_student_live_maths_progression",
+        "realm_first_level"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260911120000_complete_six_strand_whole_maths_diagnostic.sql",
+      "version": "20260911120000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "whole_math_strand_curriculum_points",
+        "whole_math_level_for_sitting"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260911153000_supervised_adaptive_whole_maths_diagnostic.sql",
+      "version": "20260911153000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "teacher_start_whole_math_diagnostic",
+        "whole_math_diagnostic_session_is_open",
+        "teacher_open_whole_math_diagnostic_session",
+        "teacher_close_whole_math_diagnostic_session",
+        "get_teacher_whole_math_diagnostic_session",
+        "guard_whole_math_diagnostic_sitting_insert",
+        "capture_whole_math_diagnostic_placement_protection"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260914110000_fix_whole_maths_diagnostic_answer_counts.sql",
+      "version": "20260914110000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "get_teacher_whole_math_diagnostics",
+        "get_student_whole_math_diagnostic_journey"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260914123000_restore_student_diagnostic_journey_access.sql",
+      "version": "20260914123000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260914133000_allow_school_teachers_manage_student_learning.sql",
+      "version": "20260914133000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "teacher_owns_student",
+        "can_manage_student_progress",
+        "can_override_student_progress",
+        "can_manage_school_student_learning"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260914160000_starpath_ground_baseline.sql",
+      "version": "20260914160000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260914161000_starpath_comparable_growth.sql",
+      "version": "20260914161000",
+      "recorded_live": false,
+      "matching_latest_function_names": [],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915100000_ground_number_measurement_baselines.sql",
+      "version": "20260915100000",
+      "recorded_live": false,
+      "matching_latest_function_names": [
+        "complete_realm_assessment",
+        "create_home_student_for_parent",
+        "parent_change_home_starting_level",
+        "realm_first_level_pretest_enabled"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915113000_defer_whole_maths_diagnostic_follow_ups.sql",
+      "version": "20260915113000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_pending_whole_math_diagnostic"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915120000_preserve_all_realm_assessment_history.sql",
+      "version": "20260915120000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "teacher_reset_pretest",
+        "get_student_realm_assessments_secure"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915130000_assessment_learning_cycles.sql",
+      "version": "20260915130000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "assign_assessment_learning_cycle"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915140000_version_safe_assessment_growth.sql",
+      "version": "20260915140000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "get_school_analytics_snapshot"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915160000_number_level1_five_form_release.sql",
+      "version": "20260915160000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "pin_number_level1_diagnostic_version",
+        "get_pending_whole_math_diagnostic_versioned"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915170000_ground_number_live_assessments.sql",
+      "version": "20260915170000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "complete_whole_math_diagnostic_strand",
+        "save_whole_math_diagnostic_progress",
+        "pin_ground_number_diagnostic_version",
+        "prepare_ground_number_diagnostic",
+        "number_diagnostic_level_value",
+        "number_diagnostic_level_label",
+        "get_pending_whole_math_diagnostic_released",
+        "complete_whole_math_diagnostic_strand_upward_v1"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915180000_number_level2_five_form_release.sql",
+      "version": "20260915180000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "pin_number_level2_diagnostic_version",
+        "get_pending_whole_math_diagnostic_level2"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    },
+    {
+      "migration": "20260915190000_number_level4_five_form_release.sql",
+      "version": "20260915190000",
+      "recorded_live": true,
+      "matching_latest_function_names": [
+        "teacher_adopt_recent_diagnostic_assessments",
+        "pin_number_level4_diagnostic_version",
+        "get_pending_whole_math_diagnostic_level4"
+      ],
+      "note": "History status is not proof that all historical data effects can be verified today."
+    }
+  ]
+}

@@ -45,6 +45,7 @@ next-env.d.ts
 /supabase/.temp/
 
 # Generated 3D review captures and candidate artwork exports.
+/.local-archive/
 /artifacts/
 /docs/captures/
 /docs/reports/
