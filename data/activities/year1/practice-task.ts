@@ -135,6 +135,7 @@ export function diffPick(
 }
 
 export type PracticeTask = (
+  | {kind:"level8Question";realm:import("@/lib/level8-config").Level8Realm;prompt:string;speakText:string;options:string[];answer:string;question:import("@/data/activities/level8/shared").Level8Question;feedback:{correct:string;wrong:string}}
   | {kind:"cave7Question";prompt:string;speakText:string;options:string[];answer:string;question:import("@/data/activities/cave7/shared").Cave7Question;feedback:{correct:string;wrong:string}}
   | {kind:"space7Question";prompt:string;speakText:string;options:string[];answer:string;question:import("@/data/activities/year7Space/questions").Space7Question;feedback:{correct:string;wrong:string}}
   | import("@/lib/starpath-independent-construction").IndependentConstructionTask

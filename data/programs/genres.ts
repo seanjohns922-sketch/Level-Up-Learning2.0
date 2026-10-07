@@ -1,3 +1,5 @@
+import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
+import { isLevel8Realm } from "@/lib/level8-config";
 import {NEW_CAVE7_PROGRAMS} from "@/data/activities/cave7/curriculum";
 import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import type { WeekPlan, Lesson } from "./year1";
@@ -195,6 +197,8 @@ export function genreIdForRealm(realmId: string): string {
 }
 
 export function getCurriculumPlan(yearLabel: string, genreId: string): WeekPlan[] {
+  const realm8 = genreId === "algebra" ? "pattern" : genreId === "probability" ? "chance" : genreId;
+  if (yearLabel === "Year 8" && isLevel8Realm(realm8)) return LEVEL8_PROGRAMS[realm8];
   if(yearLabel === "Year 7" && genreId === "algebra")return NEW_CAVE7_PROGRAMS.pattern;
   if(yearLabel === "Year 7" && genreId === "probability")return NEW_CAVE7_PROGRAMS.chance;
   if(yearLabel === "Year 7" && (genreId === "pattern" || genreId === "statistics" || genreId === "chance"))return NEW_CAVE7_PROGRAMS[genreId];

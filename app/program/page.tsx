@@ -51,6 +51,9 @@ import {SPACE7_PROGRAM} from "@/data/activities/year7Space/curriculum";
 import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
 import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
 import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
+import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
+import { isLevel8Realm, type Level8Realm } from "@/lib/level8-config";
+import { level8DemoHref } from "@/lib/level8-routes";
 import { LEVEL7_LIVE, level7LiveHref, level7LessonId } from "@/lib/level7-release";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -106,7 +109,8 @@ function ProgramPage() {
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 1");
   const realmId = requireSharedWeeklyProgramRealm(sp.get("realm_id") ?? "number");
   // Live Level 7 students always get the Level 7 week view; demo review keeps the expedition flag.
-  const isExpeditionWeek = year === "Year 7" && (sp.get("expedition") === "1" || (LEVEL7_LIVE && cave7WeekCount(realmId) > 0));
+  const isLevel8 = year === "Year 8" && isLevel8Realm(realmId);
+  const isExpeditionWeek = isLevel8 || year === "Year 7" && (sp.get("expedition") === "1" || (LEVEL7_LIVE && cave7WeekCount(realmId) > 0));
   const isNumber7 = isExpeditionWeek && cave7Realm(realmId);
   const isStarpathRealm = realmId === "space";
   const isStatisticsRealm = realmId === "statistics";
@@ -116,13 +120,13 @@ function ProgramPage() {
     () => (isStarpathRealm && !isExpeditionWeek ? getStarpathWeekProgram(year) : null),
     [isStarpathRealm, isExpeditionWeek, year],
   );
-  const weekNum = isExpeditionWeek ? cavernWeek(sp.get("week"),cave7Realm(realmId)?realmId:"number") : Number(sp.get("week") ?? "1");
+  const weekNum = isLevel8 ? Number(sp.get("week") ?? "1") : isExpeditionWeek ? cavernWeek(sp.get("week"),cave7Realm(realmId)?realmId:"number") : Number(sp.get("week") ?? "1");
   const week = String(weekNum);
   const program = useMemo(
-    () => isNumber7 ? (realmId === "pattern" || realmId === "statistics" || realmId === "chance" ? NEW_CAVE7_PROGRAMS[realmId] : realmId === "space" ? SPACE7_PROGRAM : realmId === "measurement" ? MEASUREMENT7_PROGRAM : NUMBER7_PROGRAM) : isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
+    () => isLevel8 ? LEVEL8_PROGRAMS[realmId as Level8Realm] : isNumber7 ? (realmId === "pattern" || realmId === "statistics" || realmId === "chance" ? NEW_CAVE7_PROGRAMS[realmId] : realmId === "space" ? SPACE7_PROGRAM : realmId === "measurement" ? MEASUREMENT7_PROGRAM : NUMBER7_PROGRAM) : isExpeditionWeek ? CAVERN_PREVIEW_WEEKS : isStarpathRealm
       ? starpathProgram?.weeks ?? []
       : getCurriculumPlan(year, genreIdForRealm(realmId)),
-    [isNumber7, isExpeditionWeek, isStarpathRealm, realmId, starpathProgram, year]
+    [isLevel8, isNumber7, isExpeditionWeek, isStarpathRealm, realmId, starpathProgram, year]
   );
   const curriculumYear = useMemo(() => {
     const selected = program;
@@ -643,7 +647,7 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : isNumber7 && !liveLevel7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1, year);
+    unrestrictedMode ? true : isLevel8 ? true : isNumber7 && !liveLevel7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1, year);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
@@ -688,6 +692,7 @@ function ProgramPage() {
       { type: "lesson" as const, n: 2, title: lessons[1]?.displayTitle ?? lessons[1]?.title ?? "Lesson 2", focus: lessons[1]?.focus ?? "" },
       { type: "lesson" as const, n: 3, title: lessons[2]?.displayTitle ?? lessons[2]?.title ?? "Lesson 3", focus: lessons[2]?.focus ?? "" },
     ];
+    if(isLevel8){base.push(weekNum===lastWeek?{type:"posttest",n:1,title:"Level 8 Post-Test",focus:"Show your mastery. Score 85% or above to recover the Core."}:{type:"quiz",n:1,title:"Weekly Quiz",focus:"15 questions: five from each lesson. Score at least 12/15 (80%) to continue."});return base;}
     if(isNumber7){base.push(weekNum===lastWeek?{type:"posttest",n:1,title:"Level 7 Post-Test",focus:"Show your Level 7 mastery in the existing post-test. Score 85% or above to unlock Level 8."}:{type:"quiz",n:1,title:"Weekly Quiz",focus:"15 questions: five from each lesson. Score at least 12/15 (80%) to continue."});return base;}
     if (isChanceRealm) {
       if (weekNum === lastWeek) {
@@ -713,7 +718,7 @@ function ProgramPage() {
       base.push({ type: "posttest" as const, n: 1, title: "Post-Test", focus: "Score 85%+ to unlock your Legend" });
     }
     return base;
-  }, [isNumber7, isExpeditionWeek, isChanceRealm, isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
+  }, [isLevel8, isNumber7, isExpeditionWeek, isChanceRealm, isStarpathRealm, lastWeek, program, starpathProgram, weekNum]);
 
   const currentWeekPlan = useMemo(() => {
     return program.find((w) => w.week === weekNum);
@@ -740,6 +745,7 @@ function ProgramPage() {
       }
     }
 
+    if(isLevel8){router.push(level8DemoHref(realmId as Level8Realm,weekNum,item.type === "lesson" ? item.n : item.type === "posttest" ? "posttest" : "quiz"));return;}
     if(isNumber7){
       const activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';
       if(liveLevel7){
@@ -834,6 +840,7 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
+    if (isLevel8) { router.push(level8DemoHref(realmId as Level8Realm,clamped,"week")); return; }
     if (isExpeditionWeek) {
       const realm = cavernRealm(realmId);
       if (!realm) return;
@@ -894,6 +901,7 @@ function ProgramPage() {
       : "/number-nexus";
 
   function goBackToMap() {
+    if(isLevel8){router.push(`/demo-review/volcano/${realmId}`);return;}
     if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm)router.push(liveLevel7?studentCavernHref(realm,weekNum):cavernHref(realm,weekNum));return;}
     const world3DReturnPath = getWorld3DReturnPathForWeek({
       realmId,
@@ -903,7 +911,8 @@ function ProgramPage() {
     router.push(world3DReturnPath ?? realmHomeRoute);
   }
 
-  if (!liveLevel7 && (isExpeditionWeek || (year === "Year 7" && cave7Realm(realmId))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
+  if (isLevel8 && !pathname.startsWith("/demo-review/volcano/")) return <main className="p-20">Level 8 is being reviewed.</main>;
+  if (!isLevel8 && !liveLevel7 && (isExpeditionWeek || (year === "Year 7" && cave7Realm(realmId))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
 
   if (canonicalStatus !== "ready") {
     return (
@@ -936,14 +945,15 @@ function ProgramPage() {
       {isExpeditionWeek && (
         <div className={`relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 text-center text-sm text-white ${previewMode ? "pt-16" : "pt-3"}`}>
           {previewMode && <>
-            <span>{isNumber7 ? `Level 7 demo · All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%.` : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span>
-            <ReadAloudBtn text={isNumber7 ? `Level 7 demo. All ${cave7WeekCount(realmId)} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/>
+            <span>{isNumber7 ? `Level ${isLevel8?8:7} demo · All ${lastWeek} weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%.` : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span>
+            <ReadAloudBtn text={isNumber7 ? `Level ${isLevel8?8:7} demo. All ${lastWeek} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/>
           </>}
-          {isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download className="shrink-0 underline">Download scope and sequence</a>}
+          {isLevel8 && <a href={`/demo-review/level8-curriculum?realm=${realmId}`} className="shrink-0 underline">Scope and sequence · download CSV</a>}
+          {!isLevel8 && isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download className="shrink-0 underline">Download scope and sequence</a>}
         </div>
       )}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
-      {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} /> : <div className="fixed inset-0 z-0">
+      {isExpeditionWeek ? <CavernWeekBackground realmId={realmId} week={weekNum} level={isLevel8?8:7} /> : <div className="fixed inset-0 z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={
@@ -1141,9 +1151,9 @@ function ProgramPage() {
                   boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
                 }}
               >
-                ← {isExpeditionWeek ? "Back to the cavern" : isStarpathRealm ? "Back to Starpath" : "Back to Map"}
+                ← {isLevel8 ? "Back to stronghold" : isExpeditionWeek ? "Back to the cavern" : isStarpathRealm ? "Back to Starpath" : "Back to Map"}
               </button>
-              {isExpeditionWeek && <Level7JourneyLinks realm={realmId} week={weekNum} demo={previewMode} showCave={false} />}
+              {isExpeditionWeek && <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} />}
               <div ref={weekMenuRef} className="relative">
                 <button
                   type="button"

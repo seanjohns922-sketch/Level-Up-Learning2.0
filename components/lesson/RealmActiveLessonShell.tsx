@@ -42,7 +42,7 @@ export function RealmActiveLessonShell({
   onBack: () => void;
   children: ReactNode;
 }) {
-  const isCoreHunt = levelNumber === 7;
+  const isCoreHunt = levelNumber >= 7;
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
@@ -55,7 +55,7 @@ export function RealmActiveLessonShell({
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${levelNumber === 7 ? (realm === "pattern" || realm === "statistics" || realm === "chance" ? caveLayout.active : realm === "space" ? spaceLayout.active : realm === "measurement" ? measurementLayout.active : layout.active) : ""}`}>
+    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${levelNumber >= 7 ? (realm === "pattern" || realm === "statistics" || realm === "chance" ? caveLayout.active : realm === "space" ? spaceLayout.active : realm === "measurement" ? measurementLayout.active : layout.active) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -90,10 +90,10 @@ export function RealmActiveLessonShell({
         >
           <ArrowLeft className="h-4 w-4" /> Back to Week {week}
         </button>
-        {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} demo={demoMode} />}
+        {levelNumber >= 7 && <Level7JourneyLinks level={levelNumber} realm={realm} week={week} demo={demoMode} />}
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
           <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
-          {isCoreHunt ? `Hunt for the ${theme.realmName} Core · Level 7` : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
+          {isCoreHunt ? `Hunt for the ${theme.realmName} Core · Level ${levelNumber}` : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
         </div>
       </header>
 

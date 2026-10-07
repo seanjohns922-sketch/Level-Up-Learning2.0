@@ -7,6 +7,7 @@ function hasText(value: unknown): value is string {
 }
 
 function hasMultipleChoiceShape(question: Extract<Year2QuestionData, { kind: "multiple_choice" }>) {
+  if (question.answerSpec) return hasText(question.prompt) && hasText(question.answerSpec.expected) && question.answerSpec.expected === question.answer;
   return Array.isArray(question.options) && question.options.length >= 2 && hasText(question.answer);
 }
 
@@ -339,10 +340,12 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
   "chanceQuizQuestion",
   "space7Question",
   "cave7Question",
+  "level8Question",
 ]);
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "level8Question") return hasText(task.prompt) && hasText(task.answer) && hasText(task.speakText) && hasText(task.feedback.correct) && (!!task.question.answerSpec || (task.options.length >= 2 && task.options.includes(task.answer)));
   if (task.kind === "chanceQuizQuestion" || task.kind === "space7Question" || task.kind === "cave7Question") {
     return hasText(task.prompt)
       && hasText(task.speakText)

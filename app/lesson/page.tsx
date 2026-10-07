@@ -112,6 +112,11 @@ import {
 import { getWorld3DReturnPathForLesson } from "@/lib/world3d/return-context";
 
 import {cave7Realm,type Cave7Realm} from "@/lib/cave7-config";
+import Level8SkillGuide from "@/components/lesson/level8/SkillGuide";
+import { LEVEL8_CONTENT_REVISION } from "@/data/activities/level8/shared";
+import { generateLevel8Question } from "@/data/activities/level8/questions";
+import { isLevel8Realm, type Level8Realm } from "@/lib/level8-config";
+import { level8DemoHref } from "@/lib/level8-routes";
 import Cave7SkillGuide from "@/components/lesson/cave7/Cave7SkillGuide";
 import {generateCave7Question} from "@/data/activities/cave7/questions";
 import Space7SkillGuide from "@/components/lesson/Space7SkillGuide";
@@ -130,6 +135,7 @@ import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
 
 function LessonRouteGate() {
  const q=useSearchParams(),pathname=usePathname();
+ if(normalizeStudentYearLabel(q.get('year')??'')==='Year 8' && !pathname.startsWith('/demo-review/volcano/')) return <main className="p-20">Level 8 lessons are being reviewed. Return to your stronghold.</main>;
  if(normalizeStudentYearLabel(q.get('year')??'')==='Year 7') {
   const realm=q.get('realm_id')??'number';
   // Live Level 7: real students use the normal lesson page; it checks their placement and week access.
@@ -247,12 +253,12 @@ function LessonPage() {
   const levelNumber = year === "Prep" ? 1 : yearNumber;
   const levelLabel = year === "Prep" ? "Ground Level" : `Level ${levelNumber}`;
   const defaultLessonId =
-    realmId !== "number"
+    (realmId !== "number" || yearNumber === 8)
       ? `y${yearNumber}-${realmId}-w${week}-l1`
       : `y${yearNumber}-w${week}-l1`;
   const lessonId = params.get("lessonId") ?? defaultLessonId;
   const expectedPrefix =
-    realmId !== "number"
+    (realmId !== "number" || yearNumber === 8)
       ? `y${yearNumber}-${realmId}-w${week}-`
       : `y${yearNumber}-w${week}-`;
   const previewMode = useDemoPreviewMode();
@@ -274,17 +280,19 @@ function LessonPage() {
   const isSpace7 = realmId === "space" && year === "Year 7";
   const newCaveRealm = realmId === "pattern" || realmId === "statistics" || realmId === "chance" ? realmId : null;
   const isNewCave7 = year === "Year 7" && newCaveRealm !== null;
-  const isCave7 = isNumber7 || isMeasurement7 || isSpace7 || isNewCave7;
+  const isLevel8 = year === "Year 8" && isLevel8Realm(realmId);
+  const isCave7 = isLevel8 || isNumber7 || isMeasurement7 || isSpace7 || isNewCave7;
   const [skillGuideReady, setSkillGuideReady] = useState(false);
   const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
     if(!value||typeof value!=="object")return false;
     const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
+    if(isLevel8) return q.lessonId===effectiveLessonId && q.version===1 && q.readabilityRevision===LEVEL8_CONTENT_REVISION && q.kind==='multiple_choice';
     return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:isMeasurement7?MEASUREMENT7_READABILITY_REVISION:isSpace7?SPACE7_READABILITY_REVISION:isNewCave7&&newCaveRealm?CAVE7_READABILITY_REVISION[newCaveRealm]:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
-  }:undefined,[effectiveLessonId,isCave7,isNumber7,isMeasurement7,isSpace7,isNewCave7,newCaveRealm]);
+  }:undefined,[effectiveLessonId,isLevel8,isCave7,isNumber7,isMeasurement7,isSpace7,isNewCave7,newCaveRealm]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
   // Level 7 lessons return to the demo week page in review, or the student's week page when live.
-  const level7WeekHome = isCave7 && !previewMode ? level7LiveHref(lessonRealmId as Cave7Realm, week, "week") : cavernWeekHref(lessonRealmId, week);
+  const level7WeekHome = isLevel8 ? level8DemoHref(realmId as Level8Realm,week,"week") : isCave7 && !previewMode ? level7LiveHref(lessonRealmId as Cave7Realm, week, "week") : cavernWeekHref(lessonRealmId, week);
   const lessonStrand = newCaveRealm === "pattern" ? "Algebra" : newCaveRealm === "statistics" ? "Statistics" : newCaveRealm === "chance" ? "Probability" : isSpace7 ? "Space" : isMeasurement ? "Measurement" : "Number";
   const lessonCompletionActivityKey = buildLessonCompletionActivityKey({
     realmId: lessonRealmId,
@@ -1153,11 +1161,11 @@ function LessonPage() {
             demoMode={previewMode || DEMO_MODE}
             onBack={goBackToProgram}
           >
-              {isNewCave7 && newCaveRealm && !skillGuideReady ? <Cave7SkillGuide realm={newCaveRealm} week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isSpace7 && !skillGuideReady ? <Space7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isMeasurement7 && !skillGuideReady ? <Measurement7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isNumber7 && !skillGuideReady ? <Number7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : lessonMeta?.activities?.length ? (
+              {isLevel8 && !skillGuideReady ? <Level8SkillGuide realm={realmId as Level8Realm} week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isNewCave7 && newCaveRealm && !skillGuideReady ? <Cave7SkillGuide realm={newCaveRealm} week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isSpace7 && !skillGuideReady ? <Space7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isMeasurement7 && !skillGuideReady ? <Measurement7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : isNumber7 && !skillGuideReady ? <Number7SkillGuide week={week} lesson={lessonNumber} onContinue={()=>setSkillGuideReady(true)}/> : lessonMeta?.activities?.length ? (
                 <Year2LessonEngine
                   key={lessonMeta.id}
                   lesson={lessonMeta}
-                  questionGenerator={isNewCave7 ? generateCave7Question : isSpace7 ? generateSpace7Question : isMeasurement7 ? generateMeasurement7Question : isNumber7 ? generateNumber7Question : undefined}
+                  questionGenerator={isLevel8 ? generateLevel8Question : isNewCave7 ? generateCave7Question : isSpace7 ? generateSpace7Question : isMeasurement7 ? generateMeasurement7Question : isNumber7 ? generateNumber7Question : undefined}
                   isQuestionCompatible={number7QuestionCompatible}
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}

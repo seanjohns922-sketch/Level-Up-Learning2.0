@@ -1,6 +1,6 @@
 import type {Level8Realm} from '@/lib/level8-config';
 
-export type Level8Code = `AC9M8${'N'|'M'|'A'|'SP'|'ST'|'P'}${string}`;
+export type Level8Code = `AC9M8N0${1|2|3|4|5}` | `AC9M8M0${1|2|3|4|5|6|7}` | `AC9M8A0${1|2|3|4}` | `AC9M8SP0${1|2|3|4}` | `AC9M8ST0${1|2|3|4}` | `AC9M8P0${1|2|3}`;
 export type Level8LessonPlan = {title:string;codes:Level8Code[]};
 export type Level8WeekPlan = {week:number;title:string;lessons:Level8LessonPlan[];visual:string;assessment:'quiz'|'posttest'};
 // Authoring map, not runnable lesson questions. Codes identify intended teaching coverage.

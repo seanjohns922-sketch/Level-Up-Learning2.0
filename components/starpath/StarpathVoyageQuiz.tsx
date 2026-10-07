@@ -31,7 +31,7 @@ import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 import { getWorld3DReturnPathForQuiz } from "@/lib/world3d/return-context";
 
 export type StarpathVoyageQuizMeta = {
-  level: RealmLevelId | "Year 7";
+  level: RealmLevelId | "Year 7" | "Year 8";
   levelLabel: string;
   week: number;
   title: string;
@@ -43,7 +43,7 @@ export type StarpathVoyageQuizMeta = {
   nextWeekHref?: string;
 };
 
-type VoyageQuizRealm = "space" | "statistics" | "pattern" | "chance";
+type VoyageQuizRealm = "number" | "measurement" | "space" | "statistics" | "pattern" | "chance";
 
 type QuizPhase = "home" | "quiz" | "results" | "review";
 
@@ -147,23 +147,24 @@ export default function StarpathVoyageQuiz({
   const demoMode=useDemoPreviewMode();
   const reviewOnly=useSearchParams().get("review")==="1";
   const cave7=quiz.level==="Year 7";
+  const level8Review=quiz.level==="Year 8";
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
   const isPattern = realm === "pattern";
   const isChance = realm === "chance";
   const isLessonRealm = isStatistica || isPattern || isChance;
   const unitLabel = isLessonRealm ? "lesson" : "mission";
-  const realmTitle = isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
+  const realmTitle = realm === "number" ? "Number Nexus Quiz" : realm === "measurement" ? "Measurelands Quiz" : isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `${realm}-weekly-quiz:${cave7?"v6":"v2"}:${getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:${level8Review?"level8-v2":cave7?"v6":"v2"}:${level8Review?"demo":getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   // Each new attempt gets its own questions; the attempt number is saved so a resume shows the same ones.
   const [attempt, setAttempt] = useState(0);
   const tasks = useMemo(() => (buildTasks ? buildTasks(attempt) : fixedTasks ?? []), [buildTasks, attempt, fixedTasks]);
   // Level 7 diagram questions need room to show the diagram beside the answer.
-  const wideLevel7Quiz = tasks.some((task) => task.kind === "space7Question" || task.kind === "cave7Question");
+  const wideLevel7Quiz = tasks.some((task) => task.kind === "space7Question" || task.kind === "cave7Question" || task.kind === "level8Question");
   const [order, setOrder] = useState<number[]>(() => tasks.map((_, index) => index));
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
@@ -321,7 +322,7 @@ export default function StarpathVoyageQuiz({
     setSaving(true);
     const score = Object.values(answers).filter(Boolean).length;
     const finalPercent = total > 0 ? Math.round((score / total) * 100) : 0;
-    const studentId = cave7 && demoMode ? null : getActiveStudentIdentity().studentId;
+    const studentId = level8Review || (cave7 && demoMode) ? null : getActiveStudentIdentity().studentId;
     const completedAt = new Date().toISOString();
     const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
       const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));
@@ -332,7 +333,7 @@ export default function StarpathVoyageQuiz({
         correctAnswer: correctAnswerForReview(quizTask),
         skillId: quiz.lessonSkillIds[lessonIndex][0],
         skillLabel: quiz.lessonTitles[lessonIndex],
-        strand: isStatistica ? "Statistics" : isPattern ? "Algebra" : isChance ? "Probability" : "Space",
+        strand: realm === "number" ? "Number" : realm === "measurement" ? "Measurement" : isStatistica ? "Statistics" : isPattern ? "Algebra" : isChance ? "Probability" : "Space",
         curriculumCodes: quiz.lessonCurriculumCodes[lessonIndex],
         linkedWeeks: [quiz.week],
         linkedLessons: [lessonIndex + 1],
@@ -356,7 +357,7 @@ export default function StarpathVoyageQuiz({
     try {
       const passedQuiz = weeklyQuizPassed(finalPercent);
       if(cave7 && demoMode && !reviewOnly)markQuizComplete(quiz.level,quiz.week,finalPercent,realm,score,total);
-      if (realm === "space" && quiz.level !== "Year 7") {
+      if (realm === "space" && quiz.level !== "Year 7" && quiz.level !== "Year 8") {
         writeStarpathDemoJourney(quiz.level, {
           currentWeek: passedQuiz ? Math.min(8, quiz.week + 1) : quiz.week,
           currentLesson: passedQuiz ? 0 : 3,

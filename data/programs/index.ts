@@ -1,3 +1,4 @@
+import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
 import { PREP_PROGRAM } from "./prep";
 import { YEAR1_PROGRAM, type WeekPlan } from "./year1";
 import { year2Number } from "./year2Number";
@@ -17,6 +18,7 @@ export const programs = {
   5: YEAR5_PROGRAM,
   6: YEAR6_PROGRAM,
   7: NUMBER7_PROGRAM,
+  8: LEVEL8_PROGRAMS.number,
 };
 
 export const PROGRAMS_BY_YEAR: Record<string, WeekPlan[]> = {
@@ -28,6 +30,7 @@ export const PROGRAMS_BY_YEAR: Record<string, WeekPlan[]> = {
   "Year 5": YEAR5_PROGRAM,
   "Year 6": YEAR6_PROGRAM,
   "Year 7": NUMBER7_PROGRAM,
+  "Year 8": LEVEL8_PROGRAMS.number,
 };
 
 export function getProgramForYear(yearLabel: string): WeekPlan[] {

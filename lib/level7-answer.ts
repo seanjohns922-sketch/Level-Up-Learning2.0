@@ -24,7 +24,7 @@ export function buildMeets(b:Level7Build,h:number[]){
  return b.mode==='views'||(b.mode==='fewest'?total===fewestCubes(b.front!,b.side!):total===b.cubes);
 }
 // answerUnit lets a generator state the answer's unit instead of relying on prompt wording.
-type Question={prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
+type Question={answerSpec?:Level7Answer;prompt:string;answer:string;lessonId?:string;options?:string[];answerUnit?:string;answerLabels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
 const clean=(s:string)=>s.trim().replaceAll('−','-').replaceAll('–','-').replaceAll('×','*').replaceAll('÷','/');
 export function scalarAnswer(s:string):number|null{
  s=clean(s);if(s.includes(',')&&!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(s))return null;s=s.replace(/,/g,'');
@@ -33,6 +33,7 @@ export function scalarAnswer(s:string):number|null{
  const [n,d]=s.split('/').map(Number),v=d===undefined?n:n/d;return Number.isFinite(v)?v:null;
 }
 export function level7Answer(q:Question):Level7Answer|null{
+ if(q.lessonId?.startsWith('y8-')) return q.answerSpec ?? null;
  if(!q.lessonId?.startsWith('y7-'))return null;
  if(q.build)return {kind:'build',expected:q.answer,prompt:q.prompt,build:q.build};
  if(q.place)return {kind:'place',expected:q.answer,prompt:q.prompt,place:q.place};

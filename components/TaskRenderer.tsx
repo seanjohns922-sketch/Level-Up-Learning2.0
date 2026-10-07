@@ -392,6 +392,8 @@ function TaskRendererInner({
   );
 
   switch (task.kind) {
+    case "level8Question":
+      return <Space7ChoiceCard key={k} realm={task.realm} question={task.question} selected={assessmentAnswer} onAnswer={(correct,response)=>{if(correct)onC(response);else onW(response);}}/>;
     case "cave7Question":
       return <Space7ChoiceCard key={k} realm={task.question.realm} question={task.question} selected={assessmentAnswer} onAnswer={(correct,response)=>{if(correct)onC(response);else onW(response);}}/>;
     case "space7Question":

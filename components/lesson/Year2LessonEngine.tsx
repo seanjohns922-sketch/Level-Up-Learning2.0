@@ -2,6 +2,8 @@
 import {level7Answer} from '@/lib/level7-answer';
 
 import { number7Guide } from "@/data/activities/year7Number/curriculum";
+import { SkillGuideDialog as Level8SkillGuideDialog } from "./level8/SkillGuide";
+import { isLevel8Realm } from "@/lib/level8-config";
 import {Cave7SkillGuideDialog} from "./cave7/Cave7SkillGuide";
 import {Space7SkillGuideDialog} from "./Space7SkillGuide";
 import { Measurement7SkillGuideDialog } from "@/components/lesson/Measurement7SkillGuide";
@@ -71,20 +73,20 @@ function buildInitialTurn(
 }
 
 function isOrderedStrategyFluencyLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 11 && lesson.lesson === 2;
+  return !/^y[78]-/.test(lesson.id) && level === 5 && lesson.week === 11 && lesson.lesson === 2;
 }
 
 function isEstimateReasoningLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 11 && lesson.lesson === 3;
+  return !/^y[78]-/.test(lesson.id) && level === 5 && lesson.week === 11 && lesson.lesson === 3;
 }
 
 function isMultiStepCalculationLesson(level: SupportedMathLevel, lesson: Lesson) {
-  return !lesson.id.startsWith("y7-") && level === 5 && lesson.week === 12 && lesson.lesson === 2;
+  return !/^y[78]-/.test(lesson.id) && level === 5 && lesson.week === 12 && lesson.lesson === 2;
 }
 
 function isYear6RealWorldModellingLesson(level: SupportedMathLevel, lesson: Lesson) {
   void level;
-  return !lesson.id.startsWith("y7-") && lesson.week === 12 && (lesson.lesson === 2 || lesson.lesson === 3);
+  return !/^y[78]-/.test(lesson.id) && lesson.week === 12 && (lesson.lesson === 2 || lesson.lesson === 3);
 }
 
 function chooseNextLessonTurn(
@@ -655,7 +657,8 @@ export function Year2LessonEngine({
   const isMeasurement7 = isMeasurement && levelNumber === 7;
   const isSpace7 = realmId === "space" && levelNumber === 7;
   const newCaveRealm = realmId === "pattern" || realmId === "statistics" || realmId === "chance" ? realmId : null;
-  const isCave7 = levelNumber === 7;
+  const isLevel8 = levelNumber === 8;
+  const isCave7 = levelNumber === 7 || isLevel8;
   const [skillGuideOpen, setSkillGuideOpen] = useState(false);
   const skillGuideOpenRef = useRef(false);
   const isModernNumber = isNumber7 || isLevelTwoNumber || isLevelThreeNumber || isLevelFourNumber || isLevelFiveNumber || isLevelSixNumber;
@@ -1589,11 +1592,12 @@ export function Year2LessonEngine({
         }`}
       />
 
-      {isCave7 && newCaveRealm && skillGuideOpen && <Cave7SkillGuideDialog realm={newCaveRealm} week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
+      {!isLevel8 && isCave7 && newCaveRealm && skillGuideOpen && <Cave7SkillGuideDialog realm={newCaveRealm} week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isSpace7 && skillGuideOpen && <Space7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isMeasurement7 && skillGuideOpen && <Measurement7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       {isNumber7 && skillGuideOpen && <Number7SkillGuideDialog week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       <SurgeAmbience comboCount={comboCount} realmId={realmId} dimmed={status !== "correct"} />
+      {isLevel8 && realmId && isLevel8Realm(realmId) && skillGuideOpen && <Level8SkillGuideDialog realm={realmId} week={lesson.week} lesson={lesson.lesson} onClose={()=>{skillGuideOpenRef.current=false;setSkillGuideOpen(false);}}/>}
       <ComboActivation comboCount={comboCount} realmId={realmId} cave={isCave7} />
       <NexusActivation comboCount={comboCount} realmId={realmId} cave={isCave7} />
       {brainBreakVillain && (

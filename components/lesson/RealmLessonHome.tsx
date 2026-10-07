@@ -74,7 +74,7 @@ export const REALM_LESSON_THEMES = {
     videoLabel: "Mission Transmission",
     rewardLabel: "Mission Rewards",
     completionLabel: "Mission Complete",
-    legendLabel: "Legend",
+    legendLabel: "RELIQ card",
     intro:
       "Power up your number skills, complete the mission, and keep the Nexus running.",
     pageBg: "#031616",
@@ -205,6 +205,7 @@ export const REALM_LESSON_THEMES = {
 } as const;
 
 export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: number, year: string) {
+  if (levelNumber === 8) return `/backgrounds/level8/${realm}-stronghold.webp`;
   if (levelNumber === 7) return `/images/shattered-realms/${realm}-cavern.webp`;
   if (realm === "number") return getHomeBg(levelNumber, year === "Prep");
   if (realm === "statistics") return getStatisticaBackground(`Year ${levelNumber}` as RealmLevelId);
@@ -469,8 +470,8 @@ export function RealmLessonHome({
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
-  const isCave=levelNumber === 7;
-  const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:"Cave Mission",startLabel:"Learn the skill",intro:"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
+  const isCave=levelNumber >= 7;
+  const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:levelNumber===8?"Stronghold Mission":"Cave Mission",startLabel:"Learn the skill",intro:levelNumber===8?"Enter the stronghold, learn the skill, and work towards recovering the Core.":"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
   const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
   const criteria =
     realm === "number" && !isCave

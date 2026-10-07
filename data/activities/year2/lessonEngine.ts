@@ -3462,6 +3462,9 @@ export type StrategyOwnershipVisualData = {
 };
 
 export type MultipleChoiceQuestion = {
+  space8Visual?: import("@/data/activities/level8/shared").QuestionDraft["spaceVisual"];
+  answerSpec?: import("@/lib/level7-answer").Level7Answer;
+  measurement8Visual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual;
   paintContext?: { need: number; capacity: number; price?: number };
   readabilityRevision?: number;
   cave7Visual?: import("@/data/activities/cave7/shared").Cave7Visual;

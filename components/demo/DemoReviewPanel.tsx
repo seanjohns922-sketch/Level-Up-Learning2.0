@@ -1,5 +1,7 @@
 "use client";
 
+import { isLevel8Realm, LEVEL8_WEEK_COUNTS } from '@/lib/level8-config';
+import { level8DemoHref } from '@/lib/level8-routes';
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -236,7 +238,8 @@ export default function DemoReviewPanel() {
   const [breakGame, setBreakGame] = useState<BrainBreakGame | "random">("random");
   const [activeBreak, setActiveBreak] = useState<Villain | null>(null);
   const realmDefinition = REALMS.find((item) => item.id === realm) ?? REALMS[0];
-  const maxWeek = year === "Year 7" ? cave7WeekCount(realm) : realm === "number" ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
+  const isLevel8 = year === "Year 8" && isLevel8Realm(realm);
+  const maxWeek = isLevel8 ? LEVEL8_WEEK_COUNTS[realm] : year === "Year 7" ? cave7WeekCount(realm) : realm === "number" ? 12 : realm === "statistics" || realm === "chance" ? 6 : 8;
   const levelNumber = year === "Prep" ? 0 : Number(year.replace("Year ", ""));
   const isNumber7 = cave7Realm(realm) && year === "Year 7";
   const starpathLevel = getStarpathLevelForYear(year === "Year 7" || year === "Year 8" ? "Year 6" : year).id;
@@ -244,13 +247,13 @@ export default function DemoReviewPanel() {
   const selectedStarpathWeek = starpathProgram?.weeks[week - 1];
   const pretestAvailable = hasPretest(realm, year);
   const posttestAvailable = hasPosttest(realm, year);
-  const weeklyProgramAvailable = isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
+  const weeklyProgramAvailable = isLevel8 || isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyContentAvailable = isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
+  const weeklyContentAvailable = isLevel8 || isNumber7 ? true : realm === "chance" ? levelNumber <= 6 : realm === "pattern"
     ? levelNumber >= 3 && levelNumber <= 6
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
-  const weeklyQuizAvailable = isNumber7 ? true : realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
+  const weeklyQuizAvailable = isLevel8 || isNumber7 ? true : realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
     ? week <= 5
     : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
 
@@ -371,6 +374,7 @@ export default function DemoReviewPanel() {
   }
 
   function programHref() {
+    if (isLevel8) return level8DemoHref(realm, week, "week");
     if (isNumber7) return cavernWeekHref(realm, week);
     if (realm === "space") return buildStarpathProgramHref({ selectedLevel: starpathLevel }, week);
     if (realm === "pattern") return `/pattern-peaks/program?teacher_preview=1&level=${encodeURIComponent(year)}&week=${week}`;
@@ -380,6 +384,7 @@ export default function DemoReviewPanel() {
   }
 
   function lessonHref() {
+    if (isLevel8) return level8DemoHref(realm, week, lesson);
     if (isNumber7) return number7ActivityHref(week, lesson, realm);
     if (realm === "pattern") {
       return `/pattern-peaks/lesson/${encodeURIComponent(year)}/${week}/${lesson}?teacher_preview=1`;
@@ -394,6 +399,7 @@ export default function DemoReviewPanel() {
   }
 
   function quizHref() {
+    if (isLevel8) return level8DemoHref(realm, week, week === maxWeek ? "posttest" : "quiz");
     if (isNumber7) return number7ActivityHref(week, week === maxWeek ? "posttest" : "quiz", realm);
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
@@ -499,7 +505,7 @@ export default function DemoReviewPanel() {
         <section className="border-t border-white/10 py-6">
           <h2 className="mb-3 text-base font-black">The Final Battle · Level 8 Preview</h2>
           <button type="button" onClick={() => router.push("/demo-review/level8-curriculum")} className={actionClass()}><Eye size={17} /> Level 8 scope and sequence</button>
-          <p className="mb-3 text-xs text-white/60">The volcano gate and all six summit gateways are open in demo review, and each gateway leads to its realm’s stronghold prototype. Weekly portals now show the planned lesson sequence; playable lessons are still being prepared. Nothing here changes student progress.</p>
+          <p className="mb-3 text-xs text-white/60">The volcano gate and all six summit gateways are open in demo review, and each gateway leads to its realm’s stronghold prototype. Weekly portals open the Level 8 lesson and quiz previews. Nothing here changes student progress.</p>
           <div className="grid gap-2">
             <button type="button" onClick={() => router.push("/demo-review/number-adventure/3d?summit=1")} className={actionClass()}><Eye size={17} /> Open the volcano summit</button>
             {EXPEDITION_TRAILS.map(trail => <button key={trail.id} type="button" onClick={() => router.push(strongholdDemoHref(trail.id))} className={actionClass()}><Eye size={17} /> {trail.name} stronghold</button>)}

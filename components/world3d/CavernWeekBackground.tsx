@@ -3,7 +3,7 @@ import { cavernRealm, cavernWeek } from '@/lib/world3d/shattered-realms';
 import { getRealmTheme } from '@/lib/useRealmTheme';
 
 /** Decorative only: the shared week-page layout and controls stay untouched. */
-export default function CavernWeekBackground({ realmId, week }: { realmId: string; week: number }) {
+export default function CavernWeekBackground({ realmId, week, level=7 }: { realmId: string; week: number; level?:7|8 }) {
   const realm = cavernRealm(realmId) ?? 'number';
   const depth = (cavernWeek(week,realm) - 1) / (cave7WeekCount(realm)-1);
   const theme = getRealmTheme(realm);
@@ -11,7 +11,7 @@ export default function CavernWeekBackground({ realmId, week }: { realmId: strin
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-slate-950" data-cavern-background={realm}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`/images/shattered-realms/${realm}-cavern.webp`}
+        src={level===8?`/backgrounds/level8/${realm}-stronghold.webp`:`/images/shattered-realms/${realm}-cavern.webp`}
         alt=""
         fetchPriority="high"
         className="h-full w-full object-cover"
