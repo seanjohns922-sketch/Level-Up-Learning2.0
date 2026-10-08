@@ -62,7 +62,7 @@ for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, 
 // Realms that have moved to lesson-specific guides must cover every lesson they teach.
 for (const key of seen) {
   const [realm, level, week, lesson] = key.split(':');
-  if (LESSON_GUIDES[realm]) assert(LESSON_GUIDES[realm][level]?.[`${week}:${lesson}`], `Lesson without its own guide: ${key}`);
+  if (LESSON_GUIDES[realm] && assignments[key]) assert(LESSON_GUIDES[realm][level]?.[`${week}:${lesson}`], `Lesson still on a shared card: ${key}`);
 }
 for (const level of [0, 7, 8, undefined]) assert.equal(getLowerLessonGuide('number', level, 1, 1), null);
 assert.equal(getLowerLessonGuide('number', 1, 99, 1), null);

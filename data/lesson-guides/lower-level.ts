@@ -12,6 +12,9 @@ import statistics3 from './statistics/level3.json' with { type: 'json' };
 import statistics4 from './statistics/level4.json' with { type: 'json' };
 import statistics5 from './statistics/level5.json' with { type: 'json' };
 import statistics6 from './statistics/level6.json' with { type: 'json' };
+import measurement2 from './measurement/level2.json' with { type: 'json' };
+import measurement5 from './measurement/level5.json' with { type: 'json' };
+import measurement6 from './measurement/level6.json' with { type: 'json' };
 import pattern3 from './pattern/level3.json' with { type: 'json' };
 import pattern4 from './pattern/level4.json' with { type: 'json' };
 import pattern5 from './pattern/level5.json' with { type: 'json' };
@@ -22,6 +25,7 @@ type LessonGuideSet = Record<string, LowerLessonGuide>;
 /** Guides written for one lesson each, keyed "week:lesson". They replace the shared topic cards. */
 export const LESSON_GUIDES: Record<string, Partial<Record<number, LessonGuideSet>>> = {
   number: { 1: number1, 2: number2, 3: number3, 4: number4, 5: number5, 6: number6 },
+  measurement: { 2: measurement2, 5: measurement5, 6: measurement6 },
   pattern: { 3: pattern3, 4: pattern4, 5: pattern5, 6: pattern6 },
   statistics: { 1: statistics1, 2: statistics2, 3: statistics3, 4: statistics4, 5: statistics5, 6: statistics6 },
 };

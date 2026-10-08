@@ -1,0 +1,152 @@
+{
+ "1:1": {
+  "idea": "Area of a rectangle is rows × columns, or length × width.",
+  "example": "4 rows of 6 squares → 4 × 6 = 24 square units",
+  "steps": [
+   "Count the rows: 4.",
+   "Count the squares in each row: 6.",
+   "Multiply: 4 × 6 = 24 square units."
+  ],
+  "tip": "Multiplying is faster than counting every square."
+ },
+ "2:1": {
+  "idea": "Split a composite shape into rectangles, find each area, then add.",
+  "example": "L-shape → 12 cm² + 8 cm² = 20 cm²",
+  "steps": [
+   "Cut the shape into two rectangles.",
+   "Find each area with length × width.",
+   "Add the areas for the total."
+  ],
+  "tip": "Make sure the rectangles don't overlap."
+ },
+ "4:2": {
+  "idea": "Convert mass and capacity by multiplying or dividing by 1000.",
+  "example": "1.5 L = 1500 mL; 250 g = 0.25 kg",
+  "steps": [
+   "1 L = 1000 mL and 1 kg = 1000 g.",
+   "Big unit to small unit: multiply by 1000.",
+   "Small unit to big unit: divide by 1000."
+  ],
+  "tip": "Converting to a smaller unit gives a bigger number."
+ },
+ "4:3": {
+  "idea": "Use conversions to solve real problems and spot mistakes.",
+  "example": "Is 0.8 kg more than 750 g? 0.8 kg = 800 g → yes",
+  "steps": [
+   "Convert both amounts to the same unit.",
+   "Compare or calculate.",
+   "Check the decimal point moved the right way."
+  ],
+  "tip": "Multiplying by 1000 moves digits three places."
+ },
+ "5:1": {
+  "idea": "Read a 24-hour timetable to find durations and the best service.",
+  "example": "Depart 09:20, arrive 10:05 → 45 minutes",
+  "steps": [
+   "Find the departure and arrival times.",
+   "Count on from 09:20 to 10:00 (40 min), then to 10:05 (5 min).",
+   "The trip takes 45 minutes."
+  ],
+  "tip": "To arrive 'by' a time, choose the latest service that arrives in time."
+ },
+ "5:2": {
+  "idea": "Plan a trip by adding each part's time in order.",
+  "example": "Start 9:45, 1 h 25 min later → 11:10",
+  "steps": [
+   "Add the hours first: 9:45 + 1 h = 10:45.",
+   "Add the minutes: 10:45 + 25 min = 11:10.",
+   "Repeat for each part of the trip."
+  ],
+  "tip": "Cross the hour carefully: 60 minutes make 1 hour."
+ },
+ "5:3": {
+  "idea": "Combine time skills: 24-hour time, durations and timetables.",
+  "example": "3:15 pm = 15:15",
+  "steps": [
+   "For pm times after 12 noon, add 12 to the hour.",
+   "Find durations by counting on.",
+   "Plan from the deadline backwards if you must arrive by a time."
+  ],
+  "tip": "12:30 am is 00:30; 12:30 pm is 12:30."
+ },
+ "6:2": {
+  "idea": "Angles around a point add up to 360°.",
+  "example": "90° + 120° + x = 360° → x = 150°",
+  "steps": [
+   "Add the known angles: 90 + 120 = 210.",
+   "Subtract from 360: 360 − 210 = 150.",
+   "x = 150°."
+  ],
+  "tip": "Angles on a straight line add up to 180°, not 360°."
+ },
+ "6:3": {
+  "idea": "Use angle rules to find missing angles in real structures.",
+  "example": "Straight line: 65° + x = 180° → x = 115°",
+  "steps": [
+   "Decide which rule applies: straight line (180°) or around a point (360°).",
+   "Add the known angles.",
+   "Subtract from the total."
+  ],
+  "tip": "Check: the angles must add to the right total."
+ },
+ "7:1": {
+  "idea": "Choose the measurement and tool that suit the problem.",
+  "example": "Fence around a garden → perimeter; weigh a parcel → mass",
+  "steps": [
+   "Read what the problem needs to find.",
+   "Match it to a measurement: length, area, mass, capacity, time or angle.",
+   "Choose the matching tool or calculation."
+  ],
+  "tip": "The slope of a roof is an angle, not a length."
+ },
+ "7:2": {
+  "idea": "Pick the most efficient method, not just one that works.",
+  "example": "Perimeter of a square with side 9 m → 4 × 9 = 36 m",
+  "steps": [
+   "List methods that would work.",
+   "Choose the one with the fewest steps.",
+   "Calculate it."
+  ],
+  "tip": "A rule like 180° − known angle beats measuring or estimating."
+ },
+ "7:3": {
+  "idea": "Big projects combine several kinds of measurement.",
+  "example": "Playground: area for soft fall, perimeter for fencing",
+  "steps": [
+   "Break the project into parts.",
+   "Decide which measurement each part needs.",
+   "Calculate each part, then put the plan together."
+  ],
+  "tip": "Keep units with every answer."
+ },
+ "8:1": {
+  "idea": "Plan a park by choosing the right measurement for each need.",
+  "example": "Grass → area; path edging → perimeter",
+  "steps": [
+   "List each part of the park.",
+   "Match each need to area, perimeter, capacity or time.",
+   "Calculate each one with units."
+  ],
+  "tip": "Ask: inside, around, how much it holds, or how long?"
+ },
+ "8:2": {
+  "idea": "Design real spaces using area, conversions, time and angles.",
+  "example": "Classroom 8 m × 6 m → floor area 48 m²",
+  "steps": [
+   "Find the dimensions.",
+   "Choose the calculation for each design question.",
+   "Convert units so they match before combining."
+  ],
+  "tip": "Check your answers make sense for a real building."
+ },
+ "8:3": {
+  "idea": "Bring every measurement skill together in one project.",
+  "example": "Camp: tent area, water in litres, timetable for the bus",
+  "steps": [
+   "Read the whole mission first.",
+   "Solve each part with the right measurement.",
+   "Check the units and that the plan works together."
+  ],
+  "tip": "One wrong unit can break the whole plan."
+ }
+}

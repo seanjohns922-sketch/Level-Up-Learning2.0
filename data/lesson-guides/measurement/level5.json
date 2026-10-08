@@ -1,0 +1,42 @@
+{
+ "5:2": {
+  "idea": "Shapes can have the same area but different perimeters.",
+  "example": "3 × 4 (area 12, perimeter 14) vs 2 × 6 (area 12, perimeter 16)",
+  "steps": [
+   "Find each area: 3 × 4 = 12 and 2 × 6 = 12.",
+   "Find each perimeter: 3 + 4 + 3 + 4 = 14 and 2 + 6 + 2 + 6 = 16.",
+   "Same area, but the longer, thinner shape needs more fencing."
+  ],
+  "tip": "Area is inside the shape; perimeter is around the edge."
+ },
+ "5:3": {
+  "idea": "Decide if a job needs area or perimeter, then calculate.",
+  "example": "Fence around a 6 m by 4 m pool → perimeter 20 m",
+  "steps": [
+   "Ask: is it covering the inside (area) or going around the edge (perimeter)?",
+   "A fence goes around, so find the perimeter.",
+   "6 + 4 + 6 + 4 = 20 m."
+  ],
+  "tip": "Covering = area in square units. Edging = perimeter in units."
+ },
+ "7:2": {
+  "idea": "To construct an angle, use the protractor's 0 line and count up the right scale.",
+  "example": "Build 45°: start at 0, open to 45",
+  "steps": [
+   "Line the base up with the 0 line.",
+   "Use the scale that starts at 0 on your side.",
+   "Open the arm until it reaches the target degrees."
+  ],
+  "tip": "Check: angles under 90° look narrower than a square corner."
+ },
+ "7:3": {
+  "idea": "Estimate an angle by comparing it with 90° and 180°.",
+  "example": "A bit less than a right angle → about 80°",
+  "steps": [
+   "Picture a right angle (90°) and a straight line (180°).",
+   "Decide which the angle is close to.",
+   "Make your estimate, then check with the protractor."
+  ],
+  "tip": "Half a right angle is 45°."
+ }
+}

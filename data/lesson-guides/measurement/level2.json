@@ -1,0 +1,32 @@
+{
+ "3:3": {
+  "idea": "Choose a unit that suits the size of the container.",
+  "example": "Fill a fish tank → use a jug, not a spoon",
+  "steps": [
+   "Look at how big the container is.",
+   "Small containers suit small units, like a cup or spoon.",
+   "Big containers suit big units, like a jug or bucket."
+  ],
+  "tip": "Too small a unit means too many fills to count."
+ },
+ "5:3": {
+  "idea": "A fraction of a shape uses equal parts.",
+  "example": "Split into 4 equal parts, 1 shaded → 1/4",
+  "steps": [
+   "Check the parts are all the same size.",
+   "Count the equal parts: that is the bottom number.",
+   "Count the shaded parts: that is the top number."
+  ],
+  "tip": "Unequal parts are not halves or quarters."
+ },
+ "6:3": {
+  "idea": "A turn can be a quarter, half, three-quarter or full turn.",
+  "example": "Facing north, quarter turn clockwise → facing east",
+  "steps": [
+   "Find the starting direction.",
+   "Check the direction: clockwise goes the way clock hands move.",
+   "Count quarter turns: 1 = quarter, 2 = half, 3 = three-quarter, 4 = full."
+  ],
+  "tip": "A full turn brings you back to where you started."
+ }
+}
