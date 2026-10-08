@@ -1,3 +1,4 @@
+import { releasedStarpathQuestions } from "@/data/assessments/releases/starpath";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -144,8 +145,8 @@ function assertAssessmentBank(
 
   const misconceptionById = new Map(STARPATH_MISCONCEPTION_LIBRARY.map((item) => [item.id, item]));
   for (const item of bank) {
-    assert.equal(item.version, "4.0.0", `${item.id} must declare release metadata`);
-    assert.equal(item.bankId, `starpath-level-4-${kind}-v4`, `${item.id} bank ID mismatch`);
+    assert.equal(item.version, "5.0.0", `${item.id} must declare release metadata`);
+    assert.equal(item.bankId, `starpath-level-4-${kind}-v5`, `${item.id} bank ID mismatch`);
     assert.equal(item.realm, "space", `${item.id} realm mismatch`);
     assert.equal(item.level, 4, `${item.id} level mismatch`);
     assert.equal(item.form, kind, `${item.id} form mismatch`);
@@ -220,11 +221,12 @@ assert(blueprint.descriptors.every((item) => item.curriculumMapping.implementati
 assertAssessmentBank("pretest", LEVEL4_STARPATH_INDEPENDENT_PRETEST_ITEMS as readonly Candidate[], { easy: 6, moderate: 10, challenging: 4 }, { recall: 2, understanding: 5, application: 7, reasoning: 5, transfer: 1 });
 assertAssessmentBank("posttest", LEVEL4_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], {"easy": 6, "moderate": 10, "challenging": 4}, {"recall": 2, "understanding": 5, "application": 7, "reasoning": 5, "transfer": 1});
 
+// Numeric level APIs retain the legacy bank; year-label APIs use the frozen release.
 const expectedPreIds = LEVEL4_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL4_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);
-assert.deepEqual(getPretestForYearLabel("Year 4", "space").map((item) => item.id), expectedPreIds, "Year 4 Starpath Pre-Test must resolve through the year API");
+assert.deepEqual(getPretestForYearLabel("Year 4", "space").map((item) => item.id), releasedStarpathQuestions("Year 4", "pretest").map((item) => item.id), "Year 4 Starpath Pre-Test must resolve through the year API");
 assert.deepEqual(getPretestForLevel(4, "space").map((item) => item.id), expectedPreIds, "Level 4 Starpath Pre-Test must resolve through the level API");
-assert.deepEqual((getPosttestForYearLabel("Year 4", "space")?.questions ?? []).map((item) => item.id), expectedPostIds, "Year 4 Starpath Post-Test must resolve through the year API");
+assert.deepEqual((getPosttestForYearLabel("Year 4", "space")?.questions ?? []).map((item) => item.id), releasedStarpathQuestions("Year 4", "posttest").map((item) => item.id), "Year 4 Starpath Post-Test must resolve through the year API");
 assert.deepEqual((getPosttestForLevel(4, "space")?.questions ?? []).map((item) => item.id), expectedPostIds, "Level 4 Starpath Post-Test must resolve through the level API");
 assert.equal(ASSESSMENT_THRESHOLDS.pretestPassPercent, 85, "Pre-Test pass threshold must remain 85%");
 assert.equal(ASSESSMENT_THRESHOLDS.posttestPassPercent, 85, "Post-Test pass threshold must remain 85%");

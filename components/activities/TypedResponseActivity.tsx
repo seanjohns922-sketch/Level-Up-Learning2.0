@@ -2229,10 +2229,11 @@ export default function TypedResponseActivity({
         normalizedPercent === expectedPercent ||
         normalizedPercent === expectedPercent.replace("%", "");
 
+      const submittedConversion = `${conversionDecimalInput.trim()}; ${normalizedPercent.replace(/%$/, "")}%`;
       if (decimalMatches && percentMatches) {
-        onCorrect?.(typed);
+        onCorrect?.(submittedConversion);
       } else {
-        onWrong?.(typed);
+        onWrong?.(submittedConversion);
       }
       return;
     }
@@ -2489,10 +2490,10 @@ export default function TypedResponseActivity({
 
       if (boxesMatch && totalMatches) {
         setBoxMethodFeedback("");
-        onCorrect?.(typed);
+        onCorrect?.(boxMethodTotal);
       } else {
         setBoxMethodFeedback("Complete each box correctly, then add the totals for the final answer.");
-        onWrong?.(typed);
+        onWrong?.(boxMethodTotal);
       }
       return;
     }
@@ -2506,11 +2507,12 @@ export default function TypedResponseActivity({
       const step = stepVisual?.steps[percentMethodStep];
       if (!step) return;
 
-      if (numericInputsMatch(percentMethodInputs[percentMethodStep] ?? "", step.answer)) {
+      const submittedStep = percentMethodInputs[percentMethodStep] ?? "";
+      if (numericInputsMatch(submittedStep, step.answer)) {
         setPercentMethodFeedback("");
         if (percentMethodStep >= stepVisual.steps.length - 1) {
           setPercentMethodStep(stepVisual.steps.length);
-          onCorrect?.(typed);
+          onCorrect?.(submittedStep);
         } else {
           setPercentMethodStep((current) => current + 1);
         }
@@ -2524,7 +2526,7 @@ export default function TypedResponseActivity({
             ? "Divide by 100 first, then multiply by the amount."
             : "Break the percentage into easier parts and try this step again."
         );
-        onWrong?.(typed);
+        onWrong?.(submittedStep);
       }
       return;
     }

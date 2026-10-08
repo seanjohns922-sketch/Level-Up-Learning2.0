@@ -18,7 +18,7 @@ The new generator audit samples every configured Number/Pattern activity, every 
 
 Checks cover missing tasks, non-finite numeric data, primitive multiple-choice answer inclusion and duplicate choices. A smaller subset has independent arithmetic checks: direct operations, specified multiplication rounding, missing addends, addition/subtraction strategies and array totals. Every task kind still needs its own independent mathematical oracle and interaction coverage; generic structural validation cannot establish its correctness.
 
-There are 61 new production-component handler cases. They exercise actual component input and submit/click callbacks with controlled hook state, rather than reimplementing the marking. Cases include the photographed 596 question, hidden MAB places, zero, incomplete answers, decimal formatting, equivalent fractions, mixed numbers, ordering, flexible partitions, arithmetic choices and a ruler question. These are shallow tests: effects, browser lifecycle, speech and layout are outside their coverage.
+There are now 83 production-component handler cases. They exercise actual component input and submit/click callbacks with controlled hook state, rather than reimplementing the marking. Cases include the photographed 596 question, hidden MAB places, zero, incomplete answers, decimal formatting, equivalent fractions, mixed numbers, ordering, flexible partitions, arithmetic choices and a ruler question. These are shallow tests: effects, browser lifecycle, speech and layout are outside their coverage.
 
 ## Defects fixed
 
@@ -46,9 +46,9 @@ Four stale assertions were updated after inspecting their production equivalents
 ## Open findings and release conditions
 
 1. **Signed-in persistence and reporting:** still run a controlled student journey through lesson completion, quiz failure/pass, week unlock, reload, sign-out/in, teacher placement/reset and the teacher dashboard. Existing source/logic tests pass; they are not proof of production RPC behaviour. Use the authorised disposable account and preserve/restore any fixture data. Do not run progression tests against ordinary pupils.
-2. **Interaction coverage:** the 225 sampled task kinds are not all covered by the 61 handler cases. Extend independent scoring and rendered-interaction tests across each remaining distinct control, including drag/drop, construction, clocks, grids, charts and probability simulations.
+2. **Interaction coverage:** the 225 sampled task kinds are not all covered by the 83 handler cases. Extend independent scoring and rendered-interaction tests across each remaining distinct control, including drag/drop, construction, clocks, grids, charts and probability simulations.
 3. **Devices and accessibility:** a physical iPad/touch/keyboard pass and comprehensive read-aloud coverage remain open. The sampled fraction-model lesson needs scrolling at a laptop-sized viewport; review model sizing and diagram choice labels. This run did not certify every screen or speech output.
-4. **Legacy Starpath audits:** `qa:starpath-level4`, `qa:starpath-level5` and `qa:starpath-level6` fail legacy assessment metadata/ID expectations. The current five-form and full-release checks pass. Reconcile those older scripts with the released assessment architecture; do not change approved live banks just to satisfy retired expectations.
+4. **Legacy Starpath audits — reconciled:** `qa:starpath-level4`, `qa:starpath-level5` and `qa:starpath-level6` now pass. Year-label API expectations use the frozen v9 release, while numeric level API expectations retain their existing legacy banks. Level 4 legacy metadata expectations now match its v5 bank. No assessment content or production API routing changed. The wider suite is 35/36, with the teacher advancement summary assertion still open.
 5. **Teacher advancement analytics:** `qa:teacher-progress-overrides` still fails its expectation of separate dashboard summary text for normal completion and teacher advancement. The per-student panel preserves the Advanced badge and canonical override data. Decide how to present the separate dashboard totals, then verify them against controlled records.
 6. **Prelaunch security:** the previously deferred checklist remains in [SECURITY_FOLLOW_UP.md](SECURITY_FOLLOW_UP.md). This reliability audit does not change production security settings or complete that separate review.
 
@@ -57,7 +57,20 @@ Four stale assertions were updated after inspecting their production equivalents
 - `npm run qa:activity-marking`
 - `npm run qa:g6-question-integrity` (optional `AUDIT_SEED` and `AUDIT_OUTPUT` for detailed JSON evidence)
 - `npm run qa:number-nexus-mab`
-- `npm run qa:g6-reliability` runs the wider audit and saves logs/results under `.local-archive/g6-reliability`. It deliberately exits nonzero while the four open legacy/reporting checks remain unresolved.
+- `npm run qa:g6-reliability` runs the wider audit and saves logs/results under `.local-archive/g6-reliability`. It deliberately exits nonzero while the teacher advancement summary check remains unresolved.
 - `npm run build` runs the deployment prebuild checks and production build.
 
 Do not describe this status as “bug free” or “fully verified”. Close the outstanding coverage and signed-in checks before school launch approval.
+
+## Follow-up evidence — 8 October 2026
+
+School launch approval remains **pending**. Work is ordered: signed-in journey; remaining maths/controls; device/accessibility; reporting/legacy expectations; separate security review. A successful build is only one requirement.
+
+- **Real student login observed:** exited the browser's existing demo mode, signed in as the authorised disposable student, and reached the live central hub and profile without a demo banner. The profile showed Number Level 7, Measurement Level 6, the other four maths realms at Level 3, 40 XP, one completed lesson and zero completed weeks. No lesson, quiz, placement or reset mutation was performed during this follow-up.
+- **Teacher login:** the dashboard initially redirected to login. The user then signed in and supplied a screenshot of the school-admin overview showing the Trial Class. After that, the computer-control tool returned an empty Chrome observation and no screenshot, including after a session reset. The teacher dashboard and subsequent actions could not be independently exercised. User-supplied login evidence is not a passed journey test.
+- **Still pending:** controlled completion, quiz fail/pass, unlocks, reload, sign-out/in, placement/reset, teacher reporting and fixture restoration. No claim of end-to-end persistence is made.
+- **New response-reporting defects fixed:** decimal/percentage conversion, box-method multiplication and percentage/discount/multi-step controls reported an empty plain-text response even when students used the dedicated fields. They now pass the entered conversion, total or current step to the marking callback. Regression tests first reproduced the empty responses and now pass, including incorrect input, incomplete controls, step locking and no second completion on a finished step sequence. These tests establish callback behaviour, not server persistence.
+- **Harness limit:** the shallow harness can explicitly run mount initialisation for the box-method fixture. It does not simulate effect dependencies, cleanup, Strict Mode, browser layout, touch or speech.
+- **Production read-only security probes:** the runtime-context RPC rejected both a missing session and an invalid session with HTTP 401 / SQLSTATE 42501. The target was a nonexistent all-zero UUID; no record or session fixture was created. This does not establish valid-session or cross-student isolation. See the separate security checklist.
+
+Follow-up validation: all 83 marking cases and the three updated Starpath audits pass; TypeScript no-emit checking passes. Focused ESLint has zero errors and the existing reset-effect dependency warning. The wider suite remains 35/36. A stale generated Next development validator referring to the removed temporary audit route was removed before repeating the type check.

@@ -1,3 +1,4 @@
+import { releasedStarpathQuestions } from "@/data/assessments/releases/starpath";
 /* Audit for Starpath Level 6 Weeks 1-7 (cross-sections SP01, four-quadrant
  * coordinates SP02, combined transformations + tessellations SP03). Generates
  * every lesson's tasks over several rounds and checks each answer against the
@@ -253,12 +254,13 @@ check(blueprint?.descriptors.every((item) => item.curriculumMapping.implementati
 auditAssessmentBank("pretest", LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS as readonly Candidate[], { easy: 4, moderate: 10, challenging: 6 }, { recall: 1, understanding: 4, application: 6, reasoning: 6, transfer: 3 });
 auditAssessmentBank("posttest", LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS as readonly Candidate[], {"easy": 4, "moderate": 10, "challenging": 6}, {"recall": 1, "understanding": 4, "application": 6, "reasoning": 6, "transfer": 3});
 
+// Numeric level APIs retain the legacy bank; year-label APIs use the frozen release.
 const expectedPreIds = LEVEL6_STARPATH_INDEPENDENT_PRETEST_ITEMS.map((item) => item.id);
 const expectedPostIds = LEVEL6_STARPATH_INDEPENDENT_POSTTEST_ITEMS.map((item) => item.id);
 const level6 = 6 as Parameters<typeof getPretestForLevel>[0];
-check(JSON.stringify(getPretestForYearLabel("Year 6", "space").map((item) => item.id)) === JSON.stringify(expectedPreIds), "Year 6 Starpath Pre-Test must resolve through year API");
+check(JSON.stringify(getPretestForYearLabel("Year 6", "space").map((item) => item.id)) === JSON.stringify(releasedStarpathQuestions("Year 6", "pretest").map((item) => item.id)), "Year 6 Starpath Pre-Test must resolve through year API");
 check(JSON.stringify(getPretestForLevel(level6, "space").map((item) => item.id)) === JSON.stringify(expectedPreIds), "Level 6 Starpath Pre-Test must resolve through level API");
-check(JSON.stringify((getPosttestForYearLabel("Year 6", "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Year 6 Starpath Post-Test must resolve through year API");
+check(JSON.stringify((getPosttestForYearLabel("Year 6", "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(releasedStarpathQuestions("Year 6", "posttest").map((item) => item.id)), "Year 6 Starpath Post-Test must resolve through year API");
 check(JSON.stringify((getPosttestForLevel(level6, "space")?.questions ?? []).map((item) => item.id)) === JSON.stringify(expectedPostIds), "Level 6 Starpath Post-Test must resolve through level API");
 check(ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent === 80, "Level 6 weekly quiz threshold must remain 80%");
 check(ASSESSMENT_THRESHOLDS.pretestPassPercent === 85 && ASSESSMENT_THRESHOLDS.posttestPassPercent === 85, "Level 6 assessment thresholds must remain 85%");

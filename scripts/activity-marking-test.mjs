@@ -68,4 +68,40 @@ for (const answer of [6,5]) {
 for(const [values,expected] of [[['2','3','8','10'],true],[['10','8','3','2'],false],[['2','','8','10'],false]]) {
  submit('TypedResponseActivity',{kind:'typed_response',prompt:'Type the numbers from smallest to largest.',answer:'2, 3, 8, 10'},values,expected);
 }
+for (const [values,expected] of [[['0.5','50'],true],[['.5','50%'],true],[['0.5','5'],false],[['','50'],null]]) {
+ const correct=[],wrong=[];
+ const ui=activityHarness('components/activities/TypedResponseActivity.tsx',{questionData:{kind:'typed_response',prompt:'Convert one half to a decimal and a percentage.',answer:'0.5',visual:{type:'fraction_decimal_percent_conversion',fraction:'1/2',numerator:1,denominator:2,decimalAnswer:'0.5',percentAnswer:'50%'}},onCorrect:v=>correct.push(v),onWrong:v=>wrong.push(v)});
+ values.forEach((v,i)=>ui.input(i,v));ui.click('Check answer');
+ const response=`${values[0]}; ${values[1].replace(/%$/, '')}%`;
+ assert.deepEqual(correct,expected===true?[response]:[]);
+ assert.deepEqual(wrong,expected===false?[response]:[]);
+ checks++;
+}
+for(const [values,expected] of [[['40','28','68'],true],[['40','29','69'],false],[['40','','68'],false]]) {
+ const correct=[],wrong=[];
+ const ui=activityHarness('components/activities/TypedResponseActivity.tsx',{questionData:{kind:'typed_response',prompt:'Use the box method for 17 × 4.',answer:'68',visual:{type:'box_method',leftValue:17,topValue:4}},onCorrect:v=>correct.push(v),onWrong:v=>wrong.push(v)});
+ ui.mount();
+ // 17 splits into 10 and 7; use 40 + 28 = 68, independently of the renderer.
+ values.forEach((v,i)=>ui.input(i,v));ui.click('Check answer');
+ assert.deepEqual(correct,expected===true?['68']:[]);
+ assert.deepEqual(wrong,expected===false?[values[2]]:[]);
+ checks++;
+}
+// Check that multi-step controls preserve the actual response for reporting.
+for (const type of ['percent_structured_method', 'discount_step_method', 'multi_step_method']) {
+ const correct=[],wrong=[];
+ const visual={type,method:'decimal',percent:25,amount:80,price:80,item:'Bag',contextLabel:'Find one quarter of 80.',steps:[{prompt:'25 ÷ 100',answer:'0.25'},{prompt:'0.25 × 80',answer:'20'}]};
+ if(type==='discount_step_method') visual.steps.push({prompt:'80 − 20',answer:'60'});
+ const finalAnswer=type==='discount_step_method'?'60':'20';
+ const ui=activityHarness('components/activities/TypedResponseActivity.tsx',{questionData:{kind:'typed_response',prompt:type==='discount_step_method'?'Find the price after a 25% discount on $80.':'Find 25% of 80.',answer:finalAnswer,visual},onCorrect:v=>correct.push(v),onWrong:v=>wrong.push(v)});
+ ui.click('Check step');assert.equal(wrong.length,0);assert.equal(correct.length,0);
+ ui.input(0,'0.5');ui.click('Check step');assert.deepEqual(wrong,['0.5']);
+ ui.input(0,'0.25');ui.click('Check step');assert.equal(correct.length,0);
+ assert(ui.nodes('input')[0].props.disabled,'Completed step is locked');
+ ui.input(1,'20');
+ if(type==='discount_step_method') {ui.click('Check step');assert.equal(correct.length,0);ui.input(2,'60');}
+ ui.click('Check answer');assert.deepEqual(correct,[finalAnswer]);
+ ui.click('Check answer');assert.equal(correct.length,1,'Completed method cannot submit twice');
+ checks+=5;
+}
 console.log(`PASS: ${checks} production input/marking handler cases. Includes equivalent fractions, mixed numbers, ordering, zero, place value, partitions, arithmetic choices and ruler measurement. Shallow interaction tests do not certify browser lifecycle or layout.`);

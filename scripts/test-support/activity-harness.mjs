@@ -10,7 +10,7 @@ const root = process.cwd();
 const compiled = new Map();
 const jsx = (type, props) => ({ type, props: props ?? {} });
 export function activityHarness(file, props, exportName = 'default') {
-  const slots = []; const timers = []; let cursor = 0;
+  const slots = []; const timers = []; let effects = []; let cursor = 0;
   const hooks = {
     useState(initial) {
       const index = cursor++;
@@ -18,7 +18,7 @@ export function activityHarness(file, props, exportName = 'default') {
       return [slots[index], value => { slots[index] = typeof value === 'function' ? value(slots[index]) : value; }];
     },
     useRef(value) { const index = cursor++; return slots[index] ??= { current: value }; },
-    useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect() {},
+    useMemo(fn) { return fn(); }, useCallback(fn) { return fn; }, useEffect(fn) { effects.push(fn); },
     createElement: (type, props, ...children) => jsx(type, { ...props, children }),
     Fragment: 'fragment',
   };
@@ -52,7 +52,7 @@ export function activityHarness(file, props, exportName = 'default') {
   }
   const Component = load(path.resolve(file))[exportName];
   function render() {
-    cursor = 0;
+    cursor = 0; effects = [];
     let tree = Component(props);
     // Follow same-file wrappers such as PlaceValueBuilderInner, leaving visual children shallow.
     while (typeof tree?.type === 'function') tree = tree.type(tree.props);
@@ -75,6 +75,9 @@ export function activityHarness(file, props, exportName = 'default') {
     return typeof node === 'object' ? text(node.props?.children) : String(node);
   }
   return {
+    // Explicitly run mount initialisation when a fixture needs it. This does not
+    // simulate dependency changes, cleanup, Strict Mode or browser lifecycle.
+    mount() { render(); effects.slice().forEach(effect => effect()); while (timers.length) timers.shift()(); },
     render, nodes, text, flushTimers() { while (timers.length) timers.shift()(); },
     input(index, value) { const node = nodes('input')[index]; if (!node) throw new Error(`Missing input ${index}`); node.props.onChange({ target: { value: String(value) } }); },
     click(label) { const button = nodes('button').find(node => text(node).trim() === label); if (!button) throw new Error(`Missing button ${label}: ${nodes('button').map(text)}`); if (!button.props.disabled) button.props.onClick(); },
