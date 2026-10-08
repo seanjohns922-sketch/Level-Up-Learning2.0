@@ -63,8 +63,8 @@ See [engineering release checks](docs/ENGINEERING_RELEASE.md), the
 pending. Application lint has known failures; these remain visible in CI.
 GitHub checks alone do not configure branch protection or block hosting deployments.
 
-Live screen sharing is temporarily suspended; see the
-[recording review](docs/SCREEN_RECORDING_REVIEW.md) before changing it.
+Live screen sharing has been removed from the application; server containment
+requires separate approval. See the [retirement plan](docs/SCREEN_SHARING_RETIREMENT.md) before changing it.
 The remaining RELIQ visual rebrand and domain migration are deferred until the
 user resumes them with final branding assets.
 

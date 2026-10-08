@@ -1072,7 +1072,7 @@ export default function LiveClassPanel({
     window.addEventListener("focus", loadRows);
     document.addEventListener("visibilitychange", refreshWhenVisible);
     channel = supabase
-      .channel(`live-class-${selectedClass?.id ?? "none"}`)
+      .channel(`live-class-${selectedClass?.id ?? "none"}`, { config: { private: true } })
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "live_student_activity", filter: `class_id=eq.${selectedClass?.id}` },
