@@ -124,7 +124,7 @@ function genSkipCountTrack(d: Difficulty): PracticeTask {
   const [lo, hi] = diffRange(d, [0, 20], [0, 35], [0, 50]);
   const current = pickStartForStep(step, lo, hi);
   const answer = current + step;
-  const distractors = uniqueInts(3, answer - step * 2, answer + step * 2, [answer]).map((n) => Math.max(0, n));
+  const distractors = uniqueInts(3, Math.max(0, answer - step * 2), answer + step * 2, [answer]);
   const options = shuffle([answer, ...distractors]).map(String);
   return { kind: "mcq", prompt: `Tap the next number. Start at ${current}, count by ${step}s.`, options, answer: String(answer), difficulty: d };
 }

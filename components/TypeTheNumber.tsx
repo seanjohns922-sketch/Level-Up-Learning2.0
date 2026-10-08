@@ -99,6 +99,7 @@ export default function TypeTheNumber({
   }
 
   function check() {
+    if (!typed.trim() || status !== "idle") return;
     const correctWord = toWord(currentAnswer);
     const ok =
       mode === "word"
@@ -144,7 +145,8 @@ export default function TypeTheNumber({
 
       <button
         onClick={check}
-        className="w-full py-4 bg-teal-600 text-white font-extrabold rounded-xl"
+        disabled={!typed.trim() || status !== "idle"}
+        className="w-full py-4 bg-teal-600 text-white font-extrabold rounded-xl disabled:opacity-50"
       >
         Check
       </button>

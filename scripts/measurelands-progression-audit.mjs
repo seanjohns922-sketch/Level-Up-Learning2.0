@@ -16,7 +16,7 @@ const markCorrectBody = runner.match(/function markCorrect\(\) \{([\s\S]*?)\n  \
 
 check(
   "Measurelands intro cards use a dedicated callback",
-  renderer.includes('const isIntroTask = "scene" in task && task.scene === "intro"') &&
+  renderer.includes("isNativeLessonIntro(task)") &&
     renderer.includes("if (isIntroTask && advanceIntro)"),
 );
 check(

@@ -82,9 +82,10 @@ check(
     !realmProgress.includes("fetchSnapshotFallbackForStudent")
 );
 check(
-  "Canonical pre-test assessments confirm placement completion",
+  "Canonical placement state remains authoritative after a teacher reset",
   realmProgress.includes('assessment_type === "pretest"') &&
-    realmProgress.includes("summary.placement_complete || latestPretest !== null")
+    realmProgress.includes("placement_complete: summary.placement_complete") &&
+    !realmProgress.includes("summary.placement_complete || latestPretest !== null")
 );
 check(
   "Refresh routing refuses cached fallback when the server restore fails",

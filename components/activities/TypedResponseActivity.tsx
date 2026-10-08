@@ -2588,6 +2588,10 @@ export default function TypedResponseActivity({
           : fractionDenominatorInput
       );
 
+      const submittedFraction = numerator || denominator
+        ? `${whole ? `${whole} ` : ""}${numerator}/${denominator}`
+        : whole;
+
       const parsed =
         isFlexibleFractionInput && whole && !numerator && !denominator
           ? {
@@ -2604,7 +2608,7 @@ export default function TypedResponseActivity({
               };
 
       if (!parsed) {
-        onWrong?.(typed);
+        onWrong?.(submittedFraction);
         return;
       }
 
@@ -2614,7 +2618,7 @@ export default function TypedResponseActivity({
         !Number.isFinite(parsed.denominator) ||
         parsed.denominator === 0
       ) {
-        onWrong?.(typed);
+        onWrong?.(submittedFraction);
         return;
       }
 
@@ -2625,9 +2629,9 @@ export default function TypedResponseActivity({
       });
 
       if (matchesAcceptedFraction) {
-        onCorrect?.(typed);
+        onCorrect?.(submittedFraction);
       } else {
-        onWrong?.(typed);
+        onWrong?.(submittedFraction);
       }
       return;
     }
@@ -2698,9 +2702,9 @@ export default function TypedResponseActivity({
         return value === normalizedOption || isEquivalentNumberSequence(typed, answerOption);
       });
     if (matchesAcceptedAnswer) {
-      onCorrect?.(typed);
+      onCorrect?.(isOrderingResponse ? orderedInputs.join(", ") : typed);
     } else {
-      onWrong?.(typed);
+      onWrong?.(isOrderingResponse ? orderedInputs.join(", ") : typed);
     }
   }
 
@@ -2740,6 +2744,19 @@ export default function TypedResponseActivity({
       : isRelatedDenominatorWorking && relatedDenominatorStep !== "solve" && relatedDenominatorStep !== "done"
       ? "Check step"
       : "Check answer";
+  // Structured controls keep their own state; the plain typed field stays empty.
+  const answerReady = isOrderingResponse
+    ? orderedInputs.length === orderingAnswerParts.length && orderedInputs.every(value => value.trim())
+    : isMultiStepMethod || isDiscountStepMethod || isPercentStructuredMethod
+      ? Boolean(percentMethodInputs[percentMethodStep]?.trim())
+      : isRelatedDenominatorWorking
+        ? Boolean(relatedDenominatorInputs[relatedDenominatorStep === "multiplier" ? "multiplier" : relatedDenominatorStep === "numerator" ? "scaledNumerator" : "resultNumerator"].trim())
+        : isStructuredFractionResponse
+          ? Boolean((isFlexibleFractionInput && fractionWholeInput.trim() && !fractionNumeratorInput.trim() && !fractionDenominatorInput.trim()) ||
+              (fractionNumeratorInput.trim() && (usesFixedDenominator || fractionDenominatorInput.trim())))
+          : isFractionDecimalPercentConversion
+            ? Boolean(conversionDecimalInput.trim() && conversionPercentInput.trim())
+            : Boolean(typed.trim());
   const columnMultiplicationButtonLabel = getColumnMultiplicationButtonLabel(multiplicationStep);
 
   if (missingRelationshipVisual) {
@@ -3885,7 +3902,7 @@ export default function TypedResponseActivity({
             <button
               type="button"
               onClick={check}
-              disabled={!typed.trim()}
+              disabled={!answerReady}
               className="rounded-xl bg-teal-600 px-5 py-3 font-black text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {typedResponseButtonLabel}

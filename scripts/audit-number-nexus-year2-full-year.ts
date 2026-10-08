@@ -194,7 +194,7 @@ const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page
 const curriculumSourceRule = fs.readFileSync(path.join(process.cwd(), "docs/CURRICULUM_SOURCE_OF_TRUTH.md"), "utf8");
 assert(curriculumSourceRule.includes("Australian Curriculum: Mathematics - Curriculum content F-6, Version 9.0 (ACARA)"), "The canonical ACARA PDF source rule is missing.");
 assert(curriculumSourceRule.includes("mathematics-curriculum-content-f-6-v9 (4).pdf"), "The project owner's canonical curriculum PDF is not recorded.");
-assert(engineSource.includes('data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}') && engineSource.includes("const isModernNumber = isLevelTwoNumber || isLevelThreeNumber"), "Level 2 lessons do not expose the modern presentation scope.");
+assert(engineSource.includes('data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}') && /const isModernNumber = [^;]*\bisLevelTwoNumber\b/.test(engineSource), "Level 2 lessons do not expose the modern presentation scope.");
 assert(engineSource.includes('background: "#f8fbfc"'), "Level 2 lessons do not use the modern solid workspace surface.");
 assert(globalStyles.includes(".number-nexus-level-two .rounded-2xl") && globalStyles.includes("border-radius: 0.5rem !important"), "Level 2 legacy activity cards are not normalized to the modern radius system.");
 assert(assessmentSource.includes("number_y2_") || assessmentSource.includes("renderCoins"), "Level 2 assessment visuals are not available.");

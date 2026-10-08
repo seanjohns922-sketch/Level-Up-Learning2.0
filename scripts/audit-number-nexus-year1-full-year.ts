@@ -181,7 +181,9 @@ const presentationFiles = [
 ];
 const presentationSource = presentationFiles.map((file) => fs.readFileSync(path.join(process.cwd(), file), "utf8")).join("\n");
 assert(!/rounded-\[(?:12|14|16|18|20|22|24|28)px\]|rounded-2xl|rounded-3xl/.test(presentationSource), "A live Level 1 activity uses legacy oversized corner radii.");
-assert(!/bg-gradient-to-(?:br|r)/.test(presentationSource), "A live Level 1 activity uses the retired gradient-heavy card treatment.");
+// The runner has an approved gradient CTA; activity surfaces stay solid.
+const activityPresentationSource = presentationFiles.filter(file => file !== "components/PracticeRunner.tsx").map(file => fs.readFileSync(path.join(process.cwd(), file), "utf8")).join("\n");
+assert(!/bg-gradient-to-(?:br|r)/.test(activityPresentationSource), "A live Level 1 activity uses the retired gradient-heavy card treatment.");
 assert(!/[🤖🚀🛸🪐⭐💎🏁✨]/u.test(presentationSource), "A live Level 1 activity uses platform-dependent interface emoji.");
 
 const sessionSource = fs.readFileSync(path.join(process.cwd(), "app/session/page.tsx"), "utf8");

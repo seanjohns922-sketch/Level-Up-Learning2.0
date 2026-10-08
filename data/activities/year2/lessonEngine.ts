@@ -5884,8 +5884,8 @@ function uniqueNumberOptions(answer: number, spread = 12) {
     if (candidate !== answer || values.size === 0) values.add(candidate);
   }
   // Fallback: if spread is too small, widen it
-  while (values.size < 4) {
-    values.add(answer + values.size);
+  for (let offset = 1; values.size < 4; offset++) {
+    values.add(answer + offset);
   }
   return shuffle(Array.from(values)).map(String);
 }
@@ -19087,27 +19087,24 @@ function generateGenericQuestion(
   if (explicitMode === "multiplication_estimation_check") {
     const a = randInt(18, 89);
     const b = randInt(3, 28);
-    const estimate = Math.round(a / 10) * 10 * Math.round(b / 10);
-    const reasonable = estimate + randInt(-30, 30);
-    const unreasonable = estimate * 10;
+    const roundedA = Math.round(a / 10) * 10;
+    const roundedB = b < 10 ? b : Math.round(b / 10) * 10;
+    const estimate = roundedA * roundedB;
+    const prompt = `Round two-digit numbers to the nearest 10. Estimate ${a} × ${b}.`;
+    const helper = "Keep single-digit numbers unchanged.";
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Which answer is most reasonable for ${a} × ${b}?`,
-          options: shuffle([
-            String(Math.max(1, reasonable)),
-            String(Math.max(1, unreasonable)),
-            String(Math.max(1, estimate + 200)),
-            String(Math.max(1, Math.floor(estimate / 10))),
-          ]),
-          answer: String(Math.max(1, reasonable)),
-          helper: "Round first, then decide which option is closest to the estimate.",
+          prompt,
+          options: uniqueNumberOptions(estimate, Math.max(20, Math.round(estimate / 2))),
+          answer: String(estimate),
+          helper,
         }
       : {
           kind: "typed_response",
-          prompt: `Estimate ${a} × ${b} by rounding first.`,
-          answer: String(Math.max(1, estimate)),
-          helper: "Round the numbers to friendly values first.",
+          prompt,
+          answer: String(estimate),
+          helper,
           placeholder: "Type an estimate",
         };
   }
@@ -25300,7 +25297,7 @@ function generateGenericQuestion(
             formatMathNumber(answerValue),
             formatMathNumber(dividend),
             formatMathNumber(Math.max(1, Math.floor(answerValue / factor))),
-            formatMathNumber(answerValue * factor),
+            formatMathNumber(answerValue + factor),
           ]),
           answer: formatMathNumber(answerValue),
           helper: `Dividing by ${factor} moves every digit ${String(factor).length - 1} place${factor === 10 ? "" : "s"} to the right.`,
@@ -25378,7 +25375,7 @@ function generateGenericQuestion(
     return {
       kind: "multiple_choice",
       prompt: `Which is greater: ${leftPrompt} or ${rightPrompt}?`,
-      options: shuffle([leftPrompt, rightPrompt, "They are equal"]),
+      options: shuffle(leftPrompt === rightPrompt ? [leftPrompt, "They are equal"] : [leftPrompt, rightPrompt, "They are equal"]),
       answer,
     };
   }
@@ -26370,7 +26367,7 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: `If ${a} + ? = ${total}, what is the missing number?`,
-          options: shuffle([answer, String(a), String(b + 1), String(total)]),
+          options: uniqueNumberOptions(b, Math.max(a, 4)),
           answer,
         }
       : {
