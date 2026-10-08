@@ -15,6 +15,9 @@ export type QuestionDraft = {
   };
   measurementVisual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual;
   numberVisual?: import("./number-visual").Number8Visual;
+  algebraVisual?: import("./algebra-visual").Algebra8Visual;
+  /** Expression answers that must be written expanded or fully factorised, not just equivalent. */
+  format?: Level7Answer["format"];
   unit?: string;
   choices?: string[];
   input?: Level7Answer["kind"];
@@ -123,6 +126,7 @@ export function question(
     space8Visual: draft.spaceVisual,
     measurement8Visual: draft.measurementVisual,
     number8Visual: draft.numberVisual,
+    algebra8Visual: draft.algebraVisual,
     ...(choices
       ? {}
       : {
@@ -131,6 +135,7 @@ export function question(
             expected: answer,
             prompt: draft.prompt,
             unit: draft.unit,
+            ...(draft.format ? { format: draft.format } : {}),
             ...(kind === "list"
               ? {
                   labels:

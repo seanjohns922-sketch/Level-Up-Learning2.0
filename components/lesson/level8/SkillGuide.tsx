@@ -9,6 +9,7 @@ import { getRealmTheme } from "@/lib/useRealmTheme";
 import type { Level8Realm } from "@/lib/level8-config";
 import SpaceVisual from "./SpaceVisual";
 import NumberVisual from "./NumberVisual";
+import AlgebraVisual from "./AlgebraVisual";
 import Investigation from "./Investigation";
 export default function SkillGuide({
   realm,
@@ -51,6 +52,7 @@ export default function SkillGuide({
             )}
             {q.space8Visual && <SpaceVisual visual={q.space8Visual} />}
             {q.number8Visual && <NumberVisual visual={q.number8Visual} />}
+            {q.algebra8Visual && <AlgebraVisual visual={q.algebra8Visual} />}
           </div>
         </div>
         <div

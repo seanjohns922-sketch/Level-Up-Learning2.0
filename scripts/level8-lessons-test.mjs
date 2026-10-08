@@ -64,6 +64,7 @@ for (const [realm, factories] of Object.entries(LEVEL8_FACTORIES)) {
               q.cave7Visual,
               q.measurement8Visual,
               q.number8Visual,
+              q.algebra8Visual,
               q.space8Visual,
             ]),
           ),
@@ -94,6 +95,15 @@ const fraction = {
 assert(markLevel7Answer(fraction, "2/4"));
 assert(level7SimplificationTip(fraction, "2/4"));
 assert(!markLevel7Answer(fraction, "1/3"));
+// Algebra form checks: equivalent is not enough when a question asks to expand or factorise.
+const expandedSpec = { kind: "expression", expected: "6x + 15", prompt: "Expand 3(2x + 5).", format: "expanded" };
+assert(markLevel7Answer(expandedSpec, "15+6x"));
+assert(!markLevel7Answer(expandedSpec, "3(2x+5)"));
+assert(!markLevel7Answer(expandedSpec, "4x+2x+15"));
+const factorisedSpec = { kind: "expression", expected: "6(2x + 3)", prompt: "Factorise 12x + 18 fully.", format: "factorised" };
+assert(markLevel7Answer(factorisedSpec, "6(3+2x)"));
+assert(!markLevel7Answer(factorisedSpec, "3(4x+6)"));
+assert(!markLevel7Answer(factorisedSpec, "12x+18"));
 console.log(
   `${count} generated questions checked; ${Math.round((typed / count) * 100)}% constructed responses; all 60 weekly quizzes checked across 3 attempts.`,
 );

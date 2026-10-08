@@ -1,5 +1,5 @@
 /** Input and marking contract shared by Level 7 practice and weekly quizzes. */
-export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build'|'place'|'sorter';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer';labels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
+export type Level7Answer = {kind:'number'|'fraction'|'ratio'|'coordinates'|'list'|'expression'|'text'|'points'|'set'|'build'|'place'|'sorter';expected:string;prompt:string;unit?:string;format?:'decimal'|'fraction'|'simplest'|'integer'|'expanded'|'factorised';labels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
 type P={x:number;y:number};
 /** A lettered shape on the −6 to 6 coordinate grid, with an optional mirror, centre and worked image. */
 export type Level7Plane={shape:P[];labels:string[];mirror?:'x'|'y';mirrorX?:number[];centre?:P;image?:P[];solution?:P[];turn?:{centre:P;clockwise:boolean;degrees:90|180|270}};
@@ -99,6 +99,13 @@ function expressionValue(source:string,variables:Record<string,number>):number|n
  function sum():number{let n=product();while(tokens[i]==='+'||tokens[i]==='-'){const op=tokens[i++],v=product();n=op==='+'?n+v:n-v;}return n;}
  try{const n=sum();return i===tokens.length&&Number.isFinite(n)?n:null;}catch{return null;}
 }
+/** Expand/simplify answers need no brackets and no repeated like terms; factorised answers need the full common factor outside one bracket. */
+function expressionInForm(spec:Level7Answer,answer:string){
+ const s=answer.replace(/\s+|\*/g,'').replace(/^[a-zA-Z]=/,'');
+ if(spec.format==='expanded'){if(/[()]/.test(s))return false;const keys=s.replace(/-/g,'+-').split('+').filter(Boolean).map(t=>[...t.replace(/[^a-zA-Z]/g,'')].sort().join(''));return new Set(keys).size===keys.length;}
+ if(spec.format==='factorised'){const outside=(t:string)=>t.match(/^(-?\d*[a-zA-Z]*)\(([^()]+)\)$/)?.[1];const mine=outside(s);return mine!==undefined&&mine===outside(clean(spec.expected).replace(/\s+|\*/g,''));}
+ return true;
+}
 export function stripAnswerUnit(spec:Level7Answer,value:string){const s=value.trim();return spec.unit==='$'?s.replace(/^\$\s*/,''):spec.unit&&s.endsWith(spec.unit)?s.slice(0,-spec.unit.length).trim():s;}
 export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  if(spec.kind==='build')return buildMeets(spec.build!,response.split(',').map(Number));
@@ -123,7 +130,7 @@ export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  if(spec.kind==='expression'){
   if(/model|expression|calculation/i.test(spec.prompt)&&!/[a-zA-Z+*/()^=-]/.test(a))return false;
   const variables=[...new Set(b.replace(/^[a-zA-Z]\s*=/,'').match(/[a-zA-Z]/g)??[])];if((a.replace(/^[a-zA-Z]\s*=/,'').match(/[a-zA-Z]/g)??[]).some(v=>!variables.includes(v)))return false;
-  return [0,1,2,3,5,7,11,13,17].every(n=>{const vals=Object.fromEntries(variables.map((v,i)=>[v,((n+1)**(i+1))%19-7]));return near(expressionValue(a,vals),expressionValue(b,vals));});
+  return expressionInForm(spec,a)&&[0,1,2,3,5,7,11,13,17].every(n=>{const vals=Object.fromEntries(variables.map((v,i)=>[v,((n+1)**(i+1))%19-7]));return near(expressionValue(a,vals),expressionValue(b,vals));});
  }
  const norm=(s:string)=>s.toLowerCase().replace(/[ .-]/g,''),x=norm(a),y=norm(b);if(x===y)return true;
  // Shape names forgive a small slip (sqaure, rectagle) but never accept a different shape name.
