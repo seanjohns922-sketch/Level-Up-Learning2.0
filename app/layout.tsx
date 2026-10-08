@@ -4,7 +4,6 @@ import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
-import StudentScreenRecorder from "@/components/StudentScreenRecorder";
 import DemoPreviewBanner from "@/components/demo/DemoPreviewBanner";
 import GemRevealHost from "@/components/gems/GemRevealHost";
 import VercelClientInsights from "@/components/VercelClientInsights";
@@ -37,7 +36,6 @@ export default function RootLayout({
         <ErrorBoundary>
           <GlobalTapFeedback />
           <FullscreenToggle />
-          <StudentScreenRecorder />
           <Suspense fallback={null}>
             <DemoPreviewBanner />
           </Suspense>

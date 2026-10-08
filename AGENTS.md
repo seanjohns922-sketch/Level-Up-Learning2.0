@@ -65,3 +65,36 @@ replacement, Realmies retirement or domain migration unless the user resumes
 the work. When resumed, review the final wordmark/font, visual consistency across
 all roles and outputs, favicon/social assets, separate print artwork, Realmies
 retirement and the chosen domain/email migration. No automatic reminder is set.
+
+# Engineering and release discipline
+
+RELIQ is a production education platform used by students and teachers. Investigate
+root causes and existing shared implementations before editing. Make the smallest
+change that solves the requested problem; do not refactor unrelated files or
+include another contributor's work in a commit.
+
+Use npm and package-lock.json only. Use the Node version in .nvmrc. Do not generate
+Bun, Yarn or pnpm lockfiles. Keep production credentials out of code, test fixtures,
+logs and CI; never expose service-role credentials to the browser.
+
+Preserve canonical server-backed progression, student identity and role boundaries.
+Use lib/assessment-rules.ts for application thresholds: weekly quiz 80%, pre/post
+mastery 85%. Whole-maths diagnostic placement has separate rules; do not merge it
+with the normal pre/post pathway. Do not rewrite historical migrations for cleanup.
+Explain schema, grants/RLS, data and rollback impacts before adding a new
+migration. Never weaken authentication or authorisation to make a test pass.
+
+Run affected QA, qa:critical, lint:qa and typecheck for changes to shared learning,
+identity or progression code. Run npm run build for release-affecting changes.
+Check the final diff for unrelated changes and duplicated logic. Report failures
+and untested behaviour explicitly. A build pass is not school-launch approval.
+Do not suppress a failing assertion or lint rule simply to make CI green.
+
+Live screen capture is suspended following the privacy review. Do not restore the
+public broadcast implementation or enable a capture flag without completing the
+access, masking, lifecycle and role-boundary checks in docs/SCREEN_RECORDING_REVIEW.md.
+
+New raw HTML/SVG injection must use trusted, controlled content with a documented
+trust boundary. Do not render untrusted user, database, model or external markup
+without an explicit sanitisation design and tests. Preserve controlled mathematical
+geometry when consolidating existing diagram renderers.

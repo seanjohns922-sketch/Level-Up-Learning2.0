@@ -169,10 +169,7 @@ export function LiveStudentDrawer({
 
         {activeTab === "screen" ? (
           <div className="p-5">
-            <StudentScreenViewer studentId={student.id} />
-            <p className="mt-2 text-center text-[11px] text-slate-400">
-              Live view of {student.displayName}&apos;s screen · read-only
-            </p>
+            <StudentScreenViewer />
           </div>
         ) : (
         <div className="space-y-4 p-5">

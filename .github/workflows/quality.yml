@@ -1,0 +1,75 @@
+name: RELIQ quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reliq-quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# No production credentials, live RPC mutations or deployment steps belong here.
+jobs:
+  critical:
+    name: Critical QA and types
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:qa
+      - run: npm run typecheck
+      - run: npm run qa:critical
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: critical-qa-results
+          path: .local-archive/qa/critical/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
+  lint:
+    name: Application lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Existing lint debt remains a visible failure, never continue-on-error.
+      - run: npm run lint
+  build:
+    name: Production build and release QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_ADMIN_MODE: 'false'
+      NEXT_PUBLIC_LEVEL7_LIVE: 'true'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # npm automatically runs the existing complete prebuild release suite.
+      - run: npm run build

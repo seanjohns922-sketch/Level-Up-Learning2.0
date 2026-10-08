@@ -41,6 +41,13 @@ A read-only production security findings report and a tested student-login harde
 
 The school-release audit explicitly resumes this review as a separate release condition. Production security settings remain unchanged.
 
+The subsequent recording review confirmed anonymous exchange of synthetic messages
+over the public Realtime channel mechanism used by live screen sharing. No actual
+student topic or screen was accessed. This patch suspends recording and viewing;
+see [evidence, containment limits and return requirements](SCREEN_RECORDING_REVIEW.md).
+Already-open older clients are not revoked by an application patch. Production
+channel enforcement and old-client containment remain open security work.
+
 A narrow read-only production probe used the public client key and called `get_student_runtime_context_secure` for a nonexistent all-zero UUID. Both no `x-student-session` header and an invalid header returned HTTP 401, code `42501`, “Student read access denied”. No test session or student fixture was created.
 
 This verifies only rejection in those two cases. Valid student-role execution, cross-student and cross-school boundaries, current deployed grants/RLS/storage inventory, login abuse controls, MFA, recovery, backups and the remaining checklist are still unverified. Do not equate these probes or source audits with a completed security review.
