@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Probability goes from 0 (impossible) to 1 (certain).",
+  "example": "Even chance → 1/2 = 0.5 = 50%",
+  "steps": [
+   "0 means impossible; 1 means certain.",
+   "Halfway is 1/2, 0.5 or 50%.",
+   "Place the probability on the scale by size."
+  ],
+  "tip": "0.25 is a quarter of the way along."
+ },
+ "1:2": {
+  "idea": "A probability can be a fraction, a decimal or a percentage.",
+  "example": "3/4 = 0.75 = 75%",
+  "steps": [
+   "Divide the top by the bottom for the decimal: 3 ÷ 4 = 0.75.",
+   "Multiply by 100 for the percentage: 75%.",
+   "All three show the same chance."
+  ],
+  "tip": "1/5 = 0.2 = 20%."
+ },
+ "1:3": {
+  "idea": "Estimate a probability from what the tool shows.",
+  "example": "Red covers about a third of the spinner → about 0.33",
+  "steps": [
+   "Estimate the share of the tool for the event.",
+   "Turn the share into a probability.",
+   "Place it on the scale."
+  ],
+  "tip": "An estimate should be close, not exact."
+ },
+ "2:1": {
+  "idea": "Probability = winning outcomes ÷ total outcomes.",
+  "example": "3 winning sectors out of 8 → 3/8",
+  "steps": [
+   "Count the winning outcomes: 3.",
+   "Count all equally likely outcomes: 8.",
+   "Probability = 3/8."
+  ],
+  "tip": "The outcomes must be equally likely."
+ },
+ "2:2": {
+  "idea": "An event and its complement add up to 1.",
+  "example": "P(red) = 3/8, so P(not red) = 5/8",
+  "steps": [
+   "Find the probability you know.",
+   "Subtract it from 1.",
+   "3/8 + 5/8 = 8/8 = 1."
+  ],
+  "tip": "'Not' means the complement."
+ },
+ "2:3": {
+  "idea": "Build a tool with a target probability.",
+  "example": "Target 2/5 → bag of 5 counters, 2 winning",
+  "steps": [
+   "The denominator is the total outcomes.",
+   "The numerator is the winning outcomes.",
+   "Build the tool to match: 2 winners out of 5."
+  ],
+  "tip": "Equivalent fractions also work: 4 of 10."
+ },
+ "3:1": {
+  "idea": "Expected frequency = probability × number of trials.",
+  "example": "P = 1/4, 40 trials → 1/4 × 40 = 10",
+  "steps": [
+   "Write the probability.",
+   "Multiply by the number of trials.",
+   "That is the expected count."
+  ],
+  "tip": "Expect about this many, not exactly."
+ },
+ "3:2": {
+  "idea": "Compare the expected count with what actually happened.",
+  "example": "Expected 10, observed 13 → 3 more than expected",
+  "steps": [
+   "Work out the expected count.",
+   "Read the observed count.",
+   "Find the difference."
+  ],
+  "tip": "Small differences are normal."
+ },
+ "3:3": {
+  "idea": "Different results can still fit the same model.",
+  "example": "Expected 25 heads, got 22 → still fits a fair coin",
+  "steps": [
+   "Find the gap between expected and observed.",
+   "Small gaps come from random variation.",
+   "Only a large gap over many trials suggests bias."
+  ],
+  "tip": "Don't call a tool biased after one small run."
+ },
+ "4:1": {
+  "idea": "Bigger runs usually land closer to the expected chance.",
+  "example": "10 tosses → 0.7 heads; 1000 tosses → 0.51",
+  "steps": [
+   "Work out the relative frequency for each run.",
+   "Compare each with the probability.",
+   "The larger run is usually closer."
+  ],
+  "tip": "Small runs can swing a lot."
+ },
+ "4:2": {
+  "idea": "As trials increase, the relative frequency settles near the probability.",
+  "example": "After 500 spins, red is 0.24; probability 0.25",
+  "steps": [
+   "Track the relative frequency as trials grow.",
+   "Watch it settle down.",
+   "Measure the final gap from the probability."
+  ],
+  "tip": "Settling near is not the same as equal."
+ },
+ "4:3": {
+  "idea": "Small samples vary wildly, so draw careful conclusions.",
+  "example": "20 spins: 0.45; another 20: 0.15 → wide swing",
+  "steps": [
+   "Compare runs of the same size.",
+   "Small runs vary more.",
+   "Base conclusions on large samples."
+  ],
+  "tip": "One small run can mislead."
+ },
+ "5:1": {
+  "idea": "Choose a simulator with the same probability as the event.",
+  "example": "80% event → spinner with 4 of 5 equal parts winning",
+  "steps": [
+   "Write the event's probability as a fraction.",
+   "Find a tool with the same share of winning outcomes.",
+   "Check the share matches."
+  ],
+  "tip": "80% = 4/5 = 8/10."
+ },
+ "5:2": {
+  "idea": "Fix a faulty simulator so its winning share matches the event.",
+  "example": "Event 3/4, spinner shows 2/4 → make 3 of 4 sectors win",
+  "steps": [
+   "Find the probability the event needs.",
+   "Find what the simulator gives now.",
+   "Change the winning outcomes to match."
+  ],
+  "tip": "Check the total outcomes too."
+ },
+ "5:3": {
+  "idea": "All outcomes together must cover every result and total 1.",
+  "example": "0.2 + 0.3 + 0.5 = 1",
+  "steps": [
+   "List every possible outcome.",
+   "Add their probabilities.",
+   "If the total isn't 1, an outcome is missing or wrong."
+  ],
+  "tip": "Probabilities can't add to more than 1."
+ },
+ "6:1": {
+  "idea": "Plan a fair investigation before running it.",
+  "example": "Same spinner, same method, 100 spins, record each",
+  "steps": [
+   "State the question and the event.",
+   "Fix the tool, method and number of trials.",
+   "Plan how to record every result."
+  ],
+  "tip": "Change only one thing at a time."
+ },
+ "6:2": {
+  "idea": "Run the investigation and track the evidence.",
+  "example": "After 100 spins: red 27 → relative frequency 0.27",
+  "steps": [
+   "Run every planned trial.",
+   "Record each result.",
+   "Work out the relative frequency."
+  ],
+  "tip": "Stop only when the plan says so."
+ },
+ "6:3": {
+  "idea": "Defend a conclusion with evidence and its limits.",
+  "example": "'Red came up 0.27 of the time, close to the expected 0.25.'",
+  "steps": [
+   "State what was observed.",
+   "Compare it with the model.",
+   "Say how sure you can be, given the number of trials."
+  ],
+  "tip": "Avoid saying 'proves' after one investigation."
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "A chance situation is fair if each outcome has the same chance.",
+  "example": "4 yellow and 1 purple counter → yellow is more likely, not fair",
+  "steps": [
+   "Count each outcome's counters, faces or parts.",
+   "Compare the counts.",
+   "Equal counts mean equal chances."
+  ],
+  "tip": "Look at how many of each, not just the colours."
+ },
+ "1:2": {
+  "idea": "Outcomes are equally likely when they have the same share of the tool.",
+  "example": "3 blue and 3 green parts → blue and green equally likely",
+  "steps": [
+   "Count the parts for each outcome.",
+   "If the counts match, the chances match.",
+   "Every number on a fair die has one face, so each is equally likely."
+  ],
+  "tip": "Equal size parts matter on a spinner."
+ },
+ "1:3": {
+  "idea": "Explain equal chance using the counts.",
+  "example": "3 red and 3 blue counters → same number of each",
+  "steps": [
+   "Count each outcome.",
+   "Say that the counts are the same.",
+   "Same count means the same chance."
+  ],
+  "tip": "Give the numbers in your reason."
+ },
+ "2:1": {
+  "idea": "Read a chance tool to see what it can land on.",
+  "example": "Bag of red, blue and purple → red, blue or purple",
+  "steps": [
+   "Look at every face, part or counter.",
+   "List the different results.",
+   "That list is what the tool can give."
+  ],
+  "tip": "Repeated colours only count once in the list."
+ },
+ "2:2": {
+  "idea": "Count how many different outcomes a tool has.",
+  "example": "Die → 6 outcomes; coin → 2",
+  "steps": [
+   "List the different results.",
+   "Count them.",
+   "That is the number of possible outcomes."
+  ],
+  "tip": "Count different outcomes, not total counters."
+ },
+ "2:3": {
+  "idea": "Compare tools by their outcomes.",
+  "example": "Tool A: 4 colours. Tool B: 2 → A has more outcomes",
+  "steps": [
+   "List each tool's outcomes.",
+   "Count them.",
+   "Compare the counts."
+  ],
+  "tip": "More outcomes usually means each one is less likely."
+ },
+ "3:1": {
+  "idea": "Keeping a counter changes the next draw; putting it back does not.",
+  "example": "3 red, 2 blue. Draw red and keep it → 2 red, 2 blue left",
+  "steps": [
+   "Notice whether the counter goes back in the bag.",
+   "If it is kept, recount what is left.",
+   "Compare the new counts with the old ones."
+  ],
+  "tip": "Putting it back keeps the chance the same."
+ },
+ "3:2": {
+  "idea": "Independent events don't affect each other. Dependent events do.",
+  "example": "Spin twice → independent. Eat a lolly, then take another → dependent",
+  "steps": [
+   "Ask: does the first result change what is left?",
+   "If nothing is removed, the chance stays the same: independent.",
+   "If something is removed, the chance changes: dependent."
+  ],
+  "tip": "Spinners and coins don't remember earlier results."
+ },
+ "3:3": {
+  "idea": "Predict how removing a counter changes the next draw.",
+  "example": "4 red, 4 blue. Keep a red → red is now less likely",
+  "steps": [
+   "Remove the counter you drew from the count.",
+   "Compare the new counts.",
+   "The colour that lost a counter is now less likely."
+  ],
+  "tip": "Recount after every draw you keep."
+ },
+ "4:1": {
+  "idea": "A game is fair if each player has the same chance to win.",
+  "example": "Win on even, lose on odd with one die → 3 and 3, fair",
+  "steps": [
+   "Count the winning outcomes for each player.",
+   "Compare the counts.",
+   "Equal counts make a fair game."
+  ],
+  "tip": "Check every outcome belongs to someone."
+ },
+ "4:2": {
+  "idea": "Fix an unfair game by giving each player equal outcomes.",
+  "example": "4 purple vs 1 blue → change to 3 purple and 3 blue",
+  "steps": [
+   "Find who has more outcomes.",
+   "Change the counts so both are equal.",
+   "Check the game is now fair."
+  ],
+  "tip": "Equal counts of equal-sized parts."
+ },
+ "4:3": {
+  "idea": "Design a fair game by sharing the outcomes equally.",
+  "example": "Spinner: 4 equal parts, 2 for each player",
+  "steps": [
+   "Choose a chance tool.",
+   "Give each player the same number of equal outcomes.",
+   "Test it by playing several times."
+  ],
+  "tip": "Equal parts must be the same size."
+ },
+ "5:1": {
+  "idea": "Compare tools to see which gives the better chance.",
+  "example": "Spinner A: 1 red of 4. Spinner B: 3 red of 4 → B",
+  "steps": [
+   "Count the target outcome on each tool.",
+   "Compare it with the total on each tool.",
+   "The bigger share gives the better chance."
+  ],
+  "tip": "Compare shares, not just counts."
+ },
+ "5:2": {
+  "idea": "Different tools can give the same chance.",
+  "example": "1 red of 2 parts and 2 red of 4 parts → same chance",
+  "steps": [
+   "Find the share of red on each tool.",
+   "1 of 2 is a half; 2 of 4 is also a half.",
+   "Equal shares mean the same chance."
+  ],
+  "tip": "Halves, quarters and so on help compare."
+ },
+ "5:3": {
+  "idea": "The best prediction is the outcome with the biggest share.",
+  "example": "Spinner: blue takes the biggest share → predict blue",
+  "steps": [
+   "Compare the share of each outcome.",
+   "Find the biggest share.",
+   "Predict that outcome."
+  ],
+  "tip": "The best prediction can still be wrong sometimes."
+ },
+ "6:1": {
+  "idea": "Use the tool to predict, then test it.",
+  "example": "Red covers most of the spinner → predict red most often",
+  "steps": [
+   "Look at the shares.",
+   "Predict the outcome that will come up most.",
+   "Run the spins and compare."
+  ],
+  "tip": "Results may not match exactly."
+ },
+ "6:2": {
+  "idea": "Run a trial, record results, and compare repeated runs.",
+  "example": "Run 1: red 6. Run 2: red 4 → different results",
+  "steps": [
+   "Run the experiment and record every result.",
+   "Run it again the same way.",
+   "Compare: they are usually not the same."
+  ],
+  "tip": "Variation is part of chance."
+ },
+ "6:3": {
+  "idea": "Expected results are a guide; actual results are usually close but not exact.",
+  "example": "Coin 30 times: expected 15 heads, got 14",
+  "steps": [
+   "Work out what you would expect: half of 30 is 15.",
+   "Compare it with the actual result.",
+   "Close but not exact is normal."
+  ],
+  "tip": "Expected is a prediction, not a promise."
+ }
+}

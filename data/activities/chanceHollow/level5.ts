@@ -427,7 +427,8 @@ const predictCount = fresh(() => {
 
 const estimateFromFrequency = fresh(() => {
   const total = pick([30, 40, 50] as const);
-  const a = randInt(Math.ceil(total * 0.5), total - 8);
+  // A must be strictly more than half, or the two outcomes tie.
+  const a = randInt(Math.floor(total / 2) + 1, total - 8);
   const b = total - a;
   return mcq(`After ${total} trials, outcome A occurred ${a} times and B occurred ${b} times. Which outcome is estimated to be more likely?`, "Outcome A",
     ["Outcome B", "They are equally likely", "Neither outcome is possible"],

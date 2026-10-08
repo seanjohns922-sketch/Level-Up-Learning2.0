@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Certain means it will definitely happen. Impossible means it can never happen.",
+  "example": "Roll a 9 on a normal die → impossible",
+  "steps": [
+   "Think about what could happen.",
+   "If it always happens, it is certain.",
+   "If it can never happen, it is impossible. A die only has 1 to 6."
+  ],
+  "tip": "Ask: is there any way this could happen?"
+ },
+ "1:2": {
+  "idea": "Likely means it will probably happen. Unlikely means it probably won't.",
+  "example": "Spinner mostly red → landing on red is likely",
+  "steps": [
+   "Look at how much of the tool shows that outcome.",
+   "If most of it does, the outcome is likely.",
+   "If only a small part does, it is unlikely."
+  ],
+  "tip": "Unlikely is not the same as impossible. It can still happen."
+ },
+ "1:3": {
+  "idea": "Choose a chance word and give a reason from the tool.",
+  "example": "Bag with no yellow → yellow is impossible, because there is no yellow",
+  "steps": [
+   "Look at the tool: what can it give?",
+   "Pick the word: impossible, unlikely, equal chance, likely or certain.",
+   "Give a reason that uses what you can see."
+  ],
+  "tip": "Your reason should point to the tool, not a guess."
+ },
+ "2:1": {
+  "idea": "Everyday events can be more likely or less likely.",
+  "example": "'Your teacher will take the roll' is very likely",
+  "steps": [
+   "Think about how often the event happens.",
+   "Things that happen nearly every day are likely.",
+   "Things that almost never happen are unlikely or impossible."
+  ],
+  "tip": "Use what you know about real life."
+ },
+ "2:2": {
+  "idea": "Sort events into impossible, unlikely, likely and certain piles.",
+  "example": "'Grow 10 cm taller today' → unlikely",
+  "steps": [
+   "Read each event card.",
+   "Ask how often it could really happen.",
+   "Put it in the pile that matches."
+  ],
+  "tip": "Check the impossible pile: it must never be able to happen."
+ },
+ "2:3": {
+  "idea": "A chance word needs a reason.",
+  "example": "Winning a raffle with 1 ticket is unlikely, because many other tickets could win",
+  "steps": [
+   "Say the chance word.",
+   "Add 'because'.",
+   "Give a fact that explains it."
+  ],
+  "tip": "A good reason explains why, not just what."
+ },
+ "3:1": {
+  "idea": "Outcomes are the things that could happen.",
+  "example": "A coin → heads or tails",
+  "steps": [
+   "Look at the chance tool.",
+   "List each result it could give.",
+   "Those are the possible outcomes."
+  ],
+  "tip": "Only list results the tool can really make."
+ },
+ "3:2": {
+  "idea": "List every possible outcome, with none missing.",
+  "example": "One die → 1, 2, 3, 4, 5, 6",
+  "steps": [
+   "Look at every face or colour on the tool.",
+   "Write each one once.",
+   "Check you haven't missed any."
+  ],
+  "tip": "A spinner with red, blue and green has 3 outcomes."
+ },
+ "3:3": {
+  "idea": "Match an event to what is possible, and spot what isn't.",
+  "example": "Die → rolling a 10 is not possible",
+  "steps": [
+   "List what the tool can give.",
+   "Compare the result in the question.",
+   "If it isn't on the list, it is not possible."
+  ],
+  "tip": "Colours not in the bag can't be drawn."
+ },
+ "4:1": {
+  "idea": "Predict the outcome with the biggest share.",
+  "example": "Spinner: half blue → predict blue",
+  "steps": [
+   "Look at how much of the tool each outcome takes up.",
+   "Find the biggest share.",
+   "Predict that outcome."
+  ],
+  "tip": "A prediction is your best guess, not a promise."
+ },
+ "4:2": {
+  "idea": "Test a prediction by trying it. Less likely results can still happen.",
+  "example": "Predicted green (biggest share) but drew blue → blue could still happen",
+  "steps": [
+   "Make the prediction.",
+   "Run the test.",
+   "If a less likely result appears, that is still possible."
+  ],
+  "tip": "One test can't prove a prediction wrong."
+ },
+ "4:3": {
+  "idea": "Compare your prediction with what happened.",
+  "example": "Predicted 'less than 5', rolled 2 → yes, it matched",
+  "steps": [
+   "Read your prediction.",
+   "Read the result.",
+   "Check whether the result fits the prediction."
+  ],
+  "tip": "'Less than 5' means 1, 2, 3 or 4."
+ },
+ "5:1": {
+  "idea": "Repeat a chance trial many times and record every result.",
+  "example": "Toss a coin 8 times → expect about 4 heads",
+  "steps": [
+   "Decide how many trials to run.",
+   "Record each result as it happens.",
+   "Expect results to be shared out, but not exactly."
+  ],
+  "tip": "Record every trial, even ones you don't expect."
+ },
+ "5:2": {
+  "idea": "Tally marks record each result quickly.",
+  "example": "Heads |||| |, Tails ||||",
+  "steps": [
+   "Make a row for each outcome.",
+   "Add one mark after each trial.",
+   "Cross the fifth mark through the four before it."
+  ],
+  "tip": "Count the tallies at the end to check the total."
+ },
+ "5:3": {
+  "idea": "Compare the tallies to see which happened most and least.",
+  "example": "Red 6, Blue 4, Green 6",
+  "steps": [
+   "Count the tally for each outcome.",
+   "Find the biggest and smallest counts.",
+   "Compare them."
+  ],
+  "tip": "Close counts are normal in chance trials."
+ },
+ "6:1": {
+  "idea": "The same experiment can give different results each time.",
+  "example": "Trial 1: 6 heads. Trial 2: 4 heads.",
+  "steps": [
+   "Run the experiment.",
+   "Run it again the same way.",
+   "Compare: the results are usually a bit different."
+  ],
+  "tip": "Different results don't mean you made a mistake."
+ },
+ "6:2": {
+  "idea": "Combining many results shows the pattern more clearly.",
+  "example": "60 die rolls → each number about 10 times",
+  "steps": [
+   "Add the class results together.",
+   "Look at how evenly they are shared.",
+   "Close-to-equal counts suggest equal chances."
+  ],
+  "tip": "More results give a clearer picture."
+ },
+ "6:3": {
+  "idea": "Chance results vary, even with the same tool.",
+  "example": "Group A: 7 red. Group B: 5 red → chance varies",
+  "steps": [
+   "Check both groups used the same tool.",
+   "Compare their results.",
+   "Explain: chance results change from trial to trial."
+  ],
+  "tip": "Variation is normal, not unfair."
+ }
+}

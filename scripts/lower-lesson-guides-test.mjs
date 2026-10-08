@@ -38,7 +38,8 @@ for (let level = 1; level <= 6; level++) {
   for (const week of PATTERN_PEAKS_PROGRAMS[`Year ${level}`] ?? []) for (const lesson of week.lessons) {
     check('pattern', level, week.week, lesson.lesson, !!getPatternPeaksLessonConceptIntro(`Year ${level}`, week.week, lesson.lesson));
   }
-  for (const week of CHANCE_HOLLOW_PROGRAMS[level] ?? []) for (const lesson of week.lessons) check('chance', level, week.week, lesson.lesson, true);
+  // Chance Hollow starts with an ordinary question, not a teaching scene, so every lesson needs a written guide.
+  for (const week of CHANCE_HOLLOW_PROGRAMS[level] ?? []) for (const lesson of week.lessons) { check('chance', level, week.week, lesson.lesson); assert(LESSON_GUIDES.chance?.[level]?.[`${week.week}:${lesson.lesson}`], `Chance lesson without a guide: ${level}:${week.week}:${lesson.lesson}`); }
 }
 assert.equal(covered, 780);
 for (const [key, topic] of Object.entries(assignments)) {

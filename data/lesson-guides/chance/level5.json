@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "The outcome set depends on what you record.",
+  "example": "Bag with 4 blue and 3 green counters: colour → blue, green; exact counter → 7 outcomes",
+  "steps": [
+   "Read what the question records.",
+   "If it records colour, list each colour once.",
+   "If it records each counter, count every counter."
+  ],
+  "tip": "Read the question before listing."
+ },
+ "1:2": {
+  "idea": "List every possible outcome once.",
+  "example": "Roll 4 or less → 1, 2, 3, 4",
+  "steps": [
+   "Start at the smallest outcome.",
+   "List each outcome in order.",
+   "Stop at the last one that fits; don't repeat any."
+  ],
+  "tip": "Check for missing or repeated outcomes."
+ },
+ "1:3": {
+  "idea": "Decide whether outcomes are equally likely by comparing counts.",
+  "example": "3 blue and 3 green → equally likely",
+  "steps": [
+   "Count each outcome.",
+   "Compare the counts.",
+   "Equal counts mean equally likely."
+  ],
+  "tip": "On a fair die, every number has one face."
+ },
+ "2:1": {
+  "idea": "Equal regions or counts give equal chances.",
+  "example": "Gold 3 regions, blue 3 regions → equally likely",
+  "steps": [
+   "Count the regions for each colour.",
+   "Check the regions are equal in size.",
+   "Equal counts give equal chances."
+  ],
+  "tip": "Region size matters, not just colour."
+ },
+ "2:2": {
+  "idea": "Unequal regions or counts give unequal chances.",
+  "example": "Gold 4 regions, red 2 → gold more likely",
+  "steps": [
+   "Count each outcome's regions or faces.",
+   "The bigger count is more likely.",
+   "Explain with the counts."
+  ],
+  "tip": "A die with 1 on two faces makes 1 more likely."
+ },
+ "2:3": {
+  "idea": "Use counts to find a hidden advantage.",
+  "example": "7 map tokens, 1 crystal → map is much easier to get",
+  "steps": [
+   "Count each type.",
+   "Compare them.",
+   "The type with more is easier to get; that is the hidden advantage."
+  ],
+  "tip": "Unequal counts make a game or prize unfair."
+ },
+ "3:1": {
+  "idea": "With two dice, list ordered pairs. There are 6 × 6 = 36.",
+  "example": "Sum of 8 → (2,6), (3,5), (4,4), (5,3), (6,2) → 5 pairs",
+  "steps": [
+   "Make a grid: first die across, second die down.",
+   "Each cell is one ordered pair: 36 in total.",
+   "Count the cells that match the question."
+  ],
+  "tip": "(2,6) and (6,2) are different pairs."
+ },
+ "3:2": {
+  "idea": "Some two-dice differences happen more often than others.",
+  "example": "Difference 1 → 10 pairs; difference 5 → 2 pairs",
+  "steps": [
+   "Use the 36-pair grid.",
+   "Count the pairs for each difference.",
+   "More pairs means more likely."
+  ],
+  "tip": "Difference 0 happens 6 ways: (1,1) to (6,6)."
+ },
+ "3:3": {
+  "idea": "Repair a race so both players have the same number of dice pairs.",
+  "example": "Player A: differences 0, 1 (16 pairs). Player B: 2 to 5 (20 pairs) → adjust",
+  "steps": [
+   "Count the pairs each player wins with.",
+   "Move results until both have 18 pairs.",
+   "Check the counts are equal."
+  ],
+  "tip": "Count pairs, not just the difference values."
+ },
+ "4:1": {
+  "idea": "Run a trial and record every result.",
+  "example": "Toss a coin 20 times; record each head and tail",
+  "steps": [
+   "Decide the number of trials.",
+   "Record each result straight away.",
+   "Check the total matches the number of trials."
+  ],
+  "tip": "A missed record spoils the data."
+ },
+ "4:2": {
+  "idea": "Relative frequency = times it happened ÷ total trials.",
+  "example": "Outcome happened 17 times in 30 trials → 17/30",
+  "steps": [
+   "Count how often the outcome happened.",
+   "Count the total trials.",
+   "Write it as a fraction: times ÷ total."
+  ],
+  "tip": "Compare fractions with the same total by their tops."
+ },
+ "4:3": {
+  "idea": "Compare relative frequencies from repeated runs.",
+  "example": "Trial A: 14/20 heads. Trial B: 12/20 → both possible",
+  "steps": [
+   "Write each result as a fraction.",
+   "Compare them.",
+   "Explain that fair trials can still vary."
+  ],
+  "tip": "Different results don't mean the coin is unfair."
+ },
+ "5:1": {
+  "idea": "Inspect the design to predict which outcome is more likely.",
+  "example": "Bag A: 3 of 4 blue. Bag B: 2 of 4 → Bag A",
+  "steps": [
+   "Find the share of the target in each tool.",
+   "Compare the shares.",
+   "The bigger share should happen more often."
+  ],
+  "tip": "Compare shares, not just counts."
+ },
+ "5:2": {
+  "idea": "Use recorded frequencies to estimate likelihood.",
+  "example": "Target 30/40 in B vs 10/40 in A → B more likely",
+  "steps": [
+   "Write each frequency as a fraction.",
+   "Compare them.",
+   "The bigger relative frequency suggests a bigger chance."
+  ],
+  "tip": "If the counts are equal, the estimates are equal."
+ },
+ "5:3": {
+  "idea": "Results can suggest whether a tool is fair or loaded.",
+  "example": "Die: 6 came up 30 times in 60 rolls → may be loaded",
+  "steps": [
+   "Work out what fair results would look like.",
+   "Compare the real results with that.",
+   "A big difference suggests bias; a small one fits fair."
+  ],
+  "tip": "More trials give stronger evidence."
+ },
+ "6:1": {
+  "idea": "Plan an investigation that repeated trials can answer.",
+  "example": "'Is this spinner fair?' → can be tested; 'Which looks nicest?' → can't",
+  "steps": [
+   "Write a question about chance.",
+   "Check it can be answered by repeating trials.",
+   "Plan how many trials and how to record."
+  ],
+  "tip": "Opinions can't be tested with trials."
+ },
+ "6:2": {
+  "idea": "Run the investigation and record every result.",
+  "example": "50 spins, each tallied",
+  "steps": [
+   "Follow the plan exactly.",
+   "Record every result.",
+   "Total the results at the end."
+  ],
+  "tip": "Keep the method the same for every trial."
+ },
+ "6:3": {
+  "idea": "Defend a verdict using the frequencies.",
+  "example": "Blue 18, red 12, green 10 → 'Blue came up most in this investigation.'",
+  "steps": [
+   "Read the results.",
+   "Find what the data actually shows.",
+   "State a verdict that doesn't claim more than the data shows."
+  ],
+  "tip": "Say 'in this investigation', not 'always'."
+ }
+}
