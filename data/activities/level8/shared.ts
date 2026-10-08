@@ -16,6 +16,7 @@ export type QuestionDraft = {
   measurementVisual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual;
   numberVisual?: import("./number-visual").Number8Visual;
   algebraVisual?: import("./algebra-visual").Algebra8Visual;
+  chanceVisual?: import("./chance-visual").Chance8Visual;
   /** Expression answers that must be written expanded or fully factorised, not just equivalent. */
   format?: Level7Answer["format"];
   unit?: string;
@@ -127,6 +128,7 @@ export function question(
     measurement8Visual: draft.measurementVisual,
     number8Visual: draft.numberVisual,
     algebra8Visual: draft.algebraVisual,
+    chance8Visual: draft.chanceVisual,
     ...(choices
       ? {}
       : {

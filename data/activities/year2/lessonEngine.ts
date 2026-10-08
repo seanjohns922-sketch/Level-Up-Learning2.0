@@ -3467,6 +3467,7 @@ export type MultipleChoiceQuestion = {
   measurement8Visual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual;
   number8Visual?: import("@/data/activities/level8/number-visual").Number8Visual;
   algebra8Visual?: import("@/data/activities/level8/algebra-visual").Algebra8Visual;
+  chance8Visual?: import("@/data/activities/level8/chance-visual").Chance8Visual;
   paintContext?: { need: number; capacity: number; price?: number };
   readabilityRevision?: number;
   cave7Visual?: import("@/data/activities/cave7/shared").Cave7Visual;

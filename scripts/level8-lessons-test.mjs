@@ -65,6 +65,7 @@ for (const [realm, factories] of Object.entries(LEVEL8_FACTORIES)) {
               q.measurement8Visual,
               q.number8Visual,
               q.algebra8Visual,
+              q.chance8Visual,
               q.space8Visual,
             ]),
           ),
