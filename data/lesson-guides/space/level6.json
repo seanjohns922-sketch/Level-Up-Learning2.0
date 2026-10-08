@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "A cross-section is the flat shape made by cutting straight through a solid.",
+  "example": "Cut a cylinder across → circle",
+  "steps": [
+   "Picture slicing straight through the object.",
+   "Look at the new flat face.",
+   "Name its 2D shape."
+  ],
+  "tip": "The direction of the cut changes the shape."
+ },
+ "1:2": {
+  "idea": "Compare parallel slices taken at different heights.",
+  "example": "Prism → every slice the same; pyramid → slices shrink",
+  "steps": [
+   "Take several cuts parallel to the base.",
+   "Compare the shapes and sizes.",
+   "Say whether they stay the same or change."
+  ],
+  "tip": "Same slices point to a prism or cylinder."
+ },
+ "1:3": {
+  "idea": "A horizontal cut makes the same shape as the base.",
+  "example": "Triangular prism → triangle",
+  "steps": [
+   "Find the base of the object.",
+   "A horizontal cut copies the base shape.",
+   "Predict it, then check."
+  ],
+  "tip": "For a pyramid, the slice is the base shape, but smaller."
+ },
+ "2:1": {
+  "idea": "A right prism has the same cross-section all the way through.",
+  "example": "Hexagonal prism → every slice is a hexagon",
+  "steps": [
+   "Slice the object at several heights.",
+   "If every slice is the same polygon, it is a prism.",
+   "A cylinder's slices are constant but curved, so it is not a prism."
+  ],
+  "tip": "Prisms have flat polygon ends."
+ },
+ "2:2": {
+  "idea": "Classify solids by how their slices behave.",
+  "example": "Slices shrink to a point → pyramid or cone",
+  "steps": [
+   "Compare slices from bottom to top.",
+   "Constant slices → prism or cylinder.",
+   "Shrinking to a point → pyramid or cone."
+  ],
+  "tip": "Check whether the slices are polygons or circles."
+ },
+ "2:3": {
+  "idea": "Use the slices as evidence for the solid's structure.",
+  "example": "Constant square slices → square prism",
+  "steps": [
+   "Describe the slice pattern.",
+   "Link it to the structure: constant or shrinking.",
+   "Name the solid with your reason."
+  ],
+  "tip": "Slices are evidence; explain them."
+ },
+ "3:1": {
+  "idea": "The axes extend past zero into negative numbers.",
+  "example": "(−2, 1) → 2 left, 1 up",
+  "steps": [
+   "Start at the origin.",
+   "Negative x goes left; positive x goes right.",
+   "Negative y goes down; positive y goes up."
+  ],
+  "tip": "Across first, then up or down."
+ },
+ "3:2": {
+  "idea": "Plot points in all four quadrants.",
+  "example": "(−3, −3) → 3 left, 3 down",
+  "steps": [
+   "Read the x value and move left or right.",
+   "Read the y value and move up or down.",
+   "Plot the point."
+  ],
+  "tip": "Watch the signs carefully."
+ },
+ "3:3": {
+  "idea": "The signs tell you the quadrant.",
+  "example": "x negative, y positive → Quadrant II",
+  "steps": [
+   "Quadrant I is (+, +).",
+   "Go anticlockwise: II (−, +), III (−, −), IV (+, −).",
+   "Match the signs to the quadrant."
+  ],
+  "tip": "A point on an axis is not in any quadrant."
+ },
+ "4:1": {
+  "idea": "Moving left or right changes only x; moving up or down changes only y.",
+  "example": "(1, −2) → (3, −2): x changed",
+  "steps": [
+   "Compare the two coordinates.",
+   "Find which number changed.",
+   "Left/right changes x; up/down changes y."
+  ],
+  "tip": "The other number stays the same."
+ },
+ "4:2": {
+  "idea": "Crossing an axis can change a sign.",
+  "example": "(2, −1) moves 4 left → (−2, −1)",
+  "steps": [
+   "Start at the x value: 2.",
+   "Count left 4: 1, 0, −1, −2.",
+   "The y value stays −1."
+  ],
+  "tip": "Count through zero, one step at a time."
+ },
+ "4:3": {
+  "idea": "Work out a move by comparing before and after.",
+  "example": "(−1, 2) → (3, 2): 4 right",
+  "steps": [
+   "Subtract the x values for the horizontal move.",
+   "Subtract the y values for the vertical move.",
+   "Describe the direction and distance."
+  ],
+  "tip": "Positive change means right or up."
+ },
+ "5:1": {
+  "idea": "Combine transformations by doing one after another.",
+  "example": "Slide 2 right 1 up, then 1 right 1 up → 3 right 2 up in total",
+  "steps": [
+   "Do the first transformation.",
+   "Apply the second to the new image.",
+   "Track the marked corner throughout."
+  ],
+  "tip": "Two slides make one longer slide."
+ },
+ "5:2": {
+  "idea": "Order can change the result of combined transformations.",
+  "example": "Two slides: same either way. Slide then turn: may differ",
+  "steps": [
+   "Try the moves in one order.",
+   "Try them in the other order.",
+   "Compare the final positions."
+  ],
+  "tip": "Turns and flips are where order matters."
+ },
+ "5:3": {
+  "idea": "Work out the two moves that take a shape to its final image.",
+  "example": "A flip then a slide",
+  "steps": [
+   "Compare facing: is it flipped or turned?",
+   "Then compare position: how far did it move?",
+   "Write the moves in order."
+  ],
+  "tip": "Check your sequence by doing it."
+ },
+ "6:1": {
+  "idea": "A tessellation covers a surface with no gaps and no overlaps.",
+  "example": "Squares tessellate; regular pentagons leave gaps",
+  "steps": [
+   "Repeat the tile around a point.",
+   "Check for gaps or overlaps.",
+   "If there are none, it tessellates."
+  ],
+  "tip": "Hexagons and triangles tessellate too."
+ },
+ "6:2": {
+  "idea": "A tessellation repeats a tile using a transformation.",
+  "example": "Squares → slides; triangles → turns",
+  "steps": [
+   "Track one tile to the next.",
+   "Decide whether it slid, turned or flipped.",
+   "That move is the pattern rule."
+  ],
+  "tip": "The rule must work for every tile."
+ },
+ "6:3": {
+  "idea": "Tiles fit when the angles at each corner add to 360°.",
+  "example": "Squares: 4 × 90° = 360°",
+  "steps": [
+   "Find a point where tiles meet.",
+   "Add the angles meeting there.",
+   "If they total 360°, there are no gaps."
+  ],
+  "tip": "Regular pentagons: 3 × 108° = 324°, which leaves a gap."
+ },
+ "7:1": {
+  "idea": "Investigate a pattern by tracking how one tile becomes the next.",
+  "example": "Each tile is a half-turn of the last",
+  "steps": [
+   "Pick one tile and its neighbour.",
+   "Find the move between them.",
+   "Check the same move repeats."
+  ],
+  "tip": "Look at several pairs, not just one."
+ },
+ "7:2": {
+  "idea": "Changing a tile's size or angle breaks a tessellation.",
+  "example": "Every second tile bigger → gaps and overlaps",
+  "steps": [
+   "Identical tiles fit exactly.",
+   "Changing one copy changes its edges.",
+   "Gaps or overlaps appear."
+  ],
+  "tip": "Tessellations need identical copies."
+ },
+ "7:3": {
+  "idea": "Prove a tessellation with evidence, not looks.",
+  "example": "At every corner the angles total 360° → no gaps",
+  "steps": [
+   "Check every meeting point.",
+   "Add the angles.",
+   "No gaps and no overlaps proves it."
+  ],
+  "tip": "'It looks right' is not evidence."
+ },
+ "8:1": {
+  "idea": "A design brief combines a cross-section, a coordinate and a pattern.",
+  "example": "Cylinder slice → circle; star at (−2, 3); hexagon pattern → slides",
+  "steps": [
+   "Read each part of the brief.",
+   "Answer each with the matching skill.",
+   "Check each answer."
+  ],
+  "tip": "Do one part at a time."
+ },
+ "8:2": {
+  "idea": "Classify the object, place it, then transform it.",
+  "example": "Prism test, plot (−2, 1), work out the chain",
+  "steps": [
+   "Use slices to test for a prism.",
+   "Plot the point in the right quadrant.",
+   "Find the transformation sequence."
+  ],
+  "tip": "Every part must be right."
+ },
+ "8:3": {
+  "idea": "Defend every part of the model with evidence.",
+  "example": "Constant slices → prism; signs → quadrant; 360° → tessellation",
+  "steps": [
+   "Explain the solid from its slices.",
+   "Justify the quadrant using signs.",
+   "Give evidence the pattern tessellates."
+  ],
+  "tip": "Name the evidence in each answer."
+ }
+}

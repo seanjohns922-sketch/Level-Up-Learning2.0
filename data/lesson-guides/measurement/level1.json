@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "Measure length by lining up same-sized blocks end to end.",
+  "example": "Cucumber → 6 blocks long",
+  "steps": [
+   "Start the first block at the very end of the object.",
+   "Lay blocks touching end to end along it.",
+   "Count the blocks."
+  ],
+  "tip": "Use blocks that are all the same size."
+ },
+ "1:2": {
+  "idea": "Compare lengths by comparing the number of blocks.",
+  "example": "Pencil 5 blocks, crayon 3 blocks → pencil is longer",
+  "steps": [
+   "Measure each object in blocks.",
+   "Compare the numbers.",
+   "More blocks means longer."
+  ],
+  "tip": "Compare the counts, not how the picture looks."
+ },
+ "1:3": {
+  "idea": "A fair measure has no gaps and no overlaps.",
+  "example": "Blocks with a gap → wrong count",
+  "steps": [
+   "Check the first block starts at the end.",
+   "Check blocks touch with no gaps.",
+   "Check no blocks overlap."
+  ],
+  "tip": "Gaps make the count too small; overlaps make it too big."
+ },
+ "2:1": {
+  "idea": "Measure mass with balance cubes.",
+  "example": "Book balances 8 cubes → mass of 8 cubes",
+  "steps": [
+   "Put the object on one side of the balance.",
+   "Add cubes to the other side until it is level.",
+   "Count the cubes."
+  ],
+  "tip": "The balance must be level before you count."
+ },
+ "2:2": {
+  "idea": "Compare masses by comparing cube counts.",
+  "example": "Pumpkin 9 cubes, apple 4 cubes → pumpkin is heavier",
+  "steps": [
+   "Measure each object in cubes.",
+   "Compare the numbers.",
+   "More cubes means heavier."
+  ],
+  "tip": "Big objects are not always heavier."
+ },
+ "2:3": {
+  "idea": "A fair measure uses the same cubes every time.",
+  "example": "Big cubes for one object and small cubes for another → not fair",
+  "steps": [
+   "Check every measurement used the same cubes.",
+   "If the cubes differ, the counts can't be compared.",
+   "Measure again with matching cubes."
+  ],
+  "tip": "Same unit, every time."
+ },
+ "3:1": {
+  "idea": "Measure capacity by filling with the same cup each time.",
+  "example": "Mug holds 3 cups",
+  "steps": [
+   "Fill the cup to the top.",
+   "Pour it into the container and count.",
+   "Keep going until the container is full."
+  ],
+  "tip": "Fill the cup the same way every time."
+ },
+ "3:2": {
+  "idea": "Compare capacities by comparing cup counts.",
+  "example": "Kettle 6 cups, mug 2 cups → kettle holds more",
+  "steps": [
+   "Measure each container in cups.",
+   "Compare the numbers.",
+   "More cups means it holds more."
+  ],
+  "tip": "Tall containers don't always hold more."
+ },
+ "3:3": {
+  "idea": "Choose a unit that suits the size of the container.",
+  "example": "Bathtub → bucket, not spoon",
+  "steps": [
+   "Look at how big the container is.",
+   "Small containers suit small units.",
+   "Big containers suit big units."
+  ],
+  "tip": "A tiny unit for a big container takes too long."
+ },
+ "4:1": {
+  "idea": "Some things last about an hour, some a day, some a week.",
+  "example": "A movie → about an hour; school holidays → weeks",
+  "steps": [
+   "Think about how long the activity really takes.",
+   "Match it to hour, day or week.",
+   "Check it makes sense."
+  ],
+  "tip": "An hour is shorter than a day; a day is shorter than a week."
+ },
+ "4:2": {
+  "idea": "Compare how long events last.",
+  "example": "A school day lasts longer than a movie",
+  "steps": [
+   "Think about how long each event takes.",
+   "Use hours, days and weeks to compare.",
+   "Say which is longer or shorter."
+  ],
+  "tip": "Think about the whole event, from start to finish."
+ },
+ "4:3": {
+  "idea": "Sort activities into hour, day and week groups.",
+  "example": "Brushing teeth → less than an hour; a camp → days",
+  "steps": [
+   "Read each activity.",
+   "Decide how long it lasts.",
+   "Put it in the matching group."
+  ],
+  "tip": "Order from shortest to longest to check."
+ },
+ "5:1": {
+  "idea": "Seven days make a week, Monday to Sunday.",
+  "example": "…Saturday, Sunday, then Monday again",
+  "steps": [
+   "Start with Monday.",
+   "Say the days in order to Sunday.",
+   "After Sunday, a new week begins."
+  ],
+  "tip": "There are always 7 days in a week."
+ },
+ "5:2": {
+  "idea": "About four weeks make a month.",
+  "example": "Week 1, week 2, week 3, week 4 → about a month",
+  "steps": [
+   "Each calendar row is one week.",
+   "Count the rows.",
+   "About four rows make a month."
+  ],
+  "tip": "Months are a little longer than 4 weeks."
+ },
+ "5:3": {
+  "idea": "Twelve months make a year, always in the same order.",
+  "example": "November, December, then January",
+  "steps": [
+   "Start at January.",
+   "Say the months in order.",
+   "After December, the year starts again."
+  ],
+  "tip": "Use the order to find a missing month."
+ },
+ "6:1": {
+  "idea": "A calendar shows the dates of a month.",
+  "example": "Find 24 May → the box numbered 24",
+  "steps": [
+   "Find the right month.",
+   "Find the number for the date.",
+   "Read any event written there."
+  ],
+  "tip": "The date is the number in the box."
+ },
+ "6:2": {
+  "idea": "Dates go in order: one after another.",
+  "example": "Today is the 21st → next is the 22nd",
+  "steps": [
+   "Find today's date.",
+   "The next date is one more.",
+   "The date before is one less."
+  ],
+  "tip": "One week later is 7 dates on."
+ },
+ "6:3": {
+  "idea": "Calendars help plan events.",
+  "example": "Fun Run on the 12th, Art Day on the 4th → Art Day is first",
+  "steps": [
+   "Find each event on the calendar.",
+   "Read its date.",
+   "Compare dates to see which comes first."
+  ],
+  "tip": "Smaller dates in the same month come first."
+ },
+ "7:1": {
+  "idea": "Yesterday is the day before today.",
+  "example": "Today Wednesday → yesterday Tuesday",
+  "steps": [
+   "Find today.",
+   "Go back one day.",
+   "That is yesterday."
+  ],
+  "tip": "Yesterday has already happened."
+ },
+ "7:2": {
+  "idea": "Today is happening now.",
+  "example": "We are at school today",
+  "steps": [
+   "Think about what is happening now.",
+   "That is today.",
+   "Yesterday is before; tomorrow is after."
+  ],
+  "tip": "Sort events into yesterday, today and tomorrow."
+ },
+ "7:3": {
+  "idea": "Tomorrow is the day after today.",
+  "example": "Today Friday → tomorrow Saturday",
+  "steps": [
+   "Find today.",
+   "Go forward one day.",
+   "That is tomorrow."
+  ],
+  "tip": "Tomorrow hasn't happened yet."
+ },
+ "8:1": {
+  "idea": "Put events in order using first, next and last.",
+  "example": "Wake up, then breakfast, then school",
+  "steps": [
+   "Find what happens first.",
+   "Find what comes next.",
+   "Finish with what happens last."
+  ],
+  "tip": "Think about your own morning."
+ },
+ "8:2": {
+  "idea": "A day has a morning, afternoon and evening.",
+  "example": "Bed → evening",
+  "steps": [
+   "Think about when the activity happens.",
+   "Morning is early; evening is late.",
+   "Put the day in order."
+  ],
+  "tip": "Breakfast is in the morning."
+ },
+ "8:3": {
+  "idea": "Some events always happen in the same order.",
+  "example": "Plant the seed, water it, it sprouts, it flowers",
+  "steps": [
+   "Find the first step.",
+   "Find what must happen next.",
+   "Keep going to the last step."
+  ],
+  "tip": "Ask: could this step happen before the other?"
+ }
+}

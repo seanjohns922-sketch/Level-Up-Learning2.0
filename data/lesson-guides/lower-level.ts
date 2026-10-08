@@ -6,6 +6,12 @@ import number3 from './number/level3.json' with { type: 'json' };
 import number4 from './number/level4.json' with { type: 'json' };
 import number5 from './number/level5.json' with { type: 'json' };
 import number6 from './number/level6.json' with { type: 'json' };
+import space1 from './space/level1.json' with { type: 'json' };
+import space2 from './space/level2.json' with { type: 'json' };
+import space3 from './space/level3.json' with { type: 'json' };
+import space4 from './space/level4.json' with { type: 'json' };
+import space5 from './space/level5.json' with { type: 'json' };
+import space6 from './space/level6.json' with { type: 'json' };
 import statistics1 from './statistics/level1.json' with { type: 'json' };
 import statistics2 from './statistics/level2.json' with { type: 'json' };
 import statistics3 from './statistics/level3.json' with { type: 'json' };
@@ -16,7 +22,10 @@ import chance3 from './chance/level3.json' with { type: 'json' };
 import chance4 from './chance/level4.json' with { type: 'json' };
 import chance5 from './chance/level5.json' with { type: 'json' };
 import chance6 from './chance/level6.json' with { type: 'json' };
+import measurement1 from './measurement/level1.json' with { type: 'json' };
 import measurement2 from './measurement/level2.json' with { type: 'json' };
+import measurement3 from './measurement/level3.json' with { type: 'json' };
+import measurement4 from './measurement/level4.json' with { type: 'json' };
 import measurement5 from './measurement/level5.json' with { type: 'json' };
 import measurement6 from './measurement/level6.json' with { type: 'json' };
 import pattern3 from './pattern/level3.json' with { type: 'json' };
@@ -30,8 +39,9 @@ type LessonGuideSet = Record<string, LowerLessonGuide>;
 export const LESSON_GUIDES: Record<string, Partial<Record<number, LessonGuideSet>>> = {
   number: { 1: number1, 2: number2, 3: number3, 4: number4, 5: number5, 6: number6 },
   chance: { 3: chance3, 4: chance4, 5: chance5, 6: chance6 },
-  measurement: { 2: measurement2, 5: measurement5, 6: measurement6 },
+  measurement: { 1: measurement1, 2: measurement2, 3: measurement3, 4: measurement4, 5: measurement5, 6: measurement6 },
   pattern: { 3: pattern3, 4: pattern4, 5: pattern5, 6: pattern6 },
+  space: { 1: space1, 2: space2, 3: space3, 4: space4, 5: space5, 6: space6 },
   statistics: { 1: statistics1, 2: statistics2, 3: statistics3, 4: statistics4, 5: statistics5, 6: statistics6 },
 };
 export function getLowerLessonGuide(realm: string, level: number | undefined, week: number | undefined, lesson: number | undefined): LowerLessonGuide | null {

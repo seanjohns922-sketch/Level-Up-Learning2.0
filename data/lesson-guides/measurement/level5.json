@@ -1,4 +1,134 @@
 {
+ "1:1": {
+  "idea": "Choose the metric unit that suits the object.",
+  "example": "Ant → mm; smartphone → cm; road → km",
+  "steps": [
+   "Think about the object's size.",
+   "Pick the unit that gives a sensible number.",
+   "Check the answer makes sense."
+  ],
+  "tip": "Too big a unit gives tiny decimals."
+ },
+ "1:2": {
+  "idea": "Smaller units measure more accurately.",
+  "example": "Ring for a jeweller → millimetres",
+  "steps": [
+   "Decide how precise the measurement must be.",
+   "Choose the smaller unit for precise work.",
+   "Measure in that unit."
+  ],
+  "tip": "1 cm = 10 mm."
+ },
+ "1:3": {
+  "idea": "Choose the tool first, then the unit.",
+  "example": "Weigh a puppy → scale, kilograms",
+  "steps": [
+   "Decide what is being measured.",
+   "Choose the tool for it.",
+   "Choose a unit that suits the size."
+  ],
+  "tip": "Explain why the unit is sensible."
+ },
+ "2:1": {
+  "idea": "Use two units together for a more accurate length.",
+  "example": "2 m 35 cm",
+  "steps": [
+   "Read the whole metres.",
+   "Read the extra centimetres.",
+   "Write both: 2 m 35 cm."
+  ],
+  "tip": "2 m 35 cm = 235 cm."
+ },
+ "2:2": {
+  "idea": "Some measurements need two units.",
+  "example": "2 kg 500 g = 2.5 kg",
+  "steps": [
+   "Read the larger unit.",
+   "Read the smaller unit left over.",
+   "Write both, or convert to one unit."
+  ],
+  "tip": "1 kg = 1000 g; 1 L = 1000 mL."
+ },
+ "2:3": {
+  "idea": "Use precise mixed units to solve problems.",
+  "example": "Board 1 m 85 cm vs gap 1 m 80 cm → long enough",
+  "steps": [
+   "Convert both to the same unit: 185 cm and 180 cm.",
+   "Compare them.",
+   "Decide and explain."
+  ],
+  "tip": "Convert before comparing."
+ },
+ "3:1": {
+  "idea": "If opposite sides are equal, measure once and use the value twice.",
+  "example": "Rectangle 8 m by 5 m → 2 × 8 + 2 × 5 = 26 m",
+  "steps": [
+   "Measure one long side and one short side.",
+   "Double each.",
+   "Add: 16 + 10 = 26 m."
+  ],
+  "tip": "This only works when opposite sides are equal."
+ },
+ "3:2": {
+  "idea": "Irregular shapes: add every outside edge once.",
+  "example": "Sides 5, 3, 2, 4, 3, 7 → 24 m",
+  "steps": [
+   "Follow the boundary all the way round.",
+   "Write every side length.",
+   "Add them all."
+  ],
+  "tip": "Don't add inside lines."
+ },
+ "3:3": {
+  "idea": "Use perimeter to solve fencing and path problems.",
+  "example": "Castle wall: 12 + 8 + 12 + 8 = 40 m",
+  "steps": [
+   "Find every side length.",
+   "Add them for the perimeter.",
+   "Answer with the unit."
+  ],
+  "tip": "Check you included every side."
+ },
+ "4:1": {
+  "idea": "A rectangle of squares is rows × columns.",
+  "example": "4 rows of 6 → 24 squares",
+  "steps": [
+   "Count the rows.",
+   "Count the squares in one row.",
+   "Multiply: 4 × 6 = 24."
+  ],
+  "tip": "Each row has the same number of squares."
+ },
+ "4:2": {
+  "idea": "Area of a rectangle = rows × columns.",
+  "example": "Courtyard 7 rows of 5 → 35 square units",
+  "steps": [
+   "Find the rows and columns.",
+   "Multiply them.",
+   "Write the answer in square units."
+  ],
+  "tip": "Don't add the rows and columns."
+ },
+ "4:3": {
+  "idea": "Use rows × columns to solve area problems.",
+  "example": "Carpet 6 m by 4 m → 24 m²",
+  "steps": [
+   "Find the length and width.",
+   "Multiply them.",
+   "Answer in square units."
+  ],
+  "tip": "Area answers use square units."
+ },
+ "5:1": {
+  "idea": "Decide whether to measure around (perimeter) or inside (area).",
+  "example": "Pool fence → perimeter; lawn → area",
+  "steps": [
+   "Ask: is it around the edge or covering the inside?",
+   "Around: perimeter.",
+   "Inside: area."
+  ],
+  "tip": "Ribbon around a box lid → perimeter."
+ },
  "5:2": {
   "idea": "Shapes can have the same area but different perimeters.",
   "example": "3 × 4 (area 12, perimeter 14) vs 2 × 6 (area 12, perimeter 16)",
@@ -19,6 +149,46 @@
   ],
   "tip": "Covering = area in square units. Edging = perimeter in units."
  },
+ "6:1": {
+  "idea": "24-hour time keeps counting after midday.",
+  "example": "2:30 pm → 14:30",
+  "steps": [
+   "For am times, keep the hour (add a 0 if needed): 5:50 am → 05:50.",
+   "For pm times after 12, add 12 to the hour.",
+   "12:55 pm stays 12:55."
+  ],
+  "tip": "Midnight is 00:00."
+ },
+ "6:2": {
+  "idea": "Convert between 12-hour and 24-hour time.",
+  "example": "19:15 → 7:15 pm",
+  "steps": [
+   "If the hour is over 12, subtract 12 and write pm.",
+   "If it is under 12, it is am.",
+   "12:xx is pm."
+  ],
+  "tip": "5:50 am is 05:50."
+ },
+ "6:3": {
+  "idea": "Use 24-hour conversions to solve problems.",
+  "example": "12:00 pm → 12:00",
+  "steps": [
+   "Decide if it's am or pm.",
+   "Convert using + 12 or − 12.",
+   "Check the answer is between 00:00 and 23:59."
+  ],
+  "tip": "12 pm is midday, so it stays 12."
+ },
+ "7:1": {
+  "idea": "Measure an angle with a protractor.",
+  "example": "Vertex on the centre, base on 0 → read 65°",
+  "steps": [
+   "Put the protractor's centre on the vertex.",
+   "Line the base arm up with 0.",
+   "Read the scale that starts at 0."
+  ],
+  "tip": "Use the inner or outer scale, whichever starts at 0."
+ },
  "7:2": {
   "idea": "To construct an angle, use the protractor's 0 line and count up the right scale.",
   "example": "Build 45°: start at 0, open to 45",
@@ -38,5 +208,35 @@
    "Make your estimate, then check with the protractor."
   ],
   "tip": "Half a right angle is 45°."
+ },
+ "8:1": {
+  "idea": "Design the park: choose what to measure first.",
+  "example": "Bolt → precise ruler in mm; frame → perimeter",
+  "steps": [
+   "Read each design need.",
+   "Choose the measurement and tool.",
+   "Solve each part."
+  ],
+  "tip": "Small precise parts need small units."
+ },
+ "8:2": {
+  "idea": "Engineers trust measurements, not guesses.",
+  "example": "Flour 1 kg 250 g = 1.25 kg",
+  "steps": [
+   "Read each measurement carefully.",
+   "Convert units where needed.",
+   "Make the decision from the numbers."
+  ],
+  "tip": "Check every unit."
+ },
+ "8:3": {
+  "idea": "Use every skill in the final builder mission.",
+  "example": "Turf inside AND fence around → area and perimeter",
+  "steps": [
+   "Read the whole challenge.",
+   "Decide every measurement it needs.",
+   "Solve each part."
+  ],
+  "tip": "Some jobs need two measurements."
  }
 }

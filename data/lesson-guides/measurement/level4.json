@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "Small marks between the numbers show part of a centimetre.",
+  "example": "Ends 3 marks past 6 → 6.3 cm",
+  "steps": [
+   "Find the last whole centimetre passed.",
+   "Count the small marks after it: each is 0.1 cm.",
+   "Add them: 6 + 0.3 = 6.3 cm."
+  ],
+  "tip": "Each small mark is 1 millimetre."
+ },
+ "1:2": {
+  "idea": "Measure precisely: start at zero and read every mark.",
+  "example": "Spoon from 0 to 14.5 → 14.5 cm",
+  "steps": [
+   "Line the object up exactly with 0.",
+   "Read the whole centimetres.",
+   "Count the extra small marks."
+  ],
+  "tip": "Check the object starts at 0, not at the ruler's edge."
+ },
+ "1:3": {
+  "idea": "Use precise measurements to compare and spot errors.",
+  "example": "Paintbrush 18.4 cm, pencil 15.2 cm → 3.2 cm longer",
+  "steps": [
+   "Measure each object precisely.",
+   "Compare or order them.",
+   "Subtract to find differences."
+  ],
+  "tip": "Line up the decimal points when subtracting."
+ },
+ "2:1": {
+  "idea": "Read the scale where the needle rests, even between numbers.",
+  "example": "Needle halfway between 1 and 2 kg → 1.5 kg",
+  "steps": [
+   "Find the numbers either side of the needle.",
+   "Work out what each small mark is worth.",
+   "Count the marks to the needle."
+  ],
+  "tip": "Trust the scale, not your eyes."
+ },
+ "2:2": {
+  "idea": "Read a measuring jug where the water meets the marking.",
+  "example": "Water at the middle mark between 2 L and 3 L → 2.5 L",
+  "steps": [
+   "Find the numbered marks either side of the water.",
+   "Work out what each small mark is worth.",
+   "Read the level exactly."
+  ],
+  "tip": "Read at eye level."
+ },
+ "2:3": {
+  "idea": "Use readings to compare mass and capacity.",
+  "example": "Backpack 4.5 kg, lunchbox 1.2 kg → 3.3 kg heavier",
+  "steps": [
+   "Read each instrument.",
+   "Compare the readings.",
+   "Subtract to find how much more."
+  ],
+  "tip": "Units must match before comparing."
+ },
+ "3:1": {
+  "idea": "A thermometer measures temperature in degrees Celsius.",
+  "example": "Ice 0°C; a room about 20°C",
+  "steps": [
+   "Find the top of the liquid.",
+   "Read the number beside it.",
+   "Say it with °C."
+  ],
+  "tip": "Higher means hotter."
+ },
+ "3:2": {
+  "idea": "Read the thermometer between the numbered marks.",
+  "example": "Liquid 2 marks above 10, marks in 2s → 14°C",
+  "steps": [
+   "Find the numbered mark just below the liquid.",
+   "Work out what each small mark is worth.",
+   "Count up to the top of the liquid."
+  ],
+  "tip": "Check the step size of the marks."
+ },
+ "3:3": {
+  "idea": "Compare temperatures to decide which is warmest or coldest.",
+  "example": "Sydney 22°C, Hobart 12°C → Sydney is warmer",
+  "steps": [
+   "Read each temperature.",
+   "Compare the numbers.",
+   "Higher is warmer; lower is colder."
+  ],
+  "tip": "Order from coldest to warmest to check."
+ },
+ "4:1": {
+  "idea": "Before finding perimeter, measure every side.",
+  "example": "Pond sides: 4 m, 6 m, 4 m, 6 m",
+  "steps": [
+   "Measure each side carefully.",
+   "Write each length.",
+   "Check you have measured every side."
+  ],
+  "tip": "Mark sides as you measure them."
+ },
+ "4:2": {
+  "idea": "Perimeter is the total distance around the outside.",
+  "example": "4 + 6 + 4 + 6 = 20 m",
+  "steps": [
+   "Write every side length.",
+   "Add them all together.",
+   "Check no side was missed."
+  ],
+  "tip": "Perimeter uses length units, like m or cm."
+ },
+ "4:3": {
+  "idea": "Use perimeter to work out fencing or path lengths.",
+  "example": "Patch 5 m by 3 m → fence 16 m",
+  "steps": [
+   "Find all the side lengths.",
+   "Add them: 5 + 3 + 5 + 3.",
+   "The fence needs 16 m."
+  ],
+  "tip": "Fencing goes around, so use perimeter."
+ },
+ "5:1": {
+  "idea": "Area is the flat space inside a shape, counted in squares.",
+  "example": "Notepad covered by 12 squares → 12 cm²",
+  "steps": [
+   "Cover the shape with equal squares.",
+   "Count every square.",
+   "Write the area in square units."
+  ],
+  "tip": "No gaps or overlaps when covering."
+ },
+ "5:2": {
+  "idea": "Compare areas by counting square units, not by looks.",
+  "example": "Long thin shape 12 squares, square shape 12 squares → same area",
+  "steps": [
+   "Count the squares in each shape.",
+   "Compare the counts.",
+   "Different shapes can have the same area."
+  ],
+  "tip": "Look at the count, not the outline."
+ },
+ "5:3": {
+  "idea": "Use area to decide how much is needed to cover something.",
+  "example": "Garden A 20 m², garden B 15 m² → A needs more grass",
+  "steps": [
+   "Find each area in square metres.",
+   "Compare them.",
+   "The bigger area needs more covering."
+  ],
+  "tip": "Land is measured in square metres."
+ },
+ "6:1": {
+  "idea": "Time units are connected: 60 s = 1 min, 60 min = 1 h, 24 h = 1 day.",
+  "example": "120 minutes = 2 hours",
+  "steps": [
+   "Find the link between the units.",
+   "Divide to change to a bigger unit.",
+   "Multiply to change to a smaller unit."
+  ],
+  "tip": "Time doesn't use 100s; it uses 60s."
+ },
+ "6:2": {
+  "idea": "Elapsed time is how long passes from start to finish.",
+  "example": "3:15 to 3:40 → 25 minutes",
+  "steps": [
+   "Mark the start time.",
+   "Count on to the finish time.",
+   "Add up the jumps."
+  ],
+  "tip": "Count on to the next hour first if it helps."
+ },
+ "6:3": {
+  "idea": "Use time to plan and compare events.",
+  "example": "Bus 8:10 to 8:45 → 35 minutes",
+  "steps": [
+   "Find each start and finish time.",
+   "Work out each duration.",
+   "Compare or order the events."
+  ],
+  "tip": "Earlier finish times come first."
+ },
+ "7:1": {
+  "idea": "An angle measures the amount of turn between two arms.",
+  "example": "An open door makes an angle at the hinge",
+  "steps": [
+   "Find the vertex where the arms meet.",
+   "Look at the turn between the arms.",
+   "Bigger turn, bigger angle."
+  ],
+  "tip": "Arm length doesn't change the angle."
+ },
+ "7:2": {
+  "idea": "Compare angles to a right angle.",
+  "example": "Wider than a square corner → obtuse",
+  "steps": [
+   "Hold a square corner against the angle.",
+   "Smaller: acute. Equal: right. Larger: obtuse.",
+   "Order angles by size."
+  ],
+  "tip": "A right angle is 90°."
+ },
+ "7:3": {
+  "idea": "Spot and name angles in everyday objects.",
+  "example": "Open book → obtuse; clock at 3:00 → right angle",
+  "steps": [
+   "Find the vertex and arms in the object.",
+   "Compare with a right angle.",
+   "Name the angle type."
+  ],
+  "tip": "Look for the corner where two lines meet."
+ },
+ "8:1": {
+  "idea": "Design with measurement: decide what to measure first.",
+  "example": "Fence around the park → perimeter; grass inside → area",
+  "steps": [
+   "Read each design job.",
+   "Decide: length, perimeter, area, time or angle?",
+   "Choose the tool and solve."
+  ],
+  "tip": "Around = perimeter; inside = area."
+ },
+ "8:2": {
+  "idea": "Scientists read several instruments carefully.",
+  "example": "Scale 3.5 kg, jug 2 L, thermometer 18°C",
+  "steps": [
+   "Read each instrument.",
+   "Check the units.",
+   "Compare the readings."
+  ],
+  "tip": "Every instrument has its own scale."
+ },
+ "8:3": {
+  "idea": "Mix every skill in the final mission.",
+  "example": "Perimeter, time and angles together",
+  "steps": [
+   "Read each challenge.",
+   "Pick the right skill.",
+   "Solve and check the units."
+  ],
+  "tip": "Take each part one at a time."
+ }
+}

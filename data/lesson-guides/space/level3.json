@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "Each 3D object has its own faces, edges and vertices.",
+  "example": "Cube: 6 square faces, 12 edges, 8 vertices",
+  "steps": [
+   "Look for flat faces and curved surfaces.",
+   "Count edges (where faces meet) and vertices (corners).",
+   "Match the features to the object's name."
+  ],
+  "tip": "A sphere has no faces, edges or vertices."
+ },
+ "1:2": {
+  "idea": "Match a real object to the 3D shape it looks like.",
+  "example": "Planet → sphere; fuel tank → cylinder",
+  "steps": [
+   "Look at the object's overall shape.",
+   "Check for flat or curved surfaces.",
+   "Name the matching 3D object."
+  ],
+  "tip": "Ignore colour and decoration."
+ },
+ "1:3": {
+  "idea": "Use features to identify a 3D object.",
+  "example": "1 vertex and 1 circular edge → cone",
+  "steps": [
+   "Read each feature in the clue.",
+   "Think which object has all of them.",
+   "Check every feature matches."
+  ],
+  "tip": "Count vertices carefully: a cone has just 1."
+ },
+ "2:1": {
+  "idea": "Classify objects by counting faces, edges and vertices.",
+  "example": "5 faces and 5 vertices → square pyramid",
+  "steps": [
+   "Count the flat faces.",
+   "Count the vertices.",
+   "Find the object with those exact counts."
+  ],
+  "tip": "Use the same rule for every object."
+ },
+ "2:2": {
+  "idea": "Compare two objects by their features.",
+  "example": "Cube and rectangular prism → both 6 faces, 8 vertices",
+  "steps": [
+   "List the features of each.",
+   "Find what is the same.",
+   "Find what is different."
+  ],
+  "tip": "Faces, edges, vertices and curved surfaces are the features."
+ },
+ "2:3": {
+  "idea": "Sort objects using one feature at a time.",
+  "example": "Has a curved surface? Sphere, cylinder, cone → yes",
+  "steps": [
+   "Read the sorting rule.",
+   "Check each object against it.",
+   "Put each in the yes or no group."
+  ],
+  "tip": "Every object goes in exactly one group."
+ },
+ "3:1": {
+  "idea": "Choose the object whose features suit the job.",
+  "example": "Wheel → cylinder, because it rolls",
+  "steps": [
+   "Think about what the part must do: roll, stack or point.",
+   "Curved surfaces roll; flat faces stack.",
+   "Pick the object that does the job."
+  ],
+  "tip": "Explain your choice with a feature."
+ },
+ "3:2": {
+  "idea": "Some jobs need more than one feature.",
+  "example": "Roll AND stack → cylinder (curved side, flat ends)",
+  "steps": [
+   "List what the job needs.",
+   "Check which object has every feature needed.",
+   "Choose it."
+  ],
+  "tip": "Check all parts of the job."
+ },
+ "3:3": {
+  "idea": "Explain why an object suits its job using its features.",
+  "example": "Cargo crate → rectangular prism: flat faces stack and hold well",
+  "steps": [
+   "Name the object.",
+   "Name the feature that helps.",
+   "Link the feature to the job."
+  ],
+  "tip": "Use 'because' in your answer."
+ },
+ "4:1": {
+  "idea": "A map key tells you what each symbol stands for.",
+  "example": "● = Rocket Base",
+  "steps": [
+   "Find the symbol in the key.",
+   "Read what it stands for.",
+   "Find that symbol on the map."
+  ],
+  "tip": "Always check the key first."
+ },
+ "4:2": {
+  "idea": "Read the map from the explorer's point of view.",
+  "example": "Facing north: left is west, right is east",
+  "steps": [
+   "Find where the explorer stands and faces.",
+   "What is straight ahead is in front.",
+   "Their left and right depend on which way they face."
+  ],
+  "tip": "Turn the map in your head to match the explorer."
+ },
+ "4:3": {
+  "idea": "Use symbols, marked places and position words together.",
+  "example": "Below Rocket Base, use the key → Moon Maze",
+  "steps": [
+   "Read the key.",
+   "Use position words: above, below, left, right.",
+   "Combine clues to find the place."
+  ],
+  "tip": "The answer must fit all the clues."
+ },
+ "5:1": {
+  "idea": "Place landmarks so the map matches a description.",
+  "example": "'The camp is left of the lake'",
+  "steps": [
+   "Read the condition.",
+   "Place the landmarks to make it true.",
+   "Check the condition again."
+  ],
+  "tip": "Left and right are as you look at the map."
+ },
+ "5:2": {
+  "idea": "Place landmarks so two clues are true at the same time.",
+  "example": "Tent above the lake AND right of the tree",
+  "steps": [
+   "Place one landmark using the first clue.",
+   "Adjust so the second clue is true too.",
+   "Check both clues."
+  ],
+  "tip": "Moving one landmark can break another clue."
+ },
+ "5:3": {
+  "idea": "Build a complete map that someone else could read.",
+  "example": "Place all landmarks, then check every condition",
+  "steps": [
+   "Place each landmark.",
+   "Check every condition.",
+   "Fix any that are not true."
+  ],
+  "tip": "Check the whole map before submitting."
+ },
+ "6:1": {
+  "idea": "Turning changes the way the rover faces.",
+  "example": "Facing north, turn right twice → facing south",
+  "steps": [
+   "Start with the rover's heading.",
+   "A right turn goes clockwise: north → east → south → west.",
+   "Follow each turn in order."
+  ],
+  "tip": "A left turn goes the other way: north → west."
+ },
+ "6:2": {
+  "idea": "Choose the first move to head towards a landmark.",
+  "example": "Facing south, landmark is to the east → turn left",
+  "steps": [
+   "Find which way the landmark is.",
+   "Compare it with the way the rover faces.",
+   "Turn left, turn right or go forward."
+  ],
+  "tip": "Picture yourself sitting in the rover."
+ },
+ "6:3": {
+  "idea": "Plan a full route with turns and forward moves.",
+  "example": "Forward 2, turn right, forward 3",
+  "steps": [
+   "Track the heading after every turn.",
+   "Add forward moves to reach the landmark.",
+   "Run the route to test it."
+  ],
+  "tip": "Write the heading after each turn."
+ },
+ "7:1": {
+  "idea": "Choose equipment by its features, then navigate with the map.",
+  "example": "Wheel → cylinder; then drive to Rocket Base",
+  "steps": [
+   "Choose objects that suit each job.",
+   "Read the map.",
+   "Follow the route."
+  ],
+  "tip": "Explain each choice."
+ },
+ "7:2": {
+  "idea": "Justify the object, decode the key and plan the rescue route.",
+  "example": "Rocket nose → cone, because its point cuts through air",
+  "steps": [
+   "Explain the object choice with a feature.",
+   "Use the key to find places.",
+   "Plan a route that follows the rules."
+  ],
+  "tip": "Check each rule on the route."
+ },
+ "7:3": {
+  "idea": "Choose equipment, plan the mission and fix a broken route.",
+  "example": "Find the wrong step and correct it",
+  "steps": [
+   "Choose the right objects.",
+   "Plan the route.",
+   "Test it and fix any wrong step."
+  ],
+  "tip": "Fix one problem at a time."
+ },
+ "8:1": {
+  "idea": "Review 3D objects: name, compare, classify and choose.",
+  "example": "Cylinder: 2 flat faces, 1 curved surface, 0 vertices",
+  "steps": [
+   "Name each object.",
+   "Count its features.",
+   "Use the features to compare, sort or choose."
+  ],
+  "tip": "Features decide everything."
+ },
+ "8:2": {
+  "idea": "Read, create and navigate maps.",
+  "example": "Use the key, place landmarks, plan a route",
+  "steps": [
+   "Read the map and key.",
+   "Place landmarks to fit the clues.",
+   "Plan and test a route."
+  ],
+  "tip": "Check every clue and rule."
+ },
+ "8:3": {
+  "idea": "Use every navigator skill together.",
+  "example": "Pick equipment, build the map, fix the route",
+  "steps": [
+   "Choose objects with the right features.",
+   "Create the map.",
+   "Fix the route so it reaches the goal."
+  ],
+  "tip": "Work through one part at a time."
+ }
+}

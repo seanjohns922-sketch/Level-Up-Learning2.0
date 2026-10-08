@@ -60,10 +60,10 @@ for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, 
   assert(guide.steps.length >= 2 && guide.steps.length <= 4 && guide.steps.every(step => step.trim().length > 8 && step.length <= 170), `Steps ${realm}:${level}:${key}`);
   own++;
 }
-// Realms that have moved to lesson-specific guides must cover every lesson they teach.
+// Every Level 1–6 lesson in every realm has its own written guide; intro scenes no longer stand alone.
 for (const key of seen) {
   const [realm, level, week, lesson] = key.split(':');
-  if (LESSON_GUIDES[realm] && assignments[key]) assert(LESSON_GUIDES[realm][level]?.[`${week}:${lesson}`], `Lesson still on a shared card: ${key}`);
+  assert(LESSON_GUIDES[realm]?.[level]?.[`${week}:${lesson}`], `Lesson without its own written guide: ${key}`);
 }
 for (const level of [0, 7, 8, undefined]) assert.equal(getLowerLessonGuide('number', level, 1, 1), null);
 assert.equal(getLowerLessonGuide('number', 1, 99, 1), null);

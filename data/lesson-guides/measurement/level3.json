@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "Measure with a ruler starting at zero.",
+  "example": "Spoon from 0 to 12 → 12 cm",
+  "steps": [
+   "Line the end of the object up with 0.",
+   "Look where the other end finishes.",
+   "Read that number."
+  ],
+  "tip": "Don't start at the end of the ruler, start at 0."
+ },
+ "1:2": {
+  "idea": "Read centimetres where the object finishes.",
+  "example": "Pencil ends at 15 → 15 cm",
+  "steps": [
+   "Start the object at 0.",
+   "Find where it ends.",
+   "Read the centimetres."
+  ],
+  "tip": "Keep the ruler straight along the object."
+ },
+ "1:3": {
+  "idea": "Use ruler measurements to solve problems.",
+  "example": "Leaf 14 cm, twig 9 cm → 5 cm longer",
+  "steps": [
+   "Measure each object.",
+   "Compare the measurements.",
+   "Subtract to find the difference."
+  ],
+  "tip": "If a reading looks wrong, check it started at 0."
+ },
+ "2:1": {
+  "idea": "A metre is 100 centimetres.",
+  "example": "Backpack ≈ less than 1 m",
+  "steps": [
+   "Picture one metre: about a big step.",
+   "Compare the object to it.",
+   "Say shorter, about or longer than a metre."
+  ],
+  "tip": "Use a metre stick or tape for long things."
+ },
+ "2:2": {
+  "idea": "Use centimetres for small objects and metres for big ones.",
+  "example": "Paintbrush → cm; classroom → m",
+  "steps": [
+   "Think about how long the object is.",
+   "Small things: centimetres.",
+   "Long things: metres."
+  ],
+  "tip": "Check the answer makes sense."
+ },
+ "2:3": {
+  "idea": "Estimate first, then measure to check.",
+  "example": "Toothbrush: estimate 20 cm, measure 18 cm",
+  "steps": [
+   "Use a known length to guess.",
+   "Measure the object.",
+   "Compare and see how close you were."
+  ],
+  "tip": "A good estimate is close, not exact."
+ },
+ "3:1": {
+  "idea": "Use grams for light objects and kilograms for heavy ones.",
+  "example": "Paper clip → g; suitcase → kg",
+  "steps": [
+   "Think about how heavy the object is.",
+   "Light things: grams.",
+   "Heavy things: kilograms."
+  ],
+  "tip": "1 kg = 1000 g."
+ },
+ "3:2": {
+  "idea": "Read the number where the needle points on the scale.",
+  "example": "Needle at 500 → 500 g",
+  "steps": [
+   "Find the needle.",
+   "Read the number it points to.",
+   "Say the unit."
+  ],
+  "tip": "Check the scale's unit: g or kg."
+ },
+ "3:3": {
+  "idea": "Compare masses using scale readings.",
+  "example": "Spoon 50 g, fork 30 g → spoon 20 g heavier",
+  "steps": [
+   "Read each mass.",
+   "Compare them.",
+   "Subtract to find how much heavier."
+  ],
+  "tip": "Use the same unit for both."
+ },
+ "4:1": {
+  "idea": "Use millilitres for small amounts and litres for large amounts.",
+  "example": "Teaspoon → mL; bathtub → L",
+  "steps": [
+   "Think about how much the container holds.",
+   "Small amounts: mL.",
+   "Large amounts: L."
+  ],
+  "tip": "1 L = 1000 mL."
+ },
+ "4:2": {
+  "idea": "Read a measuring jug at the water level.",
+  "example": "Water at the 4 mark → 4 L",
+  "steps": [
+   "Look at the top of the water.",
+   "Read the mark beside it.",
+   "Say the unit."
+  ],
+  "tip": "Read at eye level, straight across."
+ },
+ "4:3": {
+  "idea": "Use capacity readings to compare and solve problems.",
+  "example": "Mug 300 mL, teaspoon 5 mL → 295 mL more",
+  "steps": [
+   "Read each amount.",
+   "Compare them.",
+   "Subtract to find how much more."
+  ],
+  "tip": "Use the same unit for both."
+ },
+ "5:1": {
+  "idea": "Time is measured in seconds, minutes and hours. 60 minutes make 1 hour.",
+  "example": "Blink → seconds; brushing teeth → minutes",
+  "steps": [
+   "Think about how long the activity takes.",
+   "Very short: seconds. Short: minutes. Long: hours.",
+   "Check: 60 seconds = 1 minute, 60 minutes = 1 hour."
+  ],
+  "tip": "Sleeping overnight takes hours."
+ },
+ "5:2": {
+  "idea": "Estimate how long an activity takes.",
+  "example": "Brushing teeth ≈ 2 minutes",
+  "steps": [
+   "Think about doing the activity.",
+   "Choose a sensible unit.",
+   "Pick a sensible number."
+  ],
+  "tip": "Compare with something you know."
+ },
+ "5:3": {
+  "idea": "Compare how long activities take.",
+  "example": "Football game 90 min, brushing teeth 2 min → 88 min longer",
+  "steps": [
+   "Find each duration in the same unit.",
+   "Compare them.",
+   "Subtract to find how much longer."
+  ],
+  "tip": "Convert hours to minutes first if needed."
+ },
+ "6:1": {
+  "idea": "Read the clock by counting in fives with the minute hand.",
+  "example": "Minute hand on 6 → 30 minutes",
+  "steps": [
+   "Count the minute hand round in fives: 5, 10, 15…",
+   "Read the hour from the short hand.",
+   "Say the time: 2:30."
+  ],
+  "tip": "Each number on the clock is 5 minutes."
+ },
+ "6:2": {
+  "idea": "Read to the nearest minute: count fives, then the small marks.",
+  "example": "Past the 1 by 4 marks → 9 minutes",
+  "steps": [
+   "Count in fives to the last number passed.",
+   "Count the extra small marks one by one.",
+   "Add them: 5 + 4 = 9 minutes."
+  ],
+  "tip": "Each small mark is 1 minute."
+ },
+ "6:3": {
+  "idea": "Match analog and digital clocks.",
+  "example": "Analog 9:01 → digital 9:01",
+  "steps": [
+   "Read the minutes from the long hand.",
+   "Read the hour from the short hand.",
+   "Write it as hour:minutes."
+  ],
+  "tip": "Single minutes need a zero: 9:01, not 9:1."
+ },
+ "7:1": {
+  "idea": "An angle measures how much something turns.",
+  "example": "An opening door makes a bigger angle as it swings",
+  "steps": [
+   "Find the point where the two arms meet.",
+   "Look at the opening between the arms.",
+   "A bigger turn makes a bigger angle."
+  ],
+  "tip": "The length of the arms doesn't change the angle."
+ },
+ "7:2": {
+  "idea": "Compare angles with a right angle (a square corner).",
+  "example": "Smaller than a square corner → acute",
+  "steps": [
+   "Hold a square corner against the angle.",
+   "Smaller than it: acute. Equal: right. Larger: obtuse.",
+   "Order angles by how much they turn."
+  ],
+  "tip": "A book corner makes a right angle."
+ },
+ "7:3": {
+  "idea": "Use a right angle to classify and order angles.",
+  "example": "Scissors opened wide → obtuse",
+  "steps": [
+   "Compare each angle with a right angle.",
+   "Name it: acute, right or obtuse.",
+   "Order from smallest to largest turn."
+  ],
+  "tip": "Look at the turn, not the arm length."
+ },
+ "8:1": {
+  "idea": "Estimate first, then measure to check.",
+  "example": "Marker: estimate 12 cm, measure 13 cm",
+  "steps": [
+   "Make a sensible estimate.",
+   "Measure it.",
+   "Compare the two."
+  ],
+  "tip": "Choose sensible units."
+ },
+ "8:2": {
+  "idea": "Compare how long activities take.",
+  "example": "Sneeze 1 s, click fingers 1 s → about the same",
+  "steps": [
+   "Find each duration in the same unit.",
+   "Compare them.",
+   "Find the difference."
+  ],
+  "tip": "Use seconds for very quick events."
+ },
+ "8:3": {
+  "idea": "Classify angles using a right angle.",
+  "example": "Smaller than a right angle → acute",
+  "steps": [
+   "Compare with a square corner.",
+   "Name the angle type.",
+   "Order angles by size."
+  ],
+  "tip": "Right angles are exactly a square corner."
+ }
+}

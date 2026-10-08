@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "A shape keeps its name when it changes colour, size or turns.",
+  "example": "A big red square turned on its corner is still a square",
+  "steps": [
+   "Ignore the colour and size.",
+   "Look at the sides and corners.",
+   "Name the shape from its sides and corners."
+  ],
+  "tip": "Turning a shape does not change what it is."
+ },
+ "1:2": {
+  "idea": "Compare close shapes carefully: circle or oval, square or rectangle.",
+  "example": "Square: 4 equal sides. Rectangle: 2 long and 2 short sides.",
+  "steps": [
+   "Look at the outline closely.",
+   "A circle is round all the way; an oval is stretched.",
+   "A square has 4 equal sides; a rectangle has 2 long and 2 short."
+  ],
+  "tip": "Check the side lengths, not just the corners."
+ },
+ "1:3": {
+  "idea": "Use every clue to find a mystery shape.",
+  "example": "Clues: 3 sides, 3 corners → triangle",
+  "steps": [
+   "Read the first clue and cross out shapes that don't fit.",
+   "Read the next clue and cross out more.",
+   "The shape left fits every clue."
+  ],
+  "tip": "Use all the clues, not just one."
+ },
+ "2:1": {
+  "idea": "Shapes join a family by what they share, like their number of sides.",
+  "example": "Triangle → the 3-sides family; circle → the curved family",
+  "steps": [
+   "Count the straight sides.",
+   "Find the family with that number of sides.",
+   "Curved shapes with no straight sides go together."
+  ],
+  "tip": "Count each side once."
+ },
+ "2:2": {
+  "idea": "A sorting rule is what every shape in a group shares.",
+  "example": "Square, rectangle, kite → rule: 4 sides",
+  "steps": [
+   "Look at all the shapes in the group.",
+   "Find what is the same about every one.",
+   "That is the rule."
+  ],
+  "tip": "Check the rule works for every shape."
+ },
+ "2:3": {
+  "idea": "The same shapes can be sorted in more than one way.",
+  "example": "Sorted by colour → sort again by number of sides",
+  "steps": [
+   "Notice how the shapes are sorted now.",
+   "Pick a different feature: sides, size, colour or curved edges.",
+   "Sort them again using that feature."
+  ],
+  "tip": "A new rule makes new groups."
+ },
+ "3:1": {
+  "idea": "Pictures are made of shapes you know.",
+  "example": "Robot: square head, rectangle body, circle eyes",
+  "steps": [
+   "Pick one kind of shape to look for.",
+   "Tap every shape of that kind.",
+   "Then look for the next kind."
+  ],
+  "tip": "Look carefully at small shapes too."
+ },
+ "3:2": {
+  "idea": "Busy pictures hide more shapes. Hunt carefully and count each kind.",
+  "example": "House: 1 triangle roof, 2 square windows, 1 rectangle door",
+  "steps": [
+   "Choose one kind of shape.",
+   "Find and count every one in the picture.",
+   "Move on to the next kind."
+  ],
+  "tip": "Tick off shapes as you find them so you don't count twice."
+ },
+ "3:3": {
+  "idea": "Find every shape in the busiest pictures.",
+  "example": "Castle: triangles on the towers, rectangles for the walls",
+  "steps": [
+   "Work through the picture one part at a time.",
+   "Name the shape of each part.",
+   "Check you haven't missed any."
+  ],
+  "tip": "Go slowly. Small shapes are easy to miss."
+ },
+ "4:1": {
+  "idea": "Everyday objects have shapes we know.",
+  "example": "Clock → circle; door → rectangle; window → square",
+  "steps": [
+   "Look at the outline of the object.",
+   "Match it to a shape.",
+   "Say the shape's name."
+  ],
+  "tip": "Look at the object's front face."
+ },
+ "4:2": {
+  "idea": "Two objects can be the same shape or different shapes.",
+  "example": "A window and a present → both squares",
+  "steps": [
+   "Name the shape of each object.",
+   "Compare the two names.",
+   "Say whether they are the same or different."
+  ],
+  "tip": "Different things can be the same shape."
+ },
+ "4:3": {
+  "idea": "Objects that share a shape make a pair.",
+  "example": "Pizza and clock → circles",
+  "steps": [
+   "Name each object's shape.",
+   "Find another object with the same shape.",
+   "Pair them up."
+  ],
+  "tip": "For memory match, say the shape aloud to remember it."
+ },
+ "5:1": {
+  "idea": "Join the corners in order to make a shape.",
+  "example": "4 stars joined in order → square",
+  "steps": [
+   "Start at one corner.",
+   "Join each corner to the next, in order.",
+   "Join the last corner back to the start."
+  ],
+  "tip": "Don't cross over the middle of the shape."
+ },
+ "5:2": {
+  "idea": "A shape with a gap needs one more side.",
+  "example": "Square with a gap → join the two corners beside the gap",
+  "steps": [
+   "Find the gap.",
+   "Find the two corners on either side of it.",
+   "Join those two corners."
+  ],
+  "tip": "The new side should match the others."
+ },
+ "5:3": {
+  "idea": "A shape stays the same shape when it is made larger, smaller or turned.",
+  "example": "A small square and a big square → both squares",
+  "steps": [
+   "Look at the sides and corners of each shape.",
+   "Ignore the size and the turn.",
+   "Say what is the same and what is different."
+  ],
+  "tip": "Size changes; the shape does not."
+ },
+ "6:1": {
+  "idea": "Build a route by choosing moves in order.",
+  "example": "Rover → 2 right, 1 up → star",
+  "steps": [
+   "Find where the rover starts and where the goal is.",
+   "Choose each move in order.",
+   "Run the route to test it."
+  ],
+  "tip": "Count the squares carefully."
+ },
+ "6:2": {
+  "idea": "A mission route must reach the goal and follow the rule.",
+  "example": "Visit the checkpoint, then the flag",
+  "steps": [
+   "Read the mission rule.",
+   "Plan moves that follow the rule.",
+   "Run the route and check it worked."
+  ],
+  "tip": "Check the rule before you run it."
+ },
+ "6:3": {
+  "idea": "Plan a route that collects checkpoints and avoids blocked squares.",
+  "example": "Go around the asteroid, through the checkpoint, to the goal",
+  "steps": [
+   "Mark the checkpoints and blocked squares.",
+   "Plan a path around the blocks and through the checkpoints.",
+   "Run it to test."
+  ],
+  "tip": "More than one route can work."
+ },
+ "7:1": {
+  "idea": "A route with one wrong step won't reach the goal. Find the step.",
+  "example": "Steps: right, right, down… but the goal is up → step 3 is wrong",
+  "steps": [
+   "Follow the route one step at a time.",
+   "Find where it starts heading away from the goal.",
+   "That is the wrong step."
+  ],
+  "tip": "Use your finger to follow the moves."
+ },
+ "7:2": {
+  "idea": "Finish a route that has been started.",
+  "example": "Started: right, right → add up, up to reach the star",
+  "steps": [
+   "Follow the moves already there.",
+   "See where the rover is now.",
+   "Add the moves it still needs."
+  ],
+  "tip": "Count how many squares are left."
+ },
+ "7:3": {
+  "idea": "Test a route, then fix it until it works.",
+  "example": "Run it → it misses → fix the wrong step → run again",
+  "steps": [
+   "Run the route.",
+   "If it misses, find the wrong step.",
+   "Fix it and run it again."
+  ],
+  "tip": "Fix one step at a time."
+ },
+ "8:1": {
+  "idea": "Landmarks can be named by their shape.",
+  "example": "The round landmark → circle",
+  "steps": [
+   "Look at the landmark's outline.",
+   "Count its sides or check if it is curved.",
+   "Name its shape family."
+  ],
+  "tip": "Use the same shape rules as before."
+ },
+ "8:2": {
+  "idea": "Plan a route, test it, and fix any wrong step.",
+  "example": "Plan → run → fix",
+  "steps": [
+   "Plan the moves to the goal.",
+   "Run the route.",
+   "Fix any step that heads the wrong way."
+  ],
+  "tip": "Testing shows mistakes quickly."
+ },
+ "8:3": {
+  "idea": "Record a clear route someone else could follow.",
+  "example": "Right 2, up 1, right 1",
+  "steps": [
+   "Write each move with its direction and number of squares.",
+   "Keep the moves in order.",
+   "Check the route reaches the goal."
+  ],
+  "tip": "Clear directions use the same words each time."
+ }
+}

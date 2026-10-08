@@ -9,6 +9,26 @@
   ],
   "tip": "Multiplying is faster than counting every square."
  },
+ "1:2": {
+  "idea": "Area of a rectangle = length × width.",
+  "example": "8 cm × 5 cm = 40 cm²",
+  "steps": [
+   "Find the length.",
+   "Find the width.",
+   "Multiply and write square units."
+  ],
+  "tip": "Adding the sides gives perimeter, not area."
+ },
+ "1:3": {
+  "idea": "Use length × width to investigate area.",
+  "example": "Two rectangles: 6 × 4 = 24 and 8 × 3 = 24 → same area",
+  "steps": [
+   "Find each length and width.",
+   "Multiply for each area.",
+   "Compare the areas."
+  ],
+  "tip": "Different shapes can share an area."
+ },
  "2:1": {
   "idea": "Split a composite shape into rectangles, find each area, then add.",
   "example": "L-shape → 12 cm² + 8 cm² = 20 cm²",
@@ -18,6 +38,66 @@
    "Add the areas for the total."
   ],
   "tip": "Make sure the rectangles don't overlap."
+ },
+ "2:2": {
+  "idea": "Find a composite area by splitting into rectangles.",
+  "example": "10 × 4 = 40 and 3 × 2 = 6 → 46 m²",
+  "steps": [
+   "Split the shape into rectangles.",
+   "Find each area with length × width.",
+   "Add them."
+  ],
+  "tip": "Find missing side lengths from the ones given."
+ },
+ "2:3": {
+  "idea": "Use composite area in design problems.",
+  "example": "L-shaped garden → split, find each part, add",
+  "steps": [
+   "Split into rectangles.",
+   "Calculate each area.",
+   "Add for the total and answer the design question."
+  ],
+  "tip": "Don't count any part twice."
+ },
+ "3:1": {
+  "idea": "Choose a design using area = length × width.",
+  "example": "5 m × 6 m = 30 m² fits a 30 m² brief",
+  "steps": [
+   "Read the area the design needs.",
+   "Try lengths and widths that multiply to it.",
+   "Check other limits like fitting the space."
+  ],
+  "tip": "Several rectangles can have the same area."
+ },
+ "3:2": {
+  "idea": "Composite area: split, multiply, add.",
+  "example": "8 × 3 + 4 × 2 = 24 + 8 = 32 m²",
+  "steps": [
+   "Split the shape.",
+   "Find each rectangle's area.",
+   "Add the areas."
+  ],
+  "tip": "Check the pieces don't overlap."
+ },
+ "3:3": {
+  "idea": "Meet area constraints by adjusting the design.",
+  "example": "Need at least 40 m² → 8 × 5 works",
+  "steps": [
+   "Read the constraint.",
+   "Calculate each option's area.",
+   "Choose one that meets every constraint."
+  ],
+  "tip": "Check every rule, not just the area."
+ },
+ "4:1": {
+  "idea": "The same length can be written in different units.",
+  "example": "1.5 m = 150 cm; 0.5 m = 50 cm",
+  "steps": [
+   "1 m = 100 cm; 1 cm = 10 mm.",
+   "Big to small unit: multiply.",
+   "Small to big unit: divide."
+  ],
+  "tip": "A smaller unit gives a bigger number."
  },
  "4:2": {
   "idea": "Convert mass and capacity by multiplying or dividing by 1000.",
@@ -68,6 +148,16 @@
    "Plan from the deadline backwards if you must arrive by a time."
   ],
   "tip": "12:30 am is 00:30; 12:30 pm is 12:30."
+ },
+ "6:1": {
+  "idea": "Angles on a straight line add to 180°; around a point, 360°.",
+  "example": "Straight line: 110° + x = 180° → x = 70°",
+  "steps": [
+   "Decide: straight line (180°) or around a point (360°)?",
+   "Add the known angles.",
+   "Subtract from the total."
+  ],
+  "tip": "Reasoning is often faster than measuring."
  },
  "6:2": {
   "idea": "Angles around a point add up to 360°.",

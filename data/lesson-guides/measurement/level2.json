@@ -1,4 +1,84 @@
 {
+ "1:1": {
+  "idea": "Find how many more by comparing the two block counts.",
+  "example": "Snake 9 blocks, crayon 4 → 5 more",
+  "steps": [
+   "Measure both objects in blocks.",
+   "Subtract the smaller count from the bigger.",
+   "9 − 4 = 5 more blocks."
+  ],
+  "tip": "'How many more' means find the difference."
+ },
+ "1:2": {
+  "idea": "Order lengths by their block counts.",
+  "example": "Crayon 5, pencil 7, ruler 10 → shortest to longest",
+  "steps": [
+   "Measure each object.",
+   "Compare the counts.",
+   "Order them from smallest to biggest."
+  ],
+  "tip": "Trust the blocks, not the picture."
+ },
+ "1:3": {
+  "idea": "Choose the best tool for what you are measuring.",
+  "example": "Pencil case → ruler; playground → trundle wheel",
+  "steps": [
+   "Think about how long the object is.",
+   "Small things suit cubes or a ruler.",
+   "Long distances suit a metre stick or trundle wheel."
+  ],
+  "tip": "A tool that is too big or too small gives a poor measure."
+ },
+ "2:1": {
+  "idea": "Measure mass with cubes, then find how many more.",
+  "example": "Teddy 9 cubes, feather 1 → 8 more",
+  "steps": [
+   "Count the cubes for each object.",
+   "Subtract the smaller from the bigger.",
+   "9 − 1 = 8 more cubes."
+  ],
+  "tip": "Measure; don't guess."
+ },
+ "2:2": {
+  "idea": "Order and compare masses using cube counts.",
+  "example": "Backpack 12, shoe 5 → 7 more cubes",
+  "steps": [
+   "Measure each object.",
+   "Order them from heaviest to lightest.",
+   "Subtract to find the difference."
+  ],
+  "tip": "More cubes means more mass."
+ },
+ "2:3": {
+  "idea": "Prove which is heavier with the cube counts.",
+  "example": "Small rock 8 cubes, big balloon 2 cubes → rock is heavier",
+  "steps": [
+   "Measure both objects.",
+   "Compare the counts.",
+   "Explain using the numbers, not the size."
+  ],
+  "tip": "Big things can be light."
+ },
+ "3:1": {
+  "idea": "Count the cups, compare, and find how many more.",
+  "example": "Watering can 9 cups, teapot 4 → 5 more",
+  "steps": [
+   "Count the cups each container holds.",
+   "Compare them.",
+   "Subtract to find how many more."
+  ],
+  "tip": "Use the same cup for every container."
+ },
+ "3:2": {
+  "idea": "Order containers by their cup counts.",
+  "example": "Bottle 3, jug 6, bucket 10 → least to greatest",
+  "steps": [
+   "Read each container's cup count.",
+   "Compare them.",
+   "Order from least to greatest."
+  ],
+  "tip": "Two containers with the same count hold the same."
+ },
  "3:3": {
   "idea": "Choose a unit that suits the size of the container.",
   "example": "Fill a fish tank → use a jug, not a spoon",
@@ -8,6 +88,56 @@
    "Big containers suit big units, like a jug or bucket."
   ],
   "tip": "Too small a unit means too many fills to count."
+ },
+ "4:1": {
+  "idea": "If big blocks don't fit exactly, finish with smaller blocks.",
+  "example": "Rope: 6 big blocks and 2 small blocks",
+  "steps": [
+   "Lay big blocks along the object.",
+   "Fill the leftover bit with small blocks.",
+   "Give both counts."
+  ],
+  "tip": "Smaller blocks give a closer measure."
+ },
+ "4:2": {
+  "idea": "Estimate first, then measure to check.",
+  "example": "Guess 6 blocks, measure 7 → close",
+  "steps": [
+   "Look at the object and make a sensible guess.",
+   "Measure it.",
+   "Compare your estimate with the measurement."
+  ],
+  "tip": "Use a known length to help you guess."
+ },
+ "4:3": {
+  "idea": "Smaller units give bigger counts for the same object.",
+  "example": "Crayon: 3 dominoes or 6 paper clips",
+  "steps": [
+   "Measure the object with each unit.",
+   "Compare the counts.",
+   "Smaller units need more to cover the same length."
+  ],
+  "tip": "The object's length doesn't change."
+ },
+ "5:1": {
+  "idea": "When the minute hand points to 12, it is o'clock.",
+  "example": "Minute hand on 12, hour hand on 3 → 3 o'clock",
+  "steps": [
+   "Look at the long minute hand first.",
+   "If it points to 12, it is o'clock.",
+   "Read the hour from the short hand."
+  ],
+  "tip": "The long hand is minutes; the short hand is hours."
+ },
+ "5:2": {
+  "idea": "When the minute hand points to 6, it is half past.",
+  "example": "Minute hand on 6, hour hand between 4 and 5 → half past 4",
+  "steps": [
+   "Check the minute hand points to 6.",
+   "Look at the hour hand, between two numbers.",
+   "Say half past the smaller number."
+  ],
+  "tip": "Half past is halfway to the next hour."
  },
  "5:3": {
   "idea": "A fraction of a shape uses equal parts.",
@@ -19,6 +149,26 @@
   ],
   "tip": "Unequal parts are not halves or quarters."
  },
+ "6:1": {
+  "idea": "When the minute hand points to 3, it is quarter past.",
+  "example": "Minute hand on 3, hour hand just past 5 → quarter past 5",
+  "steps": [
+   "Check the minute hand points to 3.",
+   "Read the hour the short hand has just passed.",
+   "Say quarter past that hour."
+  ],
+  "tip": "Quarter past is 15 minutes after the hour."
+ },
+ "6:2": {
+  "idea": "When the minute hand points to 9, it is quarter to.",
+  "example": "Minute hand on 9, hour hand nearly at 8 → quarter to 8",
+  "steps": [
+   "Check the minute hand points to 9.",
+   "Find the hour the short hand is nearly reaching.",
+   "Say quarter to that hour."
+  ],
+  "tip": "Quarter to is 15 minutes before the hour."
+ },
  "6:3": {
   "idea": "A turn can be a quarter, half, three-quarter or full turn.",
   "example": "Facing north, quarter turn clockwise → facing east",
@@ -28,5 +178,65 @@
    "Count quarter turns: 1 = quarter, 2 = half, 3 = three-quarter, 4 = full."
   ],
   "tip": "A full turn brings you back to where you started."
+ },
+ "7:1": {
+  "idea": "Count the days between dates by counting the jumps.",
+  "example": "4th to 7th → 3 days",
+  "steps": [
+   "Start on the first date.",
+   "Count each jump forward to the second date.",
+   "Don't count the start day."
+  ],
+  "tip": "Count jumps, not boxes."
+ },
+ "7:2": {
+  "idea": "Count forward from today to find how many days until an event.",
+  "example": "Today the 16th, event on the 20th → 4 days",
+  "steps": [
+   "Start at today.",
+   "Count forward one day at a time.",
+   "Stop at the event date."
+  ],
+  "tip": "Today is not day one."
+ },
+ "7:3": {
+  "idea": "Use calendar clues to solve date problems.",
+  "example": "3 days after the 12th → the 15th",
+  "steps": [
+   "Find the date the clue starts from.",
+   "Count forward or back the number of days.",
+   "Read the date you land on."
+  ],
+  "tip": "Before means count back; after means count forward."
+ },
+ "8:1": {
+  "idea": "Decide what you are measuring, then choose the tool.",
+  "example": "Mass of a rock → balance and cubes",
+  "steps": [
+   "Is it length, mass, capacity or time?",
+   "Choose the tool that measures that.",
+   "Measure and answer."
+  ],
+  "tip": "Read the question twice."
+ },
+ "8:2": {
+  "idea": "Read the mission, choose the measuring skill, then solve.",
+  "example": "Water in a watering can → capacity",
+  "steps": [
+   "Read the mission.",
+   "Name what is being measured.",
+   "Use that skill to solve it."
+  ],
+  "tip": "Different missions need different skills."
+ },
+ "8:3": {
+  "idea": "Use every measuring skill in the final trial.",
+  "example": "Lengths, masses, turns and estimates",
+  "steps": [
+   "Read each challenge.",
+   "Choose the right skill.",
+   "Check your answer."
+  ],
+  "tip": "Take each challenge one at a time."
  }
 }

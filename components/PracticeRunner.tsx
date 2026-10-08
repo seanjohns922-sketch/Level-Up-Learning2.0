@@ -1467,7 +1467,8 @@ export function PracticeRunner({
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>
-        {nativeGuide || lessonHelp ? <div className="bg-white p-5 text-slate-900">
+        {/* A written lesson guide explains the method, so it comes before a one-line intro scene. */}
+        {lessonHelp || (nativeGuide && !lowerGuide) ? <div className="bg-white p-5 text-slate-900">
           <NarratedLessonGuide title={lessonTitle}>{lessonHelp ?? (nativeGuide && <TaskRenderer task={nativeGuide} taskNonce={-1} callbacks={{markCorrect: closeHelp, markCorrectSoft: () => {}, markWrong: () => {}, advanceIntro: closeHelp}} />)}</NarratedLessonGuide>
           <div className="mt-5 flex flex-wrap items-center gap-3"><button type="button" onClick={closeHelp} className={`rounded-xl px-5 py-3 font-bold text-white ${primaryActionClass}`}>Back to practice</button><ReadAloudBtn text="Your practice timer is paused. Choose Back to practice when ready." label="Read instructions" /></div>
         </div> : lowerGuide ? <LowerLessonGuide guide={lowerGuide} title={lessonTitle ?? "Learn the skill"} realm={realmId ?? "number"} review onContinue={closeHelp} /> : null}

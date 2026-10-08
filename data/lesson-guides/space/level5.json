@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "A net is a flat shape that folds into a solid.",
+  "example": "2 triangles + 3 rectangles → triangular prism",
+  "steps": [
+   "Look at the flat faces in the net.",
+   "Picture folding them up.",
+   "Name the solid they make."
+  ],
+  "tip": "Each face of the net becomes a face of the solid."
+ },
+ "1:2": {
+  "idea": "Only some arrangements of six squares fold into a cube.",
+  "example": "Cross shape → cube; a row of six squares → no",
+  "steps": [
+   "Fold the net in your head, face by face.",
+   "Check each face lands on a different side.",
+   "If two faces overlap, it isn't a cube net."
+  ],
+  "tip": "Six squares are not enough on their own."
+ },
+ "1:3": {
+  "idea": "Explain why a net works using folding evidence.",
+  "example": "Six faces meet edge to edge with no gaps or overlaps",
+  "steps": [
+   "Fold the net.",
+   "Check every face has its own side.",
+   "Explain: no gaps and no overlaps."
+  ],
+  "tip": "Give evidence from the fold."
+ },
+ "2:1": {
+  "idea": "Every flat piece of a net becomes one face.",
+  "example": "Square pyramid net → 1 square + 4 triangles = 5 faces",
+  "steps": [
+   "Count the flat pieces.",
+   "Name each shape.",
+   "The count is the number of faces."
+  ],
+  "tip": "Match the face shapes to the solid."
+ },
+ "2:2": {
+  "idea": "Follow one face through the fold to see where it lands.",
+  "example": "Marked face → the face opposite has no shared edge with it",
+  "steps": [
+   "Keep the marked face flat as the base.",
+   "Fold the faces next to it up as sides.",
+   "The face left over lands on top: opposite."
+  ],
+  "tip": "Opposite faces never touch."
+ },
+ "2:3": {
+  "idea": "Faces are either opposite or adjacent (sharing an edge).",
+  "example": "Two faces sharing an edge → adjacent",
+  "steps": [
+   "Fold the net in your head.",
+   "If the faces share an edge, they are adjacent.",
+   "If they sit across the cube, they are opposite."
+  ],
+  "tip": "Each cube face has 4 adjacent faces and 1 opposite face."
+ },
+ "3:1": {
+  "idea": "Tell solids apart by their nets.",
+  "example": "Square + 4 triangles → square pyramid",
+  "steps": [
+   "Count and name the faces.",
+   "Match them to a solid.",
+   "Fold to check."
+  ],
+  "tip": "Prisms have two matching ends."
+ },
+ "3:2": {
+  "idea": "Build your own cube net.",
+  "example": "Place six squares edge to edge, then fold to test",
+  "steps": [
+   "Place six squares, each joined edge to edge.",
+   "Fold to test.",
+   "If two faces clash, move one and test again."
+  ],
+  "tip": "There are 11 different cube nets."
+ },
+ "3:3": {
+  "idea": "Test a net for overlaps and gaps.",
+  "example": "Two faces fold onto the same side → overlap",
+  "steps": [
+   "Fold the net.",
+   "Watch for faces landing on the same side.",
+   "Watch for an open side with no face."
+  ],
+  "tip": "A good net closes perfectly."
+ },
+ "4:1": {
+  "idea": "Coordinates give the distance across, then up, from the origin.",
+  "example": "Star at (3, 2) → 3 across, 2 up",
+  "steps": [
+   "Start at the origin (0, 0).",
+   "Count across along the horizontal axis.",
+   "Then count up."
+  ],
+  "tip": "Across first, then up."
+ },
+ "4:2": {
+  "idea": "Plot a point by counting across then up; read it the same way.",
+  "example": "Plot (4, 1) → 4 across, 1 up",
+  "steps": [
+   "Start at (0, 0).",
+   "Move across the first number.",
+   "Move up the second number."
+  ],
+  "tip": "(4, 1) and (1, 4) are different points."
+ },
+ "4:3": {
+  "idea": "Spot a coordinate error by recounting.",
+  "example": "Labelled (5, 3) but it is 3 across, 5 up → (3, 5)",
+  "steps": [
+   "Count across from the origin.",
+   "Count up.",
+   "Compare with the label: are the numbers swapped?"
+  ],
+  "tip": "Swapping across and up is the most common error."
+ },
+ "5:1": {
+  "idea": "Moving along one direction changes only one number.",
+  "example": "(3, 5) moves 2 up → (3, 7)",
+  "steps": [
+   "Up or down changes only the second number.",
+   "Left or right changes only the first number.",
+   "Add or subtract the number of squares moved."
+  ],
+  "tip": "Right and up add; left and down subtract."
+ },
+ "5:2": {
+  "idea": "Follow commands in order to find the end position.",
+  "example": "Start (1, 1): right, right, up, up → (3, 3)",
+  "steps": [
+   "Start at the given point.",
+   "Apply each command one at a time.",
+   "Write the final coordinates."
+  ],
+  "tip": "Keep track after every move."
+ },
+ "5:3": {
+  "idea": "The best route reaches the goal in the fewest moves while avoiding blocks.",
+  "example": "Go around the blocked sector with as few moves as possible",
+  "steps": [
+   "Find the direct path.",
+   "Detour only where a block is in the way.",
+   "Count the moves and try for fewer."
+  ],
+  "tip": "Diagonal moves aren't allowed unless stated."
+ },
+ "6:1": {
+  "idea": "A translation slides every point the same distance.",
+  "example": "Slide 2 right, 1 up: (1, 1) → (3, 2)",
+  "steps": [
+   "Add the right move to x.",
+   "Add the up move to y.",
+   "Do the same for every corner."
+  ],
+  "tip": "The shape keeps its size and faces the same way."
+ },
+ "6:2": {
+  "idea": "Describe a slide by comparing a point with its image.",
+  "example": "(1, 1) → (4, 3) means 3 right, 2 up",
+  "steps": [
+   "Pick one corner and its image.",
+   "Count how far across it moved.",
+   "Count how far up it moved."
+  ],
+  "tip": "Use the same corner on both shapes."
+ },
+ "6:3": {
+  "idea": "A slide never flips or turns the shape.",
+  "example": "Image is flipped → not a slide",
+  "steps": [
+   "Check the size is the same.",
+   "Check the shape faces the same way.",
+   "If it is flipped or turned, it is not a translation."
+  ],
+  "tip": "Compare the direction one corner points."
+ },
+ "7:1": {
+  "idea": "A reflection flips a shape across a mirror line.",
+  "example": "Point 2 squares left of the line → image 2 squares right",
+  "steps": [
+   "Measure each point's distance from the line.",
+   "Place the image the same distance on the other side.",
+   "Do this for every corner."
+  ],
+  "tip": "The image faces the opposite way."
+ },
+ "7:2": {
+  "idea": "A rotation turns a shape around a centre point.",
+  "example": "Quarter turn clockwise about the centre",
+  "steps": [
+   "Find the centre.",
+   "Turn each point the same amount around it.",
+   "Each point stays the same distance from the centre."
+  ],
+  "tip": "Clockwise goes the way clock hands move."
+ },
+ "7:3": {
+  "idea": "Name the transformation: slide, flip or turn.",
+  "example": "Image faces the opposite way → flip (reflection)",
+  "steps": [
+   "Same facing → slide.",
+   "Mirrored → flip.",
+   "Rotated → turn."
+  ],
+  "tip": "Look at which way a corner points."
+ },
+ "8:1": {
+  "idea": "A design brief combines a net, a coordinate and a transformation.",
+  "example": "Cube net at (6, 2), slid 2 right",
+  "steps": [
+   "Read which net is needed.",
+   "Read where it goes.",
+   "Read how it moves."
+  ],
+  "tip": "Handle each part separately."
+ },
+ "8:2": {
+  "idea": "Build the net, place it, then transform it.",
+  "example": "Build a cube net, plot (6, 2), slide 2 right, 1 up",
+  "steps": [
+   "Build and test the net.",
+   "Plot the position.",
+   "Apply the transformation."
+  ],
+  "tip": "Every part must be right."
+ },
+ "8:3": {
+  "idea": "Prove every part works with evidence.",
+  "example": "Test the fold, fix the coordinate, check the image",
+  "steps": [
+   "Fold the net to test it.",
+   "Recount the coordinate.",
+   "Check the image keeps its size and facing."
+  ],
+  "tip": "Only submit when all three pass."
+ }
+}
