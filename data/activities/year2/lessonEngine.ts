@@ -22924,7 +22924,7 @@ function generateGenericQuestion(
             { prompt: "Which is larger?", answer: "7/10", options: ["7/10", "60%", "They are equal", "1/2"] },
           ]
         : [
-            { prompt: "Which benchmark is 7/10 closest to?", answer: "1", options: ["0", "1/2", "1", "It is equal to 1/2"] },
+            { prompt: "Which benchmark is 7/10 closest to?", answer: "1/2", options: ["0", "1/2", "1", "It is equal to 1"] },
             { prompt: "Which benchmark is 0.48 closest to?", answer: "1/2", options: ["0", "1/2", "1", "It is equal to 1"] },
             { prompt: "Which benchmark is 0.2 closest to?", answer: "0", options: ["0", "1/2", "1", "It is equal to 1/2"] },
             { prompt: "Which benchmark is 80% closest to?", answer: "1", options: ["0", "1/2", "1", "It is equal to 1/2"] },

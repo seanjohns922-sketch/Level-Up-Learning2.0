@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from '../data/lesson-guides/lower-level.ts';
+import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId, LESSON_GUIDES } from '../data/lesson-guides/lower-level.ts';
 import { PROGRAMS_BY_YEAR } from '../data/programs/index.ts';
 import { PATTERN_PEAKS_PROGRAMS, getPatternPeaksLessonConceptIntro } from '../data/programs/patternPeaks.ts';
 import { STATISTICA_PROGRAMS } from '../data/programs/statistica.ts';
@@ -50,6 +50,17 @@ for (const [key, guide] of Object.entries(topics)) {
   assert(guide.steps.length >= 2 && guide.steps.length <= 3, `Keep ${key} concise`);
   assert(guide.steps.every(step => step.trim().length > 8));
 }
+// Lesson-specific guides: every Number lesson in Levels 1–6 has its own, complete, concise guide.
+let own = 0;
+for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, set] of Object.entries(levels)) for (const [key, guide] of Object.entries(set)) {
+  assert(seen.has(`${realm}:${level}:${key}`), `Lesson guide for a nonexistent lesson: ${realm}:${level}:${key}`);
+  assert(guide.idea.length > 15 && guide.idea.length <= 140, `Idea length ${realm}:${level}:${key}`);
+  assert(guide.example.trim().length > 2 && guide.tip.length > 12, `Incomplete ${realm}:${level}:${key}`);
+  assert(guide.steps.length >= 2 && guide.steps.length <= 4 && guide.steps.every(step => step.trim().length > 8 && step.length <= 170), `Steps ${realm}:${level}:${key}`);
+  own++;
+}
+for (let level = 1; level <= 6; level++) for (const week of PROGRAMS_BY_YEAR[`Year ${level}`]) for (const lesson of week.lessons)
+  assert(LESSON_GUIDES.number[level]?.[`${week.week}:${lesson.lesson}`], `Number lesson without its own guide: ${level}:${week.week}:${lesson.lesson}`);
 for (const level of [0, 7, 8, undefined]) assert.equal(getLowerLessonGuide('number', level, 1, 1), null);
 assert.equal(getLowerLessonGuide('number', 1, 99, 1), null);
 assert.equal(lessonNumberFromId('y6-measurement-w8-l3'), 3);
@@ -69,4 +80,4 @@ const engine = fs.readFileSync('components/lesson/Year2LessonEngine.tsx', 'utf8'
 assert.match(engine, /skillGuideOpenRef\.current \? c : c - 1/);
 const guide = fs.readFileSync('components/lesson/LowerLessonGuide.tsx', 'utf8');
 for (const part of ['Read whole guide', 'Read example', 'Step ${i + 1}', 'Tip. ${guide.tip}', 'Read instructions']) assert(guide.includes(part), `Missing narration: ${part}`);
-console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} missing guides filled. Ground and Levels 7–8 excluded.`);
+console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific). Ground and Levels 7–8 excluded.`);
