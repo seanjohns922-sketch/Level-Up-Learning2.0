@@ -822,9 +822,8 @@ const conjecture: Form[] = [
     return { prompt: `Ravi claims every line through (0, 0) has the rule y = x. The line through (0, 0) and (${x}, ${n(m * x)}) has rule y = mx. Find m.`, answer: m, steps: [`y = mx at (${x}, ${n(m * x)}): ${n(m * x)} = m × ${x}.`, `m = ${n(m)}, so Ravi's claim is false.`] };
   },
   (r) => {
-    const m = pick(r, [2, -2]), x = nz(r, -3, 3), y = r(-5, 5), strict = r(0, 1) === 1, sym = strict ? "<" : "≤";
-    const ok = strict ? y < m * x : y <= m * x;
-    return yesNo(`Is the point (${n(x)}, ${n(y)}) in the region y ${sym} ${m === 2 ? "2x" : "−2x"}?`, ok, [`At x = ${n(x)}, the boundary has y = ${n(m * x)}.`, `${n(y)} ${sym} ${n(m * x)} is ${ok ? "true" : "false"}.`]);
+    const m = nz(r, -4, 5), c = r(-6, 6), x = r(-2, 4);
+    return { prompt: `Sam's conjecture: for y = mx + c, each time x increases by 1, y changes by m. Test it on ${rule(m, c)}: by how much does y change from x = ${n(x)} to x = ${n(x + 1)}? (Use a negative number for a decrease.)`, answer: m, steps: [`At x = ${n(x)}: y = ${n(m * x + c)}. At x = ${n(x + 1)}: y = ${n(m * (x + 1) + c)}.`, `Change: ${n(m * (x + 1) + c)} − ${n(m * x + c)} = ${n(m)}, the x-coefficient, so the conjecture holds here.`] };
   },
 ];
 
