@@ -78,9 +78,9 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
   else why('A wheel turns without slipping. Which model gives the distance travelled?','Circumference × number of complete turns.',['Radius × number of complete turns.','Diameter × number of complete turns.','Circumference ÷ number of complete turns.']);break;}
  // Week 7: students identify the relationship from the diagram or the described positions; prompts never name it.
  case 19:case 20:case 21: {
-  const relation:Relation=key===19?'corresponding':key===20?pick(['corresponding','alternate'] as const):pick(RELATIONS);
+  const relation:Relation=key===19?'corresponding':key===20?'alternate':pick(RELATIONS);
   const x=relation==='cointerior'?180-angle:angle,errors=relation==='cointerior'?[angle,360-angle,90]:[180-angle,360-angle,90];
-  task(apply?'The railway tracks are parallel. Find angle x.':`${parallelText} Find angle x.`,x,'°',relation==='cointerior'?`180 − ${angle}`:`${angle}`,`The marked angles are ${NAME[relation]} angles: ${RULE[relation]}.`,errors);
+  task(apply?'The railway tracks are parallel. Find angle x.':`${parallelText} Find angle x.`,x,'°',relation==='cointerior'?`180 − ${angle}`:'x',`The marked angles are ${NAME[relation]} angles: ${RULE[relation]}.`,errors);
   v('parallel',[angle],{relation,description:apply?'A straight road crosses two parallel railway tracks.':'The lines with matching arrow marks are parallel.'});
   reasonVisual=true;
   const wrongReason=relation==='corresponding'?'alternate angles are equal':relation==='alternate'?'corresponding angles are equal':'alternate angles sum to 180°';
@@ -102,7 +102,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
  case 23: {
   const relation=pick(RELATIONS),equal=relation!=='cointerior',name=NAME[relation];
   if(apply){const d=int(1,6),p=angle,q=equal?angle-d:180-angle-d;task(`A brace crosses two shelves. The ${name} angles measure ${p}° and ${q}°. By how many degrees must the ${q}° angle increase so the shelves are parallel?`,d,'°',equal?`${p} − ${q}`:`180 − ${p} − ${q}`,equal?`Parallel shelves need equal ${name} angles: ${p} − ${q} = ${d}.`:`Parallel shelves need co-interior angles summing to 180°: 180 − ${p} − ${q} = ${d}.`,[2*d,d+10,180-q]);}
-  else task(`A transversal crosses two lines. The ${name} angles are ${angle}° and x. What value of x makes the two lines parallel?`,equal?angle:180-angle,'°',equal?`${angle}`:`180 − ${angle}`,equal?`Lines are parallel exactly when ${name} angles are equal.`:'Lines are parallel exactly when co-interior angles sum to 180°.',equal?[180-angle,360-angle,90]:[angle,360-angle,90]);
+  else task(`A transversal crosses two lines. The ${name} angles are ${angle}° and x. What value of x makes the two lines parallel?`,equal?angle:180-angle,'°',equal?'x':`180 − ${angle}`,equal?`Lines are parallel exactly when ${name} angles are equal.`:'Lines are parallel exactly when co-interior angles sum to 180°.',equal?[180-angle,360-angle,90]:[angle,360-angle,90]);
   const parallel=variant%2===0,p=angle,q=equal?(parallel?angle:angle+pick([-4,-3,2,3,5])):(parallel?180-angle:180-angle+pick([-4,-2,2,3,5]));
   const property=equal?'equal':'sum to 180°';
   why(`A transversal crosses two lines. The ${name} angles measure ${p}° and ${q}°. Are the lines parallel?`,
@@ -112,7 +112,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
   const side=pick(['left','right'] as const);
   const supplement=apply?side==='left':side==='right',x=supplement?180-angle:angle;
   const explanationText=apply?(supplement?`The alternate angle is ${angle}°. Angle x is next to it on a straight line: 180 − ${angle} = ${x}°.`:`The alternate angle is ${angle}°. Angle x is vertically opposite it, so x = ${angle}°.`):(supplement?'These are co-interior angles, so they sum to 180°.':'These are alternate angles, so they are equal.');
-  task('The rails are parallel. Find angle x.',x,'°',supplement?`180 − ${angle}`:`${angle}`,explanationText,supplement?[angle,360-angle,90]:[180-angle,360-angle,90]);
+  task('The rails are parallel. Find angle x.',x,'°',supplement?`180 − ${angle}`:'x',explanationText,supplement?[angle,360-angle,90]:[180-angle,360-angle,90]);
   v('parallel',[angle],{relation:side==='left'?'alternate':'cointerior',anglePositions:['belowLeft',apply?(side==='left'?'belowRight':'belowLeft'):(side==='left'?'aboveRight':'aboveLeft')],description:'A diagonal brace crosses two parallel rails. The matching arrows mark the parallel rails.'});
   const d=int(1,4);
   if(variant%2)why(`A brace makes ${angle}° with the top rail and ${angle+d}° with the bottom rail, in alternate positions. What does this show?`,'The rails are not parallel, because alternate angles would be equal.',['The rails are parallel, because both angles are acute.','The rails are parallel, because the angles differ by less than 5°.','Nothing, because braces never form alternate angles.']);
@@ -206,8 +206,8 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
  }
  if(!prompt||options.length!==4||new Set(options).size!==4)throw Error(`Invalid question ${key}/${role}`);
  for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- const steps=role==='reasoning'?[guide.idea,reasonAnswer,'Check that the stated relationship applies to the given measurements.']:[guide.idea,`${formula} = ${fmt(answer)}${unit?' '+unit:''}.`,explanation];
- return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt,options,answer:result,explanation:role==='reasoning'?explanation:`${formula} = ${fmt(answer)} ${unit}. ${explanation}`,measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
+ const steps=role==='reasoning'?[guide.idea,reasonAnswer,'Check that the stated relationship applies to the given measurements.']:[guide.idea,`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}.`,explanation];
+ return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt,options,answer:result,explanation:role==='reasoning'?explanation:`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}. ${explanation}`,measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
 }
 export function generateMeasurement7Question(_level:unknown,lesson:Lesson,activity:LessonActivity) {
  if(!/^y7-measurement-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw Error('Unsupported Measurement Level 7 lesson');
