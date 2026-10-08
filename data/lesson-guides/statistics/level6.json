@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Continuous data is measured, so it can take any value in a range.",
+  "example": "Length between 6.2 and 6.4 cm → 6.3 cm",
+  "steps": [
+   "Check that the data is measured, not counted.",
+   "Any value between two measurements is possible.",
+   "Use the same unit and precision when recording."
+  ],
+  "tip": "Height, mass and time are continuous; number of pets is not."
+ },
+ "1:2": {
+  "idea": "Counting gives whole numbers; measuring gives values on a scale.",
+  "example": "Number of books → count; height → measure",
+  "steps": [
+   "Ask: am I counting or measuring?",
+   "Counting gives discrete data.",
+   "Measuring gives continuous data with units."
+  ],
+  "tip": "Measured data needs the same unit for every entry."
+ },
+ "1:3": {
+  "idea": "Only compare data sets that measure the same thing in the same way.",
+  "example": "Class A minutes vs Class B minutes → fair; minutes vs hours → not fair",
+  "steps": [
+   "Check both sets measure the same variable.",
+   "Check the units and method match.",
+   "Then compare peaks and spread."
+  ],
+  "tip": "Convert units before comparing."
+ },
+ "2:1": {
+  "idea": "The mode is the most common value in a data set.",
+  "example": "Pets: 0, 1, 1, 2, 1 → mode 1",
+  "steps": [
+   "Count each value.",
+   "Find the highest count.",
+   "That value is the mode."
+  ],
+  "tip": "The mode can be read as the tallest bar."
+ },
+ "2:2": {
+  "idea": "The range is the highest value minus the lowest.",
+  "example": "3, 4, 6, 9 → 9 − 3 = 6",
+  "steps": [
+   "Find the highest value: 9.",
+   "Find the lowest value: 3.",
+   "Subtract: 9 − 3 = 6."
+  ],
+  "tip": "The range measures spread, not the middle."
+ },
+ "2:3": {
+  "idea": "Describe the shape: peak, spread and any unusual values.",
+  "example": "Teeth lost: most at 1–2, one at 6 → peaks low, one outlier",
+  "steps": [
+   "Find the peak.",
+   "Find the range of the data.",
+   "Note any values far from the rest."
+  ],
+  "tip": "An outlier makes the range much bigger."
+ },
+ "3:1": {
+  "idea": "Side-by-side graphs compare two groups on the same scale.",
+  "example": "Group A range 5; Group B range 9 → B is more spread out",
+  "steps": [
+   "Check both graphs use the same scale.",
+   "Find each group's range.",
+   "The bigger range is more spread out."
+  ],
+  "tip": "Different scales can make a fair comparison look unfair."
+ },
+ "3:2": {
+  "idea": "Compare two groups by their peaks and ranges.",
+  "example": "Pets: Group A peaks at 1, Group B peaks at 2 → B higher",
+  "steps": [
+   "Find each group's peak.",
+   "Find each group's range.",
+   "Compare both and say which is higher or more varied."
+  ],
+  "tip": "Use more than one feature to compare."
+ },
+ "3:3": {
+  "idea": "Draw conclusions that the comparison supports.",
+  "example": "Laps: A range 3, B range 8 → 'B's results vary more.'",
+  "steps": [
+   "Compare the groups' features.",
+   "State what is different.",
+   "Only claim what the data shows."
+  ],
+  "tip": "Small samples can't prove a general rule."
+ },
+ "4:1": {
+  "idea": "Check a media claim by calculating the real share.",
+  "example": "Sport 30 of 120 → 30 ÷ 120 = 25%",
+  "steps": [
+   "Find the count and the total.",
+   "Divide the count by the total.",
+   "Multiply by 100 for a percentage."
+  ],
+  "tip": "A share needs the total, not just the count."
+ },
+ "4:2": {
+  "idea": "Check the evidence: who was asked, how many and how.",
+  "example": "20 people at a gym say 'everyone exercises' → biased sample",
+  "steps": [
+   "Look at the sample size.",
+   "Look at who was asked.",
+   "Decide if the sample represents everyone."
+  ],
+  "tip": "A small or one-sided sample gives weak evidence."
+ },
+ "4:3": {
+  "idea": "A conclusion must stay within what the data shows.",
+  "example": "Survey of one class → conclusion about that class only",
+  "steps": [
+   "Identify who the data came from.",
+   "Check the claim only covers that group.",
+   "Prefer conclusions that state their limits."
+  ],
+  "tip": "Don't stretch a small survey into a claim about everyone."
+ },
+ "5:1": {
+  "idea": "A broken axis can make small differences look big.",
+  "example": "98 and 100 on an axis starting at 97 → bar looks 3× taller",
+  "steps": [
+   "Check where the vertical axis starts.",
+   "Read the actual values.",
+   "Calculate the real difference: 100 − 98 = 2."
+  ],
+  "tip": "Always read the numbers, not just the bar heights."
+ },
+ "5:2": {
+  "idea": "Misleading graphics distort size, scale or labels.",
+  "example": "Doubling a picture's width and height makes it look 4 times bigger",
+  "steps": [
+   "Look for pictures scaled unfairly.",
+   "Look for missing or uneven scales.",
+   "Fix it with a fair scale starting at 0."
+  ],
+  "tip": "Equal values should look equal."
+ },
+ "5:3": {
+  "idea": "Critique a display using its numbers and its distortion.",
+  "example": "'The axis starts at 90, so a 2% change looks huge.'",
+  "steps": [
+   "Name the feature that misleads.",
+   "Use the real numbers to show the true change.",
+   "Suggest how to fix it."
+  ],
+  "tip": "A good critique names the problem and the real numbers."
+ },
+ "6:1": {
+  "idea": "Pose a clear question and refine it so it can be measured.",
+  "example": "'Do kids like sport?' → 'How many hours of sport do Year 6 students do each week?'",
+  "steps": [
+   "Make the question specific.",
+   "Name who you will ask.",
+   "Make the answer measurable."
+  ],
+  "tip": "Specific questions give useful data."
+ },
+ "6:2": {
+  "idea": "Analyse and compare groups using mode, range and shape.",
+  "example": "Year 5 range 6, Year 6 range 3 → Year 6 is more consistent",
+  "steps": [
+   "Calculate each group's mode and range.",
+   "Compare peaks and spread.",
+   "State what the comparison shows."
+  ],
+  "tip": "Compare the same statistics for each group."
+ },
+ "6:3": {
+  "idea": "Communicate findings and defend them with evidence.",
+  "example": "'Range 9 − 2 = 7, so results varied a lot.'",
+  "steps": [
+   "State your finding.",
+   "Support it with a calculation.",
+   "Say what limits your conclusion."
+  ],
+  "tip": "Evidence plus limits makes a strong conclusion."
+ }
+}

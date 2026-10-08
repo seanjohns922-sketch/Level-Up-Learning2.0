@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "In a many-to-one display, each symbol stands for more than one.",
+  "example": "Key: ● = 4. Shop A: ●●● → 3 × 4 = 12",
+  "steps": [
+   "Read the key: one symbol is worth 4.",
+   "Count the symbols: 3.",
+   "Multiply: 3 × 4 = 12."
+  ],
+  "tip": "Always read the key before counting."
+ },
+ "1:2": {
+  "idea": "Use the key to find each total.",
+  "example": "Key: ● = 5. Level 3: ●●●● → 20 cars",
+  "steps": [
+   "Count the symbols in the row: 4.",
+   "Multiply by the key value: 4 × 5.",
+   "Level 3 has 20 cars."
+  ],
+  "tip": "Don't just count symbols; multiply by the key."
+ },
+ "1:3": {
+  "idea": "Calculate and compare frequencies using the key.",
+  "example": "Key: ● = 2. Boat 4 ●●●●●● (12), Boat 3 ●●●● (8) → 4 more",
+  "steps": [
+   "Work out each total: 6 × 2 = 12 and 4 × 2 = 8.",
+   "Subtract: 12 − 8.",
+   "Boat 4 caught 4 more."
+  ],
+  "tip": "Find both totals before comparing."
+ },
+ "2:1": {
+  "idea": "The key tells you how many symbols to draw.",
+  "example": "Key: ● = 4. Total 16 → 16 ÷ 4 = 4 symbols",
+  "steps": [
+   "Read the key value: 4.",
+   "Divide the total by it: 16 ÷ 4.",
+   "Draw 4 symbols."
+  ],
+  "tip": "Number of symbols = total ÷ key value."
+ },
+ "2:2": {
+  "idea": "Build a many-to-one display so each row matches its total.",
+  "example": "Key: ● = 3. Crate 2 = 15 → 5 symbols",
+  "steps": [
+   "Divide each total by the key value.",
+   "Draw that many symbols in the row.",
+   "Check: symbols × key value = total."
+  ],
+  "tip": "Every row uses the same key."
+ },
+ "2:3": {
+  "idea": "A part symbol stands for part of the key value.",
+  "example": "Key: ● = 4. ●●◐ → 4 + 4 + 2 = 10",
+  "steps": [
+   "Count the whole symbols: 2 × 4 = 8.",
+   "A half symbol is half the key: 2.",
+   "8 + 2 = 10."
+  ],
+  "tip": "Half a symbol is worth half the key value."
+ },
+ "3:1": {
+  "idea": "Read a column graph using the scale on the side.",
+  "example": "10am bar reaches 35 → 35 visitors",
+  "steps": [
+   "Find the bar.",
+   "Read across from its top to the scale.",
+   "If it is between marks, use the halfway point."
+  ],
+  "tip": "Check what each line on the scale is worth."
+ },
+ "3:2": {
+  "idea": "Construct a column graph with a sensible scale.",
+  "example": "Cupcakes 12, 18, 9 → scale in 3s up to 18",
+  "steps": [
+   "Choose a scale that fits the biggest value.",
+   "Label the axes and give a title.",
+   "Draw each bar to its value."
+  ],
+  "tip": "The scale must go up in equal steps."
+ },
+ "3:3": {
+  "idea": "Interpret a column graph by checking statements against it.",
+  "example": "'Tuesday had the most books borrowed.' Tue 18, Wed 12 → supported",
+  "steps": [
+   "Read the values the statement uses.",
+   "Compare them.",
+   "Choose the statement the graph supports."
+  ],
+  "tip": "A statement is supported only if the numbers agree."
+ },
+ "4:1": {
+  "idea": "Data is concentrated where most of the values are.",
+  "example": "Apps opened: most days 3–4 → concentrated around 3–4",
+  "steps": [
+   "Look for the tallest columns or the most dots.",
+   "Find which values they sit at.",
+   "That is where the data is concentrated."
+  ],
+  "tip": "Look at the whole display, not just one bar."
+ },
+ "4:2": {
+  "idea": "Describe the shape: where it peaks and how it spreads.",
+  "example": "Most at 2, fewer at 5 → peaks low, tails off to the right",
+  "steps": [
+   "Find the peak: the most common value.",
+   "See whether the data is spread evenly or bunched.",
+   "Describe it in words: peaks at 2, spread out to 5."
+  ],
+  "tip": "Shape describes the pattern, not just one number."
+ },
+ "4:3": {
+  "idea": "Compare two distributions by their peaks.",
+  "example": "Group A peaks at 3; Group B peaks at 5 → B is higher",
+  "steps": [
+   "Find the peak of each group.",
+   "Compare the peak values.",
+   "The group with the higher peak tends to have higher values."
+  ],
+  "tip": "Compare the same thing for both groups."
+ },
+ "5:1": {
+  "idea": "Variation is how spread out the data is.",
+  "example": "Set A: 4, 4, 5. Set B: 1, 4, 8 → B varies more",
+  "steps": [
+   "Look at the smallest and largest values in each set.",
+   "Set A stays close together; Set B is spread out.",
+   "More spread means more variation."
+  ],
+  "tip": "Data that is all the same has no variation."
+ },
+ "5:2": {
+  "idea": "Compare variation by looking at how far the data spreads.",
+  "example": "Class A: 2 to 4. Class B: 0 to 8 → B has more variation",
+  "steps": [
+   "Find the lowest and highest values of each class.",
+   "Compare how far apart they are.",
+   "The wider spread has more variation."
+  ],
+  "tip": "Similar peaks can still have different spreads."
+ },
+ "5:3": {
+  "idea": "Compare data sets using both the peak and the spread.",
+  "example": "A peaks at 3, spread 2 to 4; B peaks at 6, spread 1 to 9",
+  "steps": [
+   "Compare the peaks: B is higher.",
+   "Compare the spreads: B is more spread out.",
+   "Describe both in a sentence."
+  ],
+  "tip": "Use two features to compare fairly."
+ },
+ "6:1": {
+  "idea": "Design a survey: choose a question, then plan how to collect the data.",
+  "example": "'How many minutes do you read each night?'",
+  "steps": [
+   "Pick a clear question with a measurable answer.",
+   "Decide who to ask.",
+   "Decide how to record and display the results."
+  ],
+  "tip": "A clear question gives data you can compare."
+ },
+ "6:2": {
+  "idea": "Investigate again: compare with the first results and look at variation.",
+  "example": "First class: mostly 20 min; second class: 10 to 40 min",
+  "steps": [
+   "Collect data a second time or from another group.",
+   "Compare peaks and spread.",
+   "Say how the results are the same or different."
+  ],
+  "tip": "Different groups usually give different results."
+ },
+ "6:3": {
+  "idea": "Review: read displays carefully using scales and keys.",
+  "example": "Key: ● = 3. Class 2: ●●●● → 12",
+  "steps": [
+   "Check the key or the scale first.",
+   "Read the value you are asked for.",
+   "Answer with the total, not the number of symbols."
+  ],
+  "tip": "Always check the key or scale before reading."
+ }
+}

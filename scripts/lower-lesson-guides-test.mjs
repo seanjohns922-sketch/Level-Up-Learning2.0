@@ -59,8 +59,11 @@ for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, 
   assert(guide.steps.length >= 2 && guide.steps.length <= 4 && guide.steps.every(step => step.trim().length > 8 && step.length <= 170), `Steps ${realm}:${level}:${key}`);
   own++;
 }
-for (let level = 1; level <= 6; level++) for (const week of PROGRAMS_BY_YEAR[`Year ${level}`]) for (const lesson of week.lessons)
-  assert(LESSON_GUIDES.number[level]?.[`${week.week}:${lesson.lesson}`], `Number lesson without its own guide: ${level}:${week.week}:${lesson.lesson}`);
+// Realms that have moved to lesson-specific guides must cover every lesson they teach.
+for (const key of seen) {
+  const [realm, level, week, lesson] = key.split(':');
+  if (LESSON_GUIDES[realm]) assert(LESSON_GUIDES[realm][level]?.[`${week}:${lesson}`], `Lesson without its own guide: ${key}`);
+}
 for (const level of [0, 7, 8, undefined]) assert.equal(getLowerLessonGuide('number', level, 1, 1), null);
 assert.equal(getLowerLessonGuide('number', 1, 99, 1), null);
 assert.equal(lessonNumberFromId('y6-measurement-w8-l3'), 3);

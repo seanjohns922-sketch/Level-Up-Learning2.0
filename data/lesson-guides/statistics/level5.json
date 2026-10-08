@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Nominal data is categories with no natural order.",
+  "example": "Favourite sport: soccer, netball, swimming",
+  "steps": [
+   "Check that the answers are names or labels.",
+   "Check there is no order between them.",
+   "Make the categories clear and non-overlapping."
+  ],
+  "tip": "Eye colour is nominal; shirt sizes are not, because they have an order."
+ },
+ "1:2": {
+  "idea": "Ordinal data is categories that have an order.",
+  "example": "Mild → Medium → Hot",
+  "steps": [
+   "Check that the categories are labels.",
+   "Decide if there is a natural order.",
+   "Put them in order from lowest to highest."
+  ],
+  "tip": "The order matters, but the gaps between categories may not be equal."
+ },
+ "1:3": {
+  "idea": "Discrete numerical data is counted in whole numbers.",
+  "example": "Number of siblings: 0, 1, 2, 3",
+  "steps": [
+   "Check that the answer is counted, not measured.",
+   "Counts are whole numbers.",
+   "2.5 siblings is not a valid answer."
+  ],
+  "tip": "'How many' questions usually give discrete data."
+ },
+ "2:1": {
+  "idea": "Check data for entries that can't be right.",
+  "example": "Ages: 10, 11, −3, 10 → −3 needs checking",
+  "steps": [
+   "Read every entry.",
+   "Ask: is this possible for this question?",
+   "Mark impossible, misspelled or unclear entries."
+  ],
+  "tip": "Misspellings like 'Buss' and words like 'many' also need checking."
+ },
+ "2:2": {
+  "idea": "Validate data by testing each entry against the question.",
+  "example": "Height in m: 1.48, 14.8 → 14.8 m needs checking",
+  "steps": [
+   "Know what sensible values look like.",
+   "Compare each entry with that range.",
+   "Flag any entry that doesn't fit."
+  ],
+  "tip": "Check the units match the question."
+ },
+ "2:3": {
+  "idea": "Clean the data: fix or remove entries that are wrong.",
+  "example": "Bus, Buss, bus → all 'Bus'",
+  "steps": [
+   "Find entries that mean the same thing but are written differently.",
+   "Make them match.",
+   "Remove entries that cannot be fixed."
+  ],
+  "tip": "Cleaning should not change genuine answers."
+ },
+ "3:1": {
+  "idea": "The mode is the most common value.",
+  "example": "2, 3, 3, 5 → mode 3",
+  "steps": [
+   "Count how often each value appears.",
+   "Find the value that appears most.",
+   "That value is the mode."
+  ],
+  "tip": "The mode is a value, not how many times it appears."
+ },
+ "3:2": {
+  "idea": "Data can have more than one mode.",
+  "example": "1, 1, 2, 3, 3 → modes 1 and 3",
+  "steps": [
+   "Count each value's frequency.",
+   "Find the highest frequency.",
+   "Every value with that frequency is a mode."
+  ],
+  "tip": "If every value appears once, there is no mode."
+ },
+ "3:3": {
+  "idea": "Describe the shape: where data is concentrated and where it spreads.",
+  "example": "Most values at 4–5, a few at 9 → bunched low with a tail",
+  "steps": [
+   "Find where most data sits.",
+   "Look for values far from the rest.",
+   "Describe the peak and the spread."
+  ],
+  "tip": "A long tail means a few values are much larger or smaller."
+ },
+ "4:1": {
+  "idea": "A line graph shows how something changes over time.",
+  "example": "Tue point at 12 mm → rainfall on Tuesday was 12 mm",
+  "steps": [
+   "Find the time on the bottom axis.",
+   "Go up to the point on the line.",
+   "Read across to the scale."
+  ],
+  "tip": "Read the scale's units, like mm or cm."
+ },
+ "4:2": {
+  "idea": "The slope of the line shows the change between two times.",
+  "example": "Thu 8 → Fri 3: rainfall decreased by 5",
+  "steps": [
+   "Read both values.",
+   "If the line goes up, it increased; down, it decreased.",
+   "Subtract to find by how much."
+  ],
+  "tip": "A flat line means no change."
+ },
+ "4:3": {
+  "idea": "Use a line graph to find the highest, lowest and trends.",
+  "example": "Plant height highest at Wk6",
+  "steps": [
+   "Find the highest point on the line.",
+   "Read its time on the bottom axis.",
+   "Look at the overall direction for the trend."
+  ],
+  "tip": "The highest point is where the line peaks."
+ },
+ "5:1": {
+  "idea": "Match the data to the display that shows it best.",
+  "example": "Change over time → line graph; categories → column graph",
+  "steps": [
+   "Decide what kind of data you have.",
+   "Decide what the display must show: totals, change or comparison.",
+   "Choose the display with that feature."
+  ],
+  "tip": "Line graphs are for data that changes over time."
+ },
+ "5:2": {
+  "idea": "Compare two accurate displays to see which fits the job.",
+  "example": "Show the most popular → column graph is clearer than a list",
+  "steps": [
+   "Read the job the display must do.",
+   "Check what each display makes easy to see.",
+   "Pick the one that answers the job most directly."
+  ],
+  "tip": "An accurate display can still be the wrong choice."
+ },
+ "5:3": {
+  "idea": "Design a display and explain your choice.",
+  "example": "Monthly temperatures → line graph, because it shows change",
+  "steps": [
+   "Choose the display type.",
+   "Add a title, labelled axes and a scale.",
+   "Explain why it suits the data."
+  ],
+  "tip": "Give a reason linked to the data."
+ },
+ "6:1": {
+  "idea": "An unbiased question doesn't push people towards an answer.",
+  "example": "Biased: 'Don't you love pizza?' Unbiased: 'What is your favourite food?'",
+  "steps": [
+   "Read the question for leading words.",
+   "Remove words that suggest an answer.",
+   "Give fair choices."
+  ],
+  "tip": "Ask the question the same way to everyone."
+ },
+ "6:2": {
+  "idea": "Collect data, then check it is valid.",
+  "example": "Responses 'Bus', 'buss', '7' → check the typo and the number",
+  "steps": [
+   "Collect the responses.",
+   "Check each one makes sense for the question.",
+   "Fix or remove invalid entries."
+  ],
+  "tip": "Validate before you analyse."
+ },
+ "6:3": {
+  "idea": "Analyse the data and report what you found.",
+  "example": "Website visits rose from 120 in March to 200 in May",
+  "steps": [
+   "Read the key values from your display.",
+   "Describe the pattern or trend.",
+   "Report your finding with numbers."
+  ],
+  "tip": "Link your report back to the question."
+ }
+}

@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Data is information we collect to answer a question.",
+  "example": "Favourite fruit? 🍎🍎🍌🍎 → apple 3, banana 1",
+  "steps": [
+   "Read the question so you know what to collect.",
+   "Count each answer once as you tap it.",
+   "Write how many chose each answer."
+  ],
+  "tip": "Every answer counts once. Don't skip any."
+ },
+ "1:2": {
+  "idea": "Sorting puts things that are the same kind into one group.",
+  "example": "apple, carrot, juice, pear → fruit: apple, pear",
+  "steps": [
+   "Read the group names first.",
+   "Look at each item and ask which group it belongs to.",
+   "Put it in that group, then check every item has a group."
+  ],
+  "tip": "An item only goes in one group."
+ },
+ "1:3": {
+  "idea": "Collect data by counting each answer to a question.",
+  "example": "Weather: ☀️ ☀️ ☁️ ☀️ → sunny 3, cloudy 1",
+  "steps": [
+   "Look at each answer one at a time.",
+   "Add one to the count for that answer.",
+   "When you finish, the counts should add up to the total."
+  ],
+  "tip": "Check your counts add up to how many answers there are."
+ },
+ "2:1": {
+  "idea": "A list records each answer, one after another.",
+  "example": "Pets asked: cat, dog, cat, fish",
+  "steps": [
+   "Write each answer as you hear it.",
+   "Keep writing until everyone has answered.",
+   "Then sort the list into groups to count them."
+  ],
+  "tip": "Write every answer, even if it repeats."
+ },
+ "2:2": {
+  "idea": "Tally marks record counts. Every fifth mark crosses the four before it.",
+  "example": "7 → |||| ||",
+  "steps": [
+   "Draw one mark for each answer.",
+   "On the fifth mark, draw a line across the first four.",
+   "Start a new group for the next marks."
+  ],
+  "tip": "Groups of 5 make tallies quick to count."
+ },
+ "2:3": {
+  "idea": "Read a tally by counting groups of 5, then the extra marks.",
+  "example": "|||| |||| ||| → 5, 10, 11, 12, 13",
+  "steps": [
+   "Count each crossed group as 5: 5, 10.",
+   "Count on the single marks: 11, 12, 13.",
+   "The tally shows 13."
+  ],
+  "tip": "Count the groups by fives, not one mark at a time."
+ },
+ "3:1": {
+  "idea": "In a picture graph, each picture shows one vote.",
+  "example": "Apples: 🍎🍎🍎 → 3 votes",
+  "steps": [
+   "Look at how many votes each answer got.",
+   "Place one picture for each vote.",
+   "Line the pictures up so the rows are easy to compare."
+  ],
+  "tip": "Keep the pictures the same size and evenly spaced."
+ },
+ "3:2": {
+  "idea": "Read a picture graph by counting the pictures in each row.",
+  "example": "Swimming: ●●●●● → 5",
+  "steps": [
+   "Find the row you are asked about.",
+   "Count the pictures in that row.",
+   "The longest row has the most votes."
+  ],
+  "tip": "Count every picture once."
+ },
+ "3:3": {
+  "idea": "Use the graph to answer questions about the data.",
+  "example": "Sunny 6, Rainy 2 → 6 days were sunny",
+  "steps": [
+   "Read the question carefully.",
+   "Find the matching row or column.",
+   "Count it and answer with the number."
+  ],
+  "tip": "Answer the question that was asked, not a different one."
+ },
+ "4:1": {
+  "idea": "Most means the biggest count. Least means the smallest.",
+  "example": "Red 5, Blue 2, Green 4 → most: Red; least: Blue",
+  "steps": [
+   "Compare the counts or the column heights.",
+   "The tallest column is the most.",
+   "The shortest column is the least."
+  ],
+  "tip": "Read whether to rank from MOST or from LEAST."
+ },
+ "4:2": {
+  "idea": "Compare two counts to say which is more, less or the same.",
+  "example": "Cloudy 6, Sunny 4 → 2 more chose Cloudy",
+  "steps": [
+   "Find both counts: 6 and 4.",
+   "The bigger count has more.",
+   "How many more is the difference: 6 − 4 = 2."
+  ],
+  "tip": "Equal means both counts are the same."
+ },
+ "4:3": {
+  "idea": "Compare categories by looking at the difference between them.",
+  "example": "Soccer 7, Swimming 3 → Soccer has 4 more",
+  "steps": [
+   "Read each count.",
+   "Decide which is bigger.",
+   "Find how many more: 7 − 3 = 4."
+  ],
+  "tip": "Subtract the smaller count from the bigger one."
+ },
+ "5:1": {
+  "idea": "Data can answer a question when you read it carefully.",
+  "example": "How many chose Walk? Walk ●●●● → 4",
+  "steps": [
+   "Find the category in the question.",
+   "Count its pictures or read its number.",
+   "Say the answer as a number."
+  ],
+  "tip": "Check you counted the right row."
+ },
+ "5:2": {
+  "idea": "Check a statement against the data to decide true or false.",
+  "example": "'Apple got more than Banana.' Apple 5, Banana 3 → true",
+  "steps": [
+   "Find the numbers the statement talks about.",
+   "Compare them.",
+   "If the data agrees, it is true. If not, it is false."
+  ],
+  "tip": "Use the numbers, not what you think is likely."
+ },
+ "5:3": {
+  "idea": "The most popular answer is the one with the biggest count.",
+  "example": "Blue 7, Red 4, Green 2 → Blue",
+  "steps": [
+   "Look at every count.",
+   "Find the biggest one.",
+   "That answer is the most popular."
+  ],
+  "tip": "Look at all the categories before you choose."
+ },
+ "6:1": {
+  "idea": "An investigation starts with a question, then collects answers.",
+  "example": "Question: 'What is your favourite sport?'",
+  "steps": [
+   "Choose a question people can answer.",
+   "Ask everyone and record each answer.",
+   "Count the answers for each choice."
+  ],
+  "tip": "A good question has clear choices."
+ },
+ "6:2": {
+  "idea": "Show the data in a display so it is easy to read.",
+  "example": "Soccer 4, Netball 2 → 4 pictures, 2 pictures",
+  "steps": [
+   "Draw one picture for each vote.",
+   "Put each answer in its own row or column.",
+   "Label each row or column."
+  ],
+  "tip": "Use the same size picture every time."
+ },
+ "6:3": {
+  "idea": "Report what the data shows using the numbers.",
+  "example": "Red 6, Blue 3 → 'Red is the favourite. 3 more chose Red.'",
+  "steps": [
+   "Find the most and least popular answers.",
+   "Find how many more chose the top answer.",
+   "Say it in a sentence with the numbers."
+  ],
+  "tip": "A report uses numbers from the data."
+ }
+}

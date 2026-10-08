@@ -1,0 +1,182 @@
+{
+ "1:1": {
+  "idea": "Categorical data is words or labels, like colours or pets.",
+  "example": "Favourite music: pop, rock, pop → categorical",
+  "steps": [
+   "Look at the answers.",
+   "If they are words or groups, the data is categorical.",
+   "Count how many are in each category."
+  ],
+  "tip": "Numbers used as labels, like a shirt number, are still categorical."
+ },
+ "1:2": {
+  "idea": "Numerical data is counts or measurements.",
+  "example": "Goals each game: 2, 0, 3, 2 → numerical",
+  "steps": [
+   "Look at the answers.",
+   "If they are numbers you could count or measure, the data is numerical.",
+   "The most common value is the one that appears most."
+  ],
+  "tip": "Numerical data can be ordered from smallest to largest."
+ },
+ "1:3": {
+  "idea": "Decide if data is categorical or numerical, then read it.",
+  "example": "Pets per family: 0, 2, 3, 3 → numerical; 2 families had 3",
+  "steps": [
+   "Ask: are the answers words or numbers?",
+   "Numbers that count something are numerical.",
+   "Read the graph or table to answer the question."
+  ],
+  "tip": "'How many' questions give numerical data."
+ },
+ "2:1": {
+  "idea": "A question of interest is one we can answer by collecting data.",
+  "example": "'How do students in our class travel to school?'",
+  "steps": [
+   "Choose something people's answers will vary on.",
+   "Decide who to ask.",
+   "Collect and display the answers to find the most common."
+  ],
+  "tip": "Make sure the question can be answered with data."
+ },
+ "2:2": {
+  "idea": "Decide what data you need to answer the question.",
+  "example": "'How many books do we read?' → count books for each student",
+  "steps": [
+   "Read the question.",
+   "Decide if you need words (categories) or numbers (counts).",
+   "Decide how to record it: a tally or a table."
+  ],
+  "tip": "Collect only what the question needs."
+ },
+ "2:3": {
+  "idea": "A frequency table shows how many had each value.",
+  "example": "Books: 4 → frequency 5",
+  "steps": [
+   "Find the value in the first column.",
+   "Read across to the frequency column.",
+   "That is how many had that value."
+  ],
+  "tip": "Frequency means 'how many times'."
+ },
+ "3:1": {
+  "idea": "Tallies turn a list into counts.",
+  "example": "2, 3, 2, 2, 4 → 2: |||, 3: |, 4: |",
+  "steps": [
+   "Read the list one value at a time.",
+   "Make a tally mark next to that value.",
+   "Count the tallies for each value."
+  ],
+  "tip": "Cross off each value as you tally it."
+ },
+ "3:2": {
+  "idea": "A frequency table lists every value or category with its count.",
+  "example": "Pizza 8, Pasta 5, Salad 3 → fewest: Salad",
+  "steps": [
+   "Read the frequency for each row.",
+   "The biggest frequency is the most.",
+   "The smallest frequency is the fewest."
+  ],
+  "tip": "The frequencies add to the total number of answers."
+ },
+ "3:3": {
+  "idea": "Read and complete a frequency table.",
+  "example": "Pets: 0 → 3, 1 → 6, 2 → 4 → 4 families had 2",
+  "steps": [
+   "Find the value you need.",
+   "Read its frequency.",
+   "If a frequency is missing, count it from the data."
+  ],
+  "tip": "Check the total of the frequencies."
+ },
+ "4:1": {
+  "idea": "Choose a graph that shows the data clearly.",
+  "example": "Travel to school → column graph",
+  "steps": [
+   "Look at the categories or values.",
+   "A column graph shows counts clearly.",
+   "Read it to find the most and least."
+  ],
+  "tip": "Label both axes."
+ },
+ "4:2": {
+  "idea": "Build a column graph from a frequency table.",
+  "example": "Sport 6, Reading 4 → bars to 6 and 4",
+  "steps": [
+   "Put each category on the bottom axis.",
+   "Use the scale on the side.",
+   "Draw each bar up to its frequency."
+  ],
+  "tip": "Leave equal gaps between bars."
+ },
+ "4:3": {
+  "idea": "Compare categories using a display.",
+  "example": "Pop 9, Rock 5 → Pop has 4 more",
+  "steps": [
+   "Read both bars.",
+   "Subtract to compare: 9 − 5 = 4.",
+   "Say which is more and by how much."
+  ],
+  "tip": "Read the bar heights from the scale, not by guessing."
+ },
+ "5:1": {
+  "idea": "Evidence is the numbers in the display.",
+  "example": "Families with exactly 3 pets: bar at 3 → 4 families",
+  "steps": [
+   "Find the value on the axis.",
+   "Read the bar's height.",
+   "Use that number as your evidence."
+  ],
+  "tip": "Answer with the number, then explain where it came from."
+ },
+ "5:2": {
+  "idea": "An inference is a conclusion the data supports.",
+  "example": "Car 10, Bus 4, Walk 6 → 'Most students come by car.'",
+  "steps": [
+   "Look at all the counts.",
+   "Find what stands out: the biggest is Car.",
+   "Choose the conclusion that matches the data."
+  ],
+  "tip": "Don't conclude something the data doesn't show."
+ },
+ "5:3": {
+  "idea": "Use the data to answer the original question.",
+  "example": "'Favourite lunch?' Pizza 8 (most) → pizza",
+  "steps": [
+   "Re-read the question you started with.",
+   "Find the data that answers it.",
+   "Give the answer and the evidence."
+  ],
+  "tip": "The answer should link back to the question."
+ },
+ "6:1": {
+  "idea": "Plan an investigation: question, data type and recording.",
+  "example": "'Hours of screen time?' → numerical; record in a frequency table",
+  "steps": [
+   "Write the question.",
+   "Decide if the data is categorical or numerical.",
+   "Plan a table to record it."
+  ],
+  "tip": "Decide how you will record before collecting."
+ },
+ "6:2": {
+  "idea": "Represent the data, then read what it shows.",
+  "example": "Books read: build bars to match each frequency",
+  "steps": [
+   "Draw the graph from the frequency table.",
+   "Check each bar matches its frequency.",
+   "Find the most common value."
+  ],
+  "tip": "A graph should match the table exactly."
+ },
+ "6:3": {
+  "idea": "Report your findings with evidence.",
+  "example": "'Most students like pop: 9 of 20 chose it.'",
+  "steps": [
+   "State the main finding.",
+   "Give the numbers that support it.",
+   "Answer the investigation question."
+  ],
+  "tip": "Include numbers in your report."
+ }
+}

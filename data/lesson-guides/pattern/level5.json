@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "One multiplication fact gives two division facts.",
+  "example": "7 × 13 = 91 → 91 ÷ 7 = 13, 91 ÷ 13 = 7",
+  "steps": [
+   "The product is 91.",
+   "Divide by one factor to get the other.",
+   "91 ÷ 7 = 13 and 91 ÷ 13 = 7."
+  ],
+  "tip": "The same three numbers make the whole fact family."
+ },
+ "1:2": {
+  "idea": "Check a division by multiplying.",
+  "example": "78 ÷ 13 = 6? Check: 6 × 13 = 78 ✓",
+  "steps": [
+   "Multiply the answer by the divisor.",
+   "If you get the dividend back, the division is right.",
+   "6 × 13 = 78, so it checks."
+  ],
+  "tip": "Quotient × divisor = dividend."
+ },
+ "1:3": {
+  "idea": "Use fact families in equal groups, and fix reversed divisions.",
+  "example": "117 counters, 13 per group → 117 ÷ 13 = 9 groups",
+  "steps": [
+   "The total is 117; each group has 13.",
+   "Divide the total by the group size.",
+   "117 ÷ 13 = 9."
+  ],
+  "tip": "Division starts with the total: 13 ÷ 91 is backwards."
+ },
+ "2:1": {
+  "idea": "Scale a known fact to larger numbers.",
+  "example": "12 × 6 = 72 → 120 × 6 = 720 → 720 ÷ 120 = 6",
+  "steps": [
+   "Start with the known fact.",
+   "Multiply one factor by 10, so the product is 10 times bigger.",
+   "The related division uses the new numbers."
+  ],
+  "tip": "Keep track of where the extra zero goes."
+ },
+ "2:2": {
+  "idea": "Check larger divisions with the related multiplication.",
+  "example": "660 ÷ 11 = 60 → 60 × 11 = 660 ✓",
+  "steps": [
+   "Multiply the quotient by the divisor.",
+   "60 × 11 = 660.",
+   "It matches, so the division is right."
+  ],
+  "tip": "Large numbers follow the same inverse rules."
+ },
+ "2:3": {
+  "idea": "Apply an extended fact family to a grouping problem.",
+  "example": "1 080 counters, 12 per group → 90 groups",
+  "steps": [
+   "Divide the total by the group size: 1 080 ÷ 12.",
+   "Use 108 ÷ 12 = 9, then scale by 10.",
+   "90 groups."
+  ],
+  "tip": "Check: 90 × 12 = 1 080."
+ },
+ "3:1": {
+  "idea": "Decide if the missing number is a product or a factor.",
+  "example": "8 × ? = 64 → ? = 64 ÷ 8 = 8",
+  "steps": [
+   "If the product is missing, multiply.",
+   "If a factor is missing, divide the product by the other factor.",
+   "64 ÷ 8 = 8."
+  ],
+  "tip": "Name each part: factor × factor = product."
+ },
+ "3:2": {
+  "idea": "In division, find a missing dividend or divisor.",
+  "example": "? ÷ 6 = 4 → ? = 4 × 6 = 24",
+  "steps": [
+   "Missing dividend: multiply quotient × divisor.",
+   "Missing divisor: divide dividend ÷ quotient.",
+   "4 × 6 = 24."
+  ],
+  "tip": "Dividend ÷ divisor = quotient."
+ },
+ "3:3": {
+  "idea": "Use a small fact to solve a large inverse.",
+  "example": "6 × 6 = 36 → 60 × 6 = 360",
+  "steps": [
+   "Find the matching small fact.",
+   "Scale by the power of 10 in the larger number.",
+   "60 × 6 = 360."
+  ],
+  "tip": "Divide large numbers using the small fact, then fix the zeros."
+ },
+ "4:1": {
+  "idea": "Different expressions can have the same value.",
+  "example": "3 × 8 = 8 × 3 = 6 × 4 = 24",
+  "steps": [
+   "Work out the value of each expression.",
+   "Order of factors doesn't change the product.",
+   "Other factor pairs can give the same value."
+  ],
+  "tip": "Compare values, not how the expressions look."
+ },
+ "4:2": {
+  "idea": "Judge whether a multiplicative equation is true.",
+  "example": "4 × 10 = 4 + 10? → 40 ≠ 14 → false",
+  "steps": [
+   "Work out each side.",
+   "Compare the values.",
+   "If they differ, the equation is false."
+  ],
+  "tip": "× and + give very different results."
+ },
+ "4:3": {
+  "idea": "Build an equivalent expression by halving one factor and doubling the other.",
+  "example": "5 × 4 = 10 × 2",
+  "steps": [
+   "Double 5 to get 10.",
+   "Halve 4 to get 2.",
+   "The product stays 20."
+  ],
+  "tip": "If one factor doubles, the other must halve."
+ },
+ "5:1": {
+  "idea": "Turning an array swaps rows and columns but keeps the product.",
+  "example": "3 rows of 8 = 8 rows of 3 = 24",
+  "steps": [
+   "Count rows and columns before turning.",
+   "After turning, they swap.",
+   "The total stays 24."
+  ],
+  "tip": "Division doesn't work this way: 24 ÷ 3 ≠ 3 ÷ 24."
+ },
+ "5:2": {
+  "idea": "You can regroup three factors without changing the product.",
+  "example": "(2 × 3) × 7 = 2 × (3 × 7) = 42",
+  "steps": [
+   "Choose the easiest pair to multiply first.",
+   "Multiply that pair.",
+   "Multiply by the last factor."
+  ],
+  "tip": "This is the associative property."
+ },
+ "5:3": {
+  "idea": "Division gives different results when grouped differently.",
+  "example": "(64 ÷ 8) ÷ 4 = 2, but 64 ÷ (8 ÷ 4) = 32",
+  "steps": [
+   "Work out the brackets first in each expression.",
+   "(64 ÷ 8) ÷ 4 = 8 ÷ 4 = 2.",
+   "64 ÷ (8 ÷ 4) = 64 ÷ 2 = 32."
+  ],
+  "tip": "Brackets matter in division."
+ },
+ "6:1": {
+  "idea": "Split an array into two easier parts.",
+  "example": "4 × 13 = 4 × 10 + 4 × 3 = 40 + 12 = 52",
+  "steps": [
+   "Split the 13 columns into 10 and 3.",
+   "Find each part: 40 and 12.",
+   "Add the parts: 52."
+  ],
+  "tip": "Split at 10 to make an easy part."
+ },
+ "6:2": {
+  "idea": "Use a friendly ten fact, then add or subtract the rest.",
+  "example": "3 × 14 = 3 × 10 + 3 × 4 = 30 + 12 = 42",
+  "steps": [
+   "Find the ten fact: 3 × 10 = 30.",
+   "Find the extra part: 3 × 4 = 12.",
+   "30 + 12 = 42."
+  ],
+  "tip": "For 9 or 19, subtract instead: 3 × 9 = 30 − 3."
+ },
+ "6:3": {
+  "idea": "Find a hidden shared factor in a distributed equation.",
+  "example": "? × 10 + ? × 3 = 52 → ? × 13 = 52 → 4",
+  "steps": [
+   "Both parts share the same factor.",
+   "Combine: ? × 13 = 52.",
+   "52 ÷ 13 = 4."
+  ],
+  "tip": "The shared factor multiplies every part."
+ },
+ "7:1": {
+  "idea": "Find factors systematically by testing in order.",
+  "example": "Factors of 48: 1 × 48, 2 × 24, 3 × 16, 4 × 12, 6 × 8",
+  "steps": [
+   "Test 1, 2, 3, … in order.",
+   "If it divides exactly, write the pair.",
+   "Stop when the pairs start repeating."
+  ],
+  "tip": "Factors come in pairs."
+ },
+ "7:2": {
+  "idea": "Generate multiples by skip counting, then apply the clues.",
+  "example": "Multiple of 8 greater than 88 → 96",
+  "steps": [
+   "List multiples of 8 near 88: 80, 88, 96.",
+   "Apply the clue: greater than 88.",
+   "The first one is 96."
+  ],
+  "tip": "Check every condition in the clue."
+ },
+ "7:3": {
+  "idea": "Find every factor pair, and know when you're done.",
+  "example": "36: 1 × 36, 2 × 18, 3 × 12, 4 × 9, 6 × 6 → 5 pairs",
+  "steps": [
+   "Test each number from 1 upward.",
+   "Stop at 6, where the pairs meet.",
+   "Count the pairs: 5."
+  ],
+  "tip": "Once the factors meet, there are no new pairs."
+ },
+ "8:1": {
+  "idea": "Use arrays and fact families to recover missing values.",
+  "example": "16 counters in 4 rows → 4 columns",
+  "steps": [
+   "Write the array as rows × columns = total.",
+   "4 × ? = 16.",
+   "16 ÷ 4 = 4."
+  ],
+  "tip": "Use the inverse to recover a missing factor."
+ },
+ "8:2": {
+  "idea": "Solve connected equations in order.",
+  "example": "6 × 7 = □, □ ÷ 7 = ? → 42, then 6",
+  "steps": [
+   "Solve the first equation.",
+   "Use its answer in the second.",
+   "Solve the second."
+  ],
+  "tip": "The first answer feeds the next step."
+ },
+ "8:3": {
+  "idea": "Find the misused property and fix the argument.",
+  "example": "7 × 8 ≠ 7 × 4 + 4 → should be 7 × 4 + 7 × 4 = 56",
+  "steps": [
+   "Find where the property was used wrongly.",
+   "Each part must keep the same factor.",
+   "Fix the part, then recalculate the total."
+  ],
+  "tip": "In distribution, every part is multiplied."
+ }
+}

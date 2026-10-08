@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "A growing pattern adds the same number of tiles each stage.",
+  "example": "Stage 1: 5, Stage 2: 9, Stage 3: 13 → + 4",
+  "steps": [
+   "Compare the stages: 9 − 5 = 4.",
+   "Check the next jump is also 4.",
+   "Next stage: 13 + 4 = 17."
+  ],
+  "tip": "Find what is added, not just the total."
+ },
+ "1:2": {
+  "idea": "Record a pattern in a table to see the rule.",
+  "example": "Stage 1, 2, 3 → 4, 7, 10 tiles",
+  "steps": [
+   "Write each stage and its tile count in a table.",
+   "Find the change: + 3 each stage.",
+   "Extend the table: Stage 4 has 13."
+  ],
+  "tip": "The stage number goes up by 1 each column."
+ },
+ "1:3": {
+  "idea": "Write a rule for any stage, then predict a later one.",
+  "example": "Start 2, add 3 each stage → Stage 11 = 2 + 3 × 11 = 35",
+  "steps": [
+   "Find the jump: 3.",
+   "Find the starting value (Stage 0): 2.",
+   "Tiles = 2 + 3 × stage."
+  ],
+  "tip": "Use the rule instead of drawing every stage."
+ },
+ "2:1": {
+  "idea": "Fraction sequences add the same fraction each step.",
+  "example": "1/8, 3/8, 5/8, 7/8 → + 2/8",
+  "steps": [
+   "Use the same denominator for every term.",
+   "Find the change in the numerator: + 2.",
+   "Add the same amount for the next term."
+  ],
+  "tip": "Rename fractions with equivalent forms if needed."
+ },
+ "2:2": {
+  "idea": "Decimal sequences change by the same amount each step.",
+  "example": "1.0, 2.25, 3.5, 4.75 → + 1.25",
+  "steps": [
+   "Subtract two terms next to each other: 2.25 − 1.0.",
+   "Check the jump is the same each time.",
+   "Add it to find the next term: 6.0."
+  ],
+  "tip": "Line up decimal places when adding."
+ },
+ "2:3": {
+  "idea": "Work backwards by doing the opposite of the rule.",
+  "example": "Rule + 0.75; term 4.35 → before it 3.6",
+  "steps": [
+   "Find the rule.",
+   "Do the opposite to go back a step: − 0.75.",
+   "4.35 − 0.75 = 3.6."
+  ],
+  "tip": "Backwards means undo the rule."
+ },
+ "3:1": {
+  "idea": "A pattern, a table and a rule can show the same relationship.",
+  "example": "× 4 then + 7: 1 → 11, 2 → 15",
+  "steps": [
+   "Apply the rule to each input.",
+   "Check the outputs match the table.",
+   "Check the same rule describes the picture."
+  ],
+  "tip": "Multiply first, then add, in the order given."
+ },
+ "3:2": {
+  "idea": "Adding grows by a fixed amount; multiplying grows faster and faster.",
+  "example": "+ 4: 4, 8, 12, 16. × 4: 2, 8, 32, 128",
+  "steps": [
+   "Additive: the same jump each step.",
+   "Multiplicative: each term is multiplied, so the jumps grow.",
+   "Compare the sizes after a few steps."
+  ],
+  "tip": "Multiplying soon overtakes adding."
+ },
+ "3:3": {
+  "idea": "Recognise the same rule in a new form.",
+  "example": "'× 3 then + 6' = 'input × 3 + 6'",
+  "steps": [
+   "Write the rule in words or symbols.",
+   "Apply both to the same input.",
+   "If the outputs match, it is the same rule."
+  ],
+  "tip": "Test with a number to be sure."
+ },
+ "4:1": {
+  "idea": "Follow a multi-step machine in the order shown.",
+  "example": "Input 11 → × 7 → 77 → + 2 → 79",
+  "steps": [
+   "Do the first step: 11 × 7 = 77.",
+   "Do the next step: 77 + 2 = 79.",
+   "The output is 79."
+  ],
+  "tip": "Changing the order changes the output."
+ },
+ "4:2": {
+  "idea": "Work out a two-step rule from a table.",
+  "example": "1 → 15, 2 → 20, 3 → 25 → × 5, then + 10",
+  "steps": [
+   "Find the jump between outputs: 5. That is the multiplier.",
+   "Multiply an input by 5 and see what's left: 5 → 15 needs + 10.",
+   "Test the rule on every row."
+  ],
+  "tip": "The jump in outputs tells you the multiplier."
+ },
+ "4:3": {
+  "idea": "Design a machine and test it, including 0.",
+  "example": "× 8 then + 6: 0 → 6, 11 → 94",
+  "steps": [
+   "Choose the steps and their order.",
+   "Test with several inputs, including 0.",
+   "Explain the outputs: input 0 shows the 'add' part."
+  ],
+  "tip": "Testing 0 reveals what is added."
+ },
+ "5:1": {
+  "idea": "Brackets are worked out first.",
+  "example": "(13 + 7) × 4 = 20 × 4 = 80",
+  "steps": [
+   "Work out the brackets: 13 + 7 = 20.",
+   "Then multiply: 20 × 4 = 80.",
+   "Without brackets, × comes first: 13 + 28 = 41."
+  ],
+  "tip": "Brackets change the order, so they change the answer."
+ },
+ "5:2": {
+  "idea": "Place brackets to reach a target value.",
+  "example": "13 + 5 × 3 = 54 → (13 + 5) × 3",
+  "steps": [
+   "Without brackets: 13 + 15 = 28, too small.",
+   "Try brackets around the addition: (13 + 5) × 3 = 54.",
+   "That matches the target."
+  ],
+  "tip": "Try each possible place for the brackets."
+ },
+ "5:3": {
+  "idea": "Build an equivalent expression by distributing the multiplier.",
+  "example": "(13 + 8) × 8 = 13 × 8 + 8 × 8",
+  "steps": [
+   "The 8 multiplies each part in the brackets.",
+   "13 × 8 = 104 and 8 × 8 = 64.",
+   "Both forms equal 168."
+  ],
+  "tip": "Every part in the brackets gets multiplied."
+ },
+ "6:1": {
+  "idea": "Find an unknown inside brackets by undoing the steps in reverse.",
+  "example": "(□ + 11) × 5 = 105 → □ + 11 = 21 → □ = 10",
+  "steps": [
+   "Undo the last step first: ÷ 5 → 21.",
+   "Undo the addition: 21 − 11 = 10.",
+   "Check: (10 + 11) × 5 = 105."
+  ],
+  "tip": "Undo in the opposite order to how it was done."
+ },
+ "6:2": {
+  "idea": "Solve the same way whichever side the unknown is on.",
+  "example": "19 = 3 × □ + 4 → 15 = 3 × □ → □ = 5",
+  "steps": [
+   "Undo the + 4: 19 − 4 = 15.",
+   "Undo the × 3: 15 ÷ 3 = 5.",
+   "Check: 3 × 5 + 4 = 19."
+  ],
+  "tip": "An equation reads the same both ways."
+ },
+ "6:3": {
+  "idea": "Some equations have many pairs of solutions.",
+  "example": "a + b = 10 → (1, 9), (2, 8), (3, 7) …",
+  "steps": [
+   "Pick a value for one unknown.",
+   "Work out the other to keep the equation true.",
+   "Repeat to list more pairs."
+  ],
+  "tip": "Keep the total the same: if one goes up, the other goes down."
+ },
+ "7:1": {
+  "idea": "A gate tests a number and sends it to an exit.",
+  "example": "Gate: multiple of 4? 44 → yes → ÷ 4 → 11",
+  "steps": [
+   "Test the number against the gate's rule.",
+   "Follow the yes or no exit.",
+   "Apply that exit's step."
+  ],
+  "tip": "Check the test carefully before choosing an exit."
+ },
+ "7:2": {
+  "idea": "Debug a gate by retesting the number that went wrong.",
+  "example": "48, multiple of 4 → should exit yes: 48 ÷ 4 = 12",
+  "steps": [
+   "Test the number again.",
+   "Find the exit it should have taken.",
+   "Apply the correct step for the right output."
+  ],
+  "tip": "A wrong exit means the test was misread."
+ },
+ "7:3": {
+  "idea": "Program the gate so only the right numbers pass.",
+  "example": "Pass multiples of 9 → test 'divisible by 9?'",
+  "steps": [
+   "Decide which numbers should pass.",
+   "Write a test that only those numbers meet.",
+   "Check a few numbers that should and shouldn't pass."
+  ],
+  "tip": "Digit sums help: 117 → 1 + 1 + 7 = 9."
+ },
+ "8:1": {
+  "idea": "Model a growing structure with a rule, then test it.",
+  "example": "Start 4, add 5 each stage → Stage 13 = 4 + 5 × 13 = 69",
+  "steps": [
+   "Find what is added each stage.",
+   "Find the starting value.",
+   "Use start + jump × stage, then check with a drawn stage."
+  ],
+  "tip": "Test the rule on a stage you can count."
+ },
+ "8:2": {
+  "idea": "Solve a bracketed unknown with an undoing algorithm.",
+  "example": "(□ + 7) × 4 = 92 → 23 − 7 = 16",
+  "steps": [
+   "Undo × 4: 92 ÷ 4 = 23.",
+   "Undo + 7: 23 − 7 = 16.",
+   "Check: (16 + 7) × 4 = 92."
+  ],
+  "tip": "Undo the last operation first."
+ },
+ "8:3": {
+  "idea": "Test a general claim on the first stage and fix it.",
+  "example": "Claim: 3 + 6 × n. Stage 1 is 3, but 3 + 6 = 9 → wrong",
+  "steps": [
+   "Test the claim on Stage 1.",
+   "If it fails, compare with the real counts.",
+   "Fix the rule: 3 + 6 × (n − 1)."
+  ],
+  "tip": "One counterexample is enough to disprove a rule."
+ }
+}

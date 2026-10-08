@@ -1,0 +1,242 @@
+{
+ "1:1": {
+  "idea": "A sequence follows a rule. Look at what happens from one term to the next.",
+  "example": "5, 10, 20, 40, 80 → double each term",
+  "steps": [
+   "Compare the first two terms: 5 to 10.",
+   "Test the same change on the next pair: 10 to 20.",
+   "If it works every time, that is the rule: double."
+  ],
+  "tip": "Check the rule works for every step, not just the first."
+ },
+ "1:2": {
+  "idea": "Doubling and halving rules make terms grow or shrink quickly.",
+  "example": "10, 20, 40, ?, 160 → 80",
+  "steps": [
+   "Find the rule: each term is double the one before.",
+   "Double the term before the gap: 40 × 2 = 80.",
+   "Check: 80 doubled is 160."
+  ],
+  "tip": "To go backwards in a doubling sequence, halve."
+ },
+ "1:3": {
+  "idea": "Find the term that breaks the rule, then repair it.",
+  "example": "3, 6, 12, 25, 48 → 25 should be 24",
+  "steps": [
+   "Find the rule from terms that agree: double.",
+   "Test each step: 12 doubled is 24, not 25.",
+   "Replace the broken term: 24."
+  ],
+  "tip": "Use several steps to find the rule before judging one term."
+ },
+ "2:1": {
+  "idea": "Multiples come from adding the same number each time.",
+  "example": "3, 6, 9, ?, 15 → 12",
+  "steps": [
+   "Find the jump: + 3 each time.",
+   "Add 3 to the term before the gap: 9 + 3 = 12.",
+   "Check: 12 + 3 = 15."
+  ],
+  "tip": "Multiples of 3 are the 3 times table."
+ },
+ "2:2": {
+  "idea": "A decision path sends numbers different ways depending on a test.",
+  "example": "Is it even? 15 → no → odd path",
+  "steps": [
+   "Ask the question at the start: is the number even?",
+   "Even numbers end in 0, 2, 4, 6 or 8.",
+   "Follow the matching path and do its step."
+  ],
+  "tip": "Only one path is followed for each number."
+ },
+ "2:3": {
+  "idea": "Follow a two-step algorithm in order.",
+  "example": "8 → × 2 → 16 → + 6 → 22",
+  "steps": [
+   "Do the first step: 8 × 2 = 16.",
+   "Do the second step on the new number: 16 + 6 = 22.",
+   "The output is 22."
+  ],
+  "tip": "The order matters: + 6 then × 2 gives 28, not 22."
+ },
+ "3:1": {
+  "idea": "A function machine does the same thing to every input.",
+  "example": "Rule + 5: 6 → 11",
+  "steps": [
+   "Read the rule.",
+   "Apply it to the input: 6 + 5.",
+   "The output is 11."
+  ],
+  "tip": "Use the same rule for every input."
+ },
+ "3:2": {
+  "idea": "Discover a rule by testing it on every input–output pair.",
+  "example": "2 → 4, 5 → 10, 7 → 14 → × 2",
+  "steps": [
+   "Guess a rule from the first pair: 2 → 4 could be + 2 or × 2.",
+   "Test on the next pair: 5 + 2 = 7, not 10; 5 × 2 = 10.",
+   "× 2 works for every pair."
+  ],
+  "tip": "A rule must work for all pairs, not just one."
+ },
+ "3:3": {
+  "idea": "Build a rule machine that gives the right outputs.",
+  "example": "Outputs 3 more than inputs → + 3",
+  "steps": [
+   "Compare each input with its output.",
+   "Find the change that is always the same.",
+   "Write it as the rule and test it."
+  ],
+  "tip": "Test your rule on every input."
+ },
+ "4:1": {
+  "idea": "Addition and subtraction undo each other.",
+  "example": "42 + 16 = 58, so 58 − 16 = 42",
+  "steps": [
+   "Start with the addition fact.",
+   "Take one part away from the total.",
+   "You get the other part back."
+  ],
+  "tip": "Use the inverse to check an answer."
+ },
+ "4:2": {
+  "idea": "Multiplication facts give related division facts.",
+  "example": "7 × 4 = 28, so 28 ÷ 4 = 7",
+  "steps": [
+   "Find the multiplication fact.",
+   "The product, 28, is split back into equal groups.",
+   "28 ÷ 4 = 7 and 28 ÷ 7 = 4."
+  ],
+  "tip": "The same array shows both facts."
+ },
+ "4:3": {
+  "idea": "Check a calculation by doing the inverse.",
+  "example": "18 ÷ 3 = 6? Check: 3 × 6 = 18 ✓",
+  "steps": [
+   "Do the calculation.",
+   "Apply the inverse operation to your answer.",
+   "If you get back to the start, the answer is right."
+  ],
+  "tip": "Division is checked with multiplication."
+ },
+ "5:1": {
+  "idea": "The equals sign means both sides have the same value.",
+  "example": "9 + 6 = 4 + ? → 15 = 4 + 11",
+  "steps": [
+   "Work out the side you know: 9 + 6 = 15.",
+   "The other side must also make 15.",
+   "4 + 11 = 15, so the missing number is 11."
+  ],
+  "tip": "Equals means 'is the same as', not 'write the answer'."
+ },
+ "5:2": {
+  "idea": "Decide if a number sentence is true by working out both sides.",
+  "example": "12 + 8 = 15 + 5 → 20 = 20 → true",
+  "steps": [
+   "Work out the left side: 20.",
+   "Work out the right side: 20.",
+   "Equal values mean the sentence is true."
+  ],
+  "tip": "Work out both sides before deciding."
+ },
+ "5:3": {
+  "idea": "Make an equivalent sentence by moving amounts between parts.",
+  "example": "20 + 11 = 8 + 23",
+  "steps": [
+   "20 is 12 more than 8.",
+   "So the other part must be 12 more: 11 + 12 = 23.",
+   "Both sides make 31."
+  ],
+  "tip": "Whatever one part loses, the other must gain."
+ },
+ "6:1": {
+  "idea": "Find a missing addend by subtracting the known part from the total.",
+  "example": "13 + □ = 28 → □ = 15",
+  "steps": [
+   "The total is 28 and one part is 13.",
+   "28 − 13 = 15.",
+   "Check: 13 + 15 = 28."
+  ],
+  "tip": "Use the inverse: take the known part away from the total."
+ },
+ "6:2": {
+  "idea": "Find a missing factor using a division fact.",
+  "example": "10 × □ = 70 → □ = 7",
+  "steps": [
+   "Ask: 10 times what makes 70?",
+   "Divide: 70 ÷ 10 = 7.",
+   "Check: 10 × 7 = 70."
+  ],
+  "tip": "Missing factor? Divide the product by the known factor."
+ },
+ "6:3": {
+  "idea": "Explain why a missing value is correct by checking it.",
+  "example": "31 + □ = 39 → □ = 8; check 31 + 8 = 39",
+  "steps": [
+   "Find the unknown with the inverse: 39 − 31 = 8.",
+   "Put it back into the sentence.",
+   "If both sides match, it is proven."
+  ],
+  "tip": "Substitution proves the answer."
+ },
+ "7:1": {
+  "idea": "A known fact can build bigger facts with the same pattern.",
+  "example": "6 + 4 = 10, 16 + 4 = 20, 26 + 4 = 30",
+  "steps": [
+   "Find the small fact: 6 + 4 = 10.",
+   "Adding 10 to a part adds 10 to the total.",
+   "The ones digits stay the same each time."
+  ],
+  "tip": "Look at what stays the same and what changes."
+ },
+ "7:2": {
+  "idea": "Multiplication facts grow by the same amount each step.",
+  "example": "4 × 3 = 12, 4 × 4 = 16, 4 × 5 = 20 → + 4",
+  "steps": [
+   "Write the facts in order.",
+   "Each extra group adds one more 4.",
+   "The products go up by 4 each time."
+  ],
+  "tip": "The step size is the number being multiplied."
+ },
+ "7:3": {
+  "idea": "Use one fact to find the next by adding one group.",
+  "example": "4 × 5 = 20, so 5 × 5 = 20 + 5 = 25",
+  "steps": [
+   "Start with the known fact: 4 groups of 5 = 20.",
+   "One more group of 5 makes 5 groups.",
+   "20 + 5 = 25."
+  ],
+  "tip": "Moving to the next fact adds one group."
+ },
+ "8:1": {
+  "idea": "Plan and test a pattern by recording each step.",
+  "example": "Start 30, − 5: 30, 25, 20, 15",
+  "steps": [
+   "Choose a start and a rule.",
+   "Apply the rule and record each value.",
+   "Check every step follows the rule."
+  ],
+  "tip": "Record values in order so mistakes are easy to spot."
+ },
+ "8:2": {
+  "idea": "Compare two rules by running both for the same number of steps.",
+  "example": "From 4: Rule A + 3 → 16; Rule B × 2 → 64",
+  "steps": [
+   "Run Rule A four times: 7, 10, 13, 16.",
+   "Run Rule B four times: 8, 16, 32, 64.",
+   "Compare: Rule B is larger by 48."
+  ],
+  "tip": "Multiplying usually overtakes adding."
+ },
+ "8:3": {
+  "idea": "Test a claim and fix it using evidence.",
+  "example": "13 + 9 = 9 + ? → 13, because order doesn't change a sum",
+  "steps": [
+   "Work out the known side: 22.",
+   "Find the value that makes the other side 22.",
+   "Explain why it works."
+  ],
+  "tip": "Give a reason, not just the answer."
+ }
+}
