@@ -523,7 +523,7 @@ const bracketEquations: Form[] = [
   },
   (r) => {
     const w = r(18, 30), h1 = r(4, 6), h2 = r(2, 3), up = r(3, 6), total = h1 * w + h2 * (w + up);
-    return { prompt: `Rahda earns $w per hour for ${h1} hours, then $(w + ${up}) per hour for ${h2} more hours. She earns $${total}. Find w.`, answer: w, unit: "$", steps: [`${h1}w + ${h2}(w + ${up}) = ${total}.`, `${h1 + h2}w + ${h2 * up} = ${total}, so ${h1 + h2}w = ${total - h2 * up} and w = ${w}.`] };
+    return { prompt: `Nina earns $w per hour for ${h1} hours, then $(w + ${up}) per hour for ${h2} more hours. She earns $${total}. Find w.`, answer: w, unit: "$", steps: [`${h1}w + ${h2}(w + ${up}) = ${total}.`, `${h1 + h2}w + ${h2 * up} = ${total}, so ${h1 + h2}w = ${total - h2 * up} and w = ${w}.`] };
   },
 ];
 const fixErrors: Form[] = [
@@ -868,7 +868,7 @@ const intersections: Form[] = [
   },
   (r) => {
     const fast = r(5, 8), slow = fast - r(1, 3), t = r(3, 8), head = (fast - slow) * t;
-    return { prompt: `Max runs at ${fast} m/s. Jess gets a ${head} m head start and runs at ${slow} m/s. After how many seconds does Max catch Jess?`, answer: t, unit: "s", steps: [`${fast}t = ${head} + ${slow}t.`, `${fast - slow}t = ${head}, so t = ${t}.`] };
+    return { prompt: `Tom runs at ${fast} m/s. Nia gets a ${head} m head start and runs at ${slow} m/s. After how many seconds does Tom catch Nia?`, answer: t, unit: "s", steps: [`${fast}t = ${head} + ${slow}t.`, `${fast - slow}t = ${head}, so t = ${t}.`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = r(-6, 6), c2 = c + nz(r, -5, 5);
