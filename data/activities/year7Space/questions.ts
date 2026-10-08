@@ -234,7 +234,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
    else point(`Triangle ${vtx(sh)} is translated ${units(dx)} right and 2 units down. A student moved only P and left Q and R where they were. Type the correct image of ${TRI[vi]}.`,img[vi],'Every corner moves by the same amount, or the shape changes.',[sh[vi]]);}
   break;}
  case 21:{const T=shift(dx,dy),sh=triangle(T,ps=>T(T(ps))),img=T(sh),both=`Triangle ${vtx(sh)} is translated to the dashed triangle ${vtx(img,TRI.map(l=>l+'′'))}.`;grid(sh,{image:img});
-  if(F)point(`${both} Type the translation vector as a pair (right, up).`,{x:dx,y:dy},`Compare one corner before and after: P${pair(sh[0])} moves to P′${pair(img[0])}. Right: ${img[0].x} − (${sh[0].x}) = ${dx}. Up: ${img[0].y} − (${sh[0].y}) = ${dy}.`,[{x:-dx,y:-dy}]);
+  if(F)point(`${both} Type the translation vector as a pair (right, up).`,{x:dx,y:dy},`Compare one corner before and after: P${pair(sh[0])} moves to P′${pair(img[0])}. Right: ${img[0].x} − ${sh[0].x<0?`(${sh[0].x})`:sh[0].x} = ${dx}. Up: ${img[0].y} − ${sh[0].y<0?`(${sh[0].y})`:sh[0].y} = ${dy}.`,[{x:-dx,y:-dy}]);
   else if(R)point(`${both} A student subtracted the image from the original and wrote ${pair({x:-dx,y:-dy})}. Type the correct translation vector as a pair (right, up).`,{x:dx,y:dy},'Image minus original gives the vector from the original to the image.',[{x:-dx,y:-dy}]);
   else point(`${both} Type the translation vector that takes the image back to the original, as a pair (right, up).`,{x:-dx,y:-dy},'Going back reverses both components.',[{x:dx,y:dy}]);
   break;}

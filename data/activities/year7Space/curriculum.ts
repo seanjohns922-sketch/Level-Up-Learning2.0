@@ -301,7 +301,7 @@ export const SPACE7_SKILL_GROUPS = [
  [[28],[29],[30]], [[31],[32],[35]],
 ];
 // Bump whenever lesson content changes so saved resume snapshots are discarded.
-export const SPACE7_READABILITY_REVISION = 11;
+export const SPACE7_READABILITY_REVISION = 12;
 // Rotations preserving shape properties belong with transformations (SP03), not classifiers.
 const CODE_OVERRIDES:Record<number,(typeof SPACE7_SOURCE_WEEKS)[number]['code']|undefined>={34:'AC9M7SP03'};
 export function space7SourceGuide(key:number){const w=SPACE7_SOURCE_WEEKS[Math.floor((key-1)/3)],l=w.lessons[(key-1)%3];return {title:l[0],goal:l[1],idea:l[2],caution:l[3],code:CODE_OVERRIDES[key]??w.code};}

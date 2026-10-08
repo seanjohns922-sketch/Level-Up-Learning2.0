@@ -51,20 +51,20 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   break;}
  case 2:{
   const events=[['even',(x:number)=>x%2===0],['odd',(x:number)=>x%2===1],['a multiple of 3',(x:number)=>x%3===0],['a multiple of 4',(x:number)=>x%4===0],['a multiple of 5',(x:number)=>x%5===0],['a square number',(x:number)=>Number.isInteger(Math.sqrt(x))],['a prime number',(x:number)=>x>1&&range(x-1).slice(1).every(d=>x%d!==0)]] as const;
-  if(F){const t=pick([20,24,30,36,40,50]),k=int(5,t-5);if(int(0,2)){const [name,test]=pick(events);num(`One tile is picked from tiles numbered 1 to ${t}. How many outcomes are ${name}?`,range(t).filter(test).length,`List them: ${join(range(t).filter(test))}.`);}else num(`One tile is picked from tiles numbered 1 to ${t}. How many outcomes are greater than ${k}?`,t-k,`The favourable outcomes are ${k+1} to ${t}: ${t} − ${k} = ${t-k}.`,[t-k+1]);}
+  if(F){const t=pick([20,24,30,36,40,50]),k=int(5,t-5);if(int(0,2)){const [name,test]=pick(events);num(`One tile is picked from tiles numbered 1 to ${t}. How many outcomes are ${name}?`,range(t).filter(test).length,`List the tiles from 1 to ${t} that are ${name}: ${join(range(t).filter(test))}. Count them: ${range(t).filter(test).length} outcomes.`);}else num(`One tile is picked from tiles numbered 1 to ${t}. How many outcomes are greater than ${k}?`,t-k,`The favourable outcomes are ${k+1} to ${t}: ${t} − ${k} = ${t-k}.`,[t-k+1]);}
   else if(R){const t=pick([20,30,40,50]),k=int(5,t-5);num(`For tiles numbered 1 to ${t}, a student says “greater than ${k}” has ${t-k+1} favourable outcomes, starting at ${k}. How many are there really?`,t-k,`“Greater than ${k}” does not include ${k}: the outcomes are ${k+1} to ${t}, which is ${t-k}.`,[t-k+1]);}
   else if(!alt){const counts={red:int(2,6),blue:int(2,6),green:int(2,6)};bag(counts);num('Mia wins if she does NOT pick a blue counter. How many counters are favourable for Mia?',counts.red+counts.green,`Every counter except the ${counts.blue} blue ones: ${counts.red} + ${counts.green} = ${counts.red+counts.green}.`,[counts.blue,counts.red]);}
   else{const N=int(40,120),m=pick([3,4,5,6,7,8]);num(`Raffle tickets are numbered 1 to ${N}. Every multiple of ${m} wins a prize. How many tickets win?`,Math.floor(N/m),`The winners are ${m}, ${2*m}, … up to ${Math.floor(N/m)*m}: ${N} ÷ ${m} = ${round(N/m)}, so ${Math.floor(N/m)} tickets.`,[Math.ceil(N/m),N-Math.floor(N/m)]);}
   break;}
  case 3:{
-  if(F){const a=int(1,12),b=a+int(9,15),missing=int(a,b),shown=range(b).filter(x=>x>=a&&x!==missing);num(`A spinner has sections numbered ${a} to ${b}. A proposed sample space is ${join(shown)}. Which outcome is missing?`,missing,`Count up from ${a} to ${b}: ${missing} is missing.`,[b+1]);}
+  if(F){const a=int(1,12),b=a+int(9,15),missing=int(a,b),shown=range(b).filter(x=>x>=a&&x!==missing);num(`A spinner has sections numbered ${a} to ${b}. A proposed sample space is ${join(shown)}. Which outcome is missing?`,missing,`A complete sample space lists every possible outcome once. Count up from ${a} to ${b} and check each number against the list. ${missing} is not there, so it is missing.`,[b+1]);}
   else if(R){const t=int(10,15),dup=int(1,t),listed=[...range(t).slice(0,dup),dup,...range(t).slice(dup)];num(`One tile is picked from tiles numbered 1 to ${t}. A student’s sample space is ${join(listed)}. Which outcome is listed twice?`,dup,`Each outcome should appear once; ${dup} appears twice.`,[t]);}
   else if(!alt){const {pool,counts}=colourBag();bag(counts);num('How many different outcomes are in the sample space for one pick from this bag?',pool.length,`The different colours are ${join((Object.keys(COLOURS) as Colour[]).filter(c=>pool.includes(c)))}.`,[Object.values(counts).reduce((s,c)=>s+(c??0),0)]);}
   else{const t=int(10,20);num(`A spinner’s sample space is 1 to ${t}. Three new sections are added, numbered ${t+1}, ${t} and ${t+2}. How many outcomes are in the new sample space?`,t+2,`${t} is already an outcome; only ${t+1} and ${t+2} are new, giving ${t+2} outcomes.`,[t+3,t]);}
   break;}
  // ── Week 2: assign probabilities
  case 4:{
-  if(F){spinner({red:a,blue:b});fr('What is the probability of red on one spin? Give a fraction.',a,n,`${a} of the ${n} equal sections are red: ${frac(a,n)}.`,[[a,b],[1,2]]);}
+  if(F){spinner({red:a,blue:b});fr('What is the probability of red on one spin? Give a fraction.',a,n,`All ${n} sections are equal, so each is equally likely. ${a} of them are red. P(red) = ${a}/${n}${frac(a,n)!==`${a}/${n}`?` = ${frac(a,n)}`:''}.`,[[a,b],[1,2]]);}
   else if(R){spinner({red:a,blue:b});fr(`A student says P(red) = ${a}/${b} because there are ${a} red and ${b} blue sections. What is P(red)? Give a fraction.`,a,n,`Divide by the total number of sections, ${n}, not by the number of blue ones.`,[[a,b]]);}
   else if(!alt){const N=pick([50,100,200,250]),k=int(2,10);fr(`A raffle sells ${N} tickets and you buy ${k}. What is the probability you win the one prize? Give a fraction.`,k,N,`${k} winning chances out of ${N} equally likely tickets.`,[[1,N],[k,N-k]]);}
   else{const N=int(20,30),girls=int(8,N-8);fr(`A class has ${N} students and ${girls} are girls. A captain is chosen at random. What is the probability the captain is a boy? Give a fraction.`,N-girls,N,`There are ${N-girls} boys out of ${N} students.`,[[girls,N],[N-girls,girls]]);}
@@ -84,14 +84,14 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   break;}
  // ── Week 3: probability representations and fairness
  case 7:{
-  if(F){const d=pick([8,20,25,40,50]),w=pick(range(d-1).filter(x=>x*2!==d));num(`Write the probability ${w}/${d} as a decimal.`,w/d,`${w} ÷ ${d} = ${round(w/d)}.`,[Number(`0.${w}`),d/w]);}
+  if(F){const d=pick([8,20,25,40,50]),w=pick(range(d-1).filter(x=>x*2!==d));num(`Write the probability ${w}/${d} as a decimal.`,w/d,`A fraction is a division: ${w}/${d} means ${w} ÷ ${d}. ${w} ÷ ${d} = ${round(w/d)}.`,[Number(`0.${w}`),d/w]);}
   else if(R){for(;;){const d=pick([8,20,25,40,50]),w=int(1,d-1),bad=Number(`0.${w}${d}`);if(Math.abs(bad-w/d)<1e-9||bad>=1)continue;num(`A student wrote the probability ${w}/${d} as ${bad}. What is it as a decimal?`,w/d,`Divide the numerator by the denominator: ${w} ÷ ${d} = ${round(w/d)}.`,[bad]);break;}}
   else if(!alt){const pct=pick([5,15,25,35,45,55,65,75,85,95]);fr(`The forecast gives a ${pct}% chance of rain. Write this probability as a fraction in simplest form.`,pct,100,`${pct}% = ${pct}/100 = ${frac(pct,100)}.`,[[pct,10]]);}
   else{for(;;){const x=int(10,90)/100,d=pick([4,5,8,10]),w=int(1,d-1);if(Math.abs(x-w/d)<.02)continue;num(`Which is more likely: a probability of ${x} or a probability of ${w}/${d}? Type the larger probability as a decimal.`,Math.max(x,w/d),`${w}/${d} = ${round(w/d)}, so the larger is ${round(Math.max(x,w/d))}.`,[Math.min(x,w/d)]);break;}}
   break;}
  case 8:{
   const p=int(5,30)/100,q=int(5,30)/100,r3=int(5,25)/100,known=round(p+q+r3),model=()=>table('Exactly one of A, B, C or D happens',['Outcome','Probability'],[['A',p],['B',q],['C',r3],['D','?']]);
-  if(F){model();num('What is the missing probability for D?',1-known,`The probabilities add to 1: 1 − ${p} − ${q} − ${r3} = ${round(1-known)}.`,[known]);}
+  if(F){model();num('What is the missing probability for D?',1-known,`One of the outcomes must happen, so all the probabilities add to 1. Take the known ones away from 1: 1 − ${p} − ${q} − ${r3} = ${round(1-known)}.`,[known]);}
   else if(R){model();num(`A student added A, B and C and wrote P(D) = ${known}. What is the correct P(D)?`,1-known,`All four must add to 1, so subtract: 1 − ${known} = ${round(1-known)}.`,[known]);}
   else if(!alt){const [d1,d2]=shuffle([3,4,5,6,8,10]).slice(0,2),top=d1*d2-d2-d1;fr(`A spinner is red, blue or yellow. P(red) = 1/${d1} and P(blue) = 1/${d2}. What is P(yellow)? Give a fraction.`,top,d1*d2,`Use a common denominator of ${d1*d2}: 1 − ${d2}/${d1*d2} − ${d1}/${d1*d2} = ${frac(top,d1*d2)}.`,[[d1+d2,d1*d2],[1,d1+d2]]);}
   else{const w=int(3,6)*10,d=int(1,3)*10;num(`A team’s model gives P(win) = ${w}% and P(draw) = ${d}%. What is P(lose) as a percentage?`,100-w-d,`Win, draw and lose add to 100%: 100 − ${w} − ${d} = ${100-w-d}.`,[w+d,100-w]);}
@@ -110,14 +110,14 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   else{const [p,days]=pick([[0.1,40],[0.15,40],[0.2,40],[0.25,40],[0.05,40],[0.1,60],[0.2,60],[0.15,60]] as const);num(`The probability the school bus is late is ${p}. About how many of the next ${days} school days would you expect it to be late?`,p*days,`${days} × ${p} = ${round(p*days)} days.`,[days/2,p*100]);}
   break;}
  case 11:{
-  if(F){spinner({red:a,blue:b});fr('In a very long run of spins, what fraction of spins would you expect to be red? Give a fraction.',a,n,`Over many trials the relative frequency is expected to be close to the probability, ${frac(a,n)}.`,[[1,2],[a,b]]);}
+  if(F){spinner({red:a,blue:b});fr('In a very long run of spins, what fraction of spins would you expect to be red? Give a fraction.',a,n,`The probability of red is ${a}/${n}${frac(a,n)!==`${a}/${n}`?` = ${frac(a,n)}`:''}. Over a very long run, the fraction of red results settles close to the probability. So expect about ${frac(a,n)} of spins to be red.`,[[1,2],[a,b]]);}
   else if(R){const k=int(1,4);die();fr(`A student predicts the relative frequency of rolling a number greater than ${k} is ${k}/6. What should it be? Give a fraction.`,6-k,6,`Greater than ${k} means ${k+1} to 6: ${6-k} outcomes, so ${frac(6-k,6)}.`,[[k,6]]);}
   else if(!alt){const N=pick([10,16,20]),r=int(2,N-2);bag({red:r,blue:N-r});num('Counters are picked and replaced many times. What percentage of picks would you expect to be red?',r/N*100,`P(red) = ${r}/${N} = ${r/N*100}%.`,[r*10,(N-r)/N*100]);}
   else{const s=pick([8,10,12,16]),r=int(1,s-1);spinner({red:r,blue:s-r});num('Predict the relative frequency of red over 1000 spins. Give a decimal.',r/s,`The relative frequency is expected to be near P(red) = ${r}/${s} = ${round(r/s)}.`,[r/1000,(s-r)/s]);}
   break;}
  case 12:{
   const p=pick([[1,4],[1,5],[2,5],[3,10],[3,8],[1,3]] as const),T=p[1]*int(10,40),E=T*p[0]/p[1];
-  if(F){table('Model prediction',['Trials','Expected event count'],[[T,E]]);fr('Which probability was used for this prediction? Give a fraction.',E,T,`Expected count ÷ trials = ${E} ÷ ${T} = ${frac(E,T)}.`,[[T,E]]);}
+  if(F){table('Model prediction',['Trials','Expected event count'],[[T,E]]);fr('Which probability was used for this prediction? Give a fraction.',E,T,`Expected count = trials × probability, so probability = expected count ÷ trials. ${E} ÷ ${T} = ${frac(E,T)}.`,[[T,E]]);}
   else if(R){table('Model prediction',['Trials','Expected event count'],[[T,E]]);fr(`A student divided ${T} by ${E} to find the probability. What is the correct probability? Give a fraction.`,E,T,'Probability is a part of the whole, so divide the expected count by the number of trials.',[[T,E]]);}
   else if(!alt){const N=p[1]*int(1,2),Tq=p[1]*int(10,20)*2,Eq=Tq*p[0]/p[1];num(`A bag holds ${N} counters. In ${Tq} picks (replacing each time), red came up about ${Eq} times, as expected. How many red counters are in the bag?`,N*p[0]/p[1],`P(red) ≈ ${Eq}/${Tq} = ${frac(p[0],p[1])}. ${frac(p[0],p[1])} of ${N} counters is ${N*p[0]/p[1]}.`,[Eq,N-N*p[0]/p[1]]);}
   else{const s=p[1]*int(1,2);num(`A spinner with ${s} equal sections is expected to land on red ${E} times in ${T} spins. How many sections are red?`,s*E/T,`P(red) = ${E}/${T} = ${frac(E,T)}, and ${frac(E,T)} of ${s} sections is ${s*E/T}.`,[E,s-s*E/T]);}
@@ -134,7 +134,7 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
   break;}
  case 14:{
   const total=pick([20,25,40,50]),wins=int(3,total-3);
-  if(F){table('Completed trials',['Wins','Trials'],[[wins,total]]);fr('What is the observed relative frequency of a win? Give a fraction.',wins,total,`${wins} wins out of ${total} trials: ${frac(wins,total)}.`,[[wins,total-wins]]);}
+  if(F){table('Completed trials',['Wins','Trials'],[[wins,total]]);fr('What is the observed relative frequency of a win? Give a fraction.',wins,total,`Relative frequency = number of wins ÷ number of trials. ${wins} wins out of ${total} trials gives ${wins}/${total}${frac(wins,total)!==`${wins}/${total}`?` = ${frac(wins,total)}`:''}.`,[[wins,total-wins]]);}
   else if(R){table('Completed trials',['Wins','Losses'],[[wins,total-wins]]);fr(`A student wrote the relative frequency of a win as ${wins}/${total-wins}. What is the correct relative frequency? Give a fraction.`,wins,total,`Divide by all ${total} trials (wins + losses), not by the losses.`,[[wins,total-wins]]);}
   else if(!alt){const t=pick([20,25,50]),w=int(3,t-3);table('Completed trials',['Wins','Trials'],[[w,t]]);num('Write the relative frequency of a win as a percentage.',w/t*100,`${w} ÷ ${t} × 100 = ${w/t*100}%.`,[w,(t-w)/t*100]);}
   else{const t1=int(2,5)*10,t2=int(2,5)*10,h1=int(5,t1-5),h2=int(5,t2-5);fr(`Class A tossed a coin ${t1} times and got ${h1} heads. Class B tossed it ${t2} times and got ${h2} heads. What is the combined relative frequency of heads? Give a fraction.`,h1+h2,t1+t2,`Combine counts: (${h1} + ${h2}) ÷ (${t1} + ${t2}) = ${frac(h1+h2,t1+t2)}.`,[[h1+h2,2*(t1+t2)]]);}
@@ -205,7 +205,7 @@ export function chance7Question(week:number,lesson:number,seed:number,role:Cave7
  case 23:{
   const pA=int(2,6)/10,pB=round(pA+pick([-0.2,-0.1,0.1,0.2])),T=pick([100,200,400]),near=int(0,1)?pA:pB,W=Math.round(T*near)+int(-4,4);
   table('Two models and the recorded results',['Item','Value'],[['Model A: P(win)',pA],['Model B: P(win)',pB],['Observed wins',W],['Trials',T]]);
-  if(F){const closer=Math.abs(W/T-pA)<Math.abs(W/T-pB)?'A':'B';choose('Which model is closer to the observed results? Type A or B.',closer,[closer==='A'?'B':'A','Equal','Neither'],`Observed share ${W}/${T} = ${round(W/T)}. It is closer to Model ${closer}.`);}
+  if(F){const closer=Math.abs(W/T-pA)<Math.abs(W/T-pB)?'A':'B';choose('Which model is closer to the observed results? Type A or B.',closer,[closer==='A'?'B':'A','Equal','Neither'],`Find the observed share: ${W} ÷ ${T} = ${round(W/T)}. Compare it with each model's probability: ${pA} and ${pB}. The smaller gap is to Model ${closer}.`);}
   else if(R)num('How far is the observed relative frequency from Model A’s probability? Give a decimal.',Math.abs(W/T-pA),`${W} ÷ ${T} = ${round(W/T)}; the gap from ${pA} is ${round(Math.abs(W/T-pA))}.`,[Math.abs(W-pA*T)]);
   else if(!alt)num(`Using Model A, how many wins were expected in ${T} trials?`,pA*T,`${T} × ${pA} = ${round(pA*T)}.`,[W,pB*T]);
   else num('What is the difference between the observed wins and Model B’s predicted wins?',Math.abs(W-pB*T),`Model B predicts ${round(pB*T)} wins; observed ${W}. Difference = ${round(Math.abs(W-pB*T))}.`,[Math.abs(W-pA*T)]);

@@ -63,7 +63,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  // ── Weeks 2–3: writing expressions (AC9M7A02)
  case 4:{
   if(F&&seed%2===0){const k=int(3,6);choose(`7 + 7 + 7 = 3 × 7. Write ${Array(k).fill('n').join(' + ')} as a product.`,`${k}n`,[`n${k}`,`${k}+n`,`${k+1}n`],`There are ${k} equal terms of n, so the sum is ${k} × n = ${k}n.`);}
-  else if(F)choose(`Start with n, multiply by ${a}, then add ${b}. Write an expression for the result.`,`${a}n + ${b}`,[`${a}(n + ${b})`,`${b}n + ${a}`,`n + ${a*b}`],'Follow the stated order: multiply n first, then add.');
+  else if(F)choose(`Start with n, multiply by ${a}, then add ${b}. Write an expression for the result.`,`${a}n + ${b}`,[`${a}(n + ${b})`,`${b}n + ${a}`,`n + ${a*b}`],`Follow the order in the words. Multiply n by ${a} first: ${a}n. Then add ${b}: ${a}n + ${b}.`);
   else if(R)choose(`Write an expression for: ${b} less than ${a} times a number n.`,`${a}n − ${b}`,[`${b} − ${a}n`,`${a}(n − ${b})`,`${b}n − ${a}`],`"${b} less than" something means start with that thing and take ${b} away: ${a}n − ${b}.`);
   else choose(`Think of a number n. Double it, add ${b}, then multiply the result by ${a}. Write an expression for the final answer.`,`${a}(2n + ${b})`,[`${a} × 2n + ${b}`,`2n + ${a*b}`,`${2*a}n + ${b}`],`Doubling gives 2n; adding gives 2n + ${b}; the whole result is multiplied, so use brackets: ${a}(2n + ${b}).`);
   break;}
@@ -79,7 +79,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   else choose(`A square has sides of (n + ${b}) cm. Write an expression for its perimeter in cm.`,`4n + ${4*b}`,[`4n + ${b}`,`n + ${4*b}`,`4n`],`Four sides of n + ${b}: 4(n + ${b}) = 4n + ${4*b}.`);
   break;}
  case 7:{
-  if(F)choose(`Add ${b} to n, then multiply the whole result by ${a}. Write an expression.`,`${a}(n + ${b})`,[`${a}n + ${b}`,`n + ${a*b}`,`${b}(n + ${a})`],'The addition happens inside brackets before the whole group is multiplied.');
+  if(F)choose(`Add ${b} to n, then multiply the whole result by ${a}. Write an expression.`,`${a}(n + ${b})`,[`${a}n + ${b}`,`n + ${a*b}`,`${b}(n + ${a})`],`The addition happens first, so n + ${b} goes in brackets. Then the whole bracket is multiplied by ${a}: ${a}(n + ${b}).`);
   else if(R)num(`Evaluate ${a}(n + ${b}) and ${a}n + ${b} when n = ${x}. How much larger is ${a}(n + ${b})?`,(a-1)*b,`${a}(${x} + ${b}) = ${a*(x+b)} and ${a} × ${x} + ${b} = ${a*x+b}. The bracket multiplies the ${b} as well: difference ${(a-1)*b}.`,[a*b,b,a*(x+b)]);
   else choose(`Each of ${a} teams has n players and ${b} coaches. Write an expression for the total number of people.`,`${a}(n + ${b})`,[`${a}n + ${b}`,`n + ${a*b}`,`${a+b}n`],`Each team has n + ${b} people, and there are ${a} teams: ${a}(n + ${b}).`);
   break;}
@@ -95,18 +95,18 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   break;}
  // ── Weeks 4–6: solving equations (AC9M7A03)
  case 10:{
-  if(F){balance(`x + ${b}`,String(x+b));num('The scale is balanced. Find x.',x,`Remove ${b} from both pans: x = ${x+b} − ${b} = ${x}.`,[x+2*b,x+b,b]);}
+  if(F){balance(`x + ${b}`,String(x+b));num('The scale is balanced. Find x.',x,`The pans balance, so x + ${b} = ${x+b}. Remove ${b} from both pans to keep them balanced: x = ${x+b} − ${b} = ${x}.`,[x+2*b,x+b,b]);}
   else if(R)num(`A student solved x + ${b} = ${x+b} by adding ${b} to both sides and wrote x = ${x+2*b}. What is the correct value of x?`,x,`Adding ${b} gives x + ${2*b} = ${x+2*b}, not x. Subtract ${b} instead: x = ${x}.`,[x+2*b,x+b]);
   else num(`A box of pencils plus ${b} loose pencils makes ${x+b} pencils altogether. How many pencils are in the box?`,x,`Write x + ${b} = ${x+b}, then subtract ${b}: x = ${x}.`,[x+2*b,x+b]);
   break;}
  case 11:{
-  if(F){balance(`${a}x`,String(a*x));num('The scale is balanced. Find x.',x,`Divide both pans by ${a}: x = ${a*x} ÷ ${a} = ${x}.`,[a*x*a,a*x-a,a*x]);}
+  if(F){balance(`${a}x`,String(a*x));num('The scale is balanced. Find x.',x,`The pans balance, so ${a}x = ${a*x}. Share both pans into ${a} equal groups to keep them balanced: x = ${a*x} ÷ ${a} = ${x}.`,[a*x*a,a*x-a,a*x]);}
   else if(R)num(`A student solved ${a}x = ${a*x} by multiplying both sides by ${a} and wrote x = ${a*a*x}. What is the correct value of x?`,x,`${a}x means ${a} × x, so undo it by dividing: x = ${x}.`,[a*a*x,a*x-a]);
   else num(`A ribbon is cut into ${a} equal pieces, each ${x} cm long. How long was the ribbon in cm?`,a*x,`If L is the length, L ÷ ${a} = ${x}, so L = ${a} × ${x} = ${a*x}.`,[x,a+x,x-a>0?x-a:x+a+1]);
   break;}
  case 12:{
   const k=x+(seed%3===0?0:pick([-1,1,2]));
-  if(F){formula(`${a}x + ${b} = ${a*x+b}`,`Test the value x = ${k}.`);num(`Substitute x = ${k} into the left side, ${a}x + ${b}. What does it equal?`,a*k+b,`${a} × ${k} + ${b} = ${a*k+b}.`,[a*(k+b),a+k+b,Number(`${a}${k}`)+b]);}
+  if(F){formula(`${a}x + ${b} = ${a*x+b}`,`Test the value x = ${k}.`);num(`Substitute x = ${k} into the left side, ${a}x + ${b}. What does it equal?`,a*k+b,`Replace x with ${k}: ${a} × ${k} + ${b}. Multiply first: ${a*k}. Then add ${b}: ${a*k+b}.`,[a*(k+b),a+k+b,Number(`${a}${k}`)+b]);}
   else if(R){const yes=k===x;choose(`Is x = ${k} a solution of ${a}x + ${b} = ${a*x+b}?`,yes?`Yes, because ${a} × ${k} + ${b} = ${a*x+b}.`:`No, because ${a} × ${k} + ${b} = ${a*k+b}, not ${a*x+b}.`,yes?[`No, because ${a} × ${k} + ${b} = ${a*k+b+1}.`,`No, because x must be smaller than ${b}.`,'Yes, because any whole number works.']:[`Yes, because ${a} × ${k} + ${b} = ${a*x+b}.`,'Yes, because it is close to the answer.','No, because equations have no solutions.'],'Substitute the value and compare both sides.');}
   else num(`Test whole numbers to find the value of x that makes ${a}x + ${b} = ${a*x+b} true.`,x,`Try values: ${a} × ${x} + ${b} = ${a*x+b}, so x = ${x}.`,[(a*x+b)/a,a*x+b-b*a,x+b]);
   break;}
@@ -155,13 +155,13 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   break;}
  case 20:{
   const {ctx,points,moves}=graph();
-  if(F){const i=int(0,3);choose(`What happens to the ${ctx.noun} between ${points[i][0]} and ${points[i+1][0]} ${ctx.time}?`,`It ${MOVES[moves[i]]}.`,[...MOVES.filter((_,j)=>j!==moves[i]).map(m=>`It ${m}.`),'It cannot be told from the graph.'],'Rising means increasing, horizontal means staying the same, falling means decreasing.');}
+  if(F){const i=int(0,3);choose(`What happens to the ${ctx.noun} between ${points[i][0]} and ${points[i+1][0]} ${ctx.time}?`,`It ${MOVES[moves[i]]}.`,[...MOVES.filter((_,j)=>j!==moves[i]).map(m=>`It ${m}.`),'It cannot be told from the graph.'],`Find the line between ${points[i][0]} and ${points[i+1][0]} ${ctx.time}. A rising line means increasing, a flat line means staying the same, and a falling line means decreasing. Here it ${MOVES[moves[i]]}.`);}
   else if(R){const story=(ms:number[])=>ms.map((m,i)=>(i?'then ':'')+MOVES[m]).join(', ').replace(/^./,s=>s.toUpperCase())+'.';const right=story(moves),others=new Set<string>();while(others.size<3){const s=story(Array.from({length:4},()=>int(0,2)));if(s!==right)others.add(s);}choose(`Which description matches the ${ctx.noun} over the four time intervals?`,right,[...others],'Read each segment in order: rising, horizontal or falling.');}
   else{const flat=moves.filter(m=>m===1).length*2;num(`For how many ${ctx.time} altogether did the ${ctx.noun} stay the same?`,flat,'Add the lengths of the horizontal segments.',[flat+2,moves.filter(m=>m===1).length,8-flat]);}
   break;}
  case 21:{
   const {ctx,points}=graph(true);
-  if(F){const rise=Math.max(...points.slice(1).map((p,i)=>p[1]-points[i][1]));num(`What was the greatest increase in the ${ctx.noun} during one 2-${ctx.time.replace(/s$/,'')} interval? Answer in ${ctx.unit}.`,rise,'All intervals are 2 long, so compare the vertical rises.',[rise+ctx.step,rise/2,Math.max(...points.map(p=>p[1]))]);}
+  if(F){const rise=Math.max(...points.slice(1).map((p,i)=>p[1]-points[i][1]));num(`What was the greatest increase in the ${ctx.noun} during one 2-${ctx.time.replace(/s$/,'')} interval? Answer in ${ctx.unit}.`,rise,`Every interval is 2 ${ctx.time} long, so compare how much the line rises in each one. The biggest rise is ${rise} ${ctx.unit}.`,[rise+ctx.step,rise/2,Math.max(...points.map(p=>p[1]))]);}
   else if(R){const i=int(0,3),mid=points[i][0]+1;choose(`Measurements were recorded every 2 ${ctx.time}. What can the line tell you about the ${ctx.noun} at ${mid} ${ctx.time}?`,'Only an estimate, because nothing was recorded at that time.',['The exact value, because the line passes through that time.','Nothing at all, because only points can be read.','The exact value, because graphs are always accurate.'],'Joining lines connect recorded points; values between them are estimates.');}
   else{const i=int(0,2),j=i+2,rate=(points[j][1]-points[i][1])/(points[j][0]-points[i][0]);num(`What was the average rate of change of the ${ctx.noun} from ${points[i][0]} to ${points[j][0]} ${ctx.time}, in ${ctx.unit} per ${ctx.time.replace(/s$/,'')}? Give a decrease as a negative number.`,rate,`Change ÷ time = (${points[j][1]} − ${points[i][1]}) ÷ ${points[j][0]-points[i][0]} = ${signed(round(rate))}.`,[points[j][1]-points[i][1],-rate,rate*2]);}
   break;}
@@ -186,7 +186,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   break;}
  // ── Week 9: function tables (AC9M7A05)
  case 25:{
-  if(F){formula(`y = ${a}x + ${b}`,'Apply the rule to each input.');num(`Find y when x = ${x}.`,a*x+b,`${a} × ${x} + ${b} = ${a*x+b}.`,[a*(x+b),a+x+b,a*x]);}
+  if(F){formula(`y = ${a}x + ${b}`,'Apply the rule to each input.');num(`Find y when x = ${x}.`,a*x+b,`Substitute x = ${x} into y = ${a}x + ${b}. Multiply first: ${a} × ${x} = ${a*x}. Then add ${b}: y = ${a*x+b}.`,[a*(x+b),a+x+b,a*x]);}
   else if(R){formula(`y = ${a}x + ${b}`,'Apply the rule to each input.');num(`For x = 2, a student put the x = 1 output (${a+b}) back into the rule and got ${a*(a+b)+b}. What is the correct output for x = 2?`,2*a+b,`Each input goes into the rule on its own: ${a} × 2 + ${b} = ${2*a+b}.`,[a*(a+b)+b,a+b+a+b]);}
   else{formula(`y = ${a}x + ${b}`,'Apply the rule to each input.');num(`Find y when x = −${x}.`,-a*x+b,`${a} × (−${x}) + ${b} = ${signed(-a*x+b)}.`,[a*x+b,-a*x-b,a*x-b]);}
   break;}
@@ -210,13 +210,13 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  case 29:{
   const slope=int(2,4),start=int(1,6),pts:[number,number][]=[0,1,2,3].map(n=>[n,slope*n+start]);
   visual={kind:'plot',title:'Function values',xLabel:'x',yLabel:'y',points:pts,connect:false,showValues:true,yStep:2};
-  if(F)choose('Write a rule for y in terms of x that matches all the plotted points.',`y = ${slope}x + ${start}`,[`y = ${slope+start}x`,`y = ${start}x + ${slope}`,`y = x + ${slope+start}`,`y = ${slope}x + ${start+1}`],`At x = 0, y = ${start}; each extra 1 in x adds ${slope}.`);
+  if(F)choose('Write a rule for y in terms of x that matches all the plotted points.',`y = ${slope}x + ${start}`,[`y = ${slope+start}x`,`y = ${start}x + ${slope}`,`y = x + ${slope+start}`,`y = ${slope}x + ${start+1}`],`Where x = 0, y = ${start}, so the rule ends with + ${start}. Each extra 1 in x adds ${slope} to y, so x is multiplied by ${slope}. The rule is y = ${slope}x + ${start}.`);
   else if(R){const px=int(4,8),on=seed%2===0,py=slope*px+start+(on?0:pick([-1,1,2]));choose(`The plotted points follow one rule. Does the point (${px}, ${py}) follow the same rule?`,on?`Yes, because ${slope} × ${px} + ${start} = ${py}.`:`No, because ${slope} × ${px} + ${start} = ${slope*px+start}, not ${py}.`,on?[`No, because ${px} is not plotted.`,`No, because ${slope} × ${px} = ${slope*px}.`,'Yes, because every point lies on a line.']:[`Yes, because it is close to the line.`,`Yes, because ${py} is larger than ${start}.`,'No, because points must have x below 4.'],`Find the rule y = ${slope}x + ${start}, then substitute x = ${px}.`);}
   else num('Using the pattern in the plotted points, what is y when x = 10?',slope*10+start,`The rule is y = ${slope}x + ${start}: ${slope} × 10 + ${start} = ${slope*10+start}.`,[(slope+start)*10,slope*10,slope*10+start+slope]);
   break;}
  case 30:{
   formula(`C = ${a}n + ${b}`,'C is a modelled cost in dollars for n notebooks.');
-  if(F)num(`Using this model, what cost is predicted for ${x+c} notebooks?`,a*(x+c)+b,'Substitute the notebook count into the model.',[a*(x+c),(a+b)*(x+c),a+x+c+b]);
+  if(F)num(`Using this model, what cost is predicted for ${x+c} notebooks?`,a*(x+c)+b,`Substitute n = ${x+c} into C = ${a}n + ${b}. Multiply first: ${a} × ${x+c} = ${a*(x+c)}. Then add ${b}: ${a*(x+c)+b} dollars.`,[a*(x+c),(a+b)*(x+c),a+x+c+b]);
   else if(R)choose(`The model predicts $${a*1000+b} for 1000 notebooks. Which is a reason the real cost might be different?`,'A shop may give a bulk discount, so the price per notebook could change.',['The formula cannot be used for numbers larger than 100.','1000 is too large to substitute into a formula.','The fixed amount would be multiplied by 1000.'],'A model only predicts well while its pricing rule still applies.');
   else{const budget=a*x+b+int(1,a-1);num(`You have $${budget}. Using this model, what is the greatest number of notebooks you can buy?`,x,`${a}n + ${b} ≤ ${budget}: (${budget} − ${b}) ÷ ${a} = ${round((budget-b)/a)}, so ${x} notebooks.`,[x+1,(budget-b)/a,budget/a]);}
   break;}
@@ -230,12 +230,12 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   break;}
  case 32:{
   formula('V = lwh',`Original dimensions: l = ${a}, w = ${b}, h = ${c} cm.`);
-  if(F){const f1=pick([2,3,4]),f2=pick([2,3,5]);num(`Length is multiplied by ${f1} and width by ${f2}. Height stays fixed. By what factor does volume change?`,f1*f2,`The factors multiply: ${f1} × ${f2} = ${f1*f2}.`,[f1+f2,Math.max(f1,f2),f1*f2*2]);}
+  if(F){const f1=pick([2,3,4]),f2=pick([2,3,5]);num(`Length is multiplied by ${f1} and width by ${f2}. Height stays fixed. By what factor does volume change?`,f1*f2,`Volume is length × width × height. Multiplying the length by ${f1} and the width by ${f2} multiplies the volume by both: ${f1} × ${f2} = ${f1*f2}.`,[f1+f2,Math.max(f1,f2),f1*f2*2]);}
   else if(R){const f=pick([2,3]);choose(`Length and width are both multiplied by ${f}. Height stays fixed. Which statement is correct?`,`The volume is multiplied by ${f*f}.`,[`The volume is multiplied by ${2*f}.`,`The volume is multiplied by ${f}.`,'The volume is unchanged.',`The volume is multiplied by ${f*f*f}.`],`Each multiplied dimension multiplies the volume: ${f} × ${f} = ${f*f}.`);}
   else{const f1=pick([2,3]),f2=pick([2,4]);num(`Length is multiplied by ${f1} and width by ${f2}. Height stays fixed. What is the new volume in cm³?`,a*b*c*f1*f2,`Original volume ${a*b*c} cm³, multiplied by ${f1} × ${f2} = ${f1*f2}: ${a*b*c*f1*f2} cm³.`,[a*b*c*(f1+f2),a*b*c,(a*f1)*(b+f2)*c]);}
   break;}
  case 33:{
-  if(F){formula('V = lwh',`Original dimensions: l = ${a}, w = ${b*c}, h = ${x} cm.`);num(`Length is multiplied by ${c}. Height stays fixed. What width in cm keeps V unchanged?`,b,`Divide the original width ${b*c} by ${c} to balance the larger length.`,[b*c*c,b*c-c,b*c]);}
+  if(F){formula('V = lwh',`Original dimensions: l = ${a}, w = ${b*c}, h = ${x} cm.`);num(`Length is multiplied by ${c}. Height stays fixed. What width in cm keeps V unchanged?`,b,`The length is ${c} times bigger, so the width must be ${c} times smaller to keep V the same. ${b*c} ÷ ${c} = ${b} cm.`,[b*c*c,b*c-c,b*c]);}
   else if(R){formula('V = lwh','The height stays fixed.');choose(`Length is multiplied by ${c}. By what fraction must the width be multiplied to keep V the same?`,`1/${c}`,[String(c),`1/${c*c}`,`${c-1}/${c}`,`${c}/${c+1}`],`The two changes must cancel: ${c} × 1/${c} = 1.`);}
   else{const L=a,W=b*c;num(`A rectangle is ${L} cm long and ${W} cm wide. Its length changes to ${L*c} cm. What new width in cm keeps the area the same?`,b,`Area = ${L*W} cm². ${L*W} ÷ ${L*c} = ${b} cm.`,[W*c,W-c,W]);}
   break;}
@@ -243,12 +243,12 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  case 34:{
   const k=int(1,3),meet=int(4,9),e=b,fixedA=e+k*meet,at=x===meet?x+1:x;
   formula(`A = ${a}n + ${fixedA}; B = ${a+k}n + ${e}`,'Two plans quote total prices in dollars for n items.');
-  if(F)num(`At n = ${at}, how many dollars more does the more expensive plan cost?`,Math.abs(k*at-k*meet),`A costs ${a*at+fixedA} and B costs ${(a+k)*at+e}; the difference is ${Math.abs(k*at-k*meet)}.`,[a*at+fixedA,(a+k)*at+e,k*at]);
+  if(F)num(`At n = ${at}, how many dollars more does the more expensive plan cost?`,Math.abs(k*at-k*meet),`Substitute n = ${at} into each plan. Plan A costs ${a*at+fixedA} dollars and plan B costs ${(a+k)*at+e} dollars. The difference is ${Math.abs(k*at-k*meet)} dollars.`,[a*at+fixedA,(a+k)*at+e,k*at]);
   else if(R)num('For what number of items n do both plans cost the same?',meet,`${a}n + ${fixedA} = ${a+k}n + ${e}. Subtract ${a}n and ${e}: ${fixedA-e} = ${k}n, so n = ${meet}.`,[meet+1,fixedA-e,(fixedA+e)/k]);
   else num('What is the smallest whole number of items for which plan A is cheaper?',meet+1,`The plans cost the same at n = ${meet}. Plan B adds ${k} more per item, so A is cheaper from n = ${meet+1}.`,[meet,meet-1,fixedA-e]);
   break;}
  case 35:{
-  if(F){formula('V = lwh',`Length l = ${a} cm; width w = ${b} cm.`);num(`What height in cm gives volume ${a*b*x} cm³?`,x,`Divide the target volume ${a*b*x} by the base area ${a*b}.`,[a*b*x/a,a*b*x/b,a*b*x-a*b]);}
+  if(F){formula('V = lwh',`Length l = ${a} cm; width w = ${b} cm.`);num(`What height in cm gives volume ${a*b*x} cm³?`,x,`The base area is ${a} × ${b} = ${a*b} cm². Volume = base area × height, so divide: ${a*b*x} ÷ ${a*b} = ${x} cm.`,[a*b*x/a,a*b*x/b,a*b*x-a*b]);}
   else if(R){formula('V = lwh',`Length l = ${a} cm; width w = ${b} cm.`);num(`To find the height for volume ${a*b*x} cm³, a student divided ${a*b*x} by ${a} only. What is the correct height in cm?`,x,`Divide by the whole base area, ${a} × ${b} = ${a*b}: ${a*b*x} ÷ ${a*b} = ${x}.`,[a*b*x/a,a*b*x/b]);}
   else{const rate=pick([2.5,1.5,3.5]),budget=round(rate*x+b+rate/2);formula(`C = ${rate}n + ${b}`,'C is the monthly phone cost in dollars for n gigabytes of data.');num(`Your budget is $${budget}. What is the greatest whole number of gigabytes you can afford?`,x,`(${budget} − ${b}) ÷ ${rate} = ${round((budget-b)/rate)}, so ${x} GB.`,[x+1,(budget-b)/rate,budget/rate]);}
   break;}
