@@ -43,8 +43,8 @@ The school-release audit explicitly resumes this review as a separate release co
 
 The subsequent recording review confirmed anonymous exchange of synthetic messages
 over the public Realtime channel mechanism used by live screen sharing. No actual
-student topic or screen was accessed. This patch suspends recording and viewing;
-see [evidence, containment limits and return requirements](SCREEN_RECORDING_REVIEW.md).
+student topic or screen was accessed. Application recording and viewing are now removed on the retirement branch;
+see [evidence, containment limits and return requirements](SCREEN_SHARING_RETIREMENT.md).
 Already-open older clients are not revoked by an application patch. Production
 channel enforcement and old-client containment remain open security work.
 

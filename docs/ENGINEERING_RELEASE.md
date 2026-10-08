@@ -21,7 +21,7 @@ rewriting their assertions. Per-check logs and results are saved under
 `.local-archive/qa/`; critical CI artifacts are retained for seven days. Security
 source checks are not live RLS, penetration or signed-in journey tests.
 
-QA infrastructure lint starts with the runner, screen suspension check, marking
+QA infrastructure lint starts with the runner, screen retirement check, marking
 regressions and their harness. The other scripts remain outside that lint surface
 until migrated. Existing `prebuild` protections remain intact.
 

@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { formatRelativeTime, formatTimeActive, getLearningStateMeta, getLiveStatusTone, type LearningState, type LiveStudentStatus } from "@/lib/live-class";
-import StudentScreenViewer from "@/components/teacher/StudentScreenViewer";
 import { formatAccuracy } from "@/lib/learning-score";
 
 export type LiveStudentEventRow = {
@@ -90,8 +88,6 @@ export function LiveStudentDrawer({
   student: LiveStudentDrawerData | null;
   events: LiveStudentEventRow[];
 }) {
-  const [activeTab, setActiveTab] = useState<"activity" | "screen">("activity");
-
   if (!open || !student) return null;
 
   const tone = getLiveStatusTone(student.status);
@@ -140,38 +136,6 @@ export function LiveStudentDrawer({
           </div>
         </div>
 
-        {/* Tab bar */}
-        <div className="flex border-b border-slate-200 px-5">
-          <button
-            type="button"
-            onClick={() => setActiveTab("activity")}
-            className={`pb-3 pt-2 text-xs font-bold uppercase tracking-wider mr-5 border-b-2 transition-colors ${
-              activeTab === "activity"
-                ? "border-slate-900 text-slate-900"
-                : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-          >
-            Activity
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("screen")}
-            className={`pb-3 pt-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === "screen"
-                ? "border-slate-900 text-slate-900"
-                : "border-transparent text-slate-400 hover:text-slate-600"
-            }`}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
-            Live Screen
-          </button>
-        </div>
-
-        {activeTab === "screen" ? (
-          <div className="p-5">
-            <StudentScreenViewer />
-          </div>
-        ) : (
         <div className="space-y-4 p-5">
           <section className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -365,7 +329,6 @@ export function LiveStudentDrawer({
             </div>
           </section>
         </div>
-        )}
       </aside>
     </div>
   );

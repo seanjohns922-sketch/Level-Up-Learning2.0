@@ -90,9 +90,10 @@ Check the final diff for unrelated changes and duplicated logic. Report failures
 and untested behaviour explicitly. A build pass is not school-launch approval.
 Do not suppress a failing assertion or lint rule simply to make CI green.
 
-Live screen capture is suspended following the privacy review. Do not restore the
-public broadcast implementation or enable a capture flag without completing the
-access, masking, lifecycle and role-boundary checks in docs/SCREEN_RECORDING_REVIEW.md.
+Live screen capture and sharing are permanently retired. Do not add recorders,
+DOM replay, capture controls, recording dependencies or screen broadcast paths.
+Preserve Live Class activity/progress reporting. Server containment and retention
+work is tracked in docs/SCREEN_SHARING_RETIREMENT.md; production changes require approval.
 
 New raw HTML/SVG injection must use trusted, controlled content with a documented
 trust boundary. Do not render untrusted user, database, model or external markup
