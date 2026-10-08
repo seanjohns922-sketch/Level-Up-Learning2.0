@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import {
   buildLessonActivityPool,
+  derivePlaceValueBuilderAnswer,
+  missingMabPrompt,
   generateQuestion,
   type MABVisualData,
   type PlaceValueBuilderQuestion,
@@ -73,6 +75,42 @@ function assertValidMab(
   );
 }
 
+// Regression: the renderer receives null for hidden blocks. Null must not be
+// marked as zero; use the target number to recover that place's value.
+for (const [targetNumber, place, expected] of [
+  [596, "ones", 6], [596, "tens", 90], [596, "hundreds", 500],
+  [506, "tens", 0], [1000, "thousands", 1000],
+  [123456, "ten_thousands", 20000], [123456, "hundred_thousands", 100000],
+] as const) {
+  assert.equal(derivePlaceValueBuilderAnswer({
+    targetNumber, mode: "missing_mab_part", place,
+    hundredThousands: null, tenThousands: null, thousands: null,
+    hundreds: null, tens: null, ones: null,
+  }), expected, `Hidden ${place} in ${targetNumber}`);
+}
+assert.equal(missingMabPrompt(596, "ones"), "The number is 596. How many ones are missing?");
+assert.match(missingMabPrompt(596, "tens"), /total value of the missing tens/);
+
+// Reproduce the photographed typed question with the last place (ones) hidden.
+const originalRandom = Math.random;
+try {
+  Math.random = () => 0.999;
+  const photographedQuestion = generateQuestion(2, programs[2][0]!.lessons[1]!, {
+    activityType: "typed_response",
+    weight: 1,
+    config: { min: 596, max: 596, mode: "missing_mab_part", sourceActivityType: "place_value_builder", hideOnePlaceValue: true },
+  });
+  assert.equal(photographedQuestion.kind, "typed_response");
+  assert.equal(photographedQuestion.answer, "6");
+  const visual = mabFromQuestion(photographedQuestion);
+  assert(visual);
+  assert.equal(visual.hundreds, 5);
+  assert.equal(visual.tens, 9);
+  assert.equal(visual.ones, null);
+} finally {
+  Math.random = originalRandom;
+}
+
 const thousandBoundaryLesson = programs[2][0]!.lessons[0]!;
 const thousandBoundaryActivity: LessonActivity = {
   activityType: "typed_response",
@@ -118,6 +156,20 @@ for (const level of levels) {
                 ? question.mode === "missing_mab_part"
                 : activity.config.mode === "missing_mab_part";
             assertValidMab(mab, context, missingPart);
+            if (missingPart) {
+              assert("answer" in question, `${context}: missing answer key`);
+              const target = question.kind === "place_value_builder"
+                ? question.targetNumber
+                : Number(question.prompt.match(/The number is (\d+)/)?.[1]);
+              assert(Number.isFinite(target), `${context}: missing target number`);
+              const multipliers = {hundred_thousands: 100000, ten_thousands: 10000, thousands: 1000, hundreds: 100, tens: 10, ones: 1};
+              const visibleTotal = mab.placeValues.reduce((sum, place) =>
+                sum + (mab[placeFields[place]] ?? 0) * multipliers[place], 0);
+              assert.equal(Number(question.answer), target - visibleTotal, `${context}: incorrect missing value`);
+              if (question.kind === "place_value_builder") {
+                assert.equal(derivePlaceValueBuilderAnswer(question), target - visibleTotal, `${context}: renderer marking differs from question key`);
+              }
+            }
             mabQuestions += 1;
           }
           generatedQuestions += 1;

@@ -5984,24 +5984,36 @@ export function derivePlaceValueBuilderAnswer(question: Pick<PlaceValueBuilderQu
   }
 
   const place = question.place ?? "ones";
-  const count =
+  const visibleCount =
     place === "hundred_thousands"
-      ? question.hundredThousands ?? 0
+      ? question.hundredThousands
       : place === "ten_thousands"
-      ? question.tenThousands ?? 0
+      ? question.tenThousands
       : place === "thousands"
-      ? question.thousands ?? 0
+      ? question.thousands
       : place === "hundreds"
-      ? question.hundreds ?? 0
+      ? question.hundreds
       : place === "tens"
-      ? question.tens ?? 0
-      : question.ones ?? 0;
+      ? question.tens
+      : question.ones;
+
+  // Missing blocks are null in the visual, not zero in the number.
+  const count = visibleCount ?? (question.mode === "missing_mab_part"
+    ? digitForPlace(question.targetNumber, place)
+    : 0);
 
   if (question.mode === "identify_place") {
     return count;
   }
 
   return count * placeMultiplier(place);
+}
+
+export function missingMabPrompt(target: number, place: PlaceValueName) {
+  const label = placeLabel(place).toLowerCase();
+  return place === "ones"
+    ? `The number is ${target}. How many ones are missing?`
+    : `The number is ${target}. What is the total value of the missing ${label}?`;
 }
 
 function roundToNearest(value: number, unit: number) {
@@ -6892,7 +6904,7 @@ function generateInteractiveQuestion(
     if (mode === "missing_mab_part") {
       return {
         kind: "place_value_builder",
-        prompt: "What is the missing value?",
+        prompt: missingMabPrompt(target, place),
         hundredThousands: place === "hundred_thousands" ? null : hundredThousands,
         tenThousands: place === "ten_thousands" ? null : tenThousands,
         thousands: place === "thousands" ? null : thousands,
@@ -25875,18 +25887,6 @@ function generateGenericQuestion(
         tens: partition.tens / 10,
         ones: partition.ones,
       });
-      const visibleSummary = mabPlaceSummary(
-        activePlaces,
-        {
-          hundred_thousands: hundredThousands,
-          ten_thousands: tenThousands,
-          thousands,
-          hundreds: partition.hundreds / 100,
-          tens: partition.tens / 10,
-          ones: partition.ones,
-        },
-        place
-      );
       const missingPartVisual: MABVisualData = {
         ...mabVisual,
         hundredThousands: place === "hundred_thousands" ? null : hundredThousands,
@@ -25899,16 +25899,16 @@ function generateGenericQuestion(
       return asMultipleChoice
         ? {
             kind: "multiple_choice",
-            prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
+            prompt: missingMabPrompt(target, place),
             options: uniqueNumberOptions(hiddenValue, Math.max(4, hiddenValue || 4)),
             answer: String(hiddenValue),
             visual: missingPartVisual,
           }
         : {
             kind: "typed_response",
-            prompt: `The number is ${target}. The MAB shows ${visibleSummary}. What is the missing value?`,
+            prompt: missingMabPrompt(target, place),
             answer: String(hiddenValue),
-            placeholder: "Type the missing value",
+            placeholder: place === "ones" ? "Number of ones" : `Value of missing ${placeLabel(place).toLowerCase()}`,
             visual: missingPartVisual,
           };
     }

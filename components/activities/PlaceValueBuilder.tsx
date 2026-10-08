@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { PlaceValueBuilderQuestion, PlaceValueName } from "@/data/activities/year2/lessonEngine";
+import { derivePlaceValueBuilderAnswer, type PlaceValueBuilderQuestion, type PlaceValueName } from "@/data/activities/year2/lessonEngine";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import PlaceValueMABVisual from "@/components/activities/PlaceValueMABVisual";
 
@@ -12,32 +12,6 @@ function placeLabel(place: PlaceValueName) {
   if (place === "hundreds") return "Hundreds";
   if (place === "tens") return "Tens";
   return "Ones";
-}
-
-function placeCount(questionData: PlaceValueBuilderQuestion, place: PlaceValueName) {
-  if (place === "hundred_thousands") return questionData.hundredThousands;
-  if (place === "ten_thousands") return questionData.tenThousands;
-  if (place === "thousands") return questionData.thousands;
-  if (place === "hundreds") return questionData.hundreds;
-  if (place === "tens") return questionData.tens;
-  return questionData.ones;
-}
-
-function placeMultiplier(place: PlaceValueName) {
-  if (place === "hundred_thousands") return 100000;
-  if (place === "ten_thousands") return 10000;
-  if (place === "thousands") return 1000;
-  if (place === "hundreds") return 100;
-  if (place === "tens") return 10;
-  return 1;
-}
-
-function expectedPlaceValueAnswer(questionData: PlaceValueBuilderQuestion) {
-  if (questionData.mode === "identify_number") return questionData.targetNumber;
-  const place = questionData.place ?? "ones";
-  const count = placeCount(questionData, place) ?? 0;
-  if (questionData.mode === "identify_place") return count;
-  return count * placeMultiplier(place);
 }
 
 function PlaceValueBuilderInner({
@@ -70,7 +44,8 @@ function PlaceValueBuilderInner({
       ? "What number is shown?"
       : questionData.mode === "identify_place"
       ? `How many ${placeLabel(questionData.place ?? "ones").toLowerCase()}?`
-      : `Missing ${placeLabel(questionData.place ?? "ones").toLowerCase()} value`;
+      : questionData.place === "ones" ? "Enter the number of missing ones."
+      : `Enter the total value of the missing ${placeLabel(questionData.place ?? "ones").toLowerCase()}, not the number of blocks.`;
 
   function check() {
     const cleaned = response.trim();
@@ -80,7 +55,7 @@ function PlaceValueBuilderInner({
       onWrong?.(response);
       return;
     }
-    if (numericResponse === expectedPlaceValueAnswer(questionData)) onCorrect?.();
+    if (numericResponse === derivePlaceValueBuilderAnswer(questionData)) onCorrect?.();
     else onWrong?.(response);
   }
 
@@ -94,7 +69,7 @@ function PlaceValueBuilderInner({
           <h2 className="text-2xl font-black text-gray-900">{questionData.prompt}</h2>
           <ReadAloudBtn text={questionData.prompt} />
         </div>
-        <p className="mt-1.5 text-sm text-gray-600">{answerLabel}</p>
+        <div className="mt-1.5 flex items-center gap-2"><p className="text-sm text-gray-600">{answerLabel}</p><ReadAloudBtn text={answerLabel} /></div>
         {questionData.mode === "missing_mab_part" ? (
           <div className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-900">
             Target number:

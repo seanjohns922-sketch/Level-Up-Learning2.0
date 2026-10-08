@@ -1,5 +1,6 @@
 "use client";
 
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { MABVisualData, PlaceValueName } from "@/data/activities/year2/lessonEngine";
 
 function placeLabel(place: PlaceValueName) {
@@ -118,12 +119,14 @@ export default function PlaceValueMABVisual({
   title?: string;
 }) {
   const visiblePlaces = questionData.placeValues;
+  const diagramSpeech = visiblePlaces.map(place => {
+    const count = placeCount(questionData, place);
+    return count === null ? `${placeLabel(place)}: missing part.` : `${count} ${countLabel(place, count)}.`;
+  }).join(" ");
 
   return (
     <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
-      <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
-        {title}
-      </div>
+      <div className="flex items-center justify-between gap-3"><div className="text-xs font-bold uppercase tracking-wide text-teal-700">{title}</div><ReadAloudBtn text={`${title}. ${diagramSpeech}`} label="Read diagram" /></div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {visiblePlaces.map((place) => {
           const count = placeCount(questionData, place);
