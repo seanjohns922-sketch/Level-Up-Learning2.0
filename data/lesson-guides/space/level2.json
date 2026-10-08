@@ -7,7 +7,18 @@
    "If it bends all the way round, it is curved.",
    "If it has straight lines and corners, it has straight sides."
   ],
-  "tip": "An oval is curved, like a circle."
+  "tip": "An oval is curved, like a circle.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "circle"
+    },
+    {
+     "shape": "triangle"
+    }
+   ]
+  }
  },
  "1:2": {
   "idea": "Find shapes by the kind of edges they have.",
@@ -17,7 +28,24 @@
    "Sort curved from straight.",
    "Pick the shape that matches the question."
   ],
-  "tip": "Corners only appear on straight-sided shapes."
+  "tip": "Corners only appear on straight-sided shapes.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "circle"
+    },
+    {
+     "shape": "oval"
+    },
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "triangle"
+    }
+   ]
+  }
  },
  "1:3": {
   "idea": "Show what you know about straight sides and curved edges.",
@@ -37,7 +65,16 @@
    "Count each side as you go round.",
    "Stop when you get back to the start."
   ],
-  "tip": "Start at a corner so you know where you began."
+  "tip": "Start at a corner so you know where you began.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "rectangle",
+     "label": "4 sides"
+    }
+   ]
+  }
  },
  "2:2": {
   "idea": "Find the shape with a given number of sides.",
@@ -47,7 +84,20 @@
    "Compare with the number asked for.",
    "Choose the shape that matches."
   ],
-  "tip": "Squares and rectangles both have 4 sides."
+  "tip": "Squares and rectangles both have 4 sides.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "triangle",
+     "label": "3 sides"
+    },
+    {
+     "shape": "square",
+     "label": "4 sides"
+    }
+   ]
+  }
  },
  "2:3": {
   "idea": "Show what you know about counting sides.",
@@ -57,7 +107,16 @@
    "Count round the shape.",
    "Say the total."
   ],
-  "tip": "Mark the side you started on."
+  "tip": "Mark the side you started on.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "hexagon",
+     "label": "6 sides"
+    }
+   ]
+  }
  },
  "3:1": {
   "idea": "Parallel sides run alongside each other and never meet.",
@@ -67,7 +126,20 @@
    "Check whether they stay the same distance apart.",
    "If they do, they are parallel."
   ],
-  "tip": "Think of train tracks."
+  "tip": "Think of train tracks.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square",
+     "label": "parallel sides"
+    },
+    {
+     "shape": "triangle",
+     "label": "none"
+    }
+   ]
+  }
  },
  "3:2": {
   "idea": "Find the shape that has parallel sides.",
@@ -77,7 +149,18 @@
    "Check whether they would ever meet if extended.",
    "Pick the shape whose sides never meet."
   ],
-  "tip": "Triangles have no parallel sides."
+  "tip": "Triangles have no parallel sides.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "rectangle"
+    },
+    {
+     "shape": "triangle"
+    }
+   ]
+  }
  },
  "3:3": {
   "idea": "Show what you know about parallel sides.",
@@ -87,7 +170,15 @@
    "Decide if they are parallel.",
    "Answer yes or no."
   ],
-  "tip": "One parallel pair is enough to say yes."
+  "tip": "One parallel pair is enough to say yes.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "hexagon"
+    }
+   ]
+  }
  },
  "4:1": {
   "idea": "Compare two shapes and find what is the same.",
@@ -97,7 +188,18 @@
    "Check for curves, corners and parallel sides.",
    "Say what they share."
   ],
-  "tip": "Look at sides, corners and edges."
+  "tip": "Look at sides, corners and edges.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "rectangle"
+    }
+   ]
+  }
  },
  "4:2": {
   "idea": "Compare two shapes and find what is different.",
@@ -107,7 +209,18 @@
    "Look at corners and edges.",
    "Say what is different."
   ],
-  "tip": "Name the feature that differs."
+  "tip": "Name the feature that differs.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "triangle"
+    },
+    {
+     "shape": "square"
+    }
+   ]
+  }
  },
  "4:3": {
   "idea": "Find what is the same and what is different.",
@@ -117,7 +230,18 @@
    "Find one thing that is the same.",
    "Find one thing that is different."
   ],
-  "tip": "Use shape words: sides, corners, curved, parallel."
+  "tip": "Use shape words: sides, corners, curved, parallel.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "circle"
+    },
+    {
+     "shape": "oval"
+    }
+   ]
+  }
  },
  "5:1": {
   "idea": "A star map shows places from above.",

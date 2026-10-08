@@ -37,7 +37,18 @@
    "Check the regions are equal in size.",
    "Equal counts give equal chances."
   ],
-  "tip": "Region size matters, not just colour."
+  "tip": "Region size matters, not just colour.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "gold",
+    "blue",
+    "gold",
+    "blue",
+    "gold",
+    "blue"
+   ]
+  }
  },
  "2:2": {
   "idea": "Unequal regions or counts give unequal chances.",
@@ -47,7 +58,18 @@
    "The bigger count is more likely.",
    "Explain with the counts."
   ],
-  "tip": "A die with 1 on two faces makes 1 more likely."
+  "tip": "A die with 1 on two faces makes 1 more likely.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "gold",
+    "red",
+    "gold",
+    "gold",
+    "red",
+    "gold"
+   ]
+  }
  },
  "2:3": {
   "idea": "Use counts to find a hidden advantage.",
@@ -67,7 +89,32 @@
    "Each cell is one ordered pair: 36 in total.",
    "Count the cells that match the question."
   ],
-  "tip": "(2,6) and (6,2) are different pairs."
+  "tip": "(2,6) and (6,2) are different pairs.",
+  "visual": {
+   "kind": "diceGrid",
+   "highlight": [
+    [
+     2,
+     6
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     6,
+     2
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Some two-dice differences happen more often than others.",
@@ -77,7 +124,52 @@
    "Count the pairs for each difference.",
    "More pairs means more likely."
   ],
-  "tip": "Difference 0 happens 6 ways: (1,1) to (6,6)."
+  "tip": "Difference 0 happens 6 ways: (1,1) to (6,6).",
+  "visual": {
+   "kind": "diceGrid",
+   "highlight": [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     5,
+     6
+    ],
+    [
+     6,
+     5
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Repair a race so both players have the same number of dice pairs.",

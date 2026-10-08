@@ -7,7 +7,13 @@
    "Look where the other end finishes.",
    "Read that number."
   ],
-  "tip": "Don't start at the end of the ruler, start at 0."
+  "tip": "Don't start at the end of the ruler, start at 0.",
+  "visual": {
+   "kind": "ruler",
+   "length": 15,
+   "end": 12,
+   "label": "Spoon"
+  }
  },
  "1:2": {
   "idea": "Read centimetres where the object finishes.",
@@ -17,7 +23,13 @@
    "Find where it ends.",
    "Read the centimetres."
   ],
-  "tip": "Keep the ruler straight along the object."
+  "tip": "Keep the ruler straight along the object.",
+  "visual": {
+   "kind": "ruler",
+   "length": 16,
+   "end": 15,
+   "label": "Pencil"
+  }
  },
  "1:3": {
   "idea": "Use ruler measurements to solve problems.",
@@ -77,7 +89,15 @@
    "Read the number it points to.",
    "Say the unit."
   ],
-  "tip": "Check the scale's unit: g or kg."
+  "tip": "Check the scale's unit: g or kg.",
+  "visual": {
+   "kind": "gauge",
+   "tool": "scale",
+   "max": 1000,
+   "step": 100,
+   "value": 500,
+   "unit": "g"
+  }
  },
  "3:3": {
   "idea": "Compare masses using scale readings.",
@@ -87,7 +107,19 @@
    "Compare them.",
    "Subtract to find how much heavier."
   ],
-  "tip": "Use the same unit for both."
+  "tip": "Use the same unit for both.",
+  "visual": {
+   "kind": "bars",
+   "title": "Mass (g)",
+   "categories": [
+    "Spoon",
+    "Fork"
+   ],
+   "values": [
+    50,
+    30
+   ]
+  }
  },
  "4:1": {
   "idea": "Use millilitres for small amounts and litres for large amounts.",
@@ -107,7 +139,15 @@
    "Read the mark beside it.",
    "Say the unit."
   ],
-  "tip": "Read at eye level, straight across."
+  "tip": "Read at eye level, straight across.",
+  "visual": {
+   "kind": "gauge",
+   "tool": "jug",
+   "max": 5,
+   "step": 0.5,
+   "value": 4,
+   "unit": "L"
+  }
  },
  "4:3": {
   "idea": "Use capacity readings to compare and solve problems.",
@@ -157,7 +197,12 @@
    "Read the hour from the short hand.",
    "Say the time: 2:30."
   ],
-  "tip": "Each number on the clock is 5 minutes."
+  "tip": "Each number on the clock is 5 minutes.",
+  "visual": {
+   "kind": "clock",
+   "hour": 2,
+   "minute": 30
+  }
  },
  "6:2": {
   "idea": "Read to the nearest minute: count fives, then the small marks.",
@@ -167,7 +212,12 @@
    "Count the extra small marks one by one.",
    "Add them: 5 + 4 = 9 minutes."
   ],
-  "tip": "Each small mark is 1 minute."
+  "tip": "Each small mark is 1 minute.",
+  "visual": {
+   "kind": "clock",
+   "hour": 4,
+   "minute": 9
+  }
  },
  "6:3": {
   "idea": "Match analog and digital clocks.",
@@ -177,7 +227,12 @@
    "Read the hour from the short hand.",
    "Write it as hour:minutes."
   ],
-  "tip": "Single minutes need a zero: 9:01, not 9:1."
+  "tip": "Single minutes need a zero: 9:01, not 9:1.",
+  "visual": {
+   "kind": "clock",
+   "hour": 9,
+   "minute": 1
+  }
  },
  "7:1": {
   "idea": "An angle measures how much something turns.",
@@ -187,7 +242,11 @@
    "Look at the opening between the arms.",
    "A bigger turn makes a bigger angle."
   ],
-  "tip": "The length of the arms doesn't change the angle."
+  "tip": "The length of the arms doesn't change the angle.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 60
+  }
  },
  "7:2": {
   "idea": "Compare angles with a right angle (a square corner).",
@@ -197,7 +256,12 @@
    "Smaller than it: acute. Equal: right. Larger: obtuse.",
    "Order angles by how much they turn."
   ],
-  "tip": "A book corner makes a right angle."
+  "tip": "A book corner makes a right angle.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 45,
+   "label": "acute"
+  }
  },
  "7:3": {
   "idea": "Use a right angle to classify and order angles.",
@@ -207,7 +271,12 @@
    "Name it: acute, right or obtuse.",
    "Order from smallest to largest turn."
   ],
-  "tip": "Look at the turn, not the arm length."
+  "tip": "Look at the turn, not the arm length.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 120,
+   "label": "obtuse"
+  }
  },
  "8:1": {
   "idea": "Estimate first, then measure to check.",
@@ -237,6 +306,11 @@
    "Name the angle type.",
    "Order angles by size."
   ],
-  "tip": "Right angles are exactly a square corner."
+  "tip": "Right angles are exactly a square corner.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 40,
+   "label": "acute"
+  }
  }
 }

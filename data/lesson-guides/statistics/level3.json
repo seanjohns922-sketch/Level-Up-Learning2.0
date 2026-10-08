@@ -77,7 +77,21 @@
    "The biggest frequency is the most.",
    "The smallest frequency is the fewest."
   ],
-  "tip": "The frequencies add to the total number of answers."
+  "tip": "The frequencies add to the total number of answers.",
+  "visual": {
+   "kind": "bars",
+   "title": "Lunch orders",
+   "categories": [
+    "Pizza",
+    "Pasta",
+    "Salad"
+   ],
+   "values": [
+    8,
+    5,
+    3
+   ]
+  }
  },
  "3:3": {
   "idea": "Read and complete a frequency table.",
@@ -107,7 +121,19 @@
    "Use the scale on the side.",
    "Draw each bar up to its frequency."
   ],
-  "tip": "Leave equal gaps between bars."
+  "tip": "Leave equal gaps between bars.",
+  "visual": {
+   "kind": "bars",
+   "title": "Weekend activity",
+   "categories": [
+    "Sport",
+    "Reading"
+   ],
+   "values": [
+    6,
+    4
+   ]
+  }
  },
  "4:3": {
   "idea": "Compare categories using a display.",
@@ -117,7 +143,19 @@
    "Subtract to compare: 9 − 5 = 4.",
    "Say which is more and by how much."
   ],
-  "tip": "Read the bar heights from the scale, not by guessing."
+  "tip": "Read the bar heights from the scale, not by guessing.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite music",
+   "categories": [
+    "Pop",
+    "Rock"
+   ],
+   "values": [
+    9,
+    5
+   ]
+  }
  },
  "5:1": {
   "idea": "Evidence is the numbers in the display.",
@@ -137,7 +175,21 @@
    "Find what stands out: the biggest is Car.",
    "Choose the conclusion that matches the data."
   ],
-  "tip": "Don't conclude something the data doesn't show."
+  "tip": "Don't conclude something the data doesn't show.",
+  "visual": {
+   "kind": "bars",
+   "title": "Travel to school",
+   "categories": [
+    "Car",
+    "Bus",
+    "Walk"
+   ],
+   "values": [
+    10,
+    4,
+    6
+   ]
+  }
  },
  "5:3": {
   "idea": "Use the data to answer the original question.",

@@ -97,7 +97,17 @@
    "Find the row number along the side.",
    "The cell where they meet is the reference."
   ],
-  "tip": "Letter first, then number."
+  "tip": "Letter first, then number.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 4,
+   "rows": 4,
+   "marks": [
+    {
+     "ref": "B3"
+    }
+   ]
+  }
  },
  "4:2": {
   "idea": "Use grid references to find, report or place features.",
@@ -107,7 +117,18 @@
    "Find the column, then the row.",
    "Read the landmark in that cell."
   ],
-  "tip": "The reference names the cell, not a line."
+  "tip": "The reference names the cell, not a line.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 5,
+   "rows": 4,
+   "marks": [
+    {
+     "ref": "D3",
+     "label": "Base"
+    }
+   ]
+  }
  },
  "4:3": {
   "idea": "A grid system labels every column and row in order.",
@@ -117,7 +138,13 @@
    "Label the rows with numbers in order.",
    "Check nothing is missing or repeated."
   ],
-  "tip": "Every cell must have one unique reference."
+  "tip": "Every cell must have one unique reference.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 4,
+   "rows": 4,
+   "marks": []
+  }
  },
  "5:1": {
   "idea": "A route moves from one grid reference to another.",
@@ -127,7 +154,29 @@
    "Apply each move: right changes the letter, up changes the number.",
    "Record the reference reached."
   ],
-  "tip": "Count cells, not lines."
+  "tip": "Count cells, not lines.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 6,
+   "rows": 4,
+   "marks": [
+    {
+     "ref": "B2",
+     "label": "Start"
+    },
+    {
+     "ref": "E3",
+     "label": "End"
+    }
+   ],
+   "path": [
+    "B2",
+    "C2",
+    "D2",
+    "E2",
+    "E3"
+   ]
+  }
  },
  "5:2": {
   "idea": "Write directions someone else can follow exactly.",
@@ -137,7 +186,33 @@
    "Run the route on the grid.",
    "Fix it if it misses the goal."
   ],
-  "tip": "Each move needs a direction and a distance."
+  "tip": "Each move needs a direction and a distance.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 8,
+   "rows": 4,
+   "marks": [
+    {
+     "ref": "A2",
+     "label": "A2"
+    },
+    {
+     "ref": "H3",
+     "label": "H3"
+    }
+   ],
+   "path": [
+    "A2",
+    "B2",
+    "C2",
+    "D2",
+    "E2",
+    "F2",
+    "G2",
+    "H2",
+    "H3"
+   ]
+  }
  },
  "5:3": {
   "idea": "A valid route must reach the goal and follow every rule.",
@@ -157,7 +232,18 @@
    "Find the matching spot the same distance across the line.",
    "Check every feature matches."
   ],
-  "tip": "Balanced is not the same as symmetric."
+  "tip": "Balanced is not the same as symmetric.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "hexagon"
+    }
+   ]
+  }
  },
  "6:2": {
   "idea": "Complete a reflection by copying each tile to the opposite side.",
@@ -187,7 +273,18 @@
    "Compare it with the start.",
    "If it matches before a full turn, it has rotational symmetry."
   ],
-  "tip": "Every shape matches after a full turn, so that doesn't count."
+  "tip": "Every shape matches after a full turn, so that doesn't count.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "rectangle"
+    }
+   ]
+  }
  },
  "7:2": {
   "idea": "Record which turns make the design match.",

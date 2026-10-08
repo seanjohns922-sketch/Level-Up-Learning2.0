@@ -33,16 +33,20 @@ import pattern4 from './pattern/level4.json' with { type: 'json' };
 import pattern5 from './pattern/level5.json' with { type: 'json' };
 import pattern6 from './pattern/level6.json' with { type: 'json' };
 
-export type LowerLessonGuide = { idea: string; example: string; steps: string[]; tip: string };
+import type { GuideVisual } from './guide-visual';
+
+export type LowerLessonGuide = { idea: string; example: string; steps: string[]; tip: string; visual?: GuideVisual };
 type LessonGuideSet = Record<string, LowerLessonGuide>;
 /** Guides written for one lesson each, keyed "week:lesson". They replace the shared topic cards. */
+// JSON imports widen the diagram kind to string, so each set is checked by the guide test instead.
+const set = (guides: unknown) => guides as LessonGuideSet;
 export const LESSON_GUIDES: Record<string, Partial<Record<number, LessonGuideSet>>> = {
-  number: { 1: number1, 2: number2, 3: number3, 4: number4, 5: number5, 6: number6 },
-  chance: { 3: chance3, 4: chance4, 5: chance5, 6: chance6 },
-  measurement: { 1: measurement1, 2: measurement2, 3: measurement3, 4: measurement4, 5: measurement5, 6: measurement6 },
-  pattern: { 3: pattern3, 4: pattern4, 5: pattern5, 6: pattern6 },
-  space: { 1: space1, 2: space2, 3: space3, 4: space4, 5: space5, 6: space6 },
-  statistics: { 1: statistics1, 2: statistics2, 3: statistics3, 4: statistics4, 5: statistics5, 6: statistics6 },
+  number: { 1: set(number1), 2: set(number2), 3: set(number3), 4: set(number4), 5: set(number5), 6: set(number6) },
+  chance: { 3: set(chance3), 4: set(chance4), 5: set(chance5), 6: set(chance6) },
+  measurement: { 1: set(measurement1), 2: set(measurement2), 3: set(measurement3), 4: set(measurement4), 5: set(measurement5), 6: set(measurement6) },
+  pattern: { 3: set(pattern3), 4: set(pattern4), 5: set(pattern5), 6: set(pattern6) },
+  space: { 1: set(space1), 2: set(space2), 3: set(space3), 4: set(space4), 5: set(space5), 6: set(space6) },
+  statistics: { 1: set(statistics1), 2: set(statistics2), 3: set(statistics3), 4: set(statistics4), 5: set(statistics5), 6: set(statistics6) },
 };
 export function getLowerLessonGuide(realm: string, level: number | undefined, week: number | undefined, lesson: number | undefined): LowerLessonGuide | null {
   if (!level || level < 1 || level > 6 || !week || !lesson) return null;

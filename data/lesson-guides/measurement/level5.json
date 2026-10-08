@@ -67,7 +67,17 @@
    "Double each.",
    "Add: 16 + 10 = 26 m."
   ],
-  "tip": "This only works when opposite sides are equal."
+  "tip": "This only works when opposite sides are equal.",
+  "visual": {
+   "kind": "perimeter",
+   "sides": [
+    8,
+    5,
+    8,
+    5
+   ],
+   "unit": "m"
+  }
  },
  "3:2": {
   "idea": "Irregular shapes: add every outside edge once.",
@@ -87,7 +97,17 @@
    "Add them for the perimeter.",
    "Answer with the unit."
   ],
-  "tip": "Check you included every side."
+  "tip": "Check you included every side.",
+  "visual": {
+   "kind": "perimeter",
+   "sides": [
+    12,
+    8,
+    12,
+    8
+   ],
+   "unit": "m"
+  }
  },
  "4:1": {
   "idea": "A rectangle of squares is rows × columns.",
@@ -97,7 +117,12 @@
    "Count the squares in one row.",
    "Multiply: 4 × 6 = 24."
   ],
-  "tip": "Each row has the same number of squares."
+  "tip": "Each row has the same number of squares.",
+  "visual": {
+   "kind": "areaGrid",
+   "rows": 4,
+   "cols": 6
+  }
  },
  "4:2": {
   "idea": "Area of a rectangle = rows × columns.",
@@ -107,7 +132,12 @@
    "Multiply them.",
    "Write the answer in square units."
   ],
-  "tip": "Don't add the rows and columns."
+  "tip": "Don't add the rows and columns.",
+  "visual": {
+   "kind": "areaGrid",
+   "rows": 7,
+   "cols": 5
+  }
  },
  "4:3": {
   "idea": "Use rows × columns to solve area problems.",
@@ -117,7 +147,13 @@
    "Multiply them.",
    "Answer in square units."
   ],
-  "tip": "Area answers use square units."
+  "tip": "Area answers use square units.",
+  "visual": {
+   "kind": "areaGrid",
+   "rows": 4,
+   "cols": 6,
+   "unit": "m"
+  }
  },
  "5:1": {
   "idea": "Decide whether to measure around (perimeter) or inside (area).",
@@ -147,7 +183,17 @@
    "A fence goes around, so find the perimeter.",
    "6 + 4 + 6 + 4 = 20 m."
   ],
-  "tip": "Covering = area in square units. Edging = perimeter in units."
+  "tip": "Covering = area in square units. Edging = perimeter in units.",
+  "visual": {
+   "kind": "perimeter",
+   "sides": [
+    6,
+    4,
+    6,
+    4
+   ],
+   "unit": "m"
+  }
  },
  "6:1": {
   "idea": "24-hour time keeps counting after midday.",
@@ -157,7 +203,12 @@
    "For pm times after 12, add 12 to the hour.",
    "12:55 pm stays 12:55."
   ],
-  "tip": "Midnight is 00:00."
+  "tip": "Midnight is 00:00.",
+  "visual": {
+   "kind": "clock",
+   "hour": 2,
+   "minute": 30
+  }
  },
  "6:2": {
   "idea": "Convert between 12-hour and 24-hour time.",
@@ -187,7 +238,12 @@
    "Line the base arm up with 0.",
    "Read the scale that starts at 0."
   ],
-  "tip": "Use the inner or outer scale, whichever starts at 0."
+  "tip": "Use the inner or outer scale, whichever starts at 0.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 65,
+   "protractor": true
+  }
  },
  "7:2": {
   "idea": "To construct an angle, use the protractor's 0 line and count up the right scale.",
@@ -197,7 +253,12 @@
    "Use the scale that starts at 0 on your side.",
    "Open the arm until it reaches the target degrees."
   ],
-  "tip": "Check: angles under 90° look narrower than a square corner."
+  "tip": "Check: angles under 90° look narrower than a square corner.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 45,
+   "protractor": true
+  }
  },
  "7:3": {
   "idea": "Estimate an angle by comparing it with 90° and 180°.",
@@ -207,7 +268,11 @@
    "Decide which the angle is close to.",
    "Make your estimate, then check with the protractor."
   ],
-  "tip": "Half a right angle is 45°."
+  "tip": "Half a right angle is 45°.",
+  "visual": {
+   "kind": "angle",
+   "degrees": 80
+  }
  },
  "8:1": {
   "idea": "Design the park: choose what to measure first.",

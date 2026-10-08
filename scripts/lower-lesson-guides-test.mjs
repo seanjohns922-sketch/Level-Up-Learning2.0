@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { guideVisualSpeech } from '../data/lesson-guides/guide-visual.ts';
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId, LESSON_GUIDES } from '../data/lesson-guides/lower-level.ts';
 import { PROGRAMS_BY_YEAR } from '../data/programs/index.ts';
 import { PATTERN_PEAKS_PROGRAMS, getPatternPeaksLessonConceptIntro } from '../data/programs/patternPeaks.ts';
@@ -52,12 +53,17 @@ for (const [key, guide] of Object.entries(topics)) {
   assert(guide.steps.every(step => step.trim().length > 8));
 }
 // Lesson-specific guides: every Number lesson in Levels 1–6 has its own, complete, concise guide.
-let own = 0;
+let own = 0, visuals = 0;
 for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, set] of Object.entries(levels)) for (const [key, guide] of Object.entries(set)) {
   assert(seen.has(`${realm}:${level}:${key}`), `Lesson guide for a nonexistent lesson: ${realm}:${level}:${key}`);
   assert(guide.idea.length > 15 && guide.idea.length <= 140, `Idea length ${realm}:${level}:${key}`);
   assert(guide.example.trim().length > 2 && guide.tip.length > 12, `Incomplete ${realm}:${level}:${key}`);
   assert(guide.steps.length >= 2 && guide.steps.length <= 4 && guide.steps.every(step => step.trim().length > 8 && step.length <= 170), `Steps ${realm}:${level}:${key}`);
+  if (guide.visual) {
+    assert(['thermometer','clock','ruler','gauge','angle','grid','gridRef','shapes','net','spinner','diceGrid','blocks','areaGrid','perimeter','calendar','numberLine','bars','dots'].includes(guide.visual.kind), `Unknown diagram ${realm}:${level}:${key}`);
+    assert(guideVisualSpeech(guide.visual).length > 10, `Diagram needs a spoken description ${realm}:${level}:${key}`);
+    visuals++;
+  }
   own++;
 }
 // Every Level 1–6 lesson in every realm has its own written guide; intro scenes no longer stand alone.
@@ -84,4 +90,4 @@ const engine = fs.readFileSync('components/lesson/Year2LessonEngine.tsx', 'utf8'
 assert.match(engine, /skillGuideOpenRef\.current \? c : c - 1/);
 const guide = fs.readFileSync('components/lesson/LowerLessonGuide.tsx', 'utf8');
 for (const part of ['Read whole guide', 'Read example', 'Step ${i + 1}', 'Tip. ${guide.tip}', 'Read instructions']) assert(guide.includes(part), `Missing narration: ${part}`);
-console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific). Ground and Levels 7–8 excluded.`);
+console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific, ${visuals} with diagrams). Ground and Levels 7–8 excluded.`);

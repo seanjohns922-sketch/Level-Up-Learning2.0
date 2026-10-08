@@ -57,7 +57,21 @@
    "Compare the numbers in the count column.",
    "The biggest is the most; the smallest is the fewest."
   ],
-  "tip": "Check the counts add up to the total."
+  "tip": "Check the counts add up to the total.",
+  "visual": {
+   "kind": "bars",
+   "title": "Breakfast",
+   "categories": [
+    "Egg",
+    "Toast",
+    "Cereal"
+   ],
+   "values": [
+    3,
+    7,
+    5
+   ]
+  }
  },
  "3:1": {
   "idea": "A picture graph uses one picture for each vote.",
@@ -127,7 +141,21 @@
    "Order them from biggest to smallest, or smallest to biggest.",
    "Check the order the question asks for."
   ],
-  "tip": "Read 'most to least' or 'least to most' carefully."
+  "tip": "Read 'most to least' or 'least to most' carefully.",
+  "visual": {
+   "kind": "bars",
+   "title": "Pets",
+   "categories": [
+    "Cat",
+    "Dog",
+    "Fish"
+   ],
+   "values": [
+    6,
+    4,
+    2
+   ]
+  }
  },
  "5:2": {
   "idea": "Find how many more one category has than another.",
@@ -137,7 +165,19 @@
    "Subtract the smaller from the bigger: 8 − 5.",
    "3 more chose Lion."
   ],
-  "tip": "'How many more' means find the difference."
+  "tip": "'How many more' means find the difference.",
+  "visual": {
+   "kind": "bars",
+   "title": "Zoo animals",
+   "categories": [
+    "Lion",
+    "Zebra"
+   ],
+   "values": [
+    8,
+    5
+   ]
+  }
  },
  "5:3": {
   "idea": "A conclusion must match what the data shows.",
@@ -147,7 +187,19 @@
    "Compare it with the statement.",
    "The statement is false."
   ],
-  "tip": "Check every category before deciding."
+  "tip": "Check every category before deciding.",
+  "visual": {
+   "kind": "bars",
+   "title": "Fruit votes",
+   "categories": [
+    "Banana",
+    "Apple"
+   ],
+   "values": [
+    4,
+    6
+   ]
+  }
  },
  "6:1": {
   "idea": "Plan an investigation: ask a question and record the answers with tallies.",
@@ -177,6 +229,18 @@
    "Work out the difference.",
    "Write a sentence using the numbers."
   ],
-  "tip": "Use exact numbers from the display."
+  "tip": "Use exact numbers from the display.",
+  "visual": {
+   "kind": "bars",
+   "title": "Toys",
+   "categories": [
+    "Ball",
+    "Kite"
+   ],
+   "values": [
+    7,
+    4
+   ]
+  }
  }
 }

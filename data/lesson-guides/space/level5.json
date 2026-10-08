@@ -17,7 +17,36 @@
    "Check each face lands on a different side.",
    "If two faces overlap, it isn't a cube net."
   ],
-  "tip": "Six squares are not enough on their own."
+  "tip": "Six squares are not enough on their own.",
+  "visual": {
+   "kind": "net",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Explain why a net works using folding evidence.",
@@ -27,7 +56,36 @@
    "Check every face has its own side.",
    "Explain: no gaps and no overlaps."
   ],
-  "tip": "Give evidence from the fold."
+  "tip": "Give evidence from the fold.",
+  "visual": {
+   "kind": "net",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Every flat piece of a net becomes one face.",
@@ -47,7 +105,47 @@
    "Fold the faces next to it up as sides.",
    "The face left over lands on top: opposite."
   ],
-  "tip": "Opposite faces never touch."
+  "tip": "Opposite faces never touch.",
+  "visual": {
+   "kind": "net",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "labels": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+   ],
+   "marked": [
+    0
+   ]
+  }
  },
  "2:3": {
   "idea": "Faces are either opposite or adjacent (sharing an edge).",
@@ -57,7 +155,48 @@
    "If the faces share an edge, they are adjacent.",
    "If they sit across the cube, they are opposite."
   ],
-  "tip": "Each cube face has 4 adjacent faces and 1 opposite face."
+  "tip": "Each cube face has 4 adjacent faces and 1 opposite face.",
+  "visual": {
+   "kind": "net",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   "labels": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+   ],
+   "marked": [
+    0,
+    2
+   ]
+  }
  },
  "3:1": {
   "idea": "Tell solids apart by their nets.",
@@ -77,7 +216,36 @@
    "Fold to test.",
    "If two faces clash, move one and test again."
   ],
-  "tip": "There are 11 different cube nets."
+  "tip": "There are 11 different cube nets.",
+  "visual": {
+   "kind": "net",
+   "cells": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Test a net for overlaps and gaps.",
@@ -97,7 +265,19 @@
    "Count across along the horizontal axis.",
    "Then count up."
   ],
-  "tip": "Across first, then up."
+  "tip": "Across first, then up.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "points": [
+    {
+     "x": 3,
+     "y": 2,
+     "label": "★ (3, 2)"
+    }
+   ]
+  }
  },
  "4:2": {
   "idea": "Plot a point by counting across then up; read it the same way.",
@@ -107,7 +287,19 @@
    "Move across the first number.",
    "Move up the second number."
   ],
-  "tip": "(4, 1) and (1, 4) are different points."
+  "tip": "(4, 1) and (1, 4) are different points.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "points": [
+    {
+     "x": 4,
+     "y": 1,
+     "label": "(4, 1)"
+    }
+   ]
+  }
  },
  "4:3": {
   "idea": "Spot a coordinate error by recounting.",
@@ -117,7 +309,19 @@
    "Count up.",
    "Compare with the label: are the numbers swapped?"
   ],
-  "tip": "Swapping across and up is the most common error."
+  "tip": "Swapping across and up is the most common error.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "points": [
+    {
+     "x": 3,
+     "y": 5,
+     "label": "★"
+    }
+   ]
+  }
  },
  "5:1": {
   "idea": "Moving along one direction changes only one number.",
@@ -127,7 +331,24 @@
    "Left or right changes only the first number.",
    "Add or subtract the number of squares moved."
   ],
-  "tip": "Right and up add; left and down subtract."
+  "tip": "Right and up add; left and down subtract.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 8,
+   "points": [
+    {
+     "x": 3,
+     "y": 5,
+     "label": "Start"
+    },
+    {
+     "x": 3,
+     "y": 7,
+     "label": "End"
+    }
+   ]
+  }
  },
  "5:2": {
   "idea": "Follow commands in order to find the end position.",
@@ -137,7 +358,24 @@
    "Apply each command one at a time.",
    "Write the final coordinates."
   ],
-  "tip": "Keep track after every move."
+  "tip": "Keep track after every move.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 5,
+   "points": [
+    {
+     "x": 1,
+     "y": 1,
+     "label": "Start"
+    },
+    {
+     "x": 3,
+     "y": 3,
+     "label": "End"
+    }
+   ]
+  }
  },
  "5:3": {
   "idea": "The best route reaches the goal in the fewest moves while avoiding blocks.",
@@ -157,7 +395,49 @@
    "Add the up move to y.",
    "Do the same for every corner."
   ],
-  "tip": "The shape keeps its size and faces the same way."
+  "tip": "The shape keeps its size and faces the same way.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "shapes": [
+    {
+     "points": [
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "label": "Shape"
+    },
+    {
+     "points": [
+      [
+       3,
+       2
+      ],
+      [
+       4,
+       2
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "dashed": true,
+     "label": "Image"
+    }
+   ]
+  }
  },
  "6:2": {
   "idea": "Describe a slide by comparing a point with its image.",
@@ -167,7 +447,49 @@
    "Count how far across it moved.",
    "Count how far up it moved."
   ],
-  "tip": "Use the same corner on both shapes."
+  "tip": "Use the same corner on both shapes.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "shapes": [
+    {
+     "points": [
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "label": "Shape"
+    },
+    {
+     "points": [
+      [
+       4,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       4,
+       4
+      ]
+     ],
+     "dashed": true,
+     "label": "Image"
+    }
+   ]
+  }
  },
  "6:3": {
   "idea": "A slide never flips or turns the shape.",
@@ -187,7 +509,53 @@
    "Place the image the same distance on the other side.",
    "Do this for every corner."
   ],
-  "tip": "The image faces the opposite way."
+  "tip": "The image faces the opposite way.",
+  "visual": {
+   "kind": "grid",
+   "min": 0,
+   "max": 6,
+   "shapes": [
+    {
+     "points": [
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "label": "Shape"
+    },
+    {
+     "points": [
+      [
+       5,
+       1
+      ],
+      [
+       4,
+       1
+      ],
+      [
+       5,
+       3
+      ]
+     ],
+     "dashed": true,
+     "label": "Image"
+    }
+   ],
+   "mirror": {
+    "axis": "x",
+    "at": 3
+   }
+  }
  },
  "7:2": {
   "idea": "A rotation turns a shape around a centre point.",

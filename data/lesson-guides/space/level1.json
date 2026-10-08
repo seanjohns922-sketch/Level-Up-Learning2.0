@@ -7,7 +7,24 @@
    "Look at the sides and corners.",
    "Name the shape from its sides and corners."
   ],
-  "tip": "Turning a shape does not change what it is."
+  "tip": "Turning a shape does not change what it is.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square",
+     "label": "big square",
+     "color": "red",
+     "scale": 1
+    },
+    {
+     "shape": "square",
+     "label": "small square",
+     "color": "blue",
+     "scale": 0.55
+    }
+   ]
+  }
  },
  "1:2": {
   "idea": "Compare close shapes carefully: circle or oval, square or rectangle.",
@@ -17,7 +34,18 @@
    "A circle is round all the way; an oval is stretched.",
    "A square has 4 equal sides; a rectangle has 2 long and 2 short."
   ],
-  "tip": "Check the side lengths, not just the corners."
+  "tip": "Check the side lengths, not just the corners.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "rectangle"
+    }
+   ]
+  }
  },
  "1:3": {
   "idea": "Use every clue to find a mystery shape.",
@@ -27,7 +55,15 @@
    "Read the next clue and cross out more.",
    "The shape left fits every clue."
   ],
-  "tip": "Use all the clues, not just one."
+  "tip": "Use all the clues, not just one.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "triangle"
+    }
+   ]
+  }
  },
  "2:1": {
   "idea": "Shapes join a family by what they share, like their number of sides.",
@@ -37,7 +73,18 @@
    "Find the family with that number of sides.",
    "Curved shapes with no straight sides go together."
   ],
-  "tip": "Count each side once."
+  "tip": "Count each side once.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "triangle"
+    },
+    {
+     "shape": "circle"
+    }
+   ]
+  }
  },
  "2:2": {
   "idea": "A sorting rule is what every shape in a group shares.",
@@ -47,7 +94,21 @@
    "Find what is the same about every one.",
    "That is the rule."
   ],
-  "tip": "Check the rule works for every shape."
+  "tip": "Check the rule works for every shape.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    },
+    {
+     "shape": "rectangle"
+    },
+    {
+     "shape": "kite"
+    }
+   ]
+  }
  },
  "2:3": {
   "idea": "The same shapes can be sorted in more than one way.",
@@ -57,7 +118,27 @@
    "Pick a different feature: sides, size, colour or curved edges.",
    "Sort them again using that feature."
   ],
-  "tip": "A new rule makes new groups."
+  "tip": "A new rule makes new groups.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "triangle",
+     "label": null,
+     "color": "red"
+    },
+    {
+     "shape": "square",
+     "label": null,
+     "color": "red"
+    },
+    {
+     "shape": "circle",
+     "label": null,
+     "color": "blue"
+    }
+   ]
+  }
  },
  "3:1": {
   "idea": "Pictures are made of shapes you know.",
@@ -127,7 +208,15 @@
    "Join each corner to the next, in order.",
    "Join the last corner back to the start."
   ],
-  "tip": "Don't cross over the middle of the shape."
+  "tip": "Don't cross over the middle of the shape.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square"
+    }
+   ]
+  }
  },
  "5:2": {
   "idea": "A shape with a gap needs one more side.",
@@ -147,7 +236,22 @@
    "Ignore the size and the turn.",
    "Say what is the same and what is different."
   ],
-  "tip": "Size changes; the shape does not."
+  "tip": "Size changes; the shape does not.",
+  "visual": {
+   "kind": "shapes",
+   "items": [
+    {
+     "shape": "square",
+     "label": "small",
+     "color": null,
+     "scale": 0.5
+    },
+    {
+     "shape": "square",
+     "label": "big"
+    }
+   ]
+  }
  },
  "6:1": {
   "idea": "Build a route by choosing moves in order.",
@@ -157,7 +261,28 @@
    "Choose each move in order.",
    "Run the route to test it."
   ],
-  "tip": "Count the squares carefully."
+  "tip": "Count the squares carefully.",
+  "visual": {
+   "kind": "gridRef",
+   "cols": 5,
+   "rows": 4,
+   "marks": [
+    {
+     "ref": "A1",
+     "label": "Rover"
+    },
+    {
+     "ref": "C2",
+     "label": "★"
+    }
+   ],
+   "path": [
+    "A1",
+    "B1",
+    "C1",
+    "C2"
+   ]
+  }
  },
  "6:2": {
   "idea": "A mission route must reach the goal and follow the rule.",

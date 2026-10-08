@@ -97,7 +97,21 @@
    "The tallest column is the most.",
    "The shortest column is the least."
   ],
-  "tip": "Read whether to rank from MOST or from LEAST."
+  "tip": "Read whether to rank from MOST or from LEAST.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite colour",
+   "categories": [
+    "Red",
+    "Blue",
+    "Green"
+   ],
+   "values": [
+    5,
+    2,
+    4
+   ]
+  }
  },
  "4:2": {
   "idea": "Compare two counts to say which is more, less or the same.",
@@ -107,7 +121,19 @@
    "The bigger count has more.",
    "How many more is the difference: 6 − 4 = 2."
   ],
-  "tip": "Equal means both counts are the same."
+  "tip": "Equal means both counts are the same.",
+  "visual": {
+   "kind": "bars",
+   "title": "Weather",
+   "categories": [
+    "Cloudy",
+    "Sunny"
+   ],
+   "values": [
+    6,
+    4
+   ]
+  }
  },
  "4:3": {
   "idea": "Compare categories by looking at the difference between them.",
@@ -117,7 +143,19 @@
    "Decide which is bigger.",
    "Find how many more: 7 − 3 = 4."
   ],
-  "tip": "Subtract the smaller count from the bigger one."
+  "tip": "Subtract the smaller count from the bigger one.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite sport",
+   "categories": [
+    "Soccer",
+    "Swimming"
+   ],
+   "values": [
+    7,
+    3
+   ]
+  }
  },
  "5:1": {
   "idea": "Data can answer a question when you read it carefully.",
@@ -137,7 +175,19 @@
    "Compare them.",
    "If the data agrees, it is true. If not, it is false."
   ],
-  "tip": "Use the numbers, not what you think is likely."
+  "tip": "Use the numbers, not what you think is likely.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite fruit",
+   "categories": [
+    "Apple",
+    "Banana"
+   ],
+   "values": [
+    5,
+    3
+   ]
+  }
  },
  "5:3": {
   "idea": "The most popular answer is the one with the biggest count.",
@@ -147,7 +197,21 @@
    "Find the biggest one.",
    "That answer is the most popular."
   ],
-  "tip": "Look at all the categories before you choose."
+  "tip": "Look at all the categories before you choose.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite colour",
+   "categories": [
+    "Blue",
+    "Red",
+    "Green"
+   ],
+   "values": [
+    7,
+    4,
+    2
+   ]
+  }
  },
  "6:1": {
   "idea": "An investigation starts with a question, then collects answers.",
@@ -177,6 +241,18 @@
    "Find how many more chose the top answer.",
    "Say it in a sentence with the numbers."
   ],
-  "tip": "A report uses numbers from the data."
+  "tip": "A report uses numbers from the data.",
+  "visual": {
+   "kind": "bars",
+   "title": "Favourite colour",
+   "categories": [
+    "Red",
+    "Blue"
+   ],
+   "values": [
+    6,
+    3
+   ]
+  }
  }
 }

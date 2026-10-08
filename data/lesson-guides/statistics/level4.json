@@ -97,7 +97,24 @@
    "Find which values they sit at.",
    "That is where the data is concentrated."
   ],
-  "tip": "Look at the whole display, not just one bar."
+  "tip": "Look at the whole display, not just one bar.",
+  "visual": {
+   "kind": "dots",
+   "title": "Apps opened each day",
+   "min": 1,
+   "max": 6,
+   "values": [
+    2,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    5
+   ]
+  }
  },
  "4:2": {
   "idea": "Describe the shape: where it peaks and how it spreads.",
@@ -107,7 +124,23 @@
    "See whether the data is spread evenly or bunched.",
    "Describe it in words: peaks at 2, spread out to 5."
   ],
-  "tip": "Shape describes the pattern, not just one number."
+  "tip": "Shape describes the pattern, not just one number.",
+  "visual": {
+   "kind": "dots",
+   "title": "Books read each week",
+   "min": 1,
+   "max": 6,
+   "values": [
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    4,
+    5
+   ]
+  }
  },
  "4:3": {
   "idea": "Compare two distributions by their peaks.",

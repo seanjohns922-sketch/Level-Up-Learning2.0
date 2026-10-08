@@ -6,6 +6,8 @@ import { MathFormattedText } from '@/components/FractionText';
 import { getRealmTheme } from '@/lib/useRealmTheme';
 import { stopSpeaking } from '@/lib/speak';
 import type { LowerLessonGuide as GuideData } from '@/data/lesson-guides/lower-level';
+import GuideVisual from '@/components/lesson/GuideVisual';
+import { guideVisualSpeech } from '@/data/lesson-guides/guide-visual';
 
 export function LessonHelpDialog({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -35,7 +37,7 @@ export default function LowerLessonGuide({ guide, title, realm, onContinue, revi
   const theme = getRealmTheme(realm);
   const action = review ? 'Back to practice' : 'Let’s practise';
   const timerText = 'Read at your own pace. Your practice timer is paused.';
-  const exampleSpeech = spoken(guide.example);
+  const exampleSpeech = `${guide.visual ? guideVisualSpeech(guide.visual) + ' ' : ''}${spoken(guide.example)}`;
   const speech = `Learn the skill. ${title}. ${guide.idea} Worked example. ${exampleSpeech}. How to solve it. ${guide.steps.map((s, i) => `Step ${i + 1}. ${spoken(s)}`).join(' ')} Tip. ${guide.tip} ${timerText} Choose ${action} when ready.`;
   return <section data-lower-lesson-guide className="rounded-2xl border-2 bg-[#fffdf5] p-5 text-slate-900 sm:p-8" style={{ borderColor: theme.borderRing }}>
     <div className="flex items-start justify-between gap-4">
@@ -46,7 +48,8 @@ export default function LowerLessonGuide({ guide, title, realm, onContinue, revi
     <div className="grid gap-5 md:grid-cols-2">
       <div className="rounded-xl border bg-white p-5" style={{ borderColor: theme.borderRing }}>
         <div className="flex items-center justify-between gap-3"><h3 className="font-bold">Worked example</h3><ReadAloudBtn text={`Worked example. ${exampleSpeech}`} label="Read example" /></div>
-        <div className="my-6 text-xl font-bold leading-loose sm:text-2xl"><MathFormattedText text={guide.example} /></div>
+        {guide.visual && <div className="mt-4"><GuideVisual visual={guide.visual} /></div>}
+        <div className={`${guide.visual ? "mt-3 mb-2" : "my-6"} text-xl font-bold leading-loose sm:text-2xl`}><MathFormattedText text={guide.example} /></div>
       </div>
       <div><h3 className="mb-3 font-bold">How to solve it</h3><ol className="space-y-3">{guide.steps.map((step, i) => <li key={step} className="flex items-start gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold text-white" style={{ background: theme.ctaGradientCss }}>{i + 1}</span>

@@ -7,7 +7,12 @@
    "Lay blocks touching end to end along it.",
    "Count the blocks."
   ],
-  "tip": "Use blocks that are all the same size."
+  "tip": "Use blocks that are all the same size.",
+  "visual": {
+   "kind": "blocks",
+   "count": 6,
+   "object": "Cucumber"
+  }
  },
  "1:2": {
   "idea": "Compare lengths by comparing the number of blocks.",
@@ -17,7 +22,19 @@
    "Compare the numbers.",
    "More blocks means longer."
   ],
-  "tip": "Compare the counts, not how the picture looks."
+  "tip": "Compare the counts, not how the picture looks.",
+  "visual": {
+   "kind": "bars",
+   "title": "Length in blocks",
+   "categories": [
+    "Pencil",
+    "Crayon"
+   ],
+   "values": [
+    5,
+    3
+   ]
+  }
  },
  "1:3": {
   "idea": "A fair measure has no gaps and no overlaps.",
@@ -47,7 +64,19 @@
    "Compare the numbers.",
    "More cubes means heavier."
   ],
-  "tip": "Big objects are not always heavier."
+  "tip": "Big objects are not always heavier.",
+  "visual": {
+   "kind": "bars",
+   "title": "Mass in cubes",
+   "categories": [
+    "Pumpkin",
+    "Apple"
+   ],
+   "values": [
+    9,
+    4
+   ]
+  }
  },
  "2:3": {
   "idea": "A fair measure uses the same cubes every time.",
@@ -77,7 +106,19 @@
    "Compare the numbers.",
    "More cups means it holds more."
   ],
-  "tip": "Tall containers don't always hold more."
+  "tip": "Tall containers don't always hold more.",
+  "visual": {
+   "kind": "bars",
+   "title": "Capacity in cups",
+   "categories": [
+    "Kettle",
+    "Mug"
+   ],
+   "values": [
+    6,
+    2
+   ]
+  }
  },
  "3:3": {
   "idea": "Choose a unit that suits the size of the container.",
@@ -157,7 +198,16 @@
    "Find the number for the date.",
    "Read any event written there."
   ],
-  "tip": "The date is the number in the box."
+  "tip": "The date is the number in the box.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    24
+   ],
+   "label": "24 May"
+  }
  },
  "6:2": {
   "idea": "Dates go in order: one after another.",
@@ -167,7 +217,17 @@
    "The next date is one more.",
    "The date before is one less."
   ],
-  "tip": "One week later is 7 dates on."
+  "tip": "One week later is 7 dates on.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    21,
+    22
+   ],
+   "label": "Today and tomorrow"
+  }
  },
  "6:3": {
   "idea": "Calendars help plan events.",
@@ -177,7 +237,17 @@
    "Read its date.",
    "Compare dates to see which comes first."
   ],
-  "tip": "Smaller dates in the same month come first."
+  "tip": "Smaller dates in the same month come first.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    4,
+    12
+   ],
+   "label": "Art Day and Fun Run"
+  }
  },
  "7:1": {
   "idea": "Yesterday is the day before today.",

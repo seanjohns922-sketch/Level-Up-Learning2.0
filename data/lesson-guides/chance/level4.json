@@ -17,7 +17,18 @@
    "If the counts match, the chances match.",
    "Every number on a fair die has one face, so each is equally likely."
   ],
-  "tip": "Equal size parts matter on a spinner."
+  "tip": "Equal size parts matter on a spinner.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "blue",
+    "green",
+    "blue",
+    "green",
+    "blue",
+    "green"
+   ]
+  }
  },
  "1:3": {
   "idea": "Explain equal chance using the counts.",
@@ -117,7 +128,16 @@
    "Give each player the same number of equal outcomes.",
    "Test it by playing several times."
   ],
-  "tip": "Equal parts must be the same size."
+  "tip": "Equal parts must be the same size.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "red",
+    "blue",
+    "red",
+    "blue"
+   ]
+  }
  },
  "5:1": {
   "idea": "Compare tools to see which gives the better chance.",
@@ -147,7 +167,16 @@
    "Find the biggest share.",
    "Predict that outcome."
   ],
-  "tip": "The best prediction can still be wrong sometimes."
+  "tip": "The best prediction can still be wrong sometimes.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "blue",
+    "blue",
+    "red",
+    "green"
+   ]
+  }
  },
  "6:1": {
   "idea": "Use the tool to predict, then test it.",
@@ -157,7 +186,16 @@
    "Predict the outcome that will come up most.",
    "Run the spins and compare."
   ],
-  "tip": "Results may not match exactly."
+  "tip": "Results may not match exactly.",
+  "visual": {
+   "kind": "spinner",
+   "sectors": [
+    "red",
+    "red",
+    "red",
+    "blue"
+   ]
+  }
  },
  "6:2": {
   "idea": "Run a trial, record results, and compare repeated runs.",

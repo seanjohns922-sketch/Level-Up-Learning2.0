@@ -7,7 +7,19 @@
    "Subtract the smaller count from the bigger.",
    "9 − 4 = 5 more blocks."
   ],
-  "tip": "'How many more' means find the difference."
+  "tip": "'How many more' means find the difference.",
+  "visual": {
+   "kind": "bars",
+   "title": "Length in blocks",
+   "categories": [
+    "Snake",
+    "Crayon"
+   ],
+   "values": [
+    9,
+    4
+   ]
+  }
  },
  "1:2": {
   "idea": "Order lengths by their block counts.",
@@ -17,7 +29,21 @@
    "Compare the counts.",
    "Order them from smallest to biggest."
   ],
-  "tip": "Trust the blocks, not the picture."
+  "tip": "Trust the blocks, not the picture.",
+  "visual": {
+   "kind": "bars",
+   "title": "Length in blocks",
+   "categories": [
+    "Crayon",
+    "Pencil",
+    "Ruler"
+   ],
+   "values": [
+    5,
+    7,
+    10
+   ]
+  }
  },
  "1:3": {
   "idea": "Choose the best tool for what you are measuring.",
@@ -37,7 +63,19 @@
    "Subtract the smaller from the bigger.",
    "9 − 1 = 8 more cubes."
   ],
-  "tip": "Measure; don't guess."
+  "tip": "Measure; don't guess.",
+  "visual": {
+   "kind": "bars",
+   "title": "Mass in cubes",
+   "categories": [
+    "Teddy",
+    "Feather"
+   ],
+   "values": [
+    9,
+    1
+   ]
+  }
  },
  "2:2": {
   "idea": "Order and compare masses using cube counts.",
@@ -47,7 +85,19 @@
    "Order them from heaviest to lightest.",
    "Subtract to find the difference."
   ],
-  "tip": "More cubes means more mass."
+  "tip": "More cubes means more mass.",
+  "visual": {
+   "kind": "bars",
+   "title": "Mass in cubes",
+   "categories": [
+    "Backpack",
+    "Shoe"
+   ],
+   "values": [
+    12,
+    5
+   ]
+  }
  },
  "2:3": {
   "idea": "Prove which is heavier with the cube counts.",
@@ -57,7 +107,19 @@
    "Compare the counts.",
    "Explain using the numbers, not the size."
   ],
-  "tip": "Big things can be light."
+  "tip": "Big things can be light.",
+  "visual": {
+   "kind": "bars",
+   "title": "Mass in cubes",
+   "categories": [
+    "Rock",
+    "Balloon"
+   ],
+   "values": [
+    8,
+    2
+   ]
+  }
  },
  "3:1": {
   "idea": "Count the cups, compare, and find how many more.",
@@ -67,7 +129,19 @@
    "Compare them.",
    "Subtract to find how many more."
   ],
-  "tip": "Use the same cup for every container."
+  "tip": "Use the same cup for every container.",
+  "visual": {
+   "kind": "bars",
+   "title": "Capacity in cups",
+   "categories": [
+    "Watering can",
+    "Teapot"
+   ],
+   "values": [
+    9,
+    4
+   ]
+  }
  },
  "3:2": {
   "idea": "Order containers by their cup counts.",
@@ -77,7 +151,21 @@
    "Compare them.",
    "Order from least to greatest."
   ],
-  "tip": "Two containers with the same count hold the same."
+  "tip": "Two containers with the same count hold the same.",
+  "visual": {
+   "kind": "bars",
+   "title": "Capacity in cups",
+   "categories": [
+    "Bottle",
+    "Jug",
+    "Bucket"
+   ],
+   "values": [
+    3,
+    6,
+    10
+   ]
+  }
  },
  "3:3": {
   "idea": "Choose a unit that suits the size of the container.",
@@ -97,7 +185,13 @@
    "Fill the leftover bit with small blocks.",
    "Give both counts."
   ],
-  "tip": "Smaller blocks give a closer measure."
+  "tip": "Smaller blocks give a closer measure.",
+  "visual": {
+   "kind": "blocks",
+   "count": 6,
+   "extra": 2,
+   "object": "Rope"
+  }
  },
  "4:2": {
   "idea": "Estimate first, then measure to check.",
@@ -127,7 +221,12 @@
    "If it points to 12, it is o'clock.",
    "Read the hour from the short hand."
   ],
-  "tip": "The long hand is minutes; the short hand is hours."
+  "tip": "The long hand is minutes; the short hand is hours.",
+  "visual": {
+   "kind": "clock",
+   "hour": 3,
+   "minute": 0
+  }
  },
  "5:2": {
   "idea": "When the minute hand points to 6, it is half past.",
@@ -137,7 +236,12 @@
    "Look at the hour hand, between two numbers.",
    "Say half past the smaller number."
   ],
-  "tip": "Half past is halfway to the next hour."
+  "tip": "Half past is halfway to the next hour.",
+  "visual": {
+   "kind": "clock",
+   "hour": 4,
+   "minute": 30
+  }
  },
  "5:3": {
   "idea": "A fraction of a shape uses equal parts.",
@@ -157,7 +261,12 @@
    "Read the hour the short hand has just passed.",
    "Say quarter past that hour."
   ],
-  "tip": "Quarter past is 15 minutes after the hour."
+  "tip": "Quarter past is 15 minutes after the hour.",
+  "visual": {
+   "kind": "clock",
+   "hour": 5,
+   "minute": 15
+  }
  },
  "6:2": {
   "idea": "When the minute hand points to 9, it is quarter to.",
@@ -167,7 +276,12 @@
    "Find the hour the short hand is nearly reaching.",
    "Say quarter to that hour."
   ],
-  "tip": "Quarter to is 15 minutes before the hour."
+  "tip": "Quarter to is 15 minutes before the hour.",
+  "visual": {
+   "kind": "clock",
+   "hour": 7,
+   "minute": 45
+  }
  },
  "6:3": {
   "idea": "A turn can be a quarter, half, three-quarter or full turn.",
@@ -187,7 +301,17 @@
    "Count each jump forward to the second date.",
    "Don't count the start day."
   ],
-  "tip": "Count jumps, not boxes."
+  "tip": "Count jumps, not boxes.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    4,
+    7
+   ],
+   "label": "From the 4th to the 7th"
+  }
  },
  "7:2": {
   "idea": "Count forward from today to find how many days until an event.",
@@ -197,7 +321,17 @@
    "Count forward one day at a time.",
    "Stop at the event date."
   ],
-  "tip": "Today is not day one."
+  "tip": "Today is not day one.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    16,
+    20
+   ],
+   "label": "Today and the event"
+  }
  },
  "7:3": {
   "idea": "Use calendar clues to solve date problems.",
@@ -207,7 +341,17 @@
    "Count forward or back the number of days.",
    "Read the date you land on."
   ],
-  "tip": "Before means count back; after means count forward."
+  "tip": "Before means count back; after means count forward.",
+  "visual": {
+   "kind": "calendar",
+   "days": 31,
+   "startDay": 3,
+   "highlight": [
+    12,
+    15
+   ],
+   "label": "Start and 3 days later"
+  }
  },
  "8:1": {
   "idea": "Decide what you are measuring, then choose the tool.",
