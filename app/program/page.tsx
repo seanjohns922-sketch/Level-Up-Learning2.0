@@ -1,7 +1,7 @@
 "use client";
 
 import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { getCurriculumPlan, genreIdForRealm } from "@/data/programs/genres";
@@ -940,6 +940,30 @@ function ProgramPage() {
     );
   }
 
+  // Back, week and journey links share one realm-styled widget look.
+  const navWidgetClass = `px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
+                  isStarpathRealm
+                    ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
+                    : isStatisticsRealm
+                    ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
+                    : isMeasurementRealm
+                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
+                    : isPatternRealm
+                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
+                    : isChanceRealm
+                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
+                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
+                }`;
+  const navWidgetStyle: CSSProperties = isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
+                  borderRadius: 999,
+                  border: "1px solid rgba(200,160,48,0.32)",
+                  background: "rgba(22,14,4,0.65)",
+                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
+                } : {
+                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
+                };
+
   return (
     <main className="min-h-screen relative">
       {isExpeditionWeek && (
@@ -1125,35 +1149,14 @@ function ProgramPage() {
       <div className="relative z-10">
         <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
           <div className="flex items-start justify-between gap-3 mb-6">
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
               <button
                 onClick={goBackToMap}
-                className={`px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
-                  isStarpathRealm
-                    ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
-                    : isStatisticsRealm
-                    ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
-                    : isMeasurementRealm
-                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
-                    : isPatternRealm
-                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
-                    : isChanceRealm
-                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
-                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
-                }`}
-                style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
-                  borderRadius: 999,
-                  border: "1px solid rgba(200,160,48,0.32)",
-                  background: "rgba(22,14,4,0.65)",
-                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
-                } : {
-                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                }}
+                className={navWidgetClass}
+                style={navWidgetStyle}
               >
                 ← {isLevel8 ? "Back to stronghold" : isExpeditionWeek ? "Back to the cavern" : isStarpathRealm ? "Back to Starpath" : "Back to Map"}
               </button>
-              {isExpeditionWeek && <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} />}
               <div ref={weekMenuRef} className="relative">
                 <button
                   type="button"
@@ -1334,6 +1337,7 @@ function ProgramPage() {
                   </div>
                 )}
               </div>
+              {isExpeditionWeek && <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} linkClassName={navWidgetClass} linkStyle={navWidgetStyle} />}
             </div>
             <span className="text-sm text-white/80 font-medium ml-1">{levelLabel}</span>
           </div>
