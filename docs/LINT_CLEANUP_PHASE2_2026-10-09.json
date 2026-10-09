@@ -4,7 +4,7 @@
   "branch": "cleanup/lint-phase2",
   "baseCommit": "a02d1b53",
   "workspace": "/private/tmp/reliq-lint-phase2",
-  "releaseStatus": "Local review branch only. Not merged, pushed or deployed. No production or database changes.",
+  "releaseStatus": "Prepared for a separate pull request. Not merged into main or deployed; no production or database changes.",
   "baseline": {
     "errors": 65,
     "warnings": 320,
@@ -170,5 +170,11 @@
     "NEXT_PUBLIC_ADMIN_MODE": "false",
     "NEXT_PUBLIC_LEVEL7_LIVE": "true",
     "note": "Initial sandboxed compile stalled; final full build passed with local process/IPC access. No checks were bypassed."
+  },
+  "integration": {
+    "mainCommit": "9fcbdf9cdbd083f5b84c8116607cec22e2faa8c1",
+    "mergeCommit": "820b53b0a5ae32d723a7236e5ca5b7130fd26b3a",
+    "conflicts": false,
+    "upstreamChanges": "Login branding only; no overlap with cleanup files. Checks below describe the original cleanup validation; integration checks and remote CI are reported on the pull request."
   }
 }
