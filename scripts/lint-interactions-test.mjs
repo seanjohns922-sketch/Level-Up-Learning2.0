@@ -137,3 +137,49 @@ for (const [file, task, wrongLabel, rightLabel] of [
     console.log('PASS: memory game replays mistakes, advances three rounds and completes once');
   } finally { Math.random = random; await dom.close(); }
 }
+
+{
+  const dom = domHarness();
+  try {
+    const { FullscreenToggle } = dom.load('components/FullscreenToggle.tsx');
+    await dom.render(FullscreenToggle, {});
+    assert.equal(dom.document.querySelector('button'), null, 'Unsupported fullscreen stays hidden');
+    dom.document.documentElement.requestFullscreen = async () => {
+      dom.document.fullscreenElement = dom.document.documentElement;
+      dom.document.dispatchEvent(new dom.document.defaultView.Event('fullscreenchange'));
+    };
+    dom.document.exitFullscreen = async () => {
+      dom.document.fullscreenElement = null;
+      dom.document.dispatchEvent(new dom.document.defaultView.Event('fullscreenchange'));
+    };
+    await dom.render(FullscreenToggle, {});
+    await dom.click(dom.document.querySelector('button'));
+    assert.equal(dom.document.querySelector('button').getAttribute('aria-label'), 'Exit full screen');
+    await dom.click(dom.document.querySelector('button'));
+    assert.equal(dom.document.querySelector('button').getAttribute('aria-label'), 'Enter full screen');
+    console.log('PASS: fullscreen capability, browser events and enter/exit labels');
+  } finally { await dom.close(); }
+}
+
+{
+  const dom = domHarness({ '@/lib/demo-mode': { isDemoPreviewMode: () => false } });
+  try {
+    const { default: Modal } = dom.load('components/legends/LegendDetailModal.tsx');
+    const card = { id: 'test-a', name: 'Test A', images: { cardFront: '/front.webp', cardBack: '/back.webp' }, yearLabel: 'Year 1', realmId: 'number', stars: 1, stats: { calculation: 5, speed: 5, accuracy: 5 }, showcaseVideoUrl: '/test.mp4' };
+    const props = { legend: card, onClose: () => {} };
+    const find = text => [...dom.document.querySelectorAll('button')].find(b => b.textContent.includes(text));
+    await dom.render(Modal, props);
+    await dom.click(find('Flip RELIQ card'));
+    assert(dom.document.querySelector('[alt="Test A RELIQ card back"]'));
+    await dom.render(Modal, props);
+    assert(dom.document.querySelector('[alt="Test A RELIQ card back"]'), 'Same card keeps its side');
+    await dom.click(dom.document.querySelector('[aria-label="Enlarge RELIQ card"]'));
+    assert(dom.document.querySelector('[aria-label="Close enlarged RELIQ card"]'));
+    await dom.render(Modal, { ...props, legend: { ...card, id: 'test-b', name: 'Test B' } });
+    assert(!dom.document.querySelector('[aria-label="Close enlarged RELIQ card"]'));
+    assert(dom.document.querySelector('[alt="Test B RELIQ card front"]'));
+    await dom.click(find('Watch Video')); assert(dom.document.querySelector('video'));
+    await dom.render(Modal, props); assert(!dom.document.querySelector('video'));
+    console.log('PASS: changing RELIQ cards resets side, enlargement and video without resetting the same card');
+  } finally { await dom.close(); }
+}

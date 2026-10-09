@@ -356,7 +356,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
         </div>
         {!selectedStudentId ? (
           <div className="flex flex-wrap gap-2">
-            {children.length ? <PrintAllHomeAccessCardsButton children={children} /> : null}
+            {children.length ? <PrintAllHomeAccessCardsButton students={children} /> : null}
             <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 font-bold text-white shadow-sm hover:bg-blue-700">
               <Plus className="h-5 w-5" /> Add new child
             </Link>
@@ -834,7 +834,7 @@ function PrintHomeAccessCardButton({ displayName, username, explorerCode, classN
   );
 }
 
-function PrintAllHomeAccessCardsButton({ children }: { children: readonly ParentChild[] }) {
+function PrintAllHomeAccessCardsButton({ students: children }: { students: readonly ParentChild[] }) {
   return (
     <button type="button" onClick={() => printHomeAccessCards(children.map((child) => ({ displayName: child.displayName, username: child.username, explorerCode: child.explorerCode })))} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500">
       <Printer className="h-5 w-5" /> Print all home access cards

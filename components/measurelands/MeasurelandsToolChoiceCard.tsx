@@ -348,7 +348,7 @@ function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void
               </>
             ) : hasCustomIntroTools ? (
               <>
-                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">You don't always need measuring blocks.</p>
+                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">You don&apos;t always need measuring blocks.</p>
                 <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Lots of everyday objects can be measuring units.</p>
               </>
             ) : (

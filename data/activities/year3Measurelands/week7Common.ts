@@ -60,7 +60,7 @@ export function buildWhichPath(pool: ShapeDef[]): PerimTask {
 }
 
 export function buildCompareWalk(pool: ShapeDef[]): PerimTask {
-  let a = pick(pool);
+  const a = pick(pool);
   let b = pick(pool);
   for (let k = 0; k < 30 && (a.label === b.label || perimeter(a.cells) === perimeter(b.cells)); k++) b = pick(pool);
   const longer = perimeter(a.cells) >= perimeter(b.cells) ? a.label : b.label;

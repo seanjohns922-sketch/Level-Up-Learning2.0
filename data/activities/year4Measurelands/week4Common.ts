@@ -90,7 +90,7 @@ export function randomShape(unit: Unit, opts?: { allowL?: boolean; min?: number;
     const b = randRange(2, Math.max(2, H - 2));
     return makeL(W, H, a, b, unit);
   }
-  let w = randRange(min, max);
+  const w = randRange(min, max);
   let h = randRange(min, max);
   if (w === h) h = h + 1 <= max ? h + 1 : h - 1;
   return makeRect(w, h, unit);
