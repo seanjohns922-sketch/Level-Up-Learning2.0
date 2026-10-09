@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-09",
+  "branch": "fix/teacher-reporting-reliability",
+  "base_commit": "0840bbf0",
+  "scope": "Teacher reporting reliability; independent of lint cleanup PR #6. No production, database, policy, index or stored-data changes.",
+  "confirmed_causes": [
+    {
+      "issue": "Activity-history timeouts",
+      "cause": "Dashboard and LiveClassPanel requested full class event history without time bounds or explicit pagination. Poll, focus and realtime refresh triggers could overlap.",
+      "files": [
+        "app/teacher/dashboard/page.tsx",
+        "components/teacher/LiveClassPanel.tsx",
+        "lib/teacher/reporting-history.ts"
+      ],
+      "change": "Seven-day event window, fixed upper timestamp, 250-row keyset pages, refresh leases and stale-class rejection. Keep last successful event/attempt results when fetching fails and show an availability notice."
+    },
+    {
+      "issue": "Attempt label follows question number",
+      "cause": "Year2LessonEngine sent questionsAnswered + 1 as attemptNumber; active cards displayed that telemetry field.",
+      "files": [
+        "components/lesson/Year2LessonEngine.tsx",
+        "components/teacher/LiveClassPanel.tsx",
+        "lib/teacher/reporting-history.ts"
+      ],
+      "change": "Remove question-derived attempt telemetry. Derive lesson/quiz labels from matching saved attempt numbers: latest saved for completed runs, next number for active runs. Explicitly page saved attempts without the event-history cutoff; unavailable history does not fabricate Attempt 1."
+    },
+    {
+      "issue": "Duplicate lesson completion timeline entries",
+      "cause": "PracticeRunner/Year2LessonEngine finished effects and the lesson route both emitted lesson_completed. Effect reruns could emit again.",
+      "files": [
+        "app/lesson/page.tsx",
+        "components/PracticeRunner.tsx",
+        "components/lesson/Year2LessonEngine.tsx",
+        "lib/live-class-client.ts",
+        "lib/teacher/reporting-history.ts"
+      ],
+      "change": "Lesson route owns completion telemetry; standalone runners retain a one-shot emitter. Route adds existing session identity as completionKey. Timeline collapses only explicit same-identity completion events; legacy ambiguous records and genuine retries remain."
+    }
+  ],
+  "regression_test": "scripts/teacher-reporting-reliability-test.mjs",
+  "coverage": [
+    "Compound timestamp/id pagination, equal timestamps, API caps, mid-fetch inserts and class filtering",
+    "Empty results, page failures and cancellation",
+    "Refresh overlap, class switching, stale responses, failure retry and unmount invalidation",
+    "Actual dashboard refresh function with deferred mock responses",
+    "Actual card functions: canonical attempts, reloads, question-count stability, genuine retries and saved completed scores",
+    "Completion emitter ownership, effect replay and explicit-identity deduplication"
+  ],
+  "validation": {
+    "production_build": "passed",
+    "critical_qa": "11/11 passed",
+    "lint_qa": "passed",
+    "typecheck": "passed",
+    "application_lint": "65 errors and 320 warnings; final rerun matches clean base main diagnostic set exactly. No new diagnostics. Existing failures remain visible."
+  },
+  "limitations": [
+    "No production query timing or signed-in browser verification of this branch. Mocked query tests do not prove PostgreSQL query plans or RLS performance.",
+    "Seven-day event history supports recent reporting; canonical saved attempts/progress remain separate and retain historical coverage. Large classes may still require many bounded pages.",
+    "Existing duplicate timeline events lacking completion identity are not removed or heuristically hidden.",
+    "React effect tests execute real effect fragments with a test harness; they are not a full browser lifecycle test.",
+    "PR #6 lint fixes are deliberately excluded. Required checks must not be bypassed."
+  ],
+  "release_verification": [
+    "Use an approved disposable student and authorised teacher: begin, answer, reload, complete and retry a lesson; verify stable attempt number and one new completion entry.",
+    "Verify saved scores, week unlocks and teacher progress after reload; switch classes during refresh and trigger focus/poll/realtime updates.",
+    "Measure history requests for a production-sized class, confirm explicit bounds/pages and absence of statement timeouts.",
+    "Review and integrate independently after required CI checks pass; no automatic merge or deployment."
+  ],
+  "rollback": "Revert this code commit. No database rollback or historical data repair is required."
+}

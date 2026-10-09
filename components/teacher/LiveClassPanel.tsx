@@ -1,5 +1,6 @@
 "use client";
 
+import { createReportingRequestGate, fetchReportingHistory, fetchReportingAttempts, reportingAttemptNumber, uniqueCompletionEvents } from "@/lib/teacher/reporting-history";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -715,6 +716,7 @@ function toLiveCard(
   row?: LiveStudentActivityRow | null,
   lessonPerformance?: ReturnType<typeof buildCurrentLessonPerformance> | null,
   completedAttemptSummary?: CompletedActivityAttemptSummary | null,
+  attemptHistoryAvailable = true,
 ): LiveStudentCard {
   const isCompleted = row?.current_lesson_status === "completed" || lessonPerformance?.completed === true;
   const useCanonicalScore = Boolean(
@@ -722,6 +724,9 @@ function toLiveCard(
     (lessonPerformance?.completed || row?.current_lesson_status === "completed")
   );
   const displayedScore = useCanonicalScore ? completedAttemptSummary : lessonPerformance;
+  const attemptNumber = row && !/pretest|posttest/i.test(row.current_lesson ?? "")
+    ? reportingAttemptNumber(isCompleted, attemptHistoryAvailable ? completedAttemptSummary?.attemptNumber ?? null : undefined)
+    : row?.attempt_number ?? null;
   const insight = row && !isCompleted
     ? buildLiveStudentInsight({
         studentId: student.id,
@@ -751,7 +756,7 @@ function toLiveCard(
         sessionIncorrectCount: row.session_incorrect_count ?? null,
         consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
         sessionHintCount: row.session_hint_count ?? null,
-        attemptNumber: row.attempt_number ?? null,
+        attemptNumber,
         questionsAnswered: displayedScore?.answered ?? row.questions_answered ?? null,
         correctCount: displayedScore?.correct ?? row.correct_count ?? null,
         accuracy: displayedScore?.accuracy ?? row.accuracy_percent ?? null,
@@ -785,9 +790,7 @@ function toLiveCard(
     latestCorrectAnswer: row?.latest_correct_answer ?? null,
     latestAnswerCorrect: row?.latest_answer_correct ?? null,
     timeOnCurrentQuestion: row?.time_on_current_question ?? 0,
-    attemptNumber: useCanonicalScore
-      ? completedAttemptSummary?.attemptNumber ?? null
-      : row?.attempt_number ?? completedAttemptSummary?.attemptNumber ?? null,
+    attemptNumber,
     questionsAnswered: displayedScore?.answered ?? null,
     correctCount: displayedScore?.correct ?? null,
     accuracyPercent: displayedScore?.accuracy ?? null,
@@ -901,7 +904,9 @@ export default function LiveClassPanel({
   progressRows: CanonicalProgressRow[];
 }) {
   const [rows, setRows] = useState<LiveStudentActivityRow[]>([]);
+  const [historyUnavailable, setHistoryUnavailable] = useState(false);
   const [events, setEvents] = useState<LiveActivityEventRow[]>([]);
+  const [attemptHistoryClass, setAttemptHistoryClass] = useState<string | null>(null);
   const [completedAttempts, setCompletedAttempts] = useState<CompletedActivityAttemptRow[]>([]);
   const [dailyActivity, setDailyActivity] = useState<DailyClassActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -910,7 +915,8 @@ export default function LiveClassPanel({
   const [activeOnly, setActiveOnly] = useState(false);
   const [sort, setSort] = useState<LiveSort>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
+  const [timeline, setTimeline] = useState<{ key: string; events: LiveStudentEventRow[] }>({ key: "", events: [] });
+  const selectedStudentEvents = timeline.key === `${selectedClass?.id}:${selectedStudentId}` ? timeline.events : [];
   const studentIdsKey = students.map((student) => student.id).sort().join(",");
 
   useEffect(() => {
@@ -936,130 +942,129 @@ export default function LiveClassPanel({
       });
     }
 
+    const refreshGate = createReportingRequestGate();
     async function loadRows() {
-      if (!selectedClass?.id) {
+      const request = refreshGate.begin(selectedClass?.id ?? "none");
+      if (!request) return;
+      try {
+        if (!selectedClass?.id) {
+          if (!cancelled) {
+            setRows([]);
+            setEvents([]);
+            setCompletedAttempts([]);
+            setDailyActivity([]);
+            setLoading(false);
+          }
+          return;
+        }
+        // Note: don't flip `loading` on refreshes — only the initial load shows the
+        // spinner, so periodic polls update in place without flashing the panel.
+        const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, assessmentResult, dailyActivityResult] = await Promise.all([
+          supabase
+            .from("live_student_activity")
+            .select("*")
+            .eq("class_id", selectedClass.id)
+            .order("last_active_at", { ascending: false }),
+          fetchReportingHistory(supabase, selectedClass.id, {
+            eventTypes: ["activity_started", "lesson_started", "quiz_started", "question_loaded", "answer_correct", "answer_incorrect", "hint_used", "lesson_completed", "quiz_completed", "idle_detected"],
+            isCurrent: () => !cancelled && request.isCurrent(),
+          }).then(data => ({ data, error: null }), error => ({ data: null, error })),
+          fetchReportingAttempts(supabase, "student_lesson_attempts",
+            "student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at",
+            studentIds, () => !cancelled && request.isCurrent()
+          ).then(data => ({ data, error: null }), error => ({ data: null, error })),
+          fetchReportingAttempts(supabase, "student_weekly_quiz_attempts",
+            "student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at",
+            studentIds, () => !cancelled && request.isCurrent()
+          ).then(data => ({ data, error: null }), error => ({ data: null, error })),
+          studentIds.length > 0
+            ? supabase
+              .from("student_realm_assessments")
+              .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at")
+              .in("student_id", studentIds)
+            : Promise.resolve({ data: [], error: null }),
+          supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
+        ]);
+        const { data, error } = activityResult;
+        const { data: eventData, error: eventError } = eventResult;
+        const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
+        const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
+        const { data: assessmentData, error: assessmentError } = assessmentResult;
+        const { data: dailyActivityData, error: dailyActivityError } = dailyActivityResult;
+        if (error) {
+          console.warn("[LiveClassPanel] Failed to load live student activity", error);
+        }
+        if (eventError) {
+          console.warn("[LiveClassPanel] Failed to load live activity events", eventError);
+        }
+        if (lessonAttemptError) {
+          console.warn("[LiveClassPanel] Failed to load completed lesson attempts", lessonAttemptError);
+        }
+        if (quizAttemptError) {
+          console.warn("[LiveClassPanel] Failed to load completed quiz attempts", quizAttemptError);
+        }
+        if (assessmentError) {
+          console.warn("[LiveClassPanel] Failed to load completed assessments", assessmentError);
+        }
+        if (dailyActivityError) {
+          console.warn("[LiveClassPanel] Failed to load today's class activity", dailyActivityError);
+        }
         if (!cancelled) {
-          setRows([]);
-          setEvents([]);
-          setCompletedAttempts([]);
-          setDailyActivity([]);
+          setHistoryUnavailable(Boolean(error || eventError || lessonAttemptError || quizAttemptError || assessmentError || dailyActivityError));
+          if (!error) setRows((data ?? []) as LiveStudentActivityRow[]);
+          if (!eventError) setEvents((eventData ?? []) as LiveActivityEventRow[]);
+          if (!lessonAttemptError && !quizAttemptError && !assessmentError) {
+            setAttemptHistoryClass(selectedClass.id);
+            setCompletedAttempts([
+              ...((lessonAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type">[]).map((attempt) => ({
+                ...attempt,
+                activity_type: "lesson" as const,
+              })),
+              ...((quizAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type" | "completed" | "lesson" | "lesson_id">[]).map((attempt) => ({
+                ...attempt,
+                completed: true,
+                lesson: null,
+                lesson_id: null,
+                activity_type: "quiz" as const,
+              })),
+              ...((assessmentData ?? []) as Array<{
+                student_id: string;
+                realm_id: string;
+                working_level: string;
+                assessment_type: "pretest" | "posttest";
+                correct_count: number;
+                total_questions: number;
+                score_percent: number;
+                completed_at: string;
+              }>).map((attempt) => ({
+                student_id: attempt.student_id,
+                realm_id: attempt.realm_id,
+                working_level: attempt.working_level,
+                week: null,
+                lesson: null,
+                lesson_id: null,
+                quiz_id: null,
+                attempt_no: 1,
+                correct_count: attempt.correct_count,
+                total_questions: attempt.total_questions,
+                accuracy_percent: attempt.score_percent,
+                completed: true,
+                completed_at: attempt.completed_at,
+                activity_type: attempt.assessment_type,
+              })),
+            ]);
+          }
+          setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
           setLoading(false);
         }
-        return;
-      }
-      // Note: don't flip `loading` on refreshes — only the initial load shows the
-      // spinner, so periodic polls update in place without flashing the panel.
-      const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, assessmentResult, dailyActivityResult] = await Promise.all([
-        supabase
-          .from("live_student_activity")
-          .select("*")
-          .eq("class_id", selectedClass.id)
-          .order("last_active_at", { ascending: false }),
-        supabase
-          .from("live_activity_events")
-          .select("id,student_id,class_id,event_type,created_at,payload")
-          .eq("class_id", selectedClass.id)
-          .in("event_type", [
-            "activity_started",
-            "lesson_started",
-            "quiz_started",
-            "question_loaded",
-            "answer_correct",
-            "answer_incorrect",
-            "hint_used",
-            "lesson_completed",
-            "quiz_completed",
-            "idle_detected",
-          ])
-          .order("created_at", { ascending: true }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_lesson_attempts")
-            .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
-            .in("student_id", studentIds)
-            .eq("completed", true)
-          : Promise.resolve({ data: [], error: null }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_weekly_quiz_attempts")
-            .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
-            .in("student_id", studentIds)
-          : Promise.resolve({ data: [], error: null }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_realm_assessments")
-            .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at")
-            .in("student_id", studentIds)
-          : Promise.resolve({ data: [], error: null }),
-        supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
-      ]);
-      const { data, error } = activityResult;
-      const { data: eventData, error: eventError } = eventResult;
-      const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
-      const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
-      const { data: assessmentData, error: assessmentError } = assessmentResult;
-      const { data: dailyActivityData, error: dailyActivityError } = dailyActivityResult;
-      if (error) {
-        console.warn("[LiveClassPanel] Failed to load live student activity", error);
-      }
-      if (eventError) {
-        console.warn("[LiveClassPanel] Failed to load live activity events", eventError);
-      }
-      if (lessonAttemptError) {
-        console.warn("[LiveClassPanel] Failed to load completed lesson attempts", lessonAttemptError);
-      }
-      if (quizAttemptError) {
-        console.warn("[LiveClassPanel] Failed to load completed quiz attempts", quizAttemptError);
-      }
-      if (assessmentError) {
-        console.warn("[LiveClassPanel] Failed to load completed assessments", assessmentError);
-      }
-      if (dailyActivityError) {
-        console.warn("[LiveClassPanel] Failed to load today's class activity", dailyActivityError);
-      }
-      if (!cancelled) {
-        setRows((data ?? []) as LiveStudentActivityRow[]);
-        setEvents((eventData ?? []) as LiveActivityEventRow[]);
-        setCompletedAttempts([
-          ...((lessonAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type">[]).map((attempt) => ({
-            ...attempt,
-            activity_type: "lesson" as const,
-          })),
-          ...((quizAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type" | "completed" | "lesson" | "lesson_id">[]).map((attempt) => ({
-            ...attempt,
-            completed: true,
-            lesson: null,
-            lesson_id: null,
-            activity_type: "quiz" as const,
-          })),
-          ...((assessmentData ?? []) as Array<{
-            student_id: string;
-            realm_id: string;
-            working_level: string;
-            assessment_type: "pretest" | "posttest";
-            correct_count: number;
-            total_questions: number;
-            score_percent: number;
-            completed_at: string;
-          }>).map((attempt) => ({
-            student_id: attempt.student_id,
-            realm_id: attempt.realm_id,
-            working_level: attempt.working_level,
-            week: null,
-            lesson: null,
-            lesson_id: null,
-            quiz_id: null,
-            attempt_no: 1,
-            correct_count: attempt.correct_count,
-            total_questions: attempt.total_questions,
-            accuracy_percent: attempt.score_percent,
-            completed: true,
-            completed_at: attempt.completed_at,
-            activity_type: attempt.assessment_type,
-          })),
-        ]);
-        setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
-        setLoading(false);
+      } catch (error) {
+        if (!cancelled) {
+          setHistoryUnavailable(true);
+          console.warn("[LiveClassPanel] Refresh failed", error);
+          setLoading(false);
+        }
+      } finally {
+        request.finish();
       }
     }
 
@@ -1096,6 +1101,7 @@ export default function LiveClassPanel({
       .subscribe();
     return () => {
       cancelled = true;
+      refreshGate.invalidate();
       if (intervalId) clearInterval(intervalId);
       window.removeEventListener("focus", loadRows);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
@@ -1110,19 +1116,29 @@ export default function LiveClassPanel({
       return;
     }
 
+    const timelineGate = createReportingRequestGate();
     async function loadStudentEvents() {
-      const { data, error } = await supabase
-        .from("live_activity_events")
-        .select("id,event_type,created_at,payload")
-        .eq("class_id", selectedClassId)
-        .eq("student_id", selectedStudentId)
-        .order("created_at", { ascending: false })
-        .limit(15);
-      if (error) {
-        console.warn("[LiveClassPanel] Failed to load student timeline", error);
-      }
-      if (!cancelled) {
-        setSelectedStudentEvents((data ?? []) as LiveStudentEventRow[]);
+      const request = timelineGate.begin(selectedStudentId!);
+      if (!request) return;
+      try {
+        const { data, error } = await supabase
+          .from("live_activity_events")
+          .select("id,event_type,created_at,payload")
+          .eq("class_id", selectedClassId)
+          .eq("student_id", selectedStudentId)
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: false })
+          .limit(30);
+        if (error) {
+          console.warn("[LiveClassPanel] Failed to load student timeline", error);
+        }
+        if (!cancelled && !error) {
+          setTimeline({ key: `${selectedClassId}:${selectedStudentId}`, events: uniqueCompletionEvents((data ?? []) as LiveStudentEventRow[]).slice(0, 15) });
+        }
+      } catch (error) {
+        if (!cancelled) console.warn("[LiveClassPanel] Timeline refresh failed", error);
+      } finally {
+        request.finish();
       }
     }
 
@@ -1130,6 +1146,7 @@ export default function LiveClassPanel({
     const intervalId = setInterval(loadStudentEvents, 30000);
     return () => {
       cancelled = true;
+      timelineGate.invalidate();
       clearInterval(intervalId);
     };
   }, [selectedClass?.id, selectedStudentId]);
@@ -1155,9 +1172,9 @@ export default function LiveClassPanel({
       const row = alignCompletedActivityWithCanonicalProgress(student, resolvedRow, progressRows);
       const lessonPerformance = buildCurrentLessonPerformance(row, studentEvents);
       const completedAttemptSummary = buildCompletedActivityAttemptSummary(row, completedAttempts);
-      return toLiveCard(student, row, lessonPerformance, completedAttemptSummary);
+      return toLiveCard(student, row, lessonPerformance, completedAttemptSummary, attemptHistoryClass === selectedClass?.id);
     });
-  }, [completedAttempts, dailyActivity, events, progressRows, rows, students]);
+  }, [attemptHistoryClass, selectedClass?.id, completedAttempts, dailyActivity, events, progressRows, rows, students]);
 
   const filteredCards = useMemo(() => {
     let base = filter === "all"
@@ -1247,6 +1264,7 @@ export default function LiveClassPanel({
   return (
     <>
       <section className="grid gap-4">
+        {historyUnavailable && <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">Some activity history could not refresh. Showing the last available results.</p>}
         <div>
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
             <div className="flex flex-wrap items-start justify-between gap-3">

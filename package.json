@@ -288,7 +288,8 @@
     "qa:critical": "node scripts/qa-runner.mjs critical",
     "qa:security-source": "node scripts/qa-runner.mjs security-source",
     "qa:screen-recording-safety": "node scripts/screen-recording-safety-test.mjs",
-    "lint:qa": "eslint --config eslint.qa.config.mjs scripts/qa-runner.mjs scripts/screen-recording-safety-test.mjs scripts/test-support/activity-harness.mjs scripts/activity-marking-test.mjs"
+    "lint:qa": "eslint --config eslint.qa.config.mjs scripts/qa-runner.mjs scripts/screen-recording-safety-test.mjs scripts/test-support/activity-harness.mjs scripts/activity-marking-test.mjs scripts/teacher-reporting-reliability-test.mjs",
+    "qa:teacher-reporting-reliability": "node scripts/teacher-reporting-reliability-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
