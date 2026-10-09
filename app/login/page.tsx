@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { brandFontScope } from "@/lib/brand-fonts";
 import ProductTagline from "@/components/brand/ProductTagline";
 import ProductWordmark from "@/components/brand/ProductWordmark";
 import { useRouter } from "next/navigation";
@@ -948,7 +949,7 @@ export default function LoginPage() {
 
 {/* ── Left panel — floating UI ── */}
       <div
-        className="relative z-10 w-full md:w-[440px] min-h-screen flex flex-col justify-center px-8 md:px-12 py-10"
+        className={`relative z-10 w-full md:w-[440px] min-h-screen flex flex-col justify-center px-8 md:px-12 py-10 ${brandFontScope}`}
         style={{ animation: "fadeUp 0.7s ease both" }}
       >
         {/* Title */}
@@ -1182,7 +1183,7 @@ export default function LoginPage() {
                           onChange={(event) => setParentExplorerCode(normalizeExplorerCode(event.target.value))}
                           placeholder="LUL-ABCD-2345"
                           autoComplete="off"
-                          className={`${inputCls} font-mono font-bold uppercase tracking-wider`}
+                          className={`${inputCls} font-bold uppercase tracking-wider`}
                         />
                       </InputField>
                     </label>
@@ -1196,7 +1197,7 @@ export default function LoginPage() {
                           type="password"
                           inputMode="numeric"
                           autoComplete="off"
-                          className={`${inputCls} text-center font-mono font-bold tracking-[0.45em]`}
+                          className={`${inputCls} text-center font-bold tracking-[0.45em]`}
                         />
                       </InputField>
                     </label>
@@ -1400,7 +1401,7 @@ export default function LoginPage() {
         {/* Footer */}
         <p
           className="mt-6 text-[10px] tracking-[0.06em] uppercase font-medium"
-          style={{ color: "rgba(255,200,100,0.3)", fontFamily: "'Quicksand', sans-serif" }}
+          style={{ color: "rgba(255,200,100,0.3)" }}
         >
           Discover RELIQS by mastering your skills
         </p>
