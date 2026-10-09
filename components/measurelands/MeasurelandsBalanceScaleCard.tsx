@@ -65,29 +65,8 @@ function Shell({
   );
 }
 
-/* ── The scale itself: a beam that tilts toward the heavier pan ── */
-function Scale({
-  leftItems,
-  rightItems,
-  leftWeight,
-  rightWeight,
-  onRemove,
-  hideVerdict = false,
-}: {
-  leftItems: BalanceItem[];
-  rightItems: BalanceItem[];
-  leftWeight: number;
-  rightWeight: number;
-  onRemove?: (side: "left" | "right", index: number) => void;
-  hideVerdict?: boolean;
-}) {
-  const diff = rightWeight - leftWeight; // >0 → right heavier (right drops)
-  const angle = Math.max(-16, Math.min(16, diff * 6));
-  const leftY = -angle * 1.7;
-  const rightY = angle * 1.7;
-  const balanced = diff === 0;
-
-  const Pan = ({ items, side, y }: { items: BalanceItem[]; side: "left" | "right"; y: number }) => (
+function Pan({ items, side, y, balanced, onRemove }: { items: BalanceItem[]; side: "left" | "right"; y: number; balanced: boolean; onRemove?: (side: "left" | "right", index: number) => void }) {
+  return (
     <div className="flex w-[44%] flex-col items-center" style={{ transform: `translateY(${y}px)`, transition: "transform 360ms cubic-bezier(0.34,1.4,0.5,1)" }}>
       <div
         className="flex min-h-[84px] w-full flex-wrap items-end justify-center gap-1 rounded-b-[40px] rounded-t-[12px] border-2 px-2 pb-2 pt-3"
@@ -117,6 +96,31 @@ function Scale({
       <div className="mt-1 h-5 w-px bg-[#b9914e]" />
     </div>
   );
+}
+
+/* ── The scale itself: a beam that tilts toward the heavier pan ── */
+function Scale({
+  leftItems,
+  rightItems,
+  leftWeight,
+  rightWeight,
+  onRemove,
+  hideVerdict = false,
+}: {
+  leftItems: BalanceItem[];
+  rightItems: BalanceItem[];
+  leftWeight: number;
+  rightWeight: number;
+  onRemove?: (side: "left" | "right", index: number) => void;
+  hideVerdict?: boolean;
+}) {
+  const diff = rightWeight - leftWeight; // >0 → right heavier (right drops)
+  const angle = Math.max(-16, Math.min(16, diff * 6));
+  const leftY = -angle * 1.7;
+  const rightY = angle * 1.7;
+  const balanced = diff === 0;
+
+
 
   return (
     <div className="relative mx-auto max-w-[440px] rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
@@ -124,8 +128,8 @@ function Scale({
       <div className="relative mx-auto h-3 w-[88%] rounded-full" style={{ background: "linear-gradient(90deg,#b45309,#d6b86c,#b45309)", transform: `rotate(${angle}deg)`, transition: "transform 360ms cubic-bezier(0.34,1.4,0.5,1)" }} />
       {/* pans hang below the beam ends */}
       <div className="mt-1 flex items-start justify-between">
-        <Pan items={leftItems} side="left" y={leftY} />
-        <Pan items={rightItems} side="right" y={rightY} />
+        <Pan balanced={balanced} onRemove={onRemove} items={leftItems} side="left" y={leftY} />
+        <Pan balanced={balanced} onRemove={onRemove} items={rightItems} side="right" y={rightY} />
       </div>
       {/* fulcrum */}
       <div className="mx-auto mt-1 h-0 w-0" style={{ borderLeft: "18px solid transparent", borderRight: "18px solid transparent", borderBottom: "26px solid #8a5a16" }} />
@@ -315,6 +319,10 @@ export function MeasurelandsBalanceScaleCard({
   if (task.scales) return <PickBalancedScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.fixActions) return <FixScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 
+  return <BalanceScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+}
+
+function BalanceScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorrect: () => void; onWrong: () => void }) {
   const isPile = task.supply.mode === "pile";
   const unit = task.supply.items[0]!;
   const maxAdds = task.supply.maxAdds ?? 6;
@@ -323,7 +331,7 @@ export function MeasurelandsBalanceScaleCard({
   const fixed = task.target === "left" ? task.rightItems : task.leftItems;
 
   const [added, setAdded] = useState<BalanceItem[]>([]);
-  const [locked, setLocked] = useState(false);
+  const [picked, setPicked] = useState(false);
 
   const targetItems = useMemo(() => [...baseTarget, ...added], [baseTarget, added]);
   const targetWeight = sumWeight(targetItems);
@@ -335,15 +343,16 @@ export function MeasurelandsBalanceScaleCard({
   const rightWeight = task.target === "left" ? fixedWeight : targetWeight;
 
   const balanced = leftWeight === rightWeight;
+  const pileSolved = isPile && added.length > 0 && balanced;
+  const locked = picked || pileSolved;
 
   // Pile mode: forgiving — solved the moment it balances (after the student has
   // added at least one). Auto-finish with a short celebratory settle.
   useEffect(() => {
-    if (isPile && !locked && added.length > 0 && balanced) {
-      setLocked(true);
-      window.setTimeout(() => onCorrect(), 650);
-    }
-  }, [isPile, locked, added.length, balanced, onCorrect]);
+    if (!pileSolved) return;
+    const timer = window.setTimeout(onCorrect, 650);
+    return () => window.clearTimeout(timer);
+  }, [pileSolved, onCorrect]);
 
   function addUnit() {
     if (locked || !isPile || added.length >= maxAdds) return;
@@ -361,7 +370,7 @@ export function MeasurelandsBalanceScaleCard({
   function pickCandidate(candidate: BalanceItem) {
     if (locked || isPile) return;
     setAdded([candidate]);
-    setLocked(true);
+    setPicked(true);
     const willBalance = fixedWeight === candidate.weight; // target started empty
     window.setTimeout(() => (willBalance ? onCorrect() : onWrong()), 650);
   }
