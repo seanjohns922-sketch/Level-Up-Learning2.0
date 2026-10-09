@@ -13,7 +13,7 @@ export default function ProductWordmark({ variant = "onDark", className = "" }: 
       width={472}
       height={134}
       priority
-      className={`h-auto w-[240px] drop-shadow-[0_4px_20px_rgb(0_0_0/0.5)] sm:w-[300px] ${className}`}
+      className={`h-auto w-full max-w-[344px] drop-shadow-[0_4px_20px_rgb(0_0_0/0.5)] ${className}`}
     />
   );
 }
