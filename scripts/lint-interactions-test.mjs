@@ -18,6 +18,8 @@ try {
   await h.click(add);
   assert(add.disabled, 'Solved pile must lock immediately');
   await h.flushTimers(); assert.equal(correct, 1, 'Strict Mode must award exactly once');
+  await h.render(Card, { ...props, task, onCorrect: () => correct++ });
+  await h.flushTimers(); assert.equal(correct, 1, 'A new callback after completion must not award twice');
   await h.render(Card, { ...props, task: { ...task, judge: true } });
   await h.render(Card, { ...props, task });
   const freshAdd = [...h.document.querySelectorAll('button')].find(b => b.textContent.includes('Add a cube'));

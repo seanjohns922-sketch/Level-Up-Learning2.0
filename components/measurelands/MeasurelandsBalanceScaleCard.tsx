@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Scale as ScaleIcon } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -119,8 +119,6 @@ function Scale({
   const leftY = -angle * 1.7;
   const rightY = angle * 1.7;
   const balanced = diff === 0;
-
-
 
   return (
     <div className="relative mx-auto max-w-[440px] rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
@@ -332,6 +330,7 @@ function BalanceScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorre
 
   const [added, setAdded] = useState<BalanceItem[]>([]);
   const [picked, setPicked] = useState(false);
+  const completionReported = useRef(false);
 
   const targetItems = useMemo(() => [...baseTarget, ...added], [baseTarget, added]);
   const targetWeight = sumWeight(targetItems);
@@ -349,8 +348,12 @@ function BalanceScene({ task, onCorrect, onWrong }: { task: BalanceTask; onCorre
   // Pile mode: forgiving — solved the moment it balances (after the student has
   // added at least one). Auto-finish with a short celebratory settle.
   useEffect(() => {
-    if (!pileSolved) return;
-    const timer = window.setTimeout(onCorrect, 650);
+    if (!pileSolved || completionReported.current) return;
+    const timer = window.setTimeout(() => {
+      if (completionReported.current) return;
+      completionReported.current = true;
+      onCorrect();
+    }, 650);
     return () => window.clearTimeout(timer);
   }, [pileSolved, onCorrect]);
 
