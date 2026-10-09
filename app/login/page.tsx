@@ -20,7 +20,6 @@ import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-clie
 import { clearDiagnosticHandoffPause } from "@/lib/diagnostic-handoff";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
-import { GraduationCap, Briefcase, KeyRound, User, Lock, Users } from "lucide-react";
 
 type DemoAccessDebug = {
   featureEnabledRaw?: string | null;
@@ -94,13 +93,8 @@ function summarizeProgress(progress: ReturnType<typeof readProgress>) {
 }
 
 /* ── Shared input wrapper (defined outside LoginPage to avoid remounts) ── */
-function InputField({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="relative">
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/35 z-10">{icon}</span>
-      {children}
-    </div>
-  );
+function InputField({ children }: { children: React.ReactNode }) {
+  return <div className="relative">{children}</div>;
 }
 
 export default function LoginPage() {
@@ -871,7 +865,7 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full pl-10 pr-4 py-3 rounded-xl text-[15px] text-white font-medium placeholder-white/30 bg-transparent border border-white/15 focus:outline-none focus:border-amber-400/50 focus:bg-white/[0.03] transition-all duration-200";
+    "w-full px-4 py-3 rounded-xl text-[15px] text-white font-medium placeholder-white/30 bg-transparent border border-white/15 focus:outline-none focus:border-amber-400/50 focus:bg-white/[0.03] transition-all duration-200";
 
   return (
     <main className="min-h-screen relative overflow-hidden flex">
@@ -970,7 +964,7 @@ export default function LoginPage() {
                 color: tab === "student" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
               }}
             >
-              <GraduationCap size={15} strokeWidth={2.2} /> Student
+              Student
             </button>
             <button
               type="button"
@@ -981,7 +975,7 @@ export default function LoginPage() {
                 color: tab === "teacher" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
               }}
             >
-              <Briefcase size={14} strokeWidth={2.2} /> Teacher
+              Teacher
             </button>
             <button
               type="button"
@@ -992,7 +986,7 @@ export default function LoginPage() {
                 color: tab === "parent" ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.35)",
               }}
             >
-              <Users size={14} strokeWidth={2.2} /> Parent
+              Parent
             </button>
           </div>
         </div>
@@ -1005,19 +999,19 @@ export default function LoginPage() {
             </div>
             {studentLoginMode === "school" ? <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Class Code</span>
-              <InputField icon={<KeyRound size={15} />}>
+              <InputField>
                 <input disabled={studentBootstrapState === "loading"} value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. K9F2Q" className={`${inputCls} tracking-[0.3em] text-center uppercase font-semibold disabled:opacity-60`} />
               </InputField>
             </label> : null}
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Username</span>
-              <InputField icon={<User size={15} />}>
+              <InputField>
                 <input disabled={studentBootstrapState === "loading"} value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter your username" className={`${inputCls} disabled:opacity-60`} />
               </InputField>
             </label>
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
-              <InputField icon={<Lock size={15} />}>
+              <InputField>
                 <input
                   value={studentPin}
                   onChange={(e) => setStudentPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -1087,7 +1081,7 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 <label className="grid min-w-0 gap-1.5">
                   <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">First name</span>
-                  <InputField icon={<User size={15} />}>
+                  <InputField>
                     <input
                       value={parentFirstName}
                       onChange={(event) => setParentFirstName(event.target.value)}
@@ -1099,7 +1093,7 @@ export default function LoginPage() {
                 </label>
                 <label className="grid min-w-0 gap-1.5">
                   <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Last name</span>
-                  <InputField icon={<User size={15} />}>
+                  <InputField>
                     <input
                       value={parentLastName}
                       onChange={(event) => setParentLastName(event.target.value)}
@@ -1114,7 +1108,7 @@ export default function LoginPage() {
 
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Parent Email</span>
-              <InputField icon={<User size={15} />}>
+              <InputField>
                 <input
                   value={parentEmail}
                   onChange={(event) => setParentEmail(event.target.value)}
@@ -1127,7 +1121,7 @@ export default function LoginPage() {
             </label>
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Password</span>
-              <InputField icon={<Lock size={15} />}>
+              <InputField>
                 <input
                   value={parentPassword}
                   onChange={(event) => setParentPassword(event.target.value)}
@@ -1177,7 +1171,7 @@ export default function LoginPage() {
                   <div className="mt-4 grid gap-3">
                     <label className="grid gap-1.5">
                       <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Explorer Code</span>
-                      <InputField icon={<KeyRound size={15} />}>
+                      <InputField>
                         <input
                           value={parentExplorerCode}
                           onChange={(event) => setParentExplorerCode(normalizeExplorerCode(event.target.value))}
@@ -1189,7 +1183,7 @@ export default function LoginPage() {
                     </label>
                     <label className="grid gap-1.5">
                       <span className="pl-1 text-[11px] font-bold uppercase tracking-widest text-white/50">Child’s 4-digit PIN</span>
-                      <InputField icon={<Lock size={15} />}>
+                      <InputField>
                         <input
                           value={parentStudentPin}
                           onChange={(event) => setParentStudentPin(event.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -1249,7 +1243,7 @@ export default function LoginPage() {
 
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">New Password</span>
-              <InputField icon={<Lock size={15} />}>
+              <InputField>
                 <input
                   value={recoveryPassword}
                   onChange={(e) => setRecoveryPassword(e.target.value)}
@@ -1261,7 +1255,7 @@ export default function LoginPage() {
             </label>
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Confirm Password</span>
-              <InputField icon={<Lock size={15} />}>
+              <InputField>
                 <input
                   value={recoveryConfirmPassword}
                   onChange={(e) => setRecoveryConfirmPassword(e.target.value)}
@@ -1315,13 +1309,13 @@ export default function LoginPage() {
 
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Email</span>
-              <InputField icon={<User size={15} />}>
+              <InputField>
                 <input value={teacherEmail} onChange={(e) => setTeacherEmail(e.target.value)} placeholder="teacher@school.edu" className={inputCls} />
               </InputField>
             </label>
             <label className="grid gap-1.5">
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">{teacherMode === "activate" ? "Create Password" : "Password"}</span>
-              <InputField icon={<Lock size={15} />}>
+              <InputField>
                 <input value={teacherPassword} onChange={(e) => setTeacherPassword(e.target.value)} placeholder="********" type="password" className={inputCls} />
               </InputField>
               {teacherMode === "activate" ? (
@@ -1351,7 +1345,7 @@ export default function LoginPage() {
                 </div>
                 <label className="grid gap-1.5">
                   <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">Educator Name</span>
-                  <InputField icon={<User size={15} />}>
+                  <InputField>
                     <input value={teacherName} onChange={(e) => setTeacherName(e.target.value)} placeholder="Ms Johnson" className={inputCls} />
                   </InputField>
                 </label>
@@ -1362,7 +1356,7 @@ export default function LoginPage() {
               <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest pl-1">
                 School Code {teacherMode === "login" ? "(first login only)" : ""}
               </span>
-              <InputField icon={<KeyRound size={15} />}>
+              <InputField>
                 <input
                   value={teacherSchoolCode}
                   onChange={(event) =>
