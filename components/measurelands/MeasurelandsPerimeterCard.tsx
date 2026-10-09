@@ -185,7 +185,7 @@ function CompareWalkScene({ task, onCorrect, onWrong }: { task: PerimTask; onCor
   const pa = perimeter(cmp.a.cells);
   const pb = perimeter(cmp.b.cells);
   const longerLabel = pa >= pb ? cmp.a.label : cmp.b.label;
-  const Card = ({ s, i }: { s: typeof cmp.a; i: string }) => (
+  const renderCard = ({ s, i }: { s: typeof cmp.a; i: string }) => (
     <button type="button" onClick={() => (s.label === longerLabel ? onCorrect() : onWrong())} className="flex flex-col items-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3 transition hover:-translate-y-0.5 active:scale-[0.98]">
       <span className="text-2xl">{s.emoji}</span>
       <ShapeSVG cells={s.cells} gridW={s.gridW} gridH={s.gridH} uid={`${uid}${i}`} size={210}>
@@ -196,7 +196,7 @@ function CompareWalkScene({ task, onCorrect, onWrong }: { task: PerimTask; onCor
   );
   return (
     <Shell badge={task.badgeLabel ?? "Which Walk Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-2 gap-3"><Card s={cmp.a} i="a" /><Card s={cmp.b} i="b" /></div>
+      <div className="grid grid-cols-2 gap-3">{renderCard({ s: cmp.a, i: "a" })}{renderCard({ s: cmp.b, i: "b" })}</div>
     </Shell>
   );
 }

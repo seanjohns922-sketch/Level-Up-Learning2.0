@@ -904,7 +904,7 @@ function UnitSortScene({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect
     }
   };
 
-  const Bin = ({ bin, glyph, title }: { bin: "cm" | "m"; glyph: string; title: string }) => {
+  const renderBin = ({ bin, glyph, title }: { bin: "cm" | "m"; glyph: string; title: string }) => {
     const chips = items.filter((it) => placed[it.label] === bin);
     return (
       <button
@@ -932,8 +932,8 @@ function UnitSortScene({ task, onCorrect, onWrong }: { task: UnitTask; onCorrect
   return (
     <Shell badge={task.badgeLabel ?? "Sort the Objects"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-2 gap-3">
-        <Bin bin="cm" glyph="📏" title="Centimetres" />
-        <Bin bin="m" glyph="📐" title="Metres" />
+        {renderBin({ bin: "cm", glyph: "📏", title: "Centimetres" })}
+        {renderBin({ bin: "m", glyph: "📐", title: "Metres" })}
       </div>
       <div className="rounded-[22px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-3">
         <p className="mb-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">

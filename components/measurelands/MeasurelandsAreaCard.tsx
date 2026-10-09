@@ -147,7 +147,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect:
     ? (s: typeof cmp.a) => shapePerimeter(s)
     : (s: typeof cmp.a) => s.cells.length;
   const longer = metric(cmp.a) >= metric(cmp.b) ? cmp.a.label : cmp.b.label;
-  const Card = ({ s }: { s: typeof cmp.a }) => (
+  const renderCard = ({ s }: { s: typeof cmp.a }) => (
     <button type="button" onClick={() => (s.label === longer ? onCorrect() : onWrong())} className="flex flex-col items-center gap-2 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3 transition hover:-translate-y-0.5 active:scale-[0.98]">
       <span className="text-2xl">{s.emoji}</span>
       <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={fitSize(s.gridW, s.gridH)} />
@@ -156,7 +156,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect:
   );
   return (
     <Shell badge={task.badgeLabel ?? "Which Has Greater Area?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-2 gap-3"><Card s={cmp.a} /><Card s={cmp.b} /></div>
+      <div className="grid grid-cols-2 gap-3">{renderCard({ s: cmp.a })}{renderCard({ s: cmp.b })}</div>
     </Shell>
   );
 }
@@ -269,7 +269,7 @@ function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
     if ((choice === "same") === same) onCorrect();
     else { setWrong(choice); onWrong(); window.setTimeout(() => setWrong(null), 600); }
   };
-  const ShapeCard = ({ s }: { s: typeof cmp.a }) => (
+  const renderShapeCard = ({ s }: { s: typeof cmp.a }) => (
     <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3">
       <span className="text-2xl">{s.emoji}</span>
       <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline size={fitSize(s.gridW, s.gridH)} />
@@ -278,7 +278,7 @@ function SameDiffScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorrect
   );
   return (
     <Shell badge={task.badgeLabel ?? "Equal or Different?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-2 gap-3"><ShapeCard s={cmp.a} /><ShapeCard s={cmp.b} /></div>
+      <div className="grid grid-cols-2 gap-3">{renderShapeCard({ s: cmp.a })}{renderShapeCard({ s: cmp.b })}</div>
       <div className="grid grid-cols-2 gap-3">
         <button type="button" onClick={() => pick("same")} className={`min-h-[68px] rounded-[24px] border-2 px-4 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === "same" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>Same area</button>
         <button type="button" onClick={() => pick("diff")} className={`min-h-[68px] rounded-[24px] border-2 px-4 text-lg font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === "diff" ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[#fffaf0]"}`}>Different area</button>
@@ -481,7 +481,7 @@ function InvestigateScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
     else { setWrong(c); onWrong(); window.setTimeout(() => setWrong(null), 600); }
   };
   const bigger = periA >= periB ? cmp.a.label : cmp.b.label;
-  const Card = ({ s, area, peri }: { s: typeof cmp.a; area: number; peri: number }) => (
+  const renderCard = ({ s, area, peri }: { s: typeof cmp.a; area: number; peri: number }) => (
     <div className="flex flex-col items-center gap-1 rounded-[24px] border-2 border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)] p-3">
       <span className="text-base font-black text-[#2c1c07]">{s.emoji} {s.label}</span>
       <Tiles cells={s.cells} gridW={s.gridW} gridH={s.gridH} filled={new Set(s.cells.map(([c, r]) => cellKey(c, r)))} outline={phase === "notice"} glow={phase === "reveal"} size={fitSize(s.gridW, s.gridH)} />
@@ -499,8 +499,8 @@ function InvestigateScene({ task, onCorrect, onWrong }: { task: AreaTask; onCorr
   return (
     <Shell badge={task.badgeLabel ?? "What Do You Notice?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-2 gap-3">
-        <Card s={cmp.a} area={areaA} peri={periA} />
-        <Card s={cmp.b} area={areaB} peri={periB} />
+        {renderCard({ s: cmp.a, area: areaA, peri: periA })}
+        {renderCard({ s: cmp.b, area: areaB, peri: periB })}
       </div>
       {phase === "notice" ? (
         <>
