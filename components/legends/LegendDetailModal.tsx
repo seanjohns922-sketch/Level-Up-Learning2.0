@@ -28,6 +28,10 @@ export default function LegendDetailModal({
   legend: Legend;
   onClose: () => void;
 }) {
+  return <LegendDetailContent key={legend.id} legend={legend} onClose={onClose} />;
+}
+
+function LegendDetailContent({ legend, onClose }: { legend: Legend; onClose: () => void }) {
   const [showBack, setShowBack] = useState(false);
   const [videoMode, setVideoMode] = useState<"showcase" | "unlock" | null>(null);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -48,13 +52,6 @@ export default function LegendDetailModal({
       backImage,
     });
   }, [backImage, frontImage, legend.id, legend.name]);
-
-  useEffect(() => {
-    setVideoMode(null);
-    setVideoFailed(false);
-    setShowBack(false);
-    setEnlarged(false);
-  }, [legend.id]);
 
   // Realm-aware theming keeps the shared card interaction consistent.
   const isMeasure = legend.realmId === "measurelands";

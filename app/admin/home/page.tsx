@@ -5,12 +5,11 @@ import { AdminPageHeading, FutureMetric, Metric } from "@/components/admin/Admin
 import { loadPlatformHomeUsers } from "@/lib/platform-admin-server";
 
 export default async function PlatformHomeAdminPage() {
-  let loadFailed = false;
-  const data = await loadPlatformHomeUsers().catch((error) => {
+  const result = await loadPlatformHomeUsers().then((data) => ({ data, loadFailed: false })).catch((error) => {
     console.error("[PlatformHomeAdminPage] home snapshot failed", error);
-    loadFailed = true;
-    return null;
+    return { data: null, loadFailed: true };
   });
+  const { data, loadFailed } = result;
   if (loadFailed) {
     return <><AdminPageHeading eyebrow="Home" title="Home access" detail="2026 home access is free. Parent linking, home entitlement and billing classification remain separate." action={<Link href="/admin/home/users" className="border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700">View Home users</Link>} /><section className="border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950"><p className="font-bold">Home metrics are temporarily unavailable.</p><p className="mt-1">The Home data view could not load. Other Platform Admin sections are unaffected.</p></section></>;
   }

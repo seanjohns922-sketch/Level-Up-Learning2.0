@@ -1,29 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 function isFullscreenActive() {
   if (typeof document === "undefined") return false;
   return Boolean(document.fullscreenElement);
 }
 
+function subscribeFullscreen(listener: () => void) {
+  document.addEventListener("fullscreenchange", listener);
+  return () => document.removeEventListener("fullscreenchange", listener);
+}
+
+function isFullscreenSupported() {
+  return typeof document !== "undefined" && typeof document.documentElement.requestFullscreen === "function";
+}
+
+function serverFullscreenSnapshot() { return false; }
+
 export function FullscreenToggle({ inline = false }: { inline?: boolean } = {}) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    setIsSupported(typeof document.documentElement.requestFullscreen === "function");
-    const syncFullscreenState = () => setIsFullscreen(isFullscreenActive());
-    const frame = window.requestAnimationFrame(syncFullscreenState);
-    document.addEventListener("fullscreenchange", syncFullscreenState);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      document.removeEventListener("fullscreenchange", syncFullscreenState);
-    };
-  }, []);
+  const isFullscreen = useSyncExternalStore(subscribeFullscreen, isFullscreenActive, serverFullscreenSnapshot);
+  const isSupported = useSyncExternalStore(subscribeFullscreen, isFullscreenSupported, serverFullscreenSnapshot);
 
   async function toggleFullscreen() {
     if (!isSupported || typeof document === "undefined") return;

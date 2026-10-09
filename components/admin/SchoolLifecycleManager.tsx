@@ -1,7 +1,7 @@
 "use client";
 
 import { Archive, Pause, Play, RotateCcw, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { PlatformSchoolDetail } from "@/lib/platform-admin-server";
 
 async function command(payload: Record<string, unknown>) {
@@ -38,6 +38,30 @@ function schoolAdminInviteMailto(email: string, schoolName: string, schoolCode: 
   return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+// Cache the one-shot storage snapshot for this mount, including Strict Mode's
+// repeated subscriptions. Consuming storage must not erase the visible message.
+function createSchoolMessageStore(key: string) {
+  let snapshot: string | null | undefined;
+  return {
+    subscribe: () => () => {},
+    getSnapshot: () => {
+      if (snapshot === undefined) snapshot = window.sessionStorage.getItem(key);
+      return snapshot;
+    },
+    getServerSnapshot: () => null,
+  };
+}
+
+function useSchoolAdminMessage(key: string) {
+  const store = useMemo(() => createSchoolMessageStore(key), [key]);
+  const saved = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
+  const [dismissedKey, setDismissedKey] = useState<string | null>(null);
+  useEffect(() => {
+    if (saved) window.sessionStorage.removeItem(key);
+  }, [key, saved]);
+  return { message: dismissedKey === key ? null : saved, clearMessage: () => setDismissedKey(key) };
+}
+
 export default function SchoolLifecycleManager({ detail }: { detail: PlatformSchoolDetail }) {
   const messageKey = `lul-platform-school-admin-message:${detail.school.id}`;
   const archived = detail.school.status === "archived";
@@ -45,18 +69,10 @@ export default function SchoolLifecycleManager({ detail }: { detail: PlatformSch
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = window.sessionStorage.getItem(messageKey);
-    if (saved) {
-      setMessage(saved);
-      window.sessionStorage.removeItem(messageKey);
-    }
-  }, [messageKey]);
+  const { message, clearMessage } = useSchoolAdminMessage(messageKey);
 
   async function run(payload: Record<string, unknown>, success: string) {
-    setBusy(true); setError(null); setMessage(null);
+    setBusy(true); setError(null); clearMessage();
     try {
       const result = await command(payload);
       const delivery = result?.administrator?.emailDelivery;

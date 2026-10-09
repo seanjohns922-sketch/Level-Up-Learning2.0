@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Compass, Undo2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -872,7 +872,7 @@ function CompareAccuracyScene({ task, onCorrect, onWrong }: { task: MeasurePathT
   const smallCount = isSame ? wholeBig * 2 : task.correctAnswer ?? wholeBig * 2 + 1;
   // Random card order for tap mode (stable per question) so the exact answer
   // isn't always in the same position. Computed unconditionally (hooks rule).
-  const tapOrder = useMemo<[number, number]>(() => (Math.random() < 0.5 ? [0, 1] : [1, 0]), [task]);
+  const [tapOrder] = useState<[number, number]>(() => (Math.random() < 0.5 ? [0, 1] : [1, 0]));
   // In tap/sameLength modes the child must judge from the blocks, so captions
   // state the count only (no "fits exactly" giveaway).
   const bigCaption = isSame ? (
@@ -1291,9 +1291,6 @@ function EstimateGuessScene({ task, onCorrect, onWrong }: { task: MeasurePathTas
   const isAnswered = selected !== null;
   const isCorrect = selected === task.correctAnswer;
   const correctAnswer = typeof task.correctAnswer === "number" ? task.correctAnswer : null;
-  useEffect(() => {
-    setSelected(null);
-  }, [task]);
 
   function chooseEstimate(value: number) {
     if (isAnswered) return;
@@ -1306,7 +1303,7 @@ function EstimateGuessScene({ task, onCorrect, onWrong }: { task: MeasurePathTas
     <PathShell badge={task.badgeLabel ?? "Best Guess"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-5 shadow-sm">
         <EstObjectImage src={task.objectImageSrc} label={task.objectLabel} units={task.estimateMeasurement?.objectLengthUnits ?? task.correctAnswer} />
-        <div className="mt-3 text-center text-base font-bold text-[#5f4725]">Don't measure — have a guess!</div>
+        <div className="mt-3 text-center text-base font-bold text-[#5f4725]">Don&apos;t measure — have a guess!</div>
         {isAnswered && correctAnswer !== null ? (
           <div className={`mt-3 rounded-2xl px-4 py-3 text-center text-sm font-black ${isCorrect ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
             {isCorrect
@@ -1345,17 +1342,14 @@ function EstimateSliderScene({ task, onCorrect, onWrong }: { task: MeasurePathTa
   const [checked, setChecked] = useState(false);
   const wonRef = useRef(false);
   const close = Math.abs(guess - actual) <= tolerance;
-  useEffect(() => {
-    setGuess(start);
-    setChecked(false);
-    wonRef.current = false;
-  }, [actual, min, max, start]);
+  const completionTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(completionTimer.current), []);
   function check() {
     if (checked) return;
     setChecked(true);
     if (!wonRef.current) {
       wonRef.current = true;
-      window.setTimeout(() => (close ? onCorrect() : onWrong()), 1500);
+      completionTimer.current = window.setTimeout(() => (close ? onCorrect() : onWrong()), 1500);
     }
   }
   return (
@@ -1396,9 +1390,6 @@ function EstimateLongerScene({ task, onCorrect, onWrong }: { task: MeasurePathTa
   const [selected, setSelected] = useState<string | null>(null);
   const isAnswered = selected !== null;
   const correctItem = pair.find((item) => item.id === task.correctItemId);
-  useEffect(() => {
-    setSelected(null);
-  }, [task]);
 
   function chooseItem(id: string) {
     if (isAnswered) return;
@@ -1443,6 +1434,13 @@ export function MeasurelandsPathTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  // Remount question-specific scenes before rendering a replacement task.
+  const [sceneTask, setSceneTask] = useState(task);
+  const [sceneVersion, setSceneVersion] = useState(0);
+  if (sceneTask !== task) {
+    setSceneTask(task);
+    setSceneVersion(sceneVersion + 1);
+  }
   if (task.scene === "intro") return <IntroScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "count") return <CountScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "compare") return <CompareScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
@@ -1452,12 +1450,12 @@ export function MeasurelandsPathTaskCard({
   if (task.scene === "reMeasure") return <ReMeasureScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "moreOrFewer") return <MoreOrFewerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "countSmall") return <CountSmallScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "compareAccuracy") return <CompareAccuracyScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "compareAccuracy") return <CompareAccuracyScene key={sceneVersion} task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   if (task.scene === "finishGap") return <FinishGapScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "fillSmall") return <FillSmallScene task={task} onCorrect={onCorrect} />;
   if (task.scene === "measureYourWay") return <MeasureYourWayScene task={task} onCorrect={onCorrect} />;
-  if (task.scene === "estimateGuess") return <EstimateGuessScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "estimateSlider") return <EstimateSliderScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
-  if (task.scene === "estimateLonger") return <EstimateLongerScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "estimateGuess") return <EstimateGuessScene key={sceneVersion} task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "estimateSlider") return <EstimateSliderScene key={sceneVersion} task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  if (task.scene === "estimateLonger") return <EstimateLongerScene key={sceneVersion} task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   return <BuildScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
 }

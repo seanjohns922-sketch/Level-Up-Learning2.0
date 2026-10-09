@@ -33,7 +33,8 @@ function landShape(theme: Shape["theme"], name: string): Shape {
   if (randInt(2) === 0) {
     s = makeSquare(randRange(6, 20), "m");
   } else {
-    let w = randRange(6, 22), h = randRange(6, 22);
+    const w = randRange(6, 22);
+    let h = randRange(6, 22);
     if (w === h) h += 1;
     s = makeRect(w, h, "m");
   }

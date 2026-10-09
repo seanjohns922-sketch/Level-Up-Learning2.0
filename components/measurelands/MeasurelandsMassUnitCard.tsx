@@ -257,7 +257,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: MassUnitTask; onCorrect
     window.setTimeout(() => setWrong(null), 650);
   };
 
-  const Bin = ({ unit }: { unit: Unit }) => {
+  const renderBin = ({ unit }: { unit: Unit }) => {
     const binItems = items.filter((item) => placed[item.label] === unit);
     return (
       <button
@@ -282,8 +282,8 @@ function SortScene({ task, onCorrect, onWrong }: { task: MassUnitTask; onCorrect
   return (
     <Shell badge={task.badgeLabel ?? "Sort the Objects"} prompt={task.prompt} speakText={task.speakText}>
       <div className="grid grid-cols-2 gap-3">
-        <Bin unit="g" />
-        <Bin unit="kg" />
+        {renderBin({ unit: "g" })}
+        {renderBin({ unit: "kg" })}
       </div>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-3">
         <p className="mb-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">

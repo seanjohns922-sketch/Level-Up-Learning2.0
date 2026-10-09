@@ -1,0 +1,180 @@
+{
+  "title": "RELIQ lint cleanup phase 2",
+  "date": "2026-10-09",
+  "branch": "cleanup/lint-phase2",
+  "baseCommit": "a02d1b53",
+  "workspace": "/private/tmp/reliq-lint-phase2",
+  "releaseStatus": "Prepared for a separate pull request. Not merged into main or deployed; no production or database changes.",
+  "baseline": {
+    "errors": 65,
+    "warnings": 320,
+    "errorRules": {
+      "react-hooks/immutability": 1,
+      "react-hooks/preserve-manual-memoization": 2,
+      "react-hooks/set-state-in-effect": 12,
+      "react-hooks/static-components": 30,
+      "react-hooks/rules-of-hooks": 4,
+      "react-hooks/purity": 1,
+      "react/no-unescaped-entities": 2,
+      "react/no-children-prop": 1,
+      "react-hooks/refs": 6,
+      "prefer-const": 6
+    },
+    "warningRules": {
+      "@next/next/no-img-element": 37,
+      "react-hooks/exhaustive-deps": 10,
+      "@typescript-eslint/no-unused-vars": 268,
+      "@typescript-eslint/no-unused-expressions": 4,
+      "import/no-anonymous-default-export": 1
+    }
+  },
+  "final": {
+    "errors": 0,
+    "warnings": 319,
+    "errorRules": {},
+    "warningRules": {
+      "@next/next/no-img-element": 37,
+      "react-hooks/exhaustive-deps": 9,
+      "@typescript-eslint/no-unused-vars": 268,
+      "@typescript-eslint/no-unused-expressions": 4,
+      "import/no-anonymous-default-export": 1
+    }
+  },
+  "batches": [
+    {
+      "commit": "78b17c39",
+      "changes": "Balance hook order, stable pans and completion lifecycle",
+      "remainingErrors": 59,
+      "warnings": 320
+    },
+    {
+      "commit": "b072b492",
+      "changes": "Stable measurement controls and focus",
+      "remainingErrors": 31,
+      "warnings": 320
+    },
+    {
+      "commit": "5fbdd26d",
+      "changes": "Route attempt lock, task reset and brain-break sequence",
+      "remainingErrors": 19,
+      "warnings": 320
+    },
+    {
+      "commit": "0b9b30f4",
+      "changes": "Browser/card state, preview level and straightforward lint fixes",
+      "remainingErrors": 7,
+      "warnings": 320
+    },
+    {
+      "commit": "033da159",
+      "changes": "Teacher/admin lifecycle and stable memo inputs",
+      "remainingErrors": 0,
+      "warnings": 320
+    },
+    {
+      "changes": "Final review: remove obsolete import and guard balance completion after callback identity changes",
+      "remainingErrors": 0,
+      "warnings": 319
+    }
+  ],
+  "checks": {
+    "applicationLint": "PASS: 0 errors; warnings remain visible",
+    "typescript": "PASS: standalone typecheck for all five main batches and final production TypeScript check",
+    "criticalQA": "PASS: 11/11, including new qa:lint-interactions",
+    "qaScriptLint": "PASS: lint:qa",
+    "securitySourceQA": "PASS: 4/4; source checks only, not deployed role/RLS verification",
+    "chanceWorldAudit": "PASS: Levels 3-6",
+    "platformAdminPA2": "PASS: 25/25",
+    "productionBuild": "PASS: complete npm run build, including the unmodified prebuild release suite, optimized compilation, TypeScript and page generation",
+    "diffWhitespace": "PASS",
+    "generatedTaskStructure": "PASS: 864 G\u20136 lessons, 73,860 samples, 225 task kinds; not exhaustive mathematical correctness"
+  },
+  "newRegressionCoverage": [
+    "Balance mode hook order; retained focus; correct/wrong callbacks; single completion in Strict Mode and after callback changes; cancelled pending completion",
+    "Capacity, duration, mass-unit and metre sorting: stable DOM controls, focus and scoring",
+    "Metric conversion and volume feedback preserve focus and scoring",
+    "Single-attempt route controls lock and cannot resubmit",
+    "Estimation state resets for a new task; obsolete completion timer is cancelled",
+    "Memory game replays a mistake, advances three rounds and completes once",
+    "Fullscreen capability and browser fullscreen-change events update controls",
+    "RELIQ card changes reset flip, enlargement and video; same-card rerenders retain state",
+    "Admin flash message consumption, Strict Mode, dismissal and school scoping",
+    "Teacher insights loading, changed route and cancelled stale response",
+    "Teacher week selection retained while browsing and reset for a new student or current week",
+    "Chance preview responds to selected level; live mode restores the saved level"
+  ],
+  "changedFiles": [
+    "app/admin/home/page.tsx",
+    "app/lesson/page.tsx",
+    "app/program/page.tsx",
+    "app/teacher/student-insights/page.tsx",
+    "components/FullscreenToggle.tsx",
+    "components/admin/SchoolLifecycleManager.tsx",
+    "components/legends/LegendDetailModal.tsx",
+    "components/lesson/BrainBreak.tsx",
+    "components/measurelands/MeasurelandsAreaCard.tsx",
+    "components/measurelands/MeasurelandsBalanceScaleCard.tsx",
+    "components/measurelands/MeasurelandsCapacityCard.tsx",
+    "components/measurelands/MeasurelandsDurationCard.tsx",
+    "components/measurelands/MeasurelandsMassMeasureCard.tsx",
+    "components/measurelands/MeasurelandsMassUnitCard.tsx",
+    "components/measurelands/MeasurelandsMetricConvertCard.tsx",
+    "components/measurelands/MeasurelandsPathTaskCard.tsx",
+    "components/measurelands/MeasurelandsPerimeterCard.tsx",
+    "components/measurelands/MeasurelandsRulerCard.tsx",
+    "components/measurelands/MeasurelandsTimeline.tsx",
+    "components/measurelands/MeasurelandsToolChoiceCard.tsx",
+    "components/measurelands/MeasurelandsVolumeCard.tsx",
+    "components/parent/ParentPortal.tsx",
+    "components/realms/RealmCarousel.tsx",
+    "components/realms/dashboard/RealmDashboardShell.tsx",
+    "components/starpath/StarpathLevelOnePathCards.tsx",
+    "components/teacher/StrandStudentsPanel.tsx",
+    "components/world3d/ChanceHollow3DEntry.tsx",
+    "data/activities/year1Measurelands/week2Lesson3.ts",
+    "data/activities/year3Measurelands/week7Common.ts",
+    "data/activities/year3Measurelands/week8Common.ts",
+    "data/activities/year4Measurelands/week4Common.ts",
+    "data/activities/year4Measurelands/week4Lesson3.ts",
+    "data/activities/year6Measurelands/week3Common.ts",
+    "package-lock.json",
+    "package.json",
+    "scripts/lint-interactions-test.mjs",
+    "scripts/qa-runner.mjs",
+    "scripts/test-support/react-dom-harness.mjs",
+    "docs/LINT_CLEANUP_PHASE2_2026-10-09.json"
+  ],
+  "testInfrastructure": {
+    "developmentDependency": "jsdom ^29.1.1",
+    "ci": "qa:lint-interactions added to qa:critical; new scripts included in lint:qa; no existing check or lint rule weakened"
+  },
+  "outstanding": [
+    "319 application lint warnings: 268 unused variables, 37 image-element warnings, 9 hook dependency warnings, 4 unused expressions and 1 anonymous default export.",
+    "Signed-in student/teacher journeys, real browser/iPad layout and audible read-aloud are not certified by the new DOM tests.",
+    "API security review and deployed Supabase permission/role matrix remain separate outstanding work; this pass made no permission changes.",
+    "Dependency installation reported npm audit findings. Dependency vulnerability remediation was not included in this lint-only pass.",
+    "GitHub checks must run on the branch before merge; local passing checks are not a claim that remote CI has run.",
+    "Changes were isolated from concurrent work in the original workspace; integration must be reviewed before merging."
+  ],
+  "rollback": "Each of the five main batches has a local checkpoint commit. Revert the relevant batch on this branch if review finds a regression; there is no production change to roll back.",
+  "evidence": {
+    "lintBaseline": "/tmp/reliq-lint-before.json",
+    "lintFinal": "/tmp/reliq-lint-final.json",
+    "criticalQA": "/tmp/reliq-critical-final.log",
+    "securitySourceQA": "/tmp/reliq-security-source.log",
+    "productionBuild": "/tmp/reliq-production-final.log"
+  },
+  "newRegressionGroups": 16,
+  "buildEnvironment": {
+    "node": "24.13.0",
+    "NEXT_PUBLIC_ADMIN_MODE": "false",
+    "NEXT_PUBLIC_LEVEL7_LIVE": "true",
+    "note": "Initial sandboxed compile stalled; final full build passed with local process/IPC access. No checks were bypassed."
+  },
+  "integration": {
+    "mainCommit": "9fcbdf9cdbd083f5b84c8116607cec22e2faa8c1",
+    "mergeCommit": "820b53b0a5ae32d723a7236e5ca5b7130fd26b3a",
+    "conflicts": false,
+    "upstreamChanges": "Login branding only; no overlap with cleanup files. Checks below describe the original cleanup validation; integration checks and remote CI are reported on the pull request."
+  }
+}

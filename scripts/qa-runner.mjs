@@ -8,7 +8,7 @@ const groups = {
     'qa:student-diagnostic-permissions', 'qa:realm-release-gate',
     'qa:canonical-progression', 'qa:teacher-canonical-snapshot',
     'qa:live-maths-progression', 'qa:completion-rewards',
-    'qa:activity-marking', 'qa:quiz-math-integrity',
+    'qa:activity-marking', 'qa:quiz-math-integrity', 'qa:lint-interactions',
   ],
   // Source checks only: not a substitute for deployed role/RLS tests.
   'security-source': ['qa:screen-recording-safety', 'qa:student-session-isolation', 'qa:student-diagnostic-permissions', 'qa:school-teacher-learning-access'],

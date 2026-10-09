@@ -288,7 +288,8 @@
     "qa:critical": "node scripts/qa-runner.mjs critical",
     "qa:security-source": "node scripts/qa-runner.mjs security-source",
     "qa:screen-recording-safety": "node scripts/screen-recording-safety-test.mjs",
-    "lint:qa": "eslint --config eslint.qa.config.mjs scripts/qa-runner.mjs scripts/screen-recording-safety-test.mjs scripts/test-support/activity-harness.mjs scripts/activity-marking-test.mjs"
+    "lint:qa": "eslint --config eslint.qa.config.mjs scripts/qa-runner.mjs scripts/screen-recording-safety-test.mjs scripts/test-support/activity-harness.mjs scripts/activity-marking-test.mjs scripts/lint-interactions-test.mjs scripts/test-support/react-dom-harness.mjs",
+    "qa:lint-interactions": "node scripts/lint-interactions-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -317,6 +318,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

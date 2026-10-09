@@ -89,7 +89,7 @@ export function MeasurelandsTimeline({
 
   const sx = xFor(startMin);
   const fx = xFor(finishMin);
-  const Marker = ({ x, color, label, side }: { x: number; color: string; label: string; side: "up" | "down" }) => (
+  const renderMarker = ({ x, color, label, side }: { x: number; color: string; label: string; side: "up" | "down" }) => (
     <g>
       <line x1={x} x2={x} y1={AXIS_Y} y2={AXIS_Y - 30} stroke={color} strokeWidth={2.5} />
       <circle cx={x} cy={AXIS_Y - 32} r={6} fill={color} stroke="#fff" strokeWidth={1.5} />
@@ -116,8 +116,8 @@ export function MeasurelandsTimeline({
             </g>
           </g>
         ) : null}
-        <Marker x={sx} color={GREEN} label={fmtTime(startMin)} side="down" />
-        <Marker x={fx} color={VIOLET} label={fmtTime(finishMin)} side="up" />
+        {renderMarker({ x: sx, color: GREEN, label: fmtTime(startMin), side: "down" })}
+        {renderMarker({ x: fx, color: VIOLET, label: fmtTime(finishMin), side: "up" })}
       </svg>
       {onSet ? <p className="text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">Tap the timeline to set the finish</p> : null}
     </div>

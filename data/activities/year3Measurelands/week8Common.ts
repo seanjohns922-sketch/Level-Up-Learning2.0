@@ -64,7 +64,7 @@ export function buildCountSquares(pool: ShapeDef[]): AreaTask {
 }
 
 export function buildCompareArea(pool: ShapeDef[]): AreaTask {
-  let a = pick(pool); let b = pick(pool);
+  const a = pick(pool); let b = pick(pool);
   for (let k = 0; k < 30 && (a.label === b.label || area(a) === area(b)); k++) b = pick(pool);
   const bigger = area(a) >= area(b) ? a.label : b.label;
   return {
