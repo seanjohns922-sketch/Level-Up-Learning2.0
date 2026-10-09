@@ -243,9 +243,11 @@ export default function RealmDashboardShell({
       ? readProgress(config.storageRealmId)
       : null;
   });
-  useEffect(() => {
+  const [previousRestoredProgress, setPreviousRestoredProgress] = useState(restoredProgress);
+  if (restoredProgress !== previousRestoredProgress) {
+    setPreviousRestoredProgress(restoredProgress);
     if (restoredProgress !== undefined) setProgress(restoredProgress);
-  }, [restoredProgress]);
+  }
   const [store] = useState(() => readProgramStore());
   const [launching, setLaunching] = useState(false);
   const [bestChain] = useState(() => readBestChain(config.storageRealmId, resolvedYear));

@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import React from 'react';
+import { URLSearchParams } from 'node:url';
 import { domHarness } from './test-support/react-dom-harness.mjs';
 const h = domHarness();
 try {
@@ -181,5 +183,120 @@ for (const [file, task, wrongLabel, rightLabel] of [
     await dom.click(find('Watch Video')); assert(dom.document.querySelector('video'));
     await dom.render(Modal, props); assert(!dom.document.querySelector('video'));
     console.log('PASS: changing RELIQ cards resets side, enlargement and video without resetting the same card');
+  } finally { await dom.close(); }
+}
+
+{
+  const dom = domHarness();
+  try {
+    const { useSchoolAdminMessage } = dom.load('components/admin/SchoolLifecycleManager.tsx', ['useSchoolAdminMessage']);
+    const storage = dom.document.defaultView.sessionStorage;
+    storage.setItem('school-a', 'Saved A'); storage.setItem('school-b', 'Saved B');
+    function Message({ storageKey }) {
+      const { message, clearMessage } = useSchoolAdminMessage(storageKey);
+      return React.createElement('button', { onClick: clearMessage }, message ?? 'No message');
+    }
+    await dom.render(Message, { storageKey: 'school-a' });
+    assert.equal(dom.document.querySelector('button').textContent, 'Saved A');
+    assert.equal(storage.getItem('school-a'), null, 'Message is consumed once');
+    await dom.render(Message, { storageKey: 'school-a' });
+    assert.equal(dom.document.querySelector('button').textContent, 'Saved A', 'Strict Mode and rerenders keep the message');
+    await dom.click(dom.document.querySelector('button'));
+    assert.equal(dom.document.querySelector('button').textContent, 'No message');
+    await dom.render(Message, { storageKey: 'school-b' });
+    assert.equal(dom.document.querySelector('button').textContent, 'Saved B');
+    console.log('PASS: admin flash messages survive Strict Mode, clear on action and stay school-scoped');
+  } finally { await dom.close(); }
+}
+
+{
+  let params = new URLSearchParams('studentId=a&realm_id=number');
+  const user = { id: 'test-teacher' };
+  const requests = [];
+  const dom = domHarness({
+    '@/lib/supabase': { supabase: { from(table) {
+      let id;
+      const query = { select: () => query, eq: (_key, value) => { id = value; return query; }, order: () => Promise.resolve({ data: [] }), maybeSingle: () => table === 'students' ? new Promise(resolve => requests.push({ id, resolve })) : Promise.resolve({ data: { name: 'Test class' } }) };
+      return query;
+    } } },
+    '@/lib/useAuthGuard': { useAuthGuard: () => ({ user, loading: false }) },
+    '@/lib/realm-progress-compat': { fetchRealmCompatProgressForStudent: async () => [] },
+    '@/components/teacher/AssessmentReplay': { __esModule: true, default: () => null },
+    'next/navigation': { useSearchParams: () => params },
+  });
+  try {
+    const { StudentInsightsPageInner: Page } = dom.load('app/teacher/student-insights/page.tsx', ['StudentInsightsPageInner']);
+    await dom.render(Page, {});
+    assert(dom.document.body.textContent.includes('Loading learning insights'));
+    params = new URLSearchParams('studentId=b&realm_id=number');
+    await dom.render(Page, {});
+    await dom.act(async () => requests.filter(r => r.id === 'b').forEach(r => r.resolve({ data: { id: 'b', display_name: 'Student B', class_id: 'test-class', school_year_level: 'Year 4' } })));
+    assert(dom.document.body.textContent.includes('Student B'));
+    await dom.act(async () => requests.filter(r => r.id === 'a').forEach(r => r.resolve({ data: null })));
+    assert(dom.document.body.textContent.includes('Student B'), 'Late previous request must not overwrite current student');
+    params = new URLSearchParams('studentId=b&realm_id=invalid');
+    await dom.render(Page, {});
+    assert(dom.document.body.textContent.includes('Select a valid realm'));
+    assert(!dom.document.body.textContent.includes('Student B'));
+    console.log('PASS: teacher insights loading, route changes and stale-request cancellation');
+  } finally { await dom.close(); }
+}
+
+{
+  const dom = domHarness({
+    '@/lib/supabase': { supabase: {} },
+    '@/lib/realm-progress-compat': { teacherAdvanceStudentWeek: () => assert.fail('No progression writes in UI test') },
+    './LessonPreviewDrawer': { __esModule: true, default: () => null },
+    '@/components/teacher/StatisticsExtensionReport': { __esModule: true, default: () => null },
+    '@/components/teacher/SpaceExtensionReport': { __esModule: true, default: () => null },
+    './MeasurementExtensionReport': { __esModule: true, default: () => null },
+    './NumberExtensionReport': { __esModule: true, default: () => null },
+    './AssessmentReplay': { __esModule: true, default: () => null },
+  });
+  try {
+    const { StudentStrandDetail: Detail } = dom.load('components/teacher/StrandStudentsPanel.tsx', ['StudentStrandDetail']);
+    const props = { student: { id: 'test-a', display_name: 'Student A' }, schoolYearLabel: 'Year 1', yearLabel: 'Year 1', genre: { id: 'number', strand: 'Number', realm: 'Number Nexus' }, prog: { year: 'Year 1', week: 1, current_week: 1, completed_lesson_ids: [], quiz_scores: {} }, pathwayStatus: 'Full Program', isPlaceholder: false, prefix: 'y1' };
+    await dom.render(Detail, props);
+    const weekButton = n => dom.document.querySelector(`[title^="Week ${n}:"]`);
+    await dom.click(weekButton(2));
+    assert(weekButton(2).title.includes('collapse'));
+    await dom.render(Detail, props); assert(weekButton(2).title.includes('collapse'));
+    await dom.render(Detail, { ...props, student: { ...props.student, id: 'test-b' } });
+    assert(weekButton(1).className.includes('ring-2'));
+    assert(weekButton(2).title.includes('expand'));
+    await dom.render(Detail, { ...props, prog: { ...props.prog, week: 3, current_week: 3 } });
+    assert(weekButton(3).className.includes('ring-2'));
+    console.log('PASS: teacher week selection persists while browsing and resets for a new student/current week');
+  } finally { await dom.close(); }
+}
+
+{
+  let params = new URLSearchParams('level=Year+3');
+  const pending = [];
+  const router = { replace: () => assert.fail('Valid test levels must not redirect') };
+  const dom = domHarness({
+    'next/dynamic': { __esModule: true, default: () => ({ level }) => React.createElement('div', { 'data-world-level': level }, level) },
+    'next/navigation': { useRouter: () => router, useSearchParams: () => params },
+    '@/data/progress': { ACTIVE_STUDENT_KEY: 'test-student', isPlacementComplete: () => true },
+    '@/lib/demo-mode': { useDemoPreviewMode: () => false },
+    '@/lib/last-realm': { setLastRealm: () => {} },
+    '@/lib/studentIdentity': { getActiveStudentProfile: () => ({ studentId: 'test-a', classId: 'test-class' }) },
+    '@/lib/student-progress-sync': { restoreStudentStateFromServer: () => new Promise(resolve => pending.push(resolve)), StudentRestoreSupersededError: class extends Error {} },
+    '@/lib/world3d/access': { resolveRealm3DAccess: () => ({ canExplore3D: true }) },
+    '@/lib/world3d/canonical-bootstrap': { announceCanonicalWorldStateRestored: () => {} },
+  });
+  try {
+    const { default: Entry } = dom.load('components/world3d/ChanceHollow3DEntry.tsx');
+    dom.document.defaultView.localStorage.setItem('test-student', 'test-a');
+    await dom.render(Entry, { teacherPreview: true });
+    assert.equal(dom.document.querySelector('[data-world-level]').textContent, 'Year 3');
+    params = new URLSearchParams('level=Year+6');
+    await dom.render(Entry, { teacherPreview: true });
+    assert.equal(dom.document.querySelector('[data-world-level]').textContent, 'Year 6');
+    await dom.render(Entry, { teacherPreview: false });
+    assert(dom.document.body.textContent.includes('Loading saved progress'));
+    await dom.act(async () => pending.forEach(resolve => resolve({ progress: { year: 'Year 4' } })));
+    assert.equal(dom.document.querySelector('[data-world-level]').textContent, 'Year 4', 'Live world must use restored progress, not preview URL');
+    console.log('PASS: Chance preview follows selected level; live entry uses server-restored level');
   } finally { await dom.close(); }
 }

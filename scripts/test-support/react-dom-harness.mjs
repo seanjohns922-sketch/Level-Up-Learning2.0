@@ -12,7 +12,7 @@ const require = createRequire(import.meta.url);
 export function domHarness(mocks = {}) {
   const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'http://localhost' });
   const previous = new Map();
-  for (const [name, value] of Object.entries({ window: dom.window, document: dom.window.document, HTMLElement: dom.window.HTMLElement, IS_REACT_ACT_ENVIRONMENT: true })) {
+  for (const [name, value] of Object.entries({ window: dom.window, self: dom.window, document: dom.window.document, HTMLElement: dom.window.HTMLElement, IS_REACT_ACT_ENVIRONMENT: true })) {
     previous.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
     Object.defineProperty(globalThis, name, { configurable: true, writable: true, value });
   }
@@ -28,6 +28,7 @@ export function domHarness(mocks = {}) {
     const filename = path.resolve(file);
     if (cache.has(filename)) return cache.get(filename).exports;
     const module = { exports: {} }; cache.set(filename, module);
+    if (filename.endsWith(".json")) { module.exports = JSON.parse(fs.readFileSync(filename, "utf8")); return module.exports; }
     let code = ts.transpileModule(fs.readFileSync(filename, 'utf8'), { fileName: filename, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
     for (const name of expose) code += `\nmodule.exports.${name} = ${name};`;
     function localRequire(id) {
@@ -43,7 +44,7 @@ export function domHarness(mocks = {}) {
     return module.exports;
   }
   return {
-    load, document: dom.window.document,
+    act, load, document: dom.window.document,
     async render(Component, props) { await act(async () => root.render(React.createElement(React.StrictMode, null, React.createElement(Component, props)))); },
     async click(element) { if (!element) throw Error('Missing control'); await act(async () => element.click()); },
     async pointerDown(element) { await act(async () => element.dispatchEvent(new dom.window.Event('pointerdown', { bubbles: true }))); },
