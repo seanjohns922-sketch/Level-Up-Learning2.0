@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ProductTagline from "@/components/brand/ProductTagline";
 import ProductWordmark from "@/components/brand/ProductWordmark";
 import { useRouter } from "next/navigation";
 import { getAuthErrorMessage, isServiceUnavailableError, recoverAuthSessionError, supabase } from "@/lib/supabase";
@@ -953,12 +954,7 @@ export default function LoginPage() {
         {/* Title */}
         <div className="mb-8">
           <h1><ProductWordmark /></h1>
-          <p
-            className="text-white/70 mt-3 text-xs font-bold tracking-[0.16em]"
-            style={{ fontFamily: "'Quicksand', sans-serif" }}
-          >
-            EXPLORE LEARN COLLECT
-          </p>
+          <ProductTagline className="mt-3" />
         </div>
 
         {/* Tab Toggle */}
