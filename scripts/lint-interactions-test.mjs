@@ -71,3 +71,69 @@ for (const [file, task, wrongLabel, rightLabel] of [
     console.log(`PASS: ${file} feedback preserves controls and scoring`);
   } finally { await dom.close(); }
 }
+
+{
+  const dom = domHarness();
+  try {
+    const { StarpathRouteBuildCard: Card } = dom.load('components/starpath/StarpathLevelOnePathCards.tsx');
+    let wrong = 0;
+    const task = { prompt: 'Build a route', speakText: 'Build a route', start: { r: 0, c: 0 }, goal: { r: 1, c: 1 }, rows: 2, cols: 2, palette: ['right'], maxSteps: 2, singleAttempt: true, feedback: { wrong: 'Try again', correct: 'Done' } };
+    await dom.render(Card, { task, onComplete: () => assert.fail('Wrong route must not score'), onWrong: () => wrong++ });
+    const find = label => [...dom.document.querySelectorAll('button')].find(b => b.textContent.includes(label));
+    await dom.click(find('Right')); await dom.click(find('Run route'));
+    await dom.flushTimers(); await dom.flushTimers();
+    assert.equal(wrong, 1);
+    for (const label of ['Right', 'Undo', 'Reset', 'Run route']) assert(find(label).disabled, `Single attempt must lock ${label}`);
+    await dom.click(find('Run route')); await dom.flushTimers(); assert.equal(wrong, 1);
+    console.log('PASS: route single-attempt lock updates controls and prevents repeat scoring');
+  } finally { await dom.close(); }
+}
+
+{
+  const dom = domHarness();
+  try {
+    const { MeasurelandsPathTaskCard: Card } = dom.load('components/measurelands/MeasurelandsPathTaskCard.tsx');
+    let correct = 0, wrong = 0;
+    const props = { onCorrect: () => correct++, onWrong: () => wrong++ };
+    const first = { scene: 'estimateGuess', prompt: 'Estimate', correctAnswer: 3, options: [2, 3, 4], objectLabel: 'Rope' };
+    await dom.render(Card, { ...props, task: first });
+    const answer = () => [...dom.document.querySelectorAll('button')].find(b => b.textContent.trim() === '3');
+    await dom.click(answer()); assert.equal(correct, 1); assert(answer().disabled);
+    await dom.render(Card, { ...props, task: first }); assert(answer().disabled, 'Same question must keep its answer');
+    await dom.render(Card, { ...props, task: { ...first, correctAnswer: 4 } }); assert(!answer().disabled);
+    await dom.click(answer()); assert.equal(wrong, 1);
+    await dom.render(Card, { ...props, task: { ...first, scene: 'estimateSlider', estimateStart: 3 } });
+    await dom.click([...dom.document.querySelectorAll('button')].find(b => b.textContent.includes('Check it')));
+    await dom.render(Card, { ...props, task: { ...first, scene: 'estimateSlider', correctAnswer: 5 } });
+    await dom.flushTimers(); assert.equal(correct, 1, 'Old question completion must be cancelled');
+    assert.equal(dom.document.querySelector('input').value, '5');
+    console.log('PASS: estimation answers reset only for a new task; pending completion is cancelled');
+  } finally { await dom.close(); }
+}
+
+{
+  const dom = domHarness({ '@/lib/brain-break-xp': { BRAIN_BREAK_XP_CAP: 10, awardBrainBreakXp: () => assert.fail('Sequence test must not call the XP transport') } });
+  const random = Math.random;
+  try {
+    Math.random = () => 0;
+    const { CopyMeGame } = dom.load('components/lesson/BrainBreak.tsx', ['CopyMeGame']);
+    let wins = 0;
+    await dom.render(CopyMeGame, { villain: { glow: '#fff' }, onWin: () => wins++ });
+    const pads = dom.document.querySelectorAll('button');
+    await dom.pointerDown(pads[0]); assert.equal(wins, 0);
+    await dom.flushTimers();
+    await dom.pointerDown(pads[1]);
+    assert(dom.document.body.textContent.includes('Watch the pattern'));
+    await dom.flushTimers();
+    for (const length of [2, 3, 4]) {
+      for (let i = 0; i < length; i++) await dom.pointerDown(pads[0]);
+      if (length < 4) {
+        assert(dom.document.body.textContent.includes('Watch the pattern'));
+        await dom.flushTimers();
+      }
+    }
+    assert.equal(wins, 1);
+    await dom.pointerDown(pads[0]); assert.equal(wins, 1);
+    console.log('PASS: memory game replays mistakes, advances three rounds and completes once');
+  } finally { Math.random = random; await dom.close(); }
+}
