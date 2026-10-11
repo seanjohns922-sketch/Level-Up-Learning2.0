@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap");
 @import "tailwindcss";
 @source not "../dist";
 @source not "../.next";
@@ -86,16 +85,25 @@
   --color-ring: var(--ring);
   --color-trust-blue: var(--trust-blue);
   --color-trust-blue-light: var(--trust-blue-light);
-  --font-sans: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
-  --font-display: "Quicksand", "Nunito", sans-serif;
+  --font-sans: var(--font-brand-body), Arial, sans-serif;
+  --font-display: var(--font-brand-heading), Arial, sans-serif;
   --font-mono: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Nunito", "Avenir Next", "Trebuchet MS", sans-serif;
+  font-family: var(--font-brand-body), Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Brand guide V6: display headings use Gotham Ultra's web stand-in;
+   subheadings and interface/body copy use the Conduit stand-in. Keep this in
+   the base layer so explicit utility classes can still express hierarchy. */
+@layer base {
+  h1, h2 {
+    font-family: var(--font-brand-heading), Arial, sans-serif;
+  }
 }
 
 /* Feedback animations */

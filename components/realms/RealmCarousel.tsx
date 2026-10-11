@@ -362,7 +362,7 @@ export default function RealmCarousel() {
           <h1
             className="text-3xl md:text-4xl font-black text-white tracking-wide"
             style={{
-              fontFamily: "'Quicksand', 'Nunito', sans-serif",
+              fontFamily: "var(--font-brand-heading), Arial, sans-serif",
               textShadow: "0 4px 20px rgba(0,0,0,0.6)",
             }}
           >
@@ -566,7 +566,7 @@ export default function RealmCarousel() {
             <h2
               className="text-2xl md:text-3xl font-black text-white mb-1"
               style={{
-                fontFamily: "'Quicksand', 'Nunito', sans-serif",
+                fontFamily: "var(--font-brand-heading), Arial, sans-serif",
                 textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               }}
             >

@@ -134,7 +134,7 @@ export default function MeasurelandsCollectionPage() {
         <div className="max-w-6xl mx-auto px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
-            style={{ color: "hsl(40, 22%, 74%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            style={{ color: "hsl(40, 22%, 74%)" }}
           >
             THE COLLECTION
           </h2>

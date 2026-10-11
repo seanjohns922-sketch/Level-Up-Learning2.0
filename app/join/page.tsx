@@ -208,7 +208,6 @@ function JoinPage() {
         <div className="text-center mb-8">
           <h1
             className="text-4xl font-black text-gray-900"
-            style={{ fontFamily: "'Nunito', sans-serif" }}
           >
             Join a Class
           </h1>

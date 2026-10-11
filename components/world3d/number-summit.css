@@ -1,4 +1,4 @@
-.summit-world{position:fixed;inset:0;overflow:hidden;background:#779faf;color:#f3fcf7;font-family:var(--font-nunito),ui-sans-serif,system-ui,sans-serif}
+.summit-world{position:fixed;inset:0;overflow:hidden;background:#779faf;color:#f3fcf7;font-family:var(--font-brand-body),Arial,sans-serif}
 .summit-world button,.summit-world a{-webkit-tap-highlight-color:transparent}.summit-world button:focus-visible,.summit-world a:focus-visible{outline:3px solid #fff0b8;outline-offset:4px}.summit-world canvas{touch-action:none}
 .summit-intro{position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,28,41,.94),rgba(6,28,41,.65) 30%,rgba(6,28,41,0) 73%);display:flex;flex-direction:column;padding:30px 4.5%;pointer-events:none}
 .summit-intro button,.summit-intro a{pointer-events:auto}.summit-intro-top{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:900;letter-spacing:.18em}.summit-intro-top a{display:flex;align-items:center;gap:8px;letter-spacing:0;background:#092f40aa;padding:12px 16px;border-radius:30px}

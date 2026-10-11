@@ -193,7 +193,7 @@ export default function NumbotCollectionPage() {
         <div className="max-w-6xl mx-auto px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
-            style={{ color: "hsl(160, 24%, 66%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            style={{ color: "hsl(160, 24%, 66%)" }}
           >
             THE COLLECTION
           </h2>
