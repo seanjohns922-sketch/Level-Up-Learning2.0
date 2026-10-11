@@ -1,3 +1,4 @@
+import { TRAIN_CARRIAGE_SPACING } from "./world-scale";
 import { TRAIN_DESIGNS, isTrainAsset } from "./train-catalogue";
 import type { CentralWorldPlacement } from './central-world-layout';
 import type { EconomyItem } from '../economy';
@@ -51,7 +52,7 @@ export function railwayRoute(start:CentralWorldPlacement,placements:CentralWorld
 export function segmentLength(segment:RailSegment){return segment.asset==='rail_corner'?Math.PI/2:2;}
 export function routePosition(route:RailSegment[],distance:number){
  const total=route.reduce((sum,s)=>sum+segmentLength(s),0);let d=((distance%total)+total)%total;
- for(const segment of route){const length=segmentLength(segment);if(d<=length){const t=segment.reverse?1-d/length:d/length;const local=railPoint(segment.asset,t),next=railPoint(segment.asset,Math.max(0,Math.min(1,t+(segment.reverse?-.001:.001))));const v=rotateRail(local,segment.placement.rotation),dv=rotateRail([next[0]-local[0],next[1]-local[1]],segment.placement.rotation);return {x:segment.placement.gridX*2+v[0],z:segment.placement.gridZ*2+v[1],yaw:Math.atan2(dv[0],dv[1])};}d-=length;}
+ for(const segment of route){const length=segmentLength(segment);if(d<=length){const t=segment.reverse?1-d/length:d/length;const local=railPoint(segment.asset,t),before=railPoint(segment.asset,Math.max(0,t-.001)),after=railPoint(segment.asset,Math.min(1,t+.001));const sign=segment.reverse?-1:1,v=rotateRail(local,segment.placement.rotation),dv=rotateRail([(after[0]-before[0])*sign,(after[1]-before[1])*sign],segment.placement.rotation);return {x:segment.placement.gridX*2+v[0],z:segment.placement.gridZ*2+v[1],yaw:Math.atan2(dv[0],dv[1])};}d-=length;}
  return {x:0,z:0,yaw:0};
 }
 /** Stop beside the front edge of the station's reserved footprint, not inside its building. */
@@ -70,4 +71,34 @@ export function stationStopDistances(route:RailSegment[],placements:CentralWorld
   if(best&&!stops.includes(best.offset))stops.push(best.offset);
  }
  return stops.sort((a,b)=>a-b);
+}
+
+/** Leave one full unit spacing between the last carriage and the engine on a loop. */
+export function visibleTrainCarriages(routeLength:number, requested:number){
+ return Math.max(0,Math.min(requested,Math.floor(routeLength/TRAIN_CARRIAGE_SPACING)-1));
+}
+
+/** Conservative oriented body envelope, including the widest engine details. */
+function trainBodiesOverlap(a:{x:number;z:number;yaw:number},b:{x:number;z:number;yaw:number}){
+ const axes=(yaw:number)=>[[Math.cos(yaw),-Math.sin(yaw)],[Math.sin(yaw),Math.cos(yaw)]];
+ const aa=axes(a.yaw),bb=axes(b.yaw),half=[.98,1.7];
+ return [...aa,...bb].every(([x,z])=>{
+  const radius=(basis:number[][])=>basis.reduce((sum,v,i)=>sum+Math.abs(v[0]*x+v[1]*z)*half[i],0);
+  return Math.abs((b.x-a.x)*x+(b.z-a.z)*z)<radius(aa)+radius(bb);
+ });
+}
+/** Check the complete loop, not just length: neighbouring return tracks and
+ * tight corners can bring distant route positions physically close together. */
+export function trainConsistCapacity(route:RailSegment[],requested:number){
+ const total=route.reduce((sum,s)=>sum+segmentLength(s),0);
+ let count=visibleTrainCarriages(total,requested);
+ for(;count>0;count--){
+  let clear=true;
+  for(let d=0;d<total&&clear;d+=.25){
+   const poses=Array.from({length:count+1},(_,i)=>routePosition(route,d-i*TRAIN_CARRIAGE_SPACING));
+   for(let i=0;i<poses.length&&clear;i++)for(let j=i+1;j<poses.length;j++)if(trainBodiesOverlap(poses[i],poses[j])){clear=false;break;}
+  }
+  if(clear)return count;
+ }
+ return 0;
 }

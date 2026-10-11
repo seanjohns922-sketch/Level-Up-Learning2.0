@@ -1,33 +1,45 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, Suspense } from "react";
 import { CENTRAL_WORLD_STARTER_SCENERY } from "@/lib/world3d/central-world-editor-catalog";
 import { CENTRAL_WORLD_CUSTOMISATION_CATALOG } from "@/lib/world3d/central-world-customisation-catalog";
 import { parseGridSize } from "@/lib/world3d/central-world-layout";
 import { getItemPresentation } from "@/lib/world3d/world-item-presentation";
-import { RewardPlotObject } from "./CentralWorldEnvironment";
+import { WorldRailway } from "./Railway";
+import type { CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
+import { RewardPlotObject, PlacedWorldObject } from "./CentralWorldEnvironment";
 import { SizedWorldModel, type ModelMeasurement } from "./SizedWorldModel";
-import { SceneryFinish, Box, Ball } from "./DetailedScenery";
+import { DEFAULT_OUTFIT } from "@/components/avatar/StudentAvatar";
+import { ExplorerAvatarModel } from "./SharedWorldPlayer";
+import { WORLD_AVATAR_SCALE, WORLD_AVATAR_SCALE_OFFSET } from "@/lib/world3d/world-scale";
+import { SceneryFinish } from "./DetailedScenery";
 import { WorldWater } from "./WorldWater";
 import { OrganicPaths } from "./OrganicPaths";
 const allItems=[...CENTRAL_WORLD_STARTER_SCENERY,...CENTRAL_WORLD_CUSTOMISATION_CATALOG];
-const groups = ["trees_plants","rocks_water","furniture_fun","animals","fortress","rewards","water","scale comparison"];
+const groups = ["trees_plants","rocks_water","furniture_fun","animals","fortress","rewards","water","scale comparison","all items","railway"];
+const railwayItems=new Map(allItems.map(item=>[item.item_key,item]));
+const railPlacement=(key:string,gridX:number,gridZ:number,rotation:CentralWorldPlacement["rotation"]):CentralWorldPlacement=>({itemId:allItems.find(item=>item.metadata.worldAssetKey===key)!.item_key,placementId:`review-${key}-${gridX}-${gridZ}`,gridX,gridZ,rotation});
+const railwayPlacements=[railPlacement("railway_station",0,0,0),railPlacement("rail_corner",-3,1,180),railPlacement("rail_corner",3,1,90),railPlacement("rail_corner",-3,5,270),railPlacement("rail_corner",3,5,0),...[-2,-1,0,1,2].map(x=>railPlacement("rail_straight",x,5,0)),...[2,3,4].flatMap(z=>[-3,3].map(x=>railPlacement("rail_straight",x,z,90))),railPlacement("train_country",0,5,0)];
 const waterExamples = [
  ...Array.from({length:15},(_,i)=>({gridX:-9+Math.round(Math.sin(i*.45)),gridZ:i-7,tileType:"water" as const})),
  ...Array.from({length:7},(_,x)=>Array.from({length:7},(_,z)=>({gridX:x-3,gridZ:z-3,tileType:"water" as const}))).flat(),
  ...Array.from({length:9},(_,x)=>Array.from({length:9},(_,z)=>({gridX:x+6,gridZ:z-4,tileType:"water" as const}))).flat().filter(t=>t.gridX<=7||t.gridX>=13||Math.abs(t.gridZ)>=3),
 ];
+function ScaleAvatar({position}:{position:[number,number,number]}) {
+ const moving=useRef(false);
+ return <group position={[position[0],position[1]+.73+WORLD_AVATAR_SCALE_OFFSET,position[2]]} scale={WORLD_AVATAR_SCALE}><Suspense fallback={null}><ExplorerAvatarModel avatar={DEFAULT_OUTFIT} movingRef={moving}/></Suspense></group>;
+}
 export default function WorldArtReview() {
  const [audit,setAudit]=useState(false),[measurements,setMeasurements]=useState<ModelMeasurement[]>([]);
  const onMeasured=useCallback((measurement:ModelMeasurement)=>{setTimeout(()=>setMeasurements(previous=>previous.some(row=>row.key===measurement.key)?previous:[...previous,measurement]),50);},[]);
  const [category,setCategory]=useState("trees_plants"),[selection,setSelection]=useState("");
  const comparison=category==="scale comparison";
- const comparisonKeys=["sports_stadium","backyard_pool","water_park","birch_tree","clubhouse"];
- const items=comparison?comparisonKeys.map(key=>allItems.find(i=>i.metadata.worldAssetKey===key)!):category==="rewards"?CENTRAL_WORLD_CUSTOMISATION_CATALOG:CENTRAL_WORLD_STARTER_SCENERY.filter(i=>i.metadata.worldSceneryGroup===category);
+ const comparisonKeys=["railway_station","train_steam","wood_gate","well","stone_bench"];
+ const items=category==="railway"?[]:category==="all items"?allItems:comparison?comparisonKeys.map(key=>allItems.find(i=>i.metadata.worldAssetKey===key)!):category==="rewards"?CENTRAL_WORLD_CUSTOMISATION_CATALOG:CENTRAL_WORLD_STARTER_SCENERY.filter(i=>i.metadata.worldSceneryGroup===category);
  const selected=audit?allItems[measurements.length]:items.find(i=>i.item_key===selection),shown=audit?(selected?[selected]:[]):selected?[selected]:items;
  const height=selected?getItemPresentation(selected).height:0,distance=Math.max(7,height*2.1,selected?Math.max(...parseGridSize(selected))*3:0);
- const comparisonPositions:[number,number,number][]=[[0,0,0],[43,0,15],[47,0,-12],[-42,0,0],[44,0,32]];
+ const comparisonPositions:[number,number,number][]=[[0,0,0],[0,0,5],[-8,0,0],[8,0,0],[8,0,5]];
  const spacing=Math.max(10,...items.map(item=>Math.max(...parseGridSize(item))*2+4));
  const galleryDistance=Math.max(46,spacing*4.7);
  return <main style={{height:"100dvh",background:"#cad1bf",color:"#23372b"}}>
@@ -39,10 +51,12 @@ export default function WorldArtReview() {
    <select aria-label="Inspect an item" value={selection} onChange={e=>setSelection(e.target.value)} style={{padding:8,marginTop:8,width:"100%",background:"#fffaf0",border:"1px solid #a8ad98",borderRadius:6}}><option value="">View category together</option>{items.map(item=><option key={item.item_key} value={item.item_key}>{item.name}</option>)}</select>
    <div style={{marginTop:6,fontSize:12}}>{selected?"Grid: 2 m squares · figure: avatar height · drag to orbit":"Choose an item for a close look · scale comparison uses one camera for all items"}</div>
   </div>
-  <Canvas key={category+":"+selection} shadows camera={{position:selected?[distance*.75,distance*.55,distance]:comparison?[95,100,120]:[galleryDistance*.6,galleryDistance*.74,galleryDistance],fov:42}}>
+  <Canvas key={category+":"+selection} shadows camera={{position:selected?[distance*.75,distance*.55,distance]:(comparison||category==="railway")?[17,12,23]:[galleryDistance*.6,galleryDistance*.74,galleryDistance],fov:42}}>
    <color attach="background" args={["#cad1bf"]}/><ambientLight intensity={.85}/><directionalLight position={[8,20,12]} intensity={1.85} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-28} shadow-camera-right={28} shadow-camera-top={28} shadow-camera-bottom={-28} shadow-bias={-.0001}/>
    <mesh rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[600,600]}/><meshStandardMaterial color="#7d8e64" roughness={1}/></mesh>
-   {category==="water"?<WorldWater tiles={waterExamples}/>:selected?<group><gridHelper position={[0,.012,0]} args={[24,12,"#9ea68b","#8c9877"]}/><group position={[-Math.max(3,parseGridSize(selected)[0]+2),0,0]}><Box p={[0,1.15,0]} s={[.65,.8,.32]} c="#757d6c"/><Ball p={[0,1.93,0]} s={[.25,.27,.24]} c="#a6ab96"/>{[-1,1].map(side=><group key={side}><Box p={[side*.2,.4,0]} s={[.22,.8,.27]} c="#626f60"/><Box p={[side*.45,1.1,0]} s={[.18,.8,.22]} c="#757d6c"/></group>)}<Html center position={[0,2.6,0]} style={{whiteSpace:"nowrap",fontSize:11}}>Avatar height</Html></group></group>:!comparison&&<OrganicPaths tiles={Array.from({length:18},(_,i)=>({gridX:i-9,gridZ:7+Math.round(Math.sin(i*.35)),tileType:"path" as const}))}/>}
+   {category==="water"?<WorldWater tiles={waterExamples}/>:selected?<group><gridHelper position={[0,.012,0]} args={[24,12,"#9ea68b","#8c9877"]}/><ScaleAvatar position={[-Math.max(3,parseGridSize(selected)[0]+1.1),0,0]}/></group>:!comparison&&<OrganicPaths tiles={Array.from({length:18},(_,i)=>({gridX:i-9,gridZ:7+Math.round(Math.sin(i*.35)),tileType:"path" as const}))}/>}
+   {comparison&&<ScaleAvatar position={[-3,0,3.5]}/>}
+   {category==="railway"&&<group>{railwayPlacements.map(placement=><PlacedWorldObject key={placement.placementId} placement={placement} item={railwayItems.get(placement.itemId)!} items={railwayItems} neighbours={railwayPlacements}/>) }<WorldRailway placements={railwayPlacements} items={railwayItems} editing={false}/><ScaleAvatar position={[-3,0,3.5]}/></group>}
    {shown.map((item,i)=><group key={item.item_key} position={selected?[0,0,0]:comparison?comparisonPositions[i]:[(i%5-2)*spacing,0,(Math.floor(i/5)-1)*spacing]}>
     <SizedWorldModel item={item} onMeasured={audit?onMeasured:undefined}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}><RewardPlotObject item={item} accent={item.accent} tier={Number(item.metadata.tier??1)}/></SceneryFinish></SizedWorldModel>
     {!selected&&<Html center position={[0,.15,3]}><button onClick={()=>setSelection(item.item_key)} style={{whiteSpace:"nowrap",fontSize:11,background:"#f3eedde8",padding:"4px 7px",borderRadius:4,border:0,color:"#263f2d",cursor:"pointer"}}>{item.name}</button></Html>}
