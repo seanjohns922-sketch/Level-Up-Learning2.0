@@ -1,165 +1,56 @@
 "use client";
 
-import { Lock } from "lucide-react";
+import type { CSSProperties } from "react";
+import { ArrowUpRight, Lock } from "lucide-react";
 import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import type { Legend } from "@/data/legends";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+import styles from "./BinderCard.module.css";
 
-export default function BinderCard({
-  legend,
-  isUnlocked,
-  isDemoPreview = false,
-  onClick,
-}: {
+export default function BinderCard({ legend, isUnlocked, isDemoPreview = false, onClick }: {
   legend: Legend;
   isUnlocked: boolean;
   isDemoPreview?: boolean;
   onClick: () => void;
 }) {
-  const programLabel =
-    legend.realmId === "measurelands"
-      ? "Measurelands"
-      : legend.realmId === "starpath"
-        ? "Starpath"
-        : legend.realmId === "pattern-peaks"
-          ? "Pattern Peaks"
-        : legend.realmId === "statistica"
-          ? "Statistica"
-          : "Number";
+  const names: Record<string, string> = {
+    "number-nexus": "Number Nexus", measurelands: "Measurelands", starpath: "Starpath",
+    "pattern-peaks": "Pattern Peaks", statistica: "Statistica", "chance-hollow": "Chance Hollow",
+  };
+  const color = getReliqsColor(legend.realmId);
+  const unlockLabel = `Unlock by completing the ${legend.yearLabel} ${names[legend.realmId] ?? "realm"} program.`;
   return (
     <button
+      type="button"
       onClick={isUnlocked ? onClick : undefined}
       disabled={!isUnlocked}
-      className="group relative min-w-0 w-full focus:outline-none"
-      title={
-        isUnlocked
-          ? `View ${legend.name}`
-          : `Unlock by completing the ${legend.yearLabel} ${programLabel} program.`
-      }
+      className={styles.card}
+      style={{ "--vault-accent": color } as CSSProperties}
+      aria-label={isUnlocked ? `View ${legend.name}, ${legend.yearLabel}${isDemoPreview ? ", demo preview" : ""}` : `${legend.name}. ${unlockLabel}`}
+      title={isUnlocked ? `View ${legend.name}` : unlockLabel}
     >
-      <div
-        className="relative overflow-hidden transition-all duration-300 aspect-[2/3] rounded-[18px]"
-        style={{
-          border: isUnlocked
-            ? "1.5px solid hsla(160, 50%, 64%, 0.48)"
-            : "1.5px solid hsla(160, 22%, 52%, 0.3)",
-          boxShadow: isUnlocked
-            ? "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)"
-            : "0 14px 34px hsla(170, 70%, 2%, 0.34)",
-          transform: "translateY(0)",
-          cursor: isUnlocked ? "pointer" : "default",
-          background: "hsla(166, 34%, 8%, 0.72)",
-        }}
-        onMouseEnter={(e) => {
-          if (isUnlocked) {
-            e.currentTarget.style.transform = "translateY(-4px) scale(1.02)";
-            e.currentTarget.style.boxShadow =
-              "0 18px 44px hsla(160, 50%, 28%, 0.34), 0 0 18px hsla(160, 50%, 55%, 0.14), 0 0 0 1px hsla(160, 50%, 66%, 0.18)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0) scale(1)";
-          if (isUnlocked) {
-            e.currentTarget.style.boxShadow =
-              "0 10px 28px hsla(160, 50%, 24%, 0.26), 0 0 0 1px hsla(160, 50%, 68%, 0.08)";
-          } else {
-            e.currentTarget.style.boxShadow = "0 14px 34px hsla(170, 70%, 2%, 0.34)";
-          }
-        }}
-      >
-        {/* Card artwork */}
-        <div className="absolute inset-0">
-          <LegendCardArtwork
-            src={legend.images.cardFront}
-            alt={legend.name}
-            className="h-full w-full transition-all duration-300"
-            style={{
-              filter: isUnlocked ? "none" : "blur(2px) grayscale(60%)",
-              opacity: isUnlocked ? 1 : 0.5,
-            }}
-          />
-        </div>
-
-        {/* Unlocked hover glow overlay */}
-        {isUnlocked && (
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              background: "linear-gradient(to top, hsla(160, 50%, 30%, 0.25), transparent 60%)",
-            }}
-          />
-        )}
-
-        {/* Lock overlay — subtler, silhouette visible */}
+      <div className={styles.art}>
+        <LegendCardArtwork
+          src={legend.images.cardFront}
+          alt={legend.name}
+          loading="lazy"
+          className="h-full w-full"
+          style={{ filter: isUnlocked ? "none" : "grayscale(85%)", opacity: isUnlocked ? 1 : 0.35 }}
+        />
         {!isUnlocked && (
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ background: "hsla(170, 32%, 5%, 0.42)" }}
-          >
-            <div
-              className="p-2.5 rounded-full"
-              style={{
-                background: "hsla(166, 36%, 10%, 0.78)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid hsla(160, 42%, 54%, 0.22)",
-                boxShadow: "0 2px 10px hsla(170, 60%, 2%, 0.28)",
-              }}
-            >
-              <Lock className="h-4 w-4" style={{ color: "hsl(160, 26%, 64%)" }} />
-            </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <span className="rounded-full border border-white/20 bg-black/70 p-3 text-white/75 backdrop-blur-md"><Lock aria-hidden="true" className="h-5 w-5" /></span>
           </div>
         )}
-
-        {/* Status badge */}
-        <div className="absolute top-2 right-2">
-          {isUnlocked ? (
-            <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide text-white shadow"
-              style={{
-                background: isDemoPreview ? "hsla(38, 84%, 52%, 0.92)" : "hsla(155, 60%, 42%, 0.9)",
-                backdropFilter: "blur(4px)",
-                boxShadow: isDemoPreview
-                  ? "0 0 8px hsla(38, 84%, 52%, 0.34)"
-                  : "0 0 8px hsla(155, 60%, 45%, 0.3)",
-                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
-              }}
-            >
-              ✦ {isDemoPreview ? "DEMO PREVIEW" : "UNLOCKED"}
-            </span>
-          ) : (
-            <span
-              className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[8px] font-extrabold tracking-wide shadow"
-              style={{
-                background: "hsla(166, 38%, 10%, 0.72)",
-                backdropFilter: "blur(4px)",
-                color: "hsl(160, 20%, 66%)",
-                border: "1px solid hsla(160, 32%, 48%, 0.18)",
-                fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif",
-              }}
-            >
-              <Lock className="h-2 w-2" /> LOCKED
-            </span>
-          )}
+      </div>
+      <div className="px-1 pb-1 pt-4 sm:px-2">
+        <div className="flex items-center justify-between gap-1 text-[9px] font-bold uppercase tracking-wider text-white/55 sm:text-[10px]">
+          <span>{legend.yearLabel}</span>
+          <span>{isDemoPreview && isUnlocked ? "Preview" : isUnlocked ? "Collected" : "Locked"}</span>
         </div>
-
-        {/* Bottom label */}
-        <div
-          className="absolute bottom-0 inset-x-0 p-3"
-          style={{
-            background: "linear-gradient(to top, hsla(170, 52%, 3%, 0.84), hsla(170, 44%, 4%, 0.42) 62%, transparent)",
-          }}
-        >
-          <p
-            className="text-[9px] font-extrabold tracking-[0.18em]"
-            style={{ color: "hsla(160, 32%, 86%, 0.76)", fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif" }}
-          >
-            {legend.yearLabel.toUpperCase()}
-          </p>
-          <p
-            className="text-sm font-extrabold leading-tight"
-            style={{ color: isUnlocked ? "hsl(160, 30%, 96%)" : "hsla(160, 22%, 90%, 0.62)" }}
-          >
-            {legend.name}
-          </p>
+        <div className="mt-2 flex min-h-10 items-start justify-between gap-2">
+          <span className="text-sm font-bold leading-snug text-white/90 sm:text-base">{legend.name}</span>
+          {isUnlocked && <ArrowUpRight aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" style={{ color }} />}
         </div>
       </div>
     </button>

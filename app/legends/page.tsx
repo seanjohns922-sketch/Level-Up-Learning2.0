@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
@@ -103,14 +104,19 @@ export default function LegendsPage() {
   // Progress is realm-scoped in storage, so each realm's legends must be read
   // from its own record — otherwise Measurelands unlocks (saved under the
   // "measurement" scope) are invisible on this shared page.
-  const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
-  const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
-  const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
-  const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
-  const [chanceProgress] = useState<StudentProgress | null>(() => readProgress("chance"));
-  const demoPreview =
-    useDemoPreviewMode() ||
-    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("teacher_preview") === "1");
+  const [numberProgress, setNumberProgress] = useState<StudentProgress | null>(null);
+  const [measureProgress, setMeasureProgress] = useState<StudentProgress | null>(null);
+  const [spaceProgress, setSpaceProgress] = useState<StudentProgress | null>(null);
+  const [patternProgress, setPatternProgress] = useState<StudentProgress | null>(null);
+  const [chanceProgress, setChanceProgress] = useState<StudentProgress | null>(null);
+  const demoPreview = useDemoPreviewMode();
+  useEffect(() => {
+    setNumberProgress(readProgress("number"));
+    setMeasureProgress(readProgress("measurement"));
+    setSpaceProgress(readProgress("space"));
+    setPatternProgress(readProgress("pattern"));
+    setChanceProgress(readProgress("chance"));
+  }, []);
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
@@ -182,29 +188,19 @@ export default function LegendsPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-      {/* Full-screen fantasy background */}
-      <img
-        src="/images/legends-bg.jpg"
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
-      />
-      {/* World-integrated readability layers */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle at 54% 38%, rgba(255,190,90,0.08), transparent 28%), linear-gradient(90deg, rgba(8,10,12,0.62) 0%, rgba(8,10,12,0.42) 45%, rgba(8,10,12,0.45) 78%, rgba(8,10,12,0.4) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ boxShadow: "inset 0 0 180px 70px rgba(0,0,0,0.46)" }}
-      />
+      {/* The archive stays at viewport scale instead of stretching down the collection. */}
+      <div className="pointer-events-none absolute inset-0 bg-[#080d0c]" aria-hidden="true">
+        <div className="absolute inset-x-0 top-0 h-[100svh] min-h-[760px]">
+          <Image src="/images/reliqs-archive-v1.png" alt="" fill priority sizes="100vw" className="object-cover object-[center_35%]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,10,8,0.15)_0%,rgba(5,10,8,0.12)_30%,rgba(8,13,12,0.6)_72%,#080d0c_100%)]" />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_14%,transparent_20%,rgba(4,8,7,0.45)_85%)]" />
+      </div>
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <div className="max-w-4xl mx-auto w-full px-5 pt-5 pb-2">
+        <div className="max-w-5xl mx-auto w-full px-5 pt-6 pb-2">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => router.push("/home-base")}
@@ -228,7 +224,8 @@ export default function LegendsPage() {
             </div>
           </div>
 
-          <h1 className="mx-auto mb-5 mt-10 max-w-[400px] px-3"><ReliqsWordmark /></h1>
+          <p className="mt-12 text-center text-[11px] font-bold uppercase tracking-[0.3em] text-lime-100/70">The collection archive</p>
+          <h1 className="mx-auto mb-5 mt-5 max-w-[400px] px-3"><ReliqsWordmark /></h1>
           <p
             className="text-center mt-1.5 text-base max-w-md mx-auto"
             style={{ color: "rgba(255,255,255,0.75)", textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}
@@ -237,7 +234,7 @@ export default function LegendsPage() {
           </p>
 
           {/* Progress bar */}
-          <div className="mt-5 max-w-sm mx-auto">
+          <div className="mt-7 max-w-md mx-auto rounded-2xl border border-white/10 bg-black/40 px-5 py-4 backdrop-blur-md">
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="font-bold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
                 {totalCollected} / {totalLegends} RELIQS collected
@@ -266,8 +263,9 @@ export default function LegendsPage() {
         </div>
 
         {/* Realm Grid */}
-        <div className="max-w-4xl mx-auto w-full px-5 py-6 flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="max-w-5xl mx-auto w-full px-5 pt-9 pb-12 flex-1">
+          <div className="mb-5 flex items-center gap-4"><h2 className="shrink-0 text-xs font-bold uppercase tracking-[0.24em] text-white/70">Explore the vaults</h2><div className="h-px flex-1 bg-white/15" /></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {realms.map((realm) => (
               <RealmCard
                 key={realm.id}
@@ -287,7 +285,7 @@ export default function LegendsPage() {
                         ? statisticaCollected
                       : 0
                 }
-                onClick={realm.route ? () => router.push(realm.route!) : undefined}
+                onClick={realm.route ? () => router.push(demoPreview ? `${realm.route}?teacher_preview=1` : realm.route!) : undefined}
               />
             ))}
           </div>
@@ -296,7 +294,7 @@ export default function LegendsPage() {
           <div
             className="mt-8 rounded-2xl p-5 flex items-start gap-3"
             style={{
-              background: "rgba(255,255,255,0.12)",
+              background: "rgba(10,18,15,0.8)",
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
               border: "1px solid rgba(255,255,255,0.2)",

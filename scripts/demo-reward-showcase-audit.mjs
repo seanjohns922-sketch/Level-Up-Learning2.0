@@ -7,6 +7,7 @@ const vault = read("app/gem-vault/page.tsx");
 const home = read("app/home-base/page.tsx");
 const legends = read("components/home/HallOfLegendsWidget.tsx");
 const legendsHall = read("app/legends/page.tsx");
+const demoMode = read("lib/demo-mode.ts");
 
 const checks = [
   ["Demo economy keeps central-world rewards purchasable", economy.includes("isCentralWorldReward") && economy.includes("DEMO_PURCHASED_STORAGE_KEY")],
@@ -20,9 +21,10 @@ const checks = [
   ["My Home loads the demo gem showcase", home.includes("? fetchGemVault(sid)")],
   ["My Home unlocks every implemented legend in demo", legends.includes("new Set(getAllLegends().map((legend) => legend.id))")],
   ["Pattern Peaks and Statistica realm cards are live", legendsHall.includes('id: "pattern-peaks"') && legendsHall.includes('id: "statistica"') && (legendsHall.match(/status: "open"/g) ?? []).length >= 5],
-  ["Legends page honours teacher preview URLs", legendsHall.includes("window.location.search") && legendsHall.includes('get("teacher_preview") === "1"')],
+  ["Legends page honours teacher preview through the student-scoped shared hook", legendsHall.includes("const demoPreview = useDemoPreviewMode()") && demoMode.includes('get("teacher_preview") === "1"') && demoMode.includes("!activeStudent || activeStudent === DEMO_PREVIEW_SCOPE")],
+  ["Opening a collection preserves teacher preview context", legendsHall.includes('`${realm.route}?teacher_preview=1`')],
   ["Demo opens every live Legends collection card", legendsHall.includes("demoPreview && realm.route") && legendsHall.includes('status: "open" as const')],
-  ["Demo Hall total counts implemented legend cards", legendsHall.includes("demoPreview ? getAllLegends().length")],
+  ["Demo Hall total counts implemented legend cards", legendsHall.includes("const totalLegends = getAllLegends().length;")],
 ];
 
 console.log("\nDemo Reward Showcase Audit");
