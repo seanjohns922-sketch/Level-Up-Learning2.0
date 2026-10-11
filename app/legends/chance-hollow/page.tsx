@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -88,9 +91,10 @@ export default function ChanceHollowCollectionPage() {
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#fbbf24]">
             Probability Realm
           </p>
-          <h1 className="mt-2 text-4xl font-black tracking-normal text-white md:text-6xl">
-            Chanzia Collection
-          </h1>
+          <h1 className="mt-3 max-w-[420px]" aria-label="Chance Hollow · Chanzia Collection RELIQS">
+              <ReliqsWordmark color={getReliqsColor("chance-hollow")} />
+            </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Chance Hollow · Chanzia Collection</p>
           <p className="mt-3 max-w-xl text-base font-medium text-white/75 md:text-lg">
             Meet the Fortune Seekers as they master chance words, possible outcomes, trials, and variation.
           </p>

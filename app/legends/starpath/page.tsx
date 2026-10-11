@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -137,16 +140,10 @@ export default function StarpathCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(224, 50%, 97%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(270, 80%, 56%, 0.3)",
-              }}
-            >
-              Geospin Collection
+            <h1 className="mt-3 max-w-[420px]" aria-label="Starpath Realm · Geospin Collection RELIQS">
+              <ReliqsWordmark color={getReliqsColor("starpath")} />
             </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Starpath Realm · Geospin Collection</p>
             <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(216, 26%, 84%)" }}>
               Collect Geospin&apos;s evolutions as you master shapes, position, transformation, and spatial reasoning.
             </p>

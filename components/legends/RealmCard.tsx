@@ -1,127 +1,56 @@
 "use client";
 
-import { Lock, Sparkles, ChevronRight } from "lucide-react";
+import { Lock, Sparkles, ChevronRight, Check } from "lucide-react";
 import type { RealmDef } from "@/app/legends/page";
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
 
-export default function RealmCard({
-  realm,
-  collected,
-  onClick,
-}: {
+export default function RealmCard({ realm, collected, onClick }: {
   realm: RealmDef;
   collected: number;
   onClick?: () => void;
 }) {
   const isOpen = realm.status === "open";
-  const isComingSoon = realm.status === "coming-soon";
-  const isLocked = realm.status === "locked";
+  const color = getReliqsColor(realm.id);
+  const complete = isOpen && realm.totalLegends > 0 && collected >= realm.totalLegends;
+  const percentage = realm.totalLegends > 0 ? Math.min(100, collected / realm.totalLegends * 100) : 0;
 
   return (
     <button
+      type="button"
       onClick={isOpen ? onClick : undefined}
       disabled={!isOpen}
-      className={`relative w-full rounded-2xl text-left p-4 transition-all duration-300 overflow-hidden group ${
-        isOpen ? "hover:-translate-y-1 cursor-pointer" : "cursor-default"
-      }`}
+      aria-label={`${realm.name}: ${isOpen ? `${collected} of ${realm.totalLegends} RELIQS collected. Open vault` : realm.status === "coming-soon" ? "Coming soon" : "Locked"}`}
+      className={`group relative w-full overflow-hidden rounded-2xl p-5 text-left transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white motion-reduce:transition-none ${isOpen ? "hover:-translate-y-1 motion-reduce:transform-none" : "opacity-60"}`}
       style={{
-        background: isLocked
-          ? "rgba(18,16,14,0.36)"
-          : isComingSoon
-          ? "rgba(30,24,18,0.42)"
-          : "rgba(28,24,18,0.46)",
-        backdropFilter: "blur(16px) saturate(1.05)",
-        WebkitBackdropFilter: "blur(16px) saturate(1.05)",
-        border: `1.5px solid ${realm.borderGlow}`,
-        boxShadow: isOpen
-          ? `0 0 16px ${realm.glowColor}, 0 10px 28px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.16)`
-          : isComingSoon
-          ? `0 0 12px ${realm.glowColor}, 0 8px 22px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.12)`
-          : "0 6px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
-        opacity: isLocked ? 0.7 : 1,
+        background: "linear-gradient(145deg, rgba(25,28,33,0.94), rgba(10,12,17,0.90))",
+        border: `1px solid ${isOpen ? color : "#ffffff30"}`,
+        boxShadow: "0 14px 36px rgba(0,0,0,0.25)",
+        backdropFilter: "blur(16px)",
       }}
     >
-      {/* Shine sweep on hover */}
-      {isOpen && (
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-[200%] transition-transform duration-1000" />
-        </div>
-      )}
-
-      <div className="flex items-start gap-3.5">
-        {/* Icon */}
-        <div
-          className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{
-            background: isLocked
-              ? "rgba(255,255,255,0.08)"
-              : isComingSoon
-              ? "rgba(245,180,50,0.15)"
-              : "rgba(45,212,160,0.15)",
-            color: isLocked
-              ? "rgba(255,255,255,0.4)"
-              : isComingSoon
-              ? "rgb(245,180,50)"
-              : "rgb(45,212,160)",
-            border: `1px solid ${
-              isLocked
-                ? "rgba(255,255,255,0.1)"
-                : isComingSoon
-                ? "rgba(245,180,50,0.3)"
-                : "rgba(45,212,160,0.3)"
-            }`,
-          }}
-        >
-          {isLocked ? <Lock className="h-4 w-4" /> : realm.icon}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <h3
-            className="font-extrabold text-base leading-tight"
-            style={{
-              color: isLocked ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.95)",
-              textShadow: isLocked ? "none" : "0 1px 3px rgba(0,0,0,0.3)",
-            }}
-          >
-            {realm.name}
-          </h3>
-          <p
-            className="text-sm mt-0.5"
-            style={{ color: isLocked ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.6)" }}
-          >
-            {isLocked ? "Future Realm" : isComingSoon ? `Coming Soon: ${realm.legendLine}` : realm.legendLine}
-          </p>
-
-          <div className="mt-2.5">
-            {isOpen && (
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-sm font-bold"
-                  style={{ color: "rgb(45,212,160)", textShadow: "0 0 8px rgba(45,212,160,0.3)" }}
-                >
-                  {collected} / {realm.totalLegends} collected
-                </span>
-                <ChevronRight className="h-4 w-4 text-white/70 group-hover:translate-x-1 group-hover:text-white transition-all" />
-              </div>
-            )}
-            {isComingSoon && (
-              <span
-                className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1 rounded-full"
-                style={{
-                  background: "rgba(245,180,50,0.15)",
-                  color: "rgb(245,200,80)",
-                  border: "1px solid rgba(245,180,50,0.3)",
-                }}
-              >
-                <Sparkles className="h-3 w-3" /> Coming Soon
-              </span>
-            )}
-            {isLocked && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold" style={{ color: "rgba(255,255,255,0.35)" }}>
-                <Lock className="h-3 w-3" /> Unlock in future updates
-              </span>
-            )}
-          </div>
-        </div>
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <ReliqsWordmark color={color} className="max-w-[190px]" />
+        {isOpen ? <ChevronRight aria-hidden="true" className="h-5 w-5 shrink-0 text-white/60 transition group-hover:translate-x-1 motion-reduce:transition-none" /> : <Lock aria-hidden="true" className="h-4 w-4 shrink-0 text-white/50" />}
+      </div>
+      <h2 className="text-lg font-extrabold tracking-tight text-white">{realm.name}</h2>
+      <p className="mt-1 text-sm text-white/65">{realm.legendLine}</p>
+      <div className="mt-5 border-t border-white/10 pt-4">
+        {isOpen ? (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold">
+              <span className="text-white/85">{collected} / {realm.totalLegends} collected</span>
+              {complete ? <span className="inline-flex items-center gap-1 text-amber-200"><Check aria-hidden="true" className="h-3.5 w-3.5" /> Collection complete</span> : <span className="text-white/60">Open vault</span>}
+            </div>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-full rounded-full" style={{ width: `${percentage}%`, backgroundColor: color }} />
+            </div>
+          </>
+        ) : (
+          <span className="inline-flex items-center gap-2 text-xs font-bold text-white/65">
+            {realm.status === "coming-soon" ? <><Sparkles aria-hidden="true" className="h-3.5 w-3.5" /> Coming soon</> : <><Lock aria-hidden="true" className="h-3.5 w-3.5" /> Unlock in future updates</>}
+          </span>
+        )}
       </div>
     </button>
   );

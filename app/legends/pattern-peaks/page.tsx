@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -88,9 +91,10 @@ export default function PatternPeaksCollectionPage() {
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#ffcc62]">
             Pattern Peaks Realm
           </p>
-          <h1 className="mt-2 text-4xl font-black tracking-normal text-white md:text-6xl">
-            Patternox Collection
-          </h1>
+          <h1 className="mt-3 max-w-[420px]" aria-label="Pattern Peaks · Patternox Collection RELIQS">
+              <ReliqsWordmark color={getReliqsColor("pattern-peaks")} />
+            </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Pattern Peaks · Patternox Collection</p>
           <p className="mt-3 max-w-xl text-base font-medium text-white/75 md:text-lg">
             Meet every Patternox evolution and watch how each one masters patterns, rules,
             unknowns, and algebraic structure.

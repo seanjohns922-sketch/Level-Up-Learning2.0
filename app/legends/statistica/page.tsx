@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -80,9 +83,10 @@ export default function StatisticaCollectionPage() {
 
         <header className="pb-9 pt-10">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#ff7771]">Statistica Realm</p>
-          <h1 className="mt-2 text-4xl font-black tracking-normal text-[#fff8e7] md:text-6xl">
-            Data Guardians
-          </h1>
+          <h1 className="mt-3 max-w-[420px]" aria-label="Statistica · Data Guardians RELIQS">
+              <ReliqsWordmark color={getReliqsColor("statistica")} />
+            </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Statistica · Data Guardians</p>
           <p className="mt-3 max-w-xl text-base font-medium text-[#d7e4d8] md:text-lg">
             Collect Datara&apos;s evolutions as you learn to gather, organise, represent, and interpret data.
           </p>

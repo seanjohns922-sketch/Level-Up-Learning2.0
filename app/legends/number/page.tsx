@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -184,16 +187,10 @@ export default function NumbotCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(160, 38%, 92%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(160, 55%, 45%, 0.12)",
-              }}
-            >
-              Numbot Collection
+            <h1 className="mt-3 max-w-[420px]" aria-label="Number Nexus · Numbot Collection RELIQS">
+              <ReliqsWordmark color={getReliqsColor("number-nexus")} />
             </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Number Nexus · Numbot Collection</p>
             <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(166, 18%, 76%)" }}>
               Collect powerful Numbots by mastering your number skills.
             </p>

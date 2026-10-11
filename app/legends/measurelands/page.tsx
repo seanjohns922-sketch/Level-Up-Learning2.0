@@ -1,5 +1,8 @@
 "use client";
 
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+import { getReliqsColor } from "@/lib/reliqs-brand";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -126,16 +129,10 @@ export default function MeasurelandsCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(42, 48%, 95%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(266, 60%, 52%, 0.22)",
-              }}
-            >
-              Meazurex Collection
+            <h1 className="mt-3 max-w-[420px]" aria-label="Measurelands · Meazurex Collection RELIQS">
+              <ReliqsWordmark color={getReliqsColor("measurelands")} />
             </h1>
+            <p className="mt-3 text-sm font-bold tracking-wide text-white/85">Measurelands · Meazurex Collection</p>
             <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(40, 22%, 84%)" }}>
               Collect the Measurelands legends as you master length, mass, capacity, time, and measurement reasoning.
             </p>
