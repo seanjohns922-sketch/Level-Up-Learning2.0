@@ -3,11 +3,11 @@
 import Image from "next/image";
 import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
-import { readProgress, type StudentProgress } from "@/data/progress";
+import { readProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 
@@ -99,24 +99,29 @@ const REALMS: RealmDef[] = [
   },
 ];
 
+// The server and first hydration render use the same empty progress snapshot.
+// React then switches to the client snapshot without an effect-driven state update.
+const subscribeToClientSnapshot = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function LegendsPage() {
   const router = useRouter();
   // Progress is realm-scoped in storage, so each realm's legends must be read
   // from its own record — otherwise Measurelands unlocks (saved under the
   // "measurement" scope) are invisible on this shared page.
-  const [numberProgress, setNumberProgress] = useState<StudentProgress | null>(null);
-  const [measureProgress, setMeasureProgress] = useState<StudentProgress | null>(null);
-  const [spaceProgress, setSpaceProgress] = useState<StudentProgress | null>(null);
-  const [patternProgress, setPatternProgress] = useState<StudentProgress | null>(null);
-  const [chanceProgress, setChanceProgress] = useState<StudentProgress | null>(null);
+  const hydrated = useSyncExternalStore(subscribeToClientSnapshot, getClientSnapshot, getServerSnapshot);
+  const { numberProgress, measureProgress, spaceProgress, patternProgress, chanceProgress } = useMemo(
+    () => ({
+      numberProgress: hydrated ? readProgress("number") : null,
+      measureProgress: hydrated ? readProgress("measurement") : null,
+      spaceProgress: hydrated ? readProgress("space") : null,
+      patternProgress: hydrated ? readProgress("pattern") : null,
+      chanceProgress: hydrated ? readProgress("chance") : null,
+    }),
+    [hydrated],
+  );
   const demoPreview = useDemoPreviewMode();
-  useEffect(() => {
-    setNumberProgress(readProgress("number"));
-    setMeasureProgress(readProgress("measurement"));
-    setSpaceProgress(readProgress("space"));
-    setPatternProgress(readProgress("pattern"));
-    setChanceProgress(readProgress("chance"));
-  }, []);
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),

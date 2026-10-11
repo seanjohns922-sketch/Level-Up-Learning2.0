@@ -21,13 +21,17 @@ function StatBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-export default function LegendDetailModal({
-  legend,
-  onClose,
-}: {
+type LegendDetailModalProps = {
   legend: Legend;
   onClose: () => void;
-}) {
+};
+
+export default function LegendDetailModal(props: LegendDetailModalProps) {
+  // A different card starts a fresh interaction: front face, no video, no zoom.
+  return <LegendDetailContent key={props.legend.id} {...props} />;
+}
+
+function LegendDetailContent({ legend, onClose }: LegendDetailModalProps) {
   const [showBack, setShowBack] = useState(false);
   const [videoMode, setVideoMode] = useState<"showcase" | "unlock" | null>(null);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -48,13 +52,6 @@ export default function LegendDetailModal({
       backImage,
     });
   }, [backImage, frontImage, legend.id, legend.name]);
-
-  useEffect(() => {
-    setVideoMode(null);
-    setVideoFailed(false);
-    setShowBack(false);
-    setEnlarged(false);
-  }, [legend.id]);
 
   // Realm-aware theming keeps the shared card interaction consistent.
   const isMeasure = legend.realmId === "measurelands";
