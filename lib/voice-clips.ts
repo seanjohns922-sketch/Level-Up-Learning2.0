@@ -28,7 +28,8 @@ let loading: Promise<Manifest | null> | null = null;
 export function loadVoiceClips(): Promise<Manifest | null> {
   if (manifest) return Promise.resolve(manifest);
   if (!loading && typeof window !== "undefined") {
-    loading = fetch(MANIFEST_URL, { cache: "force-cache" })
+    // Revalidate each session so newly recorded clips are found (the file is small and served with an ETag).
+    loading = fetch(MANIFEST_URL, { cache: "no-cache" })
       .then((r) => (r.ok ? (r.json() as Promise<Manifest>) : null))
       .then((m) => (manifest = m && typeof m.clips === "object" ? m : null))
       .catch(() => null);

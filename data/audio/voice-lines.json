@@ -496,7 +496,7 @@
  },
  "iuyryhohv9": {
   "text": "Worked example. ... 3:15 to 3:40 , gives 25 minutes",
-  "spoken": "Worked example. 3:15 to 3:40, gives 25 minutes",
+  "spoken": "Worked example. three fifteen to three forty, gives 25 minutes",
   "source": "measurement L4 6:2"
  },
  "grzafgcz52": {
@@ -526,7 +526,7 @@
  },
  "1y6t2mufanq": {
   "text": "Worked example. ... Bus 8:10 to 8:45 , gives 35 minutes",
-  "spoken": "Worked example. Bus 8:10 to 8:45, gives 35 minutes",
+  "spoken": "Worked example. Bus eight ten to eight forty five, gives 35 minutes",
   "source": "measurement L4 6:3"
  },
  "1j7g5a454fv": {
@@ -616,7 +616,7 @@
  },
  "2divu32gbmv": {
   "text": "Worked example. ... An angle ... of 90 degrees, labelled right angle. ... Open book , gives obtuse; clock at 3:00 , gives right angle",
-  "spoken": "Worked example. An angle of 90 degrees, labelled right angle. Open book, gives obtuse; clock at 3:00, gives right angle",
+  "spoken": "Worked example. An angle of 90 degrees, labelled right angle. Open book, gives obtuse; clock at three o'clock, gives right angle",
   "source": "measurement L4 7:3"
  },
  "12z5afybbq7": {
@@ -1781,7 +1781,7 @@
  },
  "23c2r68us1d": {
   "text": "Worked example. ... A clock showing 4:30. ... Minute hand on 6, hour hand between 4 and 5 , gives half past 4",
-  "spoken": "Worked example. A clock showing 4:30. Minute hand on 6, hour hand between 4 and 5, gives half past 4",
+  "spoken": "Worked example. A clock showing four thirty. Minute hand on 6, hour hand between 4 and 5, gives half past 4",
   "source": "measurement L2 5:2"
  },
  "953ud1ygr7": {
@@ -1841,7 +1841,7 @@
  },
  "213p6uk284d": {
   "text": "Worked example. ... A clock showing 5:15. ... Minute hand on 3, hour hand just past 5 , gives quarter past 5",
-  "spoken": "Worked example. A clock showing 5:15. Minute hand on 3, hour hand just past 5, gives quarter past 5",
+  "spoken": "Worked example. A clock showing five fifteen. Minute hand on 3, hour hand just past 5, gives quarter past 5",
   "source": "measurement L2 6:1"
  },
  "77fjtvhrn0": {
@@ -1871,7 +1871,7 @@
  },
  "1zwodr5j4lx": {
   "text": "Worked example. ... A clock showing 7:45. ... Minute hand on 9, hour hand nearly at 8 , gives quarter to 8",
-  "spoken": "Worked example. A clock showing 7:45. Minute hand on 9, hour hand nearly at 8, gives quarter to 8",
+  "spoken": "Worked example. A clock showing seven forty five. Minute hand on 9, hour hand nearly at 8, gives quarter to 8",
   "source": "measurement L2 6:2"
  },
  "slzi1isecl": {
@@ -2186,7 +2186,7 @@
  },
  "27q75lv6s3w": {
   "text": "Worked example. ... Backpack ≈ less than 1 m",
-  "spoken": "Worked example. Backpack ≈ less than 1 metre",
+  "spoken": "Worked example. Backpack approximately less than 1 metre",
   "source": "measurement L3 2:1"
  },
  "1h8opk034vo": {
@@ -2216,7 +2216,7 @@
  },
  "5xuns90sn6": {
   "text": "Worked example. ... Paintbrush , gives cm; classroom , gives m",
-  "spoken": "Worked example. Paintbrush, gives cm; classroom, gives m",
+  "spoken": "Worked example. Paintbrush, gives centimetres; classroom, gives metres",
   "source": "measurement L3 2:2"
  },
  "9s1c7f97l6": {
@@ -2266,7 +2266,7 @@
  },
  "o6hzmy6jvw": {
   "text": "Worked example. ... Paper clip , gives g; suitcase , gives kg",
-  "spoken": "Worked example. Paper clip, gives g; suitcase, gives kg",
+  "spoken": "Worked example. Paper clip, gives grams; suitcase, gives kilograms",
   "source": "measurement L3 3:1"
  },
  "1715wsf5snp": {
@@ -2316,7 +2316,7 @@
  },
  "1zxjpana1fc": {
   "text": "Tip. ... Check the scale's unit: g or kg.",
-  "spoken": "Here's a tip. Check the scale's unit: g or kilograms.",
+  "spoken": "Here's a tip. Check the scale's unit: grams or kilograms.",
   "source": "measurement L3 3:2"
  },
  "1pfnla3b4ux": {
@@ -2351,7 +2351,7 @@
  },
  "rxopmdnst1": {
   "text": "Worked example. ... Teaspoon , gives mL; bathtub , gives L",
-  "spoken": "Worked example. Teaspoon, gives mL; bathtub, gives L",
+  "spoken": "Worked example. Teaspoon, gives millilitres; bathtub, gives litres",
   "source": "measurement L3 4:1"
  },
  "19miplc30mg": {
@@ -2451,7 +2451,7 @@
  },
  "v4bgocj4zr": {
   "text": "Worked example. ... Brushing teeth ≈ 2 minutes",
-  "spoken": "Worked example. Brushing teeth ≈ 2 minutes",
+  "spoken": "Worked example. Brushing teeth approximately 2 minutes",
   "source": "measurement L3 5:2"
  },
  "1166phpby24": {
@@ -2506,7 +2506,7 @@
  },
  "14s1tt238ah": {
   "text": "Worked example. ... A clock showing 2:30. ... Minute hand on 6 , gives 30 minutes",
-  "spoken": "Worked example. A clock showing 2:30. Minute hand on 6, gives 30 minutes",
+  "spoken": "Worked example. A clock showing two thirty. Minute hand on 6, gives 30 minutes",
   "source": "measurement L3 6:1"
  },
  "sblfsi4rud": {
@@ -2521,7 +2521,7 @@
  },
  "r12lk7ec4w": {
   "text": "Step 3. ... Say the time: 2:30.",
-  "spoken": "Step 3. Say the time: 2:30.",
+  "spoken": "Step 3. Say the time: two thirty.",
   "source": "measurement L3 6:1"
  },
  "2amrt37m82l": {
@@ -2536,7 +2536,7 @@
  },
  "27ewdyie6b": {
   "text": "Worked example. ... A clock showing 4:09. ... Past the 1 by 4 marks , gives 9 minutes",
-  "spoken": "Worked example. A clock showing 4:09. Past the 1 by 4 marks, gives 9 minutes",
+  "spoken": "Worked example. A clock showing four oh nine. Past the 1 by 4 marks, gives 9 minutes",
   "source": "measurement L3 6:2"
  },
  "2d4gpodyp9k": {
@@ -2566,7 +2566,7 @@
  },
  "16iblo5ykdu": {
   "text": "Worked example. ... A clock showing 9:01. ... Analog 9:01 , gives digital 9:01",
-  "spoken": "Worked example. A clock showing 9:01. Analog 9:01, gives digital 9:01",
+  "spoken": "Worked example. A clock showing nine oh one. Analog nine oh one, gives digital nine oh one",
   "source": "measurement L3 6:3"
  },
  "6bka4n4hka": {
@@ -2581,7 +2581,7 @@
  },
  "1cyk42bkj4k": {
   "text": "Tip. ... Single minutes need a zero: 9:01, not 9:1.",
-  "spoken": "Here's a tip. Single minutes need a zero: 9:01, not 9:1.",
+  "spoken": "Here's a tip. Single minutes need a zero: nine oh one, not 9:1.",
   "source": "measurement L3 6:3"
  },
  "1odbkg9mroe": {
@@ -2736,7 +2736,7 @@
  },
  "24zaemk561": {
   "text": "Worked example. ... Ant , gives mm; smartphone , gives cm; road , gives km",
-  "spoken": "Worked example. Ant, gives mm; smartphone, gives cm; road, gives km",
+  "spoken": "Worked example. Ant, gives millimetres; smartphone, gives centimetres; road, gives kilometres",
   "source": "measurement L5 1:1"
  },
  "xuuoxp86gw": {
@@ -3176,27 +3176,27 @@
  },
  "14567swjyhc": {
   "text": "Worked example. ... A clock showing 2:30. ... 2:30 pm , gives 14:30",
-  "spoken": "Worked example. A clock showing 2:30. 2:30 pm, gives 14:30",
+  "spoken": "Worked example. A clock showing two thirty. two thirty p m, gives fourteen thirty",
   "source": "measurement L5 6:1"
  },
  "11kionzfolo": {
   "text": "Step 1. ... For am times, keep the hour open bracket add a 0 if needed close bracket : 5:50 am , gives 05:50.",
-  "spoken": "Step 1. For am times, keep the hour open bracket add a 0 if needed close bracket : 5:50 am, gives 05:50.",
+  "spoken": "Step 1. For am times, keep the hour open bracket add a 0 if needed close bracket : five fifty a m, gives zero five fifty.",
   "source": "measurement L5 6:1"
  },
  "26i7713qezr": {
   "text": "Step 2. ... For pm times after 12, add 12 to the hour.",
-  "spoken": "Step 2. For pm times after 12, add 12 to the hour.",
+  "spoken": "Step 2. For p m times after 12, add 12 to the hour.",
   "source": "measurement L5 6:1"
  },
  "1rskx01ntb5": {
   "text": "Step 3. ... 12:55 pm stays 12:55.",
-  "spoken": "Step 3. 12:55 pm stays 12:55.",
+  "spoken": "Step 3. twelve fifty five p m stays twelve fifty five.",
   "source": "measurement L5 6:1"
  },
  "1cos3cog1dp": {
   "text": "Tip. ... Midnight is 00:00.",
-  "spoken": "Here's a tip. Midnight is 00:00.",
+  "spoken": "Here's a tip. Midnight is zero zero hundred.",
   "source": "measurement L5 6:1"
  },
  "14tjjml8nys": {
@@ -3206,27 +3206,27 @@
  },
  "6r57ohv20d": {
   "text": "Worked example. ... 19:15 , gives 7:15 pm",
-  "spoken": "Worked example. 19:15, gives 7:15 pm",
+  "spoken": "Worked example. nineteen fifteen, gives seven fifteen p m",
   "source": "measurement L5 6:2"
  },
  "41ihikbqzq": {
   "text": "Step 1. ... If the hour is over 12, subtract 12 and write pm.",
-  "spoken": "Step 1. If the hour is over 12, subtract 12 and write pm.",
+  "spoken": "Step 1. If the hour is over 12, subtract 12 and write p m.",
   "source": "measurement L5 6:2"
  },
  "1yvjmut65gm": {
   "text": "Step 2. ... If it is under 12, it is am.",
-  "spoken": "Step 2. If it is under 12, it is am.",
+  "spoken": "Step 2. If it is under 12, it is a m.",
   "source": "measurement L5 6:2"
  },
  "qf2qkt1mpa": {
   "text": "Step 3. ... 12:xx is pm.",
-  "spoken": "Step 3. 12:xx is pm.",
+  "spoken": "Step 3. twelve something is p m.",
   "source": "measurement L5 6:2"
  },
  "167ihgz86qb": {
   "text": "Tip. ... 5:50 am is 05:50.",
-  "spoken": "Here's a tip. 5:50 am is 05:50.",
+  "spoken": "Here's a tip. five fifty a m is zero five fifty.",
   "source": "measurement L5 6:2"
  },
  "1bsy1ke4l9j": {
@@ -3236,12 +3236,12 @@
  },
  "1jgs7se4gix": {
   "text": "Worked example. ... 12:00 pm , gives 12:00",
-  "spoken": "Worked example. 12:00 pm, gives 12:00",
+  "spoken": "Worked example. twelve p m, gives twelve o'clock",
   "source": "measurement L5 6:3"
  },
  "1o7lh5nqt3z": {
   "text": "Step 1. ... Decide if it's am or pm.",
-  "spoken": "Step 1. Decide if it's am or pm.",
+  "spoken": "Step 1. Decide if it's am or p m.",
   "source": "measurement L5 6:3"
  },
  "1n48bdtmsj": {
@@ -3251,12 +3251,12 @@
  },
  "7j99glst5n": {
   "text": "Step 3. ... Check the answer is between 00:00 and 23:59.",
-  "spoken": "Step 3. Check the answer is between 00:00 and 23:59.",
+  "spoken": "Step 3. Check the answer is between zero zero hundred and twenty three fifty nine.",
   "source": "measurement L5 6:3"
  },
  "r4nydxq89e": {
   "text": "Tip. ... 12 pm is midday, so it stays 12.",
-  "spoken": "Here's a tip. 12 pm is midday, so it stays 12.",
+  "spoken": "Here's a tip. 12 p m is midday, so it stays 12.",
   "source": "measurement L5 6:3"
  },
  "baqz7gvyny": {
@@ -3796,7 +3796,7 @@
  },
  "1d8iibf7yhu": {
   "text": "Worked example. ... Depart 09:20, arrive 10:05 , gives 45 minutes",
-  "spoken": "Worked example. Depart 09:20, arrive 10:05, gives 45 minutes",
+  "spoken": "Worked example. Depart zero nine twenty, arrive ten oh five, gives 45 minutes",
   "source": "measurement L6 5:1"
  },
  "5h3ob6kayi": {
@@ -3806,7 +3806,7 @@
  },
  "ujvut2yqyn": {
   "text": "Step 2. ... Count on from 09:20 to 10:00 open bracket 40 min close bracket , then to 10:05 open bracket 5 min close bracket .",
-  "spoken": "Step 2. Count on from 09:20 to 10:00 open bracket 40 minutes close bracket, then to 10:05 open bracket 5 minutes close bracket.",
+  "spoken": "Step 2. Count on from zero nine twenty to ten o'clock open bracket 40 minutes close bracket, then to ten oh five open bracket 5 minutes close bracket.",
   "source": "measurement L6 5:1"
  },
  "17gqkfgir7c": {
@@ -3826,17 +3826,17 @@
  },
  "1b2xbsfqpmh": {
   "text": "Worked example. ... Start 9:45, 1 h 25 min later , gives 11:10",
-  "spoken": "Worked example. Start 9:45, 1 hour 25 minutes later, gives 11:10",
+  "spoken": "Worked example. Start nine forty five, 1 hour 25 minutes later, gives eleven ten",
   "source": "measurement L6 5:2"
  },
  "1obyui15d3c": {
   "text": "Step 1. ... Add the hours first: 9:45 plus 1 h equals 10:45.",
-  "spoken": "Step 1. Add the hours first: 9:45 plus 1 hour equals 10:45.",
+  "spoken": "Step 1. Add the hours first: nine forty five plus 1 hour equals ten forty five.",
   "source": "measurement L6 5:2"
  },
  "1rb922gyyph": {
   "text": "Step 2. ... Add the minutes: 10:45 plus 25 min equals 11:10.",
-  "spoken": "Step 2. Add the minutes: 10:45 plus 25 minutes equals 11:10.",
+  "spoken": "Step 2. Add the minutes: ten forty five plus 25 minutes equals eleven ten.",
   "source": "measurement L6 5:2"
  },
  "1ilm0kbb1jd": {
@@ -3856,12 +3856,12 @@
  },
  "y3bi5gglb3": {
   "text": "Worked example. ... 3:15 pm equals 15:15",
-  "spoken": "Worked example. 3:15 pm equals 15:15",
+  "spoken": "Worked example. three fifteen p m equals fifteen fifteen",
   "source": "measurement L6 5:3"
  },
  "25is4fpwyy5": {
   "text": "Step 1. ... For pm times after 12 noon, add 12 to the hour.",
-  "spoken": "Step 1. For pm times after 12 noon, add 12 to the hour.",
+  "spoken": "Step 1. For p m times after 12 noon, add 12 to the hour.",
   "source": "measurement L6 5:3"
  },
  "la98190bp0": {
@@ -3876,7 +3876,7 @@
  },
  "140jchw64fv": {
   "text": "Tip. ... 12:30 am is 00:30; 12:30 pm is 12:30.",
-  "spoken": "Here's a tip. 12:30 am is 00:30; 12:30 pm is 12:30.",
+  "spoken": "Here's a tip. twelve thirty a m is zero zero thirty; twelve thirty p m is twelve thirty.",
   "source": "measurement L6 5:3"
  },
  "1rzx8z4zwqz": {
