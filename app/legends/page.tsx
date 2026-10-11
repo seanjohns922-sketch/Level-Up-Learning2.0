@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
 import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
 
 import { useMemo, useSyncExternalStore } from "react";
@@ -238,6 +239,14 @@ export default function LegendsPage() {
             Your collection. Every realm. Every discovery.
           </p>
 
+          <div className="mt-4 flex justify-center">
+            <ReadAloudBtn
+              text={`Your RELIQS collection. Every realm. Every discovery. You have collected ${totalCollected} out of ${totalLegends} RELIQS. Explore the vaults. Choose a realm to see your cards. Tap Listen on a vault to hear its name and your collection progress.`}
+              label="Listen" size="md" rate={0.9}
+              className="min-h-11 !border-white/25 !bg-black/50 !text-white hover:!bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            />
+          </div>
+
           {/* Progress bar */}
           <div className="mt-7 max-w-md mx-auto rounded-2xl border border-white/10 bg-black/40 px-5 py-4 backdrop-blur-md">
             <div className="flex items-center justify-between text-sm mb-1.5">
@@ -313,6 +322,11 @@ export default function LegendsPage() {
               <div className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
                 Complete lessons in each realm to collect RELIQS. Pass the pre-test or finish the full 12-week program to unlock a RELIQ card!
               </div>
+              <ReadAloudBtn
+                text="How to collect RELIQS. Complete lessons in each realm to collect RELIQS. Pass the pre-test or finish the full twelve-week program to unlock a RELIQ card!"
+                label="Listen" size="md" rate={0.9}
+                className="mt-3 min-h-11 !border-white/25 !bg-white/10 !text-white hover:!bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              />
             </div>
           </div>
         </div>
