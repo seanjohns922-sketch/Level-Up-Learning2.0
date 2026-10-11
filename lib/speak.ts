@@ -1,4 +1,5 @@
 "use client";
+import { voiceClipUrl } from "@/lib/voice-clips";
 
 import { useSyncExternalStore } from "react";
 
@@ -316,63 +317,79 @@ function selectBrowserVoice(synth: SpeechSynthesis) {
   return englishVoices[0];
 }
 
-function speakWithBrowser(text: string, rate = 0.95) {
-  if (typeof window === "undefined") return;
-  const synth = window.speechSynthesis;
-  if (!synth) return;
+let speechSession = 0;
+let currentClip: HTMLAudioElement | null = null;
 
-  synth.cancel();
-  setSpeakState({ currentText: text, isSpeaking: true });
+/** Speak one piece with the device voice; resolves when it finishes or fails. */
+function speakWithBrowser(text: string, rate = 0.95): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined") return resolve();
+    const synth = window.speechSynthesis;
+    if (!synth) return resolve();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voice = selectBrowserVoice(synth);
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = selectBrowserVoice(synth);
 
-  utterance.lang = voice?.lang ?? "en-AU";
-  if (voice) utterance.voice = voice;
-  utterance.rate = Math.min(1.25, Math.max(0.6, rate));
-  utterance.pitch = 1.05; // slightly warmer
-  utterance.volume = 1.0;
-  utterance.onend = () => {
-    setSpeakState({ currentText: null, isSpeaking: false });
-  };
-  utterance.onerror = () => {
-    setSpeakState({ currentText: null, isSpeaking: false });
-  };
+    utterance.lang = voice?.lang ?? "en-AU";
+    if (voice) utterance.voice = voice;
+    utterance.rate = Math.min(1.25, Math.max(0.6, rate));
+    utterance.pitch = 1.05; // slightly warmer
+    utterance.volume = 1.0;
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
 
-  // Voices can be empty on first call (Safari/Chrome load them async). If so,
-  // pick the English voice once they arrive, then speak.
-  if (!voice && synth.getVoices().length === 0) {
-    const onVoices = () => {
-      synth.removeEventListener("voiceschanged", onVoices);
-      const ready = selectBrowserVoice(synth);
-      if (ready) {
-        utterance.voice = ready;
-        utterance.lang = ready.lang;
-      }
-      synth.speak(utterance);
+    // Voices can be empty on first call (Safari/Chrome load them async). If so,
+    // pick the English voice once they arrive, then speak.
+    if (!voice && synth.getVoices().length === 0) {
+      const onVoices = () => {
+        synth.removeEventListener("voiceschanged", onVoices);
+        const ready = selectBrowserVoice(synth);
+        if (ready) {
+          utterance.voice = ready;
+          utterance.lang = ready.lang;
+        }
+        synth.speak(utterance);
+      };
+      synth.addEventListener("voiceschanged", onVoices);
+      // Safety: if voiceschanged never fires, speak anyway shortly.
+      window.setTimeout(() => {
+        synth.removeEventListener("voiceschanged", onVoices);
+        if (!synth.speaking) synth.speak(utterance);
+      }, 250);
+      return;
+    }
+
+    synth.speak(utterance);
+  });
+}
+
+/** Play a recorded clip; resolves false if it cannot play so the device voice can step in. */
+function playClip(url: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const audio = new Audio(url);
+    currentClip = audio;
+    const done = (ok: boolean) => {
+      audio.onended = audio.onerror = null;
+      if (currentClip === audio) currentClip = null;
+      resolve(ok);
     };
-    synth.addEventListener("voiceschanged", onVoices);
-    // Safety: if voiceschanged never fires, speak anyway shortly.
-    window.setTimeout(() => {
-      synth.removeEventListener("voiceschanged", onVoices);
-      if (speakState.currentText === text && !speakState.isSpeaking) return;
-      if (!synth.speaking) synth.speak(utterance);
-    }, 250);
-    return;
-  }
-
-  synth.speak(utterance);
+    audio.onended = () => done(true);
+    audio.onerror = () => done(false);
+    audio.play().catch(() => done(false));
+  });
 }
 
 /**
- * Speak text using the device's built-in (Web Speech API) voice.
- * Free, instant, offline-capable, no API keys — and always English.
+ * Read text aloud. A recorded clip (lib/voice-clips) plays when one matches the
+ * exact sentence; otherwise the device's built-in English voice reads it.
+ * Pass `parts` to read a long passage as separate sentences, each of which can
+ * use its own recording; `text` still identifies the passage for the buttons.
  */
 export async function speak(
   text: string,
   _speechKey?: string,
   source: "manual" | "auto" = "manual",
-  options?: { rate?: number },
+  options?: { rate?: number; parts?: string[] },
 ) {
   if (typeof window === "undefined") return;
 
@@ -383,10 +400,26 @@ export async function speak(
   if (!normalized) return;
 
   stopSpeaking();
-  speakWithBrowser(normalized, options?.rate);
+  const session = ++speechSession;
+  setSpeakState({ currentText: normalized, isSpeaking: true });
+  const pieces = (options?.parts?.length ? options.parts.map(normalizeText) : [normalized]).filter(Boolean);
+  for (const piece of pieces) {
+    const url = await voiceClipUrl(piece);
+    if (session !== speechSession) return;
+    const played = url ? await playClip(url) : false;
+    if (session !== speechSession) return;
+    if (!played) await speakWithBrowser(piece, options?.rate);
+    if (session !== speechSession) return;
+  }
+  setSpeakState({ currentText: null, isSpeaking: false });
 }
 
 export function stopSpeaking() {
+  speechSession++;
+  if (currentClip) {
+    currentClip.pause();
+    currentClip = null;
+  }
   if (typeof window !== "undefined") {
     window.speechSynthesis?.cancel();
   }

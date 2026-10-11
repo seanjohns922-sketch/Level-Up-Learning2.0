@@ -24,6 +24,7 @@ export default function ReadAloudBtn({
   className = "",
   kind = "prompt",
   rate,
+  parts,
 }: {
   text: string;
   speechKey?: string;
@@ -32,6 +33,8 @@ export default function ReadAloudBtn({
   className?: string;
   kind?: "prompt" | "option";
   rate?: number;
+  /** Read a long passage as separate sentences so each can use its own recording. */
+  parts?: string[];
 }) {
   const inheritedRate = useContext(ReadAloudRateContext);
   const speechRate = rate ?? inheritedRate;
@@ -54,7 +57,7 @@ export default function ReadAloudBtn({
           stopSpeaking();
           return;
         }
-        void speak(text, speechKey, "manual", { rate: speechRate });
+        void speak(text, speechKey, "manual", { rate: speechRate, parts });
       }}
       aria-label={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
       title={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}

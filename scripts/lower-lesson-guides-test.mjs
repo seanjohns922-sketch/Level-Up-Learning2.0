@@ -89,5 +89,8 @@ assert.match(runner, /markCorrect: closeHelp, markCorrectSoft: \(\) => \{\}, mar
 const engine = fs.readFileSync('components/lesson/Year2LessonEngine.tsx', 'utf8');
 assert.match(engine, /skillGuideOpenRef\.current \? c : c - 1/);
 const guide = fs.readFileSync('components/lesson/LowerLessonGuide.tsx', 'utf8');
-for (const part of ['Read whole guide', 'Read example', 'Step ${i + 1}', 'Tip. ${guide.tip}', 'Read instructions']) assert(guide.includes(part), `Missing narration: ${part}`);
+for (const part of ['Read whole guide', 'Read example', 'said.steps[i]', 'said.tip', 'Read instructions']) assert(guide.includes(part), `Missing narration: ${part}`);
+// The guide's spoken sentences live in one shared module so recorded clips match them.
+const guideSpeech = fs.readFileSync('data/lesson-guides/guide-speech.ts', 'utf8');
+for (const part of ['Step ${i + 1}', 'Tip. ${guide.tip}', 'Worked example.', 'How to solve it.']) assert(guideSpeech.includes(part), `Missing narration: ${part}`);
 console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific, ${visuals} with diagrams). Ground and Levels 7–8 excluded.`);
