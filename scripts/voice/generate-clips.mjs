@@ -20,6 +20,8 @@ import { forVoice } from "./voice-text.mjs";
 
 const VOICESTUDIO = process.env.VOICESTUDIO_URL ?? "http://127.0.0.1:3900";
 const VOICE_ID = process.env.VOICE_PROFILE_ID ?? "49f8ebd2"; // "Miranda RELIQ"
+// 16 unmasking steps is about twice as fast as the model's 32-step preset and transcribes the same.
+const STEPS = Number(process.env.VOICE_STEPS ?? 16);
 const OUT_DIR = path.join(process.cwd(), "public/audio/voice/miranda");
 const MANIFEST = path.join(OUT_DIR, "manifest.json");
 const LINES = path.join(process.cwd(), "data/audio/voice-lines.json"); // text of each clip, for review
@@ -57,7 +59,7 @@ async function generate(text, wavPath) {
   const res = await fetch(`${VOICESTUDIO}/v1/audio/speech`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "omnivoice", input: text, voice: VOICE_ID, response_format: "wav", language: "English", seed: 7 }),
+    body: JSON.stringify({ model: "omnivoice", input: text, voice: VOICE_ID, response_format: "wav", language: "English", seed: 7, num_step: STEPS }),
   });
   if (!res.ok) throw new Error(`VoiceStudio ${res.status}: ${(await res.text()).slice(0, 200)}`);
   fs.writeFileSync(wavPath, Buffer.from(await res.arrayBuffer()));
