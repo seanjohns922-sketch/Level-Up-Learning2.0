@@ -21,13 +21,17 @@ function StatBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-export default function LegendDetailModal({
-  legend,
-  onClose,
-}: {
+type LegendDetailModalProps = {
   legend: Legend;
   onClose: () => void;
-}) {
+};
+
+export default function LegendDetailModal(props: LegendDetailModalProps) {
+  // A different card starts a fresh interaction: front face, no video, no zoom.
+  return <LegendDetailContent key={props.legend.id} {...props} />;
+}
+
+function LegendDetailContent({ legend, onClose }: LegendDetailModalProps) {
   const [showBack, setShowBack] = useState(false);
   const [videoMode, setVideoMode] = useState<"showcase" | "unlock" | null>(null);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -48,13 +52,6 @@ export default function LegendDetailModal({
       backImage,
     });
   }, [backImage, frontImage, legend.id, legend.name]);
-
-  useEffect(() => {
-    setVideoMode(null);
-    setVideoFailed(false);
-    setShowBack(false);
-    setEnlarged(false);
-  }, [legend.id]);
 
   // Realm-aware theming keeps the shared card interaction consistent.
   const isMeasure = legend.realmId === "measurelands";
@@ -108,12 +105,13 @@ export default function LegendDetailModal({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm bg-card rounded-3xl border-2 border-primary/20 shadow-2xl overflow-hidden animate-[fadeUp_0.3s_ease]"
+        className="relative max-h-[calc(100dvh-2rem)] w-full max-w-sm bg-card rounded-3xl border-2 border-primary/20 shadow-2xl overflow-x-hidden overflow-y-auto animate-[fadeUp_0.3s_ease]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
+          aria-label="Close RELIQ card details"
           className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-background/80 hover:bg-background transition border border-border"
         >
           <X className="h-4 w-4 text-muted-foreground" />
@@ -181,7 +179,7 @@ export default function LegendDetailModal({
             </>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => setShowBack(false)}

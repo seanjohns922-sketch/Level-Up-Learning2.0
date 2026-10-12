@@ -1,10 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Image from "next/image";
+import ReadAloudBtn from "@/components/ReadAloudBtn";
+import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
+
+import { useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Clock, Mountain, Compass, Triangle, BarChart3, Dices, BookOpen, Feather, Languages, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
-import { readProgress, type StudentProgress } from "@/data/progress";
+import { readProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 
@@ -12,12 +16,9 @@ export type RealmDef = {
   id: string;
   name: string;
   legendLine: string;
-  icon: React.ReactNode;
   totalLegends: number;
   status: "open" | "coming-soon" | "locked";
   route?: string;
-  glowColor: string;
-  borderGlow: string;
 };
 
 const REALMS: RealmDef[] = [
@@ -25,123 +26,103 @@ const REALMS: RealmDef[] = [
     id: "number-nexus",
     name: "Number Nexus",
     legendLine: "Numbot Collection",
-    icon: <Zap className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: getAllLegends("number-nexus").length,
     status: "open",
     route: "/legends/number",
-    glowColor: "rgba(45, 212, 160, 0.25)",
-    borderGlow: "rgba(45, 212, 160, 0.6)",
   },
   {
     id: "chronorok",
     name: "Chronorok",
     legendLine: "Time Legends",
-    icon: <Clock className="h-5 w-5" />,
     totalLegends: 7,
     status: "coming-soon",
-    glowColor: "rgba(245, 180, 50, 0.2)",
-    borderGlow: "rgba(245, 180, 50, 0.5)",
   },
   {
     id: "measurelands",
     name: "Measurelands",
     legendLine: "Measure Titans",
-    icon: <Mountain className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: getAllLegends("measurelands").length,
     status: "open",
     route: "/legends/measurelands",
-    glowColor: "rgba(110, 231, 183, 0.25)",
-    borderGlow: "rgba(110, 231, 183, 0.6)",
   },
   {
     id: "starpath-realm",
     name: "Starpath Realm",
     legendLine: "Geospin Collection",
-    icon: <Compass className="h-5 w-5" />,
-    totalLegends: 7,
+    totalLegends: getAllLegends("starpath").length,
     status: "open",
     route: "/legends/starpath",
-    glowColor: "rgba(103, 232, 249, 0.22)",
-    borderGlow: "rgba(139, 92, 246, 0.62)",
   },
   {
     id: "pattern-peaks",
     name: "Pattern Peaks",
     legendLine: "Patternox Collection",
-    icon: <Triangle className="h-5 w-5" />,
-    totalLegends: 4,
+    totalLegends: getAllLegends("pattern-peaks").length,
     status: "open",
     route: "/legends/pattern-peaks",
-    glowColor: "rgba(57, 217, 160, 0.22)",
-    borderGlow: "rgba(139, 92, 246, 0.58)",
   },
   {
     id: "statistica",
     name: "Statistica",
     legendLine: "Data Guardians",
-    icon: <BarChart3 className="h-5 w-5" />,
-    totalLegends: 6,
+    totalLegends: getAllLegends("statistica").length,
     status: "open",
     route: "/legends/statistica",
-    glowColor: "rgba(255, 107, 103, 0.2)",
-    borderGlow: "rgba(213, 164, 47, 0.58)",
   },
   {
     id: "chance-hollow",
     name: "Chance Hollow",
     legendLine: "Fortune Seekers",
-    icon: <Dices className="h-5 w-5" />,
-    totalLegends: 1,
+    totalLegends: getAllLegends("chance-hollow").length,
     status: "locked",
     route: "/legends/chance-hollow",
-    glowColor: "transparent",
-    borderGlow: "rgba(251,113,133,0.58)",
   },
   {
     id: "reading-ridge",
     name: "Reading Ridge",
     legendLine: "Lore Keepers",
-    icon: <BookOpen className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "inkwell-wilds",
     name: "Inkwell Wilds",
     legendLine: "Script Spirits",
-    icon: <Feather className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
   },
   {
     id: "runehaven-peaks",
     name: "Runehaven Peaks",
     legendLine: "Rune Masters",
-    icon: <Languages className="h-5 w-5" />,
     totalLegends: 7,
     status: "locked",
-    glowColor: "transparent",
-    borderGlow: "rgba(255,255,255,0.15)",
   },
 ];
+
+// The server and first hydration render use the same empty progress snapshot.
+// React then switches to the client snapshot without an effect-driven state update.
+const subscribeToClientSnapshot = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function LegendsPage() {
   const router = useRouter();
   // Progress is realm-scoped in storage, so each realm's legends must be read
   // from its own record — otherwise Measurelands unlocks (saved under the
   // "measurement" scope) are invisible on this shared page.
-  const [numberProgress] = useState<StudentProgress | null>(() => readProgress("number"));
-  const [measureProgress] = useState<StudentProgress | null>(() => readProgress("measurement"));
-  const [spaceProgress] = useState<StudentProgress | null>(() => readProgress("space"));
-  const [patternProgress] = useState<StudentProgress | null>(() => readProgress("pattern"));
-  const [chanceProgress] = useState<StudentProgress | null>(() => readProgress("chance"));
-  const demoPreview =
-    useDemoPreviewMode() ||
-    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("teacher_preview") === "1");
+  const hydrated = useSyncExternalStore(subscribeToClientSnapshot, getClientSnapshot, getServerSnapshot);
+  const { numberProgress, measureProgress, spaceProgress, patternProgress, chanceProgress } = useMemo(
+    () => ({
+      numberProgress: hydrated ? readProgress("number") : null,
+      measureProgress: hydrated ? readProgress("measurement") : null,
+      spaceProgress: hydrated ? readProgress("space") : null,
+      patternProgress: hydrated ? readProgress("pattern") : null,
+      chanceProgress: hydrated ? readProgress("chance") : null,
+    }),
+    [hydrated],
+  );
+  const demoPreview = useDemoPreviewMode();
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
@@ -208,34 +189,24 @@ export default function LegendsPage() {
     patternPeaksCollected +
     chanceHollowCollected +
     statisticaCollected;
-  const totalLegends = demoPreview ? getAllLegends().length : realms.reduce((sum, r) => sum + r.totalLegends, 0);
+  const totalLegends = getAllLegends().length;
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-      {/* Full-screen fantasy background */}
-      <img
-        src="/images/legends-bg.jpg"
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover object-[center_40%]"
-      />
-      {/* World-integrated readability layers */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle at 54% 38%, rgba(255,190,90,0.08), transparent 28%), linear-gradient(90deg, rgba(8,10,12,0.62) 0%, rgba(8,10,12,0.42) 45%, rgba(8,10,12,0.12) 78%, rgba(8,10,12,0.04) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ boxShadow: "inset 0 0 180px 70px rgba(0,0,0,0.46)" }}
-      />
+      {/* The archive stays at viewport scale instead of stretching down the collection. */}
+      <div className="pointer-events-none absolute inset-0 bg-[#080d0c]" aria-hidden="true">
+        <div className="absolute inset-x-0 top-0 h-[100svh] min-h-[760px]">
+          <Image src="/images/reliqs-archive-v1.png" alt="" fill priority sizes="100vw" className="object-cover object-[center_35%]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,10,8,0.15)_0%,rgba(5,10,8,0.12)_30%,rgba(8,13,12,0.6)_72%,#080d0c_100%)]" />
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_14%,transparent_20%,rgba(4,8,7,0.45)_85%)]" />
+      </div>
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Header */}
-        <div className="max-w-4xl mx-auto w-full px-5 pt-5 pb-2">
+        <div className="max-w-5xl mx-auto w-full px-5 pt-6 pb-2">
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={() => router.push("/home-base")}
@@ -259,29 +230,30 @@ export default function LegendsPage() {
             </div>
           </div>
 
-          <h1
-            className="text-4xl md:text-5xl font-black text-white tracking-tight text-center"
-            style={{
-              fontFamily: "'Quicksand', 'Nunito', sans-serif",
-              textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 0 40px rgba(245,180,50,0.3)",
-            }}
-          >
-            RELIQS
-          </h1>
+          <p className="mt-12 text-center text-[11px] font-bold uppercase tracking-[0.3em] text-lime-100/70">The collection archive</p>
+          <h1 className="mx-auto mb-5 mt-5 max-w-[400px] px-3"><ReliqsWordmark /></h1>
           <p
             className="text-center mt-1.5 text-base max-w-md mx-auto"
             style={{ color: "rgba(255,255,255,0.75)", textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}
           >
-            Unlock powerful legends across the realms of knowledge.
+            Your collection. Every realm. Every discovery.
           </p>
 
+          <div className="mt-4 flex justify-center">
+            <ReadAloudBtn
+              text={`Your RELIQS collection. Every realm. Every discovery. You have collected ${totalCollected} out of ${totalLegends} RELIQS. Explore the vaults. Choose a realm to see your cards. Tap Listen on a vault to hear its name and your collection progress.`}
+              label="Listen" size="md" rate={0.9}
+              className="min-h-11 !border-white/25 !bg-black/50 !text-white hover:!bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            />
+          </div>
+
           {/* Progress bar */}
-          <div className="mt-5 max-w-sm mx-auto">
+          <div className="mt-7 max-w-md mx-auto rounded-2xl border border-white/10 bg-black/40 px-5 py-4 backdrop-blur-md">
             <div className="flex items-center justify-between text-sm mb-1.5">
               <span className="font-bold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
-                {totalCollected} / {totalLegends} total legends
+                {totalCollected} / {totalLegends} RELIQS collected
               </span>
-              <span className="font-bold text-amber-300" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+              <span className="font-bold text-lime-300" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
                 {pct}%
               </span>
             </div>
@@ -296,7 +268,7 @@ export default function LegendsPage() {
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${pct}%`,
-                  background: "linear-gradient(90deg, hsl(145, 65%, 42%), hsl(42, 95%, 55%))",
+                  background: "linear-gradient(90deg, #00a600, #00d400)",
                   boxShadow: "0 0 8px rgba(45,212,160,0.4)",
                 }}
               />
@@ -305,8 +277,9 @@ export default function LegendsPage() {
         </div>
 
         {/* Realm Grid */}
-        <div className="max-w-4xl mx-auto w-full px-5 py-6 flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="max-w-5xl mx-auto w-full px-5 pt-9 pb-12 flex-1">
+          <div className="mb-5 flex items-center gap-4"><h2 className="shrink-0 text-xs font-bold uppercase tracking-[0.24em] text-white/70">Explore the vaults</h2><div className="h-px flex-1 bg-white/15" /></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {realms.map((realm) => (
               <RealmCard
                 key={realm.id}
@@ -326,7 +299,7 @@ export default function LegendsPage() {
                         ? statisticaCollected
                       : 0
                 }
-                onClick={realm.route ? () => router.push(realm.route!) : undefined}
+                onClick={realm.route ? () => router.push(demoPreview ? `${realm.route}?teacher_preview=1` : realm.route!) : undefined}
               />
             ))}
           </div>
@@ -335,7 +308,7 @@ export default function LegendsPage() {
           <div
             className="mt-8 rounded-2xl p-5 flex items-start gap-3"
             style={{
-              background: "rgba(255,255,255,0.12)",
+              background: "rgba(10,18,15,0.8)",
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
               border: "1px solid rgba(255,255,255,0.2)",
@@ -344,11 +317,16 @@ export default function LegendsPage() {
             <Lightbulb className="h-6 w-6 flex-shrink-0" />
             <div>
               <div className="font-bold text-white mb-0.5" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.3)" }}>
-                How to unlock Legends
+                How to collect RELIQS
               </div>
               <div className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
-                Complete lessons in each realm to collect powerful legends. Pass the pre-test or finish the full 12-week program to unlock a Legend!
+                Complete lessons in each realm to collect RELIQS. Pass the pre-test or finish the full 12-week program to unlock a RELIQ card!
               </div>
+              <ReadAloudBtn
+                text="How to collect RELIQS. Complete lessons in each realm to collect RELIQS. Pass the pre-test or finish the full twelve-week program to unlock a RELIQ card!"
+                label="Listen" size="md" rate={0.9}
+                className="mt-3 min-h-11 !border-white/25 !bg-white/10 !text-white hover:!bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              />
             </div>
           </div>
         </div>

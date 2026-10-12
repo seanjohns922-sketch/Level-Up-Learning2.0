@@ -1,12 +1,14 @@
 "use client";
 
+import VaultHeader from "@/components/legends/VaultHeader";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, getEffectiveUnlockedLegendIds, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import BinderCard from "@/components/legends/BinderCard";
 import LegendDetailModal from "@/components/legends/LegendDetailModal";
 
@@ -15,7 +17,7 @@ export default function MeasurelandsCollectionPage() {
   const [progress, setProgress] = useState<StudentProgress | null>(null);
   const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null);
   const [barAnimated, setBarAnimated] = useState(false);
-  const demoPreview = isDemoPreviewMode();
+  const demoPreview = useDemoPreviewMode();
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -45,7 +47,6 @@ export default function MeasurelandsCollectionPage() {
 
   const collectedCount = allLegends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
   const totalCount = allLegends.length;
-  const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
   return (
     <main
@@ -107,7 +108,7 @@ export default function MeasurelandsCollectionPage() {
           <div className="relative max-w-6xl mx-auto px-6 pt-6 pb-7">
             <div className="flex items-center justify-between mb-7">
               <button
-                onClick={() => router.push("/legends")}
+                onClick={() => router.push(demoPreview ? "/legends?teacher_preview=1" : "/legends")}
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(44, 60%, 84%)" }}
               >
@@ -126,57 +127,16 @@ export default function MeasurelandsCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(42, 48%, 95%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(266, 60%, 52%, 0.22)",
-              }}
-            >
-              Meazurex Collection
-            </h1>
-            <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(40, 22%, 84%)" }}>
-              Collect the Measurelands legends as you master length, mass, capacity, time, and measurement reasoning.
-            </p>
-
-            <div className="mt-6 max-w-sm">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-bold" style={{ color: "hsl(40, 30%, 90%)" }}>
-                  {collectedCount} / {totalCount} collected
-                </span>
-                <span className="font-bold" style={{ color: "hsl(46, 90%, 72%)" }}>
-                  {pct}%
-                </span>
-              </div>
-              <div
-                className="h-4 rounded-full overflow-hidden"
-                style={{
-                  background: "hsla(280, 42%, 6%, 0.6)",
-                  border: "1px solid hsla(266, 44%, 52%, 0.3)",
-                  boxShadow: "inset 0 1px 4px hsla(280, 60%, 2%, 0.7)",
-                }}
-              >
-                <div
-                  className="h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: barAnimated ? `${Math.max(pct, 2)}%` : "0%",
-                    background:
-                      "linear-gradient(90deg, hsl(266, 55%, 56%), hsl(286, 52%, 56%), hsl(46, 90%, 68%))",
-                    boxShadow: "0 0 12px hsla(266, 60%, 55%, 0.4), inset 0 1px 0 hsla(0, 0%, 100%, 0.3)",
-                  }}
-                />
-              </div>
-            </div>
+            <VaultHeader realm="measurelands" name="Measurelands" collection="Meazurex Collection" description={"Discover every Meazurex evolution as you master the art of measurement."} collected={collectedCount} total={totalCount} animated={barAnimated} preview={demoPreview} />
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
-            style={{ color: "hsl(40, 22%, 74%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            style={{ color: "hsl(40, 22%, 74%)" }}
           >
-            RELIQS BINDER
+            THE COLLECTION
           </h2>
 
           <section
@@ -195,7 +155,7 @@ export default function MeasurelandsCollectionPage() {
                   "radial-gradient(circle at 50% 0%, hsla(46, 90%, 70%, 0.12), transparent 36%), radial-gradient(circle at 20% 18%, hsla(266, 58%, 60%, 0.16), transparent 32%)",
               }}
             />
-            <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
               {sortedLegends.map((legend) => {
                 const isUnlocked = visibleUnlockedIds.includes(legend.id);
                 return (

@@ -1,5 +1,7 @@
 "use client";
 
+import VaultHeader from "@/components/legends/VaultHeader";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -68,7 +70,7 @@ export default function StatisticaCollectionPage() {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={() => router.push("/legends")}
+            onClick={() => router.push(demoPreview ? "/legends?teacher_preview=1" : "/legends")}
             className="flex items-center gap-1 text-sm font-bold text-[#f4dca2] transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" /> My RELIQS
@@ -78,33 +80,12 @@ export default function StatisticaCollectionPage() {
           </div>
         </div>
 
-        <header className="pb-9 pt-10">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#ff7771]">Statistica Realm</p>
-          <h1 className="mt-2 text-4xl font-black tracking-normal text-[#fff8e7] md:text-6xl">
-            Data Guardians
-          </h1>
-          <p className="mt-3 max-w-xl text-base font-medium text-[#d7e4d8] md:text-lg">
-            Collect Datara&apos;s evolutions as you learn to gather, organise, represent, and interpret data.
-          </p>
+        <VaultHeader realm="statistica" name="Statistica" collection="Data Guardians" description={"Meet Datara’s evolutions as you gather, organise and interpret data."} collected={legends.length} total={legends.length} animated={barAnimated} preview={demoPreview} />
 
-          <div className="mt-6 max-w-sm">
-            <div className="mb-2 flex items-center justify-between text-sm font-bold">
-              <span className="text-[#f6efd9]">{legends.length} / {legends.length} collected</span>
-              <span className="text-[#ff7771]">100%</span>
-            </div>
-            <div className="h-4 overflow-hidden rounded-full border border-[#d5a42f]/35 bg-[#06110e]/80">
-              <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,#c95050,#ff7771,#d5a42f)] shadow-[0_0_14px_rgba(255,107,103,0.35)] transition-all duration-1000"
-                style={{ width: barAnimated ? "100%" : "0%" }}
-              />
-            </div>
-          </div>
-        </header>
-
-        <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-[#f0dca9]">RELIQS BINDER</h2>
+        <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-[#f0dca9]">THE COLLECTION</h2>
         <section className="relative overflow-hidden rounded-[28px] border border-[#d5a42f]/25 bg-[#0c2b21]/80 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:p-5 md:p-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,107,103,0.12),transparent_42%)]" />
-          <div className="relative grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="relative grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             {legends.map((legend) => (
               <BinderCard
                 key={legend.id}

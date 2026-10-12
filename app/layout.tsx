@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
+import { brandBody, brandHeading } from "@/lib/brand-fonts";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { GlobalTapFeedback } from "@/components/GlobalTapFeedback";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
@@ -31,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${brandHeading.variable} ${brandBody.variable}`}>
       <body className="antialiased">
         <ErrorBoundary>
           <GlobalTapFeedback />

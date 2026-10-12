@@ -1,4 +1,5 @@
 "use client";
+import { TRAIN_WORLD_SCALE } from "@/lib/world3d/world-scale";
 import { trainDesign } from '@/lib/world3d/train-catalogue';
 import { Box, Ball, Pole } from './DetailedScenery';
 const dark='#253640',glass='#9bdde9',brass='#dcb968';
@@ -11,7 +12,7 @@ function Crystal({p,c,h=.45}:{p:[number,number,number];c:string;h?:number}){retu
 export function TrainUnit({asset,car=0}:{asset:string;car?:number}){
  const design=trainDesign(asset);const style=design?.style??'steam',colour=design?.colour??'#347367',trim=design?.trim??brass;
  const carriage=car>0;
- return <group><Wheels/>
+ return <group scale={TRAIN_WORLD_SCALE}><Wheels/>
   {carriage? <group>
    {style==='freight'?<group><Box p={[0,.46,0]} s={[.72,.28,1.25]} c={car===1?'#895d3d':'#52717c'}/>{car===1?[-.21,0,.21].map(x=><Drum key={x} p={[x,.68,0]} r={.13} h={1.1} c="#b58b53" axis="z"/>):<group><Box p={[0,.75,0]} s={[.65,.55,1.15]} c="#617e87"/>{[-.46,-.23,0,.23,.46].map(z=><Box key={z} p={[0,.75,z]} s={[.68,.56,.024]} c={trim}/>)}</group>}</group>:
    <group><Box p={[0,.61,0]} s={[.68,.58,1.3]} c={colour}/><Windows/><Box p={[0,.98,0]} s={[.77,.12,1.4]} c={trim}/>{style==='space'?<Ball p={[0,1.11,0]} s={[.28,.23,.36]} c={glass}/>:style==='pattern'?[-.4,0,.4].map(z=><Crystal key={z} p={[0,1.17,z]} h={.22} c={trim}/>):style==='number'?<Box p={[0,1.18,0]} s={[.4,.4,.4]} r={[0,.6,0]} c={trim}/>:style==='measurement'?<group>{[-.4,0,.4].map(z=><Pole key={z} a={[-.3,1.08,z]} b={[.3,1.08,z]} radius={.028} c={brass}/>)}</group>:style==='statistics'?<group>{[.2,.35,.5].map((h,i)=><Box key={h} p={[(i-1)*.2,1+h/2,0]} s={[.12,h,.25]} c={trim}/>)}</group>:style==='chance'?<group><Box p={[0,1.23,0]} s={[.4,.4,.4]} r={[0,.25,0]} c="#f8e9cd"/>{[-.1,.1].map(x=><Ball key={x} p={[x,1.24,.21]} s={[.035,.035,.018]} c={colour}/>)}</group>:null}</group>}

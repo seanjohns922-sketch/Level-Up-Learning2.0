@@ -137,7 +137,8 @@ export function totalTask(context?: { label: string; emoji: string }, unit?: "cm
 // ── Lesson 3: compare / packing / capacity ────────────────────────────────────
 export function compareTask(): VolumeTask {
   const ctx = choose(L3_CONTEXTS);
-  let a = buildDims(), b = buildDims();
+  const a = buildDims();
+  let b = buildDims();
   while (vol(a) === vol(b)) b = buildDims();
   return {
     kind: "volume", scene: "compare", dims: a, dimsB: b, context: ctx.label, emoji: ctx.emoji,

@@ -92,7 +92,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () 
       if (Object.keys(next).length === items.length) onCorrect();
     } else { setWrong(selected); setSelected(null); onWrong(); window.setTimeout(() => setWrong(null), 600); }
   };
-  const Bin = ({ bin, glyph }: { bin: DurUnit; glyph: string }) => (
+  const renderBin = ({ bin, glyph }: { bin: DurUnit; glyph: string }) => (
     <button type="button" onClick={() => pick(bin)} className={`flex min-h-[120px] flex-col gap-1 rounded-[20px] border-2 p-2 text-left transition ${selected ? "border-[#b4781e] bg-[rgba(214,184,108,0.14)]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
       <div className="flex items-center gap-1"><span className="text-xl">{glyph}</span><span className="text-[11px] font-black uppercase tracking-[0.1em] text-[#5b21b6]">{UNIT_WORD[bin]}</span></div>
       <div className="flex flex-wrap gap-1">{items.filter((it) => placed[it.label] === bin).map((it) => (<span key={it.label} className="flex items-center gap-1 rounded-full border border-[rgba(15,118,110,0.4)] bg-[rgba(15,118,110,0.12)] px-2 py-0.5 text-xs font-black text-[#0f766e]"><span>{it.emoji}</span>{it.label}</span>))}</div>
@@ -100,7 +100,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: DurTask; onCorrect: () 
   );
   return (
     <Shell badge={task.badgeLabel ?? "Sort the Activities"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-3 gap-2"><Bin bin="s" glyph="⚡" /><Bin bin="min" glyph="⏱️" /><Bin bin="hr" glyph="🕐" /></div>
+      <div className="grid grid-cols-3 gap-2">{renderBin({ bin: "s", glyph: "⚡" })}{renderBin({ bin: "min", glyph: "⏱️" })}{renderBin({ bin: "hr", glyph: "🕐" })}</div>
       <div className="rounded-[22px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-3">
         <p className="mb-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">{unplaced.length ? "Tap an activity, then tap its bin" : "All sorted!"}</p>
         <div className="flex flex-wrap justify-center gap-2">{unplaced.map((it) => (<button key={it.label} type="button" onClick={() => setSelected((c) => (c === it.label ? null : it.label))} className={`flex items-center gap-1.5 rounded-full border-2 px-4 py-2 text-base font-black text-[#2c1c07] transition ${wrong === it.label ? "border-[#C0564E] bg-[#FCE0E0]" : selected === it.label ? "-translate-y-0.5 border-[#b4781e] bg-[rgba(214,184,108,0.3)] shadow" : "border-[rgba(214,184,108,0.6)] bg-[#fffaf0]"}`}><span className="text-xl">{it.emoji}</span>{it.label}</button>))}</div>

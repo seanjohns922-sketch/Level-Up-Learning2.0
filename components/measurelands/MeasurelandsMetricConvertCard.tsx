@@ -92,7 +92,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorre
   const base = measure === "length" ? "mm" : measure === "mass" ? "g" : "mL";
   const bigger = convert(measure, a.value, a.unit, base) >= convert(measure, b.value, b.unit, base) ? "a" : "b";
   const [wrong, setWrong] = useState<string | null>(null);
-  const Btn = ({ id, p }: { id: string; p: { value: number; unit: string } }) => (
+  const renderBtn = ({ id, p }: { id: string; p: { value: number; unit: string } }) => (
     <button type="button" onClick={() => (id === bigger ? onCorrect() : (setWrong(id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`flex min-h-[92px] items-center justify-center gap-2 rounded-[24px] border-2 text-2xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 ${wrong === id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
       {fmt(p.value)} {p.unit}<OptionReadAloudButton text={`${fmt(p.value)} ${p.unit}`} />
     </button>
@@ -100,7 +100,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: ConvertTask; onCorre
   return (
     <Shell badge={task.badgeLabel ?? "Which Is Greater?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <p className="text-center text-[13px] font-black text-[#a98b52]">Convert to the same unit, then compare.</p>
-      <div className="grid grid-cols-2 gap-3"><Btn id="a" p={a} /><Btn id="b" p={b} /></div>
+      <div className="grid grid-cols-2 gap-3">{renderBtn({ id: "a", p: a })}{renderBtn({ id: "b", p: b })}</div>
     </Shell>
   );
 }

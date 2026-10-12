@@ -16,7 +16,7 @@ export function SizedWorldModel({item,children,onMeasured,presentation}:{item:Ec
   if(bounds.isEmpty())return;
   const size=bounds.getSize(new THREE.Vector3()),[w,d]=parseGridSize(item);
   root.current.scale.set(...fitWorldItemScale(size,[w*2,d*2],(presentation??getItemPresentation(item))));
-  content.current.position.set(-(bounds.min.x+bounds.max.x)/2, -bounds.min.y, -(bounds.min.z+bounds.max.z)/2);
+  if ((presentation??getItemPresentation(item)).sizing !== "fixed") content.current.position.set(-(bounds.min.x+bounds.max.x)/2, -bounds.min.y, -(bounds.min.z+bounds.max.z)/2);
   onMeasured?.({key:String(item.metadata.worldAssetKey),name:item.name,native:[size.x,size.y,size.z],size:[size.x*root.current.scale.x,size.y*root.current.scale.y,size.z*root.current.scale.z],footprint:[w*2,d*2]});
  },[item,onMeasured,presentation]);
  return <group ref={root}><group ref={content}>{children}</group></group>;

@@ -642,7 +642,7 @@ function CopyMeGame({ villain, onWin }: { villain: Villain; onWin: () => void })
   const TARGET_ROUNDS = 3;
   const padColors = ["#f87171", "#60a5fa", "#fbbf24", "#4ade80"];
   const [round, setRound] = useState(0);
-  const [seq, setSeq] = useState<number[]>([]);
+  const [seq, setSeq] = useState<number[]>(() => Array.from({ length: 2 }, () => Math.floor(Math.random() * PADS)));
   const [active, setActive] = useState<number | null>(null);
   const [showing, setShowing] = useState(true);
   const inputRef = useRef(0);
@@ -655,7 +655,6 @@ function CopyMeGame({ villain, onWin }: { villain: Villain; onWin: () => void })
   }, []);
 
   const playSequence = useCallback((s: number[]) => {
-    setShowing(true);
     inputRef.current = 0;
     clearTimers();
     s.forEach((pad, i) => {
@@ -666,12 +665,9 @@ function CopyMeGame({ villain, onWin }: { villain: Villain; onWin: () => void })
   }, [clearTimers]);
 
   useEffect(() => {
-    const len = round + 2; // 2, 3, 4
-    const s = Array.from({ length: len }, () => Math.floor(Math.random() * PADS));
-    setSeq(s);
-    playSequence(s);
+    playSequence(seq);
     return clearTimers;
-  }, [round, playSequence, clearTimers]);
+  }, [seq, playSequence, clearTimers]);
 
   function tapPad(pad: number) {
     if (showing || wonRef.current) return;
@@ -681,9 +677,14 @@ function CopyMeGame({ villain, onWin }: { villain: Villain; onWin: () => void })
       inputRef.current += 1;
       if (inputRef.current >= seq.length) {
         if (round + 1 >= TARGET_ROUNDS) { wonRef.current = true; onWin(); }
-        else setRound((r) => r + 1);
+        else {
+          setShowing(true);
+          setSeq(Array.from({ length: round + 3 }, () => Math.floor(Math.random() * PADS)));
+          setRound((r) => r + 1);
+        }
       }
     } else {
+      setShowing(true);
       playSequence(seq); // wrong — forgiving: replay the same pattern
     }
   }

@@ -34,7 +34,7 @@ export const REALM_BUILDING_REVIEW_ITEMS:EconomyItem[]=REALM_BUILDING_DESIGNS.ma
  realmName:REALM_REGISTRY[item.realm].name,designStage:"review",unlockProposal:item.kind==="decoration"?"Earn through realm learning":item.kind==="building"?`Unlock through learning · ${item.price} XP`:"Earn by completing the realm program"},
 }));
 
-export const REALM_DESIGN_PRESENTATIONS=Object.fromEntries(REALM_BUILDING_DESIGNS.map(item=>[item.key,{height:3,width:item.width,theme:"garden" as const}]));
+export const REALM_DESIGN_PRESENTATIONS=Object.fromEntries(REALM_BUILDING_DESIGNS.map(item=>[item.key,{height:3,width:item.width,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}]));
 
 export const SIGNATURE_REALM_BUILDING_KEYS=["nexus_tower","measure_lodge","pattern_loom","stats_station","chance_games","star_habitat"];
 

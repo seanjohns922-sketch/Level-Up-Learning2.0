@@ -1,5 +1,7 @@
 "use client";
 
+import VaultHeader from "@/components/legends/VaultHeader";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -42,7 +44,6 @@ export default function PatternPeaksCollectionPage() {
   );
   const visibleUnlockedIds = demoPreview ? legends.map((legend) => legend.id) : unlockedIds;
   const collectedCount = legends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
-  const percentage = legends.length > 0 ? Math.round((collectedCount / legends.length) * 100) : 0;
 
   if (!demoResolved) {
     return (
@@ -74,7 +75,7 @@ export default function PatternPeaksCollectionPage() {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={() => router.push("/legends")}
+            onClick={() => router.push(demoPreview ? "/legends?teacher_preview=1" : "/legends")}
             className="flex items-center gap-1 text-sm font-bold text-emerald-100 transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" /> My RELIQS
@@ -84,38 +85,14 @@ export default function PatternPeaksCollectionPage() {
           </div>
         </div>
 
-        <header className="pb-9 pt-10">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#ffcc62]">
-            Pattern Peaks Realm
-          </p>
-          <h1 className="mt-2 text-4xl font-black tracking-normal text-white md:text-6xl">
-            Patternox Collection
-          </h1>
-          <p className="mt-3 max-w-xl text-base font-medium text-white/75 md:text-lg">
-            Meet every Patternox evolution and watch how each one masters patterns, rules,
-            unknowns, and algebraic structure.
-          </p>
-
-          <div className="mt-6 max-w-sm">
-            <div className="mb-2 flex items-center justify-between text-sm font-bold">
-              <span className="text-white">{collectedCount} / {legends.length} collected</span>
-              <span className="text-[#39d9a0]">{percentage}%</span>
-            </div>
-            <div className="h-4 overflow-hidden border border-emerald-300/25 bg-black/45">
-              <div
-                className="h-full bg-[linear-gradient(90deg,#39d9a0,#54a8ff,#8b5cf6)] shadow-[0_0_14px_rgba(57,217,160,0.35)] transition-all duration-1000"
-                style={{ width: barAnimated ? `${percentage}%` : "0%" }}
-              />
-            </div>
-          </div>
-        </header>
+        <VaultHeader realm="pattern-peaks" name="Pattern Peaks" collection="Patternox Collection" description={"Explore every Patternox evolution through patterns, rules and algebra."} collected={collectedCount} total={legends.length} animated={barAnimated} preview={demoPreview} />
 
         <h2 className="mb-5 text-xs font-extrabold tracking-[0.22em] text-emerald-100">
-          RELIQS BINDER
+          THE COLLECTION
         </h2>
-        <section className="relative overflow-hidden border border-emerald-300/20 bg-[#101b22]/85 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-5 md:p-6">
+        <section className="relative overflow-hidden rounded-[28px] border border-emerald-300/20 bg-[#101b22]/85 p-3 shadow-[0_26px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-5 md:p-6">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.14),transparent_42%)]" />
-          <div className="relative grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          <div className="relative grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
             {legends.map((legend) => (
               <BinderCard
                 key={legend.id}

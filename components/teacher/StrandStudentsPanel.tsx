@@ -1174,10 +1174,12 @@ function StudentStrandDetail({
   const maxWeek = getRealmDefinition(supportedRealmId).totalWeeks == null ? plan.length : getProgramWeekCount(supportedRealmId, prog.year);
   const studentName = resolveStudentNameParts(student).displayName;
 
-  useEffect(() => {
+  const [weekContext, setWeekContext] = useState({ studentId: student.id, currentWeek });
+  if (weekContext.studentId !== student.id || weekContext.currentWeek !== currentWeek) {
+    setWeekContext({ studentId: student.id, currentWeek });
     setSelectedWeek(currentWeek);
     setExpandedWeek(null);
-  }, [student.id, currentWeek]);
+  }
 
   async function advanceStudent() {
     if (!advanceReason || selectedWeek !== currentWeek || selectedWeek >= maxWeek) return;

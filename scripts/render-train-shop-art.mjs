@@ -22,6 +22,7 @@ function compile(file){
 const THREE=await import('three');
 const {TrainUnit}=compile('components/world3d/TrainModels.tsx');
 const {TRAIN_DESIGNS}=compile('lib/world3d/train-catalogue.ts');
+const {TRAIN_CARRIAGE_SPACING}=compile('lib/world3d/world-scale.ts');
 function attach(element,parent){
  if(element==null||typeof element==='boolean')return;
  if(Array.isArray(element)){element.forEach(child=>attach(child,parent));return;}
@@ -37,7 +38,7 @@ function attach(element,parent){
 }
 
 for(const design of TRAIN_DESIGNS){const root=new THREE.Group();
- for(let car=0;car<=design.cars;car++){const group=new THREE.Group();group.position.z=-car*1.85;root.add(group);attach(TrainUnit({asset:design.key,car}),group);}
+ for(let car=0;car<=design.cars;car++){const group=new THREE.Group();group.position.z=-car*TRAIN_CARRIAGE_SPACING;root.add(group);attach(TrainUnit({asset:design.key,car}),group);}
  root.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(root),size=bounds.getSize(new THREE.Vector3());
   const centre=bounds.getCenter(new THREE.Vector3()),extent=Math.max(...size.toArray());
   const camera=new THREE.OrthographicCamera(-extent,extent,extent*.8,-extent*.8,.01,1000);

@@ -1,5 +1,6 @@
 "use client";
 
+import { WORLD_AVATAR_SCALE, WORLD_AVATAR_SCALE_OFFSET } from "@/lib/world3d/world-scale";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
@@ -258,7 +259,7 @@ export function SharedThirdPersonPlayer({
     if (cameraEnabled) {
       const cosPitch = Math.cos(pitch.current);
       const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
-      const head = new THREE.Vector3(player.position.x, player.position.y + 1.55, player.position.z);
+      const head = new THREE.Vector3(player.position.x, player.position.y + 1.55 * WORLD_AVATAR_SCALE + WORLD_AVATAR_SCALE_OFFSET, player.position.z);
       const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
       desiredCamera.y = Math.max(desiredCamera.y, cameraMinY);
       camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
@@ -284,7 +285,7 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></group>;
 }
 
 function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (active: boolean) => void }) {

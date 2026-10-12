@@ -116,9 +116,10 @@ function ProgramPage() {
   const isStatisticsRealm = realmId === "statistics";
   const isPatternRealm = realmId === "pattern";
   const isChanceRealm = realmId === "chance";
+  const starpathProgramYear = isStarpathRealm && !isExpeditionWeek ? year : null;
   const starpathProgram = useMemo(
-    () => (isStarpathRealm && !isExpeditionWeek ? getStarpathWeekProgram(year) : null),
-    [isStarpathRealm, isExpeditionWeek, year],
+    () => starpathProgramYear ? getStarpathWeekProgram(starpathProgramYear) : null,
+    [starpathProgramYear],
   );
   const weekNum = isLevel8 ? Number(sp.get("week") ?? "1") : isExpeditionWeek ? cavernWeek(sp.get("week"),cave7Realm(realmId)?realmId:"number") : Number(sp.get("week") ?? "1");
   const week = String(weekNum);

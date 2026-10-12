@@ -283,12 +283,19 @@ function LessonPage() {
   const isLevel8 = year === "Year 8" && isLevel8Realm(realmId);
   const isCave7 = isLevel8 || isNumber7 || isMeasurement7 || isSpace7 || isNewCave7;
   const [skillGuideReady, setSkillGuideReady] = useState(false);
-  const number7QuestionCompatible=useMemo(()=>isCave7?(value:unknown)=>{
-    if(!value||typeof value!=="object")return false;
-    const q=value as {lessonId?:string;version?:number;readabilityRevision?:number;kind?:string};
-    if(isLevel8) return q.lessonId===effectiveLessonId && q.version===1 && q.readabilityRevision===LEVEL8_CONTENT_REVISION && q.kind==='multiple_choice';
-    return q.readabilityRevision===(isNumber7?NUMBER7_READABILITY_REVISION:isMeasurement7?MEASUREMENT7_READABILITY_REVISION:isSpace7?SPACE7_READABILITY_REVISION:isNewCave7&&newCaveRealm?CAVE7_READABILITY_REVISION[newCaveRealm]:1)&&q.lessonId===effectiveLessonId&&q.version===(isNumber7||isSpace7?2:1)&&q.kind==='multiple_choice';
-  }:undefined,[effectiveLessonId,isLevel8,isCave7,isNumber7,isMeasurement7,isSpace7,isNewCave7,newCaveRealm]);
+  const questionRevision = isLevel8 ? LEVEL8_CONTENT_REVISION
+    : isNumber7 ? NUMBER7_READABILITY_REVISION
+    : isMeasurement7 ? MEASUREMENT7_READABILITY_REVISION
+    : isSpace7 ? SPACE7_READABILITY_REVISION
+    : isNewCave7 && newCaveRealm ? CAVE7_READABILITY_REVISION[newCaveRealm] : 1;
+  const questionVersion = !isLevel8 && (isNumber7 || isSpace7) ? 2 : 1;
+  const compatibilityLessonId = isCave7 ? effectiveLessonId : null;
+  const number7QuestionCompatible = useMemo(() => compatibilityLessonId !== null ? (value: unknown) => {
+    if (!value || typeof value !== "object") return false;
+    const q = value as { lessonId?: string; version?: number; readabilityRevision?: number; kind?: string };
+    return q.lessonId === compatibilityLessonId && q.version === questionVersion
+      && q.readabilityRevision === questionRevision && q.kind === "multiple_choice";
+  } : undefined, [compatibilityLessonId, questionVersion, questionRevision]);
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
   // Level 7 lessons return to the demo week page in review, or the student's week page when live.

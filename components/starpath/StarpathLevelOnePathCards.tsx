@@ -178,10 +178,11 @@ export function StarpathRouteBuildCard({
   const [status, setStatus] = useState<"editing" | "running" | "fail" | "done">("editing");
   const doneRef = useRef(false);
   const submittedRef = useRef(false);
+  const [submitted, setSubmitted] = useState(false);
   const cellKey = (value: Cell) => `${value.r}:${value.c}`;
   const blockedKeys = new Set((task.blocked ?? []).map(cellKey));
   const checkpointKeys = new Set((task.checkpoints ?? []).map(cellKey));
-  const attemptLocked = task.singleAttempt === true && submittedRef.current;
+  const attemptLocked = task.singleAttempt === true && submitted;
 
   function add(direction: Direction) {
     if (status === "running" || status === "done" || attemptLocked) return;
@@ -207,7 +208,11 @@ export function StarpathRouteBuildCard({
 
   function run() {
     if (status === "running" || status === "done" || attemptLocked || moves.length === 0) return;
-    if (task.singleAttempt) submittedRef.current = true;
+    if (task.singleAttempt && submittedRef.current) return;
+    if (task.singleAttempt) {
+      submittedRef.current = true;
+      setSubmitted(true);
+    }
     setStatus("running");
     let index = 0;
     let position: Cell = task.start;
