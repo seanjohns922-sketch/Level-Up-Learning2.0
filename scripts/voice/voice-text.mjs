@@ -60,7 +60,7 @@ export const speakBigNumbers = (text) => text.replace(/(?<![\d.,])\d{4,}(?![\d.]
 
 export function forVoice(normalized) {
   // The model swallows a lone opening word, so "Tip." becomes "Here's a tip."
-  const text = normalized.replace(/^Tip\. (\.\.\. )?/, "Here's a tip. ").replace(/([.?!]) \.\.\. /g, "$1 ").replace(/ \.\.\. of /g, " of ");
+  const text = normalized.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, "").replace(/^Tip\. (\.\.\. )?/, "Here's a tip. ").replace(/([.?!]) \.\.\. /g, "$1 ").replace(/ \.\.\. of /g, " of ");
   return expandUnits(speakBigNumbers(speakTimes(text.replaceAll("≈", " approximately "))))
     .replace(/\s+([,.])/g, "$1").replace(/\s+/g, " ").trim();
 }

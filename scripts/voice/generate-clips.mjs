@@ -8,7 +8,8 @@
 //   npm run voice:clips -- --realm measurement               # one realm, every level
 //   npm run voice:clips                                      # every guide
 //   npm run voice:clips -- --dry                             # count lines, generate nothing
-//   npm run voice:clips -- --prune                           # delete clips no guide uses any more
+//   npm run voice:clips -- --fixed                           # fixed app text found by voice:crawl
+//   npm run voice:clips -- --prune                           # delete clips nothing uses any more
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -26,14 +27,24 @@ const STEPS = Number(process.env.VOICE_STEPS ?? 16);
 const OUT_DIR = path.join(process.cwd(), "public/audio/voice/miranda");
 const MANIFEST = path.join(OUT_DIR, "manifest.json");
 const LINES = path.join(process.cwd(), "data/audio/voice-lines.json"); // text of each clip, for review
+const FIXED = path.join(process.cwd(), "data/audio/voice-fixed-lines.json"); // from voice:crawl, already normalised
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
-const realmFilter = opt("realm"), levelFilter = opt("level") ? Number(opt("level")) : undefined, dry = args.includes("--dry"), prune = args.includes("--prune");
+const realmFilter = opt("realm"), levelFilter = opt("level") ? Number(opt("level")) : undefined, dry = args.includes("--dry"), prune = args.includes("--prune"), fixedOnly = args.includes("--fixed");
 
 /** Every sentence the selected guides can read aloud, keyed as the app keys them. */
-function collectLines(realmFilter, levelFilter) {
+function collectLines(realmFilter, levelFilter, { guides = true, fixed = true } = {}) {
   const lines = new Map();
+  // Crawled text is already normalised; normalising twice would add extra pause marks.
+  if (fixed && !realmFilter && !levelFilter) {
+    const crawled = readJson(FIXED, {});
+    for (const text of Object.keys(crawled)) {
+      const key = voiceClipKey(text);
+      if (!lines.has(key)) lines.set(key, { normalized: text, source: `fixed ${crawled[text].paths?.[0] ?? ""}`.trim() });
+    }
+  }
+  if (!guides) return lines;
   const add = (text, source) => {
     const normalized = prepareSpeechText(text);
     if (!normalized) return;
@@ -68,11 +79,14 @@ async function generate(text, wavPath) {
 
 const readJson = (file, fallback) => { try { return JSON.parse(fs.readFileSync(file, "utf8")); } catch { return fallback; } };
 
-const lines = collectLines(realmFilter, levelFilter);
+const lines = collectLines(realmFilter, levelFilter, fixedOnly ? { guides: false } : { fixed: false });
 const manifest = readJson(MANIFEST, { version: 1, clips: {} });
 const record = readJson(LINES, {});
 // Remake a clip when the text sent to the voice has changed since it was recorded.
 const todo = [...lines].filter(([key, l]) => !manifest.clips[key] || (record[key] && record[key].spoken !== forVoice(l.normalized)));
+// Most useful first: lines without numbers (instructions, intros) before lines with
+// numbers (often questions), and shorter before longer, so a partial run covers the most.
+todo.sort(([, a], [, b]) => /\d/.test(a.normalized) - /\d/.test(b.normalized) || a.normalized.length - b.normalized.length);
 const words = todo.reduce((n, [, l]) => n + l.normalized.split(" ").length, 0);
 console.log(`${lines.size} lines selected; ${lines.size - todo.length} already recorded and current; ${todo.length} to generate (~${words} words, ~${Math.round(words / 150)} min of audio).`);
 if (prune) {

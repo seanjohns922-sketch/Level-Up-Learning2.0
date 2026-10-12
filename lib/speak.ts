@@ -1,5 +1,6 @@
 "use client";
 import { voiceClipUrl } from "@/lib/voice-clips";
+import { captureSpeech } from "@/lib/voice-capture";
 
 import { useSyncExternalStore } from "react";
 
@@ -406,6 +407,7 @@ export async function speak(
   setSpeakState({ currentText: normalized, isSpeaking: true });
   const pieces = (options?.parts?.length ? options.parts.map(normalizeText) : [normalized]).filter(Boolean);
   for (const piece of pieces) {
+    captureSpeech(piece, source);
     const url = await voiceClipUrl(piece);
     if (session !== speechSession) return;
     const played = url ? await playClip(url) : false;

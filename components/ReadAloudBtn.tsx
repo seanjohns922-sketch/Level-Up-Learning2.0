@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { Square, Volume2 } from "lucide-react";
 import { prepareSpeechText, speak, stopSpeaking, useSpeakState } from "@/lib/speak";
+import { captureSpeech } from "@/lib/voice-capture";
 
 const ReadAloudRateContext = createContext<number | undefined>(undefined);
 
@@ -45,6 +46,7 @@ export default function ReadAloudBtn({
   const { currentText, isSpeaking } = useSpeakState();
   const normalizedText = prepareSpeechText(text);
   const isCurrentSpeech = isSpeaking && currentText === normalizedText;
+  for (const piece of parts?.length ? parts : [text]) captureSpeech(prepareSpeechText(piece), kind);
 
   return (
     <button

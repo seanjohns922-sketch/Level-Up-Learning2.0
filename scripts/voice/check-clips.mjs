@@ -4,6 +4,7 @@
 //
 //   npm run voice:check -- --realm measurement --level 4
 //   npm run voice:check -- --redo        # also delete flagged clips so voice:clips remakes them
+//   npm run voice:check -- --realm fixed --sample 80   # spot-check a random sample
 import fs from "node:fs";
 import path from "node:path";
 import { expandUnits } from "./voice-text.mjs";
@@ -17,7 +18,7 @@ const THRESHOLD = 0.85;
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
-const realm = opt("realm"), level = opt("level"), redo = args.includes("--redo");
+const realm = opt("realm"), level = opt("level"), redo = args.includes("--redo"), sample = Number(opt("sample") ?? 0);
 
 const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
 const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
@@ -59,7 +60,8 @@ async function transcribe(file) {
 
 const lines = JSON.parse(fs.readFileSync(LINES, "utf8"));
 const manifest = JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
-const selected = Object.entries(lines).filter(([, l]) => (!realm || l.source.startsWith(`${realm} `)) && (!level || l.source.includes(` L${level} `)));
+let selected = Object.entries(lines).filter(([, l]) => (!realm || l.source.startsWith(`${realm} `)) && (!level || l.source.includes(` L${level} `)));
+if (sample) selected = selected.sort(() => Math.random() - 0.5).slice(0, sample);
 const results = [];
 for (const [i, [key, line]] of selected.entries()) {
   const file = path.join(OUT_DIR, manifest.clips[key] ?? "");

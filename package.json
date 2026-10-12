@@ -280,6 +280,7 @@
     "qa:level7-live-release": "node scripts/core-expedition-demo-release-test.mjs && node scripts/expedition-access-test.mjs && NEXT_PUBLIC_LEVEL7_LIVE=true node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level7-release-test.mjs && node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level7-assessment-plan-test.mjs",
     "qa:level8-curriculum": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-curriculum-test.mjs",
     "voice:check": "node --no-warnings scripts/voice/check-clips.mjs",
+    "voice:crawl": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/voice/crawl-fixed-text.mjs",
     "voice:clips": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/voice/generate-clips.mjs",
     "qa:level8-lessons": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-lessons-test.mjs",
     "qa:lesson-start-guides": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/lower-lesson-guides-test.mjs",
