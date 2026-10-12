@@ -1,9 +1,11 @@
 // Recorded narration (Miranda's cloned voice, generated offline with VoiceStudio).
 // Each clip is keyed by a hash of the exact speech text the app would otherwise
 // send to the device voice, so a recording plays only for a sentence it matches.
-// scripts/voice/generate-clips.mjs writes the manifest and audio files.
+// scripts/voice/generate-clips.mjs records them locally; upload-clips.mjs publishes them.
 
-export const VOICE_CLIP_BASE = "/audio/voice/miranda";
+// Clips live in Supabase Storage (public bucket "voice"), uploaded by scripts/voice/upload-clips.mjs.
+export const VOICE_CLIP_BASE =
+  process.env.NEXT_PUBLIC_VOICE_CLIP_BASE ?? "https://dqncplrxjxvjqbmwcyia.supabase.co/storage/v1/object/public/voice/miranda";
 const MANIFEST_URL = `${VOICE_CLIP_BASE}/manifest.json`;
 
 type Manifest = { version: number; clips: Record<string, string> };
