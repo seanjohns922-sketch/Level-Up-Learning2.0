@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {useDemoPreviewMode} from "@/lib/demo-mode";
 import {newLevel7QuizAttempt} from "@/lib/level7-quiz";
 import {markQuizComplete} from "@/lib/program-progress";
@@ -16,6 +16,7 @@ import {
   Sparkles,
   Trophy,
 } from "lucide-react";
+import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
@@ -419,7 +420,7 @@ export default function StarpathVoyageQuiz({
   }
 
   return (
-    <main className="relative isolate min-h-screen px-3 py-4 text-white sm:px-6">
+    <main data-quiz-realm={realm} style={getWeeklyQuizTheme(realm) as CSSProperties} className="relative isolate min-h-screen px-3 py-4 text-white sm:px-6 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-4 [&_button:focus-visible]:outline-[var(--quiz-ink)]">
       <div className="mx-auto w-full max-w-[1200px]">
         <RealmWeeklyQuizChrome
           realm={realm}
@@ -439,9 +440,9 @@ export default function StarpathVoyageQuiz({
         >
           {phase === "home" ? (
             <div className="mx-auto max-w-4xl">
-              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: isStatistica ? "#163a32" : isPattern ? "#102521" : isChance ? "#34172f" : "#111735" }}>
+              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: "var(--quiz-hero)" }}>
                 <div className="relative px-6 py-9 text-white sm:px-10">
-                  <div className={isStatistica ? "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(240,107,100,0.28),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(242,188,69,0.22),transparent_30%)]" : isPattern ? "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(57,217,160,0.30),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(118,89,196,0.28),transparent_30%)]" : "absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(139,92,246,0.38),transparent_34%),radial-gradient(circle_at_82%_28%,rgba(34,211,238,0.28),transparent_30%)]"} />
+                  <div className="absolute inset-0" style={{ background: "var(--quiz-halo)" }} />
                   <div className="relative">
                     <div className="font-mono text-xs font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
                       {realmTitle}
@@ -453,7 +454,7 @@ export default function StarpathVoyageQuiz({
                         speechKey={`${realm}-weekly-quiz-${quiz.level}-${quiz.week}`}
                         size="md"
                         label="Read quiz"
-                        className={isStatistica ? "border-amber-200/30 bg-emerald-950/60 text-amber-50 hover:border-amber-200 hover:text-white" : isPattern ? "border-[#39d9a0]/35 bg-[#071719]/70 text-[#d8fff1] hover:border-[#39d9a0] hover:text-white" : isChance ? "!border-[#fb7185] !bg-[#4a1f3b] !text-white shadow-[0_0_18px_rgba(251,113,133,0.22)] hover:!border-[#fda4af] hover:!bg-[#63284f] hover:!text-white" : "border-cyan-200/30 bg-indigo-950/70 text-cyan-100 hover:border-cyan-200 hover:text-white"}
+                        className="!border-white/40 !bg-black/30 !text-white hover:!bg-white/15"
                       />
                     </div>
                     <p className="mt-4 max-w-2xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
@@ -462,7 +463,7 @@ export default function StarpathVoyageQuiz({
                   </div>
                 </div>
 
-                <div className="grid gap-4 border-t border-white/10 p-5 sm:grid-cols-4 sm:p-7" style={{ background: isStatistica ? "#101d15" : isPattern ? "#091a1b" : isChance ? "#211321" : "#0b1029" }}>
+                <div className="grid gap-4 border-t border-white/10 p-5 sm:grid-cols-4 sm:p-7" style={{ background: theme.shellBg }}>
                   {[
                     { icon: BookOpen, value: "15 questions", label: `Five from each ${unitLabel}` },
                     { icon: Clock3, value: "8–10 minutes", label: "Work at your own pace" },
@@ -482,7 +483,7 @@ export default function StarpathVoyageQuiz({
                 type="button"
                 onClick={beginQuiz}
                 className="mx-auto mt-6 flex min-h-14 items-center justify-center gap-2 rounded-lg px-8 text-lg font-black text-white shadow-lg transition hover:brightness-110 active:scale-[0.98]"
-                style={{ background: isStatistica ? "linear-gradient(90deg, #a83e4b, #e85d63 58%, #f2bc45)" : isPattern ? "linear-gradient(90deg, #14785f, #28b98b 58%, #7659c4)" : isChance ? "linear-gradient(90deg, #8f3f75, #d95079 58%, #f59e0b)" : "linear-gradient(90deg, #7c3aed, #06b6d4)" }}
+                style={{ background: "var(--quiz-action)" }}
               >
                 <Sparkles className="h-5 w-5" />
                 {hasResume ? "Resume Quiz" : "Begin Quiz"}
@@ -493,17 +494,17 @@ export default function StarpathVoyageQuiz({
           {phase === "quiz" ? (
             <div className={`mx-auto ${wideLevel7Quiz ? "max-w-5xl" : "max-w-3xl"}`}>
               <div className="mb-5 flex items-center justify-between gap-3">
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#8e3341" : isPattern ? "#14785f" : isChance ? "#8f3f75" : "#5b21b6" }}>
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: "var(--quiz-ink)" }}>
                   Question {index + 1} of {total}
                 </span>
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: isStatistica ? "#13785f" : isPattern ? "#7659c4" : isChance ? "#b13f67" : "#0e7490" }}>
+                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: "var(--quiz-ink)" }}>
                   {answeredCount} answered
                 </span>
               </div>
-              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: isStatistica ? "#dcebd6" : isPattern ? "#dff5ec" : isChance ? "#efdce9" : "#ede9fe" }}>
+              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: "var(--quiz-tint)" }}>
                 <div
                   className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: isStatistica ? "linear-gradient(90deg, #20b486, #f2bc45)" : isPattern ? "linear-gradient(90deg, #39d9a0, #7659c4)" : isChance ? "linear-gradient(90deg, #8f3f75, #fb7185, #f59e0b)" : "linear-gradient(90deg, #8b5cf6, #22d3ee)" }}
+                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: "var(--quiz-action)" }}
                 />
               </div>
 
@@ -527,15 +528,15 @@ export default function StarpathVoyageQuiz({
               ) : null}
 
               {currentAnswer !== undefined ? (
-                <div className={`mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 ${isStatistica ? "border-[#79b85a]/60 bg-[#edf5e8]" : isPattern ? "border-[#39d9a0]/50 bg-[#edfbf6]" : "border-cyan-200 bg-cyan-50"}`}>
-                  <div className={`flex items-center gap-2 font-bold ${isStatistica ? "text-[#244531]" : isPattern ? "text-[#0d493b]" : "text-cyan-950"}`}>
-                    <Check className={`h-5 w-5 ${isStatistica ? "text-[#20b486]" : isPattern ? "text-[#14785f]" : "text-cyan-600"}`} />
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                  <div className="flex items-center gap-2 font-bold text-[var(--quiz-ink)]">
+                    <Check className="h-5 w-5 text-[var(--quiz-ink)]" />
                     Answer recorded. You can change it before finishing the quiz.
                   </div>
                   <button
                     type="button"
                     onClick={changeAnswer}
-                    className={`inline-flex min-h-10 items-center gap-2 rounded-lg border bg-white px-4 text-sm font-black transition ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341] hover:bg-[#fff0df]" : isPattern ? "border-[#7659c4]/45 text-[#573d9a] hover:bg-[#f4f0ff]" : "border-violet-300 text-violet-800 hover:bg-violet-50"}`}
+                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border bg-white px-4 text-sm font-black transition border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
                   >
                     <RotateCcw className="h-4 w-4" /> Change answer
                   </button>
@@ -550,7 +551,7 @@ export default function StarpathVoyageQuiz({
                     setIndex((value) => Math.max(0, value - 1));
                     setNonce((value) => value + 1);
                   }}
-                  className={`inline-flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-5 font-black disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : isPattern ? "border-[#39d9a0]/60 text-[#14785f]" : "border-violet-300 text-violet-800"}`}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-5 font-black disabled:cursor-not-allowed disabled:opacity-40 border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
                 >
                   <ArrowLeft className="h-5 w-5" /> Back
                 </button>
@@ -563,7 +564,7 @@ export default function StarpathVoyageQuiz({
                       setIndex((value) => Math.min(total - 1, value + 1));
                       setNonce((value) => value + 1);
                     }}
-                    className={`inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : isPattern ? "bg-gradient-to-r from-[#14785f] via-[#28b98b] to-[#7659c4]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
+                    className="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 bg-[image:var(--quiz-action)] hover:brightness-110"
                   >
                     Next <ArrowRight className="h-5 w-5" />
                   </button>
@@ -572,7 +573,7 @@ export default function StarpathVoyageQuiz({
                     type="button"
                     disabled={answeredCount !== total || saving}
                     onClick={finishQuiz}
-                    className={`inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : isPattern ? "bg-gradient-to-r from-[#14785f] via-[#28b98b] to-[#7659c4]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
+                    className="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 bg-[image:var(--quiz-action)] hover:brightness-110"
                   >
                     {saving ? "Saving…" : "Finish Quiz"} <Check className="h-5 w-5" />
                   </button>
@@ -583,14 +584,14 @@ export default function StarpathVoyageQuiz({
 
           {phase === "results" ? (
             <div className="mx-auto max-w-xl text-center">
-              <div className={`font-mono text-[11px] font-black uppercase tracking-[0.2em] ${isStatistica ? "text-[#a83e4b]" : isPattern ? "text-[#14785f]" : "text-violet-700"}`}>
+              <div className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[var(--quiz-ink)]">
                 {quiz.title}
               </div>
               <div
                 className={[
                   "mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg",
                   passed
-                    ? isStatistica ? "bg-gradient-to-br from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : isPattern ? "bg-gradient-to-br from-[#14785f] via-[#28b98b] to-[#7659c4]" : "bg-gradient-to-br from-violet-600 to-cyan-500"
+                    ? "bg-[image:var(--quiz-action)]"
                     : "bg-gradient-to-br from-amber-500 to-amber-700",
                 ].join(" ")}
               >
@@ -602,7 +603,7 @@ export default function StarpathVoyageQuiz({
                   text={resultsSpeech}
                   speechKey={`${realm}-weekly-quiz-results-${quiz.level}-${quiz.week}`}
                   label="Read results"
-                  className={isPattern ? "border-[#39d9a0]/45 bg-white text-[#14785f]" : isStatistica ? "border-[#f06b64]/40 bg-white text-[#8e3341]" : "border-violet-200 bg-white text-violet-800"}
+                  className="!border-[var(--quiz-border)] !bg-white !text-[var(--quiz-ink)] hover:!bg-[var(--quiz-tint)]"
                 />
               </div>
               <p className="mt-2 text-base font-semibold text-slate-600">
@@ -627,7 +628,7 @@ export default function StarpathVoyageQuiz({
                         : "border-amber-200 bg-amber-50",
                     ].join(" ")}
                   >
-                    <div className={`font-mono text-xs font-black uppercase tracking-[0.16em] ${isStatistica ? "text-[#a83e4b]" : isPattern ? "text-[#14785f]" : "text-violet-700"}`}>
+                    <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
                       {isLessonRealm ? "Lesson" : "Mission"} {result.lesson}
                     </div>
                     <div className="mt-2 text-2xl font-black text-slate-950">{result.score}/5</div>
@@ -636,8 +637,8 @@ export default function StarpathVoyageQuiz({
                 ))}
               </div>
               {wrongIndexes.length ? (
-                <div className={`mt-5 rounded-lg border-2 p-4 text-left ${isStatistica ? "border-[#79b85a]/45 bg-[#edf5e8]" : isPattern ? "border-[#39d9a0]/45 bg-[#edfbf6]" : "border-violet-200 bg-violet-50"}`}>
-                  <div className={`font-mono text-xs font-black uppercase tracking-[0.16em] ${isStatistica ? "text-[#13785f]" : isPattern ? "text-[#14785f]" : "text-violet-700"}`}>
+                <div className="mt-5 rounded-lg border-2 p-4 text-left border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                  <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
                     Where to practise
                   </div>
                   <p className="mt-2 font-bold text-slate-900">
@@ -652,7 +653,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={restart}
-                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 bg-white px-6 text-base font-black ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : isPattern ? "border-[#39d9a0]/60 text-[#14785f]" : "border-violet-300 text-violet-800"}`}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 bg-white px-6 text-base font-black border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
                   >
                     <RotateCcw className="h-5 w-5" /> Retry Quiz
                   </button>
@@ -661,7 +662,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={() => setPhase("review")}
-                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white ${isStatistica ? "bg-[#c74f4b] hover:bg-[#a93f3c]" : isPattern ? "bg-[#7659c4] hover:bg-[#6348aa]" : "bg-violet-700"}`}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white bg-[image:var(--quiz-action)] hover:brightness-110"
                   >
                     Review Answers <BookOpen className="h-5 w-5" />
                   </button>
@@ -669,7 +670,7 @@ export default function StarpathVoyageQuiz({
                 <button
                   type="button"
                   onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : backHref)}
-                  className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white shadow-lg ${isStatistica ? "bg-gradient-to-r from-[#a83e4b] via-[#e85d63] to-[#f2bc45]" : isPattern ? "bg-gradient-to-r from-[#14785f] via-[#28b98b] to-[#7659c4]" : "bg-gradient-to-r from-violet-600 to-cyan-500"}`}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white shadow-lg bg-[image:var(--quiz-action)] hover:brightness-110"
                 >
                   {passed && quiz.nextWeekHref
                     ? `Continue to Week ${quiz.week + 1}`
@@ -683,7 +684,7 @@ export default function StarpathVoyageQuiz({
           {phase === "review" ? (
             <div className="mx-auto max-w-3xl">
               <div className="text-center">
-                <div className={`font-mono text-xs font-black uppercase tracking-[0.2em] ${isStatistica ? "text-[#a83e4b]" : isPattern ? "text-[#14785f]" : "text-violet-700"}`}>
+                <div className="font-mono text-xs font-black uppercase tracking-[0.2em] text-[var(--quiz-ink)]">
                   Quiz Review
                 </div>
                 <h2 className="mt-2 text-3xl font-black text-slate-950">Questions to revisit</h2>
@@ -692,7 +693,7 @@ export default function StarpathVoyageQuiz({
                 {wrongIndexes.map((questionIndex) => {
                   const reviewTask = orderedTasks[questionIndex]!;
                   return (
-                    <div key={questionIndex} className={`rounded-lg border-2 p-4 ${isStatistica ? "border-[#f06b64]/40 bg-[#fff0df]" : "border-rose-200 bg-rose-50"}`}>
+                    <div key={questionIndex} className="rounded-lg border-2 p-4 border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-rose-700">
                           Question {questionIndex + 1}
@@ -708,7 +709,7 @@ export default function StarpathVoyageQuiz({
                           })}
                           speechKey={`${realm}-quiz-review:${quiz.level}:${quiz.week}:${questionIndex}`}
                           label="Read feedback"
-                          className={isStatistica ? "shrink-0 border-[#f06b64]/40 bg-white text-[#8e3341]" : "shrink-0 border-rose-200 bg-white text-rose-800"}
+                          className="!border-[var(--quiz-border)] !bg-white !text-[var(--quiz-ink)] hover:!bg-[var(--quiz-tint)]"
                         />
                       </div>
                       <div className="mt-2 text-lg font-black text-slate-950">{taskPrompt(reviewTask)}</div>
@@ -720,7 +721,7 @@ export default function StarpathVoyageQuiz({
                           <span className="font-black">Correct answer:</span> {correctAnswerForReview(reviewTask)}
                         </div>
                       </div>
-                      <div className={`mt-2 rounded-lg border px-3 py-2 font-semibold ${isStatistica ? "border-[#f2bc45]/50 bg-[#fffaf0] text-[#5b2e27]" : "border-rose-200 bg-white text-rose-900"}`}>
+                      <div className="mt-2 rounded-lg border px-3 py-2 font-semibold border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
                         {taskFeedback(reviewTask)?.wrong ?? "Review this question and try the quiz again."}
                       </div>
                     </div>
@@ -730,7 +731,7 @@ export default function StarpathVoyageQuiz({
               <button
                 type="button"
                 onClick={() => setPhase("results")}
-                className={`mx-auto mt-6 flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-6 font-black ${isStatistica ? "border-[#f06b64]/55 text-[#8e3341]" : isPattern ? "border-[#39d9a0]/60 text-[#14785f]" : "border-violet-300 text-violet-800"}`}
+                className="mx-auto mt-6 flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-6 font-black border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
               >
                 <ArrowLeft className="h-5 w-5" /> Back to Results
               </button>
