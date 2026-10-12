@@ -115,7 +115,7 @@ function SortScene({ task, onCorrect, onWrong }: { task: CapTask; onCorrect: () 
     }
   };
 
-  const Bin = ({ bin, title, glyph }: { bin: "mL" | "L"; title: string; glyph: string }) => (
+  const renderBin = ({ bin, title, glyph }: { bin: "mL" | "L"; title: string; glyph: string }) => (
     <button type="button" onClick={() => pick(bin)} className={`flex min-h-[130px] flex-col gap-2 rounded-[24px] border-2 p-3 text-left transition ${selected ? "border-[#b4781e] bg-[rgba(214,184,108,0.14)]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
       <div className="flex items-center gap-2"><span className="text-2xl">{glyph}</span><span className="text-sm font-black uppercase tracking-[0.12em] text-[#5b21b6]">{title}</span></div>
       <div className="flex flex-wrap gap-2">
@@ -129,8 +129,8 @@ function SortScene({ task, onCorrect, onWrong }: { task: CapTask; onCorrect: () 
   return (
     <Shell badge={task.badgeLabel ?? "Sort the Containers"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="grid grid-cols-2 gap-3">
-        <Bin bin="mL" title="Millilitres" glyph="🥤" />
-        <Bin bin="L" title="Litres" glyph="🪣" />
+        {renderBin({ bin: "mL", title: "Millilitres", glyph: "🥤" })}
+        {renderBin({ bin: "L", title: "Litres", glyph: "🪣" })}
       </div>
       <div className="rounded-[22px] border border-[rgba(214,184,108,0.45)] bg-[rgba(255,250,240,0.96)] p-3">
         <p className="mb-2 text-center text-[12px] font-bold uppercase tracking-[0.14em] text-[#a98b52]">{unplaced.length ? "Tap a container, then tap its bin" : "All sorted!"}</p>

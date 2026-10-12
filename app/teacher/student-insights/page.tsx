@@ -208,7 +208,9 @@ function StudentInsightsPageInner() {
   const studentId = searchParams.get("studentId");
   const selectedRealmId = tryCanonicalRealmId(searchParams.get("realm_id"));
   const { user, loading: authLoading } = useAuthGuard();
-  const [loading, setLoading] = useState(true);
+  const requestKey = JSON.stringify([user?.id, studentId, selectedRealmId]);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const loading = Boolean(user && studentId && selectedRealmId && loadedKey !== requestKey);
   const [student, setStudent] = useState<StudentRow | null>(null);
   const [className, setClassName] = useState<string>("");
   const [progressRows, setProgressRows] = useState<CompatProgressRow[]>([]);
@@ -218,18 +220,13 @@ function StudentInsightsPageInner() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || !studentId || !selectedRealmId) {
-      setLoading(false);
-      return;
-    }
+    if (!user || !studentId || !selectedRealmId) return;
     const activeStudentId = studentId;
     const activeRealmId = selectedRealmId;
 
     let cancelled = false;
 
     async function load() {
-      setLoading(true);
-
       const { data: studentRow } = await supabase
         .from("students")
         .select("id,display_name,class_id,school_year_level,working_level,year_level")
@@ -242,7 +239,7 @@ function StudentInsightsPageInner() {
           setClassName("");
           setProgressRows([]);
           setReflections([]);
-          setLoading(false);
+          setLoadedKey(requestKey);
         }
         return;
       }
@@ -270,7 +267,7 @@ function StudentInsightsPageInner() {
         setClassName(classRow?.name ?? "");
         setProgressRows(realmProgress);
         setReflections(nextReflections);
-        setLoading(false);
+        setLoadedKey(requestKey);
       }
     }
 
@@ -278,7 +275,7 @@ function StudentInsightsPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, selectedRealmId, studentId, user]);
+  }, [authLoading, selectedRealmId, studentId, user, requestKey]);
 
   const derived = useMemo(() => {
     if (!student || !selectedRealmId) return null;
@@ -529,7 +526,7 @@ function StudentInsightsPageInner() {
     );
   }
 
-  if (!student || !derived) {
+  if (!user || !studentId || !student || !derived) {
     return (
       <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
         <div className="text-sm font-semibold text-slate-500">Student not found.</div>

@@ -71,16 +71,14 @@ export default function RealmCarousel() {
   // pre-test, so Chance Hollow and Pattern Peaks open once they are at Level 3
   // somewhere. The school year counts too, so a new Year 3 learner with no
   // placements yet is not locked out of the realms their year can access.
+  const profileLevel = getActiveStudentProfile()?.yearLevel ?? null;
   const [reachedLevels, setReachedLevels] = useState<(string | null)[]>([]);
 
   useEffect(() => {
     if (previewMode || DEMO_MODE) return;
     const identity = getActiveStudentIdentity();
     const schoolYear = getActiveStudentProfile()?.yearLevel ?? null;
-    if (!identity.studentId) {
-      setReachedLevels([schoolYear]);
-      return;
-    }
+    if (!identity.studentId) return;
     let cancelled = false;
     void fetchStudentRealmLevels(identity.studentId)
       .then((rows) => {
@@ -162,7 +160,7 @@ export default function RealmCarousel() {
   // card says when it opens instead of sending them to a missing pre-test.
   const unlockState = previewMode || DEMO_MODE
     ? ({ unlocked: true } as const)
-    : realmUnlockState(current.id, reachedLevels);
+    : realmUnlockState(current.id, [...reachedLevels, profileLevel]);
   const isActive =
     (DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
     !blockedByFocus &&
@@ -178,7 +176,6 @@ export default function RealmCarousel() {
   const selectedLevel = LEVEL_CATALOG.some((level) => level.id === requestedLevel)
     ? requestedLevel
     : null;
-  const profileLevel = getActiveStudentProfile()?.yearLevel ?? null;
 
   // Only live curriculum realms may read scoped progress. Locked realms must
   // never borrow Number Nexus placement as their selected level.

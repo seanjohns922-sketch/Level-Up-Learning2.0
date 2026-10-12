@@ -215,7 +215,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: VolumeTask; onCorrec
   const volA = a.l * a.w * a.h, volB = b.l * b.w * b.h;
   const bigger = volA >= volB ? "a" : "b";
   const [wrong, setWrong] = useState<string | null>(null);
-  const Card = ({ id, d, label }: { id: string; d: Dims; label: string }) => (
+  const renderCard = ({ id, d, label }: { id: string; d: Dims; label: string }) => (
     <button type="button" onClick={() => (id === bigger ? onCorrect() : (setWrong(id), onWrong(), window.setTimeout(() => setWrong(null), 600)))} className={`flex flex-col items-center gap-1 rounded-[24px] border-2 p-3 transition hover:-translate-y-0.5 ${wrong === id ? "border-[#C0564E] bg-[#FCE0E0]" : "border-[rgba(214,184,108,0.55)] bg-[rgba(255,252,245,0.96)]"}`}>
       <span className="text-base font-black text-[#2c1c07]">{label}</span>
       <MeasurelandsVolumeBuilder dims={d} cubes={prismCubes(d)} size={200} />
@@ -224,7 +224,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: VolumeTask; onCorrec
   );
   return (
     <Shell badge={task.badgeLabel ?? "Which Holds More?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="grid grid-cols-2 gap-3"><Card id="a" d={a} label={task.context ?? "Box A"} /><Card id="b" d={b} label="Box B" /></div>
+      <div className="grid grid-cols-2 gap-3">{renderCard({ id: "a", d: a, label: task.context ?? "Box A" })}{renderCard({ id: "b", d: b, label: "Box B" })}</div>
     </Shell>
   );
 }

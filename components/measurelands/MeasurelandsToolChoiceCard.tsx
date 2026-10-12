@@ -24,9 +24,6 @@ const ICONS: Record<string, LucideIcon> = {
   classroom: School, car: Car, playground: Map, oval: Map, hallway: MoveHorizontal,
   court: Map, bridge: Map, tree: TreePine,
 };
-function iconFor(key: string): LucideIcon {
-  return ICONS[key] ?? Box;
-}
 
 // Relative width of each informal unit (paper clip = 1). A strip of any unit
 // tiles to the SAME total length for a given object — a block is drawn 2× a
@@ -80,7 +77,7 @@ function CubeGlyph({ className = "" }: { className?: string }) {
 }
 
 function UnitGlyph({ iconKey, imageSrc, label }: { iconKey: string; imageSrc?: string; label: string }) {
-  const Icon = iconFor(iconKey);
+  const Icon = (ICONS[iconKey] ?? Box);
   if (iconKey === "paperclips") return <PaperclipGlyph className="h-full w-full text-[#dc2626]" />;
   if (iconKey === "dominoes") return <DominoGlyph className="h-full w-full" />;
   if (iconKey === "cubes" || iconKey === "blocks") return <CubeGlyph className="h-full w-full" />;
@@ -235,7 +232,7 @@ export function MeasureGlyph({ kind, className = "" }: { kind: string; className
 
 /* A glyph tile (object or tool) — image when available, else lucide icon. */
 function Glyph({ label, iconKey, imageSrc, big = false }: { label: string; iconKey: string; imageSrc?: string; big?: boolean }) {
-  const Icon = iconFor(iconKey);
+  const Icon = (ICONS[iconKey] ?? Box);
   const size = big ? "h-24 w-24" : "h-12 w-12";
   if (iconKey.startsWith("m-")) return <MeasureGlyph kind={iconKey} className={size} />;
   if (iconKey === "paperclips") return <PaperclipGlyph className={`${size} text-[#dc2626]`} />;
@@ -351,7 +348,7 @@ function IntroScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => void
               </>
             ) : hasCustomIntroTools ? (
               <>
-                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">You don't always need measuring blocks.</p>
+                <p className="text-base font-semibold leading-relaxed text-[#2c1c07]">You don&apos;t always need measuring blocks.</p>
                 <p className="text-base font-semibold leading-relaxed text-[#5f4725]">Lots of everyday objects can be measuring units.</p>
               </>
             ) : (
@@ -550,7 +547,7 @@ function ReasonScene({ task, onCorrect, onWrong }: { task: ToolTask; onCorrect: 
 /* ── Shared: a straight horizontal object + one continuous measurement line
  * with end ticks (the "length to be measured"). ── */
 function ObjectWithLine({ object, widthPx }: { object?: ToolTask["object"]; widthPx: number }) {
-  const Icon = object ? iconFor(object.iconKey) : Box;
+  const Icon = (object ? ICONS[object.iconKey] : undefined) ?? Box;
   return (
     <div className="mx-auto flex flex-col items-center" style={{ maxWidth: "100%" }}>
       <div style={{ width: widthPx, maxWidth: "100%" }} className="flex justify-center">
@@ -646,7 +643,7 @@ function MeasureItScene({ task, onCorrect }: { task: ToolTask; onCorrect: () => 
   const [placed, setPlaced] = useState(0);
   const wonRef = useRef(false);
   const done = placed >= target;
-  const Icon = iconFor(m?.unitIconKey ?? "paperclips");
+  const Icon = (ICONS[m?.unitIconKey ?? "paperclips"] ?? Box);
   const unitLabel = m?.unitLabel ?? "units";
   function place() {
     if (done) return;

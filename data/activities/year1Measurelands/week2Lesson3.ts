@@ -53,7 +53,7 @@ function fairUnits(n: number): number[] {
 }
 // Cubes of different sizes = unfair (guaranteed at least two distinct sizes).
 function unfairUnits(n: number): number[] {
-  let units = Array.from({ length: n }, () => choose(MIXED_SIZES));
+  const units = Array.from({ length: n }, () => choose(MIXED_SIZES));
   if (units.every((s) => s === units[0])) units[0] = choose(MIXED_SIZES.filter((s) => s !== units[0]));
   return units;
 }

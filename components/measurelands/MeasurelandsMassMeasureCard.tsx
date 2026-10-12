@@ -72,6 +72,18 @@ function Shell({
   );
 }
 
+const Pan = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex w-[44%] flex-col items-center">
+      <div
+        className="flex min-h-[72px] w-full flex-wrap items-end justify-center gap-1 rounded-b-[40px] rounded-t-[12px] border-2 px-2 pb-2 pt-3"
+        style={{ borderColor: "rgba(214,184,108,0.6)", background: "rgba(255,255,255,0.94)", boxShadow: "inset 0 -6px 12px rgba(180,120,20,0.12)" }}
+      >
+        {children}
+      </div>
+      <div className="mt-1 h-5 w-px bg-[#b9914e]" />
+    </div>
+  );
+
 /* ── A live balance scale: object on the left pan, N cubes on the right ──
  * Object mass == cube count, so the beam sits level (a fair measurement). */
 function BalanceScale({
@@ -93,17 +105,7 @@ function BalanceScale({
   const objSize = compact ? 52 : 66;
   const cubeSize = compact ? 22 : 28;
   const sizes = unitSizes ?? Array.from({ length: cubes }, () => cubeSize);
-  const Pan = ({ children }: { children: React.ReactNode }) => (
-    <div className="flex w-[44%] flex-col items-center">
-      <div
-        className="flex min-h-[72px] w-full flex-wrap items-end justify-center gap-1 rounded-b-[40px] rounded-t-[12px] border-2 px-2 pb-2 pt-3"
-        style={{ borderColor: "rgba(214,184,108,0.6)", background: "rgba(255,255,255,0.94)", boxShadow: "inset 0 -6px 12px rgba(180,120,20,0.12)" }}
-      >
-        {children}
-      </div>
-      <div className="mt-1 h-5 w-px bg-[#b9914e]" />
-    </div>
-  );
+
   return (
     <div className="measurelands-balance-scale relative mx-auto max-w-[440px] rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
       {/* balance indicator: a centred, upright needle = the scale is level/balanced */}

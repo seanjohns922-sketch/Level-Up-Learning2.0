@@ -45,11 +45,9 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
   const [status, setStatus] = useState(entry.status);
   const displayStatus = previewMode && entry.decision.canExplore3D ? "ready" : status;
 
-  useEffect(() => {
-    if (previewMode && isAvailable3DLevel(requestedLevel)) {
-      setResolvedLevel(resolvePreviewLevel(requestedLevel));
-    }
-  }, [previewMode, requestedLevel]);
+  const displayLevel = previewMode && isAvailable3DLevel(requestedLevel)
+    ? resolvePreviewLevel(requestedLevel)
+    : resolvedLevel;
 
   useEffect(() => {
     if (!previewMode || isAvailable3DLevel(requestedLevel)) return;
@@ -94,5 +92,5 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
   if (!isAvailable3DLevel(requestedLevel)) return <div className="grid min-h-screen place-items-center bg-[#211728] font-semibold text-rose-100/80">Opening Chance Hollow...</div>;
   if (displayStatus === "loading") return <div className="grid min-h-screen place-items-center bg-[#211728] font-semibold text-rose-100/80">Loading saved progress...</div>;
   if (displayStatus === "disabled") return <main className="grid min-h-screen place-items-center bg-[#211728] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Chance Hollow 3D is not available</h1><p className="mt-2 text-rose-100/70">The standard Chance Hollow world is ready to use.</p><button type="button" onClick={() => router.push("/chance-hollow?level=Year%203")} className="mt-5 rounded-md bg-rose-300 px-5 py-3 font-bold text-stone-950">Open 2D World</button></div></main>;
-  return <ChanceHollowLevel3World level={resolvedLevel} />;
+  return <ChanceHollowLevel3World level={displayLevel} />;
 }
