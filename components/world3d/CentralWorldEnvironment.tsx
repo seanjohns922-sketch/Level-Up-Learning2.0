@@ -782,7 +782,7 @@ function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: s
   );
 }
 
-function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
+export function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
   const [width, depth] = parseGridSize(item);
@@ -814,10 +814,7 @@ function PlacedWorldObject({ item, placement, items, neighbours = [], preview = 
         <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
         {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
       </mesh>}
-      {assetKey === "railway_station" ? <group ref={groupRef}>
-        {/* Grid connectors must retain their exact origin and scale, including in previews. */}
-        <RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint}/>
-      </group> : RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>

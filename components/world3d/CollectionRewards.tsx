@@ -1,4 +1,5 @@
 "use client";
+import { STATION_BUILDING_SCALE, STATION_BUILDING_Z } from "@/lib/world3d/world-scale";
 import { useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { Box, Ball, Pole, Ring, Roof, Window } from "./DetailedScenery";
@@ -29,11 +30,11 @@ function Cottage({sign="BAKERY",color=cream}:{sign?:string;color?:string}){
 export function CollectionReward({assetKey,tint}:{assetKey:string;tint?:string}){
  if(assetKey==="beach_huts")return <group>{[-1,0,1].map((i)=><group key={i} position={[i*1.75,0,0]}><Box p={[0,.7,0]} s={[1.5,1.4,1.4]} c={tint??["#839d9a","#c59870","#a3aa79"][i+1]}/><Roof y={1.55} width={1.7} depth={1.7}/><Box p={[0,.58,.72]} s={[.65,1.15,.04]} c={cream}/>{[-.2,0,.2].map(x=><Box key={x} p={[x,.58,.75]} s={[.025,1.1,.015]} c="#aca58d"/>)}<Box p={[0,.06,.95]} s={[1.6,.12,.5]} c={stone}/></group>)}</group>;
  if(assetKey==="railway_station")return <group>
-  <group position={[0,0,-1]} scale={1.25}><Cottage sign="OUTBACK STATION" color={tint??cream}/>
+  <group position={[0,0,STATION_BUILDING_Z]} scale={STATION_BUILDING_SCALE}><Cottage sign="OUTBACK STATION" color={tint??cream}/>
    <group position={[0,2.5,1.05]} rotation={[Math.PI/2,0,0]}><Ring p={[0,0,0]} radius={.22} c={steel}/></group>
    <Box p={[0,2.58,1.06]} s={[.025,.15,.02]} c={steel}/><Box p={[.055,2.5,1.06]} s={[.13,.025,.02]} c={steel}/>
   </group>
-  <Box p={[0,.1,.5]} s={[10,.2,1.8]} c={stone}/>
+  <Box p={[0,.1,-.3]} s={[10,.2,3.2]} c={stone}/>
   {STATION_TRACK_CENTRES.map(x=><group key={x} position={[x,0,STATION_TRACK_Z]}><RailTrack asset="rail_straight"/></group>)}
  </group>;
  if(assetKey==="country_bakery"||assetKey==="wildlife_rescue")return <group><Cottage sign={assetKey==="country_bakery"?"COUNTRY BAKERY":"WILDLIFE RESCUE"} color={tint??cream}/>

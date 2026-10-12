@@ -1,5 +1,7 @@
 "use client";
 
+import VaultHeader from "@/components/legends/VaultHeader";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -51,7 +53,6 @@ export default function StarpathCollectionPage() {
 
   const collectedCount = allLegends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
   const totalCount = allLegends.length;
-  const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
   if (!demoResolved || !demoPreview) {
     return (
@@ -118,7 +119,7 @@ export default function StarpathCollectionPage() {
           <div className="relative min-w-0 w-full max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-7">
             <div className="flex items-center justify-between mb-7">
               <button
-                onClick={() => router.push("/legends")}
+                onClick={() => router.push(demoPreview ? "/legends?teacher_preview=1" : "/legends")}
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(188, 76%, 84%)" }}
               >
@@ -137,57 +138,16 @@ export default function StarpathCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(224, 50%, 97%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(270, 80%, 56%, 0.3)",
-              }}
-            >
-              Geospin Collection
-            </h1>
-            <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(216, 26%, 84%)" }}>
-              Collect Geospin&apos;s evolutions as you master shapes, position, transformation, and spatial reasoning.
-            </p>
-
-            <div className="mt-6 max-w-sm">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-bold" style={{ color: "hsl(210, 34%, 92%)" }}>
-                  {collectedCount} / {totalCount} collected
-                </span>
-                <span className="font-bold" style={{ color: "hsl(188, 92%, 72%)" }}>
-                  {pct}%
-                </span>
-              </div>
-              <div
-                className="h-4 rounded-full overflow-hidden"
-                style={{
-                  background: "hsla(247, 58%, 5%, 0.66)",
-                  border: "1px solid hsla(270, 64%, 58%, 0.32)",
-                  boxShadow: "inset 0 1px 4px hsla(247, 70%, 2%, 0.75)",
-                }}
-              >
-                <div
-                  className="h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: barAnimated ? `${Math.max(pct, 2)}%` : "0%",
-                    background:
-                      "linear-gradient(90deg, hsl(269, 72%, 58%), hsl(243, 78%, 66%), hsl(188, 86%, 56%))",
-                    boxShadow: "0 0 12px hsla(188, 86%, 58%, 0.4), inset 0 1px 0 hsla(0, 0%, 100%, 0.3)",
-                  }}
-                />
-              </div>
-            </div>
+            <VaultHeader realm="starpath" name="Starpath Realm" collection="Geospin Collection" description={"Discover Geospin’s evolutions through shapes, position and spatial reasoning."} collected={collectedCount} total={totalCount} animated={barAnimated} preview={demoPreview} />
           </div>
         </div>
 
         <div className="min-w-0 w-full max-w-6xl mx-auto px-3 sm:px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
-            style={{ color: "hsl(214, 26%, 76%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            style={{ color: "hsl(214, 26%, 76%)" }}
           >
-            RELIQS BINDER
+            THE COLLECTION
           </h2>
 
           <section
@@ -206,7 +166,7 @@ export default function StarpathCollectionPage() {
                   "radial-gradient(circle at 50% 0%, hsla(188, 88%, 66%, 0.12), transparent 36%), radial-gradient(circle at 20% 18%, hsla(270, 72%, 62%, 0.18), transparent 32%)",
               }}
             />
-            <div className="relative min-w-0 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="relative min-w-0 grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
               {sortedLegends.map((legend) => {
                 const isUnlocked = visibleUnlockedIds.includes(legend.id);
                 return (

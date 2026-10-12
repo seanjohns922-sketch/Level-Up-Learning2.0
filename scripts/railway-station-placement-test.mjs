@@ -10,11 +10,12 @@ import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as catalogue } from '../lib/world3d
 import { CENTRAL_WORLD_STARTER_SCENERY } from '../lib/world3d/central-world-editor-catalog.ts';
 import {parseGridSize,validateCentralWorldPlacement,writeCentralWorldPlacements,readCentralWorldPlacements} from '../lib/world3d/central-world-layout.ts';
 const require = createRequire(import.meta.url);
+const worldScale=await import('../lib/world3d/world-scale.ts');
 function compile(relativePath, dependencies = {}) {
  const filename=path.resolve(relativePath);
  const output=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2020}}).outputText;
  const loaded=new Module(filename);
- loaded.require=(name)=>dependencies[name]??require(name);
+ loaded.require=(name)=>dependencies[name]??(name==='@/lib/world3d/world-scale'?worldScale:require(name));
  loaded._compile(output,filename);
  return loaded.exports;
 }
@@ -45,6 +46,9 @@ assert.deepEqual(parseGridSize(item),[5,3],'Reserved land matches station connec
 const model=new THREE.Group();attach(CollectionReward({assetKey:'railway_station'}),model);model.updateMatrixWorld(true);
 const bounds=new THREE.Box3().setFromObject(model,true);
 assert.ok(bounds.min.x>=-5.03&&bounds.max.x<=5.03&&bounds.min.z>=-3&&bounds.max.z<=3,'Actual station fits reserved land');
+assert.ok(bounds.max.y>4.9&&bounds.max.y<5.3,'Station roof is building-sized');
+assert.ok(worldScale.STATION_DOOR_CLEARANCE>worldScale.WORLD_AVATAR_REFERENCE_HEIGHT+.35,'Station doorway clears the avatar');
+assert.ok(worldScale.TRAIN_RAIL_HALF_GAUGE>.5,'Track gauge matches the enlarged vehicles');
 // The five rendered groups use the exact same positions and RailTrack geometry as routing.
 const element=CollectionReward({assetKey:'railway_station'});
 const trackGroups=element.props.children.flat().filter(e=>e?.props?.children?.type===tracks.RailTrack);
@@ -93,7 +97,8 @@ for(const entry of trainCatalogue.TRAIN_CATALOGUE){
  for(let car=0;car<=design.cars;car++){
   const root=new THREE.Group();attach(TrainUnit({asset:entry.item_key,car}),root);root.updateMatrixWorld(true);
   const box=new THREE.Box3().setFromObject(root),size=box.getSize(new THREE.Vector3());
-  assert.ok(size.x<1.2&&size.z<1.85&&size.y<1.7,'Train units stay within safe rail dimensions');
+  assert.ok(size.x<1.9&&size.z<3.3&&size.y<2.8,'Enlarged units remain inside the railway envelope');
+  if(car===0)assert.ok(size.y>worldScale.WORLD_AVATAR_REFERENCE_HEIGHT,'Engine is taller than the reference avatar');
   const geometry=[];root.traverse(o=>{if(o.isMesh)geometry.push([o.geometry.type,o.geometry.attributes.position.count,...o.matrixWorld.elements]);});
   if(car===0)geometrySignatures.add(JSON.stringify(geometry));
  }

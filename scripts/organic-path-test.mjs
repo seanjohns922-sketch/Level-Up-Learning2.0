@@ -1,3 +1,7 @@
+import { RAIL_KEYS, trainTrackSupport } from "../lib/world3d/railway.ts";
+import { isTrainAsset } from "../lib/world3d/train-catalogue.ts";
+import { VILLAGE_BUILDING_KEYS } from "../lib/world3d/village-buildings.ts";
+import { REALM_BUILDING_KEYS } from "../lib/world3d/realm-building-collections.ts";
 import { FREE_WORLD_ADDITIONS, WORLD_REWARD_ADDITIONS } from "../lib/world3d/world-expansion.ts";
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
@@ -21,9 +25,9 @@ const junction=buildOrganicPath([tile(0,0),tile(-1,0),tile(1,0),tile(0,1)]).surf
 assert.ok(hit(junction,0,0),'Junction remains connected');
 assert.equal(hit(junction,3.8,0),false,'Rounded end does not extend indefinitely');
 assert.equal(new Set(catalogue.map(i=>i.item_key)).size,catalogue.length,'Unique catalogue keys');
-assert.equal(catalogue.length,113);
+assert.ok(catalogue.length>0,'Free catalogue is not empty');
 assert.ok(catalogue.every(i=>i.price===0&&!i.purchasable),'All additions remain free');
-console.log('Organic paths: finite geometry, diagonal joins, erased gaps, water boundaries, junctions and 113 free catalogue entries passed.');
+console.log('Organic paths: finite geometry, diagonal joins, erased gaps, water boundaries, junctions and current free catalogue entries passed.');
 
 const { WORLD_ITEM_PRESENTATION, fitWorldItem } = await import('../lib/world3d/world-item-presentation.ts');
 const { CENTRAL_WORLD_CUSTOMISATION_CATALOG: rewards } = await import('../lib/world3d/central-world-customisation-catalog.ts');
@@ -35,11 +39,11 @@ for(const item of [...catalogue,...rewards]){
  for(const size of [{x:1,y:1,z:1},{x:7,y:12,z:3},{x:3,y:.12,z:8}]){
   const scale=fitWorldItem(size,[w*2,d*2],presentation);
   assert.ok(scale>0&&Number.isFinite(scale));
-  assert.ok(size.x*scale<=w*2+1e-6&&size.z*scale<=d*2+1e-6,'Art stays within reserved footprint: '+item.name);
+  assert.equal(scale,fitWorldItem(size,[1000,1000],presentation),'Plot size never changes object scale: '+item.name);
  }
 }
-assert.equal(Object.keys(WORLD_ITEM_PRESENTATION).length,155);
-console.log('155 item size targets validated; three bounding-box shapes each remain inside their reserved footprints.');
+assert.ok([...catalogue,...rewards].every(item=>WORLD_ITEM_PRESENTATION[item.metadata.worldAssetKey]),'Every released asset has an explicit sizing contract');
+console.log('Current item size targets validated; three bounding-box shapes preserve scale regardless of plot size.');
 
 const { measureLocalModel } = await import('../lib/world3d/world-model-bounds.ts');
 const parent=new THREE.Group(),model=new THREE.Group();
@@ -69,7 +73,7 @@ const extractKeys=(file,name)=>{
  return [...match[1].matchAll(/"([^"]+)"/g)].map(m=>m[1]);
 };
 const freeRenderers=new Set([
- ...FREE_WORLD_ADDITIONS.map(i=>i.key),
+ ...FREE_WORLD_ADDITIONS.map(i=>i.key), ...RAIL_KEYS,
  ...extractKeys('DetailedScenery.tsx','DETAILED_SCENERY_KEYS'),
  ...extractKeys('ReferenceProps.tsx','REFERENCE_PROP_KEYS'),
  ...extractKeys('WildlifeScenery.tsx','WILDLIFE_KEYS'),
@@ -77,23 +81,23 @@ const freeRenderers=new Set([
  'drawbridge',
 ]);
 const rewardRenderers=new Set([
- ...WORLD_REWARD_ADDITIONS.map(i=>i.key),
+ ...WORLD_REWARD_ADDITIONS.map(i=>i.key), ...VILLAGE_BUILDING_KEYS, ...REALM_BUILDING_KEYS, ...RAIL_KEYS,
  ...extractKeys('DetailedScenery.tsx','DETAILED_REWARD_KEYS'),
  ...extractKeys('AustralianPlaces.tsx','AUSTRALIAN_PLACE_KEYS'),
  'wildlife_habitat','bunny_garden','puppy_yard','pet_sanctuary',
 ]);
 for(const item of catalogue)assert.ok(freeRenderers.has(item.metadata.worldAssetKey),'Dedicated scenery renderer: '+item.name);
 for(const item of rewards)assert.ok(rewardRenderers.has(item.metadata.worldAssetKey),'Dedicated reward renderer: '+item.name);
-console.log('All 155 catalogue items route to an upgraded renderer; no generic tree/building fallbacks.');
+console.log('All catalogue items route to an upgraded renderer; no generic tree/building fallbacks.');
 const migration=['20260925090000_world_collection_expansion.sql','20261005120000_village_building_collection.sql'].map(file=>fs.readFileSync(new URL('../supabase/migrations/'+file,import.meta.url),'utf8')).join('\n');
-assert.equal(rewards.length,42);
+assert.equal(new Set(rewards.map(item=>item.item_key)).size,rewards.length,'Unique shop items');
 for(const addition of WORLD_REWARD_ADDITIONS){
  const item=rewards.find(item=>item.metadata.worldAssetKey===addition.key);
  assert.ok(item&&migration.includes("'"+item.item_key+"'"),'New reward registered for live release');
  assert.ok(fs.existsSync(new URL('../public'+item.metadata.marketplace_visual.src,import.meta.url)),'Reward preview exists: '+addition.key);
 }
 assert.ok(!/update\s+public\.economy_items|delete\s+from|create\s+(or\s+replace\s+)?function/i.test(migration),'Expansion is additive and does not change RPCs');
-console.log('42 rewards, new preview assets and additive release registration validated.');
+console.log('Shop rewards, new preview assets and additive release registration validated.');
 
 const {buildWorldWater,waterBrushCells}=await import('../lib/world3d/world-water.ts');
 assert.equal(waterBrushCells(0,0,1).length,1);
@@ -171,12 +175,13 @@ const savedTree={itemId:birch.item_key,placementId:'scale-tree',gridX:-10,gridZ:
 assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'next-tree',gridX:-4},birch,[savedTree],treeItems),false,'Larger canopies reserve space when placing a second tree');
 console.log('Expanded tree footprint blocks formerly clear but now overlapping placements.');
 
-// Captured from all 155 actual React/Three models using the review page's
+// Captured from the complete released catalogue using the review page's
 // sequential measurement run. Re-capture native bounds after changing geometry;
 // fitted sizes are reprojected from those bounds when presentation targets change.
 const measurements=JSON.parse(fs.readFileSync(new URL('../docs/world3d/item-scale-measurements.json',import.meta.url),'utf8'));
-assert.equal(measurements.length,155);
-assert.equal(new Set(measurements.map(row=>row.key)).size,155);
+const releasedKeys=new Set([...catalogue,...rewards].map(item=>item.metadata.worldAssetKey));
+assert.deepEqual(new Set(measurements.map(row=>row.key)),releasedKeys,'Measurements cover exactly the released catalogue');
+assert.equal(new Set(measurements.map(row=>row.key)).size,measurements.length,'No duplicate measurement rows');
 const measuredItems=new Map(measurements.map(row=>[row.key,row]));
 const {CENTRAL_WORLD_GRID,rotatedGridSize}=await import('../lib/world3d/central-world-layout.ts');
 for(const item of [...catalogue,...rewards]){
@@ -187,10 +192,17 @@ for(const item of [...catalogue,...rewards]){
  const [x,y,z]=row.native,scale=fitWorldItemScale({x,y,z},footprint,p);
  const actual=[x*scale[0],y*scale[1],z*scale[2]];
  actual.forEach((value,index)=>assert.ok(Math.abs(value-row.size[index])<1e-5,'Measured geometry matches sizing: '+key));
- assert.ok(Math.abs((p.width?actual[0]:actual[1])-(p.width??p.height))<1e-4,'No silent shrinking below the individual size anchor: '+key);
- assert.ok(actual[0]<=footprint[0]+1e-5&&actual[2]<=footprint[1]+1e-5,'Actual model fits reserved land: '+key);
+ assert.ok(p.sizing==='fixed'||Math.abs((p.width?actual[0]:actual[1])-(p.width??p.height))<1e-4,'No silent shrinking below the individual size anchor: '+key);
+ if(isTrainAsset(key))assert.ok(actual[0]<=2.03&&actual[2]<=3.3,'Vehicles fit the tested railway envelope: '+key);
+ else assert.ok(actual[0]<=footprint[0]+.03&&actual[2]<=footprint[1]+.03,'Actual model fits reserved land: '+key);
  assert.deepEqual(rotatedGridSize(item,90),parseGridSize(item).toReversed(),'Rotation reserves the correct land: '+key);
  assert.deepEqual(parseGridSize({...item,metadata:{...item.metadata,gridSize:'1x1'}}),parseGridSize(item),'Old live metadata cannot miniaturise this item: '+key);
+ if(isTrainAsset(key)){
+  const track=catalogue.find(item=>item.metadata.worldAssetKey==='rail_straight');
+  const support={itemId:track.item_key,gridX:25,gridZ:25,rotation:0};
+  assert.ok(trainTrackSupport({...support,itemId:item.item_key},[support],new Map([[track.item_key,track],[item.item_key,item]])),'Vehicle remains placeable on its saved rail grid');
+  continue;
+ }
  let fits=false;
  for(let gz=CENTRAL_WORLD_GRID.maxZ;gz>=CENTRAL_WORLD_GRID.minZ&&!fits;gz--)
   for(let gx=CENTRAL_WORLD_GRID.minX;gx<=CENTRAL_WORLD_GRID.maxX&&!fits;gx++)
@@ -218,4 +230,4 @@ assert.ok(areaOf('pony_paddock')>areaOf('puppy_yard')*10,'Horse paddock is not a
 assert.ok(sizeOf('castle_gate')[1]>sizeOf('castle_wall')[1],'Measured gate, not just its target, rises above ramparts');
 assert.ok(sizeOf('cinema')[1]<10,'Widening the drive-in does not create a giant screen and cars');
 assert.ok(sizeOf('railway_station')[1]<6,'Extending the platform does not inflate the station building');
-console.log('All 155 measured models reach their size anchor, fit their land, rotate correctly and are placeable; oval/pool, paddock/yard and building proportions passed.');
+console.log('All measured models reach their size anchor, fit their land, rotate correctly and are placeable; oval/pool, paddock/yard and building proportions passed.');

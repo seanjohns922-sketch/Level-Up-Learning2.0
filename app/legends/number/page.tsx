@@ -1,12 +1,14 @@
 "use client";
 
+import VaultHeader from "@/components/legends/VaultHeader";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { readProgress, type StudentProgress } from "@/data/progress";
 import { getAllLegends, getEffectiveUnlockedLegendIds, type Legend } from "@/data/legends";
 import { YEAR_ORDER } from "@/data/yearOrder";
-import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
 import BinderCard from "@/components/legends/BinderCard";
 import LegendDetailModal from "@/components/legends/LegendDetailModal";
 
@@ -15,7 +17,7 @@ export default function NumbotCollectionPage() {
   const [progress, setProgress] = useState<StudentProgress | null>(null);
   const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null);
   const [barAnimated, setBarAnimated] = useState(false);
-  const demoPreview = isDemoPreviewMode();
+  const demoPreview = useDemoPreviewMode();
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -45,7 +47,6 @@ export default function NumbotCollectionPage() {
 
   const collectedCount = allLegends.filter((legend) => visibleUnlockedIds.includes(legend.id)).length;
   const totalCount = allLegends.length;
-  const pct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
   return (
     <main
@@ -165,7 +166,7 @@ export default function NumbotCollectionPage() {
           <div className="relative max-w-6xl mx-auto px-6 pt-6 pb-7">
             <div className="flex items-center justify-between mb-7">
               <button
-                onClick={() => router.push("/legends")}
+                onClick={() => router.push(demoPreview ? "/legends?teacher_preview=1" : "/legends")}
                 className="text-sm font-bold transition flex items-center gap-1"
                 style={{ color: "hsl(160, 62%, 72%)" }}
               >
@@ -184,48 +185,7 @@ export default function NumbotCollectionPage() {
               </div>
             </div>
 
-            <h1
-              className="text-4xl md:text-6xl font-black tracking-normal"
-              style={{
-                color: "hsl(160, 38%, 92%)",
-                fontFamily: "'Quicksand', 'Inter', system-ui, sans-serif",
-                textShadow: "0 2px 18px hsla(160, 55%, 45%, 0.12)",
-              }}
-            >
-              Numbot Collection
-            </h1>
-            <p className="mt-2 text-base md:text-lg max-w-xl" style={{ color: "hsl(166, 18%, 76%)" }}>
-              Collect powerful Numbots by mastering your number skills.
-            </p>
-
-            {/* Premium progress bar */}
-            <div className="mt-6 max-w-sm">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="font-bold" style={{ color: "hsl(160, 30%, 86%)" }}>
-                  {collectedCount} / {totalCount} collected
-                </span>
-                <span className="font-bold" style={{ color: "hsl(160, 58%, 66%)" }}>
-                  {pct}%
-                </span>
-              </div>
-              <div
-                className="h-4 rounded-full overflow-hidden"
-                style={{
-                  background: "hsla(166, 42%, 4%, 0.6)",
-                  border: "1px solid hsla(160, 38%, 42%, 0.28)",
-                  boxShadow: "inset 0 1px 4px hsla(170, 60%, 2%, 0.7)",
-                }}
-              >
-                <div
-                  className="h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: barAnimated ? `${Math.max(pct, 2)}%` : "0%",
-                    background: "linear-gradient(90deg, hsl(160, 60%, 42%), hsl(155, 55%, 48%), hsl(150, 60%, 45%))",
-                    boxShadow: "0 0 12px hsla(160, 60%, 45%, 0.4), inset 0 1px 0 hsla(0, 0%, 100%, 0.3)",
-                  }}
-                />
-              </div>
-            </div>
+            <VaultHeader realm="number-nexus" name="Number Nexus" collection="Numbot Collection" description={"Collect powerful Numbots by mastering your number skills."} collected={collectedCount} total={totalCount} animated={barAnimated} preview={demoPreview} />
           </div>
         </div>
 
@@ -233,9 +193,9 @@ export default function NumbotCollectionPage() {
         <div className="max-w-6xl mx-auto px-6 pb-12 pt-3">
           <h2
             className="text-xs font-extrabold tracking-[0.22em] mb-5"
-            style={{ color: "hsl(160, 24%, 66%)", fontFamily: "'Orbitron', 'Rajdhani', 'Exo 2', sans-serif" }}
+            style={{ color: "hsl(160, 24%, 66%)" }}
           >
-            RELIQS BINDER
+            THE COLLECTION
           </h2>
 
           <section
@@ -254,7 +214,7 @@ export default function NumbotCollectionPage() {
                   "radial-gradient(circle at 50% 0%, hsla(160, 58%, 48%, 0.12), transparent 42%), linear-gradient(90deg, hsla(160, 55%, 45%, 0.08), transparent 18%, transparent 82%, hsla(160, 55%, 45%, 0.08))",
               }}
             />
-            <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="relative grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
               {sortedLegends.map((legend) => {
                 const isUnlocked = visibleUnlockedIds.includes(legend.id);
                 return (

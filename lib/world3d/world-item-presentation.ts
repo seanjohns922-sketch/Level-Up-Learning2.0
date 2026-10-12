@@ -1,15 +1,18 @@
 import { REALM_DESIGN_PRESENTATIONS } from "./realm-building-collections";
-import { isTrainAsset } from "./train-catalogue";
+import { TRAIN_DESIGNS } from "./train-catalogue";
 import { VILLAGE_INFRASTRUCTURE } from "./village-infrastructure";
 import { VILLAGE_BUILDINGS } from "./village-buildings";
+import { STATION_ROOF_HEIGHT } from "./world-scale";
 import type { EconomyItem } from "@/lib/economy";
 
-/** World metres. The avatar is 2.2 m tall. Every item has its own land reservation.
+/** World metres. The reference avatar is 1.98 m tall. Every item has its own land reservation.
  * Sites use width as their sizing anchor; props and trees use height. Width-led
  * models retain proportions unless explicitly constructed as a height-adjustable
  * connector/ground feature. Landmarks and sporting venues use compressed game scale. */
 export type ItemPresentation = {
   height: number;
+  /** Authored directly in world units; preserve connector origins and dimensions. */
+  sizing?: "fixed";
   width?: number;
   footprint?: [number, number];
   resizeHeight?: boolean;
@@ -23,9 +26,13 @@ export const CASTLE_WALL_HEIGHT = 7.436;
 export const CASTLE_WALL_NATIVE_HEIGHT = 26;
 export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   ...REALM_DESIGN_PRESENTATIONS,
+  rail_straight: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
+  rail_corner: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
+  rail_train: {height:2.25, footprint:[2,2], sizing:"fixed", theme:"garden"},
+  ...Object.fromEntries(TRAIN_DESIGNS.map(item=>[item.key,{height:2.7,footprint:[2,2] as [number,number],sizing:"fixed" as const,theme:"garden" as const}])),
   ...Object.fromEntries(VILLAGE_INFRASTRUCTURE.map(item=>[item.key,{height:item.height,width:"width" in item?item.width:undefined,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}])),
   ...Object.fromEntries(VILLAGE_BUILDINGS.map(item=>[item.key,{height:item.height,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
-  // Small free props: target sizes relative to the 2.2 m avatar.
+  // Small free props: target sizes relative to the reference avatar.
   fruit_tree: {height:5.5, footprint:[6,6], theme:"garden"},
   flower_pots: {height:0.85, footprint:[2,2], theme:"garden"},
   mushroom_cluster: {height:0.7, footprint:[2,2], theme:"garden"},
@@ -103,15 +110,15 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   drawbridge: {height:2.5025, footprint:[6,6], theme:"fortress"},
   torch: {height:1.0725, footprint:[2,2], theme:"fortress"},
   chest: {height:0.429, footprint:[4,2], theme:"fortress"},
-  well: {height:1.25125, footprint:[4,4], theme:"fortress"},
-  stone_wall: {height:0.6435, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
-  wood_gate: {height:0.572, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  well: {height:2.5, footprint:[4,4], theme:"fortress"},
+  stone_wall: {height:1.3, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
+  wood_gate: {height:1.5, footprint:[2,2], width:2, resizeHeight:true, theme:"fortress"},
   fern: {height:1.8, footprint:[4,4], theme:"garden"},
   native_grass: {height:1, footprint:[2,2], theme:"garden"},
   reeds: {height:1.8, footprint:[4,4], theme:"garden"},
   bottlebrush: {height:4, footprint:[6,6], theme:"garden"},
   terracotta_pot: {height:1.1, footprint:[2,2], theme:"garden"},
-  climbing_trellis: {height:1.0725, footprint:[4,4], theme:"fortress"},
+  climbing_trellis: {height:2.4, footprint:[4,4], theme:"fortress"},
   driftwood: {height:.8, footprint:[6,4], width:4, resizeHeight:true, theme:"garden"},
   pebble_border: {height:.22, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
   boardwalk: {height:.3, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
@@ -129,9 +136,9 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   picnic_basket: {height:.6, footprint:[2,2], theme:"garden"},
   buoy: {height:1.2, footprint:[2,2], theme:"garden"},
   stone_planter: {height:0.5005, footprint:[2,2], theme:"fortress"},
-  stone_bench: {height:0.46475, footprint:[4,2], theme:"fortress"},
+  stone_bench: {height:0.65, footprint:[4,2], theme:"fortress"},
   arched_window: {height:1.43, footprint:[4,2], theme:"fortress"},
-  sundial: {height:0.6435, footprint:[2,2], theme:"fortress"},
+  sundial: {height:1.1, footprint:[2,2], theme:"fortress"},
   clubhouse: {height:7, footprint:[12,12], theme:"australian_reward"},
   games_room: {height:4, footprint:[8,8], theme:"australian_reward"},
   treehouse: {height:14, footprint:[18,18], theme:"australian_reward"},
@@ -157,7 +164,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   harbour_bridge: {height:20, footprint:[46,16], width:44, theme:"australian_reward"},
   lighthouse: {height:24, footprint:[18,12], theme:"australian_reward"},
   beach_huts: {height:3.5, footprint:[12,6], theme:"australian_reward"},
-  railway_station: {height:4.3, footprint:[10,6], width:10, theme:"australian_reward"},
+  railway_station: {height:STATION_ROOF_HEIGHT, footprint:[10,6], sizing:"fixed", theme:"australian_reward"},
   country_bakery: {height:4.5, footprint:[8,8], theme:"australian_reward"},
   platypus_creek: {height:2, footprint:[14,10], width:12, theme:"australian_reward"},
   wombat_burrows: {height:1.5, footprint:[8,6], width:6, theme:"australian_reward"},
@@ -167,15 +174,14 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   bush_camp: {height:2.8, footprint:[8,8], theme:"australian_reward"},
 };
 export function getItemPresentation(item: EconomyItem): ItemPresentation {
-  if (isTrainAsset(item.metadata.worldAssetKey)) return {height:1.5,footprint:[2,2],theme:"garden"};
   return WORLD_ITEM_PRESENTATION[String(item.metadata.worldAssetKey)] ?? {height:3, theme:"garden"};
 }
 
-/** Uniform scaling respects both the item's anchor and its reserved land. */
-export function fitWorldItem(size:{x:number;y:number;z:number}, footprint:[number,number], presentation:ItemPresentation){
- const target=presentation.width?presentation.width/Math.max(size.x,.001):(presentation.horizontalHeight??presentation.height)/Math.max(size.y,.001);
- const margin=presentation.width===2?0:.12;
- return Math.max(.001,Math.min(target,(footprint[0]-margin)/Math.max(size.x,.001),(footprint[1]-margin)/Math.max(size.z,.001)));
+/** Size is independent of land reservation. A too-small plot is a catalogue error,
+ * never a reason to miniaturise a building, animal or vehicle. */
+export function fitWorldItem(size:{x:number;y:number;z:number}, _footprint:[number,number], presentation:ItemPresentation){
+ if(presentation.sizing === "fixed") return 1;
+ return presentation.width ? presentation.width/Math.max(size.x,.001) : (presentation.horizontalHeight??presentation.height)/Math.max(size.y,.001);
 }
 export function fitWorldItemScale(size:{x:number;y:number;z:number},footprint:[number,number],presentation:ItemPresentation):[number,number,number]{
  const uniform=fitWorldItem(size,footprint,presentation);

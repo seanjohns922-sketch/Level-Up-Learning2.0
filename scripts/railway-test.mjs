@@ -1,6 +1,6 @@
-import fs from 'node:fs';import ts from 'typescript';import assert from 'node:assert/strict';
-const catalogue={};new Function('exports',ts.transpileModule(fs.readFileSync('lib/world3d/train-catalogue.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(catalogue);
-const exports={};new Function('exports','require',ts.transpileModule(fs.readFileSync('lib/world3d/railway.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(exports,()=>catalogue);
+import assert from 'node:assert/strict';
+import * as catalogue from '../lib/world3d/train-catalogue.ts';
+import * as exports from '../lib/world3d/railway.ts';
 const {railwayRoute,routePosition,segmentLength,stationStopDistances}=exports;
 const items=new Map(['rail_corner','rail_straight','rail_train','railway_station'].map(asset=>[asset,{metadata:{worldAssetKey:asset,gridSize:asset==='railway_station'?'5x3':'1x1'}}]));
 const p=(x,z,rotation,itemId)=>({gridX:x,gridZ:z,rotation,itemId,placementId:`${x}:${z}`});
