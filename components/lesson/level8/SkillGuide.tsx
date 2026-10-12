@@ -3,7 +3,8 @@ import { useEffect, useRef } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import Cave7Visual from "@/components/lesson/cave7/Cave7Visual";
 import Year8MeasurementAssessmentVisual from "@/components/assessment/Year8MeasurementAssessmentVisual";
-import { level8Question } from "@/data/activities/level8/questions";
+import { level8TeachingGuide } from "@/data/activities/level8/teaching";
+import { MathFormattedText } from "@/components/FractionText";
 import { LEVEL8_CURRICULUM } from "@/data/activities/level8/curriculum";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import type { Level8Realm } from "@/lib/level8-config";
@@ -12,6 +13,7 @@ import NumberVisual from "./NumberVisual";
 import AlgebraVisual from "./AlgebraVisual";
 import ChanceVisual from "./ChanceVisual";
 import Investigation from "./Investigation";
+import SkillGuideChoices from "../SkillGuideChoices";
 export default function SkillGuide({
   realm,
   week,
@@ -24,8 +26,14 @@ export default function SkillGuide({
   onContinue: () => void;
 }) {
   const plan = LEVEL8_CURRICULUM[realm][week - 1].lessons[lesson - 1];
-  const q = level8Question(realm, week, lesson, 7007),
+  const teaching = level8TeachingGuide(realm, week, lesson);
+  const q = teaching.example,
     theme = getRealmTheme(realm);
+  const hasVisual = Boolean(q.cave7Visual || q.measurement8Visual || q.space8Visual || q.number8Visual || q.algebra8Visual || q.chance8Visual);
+  const unit = q.answerSpec?.unit;
+  const isClock = q.answerSpec?.kind === 'list' && q.answerSpec.labels?.[0] === 'Hours (24-hour time)';
+  const answer = isClock ? q.answer.split(',').map(part => part.trim().padStart(2, '0')).join(':')
+    : unit === '$' ? `$${q.answer}` : `${q.answer}${unit ? ` ${unit}` : ''}`;
   return (
     <section
       className="rounded-2xl border bg-[#fffdf8] p-5 text-slate-900 sm:p-7"
@@ -38,12 +46,18 @@ export default function SkillGuide({
         <h2 className="text-2xl font-bold">{plan.title}</h2>
         <ReadAloudBtn text={plan.title} />
       </div>
-      <div className="mt-5 grid items-start gap-6 lg:grid-cols-2">
+      <div className="mt-4 flex items-start justify-between gap-3 rounded-xl p-4" style={{background: theme.surfaceTint}}>
+        <div><h3 className="font-bold">The key idea</h3><p className="mt-2 leading-relaxed"><MathFormattedText text={teaching.idea} /></p></div>
+        <ReadAloudBtn text={`The key idea. ${teaching.idea}`} />
+      </div>
+      <div className={`mt-5 grid items-start gap-6 ${hasVisual ? "lg:grid-cols-2" : ""}`}>
         <div>
+          <h3 className="mb-2 text-sm font-bold uppercase tracking-wide">Worked example</h3>
           <div className="flex justify-between gap-3">
-            <p className="text-xl font-semibold">{q.prompt}</p>
+            <p className="text-xl font-semibold"><MathFormattedText text={q.prompt} /></p>
             <ReadAloudBtn text={q.prompt} />
           </div>
+          <SkillGuideChoices options={q.options} />
           <div className="mt-4">
             {q.cave7Visual && (
               <Cave7Visual realm={realm} visual={q.cave7Visual} />
@@ -63,11 +77,11 @@ export default function SkillGuide({
         >
           <div className="flex justify-between">
             <h3 className="font-bold">How to solve it</h3>
-            <ReadAloudBtn text={q.steps.join(" ")} />
+            <ReadAloudBtn text={teaching.steps.map((step, i) => `Step ${i + 1}. ${step}`).join(" ")} />
           </div>
           <ol className="mt-3 list-decimal space-y-3 pl-6">
-            {q.steps.map((step, i) => (
-              <li key={i}>{step}</li>
+            {teaching.steps.map((step, i) => (
+              <li key={i}><MathFormattedText text={step} /></li>
             ))}
           </ol>
           <div
@@ -75,14 +89,17 @@ export default function SkillGuide({
             style={{ background: theme.surfaceTint }}
           >
             <p>
-              Answer: {q.answer}
-              {q.answerSpec?.unit ? ` ${q.answerSpec.unit}` : ""}
+              Answer: <MathFormattedText text={answer} />
             </p>
             <ReadAloudBtn
-              text={`Answer: ${q.answer} ${q.answerSpec?.unit ?? ""}`}
+              text={`Answer: ${answer}`}
             />
           </div>
         </div>
+      </div>
+      <div className="mt-5 flex items-start justify-between gap-3 rounded-xl border p-4" style={{borderColor: theme.ctaFrom}}>
+        <div><h3 className="font-bold">Check and use it again</h3><p className="mt-2 leading-relaxed"><MathFormattedText text={teaching.check} /></p></div>
+        <ReadAloudBtn text={`Check and use it again. ${teaching.check}`} />
       </div>
       <Investigation realm={realm} week={week} />
       <div className="mt-6 text-center">

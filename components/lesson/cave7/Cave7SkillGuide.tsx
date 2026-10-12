@@ -1,4 +1,5 @@
 'use client';
+import {level7WorkedSteps} from '@/data/activities/teaching/level7-working';
 import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {cave7Guide,type NewCave7Realm} from '@/data/activities/cave7/curriculum';
@@ -8,19 +9,20 @@ import {level7Answer} from '@/lib/level7-answer';
 import {solutionSteps} from '@/lib/level7-guide-steps';
 import type {Cave7Question} from '@/data/activities/cave7/shared';
 import Cave7Visual from './Cave7Visual';
+import SkillGuideChoices from '../SkillGuideChoices';
 import Cave7LearningLab from './Cave7LearningLab';
 export default function Cave7SkillGuide({realm,week,lesson,onContinue,review=false}:{realm:NewCave7Realm;week:number;lesson:number;onContinue:()=>void;review?:boolean}){
  const guide=cave7Guide(realm,week,lesson);if(!guide)return null;
  const t=getRealmTheme(realm),example=CAVE7_GENERATORS[realm](week,lesson,7007),further=CAVE7_GENERATORS[realm](week,lesson,11027,'apply_create');
- const steps=solutionSteps(example.explanation),answer=answerText(example);
+ const steps=level7WorkedSteps(realm,week,lesson,solutionSteps(example.explanation)),answer=answerText(example);
  return <section className="@container rounded-2xl border bg-[#fffdf8] p-5 text-slate-900 shadow-xl sm:p-6" style={{borderColor:t.ctaFrom}} aria-label="Learn the skill">
   <p className="text-xs font-bold uppercase tracking-widest">Learn the skill · Week {week} · Lesson {lesson}</p>
   <div className="mt-2 flex items-start justify-between gap-3"><h2 className="text-2xl font-black sm:text-3xl">{guide.title}</h2><ReadAloudBtn text={`${guide.title}. I am learning to ${guide.goal}. ${guide.idea}`}/></div><p className="mt-2 text-lg leading-relaxed">{guide.idea}</p>
   {/* The worked example sits beside its solution on wide screens, like the practice layout. */}
   <div className="mt-4 grid items-start gap-4 @4xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-   <div className="min-w-0"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-bold uppercase tracking-wide">Worked example</h3><p className="mt-1 text-xl font-semibold">{example.prompt}</p></div><ReadAloudBtn text={`${example.prompt} ${steps.join(' ')} Answer: ${answer}.`}/></div>{example.cave7Visual&&<Cave7Visual visual={example.cave7Visual} realm={realm}/>}</div>
+   <div className="min-w-0"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-bold uppercase tracking-wide">Worked example</h3><p className="mt-1 text-xl font-semibold">{example.prompt}</p></div><ReadAloudBtn text={`${example.prompt} ${steps.join(' ')} Answer: ${answer}.`}/></div><SkillGuideChoices options={example.options}/>{example.cave7Visual&&<Cave7Visual visual={example.cave7Visual} realm={realm}/>}</div>
    <div className="rounded-xl border bg-white p-4" style={{borderColor:t.ctaFrom}}>
-    <h3 className="font-bold uppercase tracking-wide">How to solve it</h3>
+    <div className="flex items-start justify-between gap-3"><h3 className="font-bold uppercase tracking-wide">How to solve it</h3><ReadAloudBtn text={steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')}/></div>
     <ol className="mt-3 space-y-2">{steps.map((s,i)=><li key={i} className="flex gap-3 leading-relaxed"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold text-white" style={{background:t.ctaFrom}}>{i+1}</span><span>{s}</span></li>)}</ol>
     <p className="mt-4 rounded-lg px-4 py-3 text-lg" style={{background:t.surfaceTint}}><span className="font-semibold">Answer: </span><strong>{answer}</strong></p>
     <div className="mt-3 flex items-start justify-between gap-3 border-t pt-3 text-sm"><p><strong>Watch out: </strong>{guide.caution}</p><ReadAloudBtn text={`Watch out. ${guide.caution}`}/></div>

@@ -1,0 +1,1562 @@
+{
+  "8/number/1/1": {
+    "title": "Recognise rational and irrational numbers",
+    "signature": "4eaa5cb05223224925e9f7bb8145b0c5c1437f4c878dbf471bd142923e97e5b9"
+  },
+  "8/number/1/2": {
+    "title": "Locate square roots on a number line",
+    "signature": "44bc04be024fbb68e575b9d764f4ea07b0922fb559d0fbcfaa2fcd6e62575e08"
+  },
+  "8/number/1/3": {
+    "title": "Understand pi as an irrational number",
+    "signature": "01f5912174a5a3bb6423ec0722b8e79e8fa72fba291a04448c5b1b7422f5012c"
+  },
+  "8/number/2/1": {
+    "title": "Multiply powers with the same base",
+    "signature": "0b115920e83ab347c162826b813ab413be2dd66fc37e894194b84f116db98f53"
+  },
+  "8/number/2/2": {
+    "title": "Divide powers with the same base",
+    "signature": "1bb2c9bf3479fef9fcf015d9730fb4760e0b5618708024c328c7a01db9cb56cd"
+  },
+  "8/number/2/3": {
+    "title": "Explain the zero exponent",
+    "signature": "5eec504b03b76b7a10da9d373746bcbf80a5d24e4939e160479fdba77d578a8c"
+  },
+  "8/number/3/1": {
+    "title": "Raise a power to a power",
+    "signature": "33b5cea129c248f5eff91d7550ca1ce997079810853fc9d87ac1add88bfeb2f2"
+  },
+  "8/number/3/2": {
+    "title": "Combine exponent laws",
+    "signature": "603d1d58c638a2c0f62f13ecfe08eb77aed5fb8dd3cc7226ce15fac189cfbbd8"
+  },
+  "8/number/3/3": {
+    "title": "Check bases and brackets",
+    "signature": "0e3d876dfa40cc426448e806e027028ed946f1676ee71a18afe085c616f71111"
+  },
+  "8/number/4/1": {
+    "title": "Recognise terminating decimals",
+    "signature": "750222178469bec5e44b376ab62d9577fbda1a6a5d05b93aa2e0febdb8813c41"
+  },
+  "8/number/4/2": {
+    "title": "Read and write recurring decimals",
+    "signature": "d993a05511238a82722be71529ac921c891a90dd3827e0fd5824cf5371351a7e"
+  },
+  "8/number/4/3": {
+    "title": "Predict terminating decimals from fractions",
+    "signature": "4504f4a4caea755253fffbe808a86da4d8a329daadf965b7d66e15dd298c5ba7"
+  },
+  "8/number/5/1": {
+    "title": "Add and subtract signed numbers",
+    "signature": "5fbc8f36e2857bd6462bd6e31e09819ffbe962775ab434692e00459a9658c840"
+  },
+  "8/number/5/2": {
+    "title": "Multiply and divide signed numbers",
+    "signature": "2b82dbd3c1d5bfa5238de0ddcb1ff7c2c91a20d6027b320c6c24372928d5f58e"
+  },
+  "8/number/5/3": {
+    "title": "Use brackets and order of operations",
+    "signature": "5b59b4ec7611ac06000c64a9cf61a015194066179e295adfc9e44b9d3e3bcbd4"
+  },
+  "8/number/6/1": {
+    "title": "Add and subtract rational numbers",
+    "signature": "fe63871e57e833c86f1843b4567948f921a96195421f6c6634d3bee973ec0e25"
+  },
+  "8/number/6/2": {
+    "title": "Multiply and divide fractions",
+    "signature": "3725d3d9cf2dc1c6f86161febf59f66cef10f99a87f17ec2caa369c92d1cfda2"
+  },
+  "8/number/6/3": {
+    "title": "Choose efficient fraction strategies",
+    "signature": "e8f8bc49b9f7e6dd41e800ba4bd58bd361eda13eb22fd1c49a0ecfbf8e4380e4"
+  },
+  "8/number/7/1": {
+    "title": "Add and subtract signed decimals",
+    "signature": "e7db59f2e42fdb664ac52d98d5acc96eb98135b53891af08bba4799b301d4457"
+  },
+  "8/number/7/2": {
+    "title": "Multiply and divide decimal numbers",
+    "signature": "8ec628d25baf2542fd87d03a4cb214158cdfbc54fd64dc00f6e72710fc3367b7"
+  },
+  "8/number/7/3": {
+    "title": "Choose fractions or decimals to calculate",
+    "signature": "5a041d0522c84bc2f0127afae84d951a238a15631357e1a9f68a1acc8feae582"
+  },
+  "8/number/8/1": {
+    "title": "Regroup to simplify a calculation",
+    "signature": "29a9528480d67555a002fbfef664321b73db110ddaf618e9b24eb5ef0837ca7c"
+  },
+  "8/number/8/2": {
+    "title": "Estimate and check rational-number answers",
+    "signature": "c974f2f5ab248e2a38727fd4b80bdbbf1a05ce38a058399a016acffef69abc25"
+  },
+  "8/number/8/3": {
+    "title": "Solve a mixed-operation problem",
+    "signature": "e5a24209e1836f747841868b213e098afcbf413c4924967a320a5318df3fec2b"
+  },
+  "8/number/9/1": {
+    "title": "Calculate percentage increases",
+    "signature": "8d00ce2d12040a02a9751dd6a5c0bb54e18e569349465e3aec16ebecd8efa1d2"
+  },
+  "8/number/9/2": {
+    "title": "Calculate percentage decreases",
+    "signature": "f5f18ddf7337fbe2b007a52797a6285561d1a80f55818f088ec74fe775dc77f7"
+  },
+  "8/number/9/3": {
+    "title": "Compare changes using the original amount",
+    "signature": "f888b4094b345951b8d5feef212c8ee382b2e3acd2d6a889e17b92d4c350ed93"
+  },
+  "8/number/10/1": {
+    "title": "Model mark-ups and discounts",
+    "signature": "6cfa3f52d3d5d1d1553bc6bbe760bbf6e3426d7ea93fd30ec604e23519aaf993"
+  },
+  "8/number/10/2": {
+    "title": "Calculate tax-inclusive and tax-exclusive prices",
+    "signature": "0ad4b8cac701a6ae3e5ec6cd1e98db78f8b3462f32a18666691929a6ff0ca830"
+  },
+  "8/number/10/3": {
+    "title": "Explain successive percentage changes",
+    "signature": "8daf2f7cc88fc36bbf946ea02c293714a3866b97dea296fbb85b0756cc409a83"
+  },
+  "8/number/11/1": {
+    "title": "Model pay and a simple budget",
+    "signature": "ea7f644800ddb2afaada2e9fc360f8e30e482a00c61c86840d229e3cec809664"
+  },
+  "8/number/11/2": {
+    "title": "Use a supplied income-tax table",
+    "signature": "f087d4bc437c87e67c05aa809bbf4ab077f07a4d17125c7342b02a43b46603a3"
+  },
+  "8/number/11/3": {
+    "title": "Compare financial choices and assumptions",
+    "signature": "568270f0245e21a49c1090a14afcdd9fcbe42cedbe0ea39adc39f1a4457c42eb"
+  },
+  "8/number/12/1": {
+    "title": "Choose exact values or useful approximations",
+    "signature": "dc44fe2e393f835094ce9bf96b5ead8521b61bf88266de05bbe517eb0ef11529"
+  },
+  "8/number/12/2": {
+    "title": "Solve a rational-number modelling problem",
+    "signature": "f0b5a378abac06cefbb01dcc3f74963b82e39fa4fe65f22d632b2dd058d0f0de"
+  },
+  "8/number/12/3": {
+    "title": "Check and explain a percentage model",
+    "signature": "2137344b0a77d5b18bf85ac2647a3b8f85fd65e6b4cafeab60c3c4dd26c71dfd"
+  },
+  "8/measurement/1/1": {
+    "title": "Find missing boundary lengths",
+    "signature": "5ea89f9d0ca9333c4dc4140a116607a21e0af3621465b22922e4c89517130dcd"
+  },
+  "8/measurement/1/2": {
+    "title": "Find the perimeter of a composite shape",
+    "signature": "36a5811339a8b74b178f3d59cabd51911c0eb6d6479ec3a1987f7e9a03b2e32d"
+  },
+  "8/measurement/1/3": {
+    "title": "Split a shape to calculate its area",
+    "signature": "82a012060786856cbe52441a899b05b4d7c64cc46f84f8ac50a783535b5ec790"
+  },
+  "8/measurement/2/1": {
+    "title": "Estimate area using a grid",
+    "signature": "d608a212e235d5ad7ec39c7abdfe0e400f1e0e2f2470a63e5bc25455ea07d570"
+  },
+  "8/measurement/2/2": {
+    "title": "Improve an irregular-area estimate",
+    "signature": "0635cb8d09979f791f5c880d1f08b643ca4b6f9f9e696b48346d815849df4f10"
+  },
+  "8/measurement/2/3": {
+    "title": "Choose perimeter or area for a practical task",
+    "signature": "3345b9bbacc87d0edf4763daef9375fc749928fd736088e7a2e752e1ac45e488"
+  },
+  "8/measurement/3/1": {
+    "title": "Connect cubic units with litres",
+    "signature": "5054887cbeaa4ff4a63098be1275b2b27799e62d83c9f8330f91a6a8c829cf1a"
+  },
+  "8/measurement/3/2": {
+    "title": "Calculate the volume of a right prism",
+    "signature": "7ecfff4e3134d9af4ec23b02c20e1f2fde019b2ab279e2e4b214e08a2c166548"
+  },
+  "8/measurement/3/3": {
+    "title": "Find capacity and compare containers",
+    "signature": "5f16b1a59b2b04133a39909a59f38180c2688a1fc742f1594caa352eb03b5ca8"
+  },
+  "8/measurement/4/1": {
+    "title": "Find a missing prism dimension",
+    "signature": "37d4635a5b9e7a48e10c2ddf16f91e54c30e02d7bc63812c797ca1c03faad777"
+  },
+  "8/measurement/4/2": {
+    "title": "Work out how many boxes fit",
+    "signature": "3fdf2326f51eda178530c5ad02f82dc0e491c5ee5ca6d70ec633341e8d3c97cd"
+  },
+  "8/measurement/4/3": {
+    "title": "Model filling a tank",
+    "signature": "47cf0bd04352c1e8b4432910added1b7ccee5ed8cc0b206cc708de2e854af89e"
+  },
+  "8/measurement/5/1": {
+    "title": "Connect radius and diameter",
+    "signature": "caec175b8bd3e45251467595e3a47a0536f2289e0a8cdbc477785face7dbb295"
+  },
+  "8/measurement/5/2": {
+    "title": "Calculate circumference",
+    "signature": "b28a412639d06aba5926b8521522f4353397ed1c109e9cca5271ca67de89bde3"
+  },
+  "8/measurement/5/3": {
+    "title": "Calculate the area of a circle",
+    "signature": "adb0b5cabb2b896a08ae2d7334412d35bdb6cd96fdc27bd639e2e9561094a504"
+  },
+  "8/measurement/6/1": {
+    "title": "Find a radius from area or circumference",
+    "signature": "cfe6520e770ced950c4a7fb942204b4e3b8ef3c1e2c48ba5f23b084e735989fb"
+  },
+  "8/measurement/6/2": {
+    "title": "Measure semicircles and rings",
+    "signature": "c6ff33ed9c6e653ae37e38a0b31bd165fd3bcaddbf9e10529e46bda0169ddf00"
+  },
+  "8/measurement/6/3": {
+    "title": "Choose a formula for a circular design",
+    "signature": "6d1c7c4b6bbd3b859657c7722146d4fd9bf50b8653323d46ee9c56c15d5ce1c9"
+  },
+  "8/measurement/7/1": {
+    "title": "Identify the hypotenuse",
+    "signature": "8eb33986f4fdc9332160ec4acf594a671b499bc7abef5d5ca729883a819b3288"
+  },
+  "8/measurement/7/2": {
+    "title": "Explain the squares on a right triangle",
+    "signature": "fe6e011bb543a43fc018c0022ec3f65aad5f3c571b5cfca21db1e8001225e804"
+  },
+  "8/measurement/7/3": {
+    "title": "Calculate the hypotenuse",
+    "signature": "4d90ffd9947286e9e5e4e6399914e1568f02beac66845a259567171d73fedbc2"
+  },
+  "8/measurement/8/1": {
+    "title": "Find a shorter side",
+    "signature": "303e09875b930523d7822ea0c109d7f72d5d7e696684a196e6233e768e042070"
+  },
+  "8/measurement/8/2": {
+    "title": "Calculate a ladder length or diagonal",
+    "signature": "bdc1c9bf069595b49719c1b7d5c7b074ce74ee6a44fc14affc61a5716c81b9e7"
+  },
+  "8/measurement/8/3": {
+    "title": "Recognise and check Pythagorean triples",
+    "signature": "e6d6110c113f194074007bd84fd0ac4b9c7bd16e162219d3112ec11178caea34"
+  },
+  "8/measurement/9/1": {
+    "title": "Convert times using supplied UTC offsets",
+    "signature": "c0a5928d39820a11d3fe6eca370f8d1f1f7abc39ef87b28a3ea86f0843232b49"
+  },
+  "8/measurement/9/2": {
+    "title": "Calculate travel time across zones",
+    "signature": "17f1a614bc19d87dff2207c378c8e61d615646976dc27aacb6bcd0f29618cc4f"
+  },
+  "8/measurement/9/3": {
+    "title": "Plan a meeting across dates and time zones",
+    "signature": "a23f050ee3ce9df9cb9ac1223f552ccbf3f2ae233e9ab270c59280279dadbda0"
+  },
+  "8/measurement/10/1": {
+    "title": "Read a rate and its units",
+    "signature": "a54ab28f13821c114bf360ee59e6b5dc13e2d8cd877cd5691439d6a9e5aa1ac4"
+  },
+  "8/measurement/10/2": {
+    "title": "Calculate speed, distance and time",
+    "signature": "109bc7ccdb2c8bb8575a219b012ffc16c5108f2703bb8a589b46298a88a511fb"
+  },
+  "8/measurement/10/3": {
+    "title": "Compare flow and consumption rates",
+    "signature": "e5ab6539c43f3f2c18c373681f98e64c07d945779e7c399377f8a140b77da0e1"
+  },
+  "8/measurement/11/1": {
+    "title": "Use a map scale",
+    "signature": "3802828041d0f88c2200920098b2acf38eb56b4cf03a4f10a3e3f14113ac9060"
+  },
+  "8/measurement/11/2": {
+    "title": "Scale a mixture or material plan",
+    "signature": "2f33db3ee2ab9be1dccf6388b0cae6349781a60783d072d62b8f2334de643fd4"
+  },
+  "8/measurement/11/3": {
+    "title": "Build and check a ratio or rate model",
+    "signature": "319d23b4d10a54148bc8c69e698f266a89e2a1d37ae3c93f014b87b87bf2bb7a"
+  },
+  "8/measurement/12/1": {
+    "title": "Plan a shape or container design",
+    "signature": "c0367dfc8f50174d83f707770c4fbf34959585a16e675939d4e6f9f8ba8cef1a"
+  },
+  "8/measurement/12/2": {
+    "title": "Combine duration and rate calculations",
+    "signature": "20fe1f834146d9af2dc0c80afc20d242bedce0e906a5a696812e1eaeb3f4a292"
+  },
+  "8/measurement/12/3": {
+    "title": "Review a practical measurement model",
+    "signature": "388d32760b330819e7b829d2af78ad41044b01800dad143cce59d25dca056ec0"
+  },
+  "8/space/1/1": {
+    "title": "Match corresponding sides and angles",
+    "signature": "1391b67fd0fa27805a66c29da0dfc441cc5113189284390846230eee625b8606"
+  },
+  "8/space/1/2": {
+    "title": "Recognise congruent shapes after a movement",
+    "signature": "054ff04c4dd13c3a0728f444811ca6d138d62f7a83fd1a7371d6a0ffa4b3155b"
+  },
+  "8/space/1/3": {
+    "title": "Test congruence by overlaying shapes",
+    "signature": "dd3b209987a260d934d75eb133b5d8df87066265caa89a16212ffd80f8552a38"
+  },
+  "8/space/2/1": {
+    "title": "Use three sides to test congruence",
+    "signature": "421eeb011aa31bd065e4133fa73dee958f31f1225e125ecdaaa9e4df52853336"
+  },
+  "8/space/2/2": {
+    "title": "Use sides and an included angle",
+    "signature": "afc05028152c3190c519f4d9a2acb97fff58f76817c5b9b7baca31d4d3125bb7"
+  },
+  "8/space/2/3": {
+    "title": "Use angles or a right triangle to test congruence",
+    "signature": "e785a69cae1ac2a1cbae680acb6dd964a76f4c0ad2390d941a4921906db7cb93"
+  },
+  "8/space/3/1": {
+    "title": "Recognise similar shapes",
+    "signature": "969c0a31a0b8b3c9ab19eb906c08f1ad693f04ecd3d49daf8162b93438355a9e"
+  },
+  "8/space/3/2": {
+    "title": "Calculate a scale factor",
+    "signature": "efd35a68d4469f6a9d2eff7854569388f69e44a7d5e436c3c88ba404c7c617d1"
+  },
+  "8/space/3/3": {
+    "title": "Find missing corresponding lengths",
+    "signature": "73cefc7246cff9503440c362a1367d87fafe9986dff9c60fb81d2d20c725bd5c"
+  },
+  "8/space/4/1": {
+    "title": "Use triangle angles to test similarity",
+    "signature": "a4e3985592e8ebbe520894b31533668113a919e65059229496e1b5607bec51c1"
+  },
+  "8/space/4/2": {
+    "title": "Compare congruence and similarity",
+    "signature": "b008e0e83f18d96a839363c0fdfc040b51ae4153d0e96094b634634562a28204"
+  },
+  "8/space/4/3": {
+    "title": "Check what a transformation preserves",
+    "signature": "3c826d86cc75e1ff2c592e8b597ca7fa45610c80b0519c9e93a0ea589504e296"
+  },
+  "8/space/5/1": {
+    "title": "Compare sides and angles",
+    "signature": "54f3baf388d58905b9ace0ea42c67712d67a5f3e4c385c103240d64c64ec4cf6"
+  },
+  "8/space/5/2": {
+    "title": "Compare diagonals and symmetry",
+    "signature": "d89e6cb0696239d8b57b2a29528c1c71bcbaf8c805da0935e544d37cb378c029"
+  },
+  "8/space/5/3": {
+    "title": "Classify quadrilaterals using their properties",
+    "signature": "eb24db8685f49eaecbddec45e088e3aadde262d3457898dc93053caa9b111e7e"
+  },
+  "8/space/6/1": {
+    "title": "Use congruent triangles to explain properties",
+    "signature": "80d0811b78880fe78af086aaf657f9f4bf16c43cf552a3bf7a044570fce043b2"
+  },
+  "8/space/6/2": {
+    "title": "Find unknown angles and lengths",
+    "signature": "ed12ca0e2b5a37da4a197154df22a84337e98bdac4044b5e75c0932f20b0434e"
+  },
+  "8/space/6/3": {
+    "title": "Test a quadrilateral claim with a counterexample",
+    "signature": "3a023bb19879b90365ae3e9aad0de62959f8da3ba29a9f4e08b719f3293b6f7c"
+  },
+  "8/space/7/1": {
+    "title": "Read three coordinates in order",
+    "signature": "b9b4ac19671df0e8504479145de060af672cb9957d2745e672a8fae7cb1603e3"
+  },
+  "8/space/7/2": {
+    "title": "Place a point in a 3D grid",
+    "signature": "e68d2476d0f6a6a28aebd809074abe53a65171bf80dbf224b4a809ee018cc7a5"
+  },
+  "8/space/7/3": {
+    "title": "Rotate a view without changing position",
+    "signature": "fd584481d3a8f9a875ef3d32678117c9e05eb739edebff7dfa27aef2c56179e1"
+  },
+  "8/space/8/1": {
+    "title": "Follow a route through a 3D grid",
+    "signature": "965c1fad247a868b67a13aa3bf9e7d9213d2be261cc3a7739aebd44955550566"
+  },
+  "8/space/8/2": {
+    "title": "Locate vertices and vertical columns",
+    "signature": "0600630e3782c9595a25067a2ac23e3d438a9a661ed9c493fdf1dc82d28b1777"
+  },
+  "8/space/8/3": {
+    "title": "Describe a practical 3D position",
+    "signature": "f346ad4064834813f68d619b1dbc90f8394e2a0818331f2d488485ca52a9ee29"
+  },
+  "8/space/9/1": {
+    "title": "Trace a congruence or similarity flowchart",
+    "signature": "e92c93e1fb50b774724e1e235a4a804ab89e793d54af4277e264498695fedc88"
+  },
+  "8/space/9/2": {
+    "title": "Find and repair a faulty decision",
+    "signature": "116f3f7cd1b0243ac636311a8aefc1cc5733e7a51b4ac8dd06ff9be62088562b"
+  },
+  "8/space/9/3": {
+    "title": "Create and test a sorting algorithm",
+    "signature": "9d14ce1e9bd3b15ec013a3013208f031eb4a08d9dc2155432b63e2b3f26903e9"
+  },
+  "8/space/10/1": {
+    "title": "Explain a shape comparison",
+    "signature": "b3e3dd1b101081b8589fcf0eb0a121e267df06900489b9e2d5deeb7775c79741"
+  },
+  "8/space/10/2": {
+    "title": "Solve a quadrilateral or 3D-location task",
+    "signature": "cf59f44870fdcd3012daeb4faa710ac03a20ab4291d12d068cab38e6e647f405"
+  },
+  "8/space/10/3": {
+    "title": "Test and improve a shape algorithm",
+    "signature": "398eae83f47e1877179669dd38265d96035cc6b4c1eecfbbde23a950e68a44a7"
+  },
+  "8/pattern/1/1": {
+    "title": "Write an expression from a situation",
+    "signature": "36a7d67a143aeb04d78fd9b059100375ab7b840b776988272fe009f81b343ed0"
+  },
+  "8/pattern/1/2": {
+    "title": "Collect like terms with integer coefficients",
+    "signature": "fcf1d178dbe14eca148bc2a2837b721f6596ea9b42858d8bb822c05c1e9fb185"
+  },
+  "8/pattern/1/3": {
+    "title": "Use algebraic properties to rearrange terms",
+    "signature": "650208888b84057bf7a68401b11d019b4f3b86facf166da93ba5e1341f2e02cf"
+  },
+  "8/pattern/2/1": {
+    "title": "Expand a single bracket",
+    "signature": "c14f7f4b0d3dfd01775b2b6c109b53ecd8d918fbfb43b057acca7efb1d839a14"
+  },
+  "8/pattern/2/2": {
+    "title": "Expand with negative coefficients",
+    "signature": "68e57a94f43e3a00e2104f6f1dcc34958123b3cc616e5bfbf2d666e3d6d1871e"
+  },
+  "8/pattern/2/3": {
+    "title": "Expand and collect like terms",
+    "signature": "e5b40e1e314396bda38c3d5ff48a41a462dbd945c49e9e50cd66f07ed7c16d4b"
+  },
+  "8/pattern/3/1": {
+    "title": "Find a common factor in terms",
+    "signature": "f6d814d40b6df893de69d1c22ae5e13f8f0184c5f0256172a01b05cd2f89d1cd"
+  },
+  "8/pattern/3/2": {
+    "title": "Factorise a linear expression",
+    "signature": "9af99524646831543c22af5e45d823e88a17ea561e3a74c6839249c58ca877bf"
+  },
+  "8/pattern/3/3": {
+    "title": "Check that expansion reverses factorisation",
+    "signature": "7e35dec6efa7beabded1f390fa43fb8bd021383d5a7893e1b6a90662475bd57d"
+  },
+  "8/pattern/4/1": {
+    "title": "Use inverse operations on both sides",
+    "signature": "504029131a886536aea9ef1afc711a3f8394ef4150dcef288db32068be3d62c1"
+  },
+  "8/pattern/4/2": {
+    "title": "Solve equations with rational answers",
+    "signature": "820f969ac815aba5a6e70f4d440ff8a0fc252231ad3e66c970e6ad5d6a64acda"
+  },
+  "8/pattern/4/3": {
+    "title": "Verify a solution by substitution",
+    "signature": "1456f405c8726904995087bfbd17032fe725fcbcb8b8bd0685246662c3993e22"
+  },
+  "8/pattern/5/1": {
+    "title": "Collect variable terms on one side",
+    "signature": "39599613cc4f043bfa8659327c96260e73aeb4b76faf38225644815c83397452"
+  },
+  "8/pattern/5/2": {
+    "title": "Solve equations containing brackets",
+    "signature": "da1f6b32e30bf2ca5bd5d9970098880a216278b0406383b4e318bf14d70fe35d"
+  },
+  "8/pattern/5/3": {
+    "title": "Find and fix an equation-solving error",
+    "signature": "94accc7908f357f83c3a5b19455f80f2e62353fa46c741b2c012cd4f8a368e0e"
+  },
+  "8/pattern/6/1": {
+    "title": "Read strict and inclusive inequalities",
+    "signature": "1bc85f2c62dbd0780f2c90eeaf1b916841e4a255a3c16d11e5ca09f8b83c52ce"
+  },
+  "8/pattern/6/2": {
+    "title": "Solve one-variable inequalities with positive coefficients",
+    "signature": "cdd4cb798b46e8bf1c1796e017a2aca600cbd873352ddae122478ab56a0a084c"
+  },
+  "8/pattern/6/3": {
+    "title": "Graph and check an inequality solution",
+    "signature": "82cad821784cc930087d6c7379e18a3c09980385dba905d6555d636d82580604"
+  },
+  "8/pattern/7/1": {
+    "title": "Recognise constant first differences",
+    "signature": "032b8bbc880111a66399c2513a454c36bf5bfe9c0566d959e679c1e12a3801a6"
+  },
+  "8/pattern/7/2": {
+    "title": "Plot a linear relation from a table",
+    "signature": "bf488dd99bfa95d2fd138afc2af7be7c76eb073e5a971a951a5bc52e04ebb403"
+  },
+  "8/pattern/7/3": {
+    "title": "Read horizontal and vertical relations",
+    "signature": "7006cf7cece21a62d03e3b2cedc7af386ae22e275fd68bfbbaa89c65c7fa68f9"
+  },
+  "8/pattern/8/1": {
+    "title": "Change the starting value of a line",
+    "signature": "b0ddd85ce8cb0562345b304019768ffd2fe6f1117c26807ba5df33bd13176d3d"
+  },
+  "8/pattern/8/2": {
+    "title": "Change the rate and direction of a line",
+    "signature": "3e7253e14be8a7cc7ce5bfc4b5cdcafde3bc67df6cccd3e61801aea8858367a4"
+  },
+  "8/pattern/8/3": {
+    "title": "Make and test a graph conjecture",
+    "signature": "5e21b151102a5542f6266ef97e3905a226de02949b21932c63fcf8c4667f513d"
+  },
+  "8/pattern/9/1": {
+    "title": "Read equation solutions from a graph",
+    "signature": "54280337cbbfbc4bbf1113981b8b5ce77c722fb1e798d8eaa4d9a3ac6af4b6f4"
+  },
+  "8/pattern/9/2": {
+    "title": "Compare intersections and parallel lines",
+    "signature": "2a541c1014d7c589cd75e522e807396fb8e145572079fab04299877d71ddbd97"
+  },
+  "8/pattern/9/3": {
+    "title": "Investigate inequalities using a graph",
+    "signature": "6637bf8e99879217acc284a80ed6977ca8b9f8f6b1918d7b01dd7b2a1903a49e"
+  },
+  "8/pattern/10/1": {
+    "title": "Write a model with an initial value and rate",
+    "signature": "95383b86b7ebc75109a7941c76201d3e0de5944b4ae3957832dca3485f78fb92"
+  },
+  "8/pattern/10/2": {
+    "title": "Use a model to calculate or predict",
+    "signature": "02a4d214c9a8ca4e216d4df22763ac23b02a116be9c0aca560db5101651ac2c6"
+  },
+  "8/pattern/10/3": {
+    "title": "Explain when a model stops making sense",
+    "signature": "75b6c1c248854e31b0880af11d2f849fdab835d63ed9be22bd9d5c235162944f"
+  },
+  "8/pattern/11/1": {
+    "title": "Compare two pricing or pay models",
+    "signature": "87175ecc7b458a405204b682c833c9b85b1c95fb7be9537c3c998d508591d961"
+  },
+  "8/pattern/11/2": {
+    "title": "Use a model to meet a budget or target",
+    "signature": "37448051d19c60bbc7ff3b48ec894471ea6dd9edcaaf6b00d7715f9d249e18b4"
+  },
+  "8/pattern/11/3": {
+    "title": "Review units, assumptions and practical limits",
+    "signature": "d793eb37b964944ac769298d069e7d004ef66a505b1790b273b5125f581a9ff9"
+  },
+  "8/pattern/12/1": {
+    "title": "Choose an expression or equation strategy",
+    "signature": "1613d0be195cc9f3be37735bfd9869595f087125a6d3b4a1b2dff17d0f8ea072"
+  },
+  "8/pattern/12/2": {
+    "title": "Build and check a practical linear model",
+    "signature": "0e2e3bd7ecf9f81142b4aeac5f84a94da2cee6fd2e206d97188623576651ecc1"
+  },
+  "8/pattern/12/3": {
+    "title": "Test and explain a graph conjecture",
+    "signature": "00379f8561f10bf871246397631c7d8ea799cb8e5521771630e00f42870d1206"
+  },
+  "8/statistics/1/1": {
+    "title": "Choose a census or a sample",
+    "signature": "33e3c2a6ae86a9be14977b4b986f1b2f2088261427266c2f4c2901ff4645c075"
+  },
+  "8/statistics/1/2": {
+    "title": "Choose an experiment or observation",
+    "signature": "8cc2cacfe96b621068699c60fc7adb28cbe74517d1349373e80e8bdeea452353"
+  },
+  "8/statistics/1/3": {
+    "title": "Explain practical limits of data collection",
+    "signature": "0adeccd57f3096b59f2a2270775d43b2e1e9ed0557bc42dda0cb89f177aabc55"
+  },
+  "8/statistics/2/1": {
+    "title": "Select a random sample",
+    "signature": "211f0f0d560891ea12030efdeb5da2a491ad59ac4489cd890f1cfd7f372fa1f0"
+  },
+  "8/statistics/2/2": {
+    "title": "Spot selection and response bias",
+    "signature": "05193caead587c79ad28208b44431fca8f21d357588cea82e434568de5bd6773"
+  },
+  "8/statistics/2/3": {
+    "title": "Consider measurement precision and error",
+    "signature": "170e2637ca82744b78930486886f66d6ce10daf7c65cc043b30fa6c0ac145bf7"
+  },
+  "8/statistics/3/1": {
+    "title": "Compare primary and secondary sources",
+    "signature": "a979477487a6467bdb76b4f56bdec69c3025d87dd567e92fa826d7c37e3106f7"
+  },
+  "8/statistics/3/2": {
+    "title": "Compare random and non-random samples",
+    "signature": "27ec56e8a0bdb3c986345df6969bdff5fe0253709f5d7dfabc967f7aa5b20ad2"
+  },
+  "8/statistics/3/3": {
+    "title": "Choose a method and explain its limitations",
+    "signature": "a8f084d1fe320958874bdf1aa9804bdedbd28f1d476a0fa1ba09a4b259c13179"
+  },
+  "8/statistics/4/1": {
+    "title": "Display a sample clearly",
+    "signature": "8c46346edf446b1ef9e5433776aedfe756be4d401d4b985116ecc97f58b51ff3"
+  },
+  "8/statistics/4/2": {
+    "title": "Describe shape, centre and spread",
+    "signature": "96f25e7bc7e3c6c3be9d2c79721a9fc87bee6e699a75db361f975ace5a72dc0f"
+  },
+  "8/statistics/4/3": {
+    "title": "Write a conclusion supported by the data",
+    "signature": "986cf7ca6b56e7c5c320977c46946a4ec1488fc5f2c7b13c567ee63cfcda3d3c"
+  },
+  "8/statistics/5/1": {
+    "title": "Compare samples of the same size",
+    "signature": "255f057ee90b3cd37db9c67d3475d7652b7862a60e0fef2f8c7f1a5a74db2296"
+  },
+  "8/statistics/5/2": {
+    "title": "Compare sample proportions",
+    "signature": "c244ad7988d2c4d38786b8865508b0d9d1c20032571980d1e2af9ea3ffe79148"
+  },
+  "8/statistics/5/3": {
+    "title": "Use a sample to estimate a population count",
+    "signature": "c19864fdfc7bdd79c41332765039c5a604b1e1a07cda3c89d550ef9affe9a8f1"
+  },
+  "8/statistics/6/1": {
+    "title": "Run repeated samples of different sizes",
+    "signature": "486a30ba1483298f2c3725795f7fbeef199f6d59842f9f7d781ac5da88e87d79"
+  },
+  "8/statistics/6/2": {
+    "title": "Compare variation as sample size changes",
+    "signature": "c637019e9c1ee449111fd4eae21996e13fbf44298d0c43ee905693a07b3ba53e"
+  },
+  "8/statistics/6/3": {
+    "title": "Explain uncertainty in an estimate",
+    "signature": "3cab649ead11a417a2c9fe29e93cd6597dee73404b3357c627e8a300acdb019a"
+  },
+  "8/statistics/7/1": {
+    "title": "Investigate changes to the mean",
+    "signature": "84f62f0f04421f5db8a77682319bbf0c6250de9b4886c029b4e3934e1ff7f831"
+  },
+  "8/statistics/7/2": {
+    "title": "Compare changes to median and range",
+    "signature": "a3772573a059c4320418c1f1ffe2f245e4b794fdd24db831db50a2bbc0fe92ba"
+  },
+  "8/statistics/7/3": {
+    "title": "Choose a useful summary for a distribution",
+    "signature": "6b8f1068f8ecfe8becc334d9c1d2f770d7825b40f48e821f5a98d1896ba4173e"
+  },
+  "8/statistics/8/1": {
+    "title": "Choose a question and target population",
+    "signature": "b9495b90d24eae523218ffed35ac8a66948c55a85da5aaee5e16abf635f16858"
+  },
+  "8/statistics/8/2": {
+    "title": "Plan an ethical and fair sample",
+    "signature": "c9edd3a247f773cca4dc6d717da78f5048f0ffd7bb24cb3f9143b292819e551b"
+  },
+  "8/statistics/8/3": {
+    "title": "Choose a collection and recording method",
+    "signature": "edf0f67bb4fa223245d15c91f896b2961d25aff8590773c93abb06b0876ed29a"
+  },
+  "8/statistics/9/1": {
+    "title": "Collect and organise sample data",
+    "signature": "c173ae2974c801db6ed0bc3736ec5b74979a73b275f6672bd3d3f78926caf285"
+  },
+  "8/statistics/9/2": {
+    "title": "Analyse and display the results",
+    "signature": "2069a6cabe7092dc4391cb45faec14f1fc4615ade811108e3500e0f8ea32d9f3"
+  },
+  "8/statistics/9/3": {
+    "title": "Report findings and acknowledge uncertainty",
+    "signature": "0258f3ff44c4f9eea577f205e4a16f2b4e3fb0f2b06d79ce4dbd35fd584aa4e8"
+  },
+  "8/statistics/10/1": {
+    "title": "Critique a data collection plan",
+    "signature": "58e929ce89591acae807188e51742e38184d5a95add443a8bd023accddaa7acd"
+  },
+  "8/statistics/10/2": {
+    "title": "Compare distributions and sampling variation",
+    "signature": "edcf5d388ed82f452f27cc5e00eda4e80b91c9a3476f256bc6f5413cbc0a9e6b"
+  },
+  "8/statistics/10/3": {
+    "title": "Improve an investigation report",
+    "signature": "de522619d19256408beb22692b372a8fe1b1604691aac20ee372637245e3249d"
+  },
+  "8/chance/1/1": {
+    "title": "Identify the event and the not-event",
+    "signature": "339ff85bb23159551805b5cb9e13fdf99179343618c0d53c1d6e841ceddb2e29"
+  },
+  "8/chance/1/2": {
+    "title": "Find a complement from a fraction",
+    "signature": "9fc5647558990fc266f7df43f423d62efe55476713db9be0ab5feb95247a87d6"
+  },
+  "8/chance/1/3": {
+    "title": "Find complements from decimals and percentages",
+    "signature": "3bc5f794d8959456da41699197536ebbfa1a7c2e2d31c6b230dd5ffd05ccd5bf"
+  },
+  "8/chance/2/1": {
+    "title": "Find a missing probability",
+    "signature": "73fa83ec7cc06e24fba7384ddf624fe65755103582ed78f5addb1eb73d73f7d5"
+  },
+  "8/chance/2/2": {
+    "title": "Calculate complements with unequal outcomes",
+    "signature": "9d6d5ade3be3c4ee4ac091d0c70182e4a0926b198863c8cd1f7849f68e84c289"
+  },
+  "8/chance/2/3": {
+    "title": "Choose a complement to simplify a problem",
+    "signature": "f3a1840ad34583f4485e755f2f1a94e436e941ef2ca06d40d44cab7b987c82d4"
+  },
+  "8/chance/3/1": {
+    "title": "Write ordered pairs",
+    "signature": "32a6abf1dbf0bd19e83f4d64f660718cc6dd89b2b1795be505535761345ff87c"
+  },
+  "8/chance/3/2": {
+    "title": "List all combinations without missing any",
+    "signature": "a56c6f7b43d375ce215eb1b6c910bbbb5d29d1fd156cba9eb8fe19600f55736d"
+  },
+  "8/chance/3/3": {
+    "title": "Count outcomes that meet a condition",
+    "signature": "981ca0e334171682289040e84b5a231a8460dbac284780debec0b5b20981e493"
+  },
+  "8/chance/4/1": {
+    "title": "Complete an outcome table",
+    "signature": "1249d19a0ff425fb75dae1818a0800d4a4993b0833fcb0ee436ae494eca9f6c9"
+  },
+  "8/chance/4/2": {
+    "title": "Read row, column and joint totals",
+    "signature": "7edee99c2f8c918ff8090adc7dafb52b3d7c91c33b0560467b65aff0ca0188be"
+  },
+  "8/chance/4/3": {
+    "title": "Calculate probabilities from a two-way table",
+    "signature": "ab69715a5d1d2212cf6da0371407a3fe87259a242ea6636a1e093c7aea146890"
+  },
+  "8/chance/5/1": {
+    "title": "Build a tree for two events",
+    "signature": "d1dd7733defeb622dddddfc38d82987087ca8e4731d11f6f4717f499a9bf8573"
+  },
+  "8/chance/5/2": {
+    "title": "Read outcomes along branches",
+    "signature": "83ed0fe95789ea5f97f722ac7f2b026119e066e8c2d57a5dac0581bfccb31968"
+  },
+  "8/chance/5/3": {
+    "title": "Use a tree to find a probability",
+    "signature": "01f4d63ce1b22b170a754e067259cd71e66a7a25def8500441761e1ee1021285"
+  },
+  "8/chance/6/1": {
+    "title": "Place outcomes into four regions",
+    "signature": "efe3a6c4d9bb46bc74a4c10c14c3b0c9fddc3058e3458e9001f800a5f2c0d403"
+  },
+  "8/chance/6/2": {
+    "title": "Find both, neither and either event",
+    "signature": "c52b909b76f34acc0941a49f5502a0f7853aa9fda7a5c2530a05c123f56bc769"
+  },
+  "8/chance/6/3": {
+    "title": "Calculate probabilities from region counts",
+    "signature": "b0044a8e0514620733ff2f7927dc2af998ef6d5a5b8cb7f7f615b944075c8159"
+  },
+  "8/chance/7/1": {
+    "title": "Distinguish and from inclusive or",
+    "signature": "9714af349c1ddf7a498724a5d276b839e4ede65905887a569d9a614ffd2691ba"
+  },
+  "8/chance/7/2": {
+    "title": "Compare exclusive or and mutually exclusive events",
+    "signature": "bcd75e5154891786f8431058eece5ff43f3b42c5b4ff77cbf832879d432495ad"
+  },
+  "8/chance/7/3": {
+    "title": "Find at least one using outcomes or complements",
+    "signature": "3b4c554cc1235b25b3ef37c5ada7a4189d18df95609ab871dfe920e43e6f65a3"
+  },
+  "8/chance/8/1": {
+    "title": "Design a fair two-event simulation",
+    "signature": "5202f9c09f16c1e525294cf8b8b45f4761b4dab90d946b86cd3160d452130699"
+  },
+  "8/chance/8/2": {
+    "title": "Run trials and record actual results",
+    "signature": "0831adb5e4a8a11263aab15f9849a3b4b3023174f5cfd9f77b526ef36a2282c8"
+  },
+  "8/chance/8/3": {
+    "title": "Calculate experimental probabilities",
+    "signature": "403111f47066c7c53fb5df1c2bf7b6c45969de4baccace3efa247ce5c258d0df"
+  },
+  "8/chance/9/1": {
+    "title": "Calculate a theoretical prediction",
+    "signature": "08227b01470b058970dc096ba4f32ec2cba2e8a94a154588adb446a333903918"
+  },
+  "8/chance/9/2": {
+    "title": "Compare small and large trial runs",
+    "signature": "f38ec1f03f36746ed021674691272930601a418f70a63026bffee12f1b03740c"
+  },
+  "8/chance/9/3": {
+    "title": "Explain variation and review a simulation model",
+    "signature": "d75e0b97157f1457851293c9c64717f975e04cbb94041ac1e284912b3d6016ed"
+  },
+  "8/chance/10/1": {
+    "title": "Choose a useful event representation",
+    "signature": "b00247c0f0cb99ea604f887ca4c242695627e786e8b13ef0196ce5c0c0a380f4"
+  },
+  "8/chance/10/2": {
+    "title": "Solve a compound-event probability problem",
+    "signature": "f3352bccc02ac1c2c66e828811c1a99062e73814479a4bd2876632ad8fb9066d"
+  },
+  "8/chance/10/3": {
+    "title": "Run and explain a probability investigation",
+    "signature": "9f2653afd71811432a2d7c33a2dfd4b716aa17c340d947c971add4bc57b66101"
+  },
+  "7/number/1/1": {
+    "title": "Build square numbers",
+    "signature": "3c90bdfd5df70a7140cb93bbcb209486a22191998b27199ee479a629eed437ec"
+  },
+  "7/number/1/2": {
+    "title": "Find perfect-square roots",
+    "signature": "5b413bcdbf329441b1da8a92b98fdb37dccd59b0b770d7b995ce56af5d307a85"
+  },
+  "7/number/1/3": {
+    "title": "Use squares to solve problems",
+    "signature": "dab46c72a81765749de5e870d5d14229be45a2b644b4cf2590cfe2084eff9e0e"
+  },
+  "7/number/2/1": {
+    "title": "Express prime factors as powers",
+    "signature": "3274308169a15e7534cc54a238521f2373a1d7d382e583dbfcf48aec3196247e"
+  },
+  "7/number/2/2": {
+    "title": "Read and build powers",
+    "signature": "f6753d1d1110a44ccea7354c7f4ee3401ecfcf5a31fc4a82ffb0b752fcdb0533"
+  },
+  "7/number/2/3": {
+    "title": "Find common factors and multiples",
+    "signature": "4eb83a9d4ae671f8ed9b8d926fff179616929f724ec715ed822cc64efe3c83d7"
+  },
+  "7/number/3/1": {
+    "title": "Understand powers of ten",
+    "signature": "e98ee971eb71cc0d04fbc31474f9713552ad4e640a0371e3936ee9b8ee890a4f"
+  },
+  "7/number/3/2": {
+    "title": "Expand whole numbers",
+    "signature": "d7d318e6d8bb77bf36dd9b9e9a44de682d63d733a79ecdf196741b80b5132ae6"
+  },
+  "7/number/3/3": {
+    "title": "Rebuild and reason about place value",
+    "signature": "afcfc8760eb9eb9be0021c09d03019c44d72dc1f4a41031e5eaf2b85aefe3a8d"
+  },
+  "7/number/4/1": {
+    "title": "Simplify and scale fractions",
+    "signature": "c6cea0e0531be99675b20eba054e80e57418ded8b0ecc01dba410af4a465fbb6"
+  },
+  "7/number/4/2": {
+    "title": "Connect fractions and decimals",
+    "signature": "292d532a36a7e9729df1679410e56f127cef8698cd5add872d47edacb4356c21"
+  },
+  "7/number/4/3": {
+    "title": "Connect fractions and percentages",
+    "signature": "5e1baef023fb078b9d5b2617facb50bd9c9a38deb98635e15be7e2156275fe41"
+  },
+  "7/number/5/1": {
+    "title": "Compare and order integers",
+    "signature": "bbdbb9af196dd519f9b151080274fc6079d2af32004e1851177352a05b9de7aa"
+  },
+  "7/number/5/2": {
+    "title": "Add integers across zero",
+    "signature": "6414e7d4623f903d1b28ce24fd836c95877ca35db8b3dafedac701e59b2d9ed7"
+  },
+  "7/number/5/3": {
+    "title": "Subtract positive and negative integers",
+    "signature": "b543b266617f87b217016eb3135c67fdca966d249ffca62e7a1a2f7bf09d4161"
+  },
+  "7/number/6/1": {
+    "title": "Place fractions between whole numbers",
+    "signature": "8bc26b7e872ddaa2d365d35023f5f7c67d4a62c288f19ee2c1bf2e556c3fefe3"
+  },
+  "7/number/6/2": {
+    "title": "Locate negative rational numbers",
+    "signature": "382407e431f73a75de1826a226347695d113f39aac05e7538967e7d15891394f"
+  },
+  "7/number/6/3": {
+    "title": "Compare rational representations",
+    "signature": "c85a45c36883fad152a670ce90c6c7fbb0796eca6dbeb8750e029d282dd1c77a"
+  },
+  "7/number/7/1": {
+    "title": "Round to a given accuracy",
+    "signature": "7e0d6d5e84795ec9fd3f32c34882904fec83158f8300068120acd0d2dc6f2838"
+  },
+  "7/number/7/2": {
+    "title": "Choose sensible contextual rounding",
+    "signature": "8926f3aa299a7d5fb9e0e0679e299765423d2a74eb0185429631968c798dcf50"
+  },
+  "7/number/7/3": {
+    "title": "Estimate and check answers",
+    "signature": "c8bae39a50105337d2130ea3fcaa23b9881060a79cb045b92984ffb779f08793"
+  },
+  "7/number/8/1": {
+    "title": "Add and subtract fractions",
+    "signature": "0d2993f840654c506d5a0f0b1770cbf143be3c0bca16fcbce218e1c65b1b1574"
+  },
+  "7/number/8/2": {
+    "title": "Multiply fractions",
+    "signature": "ea5cd2dcfaca3058a9c6cdc14ae55ef4bccc6084df8e48d251c45755114fe069"
+  },
+  "7/number/8/3": {
+    "title": "Divide by a fraction",
+    "signature": "4037492299155ec8a92cafae57112e97ebcf636723172c63ab2aa4618b42c71c"
+  },
+  "7/number/9/1": {
+    "title": "Add and subtract decimals",
+    "signature": "afb70eef4b0c5fbd0a5c7ec1ad5c7604a38b25c67734bbe510fa7954fe2fd6df"
+  },
+  "7/number/9/2": {
+    "title": "Multiply and divide decimals",
+    "signature": "3cdee7358932dd8fdc4583093f66b91fdcc2cb0e991c8a3111a1955ec8dbeff2"
+  },
+  "7/number/9/3": {
+    "title": "Choose efficient number forms",
+    "signature": "73cc24e753a83c806cd1c3f2dc00eef64c64cb67a8969f07fe6d9f74d690263a"
+  },
+  "7/number/10/1": {
+    "title": "Read and simplify ratios",
+    "signature": "571257429c576c4ce5455893eb841af2871d08627579acafd2872b4162af509b"
+  },
+  "7/number/10/2": {
+    "title": "Share a total in a ratio",
+    "signature": "43bf35c4e3014962db9adcbb5e40ff0fe21b3125100aaba70af0f8e80753a9ef"
+  },
+  "7/number/10/3": {
+    "title": "Solve mixture and scale problems",
+    "signature": "7aa4f5d4580e054249e5df718e11ade2259d9b1bd19e61a0f73c2dc4fc94b0dc"
+  },
+  "7/number/11/1": {
+    "title": "Calculate discounts and final costs",
+    "signature": "a89c9448c6c3f605ae1e73c7128b9ab274c89690ab6402ac798b42f437b0f436"
+  },
+  "7/number/11/2": {
+    "title": "Calculate profit and loss",
+    "signature": "ca5a343e2de4a017ac7af4f3cfd45c121ba1c06f55ca0f0332ed39868949eee2"
+  },
+  "7/number/11/3": {
+    "title": "Compare value for money",
+    "signature": "53338db7072984118463f678263998eefd7351d132a0d830433c1684490365fc"
+  },
+  "7/number/12/1": {
+    "title": "Plan an expedition budget",
+    "signature": "08d517e851510118639e2aa706248706a1c838259e80979f399d239286292c4e"
+  },
+  "7/number/12/2": {
+    "title": "Model signed changes",
+    "signature": "f559b25763df0152ea6a30e7bc4ed0e10114db59a7877f4c59e06ff1f7700144"
+  },
+  "7/number/12/3": {
+    "title": "Justify a model and check a solution",
+    "signature": "ea7a703b179f7a58145a6563ec7ecc44a3760e3f8154bd93218e41c29f955c0d"
+  },
+  "7/measurement/1/1": {
+    "title": "Derive triangle area",
+    "signature": "558a1ebf9cdd7638561b4b32903bd6035482c6eba65a97de0573d9de0120100b"
+  },
+  "7/measurement/1/2": {
+    "title": "Use perpendicular height",
+    "signature": "13eb393888667f0756f330e6e75ef3eb17c27d90b5f08c83328851468ba347dc"
+  },
+  "7/measurement/1/3": {
+    "title": "Build parallelogram area",
+    "signature": "f4bf80d982cc320cf3270f9b69e9e164e5589325223d7a97017c184083bb8bdc"
+  },
+  "7/measurement/2/1": {
+    "title": "Recover a missing height",
+    "signature": "2f047416aea904bf04ad7959798f202d10050f8af6fcd8e1cfa49d830b2f924e"
+  },
+  "7/measurement/2/2": {
+    "title": "Compare area models",
+    "signature": "f676fb816ec4a171355a8538378fc9c0aaf193b80ccebc8acd44f3b1a20cc503"
+  },
+  "7/measurement/2/3": {
+    "title": "Plan materials and costs",
+    "signature": "80f73cc565d54e397b92b37106fcece22bbe894fc7571fe3a4cfbb145a2e7924"
+  },
+  "7/measurement/3/1": {
+    "title": "Count equal layers",
+    "signature": "459955f9af8bce4211c1b7b34e341b8bbd3f985a48e9af0282aabb7f6b5c1a5d"
+  },
+  "7/measurement/3/2": {
+    "title": "Use a constant cross-section",
+    "signature": "9c91cc9ea37f8a49759b4b09389c31efc3dc2d170af9affa38640785771d3a70"
+  },
+  "7/measurement/3/3": {
+    "title": "Build triangular prism volume",
+    "signature": "396ddf701e675e33b43c21b0b7fdffe50e4db04a82210ddd930cd5c1bb822e5d"
+  },
+  "7/measurement/4/1": {
+    "title": "Find an unknown prism length",
+    "signature": "a9ede52f6662a0f0268f353295c9e0bea49ac19e6fa4b956cc0f832cda1a7c57"
+  },
+  "7/measurement/4/2": {
+    "title": "Connect volume and capacity",
+    "signature": "e2fa9989f789a65a625b28917c2bc8293dcafb0943d2f0e29fc9f6f9d63d7851"
+  },
+  "7/measurement/4/3": {
+    "title": "Compare storage designs",
+    "signature": "8bf1b230f9a583137de15b350a5a720ab13f11722bf7b5027b031e5ce3e8f409"
+  },
+  "7/measurement/5/1": {
+    "title": "Connect radius and diameter",
+    "signature": "72aa78b05a7016a073fc804a84c466ddf1e05ac29df3a3ab1b9c5fc9813bbc6b"
+  },
+  "7/measurement/5/2": {
+    "title": "Understand pi",
+    "signature": "3fbf1e4973b2096cc7a1914096979b688143a07562ce675d59b91a7a2f98104b"
+  },
+  "7/measurement/5/3": {
+    "title": "Find circumference from diameter",
+    "signature": "d54eac4827fc00cdf288e72af67d697e4e8c2b85ce52650e7adc5d51ad27cdb2"
+  },
+  "7/measurement/6/1": {
+    "title": "Find circumference from radius",
+    "signature": "4f0bc4380edd96a7b20a01b88efa050bcc30e93ab936f84f008c8d6932a04f32"
+  },
+  "7/measurement/6/2": {
+    "title": "Work backwards around a circle",
+    "signature": "02bbbed3cfd37be8a22d804305c9aa1f2a7974c24a277db6aad8edfa43a2e3c2"
+  },
+  "7/measurement/6/3": {
+    "title": "Model circular journeys",
+    "signature": "276f07e21ac1bfc72371328c666da9e3e8ba09d2b5047effb49adb45fee1773a"
+  },
+  "7/measurement/7/1": {
+    "title": "Recognise corresponding angles",
+    "signature": "4914b7042e0c9cb500715e15d367cc8d13e96171b763819f2747f56ef6998084"
+  },
+  "7/measurement/7/2": {
+    "title": "Recognise alternate angles",
+    "signature": "bb821a4592c2f3f12ea4ad0ef75ad025a2f6a8d4ee794c32ae5e1e2d01d97e2b"
+  },
+  "7/measurement/7/3": {
+    "title": "Use co-interior angles",
+    "signature": "116b030ce813e36f5d78616c820dc74a920f126768d4e8eb01d2ca2a43531a0c"
+  },
+  "7/measurement/8/1": {
+    "title": "Find angles with algebra",
+    "signature": "68c2ded7f3c343c89c9b7ccf75b6c3ab6474b5121abf11957592cd67af1cb3cb"
+  },
+  "7/measurement/8/2": {
+    "title": "Test for parallel lines",
+    "signature": "7da21d60e79c1944fe9dff938b250c1febf761bb0acfd910b6cd0a246cdf9385"
+  },
+  "7/measurement/8/3": {
+    "title": "Model parallel supports",
+    "signature": "ab7c7bc024a8b3d205691801696427c37035975a65ca78901f795218ab41c96d"
+  },
+  "7/measurement/9/1": {
+    "title": "Derive the triangle angle sum",
+    "signature": "3e04fcdf3a355160a4c01df7b628a2263fe46bcc5faeb1e86e398de3709948ca"
+  },
+  "7/measurement/9/2": {
+    "title": "Use equal sides and angles",
+    "signature": "9ef6b9b49ae2d2e705e7a57fedb42e0435d1193b80b8be19f3035c55b33f513d"
+  },
+  "7/measurement/9/3": {
+    "title": "Connect interior and exterior angles",
+    "signature": "f9b9ab3596f6460ec43277134f7f5683621d6e21540a47ebd2960ab39c29df51"
+  },
+  "7/measurement/10/1": {
+    "title": "Split a quadrilateral",
+    "signature": "543e4c5f0c0b0fc4a079d593f7efa49989e6978b04406169cb530769b7893de0"
+  },
+  "7/measurement/10/2": {
+    "title": "Generalise polygon sums",
+    "signature": "7d44fc1012a1f9d2acfb3220c06cc2f1c44036f61086ee5c0d5ed018958cccc1"
+  },
+  "7/measurement/10/3": {
+    "title": "Find missing polygon angles",
+    "signature": "7d3c68cc0549ce73d76e62494afa6cd8294a98c19d79efd14cfc65cae7dc9360"
+  },
+  "7/measurement/11/1": {
+    "title": "Scale a recipe",
+    "signature": "3c819bc163646b65e3c03ffa370bc480b00ac76107dec8a1434dcf57ba826842"
+  },
+  "7/measurement/11/2": {
+    "title": "Share a measured total",
+    "signature": "03a94e94af8a80657d14d5e1c41e6292c36f6c2bc7a95facd6966c532a3a0eff"
+  },
+  "7/measurement/11/3": {
+    "title": "Compare feasible mixtures",
+    "signature": "3ba8d44c43be73730d1a427972506b5b6609ab299f6c30012775231c47234596"
+  },
+  "7/measurement/12/1": {
+    "title": "Restore a mixture",
+    "signature": "5332a83964c2cc029384b685fd7e02b14eec23d346a8cce508e6094a4446c937"
+  },
+  "7/measurement/12/2": {
+    "title": "Scale a construction plan",
+    "signature": "9dbd2576fe855ac25f0d4d34c1c9e13685c27536a7555eabdd081bdf3d8dc2c1"
+  },
+  "7/measurement/12/3": {
+    "title": "Justify a practical plan",
+    "signature": "dd33966749f1191fc6bb9824260141bac227ab0de165ab8fef270276acccc942"
+  },
+  "7/space/1/1": {
+    "title": "Recognise cube nets",
+    "signature": "30bcadfe1e97596ddf42d3f568b002a542f5526cedf4270926d0df33d68be5dd"
+  },
+  "7/space/1/2": {
+    "title": "Track faces when folding",
+    "signature": "a7fce55d1e4bbf27e84bf59f80131838561b2fff6d9f3d8f9893796a36d9758d"
+  },
+  "7/space/1/3": {
+    "title": "Represent prisms with nets",
+    "signature": "b3bcc136d9a5f34636a54c15c1d4d4ef1bedb1376ad54a5bf13a34b3088e7dcf"
+  },
+  "7/space/2/1": {
+    "title": "Read a footprint",
+    "signature": "8bdd6bed76a0cebe2ffe20115c9b137b94ecce3121bd79957d03b212e894deba"
+  },
+  "7/space/2/2": {
+    "title": "Infer a front view",
+    "signature": "934e585806232323c0286b84ebadeafad69a3c8af25f7bd41e2a6720981d9bd9"
+  },
+  "7/space/2/3": {
+    "title": "Infer a side view",
+    "signature": "a81026c0c2b660c18d83dcdae71f4d1f4ed222e685f070259cff07e5c7937ff2"
+  },
+  "7/space/3/1": {
+    "title": "Reconstruct a cube model",
+    "signature": "433c2e2d4657bfe384f946c3239b8b20e210d06a718e9ba2ffcd25ff5a226804"
+  },
+  "7/space/3/2": {
+    "title": "Identify missing information",
+    "signature": "48eefe19db7a884a5294990f0c86c4bc2d62e2b08cf149a0a22687e0cc542716"
+  },
+  "7/space/3/3": {
+    "title": "Choose a representation",
+    "signature": "585b42acdbd4e14ba9f1d44dd6be4b6cfce4324467dafc85d4a7b340da739748"
+  },
+  "7/space/4/1": {
+    "title": "Classify triangles by sides and angles",
+    "signature": "f2a3c64babc0c99a214197c5e5deb9810c13892d9bddafd12968408f90f5d3c1"
+  },
+  "7/space/4/2": {
+    "title": "Test possible triangles",
+    "signature": "ffa80abc60edc5ffb5761a781b6dfd71d7bfe64182491492364d73484e7da238"
+  },
+  "7/space/4/3": {
+    "title": "Connect quadrilateral properties",
+    "signature": "f2e193a0b75c1deba6e0e08672139c02d40b21c202fb02753cb93152bb4e1b57"
+  },
+  "7/space/5/1": {
+    "title": "Build the quadrilateral family tree",
+    "signature": "c77d8646582a3b3e4189e6d1cb7d9ddec3a74c6ed57b215f7a0859de948b2653"
+  },
+  "7/space/5/2": {
+    "title": "Compare kites and trapeziums",
+    "signature": "aafd1d40b2d12d06cba433268cbf024a0b7036055123d06582155576c8d22ddb"
+  },
+  "7/space/5/3": {
+    "title": "Test regularity",
+    "signature": "b756638fd6dc71e9e1344a19dacb7eaff5ab8bef1b51fc5629ed34a660f2f57a"
+  },
+  "7/space/6/1": {
+    "title": "Translate a point",
+    "signature": "06b90055ea6df3c27bd9bd5147d0b1c3e95a0e43d0508d1046b84991fa71e130"
+  },
+  "7/space/6/2": {
+    "title": "Translate a whole shape",
+    "signature": "ffb238a49a9f50c707c6d34385afc7ebec2acfa7ceb6dff611c8dd93b419ea6b"
+  },
+  "7/space/6/3": {
+    "title": "Describe a translation",
+    "signature": "28d071bc6a780ce0164ab09b3ccf53fa5850524bf3473dba32d89a25c622b0f4"
+  },
+  "7/space/7/1": {
+    "title": "Reflect in an axis",
+    "signature": "a208394123b15ca943fe3c5d005e704418091a8265c4c5316d196f5ad49134ca"
+  },
+  "7/space/7/2": {
+    "title": "Combine parallel reflections",
+    "signature": "cb9b624fbd4e7cf9bd91874f017205b43767af089fa9085dd06c55924bcf6a5e"
+  },
+  "7/space/7/3": {
+    "title": "Compare transformation sequences",
+    "signature": "dfed93e9b724da339955d51eef8c545c1e4e1f381d629cda97c3ee8743c6833c"
+  },
+  "7/space/8/1": {
+    "title": "Rotate about the origin",
+    "signature": "d13390062fbafbac4e43551df062565271a1361ba4ce099a36f2fe31f8a30f1e"
+  },
+  "7/space/8/2": {
+    "title": "Rotate about a given centre",
+    "signature": "bc6ed0aa5cbf4127fd683f456061a9c3c428754814c6b6ac18562d7242793b70"
+  },
+  "7/space/8/3": {
+    "title": "Classify before and after a move",
+    "signature": "ea952e0a9357f02fe4b6f128cbf4b1072c3cecc491b4c0db1249b6a84f9cdf13"
+  },
+  "7/space/9/1": {
+    "title": "Classify triangles with reasons",
+    "signature": "91b6fd92658bdf73c22988a56ab8ffaccd5c49fb13f86e5bedc44a21d0cdc7f4"
+  },
+  "7/space/9/2": {
+    "title": "Classify quadrilaterals with reasons",
+    "signature": "fbe2e13761e0ac50fbd123bc64a162cf34b2fd22ca8763976c7e1024d6611d38"
+  },
+  "7/space/9/3": {
+    "title": "Classify polygons with reasons",
+    "signature": "6bbb84c24923daa50d8e2858cf42b5beaab83107baeff151daf48f8de91fc453"
+  },
+  "7/space/10/1": {
+    "title": "Sort polygons",
+    "signature": "151cd362a1bb5794cb1655900665a65011908abc6acb9df812993b1b6be625ac"
+  },
+  "7/space/10/2": {
+    "title": "Fix a broken sorter",
+    "signature": "63f81f89f543b26fb88a53f702e453110800f143650d7361cff9f6928c9b8008"
+  },
+  "7/space/10/3": {
+    "title": "Design your own sorter",
+    "signature": "c05a138e0ebfdc1cda86d7c6fe550d94db40d442802c2cf753a649ce02ea93ae"
+  },
+  "7/pattern/1/1": {
+    "title": "Understand a variable",
+    "signature": "2cfa5118d7d3a862b88b58cb591c316c38567410d3d40b4f92029affc948c312"
+  },
+  "7/pattern/1/2": {
+    "title": "Substitute one value",
+    "signature": "5f9bd3843f704ec5cdf47d507b23e2d3c045ff8eb431afec0d8039a9679489b4"
+  },
+  "7/pattern/1/3": {
+    "title": "Substitute several values",
+    "signature": "82e14cf725deaa252b03fc8dfb1a8cd9f75aaed200b11276227e5647411aea12"
+  },
+  "7/pattern/2/1": {
+    "title": "Translate words into symbols",
+    "signature": "1df4763132e13f5ae5ac5227a5535d1f0e0622ffef210cba5bca089d20bd3903"
+  },
+  "7/pattern/2/2": {
+    "title": "Represent a changing cost",
+    "signature": "d781ef6787479c11829feff5d652742fc270ab3b5ca5bd0dbe57c9a79c756bae"
+  },
+  "7/pattern/2/3": {
+    "title": "Write perimeter expressions",
+    "signature": "5c9647a5266351373288493075e2f63faddfce171828f33ce17577f7a7ae74b4"
+  },
+  "7/pattern/3/1": {
+    "title": "Preserve the calculation order",
+    "signature": "3ac788bdedbe13494937caa0682f06b478d8c0f11f1cf071213e005ca34b9513"
+  },
+  "7/pattern/3/2": {
+    "title": "Compare expressions",
+    "signature": "aea43e17c3270dce417901f2c6a2e138f6b518a2f1d5dc1cd815f9c2f52ecf3d"
+  },
+  "7/pattern/3/3": {
+    "title": "Model a discount per item",
+    "signature": "75e9dff92dfef3dc3d295330a500000587a61fa6b17c638e4b36c2fbb5e4c245"
+  },
+  "7/pattern/4/1": {
+    "title": "Undo addition and subtraction",
+    "signature": "eb3fa14d1f928b34b0483a40ab1a619933b85239ef687586b864769d28585e5f"
+  },
+  "7/pattern/4/2": {
+    "title": "Undo multiplication and division",
+    "signature": "0e10c24f77a549ae398dbe68cc2216193fe4e601c1fbd64c96ac6404c4c80cbe"
+  },
+  "7/pattern/4/3": {
+    "title": "Verify a solution",
+    "signature": "2517d27e71dae0ef99d8fbd8de28bb7d3a2efd4a00f158eabc6d0338ec854202"
+  },
+  "7/pattern/5/1": {
+    "title": "Backtrack through two steps",
+    "signature": "93a6729d0c5950fa54f2e2eedddc55a4c3b60af4cb107bf521530617d454796b"
+  },
+  "7/pattern/5/2": {
+    "title": "Solve grouped equations",
+    "signature": "8cd8dd0d775514d645dab24f4aca1b06a52aad75c3838cf6b3ae9d03912362fb"
+  },
+  "7/pattern/5/3": {
+    "title": "Solve division equations",
+    "signature": "68dc6ad6882b8015ce9d988951d142450112664b6080f55725f57c7130c845fc"
+  },
+  "7/pattern/6/1": {
+    "title": "Solve perimeter equations",
+    "signature": "544f907eaeb0a7dd4d39137e3f2ffd397976a368f9df38c79865417f81272d7c"
+  },
+  "7/pattern/6/2": {
+    "title": "Form an equation from a story",
+    "signature": "a3c26ed53403c9b156f468b244c3c6a8ee674cfff976fe3ff801d072971b5dc3"
+  },
+  "7/pattern/6/3": {
+    "title": "Diagnose an equation error",
+    "signature": "2dc555d6ef6b7fb7a8e9b468ab7a9265498b795c54891b2a4560d00c6f1c04c7"
+  },
+  "7/pattern/7/1": {
+    "title": "Read a graph value",
+    "signature": "c8c6e79f6d40d06836bc9ff76270bdbd3d91c6ef0ef3065e3c46c742e6b0be7b"
+  },
+  "7/pattern/7/2": {
+    "title": "Describe a journey graph",
+    "signature": "15b324d6fefc56cf2d70e92deec6ba8c19b293f2fa545b100843cf1fb8617c61"
+  },
+  "7/pattern/7/3": {
+    "title": "Compare change and graph limits",
+    "signature": "553f0ed6c2c97de27dccdac2f45428eb7dfe7bc26c0527d0aea00e3ff66f4235"
+  },
+  "7/pattern/8/1": {
+    "title": "Extend a visual pattern",
+    "signature": "f4ec2438659c9eb5276214dd0134c952c8eb9b078de5f6eb0ab537051736a452"
+  },
+  "7/pattern/8/2": {
+    "title": "Write a stage rule",
+    "signature": "beafbc436d4616501f22ce97741d1b76683d085df8633965e36959474e003079"
+  },
+  "7/pattern/8/3": {
+    "title": "Find an unknown stage",
+    "signature": "e78167e99b270a71af1dac2d84e5b6bfd351f250f853aaad5065df2468a5c759"
+  },
+  "7/pattern/9/1": {
+    "title": "Generate outputs",
+    "signature": "08e25fcecd67937c0b5bc2743bcdd125a1cc29bb3271ee5fd49443da17608b2e"
+  },
+  "7/pattern/9/2": {
+    "title": "Find an input",
+    "signature": "085052fcf3c0d788c2799ac83ef60a5be9e64dce6228d45bbb2403c81580ca05"
+  },
+  "7/pattern/9/3": {
+    "title": "Connect a table and rule",
+    "signature": "046272ae0e4402abf7739ac367b9f4670f8c79653eaa35ec59bc13360da992c2"
+  },
+  "7/pattern/10/1": {
+    "title": "Plot ordered pairs",
+    "signature": "bba68bb595b074bb4e7f653001d7aecd6f30ba0a21dfeec1ccc87c9e32e3a61c"
+  },
+  "7/pattern/10/2": {
+    "title": "Connect a graph and rule",
+    "signature": "924e147052c5ce136804a241e20bbf4daeacd7daa44017069c54aa8c2e8399d4"
+  },
+  "7/pattern/10/3": {
+    "title": "Interpret a graph prediction",
+    "signature": "881f4e4ef8d0add2d3f0fed72d50622f0181fc4674e6a213f9743414139f90b1"
+  },
+  "7/pattern/11/1": {
+    "title": "Vary one input",
+    "signature": "9cd982a040b266a8b9c68f2ae5559f08a5f60f6dd2668e80767d51ebc75aa0fa"
+  },
+  "7/pattern/11/2": {
+    "title": "Vary two inputs",
+    "signature": "941404d786e7b265d33faf8594b929064156b6f0361ac0c51f984c0778674f9b"
+  },
+  "7/pattern/11/3": {
+    "title": "Keep an output constant",
+    "signature": "cd8759d1a611523529de38cca44a6b5480d07eecd9dc5c40fab20695340f3e5f"
+  },
+  "7/pattern/12/1": {
+    "title": "Compare two cost formulas",
+    "signature": "4c081ce5634b5d21137fd3d4948a336f9ca2229a6253606b9fdb4174f79515b5"
+  },
+  "7/pattern/12/2": {
+    "title": "Find a target formula input",
+    "signature": "039004e54f6f30b24e1dc4c69cb869dda0664aa14cb251aecdeea4951920c4e2"
+  },
+  "7/pattern/12/3": {
+    "title": "Explain a formula investigation",
+    "signature": "cc80aea3cab0d050150cae6d63daf915c35a9708362a8789cf37221a8f6a536a"
+  },
+  "7/statistics/1/1": {
+    "title": "Distinguish numerical variables",
+    "signature": "72066daf9816687e04389b1b1b2efdd896f3a74f0cd7ca2496433661604b8d97"
+  },
+  "7/statistics/1/2": {
+    "title": "Ask an investigable question",
+    "signature": "7643a059bb7d2496ee435ddc7d2d99229312fb0b22b565d12ea0a80e97da6ebf"
+  },
+  "7/statistics/1/3": {
+    "title": "Plan consistent collection",
+    "signature": "4ed4b0fb8aad99d3f22526cd4e4f2a265e658e581664c3d0b792a427336c0655"
+  },
+  "7/statistics/2/1": {
+    "title": "Calculate a mean",
+    "signature": "fb033219de6cf125a9ac7f592e39f6a281e452feca701ff8fe7eebfebc97f1ec"
+  },
+  "7/statistics/2/2": {
+    "title": "Recover a missing observation",
+    "signature": "af759488af945b9d51e9e7c09262e95d6b0102b503d70c2be5d3041fec81d008"
+  },
+  "7/statistics/2/3": {
+    "title": "Use a frequency table",
+    "signature": "b3bbde34a12b074f13699e15e07516624080ab287622b9343e6dfe1dabbc7f6b"
+  },
+  "7/statistics/3/1": {
+    "title": "Find an odd-sized median",
+    "signature": "f6be910c03b95322901ea5b05018861fdec4cad909a73a5e459b5e8457dbeb47"
+  },
+  "7/statistics/3/2": {
+    "title": "Find an even-sized median",
+    "signature": "5f2a0fd3582d6f3a3c28978e6a9c31f5d2221fce556cc39e48e13676fa343cfa"
+  },
+  "7/statistics/3/3": {
+    "title": "Identify modes",
+    "signature": "25fabf108a077b7131080544ab6d9ef08841a78dbad5d61133f7d0fdc7ba987e"
+  },
+  "7/statistics/4/1": {
+    "title": "Calculate a range",
+    "signature": "b8e76ff9267afb6194b3acabc552519f48c72b56e24ba3f289a3967e881d0847"
+  },
+  "7/statistics/4/2": {
+    "title": "Investigate an outlier and mean",
+    "signature": "31682f2cfe81e9653e68b5a4bd406aa29650d57bb88566e23ca05b47c36a0c2c"
+  },
+  "7/statistics/4/3": {
+    "title": "Investigate an outlier and median",
+    "signature": "abf19b800e0b15dace4774bc6c1f4acd71a6b91116cd386baccaa3847b752ad6"
+  },
+  "7/statistics/5/1": {
+    "title": "Choose a representative centre",
+    "signature": "90ffe676877c2df0356fabb6b6bb17c68c0411befdc365a40626c5a8e8af6ebd"
+  },
+  "7/statistics/5/2": {
+    "title": "Same centre, different data",
+    "signature": "fb07525d03d330e365c932b7180af09016ece24341ee2d4af392a8c592c5076e"
+  },
+  "7/statistics/5/3": {
+    "title": "Compare groups fairly",
+    "signature": "a36c93bd6fb547e3e515b20d51893f6cabba5ce207676feaa50b2e8d9baf6ecb"
+  },
+  "7/statistics/6/1": {
+    "title": "Read a stem-and-leaf key",
+    "signature": "0d4a0e66575688f3162beed5613b33e3150c7b008c1a0c7daaf71689532d6836"
+  },
+  "7/statistics/6/2": {
+    "title": "Construct ordered leaves",
+    "signature": "e966eb9ae768654bbe06129f298e696172844b0e9f995e9dc13515c34f74c3aa"
+  },
+  "7/statistics/6/3": {
+    "title": "Summarise a stem-and-leaf plot",
+    "signature": "0220e7e32d4fd1e1797d5d2449c2317139cc9a057d97e132382bc07f747e488b"
+  },
+  "7/statistics/7/1": {
+    "title": "Build a dot plot",
+    "signature": "e5c3986c19b51e8c07af3ae703d9f22d353fb9a8e008943a38621e3d8cfaaddd"
+  },
+  "7/statistics/7/2": {
+    "title": "Connect frequencies and displays",
+    "signature": "65679b7bdcb68881028c670cec0ffd3e517b72ae0f6e4ae8bc572619ca1cf73b"
+  },
+  "7/statistics/7/3": {
+    "title": "Compare groups with displays",
+    "signature": "f61eb5be160f8dc2034007df8825a6a82018d31f9863c30d6a6d935d2fd780ce"
+  },
+  "7/statistics/8/1": {
+    "title": "Describe symmetry, skew and bimodal shapes",
+    "signature": "4a1ea7caa0b9fbf3531a25149278a8f27f23a8ea47b0ebc808dafcd1e08b0ff2"
+  },
+  "7/statistics/8/2": {
+    "title": "Identify clusters and gaps",
+    "signature": "3a8703429aaf5e01090cd9dc3cfcf7732992ea8df9de771eb2d7ec91d1738ad5"
+  },
+  "7/statistics/8/3": {
+    "title": "Connect shape and centre",
+    "signature": "5186277a684f0c17554dcf4468dfec1bc606fc23984ce697b22ac22186e32283"
+  },
+  "7/statistics/9/1": {
+    "title": "Choose a fair comparison",
+    "signature": "a2e024edce688273ab41d5b54dc77d5d24c87483db51031babfd234f258d20a7"
+  },
+  "7/statistics/9/2": {
+    "title": "Check unusual measurements",
+    "signature": "2c4636aab2f25a9b009eba592ff39a08218a8bcd621591c300f45cdaf1f04327"
+  },
+  "7/statistics/9/3": {
+    "title": "Evaluate a design improvement",
+    "signature": "26d3ee7e091ce7f03c125edf3d46bc0a4a01ce62f06d39e1d1c2b7cafb9aafcc"
+  },
+  "7/statistics/10/1": {
+    "title": "Analyse continuous measurements",
+    "signature": "8cd213bb7906c1555a477033eb9aecaaacff83bf1b7dc835f7557007c9f445f3"
+  },
+  "7/statistics/10/2": {
+    "title": "Support a conclusion",
+    "signature": "6e00fa7bbbba048ff8426fa482128285289e07a01b92fcb238b38e53f6203fd8"
+  },
+  "7/statistics/10/3": {
+    "title": "Recognise investigation limits",
+    "signature": "417d131021bd106290d8b053fd0d42b8636817455b6b94533cf9fb1962f814d8"
+  },
+  "7/chance/1/1": {
+    "title": "List a sample space",
+    "signature": "5a3685b7034493c8ef563e24054821be60c45f2260fe3d812c617cfe65335fb6"
+  },
+  "7/chance/1/2": {
+    "title": "Identify a favourable event",
+    "signature": "8c794150630648a3a62fbcf1a4997cd458c35bdc96d9048c34f4e54112efdd34"
+  },
+  "7/chance/1/3": {
+    "title": "Check a complete sample space",
+    "signature": "7eac273f0180a879f7d62edf2d41fed5ef936130f5bfbee5c1704387e39c6818"
+  },
+  "7/chance/2/1": {
+    "title": "Use equally likely outcomes",
+    "signature": "dba8666ca44a6f1d134c80dfc12ec4b15337b71e6f95fe92543f8353a5b85c8d"
+  },
+  "7/chance/2/2": {
+    "title": "Reason about unequal likelihood",
+    "signature": "ff377b57af3b94cc4dba18983bf92d560747b8ee334dc8cae5da9f2cadd72ff7"
+  },
+  "7/chance/2/3": {
+    "title": "Find a not-event",
+    "signature": "7941857094c187affd9e8fbbfcf0a6cb7c7c8453dbb5b5496a700e93bb3818fc"
+  },
+  "7/chance/3/1": {
+    "title": "Connect fraction and decimal",
+    "signature": "4a7302d1eaeae37b31d5a09ce625cf8ed0af285d7b2566560d7216c05c33982a"
+  },
+  "7/chance/3/2": {
+    "title": "Complete a probability model",
+    "signature": "1db0228c61ccfc1101aaf666aad94c20e89a31d826ea0a65da4e3efb4093832b"
+  },
+  "7/chance/3/3": {
+    "title": "Compare fair winning chances",
+    "signature": "8833207812e3b69d7ac854ecc059a738c5df087c3b5ea38de125bb0882742c62"
+  },
+  "7/chance/4/1": {
+    "title": "Predict an expected count",
+    "signature": "c1a84a06efca70f0ae43d46ee30e02bf8c91adbe9dd9bd36539e8704a7dc722d"
+  },
+  "7/chance/4/2": {
+    "title": "Predict a relative frequency",
+    "signature": "691e5b5d505ee41d3498c41550860d93ebd72dcfd83b247e6a0028939997b2de"
+  },
+  "7/chance/4/3": {
+    "title": "Recover a prediction model",
+    "signature": "8758731af9e6064307fe413625f741e7dfed4034c7705ab2042f76ac05946047"
+  },
+  "7/chance/5/1": {
+    "title": "Record trial totals",
+    "signature": "11d8b1e4a15e0fdc3a352d1ee5b803cd13f39c460f13b9ed7e25c8fc5f53e1bc"
+  },
+  "7/chance/5/2": {
+    "title": "Calculate observed frequency",
+    "signature": "5423e39a9df4df1d6e0e10f551604ef4343a26754551eec19375fc8b0363e8eb"
+  },
+  "7/chance/5/3": {
+    "title": "Compare observed and expected",
+    "signature": "c80a8fba58cd23ad89a0aab1b232c39a7d7351413945e96f6c2d2ef28b7c5c05"
+  },
+  "7/chance/6/1": {
+    "title": "Map random outcomes fairly",
+    "signature": "999428595f7053662b0a9d4eaf02556e13d3782f4a3a94398c98c515afc64901"
+  },
+  "7/chance/6/2": {
+    "title": "Check a simulation rule",
+    "signature": "378d34d8c279d0a145e2afd7c23b8c89576738cfb3fc0eca2c840639a3f4e80a"
+  },
+  "7/chance/6/3": {
+    "title": "Run and summarise trials",
+    "signature": "1f9840b30073651afd53c9aee069c8730184574ad569e04f274bcde7b1b69ccc"
+  },
+  "7/chance/7/1": {
+    "title": "Explain variation between runs",
+    "signature": "0142ef9367bd991f7276a6507e1a952b9961706f4370463d7ef73086a90af58b"
+  },
+  "7/chance/7/2": {
+    "title": "Compare small and large runs",
+    "signature": "318cf6168476437b0f7607e5602f82b905ab2498776503e1c620050a6bc18f07"
+  },
+  "7/chance/7/3": {
+    "title": "Challenge chance misconceptions",
+    "signature": "9a25ea79ac65d6362c5f71d4c03f83df2aa732e1221b528cfed19ee11697cb62"
+  },
+  "7/chance/8/1": {
+    "title": "Plan a chance investigation",
+    "signature": "64c37a100d2186c357bb9083ac94ab8f9b4553a87a002f2576d91c5951fa2f93"
+  },
+  "7/chance/8/2": {
+    "title": "Compare experimental evidence",
+    "signature": "ba776e5cf918a88a1e721ba3eaf5231fc0ae3470c64ab043ab0f78677788f9e2"
+  },
+  "7/chance/8/3": {
+    "title": "Report a simulation conclusion",
+    "signature": "67e18fcc0a2dd45e7d0845c30d417205271edcc5bf8fcdd6e4791720584af645"
+  }
+}

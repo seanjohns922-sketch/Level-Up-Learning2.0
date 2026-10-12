@@ -1,4 +1,5 @@
 'use client';
+import {level7WorkedSteps} from '@/data/activities/teaching/level7-working';
 import Space7LearningLab from "./cave7/Space7LearningLab";
 import {useEffect,useRef} from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
@@ -15,7 +16,7 @@ export default function Space7SkillGuide({week,lesson,onContinue,review=false}:{
  const example=space7Question(week,lesson,7007);
  const further=(['reasoning','apply_create'] as const).map(role=>space7Question(week,lesson,7007,role));
  // Skip steps that only repeat the lesson's opening idea, which is already shown above.
- const all=solutionSteps(example.explanation),fresh=all.filter(x=>!guide.idea.includes(x.replace(/\.$/,''))),steps=fresh.length?fresh:all,answer=answerText(example);
+ const all=solutionSteps(example.explanation),fresh=all.filter(x=>!guide.idea.includes(x.replace(/\.$/,''))),steps=level7WorkedSteps('space',week,lesson,fresh.length?fresh:all),answer=answerText(example);
  return <section className={`${layout.guide} rounded-2xl border border-violet-200 bg-[#faf8ff] p-5 text-[#25133f] shadow-xl sm:p-8`} aria-label="Learn the skill">
   <div className="text-xs font-bold uppercase tracking-widest text-violet-800">Learn the skill · Week {week} · Lesson {lesson}</div>
   <div className="mt-3 flex items-start justify-between gap-3"><h2 className="text-2xl font-black sm:text-3xl">{guide.title}</h2><ReadAloudBtn text={`${guide.title}. I am learning to ${guide.goal}. ${guide.idea}`}/></div>

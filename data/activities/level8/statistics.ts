@@ -296,8 +296,8 @@ const randomVsNon: Form[] = [
     return { prompt: `${text} Which sampling method is this?`, answer, choices: [...METHODS], steps: ["Simple random: anyone from the full list. Systematic: every kth. Stratified: random from each group. Cluster: whole groups. Convenience: whoever is easy to reach.", `So this is ${answer.toLowerCase()} sampling.`] };
   },
   (r) => {
-    const pop = 20 * r(20, 60), n = pick(r, [20, 40, 50, 80]);
-    return { prompt: `To take a systematic sample of ${n} from ${pop} names, every kth name is chosen. What is k?`, answer: pop / n, steps: [`k = ${pop} ÷ ${n}.`, `k = ${pop / n}.`] };
+    const k = r(5, 25), n = pick(r, [20, 40, 50, 80]), pop = n * k;
+    return { prompt: `To take a systematic sample of ${n} from ${pop} names, every kth name is chosen after a random start. What is k?`, answer: k, steps: [`Divide the population by the sample size: k = ${pop} ÷ ${n} = ${k}.`, `Choose a random start from 1 to ${k}, then every ${k}th name. The whole-number interval gives ${n} selections.`] };
   },
 ];
 const chooseMethod: Form[] = [

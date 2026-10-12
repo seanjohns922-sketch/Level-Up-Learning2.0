@@ -1,0 +1,1985 @@
+{
+  "date": "2026-10-12",
+  "scope": "Opening Learn the skill guidance for all Level 7 and Level 8 lessons across six realms",
+  "findings": [
+    "Level 8 opening guides previously reused short assessment-feedback steps without a key idea or transferable check.",
+    "Several fixed-seed examples did not directly teach their lesson title.",
+    "Selected Level 7 worked solutions skipped intermediate arithmetic, including decimal conversion, medians, ratios and transformations.",
+    "Conceptual examples sometimes referred to answer choices that the guide did not display.",
+    "A systematic-sampling practice variant could request a fractional name interval."
+  ],
+  "counts": {
+    "reviewed": 390,
+    "level7": 192,
+    "level8": 198,
+    "level8Rewritten": 198,
+    "level7Expanded": 74,
+    "level7Retained": 118,
+    "level8ReplacedExamples": 33
+  },
+  "design": [
+    "Teach the concept, demonstrate actual intermediate steps, then check or transfer the method.",
+    "Keep reviewed fixed examples and preserve matching existing visuals; replacements never inherit unrelated diagrams.",
+    "Keep valid Level 7 explanations and interactive fraction/decimal demonstrations.",
+    "Supply read-aloud text for added concepts, working, checks and conceptual choices.",
+    "Keep practice entry and progression unchanged."
+  ],
+  "regressionCheck": "npm run qa:upper-skill-guides (also required by prebuild)",
+  "testLimits": [
+    "Automated rendering stubs artwork and speech playback: it verifies supplied speech text, not audible pronunciation.",
+    "Example signatures detect content drift; they are not proof of pedagogical quality. Future content edits still require mathematical and teaching review.",
+    "This audit is of lesson-opening guides, not a fresh review of every generated practice or assessment variant. Existing practice QA additionally checks 9900 Level 8 questions."
+  ],
+  "lessons": [
+    {
+      "key": "8/number/1/1",
+      "title": "Recognise rational and irrational numbers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/1/2",
+      "title": "Locate square roots on a number line",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/1/3",
+      "title": "Understand pi as an irrational number",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/2/1",
+      "title": "Multiply powers with the same base",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/2/2",
+      "title": "Divide powers with the same base",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/2/3",
+      "title": "Explain the zero exponent",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/3/1",
+      "title": "Raise a power to a power",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/3/2",
+      "title": "Combine exponent laws",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/3/3",
+      "title": "Check bases and brackets",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/4/1",
+      "title": "Recognise terminating decimals",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/4/2",
+      "title": "Read and write recurring decimals",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/4/3",
+      "title": "Predict terminating decimals from fractions",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/5/1",
+      "title": "Add and subtract signed numbers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/5/2",
+      "title": "Multiply and divide signed numbers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/5/3",
+      "title": "Use brackets and order of operations",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/6/1",
+      "title": "Add and subtract rational numbers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/6/2",
+      "title": "Multiply and divide fractions",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/6/3",
+      "title": "Choose efficient fraction strategies",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/7/1",
+      "title": "Add and subtract signed decimals",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/7/2",
+      "title": "Multiply and divide decimal numbers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/7/3",
+      "title": "Choose fractions or decimals to calculate",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/8/1",
+      "title": "Regroup to simplify a calculation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/8/2",
+      "title": "Estimate and check rational-number answers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/8/3",
+      "title": "Solve a mixed-operation problem",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/9/1",
+      "title": "Calculate percentage increases",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/9/2",
+      "title": "Calculate percentage decreases",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/9/3",
+      "title": "Compare changes using the original amount",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/10/1",
+      "title": "Model mark-ups and discounts",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/10/2",
+      "title": "Calculate tax-inclusive and tax-exclusive prices",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/10/3",
+      "title": "Explain successive percentage changes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/11/1",
+      "title": "Model pay and a simple budget",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/11/2",
+      "title": "Use a supplied income-tax table",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/11/3",
+      "title": "Compare financial choices and assumptions",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/12/1",
+      "title": "Choose exact values or useful approximations",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/12/2",
+      "title": "Solve a rational-number modelling problem",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/number/12/3",
+      "title": "Check and explain a percentage model",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/1/1",
+      "title": "Find missing boundary lengths",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/1/2",
+      "title": "Find the perimeter of a composite shape",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/1/3",
+      "title": "Split a shape to calculate its area",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/2/1",
+      "title": "Estimate area using a grid",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/2/2",
+      "title": "Improve an irregular-area estimate",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/2/3",
+      "title": "Choose perimeter or area for a practical task",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/3/1",
+      "title": "Connect cubic units with litres",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/3/2",
+      "title": "Calculate the volume of a right prism",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/3/3",
+      "title": "Find capacity and compare containers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/4/1",
+      "title": "Find a missing prism dimension",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/4/2",
+      "title": "Work out how many boxes fit",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/4/3",
+      "title": "Model filling a tank",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/5/1",
+      "title": "Connect radius and diameter",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/5/2",
+      "title": "Calculate circumference",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/5/3",
+      "title": "Calculate the area of a circle",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/6/1",
+      "title": "Find a radius from area or circumference",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/6/2",
+      "title": "Measure semicircles and rings",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/6/3",
+      "title": "Choose a formula for a circular design",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/7/1",
+      "title": "Identify the hypotenuse",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/7/2",
+      "title": "Explain the squares on a right triangle",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/7/3",
+      "title": "Calculate the hypotenuse",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/8/1",
+      "title": "Find a shorter side",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/8/2",
+      "title": "Calculate a ladder length or diagonal",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/8/3",
+      "title": "Recognise and check Pythagorean triples",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/9/1",
+      "title": "Convert times using supplied UTC offsets",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/9/2",
+      "title": "Calculate travel time across zones",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/9/3",
+      "title": "Plan a meeting across dates and time zones",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/10/1",
+      "title": "Read a rate and its units",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/10/2",
+      "title": "Calculate speed, distance and time",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/10/3",
+      "title": "Compare flow and consumption rates",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/11/1",
+      "title": "Use a map scale",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/11/2",
+      "title": "Scale a mixture or material plan",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/11/3",
+      "title": "Build and check a ratio or rate model",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/12/1",
+      "title": "Plan a shape or container design",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/12/2",
+      "title": "Combine duration and rate calculations",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/measurement/12/3",
+      "title": "Review a practical measurement model",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/1/1",
+      "title": "Match corresponding sides and angles",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/1/2",
+      "title": "Recognise congruent shapes after a movement",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/1/3",
+      "title": "Test congruence by overlaying shapes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/2/1",
+      "title": "Use three sides to test congruence",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/2/2",
+      "title": "Use sides and an included angle",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/2/3",
+      "title": "Use angles or a right triangle to test congruence",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/3/1",
+      "title": "Recognise similar shapes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/3/2",
+      "title": "Calculate a scale factor",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/3/3",
+      "title": "Find missing corresponding lengths",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/4/1",
+      "title": "Use triangle angles to test similarity",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/4/2",
+      "title": "Compare congruence and similarity",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/4/3",
+      "title": "Check what a transformation preserves",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/5/1",
+      "title": "Compare sides and angles",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/5/2",
+      "title": "Compare diagonals and symmetry",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/5/3",
+      "title": "Classify quadrilaterals using their properties",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/6/1",
+      "title": "Use congruent triangles to explain properties",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/6/2",
+      "title": "Find unknown angles and lengths",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/6/3",
+      "title": "Test a quadrilateral claim with a counterexample",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/7/1",
+      "title": "Read three coordinates in order",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/7/2",
+      "title": "Place a point in a 3D grid",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/7/3",
+      "title": "Rotate a view without changing position",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/8/1",
+      "title": "Follow a route through a 3D grid",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/8/2",
+      "title": "Locate vertices and vertical columns",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/8/3",
+      "title": "Describe a practical 3D position",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/9/1",
+      "title": "Trace a congruence or similarity flowchart",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/9/2",
+      "title": "Find and repair a faulty decision",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/9/3",
+      "title": "Create and test a sorting algorithm",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/10/1",
+      "title": "Explain a shape comparison",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/10/2",
+      "title": "Solve a quadrilateral or 3D-location task",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/space/10/3",
+      "title": "Test and improve a shape algorithm",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/1/1",
+      "title": "Write an expression from a situation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/1/2",
+      "title": "Collect like terms with integer coefficients",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/1/3",
+      "title": "Use algebraic properties to rearrange terms",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/2/1",
+      "title": "Expand a single bracket",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/2/2",
+      "title": "Expand with negative coefficients",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/2/3",
+      "title": "Expand and collect like terms",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/3/1",
+      "title": "Find a common factor in terms",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/3/2",
+      "title": "Factorise a linear expression",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/3/3",
+      "title": "Check that expansion reverses factorisation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/4/1",
+      "title": "Use inverse operations on both sides",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/4/2",
+      "title": "Solve equations with rational answers",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/4/3",
+      "title": "Verify a solution by substitution",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/5/1",
+      "title": "Collect variable terms on one side",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/5/2",
+      "title": "Solve equations containing brackets",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/5/3",
+      "title": "Find and fix an equation-solving error",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/6/1",
+      "title": "Read strict and inclusive inequalities",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/6/2",
+      "title": "Solve one-variable inequalities with positive coefficients",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/6/3",
+      "title": "Graph and check an inequality solution",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/7/1",
+      "title": "Recognise constant first differences",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/7/2",
+      "title": "Plot a linear relation from a table",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/7/3",
+      "title": "Read horizontal and vertical relations",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/8/1",
+      "title": "Change the starting value of a line",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/8/2",
+      "title": "Change the rate and direction of a line",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/8/3",
+      "title": "Make and test a graph conjecture",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/9/1",
+      "title": "Read equation solutions from a graph",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/9/2",
+      "title": "Compare intersections and parallel lines",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/9/3",
+      "title": "Investigate inequalities using a graph",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/10/1",
+      "title": "Write a model with an initial value and rate",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/10/2",
+      "title": "Use a model to calculate or predict",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/10/3",
+      "title": "Explain when a model stops making sense",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/11/1",
+      "title": "Compare two pricing or pay models",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/11/2",
+      "title": "Use a model to meet a budget or target",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/11/3",
+      "title": "Review units, assumptions and practical limits",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/12/1",
+      "title": "Choose an expression or equation strategy",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/12/2",
+      "title": "Build and check a practical linear model",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/pattern/12/3",
+      "title": "Test and explain a graph conjecture",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/1/1",
+      "title": "Choose a census or a sample",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/1/2",
+      "title": "Choose an experiment or observation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/1/3",
+      "title": "Explain practical limits of data collection",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/2/1",
+      "title": "Select a random sample",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/2/2",
+      "title": "Spot selection and response bias",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/2/3",
+      "title": "Consider measurement precision and error",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/3/1",
+      "title": "Compare primary and secondary sources",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/3/2",
+      "title": "Compare random and non-random samples",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/3/3",
+      "title": "Choose a method and explain its limitations",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/4/1",
+      "title": "Display a sample clearly",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/4/2",
+      "title": "Describe shape, centre and spread",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/4/3",
+      "title": "Write a conclusion supported by the data",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/5/1",
+      "title": "Compare samples of the same size",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/5/2",
+      "title": "Compare sample proportions",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/5/3",
+      "title": "Use a sample to estimate a population count",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/6/1",
+      "title": "Run repeated samples of different sizes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/6/2",
+      "title": "Compare variation as sample size changes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/6/3",
+      "title": "Explain uncertainty in an estimate",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/7/1",
+      "title": "Investigate changes to the mean",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/7/2",
+      "title": "Compare changes to median and range",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/7/3",
+      "title": "Choose a useful summary for a distribution",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/8/1",
+      "title": "Choose a question and target population",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/8/2",
+      "title": "Plan an ethical and fair sample",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/8/3",
+      "title": "Choose a collection and recording method",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/9/1",
+      "title": "Collect and organise sample data",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/9/2",
+      "title": "Analyse and display the results",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/9/3",
+      "title": "Report findings and acknowledge uncertainty",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/10/1",
+      "title": "Critique a data collection plan",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/10/2",
+      "title": "Compare distributions and sampling variation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/statistics/10/3",
+      "title": "Improve an investigation report",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/1/1",
+      "title": "Identify the event and the not-event",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/1/2",
+      "title": "Find a complement from a fraction",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/1/3",
+      "title": "Find complements from decimals and percentages",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/2/1",
+      "title": "Find a missing probability",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/2/2",
+      "title": "Calculate complements with unequal outcomes",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/2/3",
+      "title": "Choose a complement to simplify a problem",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/3/1",
+      "title": "Write ordered pairs",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/3/2",
+      "title": "List all combinations without missing any",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/3/3",
+      "title": "Count outcomes that meet a condition",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/4/1",
+      "title": "Complete an outcome table",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/4/2",
+      "title": "Read row, column and joint totals",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/4/3",
+      "title": "Calculate probabilities from a two-way table",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/5/1",
+      "title": "Build a tree for two events",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/5/2",
+      "title": "Read outcomes along branches",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/5/3",
+      "title": "Use a tree to find a probability",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/6/1",
+      "title": "Place outcomes into four regions",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/6/2",
+      "title": "Find both, neither and either event",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/6/3",
+      "title": "Calculate probabilities from region counts",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/7/1",
+      "title": "Distinguish and from inclusive or",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/7/2",
+      "title": "Compare exclusive or and mutually exclusive events",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/7/3",
+      "title": "Find at least one using outcomes or complements",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/8/1",
+      "title": "Design a fair two-event simulation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/8/2",
+      "title": "Run trials and record actual results",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/8/3",
+      "title": "Calculate experimental probabilities",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/9/1",
+      "title": "Calculate a theoretical prediction",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/9/2",
+      "title": "Compare small and large trial runs",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/9/3",
+      "title": "Explain variation and review a simulation model",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/10/1",
+      "title": "Choose a useful event representation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/10/2",
+      "title": "Solve a compound-event probability problem",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "8/chance/10/3",
+      "title": "Run and explain a probability investigation",
+      "review": "rewritten method and check"
+    },
+    {
+      "key": "7/number/1/1",
+      "title": "Build square numbers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/1/2",
+      "title": "Find perfect-square roots",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/1/3",
+      "title": "Use squares to solve problems",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/2/1",
+      "title": "Express prime factors as powers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/2/2",
+      "title": "Read and build powers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/2/3",
+      "title": "Find common factors and multiples",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/3/1",
+      "title": "Understand powers of ten",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/3/2",
+      "title": "Expand whole numbers",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/3/3",
+      "title": "Rebuild and reason about place value",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/4/1",
+      "title": "Simplify and scale fractions",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/4/2",
+      "title": "Connect fractions and decimals",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/4/3",
+      "title": "Connect fractions and percentages",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/5/1",
+      "title": "Compare and order integers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/5/2",
+      "title": "Add integers across zero",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/5/3",
+      "title": "Subtract positive and negative integers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/6/1",
+      "title": "Place fractions between whole numbers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/6/2",
+      "title": "Locate negative rational numbers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/6/3",
+      "title": "Compare rational representations",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/7/1",
+      "title": "Round to a given accuracy",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/7/2",
+      "title": "Choose sensible contextual rounding",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/7/3",
+      "title": "Estimate and check answers",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/8/1",
+      "title": "Add and subtract fractions",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/8/2",
+      "title": "Multiply fractions",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/8/3",
+      "title": "Divide by a fraction",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/9/1",
+      "title": "Add and subtract decimals",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/9/2",
+      "title": "Multiply and divide decimals",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/9/3",
+      "title": "Choose efficient number forms",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/10/1",
+      "title": "Read and simplify ratios",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/10/2",
+      "title": "Share a total in a ratio",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/10/3",
+      "title": "Solve mixture and scale problems",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/11/1",
+      "title": "Calculate discounts and final costs",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/number/11/2",
+      "title": "Calculate profit and loss",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/11/3",
+      "title": "Compare value for money",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/12/1",
+      "title": "Plan an expedition budget",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/12/2",
+      "title": "Model signed changes",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/number/12/3",
+      "title": "Justify a model and check a solution",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/measurement/1/1",
+      "title": "Derive triangle area",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/1/2",
+      "title": "Use perpendicular height",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/1/3",
+      "title": "Build parallelogram area",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/2/1",
+      "title": "Recover a missing height",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/2/2",
+      "title": "Compare area models",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/2/3",
+      "title": "Plan materials and costs",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/3/1",
+      "title": "Count equal layers",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/3/2",
+      "title": "Use a constant cross-section",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/3/3",
+      "title": "Build triangular prism volume",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/4/1",
+      "title": "Find an unknown prism length",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/4/2",
+      "title": "Connect volume and capacity",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/4/3",
+      "title": "Compare storage designs",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/5/1",
+      "title": "Connect radius and diameter",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/5/2",
+      "title": "Understand pi",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/5/3",
+      "title": "Find circumference from diameter",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/6/1",
+      "title": "Find circumference from radius",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/6/2",
+      "title": "Work backwards around a circle",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/6/3",
+      "title": "Model circular journeys",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/7/1",
+      "title": "Recognise corresponding angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/7/2",
+      "title": "Recognise alternate angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/7/3",
+      "title": "Use co-interior angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/8/1",
+      "title": "Find angles with algebra",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/8/2",
+      "title": "Test for parallel lines",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/8/3",
+      "title": "Model parallel supports",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/9/1",
+      "title": "Derive the triangle angle sum",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/9/2",
+      "title": "Use equal sides and angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/9/3",
+      "title": "Connect interior and exterior angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/10/1",
+      "title": "Split a quadrilateral",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/10/2",
+      "title": "Generalise polygon sums",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/10/3",
+      "title": "Find missing polygon angles",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/11/1",
+      "title": "Scale a recipe",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/11/2",
+      "title": "Share a measured total",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/11/3",
+      "title": "Compare feasible mixtures",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/12/1",
+      "title": "Restore a mixture",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/12/2",
+      "title": "Scale a construction plan",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/measurement/12/3",
+      "title": "Justify a practical plan",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/space/1/1",
+      "title": "Recognise cube nets",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/1/2",
+      "title": "Track faces when folding",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/1/3",
+      "title": "Represent prisms with nets",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/2/1",
+      "title": "Read a footprint",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/2/2",
+      "title": "Infer a front view",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/2/3",
+      "title": "Infer a side view",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/3/1",
+      "title": "Reconstruct a cube model",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/3/2",
+      "title": "Identify missing information",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/3/3",
+      "title": "Choose a representation",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/4/1",
+      "title": "Classify triangles by sides and angles",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/4/2",
+      "title": "Test possible triangles",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/4/3",
+      "title": "Connect quadrilateral properties",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/5/1",
+      "title": "Build the quadrilateral family tree",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/5/2",
+      "title": "Compare kites and trapeziums",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/5/3",
+      "title": "Test regularity",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/6/1",
+      "title": "Translate a point",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/6/2",
+      "title": "Translate a whole shape",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/space/6/3",
+      "title": "Describe a translation",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/7/1",
+      "title": "Reflect in an axis",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/7/2",
+      "title": "Combine parallel reflections",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/space/7/3",
+      "title": "Compare transformation sequences",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/8/1",
+      "title": "Rotate about the origin",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/8/2",
+      "title": "Rotate about a given centre",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/space/8/3",
+      "title": "Classify before and after a move",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/9/1",
+      "title": "Classify triangles with reasons",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/9/2",
+      "title": "Classify quadrilaterals with reasons",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/9/3",
+      "title": "Classify polygons with reasons",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/10/1",
+      "title": "Sort polygons",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/10/2",
+      "title": "Fix a broken sorter",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/space/10/3",
+      "title": "Design your own sorter",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/1/1",
+      "title": "Understand a variable",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/1/2",
+      "title": "Substitute one value",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/1/3",
+      "title": "Substitute several values",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/2/1",
+      "title": "Translate words into symbols",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/2/2",
+      "title": "Represent a changing cost",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/2/3",
+      "title": "Write perimeter expressions",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/3/1",
+      "title": "Preserve the calculation order",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/3/2",
+      "title": "Compare expressions",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/3/3",
+      "title": "Model a discount per item",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/4/1",
+      "title": "Undo addition and subtraction",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/4/2",
+      "title": "Undo multiplication and division",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/4/3",
+      "title": "Verify a solution",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/5/1",
+      "title": "Backtrack through two steps",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/5/2",
+      "title": "Solve grouped equations",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/5/3",
+      "title": "Solve division equations",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/6/1",
+      "title": "Solve perimeter equations",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/6/2",
+      "title": "Form an equation from a story",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/6/3",
+      "title": "Diagnose an equation error",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/7/1",
+      "title": "Read a graph value",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/7/2",
+      "title": "Describe a journey graph",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/7/3",
+      "title": "Compare change and graph limits",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/8/1",
+      "title": "Extend a visual pattern",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/8/2",
+      "title": "Write a stage rule",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/8/3",
+      "title": "Find an unknown stage",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/9/1",
+      "title": "Generate outputs",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/9/2",
+      "title": "Find an input",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/9/3",
+      "title": "Connect a table and rule",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/10/1",
+      "title": "Plot ordered pairs",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/10/2",
+      "title": "Connect a graph and rule",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/10/3",
+      "title": "Interpret a graph prediction",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/11/1",
+      "title": "Vary one input",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/11/2",
+      "title": "Vary two inputs",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/11/3",
+      "title": "Keep an output constant",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/12/1",
+      "title": "Compare two cost formulas",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/pattern/12/2",
+      "title": "Find a target formula input",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/pattern/12/3",
+      "title": "Explain a formula investigation",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/1/1",
+      "title": "Distinguish numerical variables",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/1/2",
+      "title": "Ask an investigable question",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/1/3",
+      "title": "Plan consistent collection",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/2/1",
+      "title": "Calculate a mean",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/2/2",
+      "title": "Recover a missing observation",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/2/3",
+      "title": "Use a frequency table",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/3/1",
+      "title": "Find an odd-sized median",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/3/2",
+      "title": "Find an even-sized median",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/3/3",
+      "title": "Identify modes",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/4/1",
+      "title": "Calculate a range",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/4/2",
+      "title": "Investigate an outlier and mean",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/4/3",
+      "title": "Investigate an outlier and median",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/5/1",
+      "title": "Choose a representative centre",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/5/2",
+      "title": "Same centre, different data",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/5/3",
+      "title": "Compare groups fairly",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/6/1",
+      "title": "Read a stem-and-leaf key",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/6/2",
+      "title": "Construct ordered leaves",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/6/3",
+      "title": "Summarise a stem-and-leaf plot",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/7/1",
+      "title": "Build a dot plot",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/7/2",
+      "title": "Connect frequencies and displays",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/7/3",
+      "title": "Compare groups with displays",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/8/1",
+      "title": "Describe symmetry, skew and bimodal shapes",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/8/2",
+      "title": "Identify clusters and gaps",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/8/3",
+      "title": "Connect shape and centre",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/9/1",
+      "title": "Choose a fair comparison",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/9/2",
+      "title": "Check unusual measurements",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/9/3",
+      "title": "Evaluate a design improvement",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/10/1",
+      "title": "Analyse continuous measurements",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/statistics/10/2",
+      "title": "Support a conclusion",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/statistics/10/3",
+      "title": "Recognise investigation limits",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/1/1",
+      "title": "List a sample space",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/1/2",
+      "title": "Identify a favourable event",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/1/3",
+      "title": "Check a complete sample space",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/2/1",
+      "title": "Use equally likely outcomes",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/2/2",
+      "title": "Reason about unequal likelihood",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/2/3",
+      "title": "Find a not-event",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/3/1",
+      "title": "Connect fraction and decimal",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/3/2",
+      "title": "Complete a probability model",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/3/3",
+      "title": "Compare fair winning chances",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/4/1",
+      "title": "Predict an expected count",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/4/2",
+      "title": "Predict a relative frequency",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/4/3",
+      "title": "Recover a prediction model",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/5/1",
+      "title": "Record trial totals",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/5/2",
+      "title": "Calculate observed frequency",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/5/3",
+      "title": "Compare observed and expected",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/6/1",
+      "title": "Map random outcomes fairly",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/6/2",
+      "title": "Check a simulation rule",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/6/3",
+      "title": "Run and summarise trials",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/7/1",
+      "title": "Explain variation between runs",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/7/2",
+      "title": "Compare small and large runs",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/7/3",
+      "title": "Challenge chance misconceptions",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/8/1",
+      "title": "Plan a chance investigation",
+      "review": "retained existing concept and worked method"
+    },
+    {
+      "key": "7/chance/8/2",
+      "title": "Compare experimental evidence",
+      "review": "expanded worked method"
+    },
+    {
+      "key": "7/chance/8/3",
+      "title": "Report a simulation conclusion",
+      "review": "retained existing concept and worked method"
+    }
+  ]
+}

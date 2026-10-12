@@ -46,7 +46,7 @@ export const MEASUREMENT7_WEEKS = [
  ['Share a measured total','divide a mass or capacity total in a given ratio','Add the ratio parts, find one part, then multiply for the required share.','Part-to-part ratios are different from fractions of the whole.'],
  ['Compare feasible mixtures','justify the largest mixture possible from available ingredients','Find the scale each ingredient permits. The smaller scale limits the whole mixture.','The plan must keep the ratio and stay within both supplies.']]},
  {title:'Measurement modelling expedition',code:'AC9M7M06',lessons:[
- ['Restore a mixture','calculate an addition needed to restore a target ratio','Use the unchanged ingredient to establish the required partner amount, then find the difference.','Check the final ratio after the addition.'],
+ ['Restore a mixture','calculate an addition needed to restore a target ratio','Use the updated amount of one ingredient to calculate its required partner amount, then subtract the partner amount already present.','Check the final ratio after the addition.'],
  ['Scale a construction plan','use ratios of lengths to interpret a scale drawing','A scale ratio compares matching units. Convert units before applying the ratio.','Length scale factors do not apply directly to area.'],
  ['Justify a practical plan','choose and explain a feasible ratio plan with costs','Model the total in ratio parts, calculate each ingredient and its cost, then check the budget.','A valid plan must meet the quantity, ratio and budget constraints.']]},
 ] as const;

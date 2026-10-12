@@ -1,4 +1,5 @@
 'use client';
+import {level7WorkedSteps} from '@/data/activities/teaching/level7-working';
 import Number7DecimalExample, {DECIMAL_EXAMPLES,type DecimalExampleMode} from './Number7DecimalExample';
 import Number7RatioVisual from '@/components/activities/Number7RatioVisual';
 import {number7RatioVisual} from '@/lib/number7-ratio-visual';
@@ -23,7 +24,7 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
  const furtherExamples=(['reasoning','apply_create'] as const).map(role=>number7Challenge(week,lesson,7007,role));
  const fractionAddition=content===7&&lesson===1;
  const decimals=content===8&&lesson===2;
- const steps=decimals?DECIMAL_EXAMPLES[decimalMode].steps:fractionAddition?FRACTION_EXAMPLES[fractionMode].steps:guide.steps;
+ const steps=decimals?DECIMAL_EXAMPLES[decimalMode].steps:fractionAddition?FRACTION_EXAMPLES[fractionMode].steps:level7WorkedSteps('number',week,lesson,guide.steps);
  const caution=decimals?DECIMAL_EXAMPLES[decimalMode].caution:guide.caution;
  const square=content===1&&lesson===1;
  const line=content===9&&lesson===2;
