@@ -35,6 +35,18 @@ function makeEq(): Eq {
   return { a, b, op, answer: a - b };
 }
 
+/** 15 different numbers from 0 to 20, including the answer, in shuffled order. */
+function makeGrid(answer: number): number[] {
+  const set = new Set<number>([answer]);
+  while (set.size < 15) set.add(randInt(0, 20));
+  const cells = Array.from(set);
+  for (let i = cells.length - 1; i > 0; i--) {
+    const j = randInt(0, i);
+    [cells[i], cells[j]] = [cells[j], cells[i]];
+  }
+  return cells;
+}
+
 function makeBossQuestion(): BossQ {
   const kind = randInt(0, 3);
   if (kind === 0) {
@@ -117,19 +129,13 @@ export default function FunGames({
 
   // Grid Challenge
   const [gEq, setGEq] = useState<Eq>(() => makeEq());
-  const [grid, setGrid] = useState<number[]>(() => {
-    const set = new Set<number>([gEq.answer]);
-    while (set.size < 25) set.add(randInt(0, 20));
-    return Array.from(set);
-  });
+  const [grid, setGrid] = useState<number[]>(() => makeGrid(gEq.answer));
   const [cleared, setCleared] = useState<Set<number>>(new Set());
 
   function nextGrid() {
     const ne = makeEq();
     setGEq(ne);
-    const set = new Set<number>([ne.answer]);
-    while (set.size < 25) set.add(randInt(0, 20));
-    setGrid(Array.from(set));
+    setGrid(makeGrid(ne.answer));
   }
 
   function chooseGrid(n: number, idx: number) {
