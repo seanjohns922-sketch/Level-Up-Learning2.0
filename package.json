@@ -291,9 +291,9 @@
     "qa:security-source": "node scripts/qa-runner.mjs security-source",
     "qa:screen-recording-safety": "node scripts/screen-recording-safety-test.mjs",
     "lint:qa": "eslint --config eslint.qa.config.mjs scripts/qa-runner.mjs scripts/screen-recording-safety-test.mjs scripts/test-support/activity-harness.mjs scripts/activity-marking-test.mjs scripts/lint-interactions-test.mjs scripts/test-support/react-dom-harness.mjs",
-    "qa:lint-interactions": "node scripts/lint-interactions-test.mjs",
+    "qa:lint-interactions": "NODE_ENV=test node scripts/lint-interactions-test.mjs",
     "qa:world-scale": "node scripts/world-scale-suite.mjs",
-    "qa:weekly-quiz-theme": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/weekly-quiz-theme-test.mjs"
+    "qa:weekly-quiz-theme": "NODE_ENV=test node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/weekly-quiz-theme-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
