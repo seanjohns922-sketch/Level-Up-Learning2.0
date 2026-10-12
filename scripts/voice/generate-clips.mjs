@@ -8,6 +8,7 @@
 //   npm run voice:clips -- --realm measurement               # one realm, every level
 //   npm run voice:clips                                      # every guide
 //   npm run voice:clips -- --dry                             # count lines, generate nothing
+//   npm run voice:clips -- --prune                           # delete clips no guide uses any more
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -28,10 +29,10 @@ const LINES = path.join(process.cwd(), "data/audio/voice-lines.json"); // text o
 
 const args = process.argv.slice(2);
 const opt = (name) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
-const realmFilter = opt("realm"), levelFilter = opt("level") ? Number(opt("level")) : undefined, dry = args.includes("--dry");
+const realmFilter = opt("realm"), levelFilter = opt("level") ? Number(opt("level")) : undefined, dry = args.includes("--dry"), prune = args.includes("--prune");
 
 /** Every sentence the selected guides can read aloud, keyed as the app keys them. */
-function collectLines() {
+function collectLines(realmFilter, levelFilter) {
   const lines = new Map();
   const add = (text, source) => {
     const normalized = prepareSpeechText(text);
@@ -67,13 +68,27 @@ async function generate(text, wavPath) {
 
 const readJson = (file, fallback) => { try { return JSON.parse(fs.readFileSync(file, "utf8")); } catch { return fallback; } };
 
-const lines = collectLines();
+const lines = collectLines(realmFilter, levelFilter);
 const manifest = readJson(MANIFEST, { version: 1, clips: {} });
 const record = readJson(LINES, {});
 // Remake a clip when the text sent to the voice has changed since it was recorded.
 const todo = [...lines].filter(([key, l]) => !manifest.clips[key] || (record[key] && record[key].spoken !== forVoice(l.normalized)));
 const words = todo.reduce((n, [, l]) => n + l.normalized.split(" ").length, 0);
 console.log(`${lines.size} lines selected; ${lines.size - todo.length} already recorded and current; ${todo.length} to generate (~${words} words, ~${Math.round(words / 150)} min of audio).`);
+if (prune) {
+  // A clip is stale when its text no longer appears in any guide (the text changed).
+  const live = collectLines();
+  const stale = Object.keys(manifest.clips).filter((key) => !live.has(key));
+  for (const key of stale) {
+    fs.rmSync(path.join(OUT_DIR, manifest.clips[key]), { force: true });
+    delete manifest.clips[key];
+    delete record[key];
+  }
+  fs.writeFileSync(MANIFEST, JSON.stringify(manifest));
+  fs.writeFileSync(LINES, JSON.stringify(record, null, 1));
+  console.log(`Pruned ${stale.length} stale clips.`);
+  process.exit(0);
+}
 if (dry) process.exit(0);
 
 fs.mkdirSync(OUT_DIR, { recursive: true });

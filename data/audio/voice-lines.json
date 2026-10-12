@@ -2286,7 +2286,7 @@
  },
  "2ane8x80hwy": {
   "text": "Tip. ... 1 kg equals 1000 g.",
-  "spoken": "Here's a tip. 1 kilogram equals 1000 grams.",
+  "spoken": "Here's a tip. 1 kilogram equals one thousand g.",
   "source": "measurement L3 3:1"
  },
  "13li6t4uldq": {
@@ -2296,7 +2296,7 @@
  },
  "15px8ucjuke": {
   "text": "Worked example. ... A scale up to 1000 g, marked every 100. ... The needle points to 500 g. ... Needle at 500 , gives 500 g",
-  "spoken": "Worked example. A scale up to 1000 grams, marked every 100. The needle points to 500 grams. Needle at 500, gives 500 grams",
+  "spoken": "Worked example. A scale up to one thousand g, marked every 100. The needle points to 500 grams. Needle at 500, gives 500 grams",
   "source": "measurement L3 3:2"
  },
  "hwmgzciwk5": {
@@ -2371,7 +2371,7 @@
  },
  "boib04s5na": {
   "text": "Tip. ... 1 L equals 1000 mL.",
-  "spoken": "Here's a tip. 1 litre equals 1000 millilitres.",
+  "spoken": "Here's a tip. 1 litre equals one thousand mL.",
   "source": "measurement L3 4:1"
  },
  "oqgdvvwhk0": {
@@ -2876,7 +2876,7 @@
  },
  "1ifv0aqp0rc": {
   "text": "Tip. ... 1 kg equals 1000 g; 1 L equals 1000 mL.",
-  "spoken": "Here's a tip. 1 kilogram equals 1000 grams; 1 litre equals 1000 millilitres.",
+  "spoken": "Here's a tip. 1 kilogram equals one thousand g; 1 litre equals one thousand mL.",
   "source": "measurement L5 2:2"
  },
  "16zchlcws3a": {
@@ -3736,12 +3736,12 @@
  },
  "nqicbmuowi": {
   "text": "Worked example. ... A measuring jug up to 2 L, marked every 0.25. ... The water reaches 1.5 L. ... 1.5 L equals 1500 mL; 250 g equals 0.25 kg",
-  "spoken": "Worked example. A measuring jug up to 2 litres, marked every 0.25. The water reaches 1.5 litres. 1.5 litres equals 1500 millilitres; 250 grams equals 0.25 kilograms",
+  "spoken": "Worked example. A measuring jug up to 2 litres, marked every 0.25. The water reaches 1.5 litres. 1.5 litres equals one thousand, five hundred mL; 250 grams equals 0.25 kilograms",
   "source": "measurement L6 4:2"
  },
  "g62mhpw8jn": {
   "text": "Step 1. ... 1 L equals 1000 mL and 1 kg equals 1000 g.",
-  "spoken": "Step 1. 1 litre equals 1000 millilitres and 1 kilogram equals 1000 grams.",
+  "spoken": "Step 1. 1 litre equals one thousand mL and 1 kilogram equals one thousand g.",
   "source": "measurement L6 4:2"
  },
  "19o45msvmaj": {
@@ -3786,7 +3786,7 @@
  },
  "1d6oobajuwd": {
   "text": "Tip. ... Multiplying by 1000 moves digits three places.",
-  "spoken": "Here's a tip. Multiplying by 1000 moves digits three places.",
+  "spoken": "Here's a tip. Multiplying by one thousand moves digits three places.",
   "source": "measurement L6 4:3"
  },
  "1pqpf01hqw2": {
@@ -5466,12 +5466,12 @@
  },
  "29kna7r3l5f": {
   "text": "Worked example. ... Place 254 on a 0 to 1000 line , gives a bit past one quarter",
-  "spoken": "Worked example. Place 254 on a 0 to 1000 line, gives a bit past one quarter",
+  "spoken": "Worked example. Place 254 on a 0 to one thousand line, gives a bit past one quarter",
   "source": "number L2 3:3"
  },
  "1m7rn0swgsj": {
   "text": "Step 1. ... The middle ... of 0 to 1000 is 500. ... 254 is about half ... of that.",
-  "spoken": "Step 1. The middle of 0 to 1000 is 500. 254 is about half of that.",
+  "spoken": "Step 1. The middle of 0 to one thousand is 500. 254 is about half of that.",
   "source": "number L2 3:3"
  },
  "27v9976g1rj": {
@@ -6299,16 +6299,6 @@
   "spoken": "Here's a tip. Count all the parts, shaded and unshaded.",
   "source": "number L2 12:3"
  },
- "16rpjx9pjs0": {
-  "text": "Numbers past 10 000 add a ten-thousands place on the left.",
-  "spoken": "Numbers past 10 000 add a ten-thousands place on the left.",
-  "source": "number L3 1:1"
- },
- "tszr22b70m": {
-  "text": "Worked example. ... 5 ten thousands, 6 hundreds, 6 tens, 1 one , gives 50 661",
-  "spoken": "Worked example. 5 ten thousands, 6 hundreds, 6 tens, 1 one, gives 50 661",
-  "source": "number L3 1:1"
- },
  "ozhs94rbvo": {
   "text": "Step 1. ... Write a digit for every place, from ten thousands down to ones.",
   "spoken": "Step 1. Write a digit for every place, from ten thousands down to ones.",
@@ -6317,11 +6307,6 @@
  "1ledx08yc1h": {
   "text": "Step 2. ... There are no thousands, so put 0 in the thousands place.",
   "spoken": "Step 2. There are no thousands, so put 0 in the thousands place.",
-  "source": "number L3 1:1"
- },
- "1y4jj7hl9au": {
-  "text": "Step 3. ... 5, 0, 6, 6, 1 gives 50 661.",
-  "spoken": "Step 3. 5, 0, 6, 6, 1 gives 50 661.",
   "source": "number L3 1:1"
  },
  "1aq3cyuivzh": {
@@ -6334,24 +6319,9 @@
   "spoken": "Expanded form shows each digit's value. You can also partition in other ways.",
   "source": "number L3 1:2"
  },
- "2af3y3bz4rq": {
-  "text": "Worked example. ... 52 966 equals 50 000 plus 2 000 plus 900 plus 60 plus 6 equals 52 000 plus 966",
-  "spoken": "Worked example. 52 966 equals 50 000 plus 2 000 plus 900 plus 60 plus 6 equals 52 000 plus 966",
-  "source": "number L3 1:2"
- },
- "1uffdbt96ez": {
-  "text": "Step 1. ... Write the value ... of each digit: 50 000, 2 000, 900, 60, 6.",
-  "spoken": "Step 1. Write the value of each digit: 50 000, 2 000, 900, 60, 6.",
-  "source": "number L3 1:2"
- },
  "1hupaf4vpmj": {
   "text": "Step 2. ... Join them with plus .",
   "spoken": "Step 2. Join them with plus.",
-  "source": "number L3 1:2"
- },
- "1b2vr3k4e2c": {
-  "text": "Step 3. ... For another way, group parts together: 52 000 plus 966.",
-  "spoken": "Step 3. For another way, group parts together: 52 000 plus 966.",
   "source": "number L3 1:2"
  },
  "155e835vvbn": {
@@ -6362,26 +6332,6 @@
  "157npbjt00m": {
   "text": "Compare 5-digit numbers from the left, one place at a time.",
   "spoken": "Compare 5-digit numbers from the left, one place at a time.",
-  "source": "number L3 1:3"
- },
- "1qij60fisz4": {
-  "text": "Worked example. ... 58 035 less than 60 918 less than 69 990",
-  "spoken": "Worked example. 58 035 less than 60 918 less than 69 990",
-  "source": "number L3 1:3"
- },
- "22s9b2weees": {
-  "text": "Step 1. ... Compare ten thousands: 5 is less than 6, so 58 035 is smallest.",
-  "spoken": "Step 1. Compare ten thousands: 5 is less than 6, so 58 035 is smallest.",
-  "source": "number L3 1:3"
- },
- "21i7osn0ybb": {
-  "text": "Step 2. ... 60 918 and 69 990 both have 6 ten thousands; compare thousands: 0 less than 9.",
-  "spoken": "Step 2. 60 918 and 69 990 both have 6 ten thousands; compare thousands: 0 less than 9.",
-  "source": "number L3 1:3"
- },
- "1xlipi1so0b": {
-  "text": "Step 3. ... So 60 918 comes before 69 990.",
-  "spoken": "Step 3. So 60 918 comes before 69 990.",
   "source": "number L3 1:3"
  },
  "2emb9vhpk60": {
@@ -6424,29 +6374,9 @@
   "spoken": "Rounding to the nearest 100 looks at the tens digit.",
   "source": "number L3 2:2"
  },
- "2ehtth9o3p4": {
-  "text": "Worked example. ... 3 478 , gives 3 500",
-  "spoken": "Worked example. 3 478, gives 3 500",
-  "source": "number L3 2:2"
- },
- "lft2jgddrj": {
-  "text": "Step 1. ... 3 478 is between 3 400 and 3 500.",
-  "spoken": "Step 1. 3 478 is between 3 400 and 3 500.",
-  "source": "number L3 2:2"
- },
  "17eo66qf9po": {
   "text": "Step 2. ... Look at the tens digit: 7 is 5 or more.",
   "spoken": "Step 2. Look at the tens digit: 7 is 5 or more.",
-  "source": "number L3 2:2"
- },
- "18qse5atxmv": {
-  "text": "Step 3. ... So round up to 3 500.",
-  "spoken": "Step 3. So round up to 3 500.",
-  "source": "number L3 2:2"
- },
- "21icgyb6p26": {
-  "text": "Tip. ... Only the tens digit decides. ... 3 449 rounds to 3 400.",
-  "spoken": "Here's a tip. Only the tens digit decides. 3 449 rounds to 3 400.",
   "source": "number L3 2:2"
  },
  "ic2w2kpxnd": {
@@ -7564,24 +7494,9 @@
   "spoken": "Any whole number is odd or even by its ones digit.",
   "source": "number L4 3:1"
  },
- "1p0xzd40ari": {
-  "text": "Worked example. ... 8 694 , gives even; 5 079 , gives odd",
-  "spoken": "Worked example. 8 694, gives even; 5 079, gives odd",
-  "source": "number L4 3:1"
- },
  "18ktpuo3e5": {
   "text": "Step 1. ... Look only at the ones digit.",
   "spoken": "Step 1. Look only at the ones digit.",
-  "source": "number L4 3:1"
- },
- "26wtpp0otbg": {
-  "text": "Step 2. ... 8 694 ends in 4, an even digit.",
-  "spoken": "Step 2. 8 694 ends in 4, an even digit.",
-  "source": "number L4 3:1"
- },
- "1f5g4nin7zm": {
-  "text": "Step 3. ... 5 079 ends in 9, an odd digit.",
-  "spoken": "Step 3. 5 079 ends in 9, an odd digit.",
   "source": "number L4 3:1"
  },
  "14kgpfs7kwh": {
@@ -7654,11 +7569,6 @@
   "spoken": "Multiplying by 10 moves every digit one place to the left.",
   "source": "number L4 4:1"
  },
- "qadtvh83mv": {
-  "text": "Worked example. ... 82 times 100 equals 8 200",
-  "spoken": "Worked example. 82 times 100 equals 8 200",
-  "source": "number L4 4:1"
- },
  "2467s4qcsdl": {
   "text": "Step 1. ... times 100 moves each digit two places left.",
   "spoken": "Step 1. times 100 moves each digit two places left.",
@@ -7669,24 +7579,14 @@
   "spoken": "Step 2. 8 tens become 8 thousands; 2 ones become 2 hundreds.",
   "source": "number L4 4:1"
  },
- "19xpxngo79u": {
-  "text": "Step 3. ... Fill the empty places with 0: 8 200.",
-  "spoken": "Step 3. Fill the empty places with 0: 8 200.",
-  "source": "number L4 4:1"
- },
  "17738dru7cl": {
   "text": "Tip. ... times 10, times 100, times 1000 move 1, 2, 3 places.",
-  "spoken": "Here's a tip. times 10, times 100, times 1000 move 1, 2, 3 places.",
+  "spoken": "Here's a tip. times 10, times 100, times one thousand move 1, 2, 3 places.",
   "source": "number L4 4:1"
  },
  "hx4nyh0icg": {
   "text": "Dividing by 10 moves every digit one place to the right.",
   "spoken": "Dividing by 10 moves every digit one place to the right.",
-  "source": "number L4 4:2"
- },
- "26v7ifxkpgw": {
-  "text": "Worked example. ... 93 100 divided by 100 equals 931",
-  "spoken": "Worked example. 93 100 divided by 100 equals 931",
   "source": "number L4 4:2"
  },
  "6pcat25ge0": {
@@ -7716,7 +7616,7 @@
  },
  "1vxvwuysuwg": {
   "text": "Worked example. ... 9 times 1000 greater than 9 times 10",
-  "spoken": "Worked example. 9 times 1000 greater than 9 times 10",
+  "spoken": "Worked example. 9 times one thousand greater than 9 times 10",
   "source": "number L4 4:3"
  },
  "2dc87i0cxfr": {
@@ -7726,12 +7626,7 @@
  },
  "2fvqdx38hlv": {
   "text": "Step 2. ... times 1000 makes it much bigger than times 10.",
-  "spoken": "Step 2. times 1000 makes it much bigger than times 10.",
-  "source": "number L4 4:3"
- },
- "ayva4wzn6n": {
-  "text": "Step 3. ... 9 000 greater than 90.",
-  "spoken": "Step 3. 9 000 greater than 90.",
+  "spoken": "Step 2. times one thousand makes it much bigger than times 10.",
   "source": "number L4 4:3"
  },
  "hms2a03t3e": {
@@ -7742,11 +7637,6 @@
  "1izc80phfcl": {
   "text": "Find a missing digit by working through the written method.",
   "spoken": "Find a missing digit by working through the written method.",
-  "source": "number L4 5:1"
- },
- "1vdlbmrpsbi": {
-  "text": "Worked example. ... 515 plus 1 189 equals 17?4 , gives 1 704, missing 0",
-  "spoken": "Worked example. 515 plus 1 189 equals 17?4, gives 1 704, missing 0",
   "source": "number L4 5:1"
  },
  "cqspcnavqy": {
@@ -7774,24 +7664,9 @@
   "spoken": "Split numbers or round to friendly numbers, then adjust.",
   "source": "number L4 5:2"
  },
- "10o80v89e4s": {
-  "text": "Worked example. ... 5 289 minus 16 equals 5 289 minus 10 minus 6 equals 5 273",
-  "spoken": "Worked example. 5 289 minus 16 equals 5 289 minus 10 minus 6 equals 5 273",
-  "source": "number L4 5:2"
- },
  "1m2r6k8vobw": {
   "text": "Step 1. ... Split 16 into 10 and 6.",
   "spoken": "Step 1. Split 16 into 10 and 6.",
-  "source": "number L4 5:2"
- },
- "7haxise75d": {
-  "text": "Step 2. ... 5 289 minus 10 equals 5 279.",
-  "spoken": "Step 2. 5 289 minus 10 equals 5 279.",
-  "source": "number L4 5:2"
- },
- "d5y5ccudn6": {
-  "text": "Step 3. ... 5 279 minus 6 equals 5 273.",
-  "spoken": "Step 3. 5 279 minus 6 equals 5 273.",
   "source": "number L4 5:2"
  },
  "bbzo7r2ce9": {
@@ -7919,24 +7794,9 @@
   "spoken": "Round to the place that matters for the estimate.",
   "source": "number L4 7:1"
  },
- "q63aks26x0": {
-  "text": "Worked example. ... 38 920 to the nearest 1 000 , gives 39 000",
-  "spoken": "Worked example. 38 920 to the nearest 1 000, gives 39 000",
-  "source": "number L4 7:1"
- },
- "1r1s8frv4b1": {
-  "text": "Step 1. ... Find the thousands either side: 38 000 and 39 000.",
-  "spoken": "Step 1. Find the thousands either side: 38 000 and 39 000.",
-  "source": "number L4 7:1"
- },
  "11bke5d158z": {
   "text": "Step 2. ... Look at the hundreds digit: 9 is 5 or more.",
   "spoken": "Step 2. Look at the hundreds digit: 9 is 5 or more.",
-  "source": "number L4 7:1"
- },
- "22gvpx8om9b": {
-  "text": "Step 3. ... Round up to 39 000.",
-  "spoken": "Step 3. Round up to 39 000.",
   "source": "number L4 7:1"
  },
  "168y7kwtxvv": {
@@ -7949,11 +7809,6 @@
   "spoken": "Estimate with rounded numbers to check if an answer makes sense.",
   "source": "number L4 7:2"
  },
- "1ps840alr20": {
-  "text": "Worked example. ... 398 plus 204 equals 9 602? ... Estimate 400 plus 200 equals 600 , gives No",
-  "spoken": "Worked example. 398 plus 204 equals 9 602? Estimate 400 plus 200 equals 600, gives No",
-  "source": "number L4 7:2"
- },
  "171d4brx7yx": {
   "text": "Step 1. ... Round each number: 400 and 200.",
   "spoken": "Step 1. Round each number: 400 and 200.",
@@ -7962,11 +7817,6 @@
  "23dopdenzft": {
   "text": "Step 2. ... Estimate: 400 plus 200 equals 600.",
   "spoken": "Step 2. Estimate: 400 plus 200 equals 600.",
-  "source": "number L4 7:2"
- },
- "1halpfpvr2e": {
-  "text": "Step 3. ... 9 602 is far from 600, so it is wrong.",
-  "spoken": "Step 3. 9 602 is far from 600, so it is wrong.",
   "source": "number L4 7:2"
  },
  "qli1suus18": {
@@ -8429,11 +8279,6 @@
   "spoken": "Use powers of 10 and algorithms together.",
   "source": "number L4 12:3"
  },
- "24wekaqwezh": {
-  "text": "Worked example. ... 8 970 divided by 10 equals 897",
-  "spoken": "Worked example. 8 970 divided by 10 equals 897",
-  "source": "number L4 12:3"
- },
  "29g1dunalxi": {
   "text": "Step 1. ... divided by 10 moves each digit one place right.",
   "spoken": "Step 1. divided by 10 moves each digit one place right.",
@@ -8699,11 +8544,6 @@
   "spoken": "Follow a divisibility algorithm step by step.",
   "source": "number L5 3:3"
  },
- "57tnqri7mc": {
-  "text": "Worked example. ... Is 4 347 divisible by 9? ... 4 plus 3 plus 4 plus 7 equals 18 , gives yes",
-  "spoken": "Worked example. Is 4 347 divisible by 9? 4 plus 3 plus 4 plus 7 equals 18, gives yes",
-  "source": "number L5 3:3"
- },
  "a8jah0iq6y": {
   "text": "Step 1. ... Add the digits: 4 plus 3 plus 4 plus 7 equals 18.",
   "spoken": "Step 1. Add the digits: 4 plus 3 plus 4 plus 7 equals 18.",
@@ -8712,11 +8552,6 @@
  "24dhr7u8b8b": {
   "text": "Step 2. ... 18 is a multiple ... of 9.",
   "spoken": "Step 2. 18 is a multiple of 9.",
-  "source": "number L5 3:3"
- },
- "18m0c698upq": {
-  "text": "Step 3. ... So 4 347 is divisible by 9.",
-  "spoken": "Step 3. So 4 347 is divisible by 9.",
   "source": "number L5 3:3"
  },
  "297ygq6b4gx": {
@@ -8819,29 +8654,9 @@
   "spoken": "Multiply each place value part, then add.",
   "source": "number L5 5:1"
  },
- "28ypskx85oo": {
-  "text": "Worked example. ... 506 times 3 equals 1 500 plus 0 plus 18 equals 1 518",
-  "spoken": "Worked example. 506 times 3 equals 1 500 plus 0 plus 18 equals 1 518",
-  "source": "number L5 5:1"
- },
  "z64r8h08l8": {
   "text": "Step 1. ... Split 506 into 500 and 6.",
   "spoken": "Step 1. Split 506 into 500 and 6.",
-  "source": "number L5 5:1"
- },
- "1pzjjtupdd0": {
-  "text": "Step 2. ... 500 times 3 equals 1 500 and 6 times 3 equals 18.",
-  "spoken": "Step 2. 500 times 3 equals 1 500 and 6 times 3 equals 18.",
-  "source": "number L5 5:1"
- },
- "4e7ygh2cek": {
-  "text": "Step 3. ... 1 500 plus 18 equals 1 518.",
-  "spoken": "Step 3. 1 500 plus 18 equals 1 518.",
-  "source": "number L5 5:1"
- },
- "2fwwguipdzx": {
-  "text": "Tip. ... 300 times 4 is 1 200, not 120. ... Keep the zeros.",
-  "spoken": "Here's a tip. 300 times 4 is 1 200, not 120. Keep the zeros.",
   "source": "number L5 5:1"
  },
  "2g7b6gdais": {
@@ -8879,24 +8694,9 @@
   "spoken": "Estimate first so you can tell if the answer is reasonable.",
   "source": "number L5 5:3"
  },
- "qi3gwd6p0y": {
-  "text": "Worked example. ... 57 times 32 equals 3 824? ... Estimate 60 times 30 equals 1 800 , gives too large",
-  "spoken": "Worked example. 57 times 32 equals 3 824? Estimate 60 times 30 equals 1 800, gives too large",
-  "source": "number L5 5:3"
- },
  "xyvhrcnl40": {
   "text": "Step 1. ... Round: 57 ≈ 60 and 32 ≈ 30.",
   "spoken": "Step 1. Round: 57 approximately 60 and 32 approximately 30.",
-  "source": "number L5 5:3"
- },
- "2cg3geqrqyw": {
-  "text": "Step 2. ... 60 times 30 equals 1 800.",
-  "spoken": "Step 2. 60 times 30 equals 1 800.",
-  "source": "number L5 5:3"
- },
- "wftkjui95l": {
-  "text": "Step 3. ... 3 824 is about twice the estimate, so it is wrong. ... The real answer is 1 824.",
-  "spoken": "Step 3. 3 824 is about twice the estimate, so it is wrong. The real answer is 1 824.",
   "source": "number L5 5:3"
  },
  "1ts8pg0r9yq": {
@@ -9389,26 +9189,6 @@
   "spoken": "Choose an efficient strategy for each calculation.",
   "source": "number L5 11:2"
  },
- "264uvg60nb9": {
-  "text": "Worked example. ... 2 499 plus 518 equals 2 500 plus 518 minus 1 equals 3 017",
-  "spoken": "Worked example. 2 499 plus 518 equals 2 500 plus 518 minus 1 equals 3 017",
-  "source": "number L5 11:2"
- },
- "1ctm4txcq0d": {
-  "text": "Step 1. ... 2 499 is 1 less than 2 500.",
-  "spoken": "Step 1. 2 499 is 1 less than 2 500.",
-  "source": "number L5 11:2"
- },
- "efooczmq2d": {
-  "text": "Step 2. ... 2 500 plus 518 equals 3 018.",
-  "spoken": "Step 2. 2 500 plus 518 equals 3 018.",
-  "source": "number L5 11:2"
- },
- "1zjel85pyeg": {
-  "text": "Step 3. ... Take off the 1: 3 017.",
-  "spoken": "Step 3. Take off the 1: 3 017.",
-  "source": "number L5 11:2"
- },
  "1g5pyvs48ed": {
   "text": "Tip. ... Look for numbers close to a round number.",
   "spoken": "Here's a tip. Look for numbers close to a round number.",
@@ -9419,19 +9199,9 @@
   "spoken": "Estimate quickly to decide if an answer makes sense.",
   "source": "number L5 11:3"
  },
- "rj347flv1b": {
-  "text": "Worked example. ... 1 000 divided by 8 equals 80? ... 8 times 80 equals 640 , gives no",
-  "spoken": "Worked example. 1 000 divided by 8 equals 80? 8 times 80 equals 640, gives no",
-  "source": "number L5 11:3"
- },
  "wafvu0wnbi": {
   "text": "Step 1. ... Check by multiplying back: 8 times 80 equals 640.",
   "spoken": "Step 1. Check by multiplying back: 8 times 80 equals 640.",
-  "source": "number L5 11:3"
- },
- "21ro6bm0cu5": {
-  "text": "Step 2. ... 640 is much less than 1 000.",
-  "spoken": "Step 2. 640 is much less than 1 000.",
   "source": "number L5 11:3"
  },
  "1pu0ojtk7yf": {
@@ -9711,17 +9481,17 @@
  },
  "1dzg5nczxqk": {
   "text": "times 10, times 100, times 1000 move every digit 1, 2 or 3 places left.",
-  "spoken": "times 10, times 100, times 1000 move every digit 1, 2 or 3 places left.",
+  "spoken": "times 10, times 100, times one thousand move every digit 1, 2 or 3 places left.",
   "source": "number L6 3:1"
  },
  "1buk7d2qoym": {
   "text": "Worked example. ... 0.004 times 1000 equals 4",
-  "spoken": "Worked example. 0.004 times 1000 equals 4",
+  "spoken": "Worked example. 0.004 times one thousand equals 4",
   "source": "number L6 3:1"
  },
  "j1jrp6l5xj": {
   "text": "Step 1. ... times 1000 moves each digit 3 places left.",
-  "spoken": "Step 1. times 1000 moves each digit 3 places left.",
+  "spoken": "Step 1. times one thousand moves each digit 3 places left.",
   "source": "number L6 3:1"
  },
  "1qv728rtqyi": {
@@ -9731,7 +9501,7 @@
  },
  "wb7m4ed7c5": {
   "text": "Step 3. ... 0.004 times 1000 equals 4.",
-  "spoken": "Step 3. 0.004 times 1000 equals 4.",
+  "spoken": "Step 3. 0.004 times one thousand equals 4.",
   "source": "number L6 3:1"
  },
  "6af2v3halp": {
@@ -9741,7 +9511,7 @@
  },
  "1vvomhwfn3w": {
   "text": "divided by 10, divided by 100, divided by 1000 move every digit 1, 2 or 3 places right.",
-  "spoken": "divided by 10, divided by 100, divided by 1000 move every digit 1, 2 or 3 places right.",
+  "spoken": "divided by 10, divided by 100, divided by one thousand move every digit 1, 2 or 3 places right.",
   "source": "number L6 3:2"
  },
  "2i7xvayta9": {
@@ -10546,7 +10316,7 @@
  },
  "28xti5rcezq": {
   "text": "Tip. ... times and divided by by 10, 100, 1000 only move digits.",
-  "spoken": "Here's a tip. times and divided by by 10, 100, 1000 only move digits.",
+  "spoken": "Here's a tip. times and divided by by 10, 100, one thousand only move digits.",
   "source": "number L6 12:1"
  },
  "1mxtw2ye964": {
@@ -10608,5 +10378,235 @@
   "text": "Tip. ... Prime numbers have exactly 2 factors; 91 equals 7 times 13 is composite.",
   "spoken": "Here's a tip. Prime numbers have exactly 2 factors; 91 equals 7 times 13 is composite.",
   "source": "number L6 12:3"
+ },
+ "nudairwmid": {
+  "text": "Numbers past 10000 add a ten-thousands place on the left.",
+  "spoken": "Numbers past ten thousand add a ten-thousands place on the left.",
+  "source": "number L3 1:1"
+ },
+ "1tsvs02htdn": {
+  "text": "Worked example. ... 5 ten thousands, 6 hundreds, 6 tens, 1 one , gives 50661",
+  "spoken": "Worked example. 5 ten thousands, 6 hundreds, 6 tens, 1 one, gives fifty thousand, six hundred and sixty-one",
+  "source": "number L3 1:1"
+ },
+ "2c9jmz2j2ff": {
+  "text": "Step 3. ... 5, 0, 6, 6, 1 gives 50661.",
+  "spoken": "Step 3. 5, 0, 6, 6, 1 gives 50661.",
+  "source": "number L3 1:1"
+ },
+ "jey2w9xt4w": {
+  "text": "Worked example. ... 52966 equals 50000 plus 2000 plus 900 plus 60 plus 6 equals 52000 plus 966",
+  "spoken": "Worked example. fifty-two thousand, nine hundred and sixty-six equals fifty thousand plus two thousand plus 900 plus 60 plus 6 equals fifty-two thousand plus 966",
+  "source": "number L3 1:2"
+ },
+ "1xpw9j9rgrh": {
+  "text": "Step 1. ... Write the value ... of each digit: 50000, 2000, 900, 60, 6.",
+  "spoken": "Step 1. Write the value of each digit: fifty thousand, two thousand, 900, 60, 6.",
+  "source": "number L3 1:2"
+ },
+ "d4cvkqo657": {
+  "text": "Step 3. ... For another way, group parts together: 52000 plus 966.",
+  "spoken": "Step 3. For another way, group parts together: fifty-two thousand plus 966.",
+  "source": "number L3 1:2"
+ },
+ "1fuoni1vy8b": {
+  "text": "Worked example. ... 58035 less than 60918 less than 69990",
+  "spoken": "Worked example. fifty-eight thousand and thirty-five less than sixty thousand, nine hundred and eighteen less than sixty-nine thousand, nine hundred and ninety",
+  "source": "number L3 1:3"
+ },
+ "1qlm9l6k3tq": {
+  "text": "Step 1. ... Compare ten thousands: 5 is less than 6, so 58035 is smallest.",
+  "spoken": "Step 1. Compare ten thousands: 5 is less than 6, so fifty-eight thousand and thirty-five is smallest.",
+  "source": "number L3 1:3"
+ },
+ "o5reyuonwt": {
+  "text": "Step 2. ... 60918 and 69990 both have 6 ten thousands; compare thousands: 0 less than 9.",
+  "spoken": "Step 2. sixty thousand, nine hundred and eighteen and sixty-nine thousand, nine hundred and ninety both have 6 ten thousands; compare thousands: 0 less than 9.",
+  "source": "number L3 1:3"
+ },
+ "202oej3uz2n": {
+  "text": "Step 3. ... So 60918 comes before 69990.",
+  "spoken": "Step 3. So sixty thousand, nine hundred and eighteen comes before 69990.",
+  "source": "number L3 1:3"
+ },
+ "tvfihmytf": {
+  "text": "Worked example. ... 3478 , gives 3500",
+  "spoken": "Worked example. three thousand, four hundred and seventy-eight, gives three thousand, five hundred",
+  "source": "number L3 2:2"
+ },
+ "grqreijwfv": {
+  "text": "Step 1. ... 3478 is between 3400 and 3500.",
+  "spoken": "Step 1. three thousand, four hundred and seventy-eight is between three thousand, four hundred and 3500.",
+  "source": "number L3 2:2"
+ },
+ "oaol7uws2u": {
+  "text": "Step 3. ... So round up to 3500.",
+  "spoken": "Step 3. So round up to 3500.",
+  "source": "number L3 2:2"
+ },
+ "5kptdq43x5": {
+  "text": "Tip. ... Only the tens digit decides. ... 3449 rounds to 3400.",
+  "spoken": "Here's a tip. Only the tens digit decides. three thousand, four hundred and forty-nine rounds to 3400.",
+  "source": "number L3 2:2"
+ },
+ "9x8rii5pdn": {
+  "text": "Worked example. ... 8694 , gives even; 5079 , gives odd",
+  "spoken": "Worked example. eight thousand, six hundred and ninety-four, gives even; five thousand and seventy-nine, gives odd",
+  "source": "number L4 3:1"
+ },
+ "1r7eos55ou8": {
+  "text": "Step 2. ... 8694 ends in 4, an even digit.",
+  "spoken": "Step 2. eight thousand, six hundred and ninety-four ends in 4, an even digit.",
+  "source": "number L4 3:1"
+ },
+ "9tv8n11n63": {
+  "text": "Step 3. ... 5079 ends in 9, an odd digit.",
+  "spoken": "Step 3. five thousand and seventy-nine ends in 9, an odd digit.",
+  "source": "number L4 3:1"
+ },
+ "1f8026y9eme": {
+  "text": "Worked example. ... 82 times 100 equals 8200",
+  "spoken": "Worked example. 82 times 100 equals eight thousand, two hundred",
+  "source": "number L4 4:1"
+ },
+ "2ew8ve0mtdd": {
+  "text": "Step 3. ... Fill the empty places with 0: 8200.",
+  "spoken": "Step 3. Fill the empty places with 0: 8200.",
+  "source": "number L4 4:1"
+ },
+ "1q0hv45rwjq": {
+  "text": "Worked example. ... 93100 divided by 100 equals 931",
+  "spoken": "Worked example. ninety-three thousand, one hundred divided by 100 equals 931",
+  "source": "number L4 4:2"
+ },
+ "2fd6t1h1sxt": {
+  "text": "Step 3. ... 9000 greater than 90.",
+  "spoken": "Step 3. nine thousand greater than 90.",
+  "source": "number L4 4:3"
+ },
+ "g4dfatimll": {
+  "text": "Worked example. ... 515 plus 1189 equals 17?4 , gives 1704, missing 0",
+  "spoken": "Worked example. 515 plus one thousand, one hundred and eighty-nine equals 17?4, gives one thousand, seven hundred and four, missing 0",
+  "source": "number L4 5:1"
+ },
+ "27i6aia2mif": {
+  "text": "Worked example. ... 5289 minus 16 equals 5289 minus 10 minus 6 equals 5273",
+  "spoken": "Worked example. five thousand, two hundred and eighty-nine minus 16 equals five thousand, two hundred and eighty-nine minus 10 minus 6 equals five thousand, two hundred and seventy-three",
+  "source": "number L4 5:2"
+ },
+ "1s1opeujfrs": {
+  "text": "Step 2. ... 5289 minus 10 equals 5279.",
+  "spoken": "Step 2. five thousand, two hundred and eighty-nine minus 10 equals 5279.",
+  "source": "number L4 5:2"
+ },
+ "z9onef5enl": {
+  "text": "Step 3. ... 5279 minus 6 equals 5273.",
+  "spoken": "Step 3. five thousand, two hundred and seventy-nine minus 6 equals 5273.",
+  "source": "number L4 5:2"
+ },
+ "8idktd8p4t": {
+  "text": "Worked example. ... 38920 to the nearest 1000 , gives 39000",
+  "spoken": "Worked example. thirty-eight thousand, nine hundred and twenty to the nearest one thousand, gives thirty-nine thousand",
+  "source": "number L4 7:1"
+ },
+ "15fls3h9d8a": {
+  "text": "Step 1. ... Find the thousands either side: 38000 and 39000.",
+  "spoken": "Step 1. Find the thousands either side: thirty-eight thousand and 39000.",
+  "source": "number L4 7:1"
+ },
+ "ow1vf64fu9": {
+  "text": "Step 3. ... Round up to 39000.",
+  "spoken": "Step 3. Round up to 39000.",
+  "source": "number L4 7:1"
+ },
+ "1gk7tbk6bx0": {
+  "text": "Worked example. ... 398 plus 204 equals 9602? ... Estimate 400 plus 200 equals 600 , gives No",
+  "spoken": "Worked example. 398 plus 204 equals nine thousand, six hundred and two? Estimate 400 plus 200 equals 600, gives No",
+  "source": "number L4 7:2"
+ },
+ "qgxh7sxek3": {
+  "text": "Step 3. ... 9602 is far from 600, so it is wrong.",
+  "spoken": "Step 3. nine thousand, six hundred and two is far from 600, so it is wrong.",
+  "source": "number L4 7:2"
+ },
+ "2dod704m1cz": {
+  "text": "Worked example. ... 8970 divided by 10 equals 897",
+  "spoken": "Worked example. eight thousand, nine hundred and seventy divided by 10 equals 897",
+  "source": "number L4 12:3"
+ },
+ "muw2bngqez": {
+  "text": "Worked example. ... Is 4347 divisible by 9? ... 4 plus 3 plus 4 plus 7 equals 18 , gives yes",
+  "spoken": "Worked example. Is four thousand, three hundred and forty-seven divisible by 9? 4 plus 3 plus 4 plus 7 equals 18, gives yes",
+  "source": "number L5 3:3"
+ },
+ "26wiaskxnf": {
+  "text": "Step 3. ... So 4347 is divisible by 9.",
+  "spoken": "Step 3. So four thousand, three hundred and forty-seven is divisible by 9.",
+  "source": "number L5 3:3"
+ },
+ "egr3qfcmqm": {
+  "text": "Worked example. ... 506 times 3 equals 1500 plus 0 plus 18 equals 1518",
+  "spoken": "Worked example. 506 times 3 equals one thousand, five hundred plus 0 plus 18 equals one thousand, five hundred and eighteen",
+  "source": "number L5 5:1"
+ },
+ "m0zbc0ozew": {
+  "text": "Step 2. ... 500 times 3 equals 1500 and 6 times 3 equals 18.",
+  "spoken": "Step 2. 500 times 3 equals one thousand, five hundred and 6 times 3 equals 18.",
+  "source": "number L5 5:1"
+ },
+ "11xwjow8zu9": {
+  "text": "Step 3. ... 1500 plus 18 equals 1518.",
+  "spoken": "Step 3. one thousand, five hundred plus 18 equals 1518.",
+  "source": "number L5 5:1"
+ },
+ "185qtiw1s4c": {
+  "text": "Tip. ... 300 times 4 is 1200, not 120. ... Keep the zeros.",
+  "spoken": "Here's a tip. 300 times 4 is one thousand, two hundred, not 120. Keep the zeros.",
+  "source": "number L5 5:1"
+ },
+ "1zhl2bkikuz": {
+  "text": "Worked example. ... 57 times 32 equals 3824? ... Estimate 60 times 30 equals 1800 , gives too large",
+  "spoken": "Worked example. 57 times 32 equals three thousand, eight hundred and twenty-four? Estimate 60 times 30 equals one thousand, eight hundred, gives too large",
+  "source": "number L5 5:3"
+ },
+ "ykfgircy44": {
+  "text": "Step 2. ... 60 times 30 equals 1800.",
+  "spoken": "Step 2. 60 times 30 equals 1800.",
+  "source": "number L5 5:3"
+ },
+ "k5c249zin0": {
+  "text": "Step 3. ... 3824 is about twice the estimate, so it is wrong. ... The real answer is 1824.",
+  "spoken": "Step 3. three thousand, eight hundred and twenty-four is about twice the estimate, so it is wrong. The real answer is 1824.",
+  "source": "number L5 5:3"
+ },
+ "1ye4k8l1861": {
+  "text": "Worked example. ... 2499 plus 518 equals 2500 plus 518 minus 1 equals 3017",
+  "spoken": "Worked example. two thousand, four hundred and ninety-nine plus 518 equals two thousand, five hundred plus 518 minus 1 equals three thousand and seventeen",
+  "source": "number L5 11:2"
+ },
+ "1l8ze746zlh": {
+  "text": "Step 1. ... 2499 is 1 less than 2500.",
+  "spoken": "Step 1. two thousand, four hundred and ninety-nine is 1 less than 2500.",
+  "source": "number L5 11:2"
+ },
+ "1qrknlf0vpi": {
+  "text": "Step 2. ... 2500 plus 518 equals 3018.",
+  "spoken": "Step 2. two thousand, five hundred plus 518 equals 3018.",
+  "source": "number L5 11:2"
+ },
+ "xbxc3vpvth": {
+  "text": "Step 3. ... Take off the 1: 3017.",
+  "spoken": "Step 3. Take off the 1: 3017.",
+  "source": "number L5 11:2"
+ },
+ "qi4oennok0": {
+  "text": "Worked example. ... 1000 divided by 8 equals 80? ... 8 times 80 equals 640 , gives no",
+  "spoken": "Worked example. one thousand divided by 8 equals 80? 8 times 80 equals 640, gives no",
+  "source": "number L5 11:3"
+ },
+ "19lnqw6zr4h": {
+  "text": "Step 2. ... 640 is much less than 1000.",
+  "spoken": "Step 2. 640 is much less than 1000.",
+  "source": "number L5 11:3"
  }
 }

@@ -43,9 +43,24 @@ export function speakTimes(text) {
     .replace(/\bpm\b/g, "p m").replace(/\bis am\b/g, "is a m");
 }
 
+const BIG = [[1e9, "billion"], [1e6, "million"], [1e3, "thousand"]];
+/** Whole numbers in Australian words: 50661 → "fifty thousand, six hundred and sixty-one". */
+function numberWords(n) {
+  if (n < 100) return n < 20 ? ONES[n] : TENS2[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : "");
+  if (n < 1000) return `${ONES[Math.floor(n / 100)]} hundred${n % 100 ? ` and ${numberWords(n % 100)}` : ""}`;
+  for (const [size, name] of BIG) if (n >= size) {
+    const rest = n % size;
+    return `${numberWords(Math.floor(n / size))} ${name}${rest ? (rest < 100 ? ` and ${numberWords(rest)}` : `, ${numberWords(rest)}`) : ""}`;
+  }
+  return String(n);
+}
+const TENS2 = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+/** Spell whole numbers of 1000 or more, which the voice model can misread. */
+export const speakBigNumbers = (text) => text.replace(/(?<![\d.,])\d{4,}(?![\d.]|,\d)/g, (d) => numberWords(Number(d)));
+
 export function forVoice(normalized) {
   // The model swallows a lone opening word, so "Tip." becomes "Here's a tip."
   const text = normalized.replace(/^Tip\. (\.\.\. )?/, "Here's a tip. ").replace(/([.?!]) \.\.\. /g, "$1 ").replace(/ \.\.\. of /g, " of ");
-  return expandUnits(speakTimes(text.replaceAll("≈", " approximately ")))
+  return expandUnits(speakBigNumbers(speakTimes(text.replaceAll("≈", " approximately "))))
     .replace(/\s+([,.])/g, "$1").replace(/\s+/g, " ").trim();
 }

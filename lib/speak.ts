@@ -125,7 +125,9 @@ function fractionToSpeech(numeratorText: string, denominatorText: string) {
 }
 
 function normalizeMathText(text: string) {
-  let normalized = text;
+  // "50 661" (thin-space thousands, as written in Australian schools) is one number,
+  // not "50" then "661"; join the groups so every voice reads it correctly.
+  let normalized = text.replace(/\b(\d{1,3})((?:[ \u2009\u202f]\d{3})+)\b/g, (_, head: string, groups: string) => head + groups.replace(/\D/g, ""));
 
   normalized = normalized
     .replaceAll("□", " blank ")
