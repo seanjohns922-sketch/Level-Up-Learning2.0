@@ -185,3 +185,27 @@ for (const route of ["lesson", "week", "quiz"]) {
 console.log(
   "PASS six optimised backgrounds, final post-test links and server demo gates.",
 );
+
+// GST questions must supply their rate: no local tax knowledge is assumed.
+const gstForms = new Set();
+let picturedMeal;
+for (let seed = 0; seed < 2000; seed++) {
+  const q = level8Question("number", 10, 2, seed * 7919 + 17);
+  assert(q.prompt.includes("10% GST"), `GST rate missing: ${q.prompt}`);
+  const form = q.prompt.startsWith("A meal") ? "meal" : q.prompt.startsWith("An item") ? "reverse-error" : q.prompt.startsWith("A cricket") ? "inclusive" : q.prompt.startsWith("A hair") ? "exclusive" : "table";
+  gstForms.add(form);
+  if (form !== "meal") continue;
+  const inclusive = Number(q.prompt.match(/\$([\d.]+)/)[1]);
+  const before = Math.round(inclusive / 1.1 * 100) / 100;
+  const tax = Math.round((inclusive - before) * 100) / 100;
+  assert.equal(Number(q.answer), tax);
+  assert(q.steps.some(step => step.includes("÷ 1.1")), "Explain the reverse operation");
+  assert(q.steps.some(step => step.includes("Subtract it from the total")), "Show how to find the included GST");
+  if (inclusive === 132) picturedMeal = q;
+}
+assert.equal(gstForms.size, 5, "Exercise all five GST question forms");
+assert(picturedMeal, "Reproduce the user's $132 meal");
+assert.equal(picturedMeal.answer, "12");
+assert(markLevel7Answer(level7Answer(picturedMeal), "12"));
+assert(!markLevel7Answer(level7Answer(picturedMeal), "13.2"));
+console.log("PASS: all five GST variants state 10%; inclusive-tax working and the $132 → $12 marking regression checked.");
