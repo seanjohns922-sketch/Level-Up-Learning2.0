@@ -13,6 +13,7 @@ import { calculateAccuracy } from "@/lib/learning-score";
 
 type LiveLearningEventInput = {
   eventType: LiveLearningEventType;
+  completionKey?: string;
   studentId?: string | null;
   classId?: string | null;
   level?: string | null;

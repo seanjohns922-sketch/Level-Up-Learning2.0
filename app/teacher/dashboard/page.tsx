@@ -1,5 +1,6 @@
 "use client";
 
+import { createReportingRequestGate, fetchReportingHistory } from "@/lib/teacher/reporting-history";
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, Download, Printer, Lock, LockOpen } from "lucide-react";
@@ -290,6 +291,7 @@ export default function TeacherDashboardPage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [progressLoadError, setProgressLoadError] = useState<string | null>(null);
   const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
+  const [historyUnavailable, setHistoryUnavailable] = useState(false);
   const [liveEvents, setLiveEvents] = useState<LiveActivityEventRow[]>([]);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
@@ -314,6 +316,8 @@ export default function TeacherDashboardPage() {
   // Refs to prevent duplicate fetches and stale closures
   const mountedRef = useRef(false);
   const selectedClassRef = useRef<string | null>(null);
+  const [reportingGate] = useState(createReportingRequestGate);
+  useEffect(() => () => reportingGate.invalidate(), [reportingGate]);
   const fetchingRef = useRef(false);
   const renderCount = useRef(0);
   renderCount.current++;
@@ -437,6 +441,8 @@ export default function TeacherDashboardPage() {
   }
 
   async function loadClassData(classId: string, diffOnly: boolean) {
+    const request = reportingGate.begin(classId);
+    if (!request) return;
     const selected = classes.find((c) => c.id === classId);
     console.log(
       "[TeacherDashboard] loadClassData() class_id:",
@@ -457,11 +463,12 @@ export default function TeacherDashboardPage() {
 
       // The roster drives the visible class shell and is useful without the
       // heavier canonical-progress and activity history payloads.
+      if (!request.isCurrent()) return;
       if (!diffOnly) setStudents(newStuds);
 
       let newProg: ProgressRow[] = [];
       let newLiveRows: LiveStudentActivityRow[] = [];
-      let newLiveEvents: LiveActivityEventRow[] = [];
+      let newLiveEvents: LiveActivityEventRow[] | null = [];
       if (newStuds.length > 0) {
         const ids = newStuds.map((s) => s.id);
         const [
@@ -475,21 +482,10 @@ export default function TeacherDashboardPage() {
             ),
           ),
           supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
-          supabase
-            .from("live_activity_events")
-            .select("student_id,class_id,event_type,created_at,payload")
-            .in("student_id", ids)
-            .eq("class_id", classId)
-            .in("event_type", [
-              "lesson_started",
-              "quiz_started",
-              "question_loaded",
-              "answer_correct",
-              "answer_incorrect",
-              "lesson_completed",
-              "quiz_completed",
-            ])
-            .order("created_at", { ascending: true }),
+          fetchReportingHistory(supabase, classId, {
+            eventTypes: ["lesson_started", "quiz_started", "question_loaded", "answer_correct", "answer_incorrect", "lesson_completed", "quiz_completed"],
+            isCurrent: request.isCurrent,
+          }).then(data => ({ data, error: null }), error => ({ data: null, error })),
         ]);
         newProg = realmProgress.flat();
         if (liveError) {
@@ -498,12 +494,15 @@ export default function TeacherDashboardPage() {
           newLiveRows = (live ?? []) as LiveStudentActivityRow[];
         }
         if (eventsError) {
+          newLiveEvents = null;
           console.warn("[TeacherDashboard] live activity events unavailable", eventsError);
         } else {
           newLiveEvents = (events ?? []) as LiveActivityEventRow[];
         }
       }
 
+      if (!request.isCurrent()) return;
+      setHistoryUnavailable(newLiveEvents === null);
       if (diffOnly) {
         const studJson = JSON.stringify(newStuds);
         const progJson = JSON.stringify(newProg);
@@ -512,14 +511,18 @@ export default function TeacherDashboardPage() {
         setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
         setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
         setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
-        setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
+        if (newLiveEvents !== null) {
+          const nextEvents = newLiveEvents;
+          setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : nextEvents);
+        }
       } else {
         setProgress(newProg);
         setLiveRows(newLiveRows);
-        setLiveEvents(newLiveEvents);
+        if (newLiveEvents !== null) setLiveEvents(newLiveEvents);
       }
       setProgressLoadError(null);
     } catch (error) {
+      if (!request.isCurrent()) return;
       const message =
         error instanceof Error
           ? error.message
@@ -529,13 +532,17 @@ export default function TeacherDashboardPage() {
             : "Canonical student progress could not be loaded.";
       console.error("[TeacherDashboard] canonical progress load failed", error);
       setProgressLoadError(message);
+    } finally {
+      request.finish();
     }
   }
 
   function selectClass(classId: string) {
     const cls = classes.find(c => c.id === classId);
     console.log("[TeacherDashboard] selectedClassId:", classId, "code:", cls?.class_code);
+    selectedClassRef.current = classId;
     setSelectedClassId(classId);
+    setLiveEvents([]);
     setActiveYear(normalizeClassCurriculumYear(cls?.year_level));
     setExpandedStudent(null);
     loadClassData(classId, false);
@@ -1370,6 +1377,7 @@ export default function TeacherDashboardPage() {
             {schoolPreviewError}
           </div>
         )}
+        {historyUnavailable && <p role="status" className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">Recent activity could not refresh. Activity totals may be out of date; saved progress is unchanged.</p>}
         {progressLoadError && (
           <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800" role="alert">
             Student progress is temporarily unavailable. Existing results have not been replaced. {progressLoadError}

@@ -624,6 +624,7 @@ export function Year2LessonEngine({
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
+  reportLiveCompletion = true,
   sessionScopeKey,
   realmId,
   levelNumber,
@@ -640,6 +641,7 @@ export function Year2LessonEngine({
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
+  reportLiveCompletion?: boolean;
   sessionScopeKey?: string;
   realmId?: string;
   levelNumber?: number;
@@ -1212,7 +1214,6 @@ export function Year2LessonEngine({
         selectedAnswer: studentAnswer,
         isCorrect: true,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
-        attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
         progressPercent: Math.max(0, Math.min(100, Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100))),
         progressLabel: `Question ${currentQuestionSequence}`,
         skillTag: mode,
@@ -1285,7 +1286,6 @@ export function Year2LessonEngine({
         correctAnswer: getQuestionCorrectAnswer(currentQuestion),
         isCorrect: false,
         timeOnQuestion: Math.max(1, totalSeconds - secondsLeft - questionStartedAtElapsedRef.current),
-        attemptNumber: (questionsAnsweredRef.current ?? 0) + 1,
         progressPercent: Math.max(0, Math.min(100, Math.round(((totalSeconds - secondsLeft) / totalSeconds) * 100))),
         progressLabel: `Question ${currentQuestionSequence}`,
         skillTag: mode,
@@ -1338,8 +1338,10 @@ export function Year2LessonEngine({
   const showEstimatePrompt =
     isEstimateReasoningLesson(level, lesson) && questionsAnswered === 4 && status === "idle";
 
+  const liveCompletionReported = useRef(false);
   useEffect(() => {
-    if (!finished || !liveContext) return;
+    if (!finished || !liveContext || !reportLiveCompletion || liveCompletionReported.current) return;
+    liveCompletionReported.current = true;
     void trackLiveLearningEvent({
       eventType: "lesson_completed",
       level: liveContext.level,
@@ -1354,7 +1356,7 @@ export function Year2LessonEngine({
       correctCount: correctAnswers,
       correctAnswers,
     });
-  }, [correctAnswers, finished, liveContext, questionsAnswered]);
+  }, [correctAnswers, finished, liveContext, questionsAnswered, reportLiveCompletion]);
 
   // ── Finished state ──
   if (finished) {

@@ -465,6 +465,7 @@ export function PracticeRunner({
   renderCompletionCard,
   onPerformanceSummary,
   liveContext,
+  reportLiveCompletion = true,
   realmId,
   levelNumber,
   practisedSkills,
@@ -494,6 +495,7 @@ export function PracticeRunner({
   renderCompletionCard?: (summary: LessonPerformanceSummary) => ReactNode;
   onPerformanceSummary?: (summary: LessonPerformanceSummary) => void;
   liveContext?: LiveLessonContext;
+  reportLiveCompletion?: boolean;
   realmId?: string;
   levelNumber?: number;
   practisedSkills?: string[];
@@ -1231,8 +1233,10 @@ export function PracticeRunner({
         ? hint ?? "✗ Not quite — keep going!"
         : null;
 
+  const liveCompletionReported = useRef(false);
   useEffect(() => {
-    if (!finished || !liveContext) return;
+    if (!finished || !liveContext || !reportLiveCompletion || liveCompletionReported.current) return;
+    liveCompletionReported.current = true;
     void trackLiveLearningEvent({
       eventType: "lesson_completed",
       level: liveContext.level,
@@ -1247,7 +1251,7 @@ export function PracticeRunner({
       correctCount: correctAnswers,
       correctAnswers,
     });
-  }, [completionMode, correctAnswers, finished, liveContext, minutes, safeQuestionsAnswered]);
+  }, [completionMode, correctAnswers, finished, liveContext, minutes, safeQuestionsAnswered, reportLiveCompletion]);
 
   // ── Finished state ──
   if (finished) {

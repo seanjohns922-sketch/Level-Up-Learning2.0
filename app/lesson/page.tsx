@@ -599,6 +599,7 @@ function LessonPage() {
         const completedSummary = latestLessonSummaryRef.current;
         void trackLiveLearningEvent({
           eventType: "lesson_completed",
+          completionKey: getOrCreateLessonSessionId(lessonCompletionActivityKey),
           level: liveLessonContext.level,
           strand: liveLessonContext.strand,
           week: liveLessonContext.week,
@@ -1075,6 +1076,7 @@ function LessonPage() {
               completionMode={year === "Year 1" || isGroundCustomLesson || isYear2Measurelands || isYear3Measurelands || isYear4Measurelands || isYear5Measurelands || isYear6Measurelands ? "time_only" : "question_or_time"}
               scoreCap={10}
               liveContext={liveLessonContext}
+              reportLiveCompletion={false}
               realmId={realmId}
               levelNumber={levelNumber}
               practisedSkills={getLessonPractisedSkills(effectiveLessonId)}
@@ -1177,6 +1179,7 @@ function LessonPage() {
                   onTimedComplete={completeLesson}
                   onExit={goBackToProgram}
                   liveContext={liveLessonContext}
+              reportLiveCompletion={false}
                   sessionScopeKey={lessonCompletionActivityKey}
                   realmId={realmId}
                   levelNumber={levelNumber}
