@@ -45,6 +45,7 @@ import { getSchoolLogo } from "@/lib/school-logos";
 import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import HomeTrends from "./HomeTrends";
+import MyClassSummary from "./MyClassSummary";
 import { formatClassYearLevels, normalizeClassYearLevels } from "@/lib/studentLevelLabel";
 
 const SchoolAnalyticsDashboard = dynamic(
@@ -444,7 +445,7 @@ function TeacherClassCards({
             href={`/school/${schoolId}/classes/${classRow.id}`}
             className="mt-5 inline-flex min-h-10 w-fit items-center rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900"
           >
-            Open Class
+            Open class
           </a>
         </article>
       ))}
@@ -2172,10 +2173,10 @@ export default function SchoolHomeClient({
   }, [initialSnapshot.school.id]);
 
   useEffect(() => {
-    if ((tab === "licence" || tab === "administration") && licenceState === "idle") {
+    if ((tab === "licence" || tab === "administration" || (tab === "home" && snapshot.permissions.canViewAdministration)) && licenceState === "idle") {
       void loadLicenceSummaries();
     }
-  }, [licenceState, loadLicenceSummaries, tab]);
+  }, [licenceState, loadLicenceSummaries, snapshot.permissions.canViewAdministration, tab]);
 
   const filteredClasses = useMemo(
     () =>
@@ -2521,7 +2522,7 @@ export default function SchoolHomeClient({
           </label>
         ) : null}
 
-        <nav aria-label={isAdministrator ? "School administration" : "Teacher"} className="-mx-1 flex gap-1 overflow-x-auto px-1 lg:flex-col">
+        <nav aria-label={isAdministrator ? "School administration" : "Teacher"} className="-mx-1 flex shrink-0 gap-1 overflow-x-auto px-1 lg:flex-col lg:overflow-visible">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const selected = tab === item.id;
@@ -2622,7 +2623,7 @@ export default function SchoolHomeClient({
                   ))}
                 </select>
               </label>
-              {tab !== "students" &&
+              {(tab === "home" || tab === "classes") &&
               isAdministrator &&
               snapshot.permissions.canCreateClass ? (
                 <button
@@ -2686,15 +2687,39 @@ export default function SchoolHomeClient({
                   />
                 </section>
 
-                {academicYearId ? (
-                  <HomeTrends
-                    schoolId={snapshot.school.id}
-                    academicYearId={academicYearId}
-                    title="Topics to watch"
-                    subtitle="Whole school, by year level · last 28 days"
-                    onOpenAnalytics={() => setTab("insights")}
-                  />
-                ) : null}
+                <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+                  {academicYearId ? (
+                    <HomeTrends
+                      schoolId={snapshot.school.id}
+                      academicYearId={academicYearId}
+                      title="Topics to watch"
+                      subtitle="Whole school, by year level · last 28 days"
+                      onOpenAnalytics={() => setTab("insights")}
+                    />
+                  ) : null}
+                  <section className="rounded-2xl bg-[#121314] p-6 text-white">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--reliq-lime)]">Licence</p>
+                    <p className="mt-2 font-display text-2xl font-black">
+                      {licenceState !== "ready"
+                        ? "Loading…"
+                        : selectedLicence
+                          ? `${selectedLicence.used} of ${selectedLicence.seatLimit} in use`
+                          : "No licence for this year"}
+                    </p>
+                    <p className="mt-1 text-sm text-[#B5B9B2]">
+                      {licenceState === "ready" && selectedLicence
+                        ? `${selectedLicence.available} free${unlicensedEnrolments ? ` · ${unlicensedEnrolments} students without a licence` : ""}`
+                        : "School access for the selected academic year."}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setTab("licence")}
+                      className="mt-4 text-sm font-bold text-[var(--reliq-lime)] hover:underline"
+                    >
+                      Manage licence
+                    </button>
+                  </section>
+                </div>
               </div>
             ) : (
               <div className="space-y-8">
@@ -2709,9 +2734,10 @@ export default function SchoolHomeClient({
                       {myStudentCount} students · {selectedAcademicYear?.name ?? "Academic year not set"}
                     </p>
                   </div>
-                  <TeacherClassCards
-                    classes={myClasses}
+                  <MyClassSummary
                     schoolId={snapshot.school.id}
+                    academicYearId={academicYearId}
+                    classes={myClasses}
                   />
                 </section>
 

@@ -511,7 +511,7 @@ function StudentInsightsPageInner() {
 
   if (authLoading || loading) {
     return (
-      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
+      <main className="min-h-screen bg-[#F4F5F1] flex items-center justify-center">
         <div className="text-sm font-semibold text-slate-500">Loading learning insights…</div>
       </main>
     );
@@ -519,7 +519,7 @@ function StudentInsightsPageInner() {
 
   if (!selectedRealmId) {
     return (
-      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
+      <main className="min-h-screen bg-[#F4F5F1] flex items-center justify-center">
         <div className="text-sm font-semibold text-slate-500">
           Select a valid realm to view learning insights.
         </div>
@@ -529,7 +529,7 @@ function StudentInsightsPageInner() {
 
   if (!user || !studentId || !student || !derived) {
     return (
-      <main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center">
+      <main className="min-h-screen bg-[#F4F5F1] flex items-center justify-center">
         <div className="text-sm font-semibold text-slate-500">Student not found.</div>
       </main>
     );
@@ -597,7 +597,7 @@ function StudentInsightsPageInner() {
               className={[
                 "rounded-xl px-4 py-2 text-sm font-bold transition",
                 tab === id
-                  ? "bg-[#0A2F2A] text-[#00E5C3]"
+                  ? "bg-[#121314] text-[var(--reliq-lime)]"
                   : "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]",
               ].join(" ")}
             >
@@ -631,7 +631,7 @@ function StudentInsightsPageInner() {
           <div className="space-y-5">
             <ChartCard
               title="Average Lesson Accuracy"
-              subtitle="Completed lesson attempts only"
+              subtitle={`Completed lesson attempts only · lime bars are at or above ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}%`}
               content={<BarChart points={derived.lessonAccuracyByWeek} emptyLabel="No completed lesson attempts yet." />}
             />
             <ChartCard
@@ -742,7 +742,7 @@ function StudentInsightsPageInner() {
 
 export default function StudentInsightsPage() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[#F7F8FA] flex items-center justify-center"><div className="text-sm font-semibold text-slate-500">Loading learning insights…</div></main>}>
+    <Suspense fallback={<main className="min-h-screen bg-[#F4F5F1] flex items-center justify-center"><div className="text-sm font-semibold text-slate-500">Loading learning insights…</div></main>}>
       <StudentInsightsPageInner />
     </Suspense>
   );
@@ -795,7 +795,7 @@ function BarChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: s
           <div className="text-sm font-bold text-[#0F172A]">{point.label}</div>
           <div className="h-4 rounded-full bg-[#EEF2F7] overflow-hidden">
             <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#0EA5A4_0%,#14B8A6_100%)]"
+              className={`h-full rounded-full ${point.value >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent ? "bg-[#B9F23F]" : "bg-[#121314]"}`}
               style={{ width: `${Math.max(0, Math.min(100, point.value))}%` }}
             />
           </div>
@@ -919,7 +919,7 @@ function LevelTimeline({ entries }: { entries: TimelineEntry[] }) {
       {entries.map((entry, index) => (
         <div key={`${entry.year}-${index}`} className="flex gap-4 rounded-2xl border border-[#E6E8EC] bg-[#F8FAFC] p-4">
           <div className="flex flex-col items-center">
-            <div className={`h-3 w-3 rounded-full ${entry.current ? "bg-teal-500" : "bg-slate-300"}`} />
+            <div className={`h-3 w-3 rounded-full ${entry.current ? "bg-[#B9F23F] ring-2 ring-[#121314]" : "bg-slate-300"}`} />
             {index < entries.length - 1 ? <div className="mt-2 h-full min-h-10 w-px bg-slate-200" /> : null}
           </div>
           <div className="flex-1">
@@ -985,7 +985,7 @@ function AssessmentAttemptHistory({
               <button
                 type="button"
                 onClick={() => onView(attempt)}
-                className="rounded-lg bg-[#0A2F2A] px-3 py-2 text-xs font-extrabold text-white hover:bg-[#12483F]"
+                className="rounded-lg bg-[#121314] px-3 py-2 text-xs font-extrabold text-white hover:bg-[#2A2C2E]"
               >
                 View {attempt.assessmentType === "weekly_quiz" ? "Quiz" : "Assessment"}
               </button>

@@ -3,9 +3,7 @@
 import {
   Activity,
   ArrowLeft,
-  BarChart3,
   BookOpenCheck,
-  CheckCircle2,
   ChevronRight,
   CircleHelp,
   Download,
@@ -14,7 +12,6 @@ import {
   Search,
   School,
   TrendingUp,
-  UserRoundCheck,
   Users,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -23,6 +20,7 @@ import type {
   SchoolHomeSnapshot,
   StudentLearningJourney,
 } from "@/lib/school-platform-server";
+import LeaderOverview from "./analytics/LeaderOverview";
 import {
   type AcStrand,
   AC_STRANDS,
@@ -35,7 +33,6 @@ type AnalyticsTab =
   | "curriculum"
   | "placement"
   | "intervention"
-  | "engagement"
   | "classes"
   | "students";
 
@@ -55,7 +52,6 @@ const TABS: Array<{ id: AnalyticsTab; label: string }> = [
   { id: "curriculum", label: "Curriculum" },
   { id: "placement", label: "Placement" },
   { id: "intervention", label: "Intervention" },
-  { id: "engagement", label: "Engagement" },
   { id: "classes", label: "Classes" },
   { id: "students", label: "Students" },
 ];
@@ -236,20 +232,20 @@ function MetricCard({
   icon: typeof Users;
 }) {
   return (
-    <article className="min-w-0 border border-slate-200 bg-white p-4 shadow-sm">
+    <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+            <p className="text-[15px] font-medium text-slate-500">
               {label}
             </p>
             <span title={definition}>
               <CircleHelp className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
             </span>
           </div>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-slate-950">{value}</p>
+          <p className={`mt-2 font-display font-black tracking-tight text-[#121314] ${String(value).length > 8 ? "text-lg leading-snug" : "text-3xl"}`}>{value}</p>
         </div>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F1F2EE] text-slate-600">
           <Icon className="h-4 w-4" />
         </span>
       </div>
@@ -273,7 +269,7 @@ function TrendChart({
 }) {
   if (values.length === 0) {
     return (
-      <div className="flex h-44 items-center justify-center border border-dashed border-slate-300 bg-slate-50 px-5 text-center text-sm text-slate-500">
+      <div className="flex h-44 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#FAFBF8] px-5 text-center text-sm text-slate-500">
         {emptyLabel}
       </div>
     );
@@ -292,7 +288,7 @@ function TrendChart({
   const path = points.map((point) => `${point.x},${point.y}`).join(" ");
 
   return (
-    <div className="overflow-hidden border border-slate-200 bg-slate-50 p-3">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-[#FAFBF8] p-3">
       <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full" role="img">
         <title>Trend from {labels[0]} to {labels.at(-1)}</title>
         {[0, 1, 2].map((line) => (
@@ -302,14 +298,14 @@ function TrendChart({
             x2={width - 24}
             y1={24 + line * 56}
             y2={24 + line * 56}
-            stroke="#dbe3ea"
+            stroke="#E3E5E0"
             strokeWidth="1"
           />
         ))}
         <polyline
           fill="none"
-          stroke="#059669"
-          strokeWidth="4"
+          stroke="#121314"
+          strokeWidth="2.5"
           strokeLinejoin="round"
           strokeLinecap="round"
           points={path}
@@ -329,7 +325,7 @@ function TrendChart({
             }}
             aria-label={onPointClick ? `Open details for ${labels[index]}` : undefined}
           >
-            <circle cx={point.x} cy={point.y} r="5" fill="#fff" stroke="#059669" strokeWidth="3" />
+            <circle cx={point.x} cy={point.y} r="5" fill="#B9F23F" stroke="#121314" strokeWidth="2" />
             <title>{`${labels[index]}: ${point.value}${valueSuffix}`}</title>
           </g>
         ))}
@@ -367,7 +363,7 @@ export default function SchoolAnalyticsDashboard({
   teacherClassIds = [],
 }: SchoolAnalyticsDashboardProps) {
   const [tab, setTab] = useState<AnalyticsTab>("overview");
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState(90);
   const [yearLevel, setYearLevel] = useState("");
   const [classId, setClassId] = useState("");
   const [realmId, setRealmId] = useState("");
@@ -449,15 +445,6 @@ export default function SchoolAnalyticsDashboard({
       return a.name.localeCompare(b.name);
     });
   }, [snapshot?.students, studentSearch, studentSort]);
-
-  const strongestRealm = useMemo(
-    () => [...(snapshot?.realms ?? [])].filter((realm) => realm.averageAccuracy !== null).sort((a, b) => (b.averageAccuracy ?? 0) - (a.averageAccuracy ?? 0))[0],
-    [snapshot?.realms],
-  );
-  const priorityRealm = useMemo(
-    () => [...(snapshot?.realms ?? [])].filter((realm) => realm.averageAccuracy !== null).sort((a, b) => (a.averageAccuracy ?? 0) - (b.averageAccuracy ?? 0))[0],
-    [snapshot?.realms],
-  );
 
   const downloadStudentReportPdf = async (student: SchoolAnalyticsSnapshot["students"][number]) => {
     const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
@@ -906,21 +893,11 @@ export default function SchoolAnalyticsDashboard({
 
   if (!snapshot) return null;
 
-  const activeRate = snapshot.overview.students
-    ? Math.round((snapshot.overview.activeThisWeek / snapshot.overview.students) * 100)
-    : 0;
-  const targetRate = snapshot.overview.students
-    ? Math.round((snapshot.overview.weeklyTargetMet / snapshot.overview.students) * 100)
-    : 0;
-  const onTrackRate = snapshot.overview.students
-    ? Math.round((snapshot.overview.onTrack / snapshot.overview.students) * 100)
-    : 0;
-
   return (
     <section className="space-y-6">
-      <div className="border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Filters</p>
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-bold text-slate-700">Showing</p>
           <div className="flex items-center gap-2">
             {tab === "placement" ? (
               <button
@@ -953,44 +930,44 @@ export default function SchoolAnalyticsDashboard({
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <label className="text-sm font-semibold text-slate-600">
             School year level
-            <select value={yearLevel} onChange={(event) => { setYearLevel(event.target.value); setClassId(""); }} className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold normal-case tracking-normal text-slate-800">
+            <select value={yearLevel} onChange={(event) => { setYearLevel(event.target.value); setClassId(""); }} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
               <option value="">Whole school</option>
               {YEAR_LEVELS.map((level) => <option key={level}>{level}</option>)}
             </select>
           </label>
-          <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <label className="text-sm font-semibold text-slate-600">
             Class
-            <select value={classId} onChange={(event) => setClassId(event.target.value)} className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold normal-case tracking-normal text-slate-800">
+            <select value={classId} onChange={(event) => setClassId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
               <option value="">All classes</option>
               {classes.filter((item) => !yearLevel || item.yearLevels.includes(yearLevel)).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
-          <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <label className="text-sm font-semibold text-slate-600">
             Realm
-            <select value={realmId} onChange={(event) => setRealmId(event.target.value)} className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold normal-case tracking-normal text-slate-800">
+            <select value={realmId} onChange={(event) => setRealmId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
               <option value="">All realms</option>
               {Object.entries(REALMS).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
             </select>
           </label>
-          <label className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <label className="text-sm font-semibold text-slate-600">
             Reporting window
-            <select value={days} onChange={(event) => setDays(Number(event.target.value))} className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold normal-case tracking-normal text-slate-800">
+            <select value={days} onChange={(event) => setDays(Number(event.target.value))} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
               <option value={7}>Last 7 days</option>
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
             </select>
           </label>
         </div>
-        {loading ? <div className="mt-3 h-1 animate-pulse bg-emerald-300" /> : null}
+        {loading ? <div className="mt-3 h-1 animate-pulse rounded-full bg-[#B9F23F]" /> : null}
       </div>
 
       {audience === "teacher" ? (
-        <div className="flex flex-col gap-2 border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm text-emerald-950 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-[#121314] sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-bold">School view with class-level follow-through</p>
-            <p className="mt-0.5 text-emerald-800">School and class comparisons include the full cohort. Named student evidence is limited to your assigned classes.</p>
+            <p className="mt-0.5 text-slate-500">School and class comparisons include the full cohort. Named student evidence is limited to your assigned classes.</p>
           </div>
           <button type="button" onClick={() => setTab("classes")} className="inline-flex shrink-0 items-center gap-1 font-bold text-emerald-800">
             Compare classes <ChevronRight className="h-4 w-4" />
@@ -998,71 +975,33 @@ export default function SchoolAnalyticsDashboard({
         </div>
       ) : null}
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-slate-200" aria-label="School analytics views">
+      <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
         {TABS.map((item) => (
-          <button key={item.id} type="button" onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max border-b-2 px-4 py-3 text-sm font-bold ${tab === item.id ? "border-emerald-700 text-emerald-800" : "border-transparent text-slate-500 hover:text-slate-900"}`}>
+          <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#B9F23F)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
             {item.label}
           </button>
         ))}
       </nav>
 
       {tab === "overview" ? (
-        <div className="space-y-5">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-            <MetricCard label="Students" value={snapshot.overview.students} detail="Current school cohort" definition="Active school-entitled students in the selected academic year. Home-only students are excluded." icon={Users} />
-            <MetricCard label="Active this week" value={snapshot.overview.activeThisWeek} detail={`${activeRate}% of students`} definition="Students with canonical lesson, quiz or assessment activity in the last 7 days." icon={Activity} />
-            <MetricCard label="Weekly target met" value={snapshot.overview.weeklyTargetMet} detail={`${targetRate}% completed 3+ lessons`} definition={snapshot.methodology.weeklyTarget} icon={CheckCircle2} />
-            <MetricCard label="On track" value={snapshot.overview.onTrack} detail={`${onTrackRate}% with recent evidence`} definition={snapshot.methodology.onTrack} icon={UserRoundCheck} />
-            <MetricCard label="Levels mastered" value={snapshot.overview.levelsMastered} detail="Latest post-tests at 85%+" definition={snapshot.methodology.mastery} icon={GraduationCap} />
-            <MetricCard label="Average growth" value={formatPercent(snapshot.overview.averageGrowth, " pts")} detail={`${snapshot.overview.matchedGrowthPairs} matched pairs`} definition={snapshot.methodology.growth} icon={TrendingUp} />
-          </div>
-
-          <div className="grid gap-5 xl:grid-cols-2">
-            <article className="border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div><h3 className="font-bold text-slate-950">Learning engagement</h3><p className="mt-1 text-sm text-slate-500">Active students by learning day.</p></div>
-                <button type="button" onClick={() => setTab("engagement")} className="inline-flex items-center gap-1 text-sm font-bold text-emerald-700">Explore <ChevronRight className="h-4 w-4" /></button>
-              </div>
-              <div className="mt-4"><TrendChart values={snapshot.engagementTrend.map((point) => point.activeStudents)} labels={snapshot.engagementTrend.map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="No learning activity is recorded in this reporting window." onPointClick={() => setTab("engagement")} /></div>
-            </article>
-            <article className="border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div><h3 className="font-bold text-slate-950">Measured growth</h3><p className="mt-1 text-sm text-slate-500">Matched pre-test to post-test change.</p></div>
-                <button type="button" onClick={() => setTab("growth")} className="inline-flex items-center gap-1 text-sm font-bold text-emerald-700">Explore <ChevronRight className="h-4 w-4" /></button>
-              </div>
-              <div className="mt-4"><TrendChart values={snapshot.growthTrend.flatMap((point) => point.averageGrowth === null ? [] : [point.averageGrowth])} labels={snapshot.growthTrend.filter((point) => point.averageGrowth !== null).map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="Growth appears after students complete matched pre-tests and post-tests." valueSuffix=" points" onPointClick={() => setTab("growth")} /></div>
-            </article>
-          </div>
-
-          <div className="grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
-            <article className="border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between"><h3 className="font-bold">Realm evidence</h3><button type="button" onClick={() => setTab("curriculum")} className="text-sm font-bold text-emerald-700">Curriculum view</button></div>
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
-                {snapshot.realms.map((realm) => (
-                  <button key={realm.realmId} type="button" onClick={() => { setRealmId(realm.realmId); setTab("growth"); }} className="border border-slate-200 p-4 text-left hover:border-emerald-500 hover:bg-emerald-50">
-                    <p className="font-bold text-slate-950">{REALMS[realm.realmId] ?? realm.realmId}</p>
-                    <p className="mt-3 text-2xl font-bold">{formatPercent(realm.averageAccuracy)}</p>
-                    <p className="mt-1 text-xs text-slate-500">{realm.activeStudents} active · {realm.lessons} lessons · {realm.quizzes} quizzes</p>
-                  </button>
-                ))}
-                {snapshot.realms.length === 0 ? <p className="text-sm text-slate-500">No realm evidence in this reporting window.</p> : null}
-              </div>
-            </article>
-            <article className="border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-bold">Decision snapshot</h3>
-              <div className="mt-4 space-y-4 text-sm">
-                <div><p className="text-xs font-bold uppercase tracking-[0.1em] text-emerald-700">Strongest evidence</p><p className="mt-1 font-semibold">{strongestRealm ? `${REALMS[strongestRealm.realmId] ?? strongestRealm.realmId} · ${strongestRealm.averageAccuracy}%` : "Not enough evidence"}</p></div>
-                <div><p className="text-xs font-bold uppercase tracking-[0.1em] text-amber-700">Priority for review</p><p className="mt-1 font-semibold">{priorityRealm ? `${REALMS[priorityRealm.realmId] ?? priorityRealm.realmId} · ${priorityRealm.averageAccuracy}%` : "Not enough evidence"}</p></div>
-              </div>
-            </article>
-          </div>
-        </div>
+        <LeaderOverview
+          snapshot={snapshot}
+          cells={[...intervention.cells.values()].map((cell) => ({ strand: cell.strand, strandLabel: AC_STRANDS[cell.strand].label, year: cell.year, below: cell.needs, total: cell.total }))}
+          strands={intervention.strands.map((strand) => ({ id: strand, label: AC_STRANDS[strand].label }))}
+          years={intervention.years}
+          days={days}
+          onOpen={(target, filter) => {
+            if (filter?.yearLevel) setYearLevel(filter.yearLevel);
+            if (filter?.classId) setClassId(filter.classId);
+            setTab(target);
+          }}
+        />
       ) : null}
 
       {tab === "growth" ? (
         <div className="grid gap-5 xl:grid-cols-[1.3fr_0.7fr]">
-          <article className="border border-slate-200 bg-white p-5 shadow-sm"><h3 className="font-bold">School growth trend</h3><p className="mt-1 text-sm text-slate-500">Only matched pre-test and post-test pairs are included.</p><div className="mt-4"><TrendChart values={snapshot.growthTrend.flatMap((point) => point.averageGrowth === null ? [] : [point.averageGrowth])} labels={snapshot.growthTrend.filter((point) => point.averageGrowth !== null).map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="No matched pre-test and post-test pairs in this view." valueSuffix=" points" /></div></article>
-          <article className="border border-slate-200 bg-white p-5 shadow-sm"><h3 className="font-bold">Growth by realm</h3><div className="mt-4 space-y-3">{snapshot.realms.map((realm) => <button key={realm.realmId} type="button" onClick={() => setRealmId(realm.realmId)} className="flex w-full items-center justify-between border-b border-slate-100 py-3 text-left"><span className="font-semibold">{REALMS[realm.realmId] ?? realm.realmId}</span><span className="font-bold text-emerald-700">{formatPercent(realm.averageGrowth, " pts")}</span></button>)}</div><p className="mt-5 text-xs leading-5 text-slate-500">{snapshot.methodology.growth}</p></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="font-bold">School growth trend</h3><p className="mt-1 text-sm text-slate-500">Only matched pre-test and post-test pairs are included.</p><div className="mt-4"><TrendChart values={snapshot.growthTrend.flatMap((point) => point.averageGrowth === null ? [] : [point.averageGrowth])} labels={snapshot.growthTrend.filter((point) => point.averageGrowth !== null).map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="No matched pre-test and post-test pairs in this view." valueSuffix=" points" /></div></article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="font-bold">Growth by realm</h3><div className="mt-4 space-y-3">{snapshot.realms.map((realm) => <button key={realm.realmId} type="button" onClick={() => setRealmId(realm.realmId)} className="flex w-full items-center justify-between border-b border-slate-100 py-3 text-left"><span className="font-semibold">{REALMS[realm.realmId] ?? realm.realmId}</span><span className="font-bold text-emerald-700">{formatPercent(realm.averageGrowth, " pts")}</span></button>)}</div><p className="mt-5 text-xs leading-5 text-slate-500">{snapshot.methodology.growth}</p></article>
         </div>
       ) : null}
 
@@ -1087,7 +1026,7 @@ export default function SchoolAnalyticsDashboard({
             <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No placement or assessment evidence in this view yet.</p>
           ) : (
             standingByStrand.map((group) => (
-              <article key={group.strand} className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+              <article key={group.strand} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-5">
                   <div className="flex items-center gap-3">
                     <h4 className="text-base font-bold text-slate-950">{group.label}</h4>
@@ -1142,7 +1081,7 @@ export default function SchoolAnalyticsDashboard({
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
               {placementByStrand.map((group) => (
-                <article key={group.key} className="border border-slate-200 bg-white p-5 shadow-sm">
+                <article key={group.key} className="rounded-2xl border border-slate-200 bg-white p-5">
                   <div className="flex items-center justify-between gap-3">
                     <h4 className="font-bold text-slate-950">{group.label}</h4>
                     <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">Baseline {formatPercent(group.baseline)}</span>
@@ -1266,7 +1205,7 @@ export default function SchoolAnalyticsDashboard({
                     key={`${cell.strand}-${cell.year}`}
                     type="button"
                     onClick={() => { setRealmId(cell.strand); if (cell.year !== "Not recorded") setYearLevel(cell.year); setTab("students"); }}
-                    className="flex items-center justify-between gap-3 border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-rose-400 hover:bg-rose-50"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-rose-400 hover:bg-rose-50"
                   >
                     <div>
                       <p className="text-sm font-bold text-slate-950">{cell.year} · {AC_STRANDS[cell.strand].label}</p>
@@ -1279,7 +1218,7 @@ export default function SchoolAnalyticsDashboard({
                 ))}
               </div>
 
-              <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+              <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
                 <div className="flex items-center justify-between p-5">
                   <h4 className="font-bold text-slate-950">Intervention heatmap</h4>
                   <span className="text-xs font-semibold text-slate-500">{intervention.totalNeeds} students below level</span>
@@ -1328,12 +1267,8 @@ export default function SchoolAnalyticsDashboard({
         </div>
       ) : null}
 
-      {tab === "engagement" ? (
-        <div className="space-y-5"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"><MetricCard label="Active learners" value={snapshot.engagement.activeLearners} detail={`Last ${days} days`} definition="Distinct students with canonical learning activity in the reporting window." icon={Users} /><MetricCard label="Learning days" value={snapshot.engagement.averageLearningDays ?? "—"} detail="Average per active learner" definition="Distinct calendar days with learning activity, averaged across active learners." icon={Activity} /><MetricCard label="Returning learners" value={snapshot.engagement.returningLearners} detail="Active on 2+ days" definition="Students with learning activity on at least two distinct days." icon={UserRoundCheck} /><MetricCard label="Lessons" value={snapshot.engagement.lessonsCompleted} detail="Unique lesson completions" definition={snapshot.methodology.lessonDeduplication} icon={BookOpenCheck} /><MetricCard label="Quizzes" value={snapshot.engagement.quizzesCompleted} detail="Unique weekly quizzes" definition={snapshot.methodology.quizDeduplication} icon={BarChart3} /></div><article className="border border-slate-200 bg-white p-5 shadow-sm"><h3 className="font-bold">Engagement trend</h3><div className="mt-4"><TrendChart values={snapshot.engagementTrend.map((point) => point.activeStudents)} labels={snapshot.engagementTrend.map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="No engagement is recorded in this reporting window." /></div></article></div>
-      ) : null}
-
       {tab === "classes" ? (
-        <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+        <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           <div className="flex flex-wrap items-end justify-between gap-3 p-5">
             <div>
               <h3 className="font-bold text-slate-950">Class comparison</h3>
@@ -1400,7 +1335,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "students" ? (
         selectedStudent ? (
-          <article className="border border-slate-200 bg-white p-5 shadow-sm">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <button
               type="button"
               onClick={() => setSelectedStudentId("")}
@@ -1463,7 +1398,7 @@ export default function SchoolAnalyticsDashboard({
             </div>
           </article>
         ) : (
-          <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+          <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <div className="flex flex-wrap items-end justify-between gap-3 p-5">
               <div>
                 <h3 className="font-bold">Student evidence</h3>
