@@ -41,7 +41,8 @@ export default function LeaderOverview({
   onOpen: (target: LeaderSignal["target"], filter?: LeaderSignal["filter"]) => void;
 }) {
   const signals = buildLeaderSignals(snapshot, cells);
-  const weeks = weeklyUsage(snapshot.engagementTrend, snapshot.generatedAt, days);
+  // Weeks run to the end of the reporting window (a past school year ends before today).
+  const weeks = weeklyUsage(snapshot.engagementTrend, snapshot.windowEnd ?? snapshot.generatedAt, snapshot.windowStart ? snapshot.windowDays : days);
   const peak = Math.max(1, ...weeks.map((week) => week.activities));
   const placedTotal = cells.reduce((sum, cell) => sum + cell.total, 0);
   const placedBelow = cells.reduce((sum, cell) => sum + cell.below, 0);

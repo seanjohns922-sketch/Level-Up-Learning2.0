@@ -5,9 +5,13 @@
 --    their class with the rest of its group. Groups only shape dashboards;
 --    they grant no access. Writes go through security-definer commands that
 --    require school management; members of the school can read them.
--- 2. get_school_analytics_snapshot accepts up to 400 days (was 90), so the
---    default view can cover the whole academic year. The function body is
---    otherwise identical to 20260915140000_version_safe_assessment_growth.sql.
+-- 2. get_school_analytics_snapshot reports within the selected academic year:
+--    the window starts no earlier than the year's first day and ends no later
+--    than its last day (Australia/Melbourne), and may span up to 400 days
+--    (was 90) so "This school year" covers the whole year. The response adds
+--    windowStart and windowEnd. Rolling "last 7/14 days" measures are
+--    unchanged. Everything else is identical to
+--    20260915140000_version_safe_assessment_growth.sql.
 --
 -- Rollback: drop the three class-group functions and two tables, and re-run
 -- the get_school_analytics_snapshot definition from
@@ -259,6 +263,9 @@ declare
   -- Up to a full school year plus a margin, so leaders can see the whole journey.
   v_days integer := greatest(7, least(coalesce(p_days, 30), 400));
   v_since timestamptz;
+  v_until timestamptz;
+  v_year_start timestamptz;
+  v_year_end timestamptz;
   v_result jsonb;
   v_can_view_administration boolean;
 begin
@@ -271,16 +278,21 @@ begin
     raise exception 'School analytics access denied' using errcode = '42501';
   end if;
 
-  if not exists (
-    select 1
-    from public.academic_years ay
-    where ay.id = p_academic_year_id
-      and ay.school_id = p_school_id
-  ) then
+  select
+    ay.starts_on::timestamp at time zone 'Australia/Melbourne',
+    (ay.ends_on + 1)::timestamp at time zone 'Australia/Melbourne'
+  into v_year_start, v_year_end
+  from public.academic_years ay
+  where ay.id = p_academic_year_id
+    and ay.school_id = p_school_id;
+
+  if v_year_start is null then
     raise exception 'Academic year does not belong to this school' using errcode = '22023';
   end if;
 
-  v_since := now() - make_interval(days => v_days);
+  -- The window never reaches outside the selected academic year.
+  v_until := least(now(), v_year_end);
+  v_since := greatest(v_until - make_interval(days => v_days), v_year_start);
 
   with
   cohort as (
@@ -322,7 +334,7 @@ begin
     from public.student_lesson_attempts a
     join cohort co on co.student_id = a.student_id
     where a.completed
-      and a.completed_at >= v_since
+      and a.completed_at >= v_since and a.completed_at < v_until
       and (p_realm_id is null or a.realm_id = p_realm_id)
     order by a.student_id, a.realm_id, a.working_level, a.week, a.lesson,
       a.completed_at desc, a.attempt_no desc
@@ -334,7 +346,7 @@ begin
       a.completed_at as activity_at
     from public.student_weekly_quiz_attempts a
     join cohort co on co.student_id = a.student_id
-    where a.completed_at >= v_since
+    where a.completed_at >= v_since and a.completed_at < v_until
       and (p_realm_id is null or a.realm_id = p_realm_id)
     order by a.student_id, a.realm_id, a.working_level, a.week,
       a.completed_at desc, a.attempt_no desc
@@ -379,7 +391,7 @@ begin
       limit 1
     ) pre on pre.completed_at < post.completed_at
     where post.assessment_type in ('post', 'posttest', 'post-test')
-      and post.completed_at >= v_since
+      and post.completed_at >= v_since and post.completed_at < v_until
       and ((
         pre.placement_result #>> '{assessment_evidence,comparison_group}' is not null
         and pre.placement_result #>> '{assessment_evidence,comparison_group}' = (
@@ -407,7 +419,7 @@ begin
     union all
     select student_id, realm_id, working_level, score_percent, completed_at, 'assessment'::text
     from latest_assessments
-    where completed_at >= v_since
+    where completed_at >= v_since and completed_at < v_until
   ),
   recent_7d as (
     select * from activity where activity_at >= now() - interval '7 days'
@@ -573,7 +585,9 @@ begin
   )
   select jsonb_build_object(
     'generatedAt', now(),
-    'windowDays', v_days,
+    'windowDays', greatest(0, ceil(extract(epoch from (v_until - v_since)) / 86400))::integer,
+    'windowStart', v_since,
+    'windowEnd', v_until,
     'filters', jsonb_build_object(
       'yearLevel', p_year_level,
       'classId', p_class_id,

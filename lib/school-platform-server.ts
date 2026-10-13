@@ -137,6 +137,10 @@ export type SchoolHomeSnapshot = {
 export type SchoolAnalyticsSnapshot = {
   generatedAt: string;
   windowDays: number;
+  /** Reporting window, bounded by the selected academic year. Absent before
+   * the 20261014090000 migration, when the window is a rolling day count. */
+  windowStart?: string;
+  windowEnd?: string;
   filters: {
     yearLevel: string | null;
     classId: string | null;

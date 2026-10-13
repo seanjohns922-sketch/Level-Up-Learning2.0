@@ -48,12 +48,9 @@ type SchoolAnalyticsDashboardProps = {
   academicYearStart?: string;
 };
 
-/** Days from the start of the academic year to today, inclusive. */
-function daysSinceYearStart(startsOn: string) {
-  const start = Date.parse(`${startsOn}T00:00:00Z`);
-  if (Number.isNaN(start)) return 90;
-  return Math.max(7, Math.ceil((Date.now() - start) / 86400000) + 1);
-}
+/** "This school year" asks for the longest window; the analytics function
+ * bounds every window by the selected academic year's start and end. */
+const WHOLE_YEAR_DAYS = 400;
 
 const TABS: Array<{ id: AnalyticsTab; label: string }> = [
   { id: "overview", label: "Overview" },
@@ -374,7 +371,7 @@ export default function SchoolAnalyticsDashboard({
 }: SchoolAnalyticsDashboardProps) {
   const [tab, setTab] = useState<AnalyticsTab>("overview");
   const [period, setPeriod] = useState<"year" | 7 | 30 | 90>(academicYearStart ? "year" : 90);
-  const days = period === "year" && academicYearStart ? daysSinceYearStart(academicYearStart) : period === "year" ? 90 : period;
+  const days = period === "year" ? WHOLE_YEAR_DAYS : period;
   const periodLabel = period === "year" ? "This school year" : `Last ${days} days`;
   const [yearLevel, setYearLevel] = useState("");
   const [classId, setClassId] = useState("");
@@ -973,7 +970,7 @@ export default function SchoolAnalyticsDashboard({
             </select>
           </label>
         </div>
-        {snapshot.windowDays < days ? (
+        {period === "year" && !snapshot.windowStart ? (
           <p className="mt-3 rounded-lg bg-[#FFF1C7] px-3 py-2 text-sm font-semibold text-[#5C4300]">
             Showing the last {snapshot.windowDays} days. Whole-year reporting turns on after the next database update.
           </p>
