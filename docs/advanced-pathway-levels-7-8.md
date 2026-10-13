@@ -93,8 +93,8 @@ starting level up to Level 8** in every realm. Until then:
 
 - Teachers can choose up to Level 7 (`teacher_change_starting_level`, migration
   20261007100000).
-- Parents can choose up to Level 6 (`parent_change_home_starting_level`,
-  migration 20260918120000).
+- Parents can choose up to Level 7 (`parent_change_home_starting_level`,
+  migration 20261014150000).
 
 The Level 8 release must therefore include a reviewed migration that adds
 `Year 8` to both functions' allowed levels, and the matching option lists in
