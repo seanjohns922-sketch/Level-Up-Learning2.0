@@ -1,12 +1,11 @@
 "use client";
 
-import { ArrowDownRight, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
 import { buildHomeTrendRows, WINDOW_DAYS, type Tone, type TrendRow } from "@/lib/home-trends";
 
 const TONE_STYLES: Record<Tone, { icon: typeof ArrowUpRight; box: string; value: string }> = {
-  down: { icon: ArrowDownRight, box: "bg-[#FFE3DF] text-[#9B2318]", value: "text-[#9B2318]" },
   watch: { icon: ArrowRight, box: "bg-[#FFF1C7] text-[#5C4300]", value: "text-[#5C4300]" },
   up: { icon: ArrowUpRight, box: "bg-[#EEF9D9] text-[#3D6600]", value: "text-[#3D6600]" },
 };
@@ -74,18 +73,18 @@ export default function HomeTrends({
       </div>
 
       {state.status === "loading" ? (
-        <div className="space-y-2 pt-2" aria-label="Loading trends">
+        <div className="space-y-2 pt-2" aria-label="Loading topics">
           {[0, 1, 2].map((row) => (
             <div key={row} className="h-14 animate-pulse rounded-lg bg-slate-100" />
           ))}
         </div>
       ) : state.status === "error" ? (
         <p className="border-t border-slate-100 pt-4 text-sm text-slate-500">
-          Trends could not be loaded right now.
+          Topics could not be loaded right now.
         </p>
       ) : state.rows.length === 0 ? (
         <p className="border-t border-slate-100 pt-4 text-sm text-slate-500">
-          Nothing stands out yet. Trends appear once students have a few weeks of lessons and quizzes.
+          Nothing stands out yet. Topics appear once students have enough lessons and quizzes in them.
         </p>
       ) : (
         <ul>

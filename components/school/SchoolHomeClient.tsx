@@ -2690,8 +2690,8 @@ export default function SchoolHomeClient({
                   <HomeTrends
                     schoolId={snapshot.school.id}
                     academicYearId={academicYearId}
-                    title="School trends to watch"
-                    subtitle="Whole school, by year level · last 4 weeks"
+                    title="Topics to watch"
+                    subtitle="Whole school, by year level · last 28 days"
                     onOpenAnalytics={() => setTab("insights")}
                   />
                 ) : null}
@@ -2722,8 +2722,8 @@ export default function SchoolHomeClient({
                         schoolId={snapshot.school.id}
                         academicYearId={academicYearId}
                         classId={classRow.id}
-                        title={`Trends in ${classRow.name}`}
-                        subtitle="Last 4 weeks"
+                        title={`Topics in ${classRow.name}`}
+                        subtitle="Last 28 days"
                         onOpenAnalytics={() => setTab("insights")}
                       />
                     ))
