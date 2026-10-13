@@ -61,7 +61,7 @@ const checks = [
   ],
   [
     "teacher navigation is class focused",
-    ["Home", "Classes", "Insights", "Settings", "Support"].every((label) =>
+    ["Home", "All classes", "Insights", "Settings", "Support"].every((label) =>
       teacherNavigation.includes(`label: "${label}"`),
     ) &&
       !teacherNavigation.includes('label: "Students"') &&

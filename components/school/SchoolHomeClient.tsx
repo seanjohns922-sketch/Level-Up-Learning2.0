@@ -43,6 +43,9 @@ import {
 } from "@/lib/roster-import";
 import { getSchoolLogo } from "@/lib/school-logos";
 import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
+import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
+import HomeTrends from "./HomeTrends";
+import { formatClassYearLevels, normalizeClassYearLevels } from "@/lib/studentLevelLabel";
 
 const SchoolAnalyticsDashboard = dynamic(
   () => import("./SchoolAnalyticsDashboard"),
@@ -83,7 +86,7 @@ type NavItem = {
 
 const TEACHER_NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", icon: LayoutDashboard },
-  { id: "classes", label: "Classes", icon: BookOpen },
+  { id: "classes", label: "All classes", icon: BookOpen },
   { id: "insights", label: "Insights", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "support", label: "Support", icon: HelpCircle },
@@ -248,7 +251,7 @@ function EmptyState({
   detail: string;
 }) {
   return (
-    <div className="border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+    <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
       <Icon className="mx-auto h-7 w-7 text-slate-400" />
       <h3 className="mt-3 text-sm font-bold text-slate-900">{title}</h3>
       <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">{detail}</p>
@@ -310,14 +313,14 @@ function ClassTable({
   }
 
   return (
-    <div className="overflow-x-auto border border-slate-200 bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
       <table className="min-w-full divide-y divide-slate-200 text-left">
-        <thead className="bg-slate-50">
-          <tr className="text-xs font-bold uppercase text-slate-500">
+        <thead className="bg-[#FAFBF8]">
+          <tr className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">
             <th className="px-5 py-3">Class</th>
             <th className="px-5 py-3">Year levels</th>
             <th className="px-5 py-3">Academic year</th>
-            <th className="px-5 py-3">Teaching team</th>
+            <th className="px-5 py-3">Teachers</th>
             <th className="px-5 py-3">Students</th>
             <th className="px-5 py-3">Status</th>
             <th className="px-5 py-3">Your access</th>
@@ -333,8 +336,8 @@ function ClassTable({
                   {classRow.code}
                 </p>
               </td>
-              <td className="px-5 py-4">
-                {classRow.yearLevels.join(", ") || "Not set"}
+              <td className="whitespace-nowrap px-5 py-4">
+                {formatClassYearLevels(classRow.yearLevels) || "Not set"}
               </td>
               <td className="px-5 py-4">
                 {classRow.academicYear ?? "Not set"}
@@ -351,12 +354,13 @@ function ClassTable({
                 {classRow.studentCount}
               </td>
               <td className="px-5 py-4">
-                <span className="inline-flex rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold capitalize text-emerald-800">
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold capitalize text-emerald-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
                   {classRow.status}
                 </span>
               </td>
               <td className="px-5 py-4">
-                <span className="inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600">
+                <span className="inline-flex whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
                   {roleLabel(classRow.myRole)}
                 </span>
               </td>
@@ -366,7 +370,7 @@ function ClassTable({
                     <button
                       type="button"
                       onClick={() => onAssign(classRow)}
-                      className="rounded-md border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                      className="whitespace-nowrap rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:border-slate-900"
                     >
                       Manage staff
                     </button>
@@ -374,9 +378,9 @@ function ClassTable({
                   {classRow.canOpen ? (
                     <a
                       href={`/school/${schoolId}/classes/${classRow.id}`}
-                      className="rounded-md bg-emerald-800 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-900"
+                      className="whitespace-nowrap rounded-lg bg-emerald-800 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-900"
                     >
-                      View class
+                      Open class
                     </a>
                   ) : (
                     <span className="px-3 py-2 text-xs font-semibold text-slate-400">
@@ -415,7 +419,7 @@ function TeacherClassCards({
       {classes.map((classRow) => (
         <article
           key={classRow.id}
-          className="flex min-h-40 flex-col justify-between rounded-md border border-slate-200 bg-white p-5"
+          className="flex min-h-40 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5"
         >
           <div>
             <div className="flex items-start justify-between gap-4">
@@ -424,7 +428,7 @@ function TeacherClassCards({
                   {classRow.name}
                 </h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  {classRow.yearLevels.join(", ") || "Year level not set"}
+                  {formatClassYearLevels(classRow.yearLevels) || "Year level not set"}
                 </p>
               </div>
               <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-800">
@@ -474,7 +478,7 @@ function OtherSchoolClasses({
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h3 className="font-bold text-slate-950">{classRow.name}</h3>
               <span className="text-sm text-slate-500">
-                {classRow.yearLevels.join(", ") || "Year level not set"}
+                {formatClassYearLevels(classRow.yearLevels) || "Year level not set"}
               </span>
             </div>
             <p className="mt-1 text-sm text-slate-500">
@@ -1379,7 +1383,7 @@ function StudentDirectory({
                   <option key={classRow.id} value={classRow.id}>
                     {classRow.name}
                     {classRow.yearLevels.length
-                      ? ` · ${classRow.yearLevels.join(", ")}`
+                      ? ` · ${formatClassYearLevels(classRow.yearLevels)}`
                       : ""}
                   </option>
                 ))}
@@ -2085,6 +2089,10 @@ export default function SchoolHomeClient({
   const snapshot = useMemo(
     () => ({
       ...initialSnapshot,
+      classes: initialSnapshot.classes.map((classRow) => ({
+        ...classRow,
+        yearLevels: normalizeClassYearLevels(classRow.yearLevels),
+      })),
       students: directoryStudents,
       studentDirectoryError: directoryError,
     }),
@@ -2462,84 +2470,116 @@ export default function SchoolHomeClient({
       icon: Users,
     },
     {
-      label: "Academic year",
-      value: selectedAcademicYear?.calendarYear ?? "Not set",
-      icon: School,
-    },
-    {
       label: "Pending invitations",
       value: snapshot.invitations.length,
       icon: Mail,
     },
   ];
 
+  const roleLine = snapshot.permissions.isLeadingTeacher
+    ? "Leading teacher"
+    : (SCHOOL_ROLE_LABELS[snapshot.actor.role] ?? snapshot.actor.role);
+
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-5 px-5 py-4 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            {schoolLogo ? (
-              <Image
-                src={schoolLogo.src}
-                alt={schoolLogo.alt}
-                width={44}
-                height={44}
-                priority
-                className="h-11 w-11 shrink-0 rounded-md object-cover"
-              />
-            ) : (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-emerald-900 text-white">
-                <School className="h-5 w-5" />
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-lg font-bold">
-                {snapshot.school.name}
-              </p>
-              <p className="text-xs font-semibold text-slate-500">
-                {isAdministrator
-                  ? "School administration"
-                  : "Teacher workspace"}
-              </p>
+    <div className="reliq-adult min-h-screen text-slate-950 lg:flex">
+      <aside className="flex flex-col gap-5 bg-[#121314] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:w-[264px] lg:shrink-0 lg:gap-7 lg:overflow-y-auto lg:py-7">
+        <div className="flex items-center justify-between gap-3 px-2">
+          <div>
+            <ReliqAdultLogo className="w-[118px]" />
+            <p className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">
+              {isAdministrator ? "School administration" : "Teacher workspace"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#34373A] text-[#C9CCC6] hover:bg-[#222426] hover:text-white lg:hidden"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+
+        {schools.length > 1 ? (
+          <label className="relative block px-1">
+            <span className="sr-only">Switch school</span>
+            <select
+              value={snapshot.school.id}
+              onChange={(event) => {
+                window.location.assign(`/school/${event.target.value}`);
+              }}
+              className="w-full appearance-none rounded-lg border border-[#34373A] bg-[#1C1E20] py-2.5 pl-3 pr-9 text-sm font-semibold text-white"
+            >
+              {schools.map((school) => (
+                <option key={school.id} value={school.id}>
+                  {school.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-4 top-3 h-4 w-4 text-[#8F948C]" />
+          </label>
+        ) : null}
+
+        <nav aria-label={isAdministrator ? "School administration" : "Teacher"} className="-mx-1 flex gap-1 overflow-x-auto px-1 lg:flex-col">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            const selected = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                aria-current={selected ? "page" : undefined}
+                className={`flex min-w-max items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-semibold transition ${
+                  selected
+                    ? "bg-[var(--reliq-lime)] text-[#121314]"
+                    : "text-[#C9CCC6] hover:bg-[#222426] hover:text-white"
+                }`}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto hidden flex-col gap-4 lg:flex">
+          <div className="rounded-xl border border-[#2A2C2E] bg-[#1C1E20] p-4">
+            <div className="flex h-24 items-center justify-center rounded-lg bg-white p-3">
+              {schoolLogo ? (
+                <Image
+                  src={schoolLogo.src}
+                  alt={schoolLogo.alt}
+                  width={160}
+                  height={80}
+                  priority
+                  className="h-full w-auto max-w-full object-contain"
+                />
+              ) : (
+                <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-[#121314] text-2xl font-black text-[var(--reliq-lime)]">
+                  {snapshot.school.name.slice(0, 1).toUpperCase()}
+                </span>
+              )}
             </div>
+            <p className="mt-3 font-bold leading-snug">{snapshot.school.name}</p>
+            <p className="mt-0.5 text-sm text-[#8F948C]">
+              {selectedAcademicYear?.name ?? "Academic year not set"}
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {schools.length > 1 ? (
-              <label className="relative hidden sm:block">
-                <span className="sr-only">Switch school</span>
-                <select
-                  value={snapshot.school.id}
-                  onChange={(event) => {
-                    window.location.assign(`/school/${event.target.value}`);
-                  }}
-                  className="appearance-none rounded-md border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm font-semibold"
-                >
-                  {schools.map((school) => (
-                    <option key={school.id} value={school.id}>
-                      {school.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-2.5 h-4 w-4 text-slate-400" />
-              </label>
-            ) : null}
-            <div className="hidden text-right md:block">
-              <p className="text-sm font-bold">{actorFullName}</p>
-              <p className="text-xs text-slate-500">
-                {snapshot.permissions.isLeadingTeacher
-                  ? "Leading teacher"
-                  : (SCHOOL_ROLE_LABELS[snapshot.actor.role] ??
-                    snapshot.actor.role)}
-              </p>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-900 text-sm font-bold text-white">
+          <div className="flex items-center gap-3 border-t border-[#2A2C2E] px-1 pt-4">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2A2C2E] text-sm font-bold">
               {actorFullName.slice(0, 1).toUpperCase()}
-            </div>
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-bold">{actorFullName}</span>
+              <span className="block truncate text-xs text-[#8F948C]">{roleLine}</span>
+            </span>
             <button
               type="button"
               onClick={() => void signOut()}
-              className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-950 lg:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-[#C9CCC6] hover:bg-[#222426] hover:text-white"
               aria-label="Sign out"
               title="Sign out"
             >
@@ -2547,64 +2587,32 @@ export default function SchoolHomeClient({
             </button>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <div className="mx-auto grid max-w-[1500px] lg:grid-cols-[220px_1fr]">
-        <aside className="border-r border-slate-200 bg-white px-3 py-5">
-          <nav className="flex gap-2 overflow-x-auto lg:flex-col">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const selected = tab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setTab(item.id)}
-                  className={`flex min-w-max items-center gap-3 rounded-md px-3 py-2.5 text-sm font-bold transition ${
-                    selected
-                      ? "bg-emerald-50 text-emerald-900"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="mt-6 hidden w-full items-center gap-3 border-t border-slate-200 px-3 pt-5 text-left text-sm font-bold text-slate-500 hover:text-slate-950 lg:flex"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </button>
-        </aside>
-
-        <main className="min-w-0 px-5 py-7 lg:px-8">
-          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <main className="min-w-0 flex-1 px-4 py-7 sm:px-6 lg:px-10 lg:py-10">
+        <div className="mx-auto max-w-[1180px]">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase text-emerald-700">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">
                 {tab === "home"
                   ? isAdministrator
                     ? "School overview"
                     : "Teacher home"
-                  : tab}
+                  : snapshot.school.name}
               </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight">
+              <h1 className="mt-1.5 font-display text-3xl font-black tracking-tight sm:text-4xl">
                 {tab === "home"
                   ? `Welcome, ${actorFirstName}`
                   : navigationItems.find((item) => item.id === tab)?.label}
               </h1>
             </div>
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-slate-600">
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
                 Academic year
                 <select
                   value={academicYearId}
                   onChange={(event) => setAcademicYearId(event.target.value)}
-                  className="ml-2 rounded-md border border-slate-300 bg-white px-3 py-2 font-bold text-slate-900"
+                  className="h-11 rounded-lg border border-slate-300 bg-white px-3 font-bold text-slate-900"
                 >
                   {snapshot.academicYears.map((year) => (
                     <option key={year.id} value={year.id}>
@@ -2620,7 +2628,7 @@ export default function SchoolHomeClient({
                 <button
                   type="button"
                   onClick={() => setCreateOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-md bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-900"
+                  className="inline-flex h-11 items-center gap-2 rounded-lg bg-[var(--reliq-lime)] px-4 text-sm font-bold text-[#121314] hover:bg-[var(--reliq-lime-hover)]"
                 >
                   <Plus className="h-4 w-4" />
                   Create class
@@ -2644,21 +2652,21 @@ export default function SchoolHomeClient({
           {tab === "home" ? (
             isAdministrator ? (
               <div className="space-y-8">
-                <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                <section className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
                   {homeStats.map((stat) => {
                     const Icon = stat.icon;
                     return (
                       <div
                         key={stat.label}
-                        className="rounded-md border border-slate-200 bg-white p-5"
+                        className="rounded-2xl border border-slate-200 bg-white p-5"
                       >
                         <div className="flex items-center justify-between">
-                          <p className="text-sm font-semibold text-slate-500">
+                          <p className="text-[15px] font-medium text-slate-500">
                             {stat.label}
                           </p>
-                          <Icon className="h-4 w-4 text-emerald-700" />
+                          <Icon className="h-[18px] w-[18px] text-slate-400" />
                         </div>
-                        <p className="mt-3 text-3xl font-bold">{stat.value}</p>
+                        <p className="mt-3 font-display text-4xl font-black tracking-tight">{stat.value}</p>
                       </div>
                     );
                   })}
@@ -2666,9 +2674,9 @@ export default function SchoolHomeClient({
 
                 <section>
                   <div className="mb-3">
-                    <h2 className="text-lg font-bold">All Classes</h2>
+                    <h2 className="text-xl font-extrabold tracking-tight">Classes</h2>
                     <p className="text-sm text-slate-500">
-                      All active classes for the selected academic year.
+                      Active classes for the selected academic year.
                     </p>
                   </div>
                   <ClassTable
@@ -2678,27 +2686,27 @@ export default function SchoolHomeClient({
                   />
                 </section>
 
+                {academicYearId ? (
+                  <HomeTrends
+                    schoolId={snapshot.school.id}
+                    academicYearId={academicYearId}
+                    title="School trends to watch"
+                    subtitle="Whole school, by year level · last 4 weeks"
+                    onOpenAnalytics={() => setTab("insights")}
+                  />
+                ) : null}
               </div>
             ) : (
               <div className="space-y-8">
-                <section className="border-y border-slate-200 py-4">
-                  <p className="text-sm font-semibold text-slate-500">
-                    {snapshot.school.name} ·{" "}
-                    {selectedAcademicYear?.name ?? "Academic year not set"}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-700">
-                    {myClasses.length}{" "}
-                    {myClasses.length === 1 ? "class" : "classes"} ·{" "}
-                    {myStudentCount} students
-                  </p>
-                </section>
-
                 <section>
                   <div className="mb-3">
-                    <h2 className="text-lg font-bold">My Classes</h2>
+                    <h2 className="text-xl font-extrabold tracking-tight">
+                      {myClasses.length === 1 ? "My class" : "My classes"}
+                    </h2>
                     <p className="text-sm text-slate-500">
-                      Open your classroom to teach, monitor progress and support
-                      students.
+                      {myClasses.length}{" "}
+                      {myClasses.length === 1 ? "class" : "classes"} ·{" "}
+                      {myStudentCount} students · {selectedAcademicYear?.name ?? "Academic year not set"}
                     </p>
                   </div>
                   <TeacherClassCards
@@ -2707,18 +2715,32 @@ export default function SchoolHomeClient({
                   />
                 </section>
 
-                <section>
-                  <div className="mb-1">
-                    <h2 className="text-lg font-bold">Other School Classes</h2>
-                    <p className="text-sm text-slate-500">
-                      Classes across {snapshot.school.name}.
-                    </p>
-                  </div>
-                  <OtherSchoolClasses
-                    classes={otherClasses}
-                    schoolId={snapshot.school.id}
-                  />
-                </section>
+                {academicYearId
+                  ? myClasses.slice(0, 3).map((classRow) => (
+                      <HomeTrends
+                        key={classRow.id}
+                        schoolId={snapshot.school.id}
+                        academicYearId={academicYearId}
+                        classId={classRow.id}
+                        title={`Trends in ${classRow.name}`}
+                        subtitle="Last 4 weeks"
+                        onOpenAnalytics={() => setTab("insights")}
+                      />
+                    ))
+                  : null}
+
+                {otherClasses.length > 0 ? (
+                  <p className="text-sm text-slate-500">
+                    Covering for someone?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setTab("classes")}
+                      className="font-bold text-emerald-700 hover:underline"
+                    >
+                      See all {filteredClasses.length} classes at {snapshot.school.name}
+                    </button>
+                  </p>
+                ) : null}
               </div>
             )
           ) : null}
@@ -2735,16 +2757,19 @@ export default function SchoolHomeClient({
             ) : (
               <div className="space-y-8">
                 <section>
-                  <h2 className="mb-3 text-lg font-bold">My Classes</h2>
+                  <h2 className="mb-3 text-xl font-extrabold tracking-tight">My classes</h2>
                   <TeacherClassCards
                     classes={myClasses}
                     schoolId={snapshot.school.id}
                   />
                 </section>
                 <section>
-                  <h2 className="mb-1 text-lg font-bold">
-                    Other School Classes
+                  <h2 className="mb-1 text-xl font-extrabold tracking-tight">
+                    Other classes
                   </h2>
+                  <p className="mb-2 text-sm text-slate-500">
+                    You can open any class to help or cover. Ask your school administrator to add you to a class if you need to make changes.
+                  </p>
                   <OtherSchoolClasses
                     classes={otherClasses}
                     schoolId={snapshot.school.id}
@@ -3209,10 +3234,10 @@ export default function SchoolHomeClient({
           {tab === "licence" ? (
             licenceState !== "ready" ? (
               <div className="space-y-5" aria-busy="true" aria-label="Loading licence information">
-                <div className="h-28 animate-pulse rounded-md border border-slate-200 bg-white" />
+                <div className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-white" />
                 <div className="grid gap-4 sm:grid-cols-3">
                   {Array.from({ length: 3 }, (_, index) => (
-                    <div key={index} className="h-32 animate-pulse rounded-md border border-slate-200 bg-white" />
+                    <div key={index} className="h-32 animate-pulse rounded-2xl border border-slate-200 bg-white" />
                   ))}
                 </div>
               </div>
@@ -3311,8 +3336,8 @@ export default function SchoolHomeClient({
               detail="RELIQ support options will appear here. No classroom data is changed from this page."
             />
           ) : null}
-        </main>
-      </div>
+        </div>
+      </main>
 
       {createOpen ? (
         <CreateClassModal

@@ -154,7 +154,11 @@ const REALM_PALETTES: Record<string, ParentRealmPalette> = {
 
 /** Canonical realm id: progress rows and legends use a few historical aliases. */
 export function canonicalParentRealmId(realmId: string) {
-  if (realmId === "starpath") return "space";
+  // Collection cards store the realm slug (number-nexus, measurelands,
+  // starpath-realm); progress rows use the short id.
+  if (realmId === "number-nexus") return "number";
+  if (realmId === "measurelands") return "measurement";
+  if (realmId === "starpath" || realmId === "starpath-realm") return "space";
   if (realmId === "statistica") return "statistics";
   if (realmId === "pattern-peaks" || realmId === "algebra") return "pattern";
   if (realmId === "chance-hollow" || realmId === "probability") return "chance";
@@ -244,6 +248,32 @@ export function lastSevenDays(days: ParentActivityDay[], today = new Date()) {
       quizzes: day?.quizzes ?? 0,
       active: day ? activeDay(day) : false,
       isToday: index === 6,
+    };
+  });
+}
+
+/** Monday to Sunday of the current week, so "This week" reads like a calendar
+ * week. Days after today are marked as upcoming and hold no activity. */
+export function currentWeekDays(days: ParentActivityDay[], today = new Date()) {
+  const byDate = new Map(days.map((day) => [day.date, day]));
+  const todayKey = isoDate(today);
+  const monday = new Date(today);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + index);
+    const key = isoDate(date);
+    const day = byDate.get(key);
+    return {
+      date: key,
+      weekdayLabel: new Intl.DateTimeFormat("en-AU", { weekday: "short" }).format(date),
+      minutes: day?.minutes ?? 0,
+      questions: day?.questions ?? 0,
+      lessons: day?.lessons ?? 0,
+      quizzes: day?.quizzes ?? 0,
+      active: day ? activeDay(day) : false,
+      isToday: key === todayKey,
+      isUpcoming: key > todayKey,
     };
   });
 }

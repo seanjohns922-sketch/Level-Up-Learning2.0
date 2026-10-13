@@ -1,0 +1,63 @@
+/* RELIQ adult theme (teacher, school admin and parent screens).
+ *
+ * Brand guide V6 palette for grown-ups: Carbon, White and Lime. Student and
+ * realm screens keep their own themes, so everything here is scoped to
+ * `.reliq-adult`. The adult screens were built with Tailwind's emerald
+ * (school), teal (teacher) and blue (parent) accents; remapping those palette
+ * variables inside the scope moves every existing accent onto the brand in one
+ * place, without touching per-component logic.
+ *
+ * Contrast: 600/700 are "lime ink" for text and links on white (#3D6600 is
+ * 7:1 on white). 800 is Carbon, used for filled buttons with white text, and
+ * 900 is its hover. Lime itself (--reliq-lime) only ever sits behind Carbon
+ * text.
+ */
+.reliq-adult {
+  --reliq-carbon: #121314;
+  --reliq-carbon-soft: #2a2c2e;
+  --reliq-graphite: #5a5e63;
+  --reliq-ground: #f4f5f1;
+  --reliq-line: #e3e5e0;
+  --reliq-lime: #b9f23f;
+  --reliq-lime-hover: #a6e22a;
+  --reliq-lime-ink: #3d6600;
+  --reliq-lime-tint: #eef9d9;
+
+  --color-emerald-50: #f3fbe4;
+  --color-emerald-100: #e3f5c2;
+  --color-emerald-200: #cdeb98;
+  --color-emerald-300: #b0dc66;
+  --color-emerald-400: #8fc43a;
+  --color-emerald-500: #6fa51a;
+  --color-emerald-600: #3d6600;
+  --color-emerald-700: #3d6600;
+  --color-emerald-800: #121314;
+  --color-emerald-900: #2a2c2e;
+  --color-emerald-950: #121314;
+
+  --color-teal-50: #f3fbe4;
+  --color-teal-100: #e3f5c2;
+  --color-teal-200: #cdeb98;
+  --color-teal-300: #b0dc66;
+  --color-teal-400: #8fc43a;
+  --color-teal-500: #6fa51a;
+  --color-teal-600: #3d6600;
+  --color-teal-700: #3d6600;
+  --color-teal-800: #121314;
+  --color-teal-900: #2a2c2e;
+  --color-teal-950: #121314;
+
+  --color-blue-50: #f3fbe4;
+  --color-blue-100: #e3f5c2;
+  --color-blue-200: #cdeb98;
+  --color-blue-300: #b0dc66;
+  --color-blue-400: #8fc43a;
+  --color-blue-500: #6fa51a;
+  --color-blue-600: #121314;
+  --color-blue-700: #3d6600;
+  --color-blue-800: #121314;
+  --color-blue-900: #121314;
+  --color-blue-950: #121314;
+
+  background: var(--reliq-ground);
+}

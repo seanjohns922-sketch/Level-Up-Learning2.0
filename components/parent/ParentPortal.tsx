@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
+  ChevronDown,
   ChevronRight,
   Copy,
   Gem,
@@ -39,6 +40,7 @@ import type { GemRarity } from "@/lib/gems";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { formatStudentLevelLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { supabase } from "@/lib/supabase";
+import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import ParentActivityCard from "@/components/parent/ParentActivityCard";
 import ParentReportButton from "@/components/parent/ParentReportButton";
 import ParentGrowthCard from "@/components/parent/ParentGrowthCard";
@@ -242,13 +244,13 @@ export function ParentShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7f8] text-slate-950 lg:grid lg:grid-cols-[244px_minmax(0,1fr)]">
-      <aside className="hidden min-h-screen flex-col bg-gradient-to-b from-[#123a55] to-[#0d2438] px-4 py-6 text-white lg:flex">
-        <Link href="/parent" className="flex items-center gap-3 px-2">
-          <span className="grid h-11 w-11 place-items-center rounded-md bg-[#dceeff] text-[#173b68]"><Home className="h-6 w-6" /></span>
-          <span><span className="block text-xs font-bold uppercase tracking-[0.18em] text-[#9fc9ff]">RELIQ</span><span className="text-lg font-black">Parent Home</span></span>
+    <div className="reliq-adult min-h-screen text-slate-950 lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
+      <aside className="hidden flex-col bg-[#121314] px-4 py-7 text-white lg:sticky lg:top-0 lg:flex lg:h-screen">
+        <Link href="/parent" className="block px-2" aria-label="Parent Home">
+          <ReliqAdultLogo className="w-[118px]" />
+          <span className="mt-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">Parent Home</span>
         </Link>
-        <nav className="mt-10 space-y-2" aria-label="Parent navigation">
+        <nav className="mt-9 space-y-1" aria-label="Parent navigation">
           <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
           <ParentNavLink href="/parent/children" active={pathname.startsWith("/parent/children")} icon={<Users className="h-5 w-5" />} label="My children" />
           <ParentNavLink href="/parent/rewards" active={pathname === "/parent/rewards"} icon={<Trophy className="h-5 w-5" />} label="Rewards" />
@@ -256,14 +258,14 @@ export function ParentShell({ children }: { children: ReactNode }) {
           <ParentNavLink href="/parent/link-child" active={pathname === "/parent/link-child"} icon={<UserPlus className="h-5 w-5" />} label="Link a child" />
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
-          <div className="mb-4 rounded-md border border-white/10 bg-white/[0.05] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[#9fc9ff]">Home Access</p><p className="mt-2 font-black">2026 Free Access</p><p className="mt-1 text-xs text-white/60">Access status appears for each child.</p></div>
+          <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[var(--reliq-lime)]">Home Access</p><p className="mt-2 font-black">2026 Free Access</p><p className="mt-1 text-xs text-white/60">Access status appears for each child.</p></div>
           <button type="button" onClick={signOut} className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white"><LogOut className="h-5 w-5" /> Sign out</button>
         </div>
       </aside>
       <div className="min-w-0">
         <header className="border-b border-slate-200 bg-white lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
-            <Link href="/parent" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-blue-100 text-blue-900"><Home className="h-5 w-5" /></span><span className="font-black">Parent Home</span></Link>
+            <Link href="/parent" className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Parent Home</span></Link>
             <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
           </div>
           <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
@@ -282,7 +284,7 @@ export function ParentShell({ children }: { children: ReactNode }) {
 }
 
 function ParentNavLink({ href, active, icon, label }: { href: string; active: boolean; icon: ReactNode; label: string }) {
-  return <Link href={href} className={`flex min-h-12 items-center gap-3 rounded-xl px-4 font-bold transition ${active ? "bg-white text-[#123a55] shadow-sm" : "text-white/70 hover:bg-white/10 hover:text-white"}`}>{icon}{label}</Link>;
+  return <Link href={href} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-lg px-3 font-semibold transition ${active ? "bg-[var(--reliq-lime)] text-[#121314]" : "text-[#C9CCC6] hover:bg-[#222426] hover:text-white"}`}>{icon}{label}</Link>;
 }
 
 function ParentMobileNav({ href, label, active }: { href: string; label: string; active: boolean }) {
@@ -305,7 +307,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
   const router = useRouter();
   const [children, setChildren] = useState<ParentChild[]>(preview?.children ?? []);
   const [activeStudentId, setActiveStudentId] = useState(selectedStudentId ?? preview?.children[0]?.studentId ?? "");
-  const [parentName, setParentName] = useState(preview?.parentName ?? "there");
+  const [parentName, setParentName] = useState(preview?.parentName ?? "");
   const [loading, setLoading] = useState(!preview);
   const [error, setError] = useState<string | null>(null);
 
@@ -321,8 +323,8 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
     const displayName = typeof auth.user.user_metadata?.display_name === "string"
       ? auth.user.user_metadata.display_name.trim()
       : "";
-    const emailName = auth.user.email?.split("@")[0]?.split(/[._-]/)[0] ?? "";
-    setParentName(displayName || (emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1) : "there"));
+    // Only a name the parent gave us; an email username ("scjohns") reads badly.
+    setParentName(displayName.split(/\s+/)[0] ?? "");
     const { data, error: loadError } = await supabase.rpc("get_parent_home_snapshot");
     if (loadError) setError("Parent Home could not be loaded. Please try again.");
     else {
@@ -350,18 +352,24 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
     <div className="space-y-7">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-slate-500">Welcome back,</p>
-          <h1 className="mt-1 text-3xl font-black sm:text-4xl">{parentName}</h1>
-          <p className="mt-2 text-slate-600">Here&apos;s how your {children.length === 1 ? "child is" : "children are"} progressing.</p>
+          <p className="text-[15px] font-semibold text-slate-500">{parentName ? `Welcome back, ${parentName}` : "Welcome back"}</p>
+          <h1 className="mt-1 font-display text-3xl font-black tracking-tight sm:text-4xl">How your {children.length === 1 ? "child is" : "children are"} going</h1>
         </div>
         {!selectedStudentId ? (
-          <div className="flex flex-wrap gap-2">
-            {children.length ? <PrintAllHomeAccessCardsButton students={children} /> : null}
-            <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 font-bold text-white shadow-sm hover:bg-blue-700">
-              <Plus className="h-5 w-5" /> Add new child
-            </Link>
-            <Link href="/parent/link-child" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500">
-              <UserPlus className="h-5 w-5" /> Link existing child
+          <div className="flex flex-wrap items-start gap-2">
+            <details className="relative">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 font-bold text-slate-800 hover:border-slate-900 [&::-webkit-details-marker]:hidden">
+                More <ChevronDown className="h-4 w-4" />
+              </summary>
+              <div className="absolute right-0 z-20 mt-2 grid w-64 gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+                <Link href="/parent/link-child" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-slate-800 hover:bg-slate-50">
+                  <UserPlus className="h-5 w-5" /> Link existing child
+                </Link>
+                {children.length ? <PrintAllHomeAccessCardsButton students={children} /> : null}
+              </div>
+            </details>
+            <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--reliq-lime)] px-4 font-bold text-[#121314] hover:bg-[var(--reliq-lime-hover)]">
+              <Plus className="h-5 w-5" /> Add child
             </Link>
           </div>
         ) : null}
@@ -379,7 +387,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
         </section>
       ) : (
         <>
-          {!selectedStudentId ? <section><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div><div className="flex gap-3 overflow-x-auto pb-2">{children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} className={`flex min-w-[230px] items-center gap-3 rounded-lg border bg-white p-3 text-left shadow-sm transition ${activeChild?.studentId === child.studentId ? "border-blue-500 ring-2 ring-blue-100" : "border-slate-200 hover:border-slate-300"}`}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-100 text-lg font-black text-blue-900">{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span><ChevronRight className="h-4 w-4 text-slate-400" /></button>)}</div></section> : null}
+          {!selectedStudentId ? <section><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div><div className="flex gap-3 overflow-x-auto pb-2">{children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} aria-pressed={activeChild?.studentId === child.studentId} className={`flex min-w-[230px] items-center gap-3 rounded-xl border bg-white p-3 text-left transition ${activeChild?.studentId === child.studentId ? "border-[#121314] ring-1 ring-[#121314]" : "border-slate-200 hover:border-slate-400"}`}><span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-lg font-black text-[#121314] ${activeChild?.studentId === child.studentId ? "bg-[var(--reliq-lime)]" : "bg-slate-100"}`}>{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span><ChevronRight className="h-4 w-4 text-slate-400" /></button>)}</div></section> : null}
           {activeChild ? (
             <SelectedChildDashboard
               child={activeChild}
@@ -425,15 +433,15 @@ function SelectedChildDashboard({
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
-        <div className="space-y-5">
-        <section className="relative min-h-[240px] overflow-hidden rounded-2xl border border-slate-200 text-white shadow-md" style={{ backgroundColor: heroPalette.accentDeep }}><div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url('${heroPalette.image}')` }} /><div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(105deg, ${heroPalette.accentDeep} 0%, ${heroPalette.accentDeep}f2 42%, ${heroPalette.accentDeep}66 100%)` }} /><div className="relative flex h-full min-h-[240px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">Child overview</p><h2 className="mt-2 text-3xl font-black sm:text-4xl">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-emerald-300 text-emerald-950" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Last learned" value={child.lastActiveAt ? formatFeedTime(child.lastActiveAt) : "Not started"} /></div></div></section>
+        <div className="min-w-0 space-y-5">
+        <section className="relative min-h-[240px] overflow-hidden rounded-2xl border border-slate-200 text-white shadow-md" style={{ backgroundColor: "#121314" }}><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: `url('${heroPalette.image}')` }} /><div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(100deg, #121314 0%, #121314f5 48%, #12131480 100%)" }} /><div className="relative flex h-full min-h-[240px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--reliq-lime)]">Child overview</p><h2 className="mt-2 text-3xl font-black sm:text-4xl">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-[var(--reliq-lime)] text-[#121314]" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Last learned" value={child.lastActiveAt ? formatFeedTime(child.lastActiveAt) : "Not started"} /></div></div></section>
 
         <ParentActivityCard studentId={child.studentId} previewActivity={previewActivity} />
 
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#1f6f9c]">Learning journey</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Learning journey</p>
               <h3 className="mt-1 text-xl font-black">Progress by realm</h3>
             </div>
             <ParentReportButton studentId={child.studentId} previewReport={previewReport} previewActivity={previewActivity} />
@@ -446,12 +454,12 @@ function SelectedChildDashboard({
         </section>
         </div>
 
-        <div className="space-y-5">
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-md bg-rose-50 text-rose-600"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? "A learning focus will appear when the weekly journey begins."}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
+        <div className="min-w-0 space-y-5">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-lg bg-[var(--reliq-lime)] text-[#121314]"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? (focusRealm ? `${child.firstName}'s first week starts after the ${realmName(focusRealm.realmId)} pre-test.` : "A learning focus will appear when the weekly journey begins.")}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
 
         <ParentGrowthCard studentId={child.studentId} previewReport={previewReport} />
 
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Link href="/parent/rewards" className="shrink-0 text-sm font-bold text-violet-700">View all</Link></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
+        <section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Link href="/parent/rewards" className="shrink-0 text-sm font-bold text-violet-700">View all</Link></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
 
         <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-blue-600 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
         </div>
@@ -836,7 +844,7 @@ function PrintHomeAccessCardButton({ displayName, username, explorerCode, classN
 
 function PrintAllHomeAccessCardsButton({ students: children }: { students: readonly ParentChild[] }) {
   return (
-    <button type="button" onClick={() => printHomeAccessCards(children.map((child) => ({ displayName: child.displayName, username: child.username, explorerCode: child.explorerCode })))} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 font-bold text-slate-800 shadow-sm hover:border-blue-500">
+    <button type="button" onClick={() => printHomeAccessCards(children.map((child) => ({ displayName: child.displayName, username: child.username, explorerCode: child.explorerCode })))} className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-left font-bold text-slate-800 hover:bg-slate-50">
       <Printer className="h-5 w-5" /> Print all home access cards
     </button>
   );

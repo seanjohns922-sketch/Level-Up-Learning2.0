@@ -122,9 +122,9 @@ const parentOverviewBody = parent.slice(
   parent.indexOf("export function ParentRewards"),
 );
 check("parent overview does not render the full collection", !parentOverviewBody.includes("<UnlockedCollection"));
-// The parent shell keeps its own navy-and-sky identity (never a realm theme);
-// the 2026 visual refresh moved it to a navy gradient with a sky accent.
-check("parent shell uses a distinct navy and sky theme", has(parent, "from-[#123a55]", "to-[#0d2438]", "text-[#1f6f9c]", "bg-blue-600"));
+// The parent shell uses the RELIQ adult brand (Carbon, White, Lime), never a
+// realm theme; teacher and school screens share the same scoped theme.
+check("parent shell uses the RELIQ adult brand theme", has(parent, "reliq-adult", "ReliqAdultLogo", "bg-[#121314]", "bg-[var(--reliq-lime)]"));
 check("parent green is reserved for positive status", has(parent, "Active — Free Access", "border-emerald-200 bg-emerald-50", "text-emerald-900"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
