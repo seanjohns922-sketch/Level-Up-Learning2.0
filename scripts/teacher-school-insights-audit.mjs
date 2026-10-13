@@ -8,6 +8,7 @@ const migration = read("supabase/migrations/20260831160000_teacher_school_insigh
 const dashboard = read("components/school/SchoolAnalyticsDashboard.tsx");
 const schoolHome = read("components/school/SchoolHomeClient.tsx");
 const server = read("lib/school-platform-server.ts");
+const teachersSeeSchool = read("supabase/migrations/20261014230000_teachers_see_school_students.sql");
 
 const checks = [
   [
@@ -31,7 +32,7 @@ const checks = [
   ],
   [
     "unassigned classes open aggregate trends instead of students",
-    /audience === "teacher" && !isMyClass \? "overview" : "students"/.test(dashboard),
+    /namesLimited && !isMyClass \? "overview" : "students"/.test(dashboard),
   ],
   [
     "school analytics accept active teachers without granting administration",
@@ -52,6 +53,14 @@ const checks = [
   [
     "student journeys enforce existing student visibility",
     /get_student_learning_journey[\s\S]*can_view_student\(p_student_id\)/.test(migration),
+  ],
+  [
+    // Teachers see every student at their school in analytics (names and
+    // journeys), without widening can_view_student for the rest of RELIQ.
+    "teachers see every student at their school in analytics only",
+    /or public\.has_school_role\(p_school_id, array\['teacher'\]\)\s+or public\.can_view_student\(student_id\)/.test(teachersSeeSchool) &&
+      /get_student_learning_journey[\s\S]*or public\.has_school_role\(p_school_id, array\['teacher'\]\)[\s\S]*Student is not entitled at this school/.test(teachersSeeSchool) &&
+      !/function public\.can_view_student/.test(teachersSeeSchool),
   ],
   [
     "Statistica is available in the realm filter",

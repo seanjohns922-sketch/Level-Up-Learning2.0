@@ -1003,6 +1003,10 @@ export default function SchoolAnalyticsDashboard({
 
   if (!snapshot) return null;
 
+  // Teachers see every student's name at their school once 20261014230000 is
+  // applied; before it, names are limited to their own classes.
+  const namesLimited = audience === "teacher" && snapshot.students.length < snapshot.analysisStudents.length;
+
   return (
     <section className="space-y-6">
       {viewOptions.length > 1 ? (
@@ -1508,11 +1512,11 @@ export default function SchoolAnalyticsDashboard({
                           type="button"
                           onClick={() => {
                             if (item.id) setClassId(item.id);
-                            setTab(audience === "teacher" && !isMyClass ? "overview" : "students");
+                            setTab(namesLimited && !isMyClass ? "overview" : "students");
                           }}
                           className="inline-flex items-center gap-1 font-bold text-emerald-700"
                         >
-                          {audience === "teacher" && !isMyClass ? "View class trend" : "View students"}
+                          {namesLimited && !isMyClass ? "View class trend" : "View students"}
                           <ChevronRight className="h-4 w-4" />
                         </button>
                       </td>
@@ -1602,7 +1606,7 @@ export default function SchoolAnalyticsDashboard({
                 <h3 className="font-bold">Student evidence</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Search or open a student to inspect realm and assessment evidence.
-                  {audience === "teacher" && viewAudience === "leadership" ? " Names show for students in your own classes; the school figures on the other tabs include everyone." : ""}
+                  {namesLimited ? " Names show for students in your own classes; the school figures on the other tabs include everyone." : ""}
                 </p>
               </div>
               <div className="flex w-full flex-wrap gap-2 lg:w-auto">
