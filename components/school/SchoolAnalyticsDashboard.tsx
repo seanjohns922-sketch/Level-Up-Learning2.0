@@ -88,7 +88,9 @@ const YEAR_LEVELS = [
 // says how securely they hold a level; this says whether they're on track for
 // their age.)
 type LevelStanding = "below" | "at" | "above";
-const SCHOOL_LEVEL_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+// One ladder for school years (Prep–Year 6) and working levels (up to Level 8),
+// so a Year 6 student working at Level 7 reads as above level.
+const SCHOOL_LEVEL_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6", "Year 7", "Year 8"];
 const PLACEMENT_LEVEL_COLUMNS = [...SCHOOL_LEVEL_ORDER, "Not placed"];
 const levelIndex = (year: string | null | undefined) => (year ? SCHOOL_LEVEL_ORDER.indexOf(year) : -1);
 function levelStanding(grade: string | null | undefined, working: string | null | undefined): LevelStanding | null {
@@ -104,7 +106,7 @@ const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: 
 };
 const STANDING_ORDER: LevelStanding[] = ["below", "at", "above"];
 // Sequential ramp for ordinal working levels in the placement view.
-const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0"];
+const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0", "#ecd58f", "#f0c46e"];
 // Colour a level/grade by its position on the Ground->Year 6 ladder, so the
 // school-grade bar and the working-level bar share colours (Year 3 == Level 3)
 // and any mismatch between them reads as a colour shift.
@@ -113,7 +115,7 @@ const levelColor = (level: string) => { const i = levelIndex(level); return i >=
 const JOURNEY_PASS = 85;
 const JOURNEY_LADDER: Array<[string, string]> = [
   ["Prep", "Ground"], ["Year 1", "Level 1"], ["Year 2", "Level 2"], ["Year 3", "Level 3"],
-  ["Year 4", "Level 4"], ["Year 5", "Level 5"], ["Year 6", "Level 6"],
+  ["Year 4", "Level 4"], ["Year 5", "Level 5"], ["Year 6", "Level 6"], ["Year 7", "Level 7"], ["Year 8", "Level 8"],
 ];
 const JOURNEY_REALMS: Record<string, { name: string; color: string; order: number }> = {
   number: { name: "Number Nexus", color: "#0e9c93", order: 0 },
@@ -188,7 +190,7 @@ function buildJourneyHtml(data: StudentLearningJourney): string {
     .realm{border:1px solid #dde4df;border-radius:15px;padding:16px 20px 20px;margin-bottom:12px;border-left:4px solid var(--accent)}
     .realm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.realm-head h3{margin:0;font-size:16px;font-weight:850;color:var(--accent)}
     .rmeta{display:flex;gap:12px;align-items:center}.mastered{font-size:11.5px;font-weight:700;color:#5a6a62}.now{font-size:12px;font-weight:800;color:#fff;background:var(--accent);border-radius:20px;padding:3px 11px}
-    .stepwrap{overflow-x:auto;padding-top:16px}.stepper{position:relative;display:flex;justify-content:space-between;min-width:460px}
+    .stepwrap{overflow-x:auto;padding-top:16px}.stepper{position:relative;display:flex;justify-content:space-between;min-width:580px}
     .step{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
     .step::before{content:"";position:absolute;top:15px;right:50%;width:100%;height:3px;background:#dde4df;z-index:-1}.step:first-child::before{display:none}
     .step.done::before,.step.current::before{background:var(--accent)}
@@ -210,7 +212,7 @@ function buildJourneyHtml(data: StudentLearningJourney): string {
     <div class="stats"><div class="stat"><b>${mastered}</b><span>Levels mastered</span></div><div class="stat"><b>${realmIds.length}</b><span>Realms active</span></div><div class="stat"><b>${milestones.length}</b><span>Post-tests passed</span></div></div>
     <h2>Realm progression</h2>${sections || '<p style="color:#8a988f;font-size:13px">No realm progress recorded yet.</p>'}
     <h2>Milestones</h2><div class="timeline">${mileHtml}</div>
-    <footer>A level is mastered when its post-test is passed (${JOURNEY_PASS}%+). Each realm progresses Ground → Level 1–6. Dates show when each post-test was passed.</footer>
+    <footer>A level is mastered when its post-test is passed (${JOURNEY_PASS}%+). Each realm progresses Ground → Level 1–8. Dates show when each post-test was passed.</footer>
     <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
   </body></html>`;
 }

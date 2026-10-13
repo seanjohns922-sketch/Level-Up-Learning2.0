@@ -6,6 +6,8 @@ export const YEAR_ORDER = [
   "Year 4",
   "Year 5",
   "Year 6",
+  "Year 7",
+  "Year 8",
 ];
 
 export function compareByYear(a: { yearText: string }, b: { yearText: string }) {

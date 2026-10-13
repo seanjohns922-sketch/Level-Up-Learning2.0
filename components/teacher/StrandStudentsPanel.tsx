@@ -759,7 +759,8 @@ function formatDuration(seconds?: number | null) {
   return `${minutes}m ${remaining}s`;
 }
 
-const YEAR_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
+// School years and working levels share one ladder; working levels reach Level 8.
+const YEAR_ORDER = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6", "Year 7", "Year 8"];
 function yearOrdinal(label: string | null): number {
   if (!label) return -1;
   const i = YEAR_ORDER.indexOf(label);

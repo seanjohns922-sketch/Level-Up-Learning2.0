@@ -78,7 +78,7 @@ export default function CurriculumExplorer({
   progress,
   progressAvailable = true,
 }: Props) {
-  const genres = getGenresForYear(yearLabel).map(g=>yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(g.id)) ? {...g,available:true}:g);
+  const genres = getGenresForYear(yearLabel).map(g=>(yearLabel === "Year 7" || yearLabel === "Year 8") && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(g.id)) ? {...g,available:true}:g);
   const firstAvailable = genres.find((g) => g.available) ?? genres[0];
   const [genreId, setGenreId] = useState<string>(firstAvailable.id);
   const [weekNum, setWeekNum] = useState<number>(1);
