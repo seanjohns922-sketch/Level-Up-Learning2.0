@@ -205,10 +205,14 @@ export type SchoolAnalyticsSnapshot = {
   }>;
   analysisStudents: Array<{
     yearLevel: string | null;
+    /** Added by 20261014170000; absent before it is applied. */
+    classId?: string | null;
     realms: Array<{
       realmId: string;
       currentLevel: string | null;
       pretestScore: number | null;
+      /** Added by 20261014170000; absent before it is applied. */
+      averageAccuracy?: number | null;
     }>;
   }>;
   students: Array<{

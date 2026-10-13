@@ -21,7 +21,7 @@ import type {
   StudentLearningJourney,
 } from "@/lib/school-platform-server";
 import LeaderOverview from "./analytics/LeaderOverview";
-import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
+import { evidencedLevel } from "@/lib/proficiency";
 import { useClassGroups } from "./useClassGroups";
 import {
   type AcStrand,
@@ -108,21 +108,6 @@ const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: 
 };
 const STANDING_ORDER: LevelStanding[] = ["below", "at", "above"];
 
-// Pattern Peaks (Algebra) and Chance Hollow (Probability) start at Level 3, so
-// every student is assigned there by default. Only a sat pre-test is
-// evidence: unassessed placements are left out of level standing, and a
-// pre-test below the targeted minimum means the student is not yet working
-// at that level (one level lower).
-const PRETEST_GATED_REALMS = new Set(["pattern", "pattern-peaks", "chance", "chance-hollow"]);
-function evidencedLevel(realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): string | null | undefined {
-  if (!PRETEST_GATED_REALMS.has(realm.realmId)) return realm.currentLevel;
-  if (realm.pretestScore === null || realm.pretestScore === undefined) return undefined;
-  if (realm.pretestScore < ASSESSMENT_THRESHOLDS.pretestTargetedMinimumPercent) {
-    const index = levelIndex(realm.currentLevel);
-    return index > 0 ? SCHOOL_LEVEL_ORDER[index - 1] : realm.currentLevel;
-  }
-  return realm.currentLevel;
-}
 function realmStanding(yearLevel: string | null, realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): LevelStanding | null {
   const level = evidencedLevel(realm);
   return level === undefined ? null : levelStanding(yearLevel, level);
@@ -399,7 +384,8 @@ export default function SchoolAnalyticsDashboard({
   const days = period === "year" ? WHOLE_YEAR_DAYS : period;
   const periodLabel = period === "year" ? "This school year" : `Last ${days} days`;
   const [yearLevel, setYearLevel] = useState("");
-  const [classId, setClassId] = useState("");
+  // Teachers see their own class, never the whole school.
+  const [classId, setClassId] = useState(audience === "teacher" ? teacherClassIds[0] ?? "" : "");
   const [realmId, setRealmId] = useState("");
   const [snapshot, setSnapshot] = useState<SchoolAnalyticsSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -409,6 +395,16 @@ export default function SchoolAnalyticsDashboard({
   const [studentSearch, setStudentSearch] = useState("");
   const teacherClassIdSet = useMemo(() => new Set(teacherClassIds), [teacherClassIds]);
   const { groups: classGroups } = useClassGroups(schoolId, academicYearId);
+  // Three views: a teacher's own class, a class group (its year levels), and
+  // the whole school for leaders. "own" is the class or the whole school.
+  const viewGroups = useMemo(
+    () => (audience === "teacher" ? classGroups.filter((group) => group.classIds.some((id) => teacherClassIdSet.has(id))) : classGroups),
+    [audience, classGroups, teacherClassIdSet],
+  );
+  const [view, setView] = useState<string>("own");
+  const activeGroup = view === "own" ? undefined : viewGroups.find((group) => group.id === view);
+  const effectiveClassId = activeGroup ? "" : classId;
+  const effectiveYearLevel = activeGroup ? "" : yearLevel;
 
   const loadAnalytics = useCallback(async () => {
     if (!academicYearId) return;
@@ -418,8 +414,8 @@ export default function SchoolAnalyticsDashboard({
       academicYearId,
       days: String(days),
     });
-    if (yearLevel) params.set("yearLevel", yearLevel);
-    if (classId) params.set("classId", classId);
+    if (effectiveYearLevel) params.set("yearLevel", effectiveYearLevel);
+    if (effectiveClassId) params.set("classId", effectiveClassId);
     if (realmId) params.set("realmId", realmId);
 
     try {
@@ -434,7 +430,7 @@ export default function SchoolAnalyticsDashboard({
     } finally {
       setLoading(false);
     }
-  }, [academicYearId, classId, days, realmId, schoolId, yearLevel]);
+  }, [academicYearId, days, effectiveClassId, effectiveYearLevel, realmId, schoolId]);
 
   const buildExportHref = useCallback((type: "students" | "curriculum" | "results") => {
     if (!academicYearId) return "";
@@ -452,8 +448,8 @@ export default function SchoolAnalyticsDashboard({
   }, [loadAnalytics]);
 
   useEffect(() => {
-    if (classId && !classes.some((item) => item.id === classId)) setClassId("");
-  }, [classId, classes]);
+    if (classId && !classes.some((item) => item.id === classId)) setClassId(audience === "teacher" ? teacherClassIds[0] ?? "" : "");
+  }, [audience, classId, classes, teacherClassIds]);
 
   useEffect(() => {
     if (selectedStudentId && !snapshot?.students.some((student) => student.id === selectedStudentId)) {
@@ -942,6 +938,25 @@ export default function SchoolAnalyticsDashboard({
     return sections;
   })();
 
+  const groupSnapshot = (() => {
+    if (!activeGroup || !snapshot) return null;
+    const inGroup = new Set(activeGroup.classIds);
+    const groupClasses = snapshot.classes.filter((item) => item.id && inGroup.has(item.id));
+    return {
+      ...snapshot,
+      overview: {
+        ...snapshot.overview,
+        students: groupClasses.reduce((total, item) => total + item.students, 0),
+        activeThisWeek: groupClasses.reduce((total, item) => total + item.activeStudents, 0),
+        weeklyTargetMet: groupClasses.reduce((total, item) => total + item.weeklyTargetMet, 0),
+      },
+      classes: groupClasses,
+      analysisStudents: snapshot.analysisStudents.filter((student) => student.classId && inGroup.has(student.classId)),
+      students: snapshot.students.filter((student) => student.classId && inGroup.has(student.classId)),
+    };
+  })();
+  const groupNeedsUpdate = Boolean(activeGroup && snapshot && !snapshot.analysisStudents.some((student) => student.classId !== undefined));
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -960,6 +975,21 @@ export default function SchoolAnalyticsDashboard({
 
   return (
     <section className="space-y-6">
+      {viewGroups.length ? (
+        <nav aria-label="Insights view" className="flex w-fit max-w-full flex-wrap gap-1 rounded-xl bg-white p-1 shadow-[inset_0_0_0_1px_#E3E5E0]">
+          {[{ id: "own", label: audience === "teacher" ? "My class" : "Whole school" }, ...viewGroups.map((group) => ({ id: group.id, label: group.name }))].map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-current={view === item.id ? "page" : undefined}
+              onClick={() => { setView(item.id); setTab("overview"); setSelectedStudentId(""); }}
+              className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${view === item.id ? "bg-[var(--reliq-lime,#B9F23F)] text-[#121314]" : "text-slate-600 hover:bg-[#F1F2EE]"}`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+      ) : null}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-bold text-slate-700">Showing</p>
@@ -995,20 +1025,24 @@ export default function SchoolAnalyticsDashboard({
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <label className="text-sm font-semibold text-slate-600">
-            School year level
-            <select value={yearLevel} onChange={(event) => { setYearLevel(event.target.value); setClassId(""); }} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
-              <option value="">Whole school</option>
-              {YEAR_LEVELS.map((level) => <option key={level}>{level}</option>)}
-            </select>
-          </label>
-          <label className="text-sm font-semibold text-slate-600">
-            Class
-            <select value={classId} onChange={(event) => setClassId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
-              <option value="">All classes</option>
-              {classes.filter((item) => !yearLevel || item.yearLevels.includes(yearLevel)).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-            </select>
-          </label>
+          {audience === "teacher" || activeGroup ? null : (
+            <label className="text-sm font-semibold text-slate-600">
+              School year level
+              <select value={yearLevel} onChange={(event) => { setYearLevel(event.target.value); setClassId(""); }} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
+                <option value="">Whole school</option>
+                {YEAR_LEVELS.map((level) => <option key={level}>{level}</option>)}
+              </select>
+            </label>
+          )}
+          {activeGroup ? null : (
+            <label className="text-sm font-semibold text-slate-600">
+              Class
+              <select value={classId} onChange={(event) => setClassId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
+                {audience === "teacher" ? null : <option value="">All classes</option>}
+                {classes.filter((item) => (audience === "teacher" ? teacherClassIds.includes(item.id) : !yearLevel || item.yearLevels.includes(yearLevel))).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
+          )}
           <label className="text-sm font-semibold text-slate-600">
             Realm
             <select value={realmId} onChange={(event) => setRealmId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
@@ -1039,36 +1073,32 @@ export default function SchoolAnalyticsDashboard({
         {loading ? <div className="mt-3 h-1 animate-pulse rounded-full bg-[#B9F23F]" /> : null}
       </div>
 
-      {audience === "teacher" ? (
-        <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-[#121314] sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-bold">School view with class-level follow-through</p>
-            <p className="mt-0.5 text-slate-500">School and class comparisons include the full cohort. Named student evidence is limited to your assigned classes.</p>
-          </div>
-          <button type="button" onClick={() => setTab("classes")} className="inline-flex shrink-0 items-center gap-1 font-bold text-emerald-800">
-            Compare classes <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-      ) : null}
 
-      <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
-        {TABS.map((item) => (
+      {activeGroup ? null : <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
+        {TABS.filter((item) => audience !== "teacher" || item.id !== "classes").map((item) => (
           <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#B9F23F)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
             {item.label}
           </button>
         ))}
-      </nav>
+      </nav>}
 
-      {tab === "overview" ? (
+      {tab === "overview" && groupNeedsUpdate ? (
+        <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+          The {activeGroup?.name} view turns on after the next analytics database update.
+        </p>
+      ) : tab === "overview" ? (
         <LeaderOverview
-          snapshot={snapshot}
-          cells={[...intervention.cells.values()].map((cell) => ({ strand: cell.strand, strandLabel: AC_STRANDS[cell.strand].label, year: cell.year, below: cell.needs, total: cell.total }))}
-          strands={intervention.strands.map((strand) => ({ id: strand, label: AC_STRANDS[strand].label }))}
-          years={intervention.years}
+          snapshot={groupSnapshot ?? snapshot}
+          audience={activeGroup ? "group" : audience}
+          title={activeGroup ? `Where the ${activeGroup.name} are` : audience === "teacher" ? `Where ${classes.find((item) => item.id === classId)?.name ?? "my class"} is` : "Where our students are"}
           onOpen={(target, filter) => {
             if (filter?.yearLevel) setYearLevel(filter.yearLevel);
-            if (filter?.classId) setClassId(filter.classId);
+            if (filter?.strand) setRealmId(realmForStrand(filter.strand as AcStrand));
             setTab(target);
+          }}
+          onOpenStudent={(studentId) => {
+            setSelectedStudentId(studentId);
+            setTab("students");
           }}
         />
       ) : null}

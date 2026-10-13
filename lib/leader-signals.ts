@@ -1,165 +1,119 @@
-import type { SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
-import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
+import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
+import { PROFICIENCY_META, share, type Distribution } from "@/lib/proficiency";
 
-/** "Where to look" for school leaders: a short ranked list of plain-English
- * signals built only from the canonical analytics snapshot and the on-level
- * cells the dashboard already derives (working level vs school year). Every
- * signal compares groups within the same reporting window, so none depends
- * on a week that is still in progress. */
-
-export type LevelCell = { strand: string; strandLabel: string; year: string; below: number; total: number };
+/** "Where to look": a short ranked list of plain-English signals from the
+ * proficiency distributions (each student once overall, once per strand).
+ * Signals describe one group of students at a time; they never rank classes. */
 
 export type LeaderSignal = {
   key: string;
   tone: "concern" | "watch" | "strength";
   headline: string;
   detail: string;
-  value: string;
-  target: "intervention" | "curriculum" | "classes" | "overview";
-  filter?: { yearLevel?: string; strand?: string; classId?: string };
+  target: "intervention" | "curriculum" | "classes" | "overview" | "placement";
+  filter?: { yearLevel?: string; strand?: string };
+};
+
+type Distributions = {
+  overall: Distribution;
+  years: Array<[string, Distribution]>;
+  strands: Array<[AcStrand, Distribution]>;
 };
 
 /** Groups smaller than this are too noisy to call out. */
 const MIN_GROUP = 5;
-/** Topics need this much evidence before they are named. */
-const MIN_EVIDENCE = 5;
-const WEAK_TOPIC_ACCURACY = 60;
-const BELOW_LEVEL_SHARE = 0.4;
-const CLASS_GAP_POINTS = 15;
-const LOW_PARTICIPATION = 0.5;
+const NEEDS_SHARE = 25;
+const STRAND_NEEDS_SHARE = 20;
+const EXCEEDING_SHARE = 15;
+const LOW_PARTICIPATION = 50;
 const MAX_SIGNALS = 5;
 
-const pct = (part: number, whole: number) => (whole ? Math.round((part / whole) * 100) : 0);
-
-export function buildLeaderSignals(snapshot: SchoolAnalyticsSnapshot, cells: LevelCell[]): LeaderSignal[] {
+export function buildLeaderSignals(
+  distributions: Distributions,
+  activity: { students: number; activeThisWeek: number },
+  scope: "school" | "class",
+): LeaderSignal[] {
   const concerns: LeaderSignal[] = [];
+  const watches: LeaderSignal[] = [];
   const strengths: LeaderSignal[] = [];
+  const needsLabel = PROFICIENCY_META.needs.label.toLowerCase();
 
-  // 1. Year level × strand where the most students sit below their school year.
-  const placed = cells.filter((cell) => cell.total >= MIN_GROUP && cell.year !== "Not recorded");
-  [...placed]
-    .filter((cell) => cell.below / cell.total >= BELOW_LEVEL_SHARE)
-    .sort((a, b) => b.below / b.total - a.below / a.total || b.below - a.below)
-    .slice(0, 2)
-    .forEach((cell) =>
+  // 1. School year with the largest share needing support (whole school only).
+  if (scope === "school") {
+    const year = distributions.years
+      .filter(([label, row]) => label !== "Not recorded" && row.total >= MIN_GROUP && share(row.counts.needs, row.total) >= NEEDS_SHARE)
+      .sort((a, b) => share(b[1].counts.needs, b[1].total) - share(a[1].counts.needs, a[1].total))[0];
+    if (year) {
       concerns.push({
-        key: `below-${cell.strand}-${cell.year}`,
+        key: `year-${year[0]}`,
         tone: "concern",
-        headline: `${cell.year} ${cell.strandLabel}: ${pct(cell.below, cell.total)}% below their year level`,
-        detail: `${cell.below} of ${cell.total} students are working below ${cell.year}.`,
-        value: `${pct(cell.below, cell.total)}%`,
+        headline: `${year[0]}: ${share(year[1].counts.needs, year[1].total)}% ${needsLabel}`,
+        detail: `${year[1].counts.needs} of ${year[1].total} students are working below ${year[0]}.`,
         target: "intervention",
-        filter: { yearLevel: cell.year, strand: cell.strand },
-      }),
-    );
+        filter: { yearLevel: year[0] },
+      });
+    }
+  }
 
-  // 2. Weakest curriculum topic with enough evidence.
-  const weakTopic = [...snapshot.curriculum]
-    .filter((topic) => topic.averageAccuracy !== null && topic.evidenceCount >= MIN_EVIDENCE && (topic.averageAccuracy ?? 100) < WEAK_TOPIC_ACCURACY)
-    .sort((a, b) => (a.averageAccuracy ?? 0) - (b.averageAccuracy ?? 0))[0];
-  if (weakTopic) {
+  // 2. Strand with the largest share needing support.
+  const strand = distributions.strands
+    .filter(([, row]) => row.total >= MIN_GROUP && share(row.counts.needs, row.total) >= STRAND_NEEDS_SHARE)
+    .sort((a, b) => share(b[1].counts.needs, b[1].total) - share(a[1].counts.needs, a[1].total))[0];
+  if (strand) {
     concerns.push({
-      key: `topic-${weakTopic.topic}-${weakTopic.yearLevel}`,
-      tone: "watch",
-      headline: `${weakTopic.yearLevel ? `${weakTopic.yearLevel} · ` : ""}${weakTopic.topic}: ${weakTopic.averageAccuracy}% accuracy`,
-      detail: `The weakest topic with enough evidence (${weakTopic.students} ${weakTopic.students === 1 ? "student" : "students"}).`,
-      value: `${weakTopic.averageAccuracy}%`,
-      target: "curriculum",
-      filter: weakTopic.yearLevel ? { yearLevel: weakTopic.yearLevel } : undefined,
+      key: `strand-${strand[0]}`,
+      tone: "concern",
+      headline: `${AC_STRANDS[strand[0]].label}: ${share(strand[1].counts.needs, strand[1].total)}% ${needsLabel}`,
+      detail: `${strand[1].counts.needs} of ${strand[1].total} students placed in ${AC_STRANDS[strand[0]].label}.`,
+      target: "intervention",
+      filter: { strand: strand[0] },
     });
   }
 
-  // 3. Class furthest behind the school on the weekly target.
-  const classes = snapshot.classes.filter((item) => item.students >= MIN_GROUP);
-  const schoolTarget = pct(snapshot.overview.weeklyTargetMet, snapshot.overview.students);
-  const laggingClass = classes
-    .map((item) => ({ item, rate: pct(item.weeklyTargetMet, item.students) }))
-    .filter(({ rate }) => schoolTarget - rate >= CLASS_GAP_POINTS)
-    .sort((a, b) => a.rate - b.rate)[0];
-  if (laggingClass) {
-    concerns.push({
-      key: `class-${laggingClass.item.id ?? laggingClass.item.name}`,
+  // 3. Strands with little or no pre-test evidence.
+  const thin = distributions.strands.filter(([, row]) => row.total < MIN_GROUP);
+  if (thin.length && distributions.overall.total >= MIN_GROUP) {
+    const names = thin.map(([id]) => AC_STRANDS[id].label);
+    const list = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0];
+    const none = thin.every(([, row]) => row.total === 0);
+    watches.push({
+      key: "thin-strands",
       tone: "watch",
-      headline: `${laggingClass.item.name}: ${laggingClass.rate}% met the weekly target`,
-      detail: `The school average is ${schoolTarget}%.`,
-      value: `${laggingClass.rate}%`,
-      target: "classes",
-      filter: laggingClass.item.id ? { classId: laggingClass.item.id } : undefined,
+      headline: `${list}: ${none ? "no pre-tests yet" : "few students tested"}`,
+      detail: `${none ? "" : `${thin.map(([id, row]) => `${AC_STRANDS[id].label} ${row.total}`).join(" · ")}. `}${scope === "school" ? "Ask teachers to set these pre-tests so these strands can be reported." : "Set these pre-tests to see where your students are."}`,
+      target: "placement",
     });
   }
 
-  // 4. Participation across the school in the last 7 days.
-  const activeShare = snapshot.overview.students ? snapshot.overview.activeThisWeek / snapshot.overview.students : 1;
-  if (snapshot.overview.students >= MIN_GROUP && activeShare < LOW_PARTICIPATION) {
-    concerns.push({
+  // 4. Participation in the last 7 days.
+  if (activity.students >= MIN_GROUP && share(activity.activeThisWeek, activity.students) < LOW_PARTICIPATION) {
+    watches.push({
       key: "participation",
       tone: "watch",
-      headline: `${pct(snapshot.overview.activeThisWeek, snapshot.overview.students)}% of students used RELIQ in the last 7 days`,
-      detail: `${snapshot.overview.activeThisWeek} of ${snapshot.overview.students} students had a lesson, quiz or test.`,
-      value: `${pct(snapshot.overview.activeThisWeek, snapshot.overview.students)}%`,
+      headline: `${share(activity.activeThisWeek, activity.students)}% of students used RELIQ in the last 7 days`,
+      detail: `${activity.activeThisWeek} of ${activity.students} students had a lesson, quiz or test.`,
       target: "classes",
     });
   }
 
-  // 5. Strongest result, so leaders also see what is working.
-  const strongestCell = [...placed]
-    .filter((cell) => cell.below === 0 || cell.below / cell.total <= 0.1)
-    .sort((a, b) => b.total - a.total)[0];
-  const strongTopic = [...snapshot.curriculum]
-    .filter((topic) => topic.averageAccuracy !== null && topic.evidenceCount >= MIN_EVIDENCE && (topic.averageAccuracy ?? 0) >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent)
-    .sort((a, b) => (b.averageAccuracy ?? 0) - (a.averageAccuracy ?? 0))[0];
-  if (strongestCell) {
+  // 5. One strength: the largest share working above their year.
+  const groups: Array<[string, Distribution, LeaderSignal["filter"]]> = [
+    ...(scope === "school" ? distributions.years.filter(([label]) => label !== "Not recorded").map(([label, row]) => [label, row, { yearLevel: label }] as [string, Distribution, LeaderSignal["filter"]]) : []),
+    ...distributions.strands.map(([id, row]) => [AC_STRANDS[id].label, row, { strand: id }] as [string, Distribution, LeaderSignal["filter"]]),
+  ];
+  const best = groups
+    .filter(([, row]) => row.total >= MIN_GROUP && share(row.counts.exceeding, row.total) >= EXCEEDING_SHARE)
+    .sort((a, b) => share(b[1].counts.exceeding, b[1].total) - share(a[1].counts.exceeding, a[1].total))[0];
+  if (best) {
     strengths.push({
-      key: `strong-${strongestCell.strand}-${strongestCell.year}`,
+      key: `strength-${best[0]}`,
       tone: "strength",
-      headline: `${strongestCell.year} ${strongestCell.strandLabel}: ${pct(strongestCell.total - strongestCell.below, strongestCell.total)}% at or above level`,
-      detail: `${strongestCell.total - strongestCell.below} of ${strongestCell.total} students.`,
-      value: `${pct(strongestCell.total - strongestCell.below, strongestCell.total)}%`,
-      target: "intervention",
-      filter: { yearLevel: strongestCell.year, strand: strongestCell.strand },
-    });
-  } else if (strongTopic) {
-    strengths.push({
-      key: `strong-topic-${strongTopic.topic}-${strongTopic.yearLevel}`,
-      tone: "strength",
-      headline: `${strongTopic.yearLevel ? `${strongTopic.yearLevel} · ` : ""}${strongTopic.topic}: ${strongTopic.averageAccuracy}% accuracy`,
-      detail: "The strongest topic with enough evidence.",
-      value: `${strongTopic.averageAccuracy}%`,
-      target: "curriculum",
+      headline: `${best[0]}: ${share(best[1].counts.exceeding, best[1].total)}% exceeding`,
+      detail: `${best[1].counts.exceeding} of ${best[1].total} students are working above their school year.`,
+      target: "placement",
+      filter: best[2],
     });
   }
 
-  return [...concerns.slice(0, MAX_SIGNALS - strengths.length), ...strengths];
-}
-
-/** Activities per week (weeks start Monday) for the usage chart, oldest
- * first, with empty weeks filled in. A week the reporting window only partly
- * covers is flagged: the newest while it is still running, and the oldest when
- * the window starts after its Monday. Dates are the RPC's UTC dates. */
-export function weeklyUsage(trend: SchoolAnalyticsSnapshot["engagementTrend"], generatedAt: string, windowDays: number) {
-  const DAY = 86400000;
-  const toDay = (iso: string) => Date.parse(`${iso.slice(0, 10)}T00:00:00Z`);
-  const weekStart = (day: number) => day - ((new Date(day).getUTCDay() + 6) % 7) * DAY;
-  const reportingDay = toDay(generatedAt);
-  const windowStart = reportingDay - windowDays * DAY;
-  const totals = new Map<number, { activities: number; activeStudentDays: number }>();
-  for (const point of trend) {
-    const start = weekStart(toDay(point.date));
-    const week = totals.get(start) ?? { activities: 0, activeStudentDays: 0 };
-    week.activities += point.activities;
-    week.activeStudentDays += point.activeStudents;
-    totals.set(start, week);
-  }
-  const lastWeek = weekStart(reportingDay);
-  const firstWeek = weekStart(windowStart);
-  const weeks = [];
-  for (let start = firstWeek; start <= lastWeek; start += 7 * DAY) {
-    const week = totals.get(start) ?? { activities: 0, activeStudentDays: 0 };
-    weeks.push({
-      weekStart: new Date(start).toISOString().slice(0, 10),
-      ...week,
-      partial: (start === lastWeek && new Date(reportingDay).getUTCDay() !== 0) || (start === firstWeek && windowStart > start),
-    });
-  }
-  return weeks;
+  return [...concerns, ...watches].slice(0, MAX_SIGNALS - strengths.length).concat(strengths);
 }

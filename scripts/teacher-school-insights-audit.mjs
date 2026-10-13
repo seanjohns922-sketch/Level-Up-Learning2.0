@@ -16,10 +16,14 @@ const checks = [
       /teacherClassIds=\{myClasses\.map/.test(schoolHome),
   ],
   [
-    "teacher analytics include explicit school class comparison",
+    // Teachers see only their class (or their class group); classes are never
+    // compared for teachers. Leaders keep the Classes comparison tab.
+    "teacher analytics are scoped to their own class without class comparison",
     /Class comparison/.test(dashboard) &&
-      /Compare classes/.test(dashboard) &&
-      /My class/.test(dashboard),
+      !/Compare classes/.test(dashboard) &&
+      /My class/.test(dashboard) &&
+      /audience !== "teacher" \|\| item\.id !== "classes"/.test(dashboard) &&
+      /useState\(audience === "teacher" \? teacherClassIds\[0\]/.test(dashboard),
   ],
   [
     "unassigned classes open aggregate trends instead of students",
