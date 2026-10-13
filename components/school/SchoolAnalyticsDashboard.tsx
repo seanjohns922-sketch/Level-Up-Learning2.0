@@ -23,6 +23,8 @@ import type {
 import LeaderOverview from "./analytics/LeaderOverview";
 import GrowthView from "./analytics/GrowthView";
 import { usesTestHistory } from "@/lib/growth";
+import TabHelp from "./analytics/TabHelp";
+import { classesHelp, curriculumHelp, interventionHelp, placementHelp, studentsHelp } from "@/lib/analytics-help";
 import { STANDING_META, evidencedLevel, standingsFor, studentStandings, usesTests, type Standing } from "@/lib/proficiency";
 import { useClassGroups } from "./useClassGroups";
 import {
@@ -1155,6 +1157,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "curriculum" ? (
         <div className="space-y-5">
+          <TabHelp content={curriculumHelp(audience)} />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-950">Standing by AC9 strand</h3>
@@ -1223,6 +1226,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "placement" ? (
         <div className="space-y-5">
+          <TabHelp content={placementHelp(audience)} />
           <div>
             <h3 className="font-bold text-slate-950">Placement baseline by AC9 strand</h3>
             <p className="mt-1 text-sm text-slate-500">Where students are working now, and their average pre-test starting point per strand.</p>
@@ -1336,6 +1340,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "intervention" ? (
         <div className="space-y-5">
+          <TabHelp content={interventionHelp(audience)} />
           <div>
             <h3 className="font-bold text-slate-950">Where to intervene</h3>
             <p className="mt-1 text-sm text-slate-500">Students working below their grade level, by strand and school year. Direct support here, then hand the list to the class teacher.</p>
@@ -1351,13 +1356,13 @@ export default function SchoolAnalyticsDashboard({
                     key={`${cell.strand}-${cell.year}`}
                     type="button"
                     onClick={() => { setRealmId(realmForStrand(cell.strand)); if (cell.year !== "Not recorded") setYearLevel(cell.year); setTab("students"); }}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-rose-400 hover:bg-rose-50"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-[#F2998D] hover:bg-[#FFF5F3]"
                   >
                     <div>
                       <p className="text-sm font-bold text-slate-950">{cell.year} · {AC_STRANDS[cell.strand].label}</p>
                       <p className="mt-0.5 text-xs text-slate-500">{Math.round((cell.needs / cell.total) * 100)}% of {cell.total} placed</p>
                     </div>
-                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-rose-100 text-rose-800">
+                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#FFE3DF] text-[#8A1C14]">
                       <span className="text-base font-black leading-none">{cell.needs}</span>
                     </span>
                   </button>
@@ -1385,14 +1390,14 @@ export default function SchoolAnalyticsDashboard({
                             const cell = intervention.cells.get(`${strand}|${year}`);
                             if (!cell || cell.total === 0) return <td key={year} className="px-3 py-2.5 text-center text-slate-300">—</td>;
                             const intensity = cell.needs / intervention.maxNeeds;
-                            const bg = cell.needs === 0 ? "color-mix(in srgb, #0f9d6b 12%, transparent)" : `color-mix(in srgb, #c2534d ${12 + Math.round(intensity * 66)}%, transparent)`;
+                            const bg = cell.needs === 0 ? "color-mix(in srgb, #B9F23F 22%, transparent)" : `color-mix(in srgb, #E2685A ${18 + Math.round(intensity * 70)}%, transparent)`;
                             return (
                               <td key={year} className="px-2 py-2 text-center">
                                 <button
                                   type="button"
                                   onClick={() => { setRealmId(realmForStrand(strand)); if (year !== "Not recorded") setYearLevel(year); setTab("students"); }}
                                   title={`${cell.needs} of ${cell.total} below level`}
-                                  className="inline-flex min-w-11 flex-col items-center rounded-md px-2 py-1.5 font-bold text-slate-900 transition hover:ring-2 hover:ring-rose-400"
+                                  className="inline-flex min-w-11 flex-col items-center rounded-md px-2 py-1.5 font-bold text-slate-900 transition hover:ring-2 hover:ring-[#121314]"
                                   style={{ background: bg }}
                                 >
                                   <span className="tabular-nums">{cell.needs}</span>
@@ -1414,6 +1419,8 @@ export default function SchoolAnalyticsDashboard({
       ) : null}
 
       {tab === "classes" ? (
+        <div className="space-y-5">
+        <TabHelp content={classesHelp()} />
         <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           <div className="flex flex-wrap items-end justify-between gap-3 p-5">
             <div>
@@ -1496,10 +1503,13 @@ export default function SchoolAnalyticsDashboard({
           </div>
           {snapshot.classes.length === 0 ? <p className="border-t border-slate-100 p-5 text-sm text-slate-500">No classes match these filters.</p> : null}
         </article>
+        </div>
       ) : null}
 
       {tab === "students" ? (
-        selectedStudent ? (
+        <div className="space-y-5">
+        <TabHelp content={studentsHelp(audience)} />
+        {selectedStudent ? (
           <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <button
               type="button"
@@ -1517,7 +1527,7 @@ export default function SchoolAnalyticsDashboard({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] ${selectedStudent.status === "on_track" ? "bg-emerald-100 text-emerald-800" : selectedStudent.status === "needs_attention" ? "bg-amber-100 text-amber-800" : "bg-sky-100 text-sky-800"}`}>
+                <span className={`rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] ${selectedStudent.status === "on_track" ? "bg-[#EEF9D9] text-[#3D6600]" : selectedStudent.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>
                   {selectedStudent.status === "on_track" ? "On track" : selectedStudent.status === "needs_attention" ? "Needs attention" : "Active"}
                 </span>
                 <span className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
@@ -1603,7 +1613,7 @@ export default function SchoolAnalyticsDashboard({
                       <td className="px-5 py-3 font-semibold">{student.name}</td>
                       <td className="px-4 py-3">{student.yearLevel ?? "—"}</td>
                       <td className="px-4 py-3">{student.className || "—"}</td>
-                      <td className="px-4 py-3"><span className={`rounded-md px-2 py-1 text-xs font-bold ${student.status === "on_track" ? "bg-emerald-100 text-emerald-800" : student.status === "needs_attention" ? "bg-amber-100 text-amber-800" : "bg-sky-100 text-sky-800"}`}>{student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active"}</span></td>
+                      <td className="px-4 py-3"><span className={`rounded-md px-2 py-1 text-xs font-bold ${student.status === "on_track" ? "bg-[#EEF9D9] text-[#3D6600]" : student.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>{student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active"}</span></td>
                       <td className="px-4 py-3">{formatPercent(student.averageAccuracy)}</td>
                       <td className="px-4 py-3">{student.masteredLevels}</td>
                       <td className="px-4 py-3">{formatPercent(student.averageGrowth, " pts")}</td>
@@ -1617,7 +1627,8 @@ export default function SchoolAnalyticsDashboard({
               <p className="border-t border-slate-100 p-5 text-sm text-slate-500">No students match this view.</p>
             ) : null}
           </article>
-        )
+        )}
+        </div>
       ) : null}
     </section>
   );

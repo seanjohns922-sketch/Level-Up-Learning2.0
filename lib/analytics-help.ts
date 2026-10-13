@@ -80,3 +80,132 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
     ],
   };
 }
+
+const standingTerms = (): TabHelpContent["terms"] => [
+  { term: STANDING_META.wellBelow.label, text: `${STANDING_META.wellBelow.meaning}.`, swatch: STANDING_META.wellBelow.bg },
+  { term: STANDING_META.below.label, text: `${STANDING_META.below.meaning}.`, swatch: STANDING_META.below.bg },
+  { term: STANDING_META.at.label, text: `${STANDING_META.at.meaning}.`, swatch: STANDING_META.at.bg },
+  { term: STANDING_META.above.label, text: `${STANDING_META.above.meaning}.`, swatch: STANDING_META.above.bg },
+];
+
+export function curriculumHelp(audience: HelpAudience): TabHelpContent {
+  return {
+    title: "How to read Curriculum",
+    parts: [
+      { title: "What it shows", text: `Where ${scope(audience)} sits in each AC9 strand, split by school year, so you can see which strand and year need the most support.` },
+      {
+        title: "Where the numbers come from",
+        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in that strand, compared with where their school year should be on the day they sat it. A student counts once in every strand they have been tested in.",
+      },
+      {
+        title: "What to do with it",
+        text:
+          audience === "teacher"
+            ? "Pick the strand with the most students below level and tap the year row to see who they are."
+            : "Look for a strand where one school year is mostly amber or coral. Tap the row to see the students and plan support with their teachers.",
+      },
+    ],
+    terms: [
+      ...standingTerms(),
+      { term: "At or above", text: "the share of students at level or above level in that strand.", swatch: "#EEF9D9", border: "#B9F23F" },
+      { term: "Below level count", text: "students below or well below in that strand and year.", swatch: "#FFE3DF", border: "#F2998D" },
+    ],
+  };
+}
+
+export function placementHelp(audience: HelpAudience): TabHelpContent {
+  return {
+    title: "How to read Placement",
+    parts: [
+      { title: "What it shows", text: `The level each student is working at in RELIQ right now, strand by strand, set against their school year for ${scope(audience)}.` },
+      {
+        title: "Where the numbers come from",
+        text: "Working levels come from each student's pathway in each realm: their placement pre-test, then each level they move on to. Baseline is the average pre-test score. Algebra and Probability show as Not placed until the pre-test is sat. This is where students are working, not a test result, so it can differ from the Overview.",
+      },
+      {
+        title: "What to do with it",
+        text: "Read the grid row by row: each school year, and how many of its students work at each level. Lots of amber or coral in a row means many students are working below their year in that strand. Use Need lift to open Intervention.",
+      },
+    ],
+    terms: [
+      { term: "Two or more levels below", text: "working two or more levels under their school year.", swatch: "#F2998D" },
+      { term: "One level below", text: "working one level under their school year.", swatch: "#FFD866" },
+      { term: "Their year level", text: "working at the level that matches their school year (outlined).", swatch: "#B9F23F", border: "#121314" },
+      { term: "Above their year", text: "working at a higher level than their school year.", swatch: "#121314" },
+      { term: "Not placed (NP)", text: "no pre-test sat yet in that strand.", swatch: "#E9EBE5", border: "#D5D8D1" },
+      { term: "Baseline", text: "the average pre-test score for the students placed.", swatch: "#F1F2EE", border: "#C9CDC5" },
+    ],
+  };
+}
+
+export function interventionHelp(audience: HelpAudience): TabHelpContent {
+  return {
+    title: "How to read Intervention",
+    parts: [
+      { title: "What it shows", text: `Which strand and school year in ${scope(audience)} has the most students working below their year, from the biggest group down.` },
+      {
+        title: "Where the numbers come from",
+        text: "Each student's working level in each strand (as on Placement), compared with their school year. A student working at a lower level than their year counts as needing support in that strand.",
+      },
+      {
+        title: "What to do with it",
+        text:
+          audience === "teacher"
+            ? "Start with the biggest group at the top and tap it to see the students. They may suit a small focus group in that strand."
+            : "Direct support where the heatmap is darkest, then hand the list to the class teachers. Tap a cell to see the students.",
+      },
+    ],
+    terms: [
+      { term: "Heatmap cell", text: "students below their year / students placed, for one strand and school year.", swatch: "#F7C2BA" },
+      { term: "Deeper coral", text: "more students below their year.", swatch: "#E2685A" },
+      { term: "Lime tint", text: "no students below their year in that strand and year.", swatch: "#E5F7C1" },
+    ],
+  };
+}
+
+export function classesHelp(): TabHelpContent {
+  return {
+    title: "How to read Classes",
+    parts: [
+      { title: "What it shows", text: "Each class side by side: how many students are using RELIQ, meeting the weekly target, their accuracy, levels mastered and growth. Classes in the same class group are listed together." },
+      {
+        title: "Where the numbers come from",
+        text: "Activity from the reporting window you have chosen. Lessons and quizzes are counted once each, however many times they are repeated. Mastered means a post-test at 85% or more.",
+      },
+      {
+        title: "What to do with it",
+        text: "Use it to see where support or encouragement is needed, not to rank classes. Low Active or Weekly target numbers usually mean RELIQ time isn't happening yet in that class.",
+      },
+    ],
+    terms: [
+      { term: "Active", text: "had a lesson, quiz or test in the last 7 days.", swatch: "#B9F23F" },
+      { term: "Weekly target", text: "at least 3 different lessons completed in the last 7 days.", swatch: "#121314" },
+      { term: "Accuracy", text: "average score across lessons and quizzes.", swatch: "#F1F2EE", border: "#C9CDC5" },
+      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEF9D9", border: "#B9F23F" },
+      { term: "Growth", text: "average points gained from pre-test to post-test at the same level.", swatch: "#FFFFFF", border: "#8F948C" },
+    ],
+  };
+}
+
+export function studentsHelp(audience: HelpAudience): TabHelpContent {
+  return {
+    title: "How to read Students",
+    parts: [
+      { title: "What it shows", text: `Every student in ${scope(audience)} with their status, accuracy, levels mastered and growth. Open a student to see each realm, their tests and their learning journey.` },
+      {
+        title: "Where the numbers come from",
+        text: "Status uses the last 7 days of activity and the latest lesson, quiz or test score. Accuracy is the average across lessons and quizzes in the reporting window. Mastered and growth come from pre-tests and post-tests.",
+      },
+      {
+        title: "What to do with it",
+        text: "Sort by recent activity to find students who haven't been on RELIQ this week, or by growth to find who is moving slowest. Open a student to print a progress report or their learning journey.",
+      },
+    ],
+    terms: [
+      { term: "On track", text: "active this week, with their latest score at 80% or more.", swatch: "#B9F23F" },
+      { term: "Active", text: "active this week, latest score under 80%.", swatch: "#F1F2EE", border: "#C9CDC5" },
+      { term: "Needs attention", text: "no lessons, quizzes or tests in the last 7 days.", swatch: "#FFD866" },
+      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEF9D9", border: "#B9F23F" },
+    ],
+  };
+}
