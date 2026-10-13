@@ -23,7 +23,7 @@ import type {
 import LeaderOverview from "./analytics/LeaderOverview";
 import GrowthView from "./analytics/GrowthView";
 import { usesTestHistory } from "@/lib/growth";
-import { evidencedLevel } from "@/lib/proficiency";
+import { STANDING_META, evidencedLevel, standingsFor, studentStandings, usesTests, type Standing } from "@/lib/proficiency";
 import { useClassGroups } from "./useClassGroups";
 import {
   type AcStrand,
@@ -104,22 +104,35 @@ function levelStanding(grade: string | null | undefined, working: string | null 
   return w > g ? "above" : w < g ? "below" : "at";
 }
 const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: string }> = {
-  below: { label: "Below level", pill: "bg-rose-100 text-rose-800", bar: "#c2534d" },
-  at: { label: "At level", pill: "bg-emerald-100 text-emerald-800", bar: "#0f9d6b" },
-  above: { label: "Above level", pill: "bg-indigo-100 text-indigo-800", bar: "#5b6ee6" },
+  below: { label: "Below level", pill: "bg-[#FFE3DF] text-[#8A1C14]", bar: "#F2998D" },
+  at: { label: "At level", pill: "bg-[#EEF9D9] text-[#3D6600]", bar: "#B9F23F" },
+  above: { label: "Above level", pill: "bg-[#121314] text-white", bar: "#121314" },
 };
-const STANDING_ORDER: LevelStanding[] = ["below", "at", "above"];
 
 function realmStanding(yearLevel: string | null, realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): LevelStanding | null {
   const level = evidencedLevel(realm);
   return level === undefined ? null : levelStanding(yearLevel, level);
 }
-// Sequential ramp for ordinal working levels in the placement view.
-const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0", "#ecd58f", "#f0c46e"];
+// Neutral ramp for ordinal levels in the placement view (Prep lightest, Year 8
+// Carbon), so colour shows the level, never good or bad.
+const LEVEL_RAMP = ["#E4E7DF", "#CDD2C6", "#B3B9AB", "#979E90", "#7A8175", "#5E645A", "#444940", "#2C302A", "#121314"];
 // Colour a level/grade by its position on the Ground->Year 6 ladder, so the
 // school-grade bar and the working-level bar share colours (Year 3 == Level 3)
 // and any mismatch between them reads as a colour shift.
-const levelColor = (level: string) => { const i = levelIndex(level); return i >= 0 ? LEVEL_RAMP[i] : "#cbd5e1"; };
+const levelColor = (level: string) => { const i = levelIndex(level); return i >= 0 ? LEVEL_RAMP[i] : "#F1F2EE"; };
+// School grade -> working level cell, in the standings colours: one level
+// below is amber, two or more coral, the expected level lime (outlined),
+// above Carbon. Not placed is grey.
+function placementCell(grade: string, level: string, count: number) {
+  const g = levelIndex(grade);
+  const w = levelIndex(level);
+  if (!count) return { bg: "#F8F9F6", fg: "#C9CDC5", border: "#ECEEE9" };
+  if (g < 0 || w < 0) return { bg: "#E9EBE5", fg: "#3A3D40", border: "#D5D8D1" };
+  if (w < g - 1) return { bg: "#F2998D", fg: "#4A0F09", border: "#E98576" };
+  if (w < g) return { bg: "#FFD866", fg: "#3F2E00", border: "#F2C94C" };
+  if (w === g) return { bg: "#B9F23F", fg: "#121314", border: "#121314" };
+  return { bg: "#121314", fg: "#FFFFFF", border: "#121314" };
+}
 
 const JOURNEY_PASS = 85;
 const JOURNEY_LADDER: Array<[string, string]> = [
@@ -621,21 +634,23 @@ export default function SchoolAnalyticsDashboard({
     }
   };
 
-  // Group curriculum evidence by AC9 strand, with an evidence-weighted band
-  // distribution per strand (the visual leaders scan first).
+  // Standing per AC9 strand and school year: the same latest-test standings as
+  // the Overview (each student once per strand), or working level against
+  // school year before test results are available.
+  const curriculumUsesTests = snapshot ? usesTests(snapshot) : false;
+  const curriculumStandings = standingsFor(curriculumUsesTests);
   const standingByStrand = useMemo(() => {
-    const students = snapshot?.analysisStudents ?? snapshot?.students ?? [];
-    type Counts = Record<LevelStanding, number>;
+    const students = snapshot?.analysisStudents ?? [];
+    const year = snapshot && usesTests(snapshot) ? snapshot.academicYear ?? null : null;
+    type Counts = Record<Standing, number>;
+    const empty = (): Counts => ({ wellBelow: 0, below: 0, at: 0, above: 0 });
     const groups = new Map<AcStrand, { strand: AcStrand; label: string; order: number; counts: Counts; total: number; byGrade: Map<string, { counts: Counts; total: number }> }>();
     for (const student of students) {
       const grade = student.yearLevel ?? "Not recorded";
-      for (const realm of student.realms) {
-        const strand = strandForRealm(realm.realmId);
-        const standing = realmStanding(student.yearLevel, realm);
-        if (!strand || !standing) continue;
-        const group = groups.get(strand) ?? { strand, label: AC_STRANDS[strand].label, order: AC_STRANDS[strand].order, counts: { below: 0, at: 0, above: 0 }, total: 0, byGrade: new Map() };
+      for (const [strand, standing] of studentStandings(student, year).strands) {
+        const group = groups.get(strand) ?? { strand, label: AC_STRANDS[strand].label, order: AC_STRANDS[strand].order, counts: empty(), total: 0, byGrade: new Map() };
         group.counts[standing] += 1; group.total += 1;
-        const gradeRow = group.byGrade.get(grade) ?? { counts: { below: 0, at: 0, above: 0 }, total: 0 };
+        const gradeRow = group.byGrade.get(grade) ?? { counts: empty(), total: 0 };
         gradeRow.counts[standing] += 1; gradeRow.total += 1;
         group.byGrade.set(grade, gradeRow);
         groups.set(strand, group);
@@ -645,12 +660,13 @@ export default function SchoolAnalyticsDashboard({
       .map((group) => ({
         ...group,
         onTrackPct: group.total ? Math.round(((group.counts.at + group.counts.above) / group.total) * 100) : 0,
+        belowCount: group.counts.below + group.counts.wellBelow,
         grades: [...group.byGrade.entries()]
           .sort((a, b) => levelIndex(a[0]) - levelIndex(b[0]))
-          .map(([grade, value]) => ({ grade, ...value })),
+          .map(([grade, value]) => ({ grade, ...value, belowCount: value.counts.below + value.counts.wellBelow })),
       }))
       .sort((a, b) => a.order - b.order);
-  }, [snapshot?.analysisStudents, snapshot?.students]);
+  }, [snapshot]);
 
   // Placement baseline: where students currently sit per AC9 strand (working
   // level distribution) and their average pre-test starting point. This is the
@@ -883,18 +899,15 @@ export default function SchoolAnalyticsDashboard({
         pdf.text(gradeRow.grade, gridX, rowY + 4);
         PLACEMENT_LEVEL_COLUMNS.forEach((level, index) => {
           const count = gradeRow.levels.find(([workingLevel]) => workingLevel === level)?.[1] ?? 0;
-          const workingIndex = levelIndex(level);
-          const gradeIndex = levelIndex(gradeRow.grade);
-          const isBelow = count > 0 && workingIndex >= 0 && gradeIndex >= 0 && workingIndex < gradeIndex;
-          const isExpected = gradeRow.grade === level;
+          const cell = placementCell(gradeRow.grade, level, count);
           const x = gridX + labelWidth + index * (cellWidth + cellGap);
-          pdf.setFillColor(count ? (isBelow ? "#e7aaaa" : levelColor(level)) : "#f8fafc");
-          pdf.setDrawColor(isExpected ? 9 : isBelow ? 244 : 232, isExpected ? 18 : isBelow ? 114 : 237, isExpected ? 35 : isBelow ? 132 : 243);
+          pdf.setFillColor(cell.bg);
+          pdf.setDrawColor(cell.border);
           pdf.roundedRect(x, rowY, cellWidth, 7.5, 1.4, 1.4, "FD");
           if (count) {
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(8.5);
-            pdf.setTextColor(isBelow ? 140 : 255, isBelow ? 12 : 255, isBelow ? 48 : 255);
+            pdf.setTextColor(cell.fg);
             pdf.text(String(count), x + cellWidth / 2, rowY + 5.1, { align: "center" });
           }
         });
@@ -1144,14 +1157,18 @@ export default function SchoolAnalyticsDashboard({
         <div className="space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h3 className="font-bold text-slate-950">On-track standing by AC9 strand</h3>
-              <p className="mt-1 text-sm text-slate-500">Working level compared to school grade. At level means their level matches their year (e.g. Grade 3 at Level 3).</p>
+              <h3 className="font-bold text-slate-950">Standing by AC9 strand</h3>
+              <p className="mt-1 text-sm text-slate-500">
+                {curriculumUsesTests
+                  ? "Each student's latest test in each strand, against where their school year should be on the day they sat it."
+                  : "Working level compared to school year. At level means their level matches their year (e.g. Year 3 at Level 3)."}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
-              {STANDING_ORDER.map((standing) => (
+              {curriculumStandings.map((standing) => (
                 <span key={standing} className="inline-flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-sm" style={{ background: STANDING_STYLE[standing].bar }} />
-                  {STANDING_STYLE[standing].label}
+                  <span className="h-3 w-3 rounded-sm" style={{ background: STANDING_META[standing].bg }} />
+                  {STANDING_META[standing].label}
                 </span>
               ))}
             </div>
@@ -1165,16 +1182,16 @@ export default function SchoolAnalyticsDashboard({
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-5">
                   <div className="flex items-center gap-3">
                     <h4 className="text-base font-bold text-slate-950">{group.label}</h4>
-                    <span className="rounded-md bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">{group.onTrackPct}% at or above</span>
+                    <span className="rounded-md bg-[#EEF9D9] px-2.5 py-1 text-xs font-bold text-[#3D6600]">{group.onTrackPct}% at or above</span>
                     <span className="text-xs text-slate-500">{group.total} students</span>
                   </div>
                   <div className="flex min-w-[180px] flex-1 items-center justify-end gap-3">
                     <div className="flex h-3 w-full max-w-[300px] overflow-hidden rounded-full bg-slate-100">
-                      {STANDING_ORDER.map((standing) => group.total ? (
-                        <div key={standing} title={`${STANDING_STYLE[standing].label}: ${group.counts[standing]}`} style={{ width: `${(group.counts[standing] / group.total) * 100}%`, background: STANDING_STYLE[standing].bar }} />
+                      {curriculumStandings.map((standing) => group.total ? (
+                        <div key={standing} title={`${STANDING_META[standing].label}: ${group.counts[standing]}`} style={{ width: `${(group.counts[standing] / group.total) * 100}%`, background: STANDING_META[standing].bg }} />
                       ) : null)}
                     </div>
-                    <span className="text-sm font-bold tabular-nums text-rose-700">{group.counts.below} behind</span>
+                    <span className="whitespace-nowrap text-sm font-bold tabular-nums text-[#A8332A]">{group.belowCount} below level</span>
                   </div>
                 </div>
                 <div className="divide-y divide-slate-100">
@@ -1183,18 +1200,18 @@ export default function SchoolAnalyticsDashboard({
                       key={gradeRow.grade}
                       type="button"
                       onClick={() => { setRealmId(group.strand); if (gradeRow.grade !== "Not recorded") setYearLevel(gradeRow.grade); setTab("students"); }}
-                      className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm hover:bg-emerald-50"
+                      className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm hover:bg-[#FAFBF8]"
                     >
                       <span className="w-24 shrink-0 font-semibold text-slate-800">{gradeRow.grade}</span>
                       <span className="flex h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-100">
-                        {STANDING_ORDER.map((standing) => gradeRow.total ? (
-                          <span key={standing} style={{ width: `${(gradeRow.counts[standing] / gradeRow.total) * 100}%`, background: STANDING_STYLE[standing].bar }} />
+                        {curriculumStandings.map((standing) => gradeRow.total ? (
+                          <span key={standing} title={`${STANDING_META[standing].label}: ${gradeRow.counts[standing]}`} style={{ width: `${(gradeRow.counts[standing] / gradeRow.total) * 100}%`, background: STANDING_META[standing].bg }} />
                         ) : null)}
                       </span>
                       <span className="w-28 shrink-0 text-right text-xs font-semibold tabular-nums">
-                        {gradeRow.counts.below > 0 ? <span className="text-rose-700">{gradeRow.counts.below} behind</span> : <span className="text-emerald-700">all on track</span>}
+                        {gradeRow.belowCount > 0 ? <span className="text-[#A8332A]">{gradeRow.belowCount} below level</span> : <span className="text-[#3D6600]">all at or above</span>}
                       </span>
-                      <ChevronRight className="h-4 w-4 shrink-0 text-emerald-700" />
+                      <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
                     </button>
                   ))}
                 </div>
@@ -1268,7 +1285,7 @@ export default function SchoolAnalyticsDashboard({
                       )}
                     </div>
                     <div className="mt-3 space-y-2">
-                      <div className="grid grid-cols-[4.5rem_repeat(8,minmax(0,1fr))] gap-1 text-[10px] font-bold uppercase tracking-[0.04em] text-slate-400">
+                      <div className="grid grid-cols-[4.5rem_repeat(10,minmax(0,1fr))] gap-1 text-[10px] font-bold uppercase tracking-[0.04em] text-slate-400">
                         <span>Grade</span>
                         {PLACEMENT_LEVEL_COLUMNS.map((level) => <span key={level} className="text-center">{level === "Prep" ? "P" : level === "Not placed" ? "NP" : level.replace("Year ", "Y")}</span>)}
                       </div>
@@ -1277,26 +1294,20 @@ export default function SchoolAnalyticsDashboard({
                           key={gradeRow.grade}
                           type="button"
                           onClick={() => { if (group.key !== "other") setRealmId(group.key); if (gradeRow.grade !== "Not recorded") setYearLevel(gradeRow.grade); setTab("students"); }}
-                          className="grid w-full grid-cols-[4.5rem_repeat(8,minmax(0,1fr))] gap-1 text-left text-xs"
+                          className="grid w-full grid-cols-[4.5rem_repeat(10,minmax(0,1fr))] gap-1 text-left text-xs"
                         >
                           <span className="flex h-7 items-center truncate font-bold text-slate-700">{gradeRow.grade}</span>
-                          {PLACEMENT_LEVEL_COLUMNS.map((level, index) => {
+                          {PLACEMENT_LEVEL_COLUMNS.map((level) => {
                             const count = gradeRow.levels.find(([workingLevel]) => workingLevel === level)?.[1] ?? 0;
-                            const isExpected = gradeRow.grade === level;
-                            const workingIndex = levelIndex(level);
-                            const gradeIndex = levelIndex(gradeRow.grade);
-                            const isBelow = count > 0 && workingIndex >= 0 && gradeIndex >= 0 && workingIndex < gradeIndex;
-                            // How many years below expected: 1 = light rose, 2+ = progressively deeper red.
-                            const yearsBelow = isBelow ? gradeIndex - workingIndex : 0;
-                            const belowBg = `color-mix(in srgb, #c2534d ${Math.min(30 + yearsBelow * 20, 92)}%, white)`;
-                            const belowLight = yearsBelow <= 1;
-                            const textClass = !count ? "text-slate-300" : isBelow ? (belowLight ? "text-rose-900" : "text-white") : "text-white";
+                            const cell = placementCell(gradeRow.grade, level, count);
+                            const gap = levelIndex(gradeRow.grade) - levelIndex(level);
+                            const behind = count > 0 && levelIndex(level) >= 0 && levelIndex(gradeRow.grade) >= 0 && gap > 0 ? gap : 0;
                             return (
                               <span
                                 key={level}
-                                title={`${gradeRow.grade} working at ${level}: ${count}${yearsBelow ? ` (${yearsBelow} ${yearsBelow === 1 ? "year" : "years"} below)` : ""}`}
-                                className={`flex h-7 items-center justify-center rounded-sm border text-[11px] font-black tabular-nums ${isExpected ? "border-slate-900" : isBelow ? "border-rose-300" : "border-slate-100"} ${textClass}`}
-                                style={{ background: count ? (isBelow ? belowBg : LEVEL_RAMP[index % LEVEL_RAMP.length]) : "#f8fafc" }}
+                                title={`${gradeRow.grade} working at ${level}: ${count}${behind ? ` (${behind} ${behind === 1 ? "year" : "years"} below)` : ""}`}
+                                className="flex h-7 items-center justify-center rounded-sm border text-[11px] font-black tabular-nums"
+                                style={{ background: cell.bg, color: cell.fg, borderColor: cell.border, borderWidth: gradeRow.grade === level ? 1.5 : 1 }}
                               >
                                 {count || ""}
                               </span>
@@ -1309,7 +1320,7 @@ export default function SchoolAnalyticsDashboard({
                       <button
                         type="button"
                         onClick={() => { if (group.key !== "other") setRealmId(group.key); setTab("intervention"); }}
-                        className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800"
+                        className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#A8332A] hover:underline"
                       >
                         {group.standings.below} need lift in {group.label}
                         <ChevronRight className="h-3.5 w-3.5" />
