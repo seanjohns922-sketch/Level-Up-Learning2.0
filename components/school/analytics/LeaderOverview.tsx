@@ -10,6 +10,7 @@ import { buildLeaderSignals, weeklyUsage, type LeaderSignal, type LevelCell } fr
  * same analytics snapshot as the other tabs. */
 
 const WEEK_LABEL = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", timeZone: "UTC" });
+const MONTH_LABEL = new Intl.DateTimeFormat("en-AU", { month: "short", timeZone: "UTC" });
 
 const pct = (part: number, whole: number) => (whole ? Math.round((part / whole) * 100) : 0);
 
@@ -43,7 +44,14 @@ export default function LeaderOverview({
   const signals = buildLeaderSignals(snapshot, cells);
   // Weeks run to the end of the reporting window (a past school year ends before today).
   const weeks = weeklyUsage(snapshot.engagementTrend, snapshot.windowEnd ?? snapshot.generatedAt, snapshot.windowStart ? snapshot.windowDays : days);
-  const peak = Math.max(1, ...weeks.map((week) => week.activities));
+  // Start at the first week with activity, so a whole school year doesn't
+  // open with months of empty bars before a school began.
+  const firstActive = weeks.findIndex((week) => week.activities > 0);
+  const shownWeeks = firstActive > 0 ? weeks.slice(firstActive) : weeks;
+  const dense = shownWeeks.length > 12;
+  const peak = Math.max(1, ...shownWeeks.map((week) => week.activities));
+  const busiest = shownWeeks.reduce((best, week) => (week.activities > best.activities ? week : best), shownWeeks[0] ?? { weekStart: "", activities: 0 });
+  const totalActivities = shownWeeks.reduce((total, week) => total + week.activities, 0);
   const placedTotal = cells.reduce((sum, cell) => sum + cell.total, 0);
   const placedBelow = cells.reduce((sum, cell) => sum + cell.below, 0);
   const cellFor = (strand: string, year: string) => cells.find((cell) => cell.strand === strand && cell.year === year);
@@ -159,51 +167,89 @@ export default function LeaderOverview({
         <article className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
           <h3 className="text-xl font-extrabold tracking-tight">Learning activities each week</h3>
           <p className="text-sm text-slate-500">Lessons, weekly quizzes and tests. Weeks start on Monday; lighter bars are part weeks.</p>
-          {weeks.every((week) => week.activities === 0) ? (
+          {totalActivities === 0 ? (
             <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No learning activity in this reporting window.</p>
           ) : (
-            <div className="mt-5 flex h-44 items-end gap-1.5" role="img" aria-label={`Learning activities each week: ${weeks.map((week) => `week of ${WEEK_LABEL.format(new Date(week.weekStart))} ${week.activities}${week.partial ? " (part week)" : ""}`).join(", ")}`}>
-              {weeks.map((week) => (
-                <div key={week.weekStart} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
-                  <span className="text-[11px] font-bold tabular-nums text-slate-500">{week.activities || ""}</span>
-                  <span
-                    className={`w-full max-w-9 rounded-t-md ${week.partial ? "bg-[#D6D9D3]" : "bg-[#121314]"}`}
-                    style={{ height: `${Math.max(3, Math.round((week.activities / peak) * 120))}px` }}
-                    title={`Week of ${WEEK_LABEL.format(new Date(week.weekStart))}: ${week.activities}${week.partial ? " (part week)" : ""}`}
-                  />
-                  <span className="whitespace-nowrap text-[10px] font-semibold text-slate-500">{WEEK_LABEL.format(new Date(week.weekStart))}</span>
-                </div>
-              ))}
-            </div>
+            <>
+              <p className="mt-3 text-sm">
+                <strong className="tabular-nums">{totalActivities}</strong> <span className="text-slate-500">activities</span>
+                <span className="mx-2 text-slate-300">·</span>
+                <span className="text-slate-500">busiest week</span> <strong className="tabular-nums">{busiest.activities}</strong>{" "}
+                <span className="text-slate-500">(week of {WEEK_LABEL.format(new Date(busiest.weekStart))})</span>
+              </p>
+              <div className={`mt-4 flex h-44 items-end ${dense ? "gap-[3px]" : "gap-1.5"}`} role="img" aria-label={`Learning activities each week: ${shownWeeks.map((week) => `week of ${WEEK_LABEL.format(new Date(week.weekStart))} ${week.activities}${week.partial ? " (part week)" : ""}`).join(", ")}`}>
+                {shownWeeks.map((week, index) => {
+                  const date = new Date(week.weekStart);
+                  const newMonth = index === 0 || MONTH_LABEL.format(date) !== MONTH_LABEL.format(new Date(shownWeeks[index - 1].weekStart));
+                  return (
+                    <div key={week.weekStart} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5" title={`Week of ${WEEK_LABEL.format(date)}: ${week.activities}${week.partial ? " (part week)" : ""}`}>
+                      {dense ? null : <span className="text-[11px] font-bold tabular-nums text-slate-500">{week.activities || ""}</span>}
+                      <span
+                        className={`w-full max-w-9 rounded-t-[3px] ${week.partial ? "bg-[#D6D9D3]" : "bg-[#121314]"}`}
+                        style={{ height: `${Math.max(2, Math.round((week.activities / peak) * 130))}px` }}
+                      />
+                      <span className="h-3 whitespace-nowrap text-[10px] font-semibold text-slate-500">
+                        {dense ? (newMonth ? MONTH_LABEL.format(date) : "") : WEEK_LABEL.format(date)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {dense ? <p className="mt-2 text-xs text-slate-400">Hover a bar for that week&apos;s number.</p> : null}
+            </>
           )}
         </article>
 
         <article className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <h3 className="text-xl font-extrabold tracking-tight">Weekly target by class</h3>
-              <p className="text-sm text-slate-500">Students who did 3+ lessons in the last 7 days. Line = school average ({schoolTarget}%).</p>
+              <h3 className="text-xl font-extrabold tracking-tight">Classes at a glance</h3>
+              <p className="text-sm text-slate-500">Who&apos;s using RELIQ this week, how accurate they are, and levels mastered.</p>
             </div>
             <button type="button" onClick={() => onOpen("classes")} className="shrink-0 text-sm font-bold text-emerald-700 hover:underline">All classes</button>
           </div>
           {classes.length === 0 ? (
             <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No classes in this view.</p>
           ) : (
-            <ul className="mt-4 space-y-3">
-              {classes.map((item) => {
-                const rate = pct(item.weeklyTargetMet, item.students);
-                return (
-                  <li key={item.id ?? item.name} className="grid grid-cols-[minmax(0,7rem)_1fr_3rem] items-center gap-3 text-sm">
-                    <span className="truncate font-bold">{item.name}</span>
-                    <span className="relative h-3 rounded-full bg-[#ECEEE9]">
-                      <span className={`absolute inset-y-0 left-0 rounded-full ${rate >= schoolTarget ? "bg-[#121314]" : "bg-[#C9CCC6]"}`} style={{ width: `${rate}%` }} />
-                      <span className="absolute -inset-y-1 w-0.5 bg-[#3D6600]" style={{ left: `${schoolTarget}%` }} aria-hidden="true" />
-                    </span>
-                    <span className="text-right font-bold tabular-nums">{rate}%</span>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[420px] text-sm">
+                <thead>
+                  <tr className="text-left text-xs font-bold text-slate-500">
+                    <th className="pb-2 pr-3 font-bold">Class</th>
+                    <th className="pb-2 pr-3 font-bold">Active this week</th>
+                    <th className="pb-2 pr-3 font-bold">Accuracy</th>
+                    <th className="pb-2 text-right font-bold">Mastered</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {classes.map((item) => {
+                    const active = pct(item.activeStudents, item.students);
+                    return (
+                      <tr key={item.id ?? item.name} className="border-t border-slate-100">
+                        <td className="py-3 pr-3 font-bold">{item.name}</td>
+                        <td className="py-3 pr-3">
+                          <span className="flex items-center gap-2">
+                            <span className="h-2 w-20 shrink-0 rounded-full bg-[#ECEEE9]"><span className="block h-full rounded-full bg-[#121314]" style={{ width: `${active}%` }} /></span>
+                            <span className="tabular-nums">{item.activeStudents} of {item.students}</span>
+                          </span>
+                        </td>
+                        <td className="py-3 pr-3">
+                          {item.averageAccuracy === null ? (
+                            <span className="text-slate-400">—</span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              <span className="h-2 w-20 shrink-0 rounded-full bg-[#ECEEE9]"><span className={`block h-full rounded-full ${item.averageAccuracy >= 80 ? "bg-[#B9F23F]" : item.averageAccuracy >= 60 ? "bg-[#FFD866]" : "bg-[#FF9C8F]"}`} style={{ width: `${Math.min(100, item.averageAccuracy)}%` }} /></span>
+                              <span className="tabular-nums">{Math.round(item.averageAccuracy)}%</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 text-right font-bold tabular-nums">{item.masteredLevels}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </article>
       </div>
