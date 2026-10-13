@@ -21,6 +21,7 @@ import type {
   StudentLearningJourney,
 } from "@/lib/school-platform-server";
 import LeaderOverview from "./analytics/LeaderOverview";
+import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { useClassGroups } from "./useClassGroups";
 import {
   type AcStrand,
@@ -106,6 +107,26 @@ const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: 
   above: { label: "Above level", pill: "bg-indigo-100 text-indigo-800", bar: "#5b6ee6" },
 };
 const STANDING_ORDER: LevelStanding[] = ["below", "at", "above"];
+
+// Pattern Peaks (Algebra) and Chance Hollow (Probability) start at Level 3, so
+// every student is assigned there by default. Only a sat pre-test is
+// evidence: unassessed placements are left out of level standing, and a
+// pre-test below the targeted minimum means the student is not yet working
+// at that level (one level lower).
+const PRETEST_GATED_REALMS = new Set(["pattern", "pattern-peaks", "chance", "chance-hollow"]);
+function evidencedLevel(realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): string | null | undefined {
+  if (!PRETEST_GATED_REALMS.has(realm.realmId)) return realm.currentLevel;
+  if (realm.pretestScore === null || realm.pretestScore === undefined) return undefined;
+  if (realm.pretestScore < ASSESSMENT_THRESHOLDS.pretestTargetedMinimumPercent) {
+    const index = levelIndex(realm.currentLevel);
+    return index > 0 ? SCHOOL_LEVEL_ORDER[index - 1] : realm.currentLevel;
+  }
+  return realm.currentLevel;
+}
+function realmStanding(yearLevel: string | null, realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): LevelStanding | null {
+  const level = evidencedLevel(realm);
+  return level === undefined ? null : levelStanding(yearLevel, level);
+}
 // Sequential ramp for ordinal working levels in the placement view.
 const LEVEL_RAMP = ["#0b6f4c", "#0f9d6b", "#3fb889", "#7fce9f", "#a9dcb3", "#cfe8cc", "#e6e2b0", "#ecd58f", "#f0c46e"];
 // Colour a level/grade by its position on the Ground->Year 6 ladder, so the
@@ -561,7 +582,7 @@ export default function SchoolAnalyticsDashboard({
       drawRow(["No realm evidence in this window.", "", "", "", "", "", ""]);
     } else {
       student.realms.forEach((realm) => {
-        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        const standing = realmStanding(student.yearLevel, realm);
         drawRow([
           REALMS[realm.realmId] ?? realm.realmId,
           `${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}`,
@@ -612,7 +633,7 @@ export default function SchoolAnalyticsDashboard({
       const grade = student.yearLevel ?? "Not recorded";
       for (const realm of student.realms) {
         const strand = strandForRealm(realm.realmId);
-        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        const standing = realmStanding(student.yearLevel, realm);
         if (!strand || !standing) continue;
         const group = groups.get(strand) ?? { strand, label: AC_STRANDS[strand].label, order: AC_STRANDS[strand].order, counts: { below: 0, at: 0, above: 0 }, total: 0, byGrade: new Map() };
         group.counts[standing] += 1; group.total += 1;
@@ -646,14 +667,15 @@ export default function SchoolAnalyticsDashboard({
         const label = strand ? AC_STRANDS[strand].label : "Other";
         const order = strand ? AC_STRANDS[strand].order : 99;
         const group = groups.get(key) ?? { key, label, order, levels: new Map(), byGrade: new Map(), standings: { below: 0, at: 0, above: 0 }, standingTotal: 0, preSum: 0, preCount: 0, placed: 0 };
-        const level = realm.currentLevel ?? "Not placed";
+        // Default Level 3 assignments without a pre-test show as not placed.
+        const level = evidencedLevel(realm) === undefined ? "Not placed" : realm.currentLevel ?? "Not placed";
         const grade = student.yearLevel ?? "Not recorded";
         group.levels.set(level, (group.levels.get(level) ?? 0) + 1);
         const gradeRow = group.byGrade.get(grade) ?? { levels: new Map(), total: 0 };
         gradeRow.levels.set(level, (gradeRow.levels.get(level) ?? 0) + 1);
         gradeRow.total += 1;
         group.byGrade.set(grade, gradeRow);
-        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        const standing = realmStanding(student.yearLevel, realm);
         if (standing) {
           group.standings[standing] += 1;
           group.standingTotal += 1;
@@ -694,7 +716,7 @@ export default function SchoolAnalyticsDashboard({
       const year = student.yearLevel ?? "Not recorded";
       for (const realm of student.realms) {
         const strand = strandForRealm(realm.realmId);
-        const standing = levelStanding(student.yearLevel, realm.currentLevel);
+        const standing = realmStanding(student.yearLevel, realm);
         if (!strand || !standing) continue;
         yearSet.add(year);
         const key = `${strand}|${year}`;
@@ -704,7 +726,9 @@ export default function SchoolAnalyticsDashboard({
         cells.set(key, cell);
       }
     }
-    const strands = [...new Set([...cells.values()].map((c) => c.strand))].sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order);
+    // Every strand is listed once any has evidence, so a strand nobody has been
+    // assessed in yet shows as an empty (grey) row rather than disappearing.
+    const strands = cells.size ? (Object.keys(AC_STRANDS) as AcStrand[]).sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order) : [];
     const years = [...YEAR_LEVELS, "Not recorded"].filter((y) => yearSet.has(y));
     const hotspots = [...cells.values()].filter((c) => c.needs > 0).sort((a, b) => b.needs - a.needs || (b.needs / b.total) - (a.needs / a.total));
     const totalNeeds = hotspots.reduce((sum, c) => sum + c.needs, 0);
