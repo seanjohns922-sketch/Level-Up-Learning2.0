@@ -1,0 +1,708 @@
+-- Class groups and full-year school analytics.
+--
+-- 1. Class groups: a school administrator groups similar classes (for
+--    example every 3/4 class, or every Year 3 class) so teachers can compare
+--    their class with the rest of its group. Groups only shape dashboards;
+--    they grant no access. Writes go through security-definer commands that
+--    require school management; members of the school can read them.
+-- 2. get_school_analytics_snapshot reports within the selected academic year:
+--    the window starts no earlier than the year's first day and ends no later
+--    than its last day (Australia/Melbourne), and may span up to 400 days
+--    (was 90) so "This school year" covers the whole year. The response adds
+--    windowStart and windowEnd. Assessment results (mastery, curriculum,
+--    growth, bands) only use results completed before the window ends, with
+--    no lower bound so earlier pre-tests stay valid growth baselines.
+--    Current working levels (student_realm_progress) have no history and
+--    always describe today. Rolling "last 7/14 days" measures are unchanged.
+--    Everything else is identical to
+--    20260915140000_version_safe_assessment_growth.sql.
+--
+-- Rollback: drop the three class-group functions and two tables, and re-run
+-- the get_school_analytics_snapshot definition from
+-- 20260915140000_version_safe_assessment_growth.sql.
+begin;
+
+create table if not exists public.class_groups (
+  id uuid primary key default gen_random_uuid(),
+  school_id uuid not null references public.schools(id) on delete cascade,
+  academic_year_id uuid not null references public.academic_years(id) on delete cascade,
+  name text not null check (char_length(btrim(name)) between 1 and 60),
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists class_groups_school_year_idx
+  on public.class_groups (school_id, academic_year_id);
+
+create table if not exists public.class_group_members (
+  group_id uuid not null references public.class_groups(id) on delete cascade,
+  class_id uuid not null references public.classes(id) on delete cascade,
+  school_id uuid not null references public.schools(id) on delete cascade,
+  added_at timestamptz not null default now(),
+  primary key (group_id, class_id),
+  -- A class belongs to at most one group.
+  unique (class_id)
+);
+
+alter table public.class_groups enable row level security;
+alter table public.class_group_members enable row level security;
+
+drop policy if exists class_groups_school_read on public.class_groups;
+create policy class_groups_school_read on public.class_groups
+  for select to authenticated
+  using (public.can_view_school(school_id));
+
+drop policy if exists class_group_members_school_read on public.class_group_members;
+create policy class_group_members_school_read on public.class_group_members
+  for select to authenticated
+  using (public.can_view_school(school_id));
+
+revoke all on public.class_groups from anon;
+revoke all on public.class_group_members from anon;
+revoke insert, update, delete on public.class_groups from authenticated;
+revoke insert, update, delete on public.class_group_members from authenticated;
+grant select on public.class_groups to authenticated;
+grant select on public.class_group_members to authenticated;
+
+create or replace function public.get_class_groups(
+  p_school_id uuid,
+  p_academic_year_id uuid
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+begin
+  if not public.can_view_school(p_school_id) then
+    raise exception 'School access denied' using errcode = '42501';
+  end if;
+
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', g.id,
+      'name', g.name,
+      'classIds', coalesce((
+        select jsonb_agg(m.class_id order by c.name)
+        from public.class_group_members m
+        join public.classes c on c.id = m.class_id
+        where m.group_id = g.id
+          and c.status = 'active'
+      ), '[]'::jsonb)
+    ) order by g.name)
+    from public.class_groups g
+    where g.school_id = p_school_id
+      and g.academic_year_id = p_academic_year_id
+  ), '[]'::jsonb);
+end;
+$$;
+
+create or replace function public.save_class_group(
+  p_school_id uuid,
+  p_academic_year_id uuid,
+  p_group_id uuid,
+  p_name text,
+  p_class_ids uuid[]
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_group_id uuid := p_group_id;
+  v_name text := btrim(coalesce(p_name, ''));
+  v_class_ids uuid[] := array(select distinct unnest(coalesce(p_class_ids, '{}')));
+  v_previous jsonb;
+  v_emptied record;
+begin
+  if not public.can_manage_school(p_school_id) then
+    raise exception 'School administrator access required' using errcode = '42501';
+  end if;
+  if char_length(v_name) not between 1 and 60 then
+    raise exception 'Group name must be 1 to 60 characters' using errcode = '22023';
+  end if;
+  if cardinality(v_class_ids) < 2 then
+    raise exception 'Choose at least two classes for a group' using errcode = '22023';
+  end if;
+  if not exists (
+    select 1 from public.academic_years ay
+    where ay.id = p_academic_year_id and ay.school_id = p_school_id
+  ) then
+    raise exception 'Academic year does not belong to this school' using errcode = '22023';
+  end if;
+  if exists (
+    select 1
+    from unnest(v_class_ids) as requested(class_id)
+    left join public.classes c
+      on c.id = requested.class_id
+     and c.school_id = p_school_id
+     and c.academic_year_id = p_academic_year_id
+     and c.status = 'active'
+    where c.id is null
+  ) then
+    raise exception 'Every class must be an active class in this school year' using errcode = '22023';
+  end if;
+
+  if v_group_id is null then
+    insert into public.class_groups (school_id, academic_year_id, name, created_by)
+    values (p_school_id, p_academic_year_id, v_name, auth.uid())
+    returning id into v_group_id;
+  else
+    select jsonb_build_object(
+      'name', g.name,
+      'classIds', coalesce((select jsonb_agg(m.class_id) from public.class_group_members m where m.group_id = g.id), '[]'::jsonb)
+    )
+    into v_previous
+    from public.class_groups g
+    where g.id = v_group_id
+      and g.school_id = p_school_id
+      and g.academic_year_id = p_academic_year_id;
+    if v_previous is null then
+      raise exception 'Class group not found' using errcode = '22023';
+    end if;
+    update public.class_groups
+    set name = v_name, updated_at = now()
+    where id = v_group_id;
+  end if;
+
+  -- A class moves into this group if it was in another one.
+  delete from public.class_group_members
+  where school_id = p_school_id
+    and (group_id = v_group_id or class_id = any(v_class_ids));
+
+  insert into public.class_group_members (group_id, class_id, school_id)
+  select v_group_id, class_id, p_school_id
+  from unnest(v_class_ids) as requested(class_id);
+
+  -- Groups left with fewer than two classes no longer compare anything.
+  for v_emptied in
+    select g.id, g.name
+    from public.class_groups g
+    where g.school_id = p_school_id
+      and g.id <> v_group_id
+      and (select count(*) from public.class_group_members m where m.group_id = g.id) < 2
+  loop
+    delete from public.class_groups where id = v_emptied.id;
+    perform public.write_school_audit(
+      p_school_id, 'class_group_deleted', 'class_group', v_emptied.id::text,
+      jsonb_build_object('name', v_emptied.name), null,
+      jsonb_build_object('reason', 'fewer than two classes after a move')
+    );
+  end loop;
+
+  perform public.write_school_audit(
+    p_school_id,
+    case when p_group_id is null then 'class_group_created' else 'class_group_updated' end,
+    'class_group',
+    v_group_id::text,
+    v_previous,
+    jsonb_build_object('name', v_name, 'classIds', to_jsonb(v_class_ids))
+  );
+
+  return v_group_id;
+end;
+$$;
+
+create or replace function public.delete_class_group(
+  p_school_id uuid,
+  p_group_id uuid
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_previous jsonb;
+begin
+  if not public.can_manage_school(p_school_id) then
+    raise exception 'School administrator access required' using errcode = '42501';
+  end if;
+
+  select jsonb_build_object(
+    'name', g.name,
+    'classIds', coalesce((select jsonb_agg(m.class_id) from public.class_group_members m where m.group_id = g.id), '[]'::jsonb)
+  )
+  into v_previous
+  from public.class_groups g
+  where g.id = p_group_id and g.school_id = p_school_id;
+
+  if v_previous is null then
+    return false;
+  end if;
+
+  delete from public.class_groups where id = p_group_id and school_id = p_school_id;
+
+  perform public.write_school_audit(
+    p_school_id, 'class_group_deleted', 'class_group', p_group_id::text, v_previous, null
+  );
+  return true;
+end;
+$$;
+
+revoke all on function public.get_class_groups(uuid, uuid) from public, anon;
+revoke all on function public.save_class_group(uuid, uuid, uuid, text, uuid[]) from public, anon;
+revoke all on function public.delete_class_group(uuid, uuid) from public, anon;
+grant execute on function public.get_class_groups(uuid, uuid) to authenticated;
+grant execute on function public.save_class_group(uuid, uuid, uuid, text, uuid[]) to authenticated;
+grant execute on function public.delete_class_group(uuid, uuid) to authenticated;
+
+create or replace function public.get_school_analytics_snapshot(
+  p_school_id uuid,
+  p_academic_year_id uuid,
+  p_days integer default 30,
+  p_year_level text default null,
+  p_class_id uuid default null,
+  p_realm_id text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  -- Up to a full school year plus a margin, so leaders can see the whole journey.
+  v_days integer := greatest(7, least(coalesce(p_days, 30), 400));
+  v_since timestamptz;
+  v_until timestamptz;
+  v_year_start timestamptz;
+  v_year_end timestamptz;
+  v_result jsonb;
+  v_can_view_administration boolean;
+begin
+  v_can_view_administration := public.can_view_school_administration(p_school_id);
+
+  if not (
+    v_can_view_administration
+    or public.has_school_role(p_school_id, array['teacher'])
+  ) then
+    raise exception 'School analytics access denied' using errcode = '42501';
+  end if;
+
+  select
+    ay.starts_on::timestamp at time zone 'Australia/Melbourne',
+    (ay.ends_on + 1)::timestamp at time zone 'Australia/Melbourne'
+  into v_year_start, v_year_end
+  from public.academic_years ay
+  where ay.id = p_academic_year_id
+    and ay.school_id = p_school_id;
+
+  if v_year_start is null then
+    raise exception 'Academic year does not belong to this school' using errcode = '22023';
+  end if;
+
+  -- The window never reaches outside the selected academic year.
+  v_until := least(now(), v_year_end);
+  v_since := greatest(v_until - make_interval(days => v_days), v_year_start);
+
+  with
+  cohort as (
+    select distinct on (s.id)
+      s.id as student_id,
+      coalesce(nullif(s.display_name, ''), nullif(concat_ws(' ', s.first_name, s.last_name), ''), s.username, 'Student') as student_name,
+      coalesce(s.school_year_level, s.year_level) as year_level,
+      ce.class_id,
+      c.name as class_name
+    from public.student_access_entitlements sae
+    join public.students s on s.id = sae.student_id and s.archived_at is null
+    left join lateral (
+      select enrolment.class_id
+      from public.class_enrollments enrolment
+      where enrolment.student_id = s.id
+        and enrolment.school_id = p_school_id
+        and enrolment.academic_year_id = p_academic_year_id
+        and enrolment.status = 'active'
+        and enrolment.ended_at is null
+      order by enrolment.is_primary desc, enrolment.enrolled_at desc
+      limit 1
+    ) ce on true
+    left join public.classes c on c.id = ce.class_id
+    where sae.access_source = 'school'
+      and sae.school_id = p_school_id
+      and sae.academic_year_id = p_academic_year_id
+      and sae.status = 'active'
+      and sae.starts_at <= now()
+      and (sae.ends_at is null or sae.ends_at >= now())
+      and (p_year_level is null or coalesce(s.school_year_level, s.year_level) = p_year_level)
+      and (p_class_id is null or ce.class_id = p_class_id)
+    order by s.id
+  ),
+  canonical_lessons as (
+    select distinct on (a.student_id, a.realm_id, a.working_level, a.week, a.lesson)
+      a.student_id, a.realm_id, a.working_level, a.week, a.lesson,
+      a.topic_focus, a.accuracy_percent::numeric as accuracy_percent,
+      a.completed_at as activity_at
+    from public.student_lesson_attempts a
+    join cohort co on co.student_id = a.student_id
+    where a.completed
+      and a.completed_at >= v_since and a.completed_at < v_until
+      and (p_realm_id is null or a.realm_id = p_realm_id)
+    order by a.student_id, a.realm_id, a.working_level, a.week, a.lesson,
+      a.completed_at desc, a.attempt_no desc
+  ),
+  canonical_quizzes as (
+    select distinct on (a.student_id, a.realm_id, a.working_level, a.week)
+      a.student_id, a.realm_id, a.working_level, a.week,
+      a.accuracy_percent::numeric as accuracy_percent,
+      a.completed_at as activity_at
+    from public.student_weekly_quiz_attempts a
+    join cohort co on co.student_id = a.student_id
+    where a.completed_at >= v_since and a.completed_at < v_until
+      and (p_realm_id is null or a.realm_id = p_realm_id)
+    order by a.student_id, a.realm_id, a.working_level, a.week,
+      a.completed_at desc, a.attempt_no desc
+  ),
+  latest_assessments as (
+    select distinct on (a.student_id, a.realm_id, a.working_level, lower(a.assessment_type))
+      a.student_id, a.realm_id, a.working_level,
+      lower(a.assessment_type) as assessment_type,
+      a.score_percent::numeric as score_percent,
+      a.completed_at
+    from public.student_realm_assessments a
+    join cohort co on co.student_id = a.student_id
+    where (p_realm_id is null or a.realm_id = p_realm_id)
+      -- Results as they stood at the end of the window: nothing after the
+      -- selected year counts. No lower bound, so earlier pre-tests remain
+      -- valid growth baselines and earlier mastery still counts.
+      and a.completed_at < v_until
+    order by a.student_id, a.realm_id, a.working_level, lower(a.assessment_type), a.completed_at desc
+  ),
+  realm_latest_assessment as (
+    -- Most recent assessment per student x realm: the placement pre-test, then
+    -- each level's post-test. This is the "where they are" signal for achievement
+    -- bands (lesson practice accuracy is NOT used for banding).
+    select distinct on (student_id, realm_id)
+      student_id, realm_id, working_level, assessment_type, score_percent, completed_at
+    from latest_assessments
+    order by student_id, realm_id, completed_at desc
+  ),
+  paired_growth as (
+    select post.student_id, post.realm_id, post.working_level,
+      pre.score_percent::numeric as pre_score, post.score_percent as post_score,
+      post.score_percent - pre.score_percent as growth, post.completed_at
+    from latest_assessments post
+    join lateral (
+      select a.score_percent, a.completed_at, a.placement_result
+      from public.student_realm_assessments a
+      where a.student_id = post.student_id and a.realm_id = post.realm_id
+        and a.working_level = post.working_level
+        and (a.placement_result #>> '{assessment_evidence,learning_cycle_id}') is not distinct from (
+          select p.placement_result #>> '{assessment_evidence,learning_cycle_id}' from public.student_realm_assessments p
+          where p.student_id=post.student_id and p.realm_id=post.realm_id and p.working_level=post.working_level
+            and p.completed_at=post.completed_at and lower(p.assessment_type) in ('post','posttest','post-test')
+          order by p.id limit 1)
+        and lower(a.assessment_type) in ('pre', 'pretest', 'pre-test')
+      order by a.completed_at, a.id
+      limit 1
+    ) pre on pre.completed_at < post.completed_at
+    where post.assessment_type in ('post', 'posttest', 'post-test')
+      and post.completed_at >= v_since and post.completed_at < v_until
+      and ((
+        pre.placement_result #>> '{assessment_evidence,comparison_group}' is not null
+        and pre.placement_result #>> '{assessment_evidence,comparison_group}' = (
+          select a.placement_result #>> '{assessment_evidence,comparison_group}'
+          from public.student_realm_assessments a
+          where a.student_id = post.student_id and a.realm_id = post.realm_id
+            and a.working_level = post.working_level
+            and lower(a.assessment_type) in ('post', 'posttest', 'post-test')
+            and a.completed_at = post.completed_at
+          order by a.id limit 1
+        )
+      ))
+      and not exists (
+        select 1 from public.student_realm_assessments newer
+        where newer.student_id=post.student_id and newer.realm_id=post.realm_id and newer.working_level=post.working_level
+          and lower(newer.assessment_type) in ('pre','pretest','pre-test') and newer.completed_at>post.completed_at
+          and newer.completed_at < v_until
+      )
+  ),
+  activity as (
+    select student_id, realm_id, working_level, accuracy_percent, activity_at, 'lesson'::text as kind
+    from canonical_lessons
+    union all
+    select student_id, realm_id, working_level, accuracy_percent, activity_at, 'quiz'::text
+    from canonical_quizzes
+    union all
+    select student_id, realm_id, working_level, score_percent, completed_at, 'assessment'::text
+    from latest_assessments
+    where completed_at >= v_since and completed_at < v_until
+  ),
+  recent_7d as (
+    select * from activity where activity_at >= now() - interval '7 days'
+  ),
+  recent_14d as (
+    select * from activity where activity_at >= now() - interval '14 days'
+  ),
+  lesson_7d as (
+    select student_id, count(*) as lesson_count
+    from canonical_lessons
+    where activity_at >= now() - interval '7 days'
+    group by student_id
+  ),
+  latest_evidence as (
+    select distinct on (student_id) student_id, accuracy_percent, activity_at
+    from recent_14d
+    order by student_id, activity_at desc
+  ),
+  realm_summary as (
+    select
+      r.realm_id,
+      count(distinct r.student_id) as active_students,
+      round(avg(r.accuracy_percent), 1) as average_accuracy,
+      count(*) filter (where r.kind = 'lesson') as lessons,
+      count(*) filter (where r.kind = 'quiz') as quizzes
+    from activity r
+    group by r.realm_id
+  ),
+  student_activity_summary as (
+    select
+      a.student_id,
+      max(a.activity_at) as last_active,
+      round(avg(a.accuracy_percent), 1) as average_accuracy,
+      count(distinct a.realm_id) as realms_used,
+      count(distinct a.activity_at::date) as learning_days,
+      bool_or(a.activity_at >= now() - interval '7 days') as active_this_week
+    from activity a
+    group by a.student_id
+  ),
+  student_growth_summary as (
+    select
+      pg.student_id,
+      round(avg(pg.growth), 1) as average_growth
+    from paired_growth pg
+    group by pg.student_id
+  ),
+  current_progress as (
+    select distinct on (srp.student_id, srp.realm_id)
+      srp.student_id,
+      srp.realm_id,
+      srp.working_level,
+      srp.current_week,
+      srp.status,
+      srp.pretest_score::numeric as pretest_score,
+      srp.posttest_score::numeric as posttest_score
+    from public.student_realm_progress srp
+    join cohort co on co.student_id = srp.student_id
+    where srp.is_current
+      and (p_realm_id is null or srp.realm_id = p_realm_id)
+    order by srp.student_id, srp.realm_id, srp.updated_at desc
+  ),
+  mastered_realms as (
+    select la.student_id, la.realm_id, la.working_level, la.score_percent
+    from latest_assessments la
+    where la.assessment_type in ('post', 'posttest', 'post-test')
+      and la.score_percent >= 85
+  ),
+  student_mastery_summary as (
+    select student_id, count(*) as mastered_levels
+    from mastered_realms
+    group by student_id
+  ),
+  student_realm_keys as (
+    select distinct student_id, realm_id from activity
+    union
+    select distinct student_id, realm_id from current_progress
+  ),
+  student_realm_activity as (
+    select
+      student_id,
+      realm_id,
+      round(avg(accuracy_percent), 1) as average_accuracy,
+      count(*) as activities,
+      max(working_level) as evidence_level
+    from activity
+    group by student_id, realm_id
+  ),
+  student_realm_summary as (
+    select
+      keys.student_id,
+      jsonb_agg(jsonb_build_object(
+        'realmId', keys.realm_id,
+        'averageAccuracy', sra.average_accuracy,
+        'activities', coalesce(sra.activities, 0),
+        'currentLevel', coalesce(cp.working_level, sra.evidence_level),
+        'currentWeek', cp.current_week,
+        'pathwayStatus', cp.status,
+        'pretestScore', cp.pretest_score,
+        'posttestScore', cp.posttest_score,
+        'assessmentScore', rla.score_percent,
+        'assessmentLevel', rla.working_level,
+        'assessmentType', rla.assessment_type,
+        'mastered', exists (
+          select 1 from mastered_realms mr
+          where mr.student_id = keys.student_id and mr.realm_id = keys.realm_id
+        ),
+        'growth', (
+          select round(avg(pg.growth), 1)
+          from paired_growth pg
+          where pg.student_id = keys.student_id and pg.realm_id = keys.realm_id
+        )
+      ) order by keys.realm_id) as realms
+    from student_realm_keys keys
+    left join student_realm_activity sra
+      on sra.student_id = keys.student_id and sra.realm_id = keys.realm_id
+    left join current_progress cp
+      on cp.student_id = keys.student_id and cp.realm_id = keys.realm_id
+    left join realm_latest_assessment rla
+      on rla.student_id = keys.student_id and rla.realm_id = keys.realm_id
+    group by keys.student_id
+  ),
+  class_summary as (
+    select
+      co.class_id,
+      co.class_name,
+      count(*) as students,
+      count(*) filter (where sas.active_this_week) as active_students,
+      count(*) filter (where coalesce(l7.lesson_count, 0) >= 3) as weekly_target_met,
+      coalesce(sum(sms.mastered_levels), 0) as mastered_levels,
+      round(avg(sas.average_accuracy), 1) as average_accuracy,
+      round(avg(sgs.average_growth), 1) as average_growth
+    from cohort co
+    left join student_activity_summary sas on sas.student_id = co.student_id
+    left join student_growth_summary sgs on sgs.student_id = co.student_id
+    left join lesson_7d l7 on l7.student_id = co.student_id
+    left join student_mastery_summary sms on sms.student_id = co.student_id
+    group by co.class_id, co.class_name
+  ),
+  student_summary as (
+    select
+      co.student_id, co.student_name, co.year_level, co.class_id, co.class_name,
+      sas.last_active,
+      sas.average_accuracy,
+      coalesce(sas.realms_used, 0) as realms_used,
+      coalesce(sas.learning_days, 0) as learning_days,
+      coalesce(sas.active_this_week, false) as active_this_week,
+      coalesce(l7.lesson_count, 0) >= 3 as weekly_target_met,
+      coalesce(sms.mastered_levels, 0) as mastered_levels,
+      case
+        when coalesce(sas.active_this_week, false) and coalesce(le.accuracy_percent, 0) >= 80 then 'on_track'
+        when coalesce(sas.active_this_week, false) then 'active'
+        else 'needs_attention'
+      end as status,
+      sgs.average_growth,
+      coalesce(srs.realms, '[]'::jsonb) as realms
+    from cohort co
+    left join student_activity_summary sas on sas.student_id = co.student_id
+    left join student_growth_summary sgs on sgs.student_id = co.student_id
+    left join student_realm_summary srs on srs.student_id = co.student_id
+    left join lesson_7d l7 on l7.student_id = co.student_id
+    left join student_mastery_summary sms on sms.student_id = co.student_id
+    left join latest_evidence le on le.student_id = co.student_id
+  )
+  select jsonb_build_object(
+    'generatedAt', now(),
+    'windowDays', greatest(0, ceil(extract(epoch from (v_until - v_since)) / 86400))::integer,
+    'windowStart', v_since,
+    'windowEnd', v_until,
+    'filters', jsonb_build_object(
+      'yearLevel', p_year_level,
+      'classId', p_class_id,
+      'realmId', p_realm_id
+    ),
+    'overview', jsonb_build_object(
+      'students', (select count(*) from cohort),
+      'activeThisWeek', (select count(distinct student_id) from recent_7d),
+      'weeklyTargetMet', (select count(*) from lesson_7d where lesson_count >= 3),
+      'onTrack', (select count(*) from latest_evidence where accuracy_percent >= 80),
+      'levelsMastered', (select count(*) from latest_assessments where score_percent >= 85 and assessment_type in ('post','posttest','post-test')),
+      'averageGrowth', (select round(avg(growth), 1) from paired_growth),
+      'matchedGrowthPairs', (select count(*) from paired_growth)
+    ),
+    'realms', coalesce((select jsonb_agg(jsonb_build_object(
+      'realmId', realm_id,
+      'activeStudents', active_students,
+      'averageAccuracy', average_accuracy,
+      'lessons', lessons,
+      'quizzes', quizzes,
+      'averageGrowth', (select round(avg(pg.growth), 1) from paired_growth pg where pg.realm_id = rs.realm_id)
+    ) order by realm_id) from realm_summary rs), '[]'::jsonb),
+    'growthTrend', coalesce((select jsonb_agg(jsonb_build_object(
+      'date', day::date,
+      'averageGrowth', average_growth,
+      'matchedPairs', matched_pairs
+    ) order by day) from (
+      select date_trunc('day', completed_at) as day, round(avg(growth), 1) as average_growth, count(*) as matched_pairs
+      from paired_growth group by date_trunc('day', completed_at)
+    ) trend), '[]'::jsonb),
+    'engagementTrend', coalesce((select jsonb_agg(jsonb_build_object(
+      'date', day::date,
+      'activeStudents', active_students,
+      'activities', activities
+    ) order by day) from (
+      select activity_at::date as day, count(distinct student_id) as active_students, count(*) as activities
+      from activity group by activity_at::date
+    ) trend), '[]'::jsonb),
+    'engagement', jsonb_build_object(
+      'activeLearners', (select count(distinct student_id) from activity),
+      'averageLearningDays', (select round(avg(days), 1) from (select count(distinct activity_at::date) days from activity group by student_id) d),
+      'returningLearners', (select count(*) from (select student_id from activity group by student_id having count(distinct activity_at::date) >= 2) r),
+      'lessonsCompleted', (select count(*) from canonical_lessons),
+      'quizzesCompleted', (select count(*) from canonical_quizzes)
+    ),
+    'curriculum', coalesce((select jsonb_agg(jsonb_build_object(
+      'topic', topic,
+      'yearLevel', year_level,
+      'realmId', realm_id,
+      'students', students,
+      'evidenceCount', evidence_count,
+      'averageAccuracy', average_accuracy
+    ) order by realm_id, year_level) from (
+      select
+        case la.working_level when 'Prep' then 'Ground post-test'
+          else 'Level ' || replace(la.working_level, 'Year ', '') || ' post-test' end as topic,
+        la.working_level as year_level, la.realm_id as realm_id,
+        count(distinct la.student_id) as students, count(*) as evidence_count,
+        round(avg(la.score_percent), 1) as average_accuracy
+      from latest_assessments la
+      where la.assessment_type in ('post', 'posttest', 'post-test')
+      group by la.working_level, la.realm_id
+    ) topics), '[]'::jsonb),
+    'classes', coalesce((select jsonb_agg(jsonb_build_object(
+      'id', class_id, 'name', coalesce(class_name, 'Not assigned'), 'students', students,
+      'activeStudents', active_students, 'weeklyTargetMet', weekly_target_met,
+      'masteredLevels', mastered_levels, 'averageAccuracy', average_accuracy, 'averageGrowth', average_growth
+    ) order by class_name nulls last) from class_summary), '[]'::jsonb),
+    -- Anonymous working-level evidence powers whole-school placement and
+    -- intervention visuals without disclosing another class's students.
+    'analysisStudents', coalesce((select jsonb_agg(jsonb_build_object(
+      'yearLevel', summary.year_level,
+      'realms', coalesce((
+        select jsonb_agg(jsonb_build_object(
+          'realmId', realm->>'realmId',
+          'currentLevel', realm->>'currentLevel',
+          'pretestScore', realm->'pretestScore'
+        ))
+        from jsonb_array_elements(summary.realms) realm
+      ), '[]'::jsonb)
+    )) from student_summary summary), '[]'::jsonb),
+    'students', coalesce((select jsonb_agg(jsonb_build_object(
+      'id', student_id, 'name', student_name, 'yearLevel', year_level,
+      'classId', class_id, 'className', coalesce(class_name, 'Not assigned'),
+      'lastActive', last_active, 'averageAccuracy', average_accuracy,
+      'realmsUsed', realms_used, 'learningDays', learning_days,
+      'activeThisWeek', active_this_week, 'weeklyTargetMet', weekly_target_met,
+      'masteredLevels', mastered_levels, 'status', status,
+      'averageGrowth', average_growth, 'realms', realms
+    ) order by student_name)
+      from student_summary
+      where v_can_view_administration
+        or public.can_view_student(student_id)
+    ), '[]'::jsonb),
+    'methodology', jsonb_build_object(
+      'weeklyTarget', 'At least 3 unique completed lessons in the last 7 days.',
+      'onTrack', 'Canonical activity in the last 14 days with latest lesson, quiz or assessment evidence at 80% or higher.',
+      'mastery', 'Latest post-test score of 85% or higher.',
+      'growth', 'Space and Ground Number/Measurement: later post-test minus first compatible-version baseline at the same working level. Other levels retain latest post-test minus latest pre-test.',
+      'lessonDeduplication', '(student, realm, level, week, lesson)',
+      'quizDeduplication', '(student, realm, level, week)'
+    )
+  ) into v_result;
+
+  return v_result;
+end;
+$$;
+
+commit;

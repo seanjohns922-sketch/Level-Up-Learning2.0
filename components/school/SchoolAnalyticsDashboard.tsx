@@ -44,7 +44,13 @@ type SchoolAnalyticsDashboardProps = {
   >;
   audience?: "leadership" | "teacher";
   teacherClassIds?: string[];
+  /** First day of the academic year (YYYY-MM-DD); enables "This school year". */
+  academicYearStart?: string;
 };
+
+/** "This school year" asks for the longest window; the analytics function
+ * bounds every window by the selected academic year's start and end. */
+const WHOLE_YEAR_DAYS = 400;
 
 const TABS: Array<{ id: AnalyticsTab; label: string }> = [
   { id: "overview", label: "Overview" },
@@ -361,9 +367,12 @@ export default function SchoolAnalyticsDashboard({
   classes,
   audience = "leadership",
   teacherClassIds = [],
+  academicYearStart,
 }: SchoolAnalyticsDashboardProps) {
   const [tab, setTab] = useState<AnalyticsTab>("overview");
-  const [days, setDays] = useState(90);
+  const [period, setPeriod] = useState<"year" | 7 | 30 | 90>(academicYearStart ? "year" : 90);
+  const days = period === "year" ? WHOLE_YEAR_DAYS : period;
+  const periodLabel = period === "year" ? "This school year" : `Last ${days} days`;
   const [yearLevel, setYearLevel] = useState("");
   const [classId, setClassId] = useState("");
   const [realmId, setRealmId] = useState("");
@@ -711,7 +720,7 @@ export default function SchoolAnalyticsDashboard({
     const filterLine = [
       selectedClass ? selectedClass.name : yearLevel ? yearLevel : "Whole school",
       realmId ? REALMS[realmId] ?? realmId : "All strands",
-      `Last ${days} days`,
+      periodLabel,
       `Generated ${generated}`,
     ].join(" · ");
     let y = margin;
@@ -953,13 +962,24 @@ export default function SchoolAnalyticsDashboard({
           </label>
           <label className="text-sm font-semibold text-slate-600">
             Reporting window
-            <select value={days} onChange={(event) => setDays(Number(event.target.value))} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
+            <select value={String(period)} onChange={(event) => setPeriod(event.target.value === "year" ? "year" : (Number(event.target.value) as 7 | 30 | 90))} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
+              {academicYearStart ? <option value="year">This school year</option> : null}
               <option value={7}>Last 7 days</option>
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
             </select>
           </label>
         </div>
+        {snapshot.windowEnd && Date.parse(snapshot.windowEnd) < Date.parse(snapshot.generatedAt) - 86400000 ? (
+          <p className="mt-3 rounded-lg bg-[#F1F2EE] px-3 py-2 text-sm font-semibold text-slate-700">
+            Results are shown as they stood at the end of this school year. Working levels and placements show where students are now.
+          </p>
+        ) : null}
+        {period === "year" && !snapshot.windowStart ? (
+          <p className="mt-3 rounded-lg bg-[#FFF1C7] px-3 py-2 text-sm font-semibold text-[#5C4300]">
+            Showing the last {snapshot.windowDays} days. Whole-year reporting turns on after the next database update.
+          </p>
+        ) : null}
         {loading ? <div className="mt-3 h-1 animate-pulse rounded-full bg-[#B9F23F]" /> : null}
       </div>
 

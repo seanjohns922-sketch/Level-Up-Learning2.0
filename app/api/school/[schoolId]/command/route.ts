@@ -108,6 +108,24 @@ export async function POST(
         return NextResponse.json({ classId });
       }
 
+      case "saveClassGroup": {
+        const groupId = await runSchoolCommand<string>(schoolId, "save_class_group", {
+          p_school_id: schoolId,
+          p_academic_year_id: stringValue(payload.academicYearId),
+          p_group_id: stringValue(payload.groupId) || null,
+          p_name: stringValue(payload.name),
+          p_class_ids: stringArray(payload.classIds),
+        }, accessToken);
+        return NextResponse.json({ groupId });
+      }
+
+      case "deleteClassGroup":
+        await runSchoolCommand<boolean>(schoolId, "delete_class_group", {
+          p_school_id: schoolId,
+          p_group_id: stringValue(payload.groupId),
+        }, accessToken);
+        return NextResponse.json({ success: true });
+
       case "assignClassStaff":
         await runSchoolCommand<string>(schoolId, "assign_class_staff", {
           p_class_id: stringValue(payload.classId),

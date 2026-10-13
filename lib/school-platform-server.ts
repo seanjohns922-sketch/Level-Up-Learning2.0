@@ -137,6 +137,10 @@ export type SchoolHomeSnapshot = {
 export type SchoolAnalyticsSnapshot = {
   generatedAt: string;
   windowDays: number;
+  /** Reporting window, bounded by the selected academic year. Absent before
+   * the 20261014090000 migration, when the window is a rolling day count. */
+  windowStart?: string;
+  windowEnd?: string;
   filters: {
     yearLevel: string | null;
     classId: string | null;
@@ -529,6 +533,34 @@ export async function loadSchoolStudentDirectoryPreview(
         : "The school student directory could not be loaded.";
     console.error("[SchoolHome] Unable to load the canonical student directory", error);
     throw new Error(message);
+  }
+}
+
+export type ClassGroup = {
+  id: string;
+  name: string;
+  classIds: string[];
+};
+
+/** Class groups for one academic year (admin-defined, for comparison only).
+ * Returns null when the school cannot be viewed, and an empty list when the
+ * class-group migration has not been applied yet. */
+export async function loadClassGroups(
+  schoolId: string,
+  academicYearId: string,
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
+  if (!access) return null;
+  try {
+    return await supabaseRequest<ClassGroup[]>("/rest/v1/rpc/get_class_groups", access.accessToken, {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId, p_academic_year_id: academicYearId }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (/get_class_groups|could not find the function|schema cache/i.test(message)) return [];
+    throw error;
   }
 }
 

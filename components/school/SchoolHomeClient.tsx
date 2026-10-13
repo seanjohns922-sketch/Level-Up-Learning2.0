@@ -46,6 +46,7 @@ import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import HomeTrends from "./HomeTrends";
 import MyClassSummary from "./MyClassSummary";
+import ClassGroupsPanel from "./ClassGroupsPanel";
 import { formatClassYearLevels, normalizeClassYearLevels } from "@/lib/studentLevelLabel";
 
 const SchoolAnalyticsDashboard = dynamic(
@@ -2738,6 +2739,7 @@ export default function SchoolHomeClient({
                     schoolId={snapshot.school.id}
                     academicYearId={academicYearId}
                     classes={myClasses}
+                    allClasses={filteredClasses}
                   />
                 </section>
 
@@ -3008,6 +3010,7 @@ export default function SchoolHomeClient({
                 academicYearId={academicYearId}
                 classes={filteredClasses}
                 audience={isAdministrator ? "leadership" : "teacher"}
+                academicYearStart={selectedAcademicYear?.startsOn}
                 teacherClassIds={myClasses.map((classRow) => classRow.id)}
               />
             ) : (
@@ -3177,8 +3180,17 @@ export default function SchoolHomeClient({
                 })}
               </div>
 
+              {academicYearId ? (
+                <ClassGroupsPanel
+                  schoolId={snapshot.school.id}
+                  academicYearId={academicYearId}
+                  classes={filteredClasses}
+                  onSaved={notify}
+                />
+              ) : null}
+
               <div className="grid gap-5 xl:grid-cols-2">
-                <div className="border border-slate-200 bg-white">
+                <div className="rounded-2xl border border-slate-200 bg-white">
                   <div className="border-b border-slate-200 px-5 py-4">
                     <h2 className="font-bold">School administrators</h2>
                     <p className="mt-1 text-sm text-slate-500">
