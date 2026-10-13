@@ -2,16 +2,15 @@
 
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { ClassGroup } from "@/lib/school-platform-server";
+import type { ClassGroup, SchoolAnalyticsSnapshot, SchoolHomeSnapshot } from "@/lib/school-platform-server";
 import { useClassGroups } from "./useClassGroups";
-import type { SchoolAnalyticsSnapshot, SchoolHomeSnapshot } from "@/lib/school-platform-server";
 import { formatClassYearLevels } from "@/lib/studentLevelLabel";
 
 /** Teacher home: one card per class the teacher teaches, with four numbers
  * from the school analytics snapshot. When the school administrator has put
- * the class in a class group, each number sits beside the group's figure and
- * the other classes in the group are listed to compare; otherwise the
- * whole-school figure is used. */
+ * the class in a class group, participation, weekly target and mastery sit
+ * beside the group's figure (otherwise the whole-school figure) and the
+ * group's classes are listed to compare. Accuracy has no comparison. */
 
 const WINDOW_DAYS = 28;
 const ROLE_LABELS: Record<string, string> = {
@@ -26,28 +25,23 @@ type Stat = { label: string; value: string; compare: string };
 
 const pct = (part: number, whole: number) => (whole ? Math.round((part / whole) * 100) : 0);
 
-function schoolAccuracy(classes: SchoolAnalyticsSnapshot["classes"]) {
-  const withEvidence = classes.filter((item) => item.averageAccuracy !== null && item.students > 0);
-  const students = withEvidence.reduce((sum, item) => sum + item.students, 0);
-  if (!students) return null;
-  return Math.round(withEvidence.reduce((sum, item) => sum + (item.averageAccuracy ?? 0) * item.students, 0) / students);
-}
-
 function statsFor(classId: string, snapshot: SchoolAnalyticsSnapshot, group: ClassGroup | undefined): Stat[] | null {
   const row = snapshot.classes.find((item) => item.id === classId);
   if (!row) return null;
   const peers = group ? snapshot.classes.filter((item) => item.id && group.classIds.includes(item.id)) : [];
   const useGroup = peers.length >= 2;
-  const scope = useGroup ? group!.name : "school-wide";
+  const scope = useGroup ? `across ${group!.name}` : "school-wide";
   const sum = (key: "students" | "activeStudents" | "weeklyTargetMet" | "masteredLevels") => peers.reduce((total, item) => total + item[key], 0);
   const base = useGroup
-    ? { students: sum("students"), active: sum("activeStudents"), target: sum("weeklyTargetMet"), mastered: sum("masteredLevels"), accuracy: schoolAccuracy(peers) }
-    : { students: snapshot.overview.students, active: snapshot.overview.activeThisWeek, target: snapshot.overview.weeklyTargetMet, mastered: snapshot.overview.levelsMastered, accuracy: schoolAccuracy(snapshot.classes) };
+    ? { students: sum("students"), active: sum("activeStudents"), target: sum("weeklyTargetMet"), mastered: sum("masteredLevels") }
+    : { students: snapshot.overview.students, active: snapshot.overview.activeThisWeek, target: snapshot.overview.weeklyTargetMet, mastered: snapshot.overview.levelsMastered };
   return [
-    { label: "Used RELIQ in the last 7 days", value: `${row.activeStudents} of ${row.students}`, compare: `${pct(base.active, base.students)}% ${useGroup ? `across ${scope}` : scope}` },
-    { label: "Met the weekly target", value: `${pct(row.weeklyTargetMet, row.students)}%`, compare: `${pct(base.target, base.students)}% ${useGroup ? `across ${scope}` : scope}` },
-    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: base.accuracy === null ? "Not enough evidence yet" : `${base.accuracy}% ${useGroup ? `across ${scope}` : scope}` },
-    { label: "Levels mastered", value: String(row.masteredLevels), compare: `${base.mastered} ${useGroup ? `across ${scope}` : scope}` },
+    { label: "Used RELIQ in the last 7 days", value: `${row.activeStudents} of ${row.students}`, compare: `${pct(base.active, base.students)}% ${scope}` },
+    { label: "Met the weekly target", value: `${pct(row.weeklyTargetMet, row.students)}%`, compare: `${pct(base.target, base.students)}% ${scope}` },
+    // No comparison: class averages only cover students with evidence, and the
+    // snapshot doesn't say how many, so a weighted figure would mislead.
+    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: "Lessons, quizzes and tests" },
+    { label: "Levels mastered", value: String(row.masteredLevels), compare: `${base.mastered} ${scope}` },
   ];
 }
 

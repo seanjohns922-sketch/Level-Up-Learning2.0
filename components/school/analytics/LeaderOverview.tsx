@@ -156,12 +156,12 @@ export default function LeaderOverview({
 
       <div className="grid gap-5 xl:grid-cols-2">
         <article className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h3 className="text-xl font-extrabold tracking-tight">Lessons and quizzes each week</h3>
-          <p className="text-sm text-slate-500">Weeks start on Monday. Lighter bars are part weeks.</p>
+          <h3 className="text-xl font-extrabold tracking-tight">Learning activities each week</h3>
+          <p className="text-sm text-slate-500">Lessons, weekly quizzes and tests. Weeks start on Monday; lighter bars are part weeks.</p>
           {weeks.every((week) => week.activities === 0) ? (
             <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No learning activity in this reporting window.</p>
           ) : (
-            <div className="mt-5 flex h-44 items-end gap-1.5" role="img" aria-label={`Weekly lessons and quizzes: ${weeks.map((week) => `week of ${WEEK_LABEL.format(new Date(week.weekStart))} ${week.activities}${week.partial ? " (part week)" : ""}`).join(", ")}`}>
+            <div className="mt-5 flex h-44 items-end gap-1.5" role="img" aria-label={`Learning activities each week: ${weeks.map((week) => `week of ${WEEK_LABEL.format(new Date(week.weekStart))} ${week.activities}${week.partial ? " (part week)" : ""}`).join(", ")}`}>
               {weeks.map((week) => (
                 <div key={week.weekStart} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
                   <span className="text-[11px] font-bold tabular-nums text-slate-500">{week.activities || ""}</span>
