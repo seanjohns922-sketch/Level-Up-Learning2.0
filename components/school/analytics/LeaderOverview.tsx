@@ -4,6 +4,8 @@ import { AlertTriangle, ArrowRight, CircleDot, Sparkles } from "lucide-react";
 import type { SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
 import { buildLeaderSignals, type LeaderSignal } from "@/lib/leader-signals";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
+import { overviewHelp } from "@/lib/analytics-help";
+import TabHelp from "./TabHelp";
 import {
   STANDING_META,
   buildDistributions,
@@ -99,6 +101,7 @@ export default function LeaderOverview({
 
   return (
     <div className="space-y-5">
+      <TabHelp content={overviewHelp(audience)} />
       <section className={card}>
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
@@ -111,7 +114,9 @@ export default function LeaderOverview({
             const meta = STANDING_META[category];
             return (
               <div key={category} className="pl-4" style={{ boxShadow: `inset 4px 0 0 ${meta.bg}` }}>
-                <p className="text-[15px] font-semibold text-slate-700">{meta.label}</p>
+                <p className="text-[15px] font-semibold text-slate-700">
+                  <span className="cursor-help border-b-2 border-dotted border-slate-400" title={`${meta.label}: ${meta.meaning}`}>{meta.label}</span>
+                </p>
                 <p className="font-display text-4xl font-black tracking-tight text-[#121314]">{share(overall.counts[category], overall.total)}%</p>
                 <p className="text-sm text-slate-500">{overall.counts[category]} students</p>
               </div>
@@ -129,11 +134,9 @@ export default function LeaderOverview({
             </span>
           ))}
         </div>
-        <p className="mt-3 text-xs text-slate-400">
-          {usingTests
-            ? "Based on each student's latest diagnostic, pre-test or post-test, compared with where they should be on the day they sat it (a Year 4 student: Level 3 at the start of the year, 3.5 mid-year, 4 at the end). Each student once overall, weighted by the curriculum (Number counts most)."
-            : "Based on current working level against school year. Results from each student's latest test appear after the analytics update."}
-        </p>
+        {usingTests ? null : (
+          <p className="mt-3 text-xs text-slate-400">Based on current working level against school year. Results from each student&apos;s latest test appear after the analytics update.</p>
+        )}
       </section>
 
       <div className="grid gap-5 xl:grid-cols-2">
@@ -172,7 +175,6 @@ export default function LeaderOverview({
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-slate-400">Faded bars are based on fewer than {SMALL_GROUP} students.</p>
         </section>
 
         <section className={card}>

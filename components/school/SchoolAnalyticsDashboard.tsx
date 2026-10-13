@@ -1109,6 +1109,7 @@ export default function SchoolAnalyticsDashboard({
       {tab === "growth" && usesTestHistory(groupSnapshot ?? snapshot) ? (
         <GrowthView
           snapshot={groupSnapshot ?? snapshot}
+          audience={activeGroup ? "group" : audience}
           breakdown={
             activeGroup
               ? new Set((groupSnapshot ?? snapshot).analysisStudents.map((student) => student.yearLevel)).size > 1 ? "years" : "classes"

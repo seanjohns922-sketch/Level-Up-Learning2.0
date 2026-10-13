@@ -3,6 +3,8 @@
 import type { SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import { LEVEL_ORDER } from "@/lib/proficiency";
+import { growthHelp, type HelpAudience } from "@/lib/analytics-help";
+import TabHelp from "./TabHelp";
 import {
   PACE_META,
   PACE_ORDER,
@@ -42,6 +44,7 @@ const level = (value: number | null) => (value === null ? "—" : value.toFixed(
 
 export default function GrowthView({
   snapshot,
+  audience,
   breakdown,
   title,
   onOpenYear,
@@ -49,6 +52,7 @@ export default function GrowthView({
   onOpenStudent,
 }: {
   snapshot: SchoolAnalyticsSnapshot;
+  audience: HelpAudience;
   breakdown: GrowthBreakdown;
   title: string;
   onOpenYear?: (yearLevel: string) => void;
@@ -117,6 +121,8 @@ export default function GrowthView({
 
   if (summary.followed === 0) {
     return (
+      <div className="space-y-5">
+      <TabHelp content={growthHelp(audience)} />
       <section className={card}>
         <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
@@ -124,11 +130,13 @@ export default function GrowthView({
           {summary.waiting ? ` ${summary.waiting} student${summary.waiting === 1 ? " has" : "s have"} sat their first test so far.` : " No tests have been sat this year yet."}
         </p>
       </section>
+      </div>
     );
   }
 
   return (
     <div className="space-y-5">
+      <TabHelp content={growthHelp(audience)} />
       <section className={card}>
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
@@ -150,7 +158,9 @@ export default function GrowthView({
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PACE_ORDER.map((pace) => (
             <div key={pace} className="pl-4" style={{ boxShadow: `inset 4px 0 0 ${PACE_META[pace].bg}` }}>
-              <p className="text-[15px] font-semibold text-slate-700">{PACE_META[pace].label}</p>
+              <p className="text-[15px] font-semibold text-slate-700">
+                <span className="cursor-help border-b-2 border-dotted border-slate-400" title={`${PACE_META[pace].label}: ${PACE_META[pace].meaning}`}>{PACE_META[pace].label}</span>
+              </p>
               <p className="font-display text-4xl font-black tracking-tight text-[#121314]">{Math.round((summary.pace[pace] / summary.followed) * 100)}%</p>
               <p className="text-sm text-slate-500">{summary.pace[pace]} student{summary.pace[pace] === 1 ? "" : "s"} · {PACE_META[pace].meaning}</p>
             </div>
@@ -169,16 +179,12 @@ export default function GrowthView({
             </span>
           </div>
           <GrowthChart year={year} series={summary.series} comparisons={comparisons.map((row) => ({ label: row.name, series: row.series }))} />
-          <p className="mt-2 text-xs text-slate-400">
-            Each point is the average, across students with a second test by then, of their latest test minus their first. A student&apos;s level holds until their next test, so the line moves as each round of testing comes in.
-          </p>
         </section>
 
         <section className={card}>
           <h3 className="text-xl font-extrabold tracking-tight">Growth by strand</h3>
           <p className="text-sm text-slate-500">Levels gained · the mark is expected growth</p>
           <StrandBars strands={summary.strands} />
-          <p className="mt-4 text-xs text-slate-400">Algebra and Probability start at Level 3, so they count once their pre-test is sat. Faded bars are based on fewer than 5 students.</p>
         </section>
       </div>
 
