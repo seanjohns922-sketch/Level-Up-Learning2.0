@@ -532,6 +532,34 @@ export async function loadSchoolStudentDirectoryPreview(
   }
 }
 
+export type ClassGroup = {
+  id: string;
+  name: string;
+  classIds: string[];
+};
+
+/** Class groups for one academic year (admin-defined, for comparison only).
+ * Returns null when the school cannot be viewed, and an empty list when the
+ * class-group migration has not been applied yet. */
+export async function loadClassGroups(
+  schoolId: string,
+  academicYearId: string,
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
+  if (!access) return null;
+  try {
+    return await supabaseRequest<ClassGroup[]>("/rest/v1/rpc/get_class_groups", access.accessToken, {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId, p_academic_year_id: academicYearId }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (/get_class_groups|could not find the function|schema cache/i.test(message)) return [];
+    throw error;
+  }
+}
+
 export async function loadSchoolAnalyticsSnapshot(
   schoolId: string,
   academicYearId: string,

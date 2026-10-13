@@ -27,7 +27,8 @@ const checks = [
   ],
   [
     "time, year, class and realm filters are implemented",
-    ["setDays", "setYearLevel", "setClassId", "setRealmId"].every((value) =>
+    // The time filter defaults to the whole school year ("This school year").
+    ["setPeriod", "setYearLevel", "setClassId", "setRealmId", "This school year"].every((value) =>
       dashboard.includes(value),
     ),
   ],

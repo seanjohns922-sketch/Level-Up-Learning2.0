@@ -2,12 +2,16 @@
 
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { ClassGroup } from "@/lib/school-platform-server";
+import { useClassGroups } from "./useClassGroups";
 import type { SchoolAnalyticsSnapshot, SchoolHomeSnapshot } from "@/lib/school-platform-server";
 import { formatClassYearLevels } from "@/lib/studentLevelLabel";
 
 /** Teacher home: one card per class the teacher teaches, with four numbers
- * from the school analytics snapshot, each beside the whole-school figure so a
- * teacher can see at a glance where their class sits. */
+ * from the school analytics snapshot. When the school administrator has put
+ * the class in a class group, each number sits beside the group's figure and
+ * the other classes in the group are listed to compare; otherwise the
+ * whole-school figure is used. */
 
 const WINDOW_DAYS = 28;
 const ROLE_LABELS: Record<string, string> = {
@@ -29,16 +33,21 @@ function schoolAccuracy(classes: SchoolAnalyticsSnapshot["classes"]) {
   return Math.round(withEvidence.reduce((sum, item) => sum + (item.averageAccuracy ?? 0) * item.students, 0) / students);
 }
 
-function statsFor(classId: string, snapshot: SchoolAnalyticsSnapshot): Stat[] | null {
+function statsFor(classId: string, snapshot: SchoolAnalyticsSnapshot, group: ClassGroup | undefined): Stat[] | null {
   const row = snapshot.classes.find((item) => item.id === classId);
   if (!row) return null;
-  const school = snapshot.overview;
-  const accuracy = schoolAccuracy(snapshot.classes);
+  const peers = group ? snapshot.classes.filter((item) => item.id && group.classIds.includes(item.id)) : [];
+  const useGroup = peers.length >= 2;
+  const scope = useGroup ? group!.name : "school-wide";
+  const sum = (key: "students" | "activeStudents" | "weeklyTargetMet" | "masteredLevels") => peers.reduce((total, item) => total + item[key], 0);
+  const base = useGroup
+    ? { students: sum("students"), active: sum("activeStudents"), target: sum("weeklyTargetMet"), mastered: sum("masteredLevels"), accuracy: schoolAccuracy(peers) }
+    : { students: snapshot.overview.students, active: snapshot.overview.activeThisWeek, target: snapshot.overview.weeklyTargetMet, mastered: snapshot.overview.levelsMastered, accuracy: schoolAccuracy(snapshot.classes) };
   return [
-    { label: "Used RELIQ in the last 7 days", value: `${row.activeStudents} of ${row.students}`, compare: `${pct(school.activeThisWeek, school.students)}% school-wide` },
-    { label: "Met the weekly target", value: `${pct(row.weeklyTargetMet, row.students)}%`, compare: `${pct(school.weeklyTargetMet, school.students)}% school-wide` },
-    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: accuracy === null ? "Not enough evidence yet" : `${accuracy}% school-wide` },
-    { label: "Levels mastered", value: String(row.masteredLevels), compare: `${school.levelsMastered} school-wide` },
+    { label: "Used RELIQ in the last 7 days", value: `${row.activeStudents} of ${row.students}`, compare: `${pct(base.active, base.students)}% ${useGroup ? `across ${scope}` : scope}` },
+    { label: "Met the weekly target", value: `${pct(row.weeklyTargetMet, row.students)}%`, compare: `${pct(base.target, base.students)}% ${useGroup ? `across ${scope}` : scope}` },
+    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: base.accuracy === null ? "Not enough evidence yet" : `${base.accuracy}% ${useGroup ? `across ${scope}` : scope}` },
+    { label: "Levels mastered", value: String(row.masteredLevels), compare: `${base.mastered} ${useGroup ? `across ${scope}` : scope}` },
   ];
 }
 
@@ -46,11 +55,15 @@ export default function MyClassSummary({
   schoolId,
   academicYearId,
   classes,
+  allClasses,
 }: {
   schoolId: string;
   academicYearId: string;
   classes: ClassRow[];
+  /** Every class this year, for names and teachers in the group panel. */
+  allClasses: ClassRow[];
 }) {
+  const { groups } = useClassGroups(schoolId, academicYearId);
   const requestKey = `${schoolId}|${academicYearId}`;
   const [result, setResult] = useState<{ key: string; snapshot: SchoolAnalyticsSnapshot | null } | null>(null);
   const snapshot = result?.key === requestKey ? result.snapshot : undefined;
@@ -82,7 +95,11 @@ export default function MyClassSummary({
   return (
     <div className="space-y-4">
       {classes.map((classRow) => {
-        const stats = snapshot ? statsFor(classRow.id, snapshot) : null;
+        const group = groups.find((item) => item.classIds.includes(classRow.id));
+        const stats = snapshot ? statsFor(classRow.id, snapshot, group) : null;
+        const groupClasses = group
+          ? allClasses.filter((item) => group.classIds.includes(item.id)).sort((a, b) => a.name.localeCompare(b.name, "en-AU", { numeric: true }))
+          : [];
         return (
           <article key={classRow.id} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -118,6 +135,38 @@ export default function MyClassSummary({
                     ))
                   : <p className="text-sm text-slate-500 sm:col-span-2 xl:col-span-4">Class numbers could not be loaded right now.</p>}
             </div>
+
+            {group && groupClasses.length >= 2 ? (
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h4 className="text-lg font-extrabold tracking-tight">{group.name}</h4>
+                  <p className="text-sm text-slate-500">{groupClasses.length} classes · listed in order, never ranked</p>
+                </div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  {groupClasses.map((peer) => {
+                    const row = snapshot?.classes.find((item) => item.id === peer.id);
+                    const mine = peer.id === classRow.id;
+                    return (
+                      <a
+                        key={peer.id}
+                        href={`/school/${schoolId}/classes/${peer.id}`}
+                        className={`block rounded-xl p-4 text-[#121314] no-underline transition hover:border-[#121314] ${mine ? "border-2 border-[#121314]" : "border border-slate-200"}`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="font-display text-lg font-black">{peer.name}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${mine ? "bg-[var(--reliq-lime,#B9F23F)]" : "bg-slate-100 text-slate-600"}`}>{mine ? "Your class" : "Same group"}</span>
+                        </span>
+                        <span className="mt-1 block text-xs text-slate-500">{peer.leadTeacher ?? "Teacher not assigned"} · {peer.studentCount} students</span>
+                        <span className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                          <span><span className="block text-[11px] text-slate-500">Weekly target</span><span className="font-bold">{row ? `${pct(row.weeklyTargetMet, row.students)}%` : "—"}</span></span>
+                          <span><span className="block text-[11px] text-slate-500">Accuracy</span><span className="font-bold">{row?.averageAccuracy == null ? "—" : `${row.averageAccuracy}%`}</span></span>
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </article>
         );
       })}
