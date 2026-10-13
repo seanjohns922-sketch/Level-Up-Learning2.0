@@ -141,6 +141,8 @@ export type SchoolAnalyticsSnapshot = {
    * the 20261014090000 migration, when the window is a rolling day count. */
   windowStart?: string;
   windowEnd?: string;
+  /** Added by 20261014190000: the selected academic year's dates. */
+  academicYear?: { startsOn: string; endsOn: string };
   filters: {
     yearLevel: string | null;
     classId: string | null;
@@ -207,6 +209,8 @@ export type SchoolAnalyticsSnapshot = {
     yearLevel: string | null;
     /** Added by 20261014170000; absent before it is applied. */
     classId?: string | null;
+    /** Added by 20261014190000: latest test per strand (mastery scale). */
+    tests?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
     realms: Array<{
       realmId: string;
       currentLevel: string | null;
@@ -230,6 +234,8 @@ export type SchoolAnalyticsSnapshot = {
     masteredLevels: number;
     status: "on_track" | "active" | "needs_attention";
     averageGrowth: number | null;
+    /** Added by 20261014190000: latest test per strand (mastery scale). */
+    tests?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
     realms: Array<{
       realmId: string;
       averageAccuracy: number | null;

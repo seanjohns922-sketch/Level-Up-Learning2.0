@@ -1,5 +1,5 @@
 import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
-import { PROFICIENCY_META, share, type Distribution } from "@/lib/proficiency";
+import { share, type Distribution } from "@/lib/proficiency";
 
 /** "Where to look": a short ranked list of plain-English signals from the
  * proficiency distributions (each student once overall, once per strand).
@@ -22,9 +22,9 @@ type Distributions = {
 
 /** Groups smaller than this are too noisy to call out. */
 const MIN_GROUP = 5;
-const NEEDS_SHARE = 25;
-const STRAND_NEEDS_SHARE = 20;
-const EXCEEDING_SHARE = 15;
+const BELOW_SHARE = 30;
+const STRAND_BELOW_SHARE = 25;
+const ABOVE_SHARE = 15;
 const LOW_PARTICIPATION = 50;
 const MAX_SIGNALS = 5;
 
@@ -36,19 +36,20 @@ export function buildLeaderSignals(
   const concerns: LeaderSignal[] = [];
   const watches: LeaderSignal[] = [];
   const strengths: LeaderSignal[] = [];
-  const needsLabel = PROFICIENCY_META.needs.label.toLowerCase();
+  // Below level here means Below or Well below.
+  const below = (row: Distribution) => row.counts.below + row.counts.wellBelow;
 
   // 1. School year with the largest share needing support (whole school only).
   if (scope === "school") {
     const year = distributions.years
-      .filter(([label, row]) => label !== "Not recorded" && row.total >= MIN_GROUP && share(row.counts.needs, row.total) >= NEEDS_SHARE)
-      .sort((a, b) => share(b[1].counts.needs, b[1].total) - share(a[1].counts.needs, a[1].total))[0];
+      .filter(([label, row]) => label !== "Not recorded" && row.total >= MIN_GROUP && share(below(row), row.total) >= BELOW_SHARE)
+      .sort((a, b) => share(below(b[1]), b[1].total) - share(below(a[1]), a[1].total))[0];
     if (year) {
       concerns.push({
         key: `year-${year[0]}`,
         tone: "concern",
-        headline: `${year[0]}: ${share(year[1].counts.needs, year[1].total)}% ${needsLabel}`,
-        detail: `${year[1].counts.needs} of ${year[1].total} students are working below ${year[0]}.`,
+        headline: `${year[0]}: ${share(below(year[1]), year[1].total)}% below level`,
+        detail: `${below(year[1])} of ${year[1].total} students, ${year[1].counts.wellBelow} of them a year or more behind.`,
         target: "intervention",
         filter: { yearLevel: year[0] },
       });
@@ -57,14 +58,14 @@ export function buildLeaderSignals(
 
   // 2. Strand with the largest share needing support.
   const strand = distributions.strands
-    .filter(([, row]) => row.total >= MIN_GROUP && share(row.counts.needs, row.total) >= STRAND_NEEDS_SHARE)
-    .sort((a, b) => share(b[1].counts.needs, b[1].total) - share(a[1].counts.needs, a[1].total))[0];
+    .filter(([, row]) => row.total >= MIN_GROUP && share(below(row), row.total) >= STRAND_BELOW_SHARE)
+    .sort((a, b) => share(below(b[1]), b[1].total) - share(below(a[1]), a[1].total))[0];
   if (strand) {
     concerns.push({
       key: `strand-${strand[0]}`,
       tone: "concern",
-      headline: `${AC_STRANDS[strand[0]].label}: ${share(strand[1].counts.needs, strand[1].total)}% ${needsLabel}`,
-      detail: `${strand[1].counts.needs} of ${strand[1].total} students placed in ${AC_STRANDS[strand[0]].label}.`,
+      headline: `${AC_STRANDS[strand[0]].label}: ${share(below(strand[1]), strand[1].total)}% below level`,
+      detail: `${below(strand[1])} of ${strand[1].total} students tested in ${AC_STRANDS[strand[0]].label}, ${strand[1].counts.wellBelow} a year or more behind.`,
       target: "intervention",
       filter: { strand: strand[0] },
     });
@@ -79,7 +80,7 @@ export function buildLeaderSignals(
     watches.push({
       key: "thin-strands",
       tone: "watch",
-      headline: `${list}: ${none ? "no pre-tests yet" : "few students tested"}`,
+      headline: `${list}: ${none ? "no tests yet" : "few students tested"}`,
       detail: `${none ? "" : `${thin.map(([id, row]) => `${AC_STRANDS[id].label} ${row.total}`).join(" · ")}. `}${scope === "school" ? "Ask teachers to set these pre-tests so these strands can be reported." : "Set these pre-tests to see where your students are."}`,
       target: "placement",
     });
@@ -102,14 +103,14 @@ export function buildLeaderSignals(
     ...distributions.strands.map(([id, row]) => [AC_STRANDS[id].label, row, { strand: id }] as [string, Distribution, LeaderSignal["filter"]]),
   ];
   const best = groups
-    .filter(([, row]) => row.total >= MIN_GROUP && share(row.counts.exceeding, row.total) >= EXCEEDING_SHARE)
-    .sort((a, b) => share(b[1].counts.exceeding, b[1].total) - share(a[1].counts.exceeding, a[1].total))[0];
+    .filter(([, row]) => row.total >= MIN_GROUP && share(row.counts.above, row.total) >= ABOVE_SHARE)
+    .sort((a, b) => share(b[1].counts.above, b[1].total) - share(a[1].counts.above, a[1].total))[0];
   if (best) {
     strengths.push({
       key: `strength-${best[0]}`,
       tone: "strength",
-      headline: `${best[0]}: ${share(best[1].counts.exceeding, best[1].total)}% exceeding`,
-      detail: `${best[1].counts.exceeding} of ${best[1].total} students are working above their school year.`,
+      headline: `${best[0]}: ${share(best[1].counts.above, best[1].total)}% above level`,
+      detail: `${best[1].counts.above} of ${best[1].total} students are more than a term ahead.`,
       target: "placement",
       filter: best[2],
     });

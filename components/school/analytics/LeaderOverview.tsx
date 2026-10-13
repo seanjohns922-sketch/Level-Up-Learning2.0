@@ -3,23 +3,24 @@
 import { AlertTriangle, ArrowRight, CircleDot, Sparkles } from "lucide-react";
 import type { SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
 import { buildLeaderSignals, type LeaderSignal } from "@/lib/leader-signals";
-import { AC_STRANDS, strandForRealm } from "@/lib/curriculum/ac-standards";
+import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
-  PROFICIENCY_META,
+  STANDING_META,
   buildDistributions,
-  categoriesFor,
-  hasAccuracyEvidence,
-  overallProficiency,
-  realmProficiency,
   share,
+  standingsFor,
+  studentStandings,
+  usesTests,
   type Distribution,
-  type ProficiencyOrAt,
+  type Standing,
 } from "@/lib/proficiency";
 
-/** School Analytics overview. Leaders see the whole school; teachers see only
- * their class (the snapshot is already filtered to it). Students are counted
- * once overall and once per strand, in four NAPLAN-style levels (three until
- * accuracy is available). No class is ranked against another. */
+/** School Analytics overview for the three views: whole school (leaders), a
+ * class group, and a teacher's own class (the snapshot is already filtered).
+ * Each student counts once overall and once per strand, from their latest
+ * diagnostic, pre-test or post-test against where they should be on the day
+ * they sat it: Well below / Below level / At level / Above level. No class is
+ * ranked against another. */
 
 const SIGNAL_STYLE: Record<LeaderSignal["tone"], { label: string; chip: string; icon: typeof AlertTriangle }> = {
   concern: { label: "Act", chip: "bg-[#FFE3DF] text-[#8A1C14]", icon: AlertTriangle },
@@ -29,13 +30,13 @@ const SIGNAL_STYLE: Record<LeaderSignal["tone"], { label: string; chip: string; 
 
 const SMALL_GROUP = 10;
 
-function StackedBar({ row, categories, height = "h-7", labels = true }: { row: Distribution; categories: ProficiencyOrAt[]; height?: string; labels?: boolean }) {
+function StackedBar({ row, categories, height = "h-7", labels = true }: { row: Distribution; categories: Standing[]; height?: string; labels?: boolean }) {
   return (
     <span className={`flex ${height} overflow-hidden rounded-lg bg-[#F1F2EE]`}>
       {categories.map((category) => {
         const pct = share(row.counts[category], row.total);
         if (!pct) return null;
-        const meta = PROFICIENCY_META[category];
+        const meta = STANDING_META[category];
         return (
           <span
             key={category}
@@ -65,10 +66,10 @@ export default function LeaderOverview({
   onOpen: (target: LeaderSignal["target"], filter?: LeaderSignal["filter"]) => void;
   onOpenStudent: (studentId: string) => void;
 }) {
-  const students = snapshot.analysisStudents;
-  const useAccuracy = hasAccuracyEvidence(students);
-  const categories = categoriesFor(useAccuracy);
-  const { overall, years, strands, byClass } = buildDistributions(students, useAccuracy);
+  const usingTests = usesTests(snapshot);
+  const schoolYear = usingTests ? snapshot.academicYear ?? null : null;
+  const categories = standingsFor(usingTests);
+  const { overall, years, strands, byClass } = buildDistributions(snapshot.analysisStudents, schoolYear);
   const signals = buildLeaderSignals(
     { overall, years, strands },
     { students: snapshot.overview.students, activeThisWeek: snapshot.overview.activeThisWeek },
@@ -78,18 +79,20 @@ export default function LeaderOverview({
 
   // Teachers: named lists from the students they can see.
   const named = snapshot.students.map((student) => {
-    const below = student.realms
-      .filter((realm) => realmProficiency(student.yearLevel, realm, useAccuracy) === "needs")
-      .map((realm) => strandForRealm(realm.realmId))
-      .filter((strand): strand is NonNullable<typeof strand> => Boolean(strand))
-      .map((strand) => AC_STRANDS[strand].label);
-    return { student, below, level: overallProficiency({ yearLevel: student.yearLevel, realms: student.realms }, useAccuracy) };
+    const standings = studentStandings({ yearLevel: student.yearLevel, realms: student.realms, tests: student.tests }, schoolYear);
+    const below = [...standings.strands.entries()]
+      .filter(([, standing]) => standing === "below" || standing === "wellBelow")
+      .map(([strand, standing]) => ({ label: AC_STRANDS[strand].label, standing }));
+    return { student, below, level: standings.overall };
   });
   const needSupport = named
     .filter((row) => row.below.length > 0)
-    .sort((a, b) => b.below.length - a.below.length || a.student.name.localeCompare(b.student.name));
+    .sort((a, b) =>
+      b.below.filter((item) => item.standing === "wellBelow").length - a.below.filter((item) => item.standing === "wellBelow").length ||
+      b.below.length - a.below.length ||
+      a.student.name.localeCompare(b.student.name));
   const readyForMore = named
-    .filter((row) => row.level === "exceeding" || (row.level === "strong" && (row.student.averageAccuracy ?? 0) >= 85))
+    .filter((row) => row.level === "above")
     .sort((a, b) => a.student.name.localeCompare(b.student.name));
 
   const card = "rounded-2xl border border-slate-200 bg-white p-5 sm:p-6";
@@ -105,7 +108,7 @@ export default function LeaderOverview({
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {categories.map((category) => {
-            const meta = PROFICIENCY_META[category];
+            const meta = STANDING_META[category];
             return (
               <div key={category} className="pl-4" style={{ boxShadow: `inset 4px 0 0 ${meta.bg}` }}>
                 <p className="text-[15px] font-semibold text-slate-700">{meta.label}</p>
@@ -115,19 +118,21 @@ export default function LeaderOverview({
             );
           })}
         </div>
-        <div className="mt-5" role="img" aria-label={categories.map((category) => `${PROFICIENCY_META[category].label} ${share(overall.counts[category], overall.total)}%`).join(", ")}>
+        <div className="mt-5" role="img" aria-label={categories.map((category) => `${STANDING_META[category].label} ${share(overall.counts[category], overall.total)}%`).join(", ")}>
           <StackedBar row={overall} categories={categories} height="h-5" labels={false} />
         </div>
         <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
           {categories.map((category) => (
             <span key={category} className="inline-flex items-center gap-2">
-              <span className="h-3 w-3 rounded" style={{ background: PROFICIENCY_META[category].bg }} />
-              <strong className="text-[#121314]">{PROFICIENCY_META[category].label}</strong> {PROFICIENCY_META[category].meaning}
+              <span className="h-3 w-3 rounded" style={{ background: STANDING_META[category].bg }} />
+              <strong className="text-[#121314]">{STANDING_META[category].label}</strong> {STANDING_META[category].meaning}
             </span>
           ))}
         </div>
         <p className="mt-3 text-xs text-slate-400">
-          Each student once, across all of maths (Number counts most, following the curriculum). Styled after NAPLAN proficiency levels; these are RELIQ results, not NAPLAN results.
+          {usingTests
+            ? "Based on each student's latest diagnostic, pre-test or post-test, compared with where they should be on the day they sat it (a Year 4 student: Level 3 at the start of the year, 3.5 mid-year, 4 at the end). Each student once overall, weighted by the curriculum (Number counts most)."
+            : "Based on current working level against school year. Results from each student's latest test appear after the analytics update."}
         </p>
       </section>
 
@@ -151,13 +156,13 @@ export default function LeaderOverview({
 
         <section className={card}>
           <h3 className="text-xl font-extrabold tracking-tight">By strand</h3>
-          <p className="text-sm text-slate-500">Only students with a pre-test or placement in that strand</p>
+          <p className="text-sm text-slate-500">Only students who have sat a test in that strand</p>
           <ul className="mt-4 space-y-3">
             {strands.map(([strand, row]) => (
               <li key={strand} className="grid grid-cols-[7rem_1fr_3rem] items-center gap-3 text-sm">
                 <span className="font-bold">{AC_STRANDS[strand].label}</span>
                 {row.total === 0 ? (
-                  <span className="flex h-7 items-center rounded-lg bg-[#F1F2EE] px-3 text-slate-400">No pre-tests yet</span>
+                  <span className="flex h-7 items-center rounded-lg bg-[#F1F2EE] px-3 text-slate-400">No tests yet</span>
                 ) : (
                   <span style={{ opacity: row.total < SMALL_GROUP ? 0.45 : 1 }}>
                     <StackedBar row={row} categories={categories} />
@@ -217,7 +222,7 @@ export default function LeaderOverview({
                   return (
                     <li key={item.id ?? item.name} className="grid grid-cols-[5.5rem_1fr_4.5rem] items-center gap-3 border-t border-slate-100 py-2.5 text-sm">
                       <span className="truncate font-bold">{item.name}</span>
-                      {row && row.total ? <StackedBar row={row} categories={categories} height="h-3.5" labels={false} /> : <span className="text-xs text-slate-400">{useAccuracy ? "Not placed yet" : "Available after the analytics update"}</span>}
+                      {row && row.total ? <StackedBar row={row} categories={categories} height="h-3.5" labels={false} /> : <span className="text-xs text-slate-400">No tests yet</span>}
                       <span className="text-right tabular-nums">{item.activeStudents} of {item.students}</span>
                     </li>
                   );
@@ -230,9 +235,9 @@ export default function LeaderOverview({
               <h3 className="text-xl font-extrabold tracking-tight">Students who need support</h3>
               <span className="text-sm text-slate-500">{needSupport.length} students</span>
             </div>
-            <p className="text-sm text-slate-500">Working below their school year in at least one strand</p>
+            <p className="text-sm text-slate-500">Below level in at least one strand, most behind first</p>
             {needSupport.length === 0 ? (
-              <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No students are below their school year in any strand.</p>
+              <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No students are below level in any strand.</p>
             ) : (
               <ul className="mt-3">
                 {needSupport.map(({ student, below }) => (
@@ -242,7 +247,11 @@ export default function LeaderOverview({
                       <span className="block text-xs text-slate-500">{student.yearLevel ?? "Year not set"}</span>
                     </button>
                     <span className="flex flex-wrap gap-1.5">
-                      {below.map((label) => <span key={label} className="rounded-full bg-[#FFE3DF] px-2.5 py-0.5 text-xs font-bold text-[#8A1C14]">{label}</span>)}
+                      {below.map((item) => (
+                        <span key={item.label} className="rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ background: STANDING_META[item.standing].bg, color: STANDING_META[item.standing].fg }}>
+                          {item.label}{item.standing === "wellBelow" ? " · well below" : ""}
+                        </span>
+                      ))}
                     </span>
                   </li>
                 ))}
@@ -257,7 +266,7 @@ export default function LeaderOverview({
               <h3 className="text-xl font-extrabold tracking-tight">Ready for more</h3>
               <span className="text-sm text-slate-500">{readyForMore.length} students</span>
             </div>
-            <p className="text-sm text-slate-500">Exceeding overall, or strong with 85%+ accuracy</p>
+            <p className="text-sm text-slate-500">More than a term ahead overall</p>
             {readyForMore.length === 0 ? (
               <p className="mt-4 border-t border-slate-100 pt-4 text-sm text-slate-500">No students yet.</p>
             ) : (
@@ -266,7 +275,7 @@ export default function LeaderOverview({
                   <li key={student.id} className="border-t border-slate-100 py-2.5">
                     <button type="button" onClick={() => onOpenStudent(student.id)} className="text-left">
                       <span className="block font-bold text-[#121314] hover:underline">{student.name}</span>
-                      <span className="block text-xs text-slate-500">{level ? PROFICIENCY_META[level].label : ""} · {student.averageAccuracy ?? "—"}% accuracy</span>
+                      <span className="block text-xs text-slate-500">{level ? STANDING_META[level].label : ""} · {student.yearLevel ?? "Year not set"}</span>
                     </button>
                   </li>
                 ))}
