@@ -1,4 +1,5 @@
 'use client';
+import WorldAvatarJump from './WorldAvatarJump';
 import { useEffect, useRef, type MutableRefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -14,7 +15,7 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
  const cameraObstacles=useRef<THREE.Object3D[]>([]),nextObstacleScan=useRef(0);
  useEffect(()=>{const g=group.current;if(g){g.position.set(spawn[0],spawn[1]+.75,spawn[2]);position.current.copy(g.position);}const trail=nearestTrail(spawn[0],spawn[2]);if(trail.distance<6&&trail.progress>.7&&spawn[1]<5){const p=TRAIL_SAMPLES[trail.trail][60];yaw.current=Math.atan2(spawn[0]-p[0],spawn[2]-p[2]);}else yaw.current=0;if(g)g.rotation.y=yaw.current+Math.PI;nearest.current=null;pitch.current=.04;keys.current.clear();snapCamera.current=true;},[spawn,spawnKey,position]);
  useEffect(()=>{
-  const down=(e:KeyboardEvent)=>{if((e.target as HTMLElement)?.closest('button,input,select,[role="dialog"]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys.current.add(e.key.toLowerCase());};
+  const down=(e:KeyboardEvent)=>{if((e.target as HTMLElement)?.closest('button,input,select,[role="dialog"]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();keys.current.add(e.key.toLowerCase());};
   const up=(e:KeyboardEvent)=>keys.current.delete(e.key.toLowerCase());const clear=()=>keys.current.clear();
   window.addEventListener('keydown',down);window.addEventListener('keyup',up);window.addEventListener('blur',clear);document.addEventListener('visibilitychange',clear);
   return()=>{window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',clear);document.removeEventListener('visibilitychange',clear);};
@@ -63,5 +64,5 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
   if(close!==nearest.current){nearest.current=close;onNearest(close);}
   const altitude=Math.max(0,Math.round(g.position.y-.75));if(altitude!==lastHeight.current){lastHeight.current=altitude;onAltitude(altitude);}
  });
- return <group ref={group} position={[spawn[0],spawn[1]+.75,spawn[2]]} rotation={[0,Math.PI,0]}><mesh position={[0,-.7,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.72,16]}/><meshBasicMaterial color="#182128" transparent opacity={.22} depthWrite={false}/></mesh><TrialStudentAvatar movingRef={moving} sprintingRef={sprinting}/></group>;
+ return <group ref={group} position={[spawn[0],spawn[1]+.75,spawn[2]]} rotation={[0,Math.PI,0]}><mesh position={[0,-.7,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.72,16]}/><meshBasicMaterial color="#182128" transparent opacity={.22} depthWrite={false}/></mesh><WorldAvatarJump request={move.jumpRequest} enabled={!paused && !overview} resetKey={spawnKey}><TrialStudentAvatar movingRef={moving} sprintingRef={sprinting}/></WorldAvatarJump></group>;
 }

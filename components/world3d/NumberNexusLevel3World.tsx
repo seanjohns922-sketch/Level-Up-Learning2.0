@@ -41,7 +41,8 @@ import {
   type NumberNexusLevelTheme,
 } from "@/lib/number-nexus-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
-import { TrialStudentAvatar, WorldMovePad } from "@/components/world3d/SharedWorldPlayer";
+import WorldAvatarJump from "./WorldAvatarJump";
+import { TrialStudentAvatar, WorldMovePad, type WorldMoveInput } from "@/components/world3d/SharedWorldPlayer";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import RealmGuide from "@/components/world3d/RealmGuide";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -244,14 +245,18 @@ function TemporaryPlayer({
   playerRef,
   movingRef,
   initialPosition,
+  jumpRequest,
+  spawnNonce,
 }: {
+  jumpRequest?: number;
+  spawnNonce: number;
   playerRef: React.MutableRefObject<THREE.Group | null>;
   movingRef: React.MutableRefObject<boolean>;
   initialPosition: [number, number, number];
 }) {
   return (
     <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]}>
-      <TrialStudentAvatar movingRef={movingRef} />
+      <WorldAvatarJump request={jumpRequest} resetKey={spawnNonce}><TrialStudentAvatar movingRef={movingRef} /></WorldAvatarJump>
     </group>
   );
 }
@@ -284,7 +289,7 @@ function WorldScene({
   initialPosition: [number, number, number];
   spawnTarget: [number, number, number] | null;
   spawnNonce: number;
-  moveInput: { up: boolean; down: boolean; left: boolean; right: boolean };
+  moveInput: WorldMoveInput;
   onNearestGate: (gate: GateDefinition | null) => void;
   initialYaw: number;
   initialPitch: number;
@@ -507,7 +512,7 @@ function WorldScene({
         }
         return <Gate key={gate.id} gate={gate} active={activeGateId === gate.id} />;
       })}
-      <TemporaryPlayer playerRef={playerRef} movingRef={movingRef} initialPosition={initialPosition} />
+      <TemporaryPlayer playerRef={playerRef} movingRef={movingRef} initialPosition={initialPosition} jumpRequest={moveInput.jumpRequest} spawnNonce={spawnNonce} />
     </>
   );
 }
@@ -741,7 +746,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
   const [towerOpen, setTowerOpen] = useState(false);
   const [spawnTarget, setSpawnTarget] = useState<[number, number, number] | null>(null);
   const [spawnNonce, setSpawnNonce] = useState(0);
-  const [moveInput, setMoveInput] = useState({ up: false, down: false, left: false, right: false });
+  const [moveInput, setMoveInput] = useState<WorldMoveInput>({ up: false, down: false, left: false, right: false });
   const districts = useMemo(() => guidedAdventure ? [] : buildDistricts(worldState, selectedDistrictId), [guidedAdventure, selectedDistrictId, worldState]);
   const gates = useMemo(() => buildGates(worldState, selectedDistrictId, guidedAdventure), [guidedAdventure, selectedDistrictId, worldState]);
   const spawnPoints = useMemo(() => buildSpawnPoints(gates, districts), [gates, districts]);

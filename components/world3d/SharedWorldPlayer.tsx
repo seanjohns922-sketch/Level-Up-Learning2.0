@@ -1,5 +1,6 @@
 "use client";
 
+import WorldAvatarJump from "./WorldAvatarJump";
 import { WORLD_AVATAR_SCALE, WORLD_AVATAR_SCALE_OFFSET } from "@/lib/world3d/world-scale";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ import { ExplorerAvatarHead, ExplorerCharacterGear } from "./ExplorerAvatarDetai
 import { DEFAULT_OUTFIT, type AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 
-export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number; sprint?: boolean };
+export type WorldMoveInput = { up: boolean; down: boolean; left: boolean; right: boolean; analogX?: number; analogY?: number; magnitude?: number; sprint?: boolean; jumpRequest?: number };
 export type WorldLookInput = { x: number; y: number; magnitude: number };
 export type WorldMovementBounds = { minX: number; maxX: number; minZ: number; maxZ: number };
 export type WorldRoamEllipse = { centerZ: number; radiusX: number; radiusZ: number };
@@ -285,7 +286,19 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></WorldAvatarJump></group>;
+}
+
+function WorldJumpButton({ onJump }: { onJump: () => void }) {
+  return <>
+    <button type="button" className="worldJumpButton" data-world-jump aria-label="Jump" aria-keyshortcuts="Space" title="Jump: press Space or tap this button"
+      onClick={(event) => { event.preventDefault(); event.stopPropagation(); onJump(); }}
+      style={{ position: "absolute", right: "max(166px, calc(env(safe-area-inset-right) + 160px))", bottom: "max(42px, calc(env(safe-area-inset-bottom) + 36px))", zIndex: 33, width: 70, height: 70, border: "2px solid rgba(255,244,220,.58)", borderRadius: "50%", background: "rgba(15,23,42,.9)", color: "#fff8e8", boxShadow: "0 10px 28px rgba(0,0,0,.32)", fontSize: 12, fontWeight: 950, cursor: "pointer", touchAction: "manipulation", userSelect: "none", WebkitUserSelect: "none", pointerEvents: "auto" }}>
+      <span aria-hidden="true" style={{ display: "block", fontSize: 22, lineHeight: 1 }}>↑</span>
+      JUMP<span style={{ display: "block", fontSize: 9, fontWeight: 600 }}>Space / tap</span>
+    </button>
+    <style>{`@media(max-width:560px){.worldJumpButton{right:max(48px,calc(env(safe-area-inset-right) + 42px))!important;bottom:max(244px,calc(env(safe-area-inset-bottom) + 238px))!important}}.worldJumpButton:focus-visible{outline:3px solid #facc15;outline-offset:4px}.worldJumpButton:active{transform:scale(.94)}`}</style>
+  </>;
 }
 
 function WorldSprintButton({ active, onChange }: { active: boolean; onChange: (active: boolean) => void }) {
@@ -398,7 +411,7 @@ export function WorldMovePad({ input, onChange }: { input: WorldMoveInput; onCha
       >{display}</button>
     );
   };
-  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
+  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldJumpButton onJump={() => onChange({ ...input, jumpRequest: (input.jumpRequest ?? 0) + 1 })} /><div style={{ position: "absolute", left: 16, bottom: 18, display: "grid", gridTemplateColumns: "44px 44px 44px", gap: 7, pointerEvents: "auto" }}><span />{button("UP")}<span />{button("LEFT")}{button("DOWN")}{button("RIGHT")}</div><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "left" | "right"; label: string; dataAttribute: "move" | "look"; onChange: (input: { x: number; y: number; magnitude: number }) => void }) {
@@ -490,7 +503,7 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
 }
 
 export function WorldJoystick({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
-  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
+  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldJumpButton onJump={() => onChange({ ...input, jumpRequest: (input.jumpRequest ?? 0) + 1 })} /><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInput) => void }) {
