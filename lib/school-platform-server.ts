@@ -564,6 +564,30 @@ export async function loadClassGroups(
   }
 }
 
+/** Teacher home comparison for one class (get_class_group_dashboard).
+ * Returns null without class access, and "unavailable" before the
+ * 20261014120000 migration is applied. */
+export async function loadClassGroupDashboard(
+  schoolId: string,
+  academicYearId: string,
+  classId: string,
+  accessToken = "",
+) {
+  const access = await requireSchoolPreviewAccess(schoolId, accessToken);
+  if (!access) return null;
+  try {
+    return await supabaseRequest<Record<string, unknown>>("/rest/v1/rpc/get_class_group_dashboard", access.accessToken, {
+      method: "POST",
+      body: JSON.stringify({ p_school_id: schoolId, p_academic_year_id: academicYearId, p_class_id: classId }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (/get_class_group_dashboard|could not find the function|schema cache/i.test(message)) return "unavailable" as const;
+    if (/access denied/i.test(message)) return null;
+    throw error;
+  }
+}
+
 export async function loadSchoolAnalyticsSnapshot(
   schoolId: string,
   academicYearId: string,

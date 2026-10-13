@@ -46,6 +46,7 @@ import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import HomeTrends from "./HomeTrends";
 import MyClassSummary from "./MyClassSummary";
+import TeacherClassDashboard from "./TeacherClassDashboard";
 import ClassGroupsPanel from "./ClassGroupsPanel";
 import { formatClassYearLevels, normalizeClassYearLevels } from "@/lib/studentLevelLabel";
 
@@ -2204,10 +2205,6 @@ export default function SchoolHomeClient({
   const navigationItems = isAdministrator
     ? ADMIN_NAV_ITEMS
     : TEACHER_NAV_ITEMS;
-  const myStudentCount = myClasses.reduce(
-    (total, classRow) => total + classRow.studentCount,
-    0,
-  );
   const selectedLicence = licences.find(
     (licence) => licence.academicYearId === academicYearId,
   );
@@ -2724,38 +2721,24 @@ export default function SchoolHomeClient({
               </div>
             ) : (
               <div className="space-y-8">
-                <section>
-                  <div className="mb-3">
-                    <h2 className="text-xl font-extrabold tracking-tight">
-                      {myClasses.length === 1 ? "My class" : "My classes"}
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      {myClasses.length}{" "}
-                      {myClasses.length === 1 ? "class" : "classes"} ·{" "}
-                      {myStudentCount} students · {selectedAcademicYear?.name ?? "Academic year not set"}
-                    </p>
-                  </div>
+                {myClasses.length === 0 ? (
                   <MyClassSummary
                     schoolId={snapshot.school.id}
                     academicYearId={academicYearId}
                     classes={myClasses}
                     allClasses={filteredClasses}
                   />
-                </section>
-
-                {academicYearId
-                  ? myClasses.slice(0, 3).map((classRow) => (
-                      <HomeTrends
-                        key={classRow.id}
-                        schoolId={snapshot.school.id}
-                        academicYearId={academicYearId}
-                        classId={classRow.id}
-                        title={`Topics in ${classRow.name}`}
-                        subtitle="Last 28 days"
-                        onOpenAnalytics={() => setTab("insights")}
-                      />
-                    ))
-                  : null}
+                ) : academicYearId ? (
+                  myClasses.slice(0, 3).map((classRow) => (
+                    <TeacherClassDashboard
+                      key={classRow.id}
+                      schoolId={snapshot.school.id}
+                      academicYearId={academicYearId}
+                      classRow={classRow}
+                      allClasses={filteredClasses}
+                    />
+                  ))
+                ) : null}
 
                 {otherClasses.length > 0 ? (
                   <p className="text-sm text-slate-500">
