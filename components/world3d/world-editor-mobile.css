@@ -1,0 +1,106 @@
+.worldLibraryClose { display: none; }
+
+@media (max-width: 900px) {
+  [data-world3d-root] .worldBuilderToolbar {
+    inset: max(8px, env(safe-area-inset-top)) 8px auto;
+    padding: 6px;
+  }
+  [data-world3d-root] .worldBuilderTitle { display: none; }
+  [data-world3d-root] .worldBuilderToolbarActions {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+  }
+  [data-world3d-root] .worldBuilderToolbar button {
+    min-width: 0;
+    min-height: 52px;
+    flex-direction: column;
+    padding: 4px 2px;
+    gap: 3px;
+    font-size: 10px;
+    line-height: 1.15;
+  }
+  [data-world3d-root] .centralWorldEditor:not([hidden]) {
+    /* One scrolling bottom sheet leaves the world visible above the library. */
+    display: block;
+    top: auto !important;
+    left: max(8px, env(safe-area-inset-left)) !important;
+    right: max(8px, env(safe-area-inset-right)) !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    height: min(50dvh, 420px);
+    max-height: calc(100dvh - 90px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    padding: 12px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  [data-world3d-root] .centralWorldEditor h2 { font-size: 17px !important; }
+  [data-world3d-root] .worldLibraryClose {
+    display: grid;
+    place-items: center;
+    margin-left: auto;
+    margin-right: 6px;
+    width: 44px;
+    min-height: 44px;
+    border: 1px solid #65765d;
+    background: #293d32;
+    color: #fff7e7;
+    cursor: pointer;
+  }
+  [data-world3d-root] .centralWorldEditor button { min-height: 44px !important; }
+  [data-world3d-root] .centralWorldEditor [role="tablist"] {
+    display: flex !important;
+    overflow-x: auto;
+    touch-action: pan-x;
+    padding-bottom: 4px;
+  }
+  [data-world3d-root] .centralWorldEditor [role="tab"] { flex: 0 0 auto; padding: 6px 10px !important; }
+  [data-world3d-root] .centralWorldEditor .worldLibraryResults {
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  [data-world3d-root] .centralWorldEditor .worldLibrarySelection { max-height: none; overflow: visible; }
+  [data-world3d-root][data-world-library-open="true"] .centralWorldBuildControls,
+  [data-world3d-root][data-world-library-open="true"] .centralWorldCameraControls { display: none !important; }
+
+  [data-world3d-root] .centralWorldBuildControls {
+    left: 50% !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: calc(100% - 16px);
+  }
+  [data-world3d-root] .centralWorldBuildControls > div:last-child {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+  [data-world3d-root] .centralWorldBuildControls button { min-height: 44px !important; }
+  [data-world3d-root] .worldBuilderNudge {
+    display: flex !important;
+    gap: 4px !important;
+  }
+  [data-world3d-root] .worldBuilderNudge button { width: 44px; height: 44px; }
+  [data-world3d-root] .centralWorldBuildControls [role="status"] { font-size: 11px !important; text-align: center; }
+  [data-world3d-root] .centralWorldCameraControls {
+    left: 50%;
+    right: auto !important;
+    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 160px) !important;
+    transform: translateX(-50%);
+    flex-direction: row !important;
+    gap: 4px !important;
+    padding: 6px !important;
+    width: max-content;
+    max-width: calc(100% - 16px);
+    box-sizing: border-box;
+  }
+  [data-world3d-root] .centralWorldCameraControls > div:first-child { position: absolute; left: 6px; bottom: 100%; padding: 2px 6px; border-radius: 4px 4px 0 0; background: rgba(13,24,22,.92); font-size: 9px !important; }
+  [data-world3d-root] .centralWorldCameraControls > div:not(:first-child) { display: contents !important; }
+  [data-world3d-root] .centralWorldCameraControls button { width: 44px; height: 44px; min-height: 44px; padding: 0 !important; display: grid; place-items: center; }
+}

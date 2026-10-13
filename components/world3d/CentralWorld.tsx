@@ -1,5 +1,7 @@
 "use client";
 
+import "./world-editor-mobile.css";
+
 import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
@@ -525,7 +527,12 @@ export default function CentralWorld() {
     setBuildPlacement(null);
   }
 
+  function closeCompactLibrary() {
+    if (window.matchMedia("(max-width: 900px)").matches) setLibraryOpen(false);
+  }
+
   function chooseEditTool(tool: WorldEditTool) {
+    closeCompactLibrary();
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setEditTool(tool);
@@ -546,6 +553,7 @@ export default function CentralWorld() {
   }
 
   function chooseSceneryItem(item: EconomyItem) {
+    closeCompactLibrary();
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(item.item_key);
     setEditTool("scenery");
@@ -559,6 +567,7 @@ export default function CentralWorld() {
   }
 
   function chooseInventoryItem(item: EconomyItem) {
+    closeCompactLibrary();
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
     setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, cameraFocus));
@@ -590,6 +599,7 @@ export default function CentralWorld() {
   }
 
   function moveMyHome() {
+    closeCompactLibrary();
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(CENTRAL_WORLD_HOME_KEY);
     setEditTool("move");
@@ -836,7 +846,7 @@ export default function CentralWorld() {
   }
 
   return (
-    <main data-world3d-root style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
+    <main data-world3d-root data-world-library-open={editorOpen && libraryOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
         <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
       </Canvas>
@@ -878,7 +888,7 @@ export default function CentralWorld() {
           </div>
         </header>
         <section hidden={!libraryOpen} id="world-build-library" className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 12, top: 92, bottom: 16, zIndex: 35, width: "min(320px, 90vw)", overflow: "hidden", border: "1px solid #52624d", borderRadius: 16, background: "rgba(19,32,28,.97)", color: "#fff", padding: 14, boxShadow: "0 14px 40px rgba(0,0,0,.25)" }}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h2 style={{fontSize:20,margin:0}}>Build library</h2><WorldVoiceButton compact label="Read edit world instructions" text="Choose a category and an item, then tap the grass to place it. Drag to paint ground or join walls. Use Move to pick up an item, and Erase to remove it. Changes save automatically in this browser. Start fresh clears the layout. Undo brings it back."/></div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h2 style={{fontSize:20,margin:0}}>Build library</h2><button className="worldLibraryClose" type="button" aria-label="Close build library" onClick={() => setLibraryOpen(false)}><X size={20}/></button><WorldVoiceButton compact label="Read edit world instructions" text="Choose a category and an item, then tap the grass to place it. Drag to paint ground or join walls. Use Move to pick up an item, and Erase to remove it. Changes save automatically in this browser. Start fresh clears the layout. Undo brings it back."/></div>
 
           <div className="worldBuilderLibraryTabs" role="group" aria-label="Item library">
             <button type="button" aria-pressed={librarySection === "build"} onClick={() => setLibrarySection("build")}>Free to build</button>
@@ -989,7 +999,7 @@ export default function CentralWorld() {
           <div className="centralWorldBuildControls" style={{ position: "absolute", left: "calc(50% + 165px)", bottom: 16, transform: "translateX(-50%)", zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, pointerEvents: "none" }}>
             <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? (buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "House and doorway fit · choose Place to save" : buildingTrain ? "Track ready · tap to place your train" : "Arrows move it · tap the grass to drop it") : buildingTrain ? "Choose an empty railway track or the station’s rails" : "Choose clear, reachable ground with room for the doorway") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
             <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
+              <div className="worldBuilderNudge" style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
                 <button type="button" aria-label={buildPreview ? "Move item forward" : "Pan view forward"} onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>
                 <button type="button" aria-label={buildPreview ? "Move item left" : "Pan view left"} onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={18} /></button>
                 <button type="button" aria-label={buildPreview ? "Move item backward" : "Pan view backward"} onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={18} /></button>
