@@ -402,7 +402,7 @@ export default function SchoolAnalyticsDashboard({
   const days = period === "year" ? WHOLE_YEAR_DAYS : period;
   const periodLabel = period === "year" ? "This school year" : `Last ${days} days`;
   const [yearLevel, setYearLevel] = useState("");
-  // Teachers see their own class, never the whole school.
+  // Teachers start on their own class; leaders start on the whole school.
   const [classId, setClassId] = useState(audience === "teacher" ? teacherClassIds[0] ?? "" : "");
   const [realmId, setRealmId] = useState("");
   const [snapshot, setSnapshot] = useState<SchoolAnalyticsSnapshot | null>(null);
@@ -419,8 +419,20 @@ export default function SchoolAnalyticsDashboard({
     () => (audience === "teacher" ? classGroups.filter((group) => group.classIds.some((id) => teacherClassIdSet.has(id))) : classGroups),
     [audience, classGroups, teacherClassIdSet],
   );
-  const [view, setView] = useState<string>("own");
-  const activeGroup = view === "own" ? undefined : viewGroups.find((group) => group.id === view);
+  // "class": one of the user's own classes (teachers, and leaders who teach).
+  // "school": the whole school (leaders, and teachers who want to look wider).
+  // Anything else is a class group id.
+  const hasMyClass = teacherClassIds.length > 0;
+  const [view, setView] = useState<string>(audience === "teacher" && hasMyClass ? "class" : "school");
+  const activeGroup = view === "class" || view === "school" ? undefined : viewGroups.find((group) => group.id === view);
+  // What the screen is about follows the view, not the person's role.
+  const viewAudience: "teacher" | "leadership" = view === "class" ? "teacher" : "leadership";
+  const viewOptions = [
+    ...(audience === "teacher"
+      ? [...(hasMyClass ? [{ id: "class", label: "My class" }] : []), { id: "school", label: "Whole school" }]
+      : [{ id: "school", label: "Whole school" }, ...(hasMyClass ? [{ id: "class", label: "My class" }] : [])]),
+    ...viewGroups.map((group) => ({ id: group.id, label: group.name })),
+  ];
   const effectiveClassId = activeGroup ? "" : classId;
   const effectiveYearLevel = activeGroup ? "" : yearLevel;
 
@@ -466,8 +478,8 @@ export default function SchoolAnalyticsDashboard({
   }, [loadAnalytics]);
 
   useEffect(() => {
-    if (classId && !classes.some((item) => item.id === classId)) setClassId(audience === "teacher" ? teacherClassIds[0] ?? "" : "");
-  }, [audience, classId, classes, teacherClassIds]);
+    if (classId && !classes.some((item) => item.id === classId)) setClassId(viewAudience === "teacher" ? teacherClassIds[0] ?? "" : "");
+  }, [viewAudience, classId, classes, teacherClassIds]);
 
   useEffect(() => {
     if (selectedStudentId && !snapshot?.students.some((student) => student.id === selectedStudentId)) {
@@ -993,14 +1005,20 @@ export default function SchoolAnalyticsDashboard({
 
   return (
     <section className="space-y-6">
-      {viewGroups.length ? (
+      {viewOptions.length > 1 ? (
         <nav aria-label="Insights view" className="flex w-fit max-w-full flex-wrap gap-1 rounded-xl bg-white p-1 shadow-[inset_0_0_0_1px_#E3E5E0]">
-          {[{ id: "own", label: audience === "teacher" ? "My class" : "Whole school" }, ...viewGroups.map((group) => ({ id: group.id, label: group.name }))].map((item) => (
+          {viewOptions.map((item) => (
             <button
               key={item.id}
               type="button"
               aria-current={view === item.id ? "page" : undefined}
-              onClick={() => { setView(item.id); setTab("overview"); setSelectedStudentId(""); }}
+              onClick={() => {
+                setView(item.id);
+                setTab("overview");
+                setSelectedStudentId("");
+                setYearLevel("");
+                setClassId(item.id === "class" ? teacherClassIds[0] ?? "" : "");
+              }}
               className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${view === item.id ? "bg-[var(--reliq-lime,#B9F23F)] text-[#121314]" : "text-slate-600 hover:bg-[#F1F2EE]"}`}
             >
               {item.label}
@@ -1043,7 +1061,7 @@ export default function SchoolAnalyticsDashboard({
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {audience === "teacher" || activeGroup ? null : (
+          {viewAudience === "teacher" || activeGroup ? null : (
             <label className="text-sm font-semibold text-slate-600">
               School year level
               <select value={yearLevel} onChange={(event) => { setYearLevel(event.target.value); setClassId(""); }} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
@@ -1056,8 +1074,8 @@ export default function SchoolAnalyticsDashboard({
             <label className="text-sm font-semibold text-slate-600">
               Class
               <select value={classId} onChange={(event) => setClassId(event.target.value)} className="mt-1 block h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800">
-                {audience === "teacher" ? null : <option value="">All classes</option>}
-                {classes.filter((item) => (audience === "teacher" ? teacherClassIds.includes(item.id) : !yearLevel || item.yearLevels.includes(yearLevel))).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+                {viewAudience === "teacher" ? null : <option value="">All classes</option>}
+                {classes.filter((item) => (viewAudience === "teacher" ? teacherClassIds.includes(item.id) : !yearLevel || item.yearLevels.includes(yearLevel))).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </label>
           )}
@@ -1094,7 +1112,7 @@ export default function SchoolAnalyticsDashboard({
 
       <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
         {/* A class group shows its overview and its growth. */}
-        {TABS.filter((item) => (activeGroup ? item.id === "overview" || item.id === "growth" : audience !== "teacher" || item.id !== "classes")).map((item) => (
+        {TABS.filter((item) => (activeGroup ? item.id === "overview" || item.id === "growth" : viewAudience !== "teacher" || item.id !== "classes")).map((item) => (
           <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#B9F23F)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
             {item.label}
           </button>
@@ -1108,8 +1126,8 @@ export default function SchoolAnalyticsDashboard({
       ) : tab === "overview" ? (
         <LeaderOverview
           snapshot={groupSnapshot ?? snapshot}
-          audience={activeGroup ? "group" : audience}
-          title={activeGroup ? `Where the ${activeGroup.name} are` : audience === "teacher" ? `Where ${classes.find((item) => item.id === classId)?.name ?? "my class"} is` : "Where our students are"}
+          audience={activeGroup ? "group" : viewAudience}
+          title={activeGroup ? `Where the ${activeGroup.name} are` : viewAudience === "teacher" ? `Where ${classes.find((item) => item.id === classId)?.name ?? "my class"} is` : effectiveClassId ? `Where ${classes.find((item) => item.id === effectiveClassId)?.name ?? "this class"} is` : effectiveYearLevel ? `Where ${effectiveYearLevel} is` : "Where our students are"}
           onOpen={(target, filter) => {
             if (filter?.yearLevel) setYearLevel(filter.yearLevel);
             if (filter?.strand) setRealmId(realmForStrand(filter.strand as AcStrand));
@@ -1125,7 +1143,7 @@ export default function SchoolAnalyticsDashboard({
       {tab === "growth" && usesTestHistory(groupSnapshot ?? snapshot) ? (
         <GrowthView
           snapshot={groupSnapshot ?? snapshot}
-          audience={activeGroup ? "group" : audience}
+          audience={activeGroup ? "group" : viewAudience}
           breakdown={
             activeGroup
               ? new Set((groupSnapshot ?? snapshot).analysisStudents.map((student) => student.yearLevel)).size > 1 ? "years" : "classes"
@@ -1139,7 +1157,7 @@ export default function SchoolAnalyticsDashboard({
                 : effectiveYearLevel ? `${effectiveYearLevel} growth` : "Whole-school growth"
           }
           onOpenYear={activeGroup ? undefined : (year) => setYearLevel(year)}
-          onOpenClass={activeGroup || audience === "teacher" ? undefined : (id) => setClassId(id)}
+          onOpenClass={activeGroup || viewAudience === "teacher" ? undefined : (id) => setClassId(id)}
           onOpenStudent={(studentId) => {
             setSelectedStudentId(studentId);
             setTab("students");
@@ -1158,7 +1176,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "curriculum" ? (
         <div className="space-y-5">
-          <TabHelp content={curriculumHelp(audience)} />
+          <TabHelp content={curriculumHelp(viewAudience)} />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h3 className="font-bold text-slate-950">Standing by AC9 strand</h3>
@@ -1227,7 +1245,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "placement" ? (
         <div className="space-y-5">
-          <TabHelp content={placementHelp(audience)} />
+          <TabHelp content={placementHelp(viewAudience)} />
           <div>
             <h3 className="font-bold text-slate-950">Placement baseline by AC9 strand</h3>
             <p className="mt-1 text-sm text-slate-500">Where students are working now, and their average pre-test starting point per strand.</p>
@@ -1341,7 +1359,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "intervention" ? (
         <div className="space-y-5">
-          <TabHelp content={interventionHelp(audience)} />
+          <TabHelp content={interventionHelp(viewAudience)} />
           <div>
             <h3 className="font-bold text-slate-950">Where to intervene</h3>
             <p className="mt-1 text-sm text-slate-500">
@@ -1513,7 +1531,7 @@ export default function SchoolAnalyticsDashboard({
 
       {tab === "students" ? (
         <div className="space-y-5">
-        <TabHelp content={studentsHelp(audience)} />
+        <TabHelp content={studentsHelp(viewAudience)} />
         {selectedStudent ? (
           <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <button
@@ -1582,7 +1600,10 @@ export default function SchoolAnalyticsDashboard({
             <div className="flex flex-wrap items-end justify-between gap-3 p-5">
               <div>
                 <h3 className="font-bold">Student evidence</h3>
-                <p className="mt-1 text-sm text-slate-500">Search or open a student to inspect realm and assessment evidence.</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Search or open a student to inspect realm and assessment evidence.
+                  {audience === "teacher" && viewAudience === "leadership" ? " Names show for students in your own classes; the school figures on the other tabs include everyone." : ""}
+                </p>
               </div>
               <div className="flex w-full flex-wrap gap-2 lg:w-auto">
                 <label className="relative min-w-0 flex-1 lg:w-72">

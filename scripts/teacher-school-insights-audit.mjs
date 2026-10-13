@@ -16,14 +16,18 @@ const checks = [
       /teacherClassIds=\{myClasses\.map/.test(schoolHome),
   ],
   [
-    // Teachers see only their class (or their class group); classes are never
-    // compared for teachers. Leaders keep the Classes comparison tab.
-    "teacher analytics are scoped to their own class without class comparison",
+    // The My class view is about that class alone: no year filter, no "All
+    // classes", and no Classes comparison tab. Teachers start on My class and
+    // can switch to Whole school; leaders start on Whole school and get My
+    // class when they teach a class. Leaders keep the Classes comparison tab.
+    "My class view is scoped to the user's own classes without class comparison",
     /Class comparison/.test(dashboard) &&
       !/Compare classes/.test(dashboard) &&
-      /My class/.test(dashboard) &&
-      /audience !== "teacher" \|\| item\.id !== "classes"/.test(dashboard) &&
-      /useState\(audience === "teacher" \? teacherClassIds\[0\]/.test(dashboard),
+      /label: "My class"/.test(dashboard) &&
+      /label: "Whole school"/.test(dashboard) &&
+      /viewAudience !== "teacher" \|\| item\.id !== "classes"/.test(dashboard) &&
+      /useState<string>\(audience === "teacher" && hasMyClass \? "class" : "school"\)/.test(dashboard) &&
+      /hasMyClass \? \[\{ id: "class", label: "My class" \}\]/.test(dashboard),
   ],
   [
     "unassigned classes open aggregate trends instead of students",
