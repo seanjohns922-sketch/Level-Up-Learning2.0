@@ -6,8 +6,9 @@ import type { SchoolAnalyticsSnapshot, SchoolHomeSnapshot } from "@/lib/school-p
 import { formatClassYearLevels } from "@/lib/studentLevelLabel";
 
 /** Teacher home: one card per class the teacher teaches, with four numbers
- * from the school analytics snapshot, each beside the whole-school figure so a
- * teacher can see at a glance where their class sits. */
+ * from the school analytics snapshot. Participation, weekly target and
+ * mastery sit beside the whole-school figure; accuracy is shown without a
+ * comparison. */
 
 const WINDOW_DAYS = 28;
 const ROLE_LABELS: Record<string, string> = {
@@ -22,22 +23,16 @@ type Stat = { label: string; value: string; compare: string };
 
 const pct = (part: number, whole: number) => (whole ? Math.round((part / whole) * 100) : 0);
 
-function schoolAccuracy(classes: SchoolAnalyticsSnapshot["classes"]) {
-  const withEvidence = classes.filter((item) => item.averageAccuracy !== null && item.students > 0);
-  const students = withEvidence.reduce((sum, item) => sum + item.students, 0);
-  if (!students) return null;
-  return Math.round(withEvidence.reduce((sum, item) => sum + (item.averageAccuracy ?? 0) * item.students, 0) / students);
-}
-
 function statsFor(classId: string, snapshot: SchoolAnalyticsSnapshot): Stat[] | null {
   const row = snapshot.classes.find((item) => item.id === classId);
   if (!row) return null;
   const school = snapshot.overview;
-  const accuracy = schoolAccuracy(snapshot.classes);
   return [
     { label: "Used RELIQ in the last 7 days", value: `${row.activeStudents} of ${row.students}`, compare: `${pct(school.activeThisWeek, school.students)}% school-wide` },
     { label: "Met the weekly target", value: `${pct(row.weeklyTargetMet, row.students)}%`, compare: `${pct(school.weeklyTargetMet, school.students)}% school-wide` },
-    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: accuracy === null ? "Not enough evidence yet" : `${accuracy}% school-wide` },
+    // No school comparison: class averages only cover students with evidence,
+    // and the snapshot doesn't say how many, so a weighted figure would mislead.
+    { label: "Average accuracy", value: row.averageAccuracy === null ? "—" : `${row.averageAccuracy}%`, compare: "Lessons, quizzes and tests" },
     { label: "Levels mastered", value: String(row.masteredLevels), compare: `${school.levelsMastered} school-wide` },
   ];
 }
