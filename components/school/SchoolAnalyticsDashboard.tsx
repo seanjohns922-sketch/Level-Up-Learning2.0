@@ -21,6 +21,8 @@ import type {
   StudentLearningJourney,
 } from "@/lib/school-platform-server";
 import LeaderOverview from "./analytics/LeaderOverview";
+import GrowthView from "./analytics/GrowthView";
+import { usesTestHistory } from "@/lib/growth";
 import { evidencedLevel } from "@/lib/proficiency";
 import { useClassGroups } from "./useClassGroups";
 import {
@@ -1074,13 +1076,14 @@ export default function SchoolAnalyticsDashboard({
       </div>
 
 
-      {activeGroup ? null : <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
-        {TABS.filter((item) => audience !== "teacher" || item.id !== "classes").map((item) => (
+      <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
+        {/* A class group shows its overview and its growth. */}
+        {TABS.filter((item) => (activeGroup ? item.id === "overview" || item.id === "growth" : audience !== "teacher" || item.id !== "classes")).map((item) => (
           <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#B9F23F)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
             {item.label}
           </button>
         ))}
-      </nav>}
+      </nav>
 
       {tab === "overview" && groupNeedsUpdate ? (
         <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
@@ -1103,7 +1106,33 @@ export default function SchoolAnalyticsDashboard({
         />
       ) : null}
 
-      {tab === "growth" ? (
+      {tab === "growth" && usesTestHistory(groupSnapshot ?? snapshot) ? (
+        <GrowthView
+          snapshot={groupSnapshot ?? snapshot}
+          breakdown={
+            activeGroup
+              ? new Set((groupSnapshot ?? snapshot).analysisStudents.map((student) => student.yearLevel)).size > 1 ? "years" : "classes"
+              : effectiveClassId ? "students" : effectiveYearLevel ? "classes" : "years"
+          }
+          title={
+            activeGroup
+              ? `${activeGroup.name} growth`
+              : effectiveClassId
+                ? `${classes.find((item) => item.id === effectiveClassId)?.name ?? "Class"} growth`
+                : effectiveYearLevel ? `${effectiveYearLevel} growth` : "Whole-school growth"
+          }
+          onOpenYear={activeGroup ? undefined : (year) => setYearLevel(year)}
+          onOpenClass={activeGroup || audience === "teacher" ? undefined : (id) => setClassId(id)}
+          onOpenStudent={(studentId) => {
+            setSelectedStudentId(studentId);
+            setTab("students");
+          }}
+        />
+      ) : tab === "growth" && activeGroup ? (
+        <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+          Growth for the {activeGroup.name} turns on after the next analytics database update.
+        </p>
+      ) : tab === "growth" ? (
         <div className="grid gap-5 xl:grid-cols-[1.3fr_0.7fr]">
           <article className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="font-bold">School growth trend</h3><p className="mt-1 text-sm text-slate-500">Only matched pre-test and post-test pairs are included.</p><div className="mt-4"><TrendChart values={snapshot.growthTrend.flatMap((point) => point.averageGrowth === null ? [] : [point.averageGrowth])} labels={snapshot.growthTrend.filter((point) => point.averageGrowth !== null).map((point) => DATE_FORMATTER.format(new Date(point.date)))} emptyLabel="No matched pre-test and post-test pairs in this view." valueSuffix=" points" /></div></article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="font-bold">Growth by realm</h3><div className="mt-4 space-y-3">{snapshot.realms.map((realm) => <button key={realm.realmId} type="button" onClick={() => setRealmId(realm.realmId)} className="flex w-full items-center justify-between border-b border-slate-100 py-3 text-left"><span className="font-semibold">{REALMS[realm.realmId] ?? realm.realmId}</span><span className="font-bold text-emerald-700">{formatPercent(realm.averageGrowth, " pts")}</span></button>)}</div><p className="mt-5 text-xs leading-5 text-slate-500">{snapshot.methodology.growth}</p></article>

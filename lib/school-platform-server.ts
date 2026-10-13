@@ -211,6 +211,8 @@ export type SchoolAnalyticsSnapshot = {
     classId?: string | null;
     /** Added by 20261014190000: latest test per strand (mastery scale). */
     tests?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
+    /** Added by 20261014210000: every test this school year, oldest first. */
+    testHistory?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
     realms: Array<{
       realmId: string;
       currentLevel: string | null;
@@ -236,6 +238,8 @@ export type SchoolAnalyticsSnapshot = {
     averageGrowth: number | null;
     /** Added by 20261014190000: latest test per strand (mastery scale). */
     tests?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
+    /** Added by 20261014210000: every test this school year, oldest first. */
+    testHistory?: Array<{ strand: string; measured: number; testedAt: string; source: string }>;
     realms: Array<{
       realmId: string;
       averageAccuracy: number | null;

@@ -1,0 +1,209 @@
+import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
+import type { LatestTest, SchoolYearDates } from "@/lib/proficiency";
+
+/** Growth through the school year, from tests only.
+ *
+ * Each strand starts at the student's first test this school year (pre-test
+ * or start diagnostic) and follows every later test (post-tests, new
+ * pre-tests, mid and end diagnostics). Growth is the latest test minus the
+ * first; the expectation is a level a year over the same time, so a student
+ * tested in February and again in July is expected to have grown about 0.4.
+ * A strand counts once it has a second test; a student's growth is the
+ * curriculum-weighted average of their retested strands (Number most).
+ *   backwards  more than a term (0.25) below their first test
+ *   slower     more than a term behind the expected growth
+ *   onPace     within a term of it
+ *   faster     more than a term ahead of it */
+
+export type Pace = "backwards" | "slower" | "onPace" | "faster";
+
+export const PACE_ORDER: Pace[] = ["backwards", "slower", "onPace", "faster"];
+
+export const PACE_META: Record<Pace, { label: string; meaning: string; bg: string; fg: string }> = {
+  backwards: { label: "Going backwards", meaning: "more than a term below their first test", bg: "#F2998D", fg: "#4A0F09" },
+  slower: { label: "Slower than expected", meaning: "more than a term behind pace", bg: "#FFD866", fg: "#3F2E00" },
+  onPace: { label: "On pace", meaning: "within a term of expected growth", bg: "#B9F23F", fg: "#121314" },
+  faster: { label: "Faster than expected", meaning: "more than a term ahead of pace", bg: "#121314", fg: "#FFFFFF" },
+};
+
+const TERM = 0.25;
+const DAY = 86400000;
+
+export function paceFor(gained: number, expected: number): Pace {
+  if (gained < -TERM) return "backwards";
+  const gap = gained - expected;
+  if (gap < -TERM) return "slower";
+  if (gap <= TERM) return "onPace";
+  return "faster";
+}
+
+export type GrowthStudent = { yearLevel?: string | null; classId?: string | null; testHistory?: LatestTest[] };
+
+type Point = { measured: number; at: number };
+
+export function yearBounds(year: SchoolYearDates) {
+  const start = Date.parse(`${year.startsOn}T00:00:00Z`);
+  const end = Date.parse(`${year.endsOn}T00:00:00Z`) + DAY;
+  return { start, end, length: end - start };
+}
+
+function tracks(history: LatestTest[] | undefined) {
+  const byStrand = new Map<AcStrand, Point[]>();
+  for (const test of history ?? []) {
+    const strand = strandForRealm(test.strand);
+    const at = Date.parse(test.testedAt);
+    if (!strand || Number.isNaN(at) || !Number.isFinite(test.measured)) continue;
+    const points = byStrand.get(strand) ?? [];
+    points.push({ measured: test.measured, at });
+    byStrand.set(strand, points);
+  }
+  for (const points of byStrand.values()) points.sort((a, b) => a.at - b.at);
+  return byStrand;
+}
+
+export type StrandGrowth = { gained: number; expected: number; first: number; latest: number };
+export type StudentGrowth = StrandGrowth & { strands: Map<AcStrand, StrandGrowth>; tests: number };
+
+/** One student's growth using the tests sat by `at`, or null before any
+ * strand has a second test. */
+export function studentGrowthAt(history: LatestTest[] | undefined, at: number, yearLength: number): StudentGrowth | null {
+  const strands = new Map<AcStrand, StrandGrowth>();
+  let weight = 0;
+  let tests = 0;
+  const sum = { gained: 0, expected: 0, first: 0, latest: 0 };
+  for (const [strand, points] of tracks(history)) {
+    const sat = points.filter((point) => point.at <= at);
+    tests += sat.length;
+    if (sat.length < 2) continue;
+    const first = sat[0];
+    const latest = sat[sat.length - 1];
+    const growth = {
+      gained: latest.measured - first.measured,
+      expected: (latest.at - first.at) / yearLength,
+      first: first.measured,
+      latest: latest.measured,
+    };
+    strands.set(strand, growth);
+    const w = AC_STRANDS[strand].weight;
+    weight += w;
+    sum.gained += growth.gained * w;
+    sum.expected += growth.expected * w;
+    sum.first += growth.first * w;
+    sum.latest += growth.latest * w;
+  }
+  if (!weight) return null;
+  return {
+    gained: sum.gained / weight,
+    expected: sum.expected / weight,
+    first: sum.first / weight,
+    latest: sum.latest / weight,
+    strands,
+    tests,
+  };
+}
+
+/** Month ends from the start of the school year to `now`, then `now`. */
+export function seriesTimes(year: SchoolYearDates, now: number) {
+  const { start, end } = yearBounds(year);
+  const until = Math.min(now, end);
+  const times: number[] = [];
+  const first = new Date(start);
+  for (let month = 1; month <= 12; month += 1) {
+    const boundary = Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + month, 1) - 1;
+    if (boundary >= until) break;
+    times.push(boundary);
+  }
+  times.push(until);
+  return times;
+}
+
+export type SeriesPoint = { at: number; gained: number | null; expected: number | null; students: number };
+
+export type GrowthSummary = {
+  /** Students with a second test in at least one strand. */
+  followed: number;
+  /** Students with a first test but no second test yet. */
+  waiting: number;
+  tests: number;
+  gained: number | null;
+  expected: number | null;
+  first: number | null;
+  latest: number | null;
+  pace: Record<Pace, number>;
+  series: SeriesPoint[];
+  strands: Array<[AcStrand, { gained: number | null; expected: number | null; students: number }]>;
+};
+
+/** Growth is 0 at the first test by definition, so the line starts there:
+ * the earliest first test among the students it follows. */
+export function withStart(students: GrowthStudent[], series: SeriesPoint[]): SeriesPoint[] {
+  const followedAt = series.find((point) => point.gained !== null)?.at;
+  if (followedAt === undefined) return series;
+  const firsts = students
+    .flatMap((student) => (student.testHistory ?? []).map((test) => Date.parse(test.testedAt)))
+    .filter((at) => !Number.isNaN(at) && at < followedAt);
+  if (!firsts.length) return series;
+  const start = Math.min(...firsts);
+  return [{ at: start, gained: 0, expected: 0, students: 0 }, ...series.filter((point) => point.at > start)];
+}
+
+const mean = (values: number[]) => (values.length ? values.reduce((a, b) => a + b, 0) / values.length : null);
+
+export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates, now: number): GrowthSummary {
+  const { length } = yearBounds(year);
+  const times = seriesTimes(year, now);
+  const at = times[times.length - 1];
+  const pace: Record<Pace, number> = { backwards: 0, slower: 0, onPace: 0, faster: 0 };
+  const current: StudentGrowth[] = [];
+  let waiting = 0;
+  let tests = 0;
+  const byStrand = new Map<AcStrand, StrandGrowth[]>();
+
+  for (const student of students) {
+    const growth = studentGrowthAt(student.testHistory, at, length);
+    if (!growth) {
+      if ((student.testHistory ?? []).some((test) => Date.parse(test.testedAt) <= at)) waiting += 1;
+      tests += (student.testHistory ?? []).filter((test) => Date.parse(test.testedAt) <= at).length;
+      continue;
+    }
+    current.push(growth);
+    tests += growth.tests;
+    pace[paceFor(growth.gained, growth.expected)] += 1;
+    for (const [strand, strandGrowth] of growth.strands) byStrand.set(strand, [...(byStrand.get(strand) ?? []), strandGrowth]);
+  }
+
+  const series = withStart(students, times.map((time) => {
+    const rows = students.flatMap((student) => {
+      const growth = studentGrowthAt(student.testHistory, time, length);
+      return growth ? [growth] : [];
+    });
+    return { at: time, gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expected)), students: rows.length };
+  }));
+
+  const strands = (Object.keys(AC_STRANDS) as AcStrand[])
+    .sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order)
+    .map((strand) => {
+      const rows = byStrand.get(strand) ?? [];
+      return [strand, { gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expected)), students: rows.length }] as [AcStrand, { gained: number | null; expected: number | null; students: number }];
+    });
+
+  return {
+    followed: current.length,
+    waiting,
+    tests,
+    gained: mean(current.map((row) => row.gained)),
+    expected: mean(current.map((row) => row.expected)),
+    first: mean(current.map((row) => row.first)),
+    latest: mean(current.map((row) => row.latest)),
+    pace,
+    series,
+    strands,
+  };
+}
+
+export function usesTestHistory(snapshot: { academicYear?: SchoolYearDates; analysisStudents: GrowthStudent[] }) {
+  return Boolean(snapshot.academicYear && snapshot.analysisStudents.some((student) => student.testHistory !== undefined));
+}
+
+export const formatGrowth = (value: number | null) =>
+  value === null ? "—" : `${value >= 0 ? "+" : "−"}${Math.abs(value).toFixed(2)}`;
