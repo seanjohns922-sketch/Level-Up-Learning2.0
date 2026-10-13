@@ -142,23 +142,24 @@ export function interventionHelp(audience: HelpAudience): TabHelpContent {
   return {
     title: "How to read Intervention",
     parts: [
-      { title: "What it shows", text: `Which strand and school year in ${scope(audience)} has the most students working below their year, from the biggest group down.` },
+      { title: "What it shows", text: `Which strand and school year in ${scope(audience)} has the most students below level, from the biggest group down.` },
       {
         title: "Where the numbers come from",
-        text: "Each student's working level in each strand (as on Placement), compared with their school year. A student working at a lower level than their year counts as needing support in that strand.",
+        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in each strand, compared with where their school year should be on the day they sat it. Below level and well below both count; well below is shown separately.",
       },
       {
         title: "What to do with it",
         text:
           audience === "teacher"
-            ? "Start with the biggest group at the top and tap it to see the students. They may suit a small focus group in that strand."
-            : "Direct support where the heatmap is darkest, then hand the list to the class teachers. Tap a cell to see the students.",
+            ? "Start with the biggest group at the top and tap it to see the students. Students well below may need a small focus group in that strand."
+            : "Direct support where the heatmap is deepest, starting with groups that have students well below, then hand the list to the class teachers. Tap a cell to see the students.",
       },
     ],
     terms: [
-      { term: "Heatmap cell", text: "students below their year / students placed, for one strand and school year.", swatch: "#F7C2BA" },
-      { term: "Deeper coral", text: "more students below their year.", swatch: "#E2685A" },
-      { term: "Lime tint", text: "no students below their year in that strand and year.", swatch: "#E5F7C1" },
+      { term: "Heatmap cell", text: "students below level / students tested, for one strand and school year.", swatch: "#F7C2BA" },
+      { term: "Deeper coral", text: "more students below level.", swatch: "#E2685A" },
+      { term: "Lime tint", text: "no students below level in that strand and year.", swatch: "#E5F7C1" },
+      { term: "Well below", text: `${STANDING_META.wellBelow.meaning}.`, swatch: STANDING_META.wellBelow.bg },
     ],
   };
 }

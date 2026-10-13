@@ -721,24 +721,24 @@ export default function SchoolAnalyticsDashboard({
       .sort((a, b) => a.order - b.order);
   }, [snapshot?.analysisStudents, snapshot?.students]);
 
-  // Leadership intervention lens: for each AC9 strand x school year, how many
-  // students are below their grade level (aggregate only — no individual
-  // grouping/reassignment; that is the teacher surface's job).
+  // Intervention lens: for each AC9 strand x school year, how many students
+  // are below level, from the same latest-test standings as the Overview (or
+  // working level against school year before test results are available).
+  // Aggregate only: no individual grouping, which is the teacher surface's job.
   const intervention = useMemo(() => {
-    const students = snapshot?.analysisStudents ?? snapshot?.students ?? [];
-    const cells = new Map<string, { strand: AcStrand; year: string; needs: number; total: number }>();
+    const students = snapshot?.analysisStudents ?? [];
+    const year = snapshot && usesTests(snapshot) ? snapshot.academicYear ?? null : null;
+    const cells = new Map<string, { strand: AcStrand; year: string; needs: number; wellBelow: number; total: number }>();
     const yearSet = new Set<string>();
     for (const student of students) {
-      const year = student.yearLevel ?? "Not recorded";
-      for (const realm of student.realms) {
-        const strand = strandForRealm(realm.realmId);
-        const standing = realmStanding(student.yearLevel, realm);
-        if (!strand || !standing) continue;
-        yearSet.add(year);
-        const key = `${strand}|${year}`;
-        const cell = cells.get(key) ?? { strand, year, needs: 0, total: 0 };
+      const schoolYear = student.yearLevel ?? "Not recorded";
+      for (const [strand, standing] of studentStandings(student, year).strands) {
+        yearSet.add(schoolYear);
+        const key = `${strand}|${schoolYear}`;
+        const cell = cells.get(key) ?? { strand, year: schoolYear, needs: 0, wellBelow: 0, total: 0 };
         cell.total += 1;
-        if (standing === "below") cell.needs += 1;
+        if (standing === "below" || standing === "wellBelow") cell.needs += 1;
+        if (standing === "wellBelow") cell.wellBelow += 1;
         cells.set(key, cell);
       }
     }
@@ -750,7 +750,7 @@ export default function SchoolAnalyticsDashboard({
     const totalNeeds = hotspots.reduce((sum, c) => sum + c.needs, 0);
     const maxNeeds = Math.max(1, ...hotspots.map((c) => c.needs));
     return { cells, strands, years, hotspots, totalNeeds, maxNeeds };
-  }, [snapshot?.analysisStudents, snapshot?.students]);
+  }, [snapshot]);
 
   const downloadPlacementPdf = async () => {
     if (!snapshot || placementByStrand.length === 0) return;
@@ -919,7 +919,7 @@ export default function SchoolAnalyticsDashboard({
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
         pdf.setTextColor(221, 0, 63);
-        pdf.text(`${group.standings.below} need lift in ${group.label}`, margin + 7, rowY);
+        pdf.text(`${group.standings.below} working below their year in ${group.label}`, margin + 7, rowY);
       }
       y = top + cardHeight + 8;
     });
@@ -1326,7 +1326,7 @@ export default function SchoolAnalyticsDashboard({
                         onClick={() => { if (group.key !== "other") setRealmId(group.key); setTab("intervention"); }}
                         className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#A8332A] hover:underline"
                       >
-                        {group.standings.below} need lift in {group.label}
+                        {group.standings.below} working below their year · see Intervention
                         <ChevronRight className="h-3.5 w-3.5" />
                       </button>
                     ) : null}
@@ -1343,11 +1343,15 @@ export default function SchoolAnalyticsDashboard({
           <TabHelp content={interventionHelp(audience)} />
           <div>
             <h3 className="font-bold text-slate-950">Where to intervene</h3>
-            <p className="mt-1 text-sm text-slate-500">Students working below their grade level, by strand and school year. Direct support here, then hand the list to the class teacher.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {curriculumUsesTests
+                ? "Students below where their school year should be, from their latest test, by strand and school year. Direct support here, then hand the list to the class teacher."
+                : "Students working below their school year, by strand and school year. Direct support here, then hand the list to the class teacher."}
+            </p>
           </div>
 
           {intervention.hotspots.length === 0 ? (
-            <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No students are working below their grade level in this view — or there isn&apos;t enough evidence yet.</p>
+            <p className="border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">No students are below level in this view, or there isn&apos;t enough evidence yet.</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -1360,7 +1364,7 @@ export default function SchoolAnalyticsDashboard({
                   >
                     <div>
                       <p className="text-sm font-bold text-slate-950">{cell.year} · {AC_STRANDS[cell.strand].label}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">{Math.round((cell.needs / cell.total) * 100)}% of {cell.total} placed</p>
+                      <p className="mt-0.5 text-xs text-slate-500">{Math.round((cell.needs / cell.total) * 100)}% of {cell.total} {curriculumUsesTests ? "tested" : "placed"}{cell.wellBelow ? ` · ${cell.wellBelow} well below` : ""}</p>
                     </div>
                     <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#FFE3DF] text-[#8A1C14]">
                       <span className="text-base font-black leading-none">{cell.needs}</span>
@@ -1396,7 +1400,7 @@ export default function SchoolAnalyticsDashboard({
                                 <button
                                   type="button"
                                   onClick={() => { setRealmId(realmForStrand(strand)); if (year !== "Not recorded") setYearLevel(year); setTab("students"); }}
-                                  title={`${cell.needs} of ${cell.total} below level`}
+                                  title={`${cell.needs} of ${cell.total} below level${cell.wellBelow ? `, ${cell.wellBelow} well below` : ""}`}
                                   className="inline-flex min-w-11 flex-col items-center rounded-md px-2 py-1.5 font-bold text-slate-900 transition hover:ring-2 hover:ring-[#121314]"
                                   style={{ background: bg }}
                                 >
@@ -1411,7 +1415,7 @@ export default function SchoolAnalyticsDashboard({
                     </tbody>
                   </table>
                 </div>
-                <p className="px-5 py-3 text-xs text-slate-500">Each cell: students below grade level / students placed. Tap a cell to see the students.</p>
+                <p className="px-5 py-3 text-xs text-slate-500">Each cell: students below level / students {curriculumUsesTests ? "tested" : "placed"}. Tap a cell to see the students.</p>
               </article>
             </>
           )}
