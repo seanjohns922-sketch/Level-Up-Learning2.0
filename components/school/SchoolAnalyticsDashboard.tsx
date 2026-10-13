@@ -14,13 +14,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type {
   SchoolAnalyticsSnapshot,
   SchoolHomeSnapshot,
   StudentLearningJourney,
 } from "@/lib/school-platform-server";
 import LeaderOverview from "./analytics/LeaderOverview";
+import { useClassGroups } from "./useClassGroups";
 import {
   type AcStrand,
   AC_STRANDS,
@@ -383,6 +384,7 @@ export default function SchoolAnalyticsDashboard({
   const [studentSort, setStudentSort] = useState<"name" | "accuracy" | "activity" | "growth">("name");
   const [studentSearch, setStudentSearch] = useState("");
   const teacherClassIdSet = useMemo(() => new Set(teacherClassIds), [teacherClassIds]);
+  const { groups: classGroups } = useClassGroups(schoolId, academicYearId);
 
   const loadAnalytics = useCallback(async () => {
     if (!academicYearId) return;
@@ -886,6 +888,33 @@ export default function SchoolAnalyticsDashboard({
     pdf.save(`${fileParts.filter(Boolean).join("-")}.pdf`);
   };
 
+  // Classes tab: each class group's classes together with a group total
+  // (no accuracy or growth total: those averages can't be combined fairly).
+  const classSections = (() => {
+    const rows = snapshot?.classes ?? [];
+    const used = new Set<string>();
+    const sections = classGroups
+      .map((group) => {
+        const members = rows.filter((item) => item.id && group.classIds.includes(item.id));
+        members.forEach((item) => used.add(item.id!));
+        return {
+          key: group.id,
+          title: group.name,
+          rows: members,
+          total: members.reduce(
+            (sum, item) => ({ students: sum.students + item.students, active: sum.active + item.activeStudents, target: sum.target + item.weeklyTargetMet, mastered: sum.mastered + item.masteredLevels }),
+            { students: 0, active: 0, target: 0, mastered: 0 },
+          ),
+        };
+      })
+      .filter((section) => section.rows.length > 0);
+    const rest = rows.filter((item) => !item.id || !used.has(item.id));
+    if (rest.length) {
+      sections.push({ key: "ungrouped", title: sections.length ? "Not in a group" : "", rows: rest, total: { students: 0, active: 0, target: 0, mastered: 0 } });
+    }
+    return sections;
+  })();
+
   if (loading && !snapshot) return <LoadingView />;
 
   if (error && !snapshot) {
@@ -1292,7 +1321,7 @@ export default function SchoolAnalyticsDashboard({
           <div className="flex flex-wrap items-end justify-between gap-3 p-5">
             <div>
               <h3 className="font-bold text-slate-950">Class comparison</h3>
-              <p className="mt-1 text-sm text-slate-500">Compare participation, achievement and growth across the school using the same reporting window.</p>
+              <p className="mt-1 text-sm text-slate-500">Compare participation, achievement and growth across the school. Classes in the same class group are listed together.</p>
             </div>
             <span className="text-xs font-semibold text-slate-500">{snapshot.classes.length} classes in this view</span>
           </div>
@@ -1311,7 +1340,24 @@ export default function SchoolAnalyticsDashboard({
                 </tr>
               </thead>
               <tbody>
-                {snapshot.classes.map((item) => {
+                {classSections.map((section) => (
+                  <Fragment key={section.key}>
+                    {section.title ? (
+                      <tr className="border-t-2 border-slate-200 bg-[#F7F8F4]">
+                        <td className="px-5 py-3">
+                          <span className="font-extrabold text-[#121314]">{section.title}</span>
+                          <span className="ml-2 text-xs font-semibold text-slate-500">{section.rows.length} {section.rows.length === 1 ? "class" : "classes"}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-bold tabular-nums">{section.total.students}</td>
+                        <td className="px-4 py-3 text-right font-bold tabular-nums">{section.total.students ? Math.round((section.total.active / section.total.students) * 100) : 0}%</td>
+                        <td className="px-4 py-3 text-right font-bold tabular-nums">{section.total.students ? Math.round((section.total.target / section.total.students) * 100) : 0}%</td>
+                        <td className="px-4 py-3 text-right text-xs text-slate-400">—</td>
+                        <td className="px-4 py-3 text-right font-bold tabular-nums">{section.total.mastered}</td>
+                        <td className="px-4 py-3 text-right text-xs text-slate-400">—</td>
+                        <td className="px-5 py-3 text-right text-xs font-semibold text-slate-500">Group total</td>
+                      </tr>
+                    ) : null}
+                    {section.rows.map((item) => {
                   const isMyClass = Boolean(item.id && teacherClassIdSet.has(item.id));
                   const activeRate = item.students ? Math.round((item.activeStudents / item.students) * 100) : 0;
                   const targetRate = item.students ? Math.round((item.weeklyTargetMet / item.students) * 100) : 0;
@@ -1345,7 +1391,9 @@ export default function SchoolAnalyticsDashboard({
                       </td>
                     </tr>
                   );
-                })}
+                    })}
+                  </Fragment>
+                ))}
               </tbody>
             </table>
           </div>

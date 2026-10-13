@@ -2489,7 +2489,7 @@ export default function SchoolHomeClient({
           <div>
             <ReliqAdultLogo className="w-[118px]" />
             <p className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">
-              {isAdministrator ? "School administration" : "Teacher workspace"}
+              {isAdministrator ? "For admin" : "For teachers"}
             </p>
           </div>
           <button
@@ -2775,13 +2775,23 @@ export default function SchoolHomeClient({
 
           {tab === "classes" ? (
             isAdministrator ? (
-              <section>
-                <ClassTable
-                  classes={filteredClasses}
-                  schoolId={snapshot.school.id}
-                  onAssign={setAssignClass}
-                />
-              </section>
+              <div className="space-y-8">
+                <section>
+                  <ClassTable
+                    classes={filteredClasses}
+                    schoolId={snapshot.school.id}
+                    onAssign={setAssignClass}
+                  />
+                </section>
+                {academicYearId ? (
+                  <ClassGroupsPanel
+                    schoolId={snapshot.school.id}
+                    academicYearId={academicYearId}
+                    classes={filteredClasses}
+                    onSaved={notify}
+                  />
+                ) : null}
+              </div>
             ) : (
               <div className="space-y-8">
                 <section>

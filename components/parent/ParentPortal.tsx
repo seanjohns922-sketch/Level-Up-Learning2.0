@@ -248,7 +248,7 @@ export function ParentShell({ children }: { children: ReactNode }) {
       <aside className="hidden flex-col bg-[#121314] px-4 py-7 text-white lg:sticky lg:top-0 lg:flex lg:h-screen">
         <Link href="/parent" className="block px-2" aria-label="Parent Home">
           <ReliqAdultLogo className="w-[118px]" />
-          <span className="mt-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">Parent Home</span>
+          <span className="mt-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">For parents</span>
         </Link>
         <nav className="mt-9 space-y-1" aria-label="Parent navigation">
           <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
@@ -265,7 +265,7 @@ export function ParentShell({ children }: { children: ReactNode }) {
       <div className="min-w-0">
         <header className="border-b border-slate-200 bg-white lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
-            <Link href="/parent" className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Parent Home</span></Link>
+            <Link href="/parent" className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">For parents</span></Link>
             <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
           </div>
           <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
