@@ -2,22 +2,22 @@ import assert from "node:assert/strict";
 import { buildHomeTrendRows } from "../lib/home-trends.ts";
 import { formatClassYearLevels, normalizeClassYearLevels, SCHOOL_YEAR_LEVEL_OPTIONS } from "../lib/studentLevelLabel.ts";
 
-// Reporting moment is mid-morning UTC, so the reporting day is unfinished.
-const generatedAt = "2026-10-13T02:30:00Z";
-const reportingDay = Date.parse("2026-10-13T00:00:00Z");
-const daysBack = (n) => new Date(reportingDay - n * 86400000).toISOString().slice(0, 10);
+// Reporting day is Tuesday 13 Oct 2026 (mid-morning UTC, unfinished).
+// Latest completed school week: Mon 5 – Fri 9 Oct; the week before: 28 Sep – 2 Oct.
+const at = (iso) => `${iso}T02:30:00Z`;
 const topic = (name, yearLevel, averageAccuracy, evidenceCount = 12, students = 8) => ({
   topic: name, yearLevel, realmId: null, strand: null, strandLabel: null, band: null,
   students, evidenceCount, averageAccuracy,
 });
-const snapshot = (engagementTrend, curriculum = []) => ({ generatedAt, engagementTrend, curriculum });
-const day = (n, activities) => ({ date: daysBack(n), activeStudents: 1, activities });
+const snapshot = (engagementTrend, curriculum = [], generatedAt = at("2026-10-13")) => ({ generatedAt, engagementTrend, curriculum });
+const on = (date, activities) => ({ date, activeStudents: 1, activities });
+const week = (monday, perDay) => [0, 1, 2, 3, 4].map((i) => on(new Date(Date.parse(`${monday}T00:00:00Z`) + i * 86400000).toISOString().slice(0, 10), perDay));
 
-// Activity compares two complete seven-day periods; topics are ranked by accuracy.
+// Completed school weeks are compared; topics are ranked by accuracy.
 {
   const rows = buildHomeTrendRows(
     snapshot(
-      [day(1, 10), day(2, 10), day(3, 10), day(8, 20), day(9, 20), day(10, 20)],
+      [...week("2026-10-05", 10), ...week("2026-09-28", 20)],
       [topic("Fractions", "Year 4", 48), topic("Time", "Year 3", 55), topic("Area", "Year 4", 70),
        topic("Place value", "Year 3", 91), topic("Rare topic", "Year 3", 10, 2)],
     ),
@@ -29,25 +29,29 @@ const day = (n, activities) => ({ date: daysBack(n), activeStudents: 1, activiti
     ["watch", "Time · Year 3", "55%"],
     ["up", "Place value · Year 3", "91%"],
   ]);
-  assert.match(rows[0].detail, /last 7 full days.*7 days before/);
+  assert.equal(rows[0].detail, "50 lessons and quizzes in the school week of 5 Oct, 100 the week before");
 }
 
-// The unfinished reporting day never counts, so a quiet morning is not a decline.
+// The week in progress and weekends never count, so they cannot read as a drop.
 {
-  const steady = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((n) => day(n, 10));
-  assert.deepEqual(buildHomeTrendRows(snapshot([day(0, 1), ...steady]), "class"), []);
-  assert.deepEqual(buildHomeTrendRows(snapshot([day(0, 500), ...steady]), "class"), []);
+  const steady = [...week("2026-10-05", 10), ...week("2026-09-28", 10)];
+  const noise = [on("2026-10-12", 0), on("2026-10-13", 900), on("2026-10-10", 400), on("2026-10-11", 400), on("2026-10-03", 0)];
+  assert.deepEqual(buildHomeTrendRows(snapshot([...steady, ...noise]), "class"), []);
 }
 
-// Period edges: days 1–7 are recent, days 8–14 are previous, day 15+ is ignored.
+// Which week is "completed": on Friday the current week is still running;
+// from Saturday it is finished and becomes the latest week.
 {
-  const rows = buildHomeTrendRows(snapshot([day(7, 30), day(8, 10), day(14, 10), day(15, 900)]), "class");
-  assert.deepEqual(rows.map((r) => r.value), ["+50%"]);
+  const data = [...week("2026-10-12", 30), ...week("2026-10-05", 20), ...week("2026-09-28", 10)];
+  assert.deepEqual(buildHomeTrendRows(snapshot(data, [], at("2026-10-16")), "class").map((r) => r.value), ["+100%"]);
+  assert.deepEqual(buildHomeTrendRows(snapshot(data, [], at("2026-10-17")), "class").map((r) => r.value), ["+50%"]);
+  assert.deepEqual(buildHomeTrendRows(snapshot(data, [], at("2026-10-18")), "class").map((r) => r.value), ["+50%"]);
+  assert.deepEqual(buildHomeTrendRows(snapshot(data, [], at("2026-10-19")), "class").map((r) => r.value), ["+50%"]);
 }
 
 // Class scope drops the year label; thin evidence or activity shows nothing.
 {
-  const rows = buildHomeTrendRows(snapshot([day(9, 3)], [topic("Fractions", "Year 4", 48)]), "class");
+  const rows = buildHomeTrendRows(snapshot([on("2026-10-06", 3)], [topic("Fractions", "Year 4", 48)]), "class");
   assert.deepEqual(rows.map((r) => r.title), ["Fractions"]);
   assert.deepEqual(buildHomeTrendRows(snapshot([], [topic("Fractions", "Year 4", 48, 3)]), "school"), []);
 }

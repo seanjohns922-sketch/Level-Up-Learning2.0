@@ -24,20 +24,24 @@ export type TrendRow = {
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const SCHOOL_WEEK_FORMATTER = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", timeZone: "UTC" });
 
-/** Activities on the UTC calendar days from `startDay` to `endDay` (inclusive),
- * counted back from the reporting day. The RPC groups activity by UTC date
- * (`activity_at::date`) and stamps `generatedAt` with the same clock. */
-function sumActivities(
-  trend: SchoolAnalyticsSnapshot["engagementTrend"],
-  reportingDay: number,
-  startDaysBack: number,
-  endDaysBack: number,
-) {
+/** Activities on the five school days (Monday to Friday) starting at `monday`.
+ * The RPC groups activity by UTC date (`activity_at::date`), so weeks are
+ * matched on those dates; both weeks are bucketed the same way. */
+function sumSchoolWeek(trend: SchoolAnalyticsSnapshot["engagementTrend"], monday: number) {
   return trend.reduce((total, point) => {
-    const daysBack = Math.round((reportingDay - Date.parse(`${point.date.slice(0, 10)}T00:00:00Z`)) / DAY_MS);
-    return daysBack >= endDaysBack && daysBack <= startDaysBack ? total + point.activities : total;
+    const offset = Math.round((Date.parse(`${point.date.slice(0, 10)}T00:00:00Z`) - monday) / DAY_MS);
+    return offset >= 0 && offset <= 4 ? total + point.activities : total;
   }, 0);
+}
+
+/** Monday of the latest school week that has fully finished by the reporting
+ * day: this week once Friday is over (Saturday or Sunday), otherwise last week. */
+function latestCompletedSchoolWeek(reportingDay: number) {
+  const weekday = new Date(reportingDay).getUTCDay();
+  const thisMonday = reportingDay - ((weekday + 6) % 7) * DAY_MS;
+  return weekday === 6 || weekday === 0 ? thisMonday : thisMonday - 7 * DAY_MS;
 }
 
 export function buildHomeTrendRows(
@@ -46,19 +50,20 @@ export function buildHomeTrendRows(
 ): TrendRow[] {
   const rows: TrendRow[] = [];
 
-  // Compare two complete seven-day periods: the reporting day itself is still
-  // in progress, so it is left out of both.
+  // Compare the two most recent completed school weeks (Monday to Friday), so a
+  // week in progress or a weekend never reads as a drop.
   const reportingDay = Date.parse(`${snapshot.generatedAt.slice(0, 10)}T00:00:00Z`);
-  const recent = sumActivities(snapshot.engagementTrend, reportingDay, 7, 1);
-  const previous = sumActivities(snapshot.engagementTrend, reportingDay, 14, 8);
-  if (!Number.isNaN(reportingDay) && previous >= 10) {
-    const change = Math.round(((recent - previous) / previous) * 100);
+  if (!Number.isNaN(reportingDay)) {
+    const recentMonday = latestCompletedSchoolWeek(reportingDay);
+    const recent = sumSchoolWeek(snapshot.engagementTrend, recentMonday);
+    const previous = sumSchoolWeek(snapshot.engagementTrend, recentMonday - 7 * DAY_MS);
+    const change = previous >= 10 ? Math.round(((recent - previous) / previous) * 100) : 0;
     if (Math.abs(change) >= 10) {
       rows.push({
         key: "activity",
         tone: change < 0 ? "down" : "up",
         title: "Learning activity",
-        detail: `${recent} lessons and quizzes in the last 7 full days, ${previous} in the 7 days before`,
+        detail: `${recent} lessons and quizzes in the school week of ${SCHOOL_WEEK_FORMATTER.format(recentMonday)}, ${previous} the week before`,
         value: `${change > 0 ? "+" : "−"}${Math.abs(change)}%`,
       });
     }
