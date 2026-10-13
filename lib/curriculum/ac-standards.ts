@@ -81,14 +81,39 @@ const STRAND_BY_CODE: Array<[string, AcStrand]> = [
 ];
 
 // Realm id (as used across analytics + progress) -> primary AC strand.
+// Realm ids as stored on progress rows (pattern, chance) and their portal
+// slugs, plus the strand ids themselves.
 const REALM_STRAND: Record<string, AcStrand> = {
+  number: "number",
+  "number-nexus": "number",
+  measurement: "measurement",
+  measurelands: "measurement",
+  space: "space",
+  starpath: "space",
+  "starpath-realm": "space",
+  statistics: "statistics",
+  statistica: "statistics",
+  algebra: "algebra",
+  pattern: "algebra",
+  "pattern-peaks": "algebra",
+  probability: "probability",
+  chance: "probability",
+  "chance-hollow": "probability",
+};
+
+// The realm id used by analytics filters for each strand.
+const STRAND_REALM: Record<AcStrand, string> = {
   number: "number",
   measurement: "measurement",
   space: "space",
   statistics: "statistics",
-  algebra: "algebra",
-  probability: "probability",
+  algebra: "pattern",
+  probability: "chance",
 };
+
+export function realmForStrand(strand: AcStrand): string {
+  return STRAND_REALM[strand];
+}
 
 export function strandForRealm(realmId: string | null | undefined): AcStrand | null {
   if (!realmId) return null;

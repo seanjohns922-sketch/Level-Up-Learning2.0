@@ -25,6 +25,7 @@ import { useClassGroups } from "./useClassGroups";
 import {
   type AcStrand,
   AC_STRANDS,
+  realmForStrand,
   strandForRealm,
 } from "@/lib/curriculum/ac-standards";
 
@@ -1255,7 +1256,7 @@ export default function SchoolAnalyticsDashboard({
                   <button
                     key={`${cell.strand}-${cell.year}`}
                     type="button"
-                    onClick={() => { setRealmId(cell.strand); if (cell.year !== "Not recorded") setYearLevel(cell.year); setTab("students"); }}
+                    onClick={() => { setRealmId(realmForStrand(cell.strand)); if (cell.year !== "Not recorded") setYearLevel(cell.year); setTab("students"); }}
                     className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-rose-400 hover:bg-rose-50"
                   >
                     <div>
@@ -1295,7 +1296,7 @@ export default function SchoolAnalyticsDashboard({
                               <td key={year} className="px-2 py-2 text-center">
                                 <button
                                   type="button"
-                                  onClick={() => { setRealmId(strand); if (year !== "Not recorded") setYearLevel(year); setTab("students"); }}
+                                  onClick={() => { setRealmId(realmForStrand(strand)); if (year !== "Not recorded") setYearLevel(year); setTab("students"); }}
                                   title={`${cell.needs} of ${cell.total} below level`}
                                   className="inline-flex min-w-11 flex-col items-center rounded-md px-2 py-1.5 font-bold text-slate-900 transition hover:ring-2 hover:ring-rose-400"
                                   style={{ background: bg }}
