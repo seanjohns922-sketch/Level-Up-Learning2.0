@@ -85,3 +85,18 @@ and prisms, statistical sampling and multi-step probability experiments.
 This document records product direction only. It does not authorise enabling Level
 7 or Level 8 routes, placements, scoring or UI before their full release contract is
 implemented and audited.
+
+## Starting-level choices (Sean, 14 October 2026)
+
+When Level 8 is finished and released, **teachers and parents can both choose a
+starting level up to Level 8** in every realm. Until then:
+
+- Teachers can choose up to Level 7 (`teacher_change_starting_level`, migration
+  20261007100000).
+- Parents can choose up to Level 6 (`parent_change_home_starting_level`,
+  migration 20260918120000).
+
+The Level 8 release must therefore include a reviewed migration that adds
+`Year 8` to both functions' allowed levels, and the matching option lists in
+`components/teacher/PlacementManager.tsx` and `components/parent/ParentPortal.tsx`
+(`yearLevels`). Insights already show Level 7 and Level 8 (commit ae06edd5).
