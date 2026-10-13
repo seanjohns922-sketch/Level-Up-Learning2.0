@@ -9,8 +9,12 @@
 --    the window starts no earlier than the year's first day and ends no later
 --    than its last day (Australia/Melbourne), and may span up to 400 days
 --    (was 90) so "This school year" covers the whole year. The response adds
---    windowStart and windowEnd. Rolling "last 7/14 days" measures are
---    unchanged. Everything else is identical to
+--    windowStart and windowEnd. Assessment results (mastery, curriculum,
+--    growth, bands) only use results completed before the window ends, with
+--    no lower bound so earlier pre-tests stay valid growth baselines.
+--    Current working levels (student_realm_progress) have no history and
+--    always describe today. Rolling "last 7/14 days" measures are unchanged.
+--    Everything else is identical to
 --    20260915140000_version_safe_assessment_growth.sql.
 --
 -- Rollback: drop the three class-group functions and two tables, and re-run
@@ -360,6 +364,10 @@ begin
     from public.student_realm_assessments a
     join cohort co on co.student_id = a.student_id
     where (p_realm_id is null or a.realm_id = p_realm_id)
+      -- Results as they stood at the end of the window: nothing after the
+      -- selected year counts. No lower bound, so earlier pre-tests remain
+      -- valid growth baselines and earlier mastery still counts.
+      and a.completed_at < v_until
     order by a.student_id, a.realm_id, a.working_level, lower(a.assessment_type), a.completed_at desc
   ),
   realm_latest_assessment as (
@@ -408,6 +416,7 @@ begin
         select 1 from public.student_realm_assessments newer
         where newer.student_id=post.student_id and newer.realm_id=post.realm_id and newer.working_level=post.working_level
           and lower(newer.assessment_type) in ('pre','pretest','pre-test') and newer.completed_at>post.completed_at
+          and newer.completed_at < v_until
       )
   ),
   activity as (

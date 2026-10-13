@@ -970,6 +970,11 @@ export default function SchoolAnalyticsDashboard({
             </select>
           </label>
         </div>
+        {snapshot.windowEnd && Date.parse(snapshot.windowEnd) < Date.parse(snapshot.generatedAt) - 86400000 ? (
+          <p className="mt-3 rounded-lg bg-[#F1F2EE] px-3 py-2 text-sm font-semibold text-slate-700">
+            Results are shown as they stood at the end of this school year. Working levels and placements show where students are now.
+          </p>
+        ) : null}
         {period === "year" && !snapshot.windowStart ? (
           <p className="mt-3 rounded-lg bg-[#FFF1C7] px-3 py-2 text-sm font-semibold text-[#5C4300]">
             Showing the last {snapshot.windowDays} days. Whole-year reporting turns on after the next database update.
