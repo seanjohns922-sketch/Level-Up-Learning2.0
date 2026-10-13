@@ -9,16 +9,54 @@ export function normalizeSchoolYearLabel(value?: string | null) {
   return trimmed;
 }
 
-/** Clean a class's stored year levels for display and matching. Older classes
- * can hold bare numbers ("3") beside "Year 3"; these collapse to one canonical
- * label each, in school order. Stored data is not changed. */
+const SCHOOL_YEAR_INDEX_MAX = SCHOOL_YEAR_LEVEL_OPTIONS.length - 1;
+
+/** Read one year token ("Prep", "F", "Year 3", "Yr 3", "3") as an index into
+ * SCHOOL_YEAR_LEVEL_OPTIONS, or null when it is not a primary school year. */
+function schoolYearIndex(token: string) {
+  const trimmed = token.trim();
+  if (/^(prep|foundation|f|p)$/i.test(trimmed)) return 0;
+  const match = /^(?:years?|yrs?|y)?\s*(\d{1,2})$/i.exec(trimmed);
+  if (!match) return null;
+  const year = Number(match[1]);
+  return year >= 1 && year <= SCHOOL_YEAR_INDEX_MAX ? year : null;
+}
+
+/** One stored entry can hold a single year, a list ("Year 3, Year 4") or a
+ * range ("Prep – Year 6", "Years 3–4", "3/4"). Expand it to every year it
+ * covers so nothing is lost when the list is shown or saved again. */
+function expandYearLevelValue(value: string) {
+  const labels: string[] = [];
+  for (const part of value.split(/[,;]/)) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const ends = trimmed.split(/\s*(?:[-–—/]|\bto\b)\s*/i).filter(Boolean);
+    const from = ends.length === 2 ? schoolYearIndex(ends[0]) : null;
+    const to = ends.length === 2 ? schoolYearIndex(ends[1]) : null;
+    if (from !== null && to !== null) {
+      for (let index = Math.min(from, to); index <= Math.max(from, to); index += 1) {
+        labels.push(SCHOOL_YEAR_LEVEL_OPTIONS[index]);
+      }
+      continue;
+    }
+    const single = schoolYearIndex(trimmed);
+    if (single !== null) labels.push(SCHOOL_YEAR_LEVEL_OPTIONS[single]);
+    else {
+      const label = normalizeSchoolYearLabel(trimmed);
+      if (label) labels.push(label);
+    }
+  }
+  return labels;
+}
+
+/** Clean a class's stored year levels for display, matching and the class
+ * edit form. Older classes can hold bare numbers ("3") beside "Year 3", or a
+ * range in one entry; every entry expands to the years it covers, each year
+ * appears once, in school order. Unrecognised labels are kept. */
 export function normalizeClassYearLevels(values?: readonly (string | null | undefined)[] | null) {
   const labels = new Set<string>();
   for (const value of values ?? []) {
-    const trimmed = value?.trim();
-    if (!trimmed) continue;
-    const label = /^\d+$/.test(trimmed) ? `Year ${Number(trimmed)}` : normalizeSchoolYearLabel(trimmed);
-    if (label) labels.add(label);
+    if (value) expandYearLevelValue(value).forEach((label) => labels.add(label));
   }
   const order = (label: string) => {
     const index = (SCHOOL_YEAR_LEVEL_OPTIONS as readonly string[]).indexOf(label);

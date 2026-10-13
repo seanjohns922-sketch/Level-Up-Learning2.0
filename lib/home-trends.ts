@@ -23,36 +23,42 @@ export type TrendRow = {
   value: string;
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Activities on the UTC calendar days from `startDay` to `endDay` (inclusive),
+ * counted back from the reporting day. The RPC groups activity by UTC date
+ * (`activity_at::date`) and stamps `generatedAt` with the same clock. */
 function sumActivities(
   trend: SchoolAnalyticsSnapshot["engagementTrend"],
-  fromDaysAgo: number,
-  toDaysAgo: number,
-  now: number,
+  reportingDay: number,
+  startDaysBack: number,
+  endDaysBack: number,
 ) {
-  const day = 24 * 60 * 60 * 1000;
   return trend.reduce((total, point) => {
-    const age = (now - new Date(point.date).getTime()) / day;
-    return age >= toDaysAgo && age < fromDaysAgo ? total + point.activities : total;
+    const daysBack = Math.round((reportingDay - Date.parse(`${point.date.slice(0, 10)}T00:00:00Z`)) / DAY_MS);
+    return daysBack >= endDaysBack && daysBack <= startDaysBack ? total + point.activities : total;
   }, 0);
 }
 
 export function buildHomeTrendRows(
   snapshot: SchoolAnalyticsSnapshot,
   scope: "school" | "class",
-  now = Date.now(),
 ): TrendRow[] {
   const rows: TrendRow[] = [];
 
-  const thisWeek = sumActivities(snapshot.engagementTrend, 7, 0, now);
-  const lastWeek = sumActivities(snapshot.engagementTrend, 14, 7, now);
-  if (lastWeek >= 10) {
-    const change = Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+  // Compare two complete seven-day periods: the reporting day itself is still
+  // in progress, so it is left out of both.
+  const reportingDay = Date.parse(`${snapshot.generatedAt.slice(0, 10)}T00:00:00Z`);
+  const recent = sumActivities(snapshot.engagementTrend, reportingDay, 7, 1);
+  const previous = sumActivities(snapshot.engagementTrend, reportingDay, 14, 8);
+  if (!Number.isNaN(reportingDay) && previous >= 10) {
+    const change = Math.round(((recent - previous) / previous) * 100);
     if (Math.abs(change) >= 10) {
       rows.push({
         key: "activity",
         tone: change < 0 ? "down" : "up",
         title: "Learning activity",
-        detail: `${thisWeek} lessons and quizzes this week, ${lastWeek} last week`,
+        detail: `${recent} lessons and quizzes in the last 7 full days, ${previous} in the 7 days before`,
         value: `${change > 0 ? "+" : "−"}${Math.abs(change)}%`,
       });
     }
