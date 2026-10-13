@@ -29,6 +29,7 @@ import {
 import { getSchoolLogo } from "@/lib/school-logos";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 import { normalizeClassCurriculumYear } from "@/lib/class-curriculum-year";
+import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 
 /* ── types ─────────────────────────────────────────── */
 type ClassRow = {
@@ -82,8 +83,8 @@ type LiveActivityEventRow = {
 
 function TeacherDashboardSkeleton() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]" aria-busy="true" aria-label="Loading class dashboard">
-      <header className="border-b border-[#E6E8EC] bg-white px-6 py-3">
+    <main className="reliq-adult min-h-screen" aria-busy="true" aria-label="Loading class dashboard">
+      <header className="bg-[#121314] px-6 py-3">
         <div className="mx-auto flex max-w-[1800px] items-center gap-3">
           <div className="h-9 w-9 animate-pulse rounded-lg bg-[#0A2F2A]/15" />
           <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
@@ -1159,16 +1160,17 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#E2E8F0] via-[#DEE5EC] to-[#D6DEE6]">
+    <main className="reliq-adult min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-[#E6E8EC] bg-white px-3 py-3 xl:px-5">
+      <header className="sticky top-0 z-20 bg-[#121314] px-3 py-3 text-white xl:px-5">
         <div className="mx-auto flex w-full min-w-0 items-center gap-1.5 overflow-x-auto 2xl:overflow-visible">
+          <ReliqAdultLogo className="mr-2 hidden w-[76px] shrink-0 xl:block" />
           {schoolHomeId ? (
             <button
               type="button"
               onClick={() => void openSchoolPreview(schoolHomeId)}
               disabled={openingSchoolPreview}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-2 text-sm font-bold text-[#334155] transition hover:border-[#00C2A8] hover:bg-[#F0FDFA] hover:text-[#0F766E] active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-[#C9CCC6] transition hover:border-[#5A5E63] hover:bg-[#222426] hover:text-white active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
               aria-label="Back to School Home"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -1186,23 +1188,23 @@ export default function TeacherDashboardPage() {
               className="h-9 w-9 shrink-0 rounded-lg object-cover"
             />
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0A2F2A] shadow-[0_0_12px_-2px_rgba(0,229,195,0.55)] ring-1 ring-[#00C2A8]/40">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#2A2C2E]">
               <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M3 12l9-9 9 9M5 10v10h14V10" />
               </svg>
             </div>
           )}
 
-          <h1 className="max-w-56 shrink truncate text-lg font-black tracking-tight text-[#0F172A] min-[1500px]:max-w-72 min-[1500px]:text-xl min-[1900px]:max-w-none">
+          <h1 className="max-w-56 shrink truncate font-display text-lg font-black tracking-tight text-white min-[1500px]:max-w-72 min-[1500px]:text-xl min-[1900px]:max-w-none">
             {selectedClass?.name ?? "Class Dashboard"}
           </h1>
 
           {selectedClass ? (
             <>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-[#CBD5E1]" />
+              <span className="h-1 w-1 shrink-0 rounded-full bg-[#34373A]" />
               <button
                 onClick={copyCode}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#00C2A8]/40 bg-white px-2 py-0.5 font-mono text-[11px] font-extrabold text-[#0A2F2A] transition hover:border-[#00C2A8] hover:shadow-[0_0_0_3px_rgba(0,194,168,0.12)]"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#34373A] bg-transparent px-2 py-0.5 font-mono text-[11px] font-extrabold text-[var(--reliq-lime)] transition hover:border-[var(--reliq-lime)]"
               >
                 {copiedCode ? "Copied!" : selectedClass.class_code}
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1210,11 +1212,11 @@ export default function TeacherDashboardPage() {
                   <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                 </svg>
               </button>
-              <span className="hidden shrink-0 text-[11px] font-semibold text-[#94A3B8] min-[1450px]:inline">
+              <span className="hidden shrink-0 text-[11px] font-semibold text-[#8F948C] min-[1450px]:inline">
                 {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
               </span>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-[#CBD5E1]" />
-              <label className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
+              <span className="h-1 w-1 shrink-0 rounded-full bg-[#34373A]" />
+              <label className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-[#C9CCC6]">
                 <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card.">
                   <Brain className="h-3.5 w-3.5" />
                   <span className="hidden min-[1650px]:inline">Brain breaks</span>
@@ -1222,7 +1224,7 @@ export default function TeacherDashboardPage() {
                 <select
                   value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
                   onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}
-                  className="rounded-md border border-[#E6E8EC] bg-white px-2 py-1 text-[11px] font-bold text-[#0F172A] transition hover:border-[#CBD5E1]"
+                  className="rounded-md border border-[#34373A] bg-[#1C1E20] px-2 py-1 text-[11px] font-bold text-white transition hover:border-[#5A5E63]"
                 >
                   {BRAIN_BREAK_FREQUENCIES.map((f) => (
                     <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
@@ -1242,7 +1244,7 @@ export default function TeacherDashboardPage() {
               <button
                 onClick={() => void openSchoolPreview()}
                 disabled={openingSchoolPreview}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 text-[#0F766E] font-bold text-sm hover:bg-[#0EA5A4]/15 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#34373A] bg-transparent text-white font-bold text-sm hover:bg-[#222426] transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
                 type="button"
               >
                 <Building2 className="h-4 w-4" />
@@ -1253,7 +1255,7 @@ export default function TeacherDashboardPage() {
               <select
                 value={selectedClassId ?? ""}
                 onChange={(e) => selectClass(e.target.value)}
-                className="text-sm font-semibold px-3 py-2 rounded-lg border border-[#E6E8EC] bg-white text-[#0F172A] hover:border-[#CBD5E1] transition"
+                className="text-sm font-semibold px-3 py-2 rounded-lg border border-[#34373A] bg-[#1C1E20] text-white hover:border-[#5A5E63] transition"
               >
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -1265,7 +1267,7 @@ export default function TeacherDashboardPage() {
             {selectedClass && classStudents.length > 0 && (
               <button
                 onClick={() => setShowLoginDetailsActions(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-2 text-sm font-bold text-[#0F172A] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC] active:scale-[0.98] min-[1850px]:px-3.5"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-white transition hover:border-[#5A5E63] hover:bg-[#222426] active:scale-[0.98] min-[1850px]:px-3.5"
                 aria-label="Student Login Details"
                 title="Student Login Details"
               >
@@ -1280,7 +1282,7 @@ export default function TeacherDashboardPage() {
 
             <button
               onClick={() => router.push("/teacher/classes")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-2 text-sm font-bold text-[#0F172A] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC] active:scale-[0.98] min-[1850px]:px-3.5"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-white transition hover:border-[#5A5E63] hover:bg-[#222426] active:scale-[0.98] min-[1850px]:px-3.5"
               aria-label="Add or edit students"
               title="Add or edit students"
             >
@@ -1291,7 +1293,7 @@ export default function TeacherDashboardPage() {
             {selectedClass && classStudents.length > 0 ? (
               <button
                 onClick={() => setShowPlacements(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 px-2.5 py-2 text-sm font-bold text-[#0F766E] transition hover:bg-[#0EA5A4]/15 active:scale-[0.98] min-[1850px]:px-3.5"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-transparent bg-[var(--reliq-lime)] px-2.5 py-2 text-sm font-bold text-[#121314] transition hover:bg-[var(--reliq-lime-hover)] active:scale-[0.98] min-[1850px]:px-3.5"
                 aria-label="Manage placements"
                 title="Manage placements"
               >
@@ -1304,7 +1306,7 @@ export default function TeacherDashboardPage() {
             <div className="relative">
               <button
                 onClick={() => setShowSettingsMenu((v) => !v)}
-                className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] transition flex items-center justify-center"
+                className="h-9 w-9 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:text-white hover:bg-[#222426] hover:border-[#5A5E63] transition flex items-center justify-center"
                 type="button"
                 aria-label="Settings"
                 title="Settings"
@@ -1350,7 +1352,7 @@ export default function TeacherDashboardPage() {
                 await supabase.auth.signOut();
                 router.push("/login");
               }}
-              className="h-9 w-9 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] hover:border-[#FECACA] transition flex items-center justify-center"
+              className="h-9 w-9 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:text-white hover:bg-[#222426] hover:border-[#5A5E63] transition flex items-center justify-center"
               type="button"
               aria-label="Log out"
               title="Log out"
@@ -1406,7 +1408,7 @@ export default function TeacherDashboardPage() {
                     className={[
                       "px-4 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
-                        ? "bg-[#0A2F2A] text-[#00E5C3] shadow-[0_1px_3px_rgba(10,47,42,0.35)]"
+                        ? "bg-[#121314] text-[var(--reliq-lime)] shadow-sm"
                         : "text-[#64748B] hover:text-[#0F172A]",
                     ].join(" ")}
                   >

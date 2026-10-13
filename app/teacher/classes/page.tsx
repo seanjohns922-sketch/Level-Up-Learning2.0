@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import {
   SCHOOL_YEAR_LEVEL_OPTIONS,
+  normalizeClassYearLevels,
   normalizeSchoolYearLabel,
 } from "@/lib/studentLevelLabel";
 import { buildDisplayName, buildStudentUsername, resolveStudentNameParts } from "@/lib/studentName";
@@ -619,7 +620,7 @@ export default function TeacherClassesPage() {
     setEditingClassId(cls.id);
     setEditClassForm({
       name: cls.name,
-      year_levels: cls.year_levels ?? (cls.year_level ? [cls.year_level] : []),
+      year_levels: normalizeClassYearLevels(cls.year_levels ?? (cls.year_level ? [cls.year_level] : [])),
     });
   }
 
@@ -919,7 +920,7 @@ export default function TeacherClassesPage() {
                           <p className="text-sm text-gray-500">
                             Code: <span className="font-mono font-bold tracking-wider">{cls.class_code}</span>
                           </p>
-                          {(cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []).map((yr) => (
+                          {normalizeClassYearLevels(cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []).map((yr) => (
                             <span key={yr} className="rounded-full px-2 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
                               {yr}
                             </span>
@@ -1291,7 +1292,7 @@ export default function TeacherClassesPage() {
 
                       {rosterImportClassId === cls.id ? (
                         <RosterImportPanel
-                          classYearLevels={cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []}
+                          classYearLevels={normalizeClassYearLevels(cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : [])}
                           onClose={() => setRosterImportClassId(null)}
                           onImport={(roster) => importRoster(cls.id, roster)}
                         />

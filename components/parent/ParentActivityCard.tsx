@@ -6,8 +6,7 @@ import {
   activityStreak,
   fetchParentChildActivity,
   formatFeedTime,
-  lastSevenDays,
-  minutesInLastSevenDays,
+  currentWeekDays,
   parentRealmPalette,
   type ParentActivity,
 } from "@/lib/parent-insights";
@@ -67,18 +66,18 @@ export default function ParentActivityCard({
     };
   }, [previewActivity, studentId]);
 
-  const week = useMemo(() => lastSevenDays(activity?.days ?? []), [activity?.days]);
+  const week = useMemo(() => currentWeekDays(activity?.days ?? []), [activity?.days]);
   const streak = useMemo(() => activityStreak(activity?.days ?? []), [activity?.days]);
-  const weekMinutes = useMemo(() => minutesInLastSevenDays(activity?.days ?? []), [activity?.days]);
+  const weekMinutes = week.reduce((total, day) => total + day.minutes, 0);
   const weekQuestions = week.reduce((total, day) => total + day.questions, 0);
   const peakMinutes = Math.max(10, ...week.map((day) => day.minutes));
   const feed = activity?.feed.slice(0, 6) ?? [];
 
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-[#f4fbff] to-white px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#1f6f9c]">Activity</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Activity</p>
           <h3 className="mt-1 text-xl font-black">This week</h3>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5">
@@ -110,14 +109,16 @@ export default function ParentActivityCard({
                         className={`w-full rounded-lg ${
                           day.active
                             ? day.isToday
-                              ? "bg-gradient-to-t from-[#1f6f9c] to-[#41b3d3]"
-                              : "bg-gradient-to-t from-[#63c7b2] to-[#9fe3d5]"
-                            : "bg-slate-200"
+                              ? "bg-[var(--reliq-lime,#B9F23F)]"
+                              : "bg-[#121314]"
+                            : day.isUpcoming
+                              ? "bg-slate-100"
+                              : "bg-slate-200"
                         }`}
                         style={{ height }}
                         title={`${day.minutes} minutes`}
                       />
-                      <span className={`text-[11px] font-black ${day.isToday ? "text-[#1f6f9c]" : "text-slate-500"}`}>
+                      <span className={`text-[11px] font-black ${day.isToday ? "text-[#121314]" : day.isUpcoming ? "text-slate-300" : "text-slate-500"}`}>
                         {day.weekdayLabel}
                       </span>
                     </div>

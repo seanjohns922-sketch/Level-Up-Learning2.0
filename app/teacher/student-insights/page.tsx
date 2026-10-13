@@ -19,6 +19,7 @@ import AssessmentReplay, {
   type TeacherAssessmentAttempt,
 } from "@/components/teacher/AssessmentReplay";
 import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
+import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 
 type StudentRow = {
   id: string;
@@ -535,7 +536,7 @@ function StudentInsightsPageInner() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F8FA] px-6 py-8">
+    <main className="reliq-adult min-h-screen px-6 py-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="rounded-3xl border border-[#E6E8EC] bg-white px-6 py-5 shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -810,44 +811,100 @@ function LineChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: 
     return <EmptyState text={emptyLabel} />;
   }
 
-  const width = 640;
-  const height = 220;
-  const maxValue = 100;
-  const stepX = points.length > 1 ? width / (points.length - 1) : width;
-  const polyline = points
-    .map((point, index) => {
-      const x = index * stepX;
-      const y = height - (point.value / maxValue) * (height - 24) - 12;
-      return `${x},${y}`;
-    })
-    .join(" ");
+  // Only the latest and lowest scores get labels; every point keeps a hover
+  // title and the full list sits underneath, so values never overlap.
+  const target = ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent;
+  const width = 1000;
+  const height = 260;
+  const left = 48;
+  const right = 984;
+  const top = 20;
+  const bottom = 220;
+  const values = points.map((point) => Math.round(point.value));
+  const x = (index: number) => (points.length > 1 ? left + 16 + (index * (right - left - 32)) / (points.length - 1) : (left + right) / 2);
+  const y = (value: number) => bottom - (Math.max(0, Math.min(100, value)) / 100) * (bottom - top);
+  const latestIndex = values.length - 1;
+  const lowestIndex = values.indexOf(Math.min(...values));
+  const average = Math.round(values.reduce((total, value) => total + value, 0) / values.length);
+  const atTarget = values.filter((value) => value >= target).length;
+  const middleIndex = Math.floor(latestIndex / 2);
 
   return (
-    <div className="space-y-3">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full overflow-visible">
-        <polyline fill="none" stroke="#0EA5A4" strokeWidth="4" points={polyline} strokeLinejoin="round" strokeLinecap="round" />
-        {points.map((point, index) => {
-          const x = index * stepX;
-          const y = height - (point.value / maxValue) * (height - 24) - 12;
-          return (
-            <g key={point.label}>
-              <circle cx={x} cy={y} r="6" fill="#14B8A6" />
-              <text x={x} y={y - 12} textAnchor="middle" className="fill-[#0F172A] text-[12px] font-bold">
-                {point.value}%
-              </text>
-            </g>
-          );
-        })}
-      </svg>
-      <div className="grid gap-2 md:grid-cols-4">
-        {points.map((point) => (
-          <div key={point.label} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-2">
-            <div className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">{point.shortLabel}</div>
-            <div className="mt-1 text-sm font-bold text-[#0F172A]">{point.label}</div>
-            <div className="mt-1 text-lg font-black text-teal-700">{point.value}%</div>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-x-8 gap-y-2">
+        {[
+          ["Latest", `${values[latestIndex]}%`],
+          ["Average", `${average}%`],
+          ["At target", `${atTarget} of ${values.length}`],
+        ].map(([label, value]) => (
+          <div key={label}>
+            <div className="text-xs font-semibold text-[#5A5E63]">{label}</div>
+            <div className="font-display text-2xl font-black text-[#121314]">{value}</div>
           </div>
         ))}
       </div>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full"
+        role="img"
+        aria-label={`Weekly quiz accuracy across ${values.length} quizzes. Latest ${values[latestIndex]}%, average ${average}%, lowest ${values[lowestIndex]}%. Target ${target}%.`}
+      >
+        {[100, 50, 0].map((tick) => (
+          <g key={tick}>
+            <line x1={left} x2={right} y1={y(tick)} y2={y(tick)} stroke={tick === 0 ? "#D6D9D3" : "#ECEEE9"} />
+            <text x={left - 10} y={y(tick) + 4} textAnchor="end" fontSize="13" fill="#5A5E63">{tick}%</text>
+          </g>
+        ))}
+        <line x1={left} x2={right} y1={y(target)} y2={y(target)} stroke="#3D6600" strokeWidth="1.5" strokeDasharray="5 5" />
+        <text x={left + 6} y={y(target) - 8} fontSize="13" fontWeight="700" fill="#3D6600">Target {target}%</text>
+        <polyline
+          fill="none"
+          stroke="#121314"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          points={values.map((value, index) => `${x(index)},${y(value)}`).join(" ")}
+        />
+        {values.map((value, index) => (
+          <circle
+            key={index}
+            cx={x(index)}
+            cy={y(value)}
+            r={index === latestIndex ? 8 : 5.5}
+            fill={value >= target ? "#B9F23F" : "#FFFFFF"}
+            stroke="#121314"
+            strokeWidth={index === latestIndex ? 3 : 2}
+          >
+            <title>{`${points[index].label}: ${value}%`}</title>
+          </circle>
+        ))}
+        <text x={x(latestIndex)} y={y(values[latestIndex]) - 16} textAnchor={latestIndex === 0 ? "middle" : "end"} fontSize="15" fontWeight="700" fill="#121314">
+          {values[latestIndex]}%
+        </text>
+        {lowestIndex !== latestIndex ? (
+          <text x={x(lowestIndex)} y={y(values[lowestIndex]) + 24} textAnchor="middle" fontSize="14" fontWeight="600" fill="#5A5E63">
+            Low {values[lowestIndex]}%
+          </text>
+        ) : null}
+        <text x={x(0)} y={252} textAnchor={points.length > 1 ? "start" : "middle"} fontSize="13" fill="#5A5E63">{points[0].shortLabel}</text>
+        {points.length > 2 ? (
+          <text x={x(middleIndex)} y={252} textAnchor="middle" fontSize="13" fill="#5A5E63">{points[middleIndex].shortLabel}</text>
+        ) : null}
+        {points.length > 1 ? (
+          <text x={x(latestIndex)} y={252} textAnchor="end" fontSize="13" fill="#5A5E63">{points[latestIndex].shortLabel}</text>
+        ) : null}
+      </svg>
+      <p className="text-sm text-[#5A5E63]">Lime dots are quizzes at or above the {target}% target. Hover a dot for its score.</p>
+      <details className="group">
+        <summary className="cursor-pointer text-sm font-bold text-[#3D6600]">Show every quiz</summary>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3 md:grid-cols-5">
+          {points.map((point, index) => (
+            <div key={index} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-2">
+              <div className="text-sm font-bold text-[#0F172A]">{point.label}</div>
+              <div className="mt-0.5 text-lg font-black text-[#121314]">{values[index]}%</div>
+            </div>
+          ))}
+        </div>
+      </details>
     </div>
   );
 }
