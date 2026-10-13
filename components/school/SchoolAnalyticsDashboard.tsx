@@ -1041,7 +1041,6 @@ export default function SchoolAnalyticsDashboard({
           cells={[...intervention.cells.values()].map((cell) => ({ strand: cell.strand, strandLabel: AC_STRANDS[cell.strand].label, year: cell.year, below: cell.needs, total: cell.total }))}
           strands={intervention.strands.map((strand) => ({ id: strand, label: AC_STRANDS[strand].label }))}
           years={intervention.years}
-          days={days}
           onOpen={(target, filter) => {
             if (filter?.yearLevel) setYearLevel(filter.yearLevel);
             if (filter?.classId) setClassId(filter.classId);
