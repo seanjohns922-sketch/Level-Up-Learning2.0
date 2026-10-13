@@ -19,10 +19,11 @@ const checks = [
       /<SchoolAnalyticsDashboard/.test(schoolHome),
   ],
   [
-    "all six analytics views are available",
-    ["Overview", "Growth", "Curriculum", "Engagement", "Classes", "Students"].every(
+    // Engagement (usage) now sits on Overview, with "Where to look" for leaders.
+    "all analytics views are available",
+    ["Overview", "Growth", "Curriculum", "Placement", "Intervention", "Classes", "Students"].every(
       (label) => dashboard.includes(`label: "${label}"`),
-    ),
+    ) && dashboard.includes("<LeaderOverview"),
   ],
   [
     "time, year, class and realm filters are implemented",
