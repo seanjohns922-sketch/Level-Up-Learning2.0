@@ -7,6 +7,7 @@ import { buildStudentRosterTemplate } from "../lib/student-roster-template.ts";
 import { readFileSync } from "node:fs";
 import ExcelJS from "exceljs";
 import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
+import { diagnosticReportHtml } from "../lib/documents/diagnostic-report.ts";
 import { getCurriculumPlan } from "../data/programs/genres.ts";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
@@ -94,6 +95,23 @@ for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexu
   assert.ok(scope.includes(plan[0].topic.replace(/&/g, "&amp;")) && scope.includes(`Number · ${yearLabel.replace("Year", "Level")}`));
   save(`scope-${yearLabel.replace(" ", "-").toLowerCase()}`, scope);
 }
+
+// Maths diagnostic report: start, mid and end, with level probes.
+const probe = (level, percent, codes) => ({ level, score: Math.round(percent / 10), total: 10, percent, curriculumCodes: codes });
+const levelsAt = { start: [3.0, 4.0, 2.5, 3.5, 2.5, 3.0], mid: [3.5, 4.5, 3.5, 4.0, 3.0, 3.5], end: [4.0, 4.5, 4.0, 4.5, 3.5, 4.0] };
+const strandsOrder = ["number", "measurement", "space", "statistics", "algebra", "probability"];
+const letter = { measurement: "M", space: "SP", statistics: "ST", algebra: "A", probability: "P" };
+const sitting = (checkpoint, month) => ({
+  checkpoint, status: "completed", overall_level: null, completed_at: `2026-${month}-15T01:00:00Z`, created_at: `2026-${month}-15T01:00:00Z`,
+  strand_results: strandsOrder.map((strand, i) => ({ strand, status: "completed", measured_level: levelsAt[checkpoint][i], probe_scores: strand === "number"
+    ? [probe("Year 4", 92, ["AC9M4N01", "AC9M4N06"]), probe("Year 5", 40, ["AC9M5N04", "AC9M5N05"])]
+    : [probe("Year 4", 85, [`AC9M4${letter[strand]}01`]), probe("Year 5", 45, [`AC9M5${letter[strand]}02`])] })),
+});
+const diagnostic = diagnosticReportHtml({ brand: { schoolName: "Cobram Primary School", schoolLogo: logo }, student: { name: "Frankie Hicks", yearLevel: "Year 5", className: "5B" }, sittings: [sitting("start", "02"), sitting("mid", "06"), sitting("end", "12")] });
+assert.equal(pages(diagnostic), 2);
+assert.ok(diagnostic.includes("Where Frankie finished the year") && diagnostic.includes("By the end of Year 5, students are expected to be at 5.0"));
+assert.ok(diagnostic.includes("AC9M4N01") && diagnostic.includes("AC9M5N04") && diagnostic.includes("Doing well") && diagnostic.includes("Work on next"));
+save("diagnostic-report", diagnostic);
 
 // Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
 const logoPng = readFileSync("public/brand/reliq-logo.png");

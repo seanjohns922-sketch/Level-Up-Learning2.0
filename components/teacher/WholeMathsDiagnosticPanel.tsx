@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
+import { diagnosticReportHtml } from "@/lib/documents/diagnostic-report";
 import { CalendarDays, Info, ListChecks, TrendingUp, X } from "lucide-react";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
@@ -23,7 +25,7 @@ import {
 } from "@/lib/whole-maths-diagnostic-client";
 import { formatProgressionPoint } from "@/lib/live-maths-progression";
 
-type DiagnosticStudent = { id: string; display_name: string };
+type DiagnosticStudent = { id: string; display_name: string; school_year_level?: string | null; year_level?: string | null };
 type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
 type DiagnosticView = "live" | "run";
 type StudentSort = "surname-asc" | "surname-desc" | "given-asc" | "live-desc" | "live-asc" | "diagnostic-desc" | "diagnostic-asc";
@@ -126,11 +128,30 @@ function ProgressionTrack({
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
   students,
+  schoolName = null,
+  schoolLogo = null,
 }: {
   selectedClass: { id: string; name: string } | null;
   students: DiagnosticStudent[];
+  /** For the letterhead of the printed diagnostic report. */
+  schoolName?: string | null;
+  schoolLogo?: { src: string; alt: string } | null;
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
+  const openDiagnosticReport = (studentId: string) => {
+    const student = students.find((item) => item.id === studentId);
+    if (!student) return;
+    const win = openDocumentWindow();
+    if (!win) return;
+    writeDocument(win, diagnosticReportHtml({
+      brand: {
+        schoolName,
+        schoolLogo: schoolLogo ? { src: assetUrl(schoolLogo.src, window.location.origin), alt: schoolLogo.alt } : null,
+      },
+      student: { name: student.display_name, yearLevel: student.school_year_level ?? student.year_level ?? null, className: selectedClass?.name ?? null },
+      sittings: sittings.filter((sitting) => sitting.student_id === studentId),
+    }));
+  };
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
   const [view, setView] = useState<DiagnosticView>("live");
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
@@ -512,9 +533,14 @@ export default function WholeMathsDiagnosticPanel({
                       return <p className="mt-1 text-xs font-semibold text-teal-700">{completed}/6 strands complete{active ? ` · ${AC_STRANDS[active.strand].label} ${active.answered_count ?? 0}/20` : ""}</p>;
                     })() : null}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black capitalize text-slate-800">{sitting.status.replace("_", " ")}</p>
-                    <p className="text-xs text-slate-500">Overall: {sitting.overall_level == null ? "Pending all 6 strands" : sitting.overall_level.toFixed(2)}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-black capitalize text-slate-800">{sitting.status.replace("_", " ")}</p>
+                      <p className="text-xs text-slate-500">Overall: {sitting.overall_level == null ? "Pending all 6 strands" : sitting.overall_level.toFixed(2)}</p>
+                    </div>
+                    {sitting.status === "completed" && sitting.checkpoint !== "ad_hoc" ? (
+                      <button type="button" onClick={() => openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#B9F23F] hover:bg-black">Diagnostic report</button>
+                    ) : null}
                   </div>
                 </div>
               ))}

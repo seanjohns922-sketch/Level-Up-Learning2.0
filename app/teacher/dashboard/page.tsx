@@ -1318,6 +1318,8 @@ export default function TeacherDashboardPage() {
               <WholeMathsDiagnosticPanel
                 selectedClass={selectedClass ?? null}
                 students={classStudents}
+                schoolName={schoolName}
+                schoolLogo={schoolLogo}
               />
             ) : (
               <StrandStudentsPanel
