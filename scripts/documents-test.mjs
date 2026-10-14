@@ -109,7 +109,7 @@ const sitting = (checkpoint, month) => ({
 });
 const diagnostic = diagnosticReportHtml({ brand: { schoolName: "Cobram Primary School", schoolLogo: logo }, student: { name: "Frankie Hicks", yearLevel: "Year 5", className: "5B" }, sittings: [sitting("start", "02"), sitting("mid", "06"), sitting("end", "12")] });
 assert.equal(pages(diagnostic), 2);
-assert.ok(diagnostic.includes("Where Frankie finished the year") && diagnostic.includes("By the end of Year 5, students are expected to be at 5.0"));
+assert.ok(diagnostic.includes("Where Frankie finished the year") && diagnostic.includes("In Term 4 (October to December), Year 5 students are expected to be at 5.0"));
 assert.ok(diagnostic.includes("AC9M4N01") && diagnostic.includes("AC9M5N04") && diagnostic.includes("Doing well") && diagnostic.includes("Work on next"));
 save("diagnostic-report", diagnostic);
 
@@ -140,6 +140,21 @@ assert.ok(testsOnly.includes("+0.9 levels"));
 assert.ok(testsOnly.includes("appear once Abigail sits a whole-maths diagnostic"));
 assert.ok(testsOnly.includes("Where Abigail finished the year"));
 save("diagnostic-report-tests-only", testsOnly);
+
+// Brody: pre-tests sat in September are judged against Term 3 (2.75 for a
+// Year 3), not the start of the year.
+const brody = diagnosticReportHtml({
+  brand: { schoolName: "Cobram Primary School", schoolLogo: logo }, student: { name: "Brody Ambrose", yearLevel: "Year 3", className: "3/4J" }, sittings: [], year: 2026,
+  realmTests: [
+    realmRow("number", "pretest", "Year 3", 80, "2026-09-02T01:00:00Z"),
+    realmRow("measurement", "pretest", "Year 2", 58, "2026-09-02T01:00:00Z"),
+    realmRow("space", "pretest", "Year 3", 53.5, "2026-09-02T01:00:00Z"),
+    realmRow("statistics", "pretest", "Year 3", 40, "2026-09-03T01:00:00Z"),
+  ],
+});
+assert.ok(brody.includes("In Term 3 (July to September), Year 3 students are expected to be at 2.75"));
+assert.ok(!brody.includes(">Above level<") && brody.includes(">Below level<"));
+save("diagnostic-report-brody", brody);
 
 // Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
 const logoPng = readFileSync("public/brand/reliq-logo.png");

@@ -814,7 +814,7 @@ export default function SchoolAnalyticsDashboard({
               <h3 className="font-bold text-slate-950">Standing by AC9 strand</h3>
               <p className="mt-1 text-sm text-slate-500">
                 {curriculumUsesTests
-                  ? "Each student's latest test in each strand, against where their school year should be on the day they sat it."
+                  ? "Each student's latest test in each strand, against where their school year should be in the term they sat it."
                   : "Working level compared to school year. At level means their level matches their year (e.g. Year 3 at Level 3)."}
               </p>
             </div>

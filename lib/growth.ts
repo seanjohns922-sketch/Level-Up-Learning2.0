@@ -1,5 +1,5 @@
 import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
-import type { LatestTest, SchoolYearDates } from "@/lib/proficiency";
+import { termIndex, type LatestTest, type SchoolYearDates } from "@/lib/proficiency";
 
 /** Growth through the school year, from tests only.
  *
@@ -9,8 +9,8 @@ import type { LatestTest, SchoolYearDates } from "@/lib/proficiency";
  * a chain of placement pre-tests counts as its last one). Growth is the
  * latest post-test or diagnostic minus the base. Later pre-tests for a new
  * level don't count: they check content not yet taught. The expectation is a
- * level a year over the same time, so a base in February and a post-test in
- * July expects about 0.4. A student's growth is the curriculum-weighted
+ * quarter of a level for each term between the base and the latest test, so
+ * a base in Term 1 and a post-test in Term 3 expects 0.5. A student's growth is the curriculum-weighted
  * average of the strands that have growth (Number most).
  *   backwards  more than a term (0.25) below their starting test
  *   slower     more than a term behind the expected growth
@@ -29,6 +29,12 @@ export const PACE_META: Record<Pace, { label: string; meaning: string; bg: strin
 };
 
 const TERM = 0.25;
+
+function termsBetween(from: number, to: number): number {
+  const a = termIndex(new Date(from).toISOString());
+  const b = termIndex(new Date(to).toISOString());
+  return a === null || b === null ? 0 : Math.max(0, b - a);
+}
 const DAY = 86400000;
 
 export function paceFor(gained: number, expected: number): Pace {
@@ -71,7 +77,7 @@ export type StudentGrowth = StrandGrowth & { strands: Map<AcStrand, StrandGrowth
 
 /** One student's growth using the tests sat by `at`, or null before any
  * strand has a post-test or diagnostic after its base. */
-export function studentGrowthAt(history: LatestTest[] | undefined, at: number, yearLength: number): StudentGrowth | null {
+export function studentGrowthAt(history: LatestTest[] | undefined, at: number): StudentGrowth | null {
   const strands = new Map<AcStrand, StrandGrowth>();
   let weight = 0;
   let tests = 0;
@@ -85,7 +91,8 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number, y
     const latest = sat.filter((point, index) => index >= firstGrowth && measuresGrowth(point)).at(-1)!;
     const growth = {
       gained: latest.measured - first.measured,
-      expected: (latest.at - first.at) / yearLength,
+      // A quarter of a level for each term between the two tests.
+      expected: TERM * termsBetween(first.at, latest.at),
       first: first.measured,
       latest: latest.measured,
     };
@@ -156,7 +163,6 @@ export function withStart(students: GrowthStudent[], series: SeriesPoint[]): Ser
 const mean = (values: number[]) => (values.length ? values.reduce((a, b) => a + b, 0) / values.length : null);
 
 export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates, now: number): GrowthSummary {
-  const { length } = yearBounds(year);
   const times = seriesTimes(year, now);
   const at = times[times.length - 1];
   const pace: Record<Pace, number> = { backwards: 0, slower: 0, onPace: 0, faster: 0 };
@@ -166,7 +172,7 @@ export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates
   const byStrand = new Map<AcStrand, StrandGrowth[]>();
 
   for (const student of students) {
-    const growth = studentGrowthAt(student.testHistory, at, length);
+    const growth = studentGrowthAt(student.testHistory, at);
     if (!growth) {
       if ((student.testHistory ?? []).some((test) => Date.parse(test.testedAt) <= at)) waiting += 1;
       tests += (student.testHistory ?? []).filter((test) => Date.parse(test.testedAt) <= at).length;
@@ -180,7 +186,7 @@ export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates
 
   const series = withStart(students, times.map((time) => {
     const rows = students.flatMap((student) => {
-      const growth = studentGrowthAt(student.testHistory, time, length);
+      const growth = studentGrowthAt(student.testHistory, time);
       return growth ? [growth] : [];
     });
     return { at: time, gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expected)), students: rows.length };

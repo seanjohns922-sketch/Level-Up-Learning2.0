@@ -63,7 +63,6 @@ export default function GrowthView({
   const year = snapshot.academicYear!;
   const now = Date.parse(snapshot.windowEnd ?? snapshot.generatedAt);
   const summary = summariseGrowth(snapshot.analysisStudents, year, now);
-  const { length } = yearBounds(year);
   const times = seriesTimes(year, now);
 
   const groupRow = (key: string, name: string, students: SchoolAnalyticsSnapshot["analysisStudents"], onOpen?: () => void): Row => {
@@ -95,7 +94,7 @@ export default function GrowthView({
   } else {
     rows = snapshot.students
       .map((student) => {
-        const growth = studentGrowthAt(student.testHistory, times[times.length - 1], length);
+        const growth = studentGrowthAt(student.testHistory, times[times.length - 1]);
         const tests = (student.testHistory ?? []).length;
         return {
           key: student.id,
@@ -104,7 +103,7 @@ export default function GrowthView({
           journey: growth ? `${level(growth.first)} → ${level(growth.latest)}` : "—",
           gained: growth?.gained ?? null,
           series: withStart([student], times.map((time) => {
-            const point = studentGrowthAt(student.testHistory, time, length);
+            const point = studentGrowthAt(student.testHistory, time);
             return { at: time, gained: point?.gained ?? null, expected: point?.expected ?? null, students: point ? 1 : 0 };
           })),
           studentPace: growth ? paceFor(growth.gained, growth.expected) : null,
@@ -154,7 +153,7 @@ export default function GrowthView({
             <p className="text-[15px] font-semibold text-slate-700">Expected over the same time</p>
             <p className="font-display text-5xl font-black tracking-tight text-slate-400">{formatGrowth(summary.expected)}</p>
           </div>
-          <p className="max-w-xs pb-1 text-sm text-slate-500">A level a year, counted from each student&apos;s starting test to their latest post-test or diagnostic.</p>
+          <p className="max-w-xs pb-1 text-sm text-slate-500">A quarter of a level each term, counted from each student&apos;s starting test to their latest post-test or diagnostic.</p>
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PACE_ORDER.map((pace) => (

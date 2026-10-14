@@ -1,6 +1,6 @@
 import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
 import { STANDING_META, studentStandings, type SchoolYearDates, type Standing } from "@/lib/proficiency";
-import { studentGrowthAt, yearBounds, formatGrowth } from "@/lib/growth";
+import { studentGrowthAt, formatGrowth } from "@/lib/growth";
 import { COLORS, documentHtml, escapeHtml, footer, generatedOn, letterhead, type DocumentLogo } from "@/lib/documents/reliq-document";
 import type { SchoolAnalyticsSnapshot, StudentLearningJourney } from "@/lib/school-platform-server";
 
@@ -111,7 +111,7 @@ const shortDate = (iso: string) => new Intl.DateTimeFormat("en-AU", { day: "nume
 
 export function studentProgressReportHtml({ brand, student, year, windowLabel }: { brand: SchoolBrand; student: SnapshotStudent; year: SchoolYearDates | null; windowLabel: string }): string {
   const standings = studentStandings({ yearLevel: student.yearLevel, realms: student.realms, tests: student.tests }, year);
-  const growth = year ? studentGrowthAt(student.testHistory, Date.now(), yearBounds(year).length) : null;
+  const growth = year ? studentGrowthAt(student.testHistory, Date.now()) : null;
   const latestByStrand = new Map((student.tests ?? []).map((test) => [strandForRealm(test.strand), test]));
   const realmByStrand = new Map(student.realms.map((realm) => [strandForRealm(realm.realmId), realm]));
 
@@ -158,7 +158,7 @@ export function studentProgressReportHtml({ brand, student, year, windowLabel }:
       <div style="border-radius:16px;background:${COLORS.paper};padding:14px 16px"><span class="h" style="font-size:14px">Strengths</span><p style="margin:6px 0 0;font-size:12.5px;line-height:1.5;color:#3A3D40">${strengths.length ? `At or above level in ${escapeHtml(list(strengths))}.` : "No strand is at level yet; growth will show as post-tests come in."}</p></div>
       <div style="border-radius:16px;background:#FFF1C7;padding:14px 16px"><span class="h" style="font-size:14px">Next focus</span><p style="margin:6px 0 0;font-size:12.5px;line-height:1.5;color:#3F2E00">${focus.length ? `Below level in ${escapeHtml(list(focus))}.` : "No strand is below level."}${untested.length ? ` ${escapeHtml(list(untested))} ${untested.length === 1 ? "has" : "have"} no test yet.` : ""}</p></div>
     </section>
-    <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">Standing compares each strand's latest diagnostic, pre-test or post-test with where the student's school year should be on the day it was sat. Growth runs from the starting pre-test to the latest post-test or diagnostic. Level 3 complete = 3.0.</p>
+    <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">Standing compares each strand's latest diagnostic, pre-test or post-test with where the student's school year should be in the term it was sat (a quarter of a level each term). Growth runs from the starting pre-test to the latest post-test or diagnostic. Level 3 complete = 3.0.</p>
     ${footer("RELIQ · BrightUp Education", `${generatedOn()} · Page 1 of 1`)}`;
   const css = `.prow{display:grid;grid-template-columns:1.1fr 1fr 1.3fr 1fr .9fr;gap:10px;padding:9px 16px;align-items:center}`;
   return documentHtml({ title: `RELIQ progress report — ${student.name}`, pages: [page], css });

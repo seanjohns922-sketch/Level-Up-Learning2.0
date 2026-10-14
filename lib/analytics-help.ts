@@ -24,7 +24,7 @@ export function overviewHelp(audience: HelpAudience): TabHelpContent {
       },
       {
         title: "Where the numbers come from",
-        text: "Each student's latest diagnostic, pre-test or post-test in each strand, compared with where they should be on the day they sat it. A Year 4 should be at Level 3 in January, 3.5 mid-year and 4 in December. Each student counts once overall, with Number weighted most. Algebra and Probability start at Level 3, so they count once their pre-test is sat.",
+        text: "Each student's latest diagnostic, pre-test or post-test in each strand, compared with where they should be in the term they sat it. The expectation rises a quarter of a level each term: a Year 4 should be at 3.25 in Term 1 (Jan–Mar), 3.5 in Term 2, 3.75 in Term 3 and 4.0 in Term 4 (Oct–Dec). Each student counts once overall, with Number weighted most. Algebra and Probability start at Level 3, so they count once their pre-test is sat.",
       },
       {
         title: "What to do with it",
@@ -57,7 +57,7 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
       },
       {
         title: "Where the numbers come from",
-        text: "Tests only. A pre-test (or the start diagnostic) sets each student's starting point, and the post-tests and diagnostics after it show the growth. Pre-tests for a new level don't count as growth, because they check content not yet taught. Expected growth is a level a year, so February to July is about 0.4. The line steps up as each round of post-tests and diagnostics comes in.",
+        text: "Tests only. A pre-test (or the start diagnostic) sets each student's starting point, and the post-tests and diagnostics after it show the growth. Pre-tests for a new level don't count as growth, because they check content not yet taught. Expected growth is a quarter of a level each term, so Term 1 to Term 3 is 0.5. The line steps up as each round of post-tests and diagnostics comes in.",
       },
       {
         title: "What to do with it",
@@ -74,7 +74,7 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
       { term: PACE_META.slower.label, text: `${PACE_META.slower.meaning}.`, swatch: PACE_META.slower.bg },
       { term: PACE_META.onPace.label, text: `${PACE_META.onPace.meaning}.`, swatch: PACE_META.onPace.bg },
       { term: PACE_META.faster.label, text: `${PACE_META.faster.meaning}.`, swatch: PACE_META.faster.bg },
-      { term: "Expected", text: "a level a year, from each student's starting test to their latest post-test or diagnostic.", swatch: "#FFFFFF", border: "#8F948C" },
+      { term: "Expected", text: "a quarter of a level for each term from the starting test to the latest post-test or diagnostic.", swatch: "#FFFFFF", border: "#8F948C" },
       { term: "Waiting for a post-test", text: "a starting test, but no post-test or diagnostic after it yet.", swatch: "#F1F2EE", border: "#C9CDC5" },
       { term: "Small group", text: "fewer than 5 students in that strand, so read it with care.", swatch: "#F1F2EE", border: "#C9CDC5" },
     ],
@@ -95,7 +95,7 @@ export function curriculumHelp(audience: HelpAudience): TabHelpContent {
       { title: "What it shows", text: `Where ${scope(audience)} sits in each AC9 strand, split by school year, so you can see which strand and year need the most support.` },
       {
         title: "Where the numbers come from",
-        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in that strand, compared with where their school year should be on the day they sat it. A student counts once in every strand they have been tested in.",
+        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in that strand, compared with where their school year should be in the term they sat it. A student counts once in every strand they have been tested in.",
       },
       {
         title: "What to do with it",
@@ -145,7 +145,7 @@ export function interventionHelp(audience: HelpAudience): TabHelpContent {
       { title: "What it shows", text: `Which strand and school year in ${scope(audience)} has the most students below level, from the biggest group down.` },
       {
         title: "Where the numbers come from",
-        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in each strand, compared with where their school year should be on the day they sat it. Below level and well below both count; well below is shown separately.",
+        text: "The same as the Overview: each student's latest diagnostic, pre-test or post-test in each strand, compared with where their school year should be in the term they sat it. Below level and well below both count; well below is shown separately.",
       },
       {
         title: "What to do with it",

@@ -1,5 +1,5 @@
 import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
-import { STANDING_META, standingForGap } from "@/lib/proficiency";
+import { STANDING_META, expectedLevel, schoolTerm, standingForGap } from "@/lib/proficiency";
 import { getCurriculumPlan } from "@/data/programs/genres";
 import { COLORS, documentHtml, escapeHtml, footer, generatedOn, letterhead } from "@/lib/documents/reliq-document";
 import type { SchoolBrand } from "@/lib/documents/school-reports";
@@ -60,15 +60,15 @@ export function curriculumCodeTopics(): Map<string, string> {
   return topics;
 }
 
-function expectedAt(yearIndex: number, checkpoint: Checkpoint): number {
-  if (yearIndex <= 0) return 0;
-  return checkpoint === "start" ? yearIndex - 1 : checkpoint === "mid" ? yearIndex - 0.5 : yearIndex;
-}
+const TERM_MONTHS = ["", "January to March", "April to June", "July to September", "October to December"];
+const levelText = (value: number) => (Math.round(value * 4) % 2 === 0 ? value.toFixed(1) : value.toFixed(2));
 
-function expectationSentence(yearLevel: string, yearIndex: number, checkpoint: Checkpoint, expected: number): string {
+// The expectation for the term a result was sat in (a quarter of a level each term).
+function expectationSentence(yearLevel: string, yearIndex: number, iso: string, expected: number): string {
   if (yearIndex <= 0) return "Prep students are expected to be at Ground (0) all year";
-  const when = checkpoint === "end" ? `By the end of ${yearLevel}` : checkpoint === "mid" ? `Midway through ${yearLevel}` : `At the start of ${yearLevel}`;
-  return `${when}, students are expected to be at ${checkpoint === "mid" ? "about " : ""}${expected.toFixed(1)}`;
+  const term = schoolTerm(iso);
+  if (!term) return `${yearLevel} students are expected to be at ${levelText(expected)}`;
+  return `In Term ${term.term} (${TERM_MONTHS[term.term]}), ${yearLevel} students are expected to be at ${levelText(expected)}`;
 }
 
 const HATCH = `repeating-linear-gradient(45deg, ${COLORS.carbon} 0 1.5px, #FFFFFF 1.5px 4px)`;
@@ -182,6 +182,18 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
     for (const item of CHECKPOINTS.slice(0, CHECKPOINTS.indexOf(checkpoint) + 1)) level = strandLevel(item, strand) ?? level;
     return level;
   };
+  const carriedValue = (checkpoint: Checkpoint, strand: AcStrand) => {
+    let value: CheckpointValue | null = null;
+    for (const item of CHECKPOINTS.slice(0, CHECKPOINTS.indexOf(checkpoint) + 1)) value = values.get(item)?.get(strand) ?? value;
+    return value;
+  };
+  const schoolYearDates = { startsOn: `${year}-01-01`, endsOn: `${year}-12-31` };
+  // Each result is judged against the term it was sat in.
+  const gapFor = (value: CheckpointValue | null) => {
+    if (!value) return null;
+    const expected = expectedLevel(student.yearLevel, value.at, schoolYearDates);
+    return expected === null ? null : value.level - expected;
+  };
   // Curriculum-weighted across the given strands' carried results.
   const weighted = (checkpoint: Checkpoint, strands: AcStrand[]) => {
     const rows = strands.map((strand) => [strand, carried(checkpoint, strand)] as const).filter(([, level]) => level !== null) as Array<readonly [AcStrand, number]>;
@@ -208,8 +220,14 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
   };
 
   const latestOverall = latest ? overall(latest) : null;
-  const expected = latest && yearIndex >= 0 ? expectedAt(yearIndex, latest) : null;
-  const standing = latestOverall !== null && expected !== null ? standingForGap(latestOverall - expected) : null;
+  const latestDate = latest ? checkpointDate(latest) : null;
+  const expected = latestDate && yearIndex >= 0 ? expectedLevel(student.yearLevel, latestDate, schoolYearDates) : null;
+  // Overall standing: each strand's latest result against its own term's
+  // expectation, weighted by the curriculum (as on the dashboards).
+  const gaps = latest ? (STRANDS.map((strand) => [strand, gapFor(carriedValue(latest, strand))] as const).filter(([, gap]) => gap !== null) as Array<readonly [AcStrand, number]>) : [];
+  const gapWeight = gaps.reduce((sum, [strand]) => sum + AC_STRANDS[strand].weight, 0);
+  const overallGap = gapWeight ? gaps.reduce((sum, [strand, gap]) => sum + gap * AC_STRANDS[strand].weight, 0) / gapWeight : null;
+  const standing = latestOverall !== null && overallGap !== null ? standingForGap(overallGap) : null;
   const meta = standing ? STANDING_META[standing] : null;
   const firstOverall = first ? overall(first) : null;
   // Growth compares the same strands at both ends: those with a first result.
@@ -244,7 +262,7 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
 
   const summary = latest && latestOverall !== null && meta && expected !== null
     ? `<span class="chip" style="font-size:14px;padding:4px 12px;background:${meta.bg};color:${meta.fg};align-self:flex-start">${meta.label}</span>
-       <span class="sum">${firstName} ${latest === "end" ? "finished on" : "is on"} <b>${fmt(latestOverall)}</b>. ${escapeHtml(expectationSentence(yearLevel, yearIndex, latest, expected))}, so ${firstName} is ${escapeHtml(meta.meaning)}.</span>
+       <span class="sum">${firstName} ${latest === "end" ? "finished on" : "is on"} <b>${fmt(latestOverall)}</b>. ${escapeHtml(expectationSentence(yearLevel, yearIndex, latestDate!, expected))}, so ${firstName} is ${escapeHtml(meta.meaning)}.</span>
        ${growth !== null ? `<span class="sum">Growth since ${first === "start" ? "the start of the year" : "the first diagnostic"}: <b style="color:${COLORS.green}">${signed(growth)} level${Math.abs(growth) === 1 ? "" : "s"}</b>${strandGrowth[0] ? `. Strongest growth in ${escapeHtml(AC_STRANDS[strandGrowth[0].strand].label)} (${signed(strandGrowth[0].growth!)})` : ""}.</span>` : ""}`
     : `<span class="sum">The overall result appears once all six strands of a diagnostic are complete.</span>`;
 
@@ -252,7 +270,8 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
     const points = CHECKPOINTS.map((checkpoint) => [checkpoint, strandLevel(checkpoint, strand)] as const).filter(([, level]) => level !== null) as Array<[Checkpoint, number]>;
     const latestPoint = points.at(-1);
     const firstPoint = points[0];
-    const strandStanding = latestPoint && yearIndex >= 0 ? STANDING_META[standingForGap(latestPoint[1] - expectedAt(yearIndex, latestPoint[0]))] : null;
+    const latestGap = latestPoint ? gapFor(values.get(latestPoint[0])?.get(strand) ?? null) : null;
+    const strandStanding = latestGap !== null ? STANDING_META[standingForGap(latestGap)] : null;
     const dot = ([checkpoint, level]: [Checkpoint, number]) => {
       const style = checkpoint === "start" ? `background:#FFFFFF;border:2px solid ${COLORS.carbon};width:12px;height:12px;margin-left:-6px;top:10px`
         : checkpoint === "mid" ? `background:${HATCH};border:2px solid ${COLORS.carbon};width:14px;height:14px;margin-left:-7px;top:9px`
@@ -331,8 +350,8 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
     const next = pick(weak, new Set(well.map((item) => item.code)));
     const points = CHECKPOINTS.map((checkpoint) => strandLevel(checkpoint, strand)).filter((level) => level !== null) as number[];
     const journey = points.length ? `${points.map((level) => level.toFixed(1)).join(" → ")}${points.length > 1 ? ` · ${signed(points[points.length - 1] - points[0])}` : ""}` : "Not sat yet";
-    const latestLevel = latest ? strandLevel(latest, strand) : null;
-    const strandStanding = latestLevel !== null && latest && yearIndex >= 0 ? STANDING_META[standingForGap(latestLevel - expectedAt(yearIndex, latest))] : null;
+    const latestGap = latest ? gapFor(carriedValue(latest, strand)) : null;
+    const strandStanding = latestGap !== null ? STANDING_META[standingForGap(latestGap)] : null;
     const list = (items: typeof well, bg: string, fg: string, empty: string) => items.length
       ? items.map((item) => `<span class="sk" style="background:${bg}"><span style="font-size:12px;line-height:1.3"><b style="display:block;font-size:10px;color:${fg}">${escapeHtml(item.code)}</b>${escapeHtml(item.topic)}</span><b style="font-size:12px;text-align:right">${item.percent}%</b></span>`).join("")
       : `<span style="font-size:12px;color:${COLORS.muted}">${empty}</span>`;

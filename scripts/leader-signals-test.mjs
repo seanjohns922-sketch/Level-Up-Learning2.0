@@ -2,25 +2,26 @@ import assert from "node:assert/strict";
 import { buildDistributions, evidencedLevel, expectedLevel, standingForGap, studentStandings, usesTests } from "../lib/proficiency.ts";
 import { buildLeaderSignals } from "../lib/leader-signals.ts";
 
-const year = { startsOn: "2026-01-28", endsOn: "2026-12-18" };
 
-// Australian school years run January to December; schools are set up 1 Jan to 31 Dec.
+// Australian school years run January to December. The expectation rises a
+// quarter of a level each term: a Year 4 is expected at 3.25 in Term 1
+// (Jan-Mar), 3.5 in Term 2 (Apr-Jun), 3.75 in Term 3 (Jul-Sep), 4 in Term 4.
 const calendarYear = { startsOn: "2026-01-01", endsOn: "2026-12-31" };
-assert.equal(expectedLevel("Year 4", "2026-01-01T00:00:00Z", calendarYear), 3);
-assert.ok(Math.abs(expectedLevel("Year 4", "2026-07-02T12:00:00Z", calendarYear) - 3.5) < 0.01);
-assert.ok(expectedLevel("Year 4", "2026-12-31T12:00:00Z", calendarYear) > 3.99);
-assert.equal(expectedLevel("Year 4", "2025-12-15T00:00:00Z", calendarYear) > 2.95, true); // last year's Year 3 finishing at 3
-const close = (a, b) => assert.ok(Math.abs(a - b) < 0.02, `${a} ≈ ${b}`);
-
-// Expected level moves through the year: Year 4 = 3 at the start, 3.5 mid-year, 4 at the end.
-close(expectedLevel("Year 4", "2026-01-28T00:00:00Z", year), 3);
-close(expectedLevel("Year 4", "2026-07-08T12:00:00Z", year), 3.5);
-close(expectedLevel("Year 4", "2026-12-18T23:00:00Z", year), 4);
-close(expectedLevel("Year 4", "2027-02-01T00:00:00Z", year), 4); // after the year: holds at 4
-close(expectedLevel("Year 4", "2025-07-08T12:00:00Z", year), 2.5); // last year: last year's mid-year
-close(expectedLevel("Year 4", "2026-01-10T00:00:00Z", year), 3); // summer holidays hold at last year's end
-assert.equal(expectedLevel("Prep", "2026-11-01T00:00:00Z", year), 0); // Prep: Ground all year
-assert.equal(expectedLevel(null, "2026-03-01T00:00:00Z", year), null);
+assert.equal(expectedLevel("Year 4", "2026-02-10T00:00:00Z", calendarYear), 3.25);
+assert.equal(expectedLevel("Year 4", "2026-05-20T00:00:00Z", calendarYear), 3.5);
+assert.equal(expectedLevel("Year 4", "2026-08-20T00:00:00Z", calendarYear), 3.75);
+assert.equal(expectedLevel("Year 4", "2026-11-20T00:00:00Z", calendarYear), 4);
+// Brody: a Year 3 in September is expected at 2.75, so 2.0 is a term to a year behind.
+assert.equal(expectedLevel("Year 3", "2026-09-05T00:00:00Z", calendarYear), 2.75);
+assert.equal(standingForGap(2.0 - expectedLevel("Year 3", "2026-09-05T00:00:00Z", calendarYear)), "below");
+// Terms follow Melbourne time: 31 March 11pm UTC is already April (Term 2) in Melbourne.
+assert.equal(expectedLevel("Year 4", "2026-03-31T15:00:00Z", calendarYear), 3.5);
+assert.equal(expectedLevel("Year 4", "2025-11-20T00:00:00Z", calendarYear), 3); // last year's Year 3 in Term 4
+assert.equal(expectedLevel("Year 4", "2025-08-20T00:00:00Z", calendarYear), 2.75); // last year's Term 3
+assert.equal(expectedLevel("Year 4", "2027-02-01T00:00:00Z", calendarYear), 4); // after the year: holds at 4
+assert.equal(expectedLevel("Prep", "2026-11-01T00:00:00Z", calendarYear), 0); // Prep: Ground all year
+assert.equal(expectedLevel(null, "2026-03-01T00:00:00Z", calendarYear), null);
+const year = calendarYear;
 
 // Bands: within a term = at, a term to a year behind = below, a year+ = well below, a term+ ahead = above.
 assert.equal(standingForGap(0.3), "above");
@@ -29,13 +30,13 @@ assert.equal(standingForGap(-0.25), "at");
 assert.equal(standingForGap(-0.5), "below");
 assert.equal(standingForGap(-1), "wellBelow");
 
-// The spec example: Year 4 mid-year (expected 3.5).
-const mid = "2026-07-08T12:00:00Z";
+// The spec example: Year 4 in Term 2 (expected 3.5).
+const mid = "2026-05-20T02:00:00Z";
 const one = (measured) => studentStandings({ yearLevel: "Year 4", realms: [], tests: [{ strand: "number", measured, testedAt: mid, source: "diagnostic" }] }, year).overall;
 assert.deepEqual([one(3.4), one(3.0), one(2.4), one(3.9)], ["at", "below", "wellBelow", "above"]);
 // The same 3.2 reads differently through the year.
 const at = (testedAt) => studentStandings({ yearLevel: "Year 4", realms: [], tests: [{ strand: "number", measured: 3.2, testedAt, source: "pretest" }] }, year).overall;
-assert.deepEqual([at("2026-01-30T00:00:00Z"), at(mid), at("2026-12-10T00:00:00Z")], ["at", "below", "below"]); // 0.3 behind mid-year is more than a term
+assert.deepEqual([at("2026-01-30T00:00:00Z"), at(mid), at("2026-12-10T00:00:00Z")], ["at", "below", "below"]); // 3.2: at level in Term 1 (3.25), 0.3 behind in Term 2, 0.8 behind in Term 4
 
 // Overall weights strands by curriculum share (Number counts most); strands without a test don't count.
 const mixed = studentStandings({ yearLevel: "Year 4", realms: [], tests: [

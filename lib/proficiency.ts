@@ -7,9 +7,11 @@ import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-s
  *
  * Levels use the shared mastery scale: a Level N test spans N-1 (previous
  * level complete) to N (this level complete). A student in school year N is
- * expected at N-1 at the start of the school year and N at the end, moving
- * evenly through the year; Prep is expected at Ground (0) all year. Each
- * test is compared with the expectation on the day it was sat:
+ * expected to gain a quarter of a level each term (school year Jan-Dec):
+ *   Term 1 (Jan-Mar) N-0.75 · Term 2 (Apr-Jun) N-0.5
+ *   Term 3 (Jul-Sep) N-0.25 · Term 4 (Oct-Dec) N
+ * Prep is expected at Ground (0) all year. Each test is compared with the
+ * expectation for the term it was sat in:
  *   above      more than 0.25 ahead (more than a term)
  *   at         within 0.25 either side (within a term)
  *   below      0.25 to 1.0 behind (a term to a year)
@@ -53,36 +55,37 @@ export function evidencedLevel(realm: RealmEvidence): string | null | undefined 
   return realm.currentLevel;
 }
 
-const DAY = 86400000;
+const MELBOURNE_PARTS = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Melbourne", year: "numeric", month: "numeric" });
 
-/** Expected level for a school year on a given date. The expectation runs
- * from N-1 at the start of the school year to N at the end and holds through
- * the holidays. A test from an earlier year is judged against that year's
- * timeline (the same term dates a year earlier, one level lower). Prep stays
- * at Ground (0). */
-export function expectedLevel(schoolYear: string | null, testedAt: string, year: SchoolYearDates): number | null {
-  const n = levelIndex(schoolYear);
-  if (n < 0) return null;
-  const start = Date.parse(`${year.startsOn}T00:00:00Z`);
-  const end = Date.parse(`${year.endsOn}T00:00:00Z`) + DAY;
-  const at = Date.parse(testedAt);
-  if (Number.isNaN(start) || Number.isNaN(end) || Number.isNaN(at) || end <= start) return null;
-  let yearsBack = 0;
-  let shiftedStart = start;
-  let shiftedEnd = end;
-  while (at < shiftedStart && yearsBack < 10) {
-    yearsBack += 1;
-    shiftedStart = shift(start, -yearsBack);
-    shiftedEnd = shift(end, -yearsBack);
-  }
-  const progress = Math.min(1, Math.max(0, (at - shiftedStart) / (shiftedEnd - shiftedStart)));
-  return Math.max(0, n - 1 - yearsBack + progress);
+/** The school term (1-4) and calendar year a date falls in, in Victoria:
+ * Term 1 Jan-Mar, Term 2 Apr-Jun, Term 3 Jul-Sep, Term 4 Oct-Dec. */
+export function schoolTerm(iso: string): { year: number; term: 1 | 2 | 3 | 4 } | null {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = MELBOURNE_PARTS.formatToParts(date);
+  const year = Number(parts.find((part) => part.type === "year")?.value);
+  const month = Number(parts.find((part) => part.type === "month")?.value);
+  return { year, term: (Math.floor((month - 1) / 3) + 1) as 1 | 2 | 3 | 4 };
 }
 
-function shift(time: number, years: number) {
-  const date = new Date(time);
-  date.setUTCFullYear(date.getUTCFullYear() + years);
-  return date.getTime();
+/** Terms since a fixed point, so two dates' terms can be subtracted. */
+export function termIndex(iso: string): number | null {
+  const term = schoolTerm(iso);
+  return term ? term.year * 4 + term.term : null;
+}
+
+/** Expected level for a school year in the term a test was sat: a quarter of
+ * a level each term, from N-0.75 in Term 1 to N in Term 4. A test from an
+ * earlier year is judged against that year's level (one lower per year
+ * back); a test after the school year holds at N. Prep stays at Ground (0). */
+export function expectedLevel(schoolYear: string | null, testedAt: string, year: SchoolYearDates): number | null {
+  const n = levelIndex(schoolYear);
+  const term = schoolTerm(testedAt);
+  const academicYear = Number(year.startsOn.slice(0, 4));
+  if (n < 0 || !term || !Number.isFinite(academicYear)) return null;
+  if (term.year > academicYear) return n;
+  const yearsBack = academicYear - term.year;
+  return Math.max(0, n - yearsBack - 1 + 0.25 * term.term);
 }
 
 export function standingForGap(gap: number): Standing {
