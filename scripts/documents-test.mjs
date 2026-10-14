@@ -7,7 +7,7 @@ import { buildStudentRosterTemplate } from "../lib/student-roster-template.ts";
 import { readFileSync } from "node:fs";
 import ExcelJS from "exceljs";
 import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
-import { diagnosticReportHtml } from "../lib/documents/diagnostic-report.ts";
+import { diagnosticReportHtml, realmTestLevel } from "../lib/documents/diagnostic-report.ts";
 import { getCurriculumPlan } from "../data/programs/genres.ts";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
@@ -112,6 +112,34 @@ assert.equal(pages(diagnostic), 2);
 assert.ok(diagnostic.includes("Where Frankie finished the year") && diagnostic.includes("By the end of Year 5, students are expected to be at 5.0"));
 assert.ok(diagnostic.includes("AC9M4N01") && diagnostic.includes("AC9M5N04") && diagnostic.includes("Doing well") && diagnostic.includes("Work on next"));
 save("diagnostic-report", diagnostic);
+
+// Realm tests stand in for diagnostics: pre-test = Start, May-July post-test
+// = Mid, November-December post-test = End; September post-tests don't count.
+assert.equal(realmTestLevel("Year 4", 90), 4);
+assert.ok(Math.abs(realmTestLevel("Year 4", 62.5) - 3.5) < 1e-9);
+assert.equal(realmTestLevel("Year 5", 10), 3.25);
+const realmRow = (realm_id, assessment_type, working_level, score_percent, completed_at) => ({ realm_id, assessment_type, working_level, score_percent, completed_at });
+const testsOnly = diagnosticReportHtml({
+  brand: { schoolName: "Cobram Primary School", schoolLogo: logo }, student: { name: "Abigail Tozer", yearLevel: "Year 4", className: "3/4J" }, sittings: [], year: 2026,
+  realmTests: [
+    realmRow("number", "pretest", "Year 3", 95, "2026-02-03T01:00:00Z"), realmRow("number", "pretest", "Year 3", 95, "2026-02-03T01:05:00Z"),
+    realmRow("number", "pretest", "Year 4", 30, "2026-02-05T01:00:00Z"),
+    realmRow("number", "posttest", "Year 4", 70, "2026-06-10T01:00:00Z"),
+    realmRow("number", "posttest", "Year 4", 99, "2026-09-10T01:00:00Z"),
+    realmRow("number", "posttest", "Year 5", 50, "2026-12-01T01:00:00Z"),
+    realmRow("space", "pretest", "Year 4", 62.5, "2026-02-04T01:00:00Z"),
+    realmRow("space", "pretest", "Year 3", 99, "2025-11-01T01:00:00Z"),
+  ],
+});
+assert.equal(pages(testsOnly), 1);
+// Number start: the placement chain ends on the Year 4 pre-test, floored at 3.0 by the Year 3 pass.
+assert.ok(testsOnly.includes("pre-tests · 2 of 6 strands"));
+assert.ok(testsOnly.includes("post-tests · 2 of 6 strands")); // Space carries forward until replaced
+// Growth compares Number and Space at both ends: start 3.12, end (4.22 and 3.5) 4.05.
+assert.ok(testsOnly.includes("+0.9 levels"));
+assert.ok(testsOnly.includes("appear once Abigail sits a whole-maths diagnostic"));
+assert.ok(testsOnly.includes("Where Abigail finished the year"));
+save("diagnostic-report-tests-only", testsOnly);
 
 // Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
 const logoPng = readFileSync("public/brand/reliq-logo.png");

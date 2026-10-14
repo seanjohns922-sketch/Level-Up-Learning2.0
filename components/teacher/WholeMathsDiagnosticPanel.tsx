@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
-import { diagnosticReportHtml } from "@/lib/documents/diagnostic-report";
+import { diagnosticReportHtml, type RealmTestRow } from "@/lib/documents/diagnostic-report";
+import { supabase } from "@/lib/supabase";
 import { CalendarDays, Info, ListChecks, TrendingUp, X } from "lucide-react";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
@@ -138,11 +139,19 @@ export default function WholeMathsDiagnosticPanel({
   schoolLogo?: { src: string; alt: string } | null;
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
-  const openDiagnosticReport = (studentId: string) => {
+  const openDiagnosticReport = async (studentId: string) => {
     const student = students.find((item) => item.id === studentId);
     if (!student) return;
+    // Open from the click so pop-up blockers allow it, then fill it in.
     const win = openDocumentWindow();
     if (!win) return;
+    // Pre-tests count as Start and June / December post-tests as Mid / End
+    // where no whole-maths diagnostic was sat.
+    const { data: realmTests, error } = await supabase
+      .from("student_realm_assessments")
+      .select("realm_id,assessment_type,working_level,score_percent,completed_at")
+      .eq("student_id", studentId);
+    if (error) console.warn("[WholeMathsDiagnosticPanel] realm tests unavailable for the report", error);
     writeDocument(win, diagnosticReportHtml({
       brand: {
         schoolName,
@@ -150,6 +159,7 @@ export default function WholeMathsDiagnosticPanel({
       },
       student: { name: student.display_name, yearLevel: student.school_year_level ?? student.year_level ?? null, className: selectedClass?.name ?? null },
       sittings: sittings.filter((sitting) => sitting.student_id === studentId),
+      realmTests: (realmTests ?? []) as RealmTestRow[],
     }));
   };
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
@@ -460,7 +470,10 @@ export default function WholeMathsDiagnosticPanel({
           ) : trackerStudents.map(({ student, liveLevel, diagnosticPoints, latestDiagnostic }) => (
               <div key={student.id} className="grid gap-4 px-5 py-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:items-center">
                 <div>
-                  <p className="font-black text-slate-950">{student.display_name}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-black text-slate-950">{student.display_name}</p>
+                    <button type="button" onClick={() => void openDiagnosticReport(student.id)} className="shrink-0 rounded-md border border-[#121314] px-2 py-0.5 text-[11px] font-black text-[#121314] hover:bg-[#121314] hover:text-[#B9F23F]" aria-label={`Diagnostic report for ${student.display_name}`}>Report</button>
+                  </div>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
                     <span className="text-teal-700">Live {liveLevel == null ? "—" : formatProgressionPoint(liveLevel)}</span>
                     <span className="text-violet-700">Diagnostic {latestDiagnostic == null ? "—" : formatProgressionPoint(latestDiagnostic)}</span>
@@ -539,7 +552,7 @@ export default function WholeMathsDiagnosticPanel({
                       <p className="text-xs text-slate-500">Overall: {sitting.overall_level == null ? "Pending all 6 strands" : sitting.overall_level.toFixed(2)}</p>
                     </div>
                     {sitting.status === "completed" && sitting.checkpoint !== "ad_hoc" ? (
-                      <button type="button" onClick={() => openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#B9F23F] hover:bg-black">Diagnostic report</button>
+                      <button type="button" onClick={() => void openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#B9F23F] hover:bg-black">Diagnostic report</button>
                     ) : null}
                   </div>
                 </div>

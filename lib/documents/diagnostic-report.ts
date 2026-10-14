@@ -4,10 +4,17 @@ import { getCurriculumPlan } from "@/data/programs/genres";
 import { COLORS, documentHtml, escapeHtml, footer, generatedOn, letterhead } from "@/lib/documents/reliq-document";
 import type { SchoolBrand } from "@/lib/documents/school-reports";
 
-/** Maths diagnostic report: the start, mid and end diagnostics for one
- * student. Page 1: results, where they finished against their school year,
- * and the six-strand profile. Page 2: each strand's two strongest and two
- * weakest skills from the latest diagnostic.
+/** Maths diagnostic report for one student. Page 1: Start, Mid and End
+ * results, where they are against their school year, and the six-strand
+ * profile. Page 2: each strand's two strongest and two weakest skills from
+ * the latest whole-maths diagnostic.
+ *
+ * Each strand's checkpoints use the whole-maths diagnostic when it was sat,
+ * otherwise the realm tests: the pre-test counts as Start, a post-test from
+ * May to July as Mid, and a post-test from November to December as End.
+ * Realm tests are scored on the shared scale (85%+ = the level; 40-84%
+ * between the level below and the level; under 40% below it), and a pre-test
+ * never pulls a student below their best result so far.
  *
  * The diagnostic records each level probe (score, total and the curriculum
  * codes it covered), not which individual questions were right, so page 2
@@ -22,6 +29,9 @@ export type DiagnosticReportSitting = {
   created_at: string;
   strand_results: Array<{ strand: AcStrand; status: string; measured_level: number | null; probe_scores: ProbeScore[] }>;
 };
+
+/** A realm pre-test or post-test, as stored in student_realm_assessments. */
+export type RealmTestRow = { realm_id: string; assessment_type: string; working_level: string; score_percent: number | null; completed_at: string };
 
 const CHECKPOINTS = ["start", "mid", "end"] as const;
 type Checkpoint = (typeof CHECKPOINTS)[number];
@@ -66,30 +76,135 @@ const fmt = (value: number | null | undefined) => (value === null || value === u
 const signed = (value: number) => `${value >= 0 ? "+" : "−"}${Math.abs(value).toFixed(1)}`;
 const pctOfScale = (value: number) => `${((Math.max(0, Math.min(6, value)) / 6) * 100).toFixed(2)}%`;
 
-export function diagnosticReportHtml({ brand, student, sittings, codeTopics = curriculumCodeTopics() }: {
+const REALM_STRAND: Record<string, AcStrand> = { number: "number", measurement: "measurement", space: "space", statistics: "statistics", pattern: "algebra", chance: "probability" };
+const PLACEMENT_DAYS = 21;
+const DAY = 86400000;
+
+function levelNumber(workingLevel: string): number | null {
+  if (workingLevel === "Prep" || workingLevel === "Ground") return 0;
+  const match = /^Year (\d)$/.exec(workingLevel);
+  return match ? Number(match[1]) : null;
+}
+
+/** A realm test on the shared mastery scale (the diagnostic's own formula). */
+export function realmTestLevel(workingLevel: string, percent: number): number | null {
+  const level = levelNumber(workingLevel);
+  if (level === null) return null;
+  if (percent >= 85) return level;
+  if (percent >= 40) return level - 1 + (percent - 40) / 45;
+  return Math.max(0, level - 1 - Math.min(0.9, (40 - percent) / 40));
+}
+
+type CheckpointValue = { level: number; at: string; source: "diagnostic" | "pretest" | "posttest" };
+
+/** Start / Mid / End per strand from this year's realm tests. */
+function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>> {
+  const out = new Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>>();
+  const byStrand = new Map<AcStrand, Array<{ type: "pretest" | "posttest"; raw: number; at: string }>>();
+  const seen = new Set<string>();
+  for (const row of rows) {
+    const strand = REALM_STRAND[row.realm_id];
+    const type = /post/i.test(row.assessment_type) ? "posttest" : /pre/i.test(row.assessment_type) ? "pretest" : null;
+    if (!strand || !type || row.score_percent === null || new Date(row.completed_at).getFullYear() !== year) continue;
+    const raw = realmTestLevel(row.working_level, row.score_percent);
+    // The same test saved more than once counts once.
+    const key = `${strand}|${type}|${row.working_level}|${row.score_percent}|${row.completed_at.slice(0, 10)}`;
+    if (raw === null || seen.has(key)) continue;
+    seen.add(key);
+    byStrand.set(strand, [...(byStrand.get(strand) ?? []), { type, raw, at: row.completed_at }]);
+  }
+  for (const [strand, tests] of byStrand) {
+    tests.sort((a, b) => a.at.localeCompare(b.at));
+    // A pre-test never pulls a student below their best since the last post-test.
+    let floor = 0;
+    const scored = tests.map((test) => {
+      const level = test.type === "pretest" ? Math.max(test.raw, floor) : test.raw;
+      floor = test.type === "pretest" ? Math.max(floor, level) : level;
+      return { ...test, level };
+    });
+    const points: Partial<Record<Checkpoint, CheckpointValue>> = {};
+    const pretests = scored.filter((test) => test.type === "pretest");
+    if (pretests.length) {
+      // The placement chain: pre-tests in the first three weeks; the last one is where they start.
+      const first = Date.parse(pretests[0].at);
+      const chain = pretests.filter((test) => Date.parse(test.at) - first <= PLACEMENT_DAYS * DAY);
+      const start = chain[chain.length - 1];
+      points.start = { level: start.level, at: start.at, source: "pretest" };
+    }
+    for (const test of scored.filter((item) => item.type === "posttest")) {
+      const month = new Date(test.at).getMonth();
+      if (month >= 4 && month <= 6) points.mid = { level: test.level, at: test.at, source: "posttest" };
+      if (month >= 10) points.end = { level: test.level, at: test.at, source: "posttest" };
+    }
+    out.set(strand, points);
+  }
+  return out;
+}
+
+export function diagnosticReportHtml({ brand, student, sittings, realmTests = [], codeTopics = curriculumCodeTopics(), year = new Date().getFullYear() }: {
   brand: SchoolBrand;
   student: { name: string; yearLevel: string | null; className: string | null };
   sittings: DiagnosticReportSitting[];
+  realmTests?: RealmTestRow[];
   codeTopics?: Map<string, string>;
+  year?: number;
 }): string {
-  // The latest completed sitting at each checkpoint.
+  // The latest completed whole-maths sitting at each checkpoint.
   const byCheckpoint = new Map<Checkpoint, DiagnosticReportSitting>();
-  for (const sitting of [...sittings].sort((a, b) => (a.completed_at ?? a.created_at).localeCompare(b.completed_at ?? b.created_at))) {
-    if (sitting.status === "completed" && sitting.checkpoint !== "ad_hoc") byCheckpoint.set(sitting.checkpoint, sitting);
+  const completed = [...sittings]
+    .filter((sitting) => sitting.status === "completed" && sitting.checkpoint !== "ad_hoc")
+    .sort((a, b) => (a.completed_at ?? a.created_at).localeCompare(b.completed_at ?? b.created_at));
+  for (const sitting of completed) byCheckpoint.set(sitting.checkpoint as Checkpoint, sitting);
+  const fromTests = realmTestCheckpoints(realmTests, year);
+
+  // Each strand's value at each checkpoint: the diagnostic first, then realm tests.
+  const values = new Map<Checkpoint, Map<AcStrand, CheckpointValue>>();
+  for (const checkpoint of CHECKPOINTS) {
+    const row = new Map<AcStrand, CheckpointValue>();
+    for (const strand of STRANDS) {
+      const sitting = byCheckpoint.get(checkpoint);
+      const result = sitting?.strand_results.find((item) => item.strand === strand && item.status === "completed" && item.measured_level !== null);
+      if (result && sitting) row.set(strand, { level: result.measured_level!, at: sitting.completed_at ?? sitting.created_at, source: "diagnostic" });
+      else if (fromTests.get(strand)?.[checkpoint]) row.set(strand, fromTests.get(strand)![checkpoint]!);
+    }
+    values.set(checkpoint, row);
   }
-  const sat = CHECKPOINTS.filter((checkpoint) => byCheckpoint.has(checkpoint));
+  const sat = CHECKPOINTS.filter((checkpoint) => values.get(checkpoint)!.size > 0);
   const latest = sat.at(-1) ?? null;
   const first = sat[0] ?? null;
   const yearLevel = student.yearLevel ?? "Year not recorded";
   const yearIndex = YEARS.indexOf(student.yearLevel ?? "");
 
-  const strandLevel = (checkpoint: Checkpoint, strand: AcStrand) => byCheckpoint.get(checkpoint)?.strand_results.find((row) => row.strand === strand && row.status === "completed")?.measured_level ?? null;
+  const strandLevel = (checkpoint: Checkpoint, strand: AcStrand) => values.get(checkpoint)?.get(strand)?.level ?? null;
+  // A strand's result stands until a later checkpoint replaces it.
+  const carried = (checkpoint: Checkpoint, strand: AcStrand) => {
+    let level: number | null = null;
+    for (const item of CHECKPOINTS.slice(0, CHECKPOINTS.indexOf(checkpoint) + 1)) level = strandLevel(item, strand) ?? level;
+    return level;
+  };
+  // Curriculum-weighted across the given strands' carried results.
+  const weighted = (checkpoint: Checkpoint, strands: AcStrand[]) => {
+    const rows = strands.map((strand) => [strand, carried(checkpoint, strand)] as const).filter(([, level]) => level !== null) as Array<readonly [AcStrand, number]>;
+    if (!rows.length) return null;
+    const weight = rows.reduce((sum, [strand]) => sum + AC_STRANDS[strand].weight, 0);
+    return rows.reduce((sum, [strand, level]) => sum + level * AC_STRANDS[strand].weight, 0) / weight;
+  };
   const overall = (checkpoint: Checkpoint) => {
+    const row = values.get(checkpoint)!;
+    if (!row.size) return null;
     const sitting = byCheckpoint.get(checkpoint);
-    if (!sitting) return null;
-    if (sitting.overall_level !== null) return sitting.overall_level;
-    const levels = STRANDS.map((strand) => [strand, strandLevel(checkpoint, strand)] as const).filter(([, level]) => level !== null);
-    return levels.length === STRANDS.length ? levels.reduce((sum, [strand, level]) => sum + level! * AC_STRANDS[strand].weight, 0) / TOTAL_WEIGHT : null;
+    const allDiagnostic = row.size === STRANDS.length && [...row.values()].every((value) => value.source === "diagnostic");
+    if (sitting && allDiagnostic && sitting.overall_level !== null) return sitting.overall_level;
+    return weighted(checkpoint, STRANDS);
+  };
+  const sourceNote = (checkpoint: Checkpoint) => {
+    const sources = new Set([...(values.get(checkpoint)?.values() ?? [])].map((value) => value.source));
+    const words = [...sources].map((source) => (source === "diagnostic" ? "diagnostic" : source === "pretest" ? "pre-tests" : "post-tests"));
+    return words.join(" + ");
+  };
+  const checkpointDate = (checkpoint: Checkpoint) => {
+    const dates = [...(values.get(checkpoint)?.values() ?? [])].map((value) => value.at).sort();
+    return dates.at(-1) ?? null;
   };
 
   const latestOverall = latest ? overall(latest) : null;
@@ -97,13 +212,18 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
   const standing = latestOverall !== null && expected !== null ? standingForGap(latestOverall - expected) : null;
   const meta = standing ? STANDING_META[standing] : null;
   const firstOverall = first ? overall(first) : null;
-  const growth = latestOverall !== null && firstOverall !== null && first !== latest ? latestOverall - firstOverall : null;
+  // Growth compares the same strands at both ends: those with a first result.
+  const firstStrands = first ? STRANDS.filter((strand) => strandLevel(first, strand) !== null) : [];
+  const growthFrom = first ? weighted(first, firstStrands) : null;
+  const growthTo = latest ? weighted(latest, firstStrands) : null;
+  const growth = growthFrom !== null && growthTo !== null && first !== latest && firstOverall !== null ? growthTo - growthFrom : null;
   const strandGrowth = STRANDS.map((strand) => {
     const start = first ? strandLevel(first, strand) : null;
     const end = latest ? strandLevel(latest, strand) : null;
     return { strand, growth: start !== null && end !== null && first !== latest ? end - start : null };
   }).filter((row) => row.growth !== null).sort((a, b) => b.growth! - a.growth!);
 
+  const hasSkills = completed.length > 0;
   const name = escapeHtml(student.name);
   const firstName = escapeHtml(student.name.split(" ")[0] || student.name);
   const metaLine = [brand.schoolName, student.className, String(new Date().getFullYear())].filter(Boolean).join(" · ");
@@ -111,9 +231,12 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
 
   const boxes = CHECKPOINTS.map((checkpoint) => {
     const value = overall(checkpoint);
-    const sitting = byCheckpoint.get(checkpoint);
+    const date = checkpointDate(checkpoint);
     const isLatest = checkpoint === latest;
-    const when = sitting ? new Intl.DateTimeFormat("en-AU", { month: "long", timeZone: "Australia/Melbourne" }).format(new Date(sitting.completed_at ?? sitting.created_at)) : "Not sat yet";
+    const count = STRANDS.filter((strand) => carried(checkpoint, strand) !== null).length;
+    const when = date
+      ? `${new Intl.DateTimeFormat("en-AU", { month: "long", timeZone: "Australia/Melbourne" }).format(new Date(date))} · ${sourceNote(checkpoint)}${count < STRANDS.length ? ` · ${count} of 6 strands` : ""}`
+      : "Not sat yet";
     const extra = isLatest && growth !== null ? ` · ${signed(growth)}` : "";
     const style = isLatest ? `background:${COLORS.carbon};color:#FFFFFF;border-color:${COLORS.carbon}` : checkpoint === "mid" ? `background:${COLORS.paper};border-color:#C9CDC5` : "background:#FFFFFF;border-color:#C9CDC5";
     return `<span class="cp" style="${style}"><span class="cp-l">${CHECKPOINT_LABEL[checkpoint]}</span><span class="h cp-v">${fmt(value)}</span><span class="cp-w">${escapeHtml(when + extra)}</span></span>`;
@@ -168,8 +291,10 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
       <div class="pgrid"><div class="prow head"><span></span><span class="scale"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></span><span></span><span></span></div>${profileRows}</div>
     </section>
     <section style="border-radius:16px;background:${COLORS.carbon};color:#FFFFFF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px">
-      <span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Strand by strand, on page 2</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} answered best in each strand, and the two to work on next.</span></span>
-      <span class="chip" style="font-size:12px;padding:5px 12px;background:${COLORS.lime};color:${COLORS.carbon}">Turn over</span>
+      ${hasSkills
+        ? `<span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Strand by strand, on page 2</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} answered best in each strand, and the two to work on next.</span></span>
+      <span class="chip" style="font-size:12px;padding:5px 12px;background:${COLORS.lime};color:${COLORS.carbon}">Turn over</span>`
+        : `<span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Skills strand by strand</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} does best in each strand, and the two to work on next, appear once ${firstName} sits a whole-maths diagnostic.</span></span>`}
     </section>
     <section style="border-radius:16px;background:${COLORS.paper};padding:14px 16px;display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:center">
       <div style="display:flex;flex-direction:column;gap:8px"><span class="h" style="font-size:14px">How the overall level is worked out</span>
@@ -177,11 +302,13 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
         <span style="display:flex;height:16px;border-radius:999px;overflow:hidden">${STRANDS.map((strand, index) => `<span style="width:${(AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100}%;background:${WEIGHT_COLORS[index]}"></span>`).join("")}</span></div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:11.5px">${STRANDS.map((strand, index) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:${WEIGHT_COLORS[index]};border:1px solid #D5D8D1"></span>${AC_STRANDS[strand].label}</span><b style="text-align:right">${Math.round((AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100)}%</b>`).join("")}</div>
     </section>
-    ${footer("RELIQ · BrightUp Education · Levels on the Australian Curriculum scale (Level 4 complete = 4.0)", `${generatedOn()} · Page 1 of 2`)}`;
+    <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">Each strand uses the whole-maths diagnostic when it was sat. Otherwise the pre-test counts as Start, a post-test from May to July as Mid, and a post-test from November to December as End.</p>
+    ${footer("RELIQ · BrightUp Education · Levels on the Australian Curriculum scale (Level 4 complete = 4.0)", `${generatedOn()} · Page 1 of ${hasSkills ? 2 : 1}`)}`;
 
   // Page 2: per strand, the two codes from the strongest level probes and the
   // two from the weakest, from the latest diagnostic.
-  const latestSitting = latest ? byCheckpoint.get(latest)! : null;
+  const latestSitting = completed.at(-1) ?? null;
+  const latestSittingCheckpoint = (latestSitting?.checkpoint ?? null) as Checkpoint | null;
   const skillCards = STRANDS.map((strand) => {
     const result = latestSitting?.strand_results.find((row) => row.strand === strand && row.status === "completed");
     const probes = (result?.probe_scores ?? []).filter((probe) => probe.total > 0 && (probe.curriculumCodes ?? []).length > 0);
@@ -218,7 +345,7 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
   const latestWhen = latestSitting ? new Intl.DateTimeFormat("en-AU", { month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date(latestSitting.completed_at ?? latestSitting.created_at)) : "";
   const page2 = `${head}
     <section style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
-      <div><span class="h" style="font-size:26px;line-height:1">Strand by strand</span><div style="font-size:13px;color:${COLORS.muted};margin-top:4px">${escapeHtml([student.name, yearLevel, latest ? `${CHECKPOINT_LABEL[latest].toLowerCase()} diagnostic, ${latestWhen}` : ""].filter(Boolean).join(" · "))}</div></div>
+      <div><span class="h" style="font-size:26px;line-height:1">Strand by strand</span><div style="font-size:13px;color:${COLORS.muted};margin-top:4px">${escapeHtml([student.name, yearLevel, latestSittingCheckpoint ? `${CHECKPOINT_LABEL[latestSittingCheckpoint].toLowerCase()} diagnostic, ${latestWhen}` : ""].filter(Boolean).join(" · "))}</div></div>
       <span style="font-size:11.5px;color:${COLORS.muted};text-align:right;max-width:290px;line-height:1.4">For each strand: the two skills ${firstName} answered best and the two to work on next.</span>
     </section>
     <section style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start">${skillCards}</section>
@@ -244,6 +371,6 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
 .pv{text-align:right;display:flex;flex-direction:column;line-height:1.1}
 .ps{}
 .sk{display:grid;grid-template-columns:1fr 42px;gap:8px;align-items:center;border-radius:9px;padding:6px 9px}`;
-  return documentHtml({ title: `RELIQ maths diagnostic report — ${student.name}`, pages: [page1, page2], css });
+  return documentHtml({ title: `RELIQ maths diagnostic report — ${student.name}`, pages: hasSkills ? [page1, page2] : [page1], css });
 }
 
