@@ -115,10 +115,9 @@ function realmStanding(yearLevel: string | null, realm: { realmId: string; curre
   const level = evidencedLevel(realm);
   return level === undefined ? null : levelStanding(yearLevel, level);
 }
-// Brand Violet ramp for ordinal levels in the placement view (Prep palest,
-// Year 8 deepest). Violet isn't one of the standing colours, so it shows the
-// level without implying good or bad.
-const LEVEL_RAMP = ["#F6E6FC", "#EDCDF9", "#E2B0F6", "#D68AF4", "#C94DF2", "#AC3BD2", "#8C2EAC", "#6B2385", "#4A185C"];
+// Green ramp for ordinal levels in the placement view (Prep palest, Year 8
+// darkest): adult screens use green; violet is for students.
+const LEVEL_RAMP = ["#F1F9E3", "#DDF2B5", "#C6EA86", "#A9DB57", "#86C232", "#649A1E", "#477315", "#2F4F0D", "#1C3207"];
 // Colour a level/grade by its position on the Ground->Year 6 ladder, so the
 // school-grade bar and the working-level bar share colours (Year 3 == Level 3)
 // and any mismatch between them reads as a colour shift.
