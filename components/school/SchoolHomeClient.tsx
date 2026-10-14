@@ -3005,6 +3005,8 @@ export default function SchoolHomeClient({
                 audience={isAdministrator ? "leadership" : "teacher"}
                 academicYearStart={selectedAcademicYear?.startsOn}
                 teacherClassIds={myClasses.map((classRow) => classRow.id)}
+                schoolName={snapshot.school.name}
+                schoolLogo={schoolLogo}
               />
             ) : (
               <EmptyState

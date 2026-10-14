@@ -27,6 +27,8 @@ import TabHelp from "./analytics/TabHelp";
 import { classesHelp, curriculumHelp, interventionHelp, placementHelp, studentsHelp } from "@/lib/analytics-help";
 import { STANDING_META, evidencedLevel, standingsFor, studentStandings, usesTests, type Standing } from "@/lib/proficiency";
 import { useClassGroups } from "./useClassGroups";
+import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
+import { learningJourneyHtml, placementBaselineHtml, studentProgressReportHtml } from "@/lib/documents/school-reports";
 import {
   type AcStrand,
   AC_STRANDS,
@@ -53,6 +55,9 @@ type SchoolAnalyticsDashboardProps = {
   teacherClassIds?: string[];
   /** First day of the academic year (YYYY-MM-DD); enables "This school year". */
   academicYearStart?: string;
+  /** School name and logo for the letterhead of printed documents. */
+  schoolName?: string | null;
+  schoolLogo?: { src: string; alt: string } | null;
 };
 
 /** "This school year" asks for the longest window; the analytics function
@@ -105,11 +110,6 @@ function levelStanding(grade: string | null | undefined, working: string | null 
   if (g < 0 || w < 0) return null;
   return w > g ? "above" : w < g ? "below" : "at";
 }
-const STANDING_STYLE: Record<LevelStanding, { label: string; pill: string; bar: string }> = {
-  below: { label: "Below level", pill: "bg-[#FFE3DF] text-[#8A1C14]", bar: "#F2998D" },
-  at: { label: "At level", pill: "bg-[#EEF9D9] text-[#3D6600]", bar: "#B9F23F" },
-  above: { label: "Above level", pill: "bg-[#121314] text-white", bar: "#121314" },
-};
 
 function realmStanding(yearLevel: string | null, realm: { realmId: string; currentLevel: string | null; pretestScore: number | null }): LevelStanding | null {
   const level = evidencedLevel(realm);
@@ -137,110 +137,6 @@ function placementCell(grade: string, level: string, count: number) {
   return { bg: "#121314", fg: "#FFFFFF", border: "#121314" };
 }
 
-const JOURNEY_PASS = 85;
-const JOURNEY_LADDER: Array<[string, string]> = [
-  ["Prep", "Ground"], ["Year 1", "Level 1"], ["Year 2", "Level 2"], ["Year 3", "Level 3"],
-  ["Year 4", "Level 4"], ["Year 5", "Level 5"], ["Year 6", "Level 6"], ["Year 7", "Level 7"], ["Year 8", "Level 8"],
-];
-const JOURNEY_REALMS: Record<string, { name: string; color: string; order: number }> = {
-  number: { name: "Number Nexus", color: "#0e9c93", order: 0 },
-  measurement: { name: "Measurelands", color: "#c2892e", order: 1 },
-  space: { name: "Starpath", color: "#5b6ee6", order: 2 },
-  statistics: { name: "Statistica", color: "#c2557a", order: 3 },
-  pattern: { name: "Pattern Peaks", color: "#7c3aed", order: 4 },
-  chance: { name: "Chance Hollow", color: "#0891b2", order: 5 },
-};
-const JOURNEY_CHECK = '<svg viewBox="0 0 24 24" width="13" height="13"><path d="M5 12l4 4 10-10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-// Render a printable Learning Journey document from live progression data. Kept
-// as a pure string builder so it can be written into a popup for print/PDF.
-function buildJourneyHtml(data: StudentLearningJourney): string {
-  const meta = (id: string) => JOURNEY_REALMS[id] ?? { name: id, color: "#5a6a62", order: 99 };
-  const fmt = (iso: string | null) => (iso ? new Intl.DateTimeFormat("en-AU", { month: "short", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date(iso)) : "");
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
-  const labelFor = (workingLevel: string) => JOURNEY_LADDER.find((l) => l[0] === workingLevel)?.[1] ?? workingLevel;
-
-  const byRealm = new Map<string, StudentLearningJourney["levels"]>();
-  for (const lv of data.levels) {
-    const list = byRealm.get(lv.realmId) ?? [];
-    list.push(lv);
-    byRealm.set(lv.realmId, list);
-  }
-  const realmIds = [...byRealm.keys()].sort((a, b) => meta(a).order - meta(b).order);
-  const passed = (r?: StudentLearningJourney["levels"][number]) => Boolean(r && r.posttestScore != null && r.posttestScore >= JOURNEY_PASS);
-
-  let mastered = 0;
-  const milestones: Array<{ iso: string; date: string; realm: string; color: string; level: string; score: number; next: string }> = [];
-
-  const sections = realmIds.map((rid) => {
-    const rows = byRealm.get(rid)!;
-    const m = meta(rid);
-    const curRow = rows.find((r) => r.isCurrent);
-    const curLabel = curRow ? labelFor(curRow.workingLevel) : null;
-    let masteredHere = 0;
-    const steps = JOURNEY_LADDER.map(([id, label], i) => {
-      const row = rows.find((r) => r.workingLevel === id);
-      const isPass = passed(row);
-      const isCurrent = Boolean(row && row.isCurrent && !isPass);
-      let cls = ""; let date = "";
-      if (isPass && row) {
-        cls = "done"; masteredHere += 1;
-        date = i === 0 ? "start" : fmt(row.posttestCompletedAt);
-        if (row.posttestCompletedAt) milestones.push({ iso: row.posttestCompletedAt, date: fmt(row.posttestCompletedAt), realm: m.name, color: m.color, level: label, score: row.posttestScore!, next: JOURNEY_LADDER[i + 1]?.[1] ?? "complete" });
-      } else if (isCurrent && row) {
-        cls = "current"; date = row.currentWeek ? `Week ${row.currentWeek}` : "current";
-      } else if (row) {
-        cls = "started";
-      }
-      const node = isPass ? JOURNEY_CHECK : id === "Prep" ? "G" : String(i);
-      return `<div class="step ${cls}"><span class="node">${node}</span><span class="lab">${label}</span><span class="date">${date}</span></div>`;
-    }).join("");
-    mastered += masteredHere;
-    return `<section class="realm" style="--accent:${m.color}"><div class="realm-head"><h3>${esc(m.name)}</h3><div class="rmeta"><span class="mastered">${masteredHere} mastered</span>${curLabel ? `<span class="now">${curLabel}${curRow && curRow.currentWeek ? ` · Week ${curRow.currentWeek}` : ""}</span>` : ""}</div></div><div class="stepwrap"><div class="stepper">${steps}</div></div></section>`;
-  }).join("");
-
-  milestones.sort((a, b) => b.iso.localeCompare(a.iso));
-  const mileHtml = milestones.length
-    ? milestones.map((ms) => `<div class="mile" style="--accent:${ms.color}"><div class="when">${ms.date}</div><div class="what"><span class="rdot"></span><div class="txt"><b>${esc(ms.realm)}</b> — passed ${ms.level} post-test <span class="score">${ms.score}%</span> <span class="adv">→ ${ms.next === "complete" ? "realm complete" : `advanced to ${ms.next}`}</span></div></div></div>`).join("")
-    : `<p style="color:#8a988f;font-size:13px;padding:8px 0">No post-tests passed yet.</p>`;
-
-  const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(data.student.name)} — Learning Journey</title><style>
-    *{box-sizing:border-box}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0d1512;margin:0;padding:30px 40px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-    .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.19em;text-transform:uppercase;color:#0a6f4b}
-    h1{font-size:30px;margin:5px 0 2px;font-weight:850}.meta{margin:0;color:#5a6a62;font-size:13px;font-weight:600}
-    .head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:1px solid #dde4df;padding-bottom:18px}
-    .stats{display:flex;gap:12px;margin:20px 0}.stat{flex:1;border:1px solid #dde4df;border-radius:12px;padding:12px 15px}.stat b{display:block;font-size:26px;font-weight:900;line-height:1}.stat span{font-size:11px;font-weight:700;color:#5a6a62;text-transform:uppercase;letter-spacing:.05em}
-    h2{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8a988f;margin:26px 0 12px}
-    .realm{border:1px solid #dde4df;border-radius:15px;padding:16px 20px 20px;margin-bottom:12px;border-left:4px solid var(--accent)}
-    .realm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.realm-head h3{margin:0;font-size:16px;font-weight:850;color:var(--accent)}
-    .rmeta{display:flex;gap:12px;align-items:center}.mastered{font-size:11.5px;font-weight:700;color:#5a6a62}.now{font-size:12px;font-weight:800;color:#fff;background:var(--accent);border-radius:20px;padding:3px 11px}
-    .stepwrap{overflow-x:auto;padding-top:16px}.stepper{position:relative;display:flex;justify-content:space-between;min-width:580px}
-    .step{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
-    .step::before{content:"";position:absolute;top:15px;right:50%;width:100%;height:3px;background:#dde4df;z-index:-1}.step:first-child::before{display:none}
-    .step.done::before,.step.current::before{background:var(--accent)}
-    .node{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#f1f5f2;border:2.5px solid #dde4df;color:#8a988f;font-size:11px;font-weight:800}
-    .step.done .node{background:var(--accent);border-color:var(--accent);color:#fff}
-    .step.current .node{background:#fff;border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
-    .step.started .node{border-color:var(--accent)}
-    .lab{font-size:10px;font-weight:800;color:#5a6a62;white-space:nowrap}.step.current .lab{color:var(--accent)}
-    .date{font-size:9px;font-weight:700;color:#8a988f;min-height:11px}.step.current .date{color:var(--accent)}
-    .timeline{border:1px solid #dde4df;border-radius:15px;padding:6px 20px}
-    .mile{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid #eef2ef}.mile:last-child{border-bottom:0}
-    .when{font-size:12px;font-weight:800;color:#5a6a62}.what{display:flex;gap:10px;align-items:flex-start}.rdot{width:11px;height:11px;border-radius:50%;background:var(--accent);margin-top:4px;flex:0 0 auto}
-    .txt{font-size:13px}.score{font-weight:800;color:var(--accent)}.adv{color:#5a6a62;font-weight:600}
-    footer{margin-top:22px;font-size:10.5px;color:#8a988f}
-    .btn{margin-top:20px;padding:9px 16px;border:0;border-radius:8px;background:#0f9d6b;color:#fff;font-weight:800;font-size:13px;cursor:pointer}
-    @media print{body{padding:12mm}.noprint{display:none}}
-  </style></head><body>
-    <div class="head"><div><div class="eyebrow">RELIQ · Learning Journey</div><h1>${esc(data.student.name)}</h1><p class="meta">${esc(data.student.yearLevel ?? "Year not recorded")} · ${esc(data.student.className)} · Generated ${generated}</p></div></div>
-    <div class="stats"><div class="stat"><b>${mastered}</b><span>Levels mastered</span></div><div class="stat"><b>${realmIds.length}</b><span>Realms active</span></div><div class="stat"><b>${milestones.length}</b><span>Post-tests passed</span></div></div>
-    <h2>Realm progression</h2>${sections || '<p style="color:#8a988f;font-size:13px">No realm progress recorded yet.</p>'}
-    <h2>Milestones</h2><div class="timeline">${mileHtml}</div>
-    <footer>A level is mastered when its post-test is passed (${JOURNEY_PASS}%+). Each realm progresses Ground → Level 1–8. Dates show when each post-test was passed.</footer>
-    <button class="btn noprint" onclick="window.print()">Print / Save as PDF</button>
-  </body></html>`;
-}
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-AU", {
   day: "numeric",
@@ -396,8 +292,14 @@ export default function SchoolAnalyticsDashboard({
   audience = "leadership",
   teacherClassIds = [],
   academicYearStart,
+  schoolName = null,
+  schoolLogo = null,
 }: SchoolAnalyticsDashboardProps) {
   const [tab, setTab] = useState<AnalyticsTab>("overview");
+  const documentBrand = () => ({
+    schoolName,
+    schoolLogo: schoolLogo ? { src: assetUrl(schoolLogo.src, window.location.origin), alt: schoolLogo.alt } : null,
+  });
   const [period, setPeriod] = useState<"year" | 7 | 30 | 90>(academicYearStart ? "year" : 90);
   const days = period === "year" ? WHOLE_YEAR_DAYS : period;
   const periodLabel = period === "year" ? "This school year" : `Last ${days} days`;
@@ -507,143 +409,26 @@ export default function SchoolAnalyticsDashboard({
     });
   }, [snapshot?.students, studentSearch, studentSort]);
 
-  const downloadStudentReportPdf = async (student: SchoolAnalyticsSnapshot["students"][number]) => {
-    const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
-    const pct = (v: number | null) => (v === null ? "—" : `${v}%`);
-    const statusText = student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active";
-    const { default: jsPDF } = await import("jspdf");
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 16;
-    let y = 18;
-    const addPageIfNeeded = (height: number) => {
-      if (y + height <= 282) return;
-      pdf.addPage();
-      y = 18;
-    };
-    const text = (value: string, x: number, nextY: number, options?: Parameters<typeof pdf.text>[3]) => {
-      pdf.text(value, x, nextY, options);
-      y = Math.max(y, nextY);
-    };
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(11, 111, 76);
-    pdf.setFontSize(9);
-    text("RELIQ · STUDENT PROGRESS", margin, y);
-    pdf.setTextColor(14, 21, 18);
-    pdf.setFontSize(22);
-    text(student.name, margin, y + 9);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10);
-    pdf.setTextColor(92, 107, 99);
-    text(`${student.yearLevel ?? "Year not recorded"} · ${student.className || "No class"} · Last ${days} days · Generated ${generated}`, margin, y + 6);
-
-    const pill = (label: string, x: number, nextY: number) => {
-      const width = pdf.getTextWidth(label) + 8;
-      pdf.setFillColor(227, 244, 236);
-      pdf.roundedRect(x, nextY - 5, width, 7.5, 3.5, 3.5, "F");
-      pdf.setTextColor(11, 111, 76);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(8.5);
-      pdf.text(label, x + 4, nextY);
-      return x + width + 4;
-    };
-    let pillX = margin;
-    pillX = pill(statusText, pillX, y + 11);
-    pill(student.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met", pillX, y + 11);
-    y += 20;
-
-    const cards = [
-      ["Avg accuracy", pct(student.averageAccuracy)],
-      ["Avg growth", student.averageGrowth === null ? "—" : `${student.averageGrowth} pts`],
-      ["Levels mastered", String(student.masteredLevels)],
-      ["Learning days", String(student.learningDays)],
-    ];
-    const cardWidth = (pageWidth - margin * 2 - 9) / 4;
-    cards.forEach(([label, value], index) => {
-      const x = margin + index * (cardWidth + 3);
-      pdf.setDrawColor(214, 221, 215);
-      pdf.roundedRect(x, y, cardWidth, 23, 3, 3);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(7.5);
-      pdf.setTextColor(92, 107, 99);
-      pdf.text(label.toUpperCase(), x + 4, y + 7);
-      pdf.setTextColor(14, 21, 18);
-      pdf.setFontSize(15);
-      pdf.text(value, x + 4, y + 17);
-    });
-    y += 35;
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(13);
-    pdf.setTextColor(14, 21, 18);
-    text("Progress by curriculum strand", margin, y);
-    y += 8;
-
-    const headers = ["Realm / strand", "Current", "Latest", "Band", "Pre", "Post", "Growth"];
-    const widths = [39, 34, 20, 27, 18, 18, 25];
-    const drawRow = (values: string[], header = false) => {
-      addPageIfNeeded(header ? 11 : 10);
-      let x = margin;
-      pdf.setFont("helvetica", header ? "bold" : "normal");
-      pdf.setFontSize(header ? 7.2 : 8.5);
-      pdf.setTextColor(header ? 92 : 14, header ? 107 : 21, header ? 99 : 18);
-      if (header) {
-        pdf.setDrawColor(214, 221, 215);
-        pdf.line(margin, y + 2, pageWidth - margin, y + 2);
-      }
-      values.forEach((value, index) => {
-        const lines = pdf.splitTextToSize(value, widths[index] - 2).slice(0, 2);
-        pdf.text(lines, x, y + (header ? 0 : 2));
-        x += widths[index];
-      });
-      if (!header) {
-        pdf.setDrawColor(238, 242, 239);
-        pdf.line(margin, y + 8, pageWidth - margin, y + 8);
-      }
-      y += header ? 8 : 10;
-    };
-    drawRow(headers, true);
-    if (student.realms.length === 0) {
-      drawRow(["No realm evidence in this window.", "", "", "", "", "", ""]);
-    } else {
-      student.realms.forEach((realm) => {
-        const standing = realmStanding(student.yearLevel, realm);
-        drawRow([
-          REALMS[realm.realmId] ?? realm.realmId,
-          `${realm.currentLevel ?? "Not placed"}${realm.currentWeek ? ` · Wk ${realm.currentWeek}` : ""}`,
-          pct(realm.assessmentScore),
-          standing ? STANDING_STYLE[standing].label : "—",
-          pct(realm.pretestScore),
-          pct(realm.posttestScore),
-          realm.growth === null ? "—" : `${realm.growth > 0 ? "+" : ""}${realm.growth} pts`,
-        ]);
-      });
-    }
-
-    addPageIfNeeded(28);
-    pdf.setDrawColor(214, 221, 215);
-    pdf.line(margin, y + 4, pageWidth - margin, y + 4);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(138, 152, 143);
-    const footer = "Latest test = most recent post-test (or placement pre-test). Standing compares working level to school grade. Growth uses matched pre/post-test pairs.";
-    pdf.text(pdf.splitTextToSize(footer, pageWidth - margin * 2), margin, y + 12);
-    const fileName = `${student.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "student"}-progress-report.pdf`;
-    pdf.save(fileName);
+  const downloadStudentReportPdf = (student: SchoolAnalyticsSnapshot["students"][number]) => {
+    if (!snapshot) return;
+    const win = openDocumentWindow();
+    if (!win) return;
+    writeDocument(win, studentProgressReportHtml({
+      brand: documentBrand(),
+      student,
+      year: usesTests(snapshot) ? snapshot.academicYear ?? null : null,
+      windowLabel: periodLabel,
+    }));
   };
 
   const openLearningJourney = async (studentId: string) => {
-    const win = window.open("", "_blank", "width=1000,height=1200");
+    const win = openDocumentWindow();
     if (!win) return;
-    win.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:system-ui;padding:40px;color:#334">Generating learning journey…</body>');
     try {
       const response = await fetch(`/api/school/${schoolId}/student/${studentId}/journey`, { credentials: "same-origin" });
       const result = (await response.json()) as StudentLearningJourney & { error?: string };
       if (!response.ok) throw new Error(result.error ?? "Learning journey unavailable.");
-      win.document.open();
-      win.document.write(buildJourneyHtml(result));
-      win.document.close();
+      writeDocument(win, learningJourneyHtml({ brand: documentBrand(), journey: result }));
     } catch {
       win.document.body.innerHTML = '<p style="font-family:system-ui;padding:40px;color:#a33">Could not generate the learning journey. Please try again.</p>';
     }
@@ -765,180 +550,24 @@ export default function SchoolAnalyticsDashboard({
     return { cells, strands, years, hotspots, totalNeeds, maxNeeds };
   }, [snapshot]);
 
-  const downloadPlacementPdf = async () => {
+  const downloadPlacementPdf = () => {
     if (!snapshot || placementByStrand.length === 0) return;
-    const { default: jsPDF } = await import("jspdf");
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 14;
-    const contentWidth = pageWidth - margin * 2;
-    const generated = new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date());
+    const win = openDocumentWindow();
+    if (!win) return;
     const selectedClass = classes.find((item) => item.id === classId);
-    const filterLine = [
-      selectedClass ? selectedClass.name : yearLevel ? yearLevel : "Whole school",
-      realmId ? REALMS[realmId] ?? realmId : "All strands",
-      periodLabel,
-      `Generated ${generated}`,
-    ].join(" · ");
-    let y = margin;
-
-    const addPageIfNeeded = (height: number) => {
-      if (y + height <= pageHeight - margin) return;
-      pdf.addPage();
-      y = margin;
-      drawHeader(false);
-    };
-    const drawHeader = (firstPage: boolean) => {
-      pdf.setFillColor(246, 249, 252);
-      pdf.rect(0, 0, pageWidth, firstPage ? 39 : 22, "F");
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(9, 18, 35);
-      pdf.setFontSize(firstPage ? 18 : 11);
-      pdf.text("RELIQ", margin, firstPage ? 15 : 12);
-      if (firstPage) {
-        pdf.setFontSize(21);
-        pdf.text("Placement baseline by AC9 strand", margin, 28);
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-        pdf.setTextColor(99, 116, 144);
-        pdf.text("Where students are working now, and their average pre-test starting point per strand.", margin, 35);
-        y = 47;
-      } else {
-        y = 29;
-      }
-    };
-    const roundedCard = (x: number, top: number, width: number, height: number) => {
-      pdf.setFillColor(255, 255, 255);
-      pdf.setDrawColor(218, 226, 235);
-      pdf.roundedRect(x, top, width, height, 1.5, 1.5, "FD");
-    };
-    const drawSegmentBar = (items: Array<[string, number]>, x: number, top: number, width: number, height: number, total: number) => {
-      let offset = 0;
-      items.forEach(([label, count]) => {
-        if (!count) return;
-        const segmentWidth = Math.max(1.4, (count / Math.max(1, total)) * width);
-        pdf.setFillColor(levelColor(label));
-        pdf.rect(x + offset, top, segmentWidth, height, "F");
-        offset += segmentWidth;
-      });
-      pdf.setDrawColor(255, 255, 255);
-      pdf.roundedRect(x, top, width, height, height / 2, height / 2);
-    };
-    const drawLegend = (items: Array<[string, number]>, x: number, top: number, width: number) => {
-      const colWidth = width / 2;
-      items.forEach(([label, count], index) => {
-        const col = index % 2;
-        const row = Math.floor(index / 2);
-        const itemX = x + col * colWidth;
-        const itemY = top + row * 7;
-        pdf.setFillColor(levelColor(label));
-        pdf.roundedRect(itemX, itemY - 3.5, 3.3, 3.3, 1.1, 1.1, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(8.5);
-        pdf.setTextColor(45, 58, 80);
-        pdf.text(label, itemX + 6, itemY - 0.6);
-        pdf.setTextColor(96, 116, 148);
-        pdf.text(String(count), itemX + colWidth - 6, itemY - 0.6, { align: "right" });
-      });
-    };
-    const shortLevel = (level: string) => level === "Prep" ? "P" : level === "Not placed" ? "NP" : level.replace("Year ", "Y");
-
-    drawHeader(true);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(96, 116, 148);
-    pdf.text(filterLine, margin, 43);
-
-    placementByStrand.forEach((group) => {
-      const schoolLegendHeight = Math.max(1, Math.ceil(group.gradeCounts.length / 2)) * 7;
-      const levelLegendHeight = Math.max(1, Math.ceil(group.levels.length / 2)) * 7;
-      const cardHeight = 94 + schoolLegendHeight + levelLegendHeight + group.gradeRows.length * 10 + (group.standings.below > 0 ? 12 : 0);
-      addPageIfNeeded(cardHeight + 8);
-      const top = y;
-      roundedCard(margin, top, contentWidth, cardHeight);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(15);
-      pdf.setTextColor(9, 18, 35);
-      pdf.text(group.label, margin + 7, top + 13);
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(9);
-      pdf.setTextColor(96, 116, 148);
-      pdf.text(`${group.placed} placements`, margin + 7, top + 21);
-      pdf.setFillColor(243, 246, 250);
-      pdf.roundedRect(pageWidth - margin - 42, top + 8, 35, 8, 2, 2, "F");
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(9);
-      pdf.setTextColor(45, 58, 80);
-      pdf.text(`Baseline ${formatPercent(group.baseline)}`, pageWidth - margin - 24.5, top + 13.5, { align: "center" });
-
-      let rowY = top + 33;
-      pdf.setFontSize(8.5);
-      pdf.setTextColor(96, 116, 148);
-      pdf.text("STUDENTS BY SCHOOL YEAR", margin + 7, rowY);
-      drawSegmentBar(group.gradeCounts, margin + 7, rowY + 5, contentWidth - 14, 5.5, group.placed);
-      drawLegend(group.gradeCounts, margin + 7, rowY + 18, contentWidth - 14);
-
-      rowY += 24 + schoolLegendHeight;
-      pdf.setFontSize(8.5);
-      pdf.setTextColor(96, 116, 148);
-      pdf.text("STUDENTS BY WORKING LEVEL", margin + 7, rowY);
-      drawSegmentBar(group.levels, margin + 7, rowY + 5, contentWidth - 14, 5.5, group.placed);
-      drawLegend(group.levels, margin + 7, rowY + 18, contentWidth - 14);
-
-      rowY += 26 + levelLegendHeight;
-      pdf.setDrawColor(232, 237, 243);
-      pdf.line(margin + 7, rowY - 9, pageWidth - margin - 7, rowY - 9);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(9);
-      pdf.setTextColor(96, 116, 148);
-      pdf.text("SCHOOL GRADE \u2192 WORKING LEVEL", margin + 7, rowY);
-      pdf.setTextColor(45, 58, 80);
-      pdf.text(group.onLevelPct === null ? "No year match yet" : `${group.onLevelPct}% at or above`, pageWidth - margin - 7, rowY, { align: "right" });
-
-      const gridX = margin + 7;
-      const labelWidth = 28;
-      const cellGap = 1.5;
-      const cellWidth = (contentWidth - 14 - labelWidth - cellGap * PLACEMENT_LEVEL_COLUMNS.length) / PLACEMENT_LEVEL_COLUMNS.length;
-      rowY += 10;
-      pdf.setFontSize(7.5);
-      pdf.setTextColor(142, 158, 181);
-      pdf.text("GRADE", gridX, rowY);
-      PLACEMENT_LEVEL_COLUMNS.forEach((level, index) => {
-        pdf.text(shortLevel(level), gridX + labelWidth + index * (cellWidth + cellGap) + cellWidth / 2, rowY, { align: "center" });
-      });
-      group.gradeRows.forEach((gradeRow) => {
-        rowY += 10;
-        pdf.setFontSize(8.5);
-        pdf.setTextColor(45, 58, 80);
-        pdf.text(gradeRow.grade, gridX, rowY + 4);
-        PLACEMENT_LEVEL_COLUMNS.forEach((level, index) => {
-          const count = gradeRow.levels.find(([workingLevel]) => workingLevel === level)?.[1] ?? 0;
-          const cell = placementCell(gradeRow.grade, level, count);
-          const x = gridX + labelWidth + index * (cellWidth + cellGap);
-          pdf.setFillColor(cell.bg);
-          pdf.setDrawColor(cell.border);
-          pdf.roundedRect(x, rowY, cellWidth, 7.5, 1.4, 1.4, "FD");
-          if (count) {
-            pdf.setFont("helvetica", "bold");
-            pdf.setFontSize(8.5);
-            pdf.setTextColor(cell.fg);
-            pdf.text(String(count), x + cellWidth / 2, rowY + 5.1, { align: "center" });
-          }
-        });
-      });
-      if (group.standings.below > 0) {
-        rowY += 12;
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(9);
-        pdf.setTextColor(221, 0, 63);
-        pdf.text(`${group.standings.below} working below their year in ${group.label}`, margin + 7, rowY);
-      }
-      y = top + cardHeight + 8;
-    });
-
-    const fileParts = [(selectedClass?.name ?? yearLevel) || "school", "placement-baseline"].map((part) => part.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
-    pdf.save(`${fileParts.filter(Boolean).join("-")}.pdf`);
+    writeDocument(win, placementBaselineHtml({
+      brand: documentBrand(),
+      scopeLabel: activeGroup ? activeGroup.name : selectedClass ? selectedClass.name : yearLevel ? yearLevel : "Whole school",
+      strands: placementByStrand.map((group) => ({
+        label: group.label,
+        placed: group.placed,
+        baseline: group.baseline,
+        onLevelPct: group.onLevelPct,
+        belowCount: group.standings.below,
+        levels: group.levels,
+        gradeRows: group.gradeRows,
+      })),
+    }));
   };
 
   // Classes tab: each class group's classes together with a group total
@@ -1037,7 +666,7 @@ export default function SchoolAnalyticsDashboard({
             {tab === "placement" ? (
               <button
                 type="button"
-                onClick={() => void downloadPlacementPdf()}
+                onClick={() => downloadPlacementPdf()}
                 disabled={!snapshot || placementByStrand.length === 0}
                 className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
               >
@@ -1560,8 +1189,8 @@ export default function SchoolAnalyticsDashboard({
                 <span className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
                   {selectedStudent.weeklyTargetMet ? "Weekly target met" : "Weekly target not yet met"}
                 </span>
-                <button type="button" onClick={() => void downloadStudentReportPdf(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
-                  <Download className="h-3.5 w-3.5" /> Download PDF
+                <button type="button" onClick={() => downloadStudentReportPdf(selectedStudent)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
+                  <Download className="h-3.5 w-3.5" /> Progress report
                 </button>
                 <button type="button" onClick={() => void openLearningJourney(selectedStudent.id)} className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700 bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-800">
                   <TrendingUp className="h-3.5 w-3.5" /> Learning journey

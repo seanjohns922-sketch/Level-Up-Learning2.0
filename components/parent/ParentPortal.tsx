@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { homeAccessCardsHtml } from "@/lib/documents/login-cards";
+import { openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -763,75 +765,20 @@ function LoginValue({ label, value }: { label: string; value: string }) {
   return <div className="border border-slate-200 p-3"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><div className="mt-1 flex items-center justify-between gap-2"><code className="break-all font-bold">{value}</code><button type="button" onClick={() => void navigator.clipboard.writeText(value)} className="grid h-10 w-10 shrink-0 place-items-center" title={`Copy ${label}`}><Copy className="h-4 w-4" /></button></div></div>;
 }
 
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  }[char] ?? char));
-}
-
 type HomeAccessCardDetails = { displayName: string; username: string | null; explorerCode: string | null };
 
 function printHomeAccessCards(cards: readonly HomeAccessCardDetails[]) {
   if (!cards.length) return;
-  const printWindow = window.open("", "_blank", "noopener,noreferrer");
+  const printWindow = openDocumentWindow();
   if (!printWindow) return;
-  const websiteUrl = window.location.origin;
-  const safeWebsiteUrl = escapeHtml(websiteUrl);
-  const cardHtml = cards.map((details) => {
-    const safeName = escapeHtml(details.displayName);
-    const safeUsername = escapeHtml(details.username || "Not available");
-    const safeExplorerCode = escapeHtml(details.explorerCode || "Not available");
-    return `<section class="card" aria-label="RELIQ home access card for ${safeName}">
-      <div class="eyebrow">RELIQ · Home Access</div>
-      <h1>${safeName}</h1>
-      <p class="subtitle">Use these details to sign in from home.</p>
-      <div class="row"><div class="label">Website</div><div class="value">${safeWebsiteUrl}</div></div>
-      <div class="row"><div class="label">Username</div><div class="value">${safeUsername}</div></div>
-      <div class="row"><div class="label">Explorer Code</div><div class="value">${safeExplorerCode}</div></div>
-      <div class="row pin"><div><div class="label">Student PIN</div><div class="footer">Write the 4-digit PIN here after setting or resetting it.</div></div><div class="pin-line"></div></div>
-      <p class="instructions">Student login: open the website, choose Student, then Home. Enter the username and 4-digit PIN. Keep this card somewhere private.</p>
-      <p class="footer">Explorer Code helps link this learner if they later join a school.</p>
-    </section>`;
-  }).join("");
-
-  printWindow.document.write(`<!DOCTYPE html>
-    <html>
-      <head>
-        <title>Home Access Cards</title>
-        <style>
-          * { box-sizing: border-box; }
-          body { margin: 0; background: #f8fafc; font-family: "Nunito", "Avenir Next", "Trebuchet MS", Arial, sans-serif; color: #0f172a; }
-          .sheet { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 14mm; display: grid; grid-template-columns: 1fr; gap: 10mm; align-content: start; background: white; }
-          .card { width: 138mm; border: 2px solid #cbd5e1; padding: 12mm; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08); }
-          .eyebrow { color: #1d4ed8; font-size: 11px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; }
-          h1 { margin: 6px 0 2px; font-size: 28px; line-height: 1.1; }
-          .subtitle { margin: 0 0 18px; color: #475569; font-size: 14px; }
-          .row { border: 1px solid #dbe3ee; padding: 14px 16px; margin-top: 12px; }
-          .label { color: #64748b; font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
-          .value { margin-top: 7px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 21px; font-weight: 900; letter-spacing: 0.03em; overflow-wrap: anywhere; }
-          .pin { display: flex; align-items: end; gap: 12px; }
-          .pin-line { flex: 1; border-bottom: 2px solid #0f172a; height: 26px; }
-          .instructions { margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 14px; color: #334155; font-size: 13px; line-height: 1.5; }
-          .footer { margin-top: 18px; color: #64748b; font-size: 11px; }
-          @media print {
-            body { background: white; }
-            .sheet { width: auto; min-height: auto; margin: 0; padding: 0; gap: 8mm; }
-            .card { width: 100%; box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
-          }
-        </style>
-      </head>
-      <body>
-        <main class="sheet">
-          ${cardHtml}
-        </main>
-        <script>window.onload = function(){ window.print(); };</script>
-      </body>
-    </html>`);
-  printWindow.document.close();
+  writeDocument(printWindow, homeAccessCardsHtml({
+    websiteHost: window.location.host,
+    cards: cards.map((details) => ({
+      name: details.displayName,
+      username: details.username || "Not available",
+      explorerCode: details.explorerCode || "Not available",
+    })),
+  }));
 }
 
 function PrintHomeAccessCardButton({ displayName, username, explorerCode, className = "" }: { displayName: string; username: string; explorerCode: string; className?: string }) {

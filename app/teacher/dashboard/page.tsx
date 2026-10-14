@@ -27,6 +27,8 @@ import {
   type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 import { getSchoolLogo } from "@/lib/school-logos";
+import { classLoginCardsHtml, singleLoginCardHtml } from "@/lib/documents/login-cards";
+import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 import { normalizeClassCurriculumYear } from "@/lib/class-curriculum-year";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
@@ -175,10 +177,12 @@ function weekCompletionCount(completedIds: string[], week: number): number {
 }
 
 /* ── QR section for expanded student panel ─── */
-function StudentQRSection({ student, classCode, className2, onRegenerate }: {
+function StudentQRSection({ student, classCode, className2, schoolName, schoolLogo, onRegenerate }: {
   student: StudentRow;
   classCode: string;
   className2: string;
+  schoolName: string | null;
+  schoolLogo: { src: string; alt: string } | null;
   onRegenerate: (token: string) => void;
 }) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -205,33 +209,18 @@ function StudentQRSection({ student, classCode, className2, onRegenerate }: {
   }
 
   function handlePrint() {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow || !qrDataUrl) return;
-    const websiteUrl = window.location.origin;
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Login Card - ${student.display_name}</title>
-      <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;display:flex;justify-content:center;padding:20px}
-      .card{border:2px solid #e5e7eb;border-radius:16px;padding:32px;width:340px;text-align:center}
-      .brand{font-size:14px;font-weight:800;color:#6b7280;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px}
-      .name{font-size:22px;font-weight:900;color:#111827;margin-bottom:4px}
-      .class{font-size:14px;color:#6b7280;margin-bottom:16px}
-      .qr{margin:16px auto}.qr img{width:160px;height:160px}
-      .scan-label{font-size:12px;color:#9ca3af;margin-bottom:8px}
-      .website{font-size:12px;color:#0f172a;font-weight:700;word-break:break-all;margin-bottom:16px}
-      .details{display:flex;justify-content:space-between;padding:12px 16px;background:#f9fafb;border-radius:12px;margin-top:12px}
-      .detail-label{font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:700}
-      .detail-value{font-size:16px;font-weight:800;color:#111827;font-family:monospace;letter-spacing:0.15em}
-      @media print{body{padding:0}.card{border:2px solid #d1d5db}}</style></head>
-      <body><div class="card">
-      <div class="brand">RELIQ</div>
-      <div class="name">${student.display_name}</div>
-      <div class="class">${className2}</div>
-      <div class="qr"><img src="${qrDataUrl}" alt="QR Code"/></div>
-      <div class="scan-label">Scan to log in</div>
-      <div class="website">${websiteUrl}</div>
-      <div class="details"><div><div class="detail-label">Class Code</div><div class="detail-value">${classCode}</div></div>
-      <div><div class="detail-label">PIN</div><div class="detail-value">${student.pin ?? "—"}</div></div></div>
-      </div><script>window.onload=function(){window.print()}</script></body></html>`);
-    printWindow.document.close();
+    if (!qrDataUrl) return;
+    const printWindow = openDocumentWindow();
+    if (!printWindow) return;
+    writeDocument(printWindow, singleLoginCardHtml({
+      schoolName,
+      schoolLogo: schoolLogo ? { src: assetUrl(schoolLogo.src, window.location.origin), alt: schoolLogo.alt } : null,
+      className: className2,
+      classCode,
+      websiteHost: window.location.host,
+      qrSrc: qrDataUrl,
+      student: { name: student.display_name, username: student.username ?? student.display_name, password: student.pin ?? null },
+    }));
   }
 
   return (
@@ -603,168 +592,34 @@ export default function TeacherDashboardPage() {
 
     // Open synchronously from the click event so browsers do not block the
     // window after the asynchronous QR-code generation has completed.
-    const printWindow = window.open("", "_blank");
+    const printWindow = openDocumentWindow();
     if (!printWindow) {
       setPinToast("Allow pop-ups to open student login details.");
       window.setTimeout(() => setPinToast(null), 3200);
       return;
     }
 
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Preparing student login details</title></head><body style="font-family:system-ui,sans-serif;padding:32px;color:#0f172a"><strong>Preparing student login details...</strong></body></html>`);
-    printWindow.document.close();
-
     try {
-      const websiteUrl = window.location.origin;
-
       const QRCode = await import("qrcode");
       const classQrUrl = `${window.location.origin}/login?code=${selectedClass.class_code}`;
-      const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
-      const cards = classStudents.map((s) => ({ ...s, qrSrc: classQrSrc }));
-
-      const cardHtml = cards
-        .map(
-          (s) => `
-      <div class="card">
-        <div class="brand">RELIQ</div>
-        <div class="student-name">${s.display_name}</div>
-        <div class="class-name">${selectedClass.name} · Code: <strong>${selectedClass.class_code}</strong></div>
-        <img class="qr" src="${s.qrSrc}" alt="QR Code" />
-        <div class="scan-hint">Scan to open login page</div>
-        <div class="website">${websiteUrl}</div>
-        <div class="creds">
-          <div class="cred"><div class="cred-label">Username</div><div class="cred-value">${s.username ?? s.display_name}</div></div>
-          <div class="divider"></div>
-          <div class="cred"><div class="cred-label">Password</div><div class="cred-value">${s.pin ?? "—"}</div></div>
-        </div>
-      </div>`
-        )
-        .join("");
-
-      const html = `<!DOCTYPE html><html><head>
-      <meta charset="utf-8"/>
-      <title>Student Login Cards — ${selectedClass.name}</title>
-      <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f5f5f5; padding:24px; }
-        h1 { font-size:18px; font-weight:800; color:#0F172A; margin-bottom:4px; }
-        .subtitle { font-size:12px; color:#64748B; margin-bottom:20px; }
-        .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-        .card { background:#fff; border:2px solid #E2E8F0; border-radius:16px; padding:20px; text-align:center; page-break-inside:avoid; }
-        .brand { font-size:10px; font-weight:800; color:#00C2A8; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:12px; }
-        .student-name { font-size:18px; font-weight:900; color:#0F172A; margin-bottom:2px; }
-        .class-name { font-size:11px; color:#64748B; margin-bottom:12px; }
-        .qr { width:140px; height:140px; margin:0 auto 6px; display:block; }
-        .qr-missing { width:140px; height:140px; margin:0 auto 6px; background:#f1f5f9; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#94A3B8; }
-        .scan-hint { font-size:10px; color:#94A3B8; margin-bottom:6px; }
-        .website { font-size:10px; font-weight:800; color:#0F172A; margin-bottom:12px; word-break:break-all; }
-        .creds { display:flex; align-items:center; justify-content:center; gap:0; background:#F8FAFC; border-radius:10px; overflow:hidden; }
-        .cred { flex:1; padding:10px 8px; }
-        .divider { width:1px; background:#E2E8F0; height:36px; }
-        .cred-label { font-size:9px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:3px; }
-        .cred-value { font-size:16px; font-weight:900; color:#0F172A; font-family:monospace; letter-spacing:0.12em; }
-        @media print {
-          body { background:#fff; padding:10px; }
-          .grid { gap:10px; }
-          .card { border-color:#D1D5DB; }
-        }
-      </style>
-    </head><body>
-      <h1>Student Login Details — ${selectedClass.name}</h1>
-      <div class="subtitle">Class Code: ${selectedClass.class_code} · ${classStudents.length} student${classStudents.length !== 1 ? "s" : ""} · RELIQ</div>
-      <div class="grid">${cardHtml}</div>
-      <script>window.onload = function(){ window.print(); }</script>
-      </body></html>`;
-
-      printWindow.document.open();
-      printWindow.document.write(html);
-      printWindow.document.close();
+      const qrSrc = await QRCode.toDataURL(classQrUrl, { width: 300, margin: 1 });
+      writeDocument(printWindow, classLoginCardsHtml({
+        schoolName,
+        schoolLogo: schoolLogo ? { src: assetUrl(schoolLogo.src, window.location.origin), alt: schoolLogo.alt } : null,
+        className: selectedClass.name,
+        classCode: selectedClass.class_code,
+        websiteHost: window.location.host,
+        qrSrc,
+        students: classStudents.map((student) => ({
+          name: student.display_name,
+          username: student.username ?? student.display_name,
+          password: student.pin ?? null,
+        })),
+      }));
     } catch (error) {
       console.error("Unable to prepare student login details", error);
       printWindow.close();
       setPinToast("Student login details could not be prepared. Please try again.");
-      window.setTimeout(() => setPinToast(null), 3200);
-    }
-  }
-
-  async function downloadLoginCardsPdf() {
-    if (!selectedClass || classStudents.length === 0) return;
-
-    const classRow = selectedClass;
-    const studentsForCards = [...classStudents];
-
-    try {
-      const [{ jsPDF }, QRCode] = await Promise.all([
-        import("jspdf"),
-        import("qrcode"),
-      ]);
-      const classQrUrl = `${window.location.origin}/login?code=${classRow.class_code}`;
-      const classQrSrc = await QRCode.toDataURL(classQrUrl, { width: 220, margin: 1 });
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      const margin = 10;
-      const columnGap = 6;
-      const rowGap = 6;
-      const cardWidth = (210 - margin * 2 - columnGap) / 2;
-      const cardHeight = 86;
-
-      studentsForCards.forEach((student, index) => {
-        const pageIndex = Math.floor(index / 6);
-        const position = index % 6;
-        if (pageIndex > 0 && position === 0) pdf.addPage();
-
-        const column = position % 2;
-        const row = Math.floor(position / 2);
-        const x = margin + column * (cardWidth + columnGap);
-        const y = margin + row * (cardHeight + rowGap);
-        const centreX = x + cardWidth / 2;
-
-        pdf.setDrawColor(226, 232, 240);
-        pdf.setLineWidth(0.6);
-        pdf.roundedRect(x, y, cardWidth, cardHeight, 4, 4);
-
-        pdf.setTextColor(0, 151, 136);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(8);
-        pdf.text("RELIQ", centreX, y + 8, { align: "center" });
-
-        pdf.setTextColor(15, 23, 42);
-        pdf.setFontSize(14);
-        const studentName = pdf.splitTextToSize(student.display_name, cardWidth - 12)[0];
-        pdf.text(studentName, centreX, y + 16, { align: "center" });
-
-        pdf.setTextColor(100, 116, 139);
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(8);
-        pdf.text(
-          `${classRow.name} | Class code: ${classRow.class_code}`,
-          centreX,
-          y + 22,
-          { align: "center" },
-        );
-
-        pdf.addImage(classQrSrc, "PNG", centreX - 17, y + 26, 34, 34);
-        pdf.setFontSize(7);
-        pdf.text("Scan to open the login page", centreX, y + 64, { align: "center" });
-
-        pdf.setFillColor(248, 250, 252);
-        pdf.roundedRect(x + 6, y + 68, cardWidth - 12, 13, 2, 2, "F");
-        pdf.setTextColor(100, 116, 139);
-        pdf.setFontSize(6);
-        pdf.text("USERNAME", x + 10, y + 73);
-        pdf.text("PASSWORD", centreX + 3, y + 73);
-        pdf.setTextColor(15, 23, 42);
-        pdf.setFont("courier", "bold");
-        pdf.setFontSize(10);
-        pdf.text(student.username ?? student.display_name, x + 10, y + 78);
-        pdf.text(student.pin ?? "-", centreX + 3, y + 78);
-      });
-
-      const fileName = `${classRow.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "class"}-student-login-details.pdf`;
-      pdf.save(fileName);
-      setPinToast("Student login details PDF downloaded.");
-      window.setTimeout(() => setPinToast(null), 2600);
-    } catch (error) {
-      console.error("Unable to create student login details PDF", error);
-      setPinToast("Student login details PDF could not be created. Please try again.");
       window.setTimeout(() => setPinToast(null), 3200);
     }
   }
@@ -971,7 +826,7 @@ export default function TeacherDashboardPage() {
         {/* Login Details - QR + PIN */}
         <div>
           <h4 className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3"><KeyRound className="h-3.5 w-3.5" /> Login Details</h4>
-          <StudentQRSection student={student} classCode={selectedClass?.class_code ?? ""} className2={selectedClass?.name ?? ""} onRegenerate={(newToken) => {
+          <StudentQRSection student={student} classCode={selectedClass?.class_code ?? ""} className2={selectedClass?.name ?? ""} schoolName={schoolName} schoolLogo={schoolLogo} onRegenerate={(newToken) => {
             setStudents((prev) => prev.map((s) => s.id === student.id ? { ...s, qr_token: newToken } : s));
           }} />
         </div>
@@ -1592,14 +1447,14 @@ export default function TeacherDashboardPage() {
                 type="button"
                 onClick={() => {
                   setShowLoginDetailsActions(false);
-                  void downloadLoginCardsPdf();
+                  void printAllLoginCards();
                 }}
                 className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#CBD5E1] bg-white p-4 text-left hover:border-[#009688] hover:bg-[#F0FDFA]"
               >
                 <Download className="h-6 w-6 text-[#009688]" />
                 <span>
-                  <span className="block font-black text-[#0F172A]">Download PDF</span>
-                  <span className="mt-1 block text-xs text-[#64748B]">Save login cards as a PDF file.</span>
+                  <span className="block font-black text-[#0F172A]">Save as PDF</span>
+                  <span className="mt-1 block text-xs text-[#64748B]">Opens the cards; choose “Save as PDF” as the printer.</span>
                 </span>
               </button>
               <button
