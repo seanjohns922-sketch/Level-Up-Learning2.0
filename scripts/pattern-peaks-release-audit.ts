@@ -65,7 +65,7 @@ assert(
 assert(parentPortal.includes('realmId === "pattern" ? "algebra" : realmId'), "The parent portal must resolve Pattern Peaks curriculum through Algebra.");
 const schoolAnalytics = read("components/school/SchoolAnalyticsDashboard.tsx");
 assert(schoolAnalytics.includes('pattern: "Pattern Peaks"'), "School analytics must label Pattern Peaks results.");
-assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["pattern", "Algebra"]'), "School exports must include Algebra results.");
+assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["algebra", "Algebra", "pattern"]'), "School exports must include Algebra (Pattern Peaks) results.");
 assert(read("components/teacher/StrandStudentsPanel.tsx").includes("highestRosterCurriculumYear"), "Teacher strand tabs must account for every year represented in a mixed class.");
 const towerChamber = read("components/world3d/TowerRealmChamber.tsx");
 assert(!towerChamber.includes('activePortal?.realmId === "pattern" && preview ? "PREVIEW REALM"'), "The live Pattern Peaks portal must never retain its old preview label.");

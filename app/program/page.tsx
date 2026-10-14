@@ -974,7 +974,7 @@ function ProgramPage() {
             <ReadAloudBtn text={isNumber7 ? `Level ${isLevel8?8:7} demo. All ${lastWeek} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/>
           </>}
           {isLevel8 && <a href={`/demo-review/level8-curriculum?realm=${realmId}`} className="shrink-0 underline">Scope and sequence · download CSV</a>}
-          {!isLevel8 && isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download className="shrink-0 underline">Download scope and sequence</a>}
+          {!isLevel8 && isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download={`reliq-${realmId}-level-7-scope-and-sequence.csv`} className="shrink-0 underline">Download scope and sequence</a>}
         </div>
       )}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}

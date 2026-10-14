@@ -15,7 +15,12 @@ const TEMPLATE_HEADERS = [
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
 const MAX_STUDENT_ROWS = 60;
 
-export async function buildStudentRosterTemplate(classes: StudentRosterTemplateClass[]) {
+// RELIQ document colours: Carbon heading rows with lime text (adult document).
+const CARBON = "FF121314";
+const LIME = "FFB9F23F";
+const GREEN = "FF3D6600";
+
+export async function buildStudentRosterTemplate(classes: StudentRosterTemplateClass[], options: { logoPng?: ArrayBuffer } = {}) {
   const excelModule = await import("exceljs");
   const ExcelJS = excelModule.default ?? excelModule;
   const workbook = new ExcelJS.Workbook();
@@ -37,12 +42,10 @@ export async function buildStudentRosterTemplate(classes: StudentRosterTemplateC
   students.autoFilter = `A1:${String.fromCharCode(64 + TEMPLATE_HEADERS.length)}1`;
   students.getRow(1).height = 28;
   students.getRow(1).eachCell((cell, columnNumber) => {
-    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: columnNumber === 1 || columnNumber === 3 ? "FF047857" : "FF0F766E" },
-    };
+    // Required columns (First Name, Year Level) are marked with a lime fill.
+    const required = columnNumber === 1 || columnNumber === 3;
+    cell.font = { bold: true, color: { argb: required ? CARBON : LIME } };
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: required ? LIME : CARBON } };
     cell.alignment = { vertical: "middle" };
   });
 
@@ -87,22 +90,38 @@ export async function buildStudentRosterTemplate(classes: StudentRosterTemplateC
 
   const instructions = workbook.addWorksheet("Instructions");
   instructions.columns = [{ width: 24 }, { width: 78 }];
-  instructions.addRow(["RELIQ", "Student import template"]);
+  // Rows 1-3 hold the RELIQ logo when it is available.
   instructions.addRow([]);
-  instructions.addRow(["Required", "First Name and Year Level"]);
+  instructions.addRow([]);
+  instructions.addRow([]);
+  [1, 2, 3].forEach((rowNumber) => {
+    instructions.getRow(rowNumber).height = 18;
+  });
+  if (options.logoPng) {
+    const logo = workbook.addImage({ buffer: options.logoPng as never, extension: "png" });
+    instructions.addImage(logo, { tl: { col: 0.2, row: 0.3 }, ext: { width: 190, height: 52 } });
+  } else {
+    instructions.getCell(2, 1).value = "RELIQ";
+    instructions.getCell(2, 1).font = { bold: true, size: 20, color: { argb: CARBON } };
+  }
+  const titleRow = instructions.addRow(["Student import template", "Add your students, then upload this file in RELIQ › Students › Import."]);
+  titleRow.height = 30;
+  titleRow.eachCell((cell, columnNumber) => {
+    cell.font = { bold: true, color: { argb: LIME }, size: columnNumber === 1 ? 14 : 11 };
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: CARBON } };
+    cell.alignment = { vertical: "middle", wrapText: true };
+  });
+  instructions.addRow([]);
+  const firstGuide = instructions.rowCount + 1;
+  instructions.addRow(["Required", "First Name and Year Level (the lime columns)"]);
   instructions.addRow(["Optional", "Last Name, Class, Student Code and Access Code"]);
   instructions.addRow(["Class", "Choose an existing school class from the dropdown, or leave blank."]);
   instructions.addRow(["Student Code", "Leave blank to generate a student code automatically."]);
   instructions.addRow(["Access Code", "Enter exactly 4 digits, or leave blank to generate one automatically."]);
   instructions.addRow(["Limit", `Add up to ${MAX_STUDENT_ROWS} students per file.`]);
   instructions.addRow(["Important", "Keep the column headings unchanged. Do not add example or instruction rows to the Students sheet."]);
-  instructions.getRow(1).height = 30;
-  instructions.getRow(1).eachCell((cell) => {
-    cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 14 };
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF047857" } };
-  });
-  for (let rowNumber = 3; rowNumber <= instructions.rowCount; rowNumber += 1) {
-    instructions.getCell(rowNumber, 1).font = { bold: true, color: { argb: "FF065F46" } };
+  for (let rowNumber = firstGuide; rowNumber <= instructions.rowCount; rowNumber += 1) {
+    instructions.getCell(rowNumber, 1).font = { bold: true, color: { argb: GREEN } };
     instructions.getCell(rowNumber, 2).alignment = { wrapText: true, vertical: "top" };
     instructions.getRow(rowNumber).height = 34;
   }
@@ -111,7 +130,9 @@ export async function buildStudentRosterTemplate(classes: StudentRosterTemplateC
 }
 
 export async function downloadStudentRosterTemplate(classes: StudentRosterTemplateClass[]) {
-  const buffer = await buildStudentRosterTemplate(classes);
+  // The logo is a nice-to-have: the template still downloads without it.
+  const logoPng = await fetch("/brand/reliq-logo.png").then((response) => (response.ok ? response.arrayBuffer() : undefined)).catch(() => undefined);
+  const buffer = await buildStudentRosterTemplate(classes, { logoPng });
   const bytes = new Uint8Array(buffer);
   const url = URL.createObjectURL(
     new Blob([bytes], {

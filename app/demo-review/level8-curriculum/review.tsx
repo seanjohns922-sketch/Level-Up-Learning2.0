@@ -14,7 +14,7 @@ export default function CurriculumReview(){
  const theme=getRealmTheme(realm),weeks=LEVEL8_CURRICULUM[realm];
  function download(all=false){
   const url=URL.createObjectURL(new Blob([level8ScopeCsv(all?undefined:realm)],{type:'text/csv;charset=utf-8'}));
-  const a=document.createElement('a');a.href=url;a.download=`level8-${all?'all-realms':realm}-scope-and-sequence.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const a=document.createElement('a');a.href=url;a.download=`reliq-level-8-${all?'all-realms':realm}-scope-and-sequence.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
  return <main className="min-h-screen bg-slate-950 p-5 pt-24 text-slate-100 sm:p-10 sm:pt-24" style={{'--realm-ring':theme.accentText} as CSSProperties}>
   <div className="mx-auto max-w-6xl space-y-6">

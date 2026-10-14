@@ -205,7 +205,7 @@ export default function CurriculumExplorer({
   }
 
   function handleDownloadCsv() {
-    if(yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level7-scope-and-sequence.csv`;a.download=`${genreId}-level7-scope-and-sequence.csv`;a.click();return;}
+    if(yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level7-scope-and-sequence.csv`;a.download=`reliq-${genreId}-level-7-scope-and-sequence.csv`;a.click();return;}
     const rows: string[] = [
       ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes"].join(","),
     ];
@@ -228,7 +228,7 @@ export default function CurriculumExplorer({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${yearLabel.replace(" ", "-").toLowerCase()}-lesson-schedule.csv`;
+    a.download = `reliq-${yearLabel.replace(" ", "-").toLowerCase()}-lesson-schedule.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

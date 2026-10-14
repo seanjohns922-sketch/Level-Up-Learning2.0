@@ -81,7 +81,7 @@ assert(teacherReplay.includes("getRealmDefinition(realmId).name"));
 assert(/\n {2}chance: \{[^}]*name: "Chance Hollow"/.test(read("lib/parent-insights.ts")));
 assert(read("components/parent/ParentPortal.tsx").includes('? "probability"'));
 assert(read("components/school/SchoolAnalyticsDashboard.tsx").includes('chance: "Chance Hollow"'));
-assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["chance", "Probability"]'));
+assert(read("app/api/school/[schoolId]/analytics/export/route.ts").includes('["probability", "Probability", "chance"]'));
 
 const entry = read("components/chance-hollow/ChanceHollowEntry.tsx");
 assert(entry.includes('restoreStudentStateFromServer(identity.studentId, "chance")'));

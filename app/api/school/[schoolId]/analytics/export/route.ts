@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadSchoolAnalyticsSnapshot, type SchoolAnalyticsSnapshot } from "@/lib/school-platform-server";
-import { BAND_LABEL, bandFor } from "@/lib/curriculum/ac-standards";
+import { BAND_LABEL, bandFor, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
+import { STANDING_META, studentStandings, usesTests } from "@/lib/proficiency";
 
 export const dynamic = "force-dynamic";
 
@@ -34,24 +35,28 @@ function curriculumCsv(snapshot: SchoolAnalyticsSnapshot): string {
   return toCsv([header, ...body]);
 }
 
-// One row per student with per-strand level + achievement band and overall
-// results — a flat "gradebook" shape mappable into Compass / Sentral imports.
-const RESULT_REALMS: Array<[string, string]> = [
-  ["number", "Number"], ["measurement", "Measurement"], ["space", "Space"], ["statistics", "Statistics"],
-  ["pattern", "Algebra"],
-  ["chance", "Probability"],
+// One row per student for a school's SIS (Compass, Sentral): the same
+// standings as the dashboards, from each student's latest test per strand
+// against where their school year should be on the day it was sat, plus the
+// latest test level and current working level per strand.
+const RESULT_STRANDS: Array<[AcStrand, string, string]> = [
+  ["number", "Number", "number"], ["measurement", "Measurement", "measurement"], ["space", "Space", "space"],
+  ["statistics", "Statistics", "statistics"], ["algebra", "Algebra", "pattern"], ["probability", "Probability", "chance"],
 ];
 function resultsCsv(snapshot: SchoolAnalyticsSnapshot): string {
-  const header = ["Student", "Year level", "Class", "Overall accuracy %", "Overall growth (pts)", "Levels mastered"];
-  for (const [, label] of RESULT_REALMS) header.push(`${label} level`, `${label} band`);
+  const year = usesTests(snapshot) ? snapshot.academicYear ?? null : null;
+  const header = ["Student", "Year level", "Class", "Overall standing", "Levels mastered", "Accuracy %"];
+  for (const [, label] of RESULT_STRANDS) header.push(`${label} level`, `${label} standing`, `${label} working level`);
   const body = snapshot.students.map((s) => {
+    const standings = studentStandings({ yearLevel: s.yearLevel, realms: s.realms, tests: s.tests }, year);
+    const latest = new Map((s.tests ?? []).map((test) => [strandForRealm(test.strand), test]));
     const row: Array<string | number | null | undefined> = [
-      s.name, s.yearLevel ?? "", s.className, s.averageAccuracy ?? "", s.averageGrowth ?? "", s.masteredLevels,
+      s.name, s.yearLevel ?? "", s.className, standings.overall ? STANDING_META[standings.overall].label : "", s.masteredLevels, s.averageAccuracy ?? "",
     ];
-    for (const [id] of RESULT_REALMS) {
-      const realm = s.realms.find((r) => r.realmId === id);
-      const band = realm ? bandFor(realm.averageAccuracy) : null;
-      row.push(realm?.currentLevel ?? "", band ? BAND_LABEL[band] : "");
+    for (const [strand, , realmId] of RESULT_STRANDS) {
+      const test = latest.get(strand);
+      const standing = standings.strands.get(strand);
+      row.push(test ? test.measured.toFixed(1) : "", standing ? STANDING_META[standing].label : "", s.realms.find((r) => r.realmId === realmId)?.currentLevel ?? "");
     }
     return row;
   });

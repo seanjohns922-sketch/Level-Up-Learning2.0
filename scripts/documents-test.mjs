@@ -3,6 +3,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { classLoginCardsHtml, homeAccessCardsHtml, singleLoginCardHtml } from "../lib/documents/login-cards.ts";
 import { learningJourneyHtml, placementBaselineHtml, studentProgressReportHtml } from "../lib/documents/school-reports.ts";
 import { buildParentReportHtml } from "../lib/parent-report-print.ts";
+import { buildStudentRosterTemplate } from "../lib/student-roster-template.ts";
+import { readFileSync } from "node:fs";
+import ExcelJS from "exceljs";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
 // write the HTML for a visual check.
@@ -80,5 +83,15 @@ const parent = buildParentReportHtml({
 assert.equal(pages(parent), 1);
 assert.ok(parent.includes("Amani Boston") && parent.includes("Home learner") && !parent.includes(`class="school-logo"`));
 save("parent-learning-report", parent);
+
+// Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
+const logoPng = readFileSync("public/brand/reliq-logo.png");
+const workbook = new ExcelJS.Workbook();
+await workbook.xlsx.load(await buildStudentRosterTemplate([{ name: "3/4J", status: "active" }], { logoPng }));
+const sheet = workbook.getWorksheet("Students");
+assert.deepEqual(sheet.getRow(1).values.slice(1), ["First Name", "Last Name", "Year Level", "Class", "Student Code", "Access Code"]);
+assert.equal(sheet.getCell("B1").fill.fgColor.argb, "FF121314");
+assert.equal(workbook.getWorksheet("Instructions").getImages().length, 1);
+if (out) writeFileSync(`${out}/reliq-student-import-template.xlsx`, Buffer.from(await workbook.xlsx.writeBuffer()));
 
 console.log("PASS every RELIQ document builds, escapes its data and paginates");
