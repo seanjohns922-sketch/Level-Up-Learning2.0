@@ -131,17 +131,17 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
     const firstPoint = points[0];
     const strandStanding = latestPoint && yearIndex >= 0 ? STANDING_META[standingForGap(latestPoint[1] - expectedAt(yearIndex, latestPoint[0]))] : null;
     const dot = ([checkpoint, level]: [Checkpoint, number]) => {
-      const style = checkpoint === "start" ? `background:#FFFFFF;border:2px solid ${COLORS.carbon};width:12px;height:12px;margin-left:-6px;top:15px`
-        : checkpoint === "mid" ? `background:${HATCH};border:2px solid ${COLORS.carbon};width:14px;height:14px;margin-left:-7px;top:14px`
-          : `background:${COLORS.carbon};width:16px;height:16px;margin-left:-8px;top:13px;box-shadow:0 0 0 2px #FFFFFF`;
+      const style = checkpoint === "start" ? `background:#FFFFFF;border:2px solid ${COLORS.carbon};width:12px;height:12px;margin-left:-6px;top:10px`
+        : checkpoint === "mid" ? `background:${HATCH};border:2px solid ${COLORS.carbon};width:14px;height:14px;margin-left:-7px;top:9px`
+          : `background:${COLORS.carbon};width:16px;height:16px;margin-left:-8px;top:8px;box-shadow:0 0 0 2px #FFFFFF`;
       return `<span class="dot" style="left:${pctOfScale(level)};${style}"></span>`;
     };
     const span = firstPoint && latestPoint ? `<span class="span" style="left:${pctOfScale(Math.min(firstPoint[1], latestPoint[1]))};width:${pctOfScale(Math.abs(latestPoint[1] - firstPoint[1]))};background:${strandStanding?.bg ?? "#C9CDC5"}"></span>` : "";
     const strandGrowthValue = firstPoint && latestPoint && firstPoint[0] !== latestPoint[0] ? signed(latestPoint[1] - firstPoint[1]) : "";
-    return `<span class="pl"><b style="font-size:14px">${AC_STRANDS[strand].label}</b><span style="font-size:10.5px;color:${COLORS.faint};font-weight:700">Weight ${Math.round((AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100)}%</span></span>
+    return `<div class="prow"><span class="pl"><b style="font-size:14px">${AC_STRANDS[strand].label}</b><span style="font-size:10.5px;color:${COLORS.faint};font-weight:700">Weight ${Math.round((AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100)}%</span></span>
       <span class="track"><span class="rail"></span>${span}${points.map(dot).join("")}</span>
       <span class="pv"><span class="h" style="font-size:18px">${fmt(latestPoint?.[1])}</span><span style="font-size:10.5px;font-weight:800;color:${COLORS.green}">${strandGrowthValue}</span></span>
-      <span class="ps">${strandStanding ? `<span class="chip" style="background:${strandStanding.bg};color:${strandStanding.fg}">${strandStanding.label}</span>` : `<span class="chip" style="background:#F1F2EE;color:${COLORS.muted}">Not sat</span>`}</span>`;
+      <span class="ps">${strandStanding ? `<span class="chip" style="background:${strandStanding.bg};color:${strandStanding.fg}">${strandStanding.label}</span>` : `<span class="chip" style="background:#E3E5E0;color:${COLORS.muted}">Not sat</span>`}</span></div>`;
   }).join("");
 
   const page1 = `${head}
@@ -165,7 +165,7 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
           <span class="lg"><span style="width:11px;height:11px;border-radius:50%;background:${COLORS.carbon}"></span>End</span>
         </span>
       </div>
-      <div class="pgrid"><span></span><span class="scale"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></span><span></span><span></span>${profileRows}</div>
+      <div class="pgrid"><div class="prow head"><span></span><span class="scale"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></span><span></span><span></span></div>${profileRows}</div>
     </section>
     <section style="border-radius:16px;background:${COLORS.carbon};color:#FFFFFF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px">
       <span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Strand by strand, on page 2</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} answered best in each strand, and the two to work on next.</span></span>
@@ -232,15 +232,17 @@ export function diagnosticReportHtml({ brand, student, sittings, codeTopics = cu
 .sum{font-size:13px;line-height:1.45;color:#3A3D40}
 .lg{display:inline-flex;align-items:center;gap:5px}
 .lg span{display:inline-block;box-sizing:border-box}
-.pgrid{display:grid;grid-template-columns:112px 1fr 44px 96px;gap:4px 12px;align-items:center;margin-top:8px}
+.pgrid{display:flex;flex-direction:column;margin-top:8px}
+.prow{display:grid;grid-template-columns:112px 1fr 44px 96px;gap:0 12px;align-items:center;padding:6px 0;border-top:1px solid #C9CDC5}
+.prow.head{border-top:0;padding:0 0 2px}
 .scale{display:flex;justify-content:space-between;font-size:10px;color:${COLORS.faint};font-weight:700}
-.pl{display:flex;flex-direction:column;padding:6px 0;border-top:1px solid #ECEEE9}
-.track{position:relative;height:32px;border-top:1px solid #ECEEE9}
-.rail{position:absolute;left:0;right:0;top:18px;height:6px;border-radius:999px;background:#F1F2EE}
-.span{position:absolute;top:18px;height:6px;border-radius:999px}
+.pl{display:flex;flex-direction:column}
+.track{position:relative;height:32px}
+.rail{position:absolute;left:0;right:0;top:13px;height:6px;border-radius:999px;background:#DADDD6}
+.span{position:absolute;top:13px;height:6px;border-radius:999px}
 .dot{position:absolute;border-radius:50%;box-sizing:border-box}
-.pv{text-align:right;border-top:1px solid #ECEEE9;padding-top:4px;display:flex;flex-direction:column;line-height:1.1}
-.ps{border-top:1px solid #ECEEE9;padding-top:8px}
+.pv{text-align:right;display:flex;flex-direction:column;line-height:1.1}
+.ps{}
 .sk{display:grid;grid-template-columns:1fr 42px;gap:8px;align-items:center;border-radius:9px;padding:6px 9px}`;
   return documentHtml({ title: `RELIQ maths diagnostic report — ${student.name}`, pages: [page1, page2], css });
 }

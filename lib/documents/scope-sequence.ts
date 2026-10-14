@@ -43,7 +43,7 @@ export function scopeAndSequenceHtml({ realmName, strandLabel, yearLabel, weeks 
       <div class="srow label" style="background:${COLORS.paper}"><span>Week</span><span>Topic</span><span>Lessons</span><span>Curriculum</span></div>
       ${rows.map((week) => {
         const last = week.week === weeks[weeks.length - 1]?.week;
-        return `<div class="srow" style="border-top:1px solid #ECEEE9">
+        return `<div class="srow" style="border-top:1px solid #D0D4CC">
           <span class="h" style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:14px;background:${last ? COLORS.carbon : COLORS.lime};color:${last ? COLORS.lime : COLORS.carbon}">${week.week}</span>
           <b style="font-size:13px;line-height:1.25">${escapeHtml(week.topic)}</b>
           <span style="font-size:11.5px;line-height:1.4;color:#3A3D40">${escapeHtml(week.lessons.join(" · "))}</span>

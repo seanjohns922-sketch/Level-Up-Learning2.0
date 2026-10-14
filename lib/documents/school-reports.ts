@@ -30,7 +30,7 @@ const GREEN_RAMP = ["#F1F9E3", "#DDF2B5", "#C6EA86", "#A9DB57", "#86C232", "#649
 function placementCell(grade: string, level: string, count: number) {
   const g = LADDER.indexOf(grade);
   const w = LADDER.indexOf(level);
-  if (!count) return { bg: "#F8F9F6", fg: "#C9CDC5", border: "1px solid #ECEEE9" };
+  if (!count) return { bg: "#F8F9F6", fg: "#C9CDC5", border: "1px solid #D0D4CC" };
   if (g < 0 || w < 0) return { bg: "#E9EBE5", fg: "#3A3D40", border: "1px solid #D5D8D1" };
   if (w < g - 1) return { bg: COLORS.coral, fg: "#4A0F09", border: "1px solid #E98576" };
   if (w < g) return { bg: COLORS.amber, fg: "#3F2E00", border: "1px solid #F2C94C" };
@@ -48,9 +48,9 @@ export function placementBaselineHtml({ brand, scopeLabel, strands }: { brand: S
       <p style="margin:4px 0 0;font-size:13px;color:${COLORS.muted}">Each student's working level in RELIQ, strand by strand, set against their school year. Baseline is the average pre-test score.</p></div>
     <section class="card" style="overflow:hidden">
       <div class="sumrow label" style="background:${COLORS.paper}"><span>Strand</span><span>Placed</span><span>At or above</span><span>Working below their year</span><span style="text-align:right">Baseline</span></div>
-      ${strands.map((strand) => `<div class="sumrow" style="border-top:1px solid #ECEEE9;font-size:13px">
+      ${strands.map((strand) => `<div class="sumrow" style="border-top:1px solid #D0D4CC;font-size:13px">
         <b>${escapeHtml(strand.label)}</b><span style="color:${COLORS.muted}">${strand.placed}</span><b>${pct(strand.onLevelPct)}</b>
-        <span style="display:flex;align-items:center;gap:8px"><span style="flex:1;height:8px;border-radius:999px;background:#F1F2EE;overflow:hidden"><span style="display:block;height:100%;width:${(strand.belowCount / maxBelow) * 100}%;background:${COLORS.coral}"></span></span><b style="width:24px;text-align:right;color:#A8332A">${strand.belowCount}</b></span>
+        <span style="display:flex;align-items:center;gap:8px"><span style="flex:1;height:8px;border-radius:999px;background:#E3E5E0;overflow:hidden"><span style="display:block;height:100%;width:${(strand.belowCount / maxBelow) * 100}%;background:${COLORS.coral}"></span></span><b style="width:24px;text-align:right;color:#A8332A">${strand.belowCount}</b></span>
         <span style="text-align:right;font-weight:700">${pct(strand.baseline)}</span></div>`).join("")}
     </section>`;
 
@@ -102,7 +102,7 @@ type SnapshotStudent = SchoolAnalyticsSnapshot["students"][number];
 
 const STATUS_CHIP: Record<SnapshotStudent["status"], [string, string, string]> = {
   on_track: ["On track", COLORS.limeTint, COLORS.green],
-  active: ["Active", "#F1F2EE", "#3A3D40"],
+  active: ["Active", "#E3E5E0", "#3A3D40"],
   needs_attention: ["Needs attention", "#FFF1C7", "#5C4300"],
 };
 
@@ -123,7 +123,7 @@ export function studentProgressReportHtml({ brand, student, year, windowLabel }:
     return { strand, realm, test, standing, growth: strandGrowth ? formatGrowth(strandGrowth.gained) : test ? "Waiting" : "—" };
   });
   const chip = (standing: Standing | null) => {
-    if (!standing) return `<span class="chip" style="background:#F1F2EE;color:${COLORS.muted}">Not tested</span>`;
+    if (!standing) return `<span class="chip" style="background:#E3E5E0;color:${COLORS.muted}">Not tested</span>`;
     const meta = STANDING_META[standing];
     return `<span class="chip" style="background:${meta.bg};color:${meta.fg}">${meta.label}</span>`;
   };
@@ -147,7 +147,7 @@ export function studentProgressReportHtml({ brand, student, year, windowLabel }:
     </section>
     <section class="card" style="overflow:hidden">
       <div class="prow label" style="background:${COLORS.paper}"><span>Strand</span><span>Working level</span><span>Latest test</span><span>Standing</span><span style="text-align:right">Growth</span></div>
-      ${rows.map((row) => `<div class="prow" style="border-top:1px solid #ECEEE9;font-size:13px">
+      ${rows.map((row) => `<div class="prow" style="border-top:1px solid #D0D4CC;font-size:13px">
         <b>${escapeHtml(AC_STRANDS[row.strand].label)}</b>
         <span>${escapeHtml(row.realm?.currentLevel ? `${row.realm.currentLevel}${row.realm.currentWeek ? ` · Week ${row.realm.currentWeek}` : ""}` : "Not placed")}</span>
         <span style="display:flex;flex-direction:column"><b>${row.test ? row.test.measured.toFixed(1) : "—"}</b><span style="font-size:11px;color:${COLORS.muted}">${row.test ? escapeHtml(`${SOURCE_LABEL[row.test.source] ?? "Test"} · ${shortDate(row.test.testedAt)}`) : "No test yet"}</span></span>
@@ -222,7 +222,7 @@ export function learningJourneyHtml({ brand, journey }: { brand: SchoolBrand; jo
     </section>
     <section class="card" style="padding:12px 16px 4px">
       <span class="h" style="font-size:16px">Realm progression</span>
-      ${realms.map((realm) => `<div style="display:grid;grid-template-columns:128px 1fr 104px;gap:12px;align-items:center;padding:8px 0;border-top:1px solid #ECEEE9;margin-top:6px">
+      ${realms.map((realm) => `<div style="display:grid;grid-template-columns:128px 1fr 104px;gap:12px;align-items:center;padding:8px 0;border-top:1px solid #D0D4CC;margin-top:6px">
         <span style="display:flex;flex-direction:column"><b style="font-size:14px">${escapeHtml(realm.name)}</b><span style="font-size:11px;color:${COLORS.muted}">${realm.here} level${realm.here === 1 ? "" : "s"} mastered</span></span>
         <span style="display:grid;grid-template-columns:repeat(${ladder.length},1fr);position:relative">
           <span style="position:absolute;left:${50 / ladder.length}%;right:${50 / ladder.length}%;top:10px;height:3px;background:${COLORS.rule}"></span>
@@ -237,7 +237,7 @@ export function learningJourneyHtml({ brand, journey }: { brand: SchoolBrand; jo
     </section>
     <section class="card" style="overflow:hidden">
       <div style="padding:10px 16px"><span class="h" style="font-size:16px">Milestones</span></div>
-      ${milestones.slice(0, 8).map((item) => `<div style="display:grid;grid-template-columns:96px 1fr 60px;gap:10px;padding:7px 16px;border-top:1px solid #ECEEE9;font-size:12.5px;align-items:center"><span style="color:${COLORS.muted}">${escapeHtml(dateLong(item.iso))}</span><span><b>${escapeHtml(item.realm)}</b> passed the ${escapeHtml(item.level)} post-test and moved up</span><b style="text-align:right;color:${COLORS.green}">${item.score}%</b></div>`).join("") || `<p style="margin:0;padding:8px 16px 14px;font-size:13px;color:${COLORS.muted}">No post-tests passed yet.</p>`}
+      ${milestones.slice(0, 8).map((item) => `<div style="display:grid;grid-template-columns:96px 1fr 60px;gap:10px;padding:7px 16px;border-top:1px solid #D0D4CC;font-size:12.5px;align-items:center"><span style="color:${COLORS.muted}">${escapeHtml(dateLong(item.iso))}</span><span><b>${escapeHtml(item.realm)}</b> passed the ${escapeHtml(item.level)} post-test and moved up</span><b style="text-align:right;color:${COLORS.green}">${item.score}%</b></div>`).join("") || `<p style="margin:0;padding:8px 16px 14px;font-size:13px;color:${COLORS.muted}">No post-tests passed yet.</p>`}
     </section>
     ${footer("RELIQ · BrightUp Education · A level is mastered when its post-test is passed at 85%+", generatedOn())}`;
   return documentHtml({ title: `RELIQ learning journey — ${journey.student.name}`, pages: [page] });

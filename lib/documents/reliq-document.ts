@@ -28,7 +28,7 @@ export const COLORS = {
   coral: "#F2998D",
   amber: "#FFD866",
   paper: "#F4F5F1",
-  rule: "#E3E5E0",
+  rule: "#C9CDC5",
   muted: "#5A5E63",
   faint: "#767676",
 } as const;

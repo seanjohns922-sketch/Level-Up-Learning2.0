@@ -148,14 +148,14 @@ export function buildParentReportHtml(report: ParentProgressReport, activity: Pa
     </section>
     <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">A level is mastered when its post-test is passed (${threshold}% or above). Children can be at different levels in different realms; that is by design.</p>
     ${footer("RELIQ · BrightUp Education", `${generatedOn()} · Page 1 of 1`)}`;
-  const css = `.realm{display:grid;grid-template-columns:130px 1fr 150px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid #ECEEE9;margin-top:6px}
+  const css = `.realm{display:grid;grid-template-columns:130px 1fr 150px;gap:12px;align-items:center;padding:9px 0;border-top:1px solid #D0D4CC;margin-top:6px}
 .ladder{display:grid;position:relative}
 .rail{position:absolute;left:7%;right:7%;top:9px;height:3px;background:${COLORS.rule}}
 .st{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
 .dot{width:20px;height:20px;border-radius:50%;border:2px solid;display:grid;place-items:center;font-size:10px;font-weight:900;color:${COLORS.lime}}
 .lb{font-size:9.5px;font-weight:700}
 .dt{font-size:9px;color:${COLORS.faint}}
-.act{display:grid;grid-template-columns:1fr 70px 70px;gap:10px;padding:7px 16px;border-top:1px solid #ECEEE9;font-size:12.5px;align-items:center}`;
+.act{display:grid;grid-template-columns:1fr 70px 70px;gap:10px;padding:7px 16px;border-top:1px solid #D0D4CC;font-size:12.5px;align-items:center}`;
   return documentHtml({ title: `RELIQ learning report — ${report.student.name}`, pages: [page], css });
 }
 
