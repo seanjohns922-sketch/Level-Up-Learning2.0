@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
+import { scopeAndSequenceHtml } from "@/lib/documents/scope-sequence";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -204,6 +206,22 @@ export default function CurriculumExplorer({
     return "bg-rose-50 text-rose-700 border-rose-200";
   }
 
+  function handleScopePdf() {
+    const win = openDocumentWindow();
+    if (!win) return;
+    writeDocument(win, scopeAndSequenceHtml({
+      realmName: genre?.realm ?? "",
+      strandLabel: STRAND_SHORT[genreId] ?? genre?.strand ?? genreId,
+      yearLabel,
+      weeks: plan.map((week) => ({
+        week: week.week,
+        topic: week.topic,
+        lessons: week.lessons.map((lesson) => lesson.title),
+        codes: week.lessons.flatMap((lesson) => lesson.curriculum ?? []),
+      })),
+    }));
+  }
+
   function handleDownloadCsv() {
     if(yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level7-scope-and-sequence.csv`;a.download=`reliq-${genreId}-level-7-scope-and-sequence.csv`;a.click();return;}
     const rows: string[] = [
@@ -281,6 +299,14 @@ export default function CurriculumExplorer({
             </svg>
             Download Schedule
           </button>
+          {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
+            <button
+              onClick={handleScopePdf}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-[#121314] px-3 py-1.5 text-[11px] font-bold text-[#B9F23F] transition hover:bg-black"
+            >
+              Scope and sequence PDF
+            </button>
+          ) : null}
         </div>
       </div>
 

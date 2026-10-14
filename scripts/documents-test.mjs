@@ -6,6 +6,8 @@ import { buildParentReportHtml } from "../lib/parent-report-print.ts";
 import { buildStudentRosterTemplate } from "../lib/student-roster-template.ts";
 import { readFileSync } from "node:fs";
 import ExcelJS from "exceljs";
+import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
+import { getCurriculumPlan } from "../data/programs/genres.ts";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
 // write the HTML for a visual check.
@@ -83,6 +85,15 @@ const parent = buildParentReportHtml({
 assert.equal(pages(parent), 1);
 assert.ok(parent.includes("Amani Boston") && parent.includes("Home learner") && !parent.includes(`class="school-logo"`));
 save("parent-learning-report", parent);
+
+// Scope and sequence from the real curriculum plan.
+for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexus"], ["Year 7", "number", "Number Nexus"]]) {
+  const plan = getCurriculumPlan(yearLabel, genreId);
+  const scope = scopeAndSequenceHtml({ realmName, strandLabel: "Number", yearLabel, weeks: plan.map((week) => ({ week: week.week, topic: week.topic, lessons: week.lessons.map((lesson) => lesson.title), codes: week.lessons.flatMap((lesson) => lesson.curriculum ?? []) })) });
+  assert.equal(pages(scope), 1);
+  assert.ok(scope.includes(plan[0].topic.replace(/&/g, "&amp;")) && scope.includes(`Number · ${yearLabel.replace("Year", "Level")}`));
+  save(`scope-${yearLabel.replace(" ", "-").toLowerCase()}`, scope);
+}
 
 // Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
 const logoPng = readFileSync("public/brand/reliq-logo.png");
