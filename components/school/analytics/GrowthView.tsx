@@ -20,8 +20,9 @@ import {
   type SeriesPoint,
 } from "@/lib/growth";
 
-/** Growth tab: from each student's first test this school year through every
- * later test (tests only, no live tracking). The breakdown follows the view:
+/** Growth tab: a pre-test (or the start diagnostic) sets each student's base
+ * and the post-tests and diagnostics after it show the growth (tests only, no
+ * live tracking). The breakdown follows the view:
  * whole school by school year, a school year by class, a class by student,
  * and a class group by its year levels. */
 
@@ -70,7 +71,7 @@ export default function GrowthView({
     return {
       key,
       name,
-      sub: `${group.followed} followed · ${group.tests} tests${group.waiting ? ` · ${group.waiting} waiting for a retest` : ""}`,
+      sub: `${group.followed} followed · ${group.tests} tests${group.waiting ? ` · ${group.waiting} waiting for a post-test` : ""}`,
       journey: group.first === null ? "—" : `${level(group.first)} → ${level(group.latest)}`,
       gained: group.gained,
       series: group.series,
@@ -126,8 +127,8 @@ export default function GrowthView({
       <section className={card}>
         <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Growth appears once students sit a second test this year: a post-test, a new pre-test or the mid-year diagnostic.
-          {summary.waiting ? ` ${summary.waiting} student${summary.waiting === 1 ? " has" : "s have"} sat their first test so far.` : " No tests have been sat this year yet."}
+          A pre-test sets each student&apos;s starting point; growth appears once they sit a post-test or the mid-year diagnostic after it.
+          {summary.waiting ? ` ${summary.waiting} student${summary.waiting === 1 ? " has" : "s have"} a starting test so far.` : " No tests have been sat this year yet."}
         </p>
       </section>
       </div>
@@ -141,19 +142,19 @@ export default function GrowthView({
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
           <span className="text-sm text-slate-500">
-            {summary.followed} students followed · {summary.tests} tests{summary.waiting ? ` · ${summary.waiting} waiting for a retest` : ""}
+            {summary.followed} students followed · {summary.tests} tests{summary.waiting ? ` · ${summary.waiting} waiting for a post-test` : ""}
           </span>
         </div>
         <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
           <div>
-            <p className="text-[15px] font-semibold text-slate-700">Average growth since their first test</p>
+            <p className="text-[15px] font-semibold text-slate-700">Average growth since their starting test</p>
             <p className="font-display text-5xl font-black tracking-tight text-[#121314]">{formatGrowth(summary.gained)} <span className="text-xl">levels</span></p>
           </div>
           <div className="border-l-2 border-dashed border-slate-300 pl-5">
             <p className="text-[15px] font-semibold text-slate-700">Expected over the same time</p>
             <p className="font-display text-5xl font-black tracking-tight text-slate-400">{formatGrowth(summary.expected)}</p>
           </div>
-          <p className="max-w-xs pb-1 text-sm text-slate-500">A level a year, counted between each student&apos;s first and latest test.</p>
+          <p className="max-w-xs pb-1 text-sm text-slate-500">A level a year, counted from each student&apos;s starting test to their latest post-test or diagnostic.</p>
         </div>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PACE_ORDER.map((pace) => (
@@ -222,7 +223,7 @@ export default function GrowthView({
                     {row.pace ? <PaceBar pace={row.pace} /> : row.studentPace ? (
                       <span className="rounded-full px-2.5 py-1 text-xs font-extrabold" style={{ background: PACE_META[row.studentPace].bg, color: PACE_META[row.studentPace].fg }}>{PACE_META[row.studentPace].label}</span>
                     ) : (
-                      <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for a retest</span>
+                      <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for a post-test</span>
                     )}
                   </td>
                   <td className="px-3 py-3"><Sparkline year={year} series={row.series} /></td>
@@ -241,7 +242,7 @@ export default function GrowthView({
 
 function PaceBar({ pace }: { pace: Record<Pace, number> }) {
   const total = PACE_ORDER.reduce((sum, key) => sum + pace[key], 0);
-  if (!total) return <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for retests</span>;
+  if (!total) return <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for post-tests</span>;
   return (
     <span className="flex h-5 overflow-hidden rounded-md bg-[#F1F2EE]">
       {PACE_ORDER.map((key) => {
@@ -264,10 +265,13 @@ function StrandBars({ strands }: { strands: GrowthSummary["strands"] }) {
       {strands.map(([strand, row]) => {
         const pace = row.gained === null || row.expected === null ? null : paceFor(row.gained, row.expected);
         return (
-          <li key={strand} style={{ opacity: row.students && row.students < 5 ? 0.45 : 1 }}>
+          <li key={strand}>
             <span className="flex justify-between text-sm">
               <strong>{AC_STRANDS[strand].label}</strong>
-              <span className="text-slate-500">{row.gained === null ? "No retests yet" : `${formatGrowth(row.gained)} · ${row.students} student${row.students === 1 ? "" : "s"}`}</span>
+              <span className="text-slate-500">
+                {row.gained === null ? "No post-tests yet" : `${formatGrowth(row.gained)} · ${row.students} student${row.students === 1 ? "" : "s"}`}
+                {row.students && row.students < 5 ? <span className="ml-1.5 rounded-full bg-[#F1F2EE] px-2 py-0.5 text-[11px] font-bold text-slate-500">small group</span> : null}
+              </span>
             </span>
             <span className="relative mt-1.5 block h-3 rounded-full bg-[#F1F2EE]">
               {row.gained !== null && row.gained > 0 ? (

@@ -28,6 +28,24 @@ assert.equal(growth.tests, 3);
 // Before the third test only the first two count.
 assert.ok(Math.abs(studentGrowthAt(steady, Date.parse("2026-06-01T00:00:00Z"), length).gained - 0.2) < 1e-9);
 
+// A pre-test sets the base; only post-tests and diagnostics show growth.
+// A placement chain (Cobram student 1: Level 3 95%, Level 4 90%, Level 5 10%
+// within 6 days, floored by the server to 3.0, 4.0, 4.0) is not growth.
+const chain = [test("number", 3.0, "2026-08-18T00:00:00Z", "pretest"), test("number", 4.0, "2026-08-19T00:00:00Z", "pretest"), test("number", 4.0, "2026-08-24T00:00:00Z", "pretest")];
+assert.equal(studentGrowthAt(chain, now, length), null);
+// The base is the last placement pre-test before the post-test.
+const placedThenPosted = [...chain, test("number", 4.6, "2026-10-01T00:00:00Z", "posttest")];
+const posted = studentGrowthAt(placedThenPosted, now, length);
+assert.ok(Math.abs(posted.first - 4.0) < 1e-9 && Math.abs(posted.gained - 0.6) < 1e-9);
+assert.ok(Math.abs(posted.expected - 38 / 365) < 0.01);
+// A pre-test for a new level after the post-test doesn't count as growth.
+const afterNewLevel = [...placedThenPosted, test("number", 4.6, "2026-10-08T00:00:00Z", "pretest")];
+assert.ok(Math.abs(studentGrowthAt(afterNewLevel, now, length).latest - 4.6) < 1e-9);
+assert.equal(studentGrowthAt(afterNewLevel, now, length).tests, 5);
+// A start diagnostic is a base too; the mid-year diagnostic shows the growth.
+const diagnostics = [test("space", 2.8, "2026-02-05T00:00:00Z", "diagnostic"), test("space", 3.3, "2026-07-23T00:00:00Z", "diagnostic")];
+assert.ok(Math.abs(studentGrowthAt(diagnostics, now, length).gained - 0.5) < 1e-9);
+
 // Strands are weighted by the curriculum (Number most); un-retested strands don't count.
 const mixed = [
   test("number", 3.0, "2026-02-01T00:00:00Z", "pretest"), test("number", 3.5, "2026-08-01T00:00:00Z"),
@@ -68,4 +86,4 @@ assert.equal(summary.series[1].students, 0);
 assert.equal(summary.series[4].students, 1); // end of May: one student retested on 1 May
 assert.equal(summary.series.at(-1).students, 3);
 
-console.log("PASS growth from the first test through every later test this year");
+console.log("PASS growth from each base pre-test through the post-tests and diagnostics after it");

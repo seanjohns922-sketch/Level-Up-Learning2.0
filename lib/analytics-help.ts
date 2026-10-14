@@ -53,20 +53,20 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
     parts: [
       {
         title: "What it shows",
-        text: `How far ${scope(audience)} has moved since each student's first test this year, compared with the growth expected over the same time.`,
+        text: `How far ${scope(audience)} has moved since each student's starting test this year, compared with the growth expected over the same time.`,
       },
       {
         title: "Where the numbers come from",
-        text: "Tests only. Each strand starts at the first test this year (pre-test or start diagnostic) and follows every later test. Expected growth is a level a year, so February to July is about 0.4. Growth counts once a student has sat a second test, so the line steps up after each round of testing. Algebra and Probability count once their pre-test is sat.",
+        text: "Tests only. A pre-test (or the start diagnostic) sets each student's starting point, and the post-tests and diagnostics after it show the growth. Pre-tests for a new level don't count as growth, because they check content not yet taught. Expected growth is a level a year, so February to July is about 0.4. The line steps up as each round of post-tests and diagnostics comes in.",
       },
       {
         title: "What to do with it",
         text:
           audience === "teacher"
-            ? "Check in with students going backwards or slower than expected, especially in more than one strand. Students waiting for a retest may be due a post-test."
+            ? "Check in with students going backwards or slower than expected, especially in more than one strand. Students waiting for a post-test may be ready for one."
             : audience === "group"
               ? "Compare the line with the expected line. If the group is behind pace in one strand, plan it together."
-              : "Look for a school year or strand growing slower than expected. Judge the trend after the mid and end diagnostics, when most students have been retested.",
+              : "Look for a school year or strand growing slower than expected. Judge the trend after the mid and end diagnostics, when most students have a post-test or diagnostic.",
       },
     ],
     terms: [
@@ -74,9 +74,9 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
       { term: PACE_META.slower.label, text: `${PACE_META.slower.meaning}.`, swatch: PACE_META.slower.bg },
       { term: PACE_META.onPace.label, text: `${PACE_META.onPace.meaning}.`, swatch: PACE_META.onPace.bg },
       { term: PACE_META.faster.label, text: `${PACE_META.faster.meaning}.`, swatch: PACE_META.faster.bg },
-      { term: "Expected", text: "a level a year, counted between each student's first and latest test.", swatch: "#FFFFFF", border: "#8F948C" },
-      { term: "Waiting for a retest", text: "only one test so far, so no growth to show yet.", swatch: "#F1F2EE", border: "#C9CDC5" },
-      { term: "Faded bar", text: "fewer than 5 students, so read it with care.", swatch: "#DDF5A6" },
+      { term: "Expected", text: "a level a year, from each student's starting test to their latest post-test or diagnostic.", swatch: "#FFFFFF", border: "#8F948C" },
+      { term: "Waiting for a post-test", text: "a starting test, but no post-test or diagnostic after it yet.", swatch: "#F1F2EE", border: "#C9CDC5" },
+      { term: "Small group", text: "fewer than 5 students in that strand, so read it with care.", swatch: "#F1F2EE", border: "#C9CDC5" },
     ],
   };
 }

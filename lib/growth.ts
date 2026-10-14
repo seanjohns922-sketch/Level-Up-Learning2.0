@@ -3,14 +3,16 @@ import type { LatestTest, SchoolYearDates } from "@/lib/proficiency";
 
 /** Growth through the school year, from tests only.
  *
- * Each strand starts at the student's first test this school year (pre-test
- * or start diagnostic) and follows every later test (post-tests, new
- * pre-tests, mid and end diagnostics). Growth is the latest test minus the
- * first; the expectation is a level a year over the same time, so a student
- * tested in February and again in July is expected to have grown about 0.4.
- * A strand counts once it has a second test; a student's growth is the
- * curriculum-weighted average of their retested strands (Number most).
- *   backwards  more than a term (0.25) below their first test
+ * A pre-test (or the start diagnostic) sets the base; the post-tests and
+ * diagnostics after it show the growth. In each strand the base is the test
+ * just before the first post-test or diagnostic (the settled placement, so
+ * a chain of placement pre-tests counts as its last one). Growth is the
+ * latest post-test or diagnostic minus the base. Later pre-tests for a new
+ * level don't count: they check content not yet taught. The expectation is a
+ * level a year over the same time, so a base in February and a post-test in
+ * July expects about 0.4. A student's growth is the curriculum-weighted
+ * average of the strands that have growth (Number most).
+ *   backwards  more than a term (0.25) below their starting test
  *   slower     more than a term behind the expected growth
  *   onPace     within a term of it
  *   faster     more than a term ahead of it */
@@ -20,7 +22,7 @@ export type Pace = "backwards" | "slower" | "onPace" | "faster";
 export const PACE_ORDER: Pace[] = ["backwards", "slower", "onPace", "faster"];
 
 export const PACE_META: Record<Pace, { label: string; meaning: string; bg: string; fg: string }> = {
-  backwards: { label: "Going backwards", meaning: "more than a term below their first test", bg: "#F2998D", fg: "#4A0F09" },
+  backwards: { label: "Going backwards", meaning: "more than a term below their starting test", bg: "#F2998D", fg: "#4A0F09" },
   slower: { label: "Slower than expected", meaning: "more than a term behind pace", bg: "#FFD866", fg: "#3F2E00" },
   onPace: { label: "On pace", meaning: "within a term of expected growth", bg: "#B9F23F", fg: "#121314" },
   faster: { label: "Faster than expected", meaning: "more than a term ahead of pace", bg: "#121314", fg: "#FFFFFF" },
@@ -39,7 +41,10 @@ export function paceFor(gained: number, expected: number): Pace {
 
 export type GrowthStudent = { yearLevel?: string | null; classId?: string | null; testHistory?: LatestTest[] };
 
-type Point = { measured: number; at: number };
+type Point = { measured: number; at: number; source: string };
+
+/** Post-tests and diagnostics measure growth; pre-tests only set the base. */
+const measuresGrowth = (point: Point) => point.source === "posttest" || point.source === "diagnostic";
 
 export function yearBounds(year: SchoolYearDates) {
   const start = Date.parse(`${year.startsOn}T00:00:00Z`);
@@ -54,7 +59,7 @@ function tracks(history: LatestTest[] | undefined) {
     const at = Date.parse(test.testedAt);
     if (!strand || Number.isNaN(at) || !Number.isFinite(test.measured)) continue;
     const points = byStrand.get(strand) ?? [];
-    points.push({ measured: test.measured, at });
+    points.push({ measured: test.measured, at, source: test.source });
     byStrand.set(strand, points);
   }
   for (const points of byStrand.values()) points.sort((a, b) => a.at - b.at);
@@ -65,7 +70,7 @@ export type StrandGrowth = { gained: number; expected: number; first: number; la
 export type StudentGrowth = StrandGrowth & { strands: Map<AcStrand, StrandGrowth>; tests: number };
 
 /** One student's growth using the tests sat by `at`, or null before any
- * strand has a second test. */
+ * strand has a post-test or diagnostic after its base. */
 export function studentGrowthAt(history: LatestTest[] | undefined, at: number, yearLength: number): StudentGrowth | null {
   const strands = new Map<AcStrand, StrandGrowth>();
   let weight = 0;
@@ -74,9 +79,10 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number, y
   for (const [strand, points] of tracks(history)) {
     const sat = points.filter((point) => point.at <= at);
     tests += sat.length;
-    if (sat.length < 2) continue;
-    const first = sat[0];
-    const latest = sat[sat.length - 1];
+    const firstGrowth = sat.findIndex((point, index) => index > 0 && measuresGrowth(point));
+    if (firstGrowth < 0) continue;
+    const first = sat[firstGrowth - 1];
+    const latest = sat.filter((point, index) => index >= firstGrowth && measuresGrowth(point)).at(-1)!;
     const growth = {
       gained: latest.measured - first.measured,
       expected: (latest.at - first.at) / yearLength,
@@ -120,9 +126,9 @@ export function seriesTimes(year: SchoolYearDates, now: number) {
 export type SeriesPoint = { at: number; gained: number | null; expected: number | null; students: number };
 
 export type GrowthSummary = {
-  /** Students with a second test in at least one strand. */
+  /** Students with growth (a post-test or diagnostic after their base) in at least one strand. */
   followed: number;
-  /** Students with a first test but no second test yet. */
+  /** Students with a base test but no post-test or diagnostic after it yet. */
   waiting: number;
   tests: number;
   gained: number | null;
@@ -134,8 +140,8 @@ export type GrowthSummary = {
   strands: Array<[AcStrand, { gained: number | null; expected: number | null; students: number }]>;
 };
 
-/** Growth is 0 at the first test by definition, so the line starts there:
- * the earliest first test among the students it follows. */
+/** Growth is 0 at the starting test by definition, so the line starts there:
+ * the earliest test among the students it follows. */
 export function withStart(students: GrowthStudent[], series: SeriesPoint[]): SeriesPoint[] {
   const followedAt = series.find((point) => point.gained !== null)?.at;
   if (followedAt === undefined) return series;
