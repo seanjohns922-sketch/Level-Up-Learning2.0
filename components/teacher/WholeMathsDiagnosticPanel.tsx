@@ -149,7 +149,7 @@ export default function WholeMathsDiagnosticPanel({
     // where no whole-maths diagnostic was sat.
     const { data: realmTests, error } = await supabase
       .from("student_realm_assessments")
-      .select("realm_id,assessment_type,working_level,score_percent,completed_at")
+      .select("realm_id,assessment_type,working_level,score_percent,completed_at,question_results")
       .eq("student_id", studentId);
     if (error) console.warn("[WholeMathsDiagnosticPanel] realm tests unavailable for the report", error);
     writeDocument(win, diagnosticReportHtml({

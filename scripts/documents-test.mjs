@@ -137,7 +137,7 @@ assert.ok(testsOnly.includes("pre-tests · 2 of 6 strands"));
 assert.ok(testsOnly.includes("post-tests · 2 of 6 strands")); // Space carries forward until replaced
 // Growth compares Number and Space at both ends: start 3.12, end (4.22 and 3.5) 4.05.
 assert.ok(testsOnly.includes("+0.9 levels"));
-assert.ok(testsOnly.includes("appear once Abigail sits a whole-maths diagnostic"));
+assert.ok(testsOnly.includes("appear once Abigail's tests have recorded their questions"));
 assert.ok(testsOnly.includes("Where Abigail finished the year"));
 save("diagnostic-report-tests-only", testsOnly);
 
@@ -149,11 +149,19 @@ const brody = diagnosticReportHtml({
     realmRow("number", "pretest", "Year 3", 80, "2026-09-02T01:00:00Z"),
     realmRow("measurement", "pretest", "Year 2", 58, "2026-09-02T01:00:00Z"),
     realmRow("space", "pretest", "Year 3", 53.5, "2026-09-02T01:00:00Z"),
-    realmRow("statistics", "pretest", "Year 3", 40, "2026-09-03T01:00:00Z"),
+    { ...realmRow("statistics", "pretest", "Year 3", 40, "2026-09-03T01:00:00Z"), question_results: [
+      ...[true, true, true, false].map((correct) => ({ correct, curriculum_codes: ["AC9M3ST01"], curriculum_skill: { id: "AC9M3ST01", label: "Collect and record data" } })),
+      ...[false, false, true].map((correct) => ({ correct, curriculum_codes: ["AC9M3ST03"], curriculum_skill: { id: "AC9M3ST03", label: "Interpret data displays" } })),
+      ...[true, true].map((correct) => ({ correct, curriculum_codes: ["AC9M3ST02"], curriculum_skill: { id: "AC9M3ST02", label: "Choose a display" } })),
+    ] },
   ],
 });
 assert.ok(brody.includes("In Term 3 (July to September), Year 3 students are expected to be at 2.75"));
 assert.ok(!brody.includes(">Above level<") && brody.includes(">Below level<"));
+// Page 2 from the pre-test's own questions: best 100% and 75%, next step 33%.
+assert.equal(pages(brody), 2);
+assert.ok(brody.includes("from the September pre-test") && brody.includes("Choose a display") && brody.includes("Interpret data displays"));
+assert.ok(brody.indexOf("Choose a display") < brody.indexOf("Collect and record data") && brody.indexOf("Collect and record data") < brody.indexOf("Interpret data displays"));
 save("diagnostic-report-brody", brody);
 
 // Student import template: headings unchanged (the import reads them), RELIQ styling and logo.

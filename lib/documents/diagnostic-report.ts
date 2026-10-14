@@ -31,7 +31,10 @@ export type DiagnosticReportSitting = {
 };
 
 /** A realm pre-test or post-test, as stored in student_realm_assessments. */
-export type RealmTestRow = { realm_id: string; assessment_type: string; working_level: string; score_percent: number | null; completed_at: string };
+export type RealmTestRow = { realm_id: string; assessment_type: string; working_level: string; score_percent: number | null; completed_at: string; question_results?: unknown };
+
+/** One answered question from a realm test's saved results. */
+type QuestionResult = { correct?: boolean; curriculum_codes?: string[]; curriculum_skill?: { id?: string | null; label?: string } };
 
 const CHECKPOINTS = ["start", "mid", "end"] as const;
 type Checkpoint = (typeof CHECKPOINTS)[number];
@@ -95,12 +98,12 @@ export function realmTestLevel(workingLevel: string, percent: number): number | 
   return Math.max(0, level - 1 - Math.min(0.9, (40 - percent) / 40));
 }
 
-type CheckpointValue = { level: number; at: string; source: "diagnostic" | "pretest" | "posttest" };
+type CheckpointValue = { level: number; at: string; source: "diagnostic" | "pretest" | "posttest"; questions?: QuestionResult[]; sitting?: DiagnosticReportSitting };
 
 /** Start / Mid / End per strand from this year's realm tests. */
 function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>> {
   const out = new Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>>();
-  const byStrand = new Map<AcStrand, Array<{ type: "pretest" | "posttest"; raw: number; at: string }>>();
+  const byStrand = new Map<AcStrand, Array<{ type: "pretest" | "posttest"; raw: number; at: string; questions: QuestionResult[] }>>();
   const seen = new Set<string>();
   for (const row of rows) {
     const strand = REALM_STRAND[row.realm_id];
@@ -111,7 +114,8 @@ function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand,
     const key = `${strand}|${type}|${row.working_level}|${row.score_percent}|${row.completed_at.slice(0, 10)}`;
     if (raw === null || seen.has(key)) continue;
     seen.add(key);
-    byStrand.set(strand, [...(byStrand.get(strand) ?? []), { type, raw, at: row.completed_at }]);
+    const questions = Array.isArray(row.question_results) ? (row.question_results as QuestionResult[]) : [];
+    byStrand.set(strand, [...(byStrand.get(strand) ?? []), { type, raw, at: row.completed_at, questions }]);
   }
   for (const [strand, tests] of byStrand) {
     tests.sort((a, b) => a.at.localeCompare(b.at));
@@ -129,12 +133,12 @@ function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand,
       const first = Date.parse(pretests[0].at);
       const chain = pretests.filter((test) => Date.parse(test.at) - first <= PLACEMENT_DAYS * DAY);
       const start = chain[chain.length - 1];
-      points.start = { level: start.level, at: start.at, source: "pretest" };
+      points.start = { level: start.level, at: start.at, source: "pretest", questions: start.questions };
     }
     for (const test of scored.filter((item) => item.type === "posttest")) {
       const month = new Date(test.at).getMonth();
-      if (month >= 4 && month <= 6) points.mid = { level: test.level, at: test.at, source: "posttest" };
-      if (month >= 10) points.end = { level: test.level, at: test.at, source: "posttest" };
+      if (month >= 4 && month <= 6) points.mid = { level: test.level, at: test.at, source: "posttest", questions: test.questions };
+      if (month >= 10) points.end = { level: test.level, at: test.at, source: "posttest", questions: test.questions };
     }
     out.set(strand, points);
   }
@@ -164,7 +168,7 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
     for (const strand of STRANDS) {
       const sitting = byCheckpoint.get(checkpoint);
       const result = sitting?.strand_results.find((item) => item.strand === strand && item.status === "completed" && item.measured_level !== null);
-      if (result && sitting) row.set(strand, { level: result.measured_level!, at: sitting.completed_at ?? sitting.created_at, source: "diagnostic" });
+      if (result && sitting) row.set(strand, { level: result.measured_level!, at: sitting.completed_at ?? sitting.created_at, source: "diagnostic", sitting });
       else if (fromTests.get(strand)?.[checkpoint]) row.set(strand, fromTests.get(strand)![checkpoint]!);
     }
     values.set(checkpoint, row);
@@ -241,7 +245,45 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
     return { strand, growth: start !== null && end !== null && first !== latest ? end - start : null };
   }).filter((row) => row.growth !== null).sort((a, b) => b.growth! - a.growth!);
 
-  const hasSkills = completed.length > 0;
+  type Skill = { code: string; topic: string; percent: number };
+  // Each strand's skills come from the test the report used for it: a realm
+  // test's own questions (exact per skill), or a whole-maths diagnostic's
+  // level probes (a probe's result for every skill it covers).
+  const strandSkills = (strand: AcStrand) => {
+    const value = latest ? carriedValue(latest, strand) : null;
+    if (!value) return null;
+    const month = new Intl.DateTimeFormat("en-AU", { month: "long", timeZone: "Australia/Melbourne" }).format(new Date(value.at));
+    let skills: Skill[] = [];
+    if (value.source === "diagnostic" && value.sitting) {
+      const result = value.sitting.strand_results.find((row) => row.strand === strand && row.status === "completed");
+      const seen = new Set<string>();
+      for (const probe of (result?.probe_scores ?? []).filter((item) => item.total > 0)) {
+        for (const code of probe.curriculumCodes ?? []) {
+          if (seen.has(code)) continue;
+          seen.add(code);
+          skills.push({ code, topic: codeTopics.get(code) ?? AC_STRANDS[strand].label, percent: Math.round(probe.percent) });
+        }
+      }
+    } else if (value.questions?.length) {
+      const bySkill = new Map<string, { topic: string; right: number; total: number }>();
+      for (const question of value.questions) {
+        const code = question.curriculum_codes?.[0] ?? question.curriculum_skill?.id ?? question.curriculum_skill?.label;
+        if (!code) continue;
+        const entry = bySkill.get(code) ?? { topic: question.curriculum_skill?.label || codeTopics.get(code) || AC_STRANDS[strand].label, right: 0, total: 0 };
+        entry.total += 1;
+        if (question.correct) entry.right += 1;
+        bySkill.set(code, entry);
+      }
+      skills = [...bySkill.entries()].map(([code, entry]) => ({ code, topic: entry.topic, percent: Math.round((entry.right / entry.total) * 100) }));
+    }
+    if (!skills.length) return null;
+    const source = value.source === "diagnostic" ? `${month} diagnostic` : `${month} ${value.source === "pretest" ? "pre-test" : "post-test"}`;
+    // 60%+ is a strength; under 60% is a next step.
+    const well = skills.filter((skill) => skill.percent >= STRONG_PERCENT).sort((x, y) => y.percent - x.percent).slice(0, 2);
+    const next = skills.filter((skill) => skill.percent < STRONG_PERCENT).sort((x, y) => x.percent - y.percent).slice(0, 2);
+    return { source, well, next };
+  };
+  const hasSkills = STRANDS.some((strand) => strandSkills(strand) !== null);
   const name = escapeHtml(student.name);
   const firstName = escapeHtml(student.name.split(" ")[0] || student.name);
   const metaLine = [brand.schoolName, student.className, String(new Date().getFullYear())].filter(Boolean).join(" · ");
@@ -313,7 +355,7 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
       ${hasSkills
         ? `<span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Strand by strand, on page 2</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} answered best in each strand, and the two to work on next.</span></span>
       <span class="chip" style="font-size:12px;padding:5px 12px;background:${COLORS.lime};color:${COLORS.carbon}">Turn over</span>`
-        : `<span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Skills strand by strand</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} does best in each strand, and the two to work on next, appear once ${firstName} sits a whole-maths diagnostic.</span></span>`}
+        : `<span style="display:flex;flex-direction:column;gap:3px"><span class="h" style="font-size:15px">Skills strand by strand</span><span style="font-size:12.5px;color:#E3E5E0">The two skills ${firstName} does best in each strand, and the two to work on next, appear once ${firstName}'s tests have recorded their questions.</span></span>`}
     </section>
     <section style="border-radius:16px;background:${COLORS.paper};padding:14px 16px;display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:center">
       <div style="display:flex;flex-direction:column;gap:8px"><span class="h" style="font-size:14px">How the overall level is worked out</span>
@@ -326,49 +368,30 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
 
   // Page 2: per strand, the two codes from the strongest level probes and the
   // two from the weakest, from the latest diagnostic.
-  const latestSitting = completed.at(-1) ?? null;
-  const latestSittingCheckpoint = (latestSitting?.checkpoint ?? null) as Checkpoint | null;
   const skillCards = STRANDS.map((strand) => {
-    const result = latestSitting?.strand_results.find((row) => row.strand === strand && row.status === "completed");
-    const probes = (result?.probe_scores ?? []).filter((probe) => probe.total > 0 && (probe.curriculumCodes ?? []).length > 0);
-    const ranked = [...probes].sort((a, b) => b.percent - a.percent);
-    const pick = (list: ProbeScore[], exclude: Set<string>) => {
-      const items: Array<{ code: string; topic: string; percent: number }> = [];
-      for (const probe of list) {
-        for (const code of probe.curriculumCodes ?? []) {
-          if (items.length >= 2 || exclude.has(code) || items.some((item) => item.code === code)) continue;
-          items.push({ code, topic: codeTopics.get(code) ?? AC_STRANDS[strand].label, percent: Math.round(probe.percent) });
-        }
-        if (items.length >= 2) break;
-      }
-      return items;
-    };
-    // Skills from levels answered at 60%+ are strengths; below 60% are next steps.
-    const strong = ranked.filter((probe) => probe.percent >= STRONG_PERCENT);
-    const weak = [...ranked].reverse().filter((probe) => probe.percent < STRONG_PERCENT);
-    const well = pick(strong, new Set());
-    const next = pick(weak, new Set(well.map((item) => item.code)));
+    const skills = strandSkills(strand);
     const points = CHECKPOINTS.map((checkpoint) => strandLevel(checkpoint, strand)).filter((level) => level !== null) as number[];
     const journey = points.length ? `${points.map((level) => level.toFixed(1)).join(" → ")}${points.length > 1 ? ` · ${signed(points[points.length - 1] - points[0])}` : ""}` : "Not sat yet";
     const latestGap = latest ? gapFor(carriedValue(latest, strand)) : null;
     const strandStanding = latestGap !== null ? STANDING_META[standingForGap(latestGap)] : null;
-    const list = (items: typeof well, bg: string, fg: string, empty: string) => items.length
+    const list = (items: Skill[], bg: string, fg: string, empty: string) => items.length
       ? items.map((item) => `<span class="sk" style="background:${bg}"><span style="font-size:12px;line-height:1.3"><b style="display:block;font-size:10px;color:${fg}">${escapeHtml(item.code)}</b>${escapeHtml(item.topic)}</span><b style="font-size:12px;text-align:right">${item.percent}%</b></span>`).join("")
       : `<span style="font-size:12px;color:${COLORS.muted}">${empty}</span>`;
     return `<article class="card" style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="display:flex;flex-direction:column"><span class="h" style="font-size:17px">${AC_STRANDS[strand].label}</span><span style="font-size:11px;color:${COLORS.muted}">${escapeHtml(journey)}</span></span>${strandStanding ? `<span class="chip" style="background:${strandStanding.bg};color:${strandStanding.fg}">${strandStanding.label}</span>` : ""}</div>
-      <div style="display:flex;flex-direction:column;gap:5px"><span class="label" style="color:${COLORS.green}">Doing well</span>${list(well, COLORS.limeTint, COLORS.green, probes.length ? "No skill above 60% yet." : "Not enough questions to tell yet.")}</div>
-      <div style="display:flex;flex-direction:column;gap:5px"><span class="label" style="color:#8A1C14">Work on next</span>${list(next, "#FFE3DF", "#8A1C14", probes.length ? "Nothing below 60%: ready to extend at the next level." : "Not enough questions to tell yet.")}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="display:flex;flex-direction:column"><span class="h" style="font-size:17px">${AC_STRANDS[strand].label}</span><span style="font-size:11px;color:${COLORS.muted}">${escapeHtml(skills ? `${journey} · from the ${skills.source}` : journey)}</span></span>${strandStanding ? `<span class="chip" style="background:${strandStanding.bg};color:${strandStanding.fg}">${strandStanding.label}</span>` : ""}</div>
+      ${skills
+        ? `<div style="display:flex;flex-direction:column;gap:5px"><span class="label" style="color:${COLORS.green}">Doing well</span>${list(skills.well, COLORS.limeTint, COLORS.green, "No skill at 60% or more yet.")}</div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span class="label" style="color:#8A1C14">Work on next</span>${list(skills.next, "#FFE3DF", "#8A1C14", "Nothing below 60%: ready to extend at the next level.")}</div>`
+        : `<span style="font-size:12px;color:${COLORS.muted}">${points.length ? "This test didn't record its questions, so skills can't be shown." : "No test yet in this strand."}</span>`}
     </article>`;
   }).join("");
-  const latestWhen = latestSitting ? new Intl.DateTimeFormat("en-AU", { month: "long", year: "numeric", timeZone: "Australia/Melbourne" }).format(new Date(latestSitting.completed_at ?? latestSitting.created_at)) : "";
   const page2 = `${head}
     <section style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
-      <div><span class="h" style="font-size:26px;line-height:1">Strand by strand</span><div style="font-size:13px;color:${COLORS.muted};margin-top:4px">${escapeHtml([student.name, yearLevel, latestSittingCheckpoint ? `${CHECKPOINT_LABEL[latestSittingCheckpoint].toLowerCase()} diagnostic, ${latestWhen}` : ""].filter(Boolean).join(" · "))}</div></div>
+      <div><span class="h" style="font-size:26px;line-height:1">Strand by strand</span><div style="font-size:13px;color:${COLORS.muted};margin-top:4px">${escapeHtml([student.name, yearLevel].join(" · "))}</div></div>
       <span style="font-size:11.5px;color:${COLORS.muted};text-align:right;max-width:290px;line-height:1.4">For each strand: the two skills ${firstName} answered best and the two to work on next.</span>
     </section>
     <section style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start">${skillCards}</section>
-    <p style="margin:0;font-size:11px;color:${COLORS.faint}">Percentages are the share of questions answered correctly at the diagnostic level that covers each skill.</p>
+    <p style="margin:0;font-size:11px;color:${COLORS.faint}">Percentages are the share of each skill's questions answered correctly in the strand's latest test. For a whole-maths diagnostic, it is the result at the level that covers the skill.</p>
     ${footer("RELIQ · BrightUp Education", `${generatedOn()} · Page 2 of 2`)}`;
 
   const css = `.cp{flex:1;border-radius:12px;padding:10px 12px;border:1.5px solid}
