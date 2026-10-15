@@ -218,7 +218,7 @@ export default function CurriculumExplorer({
   }
 
   function accTone(avg: number, attempts: number) {
-    if (attempts === 0) return "bg-slate-50 text-slate-400 border-slate-200";
+    if (attempts === 0) return "bg-[#F7F8F5] text-[#5A5E63] border-[#E3E5E0]";
     if (avg >= 80) return "bg-emerald-50 text-emerald-700 border-emerald-200";
     if (avg >= 60) return "bg-amber-50 text-amber-700 border-amber-200";
     return "bg-rose-50 text-rose-700 border-rose-200";
@@ -288,12 +288,12 @@ export default function CurriculumExplorer({
 
   return (
     <div className="space-y-5">
-      {/* Strand picker — matches the Students tab pill filter */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="flex items-center gap-2 overflow-x-auto px-5 py-2.5">
-          <span className="shrink-0 pr-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">Strand</span>
+      {/* Realm picker */}
+      <div className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
+        <div className="flex items-center gap-2 overflow-x-auto px-5 py-3">
+          <span className="shrink-0 pr-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#5A5E63] [font-family:var(--font-display)]">Realm</span>
           {[...MATHS_STRAND_IDS, "__divider__", ...ENGLISH_STRAND_IDS].map((id, idx) => {
-            if (id === "__divider__") return <span key={`div-${idx}`} className="mx-1 h-5 w-px shrink-0 bg-[#E2E8F0]" />;
+            if (id === "__divider__") return <span key={`div-${idx}`} className="mx-1 h-5 w-px shrink-0 bg-[#E3E5E0]" />;
             const g = genres.find((x) => x.id === id);
             if (!g) return null;
             const active = g.id === genreId;
@@ -307,27 +307,35 @@ export default function CurriculumExplorer({
                 aria-pressed={active}
                 title={g.realm}
                 className={[
-                  "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] font-bold transition",
+                  "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 px-3.5 py-1.5 text-[13px] font-bold transition",
                   active
-                    ? "border-[#00C2A8] bg-[#00C2A8]/[0.08] text-[#0A2F2A] shadow-[0_0_0_2px_rgba(0,194,168,0.16)]"
+                    ? "border-[#121314] bg-[#121314] text-white"
                     : soon
-                      ? "border-[#EEF1F4] bg-[#F8FAFC] text-[#94A3B8] cursor-not-allowed"
-                      : "border-[#E6E8EC] bg-white text-[#0F172A] hover:border-[#00C2A8]/60",
+                      ? "border-[#EEF0EC] bg-[#F7F8F5] text-[#A3A7A1] cursor-not-allowed"
+                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEF9D9]",
                 ].join(" ")}
               >
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CBD5E1" : accent }} />
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CFD2CC" : active ? "#B9F23F" : accent }} />
                 {STRAND_SHORT[g.id] ?? g.strand}
                 {soon ? (
-                  <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#94A3B8]">soon</span>
-                ) : active ? (
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#00C2A8" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
+                  <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#8A8E89]">soon</span>
                 ) : null}
               </button>
             );
           })}
+        </div>
+      </div>
+
+
+      {/* Documents: schedule, curriculum and scope and sequence */}
+      <div className="flex flex-wrap items-center gap-2.5 rounded-2xl bg-[#121314] px-5 py-3">
+        <div className="mr-auto">
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#B9F23F] [font-family:var(--font-display)]">Plan and print</div>
+          <div className="text-[13px] font-semibold text-white/70">{genre?.realm ?? "This realm"} · {yearLabel.replace("Year", "Level").replace("Prep", "Ground")}</div>
+        </div>
           <button
             onClick={handleDownloadCsv}
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-white px-3 py-1.5 text-[11px] font-bold text-[#121314] transition hover:bg-[#EEF9D9] hover:text-[#3D6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-white/70 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#B9F23F] hover:text-[#B9F23F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F]"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
@@ -339,7 +347,7 @@ export default function CurriculumExplorer({
               aria-label="Curriculum for the scope and sequence"
               value={activeFramework}
               onChange={(event) => chooseFramework(event.target.value as CurriculumFramework)}
-              className="shrink-0 cursor-pointer rounded-full border border-[#121314] bg-white px-3 py-1.5 text-[11px] font-bold text-[#121314] transition hover:bg-[#EEF9D9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
+              className="shrink-0 cursor-pointer rounded-full border-2 border-white/70 bg-[#121314] px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#B9F23F] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F]"
             >
               {(Object.keys(FRAMEWORKS) as CurriculumFramework[]).map((key) => (
                 <option key={key} value={key} disabled={!frameworkAvailable(key, yearLabel, genreId)}>
@@ -351,19 +359,18 @@ export default function CurriculumExplorer({
           {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
             <button
               onClick={handleScopePdf}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-[#121314] px-3 py-1.5 text-[11px] font-bold text-[#B9F23F] transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#B9F23F] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#121314] transition hover:bg-[#A6E22A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white [font-family:var(--font-display)]"
             >
               Scope and sequence PDF
             </button>
           ) : null}
-        </div>
       </div>
 
       {/* Week strip + detail */}
       <div className="grid lg:grid-cols-[280px_1fr] gap-5">
         {/* Week strip */}
-        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-3 h-fit">
-          <div className="px-2 py-1 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">
+        <div className="h-fit rounded-2xl border border-[#E3E5E0] bg-white p-3">
+          <div className="px-2 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#5A5E63] [font-family:var(--font-display)]">
             Weeks
           </div>
           <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 mt-1">
@@ -377,18 +384,18 @@ export default function CurriculumExplorer({
                   className={[
                     "rounded-xl border px-3 py-2.5 text-left transition",
                     active
-                      ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200"
-                      : "border-[#E6E8EC] bg-white hover:border-[#CBD5E1]",
+                      ? "border-[#121314] bg-[#121314]"
+                      : "border-[#E3E5E0] bg-white hover:border-[#121314]",
                   ].join(" ")}
                 >
-                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${active ? "text-teal-700" : "text-[#94A3B8]"}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider [font-family:var(--font-display)] ${active ? "text-[#B9F23F]" : "text-[#5A5E63]"}`}>
                     Week {w.week}
                   </div>
-                  <div className="text-[12px] font-bold text-[#0F172A] line-clamp-2 leading-snug mt-0.5">
+                  <div className={`text-[12px] font-bold line-clamp-2 leading-snug mt-0.5 ${active ? "text-white" : "text-[#121314]"}`}>
                     {w.topic}
                   </div>
                   <div
-                    className="mt-2 h-2 rounded-full bg-slate-100 overflow-hidden"
+                    className={`mt-2 h-1.5 rounded-full overflow-hidden ${active ? "bg-white/15" : "bg-[#EEF0EC]"}`}
                     title={acc.attempts === 0 ? "No quiz attempts yet" : `Quiz accuracy avg across ${acc.attempts} student${acc.attempts === 1 ? "" : "s"}`}
                   >
                     <div
@@ -405,13 +412,13 @@ export default function CurriculumExplorer({
                     />
                   </div>
                   <div className="mt-1 flex items-center justify-between gap-1">
-                    <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">
+                    <span className={`text-[9px] font-extrabold uppercase tracking-wider ${active ? "text-white/60" : "text-[#5A5E63]"}`}>
                       Accuracy
                     </span>
                     <span
                       className={`text-[10px] font-extrabold tabular-nums ${
                         acc.attempts === 0
-                          ? "text-[#94A3B8]"
+                          ? "text-[#8A8E89]"
                           : acc.avg >= 80
                             ? "text-emerald-700"
                             : acc.avg >= 60
@@ -431,26 +438,27 @@ export default function CurriculumExplorer({
         {/* Detail panel */}
         <div className="space-y-4">
           {/* Week header */}
-          <div className="bg-white rounded-2xl border border-[#E6E8EC] px-5 py-4">
+          <div className="rounded-2xl border border-[#E3E5E0] bg-white px-6 py-5">
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <div className="min-w-0">
-                <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em]">
+                <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#3D6600] [font-family:var(--font-display)]">
                   {genre?.strand} · {genre?.realm}
                 </div>
-                <h2 className="text-xl font-black text-[#0F172A] mt-0.5 tracking-tight">
-                  Week {week?.week} — {week?.topic}
+                <h2 className="mt-2 text-2xl font-black uppercase leading-tight tracking-tight text-[#121314] [font-family:var(--font-display)]">
+                  <span className="mr-2 inline-block bg-[#B9F23F] px-2 py-0.5">Week {week?.week}</span>
+                  {week?.topic}
                 </h2>
-                <div className="text-xs font-semibold text-[#64748B] mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <div className="text-xs font-semibold text-[#5A5E63] mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span>{yearLabel} · {studentCount} student{studentCount === 1 ? "" : "s"}</span>
                   {(() => {
                     const acc = weekAvgAccuracy(selectedWeekNumber);
                     return (
                       <span>
                         · quiz avg{" "}
-                        <b className={acc.attempts === 0 ? "text-[#94A3B8]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-amber-700" : "text-rose-700"}>
+                        <b className={acc.attempts === 0 ? "text-[#8A8E89]" : acc.avg >= 80 ? "text-emerald-700" : acc.avg >= 60 ? "text-amber-700" : "text-rose-700"}>
                           {acc.attempts === 0 ? "—" : `${acc.avg}%`}
                         </b>
-                        <span className="text-[#94A3B8]"> ({acc.attempts} attempt{acc.attempts === 1 ? "" : "s"})</span>
+                        <span className="text-[#8A8E89]"> ({acc.attempts} attempt{acc.attempts === 1 ? "" : "s"})</span>
                       </span>
                     );
                   })()}
@@ -459,7 +467,7 @@ export default function CurriculumExplorer({
               <button
                 disabled
                 title="Coming soon: assign this whole week to your class or selected students"
-                className="px-3.5 py-2 rounded-lg bg-[#0F172A] text-white text-sm font-bold opacity-40 cursor-not-allowed"
+                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#B9F23F] opacity-40 [font-family:var(--font-display)]"
               >
                 Assign Week
               </button>
@@ -480,22 +488,22 @@ export default function CurriculumExplorer({
                   key={lsn.id}
                   type="button"
                   onClick={() => setPreviewLesson(lsn)}
-                  className="text-left bg-white rounded-2xl border border-[#E6E8EC] p-4 flex flex-col gap-3 hover:border-teal-300 hover:shadow-sm transition cursor-pointer"
+                  className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-[#E3E5E0] bg-white p-4 text-left transition hover:border-[#121314]"
                   title="Click to preview lesson content"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-teal-50 text-teal-700 text-xs font-black">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#121314] text-xs font-black text-[#B9F23F] [font-family:var(--font-display)]">
                       L{lsn.lesson}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[#121314] px-2 py-0.5 text-[10px] font-extrabold text-[#121314]">
                       {DEFAULT_LESSON_XP} XP
                     </span>
                   </div>
                   <div>
-                    <div className="text-sm font-black text-[#0F172A] leading-snug">
+                    <div className="text-[15px] font-black leading-snug text-[#121314]">
                       {lsn.title}
                     </div>
-                    <div className="text-xs text-[#64748B] mt-1 leading-relaxed line-clamp-3">
+                    <div className="mt-1 line-clamp-3 text-xs leading-relaxed text-[#5A5E63]">
                       {lsn.focus}
                     </div>
                   </div>
@@ -518,7 +526,7 @@ export default function CurriculumExplorer({
                     </span>
                   </div>
 
-                  <span className="mt-auto w-full px-3 py-2 rounded-lg bg-teal-50 text-teal-700 text-xs font-extrabold text-center border border-teal-100">
+                  <span className="mt-auto w-full rounded-full border-2 border-[#121314] px-3 py-2 text-center text-[11px] font-black uppercase tracking-wide text-[#121314] transition group-hover:bg-[#B9F23F] [font-family:var(--font-display)]">
                     Preview lesson →
                   </span>
                 </button>
@@ -527,15 +535,15 @@ export default function CurriculumExplorer({
           </div>
 
           {/* Weekly quiz card */}
-          <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E3E5E0] bg-white p-5">
             <div>
-              <div className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em]">
+              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#3D6600] [font-family:var(--font-display)]">
                 Weekly Quiz
               </div>
-              <div className="text-sm font-black text-[#0F172A] mt-0.5">
+              <div className="mt-1 text-lg font-black uppercase tracking-tight text-[#121314] [font-family:var(--font-display)]">
                 Week {week?.week} mastery check
               </div>
-              <div className="text-xs text-[#64748B] mt-0.5">
+              <div className="mt-0.5 text-xs text-[#5A5E63]">
                 15 questions · 5 from each lesson · 80% to pass
               </div>
             </div>
@@ -565,7 +573,7 @@ export default function CurriculumExplorer({
               })()}
               <button
                 disabled
-                className="px-3.5 py-2 rounded-lg bg-[#F1F5F9] text-[#64748B] text-sm font-bold cursor-not-allowed"
+                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#B9F23F] opacity-40 [font-family:var(--font-display)]"
               >
                 Assign Quiz
               </button>
