@@ -3,7 +3,10 @@
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { comparableAssessmentGrowth, hasComparableAssessmentGrowth, isGroundBaseline } from "@/lib/assessment-growth";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { BarChart3, ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Eye, FileText } from "lucide-react";
+import { assetUrl, openDocumentWindow, writeDocument, type DocumentLogo } from "@/lib/documents/reliq-document";
+import { strandReportHtml } from "@/lib/documents/strand-report";
+import { buildStrandReport } from "@/lib/teacher/strand-report";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -26,7 +29,7 @@ import {
   pretestPathwayForPercent,
 } from "@/lib/assessment-rules";
 import LessonPreviewDrawer from "./LessonPreviewDrawer";
-import type { TeacherInsight, TeacherInsightStatus } from "@/lib/teacher-insights";
+import type { TeacherInsight } from "@/lib/teacher-insights";
 import {
   teacherAdvanceStudentWeek,
   type CompatProgressRow,
@@ -38,6 +41,18 @@ import SpaceExtensionReport from "@/components/teacher/SpaceExtensionReport";
 import MeasurementExtensionReport from "./MeasurementExtensionReport";
 import NumberExtensionReport from "./NumberExtensionReport";
 import AssessmentReplay from "./AssessmentReplay";
+import {
+  getQuizPercent,
+  getQuizScore,
+  getQuizTotal,
+  latestLessonAccuracy,
+  numberOrNull,
+  parseLessonAttempts,
+  parseQuizScores,
+  pickPrimaryInsight,
+  type InsightCarrier,
+  type JsonObject,
+} from "@/lib/teacher/progress-parsing";
 import { calculateAccuracy, formatAccuracy } from "@/lib/learning-score";
 import {
   getRealmDefinition,
@@ -60,37 +75,6 @@ type StudentRow = {
   year_level?: string | null;
 };
 
-type JsonObject = Record<string, unknown>;
-type InsightCarrier = {
-  latestInsight?: TeacherInsight | null | undefined;
-  latestSummary?: {
-    timeSpentSeconds?: number | null;
-    accuracy?: number | null;
-    questionsAnswered?: number | null;
-    totalQuestions?: number | null;
-    correctAnswers?: number | null;
-    correctCount?: number | null;
-    incorrectAnswers?: number | null;
-    accuracyPercent?: number | null;
-    completedAt?: string | null;
-    at?: string | null;
-    title?: string | null;
-    topicSummaries?: Array<{
-      label?: string | null;
-      correct?: number | null;
-      total?: number | null;
-      accuracy?: number | null;
-    }> | null;
-    areasToImprove?: Array<{
-      label?: string | null;
-      correct?: number | null;
-      total?: number | null;
-      accuracy?: number | null;
-    }> | null;
-    struggledQuestionTypes?: string[] | null;
-  } | null;
-  attempts?: unknown[] | null;
-};
 type ProgressRow = CompatProgressRow;
 
 type LiveStudentActivityRow = {
@@ -159,6 +143,8 @@ type Props = {
   onRealmChange?: (realmId: LiveRealmId) => void;
   onProgressChanged?: () => Promise<void> | void;
   progressAvailable?: boolean;
+  /** Letterhead details for the printed strand report. */
+  report?: { className: string | null; schoolName: string | null; schoolLogo: DocumentLogo };
 };
 
 type StrandStatus = "Not Started" | "In Progress" | "Needs Support" | "Completed";
@@ -179,56 +165,14 @@ function parseCompleted(raw: unknown): string[] {
   return [];
 }
 
-function parseQuizScores(raw: unknown): Record<string, JsonObject> {
-  if (raw && typeof raw === "object") return raw as Record<string, JsonObject>;
-  if (typeof raw === "string") {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? (parsed as Record<string, JsonObject>) : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-function parseLessonAttempts(raw: unknown): Record<string, InsightCarrier> {
-  if (raw && typeof raw === "object") return raw as Record<string, InsightCarrier>;
-  if (typeof raw === "string") {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? (parsed as Record<string, InsightCarrier>) : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
 function weekLessonsDone(ids: string[], week: number): number {
   const tag = `-w${week}-`;
   return ids.filter((id) => id.includes(tag)).length;
 }
 
-function getQuizPercent(quiz: JsonObject | undefined): number | null {
-  return calculateAccuracy(getQuizScore(quiz), getQuizTotal(quiz));
-}
-
 // At-a-glance dots for the current week: the 3 lessons + the quiz, coloured by
 // accuracy (green >=80, orange 50-79, red <50, grey = not attempted yet).
 type WeekDot = { kind: "lesson" | "quiz"; label: string; accuracy: number | null };
-
-function latestLessonAccuracy(carrier: InsightCarrier | undefined): number | null {
-  const attempts = Array.isArray(carrier?.attempts)
-    ? carrier!.attempts.filter((entry): entry is NonNullable<InsightCarrier["latestSummary"]> => Boolean(entry) && typeof entry === "object")
-    : [];
-  const latest = [...attempts].reverse().find((entry) => Boolean(entry.completedAt ?? entry.at)) ?? carrier?.latestSummary ?? null;
-  if (!latest) return null;
-  return calculateAccuracy(
-    numberOrNull(latest.correctCount ?? latest.correctAnswers),
-    numberOrNull(latest.totalQuestions ?? latest.questionsAnswered),
-  );
-}
 
 function weekActivityDots(prog: ProgressRow | null, weekNumber: number | null, lessons: Lesson[]): WeekDot[] {
   const round = (value: number | null) => (value == null ? null : Math.round(value));
@@ -315,16 +259,6 @@ const STRAND_ACCENT: Record<string, string> = {
 };
 const MATHS_STRAND_IDS = ["number", "measurement", "space", "statistics", "algebra", "probability"];
 const ENGLISH_STRAND_IDS = ["reading", "writing", "grammar"];
-
-function getQuizScore(quiz: JsonObject | undefined): number | null {
-  const value = quiz?.score;
-  return typeof value === "number" ? value : null;
-}
-
-function getQuizTotal(quiz: JsonObject | undefined): number | null {
-  const value = quiz?.total;
-  return typeof value === "number" ? value : null;
-}
 
 function getQuizPassed(quiz: JsonObject | undefined): boolean {
   return quiz?.passed === true;
@@ -442,13 +376,6 @@ function computePlacementStatus(
   return "Full Program";
 }
 
-const INSIGHT_SEVERITY: Record<TeacherInsightStatus, number> = {
-  "Needs Support": 3,
-  "Quick Check-in Recommended": 2,
-  "On Track": 1,
-  "Ready to Move On": 0,
-};
-
 function getWeekInsightList(
   prog: ProgressRow | undefined,
   weekNumber: number,
@@ -464,15 +391,6 @@ function getWeekInsightList(
 
   const quizInsight = quizScores[String(weekNumber)]?.latestInsight as TeacherInsight | null | undefined;
   return quizInsight ? [...lessonInsights, quizInsight] : lessonInsights;
-}
-
-function pickPrimaryInsight(insights: TeacherInsight[]): TeacherInsight | null {
-  if (insights.length === 0) return null;
-  return [...insights].sort((left, right) => {
-    const severityGap = INSIGHT_SEVERITY[right.status] - INSIGHT_SEVERITY[left.status];
-    if (severityGap !== 0) return severityGap;
-    return left.needsSupport.localeCompare(right.needsSupport);
-  })[0] ?? null;
 }
 
 function deriveStudentFlag(
@@ -491,10 +409,6 @@ function deriveStudentFlag(
   return { label: "Not started", tone: "neutral" };
 }
 
-
-function numberOrNull(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
 
 function buildWeekSummary(
   insights: TeacherInsight[],
@@ -777,7 +691,7 @@ function resolveDisplayedWeek(prog?: ProgressRow) {
   return prog?.week ?? null;
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true, report }: Props) {
   const strandCatalogYear = highestRosterCurriculumYear(
     yearLabel,
     students.map((student) => student.school_year_level ?? student.year_level),
@@ -1089,6 +1003,8 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 {isOpen && prog && workingYear && week != null ? (
                   <StudentStrandDetail
                     student={s}
+                    studentProgress={progress.filter((row) => row.student_id === s.id)}
+                    report={report}
                     schoolYearLabel={schoolYear}
                     yearLabel={workingYear}
                     genre={genre}
@@ -1131,9 +1047,11 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
 /* ───────── Detail view ───────── */
 
 function StudentStrandDetail({
-  student, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, pathwayStatus, isPlaceholder, prefix, onProgressChanged,
+  student, studentProgress, report, schoolYearLabel, yearLabel, genre, prog, liveRow, latestPretest, pathwayStatus, isPlaceholder, prefix, onProgressChanged,
 }: {
   student: StudentRow;
+  studentProgress: ProgressRow[];
+  report?: Props["report"];
   schoolYearLabel: string;
   yearLabel: string;
   genre: Genre;
@@ -1178,6 +1096,22 @@ function StudentStrandDetail({
     setWeekContext({ studentId: student.id, currentWeek });
     setSelectedWeek(currentWeek);
     setExpandedWeek(null);
+  }
+
+  /** Every live realm for this student, this year so far, as a printable report. */
+  function openStrandReport() {
+    const win = openDocumentWindow();
+    if (!win) return;
+    const names = resolveStudentNameParts(student);
+    const data = buildStrandReport({ studentId: student.id, firstName: names.firstName || names.displayName, progressRows: studentProgress });
+    writeDocument(win, strandReportHtml({
+      student: names.displayName,
+      className: report?.className ?? "",
+      schoolName: report?.schoolName ?? "",
+      schoolLogo: report?.schoolLogo ? { src: assetUrl(report.schoolLogo.src, window.location.origin), alt: report.schoolLogo.alt } : null,
+      yearLevel: schoolYearLabel,
+      ...data,
+    }));
   }
 
   async function advanceStudent() {
@@ -1272,7 +1206,15 @@ function StudentStrandDetail({
 
   return (
     <div className="bg-[#FAFBF8] border-t border-[#E3E5E0] px-5 py-5 space-y-5">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={openStrandReport}
+          className="inline-flex items-center gap-2 rounded-xl border border-[#121314] bg-[#121314] px-3.5 py-2 text-sm font-bold text-[#B9F23F] transition hover:bg-black"
+        >
+          <FileText className="h-4 w-4" aria-hidden />
+          Strand report
+        </button>
         <a
           href={`/teacher/student-insights?studentId=${student.id}&realm_id=${encodeURIComponent(supportedRealmId)}`}
           className="inline-flex items-center gap-2 rounded-xl border border-[#E3E5E0] bg-white px-3.5 py-2 text-sm font-bold text-[#121314] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#C9CCC6] hover:bg-[#FAFBF8]"

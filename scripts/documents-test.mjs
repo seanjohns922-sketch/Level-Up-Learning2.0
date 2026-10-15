@@ -10,6 +10,8 @@ import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
 import { diagnosticReportHtml, realmTestLevel } from "../lib/documents/diagnostic-report.ts";
 import { getCurriculumPlan } from "../data/programs/genres.ts";
 import { coverageRows, FRAMEWORKS, frameworkAvailable, frameworkCodes } from "../lib/curriculum/frameworks.ts";
+import { buildStrandReport } from "../lib/teacher/strand-report.ts";
+import { strandReportHtml } from "../lib/documents/strand-report.ts";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
 // write the HTML for a visual check.
@@ -119,6 +121,47 @@ for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexu
   assert.equal(frameworkAvailable("nsw", "Year 7", "number"), false);
   save("scope-year-3-vic", vic);
   save("scope-year-3-nsw", nsw);
+}
+
+
+// Strand report: one student across realms, built from progress rows like the teacher dashboard loads.
+{
+  const genreFor = { number: "number", measurement: "measurement", space: "space", pattern: "algebra" };
+  const row = (realm_id, year, week, base) => {
+    const plan = getCurriculumPlan(year, genreFor[realm_id]);
+    const lesson_attempts = {};
+    const quiz_scores = {};
+    for (const entry of plan.filter((item) => item.week <= week)) {
+      entry.lessons.forEach((lesson, index) => {
+        if (entry.week === week && index === 2) return; // current week: last lesson not done yet
+        const correct = Math.min(15, Math.round((base + entry.week + index * 3) / 100 * 15));
+        const accuracy = Math.round(correct / 15 * 100);
+        lesson_attempts[lesson.id] = {
+          attempts: [{ correctCount: correct, totalQuestions: 15, completedAt: "2026-09-01T00:00:00Z" }],
+          latestInsight: {
+            status: accuracy >= 90 ? "Ready to Move On" : accuracy >= 75 ? "On Track" : accuracy >= 55 ? "Quick Check-in Recommended" : "Needs Support",
+            strongestSkill: lesson.title, needsSupport: accuracy < 75 ? lesson.title : "No priority gap identified",
+            teacherAction: `Show one worked example on ${lesson.title.toLowerCase()}, then ask the student to solve a similar problem aloud.`,
+            confidence: "High", evidenceCount: 15,
+          },
+        };
+      });
+      if (entry.week < week) quiz_scores[String(entry.week)] = { score: Math.min(15, Math.round((base + 6) / 100 * 15)), total: 15, passed: base + 6 >= 80 };
+    }
+    return { student_id: "s1", realm_id, year, is_current: true, week, status: "IN_PROGRESS", pretest_score: base + 5, completed_lesson_ids: Object.keys(lesson_attempts), unlocked_legends: [], quiz_scores, lesson_attempts };
+  };
+  const progressRows = [row("number", "Year 3", 2, 58), row("measurement", "Year 3", 4, 74), row("space", "Year 3", 8, 82), row("pattern", "Year 3", 3, 64)];
+  const report = buildStrandReport({ studentId: "s1", firstName: "Ryan", progressRows });
+  assert.equal(report.realms.length, 4);
+  assert.deepEqual(report.notStarted.map((realm) => realm.realmId), ["statistics", "chance"]);
+  const number = report.realms.find((realm) => realm.realmId === "number");
+  assert.ok(number.lessonAccuracy && number.weeks.length === 2 && number.weeks[1].current);
+  assert.ok(number.focus && number.focus.action.includes("ask Ryan to solve"));
+  const html = strandReportHtml({ student: "Ryan Heard", className: "3/4J", schoolName: "Cobram Primary School", yearLevel: "Year 3", ...report });
+  // Overview, one page per realm, and a continuation page for the realm with eight weeks of results.
+  assert.equal(pages(html), 6);
+  assert.ok(html.includes("Strand report") && html.includes("Not started yet") && html.includes("Try this:"));
+  save("strand-report", html);
 }
 
 // Maths diagnostic report: start, mid and end, with level probes.

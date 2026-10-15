@@ -1331,6 +1331,7 @@ export default function TeacherDashboardPage() {
                 onRealmChange={setAnalyticsRealmId}
                 onProgressChanged={() => selectedClassId ? loadClassData(selectedClassId, false) : undefined}
                 progressAvailable={!progressLoadError}
+                report={{ className: selectedClass?.name ?? null, schoolName, schoolLogo }}
               />
             )}
             {/* eslint-enable @typescript-eslint/no-explicit-any */}
