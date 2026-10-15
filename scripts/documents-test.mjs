@@ -9,6 +9,7 @@ import ExcelJS from "exceljs";
 import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
 import { diagnosticReportHtml, realmTestLevel } from "../lib/documents/diagnostic-report.ts";
 import { getCurriculumPlan } from "../data/programs/genres.ts";
+import { coverageRows, FRAMEWORKS, frameworkAvailable, frameworkCodes } from "../lib/curriculum/frameworks.ts";
 
 // Builds every RELIQ document with sample data. Set DOCS_OUT=<folder> to also
 // write the HTML for a visual check.
@@ -94,6 +95,30 @@ for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexu
   assert.equal(pages(scope), 1);
   assert.ok(scope.includes(plan[0].topic.replace(/&/g, "&amp;")) && scope.includes(`Number · ${yearLabel.replace("Year", "Level")}`));
   save(`scope-${yearLabel.replace(" ", "-").toLowerCase()}`, scope);
+}
+
+// Scope and sequence in each curriculum, with the code-by-code coverage pages.
+{
+  const plan = getCurriculumPlan("Year 3", "number");
+  const lessons = plan.flatMap((week) => week.lessons.map((lesson, index) => ({ week: week.week, lesson: index + 1, title: lesson.title, ac9: lesson.curriculum ?? [] })));
+  const build = (framework) => scopeAndSequenceHtml({
+    realmName: "Number Nexus", strandLabel: "Number", yearLabel: "Year 3", curriculumMeta: FRAMEWORKS[framework].meta,
+    weeks: plan.map((week) => ({ week: week.week, topic: week.topic, lessons: week.lessons.map((lesson) => lesson.title), codes: frameworkCodes(framework, week.lessons.flatMap((lesson) => lesson.curriculum ?? []), "Year 3") })),
+    coverage: coverageRows(framework, "Year 3", "number", lessons),
+  });
+  const aus = build("aus");
+  assert.ok(pages(aus) >= 2 && aus.includes("code by code") && aus.includes("1/2, 1/3, 1/4, 1/5 and 1/10"));
+  // Codes are listed in full: a range such as "AC9M3N03–N05" would claim N04 is taught.
+  assert.ok(!/AC9M\dN\d\d–/.test(aus));
+  const vic = build("vic");
+  assert.ok(vic.includes("Victorian Curriculum 2.0") && vic.includes("VC2M3N02") && !vic.includes(">AC9M3N01<"));
+  // Odd and even numbers are Level 3 in Victoria but Year 4 in AC9, so Level 3 shows the gap.
+  assert.ok(coverageRows("vic", "Year 3", "number", lessons).some((row) => row.codes[0] === "VC2M3N01" && row.uncovered));
+  const nsw = build("nsw");
+  assert.ok(nsw.includes("MA2-RN-01") && nsw.includes("Representing numbers using place value A"));
+  assert.equal(frameworkAvailable("nsw", "Year 7", "number"), false);
+  save("scope-year-3-vic", vic);
+  save("scope-year-3-nsw", nsw);
 }
 
 // Maths diagnostic report: start, mid and end, with level probes.

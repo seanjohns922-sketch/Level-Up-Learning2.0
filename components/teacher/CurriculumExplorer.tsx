@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { scopeAndSequenceHtml } from "@/lib/documents/scope-sequence";
+import { coverageRows, FRAMEWORKS, frameworkAvailable, frameworkCodes, type CurriculumFramework } from "@/lib/curriculum/frameworks";
 import {
   getGenresForYear,
   getCurriculumPlan,
@@ -52,6 +53,14 @@ type Props = {
 };
 
 // Match the Students tab strand picker so the two views read as one system.
+const FRAMEWORK_STORAGE_KEY = "reliq:scope-framework:v1";
+
+const FRAMEWORK_SOURCE: Record<CurriculumFramework, string> = {
+  aus: "Content descriptions © ACARA, Australian Curriculum v9.0 (CC BY 4.0) · RELIQ · BrightUp Education",
+  vic: "Codes from the Victorian Curriculum F–10 Version 2.0 © VCAA, matched to AC9 from official documents · RELIQ",
+  nsw: "Outcome codes © NESA, mapped through NESA's Australian Curriculum map K–6 · RELIQ",
+};
+
 const STRAND_SHORT: Record<string, string> = {
   number: "Number", measurement: "Measurement", space: "Space",
   statistics: "Statistics", algebra: "Algebra", probability: "Probability",
@@ -85,6 +94,15 @@ export default function CurriculumExplorer({
   const [genreId, setGenreId] = useState<string>(firstAvailable.id);
   const [weekNum, setWeekNum] = useState<number>(1);
   const [previewLesson, setPreviewLesson] = useState<Lesson | null>(null);
+  // Curriculum the scope and sequence is printed against; remembered on this device.
+  const [framework, setFramework] = useState<CurriculumFramework>(() => {
+    try {
+      const stored = typeof window !== "undefined" ? window.localStorage.getItem(FRAMEWORK_STORAGE_KEY) : null;
+      return stored === "vic" || stored === "nsw" ? stored : "aus";
+    } catch {
+      return "aus";
+    }
+  });
 
   const genre: Genre | undefined = genres.find((g) => g.id === genreId);
   const plan = useMemo(
@@ -206,26 +224,42 @@ export default function CurriculumExplorer({
     return "bg-rose-50 text-rose-700 border-rose-200";
   }
 
+  // NSW is only mapped to Stage 3, so higher levels fall back to the Australian Curriculum.
+  const activeFramework: CurriculumFramework = frameworkAvailable(framework, yearLabel, genreId) ? framework : "aus";
+
+  function chooseFramework(next: CurriculumFramework) {
+    setFramework(next);
+    try {
+      window.localStorage.setItem(FRAMEWORK_STORAGE_KEY, next);
+    } catch {
+      /* the choice still applies for this visit */
+    }
+  }
+
   function handleScopePdf() {
     const win = openDocumentWindow();
     if (!win) return;
+    const lessons = plan.flatMap((week) => week.lessons.map((lesson, index) => ({ week: week.week, lesson: index + 1, title: lesson.title, ac9: lesson.curriculum ?? [] })));
     writeDocument(win, scopeAndSequenceHtml({
       realmName: genre?.realm ?? "",
       strandLabel: STRAND_SHORT[genreId] ?? genre?.strand ?? genreId,
       yearLabel,
+      curriculumMeta: FRAMEWORKS[activeFramework].meta,
+      sourceNote: FRAMEWORK_SOURCE[activeFramework],
       weeks: plan.map((week) => ({
         week: week.week,
         topic: week.topic,
         lessons: week.lessons.map((lesson) => lesson.title),
-        codes: week.lessons.flatMap((lesson) => lesson.curriculum ?? []),
+        codes: frameworkCodes(activeFramework, week.lessons.flatMap((lesson) => lesson.curriculum ?? []), yearLabel),
       })),
+      coverage: coverageRows(activeFramework, yearLabel, genreId, lessons),
     }));
   }
 
   function handleDownloadCsv() {
     if(yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level7-scope-and-sequence.csv`;a.download=`reliq-${genreId}-level-7-scope-and-sequence.csv`;a.click();return;}
     const rows: string[] = [
-      ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes"].join(","),
+      ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes", ...(activeFramework === "aus" ? [] : [`${FRAMEWORKS[activeFramework].label} Codes`])].join(","),
     ];
     for (const w of plan) {
       for (const l of w.lessons) {
@@ -237,6 +271,7 @@ export default function CurriculumExplorer({
             `"${l.title.replace(/"/g, '""')}"`,
             `"${l.focus.replace(/"/g, '""')}"`,
             `"${l.curriculum.join(", ")}"`,
+            ...(activeFramework === "aus" ? [] : [`"${frameworkCodes(activeFramework, l.curriculum, yearLabel).join(", ")}"`]),
           ].join(",")
         );
       }
@@ -299,6 +334,20 @@ export default function CurriculumExplorer({
             </svg>
             Download Schedule
           </button>
+          {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
+            <select
+              aria-label="Curriculum for the scope and sequence"
+              value={activeFramework}
+              onChange={(event) => chooseFramework(event.target.value as CurriculumFramework)}
+              className="shrink-0 rounded-full border border-[#E6E8EC] bg-white px-3 py-1.5 text-[11px] font-bold text-[#0F172A]"
+            >
+              {(Object.keys(FRAMEWORKS) as CurriculumFramework[]).map((key) => (
+                <option key={key} value={key} disabled={!frameworkAvailable(key, yearLabel, genreId)}>
+                  {FRAMEWORKS[key].label}{frameworkAvailable(key, yearLabel, genreId) ? "" : " (Foundation–Level 6)"}
+                </option>
+              ))}
+            </select>
+          ) : null}
           {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
             <button
               onClick={handleScopePdf}
