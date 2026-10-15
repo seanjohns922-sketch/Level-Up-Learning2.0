@@ -1,0 +1,251 @@
+/* New-gem reveal. --stone / --stone-rgb is the gem's stone colour, --rarity the rarity colour. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 38%, rgb(var(--stone-rgb) / 0.22), transparent 55%), #05060af5;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fade 0.3s ease both;
+}
+
+.layout {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem 1rem;
+}
+
+/* ── Gem stage ── */
+.stage {
+  position: relative;
+  display: flex;
+  width: 220px;
+  height: 220px;
+  align-items: center;
+  justify-content: center;
+}
+
+.rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 720px;
+  height: 720px;
+  margin: -360px 0 0 -360px;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgb(var(--stone-rgb) / 0.3) 0deg 4deg, transparent 4deg 15deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 45%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 45%);
+  animation: fade 0.8s ease-out both, spin var(--spin, 14s) linear infinite;
+}
+
+/* Loot beam: a column of rarity-coloured light for epic and legendary gems */
+.beam {
+  position: absolute;
+  left: 50%;
+  bottom: 40%;
+  width: 120px;
+  height: 120vh;
+  margin-left: -60px;
+  pointer-events: none;
+  background: linear-gradient(to top, var(--rarity), transparent 85%);
+  mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+  opacity: 0.55;
+  transform-origin: bottom;
+  animation: beamUp 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) both, beamPulse 2.4s ease-in-out 0.7s infinite;
+}
+
+.pedestal {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 170px;
+  height: 34px;
+  margin-left: -85px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(var(--stone-rgb) / 0.55), transparent 70%);
+  filter: blur(4px);
+  animation: fade 0.6s ease-out both;
+}
+
+.orb {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, rgb(var(--stone-rgb)) 45%, transparent 72%);
+  box-shadow: 0 0 40px rgb(var(--stone-rgb) / 0.9), 0 0 90px rgb(var(--stone-rgb) / 0.5);
+  animation: orbCharge var(--charge, 1s) ease-in both;
+}
+
+.flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 40%, #fff, rgb(var(--stone-rgb) / 0.6) 30%, transparent 70%);
+  animation: flash 0.7s ease-out forwards;
+}
+
+.shockwave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160px;
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  border-radius: 50%;
+  border: 2px solid rgb(var(--stone-rgb));
+  box-shadow: 0 0 30px rgb(var(--stone-rgb) / 0.8);
+  pointer-events: none;
+  animation: shockwave 0.9s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+
+.particles {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--p-color);
+  box-shadow: 0 0 8px var(--p-color);
+  animation: converge var(--p-dur) cubic-bezier(0.55, 0, 0.9, 0.45) var(--p-delay) both;
+}
+
+.gemIn {
+  position: relative;
+  animation: gemIn 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.gemFloat {
+  position: relative;
+  animation: float 3.2s ease-in-out 0.8s infinite;
+}
+
+.glint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, #ffffffd9 50%, transparent 60%);
+  mask-image: radial-gradient(circle, #000 48%, transparent 66%);
+  -webkit-mask-image: radial-gradient(circle, #000 48%, transparent 66%);
+  mix-blend-mode: overlay;
+  animation: glint 3.6s ease-in-out 0.6s infinite;
+}
+
+/* ── Text ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.32em;
+  color: var(--rarity);
+  text-shadow: 0 0 20px var(--rarity);
+}
+
+.tag::before,
+.tag::after {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rarity));
+}
+
+.tag::after {
+  transform: scaleX(-1);
+}
+
+.rise1 { animation: rise 0.45s ease-out 0.1s both; }
+.rise2 { animation: rise 0.45s ease-out 0.22s both; }
+.rise3 { animation: rise 0.45s ease-out 0.34s both; }
+
+.skipHint {
+  position: absolute;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  border-radius: 9999px;
+  border: 1px solid #ffffff26;
+  background: #ffffff0f;
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffffb3;
+}
+
+/* ── Keyframes ── */
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes beamUp { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 0.55; } }
+@keyframes beamPulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.8; } }
+@keyframes orbCharge {
+  0% { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  85% { transform: scale(1.1); }
+  92% { transform: scale(0.9); }
+  100% { transform: scale(1.5); opacity: 1; }
+}
+@keyframes flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes shockwave { from { transform: scale(0.4); opacity: 1; } to { transform: scale(4); opacity: 0; } }
+@keyframes converge {
+  0% { transform: translate(var(--p-x), var(--p-y)) scale(1); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+}
+@keyframes gemIn {
+  0% { opacity: 0; transform: scale(0.25) rotate(-25deg); }
+  60% { opacity: 1; transform: scale(1.15) rotate(5deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes glint {
+  0%, 50% { opacity: 0; transform: translateX(-120%) skewX(-16deg); }
+  65% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(120%) skewX(-16deg); }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .rays,
+  .beam,
+  .pedestal,
+  .gemIn,
+  .gemFloat,
+  .rise1,
+  .rise2,
+  .rise3 {
+    animation: none !important;
+  }
+
+  .glint,
+  .flash,
+  .shockwave,
+  .orb {
+    display: none;
+  }
+}

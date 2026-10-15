@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
 import GemIcon, { cutForGem, emblemForGem, GEM_RARITY } from "@/components/gems/GemIcon";
-import { RARITY_LABEL, setFavouriteGem, type GemRarity } from "@/lib/gems";
+import { stoneForGem, stoneRgb } from "@/lib/gem-stones";
+import { RARITY_LABEL, setFavouriteGem, type GemDefinition, type GemRarity } from "@/lib/gems";
 import { clearReveal, getRevealQueue, subscribeReveal } from "@/lib/gem-reveal";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
+import styles from "./GemReveal.module.css";
 
 /**
- * Mounts anywhere; watches the reveal queue and shows a premium "new gem"
+ * Mounts anywhere; watches the reveal queue and shows a full-screen "new gem"
  * reveal, one gem at a time. The gem is already persisted before it appears.
- * The reveal moment is scaled by rarity — a common gem lands quietly, a
- * legendary gets a full light-burst, radiating rays and a sparkle shower.
+ * The moment is scaled by rarity: a common gem pops straight in, rare and above
+ * charge up as an orb first, and epic/legendary gems rise in a loot beam of
+ * their rarity colour. The gem itself is drawn as its real stone.
  * Everything is CSS/Canvas, sound-free, and respects reduced-motion.
  */
 
@@ -24,8 +26,47 @@ const TIER: Record<GemRarity, number> = {
   epic: 3,
   legendary: 4,
 };
-const PARTICLES = [7, 14, 22, 32, 46];
-const SPIN_SECS = [0, 16, 13, 11, 9];
+const PARTICLES = [10, 18, 28, 40, 56];
+const SPIN_SECS = [0, 18, 15, 12, 9];
+/** Charge-up before the gem appears, in ms; common and uncommon skip it. */
+const CHARGE_MS = [0, 0, 700, 1000, 1400];
+
+type Phase = "charge" | "burst" | "shown";
+
+const EARNED_VERBS: Record<string, string> = {
+  complete: "completing", earn: "earning", pass: "passing", reach: "reaching", unlock: "unlocking", collect: "collecting",
+};
+
+/** "Complete 100 lessons" → "completing 100 lessons", for "Earned for …". */
+function earnedFor(description: string) {
+  return description.replace(/^(\w+) /, (match, verb: string) => {
+    const ing = EARNED_VERBS[verb.toLowerCase()];
+    return ing ? `${ing} ` : match;
+  });
+}
+
+const EMPTY_QUEUE: GemDefinition[] = [];
+const getEmptyQueue = () => EMPTY_QUEUE;
+
+function hexToRgbTriple(hex: string) {
+  const n = Number.parseInt(hex.replace("#", ""), 16);
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+}
+
+function makeConverge(count: number) {
+  return Array.from({ length: count }, (_, i) => {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 110 + Math.random() * 160;
+    return {
+      i,
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius,
+      size: 2 + Math.random() * 4,
+      delay: Math.random() * 0.4,
+      dur: 0.5 + Math.random() * 0.5,
+    };
+  });
+}
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -113,19 +154,17 @@ function SparkleBurst({ colors, count }: { colors: string[]; count: number }) {
 export default function GemRevealHost() {
   const router = useRouter();
   const student = useMemo(() => getActiveStudentProfile(), []);
-  const [queue, setQueue] = useState(getRevealQueue());
+  // Reading the queue as an external store also catches gems queued before this mounted.
+  const queue = useSyncExternalStore(subscribeReveal, getRevealQueue, getEmptyQueue);
   const [idx, setIdx] = useState(0);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => subscribeReveal(() => setQueue(getRevealQueue())), []);
   useEffect(() => {
     if (queue.length === 0 && idx !== 0) setIdx(0);
   }, [queue.length, idx]);
 
   const gem = queue[idx];
   if (!gem) return null;
-  const c = GEM_RARITY[gem.rarity];
-  const tier = TIER[gem.rarity];
   const isDemo = !student?.studentId || student.studentId === "demo-preview";
 
   function advance() {
@@ -136,7 +175,7 @@ export default function GemRevealHost() {
     }
   }
   async function display() {
-    if (!student?.studentId || isDemo || busy) return;
+    if (!student?.studentId || isDemo || busy || !gem) return;
     setBusy(true);
     try {
       await setFavouriteGem(student.studentId, gem.id);
@@ -149,111 +188,145 @@ export default function GemRevealHost() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={`New gem: ${gem.name}`}>
-      <div className="lul-reveal-dim absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={advance} />
-      <div
-        key={gem.id}
-        className="lul-reveal-card relative w-full max-w-sm overflow-hidden rounded-2xl border border-white/12 bg-[linear-gradient(#12151d,#0b0d13)] p-7 text-center shadow-2xl"
-        style={{ boxShadow: tier >= 3 ? `0 0 60px -20px ${c.mid}, 0 25px 50px -12px rgba(0,0,0,0.6)` : undefined }}
-      >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40" style={{ background: `radial-gradient(circle at 50% 0%, ${c.mid}${tier >= 3 ? "55" : "44"}, transparent 70%)` }} aria-hidden="true" />
-        <p className="relative flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
-          <Sparkles className="h-4 w-4" /> New Gem Discovered
-        </p>
+    <GemReveal
+      key={`${gem.id}-${idx}`}
+      gem={gem}
+      position={idx}
+      total={queue.length}
+      canDisplay={!isDemo}
+      busy={busy}
+      onDisplay={display}
+      onVault={() => { clearReveal(); setIdx(0); router.push("/gem-vault"); }}
+      onNext={advance}
+    />
+  );
+}
 
-        {/* Gem stage: rays + flash + sparkle burst + the gem */}
-        <div className="relative mx-auto mt-5 flex h-40 w-40 items-center justify-center">
-          {tier >= 1 ? (
-            <div
-              className="lul-reveal-rays pointer-events-none absolute inset-[-24px]"
-              style={{
-                background: `repeating-conic-gradient(from 0deg, ${c.light}00 0deg, ${c.mid}55 3deg, ${c.light}00 7deg, ${c.light}00 15deg)`,
-                WebkitMaskImage: "radial-gradient(circle, #000 12%, transparent 62%)",
-                maskImage: "radial-gradient(circle, #000 12%, transparent 62%)",
-                opacity: 0.25 + tier * 0.12,
-                animationDuration: `${SPIN_SECS[tier]}s`,
-              }}
-              aria-hidden="true"
-            />
+function GemReveal({ gem, position, total, canDisplay, busy, onDisplay, onVault, onNext }: {
+  gem: GemDefinition;
+  position: number;
+  total: number;
+  canDisplay: boolean;
+  busy: boolean;
+  onDisplay: () => void;
+  onVault: () => void;
+  onNext: () => void;
+}) {
+  const tier = TIER[gem.rarity];
+  const rarity = GEM_RARITY[gem.rarity];
+  const stone = stoneForGem(gem);
+  const stoneTriple = stone ? stoneRgb(stone) : hexToRgbTriple(rarity.mid);
+  const [phase, setPhase] = useState<Phase>(CHARGE_MS[tier] ? "charge" : "burst");
+  const converge = useMemo(() => makeConverge(PARTICLES[tier]), [tier]);
+
+  useEffect(() => {
+    if (phase === "shown") return;
+    const reduced = prefersReducedMotion();
+    const timeout = setTimeout(
+      () => setPhase(reduced ? "shown" : phase === "charge" ? "burst" : "shown"),
+      reduced ? 0 : phase === "charge" ? CHARGE_MS[tier] : 650,
+    );
+    return () => clearTimeout(timeout);
+  }, [phase, tier]);
+
+  const vars = {
+    ["--stone-rgb" as string]: stoneTriple,
+    ["--rarity" as string]: rarity.mid,
+    ["--spin" as string]: `${SPIN_SECS[tier] || 20}s`,
+    ["--charge" as string]: `${CHARGE_MS[tier]}ms`,
+  } as CSSProperties;
+  const gemVisible = phase !== "charge";
+  const shown = phase === "shown";
+  // Stable so the one-shot sparkle burst does not replay when the text appears.
+  const sparkColors = useMemo(() => [`rgb(${stoneTriple})`, rarity.light, "#ffffff"], [stoneTriple, rarity.light]);
+
+  return (
+    <div className={styles.root} style={vars} role="dialog" aria-modal="true" aria-label={`New gem: ${gem.name}`}>
+      <div className={styles.backdrop} onClick={() => (shown ? onNext() : setPhase("shown"))} />
+      {phase === "burst" && tier >= 2 ? <div className={styles.flash} aria-hidden="true" /> : null}
+
+      <div className={`${styles.layout} pointer-events-none`}>
+        <div className={styles.stage}>
+          {gemVisible && tier >= 1 ? <div className={styles.rays} aria-hidden="true" /> : null}
+          {gemVisible && tier >= 3 ? <div className={styles.beam} aria-hidden="true" /> : null}
+          {gemVisible ? <div className={styles.pedestal} aria-hidden="true" /> : null}
+
+          {phase === "charge" ? (
+            <>
+              <div className={styles.orb} aria-hidden="true" />
+              <div className={styles.particles} aria-hidden="true">
+                {converge.map((p) => (
+                  <span
+                    key={p.i}
+                    className={styles.particle}
+                    style={{
+                      width: p.size,
+                      height: p.size,
+                      ["--p-x" as string]: `${p.x}px`,
+                      ["--p-y" as string]: `${p.y}px`,
+                      ["--p-delay" as string]: `${p.delay}s`,
+                      ["--p-dur" as string]: `${p.dur}s`,
+                      ["--p-color" as string]: p.i % 3 ? `rgb(${stoneTriple})` : "#ffffff",
+                    }}
+                  />
+                ))}
+              </div>
+            </>
           ) : null}
-          {tier >= 1 ? (
-            <div
-              className="lul-reveal-flash pointer-events-none absolute h-24 w-24 rounded-full"
-              style={{ background: `radial-gradient(circle, #ffffff 0%, ${c.light} 30%, transparent 70%)` }}
-              aria-hidden="true"
-            />
+
+          {gemVisible ? (
+            <>
+              {phase === "burst" && tier >= 1 ? <div className={styles.shockwave} aria-hidden="true" /> : null}
+              <SparkleBurst colors={sparkColors} count={PARTICLES[tier]} />
+              <div className={styles.gemIn}>
+                <div className={styles.gemFloat} style={{ filter: `drop-shadow(0 10px 34px rgb(${stoneTriple} / 0.7))` }}>
+                  <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} emblem={emblemForGem(gem.realm_id, gem.milestone_type)} stone={stone} size={168} />
+                  {tier >= 1 ? <div className={styles.glint} aria-hidden="true" /> : null}
+                </div>
+              </div>
+            </>
           ) : null}
-          <SparkleBurst colors={[c.light, c.mid, "#ffffff"]} count={PARTICLES[tier]} />
-          <div className="lul-reveal-gem relative" style={{ filter: `drop-shadow(0 8px 30px ${c.mid})` }}>
-            <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} emblem={emblemForGem(gem.realm_id, gem.milestone_type)} size={132} />
-            {tier >= 2 ? <div className="lul-reveal-shimmer pointer-events-none absolute inset-0" aria-hidden="true" /> : null}
-          </div>
         </div>
 
-        <h2 className="lul-reveal-t1 mt-5 text-2xl font-black text-white">{gem.name}</h2>
-        <span className="lul-reveal-t2 mt-2 inline-block rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide" style={{ color: c.light, background: `${c.mid}22` }}>{RARITY_LABEL[gem.rarity]}</span>
-        <p className="lul-reveal-t3 mt-3 text-sm font-semibold text-white/65">Earned for {gem.description.replace(/^Complete |^Earn |^Pass |^Reach |^Unlock |^Collect /i, (m) => m.toLowerCase())}</p>
+        {shown ? (
+          <div className="pointer-events-auto relative z-10 mt-4 flex w-full max-w-sm flex-col items-center text-center">
+            <p className={`${styles.tag} ${styles.rise1}`}>{RARITY_LABEL[gem.rarity].toUpperCase()} GEM</p>
+            <h2 className={`${styles.rise1} mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl`}>{gem.name}</h2>
+            {stone ? <p className={`${styles.rise2} mt-1 text-sm font-semibold text-white/55`}>{stone.label}</p> : null}
+            <p className={`${styles.rise2} mt-3 text-sm font-semibold text-white/70`}>
+              Earned for {earnedFor(gem.description)}
+            </p>
 
-        <div className="lul-reveal-t3 mt-6 flex flex-col gap-2">
-          {!isDemo ? (
-            <button type="button" onClick={display} disabled={busy} className="rounded-lg bg-white px-4 py-2.5 text-sm font-black text-slate-900 transition hover:bg-white/90 disabled:opacity-60">Display in My Home</button>
-          ) : null}
-          <div className="flex gap-2">
-            <button type="button" onClick={() => { clearReveal(); setIdx(0); router.push("/gem-vault"); }} className="flex-1 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">View Gem Vault</button>
-            <button type="button" onClick={advance} className="flex-1 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">
-              {idx < queue.length - 1 ? `Next (${queue.length - idx - 1})` : "Continue"}
-            </button>
+            <div className={`${styles.rise3} mt-6 flex w-full flex-col gap-2`}>
+              {canDisplay ? (
+                <button type="button" onClick={onDisplay} disabled={busy} className="min-h-11 rounded-xl px-4 py-2.5 text-sm font-black text-slate-950 transition hover:brightness-110 disabled:opacity-60" style={{ background: `linear-gradient(135deg, rgb(${stoneTriple}), rgb(${stoneTriple} / 0.8))`, boxShadow: `0 6px 24px rgb(${stoneTriple} / 0.45)` }}>
+                  Display in My Home
+                </button>
+              ) : null}
+              <div className="flex gap-2">
+                <button type="button" onClick={onVault} className="min-h-11 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">View Gem Vault</button>
+                <button type="button" onClick={onNext} className="min-h-11 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">
+                  {position < total - 1 ? `Next (${total - position - 1})` : "Continue"}
+                </button>
+              </div>
+            </div>
+
+            {total > 1 ? (
+              <div className={`${styles.rise3} mt-4 flex gap-1.5`} aria-label={`Gem ${position + 1} of ${total}`}>
+                {Array.from({ length: total }, (_, i) => (
+                  <span key={i} className="h-1.5 w-1.5 rounded-full" style={{ background: i === position ? rarity.mid : "rgba(255,255,255,0.25)" }} />
+                ))}
+              </div>
+            ) : null}
           </div>
-        </div>
+        ) : null}
       </div>
 
-      <style>{`
-        @keyframes lul-reveal-fade { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes lul-reveal-pop {
-          0% { opacity: 0; transform: translateY(10px) scale(0.9) }
-          100% { opacity: 1; transform: translateY(0) scale(1) }
-        }
-        @keyframes lul-reveal-gem-in {
-          0% { opacity: 0; transform: scale(0.35) rotate(-20deg) }
-          65% { opacity: 1; transform: scale(1.12) rotate(4deg) }
-          100% { transform: scale(1) rotate(0) }
-        }
-        @keyframes lul-reveal-rays-spin { to { transform: rotate(360deg) } }
-        @keyframes lul-reveal-flash-out {
-          0% { opacity: 0; transform: scale(0.2) }
-          25% { opacity: 0.95 }
-          100% { opacity: 0; transform: scale(2.6) }
-        }
-        @keyframes lul-reveal-shimmer-sweep {
-          0%, 55% { opacity: 0; transform: translateX(-140%) skewX(-18deg) }
-          70% { opacity: 0.9 }
-          100% { opacity: 0; transform: translateX(140%) skewX(-18deg) }
-        }
-        @keyframes lul-reveal-rise {
-          from { opacity: 0; transform: translateY(8px) }
-          to { opacity: 1; transform: translateY(0) }
-        }
-        .lul-reveal-dim { animation: lul-reveal-fade .25s ease both }
-        .lul-reveal-card { animation: lul-reveal-pop .4s cubic-bezier(.34,1.56,.64,1) both }
-        .lul-reveal-gem { animation: lul-reveal-gem-in .6s cubic-bezier(.34,1.56,.64,1) both }
-        .lul-reveal-rays { animation: lul-reveal-rays-spin linear infinite }
-        .lul-reveal-flash { animation: lul-reveal-flash-out .7s ease-out both }
-        .lul-reveal-shimmer {
-          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.85) 50%, transparent 60%);
-          animation: lul-reveal-shimmer-sweep 1.6s ease-in-out .5s both;
-        }
-        .lul-reveal-t1 { animation: lul-reveal-rise .4s ease both .35s }
-        .lul-reveal-t2 { animation: lul-reveal-rise .4s ease both .48s }
-        .lul-reveal-t3 { animation: lul-reveal-rise .4s ease both .6s }
-        @media (prefers-reduced-motion: reduce) {
-          .lul-reveal-dim, .lul-reveal-card, .lul-reveal-gem, .lul-reveal-rays,
-          .lul-reveal-flash, .lul-reveal-shimmer, .lul-reveal-t1, .lul-reveal-t2, .lul-reveal-t3 {
-            animation: none !important
-          }
-          .lul-reveal-flash, .lul-reveal-shimmer { display: none }
-          .lul-reveal-rays { opacity: 0.18 !important }
-        }
-      `}</style>
+      {!shown ? (
+        <button type="button" className={styles.skipHint} onClick={() => setPhase("shown")}>
+          Tap to skip
+        </button>
+      ) : null}
     </div>
   );
 }

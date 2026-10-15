@@ -20,6 +20,7 @@ import EconomyHeader from "@/components/economy/EconomyHeader";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
 import GemIcon, { cutForGem } from "@/components/gems/GemIcon";
+import { stoneForGem } from "@/lib/gem-stones";
 import { awardAndReveal } from "@/lib/gem-reveal";
 import { fetchGemVault, type GemVault } from "@/lib/gems";
 import { fetchRealmieCollection, type RealmieCollection } from "@/lib/realmies";
@@ -310,7 +311,7 @@ export default function HomeBasePage() {
                   className="mt-3 flex w-full items-center gap-3 rounded-md border border-white/15 bg-black/35 p-3 text-left backdrop-blur-sm transition hover:border-amber-300/40 hover:bg-black/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/60"
                 >
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[radial-gradient(circle_at_50%_35%,rgba(245,158,11,0.28),transparent_70%)]">
-                    {favGem ? <GemIcon rarity={favGem.rarity} cut={cutForGem(favGem.id, favGem.rarity)} size={40} /> : <Gem className="h-6 w-6 text-white/40" aria-hidden="true" />}
+                    {favGem ? <GemIcon rarity={favGem.rarity} cut={cutForGem(favGem.id, favGem.rarity)} stone={stoneForGem(favGem)} size={40} /> : <Gem className="h-6 w-6 text-white/40" aria-hidden="true" />}
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-wider text-amber-200/80">Gem Vault</p>

@@ -1,5 +1,6 @@
 import { useId } from "react";
 import type { GemRarity } from "@/lib/gems";
+import type { GemStone } from "@/lib/gem-stones";
 
 export type GemCut =
   | "round"
@@ -107,21 +108,156 @@ const centroid = (pts: Pt[]): Pt => [
   pts.reduce((s, p) => s + p[1], 0) / pts.length,
 ];
 
+// Glow strength carries rarity; when a stone is known, the glow colour carries the stone.
+const RARITY_GLOW: Record<GemRarity, number> = { common: 0, uncommon: 0.3, rare: 0.45, epic: 0.6, legendary: 0.75 };
+
+/** Small seeded generator so pattern details stay identical on every render. */
+function seeded(seed: number) {
+  let a = seed || 1;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const PLAY_HUES: Record<string, number[]> = {
+  "fire-opal": [8, 28, 48, 340, 18],
+  opal: [160, 200, 280, 330, 50, 120],
+};
+
+/** Polished, unfaceted stones (pearl, jade, opal, agate...): a lit dome with the stone's own pattern. */
+function Cabochon({ id, stone, rarity, locked, size, emblem, stretch }: {
+  id: string;
+  stone: GemStone;
+  rarity: GemRarity;
+  locked: boolean;
+  size: number;
+  emblem?: GemEmblem;
+  stretch: number;
+}) {
+  const cx = 32;
+  const cy = 32;
+  const rx = 24;
+  const ry = Math.min(28, 24 * Math.min(1.18, Math.max(1, stretch)));
+  const rand = seeded(stableHash(stone.key));
+  const mid = Math.max(12, Math.min(82, 48 + stone.l));
+  const tone = (dl: number, ds = 0) => locked
+    ? `hsl(222 18% ${Math.max(12, Math.min(40, (mid + dl) * 0.42))}%)`
+    : `hsl(${stone.h} ${Math.max(0, stone.s + ds)}% ${Math.max(6, Math.min(94, mid + dl))}%)`;
+  const glowAlpha = RARITY_GLOW[rarity];
+  const glow = locked || glowAlpha === 0 ? "none" : `drop-shadow(0 4px 9px hsl(${stone.h} ${Math.max(stone.s, 40)}% 58% / ${glowAlpha}))`;
+  const pattern = locked ? undefined : stone.pattern;
+
+  const round = (value: number) => Math.round(value * 100) / 100;
+  const pick = (min: number, max: number) => round(min + rand() * (max - min));
+  const inside = (): Pt => {
+    const a = rand() * TAU;
+    const r = Math.sqrt(rand()) * 0.92;
+    return [round(cx + Math.cos(a) * rx * r), round(cy + Math.sin(a) * ry * r)];
+  };
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" style={{ filter: glow }} aria-hidden="true">
+      <defs>
+        <radialGradient id={`dome-${id}`} cx="38%" cy="32%" r="78%">
+          <stop offset="0%" stopColor={tone(26, -6)} />
+          <stop offset="55%" stopColor={tone(0)} />
+          <stop offset="100%" stopColor={tone(-24, 6)} />
+        </radialGradient>
+        <clipPath id={`cab-${id}`}>
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
+        </clipPath>
+        <filter id={`blur-${id}`} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.4" />
+        </filter>
+        <filter id={`haze-${id}`} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+      </defs>
+
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={`url(#dome-${id})`} />
+
+      <g clipPath={`url(#cab-${id})`}>
+        {pattern === "bands" &&
+          Array.from({ length: 7 }, (_, i) => (
+            <ellipse key={i} cx={cx + 3 - i * 0.6} cy={cy + 5 - i * 0.4} rx={rx * (1.05 - i * 0.14)} ry={ry * (0.8 - i * 0.1)} fill="none" stroke={tone(i % 2 ? 22 : -14, 8)} strokeWidth={pick(1.6, 3)} opacity="0.45" />
+          ))}
+        {pattern === "chatoyant" && (
+          <>
+            {Array.from({ length: 9 }, (_, i) => (
+              <path key={i} d={`M4 ${10 + i * 6} C 20 ${6 + i * 6 + pick(-3, 3)}, 40 ${14 + i * 6 + pick(-3, 3)}, 60 ${9 + i * 6}`} fill="none" stroke={tone(i % 2 ? 18 : -20, 6)} strokeWidth="2.6" opacity="0.5" />
+            ))}
+            <rect x="24" y="-4" width="9" height="72" fill="#fff6d8" opacity="0.4" transform={`rotate(-18 ${cx} ${cy})`} filter={`url(#blur-${id})`} />
+          </>
+        )}
+        {pattern === "veins" &&
+          Array.from({ length: 4 }, (_, i) => (
+            <path key={i} d={`M${pick(2, 20)} ${pick(4, 60)} C ${pick(16, 30)} ${pick(10, 54)}, ${pick(34, 48)} ${pick(10, 54)}, ${pick(46, 64)} ${pick(4, 60)}`} fill="none" stroke={`hsl(220 14% ${i % 2 ? 46 : 58}%)`} strokeWidth={i === 0 ? 0.9 : 0.45} opacity="0.7" />
+          ))}
+        {pattern === "speckle" &&
+          Array.from({ length: 46 }, (_, i) => {
+            const [x, y] = inside();
+            const fill = stone.key === "sunstone" ? (i % 3 ? "#ffd98a" : tone(-22)) : i % 3 ? tone(-28, -4) : tone(30, -20);
+            return <circle key={i} cx={x} cy={y} r={pick(0.4, 1.25)} fill={fill} opacity={stone.key === "sunstone" ? 0.9 : 0.75} />;
+          })}
+        {pattern === "sheen" && (
+          <ellipse cx={cx + 6} cy={cy - 4} rx={rx * 0.62} ry={ry * 0.5} fill={stone.key === "moonstone" ? "hsl(206 95% 80%)" : stone.key === "pearl" ? "hsl(320 70% 92%)" : tone(30, 10)} opacity="0.55" filter={`url(#haze-${id})`} />
+        )}
+        {pattern === "play" &&
+          Array.from({ length: 16 }, (_, i) => {
+            const [x, y] = inside();
+            const hues = PLAY_HUES[stone.key] ?? PLAY_HUES.opal!;
+            return <circle key={i} cx={x} cy={y} r={pick(2.2, 5)} fill={`hsl(${hues[i % hues.length]} 90% 62%)`} opacity="0.6" filter={`url(#blur-${id})`} style={{ mixBlendMode: "screen" }} />;
+          })}
+        {pattern === "star" && (
+          <g transform={`translate(${cx - 2} ${cy - 3})`} filter={`url(#blur-${id})`} opacity="0.85">
+            {[0, 60, 120].map((deg) => (
+              <rect key={deg} x="-20" y="-0.7" width="40" height="1.4" fill="#fff" transform={`rotate(${deg})`} />
+            ))}
+          </g>
+        )}
+
+        {/* lit dome: soft key highlight, crisp glint and a faint reflected rim */}
+        <ellipse cx={cx - 8} cy={cy - ry * 0.45} rx={rx * 0.42} ry={ry * 0.2} fill="#fff" opacity={locked ? 0.08 : 0.5} transform={`rotate(-28 ${cx - 8} ${cy - ry * 0.45})`} filter={`url(#blur-${id})`} />
+        {!locked && <circle cx={cx - 10} cy={cy - ry * 0.5} r="1.6" fill="#fff" opacity="0.9" />}
+        <ellipse cx={cx + 6} cy={cy + ry * 0.62} rx={rx * 0.5} ry={ry * 0.16} fill="#fff" opacity={locked ? 0.03 : 0.12} filter={`url(#blur-${id})`} />
+
+        {emblem && (
+          <g transform={`translate(${cx} ${cy}) scale(0.9)`} opacity={locked ? 0.12 : 0.2}>
+            <path d={EMBLEM[emblem]} fill={emblem === "space" ? "#fff" : "none"} stroke={emblem === "space" ? "none" : "#fff"} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        )}
+      </g>
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={tone(-30, 4)} strokeWidth="0.9" />
+    </svg>
+  );
+}
+
 export default function GemIcon({
   rarity,
   cut = "round",
   locked = false,
   size = 68,
   emblem,
+  stone,
 }: {
   rarity: GemRarity;
   cut?: GemCut;
   locked?: boolean;
   size?: number;
   emblem?: GemEmblem;
+  /** The gem's real stone (see stoneForGem). Without it the gem keeps its rarity colour. */
+  stone?: GemStone;
 }) {
   const reactId = useId().replace(/:/g, "");
   const cfg = CUT_CFG[cut] ?? CUT_CFG.round;
+
+  if (stone?.finish === "cabochon") {
+    return <Cabochon id={reactId} stone={stone} rarity={rarity} locked={locked} size={size} emblem={emblem} stretch={cfg.stretch} />;
+  }
+
   const cx = 32;
   const cy = 32;
   const stretch = cfg.stretch;
@@ -134,8 +270,15 @@ export default function GemIcon({
   const T: Pt[] = Array.from({ length: cfg.table }, (_, i) => at(-Math.PI / 2 + (i / cfg.table) * TAU, rT));
   const G: Pt[] = Array.from({ length: cfg.sides }, (_, i) => at(-Math.PI / 2 + (i / cfg.sides) * TAU, R));
 
-  const base = RARITY_HSL[rarity];
+  const rarityBase = RARITY_HSL[rarity];
+  const base = stone ? { h: stone.h, s: stone.s, fire: Boolean(stone.fire) || rarityBase.fire } : rarityBase;
+  const lift = stone?.l ?? 0;
   const fire = base.fire && !locked;
+  const iridescent = Boolean(stone?.iridescent) && !locked;
+  // Colourless stones (diamond, quartz) need saturated flecks to show their fire.
+  const fireSat = Math.max(base.s, 90);
+  // Coloured stones keep their colour under the fire; colourless ones scatter the full spectrum.
+  const fireShift = base.s < 30 ? 52 : 26;
 
   // Build the crown facets by fanning each table edge out to its girdle arc.
   type Facet = { pts: Pt[]; fill: string; stroke: string };
@@ -144,15 +287,19 @@ export default function GemIcon({
     const c = centroid(pts);
     const ang = Math.atan2(c[1] - cy, c[0] - cx);
     const face = Math.cos(ang - light);
-    let L = 47 + 21 * face + dl;
-    L = Math.max(20, Math.min(84, L));
+    let L = 47 + 21 * face + dl + lift;
+    // Rounded so server and browser render identical attributes.
+    L = Math.round(Math.max(stone ? 10 : 20, Math.min(stone ? 92 : 84, L)) * 10) / 10;
     if (locked) {
       return { pts, fill: `hsl(222 18% ${Math.max(16, L * 0.34)}%)`, stroke: "hsl(222 20% 30%)" };
     }
+    // Crystals shimmer around their own hue rather than through the whole rainbow.
+    const shimmer = iridescent ? Math.sin(ang * 2) * 38 : 0;
+    const hue = Math.round((((base.h + hueShift + shimmer) % 360) + 360) % 360);
     return {
       pts,
-      fill: `hsl(${((base.h + hueShift) % 360 + 360) % 360} ${sat}% ${L}%)`,
-      stroke: `hsl(${base.h} ${sat}% ${Math.max(12, L - 24)}%)`,
+      fill: `hsl(${hue} ${sat}% ${L}%)`,
+      stroke: `hsl(${hue} ${sat}% ${Math.max(6, L - 24)}%)`,
     };
   };
 
@@ -164,17 +311,23 @@ export default function GemIcon({
     const gEnd = (i + 1) * k;
     const f = fire && i % 3 === 0;
     for (let j = gStart; j < mid; j += 1) {
-      facets.push(shade([Ti, G[j % cfg.sides]!, G[(j + 1) % cfg.sides]!], -5, f ? -52 : 0, f ? 90 : base.s));
+      facets.push(shade([Ti, G[j % cfg.sides]!, G[(j + 1) % cfg.sides]!], -5, f ? -fireShift : 0, f ? fireSat : base.s));
     }
     for (let j = mid; j < gEnd; j += 1) {
-      facets.push(shade([Tn, G[j % cfg.sides]!, G[(j + 1) % cfg.sides]!], -6, f ? 54 : 0, f ? 90 : base.s));
+      facets.push(shade([Tn, G[j % cfg.sides]!, G[(j + 1) % cfg.sides]!], -6, f ? fireShift + 2 : 0, f ? fireSat : base.s));
     }
     facets.push(shade([Ti, G[mid % cfg.sides]!, Tn], 7));
   }
 
-  const tableFill = locked ? "hsl(222 18% 26%)" : `hsl(${base.h} ${Math.max(6, base.s - 8)}% 74%)`;
-  const tableStroke = locked ? "hsl(222 20% 32%)" : `hsl(${base.h} ${base.s}% 40%)`;
-  const glow = locked ? "none" : `drop-shadow(0 4px 9px ${GEM_RARITY[rarity].glow})`;
+  const tableL = Math.max(30, Math.min(92, 74 + lift * 0.6));
+  const tableFill = locked ? "hsl(222 18% 26%)" : `hsl(${base.h} ${Math.max(6, base.s - 8)}% ${tableL}%)`;
+  const tableStroke = locked ? "hsl(222 20% 32%)" : `hsl(${base.h} ${base.s}% ${Math.max(14, 40 + lift * 0.5)}%)`;
+  const glowAlpha = RARITY_GLOW[rarity];
+  const glow = locked
+    ? "none"
+    : stone
+      ? glowAlpha === 0 ? "none" : `drop-shadow(0 4px 9px hsl(${stone.h} ${Math.max(stone.s, 40)}% 58% / ${glowAlpha}))`
+      : `drop-shadow(0 4px 9px ${GEM_RARITY[rarity].glow})`;
 
   const sparkR = R * 0.14;
 
