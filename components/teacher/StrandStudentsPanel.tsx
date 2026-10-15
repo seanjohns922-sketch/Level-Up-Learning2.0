@@ -263,7 +263,7 @@ function pickDisplayWeek(prog: ProgressRow | null, currentWeek: number | null, p
 }
 
 function weekDotColor(accuracy: number | null): string {
-  if (accuracy == null) return "#E2E8F0";
+  if (accuracy == null) return "#E3E5E0";
   if (accuracy >= 80) return "#16A34A";
   if (accuracy >= 50) return "#F59E0B";
   return "#DC2626";
@@ -274,9 +274,9 @@ function weekDotColor(accuracy: number | null): string {
 function lessonAccuracyTone(accuracy: number | null) {
   if (accuracy == null) {
     return {
-      card: "border-[#E6E8EC] bg-white hover:border-teal-300",
+      card: "border-[#E3E5E0] bg-white hover:border-teal-300",
       badge: "bg-slate-100 text-slate-500",
-      accuracy: "text-[#475569]",
+      accuracy: "text-[#3F4246]",
     };
   }
   if (accuracy >= 80) {
@@ -406,7 +406,7 @@ const PLACEMENT_STATUS_RANK: Record<PlacementStatus, number> = {
 
 const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
   "Progress Unavailable": "bg-[#FFF1F2] text-[#BE123C]",
-  "Not Placed": "bg-[#F1F5F9] text-[#64748B]",
+  "Not Placed": "bg-[#F1F2EE] text-[#5A5E63]",
   "Ready for Pre-Test": "bg-[#FEF3C7] text-[#B45309]",
   "Full Program": "bg-[#E0F2FE] text-[#0369A1]",
   "Targeted Program": "bg-[#EDE9FE] text-[#6D28D9]",
@@ -932,16 +932,16 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
       )}
 
       {/* Student panel: slim strand filter + table, one connected card */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
-        <div className="flex items-center gap-2 overflow-x-auto border-b border-[#E6E8EC] px-5 py-2.5">
-          <span className="shrink-0 pr-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">Strand</span>
+      <div className="bg-white rounded-2xl border border-[#E3E5E0] overflow-hidden shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
+        <div className="flex items-center gap-2 overflow-x-auto border-b border-[#E3E5E0] px-5 py-2.5">
+          <span className="shrink-0 pr-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#5A5E63]">Realm</span>
           {[...MATHS_STRAND_IDS, "__divider__", ...ENGLISH_STRAND_IDS].map((id, idx) => {
-            if (id === "__divider__") return <span key={`div-${idx}`} className="mx-1 h-5 w-px shrink-0 bg-[#E2E8F0]" />;
+            if (id === "__divider__") return <span key={`div-${idx}`} className="mx-1 h-5 w-px shrink-0 bg-[#E3E5E0]" />;
             const g = genres.find((x) => x.id === id);
             if (!g) return null;
             const active = g.id === genreId;
             const soon = !g.available;
-            const accent = STRAND_ACCENT[g.id] ?? "#64748B";
+            const accent = STRAND_ACCENT[g.id] ?? "#5A5E63";
             return (
               <button
                 key={g.id}
@@ -950,26 +950,24 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 aria-pressed={active}
                 title={g.realm}
                 className={[
-                  "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] font-bold transition",
+                  "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 px-3.5 py-1.5 text-[13px] font-bold transition",
                   active
-                    ? "border-[#00C2A8] bg-[#00C2A8]/[0.08] text-[#0A2F2A] shadow-[0_0_0_2px_rgba(0,194,168,0.16)]"
+                    ? "border-[#121314] bg-[#121314] text-white"
                     : soon
-                      ? "border-[#EEF1F4] bg-[#F8FAFC] text-[#94A3B8] cursor-not-allowed"
-                      : "border-[#E6E8EC] bg-white text-[#0F172A] hover:border-[#00C2A8]/60",
+                      ? "border-[#EEF0EC] bg-[#F7F8F5] text-[#A3A7A1] cursor-not-allowed"
+                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEF9D9]",
                 ].join(" ")}
               >
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CBD5E1" : accent }} />
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#C9CCC6" : active ? "#B9F23F" : accent }} />
                 {STRAND_SHORT[g.id] ?? g.strand}
                 {soon ? (
-                  <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#94A3B8]">soon</span>
-                ) : active ? (
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#00C2A8" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
+                  <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#8A8E89]">soon</span>
                 ) : null}
               </button>
             );
           })}
         </div>
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] px-5 py-3 bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] border-b border-[#E6E8EC]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] px-5 py-3 bg-gradient-to-b from-[#FAFBF8] to-[#F1F2EE] border-b border-[#E3E5E0]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -982,7 +980,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   onClick={() => toggleSort(key)}
                   className={[
                     "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
-                    active ? "text-[#0A2F2A]" : "text-[#94A3B8] hover:text-[#475569]",
+                    active ? "text-[#121314]" : "text-[#8A8E89] hover:text-[#3F4246]",
                   ].join(" ")}
                 >
                   {label}
@@ -1003,7 +1001,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           ] as [SortKey | null, string][]).map(([key, label], idx) => {
             if (!key) {
               return (
-                <span key={`hdr-${idx}`} className="text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
+                <span key={`hdr-${idx}`} className="text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
                   {label}
                 </span>
               );
@@ -1015,7 +1013,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 onClick={() => toggleSort(key)}
                 className={[
                   "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
-                  active ? "text-[#0A2F2A]" : "text-[#94A3B8] hover:text-[#475569]",
+                  active ? "text-[#121314]" : "text-[#8A8E89] hover:text-[#3F4246]",
                 ].join(" ")}
               >
                 {label}
@@ -1028,7 +1026,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
         </div>
 
         {students.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-[#64748B]">
+          <div className="px-6 py-12 text-center text-sm text-[#5A5E63]">
             No students enrolled yet.
           </div>
         ) : (
@@ -1036,31 +1034,31 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
               const isOpen = expandedId === s.id;
 
             return (
-              <div key={s.id} className="border-b border-[#F1F5F9] last:border-0">
+              <div key={s.id} className="border-b border-[#F1F2EE] last:border-0">
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
                     "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] items-center px-5 py-3.5 text-left transition",
-                    isOpen ? "bg-[#FAFBFC]" : "hover:bg-[#FAFBFC]",
+                    isOpen ? "bg-[#FAFBF8]" : "hover:bg-[#FAFBF8]",
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-full bg-[#D3F1EC] text-[#0B6B5E] flex items-center justify-center text-sm font-black shrink-0">
+                    <div className="h-9 w-9 rounded-full bg-[#121314] text-[#B9F23F] flex items-center justify-center text-sm font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
-                      <div className="text-sm font-bold text-[#0F172A] truncate">{s.display_name}</div>
+                      <div className="text-sm font-bold text-[#121314] truncate">{s.display_name}</div>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#475569]">{schoolYear}</span>
-                  <span className="text-xs font-bold text-[#475569]">
+                  <span className="text-xs font-bold text-[#3F4246]">{schoolYear}</span>
+                  <span className="text-xs font-bold text-[#3F4246]">
                     {workingYear
                       ? yearToLevelLabel(workingYear)
                       : !snapshot || snapshot.placementState === "unavailable"
                         ? "Unavailable"
                         : "Not placed"}
                   </span>
-                  <span className="text-xs font-bold text-[#475569] tabular-nums">
+                  <span className="text-xs font-bold text-[#3F4246] tabular-nums">
                     {week ? `W${week}` : "—"}
                   </span>
                   <div className="flex items-center gap-1">
@@ -1082,9 +1080,9 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-[#00C2A8] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct ?? 0}%` }} />
+                      <div className="h-full bg-[#3D6600] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct ?? 0}%` }} />
                     </div>
-                    <span className="text-[11px] font-bold text-[#475569] tabular-nums w-9 text-right">{pct == null ? "—" : `${pct}%`}</span>
+                    <span className="text-[11px] font-bold text-[#3F4246] tabular-nums w-9 text-right">{pct == null ? "—" : `${pct}%`}</span>
                   </div>
                 </button>
 
@@ -1115,7 +1113,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     onProgressChanged={onProgressChanged}
                   />
                 ) : isOpen ? (
-                  <div className="border-t border-[#E6E8EC] bg-[#F8FAFC] px-5 py-8 text-sm font-semibold text-[#64748B]">
+                  <div className="border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-8 text-sm font-semibold text-[#5A5E63]">
                     {!snapshot || snapshot.placementState === "unavailable"
                       ? "Progress is temporarily unavailable. No placement or week has been inferred."
                       : `This student is not placed in ${snapshot.realm.name}.`}
@@ -1223,7 +1221,7 @@ function StudentStrandDetail({
   const week = plan.find((p) => p.week === selectedWeek);
   if (!week) {
     return (
-      <div className="border-t border-[#E6E8EC] bg-[#F8FAFC] px-5 py-8 text-sm font-semibold text-[#64748B]">
+      <div className="border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-8 text-sm font-semibold text-[#5A5E63]">
         Curriculum details are unavailable for {yearToLevelLabel(yearLabel)}, Week {selectedWeek}.
       </div>
     );
@@ -1273,11 +1271,11 @@ function StudentStrandDetail({
   }
 
   return (
-    <div className="bg-[#F8FAFC] border-t border-[#E6E8EC] px-5 py-5 space-y-5">
+    <div className="bg-[#FAFBF8] border-t border-[#E3E5E0] px-5 py-5 space-y-5">
       <div className="flex justify-end">
         <a
           href={`/teacher/student-insights?studentId=${student.id}&realm_id=${encodeURIComponent(supportedRealmId)}`}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-3.5 py-2 text-sm font-bold text-[#0F172A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#E3E5E0] bg-white px-3.5 py-2 text-sm font-bold text-[#121314] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-[#C9CCC6] hover:bg-[#FAFBF8]"
         >
           <BarChart3 className="h-4 w-4" aria-hidden />
           Learning Insights
@@ -1323,8 +1321,8 @@ function StudentStrandDetail({
         <p className="mt-1 text-sm font-semibold text-slate-700">{growth.change !== null ? `${growth.change > 0 ? "+" : ""}${growth.change} percentage points over ${growth.days} days` : growth.reason}</p>
       </div>}
 
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4">
-        <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">
+      <div className="bg-white rounded-2xl border border-[#E3E5E0] p-4">
+        <div className="text-[10px] font-extrabold text-[#8A8E89] uppercase tracking-[0.12em] mb-2">
           This Week Summary
         </div>
         <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-3">
@@ -1375,8 +1373,8 @@ function StudentStrandDetail({
       </div>
 
       {/* Week strip */}
-      <div className="bg-white rounded-2xl border border-[#E6E8EC] p-3">
-        <div className="px-1 pb-2 text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">
+      <div className="bg-white rounded-2xl border border-[#E3E5E0] p-3">
+        <div className="px-1 pb-2 text-[10px] font-extrabold text-[#8A8E89] uppercase tracking-[0.12em]">
           Weekly Journey
         </div>
         <div className="grid grid-cols-6 lg:grid-cols-12 gap-1.5">
@@ -1421,20 +1419,20 @@ function StudentStrandDetail({
 
       {/* Selected week detail */}
       {week && expandedWeek === week.week && (
-        <div className="bg-white rounded-2xl border border-[#E6E8EC] p-4 space-y-3">
+        <div className="bg-white rounded-2xl border border-[#E3E5E0] p-4 space-y-3">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
               <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em]">
                 Week {week.week} Focus
               </div>
-              <div className="text-base font-black text-[#0F172A] mt-0.5">{week.topic}</div>
+              <div className="text-base font-black text-[#121314] mt-0.5">{week.topic}</div>
             </div>
             <button
               type="button"
               onClick={() => setShowAdvanceDialog(true)}
               disabled={isPlaceholder || selectedWeek !== currentWeek || selectedWeek >= maxWeek || teacherAdvancedWeeks.includes(selectedWeek)}
               title={selectedWeek !== currentWeek ? "Select the student's current week to manage progress" : "Manage this student's canonical week progression"}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[#334155] text-xs font-bold disabled:bg-[#F1F5F9] disabled:text-[#94A3B8] disabled:cursor-not-allowed hover:border-teal-300"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[#34373A] text-xs font-bold disabled:bg-[#F1F2EE] disabled:text-[#8A8E89] disabled:cursor-not-allowed hover:border-teal-300"
             >
               More · Manage Progress
             </button>
@@ -1477,13 +1475,13 @@ function StudentStrandDetail({
                     </span>
                   </div>
                   <div>
-                    <div className="text-xs font-black text-[#0F172A] leading-snug">{lsn.title}</div>
-                    <div className="text-[11px] text-[#64748B] mt-1 leading-relaxed line-clamp-3">
+                    <div className="text-xs font-black text-[#121314] leading-snug">{lsn.title}</div>
+                    <div className="text-[11px] text-[#5A5E63] mt-1 leading-relaxed line-clamp-3">
                       {lsn.focus}
                     </div>
                   </div>
                   <div className="space-y-1 text-[11px]">
-                    <div className="font-semibold text-[#475569]">
+                    <div className="font-semibold text-[#3F4246]">
                       {performance.correct != null && performance.total != null
                         ? `${performance.correct} / ${performance.total}`
                         : "— / —"}
@@ -1493,7 +1491,7 @@ function StudentStrandDetail({
                         ? `${formatAccuracy(performance.correct, performance.total)} accuracy`
                         : "— accuracy"}
                     </div>
-                    <div className="font-semibold text-[#94A3B8]">
+                    <div className="font-semibold text-[#8A8E89]">
                       Attempts: {performance.attemptCount}
                     </div>
                   </div>
@@ -1512,7 +1510,7 @@ function StudentStrandDetail({
 
           {/* Quiz row */}
           {weeklyQuizRequired ? (
-            <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+            <div className="rounded-xl border border-[#E3E5E0] bg-white px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
               <span className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em]">
                 Weekly Quiz
@@ -1526,14 +1524,14 @@ function StudentStrandDetail({
                   {weekPerformance.weeklyQuizStatus}
                 </span>
               ) : (
-                <span className="text-[11px] font-bold text-[#94A3B8]">Not attempted</span>
+                <span className="text-[11px] font-bold text-[#8A8E89]">Not attempted</span>
               )}
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-[#64748B]">
-              <span>Score: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizCorrect != null && weekPerformance.weeklyQuizTotal != null ? `${weekPerformance.weeklyQuizCorrect} / ${weekPerformance.weeklyQuizTotal}` : "— / —"}</b></span>
-              <span>Attempts: <b className="text-[#0F172A]">{weekQuizAttempts}</b></span>
-              <span>Accuracy: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}%` : "n/a"}</b></span>
-              <span>Result: <b className="text-[#0F172A]">{weekPerformance.weeklyQuizPassed == null ? "Not attempted" : weekPerformance.weeklyQuizPassed ? "Passed" : "Needs Review"}</b></span>
+            <div className="flex items-center gap-3 text-[11px] text-[#5A5E63]">
+              <span>Score: <b className="text-[#121314]">{weekPerformance.weeklyQuizCorrect != null && weekPerformance.weeklyQuizTotal != null ? `${weekPerformance.weeklyQuizCorrect} / ${weekPerformance.weeklyQuizTotal}` : "— / —"}</b></span>
+              <span>Attempts: <b className="text-[#121314]">{weekQuizAttempts}</b></span>
+              <span>Accuracy: <b className="text-[#121314]">{weekPerformance.weeklyQuizAccuracy != null ? `${weekPerformance.weeklyQuizAccuracy}%` : "n/a"}</b></span>
+              <span>Result: <b className="text-[#121314]">{weekPerformance.weeklyQuizPassed == null ? "Not attempted" : weekPerformance.weeklyQuizPassed ? "Passed" : "Needs Review"}</b></span>
               {weekQuizAttempts > 0 ? (
                 <button
                   type="button"
@@ -1552,7 +1550,7 @@ function StudentStrandDetail({
               <button
                 disabled
                 title="Coming soon"
-                className="px-2.5 py-1 rounded-md bg-[#F1F5F9] text-[#64748B] text-[11px] font-bold cursor-not-allowed"
+                className="px-2.5 py-1 rounded-md bg-[#F1F2EE] text-[#5A5E63] text-[11px] font-bold cursor-not-allowed"
               >
                 Assign Quiz
               </button>
@@ -1621,7 +1619,7 @@ function StudentStrandDetail({
                           <button
                             type="button"
                             onClick={() => setSelectedQuizAttempt(attempt)}
-                            className="inline-flex items-center gap-1.5 rounded-md bg-[#0A2F2A] px-3 py-1.5 text-[11px] font-extrabold text-white hover:bg-[#0E443C]"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-[#121314] px-3 py-1.5 text-[11px] font-extrabold text-white hover:bg-[#0E443C]"
                           >
                             <Eye className="h-3.5 w-3.5" />
                             View attempt
@@ -1639,15 +1637,15 @@ function StudentStrandDetail({
             </div>
           ) : null}
           {weekQuizInsight ? (
-            <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
+            <div className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-3 py-3">
               <div className="text-[10px] font-extrabold text-indigo-700 uppercase tracking-[0.14em] mb-2">
                 AI Quiz Insight
               </div>
               <div className="grid md:grid-cols-2 gap-2 text-xs">
-                <div><b className="text-[#64748B]">Status:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.status}</span></div>
-                <div><b className="text-[#64748B]">Strongest Skill:</b> <span className="font-semibold text-emerald-700">{weekQuizInsight.strongestSkill}</span></div>
-                <div><b className="text-[#64748B]">Needs Support:</b> <span className="font-semibold text-rose-700">{weekQuizInsight.needsSupport}</span></div>
-                <div><b className="text-[#64748B]">Teacher Action:</b> <span className="font-semibold text-[#0F172A]">{weekQuizInsight.teacherAction}</span></div>
+                <div><b className="text-[#5A5E63]">Status:</b> <span className="font-semibold text-[#121314]">{weekQuizInsight.status}</span></div>
+                <div><b className="text-[#5A5E63]">Strongest Skill:</b> <span className="font-semibold text-emerald-700">{weekQuizInsight.strongestSkill}</span></div>
+                <div><b className="text-[#5A5E63]">Needs Support:</b> <span className="font-semibold text-rose-700">{weekQuizInsight.needsSupport}</span></div>
+                <div><b className="text-[#5A5E63]">Teacher Action:</b> <span className="font-semibold text-[#121314]">{weekQuizInsight.teacherAction}</span></div>
               </div>
             </div>
           ) : null}
@@ -1762,19 +1760,19 @@ function teacherOverrideReasonLabel(reason: string) {
 
 function SnapshotTile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E6E8EC] px-3 py-2.5">
-      <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">{label}</div>
-      <div className="text-sm font-black text-[#0F172A] mt-1">{value}</div>
-      {sub && <div className="text-[11px] font-semibold text-[#64748B] mt-0.5">{sub}</div>}
+    <div className="bg-white rounded-xl border border-[#E3E5E0] px-3 py-2.5">
+      <div className="text-[10px] font-extrabold text-[#8A8E89] uppercase tracking-[0.12em]">{label}</div>
+      <div className="text-sm font-black text-[#121314] mt-1">{value}</div>
+      {sub && <div className="text-[11px] font-semibold text-[#5A5E63] mt-0.5">{sub}</div>}
     </div>
   );
 }
 
 function SummaryMetric({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-3">
-      <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em]">{label}</div>
-      <div className="mt-1 text-sm font-bold text-[#0F172A]">{value}</div>
+    <div className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-3 py-3">
+      <div className="text-[10px] font-extrabold text-[#8A8E89] uppercase tracking-[0.12em]">{label}</div>
+      <div className="mt-1 text-sm font-bold text-[#121314]">{value}</div>
     </div>
   );
 }

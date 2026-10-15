@@ -448,31 +448,31 @@ export default function PlacementManager({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#F7F8FA]">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-[#E6E8EC] bg-white px-6 py-4">
+      <div className="flex items-center justify-between border-b border-[#E3E5E0] bg-white px-6 py-4">
         <div className="flex items-center gap-3">
           {realmId ? (
             <button
               onClick={() => { setRealmId(null); setPending({}); setFilter("all"); setYearFilter("all"); }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#E6E8EC] px-3 py-1.5 text-sm font-bold text-[#475569] hover:bg-[#F1F5F9]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#E3E5E0] px-3 py-1.5 text-sm font-bold text-[#3F4246] hover:bg-[#F1F2EE]"
             >
               <ArrowLeft className="h-4 w-4" /> Realms
             </button>
           ) : null}
           <div>
-            <h1 className="text-lg font-black text-[#0F172A]">Manage Placements</h1>
-            <p className="text-xs font-semibold text-[#64748B]">
+            <h1 className="text-lg font-black text-[#121314]">Manage Placements</h1>
+            <p className="text-xs font-semibold text-[#5A5E63]">
               {selectedClass?.name ?? "Class"}{activeRealm ? ` · ${activeRealm.label}` : ""}
             </p>
           </div>
         </div>
-        <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E6E8EC] text-[#64748B] hover:bg-[#F1F5F9]" aria-label="Close">
+        <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E3E5E0] text-[#5A5E63] hover:bg-[#F1F2EE]" aria-label="Close">
           <X className="h-5 w-5" />
         </button>
       </div>
 
       <div className="flex-1 overflow-auto p-6">
         {loading ? (
-          <div className="rounded-2xl border border-[#E6E8EC] bg-white p-10 text-center text-sm font-semibold text-[#64748B]">
+          <div className="rounded-2xl border border-[#E3E5E0] bg-white p-10 text-center text-sm font-semibold text-[#5A5E63]">
             Loading class placement…
           </div>
         ) : loadError ? (
@@ -492,12 +492,12 @@ export default function PlacementManager({
             {PLACEMENT_REALMS.map((realm) => {
               if (!realm.active) {
                 return (
-                  <div key={realm.id} className="rounded-2xl border border-[#E6E8EC] bg-white/60 p-5 opacity-70">
+                  <div key={realm.id} className="rounded-2xl border border-[#E3E5E0] bg-white/60 p-5 opacity-70">
                     <div className="flex items-center justify-between">
-                      <div className="text-base font-black text-[#94A3B8]">{realm.label}</div>
-                      <Lock className="h-4 w-4 text-[#CBD5E1]" />
+                      <div className="text-base font-black text-[#8A8E89]">{realm.label}</div>
+                      <Lock className="h-4 w-4 text-[#C9CCC6]" />
                     </div>
-                    <div className="mt-6 text-xs font-bold uppercase tracking-wide text-[#94A3B8]">Coming soon</div>
+                    <div className="mt-6 text-xs font-bold uppercase tracking-wide text-[#8A8E89]">Coming soon</div>
                   </div>
                 );
               }
@@ -507,24 +507,24 @@ export default function PlacementManager({
                 <button
                   key={realm.id}
                   onClick={() => setRealmId(realm.id)}
-                  className="rounded-2xl border border-[#E6E8EC] bg-white p-5 text-left shadow-[0_10px_28px_-18px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-[#0EA5A4]/40 hover:shadow-[0_16px_36px_-18px_rgba(13,148,136,0.35)]"
+                  className="rounded-2xl border border-[#E3E5E0] bg-white p-5 text-left shadow-[0_10px_28px_-18px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-[#3D6600]/40 hover:shadow-[0_16px_36px_-18px_rgba(13,148,136,0.35)]"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="text-base font-black text-[#0F172A]">{realm.label}</div>
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0EA5A4]">
+                    <div className="text-base font-black text-[#121314]">{realm.label}</div>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-[#3D6600]">
                       Manage <ChevronRight className="h-4 w-4" />
                     </span>
                   </div>
                   <div className="mt-4 flex items-center gap-4">
                     <div>
-                      <div className="text-2xl font-black text-[#0F172A]">{placed}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wide text-[#64748B]">Placed</div>
+                      <div className="text-2xl font-black text-[#121314]">{placed}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-wide text-[#5A5E63]">Placed</div>
                     </div>
                     <div>
                       <div className={`text-2xl font-black ${need > 0 ? "text-[#B45309]" : "text-[#15803D]"}`}>{need}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wide text-[#64748B]">Need placement</div>
+                      <div className="text-[10px] font-bold uppercase tracking-wide text-[#5A5E63]">Need placement</div>
                     </div>
-                    <div className="ml-auto flex items-center gap-1.5 text-[#94A3B8]">
+                    <div className="ml-auto flex items-center gap-1.5 text-[#8A8E89]">
                       <Users className="h-4 w-4" />
                       <span className="text-sm font-bold">{rosterStudentIds.size}</span>
                     </div>
@@ -540,16 +540,16 @@ export default function PlacementManager({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={useSchoolYearForAll}
-                className="rounded-lg border border-[#0EA5A4]/40 bg-[#0EA5A4]/10 px-3 py-1.5 text-sm font-bold text-[#0F766E] hover:bg-[#0EA5A4]/15"
+                className="rounded-lg border border-[#3D6600]/40 bg-[#3D6600]/10 px-3 py-1.5 text-sm font-bold text-[#0F766E] hover:bg-[#3D6600]/15"
               >
                 Use School Year for All
               </button>
-              <div className="mx-1 h-5 w-px bg-[#E6E8EC]" />
+              <div className="mx-1 h-5 w-px bg-[#E3E5E0]" />
               {(["all", "needs"] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`rounded-full px-3 py-1.5 text-sm font-bold transition ${filter === f ? "bg-[#0F172A] text-white" : "border border-[#E6E8EC] text-[#475569] hover:bg-[#F1F5F9]"}`}
+                  className={`rounded-full px-3 py-1.5 text-sm font-bold transition ${filter === f ? "bg-[#121314] text-white" : "border border-[#E3E5E0] text-[#3F4246] hover:bg-[#F1F2EE]"}`}
                 >
                   {f === "all" ? "All" : "Needs placement"}
                 </button>
@@ -557,38 +557,38 @@ export default function PlacementManager({
               <select
                 value={yearFilter}
                 onChange={(e) => setYearFilter(e.target.value)}
-                className="rounded-full border border-[#E6E8EC] bg-white px-3 py-1.5 text-sm font-bold text-[#475569]"
+                className="rounded-full border border-[#E3E5E0] bg-white px-3 py-1.5 text-sm font-bold text-[#3F4246]"
               >
                 <option value="all">All years</option>
                 {["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].map((y) => (
                   <option key={y} value={y}>{y}</option>
                 ))}
               </select>
-              <span className="ml-auto text-xs font-semibold text-[#64748B]">
+              <span className="ml-auto text-xs font-semibold text-[#5A5E63]">
                 Sorted by {sortKey === "surname" ? "surname" : sortKey === "schoolYear" ? "school year" : sortKey === "assignedStart" ? "assigned start" : "current progress"}
               </span>
             </div>
 
             {/* Table */}
-            <div className="overflow-hidden rounded-2xl border border-[#E6E8EC] bg-white">
-              <div className="grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] gap-3 border-b border-[#E6E8EC] bg-[#F8FAFC] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#94A3B8]">
-                <button type="button" onClick={() => toggleSort("surname")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]" title="Sort by surname">
+            <div className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
+              <div className="grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] gap-3 border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
+                <button type="button" onClick={() => toggleSort("surname")} className="inline-flex items-center gap-1 text-left hover:text-[#3F4246]" title="Sort by surname">
                   Student {sortKey === "surname" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
                 </button>
-                <button type="button" onClick={() => toggleSort("schoolYear")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                <button type="button" onClick={() => toggleSort("schoolYear")} className="inline-flex items-center gap-1 text-left hover:text-[#3F4246]">
                   School Year {sortKey === "schoolYear" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
                 </button>
-                <button type="button" onClick={() => toggleSort("assignedStart")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                <button type="button" onClick={() => toggleSort("assignedStart")} className="inline-flex items-center gap-1 text-left hover:text-[#3F4246]">
                   Assigned Start {sortKey === "assignedStart" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
                 </button>
                 <span>Entry Method</span>
-                <button type="button" onClick={() => toggleSort("currentProgress")} className="inline-flex items-center gap-1 text-left hover:text-[#475569]">
+                <button type="button" onClick={() => toggleSort("currentProgress")} className="inline-flex items-center gap-1 text-left hover:text-[#3F4246]">
                   Current Progress {sortKey === "currentProgress" ? (sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3" />}
                 </button>
                 <span className="text-right">Actions</span>
               </div>
               {visibleStudents.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-[#64748B]">No students match this filter.</div>
+                <div className="px-5 py-10 text-center text-sm text-[#5A5E63]">No students match this filter.</div>
               ) : (
                 visibleStudents.map((s) => {
                   const cur = currentProgress(realmId, s.id);
@@ -602,14 +602,14 @@ export default function PlacementManager({
                   return (
                     <div
                       key={s.id}
-                      className={`grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] items-center gap-3 border-b border-[#F1F5F9] px-5 py-2.5 last:border-0 ${changed ? "bg-amber-50/50" : ""}`}
+                      className={`grid grid-cols-[1.6fr_0.7fr_1.1fr_1.2fr_1.2fr_0.4fr] items-center gap-3 border-b border-[#F1F2EE] px-5 py-2.5 last:border-0 ${changed ? "bg-amber-50/50" : ""}`}
                     >
-                      <span className="truncate text-sm font-bold text-[#0F172A]">{s.display_name}</span>
-                      <span className="text-xs font-bold text-[#475569]">{schoolYearOf(s)}</span>
+                      <span className="truncate text-sm font-bold text-[#121314]">{s.display_name}</span>
+                      <span className="text-xs font-bold text-[#3F4246]">{schoolYearOf(s)}</span>
                       <select
                         value={level}
                         onChange={(e) => setRowLevel(s.id, e.target.value, realmId)}
-                        className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
+                        className="rounded-lg border border-[#E3E5E0] bg-white px-2 py-1.5 text-sm font-semibold text-[#121314]"
                       >
                         {activeLevelCatalog.map((l) => (
                           <option key={l.id} value={l.id}>{l.label}</option>
@@ -618,20 +618,20 @@ export default function PlacementManager({
                       <select
                         value={entry}
                         onChange={(e) => setRowEntry(s.id, e.target.value as PlacementEntryMode, s, realmId)}
-                        className="rounded-lg border border-[#E6E8EC] bg-white px-2 py-1.5 text-sm font-semibold text-[#0F172A]"
+                        className="rounded-lg border border-[#E3E5E0] bg-white px-2 py-1.5 text-sm font-semibold text-[#121314]"
                       >
                         {entryModesForLevel(realmId, level).map((m) => (
                           <option key={m.value} value={m.value}>{m.label}</option>
                         ))}
                       </select>
-                      <span className="text-xs font-semibold text-[#64748B]">
+                      <span className="text-xs font-semibold text-[#5A5E63]">
                         {cur ? `Currently ${levelLabel(cur.year)}${cur.week ? ` · W${cur.week}` : ""}` : "No progress yet"}
                       </span>
                       <div className="relative flex justify-end">
                         <button
                           onClick={() => setMenuFor((m) => (m === s.id ? null : s.id))}
                           disabled={busyStudent === s.id}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#475569] disabled:opacity-50"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-[#8A8E89] hover:bg-[#F1F2EE] hover:text-[#3F4246] disabled:opacity-50"
                           aria-label="Student actions"
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -639,10 +639,10 @@ export default function PlacementManager({
                         {menuFor === s.id ? (
                           <>
                             <div className="fixed inset-0 z-10" onClick={() => setMenuFor(null)} />
-                            <div className="absolute right-0 top-8 z-20 w-52 overflow-hidden rounded-xl border border-[#E6E8EC] bg-white py-1 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]">
-                              {(level !== "Prep" || isFirstLevelPretestEnabled(realmId, level)) ? <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset pre-test</button> : null}
-                              <button onClick={() => onResetWeek(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#475569] hover:bg-[#F8FAFC]">Reset current week</button>
-                              <div className="my-1 h-px bg-[#F1F5F9]" />
+                            <div className="absolute right-0 top-8 z-20 w-52 overflow-hidden rounded-xl border border-[#E3E5E0] bg-white py-1 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]">
+                              {(level !== "Prep" || isFirstLevelPretestEnabled(realmId, level)) ? <button onClick={() => onResetPretest(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#3F4246] hover:bg-[#FAFBF8]">Reset pre-test</button> : null}
+                              <button onClick={() => onResetWeek(s)} className="block w-full px-3 py-2 text-left text-sm font-semibold text-[#3F4246] hover:bg-[#FAFBF8]">Reset current week</button>
+                              <div className="my-1 h-px bg-[#F1F2EE]" />
                               <button onClick={() => { setMenuFor(null); setResetRealmFor(s); setResetConfirmText(""); }} className="block w-full px-3 py-2 text-left text-sm font-bold text-[#DC2626] hover:bg-[#FEF2F2]">Reset this realm…</button>
                             </div>
                           </>
@@ -653,7 +653,7 @@ export default function PlacementManager({
                 })
               )}
             </div>
-            <p className="text-xs text-[#94A3B8]">
+            <p className="text-xs text-[#8A8E89]">
               Changing a level for a student who already has progress records your intent only — it never
               overwrites their live progress. To hard-reset and re-apply, use the reset actions.
             </p>
@@ -663,14 +663,14 @@ export default function PlacementManager({
 
       {/* Persistent save bar (per-realm view) */}
       {realmId ? (
-        <div className="flex min-h-16 items-center justify-between gap-3 border-t border-[#E6E8EC] bg-white py-3 pl-6 pr-56">
-          <span className={`text-sm font-semibold ${saveMessage?.kind === "success" ? "text-emerald-700" : saveMessage?.kind === "error" ? "text-red-700" : "text-[#64748B]"}`}>
+        <div className="flex min-h-16 items-center justify-between gap-3 border-t border-[#E3E5E0] bg-white py-3 pl-6 pr-56">
+          <span className={`text-sm font-semibold ${saveMessage?.kind === "success" ? "text-emerald-700" : saveMessage?.kind === "error" ? "text-red-700" : "text-[#5A5E63]"}`}>
             {saveMessage?.text ?? (pendingCount > 0 ? `${pendingCount} change${pendingCount === 1 ? "" : "s"} ready to save` : "No changes to save")}
           </span>
           <button
             onClick={savePlacements}
             disabled={saving || pendingCount === 0}
-            className="rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#0F172A] transition hover:bg-[#FBBF24] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#121314] transition hover:bg-[#FBBF24] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {saving ? "Saving…" : pendingCount > 0 ? `Save Placements (${pendingCount})` : "Save Placements"}
           </button>
@@ -681,23 +681,23 @@ export default function PlacementManager({
       {resetRealmFor ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-black text-[#0F172A]">Reset {activeRealm?.label} for {resetRealmFor.display_name}?</h3>
-            <p className="mt-2 text-sm text-[#475569]">
+            <h3 className="text-lg font-black text-[#121314]">Reset {activeRealm?.label} for {resetRealmFor.display_name}?</h3>
+            <p className="mt-2 text-sm text-[#3F4246]">
               This permanently clears this student&apos;s <strong>{activeRealm?.label}</strong> progress, assessments and
               unlocks. Other realms are not affected. This cannot be undone.
             </p>
-            <label className="mt-4 block text-xs font-bold uppercase tracking-wide text-[#94A3B8]">Type RESET to confirm</label>
+            <label className="mt-4 block text-xs font-bold uppercase tracking-wide text-[#8A8E89]">Type RESET to confirm</label>
             <input
               value={resetConfirmText}
               onChange={(e) => setResetConfirmText(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#E6E8EC] px-3 py-2 text-sm font-semibold text-[#0F172A]"
+              className="mt-1 w-full rounded-lg border border-[#E3E5E0] px-3 py-2 text-sm font-semibold text-[#121314]"
               placeholder="RESET"
               autoFocus
             />
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => { setResetRealmFor(null); setResetConfirmText(""); }}
-                className="rounded-lg border border-[#E6E8EC] px-4 py-2 text-sm font-bold text-[#475569] hover:bg-[#F1F5F9]"
+                className="rounded-lg border border-[#E3E5E0] px-4 py-2 text-sm font-bold text-[#3F4246] hover:bg-[#F1F2EE]"
               >
                 Cancel
               </button>

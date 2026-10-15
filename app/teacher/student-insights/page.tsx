@@ -538,20 +538,20 @@ function StudentInsightsPageInner() {
   return (
     <main className="reliq-adult min-h-screen px-6 py-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        <header className="rounded-3xl border border-[#E6E8EC] bg-white px-6 py-5 shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
+        <header className="rounded-3xl border border-[#E3E5E0] bg-white px-6 py-5 shadow-[0_4px_16px_-12px_rgba(15,23,42,0.18)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <Link
                 href="/teacher/dashboard"
-                className="text-xs font-bold uppercase tracking-[0.16em] text-[#64748B] hover:text-[#0F172A]"
+                className="text-xs font-bold uppercase tracking-[0.16em] text-[#5A5E63] hover:text-[#121314]"
               >
                 ← Back to Teacher Dashboard
               </Link>
               <div className="mt-3 text-[11px] font-extrabold uppercase tracking-[0.18em] text-teal-700">
                 Learning Insights
               </div>
-              <h1 className="mt-1 text-3xl font-black text-[#0F172A]">{student.display_name}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-[#64748B]">
+              <h1 className="mt-1 text-3xl font-black text-[#121314]">{student.display_name}</h1>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-[#5A5E63]">
                 <span>{className || "Class"}</span>
                 <span>·</span>
                 <span>
@@ -582,7 +582,7 @@ function StudentInsightsPageInner() {
           </div>
         </header>
 
-        <div className="flex flex-wrap gap-2 rounded-2xl border border-[#E6E8EC] bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+        <div className="flex flex-wrap gap-2 rounded-2xl border border-[#E3E5E0] bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
           {([
             ["overview", "Overview"],
             ["progress", "Progress"],
@@ -598,7 +598,7 @@ function StudentInsightsPageInner() {
                 "rounded-xl px-4 py-2 text-sm font-bold transition",
                 tab === id
                   ? "bg-[#121314] text-[var(--reliq-lime)]"
-                  : "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]",
+                  : "text-[#5A5E63] hover:bg-[#FAFBF8] hover:text-[#121314]",
               ].join(" ")}
             >
               {label}
@@ -689,9 +689,9 @@ function StudentInsightsPageInner() {
                     {reflections.slice(0, 4).map((item) => {
                       const meta = confidenceMeta(item.confidence);
                       return (
-                        <div key={item.id} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-2">
-                          <div className="flex items-center gap-1.5 text-sm font-bold text-[#0F172A]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
-                          <div className="text-xs text-[#64748B]">{item.lesson_title ?? item.level ?? "Lesson"} · {formatDate(item.created_at)}</div>
+                        <div key={item.id} className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-3 py-2">
+                          <div className="flex items-center gap-1.5 text-sm font-bold text-[#121314]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
+                          <div className="text-xs text-[#5A5E63]">{item.lesson_title ?? item.level ?? "Lesson"} · {formatDate(item.created_at)}</div>
                         </div>
                       );
                     })}
@@ -703,16 +703,16 @@ function StudentInsightsPageInner() {
               {reflections.length > 0 ? reflections.map((item) => {
                 const meta = confidenceMeta(item.confidence);
                 return (
-                  <div key={item.id} className="rounded-xl border border-[#E6E8EC] bg-white px-4 py-3">
+                  <div key={item.id} className="rounded-xl border border-[#E3E5E0] bg-white px-4 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-bold text-[#0F172A]">{item.lesson_title ?? item.level ?? "Lesson"}</div>
-                        <div className="text-xs text-[#64748B]">{formatDate(item.created_at)}</div>
+                        <div className="text-sm font-bold text-[#121314]">{item.lesson_title ?? item.level ?? "Lesson"}</div>
+                        <div className="text-xs text-[#5A5E63]">{formatDate(item.created_at)}</div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-sm font-bold text-[#0F172A]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
+                      <div className="flex items-center gap-1.5 text-sm font-bold text-[#121314]"><meta.Icon className="h-4 w-4" /> {meta.label}</div>
                     </div>
                     {item.hardest_part ? (
-                      <div className="mt-2 text-sm text-[#475569]">Hardest part: {item.hardest_part}</div>
+                      <div className="mt-2 text-sm text-[#3F4246]">Hardest part: {item.hardest_part}</div>
                     ) : null}
                   </div>
                 );
@@ -750,10 +750,10 @@ export default function StudentInsightsPage() {
 
 function InsightStatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-[#E6E8EC] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-      <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">{label}</div>
-      <div className="mt-2 text-3xl font-black text-[#0F172A]">{value}</div>
-      {sub ? <div className="mt-2 text-sm font-semibold text-[#64748B]">{sub}</div> : null}
+    <div className="rounded-2xl border border-[#E3E5E0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A8E89]">{label}</div>
+      <div className="mt-2 text-3xl font-black text-[#121314]">{value}</div>
+      {sub ? <div className="mt-2 text-sm font-semibold text-[#5A5E63]">{sub}</div> : null}
     </div>
   );
 }
@@ -764,20 +764,20 @@ function NarrativeCard({ title, body, tone }: { title: string; body: string; ton
       ? "border-emerald-200 bg-emerald-50"
       : tone === "warn"
         ? "border-amber-200 bg-amber-50"
-        : "border-[#E6E8EC] bg-white";
+        : "border-[#E3E5E0] bg-white";
   return (
     <div className={`rounded-2xl border p-4 ${toneClass}`}>
-      <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#64748B]">{title}</div>
-      <div className="mt-2 text-base font-bold text-[#0F172A]">{body}</div>
+      <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#5A5E63]">{title}</div>
+      <div className="mt-2 text-base font-bold text-[#121314]">{body}</div>
     </div>
   );
 }
 
 function ChartCard({ title, subtitle, content }: { title: string; subtitle: string; content: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-[#E6E8EC] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+    <section className="rounded-2xl border border-[#E3E5E0] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
       <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-teal-700">{title}</div>
-      <div className="mt-1 text-sm font-semibold text-[#64748B]">{subtitle}</div>
+      <div className="mt-1 text-sm font-semibold text-[#5A5E63]">{subtitle}</div>
       <div className="mt-5">{content}</div>
     </section>
   );
@@ -792,14 +792,14 @@ function BarChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: s
     <div className="grid gap-3">
       {points.map((point) => (
         <div key={point.label} className="grid grid-cols-[80px_1fr_48px] items-center gap-3">
-          <div className="text-sm font-bold text-[#0F172A]">{point.label}</div>
+          <div className="text-sm font-bold text-[#121314]">{point.label}</div>
           <div className="h-4 rounded-full bg-[#EEF2F7] overflow-hidden">
             <div
               className={`h-full rounded-full ${point.value >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent ? "bg-[#B9F23F]" : "bg-[#121314]"}`}
               style={{ width: `${Math.max(0, Math.min(100, point.value))}%` }}
             />
           </div>
-          <div className="text-right text-sm font-black text-[#0F172A]">{point.value}%</div>
+          <div className="text-right text-sm font-black text-[#121314]">{point.value}%</div>
         </div>
       ))}
     </div>
@@ -898,8 +898,8 @@ function LineChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: 
         <summary className="cursor-pointer text-sm font-bold text-[#3D6600]">Show every quiz</summary>
         <div className="mt-3 grid gap-2 sm:grid-cols-3 md:grid-cols-5">
           {points.map((point, index) => (
-            <div key={index} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-3 py-2">
-              <div className="text-sm font-bold text-[#0F172A]">{point.label}</div>
+            <div key={index} className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-3 py-2">
+              <div className="text-sm font-bold text-[#121314]">{point.label}</div>
               <div className="mt-0.5 text-lg font-black text-[#121314]">{values[index]}%</div>
             </div>
           ))}
@@ -917,19 +917,19 @@ function LevelTimeline({ entries }: { entries: TimelineEntry[] }) {
   return (
     <div className="space-y-3">
       {entries.map((entry, index) => (
-        <div key={`${entry.year}-${index}`} className="flex gap-4 rounded-2xl border border-[#E6E8EC] bg-[#F8FAFC] p-4">
+        <div key={`${entry.year}-${index}`} className="flex gap-4 rounded-2xl border border-[#E3E5E0] bg-[#FAFBF8] p-4">
           <div className="flex flex-col items-center">
             <div className={`h-3 w-3 rounded-full ${entry.current ? "bg-[#B9F23F] ring-2 ring-[#121314]" : "bg-slate-300"}`} />
             {index < entries.length - 1 ? <div className="mt-2 h-full min-h-10 w-px bg-slate-200" /> : null}
           </div>
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="text-lg font-black text-[#0F172A]">{entry.year}</div>
+              <div className="text-lg font-black text-[#121314]">{entry.year}</div>
               {entry.current ? (
                 <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-bold text-teal-700">Current</span>
               ) : null}
             </div>
-            <div className="mt-2 grid gap-1 text-sm text-[#475569]">
+            <div className="mt-2 grid gap-1 text-sm text-[#3F4246]">
               <div>Date entered: {formatDate(entry.enteredAt)}</div>
               <div>Date completed: {entry.current ? "In progress" : formatDate(entry.completedAt)}</div>
               <div>Weeks spent: {entry.weeksSpent != null ? `${entry.weeksSpent}` : "—"}</div>
@@ -943,7 +943,7 @@ function LevelTimeline({ entries }: { entries: TimelineEntry[] }) {
 
 function HistoryCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-[#E6E8EC] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+    <section className="rounded-2xl border border-[#E3E5E0] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
       <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-teal-700">{title}</div>
       <div className="mt-4 grid gap-3">{children}</div>
     </section>
@@ -964,14 +964,14 @@ function AssessmentAttemptHistory({
   return (
     <HistoryCard title={title}>
       {attempts.length > 0 ? attempts.map((attempt) => (
-        <div key={attempt.id} className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-4 py-3">
+        <div key={attempt.id} className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="text-sm font-bold text-[#0F172A]">
+              <div className="text-sm font-bold text-[#121314]">
                 {attempt.workingLevel}
                 {attempt.assessmentType === "weekly_quiz" ? ` · Week ${attempt.week ?? "—"}` : ""}
               </div>
-              <div className="mt-0.5 text-xs text-[#64748B]">
+              <div className="mt-0.5 text-xs text-[#5A5E63]">
                 Completed {formatDate(attempt.completedAt)} · Attempt {attempt.attemptNumber}
               </div>
               <div className={`mt-1 text-xs font-extrabold ${attempt.passed ? "text-emerald-700" : "text-amber-700"}`}>
@@ -979,7 +979,7 @@ function AssessmentAttemptHistory({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-xl font-black text-[#0F172A]">
+              <div className="text-xl font-black text-[#121314]">
                 {formatAccuracy(attempt.correctCount, attempt.totalQuestions, `${attempt.scorePercent}%`)}
               </div>
               <button
@@ -999,7 +999,7 @@ function AssessmentAttemptHistory({
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] px-4 py-6 text-center text-sm font-semibold text-[#64748B]">
+    <div className="rounded-xl border border-dashed border-[#C9CCC6] bg-[#FAFBF8] px-4 py-6 text-center text-sm font-semibold text-[#5A5E63]">
       {text}
     </div>
   );
@@ -1028,11 +1028,11 @@ function MasteryRow({
         : "Not Yet Mastered";
 
   return (
-    <div className="rounded-xl border border-[#E6E8EC] bg-[#F8FAFC] px-4 py-3">
+    <div className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-bold text-[#0F172A]">{label}</div>
-          <div className="text-xs text-[#64748B]">{detail}</div>
+          <div className="text-sm font-bold text-[#121314]">{label}</div>
+          <div className="text-xs text-[#5A5E63]">{detail}</div>
         </div>
         <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${tone}`}>
           {labelText}

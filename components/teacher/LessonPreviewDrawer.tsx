@@ -201,28 +201,28 @@ export default function LessonPreviewDrawer({
       <button
         aria-label="Close lesson preview"
         onClick={onClose}
-        className="flex-1 bg-[#0F172A]/40 backdrop-blur-[2px]"
+        className="flex-1 bg-[#121314]/40 backdrop-blur-[2px]"
       />
 
-      <aside className="w-full max-w-[680px] h-full bg-white shadow-2xl border-l border-[#E6E8EC] flex flex-col">
-        <div className="px-5 py-4 border-b border-[#E6E8EC] flex items-start justify-between gap-3">
+      <aside className="w-full max-w-[680px] h-full bg-white shadow-2xl border-l border-[#E3E5E0] flex flex-col">
+        <div className="px-5 py-4 border-b border-[#E3E5E0] flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[10px] font-extrabold text-teal-700 uppercase tracking-[0.14em]">
               {strand ?? "Lesson"}
               {realm ? ` · ${realm}` : ""}
             </div>
-            <div className="text-base font-black text-[#0F172A] mt-0.5 truncate">
+            <div className="text-base font-black text-[#121314] mt-0.5 truncate">
               {weekNumber ? `Week ${weekNumber} · L${lesson.lesson} - ` : ""}
               {lesson.title}
             </div>
-            <div className="text-[11px] font-semibold text-[#64748B] mt-0.5">
+            <div className="text-[11px] font-semibold text-[#5A5E63] mt-0.5">
               {yearLabel ? `${yearLabel} · ` : ""}
               {weekTopic ?? ""}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="h-8 w-8 rounded-lg border border-[#E6E8EC] text-[#64748B] hover:bg-[#F8FAFC] text-sm font-bold shrink-0"
+            className="h-8 w-8 rounded-lg border border-[#E3E5E0] text-[#5A5E63] hover:bg-[#FAFBF8] text-sm font-bold shrink-0"
             aria-label="Close"
           >
             x
@@ -243,10 +243,10 @@ export default function LessonPreviewDrawer({
           </div>
 
           <Section title="Learning goal">
-            <p className="text-sm text-[#0F172A] leading-relaxed font-semibold">
+            <p className="text-sm text-[#121314] leading-relaxed font-semibold">
               Students will <span className="lowercase">{lesson.title.replace(/\.$/, "")}</span>.
             </p>
-            <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">{lesson.focus}</p>
+            <p className="text-xs text-[#5A5E63] mt-1.5 leading-relaxed">{lesson.focus}</p>
           </Section>
 
           <Section title="Real student activity preview">
@@ -262,22 +262,22 @@ export default function LessonPreviewDrawer({
                         "min-h-[72px] rounded-lg border px-2.5 py-2 text-left transition-colors",
                         selectedStepId === step.id
                           ? "border-teal-400 bg-teal-50 text-teal-900"
-                          : "border-[#E6E8EC] bg-white text-[#0F172A] hover:border-teal-200",
+                          : "border-[#E3E5E0] bg-white text-[#121314] hover:border-teal-200",
                       ].join(" ")}
                     >
                       <div className="text-[11px] font-black leading-tight">{step.label}</div>
-                      <div className="mt-1 text-[10px] font-semibold leading-snug text-[#64748B]">{step.detail}</div>
+                      <div className="mt-1 text-[10px] font-semibold leading-snug text-[#5A5E63]">{step.detail}</div>
                     </button>
                   ))}
                 </div>
 
-                <div className="rounded-xl border border-[#DDE7FF] bg-[#F7F9FF] overflow-hidden">
-                  <div className="flex items-center justify-between gap-3 border-b border-[#DDE7FF] px-3 py-2">
+                <div className="rounded-xl border border-[#EEF9D9] bg-[#F7F9FF] overflow-hidden">
+                  <div className="flex items-center justify-between gap-3 border-b border-[#EEF9D9] px-3 py-2">
                     <div className="min-w-0">
                       <div className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-teal-700">
                         {selectedStep?.label ?? "Student preview"}
                       </div>
-                      <div className="truncate text-xs font-semibold text-[#64748B]">
+                      <div className="truncate text-xs font-semibold text-[#5A5E63]">
                         Production lesson renderer in demo review mode. No progress, XP, attempts or live-class writes are recorded.
                       </div>
                     </div>
@@ -285,14 +285,14 @@ export default function LessonPreviewDrawer({
                       <button
                         type="button"
                         onClick={() => window.open(fullPreviewHref, "_blank", "noopener,noreferrer")}
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#C7D2FE] bg-white px-2.5 py-1.5 text-[11px] font-black text-[#334155] hover:border-teal-300 hover:text-teal-700"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#C7D2FE] bg-white px-2.5 py-1.5 text-[11px] font-black text-[#34373A] hover:border-teal-300 hover:text-teal-700"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                         View larger
                       </button>
                     ) : null}
                   </div>
-                  <div className="aspect-[4/3] w-full bg-[#0F172A]">
+                  <div className="aspect-[4/3] w-full bg-[#121314]">
                     <iframe
                       key={teacherPreviewHref}
                       title={`Student preview - ${lesson.title}`}
@@ -305,9 +305,9 @@ export default function LessonPreviewDrawer({
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-[#E6E8EC] bg-[#FAFBFC] px-4 py-5 text-center">
-                <div className="text-sm font-black text-[#0F172A]">Activity preview unavailable</div>
-                <div className="mt-1 text-xs font-semibold text-[#64748B]">
+              <div className="rounded-xl border border-[#E3E5E0] bg-[#FAFBF8] px-4 py-5 text-center">
+                <div className="text-sm font-black text-[#121314]">Activity preview unavailable</div>
+                <div className="mt-1 text-xs font-semibold text-[#5A5E63]">
                   This lesson does not have a safe student preview route yet.
                 </div>
               </div>
@@ -340,12 +340,12 @@ export default function LessonPreviewDrawer({
               {student.aiInsight ? (
                 <div className="mt-3 space-y-2">
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5">
-                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">Status</div>
-                      <div className="mt-0.5 text-xs font-black text-[#0F172A]">{student.aiInsight.status}</div>
+                    <div className="rounded-xl border border-[#E3E5E0] bg-white px-3 py-2.5">
+                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#8A8E89]">Status</div>
+                      <div className="mt-0.5 text-xs font-black text-[#121314]">{student.aiInsight.status}</div>
                     </div>
-                    <div className="rounded-xl border border-[#E6E8EC] bg-white px-3 py-2.5">
-                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#94A3B8]">Strongest Skill</div>
+                    <div className="rounded-xl border border-[#E3E5E0] bg-white px-3 py-2.5">
+                      <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#8A8E89]">Strongest Skill</div>
                       <div className="mt-0.5 text-xs font-black text-emerald-700">{student.aiInsight.strongestSkill}</div>
                     </div>
                   </div>
@@ -353,7 +353,7 @@ export default function LessonPreviewDrawer({
                     <div className="text-[9px] font-extrabold uppercase tracking-wider text-rose-400">Needs Support</div>
                     <div className="mt-0.5 text-xs font-bold text-rose-900">{student.aiInsight.needsSupport}</div>
                   </div>
-                  <div className="rounded-xl bg-[#0F172A] px-3 py-2.5">
+                  <div className="rounded-xl bg-[#121314] px-3 py-2.5">
                     <div className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400">Teacher Action</div>
                     <div className="mt-1 text-xs font-bold text-white leading-relaxed">{student.aiInsight.teacherAction}</div>
                   </div>
@@ -370,12 +370,12 @@ export default function LessonPreviewDrawer({
                 <Meta label="Not started" value={String(classStats.notStarted)} />
               </div>
               {classStats.quizAvg != null && (
-                <div className="text-xs text-[#64748B]">
+                <div className="text-xs text-[#5A5E63]">
                   Quiz accuracy on this lesson&apos;s questions:{" "}
                   <b
                     className={
                       (classStats.quizAttempts ?? 0) === 0
-                        ? "text-[#94A3B8]"
+                        ? "text-[#8A8E89]"
                         : (classStats.quizAvg ?? 0) >= 80
                           ? "text-emerald-700"
                           : (classStats.quizAvg ?? 0) >= 60
@@ -385,7 +385,7 @@ export default function LessonPreviewDrawer({
                   >
                     {(classStats.quizAttempts ?? 0) === 0 ? "-" : `${classStats.quizAvg}%`}
                   </b>{" "}
-                  <span className="text-[#94A3B8]">
+                  <span className="text-[#8A8E89]">
                     ({classStats.quizAttempts ?? 0} attempt{classStats.quizAttempts === 1 ? "" : "s"})
                   </span>
                 </div>
@@ -394,11 +394,11 @@ export default function LessonPreviewDrawer({
           )}
         </div>
 
-        <div className="px-5 py-3 border-t border-[#E6E8EC] bg-[#FAFBFC] flex flex-wrap items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-[#E3E5E0] bg-[#FAFBF8] flex flex-wrap items-center justify-end gap-2">
           <button
             disabled
             title="Coming soon"
-            className="px-3 py-1.5 rounded-lg bg-white border border-[#E6E8EC] text-[#64748B] text-xs font-bold cursor-not-allowed"
+            className="px-3 py-1.5 rounded-lg bg-white border border-[#E3E5E0] text-[#5A5E63] text-xs font-bold cursor-not-allowed"
           >
             Recommend revisit
           </button>
@@ -410,10 +410,10 @@ export default function LessonPreviewDrawer({
               window.open(fullPreviewHref, "_blank", "noopener,noreferrer");
             }}
             className={[
-              "px-3 py-1.5 rounded-lg bg-white border border-[#E6E8EC] text-xs font-bold",
+              "px-3 py-1.5 rounded-lg bg-white border border-[#E3E5E0] text-xs font-bold",
               fullPreviewHref
-                ? "text-[#0F172A] hover:border-teal-300 hover:text-teal-700"
-                : "text-[#64748B] cursor-not-allowed",
+                ? "text-[#121314] hover:border-teal-300 hover:text-teal-700"
+                : "text-[#5A5E63] cursor-not-allowed",
             ].join(" ")}
           >
             Preview student view
@@ -421,7 +421,7 @@ export default function LessonPreviewDrawer({
           <button
             disabled
             title="Coming soon"
-            className="px-3 py-1.5 rounded-lg bg-[#0F172A] text-white text-xs font-bold opacity-50 cursor-not-allowed"
+            className="px-3 py-1.5 rounded-lg bg-[#121314] text-white text-xs font-bold opacity-50 cursor-not-allowed"
           >
             Assign lesson
           </button>
@@ -434,7 +434,7 @@ export default function LessonPreviewDrawer({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10px] font-extrabold text-[#94A3B8] uppercase tracking-[0.12em] mb-2">{title}</div>
+      <div className="text-[10px] font-extrabold text-[#8A8E89] uppercase tracking-[0.12em] mb-2">{title}</div>
       {children}
     </div>
   );
@@ -442,9 +442,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Meta({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-[#E6E8EC] bg-white px-2.5 py-2">
-      <div className="text-[9px] font-extrabold text-[#94A3B8] uppercase tracking-wider">{label}</div>
-      <div className="text-xs font-black text-[#0F172A] mt-0.5 truncate">{value}</div>
+    <div className="rounded-lg border border-[#E3E5E0] bg-white px-2.5 py-2">
+      <div className="text-[9px] font-extrabold text-[#8A8E89] uppercase tracking-wider">{label}</div>
+      <div className="text-xs font-black text-[#121314] mt-0.5 truncate">{value}</div>
     </div>
   );
 }

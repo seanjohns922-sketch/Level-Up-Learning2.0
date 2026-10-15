@@ -103,16 +103,16 @@ function ProgressionTrack({
         </div>
       </div>
       <div className="mt-2 grid grid-cols-[68px_1fr] items-center gap-2">
-        <span className="text-[10px] font-black uppercase tracking-wide text-violet-700">Diagnostic</span>
+        <span className="text-[10px] font-black uppercase tracking-wide text-[#121314]">Diagnostic</span>
         <div className="relative h-7">
           <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-slate-100" />
-          {latestDiagnostic != null && <div className="absolute left-0 top-3 h-1 rounded-full bg-violet-400" style={{ width: levelPosition(latestDiagnostic) }} />}
+          {latestDiagnostic != null && <div className="absolute left-0 top-3 h-1 rounded-full bg-[#5A5E63]" style={{ width: levelPosition(latestDiagnostic) }} />}
           {diagnosticPoints.map((point) => (
             <button
               key={`${point.checkpoint}-${point.completedAt}`}
               type="button"
               onClick={() => onSelectDiagnostic(point.sittingId)}
-              className="absolute top-0 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-violet-600 text-[10px] font-black text-white shadow"
+              className="absolute top-0 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-[#121314] text-[10px] font-black text-white shadow"
               style={{ left: levelPosition(point.level) }}
               title={`${CHECKPOINT_LABEL[point.checkpoint]}: ${formatProgressionPoint(point.level)}. Open details.`}
               aria-label={`Open ${CHECKPOINT_LABEL[point.checkpoint]} result at level ${formatProgressionPoint(point.level)}`}
@@ -457,7 +457,7 @@ export default function WholeMathsDiagnosticPanel({
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600">
           <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-teal-600" />Live score</span>
-          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-violet-600" />Diagnostic score</span>
+          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#121314]" />Diagnostic score</span>
           <span className="text-slate-400">S = Start · M = Mid · E = End</span>
           {diagnosticError ? <span className="font-semibold text-amber-700">Diagnostic markers are temporarily unavailable; live scores remain current.</span> : null}
           {selectedStrand === "all" && <span className="font-semibold text-amber-700">All requires completed results from all six strands.</span>}
@@ -476,7 +476,7 @@ export default function WholeMathsDiagnosticPanel({
                   </div>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
                     <span className="text-teal-700">Live {liveLevel == null ? "—" : formatProgressionPoint(liveLevel)}</span>
-                    <span className="text-violet-700">Diagnostic {latestDiagnostic == null ? "—" : formatProgressionPoint(latestDiagnostic)}</span>
+                    <span className="text-[#121314]">Diagnostic {latestDiagnostic == null ? "—" : formatProgressionPoint(latestDiagnostic)}</span>
                   </div>
                 </div>
                 {selectedStrand === "all" && liveLevel == null && diagnosticPoints.length === 0 ? (
@@ -492,7 +492,7 @@ export default function WholeMathsDiagnosticPanel({
           ))}
         </div>
         <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
-          The teal marker moves as lessons, quizzes and realm tests update the live score. Purple markers are fixed formal results. Levels 7–8 show the future Advanced Pathway range. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
+          The green marker moves as lessons, quizzes and realm tests update the live score. Black markers are fixed formal results. Levels 7–8 show the future Advanced Pathway range. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
         </div>
       </article> : null}
 
@@ -567,7 +567,7 @@ export default function WholeMathsDiagnosticPanel({
           <section role="dialog" aria-modal="true" aria-labelledby="diagnostic-detail-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-violet-700">{CHECKPOINT_LABEL[selectedSitting.checkpoint]}</p>
+                <p className="text-xs font-black uppercase tracking-wide text-[#121314]">{CHECKPOINT_LABEL[selectedSitting.checkpoint]}</p>
                 <h3 id="diagnostic-detail-title" className="mt-1 text-xl font-black text-slate-950">{studentNames.get(selectedSitting.student_id) ?? "Student"}</h3>
                 <p className="mt-1 text-sm text-slate-500">Overall {selectedSitting.overall_level == null ? "pending" : formatProgressionPoint(selectedSitting.overall_level)}</p>
               </div>
@@ -576,7 +576,7 @@ export default function WholeMathsDiagnosticPanel({
             <div className="grid gap-3 p-5 sm:grid-cols-2">
               {DIAGNOSTIC_STRANDS.map((definition) => {
                 const result = selectedSitting.strand_results.find((item) => item.strand === definition.strand);
-                return <div key={definition.strand} className="rounded-xl border border-slate-200 p-4"><p className="font-black text-slate-900">{AC_STRANDS[definition.strand].label}</p><p className="mt-1 text-2xl font-black text-violet-700">{result?.measured_level == null ? "—" : formatProgressionPoint(result.measured_level)}</p><p className="mt-1 text-xs font-semibold capitalize text-slate-500">{result?.status ?? "Not recorded"}</p></div>;
+                return <div key={definition.strand} className="rounded-xl border border-slate-200 p-4"><p className="font-black text-slate-900">{AC_STRANDS[definition.strand].label}</p><p className="mt-1 text-2xl font-black text-[#121314]">{result?.measured_level == null ? "—" : formatProgressionPoint(result.measured_level)}</p><p className="mt-1 text-xs font-semibold capitalize text-slate-500">{result?.status ?? "Not recorded"}</p></div>;
               })}
             </div>
           </section>

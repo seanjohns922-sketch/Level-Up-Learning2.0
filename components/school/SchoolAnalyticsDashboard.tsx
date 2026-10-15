@@ -258,8 +258,8 @@ function TrendChart({
             <title>{`${labels[index]}: ${point.value}${valueSuffix}`}</title>
           </g>
         ))}
-        <text x="24" y={height - 5} fontSize="12" fill="#64748b">{labels[0]}</text>
-        <text x={width - 24} y={height - 5} textAnchor="end" fontSize="12" fill="#64748b">
+        <text x="24" y={height - 5} fontSize="12" fill="#5A5E63">{labels[0]}</text>
+        <text x={width - 24} y={height - 5} textAnchor="end" fontSize="12" fill="#5A5E63">
           {labels.at(-1)}
         </text>
       </svg>

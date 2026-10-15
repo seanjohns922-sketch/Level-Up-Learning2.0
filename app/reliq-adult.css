@@ -59,5 +59,104 @@
   --color-blue-900: #121314;
   --color-blue-950: #121314;
 
+
+  /* Slate and gray become the brand's warm neutrals (Carbon text, warm greys). */
+  --color-slate-50: #fafbf8;
+  --color-slate-100: #f1f2ee;
+  --color-slate-200: #e3e5e0;
+  --color-slate-300: #c9ccc6;
+  --color-slate-400: #8a8e89;
+  --color-slate-500: #6b6f6a;
+  --color-slate-600: #5a5e63;
+  --color-slate-700: #3f4246;
+  --color-slate-800: #2a2c2e;
+  --color-slate-900: #121314;
+  --color-slate-950: #000000;
+
+  --color-gray-50: #fafbf8;
+  --color-gray-100: #f1f2ee;
+  --color-gray-200: #e3e5e0;
+  --color-gray-300: #c9ccc6;
+  --color-gray-400: #8a8e89;
+  --color-gray-500: #6b6f6a;
+  --color-gray-600: #5a5e63;
+  --color-gray-700: #3f4246;
+  --color-gray-800: #2a2c2e;
+  --color-gray-900: #121314;
+  --color-gray-950: #000000;
+
+  /* Violet is for students; on adult screens violet, indigo, purple, cyan and sky accents become lime-ink and Carbon. */
+  --color-violet-50: #f3fbe4;
+  --color-violet-100: #e3f5c2;
+  --color-violet-200: #cdeb98;
+  --color-violet-300: #b0dc66;
+  --color-violet-400: #8fc43a;
+  --color-violet-500: #6fa51a;
+  --color-violet-600: #3d6600;
+  --color-violet-700: #3d6600;
+  --color-violet-800: #121314;
+  --color-violet-900: #121314;
+  --color-violet-950: #121314;
+
+  --color-indigo-50: #f3fbe4;
+  --color-indigo-100: #e3f5c2;
+  --color-indigo-200: #cdeb98;
+  --color-indigo-300: #b0dc66;
+  --color-indigo-400: #8fc43a;
+  --color-indigo-500: #6fa51a;
+  --color-indigo-600: #3d6600;
+  --color-indigo-700: #3d6600;
+  --color-indigo-800: #121314;
+  --color-indigo-900: #121314;
+  --color-indigo-950: #121314;
+
+  --color-purple-50: #f3fbe4;
+  --color-purple-100: #e3f5c2;
+  --color-purple-200: #cdeb98;
+  --color-purple-300: #b0dc66;
+  --color-purple-400: #8fc43a;
+  --color-purple-500: #6fa51a;
+  --color-purple-600: #3d6600;
+  --color-purple-700: #3d6600;
+  --color-purple-800: #121314;
+  --color-purple-900: #121314;
+  --color-purple-950: #121314;
+
+  --color-cyan-50: #f3fbe4;
+  --color-cyan-100: #e3f5c2;
+  --color-cyan-200: #cdeb98;
+  --color-cyan-300: #b0dc66;
+  --color-cyan-400: #8fc43a;
+  --color-cyan-500: #6fa51a;
+  --color-cyan-600: #3d6600;
+  --color-cyan-700: #3d6600;
+  --color-cyan-800: #121314;
+  --color-cyan-900: #121314;
+  --color-cyan-950: #121314;
+
+  --color-sky-50: #f3fbe4;
+  --color-sky-100: #e3f5c2;
+  --color-sky-200: #cdeb98;
+  --color-sky-300: #b0dc66;
+  --color-sky-400: #8fc43a;
+  --color-sky-500: #6fa51a;
+  --color-sky-600: #3d6600;
+  --color-sky-700: #3d6600;
+  --color-sky-800: #121314;
+  --color-sky-900: #121314;
+  --color-sky-950: #121314;
+
   background: var(--reliq-ground);
+}
+
+/* Small uppercase labels (section kickers, table headers, badges) use the
+ * brand display face, as on the Curriculum tab. */
+.reliq-adult .uppercase:is(.font-black, .font-extrabold) {
+  font-family: var(--font-display);
+}
+
+/* Uppercase labels that were set in monospace take the brand display face too. */
+.reliq-adult .uppercase.font-mono {
+  font-family: var(--font-display);
+  font-weight: 900;
 }

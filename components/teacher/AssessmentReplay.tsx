@@ -183,7 +183,7 @@ function SnapshotQuestion({
   const hasVisual = Boolean(question.visual);
   const hasTask = Boolean(question.task_snapshot);
   return (
-    <article className="rounded-2xl border border-[#D9E2EA] bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)]">
+    <article className="rounded-2xl border border-[#E3E5E0] bg-white p-5 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-teal-700">
@@ -388,9 +388,9 @@ export default function AssessmentReplay({
         {backLabel}
       </button>
 
-      <section className="overflow-hidden rounded-2xl border border-[#D9E2EA] bg-white">
-        <div className="bg-[#0A2F2A] px-6 py-5 text-white">
-          <div className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#5EEAD4]">
+      <section className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
+        <div className="bg-[#121314] px-6 py-5 text-white">
+          <div className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9F23F]">
             Read-only Assessment Replay
           </div>
           <h2 className="mt-1 text-2xl font-black">
@@ -459,7 +459,7 @@ export default function AssessmentReplay({
         </section>
       ) : (
         <>
-          <section className="rounded-2xl border border-[#D9E2EA] bg-white p-4">
+          <section className="rounded-2xl border border-[#E3E5E0] bg-white p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-black text-slate-950">
                 <List className="h-4 w-4" />
@@ -479,7 +479,7 @@ export default function AssessmentReplay({
                     onClick={() => selectFilter(id)}
                     className={[
                       "rounded-md px-3 py-2 text-xs font-extrabold",
-                      filter === id ? "bg-[#0A2F2A] text-[#5EEAD4]" : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                      filter === id ? "bg-[#121314] text-[#B9F23F]" : "bg-slate-100 text-slate-600 hover:bg-slate-200",
                     ].join(" ")}
                   >
                     {label}
@@ -530,7 +530,7 @@ export default function AssessmentReplay({
                 type="button"
                 disabled={activeIndex >= filteredQuestions.length - 1}
                 onClick={() => setActiveQuestionId(filteredQuestions[activeIndex + 1]?.question_id ?? null)}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#0A2F2A] px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#121314] px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
               >
                 Next Question
                 <ArrowRight className="h-4 w-4" />
@@ -545,7 +545,7 @@ export default function AssessmentReplay({
 
 function ReplayInsight({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#D9E2EA] bg-white p-4">
+    <div className="rounded-xl border border-[#E3E5E0] bg-white p-4">
       <div className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-teal-700">{title}</div>
       <p className="mt-2 text-sm font-semibold leading-5 text-slate-700">{value}</p>
     </div>

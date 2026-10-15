@@ -88,7 +88,7 @@ function TeacherDashboardSkeleton() {
     <main className="reliq-adult min-h-screen" aria-busy="true" aria-label="Loading class dashboard">
       <header className="bg-[#121314] px-6 py-3">
         <div className="mx-auto flex max-w-[1800px] items-center gap-3">
-          <div className="h-9 w-9 animate-pulse rounded-lg bg-[#0A2F2A]/15" />
+          <div className="h-9 w-9 animate-pulse rounded-lg bg-[#121314]/15" />
           <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
           <div className="h-5 w-20 animate-pulse rounded bg-slate-100" />
           <div className="ml-auto h-9 w-40 animate-pulse rounded-lg bg-slate-100" />
@@ -1087,7 +1087,7 @@ export default function TeacherDashboardPage() {
                 </select>
               </label>
               {isDev ? (
-                <span className="shrink-0 font-mono text-[10px] text-[#94A3B8]">
+                <span className="shrink-0 font-mono text-[10px] text-[#8A8E89]">
                   id:{selectedClass.id.slice(0, 8)}
                 </span>
               ) : null}
@@ -1172,25 +1172,25 @@ export default function TeacherDashboardPage() {
                 </svg>
               </button>
               {showSettingsMenu && (
-                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl border border-[#E6E8EC] shadow-lg z-30 py-1">
-                  <div className="px-4 py-2 border-b border-[#F1F5F9]">
-                    <p className="text-xs font-bold text-[#0F172A]">Account Settings</p>
-                    <p className="text-[11px] text-[#94A3B8] truncate">{authUser?.email}</p>
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl border border-[#E3E5E0] shadow-lg z-30 py-1">
+                  <div className="px-4 py-2 border-b border-[#F1F2EE]">
+                    <p className="text-xs font-bold text-[#121314]">Account Settings</p>
+                    <p className="text-[11px] text-[#8A8E89] truncate">{authUser?.email}</p>
                   </div>
                   <button
                     onClick={() => { setShowSettingsMenu(false); setShowPasswordModal(true); }}
-                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#121314] hover:bg-[#FAFBF8] flex items-center gap-2"
                   >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#5A5E63]" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
                     </svg>
                     Change Password
                   </button>
                   <button
                     onClick={() => { setShowSettingsMenu(false); router.push("/teacher/classes"); }}
-                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm font-semibold text-[#121314] hover:bg-[#FAFBF8] flex items-center gap-2"
                   >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#64748B]" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#5A5E63]" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" />
                     </svg>
                     Manage Classes
@@ -1233,15 +1233,15 @@ export default function TeacherDashboardPage() {
           </div>
         )}
         {classes.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-[#E6E8EC]">
+          <div className="text-center py-20 bg-white rounded-2xl border border-[#E3E5E0]">
             <div className="mx-auto h-12 w-12 rounded-xl bg-teal-50 flex items-center justify-center mb-3">
               <svg viewBox="0 0 24 24" className="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m3-5.13a4 4 0 100-8 4 4 0 000 8zm6-2a3 3 0 100-6 3 3 0 000 6z" /></svg>
             </div>
-            <p className="text-[#0F172A] font-bold mb-1">No classes yet</p>
-            <p className="text-sm text-[#64748B] mb-5">Create your first class to start tracking students.</p>
+            <p className="text-[#121314] font-bold mb-1">No classes yet</p>
+            <p className="text-sm text-[#5A5E63] mb-5">Create your first class to start tracking students.</p>
             <button
               onClick={() => router.push("/teacher/classes/new")}
-              className="px-5 py-2.5 rounded-lg bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition"
+              className="px-5 py-2.5 rounded-lg bg-[#121314] text-white font-bold text-sm hover:bg-[#1E293B] transition"
             >
               Create Your First Class
             </button>
@@ -1249,8 +1249,8 @@ export default function TeacherDashboardPage() {
         ) : (
           <>
             {/* View tabs on the left; year pills (curriculum) or roll count fill the right */}
-            <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-[#E6E8EC] bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-              <div className="flex w-fit items-center gap-1 rounded-xl bg-[#F1F5F9] p-1">
+            <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-[#E3E5E0] bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+              <div className="flex w-fit items-center gap-1 rounded-xl bg-[#F1F2EE] p-1">
                 {([
                   { id: "live",       label: "Live Class" },
                   { id: "students",   label: "Students" },
@@ -1264,7 +1264,7 @@ export default function TeacherDashboardPage() {
                       "px-4 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                       activeTab === t.id
                         ? "bg-[#121314] text-[var(--reliq-lime)] shadow-sm"
-                        : "text-[#64748B] hover:text-[#0F172A]",
+                        : "text-[#5A5E63] hover:text-[#121314]",
                     ].join(" ")}
                   >
                     {t.label}
@@ -1274,8 +1274,8 @@ export default function TeacherDashboardPage() {
 
               {activeTab === "curriculum" ? (
                 <div className="flex items-center gap-2">
-                  <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#94A3B8]">Year</span>
-                  <div className="flex w-fit items-center gap-0.5 overflow-x-auto rounded-xl bg-[#F1F5F9] p-1">
+                  <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#8A8E89]">Year</span>
+                  <div className="flex w-fit items-center gap-0.5 overflow-x-auto rounded-xl bg-[#F1F2EE] p-1">
                     {YEAR_LEVELS.map((yr) => (
                       <button
                         key={yr}
@@ -1283,8 +1283,8 @@ export default function TeacherDashboardPage() {
                         className={[
                           "px-3 py-1.5 rounded-lg font-bold text-sm whitespace-nowrap transition",
                           activeYear === yr
-                            ? "bg-[#0F172A] text-white shadow-sm"
-                            : "text-[#64748B] hover:text-[#0F172A] hover:bg-white",
+                            ? "bg-[#121314] text-white shadow-sm"
+                            : "text-[#5A5E63] hover:text-[#121314] hover:bg-white",
                         ].join(" ")}
                       >
                         {yr === "Prep" ? "Prep" : yr.replace("Year ", "Y")}
@@ -1293,7 +1293,7 @@ export default function TeacherDashboardPage() {
                   </div>
                 </div>
               ) : (
-                <span className="pr-1 text-xs font-semibold text-[#64748B]">
+                <span className="pr-1 text-xs font-semibold text-[#5A5E63]">
                   {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
                 </span>
               )}
@@ -1350,29 +1350,29 @@ export default function TeacherDashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowPasswordModal(false); setPasswordError(null); setNewPassword(""); setConfirmPassword(""); }} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
-            <h2 className="text-lg font-black text-[#0F172A] mb-1">Change Password</h2>
-            <p className="text-sm text-[#64748B] mb-5">Enter a new password for your account.</p>
+            <h2 className="text-lg font-black text-[#121314] mb-1">Change Password</h2>
+            <p className="text-sm text-[#5A5E63] mb-5">Enter a new password for your account.</p>
 
             <div className="grid gap-3">
               <label className="grid gap-1">
-                <span className="text-xs font-bold text-[#64748B]">New Password</span>
+                <span className="text-xs font-bold text-[#5A5E63]">New Password</span>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Min. 6 characters"
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-medium text-[#0F172A] outline-none focus:border-[#0F172A] transition"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[#E3E5E0] text-sm font-medium text-[#121314] outline-none focus:border-[#121314] transition"
                   autoFocus
                 />
               </label>
               <label className="grid gap-1">
-                <span className="text-xs font-bold text-[#64748B]">Confirm Password</span>
+                <span className="text-xs font-bold text-[#5A5E63]">Confirm Password</span>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat new password"
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-medium text-[#0F172A] outline-none focus:border-[#0F172A] transition"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[#E3E5E0] text-sm font-medium text-[#121314] outline-none focus:border-[#121314] transition"
                   onKeyDown={(e) => e.key === "Enter" && changePassword()}
                 />
               </label>
@@ -1389,14 +1389,14 @@ export default function TeacherDashboardPage() {
                   type="button"
                   onClick={changePassword}
                   disabled={passwordSaving || passwordSuccess}
-                  className="flex-1 py-2.5 rounded-xl bg-[#0F172A] text-white font-bold text-sm hover:bg-[#1E293B] transition disabled:opacity-50"
+                  className="flex-1 py-2.5 rounded-xl bg-[#121314] text-white font-bold text-sm hover:bg-[#1E293B] transition disabled:opacity-50"
                 >
                   {passwordSaving ? "Saving…" : passwordSuccess ? "Saved!" : "Save Password"}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowPasswordModal(false); setPasswordError(null); setNewPassword(""); setConfirmPassword(""); }}
-                  className="px-4 py-2.5 rounded-xl border border-[#E6E8EC] text-sm font-bold text-[#64748B] hover:bg-[#F8FAFC] transition"
+                  className="px-4 py-2.5 rounded-xl border border-[#E3E5E0] text-sm font-bold text-[#5A5E63] hover:bg-[#FAFBF8] transition"
                 >
                   Cancel
                 </button>
@@ -1416,7 +1416,7 @@ export default function TeacherDashboardPage() {
 
       {showLoginDetailsActions && selectedClass && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0F172A]/45 p-4"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#121314]/45 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="student-login-details-title"
@@ -1424,20 +1424,20 @@ export default function TeacherDashboardPage() {
             if (event.target === event.currentTarget) setShowLoginDetailsActions(false);
           }}
         >
-          <div className="w-full max-w-md rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-[0_24px_70px_-24px_rgba(15,23,42,0.55)]">
+          <div className="w-full max-w-md rounded-2xl border border-[#E3E5E0] bg-white p-6 shadow-[0_24px_70px_-24px_rgba(15,23,42,0.55)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 id="student-login-details-title" className="text-xl font-black text-[#0F172A]">
+                <h2 id="student-login-details-title" className="text-xl font-black text-[#121314]">
                   Student Login Details
                 </h2>
-                <p className="mt-1 text-sm text-[#64748B]">
+                <p className="mt-1 text-sm text-[#5A5E63]">
                   {selectedClass.name} · {classStudents.length} students
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowLoginDetailsActions(false)}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[#E3E5E0] text-[#5A5E63] hover:bg-[#FAFBF8]"
                 aria-label="Close student login details"
               >
                 <X className="h-5 w-5" />
@@ -1451,12 +1451,12 @@ export default function TeacherDashboardPage() {
                   setShowLoginDetailsActions(false);
                   void printAllLoginCards();
                 }}
-                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#CBD5E1] bg-white p-4 text-left hover:border-[#009688] hover:bg-[#F0FDFA]"
+                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#C9CCC6] bg-white p-4 text-left hover:border-[#3D6600] hover:bg-[#F0FDFA]"
               >
-                <Download className="h-6 w-6 text-[#009688]" />
+                <Download className="h-6 w-6 text-[#3D6600]" />
                 <span>
-                  <span className="block font-black text-[#0F172A]">Save as PDF</span>
-                  <span className="mt-1 block text-xs text-[#64748B]">Opens the cards; choose “Save as PDF” as the printer.</span>
+                  <span className="block font-black text-[#121314]">Save as PDF</span>
+                  <span className="mt-1 block text-xs text-[#5A5E63]">Opens the cards; choose “Save as PDF” as the printer.</span>
                 </span>
               </button>
               <button
@@ -1465,12 +1465,12 @@ export default function TeacherDashboardPage() {
                   setShowLoginDetailsActions(false);
                   void printAllLoginCards();
                 }}
-                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#CBD5E1] bg-white p-4 text-left hover:border-[#009688] hover:bg-[#F0FDFA]"
+                className="flex min-h-28 flex-col items-start justify-between rounded-xl border border-[#C9CCC6] bg-white p-4 text-left hover:border-[#3D6600] hover:bg-[#F0FDFA]"
               >
-                <Printer className="h-6 w-6 text-[#009688]" />
+                <Printer className="h-6 w-6 text-[#3D6600]" />
                 <span>
-                  <span className="block font-black text-[#0F172A]">Print</span>
-                  <span className="mt-1 block text-xs text-[#64748B]">Open the printable login cards.</span>
+                  <span className="block font-black text-[#121314]">Print</span>
+                  <span className="mt-1 block text-xs text-[#5A5E63]">Open the printable login cards.</span>
                 </span>
               </button>
             </div>
@@ -1479,7 +1479,7 @@ export default function TeacherDashboardPage() {
       )}
 
       {pinToast && (
-        <div className="fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-xl bg-[#0F172A] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.5)]">
+        <div className="fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-xl bg-[#121314] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_32px_-8px_rgba(15,23,42,0.5)]">
           {pinToast}
         </div>
       )}
