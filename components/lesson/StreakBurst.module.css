@@ -1,0 +1,294 @@
+/* Streak celebration. --a / --b are the realm's two hues as colours, --dur the full length. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Hit-stop: the edges darken for a beat so the impact reads */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #04060e73 25%, #000000cc 100%);
+  animation: vignette var(--dur) ease-out forwards;
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, #ffffffd9, var(--a) 22%, transparent 62%);
+  mix-blend-mode: screen;
+  animation: flash 0.55s ease-out 0.08s both;
+}
+
+.edgeGlow {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 120px 20px var(--a), inset 0 0 40px 6px var(--b);
+  opacity: 0;
+  animation: edgeGlow var(--dur) ease-in-out 0.1s forwards;
+}
+
+/* Everything orbits this point */
+.center {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 0;
+  height: 0;
+}
+
+.rays {
+  position: absolute;
+  left: -70vmax;
+  top: -70vmax;
+  width: 140vmax;
+  height: 140vmax;
+  background: repeating-conic-gradient(from 0deg, var(--a) 0deg 5deg, transparent 5deg 16deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+  opacity: 0;
+  animation: rays var(--dur) ease-out 0.06s forwards, spin 9s linear infinite;
+}
+
+.ring {
+  position: absolute;
+  left: -110px;
+  top: -110px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 6px solid var(--a);
+  box-shadow: 0 0 34px var(--a), inset 0 0 22px var(--b);
+  opacity: 0;
+  animation: ring 0.9s cubic-bezier(0.12, 0.8, 0.3, 1) both;
+}
+
+/* Magic circle of realm glyphs */
+.circle {
+  position: absolute;
+  left: -190px;
+  top: -190px;
+  width: 380px;
+  height: 380px;
+  opacity: 0;
+  animation: circleIn var(--dur) ease-out 0.12s forwards;
+}
+
+.circleSpin {
+  position: absolute;
+  inset: 0;
+  animation: spin 6s linear infinite;
+}
+
+.circleSpinReverse {
+  position: absolute;
+  inset: 0;
+  animation: spin 9s linear infinite reverse;
+}
+
+.circleStroke {
+  fill: none;
+  stroke: var(--a);
+  stroke-width: 1.6;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px var(--a));
+  animation: draw 0.6s ease-out 0.15s forwards;
+}
+
+.glyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: #fff;
+  filter: drop-shadow(0 0 8px var(--a)) drop-shadow(0 0 16px var(--b));
+}
+
+/* The count: a chunky number that slams in */
+.number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.85;
+  font-size: var(--num-size);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.numberInner {
+  position: relative;
+  display: block;
+  animation: slam 0.42s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.numberPulse {
+  display: block;
+  animation: wobble 0.9s ease-in-out 0.45s 2 both;
+}
+
+.numberShadow {
+  position: absolute;
+  inset: 0;
+  color: var(--deep);
+  /* The outline lives on this back layer so the font's overlapping contours stay hidden under the face. */
+  -webkit-text-stroke: 7px #fffffff0;
+  paint-order: stroke fill;
+  text-shadow:
+    0 2px 0 var(--deep), 0 4px 0 var(--deep), 0 6px 0 var(--deep), 0 8px 0 var(--deep),
+    0 10px 0 var(--deep), 0 14px 24px #000000b3;
+}
+
+.numberFace {
+  position: relative;
+  display: block;
+  background: var(--face);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 22px var(--a));
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  top: calc(var(--num-size) * 0.52);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(0.9rem, 2.4vw, 1.4rem);
+  letter-spacing: 0.32em;
+  color: #fff;
+  text-shadow: 0 0 14px var(--a), 0 2px 0 var(--deep);
+  animation: rise 0.4s ease-out 0.28s both, fadeOut var(--dur) ease-in both;
+}
+
+/* Title plate: a slanted banner that slides through */
+.plate {
+  position: absolute;
+  left: 0;
+  top: calc(var(--num-size) * 0.52 + 2.6rem);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  animation: plateIn 0.5s cubic-bezier(0.2, 1.2, 0.4, 1) 0.34s both, fadeOut var(--dur) ease-in both;
+}
+
+.plateInner {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.5rem 1.6rem 0.55rem;
+  transform: skewX(-12deg);
+  background: linear-gradient(100deg, var(--b), var(--a));
+  box-shadow: 0 10px 30px #00000080, 0 0 30px var(--a), inset 0 1px 0 #ffffff80;
+  border: 2px solid #ffffffb3;
+  border-radius: 6px;
+}
+
+.plateTitle {
+  display: inline-block;
+  transform: skewX(12deg);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.3rem, 4vw, 2.3rem);
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 2px 0 #00000059;
+}
+
+.plateWord {
+  display: inline-block;
+  transform: skewX(12deg);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(0.7rem, 1.8vw, 1rem);
+  letter-spacing: 0.3em;
+  color: #ffffffe6;
+}
+
+.subtitle {
+  position: absolute;
+  left: 0;
+  top: calc(var(--num-size) * 0.52 + 7.2rem);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 800;
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  color: #fff;
+  text-shadow: 0 0 12px var(--a), 0 1px 2px #000;
+  animation: rise 0.4s ease-out 0.6s both, fadeOut var(--dur) ease-in both;
+}
+
+.heroImage {
+  position: absolute;
+  left: -160px;
+  top: -160px;
+  width: 320px;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 28px var(--a));
+  animation: heroSpin var(--dur) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Keyframes ── */
+@keyframes vignette { 0% { opacity: 0; } 6% { opacity: 1; } 30% { opacity: 0.55; } 100% { opacity: 0; } }
+@keyframes flash { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes edgeGlow { 0% { opacity: 0; } 15% { opacity: 0.9; } 50% { opacity: 0.5; } 65% { opacity: 0.85; } 100% { opacity: 0; } }
+@keyframes rays { 0% { opacity: 0; transform: scale(0.3); } 15% { opacity: 0.75; transform: scale(1); } 75% { opacity: 0.5; } 100% { opacity: 0; transform: scale(1.15); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes ring { 0% { opacity: 1; transform: scale(0.15); border-width: 18px; } 100% { opacity: 0; transform: scale(4.2); border-width: 1px; } }
+@keyframes circleIn { 0% { opacity: 0; transform: scale(0.6) rotate(-40deg); } 18% { opacity: 1; transform: scale(1) rotate(0); } 78% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.25); } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes slam {
+  0% { opacity: 0; transform: scale(3.2) rotate(-8deg); filter: blur(12px); }
+  55% { opacity: 1; transform: scale(0.88) rotate(2deg); filter: blur(0); }
+  78% { transform: scale(1.06) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes wobble { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.04); } 60% { transform: scale(0.99); } }
+@keyframes rise { from { opacity: 0; transform: translate(-50%, 14px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes plateIn {
+  0% { opacity: 0; transform: translateX(-160%) scaleX(1.4); }
+  70% { opacity: 1; transform: translateX(-46%) scaleX(0.96); }
+  100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
+}
+@keyframes fadeOut { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes heroSpin {
+  0% { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  20% { opacity: 0.9; transform: scale(1.05) rotate(10deg); }
+  80% { opacity: 0.85; transform: scale(1) rotate(200deg); }
+  100% { opacity: 0; transform: scale(0.9) rotate(260deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rays,
+  .ring,
+  .circle,
+  .flash,
+  .edgeGlow,
+  .heroImage,
+  .canvas {
+    display: none;
+  }
+
+  .numberInner,
+  .numberPulse,
+  .plate,
+  .label,
+  .subtitle {
+    animation: fadeOut var(--dur) ease-in both !important;
+  }
+}

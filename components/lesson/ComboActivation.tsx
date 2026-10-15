@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles, Orbit } from "lucide-react";
-
-type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
+import { useEffect, useRef, useState } from "react";
+import { BarChart3, Braces, CircleDot, Dices, Divide, Equal, Hash, Hourglass, Cog, PieChart, Plus, Timer, TrendingUp, Scale, Ruler, Sigma, Star, Sparkles, Orbit, X, Zap } from "lucide-react";
+import StreakBurst, { type StreakGlyph as GlyphIcon } from "@/components/lesson/StreakBurst";
 
 /**
  * Full-screen activation burst for the mid-streak tiers (5 and 8).
@@ -12,13 +11,12 @@ type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties
  *   - Measurelands: BREAKTHROUGH (5, brass) / MASTER EXPLORER (8, purple+brass)
  *     — magical measurement bursts with floating hourglass/ruler glyphs.
  * NexusActivation handles 10-combo (Nexus State / Legendary) separately.
- * Same DNA — rings, particles, corner bursts, scanline — scaled per tier.
+ * The celebration itself is StreakBurst; these configs supply each realm's
+ * titles, colours and glyphs. Mid tiers scale up to the 10-streak finale.
  */
 
-function seeded(seed: number) {
-  const x = Math.sin(seed * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
-}
+const NUMBER_GLYPHS: GlyphIcon[] = [Zap, Hash, Plus, X, Divide];
+const DATA_GLYPHS: GlyphIcon[] = [BarChart3, PieChart, TrendingUp];
 
 type TierConfig = {
   threshold: number;
@@ -57,6 +55,7 @@ const NEXUS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 20px rgba(253,224,71,0.95)) drop-shadow(0 0 42px rgba(202,138,4,0.7))",
     accentColor: "rgba(253,224,71,0.92)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(253,224,71,0.9), rgba(202,138,4,0.7), transparent)",
+    glyphs: NUMBER_GLYPHS,
   },
   {
     threshold: 8,
@@ -74,6 +73,7 @@ const NEXUS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 22px rgba(251,146,60,0.95)) drop-shadow(0 0 46px rgba(194,65,12,0.72))",
     accentColor: "rgba(253,186,116,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(251,146,60,0.9), rgba(194,65,12,0.7), transparent)",
+    glyphs: NUMBER_GLYPHS,
   },
 ];
 
@@ -192,6 +192,7 @@ const STATISTICS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 20px rgba(242,188,69,0.9)) drop-shadow(0 0 42px rgba(143,191,127,0.65))",
     accentColor: "rgba(255,224,150,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(242,188,69,0.9), rgba(143,191,127,0.7), transparent)",
+    glyphs: DATA_GLYPHS,
   },
   {
     threshold: 8,
@@ -209,6 +210,7 @@ const STATISTICS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 22px rgba(240,107,100,0.92)) drop-shadow(0 0 46px rgba(242,188,69,0.68))",
     accentColor: "rgba(255,189,182,0.96)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(240,107,100,0.9), rgba(242,188,69,0.7), transparent)",
+    glyphs: DATA_GLYPHS,
   },
 ];
 
@@ -290,7 +292,11 @@ const CHANCE_TIERS: TierConfig[] = [
   },
 ];
 
-type ActivationKey = { id: number; tier: TierConfig };
+type ActivationKey = { id: number; tier: TierConfig; count: number };
+
+/** Celebration strength and length by threshold: 3 is a quick spark, 8 is nearly the finale. */
+const powerFor = (threshold: number) => (threshold >= 8 ? 3 : threshold >= 5 ? 2 : 1) as 1 | 2 | 3;
+const durationFor = (threshold: number) => (threshold >= 8 ? 2.4 : threshold >= 5 ? 2.0 : 1.6);
 
 const CAVE_TIERS=NEXUS_TIERS.map((tier,index)=>({...tier,title:index===0?'CRYSTAL SURGE':'CAVERN GLOW'}));
 
@@ -313,8 +319,8 @@ export default function ComboActivation({ comboCount, realmId, cave=false }: { c
     for (const tier of [...tiers].reverse()) {
       if (prev < tier.threshold && comboCount >= tier.threshold && comboCount < 10) {
         idRef.current += 1;
-        setActive({ id: idRef.current, tier });
-        const t = setTimeout(() => setActive(null), Math.round(tier.duration * 1000) + 300);
+        setActive({ id: idRef.current, tier, count: comboCount });
+        const t = setTimeout(() => setActive(null), Math.round(durationFor(tier.threshold) * 1000) + 100);
         try {
           window.dispatchEvent(new CustomEvent(`lul:${tier.title.toLowerCase().replace(/\s+/g, "-")}-activated`));
         } catch {}
@@ -323,277 +329,21 @@ export default function ComboActivation({ comboCount, realmId, cave=false }: { c
     }
   }, [comboCount, tiers]);
 
-  const particles = useMemo(() => {
-    if (!active) return [];
-    const { tier } = active;
-    return Array.from({ length: tier.particleCount }, (_, i) => {
-      const angle = (i / tier.particleCount) * Math.PI * 2 + seeded(active.id * 13 + i) * 0.5;
-      const distance = 130 + seeded(active.id * 17 + i) * 240;
-      const size = 3 + seeded(active.id * 23 + i) * 7;
-      const delay = seeded(active.id * 29 + i) * 0.24;
-      const duration = 0.85 + seeded(active.id * 31 + i) * 0.6;
-      const hue = tier.hues[seeded(active.id * 37 + i) < 0.5 ? 0 : 1];
-      return { id: i, x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, size, delay, duration, hue };
-    });
-  }, [active]);
-
-  const glyphs = useMemo(() => {
-    if (!active || !active.tier.glyphs) return [];
-    const set = active.tier.glyphs;
-    return Array.from({ length: 11 }, (_, i) => {
-      const left = 6 + seeded(active.id * 41 + i) * 88;
-      const delay = seeded(active.id * 43 + i) * 0.5;
-      const size = 22 + seeded(active.id * 47 + i) * 26;
-      const drift = (seeded(active.id * 53 + i) - 0.5) * 80;
-      const rot = (seeded(active.id * 59 + i) - 0.5) * 40;
-      return { id: i, Icon: set[i % set.length], left, delay, size, drift, rot };
-    });
-  }, [active]);
-
   if (!active) return null;
   const { tier } = active;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
-      <style jsx>{`
-        @keyframes comboFlash {
-          0% { opacity: 0; }
-          8% { opacity: 1; }
-          100% { opacity: 0; }
-        }
-        @keyframes comboRing {
-          0% { transform: translate(-50%, -50%) scale(0.06); opacity: 0; border-width: 16px; }
-          12% { opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(3.8); opacity: 0; border-width: 1px; }
-        }
-        @keyframes comboBurst {
-          0% { transform: translate(-50%, -50%) translate(0, 0) scale(0.5); opacity: 0; }
-          12% { opacity: 1; }
-          100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.1); opacity: 0; }
-        }
-        @keyframes comboTitleIn {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.52) translateY(14px); filter: blur(10px); }
-          16% { opacity: 1; transform: translate(-50%, -50%) scale(1.07) translateY(-3px); filter: blur(0); }
-          30% { transform: translate(-50%, -50%) scale(1); }
-          74% { opacity: 1; }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.03); filter: blur(3px); }
-        }
-        @keyframes comboSubIn {
-          0% { opacity: 0; transform: translate(-50%, 0) translateY(12px); }
-          22% { opacity: 1; transform: translate(-50%, 0) translateY(0); }
-          74% { opacity: 1; }
-          100% { opacity: 0; }
-        }
-        @keyframes comboScan {
-          0% { transform: translateY(-100%); opacity: 0; }
-          10% { opacity: 0.85; }
-          100% { transform: translateY(100vh); opacity: 0; }
-        }
-        @keyframes comboCorner {
-          0% { opacity: 0; transform: scale(0.2); }
-          15% { opacity: 1; transform: scale(1.08); }
-          30% { transform: scale(1); }
-          72% { opacity: 0.6; }
-          100% { opacity: 0; }
-        }
-        @keyframes comboGlyph {
-          0% { opacity: 0; transform: translate(-50%, 0) translateY(60px) scale(0.5) rotate(var(--rot)); }
-          18% { opacity: 0.95; }
-          75% { opacity: 0.7; }
-          100% { opacity: 0; transform: translate(-50%, 0) translateY(-240px) scale(1.15) rotate(calc(var(--rot) * -1)); }
-        }
-        @keyframes chanceWheelPop {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.35) rotate(-18deg); filter: blur(8px); }
-          18% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) rotate(7deg); filter: blur(0); }
-          54% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92) rotate(28deg); filter: blur(2px); }
-        }
-      `}</style>
-
-      {/* Colour flash */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(circle at 50% 50%, ${tier.flashColor} 0%, transparent 70%)`,
-          animation: "comboFlash 0.85s ease-out forwards",
-        }}
-      />
-
-      {/* Scanline */}
-      <div
-        className="absolute inset-x-0 h-36"
-        style={{
-          background: `linear-gradient(to bottom, transparent 0%, ${tier.ringColor.replace("0.85", "0.42").replace("0.88", "0.46")} 50%, transparent 100%)`,
-          mixBlendMode: "screen",
-          animation: `comboScan ${(tier.duration * 0.44).toFixed(2)}s ease-in forwards`,
-        }}
-      />
-
-      {/* Floating measurement glyphs (Measurelands only) */}
-      {glyphs.map((g) => {
-        const G = g.Icon;
-        return (
-          <span
-            key={g.id}
-            className="absolute bottom-[18%]"
-            style={
-              {
-                left: `${g.left}%`,
-                lineHeight: 1,
-                filter: `drop-shadow(0 0 10px ${tier.flashColor})`,
-                "--rot": `${g.rot}deg`,
-                "--dx": `${g.drift}px`,
-                animation: `comboGlyph ${(tier.duration * 0.95).toFixed(2)}s ease-out ${g.delay.toFixed(2)}s forwards`,
-                opacity: 0,
-              } as React.CSSProperties
-            }
-          >
-            <G style={{ width: g.size, height: g.size, color: tier.accentColor }} />
-          </span>
-        );
-      })}
-
-      {isChance ? (
-        <img
-          src="/images/chance-hollow-streak-wheel-dice.png"
-          alt=""
-          className="absolute left-1/2 top-[43%] w-[min(48vw,420px)] max-w-[82vw]"
-          style={{
-            animation: `chanceWheelPop ${(tier.duration + 0.12).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards`,
-            filter: "drop-shadow(0 0 28px rgba(251,113,133,0.52)) drop-shadow(0 0 44px rgba(251,191,36,0.36))",
-          }}
-        />
-      ) : null}
-
-      {/* Shockwave rings */}
-      {Array.from({ length: tier.ringCount }, (_, i) => (
-        <div
-          key={i}
-          className="absolute left-1/2 top-1/2 rounded-full"
-          style={{
-            width: 200,
-            height: 200,
-            borderStyle: "solid",
-            borderColor: tier.ringColor,
-            boxShadow: `0 0 40px ${tier.flashColor}, inset 0 0 20px ${tier.flashColor}`,
-            animation: `comboRing ${(tier.duration * 0.66).toFixed(2)}s cubic-bezier(0.16,1,0.3,1) ${(i * 0.13).toFixed(2)}s forwards`,
-          }}
-        />
-      ))}
-
-      {/* Particle burst */}
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="absolute left-1/2 top-1/2 rounded-full"
-          style={
-            {
-              width: p.size,
-              height: p.size,
-              background: `hsl(${p.hue} 94% 63%)`,
-              boxShadow: `0 0 ${p.size * 3}px hsl(${p.hue} 95% 60% / 0.95), 0 0 ${p.size * 6}px hsl(${p.hue} 95% 55% / 0.5)`,
-              "--dx": `${p.x}px`,
-              "--dy": `${p.y}px`,
-              animation: `comboBurst ${p.duration}s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
-
-      {/* Corner energy bursts */}
-      {([
-        { top: "0%", left: "0%", origin: "top left" },
-        { top: "0%", right: "0%", origin: "top right" },
-        { bottom: "0%", left: "0%", origin: "bottom left" },
-        { bottom: "0%", right: "0%", origin: "bottom right" },
-      ] as const).map((pos, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            ...pos,
-            width: tier.cornerSize,
-            height: tier.cornerSize,
-            background: `conic-gradient(from 45deg, rgba(0,0,0,0), ${tier.ringColor} 15%, ${tier.flashColor} 35%, rgba(0,0,0,0) 55%)`,
-            transformOrigin: pos.origin,
-            animation: `comboCorner ${(tier.duration * 0.88).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) ${(0.06 * i).toFixed(2)}s forwards`,
-            mixBlendMode: "screen",
-          }}
-        />
-      ))}
-
-      {/* Main title lockup */}
-      <div
-        className="absolute left-1/2 text-center"
-        style={{
-          top: isChance ? "68%" : "50%",
-          animation: `comboTitleIn ${(tier.duration + 0.18).toFixed(2)}s cubic-bezier(0.22,1,0.36,1) forwards`,
-        }}
-      >
-        <div
-          className="font-mono font-black uppercase leading-none"
-          style={{
-            fontSize: "clamp(2.2rem, 6.5vw, 4.4rem)",
-            letterSpacing: "0.12em",
-            background: tier.titleGradient,
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            filter: tier.titleFilter,
-          }}
-        >
-          {tier.title}
-        </div>
-
-        <div
-          className="font-mono font-black uppercase"
-          style={{
-            fontSize: "clamp(0.9rem, 2.2vw, 1.5rem)",
-            letterSpacing: "0.5em",
-            marginTop: "0.14em",
-            color: tier.accentColor,
-            textShadow: `0 0 16px ${tier.flashColor}`,
-          }}
-        >
-          {tier.engaged}
-        </div>
-
-        <div
-          className="mx-auto mt-3 h-[2px] rounded-full"
-          style={{
-            width: "clamp(110px, 20vw, 250px)",
-            background: tier.dividerGradient,
-            boxShadow: `0 0 10px ${tier.flashColor}`,
-          }}
-        />
-
-        <div
-          className="mt-2 font-sans font-extrabold"
-          style={{
-            fontSize: "clamp(0.72rem, 1.3vw, 0.92rem)",
-            letterSpacing: "0.06em",
-            color: tier.accentColor,
-            opacity: 0.88,
-          }}
-        >
-          {tier.subtitle}
-        </div>
-      </div>
-
-      {/* Bottom badge */}
-      <div
-        className="absolute left-1/2 text-center font-mono font-bold uppercase"
-        style={{
-          bottom: "22%",
-          fontSize: "clamp(0.68rem, 1.1vw, 0.88rem)",
-          letterSpacing: "0.28em",
-          color: tier.accentColor,
-          animation: `comboSubIn ${(tier.duration + 0.18).toFixed(2)}s ease-out 0.1s forwards`,
-          opacity: 0,
-        }}
-      >
-        Keep it going!
-      </div>
-    </div>
+    <StreakBurst
+      key={active.id}
+      count={active.count}
+      power={powerFor(tier.threshold)}
+      title={tier.title}
+      engaged={tier.engaged}
+      hues={tier.hues}
+      face={tier.titleGradient}
+      glyphs={tier.glyphs}
+      heroImage={isChance ? "/images/chance-hollow-streak-wheel-dice.png" : undefined}
+      duration={durationFor(tier.threshold)}
+    />
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BarChart3, Braces, CircleDot, Crown, Dices, Divide, Equal, Hash, Hourglass, Cog, PieChart, Plus, Timer, TrendingUp, Scale, Ruler, Sigma, Star, Sparkles, X, Zap } from "lucide-react";
+import StreakBurst from "@/components/lesson/StreakBurst";
 
 /**
  * The top-tier 10-combo celebration.
@@ -9,14 +10,11 @@ import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, S
  *   - Number Nexus: "NEXUS STATE — ACTIVATED" (teal energy grid + data scanline).
  *   - Measurelands: "LEGENDARY — EXPLORER" (golden clock-face bloom, sweeping
  *     clock hand, purple+brass particle storm, floating measurement glyphs).
+ * Rendered by StreakBurst at full power: the finale adds confetti, an edge glow
+ * and the biggest number slam.
  */
 
-function seeded(seed: number) {
-  const x = Math.sin(seed * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
-}
-
-type ActivationKey = { id: number };
+type ActivationKey = { id: number; count: number };
 
 type RealmTheme = {
   flashBg: string;
@@ -207,6 +205,9 @@ const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
 const STARPATH_GLYPHS = [Star, Sparkles];
 const PATTERN_GLYPHS = [Sigma, Braces, Equal];
 const CHANCE_GLYPHS = [Dices, CircleDot, Sparkles];
+const NUMBER_GLYPHS = [Zap, Hash, Plus, X, Divide, Crown];
+const DATA_GLYPHS = [BarChart3, PieChart, TrendingUp, Crown];
+const FINALE_SECONDS = 3.2;
 
 const CAVE_THEME={...NEXUS_THEME,title:'CRYSTAL RADIANCE'};
 
@@ -217,8 +218,7 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
   const t = cave && isStarpath ? {...STARPATH_THEME,title:"STAR CRYSTAL RADIANCE"} : cave && isMeasurement ? {...MEASURE_THEME,title:'AMBER RADIANCE'} : cave && (!realmId || realmId === "number") ? CAVE_THEME : isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
-  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : STARPATH_GLYPHS;
-  const glyphColorRgb = isStarpath ? "196,181,253" : isPattern ? "110,231,183" : isChance ? "251,191,36" : "200,160,48";
+  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : isStarpath ? STARPATH_GLYPHS : isStatistics ? DATA_GLYPHS : NUMBER_GLYPHS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -228,8 +228,8 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
     prevRef.current = comboCount;
     if (prev < 10 && comboCount >= 10) {
       idRef.current += 1;
-      setActive({ id: idRef.current });
-      const timer = setTimeout(() => setActive(null), 2800);
+      setActive({ id: idRef.current, count: comboCount });
+      const timer = setTimeout(() => setActive(null), FINALE_SECONDS * 1000 + 100);
       try {
         window.dispatchEvent(new CustomEvent(isMeasurement ? "lul:legendary-activated" : isStatistics ? "lul:master-analyst-activated" : isPattern ? "lul:pattern-mastery-activated" : isChance ? "lul:fortune-flow-activated" : "lul:nexus-activated"));
       } catch {}
@@ -237,310 +237,21 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
     }
   }, [comboCount, isChance, isMeasurement, isPattern, isStatistics]);
 
-  const particles = useMemo(() => {
-    if (!active) return [];
-    return Array.from({ length: 52 }, (_, i) => {
-      const angle = (i / 52) * Math.PI * 2 + seeded(active.id * 13 + i) * 0.5;
-      const distance = 180 + seeded(active.id * 17 + i) * 300;
-      const size = 3 + seeded(active.id * 23 + i) * 8;
-      const delay = seeded(active.id * 29 + i) * 0.3;
-      const duration = 1.0 + seeded(active.id * 31 + i) * 0.8;
-      const hue = seeded(active.id * 37 + i) < t.particleSplit ? t.particleHues[0] : t.particleHues[1];
-      return { id: i, x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, size, delay, duration, hue };
-    });
-  }, [active, t.particleHues, t.particleSplit]);
-
-  const glyphs = useMemo(() => {
-    if (!active || (!isMeasurement && !isStarpath && !isPattern && !isChance)) return [];
-    return Array.from({ length: 14 }, (_, i) => {
-      const left = 5 + seeded(active.id * 61 + i) * 90;
-      const delay = seeded(active.id * 67 + i) * 0.7;
-      const size = 24 + seeded(active.id * 71 + i) * 32;
-      const rot = (seeded(active.id * 73 + i) - 0.5) * 50;
-      return { id: i, Icon: glyphSet[i % glyphSet.length], left, delay, size, rot };
-    });
-  }, [active, isChance, isMeasurement, isPattern, isStarpath, glyphSet]);
-
   if (!active) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
-      <style jsx>{`
-        @keyframes nexusFlash { 0% { opacity: 0; } 8% { opacity: 1; } 100% { opacity: 0; } }
-        @keyframes nexusFlashWhite { 0% { opacity: 0; } 5% { opacity: 0.22; } 25% { opacity: 0; } }
-        @keyframes nexusRing {
-          0% { transform: translate(-50%, -50%) scale(0.05); opacity: 0; border-width: 18px; }
-          12% { opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(4); opacity: 0; border-width: 1px; }
-        }
-        @keyframes nexusBurst {
-          0% { transform: translate(-50%, -50%) translate(0, 0) scale(0.5); opacity: 0; }
-          12% { opacity: 1; }
-          100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.1); opacity: 0; }
-        }
-        @keyframes nexusTitleIn {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) translateY(16px); filter: blur(12px); }
-          16% { opacity: 1; transform: translate(-50%, -50%) scale(1.06) translateY(-4px); filter: blur(0); }
-          30% { transform: translate(-50%, -50%) scale(1); }
-          76% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(1.03); filter: blur(4px); }
-        }
-        @keyframes nexusSubIn {
-          0% { opacity: 0; transform: translate(-50%, 0) translateY(16px); }
-          22% { opacity: 1; transform: translate(-50%, 0) translateY(0); }
-          76% { opacity: 1; }
-          100% { opacity: 0; transform: translate(-50%, 0) translateY(-8px); }
-        }
-        @keyframes nexusScanline {
-          0% { transform: translateY(-100%); opacity: 0; }
-          10% { opacity: 0.9; }
-          100% { transform: translateY(100vh); opacity: 0; }
-        }
-        @keyframes nexusCorner {
-          0% { opacity: 0; transform: scale(0.2); }
-          15% { opacity: 1; transform: scale(1.1); }
-          30% { transform: scale(1); }
-          75% { opacity: 0.7; }
-          100% { opacity: 0; }
-        }
-        @keyframes nexusGrid {
-          0% { opacity: 0; } 10% { opacity: 0.18; } 60% { opacity: 0.10; } 100% { opacity: 0; }
-        }
-        @keyframes nexusClock {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.15) rotate(0deg); }
-          14% { opacity: 0.55; }
-          70% { opacity: 0.28; }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(3) rotate(90deg); }
-        }
-        @keyframes nexusHand {
-          0% { opacity: 0; transform: translate(-50%, -100%) rotate(0deg); }
-          16% { opacity: 0.85; }
-          100% { opacity: 0; transform: translate(-50%, -100%) rotate(460deg); }
-        }
-        @keyframes nexusGlyph {
-          0% { opacity: 0; transform: translate(-50%, 0) translateY(80px) scale(0.5) rotate(var(--rot)); }
-          18% { opacity: 0.95; }
-          78% { opacity: 0.6; }
-          100% { opacity: 0; transform: translate(-50%, 0) translateY(-300px) scale(1.2) rotate(calc(var(--rot) * -1)); }
-        }
-        @keyframes fortuneWheelFinal {
-          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.28) rotate(-28deg); filter: blur(10px); }
-          16% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(12deg); filter: blur(0); }
-          55% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.96) rotate(42deg); filter: blur(3px); }
-        }
-      `}</style>
-
-      {/* Colour flash */}
-      <div className="absolute inset-0" style={{ background: t.flashBg, animation: "nexusFlash 1.1s ease-out forwards" }} />
-      {/* White punch flash */}
-      <div className="absolute inset-0 bg-white" style={{ animation: "nexusFlashWhite 0.5s ease-out forwards" }} />
-
-      {/* Energy grid overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `linear-gradient(${t.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${t.gridColor} 1px, transparent 1px)`,
-          backgroundSize: "48px 48px",
-          animation: "nexusGrid 2.2s ease-out forwards",
-          mixBlendMode: "screen",
-        }}
-      />
-
-      {/* Measurelands: golden clock-face bloom + sweeping hand */}
-      {isMeasurement && (
-        <>
-          <div
-            className="absolute left-1/2 top-1/2 rounded-full"
-            style={{
-              width: 280,
-              height: 280,
-              background:
-                "repeating-conic-gradient(from 0deg, rgba(200,160,48,0.5) 0deg 1.4deg, transparent 1.4deg 30deg)",
-              animation: "nexusClock 2.6s cubic-bezier(0.16,1,0.3,1) forwards",
-              mixBlendMode: "screen",
-            }}
-          />
-          <div
-            className="absolute left-1/2 top-1/2 origin-bottom rounded-full"
-            style={{
-              width: 4,
-              height: 130,
-              background: "linear-gradient(to top, rgba(232,200,120,0.95), rgba(200,160,48,0))",
-              boxShadow: "0 0 12px rgba(200,160,48,0.8)",
-              animation: "nexusHand 2.4s cubic-bezier(0.22,1,0.36,1) forwards",
-            }}
-          />
-        </>
-      )}
-
-      {/* Data scanline */}
-      <div
-        className="absolute inset-x-0 h-48"
-        style={{
-          background: `linear-gradient(to bottom, transparent 0%, ${t.scanColor} 50%, transparent 100%)`,
-          mixBlendMode: "screen",
-          animation: "nexusScanline 1.2s ease-in forwards",
-        }}
-      />
-
-      {/* Shockwave rings */}
-      {[0, 0.12, 0.24, 0.38, 0.52].map((d, i) => (
-        <div
-          key={i}
-          className="absolute left-1/2 top-1/2 rounded-full"
-          style={{
-            width: 200,
-            height: 200,
-            borderStyle: "solid",
-            borderColor: i < 2 ? t.ringInner : t.ringOuter,
-            boxShadow: t.ringShadow,
-            animation: `nexusRing 1.8s cubic-bezier(0.16,1,0.3,1) ${d}s forwards`,
-          }}
-        />
-      ))}
-
-      {isChance ? (
-        <img
-          src="/images/chance-hollow-streak-wheel-dice.png"
-          alt=""
-          className="absolute left-1/2 top-[42%] w-[min(54vw,500px)] max-w-[86vw]"
-          style={{
-            animation: "fortuneWheelFinal 2.75s cubic-bezier(0.22,1,0.36,1) forwards",
-            filter: "drop-shadow(0 0 32px rgba(251,113,133,0.58)) drop-shadow(0 0 52px rgba(251,191,36,0.42))",
-          }}
-        />
-      ) : null}
-
-      {/* Particle burst */}
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="absolute left-1/2 top-1/2 rounded-full"
-          style={
-            {
-              width: p.size,
-              height: p.size,
-              background: `hsl(${p.hue} 90% 65%)`,
-              boxShadow: `0 0 ${p.size * 3}px hsl(${p.hue} 95% 62% / 0.95), 0 0 ${p.size * 7}px hsl(${p.hue} 95% 55% / 0.5)`,
-              "--dx": `${p.x}px`,
-              "--dy": `${p.y}px`,
-              animation: `nexusBurst ${p.duration}s cubic-bezier(0.16,1,0.3,1) ${p.delay}s forwards`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
-
-      {/* Floating measurement glyphs (Measurelands only) */}
-      {glyphs.map((g) => {
-        const G = g.Icon;
-        return (
-          <span
-            key={g.id}
-            className="absolute bottom-[16%]"
-            style={
-              {
-                left: `${g.left}%`,
-                lineHeight: 1,
-                filter: `drop-shadow(0 0 12px rgba(${glyphColorRgb},0.7))`,
-                "--rot": `${g.rot}deg`,
-                animation: `nexusGlyph 2.5s ease-out ${g.delay.toFixed(2)}s forwards`,
-                opacity: 0,
-              } as React.CSSProperties
-            }
-          >
-            <G style={{ width: g.size, height: g.size, color: `rgb(${glyphColorRgb})` }} />
-          </span>
-        );
-      })}
-
-      {/* Corner energy bursts */}
-      {[
-        { top: "0%", left: "0%", origin: "top left" },
-        { top: "0%", right: "0%", origin: "top right" },
-        { bottom: "0%", left: "0%", origin: "bottom left" },
-        { bottom: "0%", right: "0%", origin: "bottom right" },
-      ].map((pos, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            ...pos,
-            width: 160,
-            height: 160,
-            background: t.cornerConic,
-            transformOrigin: pos.origin as string,
-            animation: `nexusCorner 2.2s cubic-bezier(0.22,1,0.36,1) ${0.08 * i}s forwards`,
-            mixBlendMode: "screen",
-          }}
-        />
-      ))}
-
-      {/* Main title lockup */}
-      <div className="absolute left-1/2 top-1/2 text-center" style={{ animation: "nexusTitleIn 2.6s cubic-bezier(0.22,1,0.36,1) forwards" }}>
-        <div
-          className="font-mono font-black uppercase leading-none"
-          style={{
-            fontSize: "clamp(2.6rem, 7.5vw, 5rem)",
-            letterSpacing: "0.15em",
-            background: t.titleGradient,
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            textShadow: "none",
-            filter: t.titleFilter,
-          }}
-        >
-          {t.title}
-        </div>
-        <div
-          className="font-mono font-black uppercase"
-          style={{
-            fontSize: "clamp(1rem, 2.6vw, 1.7rem)",
-            letterSpacing: "0.55em",
-            marginTop: "0.15em",
-            color: t.engagedColor,
-            textShadow: t.engagedShadow,
-          }}
-        >
-          {t.engaged}
-        </div>
-        <div
-          className="mx-auto mt-3 h-[2px] rounded-full"
-          style={{
-            width: "clamp(160px, 28vw, 320px)",
-            background: t.dividerGradient,
-            boxShadow: t.dividerShadow,
-          }}
-        />
-        <div
-          className="mt-2 font-sans font-extrabold"
-          style={{
-            fontSize: "clamp(0.8rem, 1.4vw, 1rem)",
-            letterSpacing: "0.06em",
-            color: t.copyColor,
-            textShadow: t.copyShadow,
-          }}
-        >
-          {t.copy}
-        </div>
-      </div>
-
-      {/* Bottom subtitle */}
-      <div
-        className="absolute left-1/2 text-center font-mono font-bold uppercase"
-        style={{
-          bottom: "22%",
-          fontSize: "clamp(0.75rem, 1.3vw, 0.95rem)",
-          letterSpacing: "0.3em",
-          color: t.bottomColor,
-          textShadow: t.bottomShadow,
-          animation: "nexusSubIn 2.6s ease-out 0.1s forwards",
-          opacity: 0,
-        }}
-      >
-        {t.bottomText}
-      </div>
-    </div>
+    <StreakBurst
+      key={active.id}
+      count={active.count}
+      power={4}
+      title={t.title}
+      engaged={t.engaged}
+      subtitle={t.copy}
+      hues={t.particleHues}
+      face={t.titleGradient}
+      glyphs={glyphSet}
+      heroImage={isChance ? "/images/chance-hollow-streak-wheel-dice.png" : undefined}
+      duration={FINALE_SECONDS}
+    />
   );
 }

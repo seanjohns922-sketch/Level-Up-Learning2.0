@@ -325,7 +325,7 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
   const config = TIER_CONFIG[activeTier];
 
   return (
-    <div className="relative">
+    <div className="relative" data-combo-counter>
       {/* Animated bezel */}
       <div
         aria-hidden
