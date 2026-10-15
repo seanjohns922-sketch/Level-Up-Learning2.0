@@ -11,7 +11,7 @@ import { VIC_FROM_AC9, VIC_MATHS_CODES } from "@/data/curriculum/vic-maths";
 export type CurriculumFramework = "aus" | "vic" | "nsw";
 
 export const FRAMEWORKS: Record<CurriculumFramework, { label: string; meta: string }> = {
-  aus: { label: "Australian Curriculum v9", meta: "Australian Curriculum v9 · Mathematics" },
+  aus: { label: "Australian Curriculum v9 (QLD, SA, NT, ACT, TAS)", meta: "Australian Curriculum v9 · Mathematics" },
   vic: { label: "Victorian Curriculum 2.0", meta: "Victorian Curriculum 2.0 · Mathematics" },
   nsw: { label: "NSW Syllabus (2022)", meta: "NSW Mathematics K–10 Syllabus (2022)" },
 };
