@@ -327,7 +327,7 @@ export default function CurriculumExplorer({
           })}
           <button
             onClick={handleDownloadCsv}
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-[#E6E8EC] bg-white px-3 py-1.5 text-[11px] font-bold text-[#64748B] transition hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700"
+            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-white px-3 py-1.5 text-[11px] font-bold text-[#121314] transition hover:bg-[#EEF9D9] hover:text-[#3D6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
@@ -339,7 +339,7 @@ export default function CurriculumExplorer({
               aria-label="Curriculum for the scope and sequence"
               value={activeFramework}
               onChange={(event) => chooseFramework(event.target.value as CurriculumFramework)}
-              className="shrink-0 rounded-full border border-[#E6E8EC] bg-white px-3 py-1.5 text-[11px] font-bold text-[#0F172A]"
+              className="shrink-0 cursor-pointer rounded-full border border-[#121314] bg-white px-3 py-1.5 text-[11px] font-bold text-[#121314] transition hover:bg-[#EEF9D9] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
             >
               {(Object.keys(FRAMEWORKS) as CurriculumFramework[]).map((key) => (
                 <option key={key} value={key} disabled={!frameworkAvailable(key, yearLabel, genreId)}>
@@ -351,7 +351,7 @@ export default function CurriculumExplorer({
           {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
             <button
               onClick={handleScopePdf}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-[#121314] px-3 py-1.5 text-[11px] font-bold text-[#B9F23F] transition hover:bg-black"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#121314] bg-[#121314] px-3 py-1.5 text-[11px] font-bold text-[#B9F23F] transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F] focus-visible:ring-offset-1"
             >
               Scope and sequence PDF
             </button>
