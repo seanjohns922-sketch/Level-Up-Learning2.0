@@ -1,24 +1,32 @@
 "use client";
 
-import { useEffect, useRef, type ComponentType, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import RealmScene from "@/components/lesson/StreakScenes";
+import { playStreakSound, type StreakStyle } from "@/lib/audio/streak-sfx";
 import styles from "./StreakBurst.module.css";
 
-export type StreakGlyph = ComponentType<{ className?: string; style?: CSSProperties }>;
+export type { StreakStyle };
 
 /**
  * The shared streak celebration used by ComboActivation (3/5/8 in a row) and
- * NexusActivation (10 in a row). Realm components supply the title, colours and
- * glyphs; this owns the feel:
- *   hit-stop vignette → a quick screen shake → the count slams in over spinning
- *   rays and a magic circle of realm glyphs → spark physics → the title banner
- *   slides through → the number flies into the on-screen streak counter.
- * `power` scales everything (1 = small, 4 = the 10-streak finale with confetti).
- * Never blocks input (pointer-events: none) and respects reduced motion.
+ * NexusActivation (10 in a row). Every realm has its own scene, particles,
+ * banner and sound:
+ *   Number Nexus  hex grid, scan beam, glitching number, data bits
+ *   Measurelands  brass gears, clock face, rising gold dust, ribbon banner
+ *   Starpath      nebula, orbiting planets, warp streaks and twinkling stars
+ *   Pattern Peaks triangle tessellation lighting up in a wave, tumbling shapes
+ *   Statistica    bars shooting up, a rising trend line, data points
+ *   Chance Hollow a wheel of fortune spinning to rest, coins and card suits
+ * Shared beats: hit-stop vignette, a short screen shake, the number slam, and
+ * the number flying into the streak counter. `power` scales everything
+ * (4 = the 10-streak finale with confetti). Never blocks input and respects
+ * reduced motion.
  */
 
 export type StreakBurstProps = {
   count: number;
   power: 1 | 2 | 3 | 4;
+  realm: StreakStyle;
   title: string;
   engaged: string;
   subtitle?: string;
@@ -26,22 +34,131 @@ export type StreakBurstProps = {
   hues: [number, number];
   /** Fill for the big number, usually the tier's title gradient. */
   face: string;
-  glyphs?: StreakGlyph[];
-  heroImage?: string;
   /** Total length in seconds. */
   duration: number;
 };
 
 const SHAKE_PX = [0, 3, 5, 8, 12];
-const SPARKS = [0, 40, 70, 100, 150];
+const BURST = [0, 40, 70, 100, 150];
 const RING_COUNT = [0, 1, 2, 3, 4];
+const SUITS = ["♠", "♥", "♦", "♣"];
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Spark burst with gravity and motion trails, plus a confetti rain for the finale. Stops itself. */
-function useSparks(canvasRef: React.RefObject<HTMLCanvasElement | null>, power: number, hues: [number, number], duration: number) {
+type P = {
+  x: number; y: number; vx: number; vy: number; life: number; decay: number;
+  size: number; rot: number; vr: number; c: string; kind: number; delay: number;
+};
+
+/** Per-realm particle physics: how each particle starts, moves and is drawn. */
+const PHYSICS: Record<StreakStyle, { gravity: number; drag: number; spawn: (p: P, i: number) => void; draw: (ctx: CanvasRenderingContext2D, p: P) => void }> = {
+  nexus: {
+    gravity: 0.05,
+    drag: 0.94,
+    spawn: (p, i) => { p.kind = i % 3; p.size = p.kind === 2 ? 14 + Math.random() * 6 : 3 + Math.random() * 4; },
+    draw: (ctx, p) => {
+      if (p.kind === 2) {
+        ctx.font = `800 ${p.size}px ui-monospace, monospace`;
+        ctx.fillText(Math.random() < 0.5 ? "1" : "0", p.x, p.y);
+      } else {
+        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      }
+    },
+  },
+  measure: {
+    gravity: -0.05,
+    drag: 0.95,
+    spawn: (p) => { p.size = 1.5 + Math.random() * 3; p.decay *= 0.7; },
+    draw: (ctx, p) => {
+      const twinkle = 0.6 + 0.4 * Math.sin(p.life * 30);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * twinkle, 0, Math.PI * 2);
+      ctx.fill();
+    },
+  },
+  star: {
+    gravity: 0,
+    drag: 1.06,
+    spawn: (p, i) => { p.kind = i % 2; p.size = p.kind ? 2 + Math.random() * 4 : 1.5; p.vx *= 0.35; p.vy *= 0.35; },
+    draw: (ctx, p) => {
+      if (p.kind === 0) {
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 4, p.y - p.vy * 4);
+        ctx.stroke();
+        return;
+      }
+      const r = p.size * (0.7 + 0.3 * Math.sin(p.life * 40));
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - r * 2.4);
+      ctx.quadraticCurveTo(p.x, p.y, p.x + r * 2.4, p.y);
+      ctx.quadraticCurveTo(p.x, p.y, p.x, p.y + r * 2.4);
+      ctx.quadraticCurveTo(p.x, p.y, p.x - r * 2.4, p.y);
+      ctx.quadraticCurveTo(p.x, p.y, p.x, p.y - r * 2.4);
+      ctx.fill();
+    },
+  },
+  pattern: {
+    gravity: 0.22,
+    drag: 0.97,
+    spawn: (p, i) => { p.kind = i % 3; p.size = 8 + Math.random() * 10; p.vr = (Math.random() - 0.5) * 0.3; },
+    draw: (ctx, p) => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      if (p.kind === 0) { ctx.moveTo(0, -p.size); ctx.lineTo(p.size * 0.87, p.size / 2); ctx.lineTo(-p.size * 0.87, p.size / 2); ctx.closePath(); }
+      else if (p.kind === 1) ctx.rect(-p.size / 2, -p.size / 2, p.size, p.size);
+      else for (let k = 0; k < 6; k += 1) { const a = (k / 6) * Math.PI * 2; ctx[k ? "lineTo" : "moveTo"](Math.cos(a) * p.size * 0.6, Math.sin(a) * p.size * 0.6); }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    },
+  },
+  data: {
+    gravity: 0.25,
+    drag: 0.97,
+    spawn: (p, i) => { p.kind = i % 2; p.size = 3 + Math.random() * 4; },
+    draw: (ctx, p) => {
+      ctx.beginPath();
+      if (p.kind) ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      else ctx.rect(p.x - p.size, p.y - p.size, p.size * 2, p.size * 2);
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "#ffffff";
+      ctx.stroke();
+    },
+  },
+  chance: {
+    gravity: 0.3,
+    drag: 0.98,
+    spawn: (p, i) => { p.kind = i % 3; p.size = p.kind === 2 ? 18 + Math.random() * 8 : 7 + Math.random() * 4; p.vr = 0.2 + Math.random() * 0.2; },
+    draw: (ctx, p) => {
+      if (p.kind === 2) {
+        ctx.font = `900 ${p.size}px Arial, sans-serif`;
+        ctx.fillStyle = (Math.floor(p.delay) % 2) ? "#f43f5e" : "#ffffff";
+        ctx.fillText(SUITS[Math.floor(p.delay) % 4]!, p.x, p.y);
+        return;
+      }
+      // A coin flipping: an ellipse whose width follows the spin.
+      ctx.fillStyle = "#fbbf24";
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, Math.max(1, Math.abs(Math.cos(p.rot)) * p.size), p.size, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#b45309";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    },
+  },
+};
+
+/** Realm particle burst, plus realm-shaped confetti rain for the finale. Stops itself. */
+function useParticles(canvasRef: React.RefObject<HTMLCanvasElement | null>, realm: StreakStyle, power: number, hues: [number, number], duration: number) {
+  const [h0, h1] = hues;
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || prefersReducedMotion()) return;
@@ -53,25 +170,25 @@ function useSparks(canvasRef: React.RefObject<HTMLCanvasElement | null>, power: 
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     const cx = W / 2;
     const cy = H * 0.42;
-    const colour = (i: number) => (i % 4 === 0 ? "hsl(48 100% 92%)" : `hsl(${hues[i % 2]} 95% ${58 + (i % 3) * 8}%)`);
+    const physics = PHYSICS[realm];
+    const colour = (i: number) => (i % 4 === 0 ? "hsl(48 100% 92%)" : `hsl(${i % 2 ? h1 : h0} 95% ${58 + (i % 3) * 8}%)`);
 
-    type Spark = { x: number; y: number; px: number; py: number; vx: number; vy: number; life: number; decay: number; w: number; c: string };
-    const sparks: Spark[] = Array.from({ length: SPARKS[power] }, (_, i) => {
+    const make = (i: number, confetti: boolean): P => {
       const a = Math.random() * Math.PI * 2;
-      const speed = (6 + Math.random() * 10) * (0.8 + power * 0.15);
-      return { x: cx, y: cy, px: cx, py: cy, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - 3, life: 1, decay: 0.012 + Math.random() * 0.018, w: 1.5 + Math.random() * 2.5, c: colour(i) };
-    });
-
-    type Bit = { x: number; y: number; vy: number; vx: number; rot: number; vr: number; w: number; h: number; c: string; delay: number };
-    const confetti: Bit[] = power >= 4
-      ? Array.from({ length: 120 }, (_, i) => ({
-        x: Math.random() * W, y: -20 - Math.random() * H * 0.4, vy: 2.2 + Math.random() * 2.8, vx: (Math.random() - 0.5) * 1.6,
-        rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.25, w: 6 + Math.random() * 6, h: 10 + Math.random() * 10,
-        c: i % 5 === 0 ? "#ffffff" : `hsl(${hues[i % 2] + (i % 3) * 20} 92% 60%)`, delay: Math.random() * 30,
-      }))
-      : [];
+      const speed = (5 + Math.random() * 10) * (0.8 + power * 0.15);
+      const p: P = confetti
+        ? { x: Math.random() * W, y: -30 - Math.random() * H * 0.3, vx: (Math.random() - 0.5) * 1.5, vy: 2 + Math.random() * 2.5, life: 1, decay: 0, size: 8, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.2, c: colour(i), kind: 0, delay: Math.random() * 40 }
+        : { x: cx, y: cy, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed - 2, life: 1, decay: 0.012 + Math.random() * 0.016, size: 3, rot: Math.random() * 6, vr: 0, c: colour(i), kind: 0, delay: i };
+      physics.spawn(p, i);
+      if (confetti) p.vy = 2 + Math.random() * 2.5;
+      return p;
+    };
+    const burst = Array.from({ length: BURST[power] }, (_, i) => make(i, false));
+    const rain = power >= 4 ? Array.from({ length: 110 }, (_, i) => make(i + 1000, true)) : [];
 
     let raf = 0;
     let frame = 0;
@@ -79,62 +196,54 @@ function useSparks(canvasRef: React.RefObject<HTMLCanvasElement | null>, power: 
     const tick = (now: number) => {
       frame += 1;
       ctx.clearRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "lighter";
-      for (const s of sparks) {
-        if (s.life <= 0) continue;
-        s.px = s.x;
-        s.py = s.y;
-        s.x += s.vx;
-        s.y += s.vy;
-        s.vx *= 0.965;
-        s.vy = s.vy * 0.965 + 0.32;
-        s.life -= s.decay;
-        ctx.globalAlpha = Math.max(0, s.life);
-        ctx.strokeStyle = s.c;
-        ctx.lineWidth = s.w;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(s.px - s.vx * 1.5, s.py - s.vy * 1.5);
-        ctx.lineTo(s.x, s.y);
-        ctx.stroke();
+      ctx.globalCompositeOperation = realm === "chance" || realm === "data" ? "source-over" : "lighter";
+      for (const p of burst) {
+        if (p.life <= 0) continue;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= physics.drag;
+        p.vy = p.vy * physics.drag + physics.gravity;
+        p.rot += p.vr;
+        p.life -= p.decay;
+        ctx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.4));
+        ctx.fillStyle = p.c;
+        ctx.strokeStyle = p.c;
+        physics.draw(ctx, p);
       }
       ctx.globalCompositeOperation = "source-over";
-      for (const b of confetti) {
-        if (frame < b.delay) continue;
-        b.x += b.vx + Math.sin((frame + b.delay) / 14) * 0.8;
-        b.y += b.vy;
-        b.rot += b.vr;
-        ctx.globalAlpha = Math.max(0, Math.min(1, (end - now) / 500));
-        ctx.save();
-        ctx.translate(b.x, b.y);
-        ctx.rotate(b.rot);
-        ctx.scale(1, Math.cos(frame / 6 + b.delay));
-        ctx.fillStyle = b.c;
-        ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
-        ctx.restore();
+      const fade = Math.max(0, Math.min(1, (end - now) / 500));
+      for (const p of rain) {
+        if (frame < p.delay) continue;
+        p.x += p.vx + Math.sin((frame + p.delay) / 14) * 0.7;
+        p.y += p.vy;
+        p.rot += p.vr;
+        ctx.globalAlpha = fade;
+        ctx.fillStyle = p.c;
+        ctx.strokeStyle = p.c;
+        physics.draw(ctx, p);
       }
       if (now < end) raf = requestAnimationFrame(tick);
       else ctx.clearRect(0, 0, W, H);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [canvasRef, power, hues, duration]);
+  }, [canvasRef, realm, power, h0, h1, duration]);
 }
 
-export default function StreakBurst({ count, power, title, engaged, subtitle, hues, face, glyphs, heroImage, duration }: StreakBurstProps) {
+export default function StreakBurst({ count, power, realm, title, engaged, subtitle, hues, face, duration }: StreakBurstProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const numberRef = useRef<HTMLDivElement | null>(null);
-  useSparks(canvasRef, power, hues, duration);
+  useParticles(canvasRef, realm, power, hues, duration);
 
-  // Impact shake, then the number flies into the streak counter and the counter pulses.
+  // Sound, the impact shake, then the number flies into the streak counter and the counter pulses.
   useEffect(() => {
+    playStreakSound(realm, power);
     if (prefersReducedMotion()) return;
     const amp = SHAKE_PX[power];
     const shake = document.body.animate(
       [0, -1, 0.8, -0.6, 0.4, -0.2, 0].map((k, i) => ({ transform: `translate(${k * amp}px, ${(i % 2 ? 1 : -1) * k * amp * 0.6}px)` })),
       { duration: 320, delay: 70, easing: "ease-out" },
     );
-    const flyAt = duration * 1000 - 520;
     const timer = window.setTimeout(() => {
       const el = numberRef.current;
       if (!el) return;
@@ -157,25 +266,21 @@ export default function StreakBurst({ count, power, title, engaged, subtitle, hu
           { duration: 420, delay: 440, easing: "ease-out" },
         );
       }
-    }, flyAt);
+    }, duration * 1000 - 520);
     return () => {
       shake.cancel();
       window.clearTimeout(timer);
     };
-  }, [power, duration]);
+  }, [realm, power, duration]);
 
-  const a = `hsl(${hues[0]} 95% 60%)`;
-  const b = `hsl(${hues[1]} 90% 52%)`;
-  const deep = `hsl(${hues[1]} 80% 18%)`;
   const vars = {
-    ["--a" as string]: a,
-    ["--b" as string]: b,
-    ["--deep" as string]: deep,
+    ["--a" as string]: `hsl(${hues[0]} 95% 60%)`,
+    ["--b" as string]: `hsl(${hues[1]} 90% 52%)`,
+    ["--deep" as string]: `hsl(${hues[1]} 80% 18%)`,
     ["--face" as string]: face,
     ["--dur" as string]: `${duration}s`,
     ["--num-size" as string]: power >= 4 ? "clamp(7rem, 26vw, 15rem)" : power === 3 ? "clamp(6rem, 22vw, 12.5rem)" : "clamp(5rem, 18vw, 10rem)",
   } as CSSProperties;
-  const glyphCount = power >= 3 ? 10 : 8;
 
   return (
     <div className={styles.root} style={vars} aria-hidden>
@@ -183,45 +288,9 @@ export default function StreakBurst({ count, power, title, engaged, subtitle, hu
       {power >= 3 ? <div className={styles.edgeGlow} /> : null}
 
       <div className={styles.center}>
-        <div className={styles.rays} />
-        {heroImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={heroImage} alt="" className={styles.heroImage} />
-        ) : null}
-        {power >= 2 && glyphs?.length ? (
-          <div className={styles.circle}>
-            <svg viewBox="0 0 380 380" className="absolute inset-0 h-full w-full" aria-hidden>
-              <circle cx="190" cy="190" r="186" className={styles.circleStroke} pathLength={1} />
-              <circle cx="190" cy="190" r="150" className={styles.circleStroke} pathLength={1} style={{ strokeDasharray: "0.02 0.015", strokeDashoffset: 0, opacity: 0.7 }} />
-            </svg>
-            <div className={styles.circleSpin}>
-              {Array.from({ length: glyphCount }, (_, i) => {
-                const Glyph = glyphs[i % glyphs.length]!;
-                const angle = (i / glyphCount) * 360;
-                return (
-                  <span key={i} className={styles.glyph} style={{ transform: `rotate(${angle}deg) translateY(-168px) rotate(${-angle}deg) translate(-50%, -50%)` }}>
-                    <Glyph style={{ width: 26, height: 26 }} />
-                  </span>
-                );
-              })}
-            </div>
-            {power >= 3 ? (
-              <div className={styles.circleSpinReverse}>
-                {Array.from({ length: 6 }, (_, i) => {
-                  const Glyph = glyphs[(i + 1) % glyphs.length]!;
-                  const angle = (i / 6) * 360 + 30;
-                  return (
-                    <span key={i} className={styles.glyph} style={{ transform: `rotate(${angle}deg) translateY(-122px) rotate(${-angle}deg) translate(-50%, -50%)`, opacity: 0.75 }}>
-                      <Glyph style={{ width: 18, height: 18 }} />
-                    </span>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+        <RealmScene style={realm} power={power} />
         {Array.from({ length: RING_COUNT[power] }, (_, i) => (
-          <div key={i} className={styles.ring} style={{ animationDelay: `${0.08 + i * 0.12}s` }} />
+          <div key={i} className={styles.ring} style={{ animationDelay: `${0.08 + i * 0.12}s`, borderRadius: realm === "nexus" ? 0 : undefined, clipPath: realm === "nexus" ? "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)" : undefined }} />
         ))}
 
         <div ref={numberRef} className={styles.number}>
@@ -229,12 +298,18 @@ export default function StreakBurst({ count, power, title, engaged, subtitle, hu
             <span className={styles.numberPulse}>
               <span className={styles.numberShadow}>{count}</span>
               <span className={styles.numberFace}>{count}</span>
+              {realm === "nexus" ? (
+                <>
+                  <span className={`${styles.glitch} ${styles.glitchCyan}`}>{count}</span>
+                  <span className={`${styles.glitch} ${styles.glitchRed}`}>{count}</span>
+                </>
+              ) : null}
             </span>
           </span>
         </div>
         <div className={styles.label}>IN A ROW!</div>
         <div className={styles.plate}>
-          <div className={styles.plateInner}>
+          <div className={`${styles.plateInner} ${styles[`plate_${realm}`] ?? ""}`}>
             <span className={styles.plateTitle}>{title}</span>
             <span className={styles.plateWord}>{engaged}</span>
           </div>

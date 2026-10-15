@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, Braces, CircleDot, Crown, Dices, Divide, Equal, Hash, Hourglass, Cog, PieChart, Plus, Timer, TrendingUp, Scale, Ruler, Sigma, Star, Sparkles, X, Zap } from "lucide-react";
 import StreakBurst from "@/components/lesson/StreakBurst";
+import { streakStyleFor } from "@/components/lesson/ComboActivation";
 
 /**
  * The top-tier 10-combo celebration.
@@ -10,8 +10,8 @@ import StreakBurst from "@/components/lesson/StreakBurst";
  *   - Number Nexus: "NEXUS STATE — ACTIVATED" (teal energy grid + data scanline).
  *   - Measurelands: "LEGENDARY — EXPLORER" (golden clock-face bloom, sweeping
  *     clock hand, purple+brass particle storm, floating measurement glyphs).
- * Rendered by StreakBurst at full power: the finale adds confetti, an edge glow
- * and the biggest number slam.
+ * Rendered by StreakBurst at full power, in the realm's own scene: the finale
+ * adds realm-shaped confetti, an edge glow, the biggest slam and a fanfare.
  */
 
 type ActivationKey = { id: number; count: number };
@@ -201,12 +201,6 @@ const CHANCE_THEME: RealmTheme = {
   particleSplit: 0.55,
 };
 
-const MEASURE_GLYPHS = [Hourglass, Cog, Timer, Scale, Ruler];
-const STARPATH_GLYPHS = [Star, Sparkles];
-const PATTERN_GLYPHS = [Sigma, Braces, Equal];
-const CHANCE_GLYPHS = [Dices, CircleDot, Sparkles];
-const NUMBER_GLYPHS = [Zap, Hash, Plus, X, Divide, Crown];
-const DATA_GLYPHS = [BarChart3, PieChart, TrendingUp, Crown];
 const FINALE_SECONDS = 3.2;
 
 const CAVE_THEME={...NEXUS_THEME,title:'CRYSTAL RADIANCE'};
@@ -218,7 +212,6 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
   const t = cave && isStarpath ? {...STARPATH_THEME,title:"STAR CRYSTAL RADIANCE"} : cave && isMeasurement ? {...MEASURE_THEME,title:'AMBER RADIANCE'} : cave && (!realmId || realmId === "number") ? CAVE_THEME : isMeasurement ? MEASURE_THEME : isStarpath ? STARPATH_THEME : isStatistics ? STATISTICS_THEME : isPattern ? PATTERN_THEME : isChance ? CHANCE_THEME : NEXUS_THEME;
-  const glyphSet = isMeasurement ? MEASURE_GLYPHS : isPattern ? PATTERN_GLYPHS : isChance ? CHANCE_GLYPHS : isStarpath ? STARPATH_GLYPHS : isStatistics ? DATA_GLYPHS : NUMBER_GLYPHS;
   const prevRef = useRef(comboCount);
   const idRef = useRef(0);
   const [active, setActive] = useState<ActivationKey | null>(null);
@@ -247,10 +240,9 @@ export default function NexusActivation({ comboCount, realmId, cave=false }: { c
       title={t.title}
       engaged={t.engaged}
       subtitle={t.copy}
+      realm={streakStyleFor(realmId)}
       hues={t.particleHues}
       face={t.titleGradient}
-      glyphs={glyphSet}
-      heroImage={isChance ? "/images/chance-hollow-streak-wheel-dice.png" : undefined}
       duration={FINALE_SECONDS}
     />
   );

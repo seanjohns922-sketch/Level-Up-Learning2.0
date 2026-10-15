@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import ComboActivation from "@/components/lesson/ComboActivation";
+import { ComboCounter } from "@/components/lesson/ComboCounter";
+import { renderStreakSound, setStreakSoundsEnabled, type StreakStyle } from "@/lib/audio/streak-sfx";
 import NexusActivation from "@/components/lesson/NexusActivation";
 
 const REALMS = [
@@ -14,7 +16,7 @@ const REALMS = [
 ] as const;
 const STEPS = [3, 5, 8, 10];
 
-/** Review-only: fires the in-lesson streak moments for each realm. ?realm=space&n=8 fires on load. */
+/** Review-only: fires the in-lesson streak moments for each realm. ?realm=space&n=8 fires on load; &sound=1 turns streak sounds on. */
 export default function StreakReview() {
   const [realm, setRealm] = useState<string>("number");
   const [combo, setCombo] = useState(0);
@@ -25,6 +27,7 @@ export default function StreakReview() {
     const n = Number(params.get("n"));
     const realmTimer = setTimeout(() => {
       if (r) setRealm(r);
+      if (params.get("sound") === "1") setStreakSoundsEnabled(true);
     }, 0);
     const timer = setTimeout(() => {
       if (n) setCombo(n);
@@ -32,6 +35,25 @@ export default function StreakReview() {
     return () => {
       clearTimeout(realmTimer);
       clearTimeout(timer);
+    };
+  }, []);
+
+  // Exposed for review tooling: render a realm's sound offline and return its peak level.
+  useEffect(() => {
+    (window as unknown as { __renderStreak?: unknown }).__renderStreak = async (style: StreakStyle, power: number) => {
+      const buffer = await renderStreakSound(style, power);
+      const data = buffer.getChannelData(0);
+      const pcm = new Int16Array(data.length);
+      let peak = 0;
+      for (let i = 0; i < data.length; i += 1) {
+        const v = Math.max(-1, Math.min(1, data[i]!));
+        peak = Math.max(peak, Math.abs(v));
+        pcm[i] = v * 32767;
+      }
+      let binary = "";
+      const bytes = new Uint8Array(pcm.buffer);
+      for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]!);
+      return { peak, sampleRate: buffer.sampleRate, pcm: btoa(binary) };
     };
   }, []);
 
@@ -53,7 +75,7 @@ export default function StreakReview() {
           <button key={n} type="button" onClick={() => fire(n)} className="rounded-lg border border-white/20 px-3 py-2 text-sm font-bold">{n} in a row</button>
         ))}
       </div>
-      <div data-combo-counter className="fixed right-6 top-6 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center"><div className="text-[10px] font-black tracking-widest text-white/60">STREAK</div><div className="text-2xl font-black">{combo}</div></div>
+      <div className="fixed right-6 top-6 w-44"><ComboCounter count={combo} realmId={realm} /></div>
       {/* Stand-in lesson card so the overlay is judged over real-looking content */}
       <div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-8">
         <p className="text-sm font-bold text-white/60">Question 6 of 12</p>

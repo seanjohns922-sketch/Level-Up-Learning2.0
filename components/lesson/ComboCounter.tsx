@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Gem, BarChart3, Compass, Dices, Orbit, Sigma, Zap } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Gem, BarChart3, Compass, Dices, Orbit, Sigma, Volume2, VolumeX, Zap } from "lucide-react";
+import { setStreakSoundsEnabled, streakSoundsEnabled, subscribeStreakSounds } from "@/lib/audio/streak-sfx";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -321,6 +322,7 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
     }
   }, [count, TIER_CONFIG]);
 
+  const soundsOn = useSyncExternalStore(subscribeStreakSounds, streakSoundsEnabled, () => false);
   const activeTier = broken ? "cold" : getTier(count);
   const config = TIER_CONFIG[activeTier];
 
@@ -418,6 +420,18 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
             </span>
           )}
         </div>
+
+        {/* Streak sounds toggle: off by default, remembered on this device */}
+        <button
+          type="button"
+          onClick={() => setStreakSoundsEnabled(!soundsOn)}
+          aria-pressed={soundsOn}
+          aria-label={soundsOn ? "Turn streak sounds off" : "Turn streak sounds on"}
+          title={soundsOn ? "Streak sounds on" : "Streak sounds off"}
+          className="absolute bottom-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center rounded-lg text-white/55 transition hover:bg-white/10 hover:text-white"
+        >
+          {soundsOn ? <Volume2 className="h-4 w-4" aria-hidden /> : <VolumeX className="h-4 w-4" aria-hidden />}
+        </button>
 
         {/* Big counter number */}
         <div

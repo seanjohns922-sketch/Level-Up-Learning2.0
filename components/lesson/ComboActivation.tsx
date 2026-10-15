@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BarChart3, Braces, CircleDot, Dices, Divide, Equal, Hash, Hourglass, Cog, PieChart, Plus, Timer, TrendingUp, Scale, Ruler, Sigma, Star, Sparkles, Orbit, X, Zap } from "lucide-react";
-import StreakBurst, { type StreakGlyph as GlyphIcon } from "@/components/lesson/StreakBurst";
+import type { ComponentType } from "react";
+import { Braces, CircleDot, Dices, Equal, Hourglass, Cog, Timer, Scale, Ruler, Sigma, Star, Sparkles, Orbit } from "lucide-react";
+import StreakBurst, { type StreakStyle } from "@/components/lesson/StreakBurst";
+
+type GlyphIcon = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
 /**
  * Full-screen activation burst for the mid-streak tiers (5 and 8).
@@ -11,12 +14,21 @@ import StreakBurst, { type StreakGlyph as GlyphIcon } from "@/components/lesson/
  *   - Measurelands: BREAKTHROUGH (5, brass) / MASTER EXPLORER (8, purple+brass)
  *     — magical measurement bursts with floating hourglass/ruler glyphs.
  * NexusActivation handles 10-combo (Nexus State / Legendary) separately.
- * The celebration itself is StreakBurst; these configs supply each realm's
- * titles, colours and glyphs. Mid tiers scale up to the 10-streak finale.
+ * The celebration itself is StreakBurst, which draws each realm's own scene
+ * and plays its sound; these configs supply the titles and colours.
  */
 
-const NUMBER_GLYPHS: GlyphIcon[] = [Zap, Hash, Plus, X, Divide];
-const DATA_GLYPHS: GlyphIcon[] = [BarChart3, PieChart, TrendingUp];
+/** Which realm scene and sound a lesson's realm uses. */
+export function streakStyleFor(realmId?: string): StreakStyle {
+  switch (realmId) {
+    case "measurement": return "measure";
+    case "space": return "star";
+    case "pattern": return "pattern";
+    case "statistics": return "data";
+    case "chance": return "chance";
+    default: return "nexus";
+  }
+}
 
 type TierConfig = {
   threshold: number;
@@ -55,7 +67,6 @@ const NEXUS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 20px rgba(253,224,71,0.95)) drop-shadow(0 0 42px rgba(202,138,4,0.7))",
     accentColor: "rgba(253,224,71,0.92)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(253,224,71,0.9), rgba(202,138,4,0.7), transparent)",
-    glyphs: NUMBER_GLYPHS,
   },
   {
     threshold: 8,
@@ -73,7 +84,6 @@ const NEXUS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 22px rgba(251,146,60,0.95)) drop-shadow(0 0 46px rgba(194,65,12,0.72))",
     accentColor: "rgba(253,186,116,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(251,146,60,0.9), rgba(194,65,12,0.7), transparent)",
-    glyphs: NUMBER_GLYPHS,
   },
 ];
 
@@ -192,7 +202,6 @@ const STATISTICS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 20px rgba(242,188,69,0.9)) drop-shadow(0 0 42px rgba(143,191,127,0.65))",
     accentColor: "rgba(255,224,150,0.95)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(242,188,69,0.9), rgba(143,191,127,0.7), transparent)",
-    glyphs: DATA_GLYPHS,
   },
   {
     threshold: 8,
@@ -210,7 +219,6 @@ const STATISTICS_TIERS: TierConfig[] = [
     titleFilter: "drop-shadow(0 0 22px rgba(240,107,100,0.92)) drop-shadow(0 0 46px rgba(242,188,69,0.68))",
     accentColor: "rgba(255,189,182,0.96)",
     dividerGradient: "linear-gradient(90deg, transparent, rgba(240,107,100,0.9), rgba(242,188,69,0.7), transparent)",
-    glyphs: DATA_GLYPHS,
   },
 ];
 
@@ -339,10 +347,9 @@ export default function ComboActivation({ comboCount, realmId, cave=false }: { c
       power={powerFor(tier.threshold)}
       title={tier.title}
       engaged={tier.engaged}
+      realm={streakStyleFor(realmId)}
       hues={tier.hues}
       face={tier.titleGradient}
-      glyphs={tier.glyphs}
-      heroImage={isChance ? "/images/chance-hollow-streak-wheel-dice.png" : undefined}
       duration={durationFor(tier.threshold)}
     />
   );
