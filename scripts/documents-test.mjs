@@ -157,7 +157,10 @@ for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexu
   const number = report.realms.find((realm) => realm.realmId === "number");
   assert.ok(number.lessonAccuracy && number.weeks.length === 2 && number.weeks[1].current);
   assert.ok(number.focus && number.focus.action.includes("ask Ryan to solve"));
-  const html = strandReportHtml({ student: "Ryan Heard", className: "3/4J", schoolName: "Cobram Primary School", yearLevel: "Year 3", ...report });
+  const cobramLogo = { src: `file://${process.cwd()}/public/schools/cobram-primary-logo.png`, alt: "Cobram Primary School logo" };
+  const html = strandReportHtml({ student: "Ryan Heard", className: "3/4J", schoolName: "Cobram Primary School", schoolLogo: cobramLogo, yearLevel: "Year 3", ...report });
+  // The school's logo sits in the letterhead of every page.
+  assert.equal(html.split(cobramLogo.src).length - 1, pages(html));
   // Overview, one page per realm, and a continuation page for the realm with eight weeks of results.
   assert.equal(pages(html), 6);
   assert.ok(html.includes("Strand report") && html.includes("Not started yet") && html.includes("Try this:"));
