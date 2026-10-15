@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { runPlatformOwnerCommand } from "@/lib/platform-admin-server";
+import { PlatformOwnerAccessError, runPlatformOwnerCommand } from "@/lib/platform-admin-server";
 import { sendSchoolAdminAccessEmail, sendSchoolAdminInviteEmail } from "@/lib/school-admin-invite-email";
 
 function text(value: unknown) { return typeof value === "string" ? value.trim() : ""; }
@@ -139,6 +139,8 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: "Unknown Platform Admin command" }, { status: 400 });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Platform Admin command failed" }, { status: 403 });
+    // Only a failed owner check is a 403; anything else (for example a seat limit below seats in use) is a rejected request.
+    const status = error instanceof PlatformOwnerAccessError ? 403 : 400;
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Platform Admin command failed" }, { status });
   }
 }

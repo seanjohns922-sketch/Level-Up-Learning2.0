@@ -160,3 +160,19 @@
   font-family: var(--font-display);
   font-weight: 900;
 }
+
+/* Platform owner console: aqua is the owner-only accent in place of lime.
+ * 600/700 are aqua ink for text on white (#0E7C86, 5:1); 800+ stay Carbon. */
+.reliq-adult.admin-console {
+  --color-emerald-50: #e8fbfb;
+  --color-emerald-100: #cdf6f5;
+  --color-emerald-200: #9debe8;
+  --color-emerald-300: #2ee6e0;
+  --color-emerald-400: #22c9c4;
+  --color-emerald-500: #14a8a4;
+  --color-emerald-600: #0e7c86;
+  --color-emerald-700: #0e7c86;
+  --color-emerald-800: #121314;
+  --color-emerald-900: #121314;
+  --color-emerald-950: #121314;
+}

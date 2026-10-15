@@ -3,6 +3,7 @@
 import { Building2, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { schoolAdminInviteMailto } from "@/lib/admin/school-admin-invite";
 import type { PlatformSchoolSummary } from "@/lib/platform-admin-server";
 
 type Filter = "current" | "active" | "trial" | "paused" | "archived";
@@ -22,11 +23,10 @@ type CreationResult = {
 };
 
 function statusClass(status: string) {
-  if (status === "active") return "bg-emerald-100 text-emerald-800";
-  if (status === "trial") return "bg-sky-100 text-sky-800";
-  if (status === "paused") return "bg-amber-100 text-amber-800";
-  if (status === "archived") return "bg-slate-200 text-slate-700";
-  return "bg-slate-100 text-slate-700";
+  if (status === "active") return "bg-[#EEF9D9] text-[#3D6600]";
+  if (status === "trial") return "bg-[#E8FBFB] text-[#0E7C86]";
+  if (status === "paused") return "bg-[#FFF1C7] text-[#8A5A00]";
+  return "bg-[#F1F2EE] text-[#5A5E63]";
 }
 
 function formatDate(value: string | null) {
@@ -37,26 +37,6 @@ function formatDate(value: string | null) {
     : new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
-function schoolAdminInviteMailto(email: string | null, schoolName: string, schoolCode: string) {
-  if (!email) return "#";
-  const loginUrl = typeof window === "undefined" ? "/login" : `${window.location.origin}/login`;
-  const subject = `RELIQ school admin access for ${schoolName}`;
-  const body = [
-    `Hi,`,
-    ``,
-    `Your RELIQ school administrator access is ready for ${schoolName}.`,
-    ``,
-    `Go to: ${loginUrl}`,
-    `Choose: Activate Invite`,
-    `Email: ${email}`,
-    `School Code: ${schoolCode}`,
-    ``,
-    `If this is your first time using RELIQ, create your own password on that screen. The School Code is only used to connect your invited email to the school.`,
-    ``,
-    `After activation, use Log In with the same email and password.`,
-  ].join("\n");
-  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
 
 export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoolSummary[] }) {
   const [query, setQuery] = useState("");
@@ -146,14 +126,14 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
             ["current", "All Current"], ["active", "Active"], ["trial", "Trial"],
             ["paused", "Paused"], ["archived", "Archived"],
           ] as Array<[Filter, string]>).map(([value, label]) => (
-            <button key={value} type="button" onClick={() => setFilter(value)} className={`rounded-md border px-3 py-2 text-xs font-bold ${filter === value ? "border-emerald-700 bg-emerald-700 text-white" : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"}`}>
+            <button key={value} type="button" onClick={() => setFilter(value)} className={`rounded-full border-2 px-3.5 py-1.5 text-xs font-bold ${filter === value ? "border-[#121314] bg-[#121314] text-white" : "border-[#121314] bg-white text-[#121314] hover:bg-[#E8FBFB]"}`}>
               {label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1180px] border-collapse text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-[0.1em] text-slate-500">
@@ -165,7 +145,7 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
               {filtered.map((school) => (
                 <tr key={school.id} className="hover:bg-emerald-50/40">
                   <td className="px-4 py-4"><Link href={`/admin/schools/${school.id}`} className="font-bold text-slate-950 hover:text-emerald-800">{school.name}</Link><p className="mt-1 text-xs text-slate-400">{school.code}</p>{school.attention.length ? <div className="mt-2 flex flex-wrap gap-1">{school.attention.map((item) => <span key={item} className="rounded-sm bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">{item}</span>)}</div> : null}</td>
-                  <td className="px-4 py-4"><span className={`rounded-md px-2.5 py-1 text-xs font-bold capitalize ${statusClass(school.status)}`}>{school.status}</span></td>
+                  <td className="px-4 py-4"><span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wide ${statusClass(school.status)}`}>{school.status}</span></td>
                   <td className="px-4 py-4 tabular-nums">{school.students}</td>
                   <td className="px-4 py-4 font-semibold tabular-nums">{school.seatLimit}</td>
                   <td className="px-4 py-4 tabular-nums">{school.available}</td>
@@ -179,7 +159,7 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
         {filtered.length === 0 ? <div className="px-6 py-16 text-center"><Building2 className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 text-sm text-slate-500">No schools match this view.</p></div> : null}
       </div>
 
-      <button type="button" onClick={() => setCreating(true)} className="fixed bottom-6 right-6 flex h-12 items-center gap-2 rounded-md bg-emerald-700 px-5 text-sm font-bold text-white shadow-lg hover:bg-emerald-800">
+      <button type="button" onClick={() => setCreating(true)} className="fixed bottom-6 right-6 flex h-12 items-center gap-2 rounded-full bg-[#2EE6E0] px-5 text-sm font-black text-[#121314] shadow-lg hover:bg-[#22C9C4]">
         <Plus className="h-5 w-5" aria-hidden="true" /> Create school
       </button>
 
@@ -220,9 +200,9 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
                 </div>
                 {created.similarSchools.length ? <p className="mt-4 text-sm text-amber-800">Review recommended: a similarly named school already exists.</p> : null}
                 <div className="mt-6 flex flex-wrap justify-end gap-3">
-                  <button type="button" onClick={() => { setCreated(null); setError(null); }} className="rounded-md border border-slate-300 px-4 py-2.5 text-sm font-bold">Create another</button>
-                  <button type="button" onClick={() => { setCreating(false); setCreated(null); window.location.reload(); }} className="rounded-md border border-slate-300 px-4 py-2.5 text-sm font-bold">Return to schools</button>
-                  <Link href={`/admin/schools/${created.schoolId}`} className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white">Open school</Link>
+                  <button type="button" onClick={() => { setCreated(null); setError(null); }} className="rounded-full border-2 border-[#121314] px-4 py-2.5 text-sm font-bold">Create another</button>
+                  <button type="button" onClick={() => { setCreating(false); setCreated(null); window.location.reload(); }} className="rounded-full border-2 border-[#121314] px-4 py-2.5 text-sm font-bold">Return to schools</button>
+                  <Link href={`/admin/schools/${created.schoolId}`} className="rounded-full bg-[#121314] px-4 py-2.5 text-sm font-bold text-white">Open school</Link>
                 </div>
               </div>
             ) : <form action={createSchool} className="grid max-h-[75vh] gap-5 overflow-y-auto p-6 sm:grid-cols-2">
@@ -239,7 +219,7 @@ export default function SchoolsAdminClient({ schools }: { schools: PlatformSchoo
               <label className="text-sm font-semibold sm:col-span-2">Initial school administrator email <span className="font-normal text-slate-500">(optional)</span><input name="initialAdminEmail" type="email" className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" /><span className="mt-1 block text-xs font-normal text-slate-500">We will create an invitation or link an existing account. Passwords are never created here.</span></label>
               <label className="text-sm font-semibold sm:col-span-2">Internal notes<textarea name="notes" rows={3} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" /></label>
               {error ? <p className="sm:col-span-2 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p> : null}
-              <div className="flex justify-end gap-3 sm:col-span-2"><button type="button" onClick={() => setCreating(false)} className="rounded-md border border-slate-300 px-4 py-2.5 text-sm font-bold">Cancel</button><button disabled={submitting} className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{submitting ? "Creating…" : "Create school"}</button></div>
+              <div className="flex justify-end gap-3 sm:col-span-2"><button type="button" onClick={() => setCreating(false)} className="rounded-full border-2 border-[#121314] px-4 py-2.5 text-sm font-bold">Cancel</button><button disabled={submitting} className="rounded-full bg-[#121314] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{submitting ? "Creating…" : "Create school"}</button></div>
             </form>}
           </div>
         </div>

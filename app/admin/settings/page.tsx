@@ -7,17 +7,17 @@ export default function PlatformAdminSettingsPage() {
       <AdminPageHeading
         eyebrow="Settings"
         title="Platform administration"
-        detail="PA1 keeps owner access, identity, entitlements and billing classifications deliberately separate."
+        detail="Owner access, student identity, school entitlements and billing classifications are kept deliberately separate."
       />
-      <section className="border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex items-start gap-4">
-          <div className="rounded-md bg-emerald-100 p-3 text-emerald-800">
+          <div className="rounded-xl bg-[#121314] p-3 text-[#2EE6E0]">
             <ShieldCheck className="h-6 w-6" aria-hidden="true" />
           </div>
           <div>
             <h2 className="text-lg font-bold">Platform Owner security</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Owner access is read from the protected canonical platform role. Role assignment is not editable in PA1 and cannot be derived from email, browser storage, URLs or school membership.
+              Owner access comes from the protected platform role in the database. It cannot be granted from this console, and it is never inferred from an email address, browser storage, a link or a school membership.
             </p>
           </div>
         </div>

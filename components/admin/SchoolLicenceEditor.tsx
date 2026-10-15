@@ -27,7 +27,7 @@ export default function SchoolLicenceEditor({ detail }: { detail: PlatformSchool
   }
 
   if (!editing) {
-    return <button type="button" onClick={() => setEditing(true)} className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">Edit access</button>;
+    return <button type="button" onClick={() => setEditing(true)} className="rounded-full bg-[#121314] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#121314]">Edit access</button>;
   }
 
   return (
@@ -39,7 +39,7 @@ export default function SchoolLicenceEditor({ detail }: { detail: PlatformSchool
       <label className="text-sm font-semibold">Reason for change<input name="reason" className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 font-normal" placeholder="Recorded in audit history" /></label>
       <label className="text-sm font-semibold sm:col-span-2">Internal notes<textarea name="notes" rows={3} defaultValue={detail.licence.notes ?? ""} className="mt-2 w-full rounded-md border border-slate-300 p-3 font-normal" /></label>
       {error ? <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 sm:col-span-2">{error}</p> : null}
-      <div className="flex justify-end gap-3 sm:col-span-2"><button type="button" onClick={() => setEditing(false)} className="rounded-md border border-slate-300 px-4 py-2.5 text-sm font-bold">Cancel</button><button disabled={saving} className="rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{saving ? "Saving…" : "Save access"}</button></div>
+      <div className="flex justify-end gap-3 sm:col-span-2"><button type="button" onClick={() => setEditing(false)} className="rounded-full border-2 border-[#121314] px-4 py-2.5 text-sm font-bold">Cancel</button><button disabled={saving} className="rounded-full bg-[#121314] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{saving ? "Saving…" : "Save access"}</button></div>
     </form>
   );
 }

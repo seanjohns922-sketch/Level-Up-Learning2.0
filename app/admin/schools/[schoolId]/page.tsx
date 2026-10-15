@@ -49,7 +49,7 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
       </section>
 
       <section className="mt-7 grid gap-6 xl:grid-cols-[1.2fr_1fr]">
-        <div className="border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Access</p><h2 className="mt-2 text-xl font-bold">School licence entitlement</h2></div>
             {!archived ? <SchoolLicenceEditor detail={detail} /> : null}
@@ -66,13 +66,13 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
           <dl className="mt-6 grid gap-4 border-t border-slate-200 pt-5 text-sm sm:grid-cols-3"><div><dt className="text-slate-500">Status</dt><dd className="mt-1 font-bold capitalize">{detail.licence.status}</dd></div><div><dt className="text-slate-500">Starts</dt><dd className="mt-1 font-bold">{detail.licence.startDate}</dd></div><div><dt className="text-slate-500">Ends</dt><dd className="mt-1 font-bold">{detail.licence.endDate}</dd></div></dl>
         </div>
 
-        <div className="border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Home</p><h2 className="mt-2 text-xl font-bold">School → Home activation</h2>
           <div className="mt-5 space-y-3"><div className="flex justify-between bg-sky-50 p-4"><span className="font-semibold">School only</span><strong>{detail.home.schoolOnly}</strong></div><div className="flex justify-between bg-amber-50 p-4"><span className="font-semibold">Parent linked / no home</span><strong>{detail.home.parentLinkedNoHome}</strong></div><div className="flex justify-between bg-emerald-50 p-4"><span className="font-semibold">School + Home</span><strong>{detail.home.schoolAndHome}</strong></div><div className="flex justify-between bg-violet-50 p-4"><span className="font-semibold">Free home access</span><strong>{detail.home.freeHomeAccess}</strong></div></div>
         </div>
       </section>
 
-      <section className="mt-7 border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Platform use includes student sessions and submitted work. Work totals include completed lessons, quizzes and assessments.</p></div></div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
           {[
@@ -108,7 +108,7 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
 
       <div className="mt-7"><SchoolLifecycleManager detail={detail} /></div>
 
-      <section className="mt-7 border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-xl font-bold">Lifecycle audit history</h2>
         <div className="mt-5 divide-y divide-slate-100 border border-slate-200">
           {detail.audit.map((entry) => <div key={entry.id} className="grid gap-1 p-4 text-sm sm:grid-cols-[1fr_auto]"><div><p className="font-bold">{entry.action.replaceAll("_", " ")}</p>{entry.reason ? <p className="mt-1 text-slate-500">{entry.reason}</p> : null}</div><time className="text-slate-500">{formatDate(entry.createdAt)}</time></div>)}

@@ -61,7 +61,7 @@ export default async function PlatformHomeUsersPage() {
         </p>
       </section>
 
-      <section className="mt-6 overflow-hidden border border-slate-200 bg-white shadow-sm">
+      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div>
             <h2 className="font-bold text-slate-950">Active Home access contacts</h2>

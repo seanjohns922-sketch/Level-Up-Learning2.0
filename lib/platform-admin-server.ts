@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { verifyAdultAccessToken } from "@/lib/school-platform-server";
 
 const SUPABASE_URL =
@@ -300,11 +301,12 @@ export async function verifyPlatformOwnerToken(accessToken: string) {
   }
 }
 
-export async function requirePlatformOwner() {
+/** Verified once per request: the admin layout and the page's loader share the result. */
+export const requirePlatformOwner = cache(async () => {
   const accessToken = await getAdminToken();
   const access = await verifyPlatformOwnerToken(accessToken);
   return access ? { ...access, accessToken } : null;
-}
+});
 
 export async function loadPlatformOverview() {
   const access = await requirePlatformOwner();
@@ -422,11 +424,18 @@ export async function loadPlatformIdentityCentre() {
   return { access, snapshot };
 }
 
+/** Thrown when the caller is not the platform owner, so routes can answer 403 rather than 400. */
+export class PlatformOwnerAccessError extends Error {
+  constructor() {
+    super("Platform owner access required");
+  }
+}
+
 export async function runPlatformOwnerCommand<T>(
   rpc: string,
   body: Record<string, unknown>,
 ) {
   const access = await requirePlatformOwner();
-  if (!access) throw new Error("Platform owner access required");
+  if (!access) throw new PlatformOwnerAccessError();
   return adminRequest<T>(rpc, access.accessToken, body);
 }
