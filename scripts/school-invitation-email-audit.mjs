@@ -12,8 +12,10 @@ assert.match(route, /case "inviteStaff"[\s\S]*sendSchoolStaffInviteEmail/);
 assert.match(route, /case "resendInvitation"[\s\S]*getSchoolInviteEmailContext[\s\S]*sendSchoolStaffInviteEmail/);
 assert.match(route, /emailDelivery/);
 assert.match(email, /RESEND_API_KEY/);
-assert.match(email, /Choose <strong>Activate Invite<\/strong>/);
-assert.match(email, /School Code: \$\{schoolCode\}/);
+assert.match(email, /choose <strong>Activate Invite<\/strong>/i);
+assert.match(email, /School code: \$\{schoolCode\}/i);
+// Every email sends as "RELIQ", whatever display name EMAIL_FROM carries.
+assert.match(email, /return `RELIQ <\$\{address\}>`/);
 assert.match(server, /school_invitations[\s\S]*status=eq\.pending[\s\S]*select=email,role/);
 assert.match(schoolHome, /Staff invitation created and emailed/);
 assert.match(schoolHome, /Invitation email resent/);
