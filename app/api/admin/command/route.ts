@@ -5,6 +5,8 @@ import { sendSchoolAdminAccessEmail, sendSchoolAdminInviteEmail } from "@/lib/sc
 function text(value: unknown) { return typeof value === "string" ? value.trim() : ""; }
 function number(value: unknown) { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : 0; }
 function baseUrl(request: Request) { return new URL(request.url).origin; }
+/** Blank means "not set" (null), unlike number() which treats blank as 0. */
+function optionalNumber(value: unknown) { if (value === null || value === undefined || String(value).trim() === "") return null; const parsed = Number(value); return Number.isFinite(parsed) ? parsed : null; }
 
 export async function POST(request: Request) {
   let payload: Record<string, unknown>;
@@ -47,6 +49,26 @@ export async function POST(request: Request) {
         p_seat_limit: number(payload.seatLimit),
         p_start_date: text(payload.startDate), p_end_date: text(payload.endDate),
         p_billing_status: text(payload.billingStatus) || "free", p_notes: text(payload.notes) || null,
+        p_reason: text(payload.reason) || null,
+      });
+      return NextResponse.json({ licence });
+    }
+    if (payload.action === "renewLicence") {
+      const licence = await runPlatformOwnerCommand<Record<string, unknown>>("platform_owner_renew_school_licence", {
+        p_school_id: text(payload.schoolId), p_calendar_year: number(payload.calendarYear),
+        p_seat_limit: number(payload.seatLimit), p_status: text(payload.status) || "active",
+        p_start_date: text(payload.startDate), p_end_date: text(payload.endDate),
+        p_billing_status: text(payload.billingStatus) || "paid",
+        p_price_per_seat: optionalNumber(payload.pricePerSeat), p_contract_value: optionalNumber(payload.contractValue),
+        p_notes: text(payload.notes) || null, p_reason: text(payload.reason) || null,
+        p_idempotency_key: text(payload.idempotencyKey) || crypto.randomUUID(),
+      });
+      return NextResponse.json({ licence });
+    }
+    if (payload.action === "updatePricing") {
+      const licence = await runPlatformOwnerCommand<Record<string, unknown>>("platform_owner_update_licence_pricing", {
+        p_school_id: text(payload.schoolId), p_academic_year_id: text(payload.academicYearId),
+        p_price_per_seat: optionalNumber(payload.pricePerSeat), p_contract_value: optionalNumber(payload.contractValue),
         p_reason: text(payload.reason) || null,
       });
       return NextResponse.json({ licence });

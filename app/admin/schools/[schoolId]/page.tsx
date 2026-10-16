@@ -4,8 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminPageHeading, Metric } from "@/components/admin/AdminPrimitives";
 import SchoolLicenceEditor from "@/components/admin/SchoolLicenceEditor";
+import SchoolLicencesPanel from "@/components/admin/SchoolLicencesPanel";
 import SchoolLifecycleManager from "@/components/admin/SchoolLifecycleManager";
-import { loadPlatformSchoolDetail } from "@/lib/platform-admin-server";
+import { loadPlatformSchoolDetail, loadPlatformSchoolLicences } from "@/lib/platform-admin-server";
 import { getSchoolLogo } from "@/lib/school-logos";
 
 function formatDate(value: string | null) {
@@ -19,7 +20,10 @@ function formatDate(value: string | null) {
 
 export default async function PlatformSchoolDetailPage({ params }: { params: Promise<{ schoolId: string }> }) {
   const { schoolId } = await params;
-  const data = await loadPlatformSchoolDetail(schoolId).catch(() => null);
+  const [data, licences] = await Promise.all([
+    loadPlatformSchoolDetail(schoolId).catch(() => null),
+    loadPlatformSchoolLicences(schoolId),
+  ]);
   if (!data) notFound();
   const { detail } = data;
   const archived = detail.school.status === "archived";
@@ -71,6 +75,8 @@ export default async function PlatformSchoolDetailPage({ params }: { params: Pro
           <div className="mt-5 space-y-3"><div className="flex justify-between bg-sky-50 p-4"><span className="font-semibold">School only</span><strong>{detail.home.schoolOnly}</strong></div><div className="flex justify-between bg-amber-50 p-4"><span className="font-semibold">Parent linked / no home</span><strong>{detail.home.parentLinkedNoHome}</strong></div><div className="flex justify-between bg-emerald-50 p-4"><span className="font-semibold">School + Home</span><strong>{detail.home.schoolAndHome}</strong></div><div className="flex justify-between bg-violet-50 p-4"><span className="font-semibold">Free home access</span><strong>{detail.home.freeHomeAccess}</strong></div></div>
         </div>
       </section>
+
+      <div className="mt-7"><SchoolLicencesPanel schoolId={detail.school.id} schoolName={detail.school.name} archived={archived} licences={licences} /></div>
 
       <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-3"><Activity className="h-5 w-5 text-emerald-700" /><div><h2 className="text-xl font-bold">Activity</h2><p className="text-sm text-slate-500">Platform use includes student sessions and submitted work. Work totals include completed lessons, quizzes and assessments.</p></div></div>

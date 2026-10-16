@@ -403,6 +403,34 @@ export async function loadPlatformSchoolDetail(schoolId: string) {
   return { access, detail };
 }
 
+export type PlatformSchoolLicence = {
+  licenceId: string;
+  academicYearId: string;
+  academicYear: string;
+  calendarYear: number;
+  status: string;
+  seatLimit: number;
+  used: number;
+  startDate: string;
+  endDate: string;
+  billingStatus: string;
+  pricePerSeat: number | null;
+  contractValue: number | null;
+  notes: string | null;
+};
+
+/** Every licence a school holds, newest year first. Null when the licence-renewal database update is not applied yet. */
+export async function loadPlatformSchoolLicences(schoolId: string): Promise<PlatformSchoolLicence[] | null> {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  try {
+    return await adminRequest<PlatformSchoolLicence[]>("get_platform_admin_school_licences", access.accessToken, { p_school_id: schoolId });
+  } catch (error) {
+    console.error("[platform-admin] school licences unavailable", error);
+    return null;
+  }
+}
+
 export async function loadPlatformAudit() {
   const access = await requirePlatformOwner();
   if (!access) return null;

@@ -3,6 +3,7 @@
 import { Activity, Building2, GraduationCap, ShieldAlert, Users } from "lucide-react";
 import PlatformAdminShell from "@/components/admin/PlatformAdminShell";
 import { AdminPageHeading, Metric } from "@/components/admin/AdminPrimitives";
+import SchoolLicencesPanel from "@/components/admin/SchoolLicencesPanel";
 import SchoolsAdminClient from "@/components/admin/SchoolsAdminClient";
 import type { PlatformSchoolSummary } from "@/lib/platform-admin-server";
 
@@ -31,6 +32,12 @@ export default function AdminConsoleReview() {
         <Metric label="Seats used" value="236/719" detail="33% of school seats" icon={ShieldAlert} />
         <Metric label="Active this week" value={7} detail="Submitted work in 7 days · +2 on last week" icon={Activity} />
       </section>
+      <div className="mt-8">
+        <SchoolLicencesPanel schoolId="1" schoolName="Cobram Primary School" archived={false} licences={[
+          { licenceId: "l27", academicYearId: "y27", academicYear: "2027", calendarYear: 2027, status: "active", seatLimit: 350, used: 0, startDate: "2026-12-01", endDate: "2027-12-31", billingStatus: "paid", pricePerSeat: 18, contractValue: 6300, notes: null },
+          { licenceId: "l26", academicYearId: "y26", academicYear: "2026", calendarYear: 2026, status: "active", seatLimit: 350, used: 70, startDate: "2026-01-01", endDate: "2026-12-31", billingStatus: "free", pricePerSeat: null, contractValue: null, notes: null },
+        ]} />
+      </div>
       <div className="mt-8">
         <SchoolsAdminClient schools={SCHOOLS} />
       </div>
