@@ -169,7 +169,7 @@ export default function ClassGroupsPanel({
             </div>
           </fieldset>
           <div className="flex flex-wrap gap-2">
-            <button type="submit" disabled={busy || draft.classIds.length < 2 || !draft.name.trim()} className="h-11 rounded-lg bg-[var(--reliq-lime,#B9F23F)] px-4 text-sm font-bold text-[#121314] disabled:opacity-50">
+            <button type="submit" disabled={busy || draft.classIds.length < 2 || !draft.name.trim()} className="h-11 rounded-lg bg-[var(--reliq-lime,#83E300)] px-4 text-sm font-bold text-[#121314] disabled:opacity-50">
               {busy ? "Saving…" : "Save group"}
             </button>
             <button type="button" onClick={() => { setDraft(null); setError(""); }} className="h-11 rounded-lg px-4 text-sm font-bold text-slate-600 hover:bg-slate-50">Cancel</button>

@@ -312,10 +312,10 @@ export default function CurriculumExplorer({
                     ? "border-[#121314] bg-[#121314] text-white"
                     : soon
                       ? "border-[#EEF0EC] bg-[#F7F8F5] text-[#A3A7A1] cursor-not-allowed"
-                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEF9D9]",
+                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEFBDB]",
                 ].join(" ")}
               >
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CFD2CC" : active ? "#B9F23F" : accent }} />
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#CFD2CC" : active ? "#83E300" : accent }} />
                 {STRAND_SHORT[g.id] ?? g.strand}
                 {soon ? (
                   <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#8A8E89]">soon</span>
@@ -330,12 +330,12 @@ export default function CurriculumExplorer({
       {/* Documents: schedule, curriculum and scope and sequence */}
       <div className="flex flex-wrap items-center gap-2.5 rounded-2xl bg-[#121314] px-5 py-3">
         <div className="mr-auto">
-          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#B9F23F] [font-family:var(--font-display)]">Plan and print</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#83E300] [font-family:var(--font-display)]">Plan and print</div>
           <div className="text-[13px] font-semibold text-white/70">{genre?.realm ?? "This realm"} · {yearLabel.replace("Year", "Level").replace("Prep", "Ground")}</div>
         </div>
           <button
             onClick={handleDownloadCsv}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-white/70 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#B9F23F] hover:text-[#B9F23F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F]"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-white/70 px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#83E300] hover:text-[#83E300] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#83E300]"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
@@ -347,7 +347,7 @@ export default function CurriculumExplorer({
               aria-label="Curriculum for the scope and sequence"
               value={activeFramework}
               onChange={(event) => chooseFramework(event.target.value as CurriculumFramework)}
-              className="shrink-0 cursor-pointer rounded-full border-2 border-white/70 bg-[#121314] px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#B9F23F] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#B9F23F]"
+              className="shrink-0 cursor-pointer rounded-full border-2 border-white/70 bg-[#121314] px-3.5 py-1.5 text-[12px] font-bold text-white transition hover:border-[#83E300] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#83E300]"
             >
               {(Object.keys(FRAMEWORKS) as CurriculumFramework[]).map((key) => (
                 <option key={key} value={key} disabled={!frameworkAvailable(key, yearLabel, genreId)}>
@@ -359,7 +359,7 @@ export default function CurriculumExplorer({
           {MATHS_STRAND_IDS.includes(genreId) && plan.length > 0 ? (
             <button
               onClick={handleScopePdf}
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#B9F23F] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#121314] transition hover:bg-[#A6E22A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white [font-family:var(--font-display)]"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#83E300] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#121314] transition hover:bg-[#74CC00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white [font-family:var(--font-display)]"
             >
               Scope and sequence PDF
             </button>
@@ -388,7 +388,7 @@ export default function CurriculumExplorer({
                       : "border-[#E3E5E0] bg-white hover:border-[#121314]",
                   ].join(" ")}
                 >
-                  <div className={`text-[11px] font-black uppercase tracking-wider [font-family:var(--font-display)] ${active ? "text-[#B9F23F]" : "text-[#5A5E63]"}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider [font-family:var(--font-display)] ${active ? "text-[#83E300]" : "text-[#5A5E63]"}`}>
                     Week {w.week}
                   </div>
                   <div className={`text-[12px] font-bold line-clamp-2 leading-snug mt-0.5 ${active ? "text-white" : "text-[#121314]"}`}>
@@ -445,7 +445,7 @@ export default function CurriculumExplorer({
                   {genre?.strand} · {genre?.realm}
                 </div>
                 <h2 className="mt-2 text-2xl font-black uppercase leading-tight tracking-tight text-[#121314] [font-family:var(--font-display)]">
-                  <span className="mr-2 inline-block bg-[#B9F23F] px-2 py-0.5">Week {week?.week}</span>
+                  <span className="mr-2 inline-block bg-[#83E300] px-2 py-0.5">Week {week?.week}</span>
                   {week?.topic}
                 </h2>
                 <div className="text-xs font-semibold text-[#5A5E63] mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -467,7 +467,7 @@ export default function CurriculumExplorer({
               <button
                 disabled
                 title="Coming soon: assign this whole week to your class or selected students"
-                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#B9F23F] opacity-40 [font-family:var(--font-display)]"
+                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#83E300] opacity-40 [font-family:var(--font-display)]"
               >
                 Assign Week
               </button>
@@ -492,7 +492,7 @@ export default function CurriculumExplorer({
                   title="Click to preview lesson content"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#121314] text-xs font-black text-[#B9F23F] [font-family:var(--font-display)]">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#121314] text-xs font-black text-[#83E300] [font-family:var(--font-display)]">
                       L{lsn.lesson}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[#121314] px-2 py-0.5 text-[10px] font-extrabold text-[#121314]">
@@ -526,7 +526,7 @@ export default function CurriculumExplorer({
                     </span>
                   </div>
 
-                  <span className="mt-auto w-full rounded-full border-2 border-[#121314] px-3 py-2 text-center text-[11px] font-black uppercase tracking-wide text-[#121314] transition group-hover:bg-[#B9F23F] [font-family:var(--font-display)]">
+                  <span className="mt-auto w-full rounded-full border-2 border-[#121314] px-3 py-2 text-center text-[11px] font-black uppercase tracking-wide text-[#121314] transition group-hover:bg-[#83E300] [font-family:var(--font-display)]">
                     Preview lesson →
                   </span>
                 </button>
@@ -573,7 +573,7 @@ export default function CurriculumExplorer({
               })()}
               <button
                 disabled
-                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#B9F23F] opacity-40 [font-family:var(--font-display)]"
+                className="cursor-not-allowed rounded-full bg-[#121314] px-4 py-2 text-[12px] font-black uppercase tracking-wide text-[#83E300] opacity-40 [font-family:var(--font-display)]"
               >
                 Assign Quiz
               </button>

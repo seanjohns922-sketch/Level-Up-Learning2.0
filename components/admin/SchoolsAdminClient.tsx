@@ -23,7 +23,7 @@ type CreationResult = {
 };
 
 function statusClass(status: string) {
-  if (status === "active") return "bg-[#EEF9D9] text-[#3D6600]";
+  if (status === "active") return "bg-[#EEFBDB] text-[#3D6600]";
   if (status === "trial") return "bg-[#E8FBFB] text-[#0E7C86]";
   if (status === "paused") return "bg-[#FFF1C7] text-[#8A5A00]";
   return "bg-[#F1F2EE] text-[#5A5E63]";

@@ -39,7 +39,7 @@ export default function TabHelp({ content }: { content: TabHelpContent }) {
         title={content.title}
         className={`grid h-9 w-9 place-items-center rounded-full border-[1.5px] text-base font-extrabold transition ${
           open
-            ? "border-[#121314] bg-[#121314] text-[#B9F23F] shadow-[0_0_0_4px_rgba(185,242,63,0.45)]"
+            ? "border-[#121314] bg-[#121314] text-[#83E300] shadow-[0_0_0_4px_rgba(131, 227, 0,0.45)]"
             : "border-slate-300 bg-white text-[#121314] shadow-sm hover:border-[#121314]"
         }`}
       >
@@ -63,7 +63,7 @@ export default function TabHelp({ content }: { content: TabHelpContent }) {
             {content.parts.map((part, index) => (
               <div key={part.title}>
                 <p className="flex items-start gap-2 font-bold">
-                  <span className="mt-px grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md bg-[#121314] text-xs font-extrabold text-[#B9F23F]">{index + 1}</span>
+                  <span className="mt-px grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md bg-[#121314] text-xs font-extrabold text-[#83E300]">{index + 1}</span>
                   {part.title}
                 </p>
                 <p className="mt-1.5 text-sm leading-6 text-slate-700">{part.text}</p>

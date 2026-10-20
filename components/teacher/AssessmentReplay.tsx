@@ -390,7 +390,7 @@ export default function AssessmentReplay({
 
       <section className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
         <div className="bg-[#121314] px-6 py-5 text-white">
-          <div className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#B9F23F]">
+          <div className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#83E300]">
             Read-only Assessment Replay
           </div>
           <h2 className="mt-1 text-2xl font-black">
@@ -479,7 +479,7 @@ export default function AssessmentReplay({
                     onClick={() => selectFilter(id)}
                     className={[
                       "rounded-md px-3 py-2 text-xs font-extrabold",
-                      filter === id ? "bg-[#121314] text-[#B9F23F]" : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                      filter === id ? "bg-[#121314] text-[#83E300]" : "bg-slate-100 text-slate-600 hover:bg-slate-200",
                     ].join(" ")}
                   >
                     {label}

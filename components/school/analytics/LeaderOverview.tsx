@@ -27,7 +27,7 @@ import {
 const SIGNAL_STYLE: Record<LeaderSignal["tone"], { label: string; chip: string; icon: typeof AlertTriangle }> = {
   concern: { label: "Act", chip: "bg-[#FFE3DF] text-[#8A1C14]", icon: AlertTriangle },
   watch: { label: "Watch", chip: "bg-[#FFF1C7] text-[#5C4300]", icon: CircleDot },
-  strength: { label: "Strength", chip: "bg-[#EEF9D9] text-[#3D6600]", icon: Sparkles },
+  strength: { label: "Strength", chip: "bg-[#EEFBDB] text-[#3D6600]", icon: Sparkles },
 };
 
 const SMALL_GROUP = 10;

@@ -175,7 +175,7 @@ export default function GrowthView({
             <span className="flex flex-wrap gap-4 text-sm text-slate-600">
               <span className="inline-flex items-center gap-2"><span className="h-[3px] w-5 bg-[#121314]" />Average growth</span>
               <span className="inline-flex items-center gap-2"><span className="w-5 border-t-2 border-dashed border-slate-400" />Expected</span>
-              <span className="inline-flex items-center gap-2"><span className="h-2.5 w-4 bg-[#B9F23F]/40" />On pace</span>
+              <span className="inline-flex items-center gap-2"><span className="h-2.5 w-4 bg-[#83E300]/40" />On pace</span>
             </span>
           </div>
           <GrowthChart year={year} series={summary.series} comparisons={comparisons.map((row) => ({ label: row.name, series: row.series }))} />
@@ -274,7 +274,7 @@ function StrandBars({ strands }: { strands: GrowthSummary["strands"] }) {
             </span>
             <span className="relative mt-1.5 block h-3 rounded-full bg-[#F1F2EE]">
               {row.gained !== null && row.gained > 0 ? (
-                <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${(row.gained / scale) * 100}%`, background: pace ? PACE_META[pace].bg : "#B9F23F" }} />
+                <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${(row.gained / scale) * 100}%`, background: pace ? PACE_META[pace].bg : "#83E300" }} />
               ) : null}
               {row.expected !== null ? <span className="absolute -inset-y-1 w-0.5 bg-[#121314]" style={{ left: `${(row.expected / scale) * 100}%` }} title={`Expected ${formatGrowth(row.expected)}`} /> : null}
             </span>
@@ -336,14 +336,14 @@ function GrowthChart({ year, series, comparisons }: { year: { startsOn: string; 
       {months.map((month) => (
         <text key={month.at} x={x(month.at)} y={H - 10} textAnchor="middle" fontSize="12" fontWeight="600" fill="#8F948C">{month.label}</text>
       ))}
-      {band ? <path d={band} fill="#B9F23F" fillOpacity="0.28" /> : null}
+      {band ? <path d={band} fill="#83E300" fillOpacity="0.28" /> : null}
       <path d={line(series, "expected")} fill="none" stroke="#8F948C" strokeWidth="2" strokeDasharray="7 6" />
       {comparisons.map((item) => (
         <path key={item.label} d={line(item.series, "gained")} fill="none" stroke="#B8BCB4" strokeWidth="2" strokeLinejoin="round" />
       ))}
       <path d={line(series, "gained")} fill="none" stroke="#121314" strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
       {series.filter((point) => point.gained !== null).map((point) => (
-        <circle key={point.at} cx={x(point.at)} cy={y(point.gained!)} r="4" fill="#B9F23F" stroke="#121314" strokeWidth="2" />
+        <circle key={point.at} cx={x(point.at)} cy={y(point.gained!)} r="4" fill="#83E300" stroke="#121314" strokeWidth="2" />
       ))}
       {last ? (
         <g>

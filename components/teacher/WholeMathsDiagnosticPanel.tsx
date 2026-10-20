@@ -472,7 +472,7 @@ export default function WholeMathsDiagnosticPanel({
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-black text-slate-950">{student.display_name}</p>
-                    <button type="button" onClick={() => void openDiagnosticReport(student.id)} className="shrink-0 rounded-md border border-[#121314] px-2 py-0.5 text-[11px] font-black text-[#121314] hover:bg-[#121314] hover:text-[#B9F23F]" aria-label={`Diagnostic report for ${student.display_name}`}>Report</button>
+                    <button type="button" onClick={() => void openDiagnosticReport(student.id)} className="shrink-0 rounded-md border border-[#121314] px-2 py-0.5 text-[11px] font-black text-[#121314] hover:bg-[#121314] hover:text-[#83E300]" aria-label={`Diagnostic report for ${student.display_name}`}>Report</button>
                   </div>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
                     <span className="text-teal-700">Live {liveLevel == null ? "—" : formatProgressionPoint(liveLevel)}</span>
@@ -552,7 +552,7 @@ export default function WholeMathsDiagnosticPanel({
                       <p className="text-xs text-slate-500">Overall: {sitting.overall_level == null ? "Pending all 6 strands" : sitting.overall_level.toFixed(2)}</p>
                     </div>
                     {sitting.status === "completed" && sitting.checkpoint !== "ad_hoc" ? (
-                      <button type="button" onClick={() => void openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#B9F23F] hover:bg-black">Diagnostic report</button>
+                      <button type="button" onClick={() => void openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#83E300] hover:bg-black">Diagnostic report</button>
                     ) : null}
                   </div>
                 </div>

@@ -22,7 +22,7 @@ async function command(payload: Record<string, unknown>) {
 }
 
 function statusChip(status: string) {
-  const tone = status === "active" ? "bg-[#EEF9D9] text-[#3D6600]" : status === "trial" ? "bg-[#E8FBFB] text-[#0E7C86]" : "bg-[#F1F2EE] text-[#5A5E63]";
+  const tone = status === "active" ? "bg-[#EEFBDB] text-[#3D6600]" : status === "trial" ? "bg-[#E8FBFB] text-[#0E7C86]" : "bg-[#F1F2EE] text-[#5A5E63]";
   return <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${tone}`}>{status}</span>;
 }
 

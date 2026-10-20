@@ -18,8 +18,8 @@ export type DocumentLogo = { src: string; alt: string } | null;
 
 export const COLORS = {
   carbon: "#121314",
-  lime: "#B9F23F",
-  limeTint: "#EEF9D9",
+  lime: "#83E300",
+  limeTint: "#EEFBDB",
   green: "#3D6600",
   violet: "#C94DF2",
   violetDeep: "#8C2EAC",

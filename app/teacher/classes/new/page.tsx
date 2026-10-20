@@ -307,7 +307,7 @@ export default function NewClassPage() {
             <button
               onClick={handleCreate}
               disabled={creating || !className.trim() || !schoolName.trim() || academicYear.length !== 4}
-              className="mt-2 w-full py-3 rounded-full bg-[#B9F23F] text-[#121314] font-black text-lg uppercase tracking-wide hover:bg-[#A6E22A] transition disabled:opacity-50"
+              className="mt-2 w-full py-3 rounded-full bg-[#83E300] text-[#121314] font-black text-lg uppercase tracking-wide hover:bg-[#74CC00] transition disabled:opacity-50"
             >
               {creating ? "Creating…" : "Create Class"}
             </button>
@@ -404,7 +404,7 @@ export default function NewClassPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => router.push("/teacher/classes")}
-                className="flex-1 py-3 rounded-full bg-[#B9F23F] text-[#121314] font-black text-base uppercase tracking-wide hover:bg-[#A6E22A] transition"
+                className="flex-1 py-3 rounded-full bg-[#83E300] text-[#121314] font-black text-base uppercase tracking-wide hover:bg-[#74CC00] transition"
               >
                 Done — View Classes
               </button>

@@ -795,7 +795,7 @@ function BarChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: s
           <div className="text-sm font-bold text-[#121314]">{point.label}</div>
           <div className="h-4 rounded-full bg-[#EEF2F7] overflow-hidden">
             <div
-              className={`h-full rounded-full ${point.value >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent ? "bg-[#B9F23F]" : "bg-[#121314]"}`}
+              className={`h-full rounded-full ${point.value >= ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent ? "bg-[#83E300]" : "bg-[#121314]"}`}
               style={{ width: `${Math.max(0, Math.min(100, point.value))}%` }}
             />
           </div>
@@ -870,7 +870,7 @@ function LineChart({ points, emptyLabel }: { points: WeeklyPoint[]; emptyLabel: 
             cx={x(index)}
             cy={y(value)}
             r={index === latestIndex ? 8 : 5.5}
-            fill={value >= target ? "#B9F23F" : "#FFFFFF"}
+            fill={value >= target ? "#83E300" : "#FFFFFF"}
             stroke="#121314"
             strokeWidth={index === latestIndex ? 3 : 2}
           >
@@ -919,7 +919,7 @@ function LevelTimeline({ entries }: { entries: TimelineEntry[] }) {
       {entries.map((entry, index) => (
         <div key={`${entry.year}-${index}`} className="flex gap-4 rounded-2xl border border-[#E3E5E0] bg-[#FAFBF8] p-4">
           <div className="flex flex-col items-center">
-            <div className={`h-3 w-3 rounded-full ${entry.current ? "bg-[#B9F23F] ring-2 ring-[#121314]" : "bg-slate-300"}`} />
+            <div className={`h-3 w-3 rounded-full ${entry.current ? "bg-[#83E300] ring-2 ring-[#121314]" : "bg-slate-300"}`} />
             {index < entries.length - 1 ? <div className="mt-2 h-full min-h-10 w-px bg-slate-200" /> : null}
           </div>
           <div className="flex-1">

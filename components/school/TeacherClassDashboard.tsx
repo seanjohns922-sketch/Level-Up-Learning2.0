@@ -36,7 +36,7 @@ const formatDay = (iso: string) => DAY.format(new Date(`${iso}T00:00:00Z`));
 function tagStyle(tag: TrendTag) {
   if (tag === "whole") return "bg-[#121314] text-white";
   if (tag === "class") return "bg-[#FFF1C7] text-[#5C4300]";
-  return "bg-[#EEF9D9] text-[#3D6600]";
+  return "bg-[#EEFBDB] text-[#3D6600]";
 }
 
 export default function TeacherClassDashboard({
@@ -95,7 +95,7 @@ export default function TeacherClassDashboard({
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <h2 className="font-display text-3xl font-black tracking-tight">{classRow.name}</h2>
-            <span className="rounded-full bg-[#EEF9D9] px-2.5 py-1 text-xs font-bold text-[#3D6600]">{ROLE_LABELS[classRow.myRole ?? ""] ?? "Teacher"}</span>
+            <span className="rounded-full bg-[#EEFBDB] px-2.5 py-1 text-xs font-bold text-[#3D6600]">{ROLE_LABELS[classRow.myRole ?? ""] ?? "Teacher"}</span>
           </div>
           <p className="mt-1 text-sm text-slate-500">
             {formatClassYearLevels(classRow.yearLevels) || "Year level not set"} · {classRow.studentCount} students
@@ -143,7 +143,7 @@ export default function TeacherClassDashboard({
               const Icon = row.direction === "down" ? ArrowDownRight : ArrowUpRight;
               return (
                 <li key={row.key} className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100 py-4">
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${row.direction === "down" ? "bg-[#FFE3DF] text-[#9B2318]" : "bg-[#EEF9D9] text-[#3D6600]"}`}>
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${row.direction === "down" ? "bg-[#FFE3DF] text-[#9B2318]" : "bg-[#EEFBDB] text-[#3D6600]"}`}>
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1 basis-64">
@@ -187,7 +187,7 @@ export default function TeacherClassDashboard({
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="font-display text-2xl font-black">{row.name}</span>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${mine ? "bg-[var(--reliq-lime,#B9F23F)]" : "bg-slate-100 text-slate-700"}`}>{mine ? "Your class" : "Same group"}</span>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${mine ? "bg-[var(--reliq-lime,#83E300)]" : "bg-slate-100 text-slate-700"}`}>{mine ? "Your class" : "Same group"}</span>
                   </span>
                   <span className="mt-2 block text-sm text-slate-500">{row.leadTeacher ?? "Teacher not assigned"} · {peer.students} students</span>
                   <span className="mt-4 grid grid-cols-2 gap-3">

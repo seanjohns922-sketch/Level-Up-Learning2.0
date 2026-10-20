@@ -107,7 +107,7 @@ export function curriculumHelp(audience: HelpAudience): TabHelpContent {
     ],
     terms: [
       ...standingTerms(),
-      { term: "At or above", text: "the share of students at level or above level in that strand.", swatch: "#EEF9D9", border: "#B9F23F" },
+      { term: "At or above", text: "the share of students at level or above level in that strand.", swatch: "#EEFBDB", border: "#83E300" },
       { term: "Below level count", text: "students below or well below in that strand and year.", swatch: "#FFE3DF", border: "#F2998D" },
     ],
   };
@@ -130,7 +130,7 @@ export function placementHelp(audience: HelpAudience): TabHelpContent {
     terms: [
       { term: "Two or more levels below", text: "working two or more levels under their school year.", swatch: "#F2998D" },
       { term: "One level below", text: "working one level under their school year.", swatch: "#FFD866" },
-      { term: "Their year level", text: "working at the level that matches their school year (outlined).", swatch: "#B9F23F", border: "#121314" },
+      { term: "Their year level", text: "working at the level that matches their school year (outlined).", swatch: "#83E300", border: "#121314" },
       { term: "Above their year", text: "working at a higher level than their school year.", swatch: "#121314" },
       { term: "Not placed (NP)", text: "no pre-test sat yet in that strand.", swatch: "#E9EBE5", border: "#D5D8D1" },
       { term: "Baseline", text: "the average pre-test score for the students placed.", swatch: "#F1F2EE", border: "#C9CDC5" },
@@ -179,10 +179,10 @@ export function classesHelp(): TabHelpContent {
       },
     ],
     terms: [
-      { term: "Active", text: "had a lesson, quiz or test in the last 7 days.", swatch: "#B9F23F" },
+      { term: "Active", text: "had a lesson, quiz or test in the last 7 days.", swatch: "#83E300" },
       { term: "Weekly target", text: "at least 3 different lessons completed in the last 7 days.", swatch: "#121314" },
       { term: "Accuracy", text: "average score across lessons and quizzes.", swatch: "#F1F2EE", border: "#C9CDC5" },
-      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEF9D9", border: "#B9F23F" },
+      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEFBDB", border: "#83E300" },
       { term: "Growth", text: "average points gained from pre-test to post-test at the same level.", swatch: "#FFFFFF", border: "#8F948C" },
     ],
   };
@@ -203,10 +203,10 @@ export function studentsHelp(audience: HelpAudience): TabHelpContent {
       },
     ],
     terms: [
-      { term: "On track", text: "active this week, with their latest score at 80% or more.", swatch: "#B9F23F" },
+      { term: "On track", text: "active this week, with their latest score at 80% or more.", swatch: "#83E300" },
       { term: "Active", text: "active this week, latest score under 80%.", swatch: "#F1F2EE", border: "#C9CDC5" },
       { term: "Needs attention", text: "no lessons, quizzes or tests in the last 7 days.", swatch: "#FFD866" },
-      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEF9D9", border: "#B9F23F" },
+      { term: "Mastered", text: "levels finished with a post-test of 85% or more.", swatch: "#EEFBDB", border: "#83E300" },
     ],
   };
 }

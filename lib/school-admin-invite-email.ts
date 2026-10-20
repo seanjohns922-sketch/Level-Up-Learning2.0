@@ -23,7 +23,7 @@ export type InviteEmailDelivery = "sent" | "unconfigured" | "failed";
 
 const DEFAULT_SENDER_ADDRESS = "schools@level-uplearning.com.au";
 const CARBON = "#121314";
-const LIME = "#B9F23F";
+const LIME = "#83E300";
 const INK = "#121314";
 const MUTED = "#5A5E63";
 const RULE = "#E3E5E0";

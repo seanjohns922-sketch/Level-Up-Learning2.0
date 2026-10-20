@@ -132,7 +132,7 @@ function placementCell(grade: string, level: string, count: number) {
   if (g < 0 || w < 0) return { bg: "#E9EBE5", fg: "#3A3D40", border: "#D5D8D1" };
   if (w < g - 1) return { bg: "#F2998D", fg: "#4A0F09", border: "#E98576" };
   if (w < g) return { bg: "#FFD866", fg: "#3F2E00", border: "#F2C94C" };
-  if (w === g) return { bg: "#B9F23F", fg: "#121314", border: "#121314" };
+  if (w === g) return { bg: "#83E300", fg: "#121314", border: "#121314" };
   return { bg: "#121314", fg: "#FFFFFF", border: "#121314" };
 }
 
@@ -254,7 +254,7 @@ function TrendChart({
             }}
             aria-label={onPointClick ? `Open details for ${labels[index]}` : undefined}
           >
-            <circle cx={point.x} cy={point.y} r="5" fill="#B9F23F" stroke="#121314" strokeWidth="2" />
+            <circle cx={point.x} cy={point.y} r="5" fill="#83E300" stroke="#121314" strokeWidth="2" />
             <title>{`${labels[index]}: ${point.value}${valueSuffix}`}</title>
           </g>
         ))}
@@ -651,7 +651,7 @@ export default function SchoolAnalyticsDashboard({
                 setYearLevel("");
                 setClassId(item.id === "class" ? teacherClassIds[0] ?? "" : "");
               }}
-              className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${view === item.id ? "bg-[var(--reliq-lime,#B9F23F)] text-[#121314]" : "text-slate-600 hover:bg-[#F1F2EE]"}`}
+              className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${view === item.id ? "bg-[var(--reliq-lime,#83E300)] text-[#121314]" : "text-slate-600 hover:bg-[#F1F2EE]"}`}
             >
               {item.label}
             </button>
@@ -738,14 +738,14 @@ export default function SchoolAnalyticsDashboard({
             Showing the last {snapshot.windowDays} days. Whole-year reporting turns on after the next database update.
           </p>
         ) : null}
-        {loading ? <div className="mt-3 h-1 animate-pulse rounded-full bg-[#B9F23F]" /> : null}
+        {loading ? <div className="mt-3 h-1 animate-pulse rounded-full bg-[#83E300]" /> : null}
       </div>
 
 
       <nav className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl bg-[#ECEEE9] p-1" aria-label="School analytics views">
         {/* A class group shows its overview and its growth. */}
         {TABS.filter((item) => (activeGroup ? item.id === "overview" || item.id === "growth" : viewAudience !== "teacher" || item.id !== "classes")).map((item) => (
-          <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#B9F23F)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
+          <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined} onClick={() => { setTab(item.id); setSelectedStudentId(""); }} className={`min-w-max rounded-lg px-4 py-2 text-sm font-bold transition ${tab === item.id ? "bg-[#121314] text-[var(--reliq-lime,#83E300)]" : "text-slate-600 hover:bg-white hover:text-[#121314]"}`}>
             {item.label}
           </button>
         ))}
@@ -836,7 +836,7 @@ export default function SchoolAnalyticsDashboard({
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-5">
                   <div className="flex items-center gap-3">
                     <h4 className="text-base font-bold text-slate-950">{group.label}</h4>
-                    <span className="rounded-md bg-[#EEF9D9] px-2.5 py-1 text-xs font-bold text-[#3D6600]">{group.onTrackPct}% at or above</span>
+                    <span className="rounded-md bg-[#EEFBDB] px-2.5 py-1 text-xs font-bold text-[#3D6600]">{group.onTrackPct}% at or above</span>
                     <span className="text-xs text-slate-500">{group.total} students</span>
                   </div>
                   <div className="flex min-w-[180px] flex-1 items-center justify-end gap-3">
@@ -1045,7 +1045,7 @@ export default function SchoolAnalyticsDashboard({
                             const cell = intervention.cells.get(`${strand}|${year}`);
                             if (!cell || cell.total === 0) return <td key={year} className="px-3 py-2.5 text-center text-slate-300">—</td>;
                             const intensity = cell.needs / intervention.maxNeeds;
-                            const bg = cell.needs === 0 ? "color-mix(in srgb, #B9F23F 22%, transparent)" : `color-mix(in srgb, #E2685A ${18 + Math.round(intensity * 70)}%, transparent)`;
+                            const bg = cell.needs === 0 ? "color-mix(in srgb, #83E300 22%, transparent)" : `color-mix(in srgb, #E2685A ${18 + Math.round(intensity * 70)}%, transparent)`;
                             return (
                               <td key={year} className="px-2 py-2 text-center">
                                 <button
@@ -1182,7 +1182,7 @@ export default function SchoolAnalyticsDashboard({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] ${selectedStudent.status === "on_track" ? "bg-[#EEF9D9] text-[#3D6600]" : selectedStudent.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>
+                <span className={`rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] ${selectedStudent.status === "on_track" ? "bg-[#EEFBDB] text-[#3D6600]" : selectedStudent.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>
                   {selectedStudent.status === "on_track" ? "On track" : selectedStudent.status === "needs_attention" ? "Needs attention" : "Active"}
                 </span>
                 <span className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
@@ -1271,7 +1271,7 @@ export default function SchoolAnalyticsDashboard({
                       <td className="px-5 py-3 font-semibold">{student.name}</td>
                       <td className="px-4 py-3">{student.yearLevel ?? "—"}</td>
                       <td className="px-4 py-3">{student.className || "—"}</td>
-                      <td className="px-4 py-3"><span className={`rounded-md px-2 py-1 text-xs font-bold ${student.status === "on_track" ? "bg-[#EEF9D9] text-[#3D6600]" : student.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>{student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active"}</span></td>
+                      <td className="px-4 py-3"><span className={`rounded-md px-2 py-1 text-xs font-bold ${student.status === "on_track" ? "bg-[#EEFBDB] text-[#3D6600]" : student.status === "needs_attention" ? "bg-[#FFF1C7] text-[#5C4300]" : "bg-[#F1F2EE] text-slate-700"}`}>{student.status === "on_track" ? "On track" : student.status === "needs_attention" ? "Needs attention" : "Active"}</span></td>
                       <td className="px-4 py-3">{formatPercent(student.averageAccuracy)}</td>
                       <td className="px-4 py-3">{student.masteredLevels}</td>
                       <td className="px-4 py-3">{formatPercent(student.averageGrowth, " pts")}</td>

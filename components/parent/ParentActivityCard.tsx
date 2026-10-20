@@ -109,7 +109,7 @@ export default function ParentActivityCard({
                         className={`w-full rounded-lg ${
                           day.active
                             ? day.isToday
-                              ? "bg-[var(--reliq-lime,#B9F23F)]"
+                              ? "bg-[var(--reliq-lime,#83E300)]"
                               : "bg-[#121314]"
                             : day.isUpcoming
                               ? "bg-slate-100"

@@ -24,7 +24,7 @@ export const PACE_ORDER: Pace[] = ["backwards", "slower", "onPace", "faster"];
 export const PACE_META: Record<Pace, { label: string; meaning: string; bg: string; fg: string }> = {
   backwards: { label: "Going backwards", meaning: "more than a term below their starting test", bg: "#F2998D", fg: "#4A0F09" },
   slower: { label: "Slower than expected", meaning: "more than a term behind pace", bg: "#FFD866", fg: "#3F2E00" },
-  onPace: { label: "On pace", meaning: "within a term of expected growth", bg: "#B9F23F", fg: "#121314" },
+  onPace: { label: "On pace", meaning: "within a term of expected growth", bg: "#83E300", fg: "#121314" },
   faster: { label: "Faster than expected", meaning: "more than a term ahead of pace", bg: "#121314", fg: "#FFFFFF" },
 };
 

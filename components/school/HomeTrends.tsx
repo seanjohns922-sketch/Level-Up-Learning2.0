@@ -7,7 +7,7 @@ import { buildHomeTrendRows, WINDOW_DAYS, type Tone, type TrendRow } from "@/lib
 
 const TONE_STYLES: Record<Tone, { icon: typeof ArrowUpRight; box: string; value: string }> = {
   watch: { icon: ArrowRight, box: "bg-[#FFF1C7] text-[#5C4300]", value: "text-[#5C4300]" },
-  up: { icon: ArrowUpRight, box: "bg-[#EEF9D9] text-[#3D6600]", value: "text-[#3D6600]" },
+  up: { icon: ArrowUpRight, box: "bg-[#EEFBDB] text-[#3D6600]", value: "text-[#3D6600]" },
 };
 
 export default function HomeTrends({

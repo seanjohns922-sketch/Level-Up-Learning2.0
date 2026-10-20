@@ -869,10 +869,10 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     ? "border-[#121314] bg-[#121314] text-white"
                     : soon
                       ? "border-[#EEF0EC] bg-[#F7F8F5] text-[#A3A7A1] cursor-not-allowed"
-                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEF9D9]",
+                      : "border-[#121314] bg-white text-[#121314] hover:bg-[#EEFBDB]",
                 ].join(" ")}
               >
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#C9CCC6" : active ? "#B9F23F" : accent }} />
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: soon ? "#C9CCC6" : active ? "#83E300" : accent }} />
                 {STRAND_SHORT[g.id] ?? g.strand}
                 {soon ? (
                   <span className="text-[9px] font-extrabold uppercase tracking-wide text-[#8A8E89]">soon</span>
@@ -957,7 +957,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   ].join(" ")}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-full bg-[#121314] text-[#B9F23F] flex items-center justify-center text-sm font-black shrink-0">
+                    <div className="h-9 w-9 rounded-full bg-[#121314] text-[#83E300] flex items-center justify-center text-sm font-black shrink-0">
                       {s.display_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex items-center gap-2.5 flex-wrap">
@@ -1210,7 +1210,7 @@ function StudentStrandDetail({
         <button
           type="button"
           onClick={openStrandReport}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#121314] bg-[#121314] px-3.5 py-2 text-sm font-bold text-[#B9F23F] transition hover:bg-black"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#121314] bg-[#121314] px-3.5 py-2 text-sm font-bold text-[#83E300] transition hover:bg-black"
         >
           <FileText className="h-4 w-4" aria-hidden />
           Strand report

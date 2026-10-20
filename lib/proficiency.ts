@@ -26,7 +26,7 @@ export const STANDING_ORDER: Standing[] = ["wellBelow", "below", "at", "above"];
 export const STANDING_META: Record<Standing, { label: string; meaning: string; bg: string; fg: string }> = {
   wellBelow: { label: "Well below", meaning: "a year or more behind", bg: "#F2998D", fg: "#4A0F09" },
   below: { label: "Below level", meaning: "a term to a year behind", bg: "#FFD866", fg: "#3F2E00" },
-  at: { label: "At level", meaning: "within a term of where they should be", bg: "#B9F23F", fg: "#121314" },
+  at: { label: "At level", meaning: "within a term of where they should be", bg: "#83E300", fg: "#121314" },
   above: { label: "Above level", meaning: "more than a term ahead", bg: "#121314", fg: "#FFFFFF" },
 };
 

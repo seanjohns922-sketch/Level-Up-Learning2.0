@@ -5,7 +5,7 @@ import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
  * with a lime Q so adult screens read differently from the violet student brand.
  * All paths are fixed, trusted artwork; no external SVG/HTML is injected.
  */
-export const RELIQ_LIME = "#B9F23F";
+export const RELIQ_LIME = "#83E300";
 
 export default function ReliqAdultLogo({
   variant = "onDark",

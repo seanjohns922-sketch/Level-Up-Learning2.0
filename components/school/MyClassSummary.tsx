@@ -100,7 +100,7 @@ export default function MyClassSummary({
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h3 className="font-display text-2xl font-black tracking-tight">{classRow.name}</h3>
-                  <span className="rounded-full bg-[#EEF9D9] px-2.5 py-1 text-xs font-bold text-[#3D6600]">
+                  <span className="rounded-full bg-[#EEFBDB] px-2.5 py-1 text-xs font-bold text-[#3D6600]">
                     {ROLE_LABELS[classRow.myRole ?? ""] ?? "Teacher"}
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export default function MyClassSummary({
                       >
                         <span className="flex items-center justify-between gap-2">
                           <span className="font-display text-lg font-black">{peer.name}</span>
-                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${mine ? "bg-[var(--reliq-lime,#B9F23F)]" : "bg-slate-100 text-slate-600"}`}>{mine ? "Your class" : "Same group"}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${mine ? "bg-[var(--reliq-lime,#83E300)]" : "bg-slate-100 text-slate-600"}`}>{mine ? "Your class" : "Same group"}</span>
                         </span>
                         <span className="mt-1 block text-xs text-slate-500">{peer.leadTeacher ?? "Teacher not assigned"} · {peer.studentCount} students</span>
                         <span className="mt-3 grid grid-cols-2 gap-2 text-sm">
