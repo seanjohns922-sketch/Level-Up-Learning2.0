@@ -53,10 +53,13 @@ type GenericAssessmentQuestion = AssessmentQuestionMetadata & {
   visual?: unknown;
 };
 
+const UNIT_SUFFIX = /(?<=\d)\s*(?:mm|cm|km|m|millimetres?|centimetres?|kilometres?|metres?|(?:square|sq)\s*(?:cm|m|centimetres?|metres?)|cm²|cm2|m²|m2|mg|g|kg|grams?|kilograms?|ml|millilitres?|l|litres?|s|secs?|seconds?|mins?|minutes?|h|hrs?|hours?|days?|weeks?|c|cents?|dollars?|°\s*c?|degrees?(?:\s*c(?:elsius)?)?)\.?$/i;
+
 function parseNumericAssessmentValue(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value !== "string") return null;
-  const cleaned = value.replace(/,/g, "").trim();
+  // The question already names the unit, so "8 cm", "$85" or "18 °C" count as the number.
+  const cleaned = value.replace(/,/g, "").trim().replace(/^\$\s*/, "").replace(UNIT_SUFFIX, "").trim();
   if (!cleaned.length) return null;
   const parsed = Number(cleaned);
   return Number.isFinite(parsed) ? parsed : null;
