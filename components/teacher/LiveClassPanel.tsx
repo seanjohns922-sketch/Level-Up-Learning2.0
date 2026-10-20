@@ -164,6 +164,7 @@ type LiveStudentCard = {
   correctCount?: number | null;
   accuracyPercent?: number | null;
   scoreSource?: "live" | "canonical" | null;
+  assessmentUnmarked?: boolean;
   currentLessonStatus?: string | null;
   completedAt?: string | null;
   lessonStartedAt?: string | null;
@@ -721,7 +722,10 @@ function toLiveCard(
     completedAttemptSummary &&
     (lessonPerformance?.completed || row?.current_lesson_status === "completed")
   );
-  const displayedScore = useCanonicalScore ? completedAttemptSummary : lessonPerformance;
+  // Pre- and post-tests are marked only when submitted, so an unfinished one has
+  // answers but no right/wrong yet. Showing it as 0% would read as a failing class.
+  const assessmentUnmarked = !useCanonicalScore && isAssessmentInProgress(row?.current_lesson_title, row?.current_step_label);
+  const displayedScore = useCanonicalScore ? completedAttemptSummary : assessmentUnmarked ? null : lessonPerformance;
   const insight = row && !isCompleted
     ? buildLiveStudentInsight({
         studentId: student.id,
@@ -752,9 +756,9 @@ function toLiveCard(
         consecutiveIncorrectCount: row.consecutive_incorrect_count ?? null,
         sessionHintCount: row.session_hint_count ?? null,
         attemptNumber: row.attempt_number ?? null,
-        questionsAnswered: displayedScore?.answered ?? row.questions_answered ?? null,
-        correctCount: displayedScore?.correct ?? row.correct_count ?? null,
-        accuracy: displayedScore?.accuracy ?? row.accuracy_percent ?? null,
+        questionsAnswered: assessmentUnmarked ? null : displayedScore?.answered ?? row.questions_answered ?? null,
+        correctCount: assessmentUnmarked ? null : displayedScore?.correct ?? row.correct_count ?? null,
+        accuracy: assessmentUnmarked ? null : displayedScore?.accuracy ?? row.accuracy_percent ?? null,
         completedAt: row.completed_at ?? null,
         skillTag: row.skill_tag ?? null,
         misconceptionTag: row.misconception_tag ?? null,
@@ -792,6 +796,7 @@ function toLiveCard(
     correctCount: displayedScore?.correct ?? null,
     accuracyPercent: displayedScore?.accuracy ?? null,
     scoreSource: useCanonicalScore ? "canonical" : displayedScore ? "live" : null,
+    assessmentUnmarked,
     currentLessonStatus: lessonPerformance?.completed ? "completed" : (row?.current_lesson_status ?? null),
     completedAt: row?.completed_at ?? null,
     lessonStartedAt: row?.lesson_started_at ?? null,
@@ -853,6 +858,10 @@ function getDisplayStatusSubtext(card: LiveStudentCard, group: LiveCardDisplayGr
     return "Active now";
   }
   return formatRelativeTime(card.lastActiveAt);
+}
+
+function isAssessmentInProgress(lessonTitle: string | null | undefined, stepLabel: string | null | undefined) {
+  return /^(pre-test|post-test)$/i.test(lessonTitle ?? "") && /^question\s+\d+/i.test(stepLabel ?? "");
 }
 
 function getCardDisplayGroup(card: LiveStudentCard): LiveCardDisplayGroup {
@@ -1398,7 +1407,7 @@ export default function LiveClassPanel({
                   </span>
                   {/* score */}
                   <span className="text-right text-sm font-bold tabular-nums text-slate-700">
-                    {answered > 0 ? `${correct}/${answered}` : "—"}
+                    {card.assessmentUnmarked ? <span className="text-xs font-semibold text-slate-400">Marked at end</span> : answered > 0 ? `${correct}/${answered}` : "—"}
                   </span>
                   {/* accuracy */}
                   <span className={`text-right text-sm font-black tabular-nums ${
