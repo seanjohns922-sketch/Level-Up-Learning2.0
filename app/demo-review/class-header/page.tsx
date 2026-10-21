@@ -60,10 +60,10 @@ function ClassIdentity() {
   return (
     <div className="flex min-w-0 items-center gap-4">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={LOGO} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+      <img src={LOGO} alt="" className="h-[74px] w-[74px] shrink-0 rounded-xl object-cover" />
       <div className="min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#8F948C]">Class</p>
-        <h1 className="font-display text-3xl font-black leading-none tracking-tight">3/4J</h1>
+        <p className="text-[10px] font-black uppercase leading-none tracking-[0.22em] text-[#8F948C]">Class</p>
+        <h1 className="mt-1.5 font-display text-3xl font-black leading-none tracking-tight">3/4J</h1>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-[#A9ADA6]">
           <span className="inline-flex items-center gap-1.5">Class code <span className="inline-flex items-center gap-1 rounded-md bg-[#1E2022] px-1.5 py-0.5 font-mono font-extrabold text-[var(--reliq-lime)]">XWFKN<Copy className="h-3 w-3" /></span></span>
           <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" />24 students</span>

@@ -1043,21 +1043,22 @@ export default function TeacherDashboardPage() {
               <Image
                 src={schoolLogo.src}
                 alt={schoolLogo.alt}
-                width={56}
-                height={56}
+                width={74}
+                height={74}
                 priority
-                className="h-11 w-11 shrink-0 rounded-xl object-cover xl:h-14 xl:w-14"
+                className="h-[68px] w-[68px] shrink-0 rounded-xl object-cover xl:h-[74px] xl:w-[74px]"
               />
             ) : (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2A2C2E] xl:h-14 xl:w-14">
+              <div className="flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-xl bg-[#2A2C2E] xl:h-[74px] xl:w-[74px]">
                 <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M3 12l9-9 9 9M5 10v10h14V10" />
                 </svg>
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#8F948C]">Class</p>
-              <div className="flex min-w-0 items-center gap-2">
+              {/* Logo height = this block: label 10 + 6 + name 24/30 + 8 + details 20 */}
+              <p className="text-[10px] font-black uppercase leading-none tracking-[0.22em] text-[#8F948C]">Class</p>
+              <div className="mt-1.5 flex min-w-0 items-center gap-2">
                 <h1 className="truncate font-display text-2xl font-black leading-none tracking-tight text-white xl:text-3xl">
                   {selectedClass?.name ?? "Class Dashboard"}
                 </h1>
