@@ -2,7 +2,7 @@
 
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, X, KeyRound, Brain, Building2, Download, Printer, Lock, LockOpen } from "lucide-react";
+import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -263,6 +263,21 @@ function StudentQRSection({ student, classCode, className2, schoolName, schoolLo
 }
 
 /* ── component ─────────────────────────────────────── */
+// Brain breaks run from least to most in the Manage class menu.
+const BRAIN_BREAK_MENU_ORDER = ["minimal", "normal", "frequent"] as const;
+
+function ClassMenuItem({ icon: Icon, title, detail, onClick }: { icon: LucideIcon; title: string; detail: string; onClick: () => void }) {
+  return (
+    <button type="button" role="menuitem" onClick={onClick} className="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#F1F2EE]">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+      <span>
+        <span className="block text-sm font-bold">{title}</span>
+        <span className="block text-xs text-[#5A5E63]">{detail}</span>
+      </span>
+    </button>
+  );
+}
+
 export default function TeacherDashboardPage() {
   const router = useRouter();
   const [schoolPreviewClassId, setSchoolPreviewClassId] = useState<
@@ -290,6 +305,7 @@ export default function TeacherDashboardPage() {
   const [copiedCode, setCopiedCode] = useState(false);
   const [showLoginDetailsActions, setShowLoginDetailsActions] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showClassMenu, setShowClassMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -1016,157 +1032,160 @@ export default function TeacherDashboardPage() {
 
   return (
     <main className="reliq-adult min-h-screen">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-[#121314] px-3 py-3 text-white xl:px-5">
-        <div className="mx-auto flex w-full min-w-0 items-center gap-1.5 overflow-x-auto 2xl:overflow-visible">
-          <ReliqAdultLogo className="mr-2 hidden w-[76px] shrink-0 xl:block" />
-          {schoolHomeId ? (
-            <button
-              type="button"
-              onClick={() => void openSchoolPreview(schoolHomeId)}
-              disabled={openingSchoolPreview}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-[#C9CCC6] transition hover:border-[#5A5E63] hover:bg-[#222426] hover:text-white active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
-              aria-label="Back to School Home"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {openingSchoolPreview ? "Opening..." : "School Home"}
-            </button>
-          ) : null}
+      {/* Header: RELIQ and the class on the left; School Home and one Manage class menu on the right */}
+      <header className="sticky top-0 z-20 bg-[#121314] px-4 py-3 text-white xl:px-6 xl:py-4">
+        <div className="mx-auto flex w-full min-w-0 items-center gap-4 xl:gap-6">
+          <ReliqAdultLogo className="hidden w-[110px] shrink-0 lg:block xl:w-[150px]" />
+          <span className="hidden h-12 w-px shrink-0 bg-[#34373A] lg:block" />
 
-          {schoolLogo ? (
-            <Image
-              src={schoolLogo.src}
-              alt={schoolLogo.alt}
-              width={36}
-              height={36}
-              priority
-              className="h-9 w-9 shrink-0 rounded-lg object-cover"
-            />
-          ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#2A2C2E]">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M3 12l9-9 9 9M5 10v10h14V10" />
-              </svg>
-            </div>
-          )}
-
-          <h1 className="max-w-56 shrink truncate font-display text-lg font-black tracking-tight text-white min-[1500px]:max-w-72 min-[1500px]:text-xl min-[1900px]:max-w-none">
-            {selectedClass?.name ?? "Class Dashboard"}
-          </h1>
-
-          {selectedClass ? (
-            <>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-[#34373A]" />
-              <button
-                onClick={copyCode}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-[#34373A] bg-transparent px-2 py-0.5 font-mono text-[11px] font-extrabold text-[var(--reliq-lime)] transition hover:border-[var(--reliq-lime)]"
-              >
-                {copiedCode ? "Copied!" : selectedClass.class_code}
-                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" />
-                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+          <div className="flex min-w-0 items-center gap-3 xl:gap-4">
+            {schoolLogo ? (
+              <Image
+                src={schoolLogo.src}
+                alt={schoolLogo.alt}
+                width={56}
+                height={56}
+                priority
+                className="h-11 w-11 shrink-0 rounded-xl object-cover xl:h-14 xl:w-14"
+              />
+            ) : (
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2A2C2E] xl:h-14 xl:w-14">
+                <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M3 12l9-9 9 9M5 10v10h14V10" />
                 </svg>
-              </button>
-              <span className="hidden shrink-0 text-[11px] font-semibold text-[#8F948C] min-[1450px]:inline">
-                {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
-              </span>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-[#34373A]" />
-              <label className="inline-flex shrink-0 items-center gap-1.5 text-[11px] font-semibold text-[#C9CCC6]">
-                <span className="inline-flex items-center gap-1.5" title="Mid-lesson mini-game frequency. Override per student in their card.">
-                  <Brain className="h-3.5 w-3.5" />
-                  <span className="hidden min-[1650px]:inline">Brain breaks</span>
-                </span>
-                <select
-                  value={isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal"}
-                  onChange={(e) => { if (isBrainBreakFrequency(e.target.value)) void setClassBrainBreak(e.target.value); }}
-                  className="rounded-md border border-[#34373A] bg-[#1C1E20] px-2 py-1 text-[11px] font-bold text-white transition hover:border-[#5A5E63]"
-                >
-                  {BRAIN_BREAK_FREQUENCIES.map((f) => (
-                    <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
-                  ))}
-                </select>
-              </label>
-              {isDev ? (
-                <span className="shrink-0 font-mono text-[10px] text-[#8A8E89]">
-                  id:{selectedClass.id.slice(0, 8)}
-                </span>
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#8F948C]">Class</p>
+              <div className="flex min-w-0 items-center gap-2">
+                <h1 className="truncate font-display text-2xl font-black leading-none tracking-tight text-white xl:text-3xl">
+                  {selectedClass?.name ?? "Class Dashboard"}
+                </h1>
+                {classes.length > 1 ? (
+                  <select
+                    value={selectedClassId ?? ""}
+                    onChange={(e) => selectClass(e.target.value)}
+                    aria-label="Switch class"
+                    className="max-w-40 rounded-md border border-[#34373A] bg-[#1C1E20] px-2 py-1 text-xs font-bold text-[#C9CCC6] transition hover:border-[#5A5E63]"
+                  >
+                    {classes.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                ) : null}
+              </div>
+              {selectedClass ? (
+                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-[#A9ADA6]">
+                  <span className="inline-flex items-center gap-1.5">
+                    Class code
+                    <button
+                      type="button"
+                      onClick={copyCode}
+                      title="Copy class code"
+                      className="inline-flex items-center gap-1 rounded-md bg-[#1E2022] px-1.5 py-0.5 font-mono font-extrabold text-[var(--reliq-lime)] transition hover:bg-[#2A2C2E]"
+                    >
+                      {copiedCode ? "Copied!" : selectedClass.class_code}
+                      <Copy className="h-3 w-3" aria-hidden="true" />
+                    </button>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                    {classStudents.length} student{classStudents.length === 1 ? "" : "s"}
+                  </span>
+                  {isDev ? <span className="font-mono text-[10px] text-[#8A8E89]">id:{selectedClass.id.slice(0, 8)}</span> : null}
+                </div>
               ) : null}
-            </>
-          ) : null}
+            </div>
+          </div>
 
-          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             {isDev && !isSchoolPreview && (
               <button
                 onClick={() => void openSchoolPreview()}
                 disabled={openingSchoolPreview}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#34373A] bg-transparent text-white font-bold text-sm hover:bg-[#222426] transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#34373A] px-3 py-2 text-sm font-bold text-white transition hover:bg-[#222426] disabled:cursor-wait disabled:opacity-60"
                 type="button"
               >
                 <Building2 className="h-4 w-4" />
                 {openingSchoolPreview ? "Opening..." : "School Home Preview"}
               </button>
             )}
-            {classes.length > 1 && (
-              <select
-                value={selectedClassId ?? ""}
-                onChange={(e) => selectClass(e.target.value)}
-                className="text-sm font-semibold px-3 py-2 rounded-lg border border-[#34373A] bg-[#1C1E20] text-white hover:border-[#5A5E63] transition"
-              >
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            )}
-
-            {/* Student Login Details */}
-            {selectedClass && classStudents.length > 0 && (
+            {schoolHomeId ? (
               <button
-                onClick={() => setShowLoginDetailsActions(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-white transition hover:border-[#5A5E63] hover:bg-[#222426] active:scale-[0.98] min-[1850px]:px-3.5"
-                aria-label="Student Login Details"
-                title="Student Login Details"
+                type="button"
+                onClick={() => void openSchoolPreview(schoolHomeId)}
+                disabled={openingSchoolPreview}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#34373A] px-3 py-2 text-sm font-bold text-[#C9CCC6] transition hover:border-[#5A5E63] hover:bg-[#222426] hover:text-white active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+                aria-label="Back to School Home"
               >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25">
-                  <path d="M16 2H8a2 2 0 00-2 2v16a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" />
-                  <path d="M12 18h.01M8 6h8M8 10h8M8 14h4" />
-                </svg>
-                <span className="min-[1850px]:hidden">Login details</span>
-                <span className="hidden min-[1850px]:inline">Student Login Details</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => router.push("/teacher/classes")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#34373A] bg-transparent px-2.5 py-2 text-sm font-bold text-white transition hover:border-[#5A5E63] hover:bg-[#222426] active:scale-[0.98] min-[1850px]:px-3.5"
-              aria-label="Add or edit students"
-              title="Add or edit students"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" /><circle cx="10" cy="7" r="4" /><path d="M19 8v6M16 11h6" /></svg>
-              <span className="min-[1850px]:hidden">Students</span>
-              <span className="hidden min-[1850px]:inline">Add / Edit Students</span>
-            </button>
-            {selectedClass && classStudents.length > 0 ? (
-              <button
-                onClick={() => setShowPlacements(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-transparent bg-[var(--reliq-lime)] px-2.5 py-2 text-sm font-bold text-[#121314] transition hover:bg-[var(--reliq-lime-hover)] active:scale-[0.98] min-[1850px]:px-3.5"
-                aria-label="Manage placements"
-                title="Manage placements"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg>
-                <span className="min-[1850px]:hidden">Placements</span>
-                <span className="hidden min-[1850px]:inline">Manage Placements</span>
+                <ArrowLeft className="h-4 w-4" />
+                {openingSchoolPreview ? "Opening..." : "School Home"}
               </button>
             ) : null}
+
+            {selectedClass ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => { setShowClassMenu((v) => !v); setShowSettingsMenu(false); }}
+                  aria-haspopup="menu"
+                  aria-expanded={showClassMenu}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-black text-[#121314] transition active:scale-[0.98] ${showClassMenu ? "bg-[var(--reliq-lime-hover)]" : "bg-[var(--reliq-lime)] hover:bg-[var(--reliq-lime-hover)]"}`}
+                >
+                  <Users className="h-4 w-4" aria-hidden="true" />
+                  Manage class
+                  <ChevronDown className={`h-4 w-4 transition ${showClassMenu ? "rotate-180" : ""}`} aria-hidden="true" />
+                </button>
+                {showClassMenu ? (
+                  <>
+                    <div className="fixed inset-0 z-20" onClick={() => setShowClassMenu(false)} />
+                    <div role="menu" className="absolute right-0 top-full z-30 mt-2 w-80 rounded-2xl border border-[#E3E5E0] bg-white p-2 text-[#121314] shadow-2xl">
+                      <p className="px-3 pb-1 pt-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#8F948C]">Class {selectedClass.name}</p>
+                      {classStudents.length > 0 ? (
+                        <>
+                          <ClassMenuItem icon={SquareCheck} title="Placements" detail="Set each student's starting level and realm" onClick={() => { setShowClassMenu(false); setShowPlacements(true); }} />
+                          <ClassMenuItem icon={ClipboardList} title="Login details" detail="Print or share student login cards" onClick={() => { setShowClassMenu(false); setShowLoginDetailsActions(true); }} />
+                        </>
+                      ) : null}
+                      <ClassMenuItem icon={UserPlus} title="Add / edit students" detail="Names, levels and class list" onClick={() => { setShowClassMenu(false); router.push("/teacher/classes"); }} />
+                      <div className="my-1 h-px bg-[#EDEEE9]" />
+                      <div className="px-3 py-2.5">
+                        <p className="flex items-center gap-2 text-sm font-bold"><Brain className="h-4 w-4" aria-hidden="true" />Brain breaks</p>
+                        <p className="mt-0.5 pl-6 text-xs text-[#5A5E63]">How often mini-games appear mid-lesson. Override per student in their card.</p>
+                        <div role="radiogroup" aria-label="Brain breaks" className="ml-6 mt-2 grid grid-cols-3 gap-1 rounded-full bg-[#F1F2EE] p-1 text-xs font-bold">
+                          {BRAIN_BREAK_MENU_ORDER.map((f) => {
+                            const current = isBrainBreakFrequency(selectedClass.brain_break_frequency) ? selectedClass.brain_break_frequency : "normal";
+                            return (
+                              <button
+                                key={f}
+                                type="button"
+                                role="radio"
+                                aria-checked={current === f}
+                                onClick={() => void setClassBrainBreak(f)}
+                                className={`rounded-full py-1.5 transition ${current === f ? "bg-[#121314] text-white" : "text-[#5A5E63] hover:text-[#121314]"}`}
+                              >
+                                {BRAIN_BREAK_FREQUENCY_LABEL[f]}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+
             {/* Settings gear */}
             <div className="relative">
               <button
-                onClick={() => setShowSettingsMenu((v) => !v)}
-                className="h-9 w-9 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:text-white hover:bg-[#222426] hover:border-[#5A5E63] transition flex items-center justify-center"
+                onClick={() => { setShowSettingsMenu((v) => !v); setShowClassMenu(false); }}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#8F948C] transition hover:bg-[#222426] hover:text-white"
                 type="button"
                 aria-label="Settings"
                 title="Settings"
               >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="3" />
                   <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
                 </svg>
@@ -1207,12 +1226,12 @@ export default function TeacherDashboardPage() {
                 await supabase.auth.signOut();
                 router.push("/login");
               }}
-              className="h-9 w-9 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:text-white hover:bg-[#222426] hover:border-[#5A5E63] transition flex items-center justify-center"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-[#8F948C] transition hover:bg-[#222426] hover:text-white"
               type="button"
               aria-label="Log out"
               title="Log out"
             >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+              <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="2.25"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
             </button>
           </div>
         </div>
