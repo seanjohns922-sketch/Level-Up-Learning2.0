@@ -1031,7 +1031,7 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <main className="reliq-adult min-h-screen">
+    <main className="reliq-adult min-h-screen" data-teacher-dashboard>
       {/* Header: RELIQ and the class on the left; School Home and one Manage class menu on the right */}
       <header className="sticky top-0 z-20 bg-[#121314] px-4 py-3 text-white xl:px-6 xl:py-4">
         <div className="mx-auto flex w-full min-w-0 items-center gap-4 xl:gap-6">

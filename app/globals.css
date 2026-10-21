@@ -883,9 +883,9 @@ html:fullscreen .measurelands-month-grid {
   }
 }
 
-/* Assessment headers and the Live Class toolbar own this control so it cannot cover their content. */
+/* Assessment headers and the teacher dashboard (Live Class toolbar) own this control so it cannot cover their content. */
 body:has(.assessment-shell) .fullscreen-toggle:not([data-inline="true"]),
-body:has([data-live-class]) .fullscreen-toggle:not([data-inline="true"]) {
+body:has([data-teacher-dashboard]) .fullscreen-toggle:not([data-inline="true"]) {
   display: none;
 }
 

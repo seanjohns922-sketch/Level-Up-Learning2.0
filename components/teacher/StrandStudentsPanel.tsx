@@ -206,6 +206,30 @@ function pickDisplayWeek(prog: ProgressRow | null, currentWeek: number | null, p
   return currentWeek;
 }
 
+// Flags a student working below or above their school year (Prep counts as 0).
+function yearNumber(label: string | null | undefined): number | null {
+  if (!label) return null;
+  if (/prep|foundation|ground/i.test(label)) return 0;
+  const match = /(\d+)/.exec(label);
+  return match ? Number(match[1]) : null;
+}
+
+function LevelGapFlag({ schoolYear, workingYear }: { schoolYear: string | null | undefined; workingYear: string | null | undefined }) {
+  const year = yearNumber(schoolYear);
+  const level = yearNumber(workingYear);
+  if (year == null || level == null || year === level) return null;
+  const below = level < year;
+  const gap = Math.abs(level - year);
+  return (
+    <span
+      title={`Working ${gap} level${gap === 1 ? "" : "s"} ${below ? "below" : "above"} ${schoolYear}`}
+      className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-black ${below ? "bg-[#FFF3DC] text-[#8A5A00]" : "bg-[#EEFBDB] text-[#3D6600]"}`}
+    >
+      {below ? "↓ Below" : "↑ Above"}
+    </span>
+  );
+}
+
 function weekDotColor(accuracy: number | null): string {
   if (accuracy == null) return "#E3E5E0";
   if (accuracy >= 80) return "#16A34A";
@@ -342,8 +366,8 @@ const PLACEMENT_STATUS_STYLE: Record<PlacementStatus, string> = {
   "Progress Unavailable": "bg-[#FFF1F2] text-[#BE123C]",
   "Not Placed": "bg-[#F1F2EE] text-[#5A5E63]",
   "Ready for Pre-Test": "bg-[#FEF3C7] text-[#B45309]",
-  "Full Program": "bg-[#E0F2FE] text-[#0369A1]",
-  "Targeted Program": "bg-[#EDE9FE] text-[#6D28D9]",
+  "Full Program": "bg-[#F1F2EE] text-[#3F4246]",
+  "Targeted Program": "bg-[#EEFBDB] text-[#3D6600]",
   "Post-Test Ready": "bg-[#DCFCE7] text-[#15803D]",
   "Level Complete": "bg-[#D1FAE5] text-[#047857]",
 };
@@ -881,7 +905,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             );
           })}
         </div>
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] items-center px-5 py-3 bg-gradient-to-b from-[#FAFBF8] to-[#F1F2EE] border-b border-[#E3E5E0]">
+        <div className="grid grid-cols-[2fr_0.7fr_1.1fr_1.15fr_1.1fr_1.15fr] gap-4 items-center px-5 py-3 bg-gradient-to-b from-[#FAFBF8] to-[#F1F2EE] border-b border-[#E3E5E0]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -907,16 +931,19 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           </div>
           {([
             ["schoolYear", "School Year"],
-            ["workingLevel", "Working Level"],
-            ["week", "Week"],
+            ["workingLevel", "Level · Week"],
             [null, "This Week"],
             ["status", "Pathway"],
-            ["tower", "Progress"],
+            ["tower", "Year Progress"],
           ] as [SortKey | null, string][]).map(([key, label], idx) => {
             if (!key) {
               return (
                 <span key={`hdr-${idx}`} className="whitespace-nowrap text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
                   {label}
+                  {/* Each week is three lessons and a quiz, in the order of the dots below. */}
+                  <span className="mt-1 flex gap-1 text-[9px] tracking-[0.06em] text-[#A3A7A1]" aria-hidden="true">
+                    {["L1", "L2", "L3", "Quiz"].map((dotLabel) => <span key={dotLabel} className="w-7 text-center">{dotLabel}</span>)}
+                  </span>
                 </span>
               );
             }
@@ -952,7 +979,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 <button
                   onClick={() => setExpandedId(isOpen ? null : s.id)}
                   className={[
-                    "w-full grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] items-center px-5 py-3.5 text-left transition",
+                    "w-full grid grid-cols-[2fr_0.7fr_1.1fr_1.15fr_1.1fr_1.15fr] gap-4 items-center px-5 py-3.5 text-left transition",
                     isOpen ? "bg-[#FAFBF8]" : "hover:bg-[#FAFBF8]",
                   ].join(" ")}
                 >
@@ -965,22 +992,21 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#3F4246]">{schoolYear}</span>
-                  <span className="text-xs font-bold text-[#3F4246]">
+                  <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold text-[#121314]">
                     {workingYear
                       ? yearToLevelLabel(workingYear)
                       : !snapshot || snapshot.placementState === "unavailable"
                         ? "Unavailable"
                         : "Not placed"}
-                  </span>
-                  <span className="text-xs font-bold text-[#3F4246] tabular-nums">
-                    {week ? `W${week}` : "—"}
+                    {workingYear ? <span className="font-semibold text-[#8F948C] tabular-nums">· {week ? `W${week}` : "—"}</span> : null}
+                    <LevelGapFlag schoolYear={schoolYear} workingYear={workingYear} />
                   </span>
                   <div className="flex items-center gap-1">
                     {weekDots.map((dot, i) => (
                       <span
                         key={i}
                         title={`${dot.label}: ${dot.accuracy == null ? "not attempted" : `${dot.accuracy}%`}`}
-                        className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black tabular-nums ${dot.accuracy == null ? "text-slate-400" : "text-white"} ${dot.kind === "quiz" ? "ring-2 ring-offset-1 ring-slate-300" : ""}`}
+                        className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-black tabular-nums ${dot.accuracy == null ? "text-slate-400" : "text-white"} ${dot.kind === "quiz" ? "ring-2 ring-offset-2 ring-[#121314]" : ""}`}
                         style={{ background: weekDotColor(dot.accuracy) }}
                       >
                         {dot.accuracy == null ? "–" : dot.accuracy}
@@ -988,15 +1014,18 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     ))}
                   </div>
                   <div className="min-w-0">
-                    <span className={`inline-block whitespace-nowrap rounded-md px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.04em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
+                    <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
                       {placementStatus}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-[#3D6600] shadow-[0_0_8px_rgba(0,229,195,0.55)] transition-all" style={{ width: `${pct ?? 0}%` }} />
+                  <div title={pct == null ? undefined : `${pct}% of this year's program done`}>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 rounded-full bg-[#ECEDE9] overflow-hidden">
+                        <div className="h-full rounded-full bg-[#5FAE00] transition-all" style={{ width: `${pct ?? 0}%` }} />
+                      </div>
+                      <span className="text-[11px] font-bold text-[#121314] tabular-nums w-9 text-right">{pct == null ? "—" : `${pct}%`}</span>
                     </div>
-                    <span className="text-[11px] font-bold text-[#3F4246] tabular-nums w-9 text-right">{pct == null ? "—" : `${pct}%`}</span>
+                    {pct != null ? <p className="mt-1 text-[10px] font-semibold text-[#8F948C]">of this year&apos;s program</p> : null}
                   </div>
                 </button>
 
