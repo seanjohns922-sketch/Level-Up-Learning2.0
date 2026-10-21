@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { supabase } from "@/lib/supabase";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
@@ -885,6 +886,64 @@ function rowStatusMeta(card: LiveStudentCard, group: LiveCardDisplayGroup) {
   return { dot: "bg-emerald-500", text: "text-emerald-700", label: "Active now" };
 }
 
+// Live Class tiles: each count doubles as a filter for the table.
+const LIVE_TILES: Array<{ id: LiveCardDisplayGroup; label: string }> = [
+  { id: "live", label: "Active now" },
+  { id: "needs_support", label: "Need help" },
+  { id: "idle", label: "Idle" },
+  { id: "waiting_to_start", label: "Not started" },
+];
+
+// Same names and accents as the realm pills on the Students tab.
+const LIVE_REALM_TAGS: Record<string, { label: string; color: string }> = {
+  number: { label: "Number", color: "#0E9C93" },
+  measurement: { label: "Measurement", color: "#C2892E" },
+  space: { label: "Space", color: "#5B6EE6" },
+  statistics: { label: "Statistics", color: "#C2557A" },
+  pattern: { label: "Algebra", color: "#7C3AED" },
+  chance: { label: "Probability", color: "#0891B2" },
+};
+
+function liveRealmTag(realm?: string | null) {
+  const normalized = normalizeAttemptRealm(realm);
+  if (!normalized) return null;
+  return LIVE_REALM_TAGS[normalized] ?? { label: formatRealmName(normalized), color: "#5A5E63" };
+}
+
+function liveLevelLabel(badge?: string | null) {
+  if (!badge) return "—";
+  if (badge === "GROUND") return "Ground";
+  const match = /^LVL\s+(\d+)$/.exec(badge);
+  return match ? `Level ${match[1]}` : badge;
+}
+
+function describeLiveActivity(card: LiveStudentCard, notStarted: boolean, activeNow: boolean): { title: string; detail: string | null } {
+  if (notStarted) return { title: "Not started today", detail: null };
+  const assessment = /^(pre-test|post-test)$/i.exec(card.currentLessonTitle ?? "");
+  if (assessment) {
+    const title = assessment[1].toLowerCase().startsWith("pre") ? "Pre-test" : "Post-test";
+    const step = card.currentStepLabel?.replace(/^Question\s+/i, "Q") ?? null;
+    return { title, detail: step ?? (card.attemptNumber ? `Attempt ${card.attemptNumber}` : null) };
+  }
+  if (!card.currentLesson && !card.currentActivityLabel) {
+    return card.lastActiveAt ? { title: "App open", detail: "Activity unavailable" } : { title: "—", detail: null };
+  }
+  const tag = card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : null;
+  const lesson = tag && /^L(\d+)$/.exec(tag);
+  const title = lesson ? `Lesson ${lesson[1]}` : card.currentLessonTitle ?? tag ?? card.currentActivityLabel ?? "—";
+  const detail = activeNow && card.currentStepLabel ? card.currentStepLabel : card.attemptNumber ? `Attempt ${card.attemptNumber}` : null;
+  return { title, detail };
+}
+
+function shortTimeAgo(value?: string | null, now = Date.now()) {
+  if (!value) return "—";
+  const minutes = Math.max(0, Math.round((now - new Date(value).getTime()) / 60000));
+  if (minutes < 60) return `${Math.max(1, minutes)}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
 function statusFilterLabel(filter: LiveStatusFilter) {
   switch (filter) {
     case "live":
@@ -1234,11 +1293,6 @@ export default function LiveClassPanel({
     [dailyActivity]
   );
   const activeTodayCount = cards.filter((card) => activeTodayIds.has(card.id)).length;
-  // Idle = worked today but not active right now. Not started = no work today yet.
-  const idleTodayCount = cards.filter(
-    (card) => activeTodayIds.has(card.id) && !isCardActiveNow(card)
-  ).length;
-  const notStartedTodayCount = cards.filter((card) => !activeTodayIds.has(card.id)).length;
   // Accuracy scoped to today's workers, so the number reflects the live picture.
   const classAccuracy = useMemo(() => {
     return aggregateLearningScores(
@@ -1255,107 +1309,84 @@ export default function LiveClassPanel({
 
   return (
     <>
-      <section className="grid gap-4">
-        <div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <div className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-teal-700">
-                  Live Class
-                </div>
-                <h2 className="mt-1 text-2xl font-black text-slate-900">
-                  {selectedClass?.name ?? "Select a class"}
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                  See who is working right now, who needs support, and who is idle.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={activeOnly}
-                    onChange={(event) => setActiveOnly(event.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                  />
-                  Active only
-                </label>
-                <label className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={spotlightMode}
-                    onChange={(event) => setSpotlightMode(event.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                  />
-                  Spotlight
-                </label>
-              </div>
-            </div>
-
-            {/* Compact class total — not another set of big widgets */}
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold">
-              <span className="inline-flex items-center gap-1.5 text-emerald-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />{activeStudentCount} active now
-              </span>
-              <span className="text-slate-300">·</span>
-              <span className="text-teal-700">{activeTodayCount} active today</span>
-              <span className="text-slate-300">·</span>
-              <span className="inline-flex items-center gap-1.5 text-rose-700">
-                <span className="h-2 w-2 rounded-full bg-rose-500" />{statusCounts.needs_support} need help
-              </span>
-              <span className="text-slate-300">·</span>
-              <span className="text-slate-600">{formatPercentage(classAccuracy, "—", 0)} accuracy today</span>
-              <span className="text-slate-300">·</span>
-              <span className="text-slate-500">{idleTodayCount} idle</span>
-              <span className="text-slate-300">·</span>
-              <span className="text-slate-400">{notStartedTodayCount} not started</span>
-            </div>
-
-            {selectedClass?.id ? <FocusModeControl classId={selectedClass.id} /> : null}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {(["live", "needs_support", "idle", "waiting_to_start"] as const).map((status) => {
-            const active = filter === status;
+      <section className="grid gap-4" data-live-class>
+        {/* Tiles: the class counts, and tapping one filters the table */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {LIVE_TILES.map((tile) => {
+            const value = tile.id === "live"
+              ? activeStudentCount
+              : statusCounts[tile.id];
+            const on = filter === tile.id;
+            const alert = tile.id === "needs_support" && value > 0;
             return (
               <button
-                key={status}
+                key={tile.id}
                 type="button"
-                onClick={() => setFilter((current) => (current === status ? "all" : status))}
+                aria-pressed={on}
+                aria-label={tile.id === "live" ? `${value} active now` : `${value} ${tile.label.toLowerCase()}`}
+                onClick={() => setFilter((current) => (current === tile.id ? "all" : tile.id))}
                 className={[
-                  "rounded-full border px-3 py-1.5 text-sm font-bold transition",
-                  active
-                    ? "border-teal-500 bg-teal-600 text-white shadow-[0_8px_18px_-12px_rgba(13,148,136,0.8)]"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900",
+                  "rounded-2xl border bg-white px-5 py-4 text-left transition hover:border-[#121314]",
+                  on ? "border-[#121314] ring-2 ring-[#121314]" : alert ? "border-[#F3B7C0] bg-[#FFF5F6]" : "border-[#E3E5E0]",
                 ].join(" ")}
               >
-                {statusFilterLabel(status)}
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8F948C]">{tile.label}</p>
+                <p className={`mt-1 font-display text-4xl font-black leading-none tabular-nums ${tile.id === "live" && value > 0 ? "text-[#3D6600]" : alert ? "text-[#C8102E]" : "text-[#121314]"}`}>{value}</p>
+                <p className="mt-2 text-[11px] font-semibold text-[#8F948C]">{on ? "Showing only these · tap to clear" : "Tap to show"}</p>
               </button>
             );
           })}
+          <div className="rounded-2xl border border-[#E3E5E0] bg-white px-5 py-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8F948C]">Accuracy today</p>
+            <p className="mt-1 font-display text-4xl font-black leading-none tabular-nums text-[#121314]">{formatPercentage(classAccuracy, "—", 0)}</p>
+            <p className="mt-2 text-[11px] font-semibold text-[#8F948C]">{activeTodayCount} active today</p>
+          </div>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#E3E5E0] bg-white px-4 py-2.5">
+          <p className="mr-auto text-sm font-bold text-[#121314]">
+            {filter === "all" ? `All ${cards.length} students` : `${statusFilterLabel(filter)} · ${filteredCards.length}`}
+            {!sort ? <span className="ml-2 text-xs font-semibold text-[#8F948C]">Need help shows first</span> : null}
+          </p>
+          <button
+            type="button"
+            aria-pressed={activeOnly}
+            onClick={() => setActiveOnly((value) => !value)}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${activeOnly ? "border-[#121314] bg-[#121314] text-white" : "border-[#D9DBD4] text-[#121314] hover:border-[#121314]"}`}
+          >
+            <Eye className="h-4 w-4" aria-hidden="true" />Active only
+          </button>
+          <button
+            type="button"
+            aria-pressed={spotlightMode}
+            onClick={() => setSpotlightMode((value) => !value)}
+            title="Show the six students who most need attention"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${spotlightMode ? "border-[#121314] bg-[#121314] text-white" : "border-[#D9DBD4] text-[#121314] hover:border-[#121314]"}`}
+          >
+            <Sparkles className="h-4 w-4" aria-hidden="true" />Spotlight
+          </button>
+          {selectedClass?.id ? <FocusModeControl classId={selectedClass.id} /> : null}
+          <FullscreenToggle inline className="inline-flex items-center gap-1.5 rounded-full bg-[#121314] px-3.5 py-1.5 text-sm font-bold text-white transition hover:bg-black" />
         </div>
 
         {loading ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm font-semibold text-slate-500">
+          <div className="rounded-2xl border border-[#E3E5E0] bg-white p-8 text-center text-sm font-semibold text-[#5A5E63]">
             Loading live class activity…
           </div>
         ) : filteredCards.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <div className="rounded-2xl border border-[#E3E5E0] bg-white p-8 text-center text-sm text-[#5A5E63]">
             No students match the current filter yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-16px_rgba(15,23,42,0.18)]">
+          <div className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
             {/* Column headers */}
-            <div className="grid grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.8fr_0.7fr_0.7fr_1fr] items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
+            <div className="grid grid-cols-[1.6fr_1fr_0.9fr_1.2fr_1fr_0.6fr] items-center gap-4 border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-2 text-[10px] font-black uppercase tracking-[0.16em]">
               <SortHeader sortKey="student" sort={sort} onSort={updateSort}>Student</SortHeader>
               <SortHeader sortKey="realm" sort={sort} onSort={updateSort}>Realm</SortHeader>
-              <SortHeader sortKey="level" sort={sort} onSort={updateSort}>Level</SortHeader>
-              <SortHeader sortKey="week" sort={sort} onSort={updateSort}>Week</SortHeader>
-              <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Activity</SortHeader>
-              <SortHeader sortKey="attempt" sort={sort} onSort={updateSort}>Attempt / progress</SortHeader>
-              <SortHeader sortKey="score" sort={sort} onSort={updateSort} align="right">Current score</SortHeader>
-              <SortHeader sortKey="percentage" sort={sort} onSort={updateSort} align="right">Current accuracy</SortHeader>
+              <SortHeader sortKey="level" sort={sort} onSort={updateSort}>Level · Week</SortHeader>
+              <SortHeader sortKey="lesson" sort={sort} onSort={updateSort}>Doing now</SortHeader>
+              <SortHeader sortKey="percentage" sort={sort} onSort={updateSort}>Score</SortHeader>
               <SortHeader sortKey="lastActive" sort={sort} onSort={updateSort} align="right">Last active</SortHeader>
             </div>
             {filteredCards.map((card) => {
@@ -1365,62 +1396,66 @@ export default function LiveClassPanel({
               const correct = Math.max(0, card.correctCount ?? 0);
               const accuracy = calculateAccuracy(correct, answered);
               const notStarted = displayGroup === "waiting_to_start";
-              const levelTag = card.workingLevelBadge ?? "—";
-              const weekTag = card.currentWeek ? `W${card.currentWeek}` : "—";
-              const assessmentTitle = /^(pre-test|post-test)$/i.test(card.currentLessonTitle ?? "")
-                ? card.currentLessonTitle
-                : null;
-              const presenceOnly = !card.currentLesson && !card.currentActivityLabel && Boolean(card.lastActiveAt);
-              const lessonTag = notStarted
-                ? "—"
-                : assessmentTitle ?? (card.currentLesson ? card.currentLesson.replace(/^.*-/, "").toUpperCase() : presenceOnly ? "App open" : "—");
-              const assessmentProgress = assessmentTitle && card.currentStepLabel
-                ? card.currentStepLabel.replace(/^Question\s+/i, "Q")
-                : null;
+              const needsHelp = displayGroup === "needs_support";
+              const activeNow = isCardActiveNow(card);
+              const realm = liveRealmTag(card.currentRealm);
+              const doing = describeLiveActivity(card, notStarted, activeNow);
+              const tone = accuracy == null ? "#C9CCC6" : accuracy >= 70 ? "#5FAE00" : accuracy >= 50 ? "#D08A00" : "#C8102E";
               return (
                 <button
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedStudentId(card.id)}
-                  className="grid w-full grid-cols-[1.5fr_0.6fr_0.7fr_0.5fr_0.7fr_0.8fr_0.7fr_0.7fr_1fr] items-center gap-3 border-t border-slate-100 px-4 py-2.5 text-left transition hover:bg-slate-50"
+                  className={`relative grid w-full grid-cols-[1.6fr_1fr_0.9fr_1.2fr_1fr_0.6fr] items-center gap-4 border-t border-[#F1F2EE] px-5 py-3 text-left transition first:border-t-0 ${needsHelp ? "bg-[#FFF5F6] hover:bg-[#FFECEF]" : "hover:bg-[#FAFBF8]"}`}
                   title="Open student detail"
                 >
+                  {needsHelp ? <span className="absolute inset-y-0 left-0 w-1 bg-[#C8102E]" aria-hidden="true" /> : null}
                   {/* status dot + name */}
-                  <div className="flex min-w-0 items-center gap-2.5">
-                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${meta.dot}`} />
-                    <span className="truncate text-sm font-bold text-slate-900">{card.displayName}</span>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0" aria-label={meta.label} title={meta.label}>
+                      {activeNow || needsHelp ? <span className={`absolute inset-0 animate-ping rounded-full opacity-60 ${meta.dot}`} /> : null}
+                      <span className={`relative h-2.5 w-2.5 rounded-full ${meta.dot}`} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className={`truncate text-sm font-black ${notStarted ? "text-[#A3A7A1]" : "text-[#121314]"}`}>{card.displayName}</p>
+                      {needsHelp && card.aiIssue ? <p className="truncate text-xs font-bold text-[#C8102E]">{card.aiIssue}</p> : null}
+                    </div>
                   </div>
-                  <span
-                    className="text-xs font-bold text-slate-500"
-                    title={formatRealmName(card.currentRealm)}
-                    aria-label={`Realm: ${formatRealmName(card.currentRealm)}`}
-                  >
-                    {formatRealmBadge(card.currentRealm)}
+                  {realm ? (
+                    <span
+                      className="inline-flex w-fit max-w-full items-center gap-1.5 truncate rounded-full px-2.5 py-1 text-xs font-bold"
+                      style={{ background: `${realm.color}14`, color: realm.color }}
+                      title={formatRealmName(card.currentRealm)}
+                      aria-label={`Realm: ${formatRealmName(card.currentRealm)}`}
+                    >
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: realm.color }} />{realm.label}
+                    </span>
+                  ) : <span className="text-[#C9CCC6]">—</span>}
+                  <span className="text-sm font-semibold text-[#3F4246]">
+                    {liveLevelLabel(card.workingLevelBadge)}
+                    {card.currentWeek ? <span className="text-[#8F948C]"> · Week {card.currentWeek}</span> : null}
                   </span>
-                  <span className="text-xs font-semibold text-slate-600">{levelTag}</span>
-                  <span className="text-xs font-semibold text-slate-500 tabular-nums">{weekTag}</span>
-                  <span className="truncate text-xs font-semibold text-slate-600">{lessonTag}</span>
-                  <span className="truncate text-xs font-bold tabular-nums text-slate-500">
-                    {presenceOnly
-                      ? "Activity unavailable"
-                      : assessmentProgress ?? (!notStarted && card.attemptNumber ? `Attempt ${card.attemptNumber}` : "—")}
-                  </span>
-                  {/* score */}
-                  <span className="text-right text-sm font-bold tabular-nums text-slate-700">
-                    {card.assessmentUnmarked ? <span className="text-xs font-semibold text-slate-400">Marked at end</span> : answered > 0 ? `${correct}/${answered}` : "—"}
-                  </span>
-                  {/* accuracy */}
-                  <span className={`text-right text-sm font-black tabular-nums ${
-                    accuracy == null ? "text-slate-300"
-                    : accuracy >= 70 ? "text-emerald-700"
-                    : accuracy >= 50 ? "text-amber-700"
-                    : "text-rose-700"
-                  }`}>
-                    {formatAccuracy(correct, answered, "—", 0)}
-                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-[#121314]">{doing.title}</p>
+                    {doing.detail ? <p className="truncate text-xs font-semibold text-[#8F948C]">{doing.detail}</p> : null}
+                  </div>
+                  {/* score + accuracy */}
+                  {card.assessmentUnmarked ? (
+                    <span className="text-xs font-semibold text-[#8F948C]">Marked at end</span>
+                  ) : answered > 0 && accuracy != null ? (
+                    <div className="w-28" aria-label={`Current score ${correct}/${answered}, Current accuracy ${formatAccuracy(correct, answered, "—", 0)}`}>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-sm font-black tabular-nums text-[#121314]">{correct}/{answered}</span>
+                        <span className="text-xs font-black tabular-nums" style={{ color: tone }}>{formatAccuracy(correct, answered, "—", 0)}</span>
+                      </div>
+                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#EDEEE9]">
+                        <div className="h-full rounded-full" style={{ width: `${Math.max(accuracy, 3)}%`, background: tone }} />
+                      </div>
+                    </div>
+                  ) : <span className="text-[#C9CCC6]">—</span>}
                   {/* last active */}
-                  <span className="text-right text-[11px] font-semibold text-slate-400">
-                    {getDisplayStatusSubtext(card, displayGroup)}
+                  <span className={`text-right text-xs font-bold ${activeNow ? "text-[#3D6600]" : "text-[#8F948C]"}`} title={getDisplayStatusSubtext(card, displayGroup)}>
+                    {activeNow ? "Now" : shortTimeAgo(card.lastActiveAt)}
                   </span>
                 </button>
               );

@@ -42,8 +42,8 @@ const checks = [
   ["lesson reveals are gated by server eligibility", /if \(completed === true\)[\s\S]*awardAndReveal\(studentId, "lesson"/.test(syncClient)],
   [
     "live table distinguishes lesson attempts",
-    /<SortHeader sortKey="attempt"[\s\S]*?>Attempt \/ progress<\/SortHeader>/.test(livePanel) &&
-      /`Attempt \$\{card\.attemptNumber\}`/.test(livePanel),
+    // Attempts show under "Doing now" (e.g. "Lesson 2 · Attempt 8").
+    /`Attempt \$\{card\.attemptNumber\}`/.test(livePanel),
   ],
   ["timed lessons finish on time, not question count", /const finished = secondsLeft <= 0;/.test(practiceRunner)],
   ["Number Nexus lessons finish on time, not question count", /const finished = secondsLeft <= 0;/.test(lessonEngine)],

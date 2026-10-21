@@ -18,7 +18,7 @@ function isFullscreenSupported() {
 
 function serverFullscreenSnapshot() { return false; }
 
-export function FullscreenToggle({ inline = false }: { inline?: boolean } = {}) {
+export function FullscreenToggle({ inline = false, className }: { inline?: boolean; className?: string } = {}) {
   const isFullscreen = useSyncExternalStore(subscribeFullscreen, isFullscreenActive, serverFullscreenSnapshot);
   const isSupported = useSyncExternalStore(subscribeFullscreen, isFullscreenSupported, serverFullscreenSnapshot);
 
@@ -43,7 +43,7 @@ export function FullscreenToggle({ inline = false }: { inline?: boolean } = {}) 
       type="button"
       onClick={toggleFullscreen}
       data-inline={inline ? "true" : undefined}
-      className={`fullscreen-toggle ${inline ? "rounded-lg px-2.5 py-1.5 text-xs" : "fixed bottom-4 right-4 z-[100] rounded-2xl px-4 py-2 text-sm"} border border-white/20 bg-slate-950/80 font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900`}
+      className={className ? `fullscreen-toggle ${className}` : `fullscreen-toggle ${inline ? "rounded-lg px-2.5 py-1.5 text-xs" : "fixed bottom-4 right-4 z-[100] rounded-2xl px-4 py-2 text-sm"} border border-white/20 bg-slate-950/80 font-black text-white shadow-xl backdrop-blur transition hover:bg-slate-900`}
       style={inline ? undefined : { bottom: "max(1rem, env(safe-area-inset-bottom))" }}
       aria-label={isFullscreen ? "Exit full screen" : "Enter full screen"}
       title={isFullscreen ? "Exit full screen" : "Enter full screen"}

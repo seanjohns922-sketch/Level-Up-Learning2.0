@@ -52,6 +52,7 @@ export default function FocusModeControl({ classId }: { classId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [draftRealm, setDraftRealm] = useState<string>(realmOptions[0]?.id ?? "number");
   const [draftDays, setDraftDays] = useState<number | null>(14);
+  const [open, setOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -114,18 +115,36 @@ export default function FocusModeControl({ classId }: { classId: string }) {
   }
 
   const selectClass =
-    "rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm font-semibold text-slate-700";
+    "rounded-lg border border-[#D9DBD4] bg-white px-2 py-1.5 text-sm font-semibold text-[#121314]";
+  const target = (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="3.4" />
+    </svg>
+  );
+  const buttonLabel = loading ? "Focus" : focus ? `Focus: ${focusRealmName}${focus.engaged ? " · locked" : ""}` : "Focus: Off";
 
   return (
-    <div className="mt-4 border-t border-slate-100 pt-3">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-slate-500">
-          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="9" />
-            <circle cx="12" cy="12" r="3.4" />
-          </svg>
-          Focus Mode
-        </span>
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${
+          focus?.engaged
+            ? "border-[#83E300] bg-[#EEFBDB] text-[#3D6600]"
+            : open ? "border-[#121314] bg-[#121314] text-white" : "border-[#D9DBD4] text-[#121314] hover:border-[#121314]"
+        }`}
+      >
+        {target}
+        {buttonLabel}
+        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </button>
+      {open ? <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} /> : null}
+    <div role="dialog" aria-label="Focus mode" className={`${open ? "" : "hidden"} absolute right-0 top-full z-30 mt-2 w-[min(400px,calc(100vw-2rem))] rounded-2xl border border-[#E3E5E0] bg-white p-4 text-left shadow-2xl`}>
+      <p className="flex items-center gap-2 text-sm font-black text-[#121314]">{target}Focus mode</p>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
 
         {loading ? (
           <span className="h-6 w-40 animate-pulse rounded bg-slate-100" />
@@ -162,7 +181,7 @@ export default function FocusModeControl({ classId }: { classId: string }) {
               {focus.engaged ? "In session — locked" : "Class in session"}
             </button>
 
-            <span className="mx-1 h-5 w-px bg-slate-200" aria-hidden />
+            <span className="w-full" aria-hidden />
 
             <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500">
               Realm
@@ -199,7 +218,7 @@ export default function FocusModeControl({ classId }: { classId: string }) {
           </>
         ) : (
           <>
-            <span className="text-slate-500">Lock the class to one realm during class — students still roam at home.</span>
+            <span className="w-full text-xs text-[#5A5E63]">Lock the class to one realm during class. Students still roam at home.</span>
             <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500">
               Realm
               <select
@@ -241,8 +260,9 @@ export default function FocusModeControl({ classId }: { classId: string }) {
           </>
         )}
 
-        {error ? <span className="text-xs font-semibold text-rose-600">{error}</span> : null}
+        {error ? <span className="w-full text-xs font-semibold text-rose-600">{error}</span> : null}
       </div>
+    </div>
     </div>
   );
 }
