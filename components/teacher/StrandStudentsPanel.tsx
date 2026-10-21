@@ -881,7 +881,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
             );
           })}
         </div>
-        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] px-5 py-3 bg-gradient-to-b from-[#FAFBF8] to-[#F1F2EE] border-b border-[#E3E5E0]">
+        <div className="grid grid-cols-[2fr_0.7fr_0.7fr_0.5fr_1.15fr_1.3fr_1.05fr] items-center px-5 py-3 bg-gradient-to-b from-[#FAFBF8] to-[#F1F2EE] border-b border-[#E3E5E0]">
           <div className="flex items-center gap-3">
             {([
               ["name", "Student"],
@@ -893,7 +893,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                   key={key}
                   onClick={() => toggleSort(key)}
                   className={[
-                    "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
+                    "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] whitespace-nowrap transition flex items-center gap-1",
                     active ? "text-[#121314]" : "text-[#8A8E89] hover:text-[#3F4246]",
                   ].join(" ")}
                 >
@@ -915,7 +915,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           ] as [SortKey | null, string][]).map(([key, label], idx) => {
             if (!key) {
               return (
-                <span key={`hdr-${idx}`} className="text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
+                <span key={`hdr-${idx}`} className="whitespace-nowrap text-left text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
                   {label}
                 </span>
               );
@@ -926,7 +926,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                 key={`${key}-${idx}`}
                 onClick={() => toggleSort(key)}
                 className={[
-                  "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] transition flex items-center gap-1",
+                  "text-left text-[10px] font-extrabold uppercase tracking-[0.12em] whitespace-nowrap transition flex items-center gap-1",
                   active ? "text-[#121314]" : "text-[#8A8E89] hover:text-[#3F4246]",
                 ].join(" ")}
               >
