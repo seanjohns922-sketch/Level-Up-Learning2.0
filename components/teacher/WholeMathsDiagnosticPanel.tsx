@@ -30,7 +30,9 @@ import { formatProgressionPoint } from "@/lib/live-maths-progression";
 type DiagnosticStudent = { id: string; display_name: string; school_year_level?: string | null; year_level?: string | null };
 type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
 type DiagnosticView = "live" | "run";
-type StudentSort = "behind-first" | "surname-asc" | "surname-desc" | "given-asc" | "live-desc" | "live-asc" | "diagnostic-desc" | "diagnostic-asc";
+type LiveSortKey = "surname" | "given" | "expected" | "start" | "mid" | "end" | "live" | "growth" | "diagnostic";
+type StudentSort = "behind-first" | `${LiveSortKey}-${"asc" | "desc"}`;
+type RunSortKey = "name" | "result" | string; // a strand id sorts by that strand's progress
 type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
 type DiagnosticPoint = { sittingId: string; checkpoint: FormalCheckpoint; level: number; completedAt: string };
 
@@ -216,6 +218,34 @@ function GrowthLine({ row, onReport, onOpenSitting }: { row: LiveRow; onReport: 
   );
 }
 
+function SortArrow({ direction }: { direction: "asc" | "desc" | null }) {
+  return <span aria-hidden="true" className={`text-[9px] ${direction ? "text-[#121314]" : "opacity-50"}`}>{direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}</span>;
+}
+
+/** A Live progression column heading: click to sort, click again to reverse. Levels start highest first. */
+function SortHeading({ label, sortKey, sort, onSort, first = "desc", align = "center" }: {
+  label: string; sortKey: LiveSortKey; sort: StudentSort; onSort: (sort: StudentSort) => void; first?: "asc" | "desc"; align?: "left" | "center";
+}) {
+  const active = sort.startsWith(`${sortKey}-`) ? (sort.split("-")[1] as "asc" | "desc") : null;
+  const next = active ? (active === "asc" ? "desc" : "asc") : first;
+  return (
+    <button type="button" onClick={() => onSort(`${sortKey}-${next}`)} aria-label={`Sort by ${label}`} className={`flex min-w-0 items-center gap-1 uppercase tracking-[inherit] transition hover:text-[#121314] ${align === "left" ? "justify-start text-left" : "justify-center"} ${active ? "text-[#121314]" : ""}`}>
+      <span className="truncate">{label}</span><SortArrow direction={active} />
+    </button>
+  );
+}
+
+function RunSortHeading({ label, sortKey, sort, onSort, first = "desc", align = "center" }: {
+  label: string; sortKey: RunSortKey; sort: { key: RunSortKey; direction: "asc" | "desc" }; onSort: (sort: { key: RunSortKey; direction: "asc" | "desc" }) => void; first?: "asc" | "desc"; align?: "left" | "center" | "right";
+}) {
+  const active = sort.key === sortKey ? sort.direction : null;
+  return (
+    <button type="button" onClick={() => onSort({ key: sortKey, direction: active ? (active === "asc" ? "desc" : "asc") : first })} aria-label={`Sort by ${label}`} className={`flex min-w-0 items-center gap-1 uppercase tracking-[inherit] transition hover:text-[#121314] ${align === "left" ? "justify-start" : align === "right" ? "justify-end" : "justify-center"} ${active ? "text-[#121314]" : ""}`}>
+      <span className="truncate">{label}</span><SortArrow direction={active} />
+    </button>
+  );
+}
+
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
   students,
@@ -257,6 +287,7 @@ export default function WholeMathsDiagnosticPanel({
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
   const [studentSort, setStudentSort] = useState<StudentSort>("behind-first");
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
+  const [runSort, setRunSort] = useState<{ key: RunSortKey; direction: "asc" | "desc" }>({ key: "name", direction: "asc" });
   const [liveLoading, setLiveLoading] = useState(true);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [diagnosticLoading, setDiagnosticLoading] = useState(true);
@@ -451,9 +482,27 @@ export default function WholeMathsDiagnosticPanel({
         expectedGrowth: first && expectedNow != null && firstExpected != null ? Math.max(0, expectedNow - firstExpected) : null,
       };
     });
-    if (studentSort !== "behind-first") return rows;
-    const gap = (row: LiveRow) => (row.liveLevel != null && row.expectedNow != null ? row.liveLevel - row.expectedNow : null);
-    return [...rows].sort((left, right) => compareNullableLevels(gap(left), gap(right), "asc") || NAME_COLLATOR.compare(left.student.display_name, right.student.display_name));
+    const byName = (left: LiveRow, right: LiveRow) => NAME_COLLATOR.compare(left.student.display_name, right.student.display_name);
+    if (studentSort === "behind-first") {
+      const gap = (row: LiveRow) => (row.liveLevel != null && row.expectedNow != null ? row.liveLevel - row.expectedNow : null);
+      return [...rows].sort((left, right) => compareNullableLevels(gap(left), gap(right), "asc") || byName(left, right));
+    }
+    const [key, direction] = studentSort.split("-") as [LiveSortKey, "asc" | "desc"];
+    if (key === "surname" || key === "given") {
+      const part = (row: LiveRow) => studentNameParts(row.student.display_name)[key === "surname" ? "surname" : "given"];
+      return [...rows].sort((left, right) => (direction === "asc" ? 1 : -1) * NAME_COLLATOR.compare(part(left), part(right)) || byName(left, right));
+    }
+    const value = (row: LiveRow): number | null => {
+      switch (key) {
+        case "expected": return row.expectedNow;
+        case "start": case "mid": case "end": return row.byCheckpoint.get(key)?.level ?? null;
+        case "live": return row.liveLevel;
+        case "growth": return row.growth;
+        case "diagnostic": return row.points.at(-1)?.level ?? null;
+        default: return null;
+      }
+    };
+    return [...rows].sort((left, right) => compareNullableLevels(value(left), value(right), direction) || byName(left, right));
   }, [now, studentSort, trackerStudents]);
 
   const runRows = useMemo(() => students.map((student) => {
@@ -470,7 +519,19 @@ export default function WholeMathsDiagnosticPanel({
           ? "progress" as const
           : "notStarted" as const;
     return { student, sitting, state, otherActive: otherOpen ? otherOpen.checkpoint as FormalCheckpoint : null };
-  }), [assignmentCheckpoint, sittings, students]);
+  }).sort((left, right) => {
+    const byName = NAME_COLLATOR.compare(studentNameParts(left.student.display_name).surname, studentNameParts(right.student.display_name).surname)
+      || NAME_COLLATOR.compare(left.student.display_name, right.student.display_name);
+    if (runSort.key === "name") return runSort.direction === "asc" ? byName : -byName;
+    // Result: overall level. A strand: done counts above any answered count; unassigned last.
+    const value = (row: { sitting: TeacherDiagnosticSittingRow | null }) => {
+      if (!row.sitting) return null;
+      if (runSort.key === "result") return row.sitting.overall_level;
+      const result = row.sitting.strand_results.find((item) => item.strand === runSort.key);
+      return result?.status === "completed" ? 21 : result?.answered_count ?? 0;
+    };
+    return compareNullableLevels(value(left), value(right), runSort.direction) || byName;
+  }), [assignmentCheckpoint, runSort, sittings, students]);
   const runCounts = useMemo(() => runRows.reduce(
     (acc, row) => {
       if (row.state !== "unassigned") acc.assigned += 1;
@@ -620,9 +681,9 @@ export default function WholeMathsDiagnosticPanel({
             ) : (
               <>
                 <div className={`${RUN_COLS} border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-center text-[10px] font-black uppercase tracking-[0.12em] text-[#8F948C]`}>
-                  <span className="text-left">Student</span>
-                  {DIAGNOSTIC_STRANDS.map((definition) => <span key={definition.strand} className="truncate">{AC_STRANDS[definition.strand].label}</span>)}
-                  <span className="text-right">{CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} result</span>
+                  <RunSortHeading label="Student" sortKey="name" first="asc" sort={runSort} onSort={setRunSort} align="left" />
+                  {DIAGNOSTIC_STRANDS.map((definition) => <RunSortHeading key={definition.strand} label={AC_STRANDS[definition.strand].label} sortKey={definition.strand} sort={runSort} onSort={setRunSort} />)}
+                  <RunSortHeading label={`${CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} result`} sortKey="result" sort={runSort} onSort={setRunSort} align="right" />
                 </div>
                 {runRows.map(({ student, sitting, state, otherActive }) => {
                   const done = sitting ? sitting.strand_results.filter((result) => result.status === "completed").length : 0;
@@ -701,19 +762,29 @@ export default function WholeMathsDiagnosticPanel({
               <option value="live-asc">Live level: lowest</option>
               <option value="diagnostic-desc">Diagnostic: highest</option>
               <option value="diagnostic-asc">Diagnostic: lowest</option>
+              <option value="expected-desc">Expected now: highest</option>
+              <option value="expected-asc">Expected now: lowest</option>
+              <option value="start-desc">Start: highest</option>
+              <option value="start-asc">Start: lowest</option>
+              <option value="mid-desc">Mid: highest</option>
+              <option value="mid-asc">Mid: lowest</option>
+              <option value="end-desc">End: highest</option>
+              <option value="end-asc">End: lowest</option>
+              <option value="growth-desc">Growth: most</option>
+              <option value="growth-asc">Growth: least</option>
             </select>
           </label>
         </div>
 
         {/* Column headings */}
         <div className={`${LIVE_COLS} sticky top-0 z-10 border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-center text-[10px] font-black uppercase tracking-[0.14em] text-[#8F948C]`}>
-          <span className="text-left">Student</span>
-          <span>Expected now</span>
-          <span>Start</span>
-          <span>Mid</span>
-          <span>End</span>
-          <span className="text-[#121314]">Live now</span>
-          <span className="text-left">Growth vs expected</span>
+          <SortHeading label="Student" sortKey="surname" first="asc" sort={studentSort} onSort={setStudentSort} align="left" />
+          <SortHeading label="Expected now" sortKey="expected" sort={studentSort} onSort={setStudentSort} />
+          <SortHeading label="Start" sortKey="start" sort={studentSort} onSort={setStudentSort} />
+          <SortHeading label="Mid" sortKey="mid" sort={studentSort} onSort={setStudentSort} />
+          <SortHeading label="End" sortKey="end" sort={studentSort} onSort={setStudentSort} />
+          <SortHeading label="Live now" sortKey="live" sort={studentSort} onSort={setStudentSort} />
+          <SortHeading label="Growth vs expected" sortKey="growth" sort={studentSort} onSort={setStudentSort} align="left" />
           <span />
         </div>
 
