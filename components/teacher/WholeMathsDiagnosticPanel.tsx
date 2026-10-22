@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { diagnosticReportHtml, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Check, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
-import { STANDING_META, expectedLevel, standingForGap } from "@/lib/proficiency";
+import { CalendarDays, Check, ChevronDown, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
+import { STANDING_META, STANDING_ORDER, expectedLevel, standingForGap } from "@/lib/proficiency";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
   DIAGNOSTIC_FLOOR,
@@ -30,7 +30,7 @@ import { formatProgressionPoint } from "@/lib/live-maths-progression";
 type DiagnosticStudent = { id: string; display_name: string; school_year_level?: string | null; year_level?: string | null };
 type TrackerTab = "all" | LiveMathsProgressionRow["strand"];
 type DiagnosticView = "live" | "run";
-type StudentSort = "surname-asc" | "surname-desc" | "given-asc" | "live-desc" | "live-asc" | "diagnostic-desc" | "diagnostic-asc";
+type StudentSort = "behind-first" | "surname-asc" | "surname-desc" | "given-asc" | "live-desc" | "live-asc" | "diagnostic-desc" | "diagnostic-asc";
 type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
 type DiagnosticPoint = { sittingId: string; checkpoint: FormalCheckpoint; level: number; completedAt: string };
 
@@ -41,19 +41,8 @@ const CHECKPOINT_LABEL = {
   ad_hoc: "Ad hoc",
 } as const;
 
-const CHECKPOINT_SHORT: Record<FormalCheckpoint, string> = {
-  start: "S",
-  mid: "M",
-  end: "E",
-};
-
-const TRACK_LEVELS = ["Prep", "1", "2", "3", "4", "5", "6", "7", "8"] as const;
 const TRACK_MAX_LEVEL = 8;
 const NAME_COLLATOR = new Intl.Collator("en-AU", { numeric: true, sensitivity: "base" });
-
-function levelPosition(level: number) {
-  return `${(Math.max(0, Math.min(TRACK_MAX_LEVEL, level)) / TRACK_MAX_LEVEL) * 100}%`;
-}
 
 function studentNameParts(displayName: string) {
   const parts = displayName.trim().split(/\s+/).filter(Boolean);
@@ -68,63 +57,6 @@ function compareNullableLevels(left: number | null, right: number | null, direct
   if (left == null) return 1;
   if (right == null) return -1;
   return direction === "asc" ? left - right : right - left;
-}
-
-function ProgressionTrack({
-  liveLevel,
-  diagnosticPoints,
-  onSelectDiagnostic,
-}: {
-  liveLevel: number | null;
-  diagnosticPoints: DiagnosticPoint[];
-  onSelectDiagnostic: (sittingId: string) => void;
-}) {
-  const latestDiagnostic = diagnosticPoints.at(-1)?.level ?? null;
-  return (
-    <div className="w-full min-w-0">
-      <div className="relative ml-[76px] h-4 text-[10px] font-black uppercase tracking-wide text-slate-400" aria-hidden>
-        {TRACK_LEVELS.map((level, index) => (
-          <span
-            key={level}
-            className={`absolute ${index === 0 ? "" : index === TRACK_LEVELS.length - 1 ? "-translate-x-full" : "-translate-x-1/2"}`}
-            style={{ left: levelPosition(index) }}
-          >
-            {level}
-          </span>
-        ))}
-      </div>
-      <div className="mt-1 grid grid-cols-[68px_1fr] items-center gap-2">
-        <span className="text-[10px] font-black uppercase tracking-wide text-teal-700">Live</span>
-        <div className="relative h-5">
-          <div className="absolute inset-x-0 top-2 h-1 rounded-full bg-slate-100" />
-          {liveLevel != null && <>
-            <div className="absolute left-0 top-2 h-1 rounded-full bg-teal-500" style={{ width: levelPosition(liveLevel) }} />
-            <span className="absolute top-0 h-5 w-5 -translate-x-1/2 rounded-full border-[3px] border-white bg-teal-600 shadow" style={{ left: levelPosition(liveLevel) }} aria-label={`Current live level ${formatProgressionPoint(liveLevel)}`} />
-          </>}
-        </div>
-      </div>
-      <div className="mt-2 grid grid-cols-[68px_1fr] items-center gap-2">
-        <span className="text-[10px] font-black uppercase tracking-wide text-[#121314]">Diagnostic</span>
-        <div className="relative h-7">
-          <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-slate-100" />
-          {latestDiagnostic != null && <div className="absolute left-0 top-3 h-1 rounded-full bg-[#5A5E63]" style={{ width: levelPosition(latestDiagnostic) }} />}
-          {diagnosticPoints.map((point) => (
-            <button
-              key={`${point.checkpoint}-${point.completedAt}`}
-              type="button"
-              onClick={() => onSelectDiagnostic(point.sittingId)}
-              className="absolute top-0 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white bg-[#121314] text-[10px] font-black text-white shadow"
-              style={{ left: levelPosition(point.level) }}
-              title={`${CHECKPOINT_LABEL[point.checkpoint]}: ${formatProgressionPoint(point.level)}. Open details.`}
-              aria-label={`Open ${CHECKPOINT_LABEL[point.checkpoint]} result at level ${formatProgressionPoint(point.level)}`}
-            >
-              {CHECKPOINT_SHORT[point.checkpoint]}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 const CHECKPOINT_SHORT_LABEL: Record<FormalCheckpoint, string> = { start: "Start", mid: "Mid", end: "End" };
@@ -172,6 +104,118 @@ function RunStrandCell({ result }: { result: TeacherDiagnosticSittingRow["strand
   return <span title={result?.status === "unavailable" ? "Unavailable" : "Not started"} className="mx-auto block h-1.5 w-4 rounded-full bg-[#E3E5E0]" />;
 }
 
+// Live progression table: Expected now, Start, Mid, End, Live now, growth; a row opens its growth line.
+const LIVE_COLS = "grid grid-cols-[minmax(180px,1.4fr)_repeat(5,minmax(58px,0.55fr))_minmax(150px,1fr)_20px] items-center gap-3";
+// The growth bar spans a level and a quarter, so a full year's expected growth sits at 80%.
+const GROWTH_BAR_MAX = 1.25;
+
+type Standing = ReturnType<typeof standingForGap>;
+type LiveCheckpointPoint = DiagnosticPoint & { standing: Standing | null };
+type LiveRow = {
+  student: DiagnosticStudent;
+  schoolYear: string | null;
+  liveLevel: number | null;
+  liveStanding: Standing | null;
+  expectedNow: number | null;
+  points: LiveCheckpointPoint[];
+  byCheckpoint: Map<FormalCheckpoint, LiveCheckpointPoint>;
+  firstCheckpoint: FormalCheckpoint | null;
+  growth: number | null;
+  expectedGrowth: number | null;
+};
+
+const signed = (value: number, digits = 1) => `${value >= 0 ? "+" : ""}${value.toFixed(digits)}`;
+
+/** "Year 3", "3", "Foundation" → the labels the expectation scale uses. */
+function normalizeYearLabel(value: string | null | undefined): string | null {
+  if (!value) return null;
+  if (/prep|foundation|ground/i.test(value)) return "Prep";
+  const match = /(\d+)/.exec(value);
+  return match ? `Year ${match[1]}` : null;
+}
+
+function expectedAt(schoolYear: string | null, iso: string) {
+  const year = iso.slice(0, 4);
+  return expectedLevel(schoolYear, iso, { startsOn: `${year}-01-01`, endsOn: `${year}-12-31` });
+}
+
+function LevelBlock({ level, standing }: { level: number; standing: Standing | null }) {
+  const meta = standing ? STANDING_META[standing] : null;
+  return (
+    <span
+      className="inline-flex min-w-12 justify-center rounded-lg px-2 py-1 text-sm font-black tabular-nums"
+      style={meta ? { background: meta.bg, color: meta.fg } : { background: "#F1F2EE", color: "#121314" }}
+    >
+      {level.toFixed(1)}
+    </span>
+  );
+}
+
+/** One student's growth line, zoomed to the levels that matter for them. */
+function GrowthLine({ row, onReport, onOpenSitting }: { row: LiveRow; onReport: () => void; onOpenSitting: (sittingId: string) => void }) {
+  const first = row.points[0] ?? null;
+  const lastLevel = row.liveLevel ?? row.points.at(-1)?.level ?? null;
+  const values = [...row.points.map((point) => point.level), row.liveLevel, row.expectedNow].filter((value): value is number => value != null);
+  if (values.length === 0) {
+    return <div className="border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-5 text-sm text-[#5A5E63]">No live score or diagnostic yet for {row.student.display_name}.</div>;
+  }
+  const lo = Math.max(0, Math.floor(Math.min(...values) - 0.25));
+  const hi = Math.min(TRACK_MAX_LEVEL, Math.max(lo + 2, Math.ceil(Math.max(...values) + 0.25)));
+  const x = (value: number) => `${((Math.max(lo, Math.min(hi, value)) - lo) / (hi - lo)) * 100}%`;
+  const liveMeta = row.liveStanding ? STANDING_META[row.liveStanding] : null;
+  const liveColour = liveMeta ? (liveMeta.bg === "#121314" ? "#5FAE00" : liveMeta.bg) : "#5FAE00";
+  return (
+    <div className="grid gap-5 border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-5 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <div className="min-w-0">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8F948C]">Growth line · {row.student.display_name}</p>
+        <div className="relative mx-6 mt-9 h-24">
+          {Array.from({ length: hi - lo + 1 }, (_, index) => lo + index).map((level) => (
+            <span key={level} className="absolute top-12 -translate-x-1/2 text-center" style={{ left: x(level) }}>
+              <span className="mx-auto block h-3 w-px bg-[#C9CCC6]" />
+              <span className="mt-1 block whitespace-nowrap text-[10px] font-black text-[#8F948C]">{level === 0 ? "Prep" : `Level ${level}`}</span>
+            </span>
+          ))}
+          <span className="absolute inset-x-0 top-[54px] h-px bg-[#D9DBD4]" />
+          {row.expectedNow != null ? (
+            <>
+              <span className="absolute top-0 h-[66px] w-0 -translate-x-1/2 border-l-2 border-dashed border-[#121314]/40" style={{ left: x(row.expectedNow) }} />
+              <span className="absolute -top-5 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-[#5A5E63]" style={{ left: x(row.expectedNow) }}>Expected now {row.expectedNow.toFixed(1)}</span>
+            </>
+          ) : null}
+          {first && lastLevel != null && lastLevel > first.level ? (
+            <span className="absolute top-[52px] h-1.5 rounded-full bg-[#121314]" style={{ left: x(first.level), width: `calc(${x(lastLevel)} - ${x(first.level)})` }} />
+          ) : null}
+          {row.points.map((point) => (
+            <button key={point.sittingId} type="button" onClick={() => onOpenSitting(point.sittingId)} title="Open diagnostic details" className="absolute top-[47px] -translate-x-1/2" style={{ left: x(point.level) }}>
+              <span className="block h-4 w-4 rounded-full border-[3px] border-[#121314] bg-white" />
+              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#121314] px-1.5 py-0.5 text-[10px] font-black text-white">{CHECKPOINT_SHORT_LABEL[point.checkpoint]} {point.level.toFixed(1)}</span>
+            </button>
+          ))}
+          {row.liveLevel != null ? (
+            <span className="absolute top-[45px] -translate-x-1/2" style={{ left: x(row.liveLevel) }}>
+              <span className="block h-5 w-5 rounded-full ring-4 ring-[#FAFBF8]" style={{ background: liveColour }} />
+              <span className="absolute left-1/2 top-7 -translate-x-1/2 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10px] font-black" style={liveMeta ? { background: liveMeta.bg, color: liveMeta.fg } : { background: "#F1F2EE", color: "#121314" }}>Now {row.liveLevel.toFixed(1)}</span>
+            </span>
+          ) : null}
+        </div>
+      </div>
+      <div className="grid content-start gap-2 rounded-2xl border border-[#E3E5E0] bg-white p-4">
+        {liveMeta ? <span className="inline-flex w-fit rounded-full px-2.5 py-1 text-[11px] font-black" style={{ background: liveMeta.bg, color: liveMeta.fg }}>{liveMeta.label}</span> : null}
+        {row.growth == null || row.expectedGrowth == null || !first ? (
+          <p className="text-sm text-[#5A5E63]">{row.liveLevel == null ? "The live score appears once there is progress to measure." : "No diagnostic yet. The growth line starts at their first Start, Mid or End result."}</p>
+        ) : (
+          <>
+            <p className="text-sm text-[#121314]"><b>{signed(row.growth)} levels</b> since {CHECKPOINT_SHORT_LABEL[first.checkpoint]}</p>
+            <p className="text-sm text-[#5A5E63]">Expected {signed(row.expectedGrowth, 2)} in that time.</p>
+            <p className={`text-sm font-black ${row.growth >= row.expectedGrowth ? "text-[#3D6600]" : "text-[#8A5A00]"}`}>{row.growth >= row.expectedGrowth ? "Growing faster than expected" : "Growing slower than expected"}</p>
+          </>
+        )}
+        <button type="button" onClick={onReport} className="mt-2 inline-flex w-fit rounded-full bg-[#121314] px-4 py-2 text-xs font-bold text-[#83E300] hover:bg-black" aria-label={`Diagnostic report for ${row.student.display_name}`}>Open full report</button>
+      </div>
+    </div>
+  );
+}
+
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
   students,
@@ -211,7 +255,8 @@ export default function WholeMathsDiagnosticPanel({
   const [progression, setProgression] = useState<LiveMathsProgressionRow[]>([]);
   const [view, setView] = useState<DiagnosticView>("live");
   const [selectedStrand, setSelectedStrand] = useState<TrackerTab>("all");
-  const [studentSort, setStudentSort] = useState<StudentSort>("surname-asc");
+  const [studentSort, setStudentSort] = useState<StudentSort>("behind-first");
+  const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
   const [liveLoading, setLiveLoading] = useState(true);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [diagnosticLoading, setDiagnosticLoading] = useState(true);
@@ -381,6 +426,35 @@ export default function WholeMathsDiagnosticPanel({
       return comparison || NAME_COLLATOR.compare(left.student.display_name, right.student.display_name);
     });
   }, [diagnosticPointsByStudent, progressionByStudent, selectedStrand, studentSort, students]);
+
+  const liveRows = useMemo<LiveRow[]>(() => {
+    const nowIso = new Date(now).toISOString();
+    const rows = trackerStudents.map(({ student, liveLevel, diagnosticPoints }) => {
+      const schoolYear = normalizeYearLabel(student.school_year_level ?? student.year_level ?? null);
+      const expectedNow = expectedAt(schoolYear, nowIso);
+      const points: LiveCheckpointPoint[] = diagnosticPoints.map((point) => {
+        const expected = expectedAt(schoolYear, point.completedAt);
+        return { ...point, standing: expected == null ? null : standingForGap(point.level - expected) };
+      });
+      const first = points[0] ?? null;
+      const firstExpected = first ? expectedAt(schoolYear, first.completedAt) : null;
+      return {
+        student,
+        schoolYear,
+        liveLevel,
+        liveStanding: liveLevel != null && expectedNow != null ? standingForGap(liveLevel - expectedNow) : null,
+        expectedNow,
+        points,
+        byCheckpoint: new Map(points.map((point) => [point.checkpoint, point])),
+        firstCheckpoint: first?.checkpoint ?? null,
+        growth: first && liveLevel != null ? liveLevel - first.level : null,
+        expectedGrowth: first && expectedNow != null && firstExpected != null ? Math.max(0, expectedNow - firstExpected) : null,
+      };
+    });
+    if (studentSort !== "behind-first") return rows;
+    const gap = (row: LiveRow) => (row.liveLevel != null && row.expectedNow != null ? row.liveLevel - row.expectedNow : null);
+    return [...rows].sort((left, right) => compareNullableLevels(gap(left), gap(right), "asc") || NAME_COLLATOR.compare(left.student.display_name, right.student.display_name));
+  }, [now, studentSort, trackerStudents]);
 
   const runRows = useMemo(() => students.map((student) => {
     const own = sittings
@@ -590,88 +664,136 @@ export default function WholeMathsDiagnosticPanel({
         </div>
       ) : null}
 
-      {view === "live" ? <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
-          <div>
-            <div className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-teal-700" aria-hidden /><h3 className="text-lg font-black text-slate-950">Live progression tracker</h3></div>
-            <p className="mt-1 text-sm text-slate-500">Compare each student&apos;s live learning level with their Start, Mid and End diagnostic checkpoints on the Prep–8 continuum.</p>
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-slate-100 p-1">
-              <button
-                type="button"
-                onClick={() => setSelectedStrand("all")}
-                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === "all" ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
-              >
-                All
-              </button>
-              {DIAGNOSTIC_STRANDS.filter((definition) => definition.available).map((definition) => (
-                <button
-                  key={definition.strand}
-                  type="button"
-                  onClick={() => setSelectedStrand(definition.strand as LiveMathsProgressionRow["strand"])}
-                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition ${selectedStrand === definition.strand ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-white"}`}
-                >
-                  {AC_STRANDS[definition.strand].label}
-                </button>
-              ))}
-            </div>
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-600">
-              <span className="whitespace-nowrap">Order by</span>
-              <select
-                value={studentSort}
-                onChange={(event) => setStudentSort(event.target.value as StudentSort)}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-800 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
-              >
-                <option value="surname-asc">Surname A–Z</option>
-                <option value="surname-desc">Surname Z–A</option>
-                <option value="given-asc">First name A–Z</option>
-                <option value="live-desc">Live level: highest</option>
-                <option value="live-asc">Live level: lowest</option>
-                <option value="diagnostic-desc">Diagnostic: highest</option>
-                <option value="diagnostic-asc">Diagnostic: lowest</option>
-              </select>
-            </label>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-600">
-          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-teal-600" />Live score</span>
-          <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#121314]" />Diagnostic score</span>
-          <span className="text-slate-400">S = Start · M = Mid · E = End</span>
-          {diagnosticError ? <span className="font-semibold text-amber-700">Diagnostic markers are temporarily unavailable; live scores remain current.</span> : null}
-          {selectedStrand === "all" && <span className="font-semibold text-amber-700">All requires completed results from all six strands.</span>}
-        </div>
-        <div className="divide-y divide-slate-100">
-          {liveLoading || liveError ? (
-            <div className={`px-5 py-8 text-center text-sm font-semibold ${liveError ? "text-rose-700" : "text-slate-500"}`}>{liveError ?? "Loading live progression…"}</div>
-          ) : students.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm font-semibold text-slate-500">No students in this class.</div>
-          ) : trackerStudents.map(({ student, liveLevel, diagnosticPoints, latestDiagnostic }) => (
-              <div key={student.id} className="grid gap-4 px-5 py-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:items-center">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-black text-slate-950">{student.display_name}</p>
-                    <button type="button" onClick={() => void openDiagnosticReport(student.id)} className="shrink-0 rounded-md border border-[#121314] px-2 py-0.5 text-[11px] font-black text-[#121314] hover:bg-[#121314] hover:text-[#83E300]" aria-label={`Diagnostic report for ${student.display_name}`}>Report</button>
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold">
-                    <span className="text-teal-700">Live {liveLevel == null ? "—" : formatProgressionPoint(liveLevel)}</span>
-                    <span className="text-[#121314]">Diagnostic {latestDiagnostic == null ? "—" : formatProgressionPoint(latestDiagnostic)}</span>
-                  </div>
-                </div>
-                {selectedStrand === "all" && liveLevel == null && diagnosticPoints.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-                    A complete Whole-Maths live score appears after the student has progress in all six strands.
-                  </div>
-                ) : (
-                  <div className="min-w-0 pb-1">
-                    <ProgressionTrack liveLevel={liveLevel} diagnosticPoints={diagnosticPoints} onSelectDiagnostic={setSelectedSittingId} />
-                  </div>
-                )}
-              </div>
+      {view === "live" ? <article aria-label="Live progression tracker" className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
+        {/* Realm filter and order */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-[#E3E5E0] px-5 py-3">
+          <button
+            type="button"
+            onClick={() => setSelectedStrand("all")}
+            aria-pressed={selectedStrand === "all"}
+            className={`whitespace-nowrap rounded-full border-2 border-[#121314] px-3.5 py-1.5 text-[13px] font-bold transition ${selectedStrand === "all" ? "bg-[#121314] text-white" : "bg-white text-[#121314] hover:bg-[#EEFBDB]"}`}
+          >
+            All
+          </button>
+          {DIAGNOSTIC_STRANDS.filter((definition) => definition.available).map((definition) => (
+            <button
+              key={definition.strand}
+              type="button"
+              onClick={() => setSelectedStrand(definition.strand as LiveMathsProgressionRow["strand"])}
+              aria-pressed={selectedStrand === definition.strand}
+              className={`whitespace-nowrap rounded-full border-2 border-[#121314] px-3.5 py-1.5 text-[13px] font-bold transition ${selectedStrand === definition.strand ? "bg-[#121314] text-white" : "bg-white text-[#121314] hover:bg-[#EEFBDB]"}`}
+            >
+              {AC_STRANDS[definition.strand].label}
+            </button>
           ))}
+          <label className="ml-auto flex items-center gap-2 text-xs font-bold text-[#5A5E63]">
+            <span className="whitespace-nowrap">Order by</span>
+            <select
+              value={studentSort}
+              onChange={(event) => setStudentSort(event.target.value as StudentSort)}
+              className="rounded-full border border-[#D9DBD4] bg-white px-3 py-1.5 text-sm font-bold text-[#121314] outline-none focus:border-[#121314]"
+            >
+              <option value="behind-first">Furthest behind first</option>
+              <option value="surname-asc">Surname A–Z</option>
+              <option value="surname-desc">Surname Z–A</option>
+              <option value="given-asc">First name A–Z</option>
+              <option value="live-desc">Live level: highest</option>
+              <option value="live-asc">Live level: lowest</option>
+              <option value="diagnostic-desc">Diagnostic: highest</option>
+              <option value="diagnostic-asc">Diagnostic: lowest</option>
+            </select>
+          </label>
         </div>
-        <div className="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs leading-5 text-slate-500">
-          The green marker moves as lessons, quizzes and realm tests update the live score. Black markers are fixed formal results. Levels 7–8 show the future Advanced Pathway range. Trial schools can begin with an End checkpoint; Start and Mid remain blank.
+
+        {/* Column headings */}
+        <div className={`${LIVE_COLS} sticky top-0 z-10 border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-center text-[10px] font-black uppercase tracking-[0.14em] text-[#8F948C]`}>
+          <span className="text-left">Student</span>
+          <span>Expected now</span>
+          <span>Start</span>
+          <span>Mid</span>
+          <span>End</span>
+          <span className="text-[#121314]">Live now</span>
+          <span className="text-left">Growth vs expected</span>
+          <span />
+        </div>
+
+        <div>
+          {liveLoading || liveError ? (
+            <div className={`px-5 py-8 text-center text-sm font-semibold ${liveError ? "text-rose-700" : "text-[#5A5E63]"}`}>{liveError ?? "Loading live progression…"}</div>
+          ) : students.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm font-semibold text-[#5A5E63]">No students in this class.</div>
+          ) : liveRows.map((row) => {
+            const isOpen = expandedStudentId === row.student.id;
+            return (
+              <div key={row.student.id} className="border-b border-[#F1F2EE] last:border-0">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                  onClick={() => setExpandedStudentId(isOpen ? null : row.student.id)}
+                  onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setExpandedStudentId(isOpen ? null : row.student.id); } }}
+                  className={`${LIVE_COLS} cursor-pointer px-5 py-2.5 text-center transition hover:bg-[#FAFBF8] ${isOpen ? "bg-[#FAFBF8]" : ""}`}
+                >
+                  <p className="truncate text-left text-sm font-black text-[#121314]">
+                    {row.student.display_name}
+                    {row.schoolYear ? <span className="ml-2 text-xs font-semibold text-[#8F948C]">{row.schoolYear.replace("Year ", "Y")}</span> : null}
+                  </p>
+                  <span className="text-sm font-bold tabular-nums text-[#8F948C]">{row.expectedNow == null ? "—" : row.expectedNow.toFixed(1)}</span>
+                  {(["start", "mid", "end"] as FormalCheckpoint[]).map((checkpoint) => {
+                    const point = row.byCheckpoint.get(checkpoint);
+                    return point ? (
+                      <button
+                        key={checkpoint}
+                        type="button"
+                        onClick={(event) => { event.stopPropagation(); setSelectedSittingId(point.sittingId); }}
+                        title={`${CHECKPOINT_LABEL[checkpoint]} · ${formatProgressionPoint(point.level)} · open details`}
+                        className="mx-auto"
+                      >
+                        <LevelBlock level={point.level} standing={point.standing} />
+                      </button>
+                    ) : <span key={checkpoint} className="text-sm text-[#C9CCC6]">—</span>;
+                  })}
+                  {row.liveLevel == null ? (
+                    <span className="text-sm text-[#C9CCC6]" title={selectedStrand === "all" ? "A Whole-Maths live score appears after progress in all six strands" : undefined}>—</span>
+                  ) : (
+                    <span className="mx-auto" title={`Live ${formatProgressionPoint(row.liveLevel)}`}><LevelBlock level={row.liveLevel} standing={row.liveStanding} /></span>
+                  )}
+                  {row.growth == null || row.expectedGrowth == null ? (
+                    <span className="text-left text-xs font-semibold text-[#A3A7A1]">{row.liveLevel == null ? "Live score pending" : "No diagnostic yet"}</span>
+                  ) : (
+                    <div className="flex items-center gap-2 text-left" title={`${signed(row.growth)} since ${CHECKPOINT_SHORT_LABEL[row.firstCheckpoint ?? "start"]} · expected ${signed(row.expectedGrowth, 2)}`}>
+                      <div className="relative h-2 flex-1 rounded-full bg-[#ECEDE9]">
+                        <div className={`h-full rounded-full ${row.growth >= row.expectedGrowth ? "bg-[#5FAE00]" : "bg-[#F0A23B]"}`} style={{ width: `${Math.max(0, Math.min(100, (row.growth / GROWTH_BAR_MAX) * 100))}%` }} />
+                        <span className="absolute -top-1 h-4 w-0.5 rounded bg-[#121314]" style={{ left: `${Math.max(0, Math.min(100, (row.expectedGrowth / GROWTH_BAR_MAX) * 100))}%` }} />
+                      </div>
+                      <span className="w-10 text-xs font-black tabular-nums text-[#121314]">{signed(row.growth)}</span>
+                    </div>
+                  )}
+                  <ChevronDown className={`h-4 w-4 text-[#8F948C] transition ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                </div>
+                {isOpen ? (
+                  <GrowthLine
+                    row={row}
+                    onReport={() => void openDiagnosticReport(row.student.id)}
+                    onOpenSitting={setSelectedSittingId}
+                  />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Key */}
+        <div className="flex flex-wrap items-center gap-2 border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-[11px] font-bold">
+          {STANDING_ORDER.map((standing) => (
+            <span key={standing} className="rounded-full px-2.5 py-1" style={{ background: STANDING_META[standing].bg, color: STANDING_META[standing].fg }}>{STANDING_META[standing].label}</span>
+          ))}
+          <span className="font-semibold text-[#5A5E63]">
+            Live score = Live now, updated by lessons, quizzes and realm tests. Diagnostic score = the fixed Start, Mid and End results (S = Start · M = Mid · E = End), each coloured against where the student was expected to be when they sat it.
+            {" "}<span className="inline-flex items-center gap-1"><span className="inline-block h-3 w-0.5 rounded bg-[#121314]" />on the growth bar = growth expected since their first diagnostic (a quarter of a level per term).</span>
+            {selectedStrand === "all" ? " “All” needs results from all six strands." : ""}
+            {diagnosticError ? " Diagnostic results are temporarily unavailable; live scores remain current." : ""}
+          </span>
         </div>
       </article> : null}
 
