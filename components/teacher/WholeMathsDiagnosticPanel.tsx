@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
-import { diagnosticReportHtml, type RealmTestRow } from "@/lib/documents/diagnostic-report";
+import { diagnosticReportHtml, realmTestCheckpoints, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
 import { CalendarDays, Check, ChevronDown, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
 import { STANDING_META, STANDING_ORDER, expectedLevel, standingForGap } from "@/lib/proficiency";
-import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
+import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
 import {
   DIAGNOSTIC_FLOOR,
   DIAGNOSTIC_MASTERY,
@@ -34,7 +34,12 @@ type LiveSortKey = "surname" | "given" | "expected" | "start" | "mid" | "end" | 
 type StudentSort = "behind-first" | `${LiveSortKey}-${"asc" | "desc"}`;
 type RunSortKey = "name" | "result" | string; // a strand id sorts by that strand's progress
 type FormalCheckpoint = Exclude<TeacherDiagnosticSittingRow["checkpoint"], "ad_hoc">;
-type DiagnosticPoint = { sittingId: string; checkpoint: FormalCheckpoint; level: number; completedAt: string };
+// A checkpoint result: the whole-maths diagnostic, or (where none was sat) the
+// realm tests under the report's rule (first pre-test = Start, or Mid / End by when it was sat).
+type DiagnosticPoint = { sittingId: string | null; checkpoint: FormalCheckpoint; level: number; completedAt: string; source: "diagnostic" | "pretest" | "posttest" };
+type ClassRealmTestRow = RealmTestRow & { student_id: string };
+const FORMAL_CHECKPOINTS: FormalCheckpoint[] = ["start", "mid", "end"];
+const SOURCE_WORD = { diagnostic: "diagnostic", pretest: "pre-test", posttest: "post-test" } as const;
 
 const CHECKPOINT_LABEL = {
   start: "Start-of-year diagnostic",
@@ -188,9 +193,9 @@ function GrowthLine({ row, onReport, onOpenSitting }: { row: LiveRow; onReport: 
             <span className="absolute top-[52px] h-1.5 rounded-full bg-[#121314]" style={{ left: x(first.level), width: `calc(${x(lastLevel)} - ${x(first.level)})` }} />
           ) : null}
           {row.points.map((point) => (
-            <button key={point.sittingId} type="button" onClick={() => onOpenSitting(point.sittingId)} title="Open diagnostic details" className="absolute top-[47px] -translate-x-1/2" style={{ left: x(point.level) }}>
+            <button key={point.checkpoint} type="button" onClick={() => { if (point.sittingId) onOpenSitting(point.sittingId); }} title={point.sittingId ? "Open diagnostic details" : `From the ${SOURCE_WORD[point.source]}`} className="absolute top-[47px] -translate-x-1/2" style={{ left: x(point.level) }}>
               <span className="block h-4 w-4 rounded-full border-[3px] border-[#121314] bg-white" />
-              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#121314] px-1.5 py-0.5 text-[10px] font-black text-white">{CHECKPOINT_SHORT_LABEL[point.checkpoint]} {point.level.toFixed(1)}</span>
+              <span className="absolute bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#121314] px-1.5 py-0.5 text-[10px] font-black text-white">{CHECKPOINT_SHORT_LABEL[point.checkpoint]} {point.level.toFixed(1)}{point.source === "diagnostic" ? "" : ` · ${SOURCE_WORD[point.source]}`}</span>
             </button>
           ))}
           {row.liveLevel != null ? (
@@ -259,6 +264,9 @@ export default function WholeMathsDiagnosticPanel({
   schoolLogo?: { src: string; alt: string } | null;
 }) {
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
+  const [realmTests, setRealmTests] = useState<ClassRealmTestRow[]>([]);
+  // A stable key so a re-rendered student list doesn't refetch.
+  const studentIdsKey = students.map((student) => student.id).join(",");
   const openDiagnosticReport = async (studentId: string) => {
     const student = students.find((item) => item.id === studentId);
     if (!student) return;
@@ -351,11 +359,24 @@ export default function WholeMathsDiagnosticPanel({
         return;
       }
       if (showLoading) setDiagnosticLoading(true);
-      const [recordsResult, sessionResult] = await Promise.allSettled([
+      const studentIds = studentIdsKey ? studentIdsKey.split(",") : [];
+      const [recordsResult, sessionResult, testsResult] = await Promise.allSettled([
         fetchTeacherDiagnostics(selectedClass.id),
         fetchDiagnosticSchoolSession(selectedClass.id),
+        studentIds.length
+          ? supabase
+            .from("student_realm_assessments")
+            .select("student_id,realm_id,assessment_type,working_level,score_percent,completed_at")
+            .in("student_id", studentIds)
+          : Promise.resolve({ data: [], error: null }),
       ]);
       if (cancelled) return;
+      // Pre- and post-tests fill checkpoints the diagnostic hasn't; without them the table still works.
+      if (testsResult.status === "fulfilled" && !testsResult.value.error) {
+        setRealmTests((testsResult.value.data ?? []) as ClassRealmTestRow[]);
+      } else {
+        console.warn("[WholeMathsDiagnostic] Realm tests unavailable for checkpoints", testsResult.status === "fulfilled" ? testsResult.value.error : testsResult.reason);
+      }
       if (recordsResult.status === "fulfilled") {
         setSittings(recordsResult.value);
         setDiagnosticError(null);
@@ -379,7 +400,7 @@ export default function WholeMathsDiagnosticPanel({
     void loadDiagnostic(true);
     const intervalId = window.setInterval(() => { void loadDiagnostic(false); }, 30_000);
     return () => { cancelled = true; window.clearInterval(intervalId); };
-  }, [selectedClass?.id]);
+  }, [selectedClass?.id, studentIdsKey]);
 
   const studentNames = useMemo(
     () => new Map(students.map((student) => [student.id, student.display_name])),
@@ -396,24 +417,62 @@ export default function WholeMathsDiagnosticPanel({
   }, [progression]);
 
   const diagnosticPointsByStudent = useMemo(() => {
-    const grouped = new Map<string, Map<FormalCheckpoint, DiagnosticPoint>>();
-    for (const sitting of [...sittings].sort((left, right) => left.created_at.localeCompare(right.created_at))) {
+    const year = new Date(now).getFullYear();
+    const testsByStudent = new Map<string, ClassRealmTestRow[]>();
+    for (const test of realmTests) testsByStudent.set(test.student_id, [...(testsByStudent.get(test.student_id) ?? []), test]);
+    const sittingsByStudent = new Map<string, TeacherDiagnosticSittingRow[]>();
+    for (const sitting of sittings) {
       if (sitting.checkpoint === "ad_hoc" || sitting.status !== "completed") continue;
-      const level = selectedStrand === "all"
-        ? sitting.overall_level
-        : sitting.strand_results.find((result) => result.strand === selectedStrand && result.status === "completed")?.measured_level;
-      if (level == null) continue;
-      const checkpoints = grouped.get(sitting.student_id) ?? new Map<FormalCheckpoint, DiagnosticPoint>();
-      checkpoints.set(sitting.checkpoint, {
-        sittingId: sitting.id,
-        checkpoint: sitting.checkpoint,
-        level,
-        completedAt: sitting.completed_at ?? sitting.created_at,
-      });
-      grouped.set(sitting.student_id, checkpoints);
+      sittingsByStudent.set(sitting.student_id, [...(sittingsByStudent.get(sitting.student_id) ?? []), sitting]);
     }
-    return new Map([...grouped].map(([studentId, checkpoints]) => [studentId, [...checkpoints.values()].sort((left, right) => left.completedAt.localeCompare(right.completedAt))]));
-  }, [selectedStrand, sittings]);
+    const result = new Map<string, DiagnosticPoint[]>();
+    for (const student of students) {
+      const own = (sittingsByStudent.get(student.id) ?? []).sort((left, right) => left.created_at.localeCompare(right.created_at));
+      const latestSitting = new Map<FormalCheckpoint, TeacherDiagnosticSittingRow>();
+      for (const sitting of own) latestSitting.set(sitting.checkpoint as FormalCheckpoint, sitting);
+      const fromTests = realmTestCheckpoints(testsByStudent.get(student.id) ?? [], year);
+      // One strand's value at a checkpoint: the diagnostic first, then the realm tests.
+      const strandValue = (checkpoint: FormalCheckpoint, strand: AcStrand) => {
+        const sitting = latestSitting.get(checkpoint);
+        const measured = sitting?.strand_results.find((item) => item.strand === strand && item.status === "completed")?.measured_level;
+        if (sitting && measured != null) return { level: measured, at: sitting.completed_at ?? sitting.created_at, source: "diagnostic" as const, sittingId: sitting.id };
+        const test = fromTests.get(strand)?.[checkpoint];
+        return test ? { level: test.level, at: test.at, source: test.source as "pretest" | "posttest", sittingId: null } : null;
+      };
+      const points: DiagnosticPoint[] = [];
+      for (const checkpoint of FORMAL_CHECKPOINTS) {
+        const sitting = latestSitting.get(checkpoint);
+        if (selectedStrand !== "all") {
+          const value = strandValue(checkpoint, selectedStrand as AcStrand);
+          if (value) points.push({ sittingId: value.sittingId, checkpoint, level: value.level, completedAt: value.at, source: value.source });
+          continue;
+        }
+        if (sitting?.overall_level != null) {
+          points.push({ sittingId: sitting.id, checkpoint, level: sitting.overall_level, completedAt: sitting.completed_at ?? sitting.created_at, source: "diagnostic" });
+          continue;
+        }
+        // Whole-maths from tests needs a result in all six strands, each carried from its latest earlier checkpoint.
+        const here = DIAGNOSTIC_STRANDS.map((definition) => strandValue(checkpoint, definition.strand));
+        if (!here.some(Boolean)) continue;
+        const carried = DIAGNOSTIC_STRANDS.map((definition, index) => {
+          if (here[index]) return here[index];
+          for (const earlier of FORMAL_CHECKPOINTS.slice(0, FORMAL_CHECKPOINTS.indexOf(checkpoint)).reverse()) {
+            const value = strandValue(earlier, definition.strand);
+            if (value) return value;
+          }
+          return null;
+        });
+        if (carried.some((value) => value == null)) continue;
+        const total = DIAGNOSTIC_STRANDS.reduce((sum, definition) => sum + AC_STRANDS[definition.strand].weight, 0);
+        const level = DIAGNOSTIC_STRANDS.reduce((sum, definition, index) => sum + carried[index]!.level * AC_STRANDS[definition.strand].weight, 0) / total;
+        const latest = here.filter(Boolean).map((value) => value!.at).sort().at(-1)!;
+        const sources = here.filter(Boolean).map((value) => value!.source);
+        points.push({ sittingId: null, checkpoint, level, completedAt: latest, source: sources.includes("posttest") ? "posttest" : sources.includes("pretest") ? "pretest" : "diagnostic" });
+      }
+      if (points.length) result.set(student.id, points.sort((left, right) => left.completedAt.localeCompare(right.completedAt)));
+    }
+    return result;
+  }, [now, realmTests, selectedStrand, sittings, students]);
 
   const activeStudentIds = useMemo(
     () => new Set(sittings.filter((sitting) => sitting.status !== "completed").map((sitting) => sitting.student_id)),
@@ -816,8 +875,8 @@ export default function WholeMathsDiagnosticPanel({
                       <button
                         key={checkpoint}
                         type="button"
-                        onClick={(event) => { event.stopPropagation(); setSelectedSittingId(point.sittingId); }}
-                        title={`${CHECKPOINT_LABEL[checkpoint]} · ${formatProgressionPoint(point.level)} · open details`}
+                        onClick={(event) => { event.stopPropagation(); if (point.sittingId) setSelectedSittingId(point.sittingId); }}
+                        title={`${CHECKPOINT_LABEL[checkpoint]} · ${formatProgressionPoint(point.level)} · from the ${SOURCE_WORD[point.source]}${point.sittingId ? " · open details" : ""}`}
                         className="mx-auto"
                       >
                         <LevelBlock level={point.level} standing={point.standing} />

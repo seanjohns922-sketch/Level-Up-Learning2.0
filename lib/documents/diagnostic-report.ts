@@ -10,8 +10,10 @@ import type { SchoolBrand } from "@/lib/documents/school-reports";
  * the latest whole-maths diagnostic.
  *
  * Each strand's checkpoints use the whole-maths diagnostic when it was sat,
- * otherwise the realm tests: the pre-test counts as Start, a post-test from
- * May to July as Mid, and a post-test from November to December as End.
+ * otherwise the realm tests: a student's first pre-test counts as Start (or
+ * as Mid when sat May to July, or End when sat November to December), a
+ * post-test from May to July as Mid, and a post-test from November to
+ * December as End. A post-test replaces a pre-test in the same window.
  * Realm tests are scored on the shared scale (85%+ = the level; 40-84%
  * between the level below and the level; under 40% below it), and a pre-test
  * never pulls a student below their best result so far.
@@ -37,7 +39,7 @@ export type RealmTestRow = { realm_id: string; assessment_type: string; working_
 type QuestionResult = { correct?: boolean; curriculum_codes?: string[]; curriculum_skill?: { id?: string | null; label?: string } };
 
 const CHECKPOINTS = ["start", "mid", "end"] as const;
-type Checkpoint = (typeof CHECKPOINTS)[number];
+export type Checkpoint = (typeof CHECKPOINTS)[number];
 const CHECKPOINT_LABEL: Record<Checkpoint, string> = { start: "Start", mid: "Mid year", end: "End of year" };
 const STRANDS: AcStrand[] = ["number", "measurement", "space", "statistics", "algebra", "probability"];
 const TOTAL_WEIGHT = STRANDS.reduce((sum, strand) => sum + AC_STRANDS[strand].weight, 0);
@@ -98,10 +100,16 @@ export function realmTestLevel(workingLevel: string, percent: number): number | 
   return Math.max(0, level - 1 - Math.min(0.9, (40 - percent) / 40));
 }
 
-type CheckpointValue = { level: number; at: string; source: "diagnostic" | "pretest" | "posttest"; questions?: QuestionResult[]; sitting?: DiagnosticReportSitting };
+export type CheckpointValue = { level: number; at: string; source: "diagnostic" | "pretest" | "posttest"; questions?: QuestionResult[]; sitting?: DiagnosticReportSitting };
+
+/** May to July is Mid; November to December is End; any other time is Start. */
+export function checkpointForPretest(at: string): Checkpoint {
+  const month = new Date(at).getMonth();
+  return month >= 4 && month <= 6 ? "mid" : month >= 10 ? "end" : "start";
+}
 
 /** Start / Mid / End per strand from this year's realm tests. */
-function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>> {
+export function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>> {
   const out = new Map<AcStrand, Partial<Record<Checkpoint, CheckpointValue>>>();
   const byStrand = new Map<AcStrand, Array<{ type: "pretest" | "posttest"; raw: number; at: string; questions: QuestionResult[] }>>();
   const seen = new Set<string>();
@@ -133,7 +141,9 @@ function realmTestCheckpoints(rows: RealmTestRow[], year: number): Map<AcStrand,
       const first = Date.parse(pretests[0].at);
       const chain = pretests.filter((test) => Date.parse(test.at) - first <= PLACEMENT_DAYS * DAY);
       const start = chain[chain.length - 1];
-      points.start = { level: start.level, at: start.at, source: "pretest", questions: start.questions };
+      // The first test fills the checkpoint for when it was sat: a student who
+      // joins mid-year starts at Mid, one who joins in November starts at End.
+      points[checkpointForPretest(start.at)] = { level: start.level, at: start.at, source: "pretest", questions: start.questions };
     }
     for (const test of scored.filter((item) => item.type === "posttest")) {
       const month = new Date(test.at).getMonth();
@@ -363,7 +373,7 @@ export function diagnosticReportHtml({ brand, student, sittings, realmTests = []
         <span style="display:flex;height:16px;border-radius:999px;overflow:hidden">${STRANDS.map((strand, index) => `<span style="width:${(AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100}%;background:${WEIGHT_COLORS[index]}"></span>`).join("")}</span></div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:11.5px">${STRANDS.map((strand, index) => `<span style="display:inline-flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:${WEIGHT_COLORS[index]};border:1px solid #D5D8D1"></span>${AC_STRANDS[strand].label}</span><b style="text-align:right">${Math.round((AC_STRANDS[strand].weight / TOTAL_WEIGHT) * 100)}%</b>`).join("")}</div>
     </section>
-    <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">Each strand uses the whole-maths diagnostic when it was sat. Otherwise the pre-test counts as Start, a post-test from May to July as Mid, and a post-test from November to December as End.</p>
+    <p style="margin:0;font-size:11px;line-height:1.5;color:${COLORS.faint}">Each strand uses the whole-maths diagnostic when it was sat. Otherwise the first pre-test counts as Start (or Mid when sat May to July, End when sat November to December), a post-test from May to July as Mid, and a post-test from November to December as End.</p>
     ${footer("RELIQ · BrightUp Education · Levels on the Australian Curriculum scale (Level 4 complete = 4.0)", `${generatedOn()} · Page 1 of ${hasSkills ? 2 : 1}`)}`;
 
   // Page 2: per strand, the two codes from the strongest level probes and the
