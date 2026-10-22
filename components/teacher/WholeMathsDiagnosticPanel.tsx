@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { diagnosticReportHtml, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Info, ListChecks, TrendingUp, X } from "lucide-react";
+import { CalendarDays, Check, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
+import { STANDING_META, expectedLevel, standingForGap } from "@/lib/proficiency";
 import { AC_STRANDS } from "@/lib/curriculum/ac-standards";
 import {
   DIAGNOSTIC_FLOOR,
@@ -126,6 +127,51 @@ function ProgressionTrack({
   );
 }
 
+const CHECKPOINT_SHORT_LABEL: Record<FormalCheckpoint, string> = { start: "Start", mid: "Mid", end: "End" };
+const RUN_COLS = "grid grid-cols-[minmax(170px,1.3fr)_repeat(6,minmax(56px,0.55fr))_minmax(170px,1fr)] items-center gap-3";
+
+function formatTimeLeft(closesAt: string, now: number) {
+  const minutes = Math.max(0, Math.round((new Date(closesAt).getTime() - now) / 60000));
+  const hours = Math.floor(minutes / 60);
+  return hours > 0 ? `${hours}h ${minutes % 60}m left` : `${minutes}m left`;
+}
+
+/** Standing of a finished sitting against the level expected when it was sat. */
+function sittingStanding(student: DiagnosticStudent, sitting: TeacherDiagnosticSittingRow) {
+  if (sitting.overall_level == null) return null;
+  const testedAt = sitting.completed_at ?? sitting.created_at;
+  const year = testedAt.slice(0, 4);
+  const expected = expectedLevel(student.school_year_level ?? student.year_level ?? null, testedAt, { startsOn: `${year}-01-01`, endsOn: `${year}-12-31` });
+  return expected == null ? null : STANDING_META[standingForGap(sitting.overall_level - expected)];
+}
+
+function RunStep({ n, title, active = false, children }: { n: number; title: string; active?: boolean; children: React.ReactNode }) {
+  return (
+    <div className={`rounded-2xl border p-4 ${active ? "border-[#83E300] bg-[#F6FDEB]" : "border-[#E3E5E0] bg-white"}`}>
+      <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#8F948C]">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#121314] text-[10px] text-white">{n}</span>{title}
+      </p>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+
+function RunStrandCell({ result }: { result: TeacherDiagnosticSittingRow["strand_results"][number] | undefined }) {
+  if (result?.status === "completed") {
+    return <span title="Done" className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-[#121314] text-[#83E300]"><Check className="h-4 w-4" strokeWidth={3} aria-label="Done" /></span>;
+  }
+  const answered = result?.answered_count ?? 0;
+  if (result?.status === "pending" && answered > 0) {
+    return (
+      <span title={`${answered} of 20 answered`} className="mx-auto flex w-12 flex-col items-center">
+        <span className="text-[11px] font-black tabular-nums text-[#121314]">{answered}/20</span>
+        <span className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-[#ECEDE9]"><span className="block h-full rounded-full bg-[#5FAE00]" style={{ width: `${Math.min(100, (answered / 20) * 100)}%` }} /></span>
+      </span>
+    );
+  }
+  return <span title={result?.status === "unavailable" ? "Unavailable" : "Not started"} className="mx-auto block h-1.5 w-4 rounded-full bg-[#E3E5E0]" />;
+}
+
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
   students,
@@ -180,6 +226,14 @@ export default function WholeMathsDiagnosticPanel({
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [scoringOpen, setScoringOpen] = useState(false);
   const [selectedSittingId, setSelectedSittingId] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  // Keep the open session's time left current.
+  useEffect(() => {
+    if (!schoolSession) return;
+    const intervalId = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(intervalId);
+  }, [schoolSession]);
 
   useEffect(() => {
     let cancelled = false;
@@ -236,6 +290,8 @@ export default function WholeMathsDiagnosticPanel({
       }
       if (sessionResult.status === "fulfilled") {
         setSchoolSession(sessionResult.value);
+        // An open session fixes the checkpoint the page shows.
+        if (sessionResult.value) setAssignmentCheckpoint(sessionResult.value.checkpoint);
         setSessionError(null);
       } else {
         console.warn("[WholeMathsDiagnostic] Could not load supervised session", sessionResult.reason);
@@ -326,6 +382,32 @@ export default function WholeMathsDiagnosticPanel({
     });
   }, [diagnosticPointsByStudent, progressionByStudent, selectedStrand, studentSort, students]);
 
+  const runRows = useMemo(() => students.map((student) => {
+    const own = sittings
+      .filter((sitting) => sitting.student_id === student.id)
+      .sort((left, right) => right.created_at.localeCompare(left.created_at));
+    const sitting = own.find((item) => item.checkpoint === assignmentCheckpoint) ?? null;
+    const otherOpen = own.find((item) => item.status !== "completed" && item.checkpoint !== assignmentCheckpoint && item.checkpoint !== "ad_hoc");
+    const state = !sitting
+      ? "unassigned" as const
+      : sitting.status === "completed"
+        ? "finished" as const
+        : sitting.strand_results.some((result) => result.status === "completed" || (result.answered_count ?? 0) > 0)
+          ? "progress" as const
+          : "notStarted" as const;
+    return { student, sitting, state, otherActive: otherOpen ? otherOpen.checkpoint as FormalCheckpoint : null };
+  }), [assignmentCheckpoint, sittings, students]);
+  const runCounts = useMemo(() => runRows.reduce(
+    (acc, row) => {
+      if (row.state !== "unassigned") acc.assigned += 1;
+      if (row.state === "finished") acc.finished += 1;
+      if (row.state === "progress") acc.progress += 1;
+      if (row.state === "notStarted") acc.notStarted += 1;
+      return acc;
+    },
+    { assigned: 0, finished: 0, progress: 0, notStarted: 0 },
+  ), [runRows]);
+
   function openAssignment() {
     setSelectedStudentIds(assignableStudents.map((student) => student.id));
     setAssignmentMessage(null);
@@ -380,36 +462,133 @@ export default function WholeMathsDiagnosticPanel({
 
   return (
     <section className="space-y-5" aria-labelledby="whole-maths-diagnostic-title">
-      <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 id="whole-maths-diagnostic-title" className="text-2xl font-black text-slate-950">
-              Whole-Maths Diagnostic
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">Follow live learning every day and run a formal Start, Mid or End checkpoint when your school is ready.</p>
-          </div>
-          <button type="button" onClick={() => setScoringOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50"><Info className="h-4 w-4" />How scoring works</button>
+      <header className="flex flex-wrap items-center gap-4 rounded-2xl border border-[#E3E5E0] bg-white px-5 py-4">
+        <h2 id="whole-maths-diagnostic-title" className="font-display text-xl font-black text-[#121314]">
+          Whole-Maths Diagnostic
+        </h2>
+        <div className="inline-flex rounded-xl bg-[#F1F2EE] p-1" aria-label="Diagnostic views">
+          <button type="button" onClick={() => setView("live")} aria-pressed={view === "live"} className={view === "live" ? "inline-flex items-center gap-1.5 rounded-lg bg-[#121314] px-3.5 py-1.5 text-sm font-bold text-white" : "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-bold text-[#3F4246]"}><TrendingUp className="h-4 w-4" />Live progression</button>
+          <button type="button" onClick={() => setView("run")} aria-pressed={view === "run"} className={view === "run" ? "inline-flex items-center gap-1.5 rounded-lg bg-[#121314] px-3.5 py-1.5 text-sm font-bold text-white" : "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-bold text-[#3F4246]"}><ListChecks className="h-4 w-4" />Run diagnostic</button>
         </div>
-        <div className="mt-4 inline-flex rounded-xl bg-slate-100 p-1" aria-label="Diagnostic views">
-          <button type="button" onClick={() => setView("live")} className={view === "live" ? "inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white shadow" : "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-black text-slate-600"}><TrendingUp className="h-4 w-4" />Live progression</button>
-          <button type="button" onClick={() => setView("run")} className={view === "run" ? "inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white shadow" : "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-black text-slate-600"}><ListChecks className="h-4 w-4" />Run diagnostic</button>
+        <div className="ml-auto flex flex-wrap items-center gap-3">
+          {view === "run" ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8F948C]">Checkpoint</span>
+              <div role="radiogroup" aria-label="Checkpoint" className="flex items-center gap-1 rounded-full border-2 border-[#121314] p-0.5 text-sm font-bold">
+                {(["start", "mid", "end"] as FormalCheckpoint[]).map((checkpoint) => (
+                  <button key={checkpoint} type="button" role="radio" aria-checked={assignmentCheckpoint === checkpoint} disabled={Boolean(schoolSession)} title={schoolSession ? "Close the open session to switch checkpoint" : undefined} onClick={() => setAssignmentCheckpoint(checkpoint)} className={`rounded-full px-4 py-1 transition disabled:cursor-not-allowed ${assignmentCheckpoint === checkpoint ? "bg-[#121314] text-white" : "text-[#121314] hover:bg-[#F1F2EE]"}`}>{CHECKPOINT_SHORT_LABEL[checkpoint]}</button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          <button type="button" onClick={() => setScoringOpen(true)} className="inline-flex items-center gap-1.5 rounded-full border border-[#D9DBD4] px-3.5 py-1.5 text-sm font-bold text-[#121314] hover:border-[#121314]"><Info className="h-4 w-4" />How scoring works</button>
         </div>
       </header>
 
-      {view === "run" ? <article className={`rounded-2xl border p-4 shadow-sm ${schoolSession ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white"}`}>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-black text-slate-950">Supervised school session</p>
-            <p className="mt-1 text-xs font-semibold text-slate-600">{schoolSession
-              ? `${CHECKPOINT_LABEL[schoolSession.checkpoint]} is open until ${new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}. Assigned students can continue at school.`
-              : "Closed. Students cannot open or continue diagnostic questions at home."}</p>
+      {view === "run" ? (
+        <div className="space-y-4">
+          {/* Live session strip */}
+          {schoolSession ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-[#121314] px-5 py-3.5 text-white">
+              <span className="relative flex h-3 w-3" aria-hidden="true"><span className="absolute inset-0 animate-ping rounded-full bg-[#83E300] opacity-70" /><span className="relative h-3 w-3 rounded-full bg-[#83E300]" /></span>
+              <p className="text-sm font-black">{CHECKPOINT_SHORT_LABEL[schoolSession.checkpoint]} diagnostic session open</p>
+              <p className="text-sm text-[#C9CCC6]">
+                Closes {new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}
+                {" · "}<b className="text-white">{formatTimeLeft(schoolSession.closes_at, now)}</b>{" · "}assigned students can work now
+              </p>
+              <button type="button" disabled={sessionBusy} onClick={() => void toggleSchoolSession()} className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-black text-[#121314] disabled:opacity-50"><Lock className="h-4 w-4" />{sessionBusy ? "Closing…" : "Close now"}</button>
+            </div>
+          ) : null}
+
+          {/* Three steps */}
+          <div className="grid gap-3 md:grid-cols-3">
+            <RunStep n={1} title="Assign">
+              <p className="font-display text-3xl font-black text-[#121314]">{runCounts.assigned}<span className="text-lg text-[#8F948C]"> / {students.length}</span></p>
+              <p className="text-xs font-semibold text-[#5A5E63]">students assigned the {CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} diagnostic</p>
+              <button type="button" onClick={openAssignment} aria-label="Assign Start / Mid / End diagnostic to students" disabled={!selectedClass || assignableStudents.length === 0 || Boolean(diagnosticError)} className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#121314] px-3.5 py-1.5 text-sm font-bold text-[#121314] transition hover:bg-[#121314] hover:text-white disabled:opacity-40"><CalendarDays className="h-4 w-4" />Assign students</button>
+            </RunStep>
+            <RunStep n={2} title="Supervised school session" active={Boolean(schoolSession)}>
+              {schoolSession ? (
+                <>
+                  <p className="font-display text-3xl font-black text-[#3D6600]">Open</p>
+                  <p className="text-xs font-semibold text-[#5A5E63]">{CHECKPOINT_SHORT_LABEL[schoolSession.checkpoint]} · until {new Date(schoolSession.closes_at).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" })}</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-display text-3xl font-black text-[#121314]">Closed</p>
+                  <p className="text-xs font-semibold text-[#5A5E63]">Students can only work during a session at school</p>
+                  <button type="button" disabled={!selectedClass || sessionBusy || Boolean(sessionError)} onClick={() => void toggleSchoolSession()} className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#83E300] px-4 py-1.5 text-sm font-black text-[#121314] transition hover:bg-[#74CC00] disabled:opacity-40"><Unlock className="h-4 w-4" />{sessionBusy ? "Opening…" : `Open ${CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} for 2 hours`}</button>
+                </>
+              )}
+            </RunStep>
+            <RunStep n={3} title="Progress">
+              <div className="grid grid-cols-3 gap-2">
+                <div><p className="font-display text-3xl font-black text-[#121314]">{runCounts.finished}</p><p className="text-[11px] font-semibold text-[#5A5E63]">finished</p></div>
+                <div><p className="font-display text-3xl font-black text-[#3D6600]">{runCounts.progress}</p><p className="text-[11px] font-semibold text-[#5A5E63]">in progress</p></div>
+                <div><p className="font-display text-3xl font-black text-[#8F948C]">{runCounts.notStarted}</p><p className="text-[11px] font-semibold text-[#5A5E63]">not started</p></div>
+              </div>
+            </RunStep>
           </div>
-          <button type="button" disabled={!selectedClass || sessionBusy || Boolean(sessionError)} onClick={() => void toggleSchoolSession()} className={`rounded-xl px-4 py-2.5 text-sm font-black text-white disabled:opacity-40 ${schoolSession ? "bg-rose-600" : "bg-emerald-700"}`}>{sessionBusy ? "Saving…" : schoolSession ? "Close session" : `Open ${assignmentCheckpoint === "start" ? "Start" : assignmentCheckpoint === "mid" ? "Mid" : "End"} for 2 hours`}</button>
+          {sessionError ? <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-800">{sessionError}</p> : null}
+          {!diagnosticLoading && !diagnosticError && sittings.length === 0 ? (
+            <p className="flex items-center gap-2 rounded-xl border border-[#E3E5E0] bg-white px-4 py-3 text-sm text-[#3F4246]">
+              <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span><b className="text-[#121314]">No diagnostic sittings yet.</b> Trial schools can begin with the End diagnostic when they are ready. No Start or Mid result is required.</span>
+            </p>
+          ) : null}
+
+          {/* Every student, six strands */}
+          <article className="overflow-hidden rounded-2xl border border-[#E3E5E0] bg-white">
+            {diagnosticLoading ? (
+              <div className="p-8 text-center text-sm font-semibold text-[#5A5E63]">Loading diagnostic records…</div>
+            ) : diagnosticError ? (
+              <div className="m-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">{diagnosticError}</div>
+            ) : (
+              <>
+                <div className={`${RUN_COLS} border-b border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-center text-[10px] font-black uppercase tracking-[0.12em] text-[#8F948C]`}>
+                  <span className="text-left">Student</span>
+                  {DIAGNOSTIC_STRANDS.map((definition) => <span key={definition.strand} className="truncate">{AC_STRANDS[definition.strand].label}</span>)}
+                  <span className="text-right">{CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} result</span>
+                </div>
+                {runRows.map(({ student, sitting, state, otherActive }) => {
+                  const done = sitting ? sitting.strand_results.filter((result) => result.status === "completed").length : 0;
+                  const standing = sitting?.overall_level != null ? sittingStanding(student, sitting) : null;
+                  return (
+                    <div key={student.id} className={`${RUN_COLS} border-b border-[#F1F2EE] px-5 py-2.5 text-center last:border-0 ${state === "unassigned" ? "bg-[#FAFBF8]" : ""}`}>
+                      <div className="min-w-0 text-left">
+                        {sitting ? (
+                          <button type="button" onClick={() => setSelectedSittingId(sitting.id)} className="block max-w-full truncate text-left text-sm font-black text-[#121314] hover:underline">{student.display_name}</button>
+                        ) : <p className="truncate text-sm font-black text-[#A3A7A1]">{student.display_name}</p>}
+                        <p className="text-[11px] font-semibold text-[#8F948C]">
+                          {state === "finished" ? "Finished" : state === "progress" ? `${done} of 6 strands` : state === "notStarted" ? "Assigned · not started" : otherActive ? `${CHECKPOINT_SHORT_LABEL[otherActive]} diagnostic still open` : "Not assigned"}
+                        </p>
+                      </div>
+                      {sitting ? DIAGNOSTIC_STRANDS.map((definition) => (
+                        <RunStrandCell key={definition.strand} result={sitting.strand_results.find((result) => result.strand === definition.strand)} />
+                      )) : <span className="col-span-6 text-xs font-semibold text-[#A3A7A1]">Not assigned the {CHECKPOINT_SHORT_LABEL[assignmentCheckpoint]} diagnostic</span>}
+                      <div className="flex items-center justify-end gap-2">
+                        {state === "finished" && sitting?.overall_level != null ? (
+                          <>
+                            <span className="rounded-lg px-2 py-1 text-sm font-black tabular-nums" style={standing ? { background: standing.bg, color: standing.fg } : { background: "#F1F2EE", color: "#121314" }} title={standing ? standing.label : undefined}>{sitting.overall_level.toFixed(1)}</span>
+                            <button type="button" onClick={() => void openDiagnosticReport(student.id)} className="rounded-full bg-[#121314] px-3 py-1 text-xs font-bold text-[#83E300] hover:bg-black">Report</button>
+                          </>
+                        ) : state === "unassigned" && !otherActive ? (
+                          <button type="button" onClick={() => { setSelectedStudentIds([student.id]); setAssignmentMessage(null); setAssignmentOpen(true); }} className="inline-flex items-center gap-1 rounded-full border border-[#121314] px-3 py-1 text-xs font-bold text-[#121314] hover:bg-[#121314] hover:text-white"><UserPlus className="h-3.5 w-3.5" />Assign</button>
+                        ) : state === "unassigned" ? null : (
+                          <span className="text-xs font-semibold text-[#A3A7A1]">After all 6 strands</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                <p className="flex items-center gap-2 border-t border-[#E3E5E0] bg-[#FAFBF8] px-5 py-3 text-xs font-semibold text-[#5A5E63]">
+                  <Info className="h-4 w-4 shrink-0" aria-hidden="true" />Each strand is 20 questions and saves after every answer. The overall result appears once all six strands are done. A diagnostic can move a student up a level but never down.
+                </p>
+              </>
+            )}
+          </article>
         </div>
-        {!schoolSession ? <div className="mt-3 flex flex-wrap gap-2">{(["start","mid","end"] as FormalCheckpoint[]).map((checkpoint) => <button key={checkpoint} type="button" onClick={() => setAssignmentCheckpoint(checkpoint)} className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${assignmentCheckpoint === checkpoint ? "border-emerald-500 bg-emerald-100 text-emerald-900" : "border-slate-200 bg-slate-50 text-slate-600"}`}>{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</button>)}</div> : null}
-        {!schoolSession && assignmentCheckpoint === "end" ? <p className="mt-3 text-xs font-semibold text-slate-500">End can be this school&apos;s first formal checkpoint. No Start or Mid result is required.</p> : null}
-        {sessionError ? <p role="alert" className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-800">{sessionError}</p> : null}
-      </article> : null}
+      ) : null}
 
       {view === "live" ? <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
@@ -500,67 +679,19 @@ export default function WholeMathsDiagnosticPanel({
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !assignmentBusy) setAssignmentOpen(false); }}>
           <section role="dialog" aria-modal="true" aria-labelledby="assign-diagnostic-title" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
-              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete six 20-question starting-level tests over several school sessions. Their work saves after every response and resumes when you next open the checkpoint.</p>{assignmentCheckpoint === "end" ? <p className="mt-2 text-xs font-bold text-teal-700">End may be the student&apos;s first formal checkpoint. Start and Mid will remain blank.</p> : null}</div>
+              <div><h3 id="assign-diagnostic-title" className="text-xl font-black text-slate-950">Assign Whole-Maths Diagnostic</h3><p className="mt-1 text-sm text-slate-500">Students complete six 20-question starting-level tests over several school sessions. Their work saves after every response and resumes when you next open the checkpoint.</p>{assignmentCheckpoint === "end" ? <p className="mt-2 text-xs font-bold text-[#3D6600]">End may be the student&apos;s first formal checkpoint. Start and Mid will remain blank.</p> : null}</div>
               <button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} aria-label="Close assignment" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-5 p-5">
-              <fieldset><legend className="text-sm font-black text-slate-900">Checkpoint</legend><div className="mt-2 grid gap-2 sm:grid-cols-3">{(["start", "mid", "end"] as FormalCheckpoint[]).map((checkpoint) => <label key={checkpoint} className={`cursor-pointer rounded-xl border p-3 ${assignmentCheckpoint === checkpoint ? "border-teal-500 bg-teal-50" : "border-slate-200"}`}><input type="radio" name="diagnostic-checkpoint" value={checkpoint} checked={assignmentCheckpoint === checkpoint} onChange={() => setAssignmentCheckpoint(checkpoint)} className="mr-2" /><span className="font-bold text-slate-900">{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</span></label>)}</div></fieldset>
-              <fieldset><legend className="sr-only">Students</legend><div className="flex items-center justify-between gap-3"><span className="text-sm font-black text-slate-900">Students</span><button type="button" onClick={() => setSelectedStudentIds(selectedStudentIds.length === assignableStudents.length ? [] : assignableStudents.map((student) => student.id))} className="text-xs font-black text-teal-700">{selectedStudentIds.length === assignableStudents.length ? "Clear all" : "Select all"}</button></div><div className="mt-2 grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">{students.map((student) => { const active = activeStudentIds.has(student.id); return <label key={student.id} className={`rounded-xl border p-3 ${active ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer border-slate-200 text-slate-900"}`}><input type="checkbox" disabled={active || assignmentBusy} checked={selectedStudentIds.includes(student.id)} onChange={() => setSelectedStudentIds((current) => current.includes(student.id) ? current.filter((id) => id !== student.id) : [...current, student.id])} className="mr-2" /><span className="font-bold">{student.display_name}</span>{active ? <span className="ml-2 text-xs">Active diagnostic</span> : null}</label>; })}</div></fieldset>
+              <fieldset><legend className="text-sm font-black text-slate-900">Checkpoint</legend><div className="mt-2 grid gap-2 sm:grid-cols-3">{(["start", "mid", "end"] as FormalCheckpoint[]).map((checkpoint) => <label key={checkpoint} className={`cursor-pointer rounded-xl border p-3 ${assignmentCheckpoint === checkpoint ? "border-[#121314] bg-[#F1F2EE]" : "border-slate-200"}`}><input type="radio" name="diagnostic-checkpoint" value={checkpoint} checked={assignmentCheckpoint === checkpoint} onChange={() => setAssignmentCheckpoint(checkpoint)} className="mr-2" /><span className="font-bold text-slate-900">{checkpoint === "start" ? "Start" : checkpoint === "mid" ? "Mid" : "End"}</span></label>)}</div></fieldset>
+              <fieldset><legend className="sr-only">Students</legend><div className="flex items-center justify-between gap-3"><span className="text-sm font-black text-slate-900">Students</span><button type="button" onClick={() => setSelectedStudentIds(selectedStudentIds.length === assignableStudents.length ? [] : assignableStudents.map((student) => student.id))} className="text-xs font-black text-[#3D6600]">{selectedStudentIds.length === assignableStudents.length ? "Clear all" : "Select all"}</button></div><div className="mt-2 grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">{students.map((student) => { const active = activeStudentIds.has(student.id); return <label key={student.id} className={`rounded-xl border p-3 ${active ? "cursor-not-allowed bg-slate-100 text-slate-400" : "cursor-pointer border-slate-200 text-slate-900"}`}><input type="checkbox" disabled={active || assignmentBusy} checked={selectedStudentIds.includes(student.id)} onChange={() => setSelectedStudentIds((current) => current.includes(student.id) ? current.filter((id) => id !== student.id) : [...current, student.id])} className="mr-2" /><span className="font-bold">{student.display_name}</span>{active ? <span className="ml-2 text-xs">Active diagnostic</span> : null}</label>; })}</div></fieldset>
               <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Official overall results appear only after Number, Measurement, Space, Statistics, Algebra and Probability are all complete. Start, Mid and End may securely promote a mastered realm, but never automatically demote a student.</div>
               {assignmentMessage ? <p role="status" className="rounded-xl bg-slate-100 p-3 text-sm font-bold text-slate-800">{assignmentMessage}</p> : null}
-              <div className="flex justify-end gap-2"><button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} className="rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-700">Close</button><button type="button" disabled={assignmentBusy || selectedStudentIds.length === 0} onClick={() => void assignDiagnostics()} className="rounded-xl bg-teal-600 px-5 py-2.5 font-black text-white disabled:opacity-40">{assignmentBusy ? "Assigning…" : `Assign to ${selectedStudentIds.length}`}</button></div>
+              <div className="flex justify-end gap-2"><button type="button" disabled={assignmentBusy} onClick={() => setAssignmentOpen(false)} className="rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-700">Close</button><button type="button" disabled={assignmentBusy || selectedStudentIds.length === 0} onClick={() => void assignDiagnostics()} className="rounded-xl bg-[#121314] px-5 py-2.5 font-black text-white disabled:opacity-40">{assignmentBusy ? "Assigning…" : `Assign to ${selectedStudentIds.length}`}</button></div>
             </div>
           </section>
         </div>
       ) : null}
-
-      {view === "run" ? <div>
-        <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
-            <div>
-              <h3 className="font-black text-slate-950">Class diagnostic progress</h3>
-              <p className="mt-1 text-xs text-slate-500">Students complete all six strands over multiple supervised sessions.</p>
-            </div>
-            <button type="button" onClick={openAssignment} disabled={!selectedClass || assignableStudents.length === 0 || Boolean(diagnosticError)} className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-40"><CalendarDays className="h-4 w-4" />Assign Start / Mid / End</button>
-          </div>
-          {diagnosticLoading ? (
-            <div className="p-8 text-center text-sm font-semibold text-slate-500">Loading diagnostic records…</div>
-          ) : diagnosticError ? (
-            <div className="m-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">{diagnosticError}</div>
-          ) : sittings.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="font-bold text-slate-700">No diagnostic sittings yet</p>
-              <p className="mt-1 text-sm text-slate-500">Trial schools can begin with the End diagnostic when they are ready.</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {sittings.map((sitting) => (
-                <div key={sitting.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-                  <div>
-                    <p className="font-bold text-slate-900">{studentNames.get(sitting.student_id) ?? "Student"}</p>
-                    <p className="text-xs text-slate-500">{CHECKPOINT_LABEL[sitting.checkpoint]} · {new Date(sitting.created_at).toLocaleDateString("en-AU")}</p>
-                    {sitting.status !== "completed" ? (() => {
-                      const completed = sitting.strand_results.filter((result) => result.status === "completed").length;
-                      const active = sitting.strand_results.find((result) => result.status === "pending" && (result.answered_count ?? 0) > 0)
-                        ?? sitting.strand_results.find((result) => result.status === "pending");
-                      return <p className="mt-1 text-xs font-semibold text-teal-700">{completed}/6 strands complete{active ? ` · ${AC_STRANDS[active.strand].label} ${active.answered_count ?? 0}/20` : ""}</p>;
-                    })() : null}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="text-sm font-black capitalize text-slate-800">{sitting.status.replace("_", " ")}</p>
-                      <p className="text-xs text-slate-500">Overall: {sitting.overall_level == null ? "Pending all 6 strands" : sitting.overall_level.toFixed(2)}</p>
-                    </div>
-                    {sitting.status === "completed" && sitting.checkpoint !== "ad_hoc" ? (
-                      <button type="button" onClick={() => void openDiagnosticReport(sitting.student_id)} className="rounded-lg border border-[#121314] bg-[#121314] px-3 py-1.5 text-xs font-black text-[#83E300] hover:bg-black">Diagnostic report</button>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </article>
-      </div> : null}
 
       {selectedSitting ? (
         <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedSittingId(null); }}>
