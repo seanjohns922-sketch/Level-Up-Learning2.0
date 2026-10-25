@@ -157,6 +157,11 @@ for (const [yearLabel, genreId, realmName] of [["Year 3", "number", "Number Nexu
   const number = report.realms.find((realm) => realm.realmId === "number");
   assert.ok(number.lessonAccuracy && number.weeks.length === 2 && number.weeks[1].current);
   assert.ok(number.focus && number.focus.action.includes("ask Ryan to solve"));
+  // A lesson is tagged FOCUS only when the realm has a focus box, and then exactly one.
+  for (const realm of report.realms) {
+    const tagged = realm.weeks.flatMap((week) => week.lessons).filter((lesson) => lesson.focus).length;
+    assert.equal(tagged, realm.focus ? 1 : 0, `${realm.realmId} focus tag matches its focus box`);
+  }
   const cobramLogo = { src: `file://${process.cwd()}/public/schools/cobram-primary-logo.png`, alt: "Cobram Primary School logo" };
   const html = strandReportHtml({ student: "Ryan Heard", className: "3/4J", schoolName: "Cobram Primary School", schoolLogo: cobramLogo, yearLevel: "Year 3", ...report });
   // The school's logo sits in the letterhead of every page.

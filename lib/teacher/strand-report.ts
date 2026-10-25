@@ -116,6 +116,8 @@ export function buildStrandReport(input: {
       primary = pickPrimaryInsight(withInsight.map((entry) => entry.insight));
       focusLessonId = withInsight.find((entry) => entry.insight === primary)?.id ?? null;
     }
+    // Only a real gap is a focus: no "needs support" box means no FOCUS tag on a lesson either.
+    if (!primary || NO_FOCUS.has(primary.needsSupport)) focusLessonId = null;
 
     let correct = 0;
     let total = 0;
