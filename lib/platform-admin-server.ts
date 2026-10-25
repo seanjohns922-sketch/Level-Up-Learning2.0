@@ -337,6 +337,36 @@ export async function loadPlatformOperations() {
   return { access, snapshot, schools };
 }
 
+/** Everything the admin home shows. Engagement, home users and licences are
+ * optional extras: if one is unavailable the page still loads without it. */
+export async function loadPlatformAdminHome() {
+  const access = await requirePlatformOwner();
+  if (!access) return null;
+  const [snapshot, schools] = await Promise.all([
+    adminRequest<PlatformOperationsSnapshot>("get_platform_admin_operations_snapshot", access.accessToken),
+    adminRequest<PlatformSchoolSummary[]>("get_platform_admin_school_summaries_pa2", access.accessToken),
+  ]);
+  const optional = async <T,>(label: string, load: () => Promise<T>): Promise<T | null> => {
+    try {
+      return await load();
+    } catch (error) {
+      console.error(`[platform-admin] ${label} unavailable for the admin home`, error);
+      return null;
+    }
+  };
+  const current = schools.filter((school) => school.status !== "archived");
+  const [engagement, homeUsers, licenceLists] = await Promise.all([
+    optional("engagement", () => adminRequest<PlatformEngagementSnapshot>("get_platform_admin_engagement_snapshot", access.accessToken)),
+    optional("home users", () => adminRequest<PlatformHomeUsersSnapshot>("get_platform_admin_home_users", access.accessToken)),
+    Promise.all(current.map((school) => optional("licences", () => adminRequest<PlatformSchoolLicence[]>("get_platform_admin_school_licences", access.accessToken, { p_school_id: school.id })))),
+  ]);
+  // Null when the licence-renewal database update isn't applied (every lookup failed).
+  const licences = licenceLists.every((list) => list === null)
+    ? null
+    : new Map(current.map((school, index) => [school.id, licenceLists[index] ?? []]));
+  return { access, snapshot, schools, engagement, homeUsers, licences };
+}
+
 export async function loadPlatformGrowth() {
   const access = await requirePlatformOwner();
   if (!access) return null;

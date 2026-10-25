@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Activity,
-  BarChart3,
-  Building2,
-  Gauge,
-  Fingerprint,
-  Home,
-  LogOut,
-  Settings,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -25,16 +14,18 @@ import { supabase } from "@/lib/supabase";
  */
 export const ADMIN_AQUA = "#2EE6E0";
 
+// Grouped by job so new staff can find their way; the current page gets a thin aqua bar.
 const NAVIGATION = [
-  { href: "/admin", label: "Overview", icon: Gauge },
-  { href: "/admin/schools", label: "Schools", icon: Building2 },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/identity", label: "Identity", icon: Fingerprint },
-  { href: "/admin/home", label: "Home", icon: Home },
-  { href: "/admin/growth", label: "Growth", icon: TrendingUp },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/admin/audit", label: "Audit", icon: Activity },
+  { href: "/admin", label: "Overview", group: "Run the business" },
+  { href: "/admin/schools", label: "Schools & licences", group: "Run the business" },
+  { href: "/admin/users", label: "Users", group: "People" },
+  { href: "/admin/identity", label: "Identity", group: "People" },
+  { href: "/admin/home", label: "Home families", group: "People" },
+  { href: "/admin/growth", label: "Growth", group: "Insights" },
+  { href: "/admin/analytics", label: "Analytics", group: "Insights" },
+  { href: "/admin/audit", label: "Audit log", group: "System" },
 ] as const;
+const GROUPS = ["Run the business", "People", "Insights", "System"] as const;
 
 function isCurrent(pathname: string, href: string) {
   return href === "/admin" ? pathname === href : pathname.startsWith(href);
@@ -73,23 +64,30 @@ export default function PlatformAdminShell({
             Platform Admin
           </p>
         </div>
-        <nav className="flex-1 space-y-1 px-3" aria-label="Platform Admin">
-          {NAVIGATION.map(({ href, label, icon: Icon }) => {
-            const active = isCurrent(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-bold transition ${
-                  active ? "bg-[#2EE6E0] text-[#121314]" : "text-white/75 hover:bg-white/[0.08] hover:text-white"
-                }`}
-              >
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                {label}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3" aria-label="Platform Admin">
+          {GROUPS.map((group) => (
+            <div key={group}>
+              <p className="px-3 text-[10px] font-black uppercase tracking-[0.18em] text-white/40">{group}</p>
+              <div className="mt-2 space-y-0.5">
+                {NAVIGATION.filter((item) => item.group === group).map(({ href, label }) => {
+                  const active = isCurrent(pathname, href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      aria-current={active ? "page" : undefined}
+                      className={`relative flex min-h-10 items-center rounded-lg px-3 text-sm font-semibold transition ${
+                        active ? "bg-white/[0.08] text-white" : "text-white/65 hover:bg-white/[0.05] hover:text-white"
+                      }`}
+                    >
+                      {active ? <span className="absolute inset-y-2 left-0 w-1 rounded-full bg-[#2EE6E0]" aria-hidden="true" /> : null}
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
         <div className="space-y-1 border-t border-white/10 p-3">
           <div className="px-3 py-2">
@@ -99,8 +97,8 @@ export default function PlatformAdminShell({
           <Link
             href="/admin/settings"
             aria-current={isCurrent(pathname, "/admin/settings") ? "page" : undefined}
-            className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-bold transition ${
-              isCurrent(pathname, "/admin/settings") ? "bg-[#2EE6E0] text-[#121314]" : "text-white/75 hover:bg-white/[0.08] hover:text-white"
+            className={`flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-semibold transition ${
+              isCurrent(pathname, "/admin/settings") ? "bg-white/[0.08] text-white" : "text-white/65 hover:bg-white/[0.05] hover:text-white"
             }`}
           >
             <Settings className="h-5 w-5" aria-hidden="true" />
@@ -109,7 +107,7 @@ export default function PlatformAdminShell({
           <button
             type="button"
             onClick={signOut}
-            className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-bold text-white/75 transition hover:bg-white/[0.08] hover:text-white"
+            className="flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-semibold text-white/65 transition hover:bg-white/[0.05] hover:text-white"
           >
             <LogOut className="h-5 w-5" aria-hidden="true" />
             Sign Out
