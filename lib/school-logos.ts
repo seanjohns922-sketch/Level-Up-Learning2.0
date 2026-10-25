@@ -42,6 +42,13 @@ export function getSchoolLogo(school: { name?: string | null; code?: string | nu
     };
   }
 
+  if (codeKey === "numps2026" || nameKey === "numurkahprimary" || nameKey === "numurkahprimaryschool") {
+    return {
+      src: "/schools/numurkah-primary-logo.png",
+      alt: `${school.name ?? "Numurkah Primary School"} logo`,
+    };
+  }
+
   if (
     nameKey === "stmarysthornbury"
     || nameKey === "stmarysschoolthornbury"
