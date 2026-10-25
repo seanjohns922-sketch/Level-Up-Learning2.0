@@ -4,6 +4,8 @@ import { classLoginCardsHtml, homeAccessCardsHtml, singleLoginCardHtml } from ".
 import { learningJourneyHtml, placementBaselineHtml, studentProgressReportHtml } from "../lib/documents/school-reports.ts";
 import { buildParentReportHtml } from "../lib/parent-report-print.ts";
 import { buildStudentRosterTemplate } from "../lib/student-roster-template.ts";
+import { readStudentTemplateSheets, templateRowIssue } from "../lib/school-student-template.ts";
+import readXlsxFile from "read-excel-file/node";
 import { readFileSync } from "node:fs";
 import ExcelJS from "exceljs";
 import { scopeAndSequenceHtml } from "../lib/documents/scope-sequence.ts";
@@ -240,14 +242,23 @@ assert.ok(brody.includes("from the September pre-test") && brody.includes("Choos
 assert.ok(brody.indexOf("Choose a display") < brody.indexOf("Collect and record data") && brody.indexOf("Collect and record data") < brody.indexOf("Interpret data displays"));
 save("diagnostic-report-brody", brody);
 
-// Student import template: headings unchanged (the import reads them), RELIQ styling and logo.
+// Student template: the only spreadsheet leadership can upload. Three columns, a hidden stamp, RELIQ styling.
 const logoPng = readFileSync("public/brand/reliq-logo.png");
 const workbook = new ExcelJS.Workbook();
-await workbook.xlsx.load(await buildStudentRosterTemplate([{ name: "3/4J", status: "active" }], { logoPng }));
+await workbook.xlsx.load(await buildStudentRosterTemplate({ logoPng }));
 const sheet = workbook.getWorksheet("Students");
-assert.deepEqual(sheet.getRow(1).values.slice(1), ["First Name", "Last Name", "Year Level", "Class", "Student Code", "Access Code"]);
-assert.equal(sheet.getCell("B1").fill.fgColor.argb, "FF121314");
-assert.equal(workbook.getWorksheet("Instructions").getImages().length, 1);
-if (out) writeFileSync(`${out}/reliq-student-import-template.xlsx`, Buffer.from(await workbook.xlsx.writeBuffer()));
+assert.deepEqual(sheet.getRow(1).values.slice(1), ["First Name", "Last Name", "Year Level"]);
+assert.equal(sheet.getCell("A1").fill.fgColor.argb, "FF121314");
+assert.equal(workbook.getWorksheet("How to use").getImages().length, 1);
+assert.equal(workbook.getWorksheet("RELIQ").state, "veryHidden");
+// Filled in, saved and read back the way the upload reads it.
+[["Mia", "Thompson", "Year 4"], ["Leo", "Patel", "3"], ["Ava", "Nguyen", "Foundation"], ["Jack", "", "Yr 5"]].forEach((row, index) => { sheet.getRow(index + 2).values = row; });
+const filled = Buffer.from(await workbook.xlsx.writeBuffer());
+const templateRows = readStudentTemplateSheets(await readXlsxFile(filled));
+assert.deepEqual(templateRows.map((row) => row.schoolYear), ["Year 4", "Year 3", "Prep", "Year 5"]);
+assert.equal(templateRowIssue(templateRows[3], ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"]), "Last name missing");
+// Any other spreadsheet is turned away, even with the same headings.
+assert.throws(() => readStudentTemplateSheets([{ sheet: "Students", data: [["First Name", "Last Name", "Year Level"], ["Ava", "Smith", "Year 3"]] }]), /isn't the RELIQ student template/);
+if (out) writeFileSync(`${out}/RELIQ-student-template.xlsx`, filled);
 
 console.log("PASS every RELIQ document builds, escapes its data and paginates");

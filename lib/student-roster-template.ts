@@ -1,147 +1,131 @@
-export type StudentRosterTemplateClass = {
-  name: string;
-  status: string;
-};
+/** The RELIQ student template: the only spreadsheet leadership can upload.
+ *
+ * Three columns (First Name, Last Name, Year Level), room for a whole school,
+ * and a hidden stamp so RELIQ can tell its own template from any other file.
+ * Usernames, access codes and Explorer Codes are created by RELIQ; teachers add
+ * students to their classes from the school's list. */
 
-const TEMPLATE_HEADERS = [
-  "First Name",
-  "Last Name",
-  "Year Level",
-  "Class",
-  "Student Code",
-  "Access Code",
-] as const;
+export const STUDENT_TEMPLATE_STAMP = "RELIQ student template v2";
+export const STUDENT_TEMPLATE_STAMP_SHEET = "RELIQ";
+export const STUDENT_TEMPLATE_SHEET = "Students";
+export const STUDENT_TEMPLATE_HEADERS = ["First Name", "Last Name", "Year Level"] as const;
+export const STUDENT_TEMPLATE_MAX_ROWS = 1000;
+export const STUDENT_TEMPLATE_FILE_NAME = "RELIQ-student-template.xlsx";
 
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"];
-const MAX_STUDENT_ROWS = 60;
 
-// RELIQ document colours: Carbon heading rows with lime text (adult document).
+// RELIQ adult document colours: Carbon with green.
 const CARBON = "FF121314";
-const LIME = "FFB9F23F";
+const LIME = "FF83E300";
 const GREEN = "FF3D6600";
 
-export async function buildStudentRosterTemplate(classes: StudentRosterTemplateClass[], options: { logoPng?: ArrayBuffer } = {}) {
+export async function buildStudentRosterTemplate(options: { logoPng?: ArrayBuffer } = {}) {
   const excelModule = await import("exceljs");
   const ExcelJS = excelModule.default ?? excelModule;
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "RELIQ";
-  workbook.title = "Student import template";
-  workbook.subject = "School student roster import";
+  workbook.title = STUDENT_TEMPLATE_STAMP;
+  workbook.subject = "Whole-school student list";
 
-  const students = workbook.addWorksheet("Students", {
-    views: [{ state: "frozen", ySplit: 1 }],
-  });
+  // Instructions first, so it's the sheet that opens.
+  const instructions = workbook.addWorksheet("How to use");
+  const students = workbook.addWorksheet(STUDENT_TEMPLATE_SHEET, { views: [{ state: "frozen", ySplit: 1 }] });
   students.columns = [
-    { header: TEMPLATE_HEADERS[0], key: "firstName", width: 22 },
-    { header: TEMPLATE_HEADERS[1], key: "lastName", width: 22 },
-    { header: TEMPLATE_HEADERS[2], key: "schoolYear", width: 16 },
-    { header: TEMPLATE_HEADERS[3], key: "className", width: 24 },
-    { header: TEMPLATE_HEADERS[4], key: "username", width: 22 },
-    { header: TEMPLATE_HEADERS[5], key: "pin", width: 18 },
+    { header: STUDENT_TEMPLATE_HEADERS[0], key: "firstName", width: 24 },
+    { header: STUDENT_TEMPLATE_HEADERS[1], key: "lastName", width: 24 },
+    { header: STUDENT_TEMPLATE_HEADERS[2], key: "schoolYear", width: 16 },
   ];
-  students.autoFilter = `A1:${String.fromCharCode(64 + TEMPLATE_HEADERS.length)}1`;
   students.getRow(1).height = 28;
-  students.getRow(1).eachCell((cell, columnNumber) => {
-    // Required columns (First Name, Year Level) are marked with a lime fill.
-    const required = columnNumber === 1 || columnNumber === 3;
-    cell.font = { bold: true, color: { argb: required ? CARBON : LIME } };
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: required ? LIME : CARBON } };
+  students.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: LIME } };
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: CARBON } };
     cell.alignment = { vertical: "middle" };
   });
 
-  const activeClassNames = [...new Set(
-    classes
-      .filter((classRow) => classRow.status === "active")
-      .map((classRow) => classRow.name.trim())
-      .filter(Boolean),
-  )].sort((left, right) => left.localeCompare(right));
-
-  const lists = workbook.addWorksheet("Lists", { state: "veryHidden" });
+  // Hidden lists and the stamp that marks this file as the RELIQ template.
+  const stamp = workbook.addWorksheet(STUDENT_TEMPLATE_STAMP_SHEET, { state: "veryHidden" });
+  stamp.getCell(1, 1).value = STUDENT_TEMPLATE_STAMP;
   YEAR_LEVELS.forEach((year, index) => {
-    lists.getCell(index + 1, 1).value = year;
-  });
-  activeClassNames.forEach((className, index) => {
-    lists.getCell(index + 1, 2).value = className;
+    stamp.getCell(index + 1, 2).value = year;
   });
 
-  for (let rowNumber = 2; rowNumber <= MAX_STUDENT_ROWS + 1; rowNumber += 1) {
-    const row = students.getRow(rowNumber);
-    row.height = 22;
-    row.getCell(3).dataValidation = {
+  for (let rowNumber = 2; rowNumber <= STUDENT_TEMPLATE_MAX_ROWS + 1; rowNumber += 1) {
+    students.getRow(rowNumber).getCell(3).dataValidation = {
       type: "list",
-      allowBlank: false,
-      formulae: [`Lists!$A$1:$A$${YEAR_LEVELS.length}`],
+      allowBlank: true,
+      formulae: [`${STUDENT_TEMPLATE_STAMP_SHEET}!$B$1:$B$${YEAR_LEVELS.length}`],
+      // Pasted values like "3" or "Foundation" are tidied up on upload, so only warn.
       showErrorMessage: true,
-      errorTitle: "Choose a year level",
-      error: "Select Prep or Year 1 to Year 6 from the list.",
+      errorStyle: "warning",
+      errorTitle: "Year level",
+      error: "Use Prep or Year 1 to Year 6. RELIQ also understands 3, Yr 3 and Foundation.",
     };
-    if (activeClassNames.length > 0) {
-      row.getCell(4).dataValidation = {
-        type: "list",
-        allowBlank: true,
-        formulae: [`Lists!$B$1:$B$${activeClassNames.length}`],
-        showErrorMessage: true,
-        errorTitle: "Choose a school class",
-        error: "Select a class from the list or leave this cell blank.",
-      };
-    }
-    row.getCell(6).numFmt = "0000";
   }
 
-  const instructions = workbook.addWorksheet("Instructions");
-  instructions.columns = [{ width: 24 }, { width: 78 }];
-  // Rows 1-3 hold the RELIQ logo when it is available.
+  instructions.columns = [{ width: 6 }, { width: 92 }];
   instructions.addRow([]);
   instructions.addRow([]);
   instructions.addRow([]);
-  [1, 2, 3].forEach((rowNumber) => {
-    instructions.getRow(rowNumber).height = 18;
-  });
   if (options.logoPng) {
     const logo = workbook.addImage({ buffer: options.logoPng as never, extension: "png" });
     instructions.addImage(logo, { tl: { col: 0.2, row: 0.3 }, ext: { width: 190, height: 52 } });
   } else {
-    instructions.getCell(2, 1).value = "RELIQ";
-    instructions.getCell(2, 1).font = { bold: true, size: 20, color: { argb: CARBON } };
+    instructions.getCell(2, 2).value = "RELIQ";
+    instructions.getCell(2, 2).font = { bold: true, size: 20, color: { argb: CARBON } };
   }
-  const titleRow = instructions.addRow(["Student import template", "Add your students, then upload this file in RELIQ › Students › Import."]);
-  titleRow.height = 30;
-  titleRow.eachCell((cell, columnNumber) => {
-    cell.font = { bold: true, color: { argb: LIME }, size: columnNumber === 1 ? 14 : 11 };
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: CARBON } };
-    cell.alignment = { vertical: "middle", wrapText: true };
+  const title = instructions.addRow(["", "Whole-school student list"]);
+  title.height = 30;
+  title.getCell(2).font = { bold: true, size: 14, color: { argb: LIME } };
+  [1, 2].forEach((column) => {
+    title.getCell(column).fill = { type: "pattern", pattern: "solid", fgColor: { argb: CARBON } };
+  });
+  title.getCell(2).alignment = { vertical: "middle" };
+  instructions.addRow([]);
+  const steps = [
+    "Open the Students sheet (the tab at the bottom).",
+    "Copy your students' first names, last names and year levels from your school system, and paste them into the three columns. Use Paste Values so the formatting stays tidy.",
+    "Keep the headings in row 1 exactly as they are, and don't add any other columns or sheets.",
+    "Save the file, then upload it in RELIQ › School Home › Students › Upload student list.",
+  ];
+  steps.forEach((step, index) => {
+    const row = instructions.addRow([index + 1, step]);
+    row.height = 34;
+    row.getCell(1).font = { bold: true, color: { argb: GREEN }, size: 13 };
+    row.getCell(1).alignment = { vertical: "top", horizontal: "center" };
+    row.getCell(2).alignment = { wrapText: true, vertical: "top" };
   });
   instructions.addRow([]);
-  const firstGuide = instructions.rowCount + 1;
-  instructions.addRow(["Required", "First Name and Year Level (the lime columns)"]);
-  instructions.addRow(["Optional", "Last Name, Class, Student Code and Access Code"]);
-  instructions.addRow(["Class", "Choose an existing school class from the dropdown, or leave blank."]);
-  instructions.addRow(["Student Code", "Leave blank to generate a student code automatically."]);
-  instructions.addRow(["Access Code", "Enter exactly 4 digits, or leave blank to generate one automatically."]);
-  instructions.addRow(["Limit", `Add up to ${MAX_STUDENT_ROWS} students per file.`]);
-  instructions.addRow(["Important", "Keep the column headings unchanged. Do not add example or instruction rows to the Students sheet."]);
-  for (let rowNumber = firstGuide; rowNumber <= instructions.rowCount; rowNumber += 1) {
-    instructions.getCell(rowNumber, 1).font = { bold: true, color: { argb: GREEN } };
-    instructions.getCell(rowNumber, 2).alignment = { wrapText: true, vertical: "top" };
-    instructions.getRow(rowNumber).height = 34;
-  }
+  const notes = [
+    ["Made for you", "RELIQ creates each student's username, 4-digit access code and Explorer Code. Leave them out."],
+    ["Classes", "Teachers add students to their own classes from the school's list after the upload."],
+    ["Size", `Up to ${STUDENT_TEMPLATE_MAX_ROWS} students in one file.`],
+    ["Re-uploading", "Safe: students already in RELIQ are recognised and skipped, not added twice."],
+    ["Only this file", "RELIQ only accepts this template. Other spreadsheets or exports can't be uploaded."],
+  ];
+  notes.forEach(([label, text]) => {
+    const row = instructions.addRow([label, text]);
+    row.height = 30;
+    row.getCell(1).font = { bold: true, color: { argb: GREEN } };
+    row.getCell(1).alignment = { vertical: "top", wrapText: true };
+    row.getCell(2).alignment = { wrapText: true, vertical: "top" };
+  });
+  instructions.getColumn(1).width = 16;
 
   return workbook.xlsx.writeBuffer();
 }
 
-export async function downloadStudentRosterTemplate(classes: StudentRosterTemplateClass[]) {
+export async function downloadStudentRosterTemplate() {
   // The logo is a nice-to-have: the template still downloads without it.
   const logoPng = await fetch("/brand/reliq-logo.png").then((response) => (response.ok ? response.arrayBuffer() : undefined)).catch(() => undefined);
-  const buffer = await buildStudentRosterTemplate(classes, { logoPng });
-  const bytes = new Uint8Array(buffer);
+  const buffer = await buildStudentRosterTemplate({ logoPng });
   const url = URL.createObjectURL(
-    new Blob([bytes], {
+    new Blob([new Uint8Array(buffer)], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     }),
   );
   const link = document.createElement("a");
   link.href = url;
-  link.download = "reliq-student-import-template.xlsx";
+  link.download = STUDENT_TEMPLATE_FILE_NAME;
   document.body.appendChild(link);
   link.click();
   link.remove();

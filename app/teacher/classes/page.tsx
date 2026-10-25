@@ -157,6 +157,18 @@ export default function TeacherClassesPage() {
   const [directoryStudents, setDirectoryStudents] = useState<SchoolDirectoryStudent[]>([]);
   const [directoryQuery, setDirectoryQuery] = useState("");
   const [directoryYear, setDirectoryYear] = useState("");
+  // Students not in any class yet: what a teacher building a new class usually wants.
+  const [directoryUnassignedOnly, setDirectoryUnassignedOnly] = useState(true);
+  const directorySearch = directoryQuery.trim().toLowerCase();
+  const shownDirectoryStudents = directoryClass
+    ? directoryStudents
+      .filter((student) => student.status === "active")
+      .filter((student) => !(student.classIds ?? []).includes(directoryClass.id))
+      .filter((student) => !directoryUnassignedOnly || (student.classIds ?? []).length === 0)
+      .filter((student) => !directoryYear || student.yearLevel === directoryYear)
+      .filter((student) => !directorySearch || [student.name, student.username ?? "", student.explorerCode ?? ""].some((value) => value.toLowerCase().includes(directorySearch)))
+      .sort((left, right) => left.name.localeCompare(right.name))
+    : [];
   const [selectedDirectoryIds, setSelectedDirectoryIds] = useState<Set<string>>(new Set());
   const [directoryLoading, setDirectoryLoading] = useState(false);
   const [directoryError, setDirectoryError] = useState("");
@@ -688,6 +700,7 @@ export default function TeacherClassesPage() {
     setSelectedDirectoryIds(new Set());
     setDirectoryQuery("");
     setDirectoryYear("");
+    setDirectoryUnassignedOnly(true);
     setDirectoryError("");
     setDirectoryLoading(true);
     try {
@@ -941,11 +954,6 @@ export default function TeacherClassesPage() {
                         {!isClassArchived ? (
                           <button type="button" onClick={() => openAddStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700">
                             <UserPlus size={14} /> {cls.school_id ? "Add existing students" : "Add student"}
-                          </button>
-                        ) : null}
-                        {!isClassArchived && cls.school_id ? (
-                          <button type="button" onClick={() => openNewStudent(cls.id)} className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
-                            <UserPlus size={14} /> Add new student
                           </button>
                         ) : null}
                         {!isClassArchived && !cls.school_id ? (
@@ -1442,7 +1450,8 @@ export default function TeacherClassesPage() {
               </div>
 
               <div className="border-b border-slate-200 px-6 py-4">
-                <label className="relative block max-w-lg">
+                <div className="flex flex-wrap items-center gap-3">
+                <label className="relative block min-w-64 max-w-lg flex-1">
                   <span className="sr-only">Find student</span>
                   <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <input
@@ -1453,6 +1462,24 @@ export default function TeacherClassesPage() {
                     className="w-full rounded-md border border-slate-300 py-2.5 pl-9 pr-3 text-sm"
                   />
                 </label>
+                <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <input type="checkbox" checked={directoryUnassignedOnly} onChange={(event) => setDirectoryUnassignedOnly(event.target.checked)} className="h-4 w-4" />
+                  Not in a class yet
+                </label>
+                <button
+                  type="button"
+                  disabled={shownDirectoryStudents.length === 0}
+                  onClick={() => setSelectedDirectoryIds((current) => {
+                    const next = new Set(current);
+                    const allShown = shownDirectoryStudents.every((student) => next.has(student.id));
+                    shownDirectoryStudents.forEach((student) => (allShown ? next.delete(student.id) : next.add(student.id)));
+                    return next;
+                  })}
+                  className="rounded-md border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700 disabled:opacity-40"
+                >
+                  {shownDirectoryStudents.length > 0 && shownDirectoryStudents.every((student) => selectedDirectoryIds.has(student.id)) ? "Clear shown" : `Select all shown (${shownDirectoryStudents.length})`}
+                </button>
+                </div>
               </div>
 
               <div className="min-h-64 flex-1 overflow-y-auto p-6">
@@ -1464,19 +1491,14 @@ export default function TeacherClassesPage() {
                   </p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    {directoryStudents
-                      .filter((student) => student.status === "active")
-                      .filter((student) => !(student.classIds ?? []).includes(directoryClass.id))
-                      .filter((student) => !directoryYear || student.yearLevel === directoryYear)
-                      .filter((student) => {
-                        const search = directoryQuery.trim().toLowerCase();
-                        return !search || [
-                          student.name,
-                          student.username ?? "",
-                          student.explorerCode ?? "",
-                        ].some((value) => value.toLowerCase().includes(search));
-                      })
-                      .sort((left, right) => left.name.localeCompare(right.name))
+                    {shownDirectoryStudents.length === 0 ? (
+                      <p className="col-span-full py-10 text-center text-sm text-slate-500">
+                        {directoryUnassignedOnly
+                          ? "Everyone here is already in a class. Untick “Not in a class yet” to see all students, or ask your school leader to upload any new students."
+                          : "No students found. New students are added by your school leader with the RELIQ student list."}
+                      </p>
+                    ) : null}
+                    {shownDirectoryStudents
                       .map((student) => {
                         const selected = selectedDirectoryIds.has(student.id);
                         return (

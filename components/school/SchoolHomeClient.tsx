@@ -38,9 +38,11 @@ import type {
 } from "@/lib/school-platform-server";
 import { supabase } from "@/lib/supabase";
 import {
-  parseRosterWorkbook,
-  type RosterDraft,
-} from "@/lib/roster-import";
+  readStudentTemplateFile,
+  StudentTemplateError,
+  templateRowIssue,
+  type TemplateStudent,
+} from "@/lib/school-student-template";
 import { getSchoolLogo } from "@/lib/school-logos";
 import { downloadStudentRosterTemplate } from "@/lib/student-roster-template";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
@@ -623,7 +625,9 @@ function StudentDirectory({
     requestId: string;
     candidates: DuplicateCandidate[];
   } | null>(null);
-  const [importRows, setImportRows] = useState<RosterDraft[]>([]);
+  const [importRows, setImportRows] = useState<TemplateStudent[]>([]);
+  const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
+  const [importResult, setImportResult] = useState<{ added: number; skipped: string[]; failed: Array<{ name: string; message: string }> } | null>(null);
   const [importFileName, setImportFileName] = useState("");
   const [importMessage, setImportMessage] = useState("");
   const [linkCode, setLinkCode] = useState("");
@@ -792,6 +796,7 @@ function StudentDirectory({
     setImportRows([]);
     setImportFileName("");
     setImportMessage("");
+    setImportResult(null);
     setManualDraft(emptyStudentDraft());
     setDuplicateReview(null);
     setLinkCode("");
@@ -870,93 +875,68 @@ function StudentDirectory({
     if (!file) return;
     setReadingFile(true);
     setImportMessage("");
+    setImportResult(null);
     setImportFileName(file.name);
     try {
-      const rows = await parseRosterWorkbook(file, "");
+      const rows = await readStudentTemplateFile(file);
       setImportRows(rows);
-      setImportMessage(
-        rows.length
-          ? "Review the students before adding them."
-          : "No student names were found in that file.",
-      );
+      setImportMessage(rows.length ? "" : "The Students sheet is empty. Paste your students into it, save, and upload again.");
     } catch (error) {
       setImportRows([]);
       setImportMessage(
-        error instanceof Error ? error.message : "Could not read that file.",
+        error instanceof StudentTemplateError
+          ? error.message
+          : "That file couldn't be read. Download the RELIQ template, paste your students in, then upload it.",
       );
     } finally {
       setReadingFile(false);
     }
   }
 
-  function updateImportRow(
-    id: string,
-    field: keyof RosterDraft,
-    value: string,
-  ) {
-    setImportRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
-    );
-  }
-
-  function classForImportRow(row: RosterDraft) {
-    const className = row.className.trim().toLowerCase();
-    if (!className) return null;
-    return activeClasses.find(
-      (classRow) => classRow.name.trim().toLowerCase() === className,
-    ) ?? null;
-  }
-
-  function importRowIssue(row: RosterDraft) {
-    if (!row.firstName.trim()) return "First name is required";
-    if (!YEAR_LEVELS.includes(row.schoolYear)) return "Choose a valid year";
-    if (row.pin && !/^\d{4}$/.test(row.pin)) return "Access code must be 4 digits";
-    if (row.className.trim()) {
-      const classRow = classForImportRow(row);
-      if (!classRow) return "Choose an existing class";
-      if (classRow.yearLevels.length > 0 && !classRow.yearLevels.includes(row.schoolYear)) {
-        return "Class does not include this year level";
-      }
-    }
-    return null;
+  function updateImportRow(id: string, field: "firstName" | "lastName" | "schoolYear", value: string) {
+    setImportRows((current) => current.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   }
 
   async function downloadImportTemplate() {
     setDownloadingTemplate(true);
     setImportMessage("");
     try {
-      await downloadStudentRosterTemplate(activeClasses);
+      await downloadStudentRosterTemplate();
     } catch (error) {
-      setImportMessage(
-        error instanceof Error ? error.message : "Could not create the template.",
-      );
+      setImportMessage(error instanceof Error ? error.message : "Could not create the template.");
     } finally {
       setDownloadingTemplate(false);
     }
   }
 
+  // Sends the list in batches (the server takes up to 100 at a time) so a whole school fits in one upload.
   async function submitImport() {
-    const validRows = importRows.filter((row) => !importRowIssue(row));
-    const result = await onCreate(
-      validRows.map((row) => ({
+    const ready = importRows.filter((row) => !templateRowIssue(row, YEAR_LEVELS));
+    const added: string[] = [];
+    const skipped: string[] = [];
+    const failed: Array<{ name: string; message: string }> = [];
+    setImportProgress({ done: 0, total: ready.length });
+    for (let start = 0; start < ready.length; start += 100) {
+      const batch = ready.slice(start, start + 100);
+      const result = await onCreate(batch.map((row) => ({
         firstName: row.firstName,
         lastName: row.lastName,
         schoolYear: row.schoolYear,
-        username: row.username,
-        pin: row.pin,
-        classId: classForImportRow(row)?.id ?? "",
-        idempotencyKey: row.id,
-      })),
-    );
-    if (result.errors.length === 0) {
-      closeCreate();
-      return;
+        username: "",
+        pin: "",
+        classId: "",
+        idempotencyKey: crypto.randomUUID(),
+      })));
+      added.push(...result.created.map((student) => String((student as { name?: string }).name ?? "")));
+      for (const error of result.errors) {
+        if (error.code === "potential_duplicate") skipped.push(error.name);
+        else failed.push({ name: error.name, message: error.message });
+      }
+      setImportProgress({ done: Math.min(ready.length, start + batch.length), total: ready.length });
     }
-    setImportMessage(
-      `${result.created.length} added. ${result.errors.length} could not be added: ${result.errors
-        .map((error) => `${error.name || `row ${error.row}`}: ${error.message}`)
-        .join("; ")}`,
-    );
+    setImportProgress(null);
+    setImportRows([]);
+    setImportResult({ added: added.length, skipped, failed });
   }
 
   return (
@@ -976,7 +956,7 @@ function StudentDirectory({
             className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700"
           >
             <Upload className="h-4 w-4" />
-            Import spreadsheet
+            Upload student list
           </button>
           <button
             type="button"
@@ -1620,209 +1600,100 @@ function StudentDirectory({
       ) : null}
 
       {createMode === "import" ? (
-        <Modal title="Import students" onClose={closeCreate}>
+        <Modal title="Upload student list" onClose={closeCreate}>
           <div className="space-y-5 p-6">
-            <div className="flex flex-wrap justify-end gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.tsv,.xlsx"
-                onChange={handleRosterFile}
-                className="hidden"
-              />
-              <button
-                type="button"
-                disabled={downloadingTemplate}
-                onClick={() => void downloadImportTemplate()}
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-emerald-700 bg-white px-4 text-sm font-bold text-emerald-800 disabled:opacity-50"
-              >
-                <Download className="h-4 w-4" />
-                {downloadingTemplate ? "Creating..." : "Download template"}
-              </button>
-              <button
-                type="button"
-                disabled={readingFile}
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50"
-              >
-                <FileSpreadsheet className="h-4 w-4" />
-                {readingFile ? "Reading..." : "Choose CSV or Excel"}
-              </button>
-            </div>
-            <p className="text-xs text-slate-500">
-              Required columns are First Name and Year Level. Last Name, Class,
-              Student Code and Access Code are optional. Blank student and access
-              codes are generated automatically.
-            </p>
-            {importFileName ? (
-              <p className="text-xs font-bold text-slate-600">
-                {importFileName}
-              </p>
-            ) : null}
-            {importMessage ? (
-              <p className="text-sm font-semibold text-slate-700" role="status">
-                {importMessage}
-              </p>
-            ) : null}
-            {importRows.length > 0 ? (
-              <div className="overflow-x-auto border border-slate-200">
-                <table className="min-w-[980px] divide-y divide-slate-200 text-left text-xs">
-                  <thead className="bg-slate-50 font-bold uppercase text-slate-500">
-                    <tr>
-                      <th className="px-2 py-2">First name *</th>
-                      <th className="px-2 py-2">Last name</th>
-                      <th className="px-2 py-2">Year *</th>
-                      <th className="px-2 py-2">Class</th>
-                      <th className="px-2 py-2">Student code</th>
-                      <th className="px-2 py-2">Access code</th>
-                      <th className="px-2 py-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {importRows.map((row) => {
-                      const issue = importRowIssue(row);
-                      const availableClasses = activeClasses.filter(
-                        (classRow) =>
-                          !row.schoolYear ||
-                          classRow.yearLevels.length === 0 ||
-                          classRow.yearLevels.includes(row.schoolYear),
-                      );
-                      const importedClassIsAvailable = availableClasses.some(
-                        (classRow) =>
-                          classRow.name.trim().toLowerCase() === row.className.trim().toLowerCase(),
-                      );
-                      return (
-                        <tr key={row.id} className={issue ? "bg-red-50/60" : undefined}>
-                        <td className="p-1.5">
-                          <input
-                            value={row.firstName}
-                            onChange={(event) =>
-                              updateImportRow(
-                                row.id,
-                                "firstName",
-                                event.target.value,
-                              )
-                            }
-                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
-                          />
-                        </td>
-                        <td className="p-1.5">
-                          <input
-                            value={row.lastName}
-                            onChange={(event) =>
-                              updateImportRow(
-                                row.id,
-                                "lastName",
-                                event.target.value,
-                              )
-                            }
-                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
-                          />
-                        </td>
-                        <td className="p-1.5">
-                          <select
-                            value={row.schoolYear}
-                            onChange={(event) =>
-                              updateImportRow(
-                                row.id,
-                                "schoolYear",
-                                event.target.value,
-                              )
-                            }
-                            className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5"
-                          >
-                            <option value="">Choose year</option>
-                            {YEAR_LEVELS.map((year) => (
-                              <option key={year}>{year}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="p-1.5">
-                          <select
-                            value={row.className}
-                            onChange={(event) =>
-                              updateImportRow(row.id, "className", event.target.value)
-                            }
-                            className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5"
-                          >
-                            <option value="">No class</option>
-                            {row.className && !importedClassIsAvailable ? (
-                              <option value={row.className}>{row.className} (unavailable)</option>
-                            ) : null}
-                            {availableClasses.map((classRow) => (
-                              <option key={classRow.id} value={classRow.name}>
-                                {classRow.name}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="p-1.5">
-                          <input
-                            value={row.username}
-                            onChange={(event) =>
-                              updateImportRow(
-                                row.id,
-                                "username",
-                                event.target.value,
-                              )
-                            }
-                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
-                          />
-                        </td>
-                        <td className="p-1.5">
-                          <input
-                            inputMode="numeric"
-                            maxLength={4}
-                            value={row.pin}
-                            onChange={(event) =>
-                              updateImportRow(
-                                row.id,
-                                "pin",
-                                event.target.value
-                                  .replace(/\D/g, "")
-                                  .slice(0, 4),
-                              )
-                            }
-                            className="w-full rounded-md border border-slate-300 px-2 py-1.5"
-                          />
-                        </td>
-                        <td className={`p-2 font-semibold ${issue ? "text-red-700" : "text-emerald-700"}`}>
-                          {issue ?? "Ready"}
-                        </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            <input ref={fileInputRef} type="file" accept=".xlsx" onChange={handleRosterFile} className="hidden" />
+            {importResult ? (
+              <div className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{importResult.added}</p><p className="text-xs font-semibold text-slate-600">students added</p></div>
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.length}</p><p className="text-xs font-semibold text-slate-600">already in RELIQ, skipped</p></div>
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className={`font-display text-3xl font-black ${importResult.failed.length ? "text-red-700" : "text-[#121314]"}`}>{importResult.failed.length}</p><p className="text-xs font-semibold text-slate-600">couldn&apos;t be added</p></div>
+                </div>
+                {importResult.skipped.length ? (
+                  <p className="text-sm text-slate-600">
+                    <b>Skipped because they look like students already in RELIQ:</b> {importResult.skipped.join(", ")}. If one of these really is a different child, add them on their own with <b>Add student</b>.
+                  </p>
+                ) : null}
+                {importResult.failed.length ? (
+                  <ul className="space-y-1 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                    {importResult.failed.map((item, index) => <li key={index}><b>{item.name || "A student"}:</b> {item.message}</li>)}
+                  </ul>
+                ) : null}
+                <p className="text-sm text-slate-600">Next: teachers add these students to their classes with <b>Add existing students</b>, then print login cards.</p>
+                <div className="flex justify-end"><button type="button" onClick={closeCreate} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white">Done</button></div>
               </div>
-            ) : null}
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeCreate}
-                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                disabled={
-                  busy ||
-                  !importRows.some((row) => !importRowIssue(row))
-                }
-                onClick={() => void submitImport()}
-                className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-              >
-                {busy
-                  ? "Adding..."
-                  : `Add ${
-                      importRows.filter(
-                        (row) =>
-                          !importRowIssue(row),
-                      ).length
-                    } students`}
-              </button>
-            </div>
+            ) : importRows.length === 0 ? (
+              <>
+                <ol className="space-y-3 text-sm text-slate-700">
+                  <li className="flex gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#121314] text-xs font-black text-[#83E300]">1</span><span><b>Download the RELIQ student template.</b> It&apos;s the only file RELIQ accepts.</span></li>
+                  <li className="flex gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#121314] text-xs font-black text-[#83E300]">2</span><span><b>Paste your students in:</b> first name, last name and year level, copied from your school system. RELIQ makes the usernames and access codes.</span></li>
+                  <li className="flex gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#121314] text-xs font-black text-[#83E300]">3</span><span><b>Save it and upload it here.</b> You&apos;ll check the list before anything is added.</span></li>
+                </ol>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" disabled={downloadingTemplate} onClick={() => void downloadImportTemplate()} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-emerald-700 bg-white px-4 text-sm font-bold text-emerald-800 disabled:opacity-50">
+                    <Download className="h-4 w-4" />{downloadingTemplate ? "Creating..." : "Download template"}
+                  </button>
+                  <button type="button" disabled={readingFile} onClick={() => fileInputRef.current?.click()} className="inline-flex min-h-10 items-center gap-2 rounded-md bg-emerald-800 px-4 text-sm font-bold text-white disabled:opacity-50">
+                    <FileSpreadsheet className="h-4 w-4" />{readingFile ? "Reading..." : "Upload completed template"}
+                  </button>
+                </div>
+                {importMessage ? <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900" role="alert">{importMessage}</p> : null}
+              </>
+            ) : (
+              (() => {
+                const issues = importRows.filter((row) => templateRowIssue(row, YEAR_LEVELS));
+                const ready = importRows.length - issues.length;
+                const byYear = YEAR_LEVELS.map((year) => [year, importRows.filter((row) => row.schoolYear === year && !templateRowIssue(row, YEAR_LEVELS)).length] as const).filter(([, count]) => count > 0);
+                return (
+                  <>
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-sm font-bold text-slate-700">{importFileName}</p>
+                      <button type="button" onClick={() => fileInputRef.current?.click()} className="text-xs font-bold text-emerald-800 underline">Upload a different file</button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{ready}</p><p className="text-xs font-semibold text-slate-600">ready to add · {byYear.map(([year, count]) => `${year.replace("Year ", "Y")} ${count}`).join(" · ")}</p></div>
+                      <div className={`rounded-xl border p-4 ${issues.length ? "border-red-200 bg-red-50" : "border-[#E3E5E0]"}`}><p className={`font-display text-3xl font-black ${issues.length ? "text-red-700" : "text-[#121314]"}`}>{issues.length}</p><p className="text-xs font-semibold text-slate-600">{issues.length ? "need fixing below (or they'll be left out)" : "need fixing"}</p></div>
+                    </div>
+                    <p className="text-xs text-slate-500">Students already in RELIQ are recognised when you add them and skipped, so uploading again is safe.</p>
+                    {issues.length ? (
+                      <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200">
+                        <table className="w-full text-left text-xs">
+                          <thead className="sticky top-0 bg-slate-50 font-bold uppercase text-slate-500"><tr><th className="px-2 py-2">First name</th><th className="px-2 py-2">Last name</th><th className="px-2 py-2">Year</th><th className="px-2 py-2">Problem</th></tr></thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {issues.map((row) => (
+                              <tr key={row.id} className="bg-red-50/40">
+                                <td className="p-1.5"><input value={row.firstName} onChange={(event) => updateImportRow(row.id, "firstName", event.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5" /></td>
+                                <td className="p-1.5"><input value={row.lastName} onChange={(event) => updateImportRow(row.id, "lastName", event.target.value)} className="w-full rounded-md border border-slate-300 px-2 py-1.5" /></td>
+                                <td className="p-1.5">
+                                  <select value={YEAR_LEVELS.includes(row.schoolYear) ? row.schoolYear : ""} onChange={(event) => updateImportRow(row.id, "schoolYear", event.target.value)} className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5">
+                                    <option value="">Choose year</option>
+                                    {YEAR_LEVELS.map((year) => <option key={year}>{year}</option>)}
+                                  </select>
+                                </td>
+                                <td className="p-2 font-semibold text-red-700">{templateRowIssue(row, YEAR_LEVELS)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : null}
+                    {importProgress ? (
+                      <div>
+                        <p className="text-sm font-semibold text-slate-700">Adding {importProgress.done} of {importProgress.total}…</p>
+                        <span className="mt-1 block h-2 overflow-hidden rounded-full bg-slate-100"><span className="block h-full rounded-full bg-emerald-700 transition-all" style={{ width: `${importProgress.total ? (importProgress.done / importProgress.total) * 100 : 0}%` }} /></span>
+                      </div>
+                    ) : null}
+                    <div className="flex justify-end gap-2">
+                      <button type="button" onClick={closeCreate} disabled={Boolean(importProgress)} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold disabled:opacity-50">Cancel</button>
+                      <button type="button" disabled={busy || Boolean(importProgress) || ready === 0} onClick={() => void submitImport()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
+                        {importProgress ? "Adding..." : `Add ${ready} student${ready === 1 ? "" : "s"}`}
+                      </button>
+                    </div>
+                  </>
+                );
+              })()
+            )}
           </div>
         </Modal>
       ) : null}
