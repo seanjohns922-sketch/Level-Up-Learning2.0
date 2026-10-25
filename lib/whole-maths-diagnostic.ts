@@ -206,6 +206,50 @@ export function computeWholeMathsLevel(
   return wholeMathsLevelForCurriculumPoints(reachedPoints);
 }
 
+/** The strands that make up a student's whole-maths picture. Number,
+ * Measurement, Space and Statistics always count. Algebra and Probability
+ * start at Level 3, so they count from Year 3, or earlier once the student
+ * has a result in them (moved into the realm early). */
+export const CORE_STRANDS: readonly AcStrand[] = ["number", "measurement", "space", "statistics"];
+const LEVEL_THREE_STRANDS: readonly AcStrand[] = ["algebra", "probability"];
+
+export function schoolYearNumber(label: string | null | undefined): number | null {
+  if (!label) return null;
+  if (/prep|foundation|ground/i.test(label)) return 0;
+  const match = /(\d+)/.exec(label);
+  return match ? Number(match[1]) : null;
+}
+
+export function availableStrands(schoolYear: string | null | undefined, enteredStrands: Iterable<AcStrand> = []): AcStrand[] {
+  const entered = new Set(enteredStrands);
+  const year = schoolYearNumber(schoolYear);
+  return (Object.keys(AC_STRANDS) as AcStrand[])
+    .sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order)
+    .filter((strand) => CORE_STRANDS.includes(strand) || entered.has(strand) || (year !== null && year >= 3 && LEVEL_THREE_STRANDS.includes(strand)));
+}
+
+/** Whole-maths level across a set of strands: the same curriculum-points
+ * scale as the official level, but counted over those strands only, so a
+ * Year 2 student is placed on Number, Measurement, Space and Statistics.
+ * Null until every strand in the set has a level. With all six strands this
+ * equals computeWholeMathsLevel. */
+export function computeAvailableWholeMathsLevel(
+  measuredLevels: Partial<Record<AcStrand, number | null>>,
+  strands: readonly AcStrand[],
+): number | null {
+  if (!strands.length || strands.some((strand) => measuredLevels[strand] == null)) return null;
+  const reached = strands.reduce((sum, strand) => sum + curriculumPointsReached(strand, measuredLevels[strand]!), 0);
+  let completed = 0;
+  for (const level of AC_PRIMARY_LEVELS.slice(0, 6)) {
+    const levelPoints = strands.reduce((sum, strand) => sum + AC_DESCRIPTOR_COUNTS_BY_LEVEL[level][strand], 0);
+    if (levelPoints > 0 && reached <= completed + levelPoints) {
+      return Math.round((level + (reached - completed) / levelPoints) * 100) / 100;
+    }
+    completed += levelPoints;
+  }
+  return 6;
+}
+
 // A strand level is a position inside that year's curriculum: 3.5 means
 // halfway through the Year 3 descriptor load. A level of 4.0 therefore carries
 // all descriptors below Year 4, while 4.5 carries half of Year 4. The Level 6

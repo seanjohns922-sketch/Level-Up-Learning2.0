@@ -63,7 +63,7 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
         title: "What to do with it",
         text:
           audience === "teacher"
-            ? "Check in with students going backwards or slower than expected, especially in more than one strand. Students waiting for a post-test may be ready for one."
+            ? "Check in with students going backwards or slower than expected, especially in more than one strand. Students waiting for every strand may need a post-test or a starting test in a strand."
             : audience === "group"
               ? "Compare the line with the expected line. If the group is behind pace in one strand, plan it together."
               : "Look for a school year or strand growing slower than expected. Judge the trend after the mid and end diagnostics, when most students have a post-test or diagnostic.",
@@ -75,7 +75,7 @@ export function growthHelp(audience: HelpAudience): TabHelpContent {
       { term: PACE_META.onPace.label, text: `${PACE_META.onPace.meaning}.`, swatch: PACE_META.onPace.bg },
       { term: PACE_META.faster.label, text: `${PACE_META.faster.meaning}.`, swatch: PACE_META.faster.bg },
       { term: "Expected", text: "a steady quarter of a level per term from the starting test: to the latest post-test or diagnostic for pace, and to each date on the line.", swatch: "#FFFFFF", border: "#8F948C" },
-      { term: "Waiting for a post-test", text: "a starting test, but no post-test or diagnostic after it yet.", swatch: "#F1F2EE", border: "#C9CDC5" },
+      { term: "Waiting for every strand", text: "a student counts once every strand available to them has a starting test and a post-test or diagnostic after it: Number, Measurement, Space and Statistics, plus Algebra and Probability from Year 3 or once they move into them early. Growth by strand still includes them.", swatch: "#F1F2EE", border: "#C9CDC5" },
       { term: "Small group", text: "fewer than 5 students in that strand, so read it with care.", swatch: "#F1F2EE", border: "#C9CDC5" },
     ],
   };

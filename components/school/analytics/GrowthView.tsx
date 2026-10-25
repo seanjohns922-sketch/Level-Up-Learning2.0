@@ -8,7 +8,9 @@ import TabHelp from "./TabHelp";
 import {
   PACE_META,
   PACE_ORDER,
+  describeGrowthGaps,
   formatGrowth,
+  growthCoverage,
   paceFor,
   seriesTimes,
   studentGrowthAt,
@@ -70,7 +72,7 @@ export default function GrowthView({
     return {
       key,
       name,
-      sub: `${group.followed} followed · ${group.tests} tests${group.waiting ? ` · ${group.waiting} waiting for a post-test` : ""}`,
+      sub: `${group.followed} followed · ${group.tests} tests${group.waiting ? ` · ${group.waiting} waiting for every strand` : ""}`,
       journey: group.first === null ? "—" : `${level(group.first)} → ${level(group.latest)}`,
       gained: group.gained,
       series: group.series,
@@ -94,19 +96,21 @@ export default function GrowthView({
   } else {
     rows = snapshot.students
       .map((student) => {
-        const growth = studentGrowthAt(student.testHistory, times[times.length - 1]);
+        const at = times[times.length - 1];
+        const growth = studentGrowthAt(student.testHistory, at);
+        const coverage = growthCoverage(student.testHistory, at, student.yearLevel);
         const tests = (student.testHistory ?? []).length;
         return {
           key: student.id,
           name: student.name,
-          sub: `${student.yearLevel ?? "Year not recorded"} · ${tests} test${tests === 1 ? "" : "s"}`,
+          sub: `${student.yearLevel ?? "Year not recorded"} · ${tests} test${tests === 1 ? "" : "s"}${coverage.complete ? "" : ` · ${describeGrowthGaps(coverage.missing)}`}`,
           journey: growth ? `${level(growth.first)} → ${level(growth.latest)}` : "—",
           gained: growth?.gained ?? null,
           series: withStart([student], times.map((time) => {
             const point = studentGrowthAt(student.testHistory, time);
             return { at: time, gained: point?.gained ?? null, expected: point?.expectedNow ?? null, students: point ? 1 : 0 };
           })),
-          studentPace: growth ? paceFor(growth.gained, growth.expected) : null,
+          studentPace: growth && coverage.complete ? paceFor(growth.gained, growth.expected) : null,
           onOpen: onOpenStudent ? () => onOpenStudent(student.id) : undefined,
         };
       })
@@ -116,7 +120,10 @@ export default function GrowthView({
         a.name.localeCompare(b.name));
   }
 
-  const comparisons = breakdown !== "students" && rows.length >= 2 && rows.length <= 4 ? rows : [];
+  // Leaders compare groups: whole school draws a line per school year, a year
+  // a line per class. Student detail belongs to the class teacher's view.
+  const comparisons = breakdown !== "students" && rows.length >= 2 ? rows.filter((row) => row.series.some((point) => point.gained !== null)) : [];
+  const groupWord = breakdown === "years" ? "school year" : "class";
   const firstColumn = breakdown === "years" ? "School year" : breakdown === "classes" ? "Class" : "Student";
 
   if (summary.followed === 0) {
@@ -126,7 +133,7 @@ export default function GrowthView({
       <section className={card}>
         <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          A pre-test sets each student&apos;s starting point; growth appears once they sit a post-test or the mid-year diagnostic after it.
+          A pre-test sets each student&apos;s starting point; a student counts once every strand available to them has a post-test or diagnostic after it (Algebra and Probability from Year 3, or once they move into them early).
           {summary.waiting ? ` ${summary.waiting} student${summary.waiting === 1 ? " has" : "s have"} a starting test so far.` : " No tests have been sat this year yet."}
         </p>
       </section>
@@ -141,7 +148,7 @@ export default function GrowthView({
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-xl font-extrabold tracking-tight">{title}</h3>
           <span className="text-sm text-slate-500">
-            {summary.followed} students followed · {summary.tests} tests{summary.waiting ? ` · ${summary.waiting} waiting for a post-test` : ""}
+            {summary.followed} students followed · {summary.tests} tests{summary.waiting ? ` · ${summary.waiting} waiting for every strand` : ""}
           </span>
         </div>
         <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
@@ -171,9 +178,13 @@ export default function GrowthView({
       <div className="grid gap-5 xl:grid-cols-[1.75fr_1fr]">
         <section className={card}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-xl font-extrabold tracking-tight">Growth through the year</h3>
+            <h3 className="text-xl font-extrabold tracking-tight">Growth through the year{comparisons.length ? ` by ${groupWord}` : ""}</h3>
             <span className="flex flex-wrap gap-4 text-sm text-slate-600">
-              <span className="inline-flex items-center gap-2"><span className="h-[3px] w-5 bg-[#121314]" />Average growth</span>
+              {comparisons.length ? (
+                <span className="inline-flex items-center gap-2"><span className="h-[3px] w-5 bg-[#121314]" />Each {groupWord}</span>
+              ) : (
+                <span className="inline-flex items-center gap-2"><span className="h-[3px] w-5 bg-[#121314]" />Average growth</span>
+              )}
               <span className="inline-flex items-center gap-2"><span className="w-5 border-t-2 border-dashed border-slate-400" />Expected</span>
               <span className="inline-flex items-center gap-2"><span className="h-2.5 w-4 bg-[#83E300]/40" />On pace</span>
             </span>
@@ -222,7 +233,7 @@ export default function GrowthView({
                     {row.pace ? <PaceBar pace={row.pace} /> : row.studentPace ? (
                       <span className="rounded-full px-2.5 py-1 text-xs font-extrabold" style={{ background: PACE_META[row.studentPace].bg, color: PACE_META[row.studentPace].fg }}>{PACE_META[row.studentPace].label}</span>
                     ) : (
-                      <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for a post-test</span>
+                      <span className="rounded-full bg-[#F1F2EE] px-2.5 py-1 text-xs font-bold text-slate-500">Waiting for every strand</span>
                     )}
                   </td>
                   <td className="px-3 py-3"><Sparkline year={year} series={row.series} /></td>
@@ -287,7 +298,9 @@ function StrandBars({ strands }: { strands: GrowthSummary["strands"] }) {
 
 const W = 760;
 const H = 300;
-const PAD = { left: 48, right: 96, top: 28, bottom: 34 };
+const PAD = { left: 48, right: 150, top: 28, bottom: 34 };
+// One colour per school year or class line (adult palette: no violet).
+const GROUP_COLOURS = ["#121314", "#0E9C93", "#C2892E", "#5B6EE6", "#C2557A", "#3D6600", "#0891B2", "#8A5A00", "#5A5E63"];
 
 function GrowthChart({ year, series, comparisons }: { year: { startsOn: string; endsOn: string }; series: SeriesPoint[]; comparisons: Array<{ label: string; series: SeriesPoint[] }> }) {
   const { start, end } = yearBounds(year);
@@ -311,12 +324,21 @@ function GrowthChart({ year, series, comparisons }: { year: { startsOn: string; 
   const last = series[series.length - 1];
   const lastGained = [...series].reverse().find((point) => point.gained !== null);
 
-  // Line-end labels, nudged apart so they never overlap.
+  // With groups to compare, each group is its own coloured line and the
+  // overall average isn't drawn (the headline above carries it).
+  const grouped = comparisons.length > 0;
+  const colourFor = (index: number) => GROUP_COLOURS[index % GROUP_COLOURS.length];
+
+  // Line-end labels, nudged apart so they never overlap. A group behind the
+  // expected growth is flagged so leaders can see which to target.
   const endLabels = [
-    ...(lastGained ? [{ text: formatGrowth(lastGained.gained), at: lastGained.at, value: lastGained.gained!, main: true }] : []),
-    ...comparisons.flatMap((item) => {
+    ...(!grouped && lastGained ? [{ text: formatGrowth(lastGained.gained), at: lastGained.at, value: lastGained.gained!, main: true, colour: "#121314" }] : []),
+    ...comparisons.flatMap((item, index) => {
       const point = [...item.series].reverse().find((entry) => entry.gained !== null);
-      return point ? [{ text: `${item.label} ${formatGrowth(point.gained)}`, at: point.at, value: point.gained!, main: false }] : [];
+      if (!point) return [];
+      const pace = point.expected === null ? null : paceFor(point.gained!, point.expected);
+      const flag = pace === "backwards" || pace === "slower" ? ` · ${PACE_META[pace].label.toLowerCase()}` : "";
+      return [{ text: `${item.label} ${formatGrowth(point.gained)}${flag}`, at: point.at, value: point.gained!, main: Boolean(flag), colour: pace === "backwards" ? "#B42318" : pace === "slower" ? "#8A5A00" : colourFor(index) }];
     }),
   ]
     .map((label) => ({ ...label, x: x(label.at) + 10, y: y(label.value) }))
@@ -338,13 +360,24 @@ function GrowthChart({ year, series, comparisons }: { year: { startsOn: string; 
       ))}
       {band ? <path d={band} fill="#83E300" fillOpacity="0.28" /> : null}
       <path d={line(series, "expected")} fill="none" stroke="#8F948C" strokeWidth="2" strokeDasharray="7 6" />
-      {comparisons.map((item) => (
-        <path key={item.label} d={line(item.series, "gained")} fill="none" stroke="#B8BCB4" strokeWidth="2" strokeLinejoin="round" />
+      {comparisons.map((item, index) => (
+        <g key={item.label}>
+          <path d={line(item.series, "gained")} fill="none" stroke={colourFor(index)} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round">
+            <title>{item.label}</title>
+          </path>
+          {item.series.filter((point) => point.gained !== null).map((point) => (
+            <circle key={point.at} cx={x(point.at)} cy={y(point.gained!)} r="3" fill="#FFFFFF" stroke={colourFor(index)} strokeWidth="2" />
+          ))}
+        </g>
       ))}
-      <path d={line(series, "gained")} fill="none" stroke="#121314" strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
-      {series.filter((point) => point.gained !== null).map((point) => (
-        <circle key={point.at} cx={x(point.at)} cy={y(point.gained!)} r="4" fill="#83E300" stroke="#121314" strokeWidth="2" />
-      ))}
+      {!grouped ? (
+        <>
+          <path d={line(series, "gained")} fill="none" stroke="#121314" strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
+          {series.filter((point) => point.gained !== null).map((point) => (
+            <circle key={point.at} cx={x(point.at)} cy={y(point.gained!)} r="4" fill="#83E300" stroke="#121314" strokeWidth="2" />
+          ))}
+        </>
+      ) : null}
       {last ? (
         <g>
           <line x1={x(last.at)} x2={x(last.at)} y1={PAD.top - 8} y2={H - PAD.bottom} stroke="#121314" strokeDasharray="2 4" />
@@ -352,7 +385,7 @@ function GrowthChart({ year, series, comparisons }: { year: { startsOn: string; 
         </g>
       ) : null}
       {endLabels.map((label) => (
-        <text key={label.text} x={label.x} y={label.y + 4} fontSize={label.main ? "13" : "12"} fontWeight={label.main ? "800" : "700"} fill={label.main ? "#121314" : "#8F948C"}>{label.text}</text>
+        <text key={label.text} x={label.x} y={label.y + 4} fontSize={label.main ? "13" : "12"} fontWeight={label.main ? "800" : "700"} fill={label.colour}>{label.text}</text>
       ))}
     </svg>
   );

@@ -12,7 +12,8 @@ import {
   DIAGNOSTIC_MASTERY,
   DIAGNOSTIC_STRANDS,
   WHOLE_MATHS_WEIGHT_TOTAL,
-  computeWholeMathsLevel,
+  availableStrands,
+  computeAvailableWholeMathsLevel,
 } from "@/lib/whole-maths-diagnostic";
 import {
   fetchTeacherDiagnostics,
@@ -451,20 +452,23 @@ export default function WholeMathsDiagnosticPanel({
           points.push({ sittingId: sitting.id, checkpoint, level: sitting.overall_level, completedAt: sitting.completed_at ?? sitting.created_at, source: "diagnostic" });
           continue;
         }
-        // Whole-maths from tests needs a result in all six strands, each carried from its latest earlier checkpoint.
-        const here = DIAGNOSTIC_STRANDS.map((definition) => strandValue(checkpoint, definition.strand));
+        // Whole-maths from tests needs a result in every strand available to the
+        // student, each carried from its latest earlier checkpoint.
+        const allStrands = DIAGNOSTIC_STRANDS.map((definition) => definition.strand);
+        const here = allStrands.map((strand) => strandValue(checkpoint, strand));
         if (!here.some(Boolean)) continue;
-        const carried = DIAGNOSTIC_STRANDS.map((definition, index) => {
+        const carried = allStrands.map((strand, index) => {
           if (here[index]) return here[index];
           for (const earlier of FORMAL_CHECKPOINTS.slice(0, FORMAL_CHECKPOINTS.indexOf(checkpoint)).reverse()) {
-            const value = strandValue(earlier, definition.strand);
+            const value = strandValue(earlier, strand);
             if (value) return value;
           }
           return null;
         });
-        if (carried.some((value) => value == null)) continue;
-        const total = DIAGNOSTIC_STRANDS.reduce((sum, definition) => sum + AC_STRANDS[definition.strand].weight, 0);
-        const level = DIAGNOSTIC_STRANDS.reduce((sum, definition, index) => sum + carried[index]!.level * AC_STRANDS[definition.strand].weight, 0) / total;
+        const levels = Object.fromEntries(allStrands.map((strand, index) => [strand, carried[index]?.level ?? null])) as Partial<Record<AcStrand, number | null>>;
+        const needed = availableStrands(student.school_year_level ?? student.year_level ?? null, allStrands.filter((_, index) => carried[index]));
+        const level = computeAvailableWholeMathsLevel(levels, needed);
+        if (level == null) continue;
         const latest = here.filter(Boolean).map((value) => value!.at).sort().at(-1)!;
         const sources = here.filter(Boolean).map((value) => value!.source);
         points.push({ sittingId: null, checkpoint, level, completedAt: latest, source: sources.includes("posttest") ? "posttest" : sources.includes("pretest") ? "pretest" : "diagnostic" });
@@ -489,8 +493,11 @@ export default function WholeMathsDiagnosticPanel({
       const realmRow = selectedStrand === "all"
         ? null
         : studentProgression.find((row) => row.strand === selectedStrand) ?? null;
+      // Whole-maths uses every strand available to the student (Algebra and Probability from Year 3, or once entered).
+      const strandLevels = Object.fromEntries(studentProgression.map((row) => [row.strand, row.predicted_level])) as Partial<Record<AcStrand, number | null>>;
+      const entered = studentProgression.filter((row) => row.predicted_level != null).map((row) => row.strand as AcStrand);
       const liveLevel = selectedStrand === "all"
-        ? computeWholeMathsLevel(Object.fromEntries(studentProgression.map((row) => [row.strand, row.predicted_level])))
+        ? computeAvailableWholeMathsLevel(strandLevels, availableStrands(student.school_year_level ?? student.year_level ?? null, entered))
         : realmRow?.predicted_level ?? null;
       const diagnosticPoints = diagnosticPointsByStudent.get(student.id) ?? [];
       return {
@@ -884,7 +891,7 @@ export default function WholeMathsDiagnosticPanel({
                     ) : <span key={checkpoint} className="text-sm text-[#C9CCC6]">—</span>;
                   })}
                   {row.liveLevel == null ? (
-                    <span className="text-sm text-[#C9CCC6]" title={selectedStrand === "all" ? "A Whole-Maths live score appears after progress in all six strands" : undefined}>—</span>
+                    <span className="text-sm text-[#C9CCC6]" title={selectedStrand === "all" ? "A Whole-Maths live score appears once every strand available to the student has progress" : undefined}>—</span>
                   ) : (
                     <span className="mx-auto" title={`Live ${formatProgressionPoint(row.liveLevel)}`}><LevelBlock level={row.liveLevel} standing={row.liveStanding} /></span>
                   )}
@@ -921,7 +928,7 @@ export default function WholeMathsDiagnosticPanel({
           <span className="font-semibold text-[#5A5E63]">
             Live score = Live now, updated by lessons, quizzes and realm tests. Diagnostic score = the fixed Start, Mid and End results (S = Start · M = Mid · E = End), each coloured against where the student was expected to be when they sat it.
             {" "}<span className="inline-flex items-center gap-1"><span className="inline-block h-3 w-0.5 rounded bg-[#121314]" />on the growth bar = growth expected since their first diagnostic (a quarter of a level per term).</span>
-            {selectedStrand === "all" ? " “All” needs results from all six strands." : ""}
+            {selectedStrand === "all" ? " “All” needs a result in every strand available to the student: Number, Measurement, Space and Statistics, plus Algebra and Probability from Year 3 or once they move into them." : ""}
             {diagnosticError ? " Diagnostic results are temporarily unavailable; live scores remain current." : ""}
           </span>
         </div>

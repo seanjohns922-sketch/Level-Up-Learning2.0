@@ -1,5 +1,6 @@
 import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
 import { type LatestTest, type SchoolYearDates } from "@/lib/proficiency";
+import { availableStrands } from "@/lib/whole-maths-diagnostic";
 
 /** Growth through the school year, from tests only.
  *
@@ -13,6 +14,13 @@ import { type LatestTest, type SchoolYearDates } from "@/lib/proficiency";
  * from the base: to the latest test for a student's pace, and to each point in
  * time for the "expected" line, so the line climbs smoothly between tests. A student's growth is the curriculum-weighted
  * average of the strands that have growth (Number most).
+ *
+ * A student counts in whole-school, year and class growth once every strand
+ * available to them has growth: Number, Measurement, Space and Statistics,
+ * plus Algebra and Probability from Year 3 or once they've moved into them.
+ * A newly joined strand adds a starting point, not growth. Until then they
+ * show as waiting, with what's missing. Growth by strand still uses every
+ * student with growth in that strand.
  *   backwards  more than a term (0.25) below their starting test
  *   slower     more than a term behind the expected growth
  *   onPace     within a term of it
@@ -122,6 +130,39 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number): 
   };
 }
 
+export type GrowthGap = { strand: AcStrand; need: "start" | "post" };
+export type GrowthCoverage = { complete: boolean; missing: GrowthGap[] };
+
+/** Whether a student has growth in every strand available to them by `at`. */
+export function growthCoverage(history: LatestTest[] | undefined, at: number, yearLevel?: string | null): GrowthCoverage {
+  const satByStrand = new Map<AcStrand, Point[]>();
+  for (const [strand, points] of tracks(history)) {
+    const sat = points.filter((point) => point.at <= at);
+    if (sat.length) satByStrand.set(strand, sat);
+  }
+  const missing: GrowthGap[] = [];
+  for (const strand of availableStrands(yearLevel, satByStrand.keys())) {
+    const sat = satByStrand.get(strand);
+    if (!sat) { missing.push({ strand, need: "start" }); continue; }
+    const hasGrowth = sat.some((point, index) => index > 0 && measuresGrowth(point));
+    if (!hasGrowth) missing.push({ strand, need: "post" });
+  }
+  return { complete: missing.length === 0, missing };
+}
+
+/** "needs a Statistics post-test", "needs Algebra and Space starting tests". */
+export function describeGrowthGaps(missing: GrowthGap[]): string {
+  const names = (need: GrowthGap["need"]) => missing.filter((gap) => gap.need === need).map((gap) => AC_STRANDS[gap.strand].label);
+  const list = (items: string[]) => (items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`);
+  const parts: string[] = [];
+  const posts = names("post");
+  const starts = names("start");
+  const article = (items: string[]) => (items.length === 1 ? (/^[AEIOU]/.test(items[0]) ? "an " : "a ") : "");
+  if (posts.length) parts.push(`${article(posts)}${list(posts)} post-test${posts.length === 1 ? "" : "s"}`);
+  if (starts.length) parts.push(`${article(starts)}${list(starts)} starting test${starts.length === 1 ? "" : "s"}`);
+  return parts.length ? `needs ${parts.join(" and ")}` : "";
+}
+
 /** Month ends from the start of the school year to `now`, then `now`. */
 export function seriesTimes(year: SchoolYearDates, now: number) {
   const { start, end } = yearBounds(year);
@@ -140,9 +181,9 @@ export function seriesTimes(year: SchoolYearDates, now: number) {
 export type SeriesPoint = { at: number; gained: number | null; expected: number | null; students: number };
 
 export type GrowthSummary = {
-  /** Students with growth (a post-test or diagnostic after their base) in at least one strand. */
+  /** Students with growth (a post-test or diagnostic after their base) in every strand available to them. */
   followed: number;
-  /** Students with a base test but no post-test or diagnostic after it yet. */
+  /** Students with tests but not yet growth in every strand available to them. */
   waiting: number;
   tests: number;
   gained: number | null;
@@ -180,21 +221,21 @@ export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates
 
   for (const student of students) {
     const growth = studentGrowthAt(student.testHistory, at);
-    if (!growth) {
+    tests += (student.testHistory ?? []).filter((test) => Date.parse(test.testedAt) <= at).length;
+    // Growth by strand uses every student with growth in that strand.
+    for (const [strand, strandGrowth] of growth?.strands ?? []) byStrand.set(strand, [...(byStrand.get(strand) ?? []), strandGrowth]);
+    if (!growth || !growthCoverage(student.testHistory, at, student.yearLevel).complete) {
       if ((student.testHistory ?? []).some((test) => Date.parse(test.testedAt) <= at)) waiting += 1;
-      tests += (student.testHistory ?? []).filter((test) => Date.parse(test.testedAt) <= at).length;
       continue;
     }
     current.push(growth);
-    tests += growth.tests;
     pace[paceFor(growth.gained, growth.expected)] += 1;
-    for (const [strand, strandGrowth] of growth.strands) byStrand.set(strand, [...(byStrand.get(strand) ?? []), strandGrowth]);
   }
 
   const measured = withStart(students, times.map((time) => {
     const rows = students.flatMap((student) => {
       const growth = studentGrowthAt(student.testHistory, time);
-      return growth ? [growth] : [];
+      return growth && growthCoverage(student.testHistory, time, student.yearLevel).complete ? [growth] : [];
     });
     return { at: time, gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expectedNow)), students: rows.length };
   }));
