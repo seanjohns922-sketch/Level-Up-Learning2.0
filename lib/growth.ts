@@ -1,5 +1,5 @@
 import { AC_STRANDS, strandForRealm, type AcStrand } from "@/lib/curriculum/ac-standards";
-import { termIndex, type LatestTest, type SchoolYearDates } from "@/lib/proficiency";
+import { type LatestTest, type SchoolYearDates } from "@/lib/proficiency";
 
 /** Growth through the school year, from tests only.
  *
@@ -8,9 +8,10 @@ import { termIndex, type LatestTest, type SchoolYearDates } from "@/lib/proficie
  * just before the first post-test or diagnostic (the settled placement, so
  * a chain of placement pre-tests counts as its last one). Growth is the
  * latest post-test or diagnostic minus the base. Later pre-tests for a new
- * level don't count: they check content not yet taught. The expectation is a
- * quarter of a level for each term between the base and the latest test, so
- * a base in Term 1 and a post-test in Term 3 expects 0.5. A student's growth is the curriculum-weighted
+ * level don't count: they check content not yet taught. The expectation rises
+ * steadily at a quarter of a level per term (a level a year), counted by date
+ * from the base: to the latest test for a student's pace, and to each point in
+ * time for the "expected" line, so the line climbs smoothly between tests. A student's growth is the curriculum-weighted
  * average of the strands that have growth (Number most).
  *   backwards  more than a term (0.25) below their starting test
  *   slower     more than a term behind the expected growth
@@ -30,12 +31,14 @@ export const PACE_META: Record<Pace, { label: string; meaning: string; bg: strin
 
 const TERM = 0.25;
 
-function termsBetween(from: number, to: number): number {
-  const a = termIndex(new Date(from).toISOString());
-  const b = termIndex(new Date(to).toISOString());
-  return a === null || b === null ? 0 : Math.max(0, b - a);
-}
 const DAY = 86400000;
+// A school term is a quarter of the year; expected growth rises steadily through it.
+const TERM_MS = (365.25 / 4) * DAY;
+
+/** Terms elapsed between two times, counted steadily by date (not in whole-term steps). */
+function termsBetween(from: number, to: number): number {
+  return Math.max(0, (to - from) / TERM_MS);
+}
 
 export function paceFor(gained: number, expected: number): Pace {
   if (gained < -TERM) return "backwards";
@@ -72,7 +75,8 @@ function tracks(history: LatestTest[] | undefined) {
   return byStrand;
 }
 
-export type StrandGrowth = { gained: number; expected: number; first: number; latest: number };
+/** `expected` runs to the latest test (for pace); `expectedNow` runs to the time asked about (for the line). */
+export type StrandGrowth = { gained: number; expected: number; expectedNow: number; first: number; latest: number };
 export type StudentGrowth = StrandGrowth & { strands: Map<AcStrand, StrandGrowth>; tests: number };
 
 /** One student's growth using the tests sat by `at`, or null before any
@@ -81,7 +85,7 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number): 
   const strands = new Map<AcStrand, StrandGrowth>();
   let weight = 0;
   let tests = 0;
-  const sum = { gained: 0, expected: 0, first: 0, latest: 0 };
+  const sum = { gained: 0, expected: 0, expectedNow: 0, first: 0, latest: 0 };
   for (const [strand, points] of tracks(history)) {
     const sat = points.filter((point) => point.at <= at);
     tests += sat.length;
@@ -91,8 +95,9 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number): 
     const latest = sat.filter((point, index) => index >= firstGrowth && measuresGrowth(point)).at(-1)!;
     const growth = {
       gained: latest.measured - first.measured,
-      // A quarter of a level for each term between the two tests.
+      // A quarter of a level per term, steadily, from the base.
       expected: TERM * termsBetween(first.at, latest.at),
+      expectedNow: TERM * termsBetween(first.at, at),
       first: first.measured,
       latest: latest.measured,
     };
@@ -101,6 +106,7 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number): 
     weight += w;
     sum.gained += growth.gained * w;
     sum.expected += growth.expected * w;
+    sum.expectedNow += growth.expectedNow * w;
     sum.first += growth.first * w;
     sum.latest += growth.latest * w;
   }
@@ -108,6 +114,7 @@ export function studentGrowthAt(history: LatestTest[] | undefined, at: number): 
   return {
     gained: sum.gained / weight,
     expected: sum.expected / weight,
+    expectedNow: sum.expectedNow / weight,
     first: sum.first / weight,
     latest: sum.latest / weight,
     strands,
@@ -184,13 +191,20 @@ export function summariseGrowth(students: GrowthStudent[], year: SchoolYearDates
     for (const [strand, strandGrowth] of growth.strands) byStrand.set(strand, [...(byStrand.get(strand) ?? []), strandGrowth]);
   }
 
-  const series = withStart(students, times.map((time) => {
+  const measured = withStart(students, times.map((time) => {
     const rows = students.flatMap((student) => {
       const growth = studentGrowthAt(student.testHistory, time);
       return growth ? [growth] : [];
     });
-    return { at: time, gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expected)), students: rows.length };
+    return { at: time, gained: mean(rows.map((row) => row.gained)), expected: mean(rows.map((row) => row.expectedNow)), students: rows.length };
   }));
+  // The chart's expected line is one steady climb, a quarter of a level per
+  // term from the group's first test, so students joining later don't bend it.
+  // Each student's pace still uses their own starting test.
+  const lineStart = measured[0]?.gained === 0 ? measured[0].at : null;
+  const series = lineStart === null
+    ? measured
+    : measured.map((point) => (point.expected === null && point.at !== lineStart ? point : { ...point, expected: TERM * termsBetween(lineStart, point.at) }));
 
   const strands = (Object.keys(AC_STRANDS) as AcStrand[])
     .sort((a, b) => AC_STRANDS[a].order - AC_STRANDS[b].order)

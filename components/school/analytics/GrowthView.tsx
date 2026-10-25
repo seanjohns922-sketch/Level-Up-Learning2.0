@@ -104,7 +104,7 @@ export default function GrowthView({
           gained: growth?.gained ?? null,
           series: withStart([student], times.map((time) => {
             const point = studentGrowthAt(student.testHistory, time);
-            return { at: time, gained: point?.gained ?? null, expected: point?.expected ?? null, students: point ? 1 : 0 };
+            return { at: time, gained: point?.gained ?? null, expected: point?.expectedNow ?? null, students: point ? 1 : 0 };
           })),
           studentPace: growth ? paceFor(growth.gained, growth.expected) : null,
           onOpen: onOpenStudent ? () => onOpenStudent(student.id) : undefined,

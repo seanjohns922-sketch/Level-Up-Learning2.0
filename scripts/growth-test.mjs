@@ -16,11 +16,13 @@ assert.equal(paceFor(-0.2, 0), "onPace"); // a small dip right after the first t
 // One test is a starting point, not growth.
 assert.equal(studentGrowthAt([test("number", 3.1, "2026-02-10T00:00:00Z", "pretest")], now), null);
 
-// Pre-test in Feb (Term 1), then May and Aug (Term 3): expected growth is a quarter of a level per term between them.
+// Pre-test 1 Feb, then May and 1 Aug: expected growth rises steadily, a quarter of a level per term (181 days ≈ 1.98 terms).
 const steady = [test("number", 3.0, "2026-02-01T00:00:00Z", "pretest"), test("number", 3.2, "2026-05-01T00:00:00Z"), test("number", 3.45, "2026-08-01T00:00:00Z", "diagnostic")];
 const growth = studentGrowthAt(steady, now);
 assert.ok(Math.abs(growth.gained - 0.45) < 1e-9);
-assert.equal(growth.expected, 0.5);
+assert.ok(Math.abs(growth.expected - 0.4956) < 0.001, `expected ${growth.expected}`);
+// The line keeps rising to "now" (14 Oct, 255 days) even without a newer test.
+assert.ok(growth.expectedNow > growth.expected && Math.abs(growth.expectedNow - 0.6982) < 0.001, `expectedNow ${growth.expectedNow}`);
 assert.ok(Math.abs(growth.first - 3) < 1e-9);
 assert.ok(Math.abs(growth.latest - 3.45) < 1e-9);
 assert.equal(growth.tests, 3);
@@ -36,7 +38,7 @@ assert.equal(studentGrowthAt(chain, now), null);
 const placedThenPosted = [...chain, test("number", 4.6, "2026-10-01T00:00:00Z", "posttest")];
 const posted = studentGrowthAt(placedThenPosted, now);
 assert.ok(Math.abs(posted.first - 4.0) < 1e-9 && Math.abs(posted.gained - 0.6) < 1e-9);
-assert.equal(posted.expected, 0.25); // Term 3 base, Term 4 post-test
+assert.ok(Math.abs(posted.expected - 0.104) < 0.001, `posted ${posted.expected}`); // 24 Aug base, 1 Oct post-test: 38 days
 // A pre-test for a new level after the post-test doesn't count as growth.
 const afterNewLevel = [...placedThenPosted, test("number", 4.6, "2026-10-08T00:00:00Z", "pretest")];
 assert.ok(Math.abs(studentGrowthAt(afterNewLevel, now).latest - 4.6) < 1e-9);
