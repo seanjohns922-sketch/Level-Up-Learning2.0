@@ -13,7 +13,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -1058,10 +1058,8 @@ export default function CentralWorld() {
       </div>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
-        { key: "centre", label: "Centre", icon: <MapPin size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.spawnPoint) },
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
-        { key: "plaza", label: "Plaza", icon: <LayoutGrid size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
-        { key: "map", label: "Map", icon: <MapIcon size={15} />, onClick: () => router.push(preview ? "/home-base?teacher_preview=1" : "/home-base") },
+        { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
       {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
