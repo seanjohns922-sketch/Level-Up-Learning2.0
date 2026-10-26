@@ -1,106 +1,195 @@
-.worldLibraryClose { display: none; }
+/* Edit World: glass panels, violet student accents, brand fonts, big targets.
+   Montserrat (--font-display) for labels and buttons, Barlow (--font-sans) for text. */
 
-@media (max-width: 900px) {
-  [data-world3d-root] .worldBuilderToolbar {
-    inset: max(8px, env(safe-area-inset-top)) 8px auto;
-    padding: 6px;
-  }
-  [data-world3d-root] .worldBuilderTitle { display: none; }
-  [data-world3d-root] .worldBuilderToolbarActions {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px;
-    width: 100%;
-  }
-  [data-world3d-root] .worldBuilderToolbar button {
-    min-width: 0;
-    min-height: 52px;
-    flex-direction: column;
-    padding: 4px 2px;
-    gap: 3px;
-    font-size: 10px;
-    line-height: 1.15;
-  }
-  [data-world3d-root] .centralWorldEditor:not([hidden]) {
-    /* One scrolling bottom sheet leaves the world visible above the library. */
-    display: block;
-    top: auto !important;
-    left: max(8px, env(safe-area-inset-left)) !important;
-    right: max(8px, env(safe-area-inset-right)) !important;
-    bottom: max(8px, env(safe-area-inset-bottom)) !important;
-    width: auto !important;
-    height: min(50dvh, 420px);
-    max-height: calc(100dvh - 90px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
-    padding: 12px !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-  }
-  [data-world3d-root] .centralWorldEditor h2 { font-size: 17px !important; }
-  [data-world3d-root] .worldLibraryClose {
-    display: grid;
-    place-items: center;
-    margin-left: auto;
-    margin-right: 6px;
-    width: 44px;
-    min-height: 44px;
-    border: 1px solid #65765d;
-    background: #293d32;
-    color: #fff7e7;
-    cursor: pointer;
-  }
-  [data-world3d-root] .centralWorldEditor button { min-height: 44px !important; }
-  [data-world3d-root] .centralWorldEditor [role="tablist"] {
-    display: flex !important;
-    overflow-x: auto;
-    touch-action: pan-x;
-    padding-bottom: 4px;
-  }
-  [data-world3d-root] .centralWorldEditor [role="tab"] { flex: 0 0 auto; padding: 6px 10px !important; }
-  [data-world3d-root] .centralWorldEditor .worldLibraryResults {
-    min-height: 0;
-    max-height: none;
-    overflow: visible;
-  }
-  [data-world3d-root] .centralWorldEditor .worldLibrarySelection { max-height: none; overflow: visible; }
-  [data-world3d-root][data-world-library-open="true"] .centralWorldBuildControls,
-  [data-world3d-root][data-world-library-open="true"] .centralWorldCameraControls { display: none !important; }
+[data-world3d-root] {
+  --edit-glass: rgba(16, 14, 24, 0.66);
+  --edit-line: rgba(255, 255, 255, 0.16);
+  --edit-violet: #c94df2;
+  --edit-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
 
-  [data-world3d-root] .centralWorldBuildControls {
-    left: 50% !important;
-    bottom: max(8px, env(safe-area-inset-bottom)) !important;
-    width: calc(100% - 16px);
+.worldEditBar, .worldEditHint, .worldEditZoom, .worldEditArrows, .worldEditTray { font-family: var(--font-sans); color: #fff; }
+.worldEditBar button, .worldEditTray button, .worldEditArrows button, .worldEditZoom button { font-family: var(--font-display); cursor: pointer; }
+.worldEditBar button:focus-visible, .worldEditTray button:focus-visible, .worldEditArrows button:focus-visible, .worldEditZoom button:focus-visible, .worldBuilderReset button:focus-visible {
+  outline: 3px solid #f6d36b; outline-offset: 2px;
+}
+
+/* Top bar */
+.worldEditBar {
+  position: absolute; z-index: 40; left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); top: max(14px, env(safe-area-inset-top));
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; pointer-events: none;
+}
+.worldEditBar > * { pointer-events: auto; }
+.worldEditTitle {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 8px 0 18px; border-radius: 18px;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditTitle b { font: 900 17px var(--font-display); letter-spacing: 0.04em; white-space: nowrap; }
+.worldEditSaved { display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 13px; color: #bff5c9; white-space: nowrap; }
+.worldEditActions { display: flex; align-items: center; gap: 10px; }
+.worldEditRound {
+  width: 52px; height: 52px; border-radius: 999px; display: grid; place-items: center; padding: 0; color: #fff;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditRound:disabled { opacity: 0.45; cursor: default; }
+.worldEditRound[aria-pressed="true"] { background: #fff; color: #16121f; }
+.worldEditDone {
+  display: flex; align-items: center; gap: 9px; height: 52px; padding: 0 26px; border: 0; border-radius: 999px; color: #fff;
+  font: 900 15px var(--font-display) !important; letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #d86bf7, #8c2eac); box-shadow: 0 10px 24px rgba(140, 46, 172, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.worldEditMenuWrap { position: relative; }
+.worldEditMenu {
+  position: absolute; right: 0; top: 62px; width: 260px; padding: 8px; border-radius: 18px; background: #fff; color: #16121f;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); display: grid; gap: 2px;
+}
+.worldEditMenu button {
+  display: flex; align-items: center; gap: 11px; min-height: 48px; padding: 0 12px; border: 0; border-radius: 12px; background: transparent;
+  color: inherit; text-align: left; font: 700 15px var(--font-sans) !important;
+}
+.worldEditMenu button:hover { background: #f3eef8; }
+.worldEditMenu hr { border: 0; border-top: 1px solid #eee; margin: 4px 0; }
+.worldEditMenuState { margin-left: auto; font-size: 12px; font-weight: 800; color: #8a7f99; }
+.worldEditMenu [aria-checked="true"] .worldEditMenuState { color: #8c2eac; }
+.worldEditMenuWarn { color: #b42318 !important; }
+
+/* Hint */
+.worldEditHint {
+  position: absolute; z-index: 39; left: 50%; top: calc(max(14px, env(safe-area-inset-top)) + 64px); transform: translateX(-50%);
+  max-width: calc(100% - 32px); padding: 9px 16px; border-radius: 999px; text-align: center; font-size: 14px; font-weight: 700; pointer-events: none;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditHint[data-tone="ok"] { color: #bff5c9; }
+.worldEditHint[data-tone="bad"] { color: #ffb3bd; }
+
+/* Zoom + arrows */
+.worldEditZoom { position: absolute; z-index: 38; right: max(16px, env(safe-area-inset-right)); top: 38%; display: grid; gap: 8px; }
+.worldEditArrows {
+  position: absolute; z-index: 38; left: max(16px, env(safe-area-inset-left)); bottom: 260px; display: grid; gap: 8px; padding: 10px; border-radius: 18px;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditPad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(2, 48px); gap: 4px; }
+.worldEditTurnView { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.worldEditArrows button { display: grid; place-items: center; min-height: 40px; padding: 0; border: 1px solid var(--edit-line); border-radius: 12px; background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+/* Tray */
+.worldEditTray {
+  position: absolute; z-index: 38; left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom));
+  padding: 12px 14px 14px; border-radius: 24px;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditTrayTop { display: flex; align-items: center; gap: 12px; }
+.worldEditTabs { display: flex; gap: 6px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; touch-action: pan-x; }
+.worldEditTabs::-webkit-scrollbar { display: none; }
+.worldEditTabs button {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08); color: #e9e6f2; font: 900 13px var(--font-display) !important; letter-spacing: 0.02em;
+}
+.worldEditTabs button[aria-selected="true"] { background: #fff; color: #16121f; }
+.worldEditTabs em { font-style: normal; padding: 1px 7px; border-radius: 99px; background: var(--edit-violet); color: #fff; font-size: 11px; }
+.worldEditModes { display: flex; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+.worldEditModes button {
+  display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent;
+  color: #e9e6f2; font: 900 13px var(--font-display) !important;
+}
+.worldEditModes button[aria-pressed="true"] { background: var(--edit-violet); color: #fff; }
+.worldEditModes button[data-tone="erase"][aria-pressed="true"] { background: #e5484d; }
+.worldEditTrayToggle { width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #fff; }
+.worldEditCards {
+  display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; overscroll-behavior: contain; touch-action: pan-x; scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; padding-bottom: 4px;
+}
+.worldEditCard {
+  position: relative; flex: 0 0 140px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px;
+  padding: 8px; overflow: hidden; border-radius: 18px; color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)); border: 2px solid rgba(255, 255, 255, 0.12);
+}
+.worldEditCard[aria-pressed="true"] { border-color: var(--edit-violet); box-shadow: 0 0 0 3px rgba(201, 77, 242, 0.35); background: linear-gradient(180deg, rgba(201, 77, 242, 0.3), rgba(201, 77, 242, 0.12)); }
+.worldEditCard:hover { border-color: rgba(255, 255, 255, 0.35); }
+.worldEditCard b { position: relative; font: 800 13px var(--font-sans); text-align: center; line-height: 1.15; }
+.worldEditArt { position: relative; flex: 1; width: 100%; display: grid; place-items: center; border-radius: 12px; overflow: hidden; background: #f2efe8; color: #6b5a86; }
+.worldEditArtFree { background: transparent; color: #fff; }
+.worldEditArt svg { width: 100%; height: 100%; }
+.worldEditArt > svg.lucide { width: 36px; height: 36px; }
+.worldEditShop .worldEditArt { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.worldEditEmpty { align-self: center; max-width: 260px; margin: 0 8px; color: #d8d2e4; font-size: 14px; font-weight: 700; }
+.worldEditSearch {
+  flex: 0 1 150px; min-width: 90px; min-height: 44px; padding: 0 14px; border-radius: 999px; box-sizing: border-box;
+  border: 1px solid var(--edit-line); background: rgba(255, 255, 255, 0.08); color: #fff; font: 700 14px var(--font-sans);
+}
+.worldEditSearch::placeholder { color: #cfc7dc; }
+
+/* Held item bar, above the tray */
+.worldEditItemBar {
+  position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); max-width: calc(100vw - 32px);
+  display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 999px;
+  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
+}
+.worldEditItemName { padding: 0 8px 0 10px; font: 900 14px var(--font-display); white-space: nowrap; }
+.worldEditItemBar > button {
+  display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; white-space: nowrap;
+  background: rgba(255, 255, 255, 0.1); color: #fff; font: 900 13px var(--font-display) !important;
+}
+.worldEditItemBar > button[aria-pressed="true"] { background: var(--edit-violet); }
+.worldEditItemBar select { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.1); color: #fff; font: 700 13px var(--font-sans); }
+.worldEditItemBar select option { color: #16121f; }
+.worldEditItemSpacer { flex: 0 0 4px; }
+.worldEditPlace { background: #22c55e !important; }
+.worldEditPlace:disabled { opacity: 0.45; cursor: default; }
+.worldEditDanger { width: 44px; justify-content: center; padding: 0 !important; background: #e5484d !important; }
+.worldEditTints { display: flex; gap: 5px; align-items: center; }
+.worldEditTints button { width: 26px; height: 26px; padding: 0; border-radius: 999px; border: 2px solid rgba(255, 255, 255, 0.35); }
+.worldEditTints button[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 3px rgba(201, 77, 242, 0.6); }
+.worldEditTintDefault { background: conic-gradient(#ef4444, #f5c451, #22c55e, #38bdf8, #a855f7, #ef4444); }
+
+/* Laptop key hints: only where there is a keyboard and a mouse or trackpad */
+.worldEditTray kbd { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .worldEditTray kbd {
+    display: inline-block; margin-left: 2px; padding: 1px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.16);
+    font: 800 11px var(--font-sans); color: inherit; opacity: 0.85;
   }
-  [data-world3d-root] .centralWorldBuildControls > div:last-child {
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px !important;
-    padding: 6px !important;
+}
+
+/* Short screens and phones */
+@media (max-height: 640px) {
+  .worldEditCard { flex-basis: 108px; height: 108px; }
+  .worldEditArrows { bottom: 220px; }
+}
+@media (max-width: 1100px) {
+  .worldEditTrayTop { flex-wrap: wrap; }
+  .worldEditTabs { order: 2; flex-basis: 100%; }
+  .worldEditModes { order: 1; }
+  .worldEditTrayToggle { order: 1; margin-left: auto; }
+  .worldEditSearch { order: 1; flex: 1 1 100px; }
+  .worldEditItemBar { flex-wrap: wrap; justify-content: center; border-radius: 22px; }
+}
+@media (max-width: 700px) {
+  .worldEditBar { left: 8px; right: 8px; gap: 6px; }
+  .worldEditTitle { padding-left: 12px; min-height: 48px; }
+  .worldEditSaved { display: none; }
+  .worldEditActions { gap: 6px; }
+  .worldEditRound { width: 48px; height: 48px; }
+  .worldEditDone { height: 48px; padding: 0 16px; }
+  .worldEditHint { top: calc(max(14px, env(safe-area-inset-top)) + 58px); font-size: 12px; border-radius: 16px; }
+  .worldEditTray { left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); padding: 10px; border-radius: 20px; }
+  .worldEditModes button { padding: 0 10px; }
+  .worldEditCard { flex-basis: 96px; height: 104px; border-radius: 14px; }
+  .worldEditCard b { font-size: 11px; }
+  .worldEditZoom { right: 8px; top: 30%; }
+  .worldEditArrows { left: 8px; bottom: 250px; }
+  /* One swipeable row for the held item's controls, just above the tray */
+  .worldEditItemBar {
+    left: 0; right: 0; transform: none; max-width: none; flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; scrollbar-width: none; touch-action: pan-x; border-radius: 20px;
   }
-  [data-world3d-root] .centralWorldBuildControls button { min-height: 44px !important; }
-  [data-world3d-root] .worldBuilderNudge {
-    display: flex !important;
-    gap: 4px !important;
-  }
-  [data-world3d-root] .worldBuilderNudge button { width: 44px; height: 44px; }
-  [data-world3d-root] .centralWorldBuildControls [role="status"] { font-size: 11px !important; text-align: center; }
-  [data-world3d-root] .centralWorldCameraControls {
-    left: 50%;
-    right: auto !important;
-    bottom: calc(max(8px, env(safe-area-inset-bottom)) + 160px) !important;
-    transform: translateX(-50%);
-    flex-direction: row !important;
-    gap: 4px !important;
-    padding: 6px !important;
-    width: max-content;
-    max-width: calc(100% - 16px);
-    box-sizing: border-box;
-  }
-  [data-world3d-root] .centralWorldCameraControls > div:first-child { position: absolute; left: 6px; bottom: 100%; padding: 2px 6px; border-radius: 4px 4px 0 0; background: rgba(13,24,22,.92); font-size: 9px !important; }
-  [data-world3d-root] .centralWorldCameraControls > div:not(:first-child) { display: contents !important; }
-  [data-world3d-root] .centralWorldCameraControls button { width: 44px; height: 44px; min-height: 44px; padding: 0 !important; display: grid; place-items: center; }
+  .worldEditItemBar::-webkit-scrollbar { display: none; }
+  .worldEditItemBar > *, .worldEditTints button { flex: 0 0 auto; }
+  .worldEditSearch { display: none; }
+}
+@media (max-width: 430px) {
+  .worldEditTitle { gap: 6px; padding: 0 6px 0 12px; }
+  .worldEditTitle b { font-size: 14px; }
+  .worldEditRound { width: 44px; height: 44px; }
+  .worldEditDone { height: 44px; padding: 0 14px; font-size: 13px !important; gap: 6px; }
 }

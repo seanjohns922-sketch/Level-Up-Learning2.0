@@ -44,18 +44,19 @@ function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void})
   <SizedWorldModel item={item} onMeasured={measure} presentation={REALM_DESIGN_PRESENTATIONS[String(item.metadata.worldAssetKey)]}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}>{REALM_BUILDING_KEYS.has(String(item.metadata.worldAssetKey))?<RealmBuildingModel assetKey={String(item.metadata.worldAssetKey)}/>:VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey))?<VillageInfrastructure assetKey={String(item.metadata.worldAssetKey)}/>:<RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/>}</SceneryFinish></SizedWorldModel>
  </>;
 }
-export default function MarketplaceArtReview({infrastructure=false,realms=false}:{infrastructure?:boolean;realms?:boolean}){
- const items=realms?REALM_BUILDING_REVIEW_ITEMS.filter(item=>SIGNATURE_REALM_BUILDING_KEYS.includes(String(item.metadata.worldAssetKey))):infrastructure?infrastructureItems:shopItems;
+const sceneryItems = CENTRAL_WORLD_STARTER_SCENERY.filter(item=>item.metadata.worldAssetKey!=="rail_train");
+export default function MarketplaceArtReview({infrastructure=false,realms=false,scenery=false}:{infrastructure?:boolean;realms?:boolean;scenery?:boolean}){
+ const items=scenery?sceneryItems:realms?REALM_BUILDING_REVIEW_ITEMS.filter(item=>SIGNATURE_REALM_BUILDING_KEYS.includes(String(item.metadata.worldAssetKey))):infrastructure?infrastructureItems:shopItems;
  const [rows,setRows]=useState<Exported[]>([]),[running,setRunning]=useState(false);
  const capture=useCallback((row:Exported)=>setRows(previous=>previous.some(r=>r.key===row.key)?previous:[...previous,row]),[]);
  const current=items[rows.length];
  return <main style={{padding:24,background:"#f5f2e9",color:"#263a32",minHeight:"100vh"}}>
-  <h1>{realms?"Realm collection — design review":infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
+  <h1>{scenery?"Free build items":realms?"Realm collection — design review":infrastructure?"Village infrastructure":"World shop photography"}</h1><p>Renders the actual placeable models with consistent lighting and framing.</p>
   {realms&&<p>Six signature buildings, one from each realm. Available in the Buildings shop with XP.</p>}
   <button onClick={()=>{setRows([]);setRunning(true);}}>Render all shop images</button>
   <p role="status">{rows.length} / {items.length} captured {running&&current?`· ${current.name}`:""}</p>
   {running&&current&&<div style={{width:800,height:640}}><Canvas orthographic dpr={1} shadows gl={{antialias:true,preserveDrawingBuffer:true}} camera={{near:.1,far:2000,position:[20,15,24]}}><Suspense fallback={null}><Product key={current.item_key} item={current} onReady={capture}/></Suspense></Canvas></div>}
-  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=realms?"reliq-realm-designs.json":infrastructure?"reliq-village-infrastructure.json":"reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
+  {rows.length===items.length&&<button onClick={()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(rows)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=scenery?"reliq-free-build-items.json":realms?"reliq-realm-designs.json":infrastructure?"reliq-village-infrastructure.json":"reliq-world-shop-renders.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Download shop images</button>}
  <div style={{display:"grid",gridTemplateColumns:realms?"repeat(3, 1fr)":"repeat(4, 1fr)",gap:16}}>{rows.map(row=><figure key={row.key}><Image unoptimized src={row.png} alt={row.name} width={800} height={640} style={{width:"100%",height:"auto"}}/><figcaption><strong>{row.name}</strong>{realms&&<p>{String(items.find(item=>item.metadata.worldAssetKey===row.key)?.metadata.realmName)} · Signature building · design preview</p>}</figcaption></figure>)}</div>
  </main>;
 }

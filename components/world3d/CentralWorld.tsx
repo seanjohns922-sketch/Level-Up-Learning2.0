@@ -7,14 +7,15 @@ import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
-import { WORLD_COLLECTIONS, worldCollectionFor } from "@/lib/world3d/world-expansion";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
+import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
@@ -68,6 +69,7 @@ import {
   type CentralWorldPlacement,
 } from "@/lib/world3d/central-world-layout";
 
+const ARROW_CONTROLS_KEY = "lul:world-edit:arrow-controls:v1";
 type WorldEditTool = CentralWorldGroundType | "move" | "scenery" | "erase";
 const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", water: "Water", scenery: "Scenery", erase: "Eraser" };
 // The free scenery palette is driven entirely off CENTRAL_WORLD_STARTER_SCENERY,
@@ -84,6 +86,18 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "animals", label: "Animals", Icon: PawPrint },
   { key: "fortress", label: "Fortress", Icon: Castle },
 ];
+type TrayTab = "owned" | PaletteTab;
+const TRAY_TABS: Array<{ key: TrayTab; label: string }> = [
+  { key: "owned", label: "My items" },
+  ...PALETTE_TABS.map(({ key, label }) => ({ key, label })),
+];
+// Little pictures of each ground type for the tray.
+function GroundSwatch({ tool }: { tool: WorldEditTool }) {
+  if (tool === "water") return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="14" fill="#5cc8e8" /><path d="M22 36q10-8 20 0t20 0 20 0 20 0M22 56q10-8 20 0t20 0 20 0 20 0" stroke="#d9f6ff" strokeWidth="5" fill="none" strokeLinecap="round" /></svg>;
+  if (tool === "road") return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="10" fill="#4a4f57" /><path d="M18 45h18M50 45h18M82 45h18" stroke="#f5d76e" strokeWidth="6" strokeLinecap="round" /></svg>;
+  if (tool === "stone") return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="10" fill="#8e8a82" />{[0, 1, 2].map((r) => [0, 1, 2, 3].map((c) => <rect key={`${r}${c}`} x={14 + c * 25 + (r % 2) * 6} y={16 + r * 21} width="20" height="16" rx="3" fill="#c9c4b8" />))}</svg>;
+  return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="10" fill="#7fb84f" /><path d="M8 52c30-18 60 14 104-8v22H8z" fill="#d6b77a" /><circle cx="40" cy="58" r="3" fill="#b8975e" /><circle cx="78" cy="56" r="2.5" fill="#b8975e" /></svg>;
+}
 const GROUND_TOOLS: Array<[WorldEditTool, string, LucideIcon]> = [
   ["path", "Path", Route],
   ["road", "Road", Route],
@@ -165,25 +179,54 @@ function BuildModeCamera({ active, cursor, zoom, yaw, pitch }: { active: boolean
   return null;
 }
 
-function BuildModeSurface({ active, paint, continuous, onStrokeState, onCell }: { active: boolean; paint: boolean; continuous: boolean; onStrokeState:(active:boolean)=>void; onCell: (gridX: number, gridZ: number, paint: boolean) => void }) {
+// What a press on the build surface turned into: picking up an item to drag, or
+// (on empty ground with nothing chosen) a drag that pans the view.
+type BuildCellResult = "carry" | "pan" | void;
+type BuildSurfaceHandlers = {
+  onCell: (gridX: number, gridZ: number, paint: boolean) => BuildCellResult;
+  onCarry: (gridX: number, gridZ: number) => void;
+  onCarryEnd: () => void;
+  onHover: (gridX: number, gridZ: number) => void;
+};
+
+function BuildModeSurface({ active, paint, continuous, onStrokeState, gestureRef, handlers }: { active: boolean; paint: boolean; continuous: boolean; onStrokeState:(active:boolean)=>void; gestureRef: React.RefObject<BuildGestureState>; handlers: BuildSurfaceHandlers }) {
   const painting = useRef(false);
+  const carrying = useRef(false);
   const lastCell = useRef("");
+  const hoverCell = useRef("");
   const width = (CENTRAL_WORLD_GRID.maxX - CENTRAL_WORLD_GRID.minX + 1) * CENTRAL_WORLD_GRID.cellSize;
   const depth = (CENTRAL_WORLD_GRID.maxZ - CENTRAL_WORLD_GRID.minZ + 1) * CENTRAL_WORLD_GRID.cellSize;
   const centreX = ((CENTRAL_WORLD_GRID.minX + CENTRAL_WORLD_GRID.maxX) / 2) * CENTRAL_WORLD_GRID.cellSize;
   const centreZ = ((CENTRAL_WORLD_GRID.minZ + CENTRAL_WORLD_GRID.maxZ) / 2) * CENTRAL_WORLD_GRID.cellSize;
 
-  function selectCell(event: ThreeEvent<PointerEvent>, shouldPaint: boolean) {
-    const gridX = THREE.MathUtils.clamp(Math.round(event.point.x / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
-    const gridZ = THREE.MathUtils.clamp(Math.round(event.point.z / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
+  function cellOf(event: ThreeEvent<PointerEvent>) {
+    return {
+      gridX: THREE.MathUtils.clamp(Math.round(event.point.x / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
+      gridZ: THREE.MathUtils.clamp(Math.round(event.point.z / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+    };
+  }
+
+  function selectCell(event: ThreeEvent<PointerEvent>, shouldPaint: boolean): BuildCellResult {
+    const { gridX, gridZ } = cellOf(event);
     const key = `${gridX}:${gridZ}`;
     if (key === lastCell.current && shouldPaint) return;
     const previous = lastCell.current;
     lastCell.current = key;
     if (shouldPaint && continuous && previous) {
       const [x,z]=previous.split(":").map(Number);
-      for(const cell of gridStroke({gridX:x,gridZ:z},{gridX,gridZ})) onCell(cell.gridX,cell.gridZ,true);
-    } else onCell(gridX, gridZ, shouldPaint);
+      for(const cell of gridStroke({gridX:x,gridZ:z},{gridX,gridZ})) handlers.onCell(cell.gridX,cell.gridZ,true);
+      return;
+    }
+    return handlers.onCell(gridX, gridZ, shouldPaint);
+  }
+
+  function endPress(event: ThreeEvent<PointerEvent>) {
+    onStrokeState(false);
+    painting.current = false;
+    lastCell.current = "";
+    if (carrying.current) { carrying.current = false; handlers.onCarryEnd(); }
+    const target = event.nativeEvent.target as HTMLElement | null;
+    if (target?.hasPointerCapture?.(event.pointerId)) target.releasePointerCapture(event.pointerId);
   }
 
   if (!active) return null;
@@ -192,25 +235,39 @@ function BuildModeSurface({ active, paint, continuous, onStrokeState, onCell }: 
       position={[centreX, 0.34, centreZ]}
       rotation={[-Math.PI / 2, 0, 0]}
       onPointerDown={(event) => {
+        if (gestureRef.current?.block || event.nativeEvent.button === 2) return;
         event.stopPropagation();
         onStrokeState(true);
         painting.current = paint;
         (event.nativeEvent.target as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
-        selectCell(event, paint);
+        const result = selectCell(event, paint);
+        if (result === "carry") carrying.current = true;
+        if (result === "pan" && gestureRef.current) gestureRef.current.mode = "pan";
       }}
       onPointerMove={(event) => {
-        if (!painting.current || !paint) return;
-        event.stopPropagation();
-        selectCell(event, true);
+        if (gestureRef.current?.block) { painting.current = false; carrying.current = false; return; }
+        if (carrying.current) {
+          event.stopPropagation();
+          const { gridX, gridZ } = cellOf(event);
+          handlers.onCarry(gridX, gridZ);
+          return;
+        }
+        if (painting.current && paint) {
+          event.stopPropagation();
+          selectCell(event, true);
+          return;
+        }
+        // A mouse hovering with nothing pressed: show where the item would land.
+        if (event.nativeEvent.pointerType === "mouse" && event.nativeEvent.buttons === 0) {
+          const { gridX, gridZ } = cellOf(event);
+          const key = `${gridX}:${gridZ}`;
+          if (key === hoverCell.current) return;
+          hoverCell.current = key;
+          handlers.onHover(gridX, gridZ);
+        }
       }}
-      onPointerUp={(event) => {
-        onStrokeState(false);
-        painting.current = false;
-        lastCell.current = "";
-        const target = event.nativeEvent.target as HTMLElement | null;
-        if (target?.hasPointerCapture?.(event.pointerId)) target.releasePointerCapture(event.pointerId);
-      }}
-      onPointerCancel={() => { onStrokeState(false); painting.current = false; lastCell.current = ""; }}
+      onPointerUp={endPress}
+      onPointerCancel={() => { onStrokeState(false); painting.current = false; carrying.current = false; lastCell.current = ""; }}
     >
       <planeGeometry args={[width, depth]} />
       <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -218,8 +275,11 @@ function BuildModeSurface({ active, paint, continuous, onStrokeState, onCell }: 
   );
 }
 
-function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, onBuildCell, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef }: { onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; onBuildCell: (gridX: number, gridZ: number, paint: boolean) => void; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef }: { onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
+  // The camera can rest between cells while panning; the build grid snaps to one.
+  const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
+  const focusCell = useMemo(() => ({ gridX: focusX, gridZ: focusZ }), [focusX, focusZ]);
   const handleNearestTarget = useCallback((id: string | null) => {
     setActiveTargetId(id);
     onActiveTarget(id);
@@ -274,7 +334,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         buildPreview={buildPreview}
         groundPreview={groundPreview}
         editing={editing}
-        editCursor={cameraFocus}
+        editCursor={focusCell}
         onEnterTower={onEnterTower}
         onEnterHome={onEnterHome}
         onToggleDrawbridge={onToggleDrawbridge}
@@ -317,7 +377,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         positionRef={avatarPosRef}
       />
       <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
-      <BuildModeSurface active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} onCell={onBuildCell} />
+      <BuildModeSurface active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
       <CentralWorldMetricsReporter quality={quality} />
     </>
   );
@@ -363,7 +423,6 @@ export default function CentralWorld() {
   const [showIntro, setShowIntro] = useState(false);
   const [waterBrushWidth, setWaterBrushWidth] = useState(1);
   const [scenerySearch, setScenerySearch] = useState("");
-  const [sceneryCollection, setSceneryCollection] = useState("all");
   const [itemsById, setItemsById] = useState<Map<string, EconomyItem>>(() => new Map([...CENTRAL_WORLD_CUSTOMISATION_CATALOG, CENTRAL_WORLD_HOME_ITEM, ...CENTRAL_WORLD_STARTER_SCENERY].map((item) => [item.item_key, item])));
   const [ownedItemKeys, setOwnedItemKeys] = useState<Set<string>>(() => new Set());
   const [groundTiles, setGroundTiles] = useState<CentralWorldGroundTile[]>(() => readCentralWorldGroundTiles(placementScope));
@@ -393,7 +452,13 @@ export default function CentralWorld() {
   const [editorOpen, setEditorOpen] = useState(false);
   const resetDialog = useRef<HTMLDialogElement>(null);
   const resetCancel = useRef<HTMLButtonElement>(null);
-  const [libraryOpen, setLibraryOpen] = useState(true);
+  const [trayOpen, setTrayOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Arrow buttons are an option for learners who prefer them to gestures.
+  const [arrowControls, setArrowControls] = useState(() => { try { return localStorage.getItem(ARROW_CONTROLS_KEY) === "1"; } catch { return false; } });
+  const touchFirst = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
+  const undoKeyLabel = useMemo(() => (/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘Z" : "Ctrl Z"), []);
+  const canvasWrapRef = useRef<HTMLDivElement>(null);
   const [librarySection, setLibrarySection] = useState<"build" | "owned">("build");
   const [editTool, setEditTool] = useState<WorldEditTool>("move");
   const [selectedInventoryItemKey, setSelectedInventoryItemKey] = useState<string | null>(null);
@@ -408,9 +473,28 @@ export default function CentralWorld() {
     setBuildOrbit((o) => ({ yaw: o.yaw + dYaw, pitch: THREE.MathUtils.clamp(o.pitch + dPitch, 0.32, 1.45) }));
   }, [setBuildOrbit]);
   const [buildZoom, setBuildZoom] = useState(28);
+  const viewRef = useRef({ zoom: 28, yaw: 0.67, pitch: 0.78 });
+  useEffect(() => { viewRef.current = { zoom: buildZoom, yaw: buildOrbit.yaw, pitch: buildOrbit.pitch }; }, [buildZoom, buildOrbit]);
+  const zoomView = useCallback((factor: number) => setBuildZoom((z) => THREE.MathUtils.clamp(z * factor, 14, 44)), []);
+  // Drag the ground and it follows your finger: turn screen pixels into grid
+  // cells along the camera's current heading.
+  const panView = useCallback((dxPx: number, dyPx: number) => {
+    const height = canvasWrapRef.current?.clientHeight || window.innerHeight;
+    const { zoom, yaw, pitch } = viewRef.current;
+    const k = (2 * zoom * 1.2 * Math.tan(Math.PI / 6)) / height / CENTRAL_WORLD_GRID.cellSize;
+    const depth = k / Math.max(0.35, Math.sin(pitch));
+    const right = { x: Math.cos(yaw), z: -Math.sin(yaw) };
+    const forward = { x: -Math.sin(yaw), z: -Math.cos(yaw) };
+    setCameraFocus((f) => ({
+      gridX: THREE.MathUtils.clamp(f.gridX - right.x * dxPx * k + forward.x * dyPx * depth, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
+      gridZ: THREE.MathUtils.clamp(f.gridZ - right.z * dxPx * k + forward.z * dyPx * depth, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+    }));
+  }, []);
   const strokeState = useRef({active:false,recorded:false});
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
+  const historyRef = useRef(editHistory);
+  useEffect(() => { historyRef.current = editHistory; }, [editHistory]);
   const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
   const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const activeBuildItemKey = editorItemKey ?? requestedBuildItemKey;
@@ -499,7 +583,7 @@ export default function CentralWorld() {
       // spot anywhere on the map and drop it there.
       setEditCursor((cur) => ({ gridX: cx(cur.gridX + dx), gridZ: cz(cur.gridZ + dz) }));
       setBuildPlacement((bp) => (bp ? { ...bp, gridX: cx(bp.gridX + dx), gridZ: cz(bp.gridZ + dz) } : bp));
-      setCameraFocus((f) => ({ gridX: cx(f.gridX + dx), gridZ: cz(f.gridZ + dz) }));
+      setCameraFocus((f) => ({ gridX: cx(Math.round(f.gridX) + dx), gridZ: cz(Math.round(f.gridZ) + dz) }));
     } else {
       setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
     }
@@ -510,10 +594,12 @@ export default function CentralWorld() {
     setBuildPlacement((current) => (current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current));
   }, [setBuildPlacement]);
 
-  // Laptop: arrow keys and WASD pan the build view (the on-screen arrows do the
-  // same on iPad). Only while editing, and we swallow the keys so they neither
-  // scroll the page nor walk the avatar.
+  // Laptop keys while building. Arrows / WASD move the held item, or the view
+  // when nothing is held. Swallowed so they neither scroll the page nor walk the avatar.
+  //   R turn item · Q/E turn view · +/- zoom · Delete remove item · Esc put it down
+  //   M move tool · X erase · Ctrl/Cmd+Z undo
   const inBuildMode = editorOpen || Boolean(buildPreview);
+  const keyActions = useRef({ rotate: rotateHeld, remove: () => {}, cancel: () => {}, undo: () => {}, tool: (() => {}) as (tool: WorldEditTool) => void });
   useEffect(() => {
     if (!inBuildMode) return;
     const move: Record<string, [number, number]> = {
@@ -522,15 +608,35 @@ export default function CentralWorld() {
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable=true]")) return;
-      if (resetDialog.current?.open || event.metaKey || event.ctrlKey || event.altKey) return;
-      const delta = move[event.key.toLowerCase()];
-      if (!delta) return;
+      if (resetDialog.current?.open || event.altKey) return;
+      const key = event.key.toLowerCase();
+      const actions = keyActions.current;
+      if ((event.metaKey || event.ctrlKey) && key === "z") { event.preventDefault(); actions.undo(); return; }
+      if (event.metaKey || event.ctrlKey) return;
+      const delta = move[key];
+      if (delta) { event.preventDefault(); moveBuildPlacement(delta[0], delta[1]); return; }
+      const run: Record<string, () => void> = {
+        r: actions.rotate,
+        q: () => orbitCamera(0.4, 0),
+        e: () => orbitCamera(-0.4, 0),
+        "+": () => zoomView(0.85), "=": () => zoomView(0.85), "-": () => zoomView(1 / 0.85), _: () => zoomView(1 / 0.85),
+        delete: actions.remove, backspace: actions.remove,
+        escape: actions.cancel,
+        m: () => actions.tool("move"),
+        x: () => actions.tool("erase"),
+      };
+      const action = run[key];
+      if (!action) return;
       event.preventDefault();
-      moveBuildPlacement(delta[0], delta[1]);
+      action();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inBuildMode, moveBuildPlacement]);
+  }, [inBuildMode, moveBuildPlacement, orbitCamera, zoomView]);
+
+  function focusCell() {
+    return { gridX: Math.round(cameraFocus.gridX), gridZ: Math.round(cameraFocus.gridZ) };
+  }
 
   function setStrokeActive(active:boolean) {
     strokeState.current={active,recorded:false};
@@ -556,23 +662,22 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
     setBuildZoom(28);
+    setMenuOpen(false);
+    setTrayOpen(true);
+    if (ownedWorldItems.length) setLibrarySection("owned");
     setEditorOpen(true);
     // Leave the avatar where it was standing — only the build camera moves.
-    void speak("Edit World. Your character stays put. With nothing chosen, the arrows move the view around. Pick something, and the arrows move it — then tap the grass to drop it.", undefined, "manual", { rate: 0.9 });
+    void speak("Edit World. Choose something from the tray, then tap the ground to place it. Drag an item to move it. Drag the ground to look around, and pinch to zoom.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
     setStrokeActive(false);
+    setMenuOpen(false);
     setEditorOpen(false);
     setBuildPlacement(null);
   }
 
-  function closeCompactLibrary() {
-    if (window.matchMedia("(max-width: 900px)").matches) setLibraryOpen(false);
-  }
-
   function chooseEditTool(tool: WorldEditTool) {
-    closeCompactLibrary();
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setEditTool(tool);
@@ -593,12 +698,11 @@ export default function CentralWorld() {
   }
 
   function chooseSceneryItem(item: EconomyItem) {
-    closeCompactLibrary();
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(item.item_key);
     setEditTool("scenery");
 
-    setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...cameraFocus, rotation: 0 });
+    setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focusCell(), rotation: 0 });
     void speak(`${item.name} selected. Tap the grass to place it, and drag to lay a whole row. Place as many as you like.`, undefined, "manual", { rate: 0.9 });
   }
 
@@ -607,10 +711,9 @@ export default function CentralWorld() {
   }
 
   function chooseInventoryItem(item: EconomyItem) {
-    closeCompactLibrary();
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
-    setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, cameraFocus));
+    setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, focusCell()));
     void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Tap an empty railway track to place it. The train follows the track direction.` : `${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
@@ -622,31 +725,32 @@ export default function CentralWorld() {
   // Move tool: tap anywhere on a placed object to pick it up, then nudge / rotate
   // / delete / place it. Reuses the held-item flow (selecting its item hides it
   // from the placed set while it's in hand).
-  function pickUpPlacementAt(gridX: number, gridZ: number) {
+  function pickUpPlacementAt(gridX: number, gridZ: number): boolean {
     const hit = [...placedCustomisations].reverse().find((placement) => {
       const item = itemsById.get(placement.itemId);
       return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
     });
-    if (!hit) return;
-    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) { moveMyHome(); return; }
+    if (!hit) return false;
+    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) { moveMyHome(); return true; }
     const item = itemsById.get(hit.itemId);
 
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(hit.itemId);
     setBuildPlacement({ ...hit, placementId: hit.placementId ?? newWorldPlacementId(hit.itemId) });
     setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
-    void speak(`${item?.name ?? "Item"} picked up. Use the arrows to move it, then tap to drop it.`, undefined, "manual", { rate: 0.9 });
+    void speak(`${item?.name ?? "Item"} picked up. Drag it to a new spot, or tap where it should go.`, undefined, "manual", { rate: 0.9 });
+    return true;
   }
 
   function moveMyHome() {
-    closeCompactLibrary();
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(CENTRAL_WORLD_HOME_KEY);
     setEditTool("move");
     setBuildPlacement({ ...homePlacement });
     setEditCursor({ gridX: homePlacement.gridX, gridZ: homePlacement.gridZ });
     setCameraFocus({ gridX: homePlacement.gridX, gridZ: homePlacement.gridZ });
-    void speak("Move My Home. Use the arrows or tap a clear space. Turn rotates the house. Green means the house and doorway fit. Place saves it. Cancel keeps your home where it was. Existing paths stay where they are; use Ground and Erase to redesign them.", undefined, "manual", { rate: 0.9 });
+    setMenuOpen(false);
+    void speak("Move My Home. Drag your house or tap a clear space. Turn rotates the house. Green means the house and doorway fit. Place saves it. Cancel keeps your home where it was. Existing paths stay where they are; use Ground and Erase to redesign them.", undefined, "manual", { rate: 0.9 });
   }
 
   function commitHomePlacement(candidate: CentralWorldPlacement) {
@@ -744,10 +848,6 @@ export default function CentralWorld() {
     if (announce) void speak(`${EDIT_TOOL_NAMES[editTool]} added.`, undefined, "manual", { rate: 0.9 });
   }
 
-  function applyGroundTool() {
-    applyGroundAt(editCursor.gridX, editCursor.gridZ, true);
-  }
-
   // Minecraft-style: tap a cell to drop the held item right there (and keep it in
   // hand for the next), drag to lay a whole run. Invalid cells just show the red
   // ghost without placing.
@@ -777,12 +877,13 @@ export default function CentralWorld() {
     }
   }
 
-  function selectBuildCell(gridX: number, gridZ: number, paint: boolean) {
+  function selectBuildCell(gridX: number, gridZ: number, paint: boolean): BuildCellResult {
+    setMenuOpen(false);
     if (buildPlacement) {
       if (buildPlacement.itemId === CENTRAL_WORLD_HOME_KEY) {
         setBuildPlacement({ ...buildPlacement, gridX, gridZ });
         setEditCursor({ gridX, gridZ });
-        return;
+        return "carry";
       }
       // Editor: tap/drag drops the item. Marketplace deep-link (no editor): keep
       // the old move-the-cursor-then-Place flow so a single item isn't duplicated.
@@ -792,11 +893,55 @@ export default function CentralWorld() {
     }
     setEditCursor({ gridX, gridZ });
     if (isMoveTool) {
-      pickUpPlacementAt(gridX, gridZ);
-      return;
+      // Press on an item to pick it up and drag it; press on open ground to look around.
+      if (!editorOpen) return;
+      carryMoved.current = false;
+      return pickUpPlacementAt(gridX, gridZ) ? "carry" : "pan";
     }
     if (paint) applyGroundAt(gridX, gridZ);
+    else return "pan";
   }
+
+  // Dragging a picked-up item: it follows the finger, and lands where it is let go.
+  const carryMoved = useRef(false);
+  function carryHeldTo(gridX: number, gridZ: number) {
+    if (!buildPlacement || (buildPlacement.gridX === gridX && buildPlacement.gridZ === gridZ)) return;
+    carryMoved.current = true;
+    setBuildPlacement({ ...buildPlacement, gridX, gridZ });
+    setEditCursor({ gridX, gridZ });
+  }
+  function dropCarried() {
+    if (carryMoved.current && buildValid) confirmBuildPlacement();
+    carryMoved.current = false;
+  }
+  // Mouse hover: the held item (or the paint brush) previews where a click lands.
+  function hoverAt(gridX: number, gridZ: number) {
+    if (!editorOpen) return;
+    if (buildPlacement) setBuildPlacement({ ...buildPlacement, gridX, gridZ });
+    else if (isGroundTool || isEraseTool) setEditCursor({ gridX, gridZ });
+  }
+  // A second finger arriving means a pinch, not a tap: take back whatever the
+  // first finger just placed or painted.
+  function cancelStroke() {
+    if (strokeState.current.active && strokeState.current.recorded) {
+      const previous = historyRef.current.at(-1);
+      if (previous) {
+        setEditHistory((current) => current.slice(0, -1));
+        setPlacedCustomisations(previous.placements);
+        setGroundTiles(previous.tiles);
+        writeCentralWorldPlacements(placementScope, previous.placements);
+        writeCentralWorldGroundTiles(placementScope, previous.tiles);
+      }
+    }
+    setStrokeActive(false);
+  }
+  const surfaceHandlers: BuildSurfaceHandlers = { onCell: selectBuildCell, onCarry: carryHeldTo, onCarryEnd: dropCarried, onHover: hoverAt };
+  const gestureRef = useBuildGestures(canvasWrapRef, editorOpen || Boolean(buildPreview), {
+    onPan: panView,
+    onOrbit: orbitCamera,
+    onZoom: zoomView,
+    onCancelStroke: cancelStroke,
+  });
 
   function startFreshWorld() {
     // Keep the current home, ownership and economy; only clear the editable layout.
@@ -835,6 +980,15 @@ export default function CentralWorld() {
     void speak("Last world edit undone.", undefined, "manual", { rate: 0.9 });
   }
 
+  useEffect(() => {
+    keyActions.current = {
+      rotate: rotateHeld,
+      remove: () => { if (buildPlacement && selectedInventoryItemKey) deleteHeldPlacement(); },
+      cancel: () => { if (menuOpen) setMenuOpen(false); else if (buildPlacement || heldItemKey || isGroundTool || isEraseTool) chooseEditTool("move"); },
+      undo: undoWorldEdit,
+      tool: chooseEditTool,
+    };
+  });
   useEffect(() => {
     const key = "lul:central-world:intro-seen:v1";
     try {
@@ -886,10 +1040,12 @@ export default function CentralWorld() {
   }
 
   return (
-    <main data-world3d-root data-world-library-open={editorOpen && libraryOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
+    <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
+      <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
-        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
+        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
       </Canvas>
+      </div>
 
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "centre", label: "Centre", icon: <MapPin size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.spawnPoint) },
@@ -915,113 +1071,180 @@ export default function CentralWorld() {
           <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildValid ? "This space is ready." : buildingTrain ? "Choose an empty railway track or the station’s rails." : "This space is protected or already occupied."}</div>
         </section>
       ) : null}
-      {editorOpen ? (
+      {editorOpen ? (() => {
+        const trayTab: TrayTab = librarySection === "owned" ? "owned" : paletteTab;
+        const query = scenerySearch.trim().toLowerCase();
+        const sceneryInTab = paletteTab === "ground" ? [] : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(query));
+        const holding = Boolean(heldItemKey);
+        const placing = holding || isGroundTool;
+        const isHome = buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY;
+        const tintable = buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey) || isRealmBuilding(buildItem?.metadata.worldAssetKey));
+        const styled = buildPreview && isVillageBuilding(buildItem?.metadata.worldAssetKey) && buildItem?.metadata.worldAssetKey !== "village_apartments";
+        const chooseTab = (tab: TrayTab) => {
+          setTrayOpen(true);
+          setScenerySearch("");
+          if (tab === "owned") { setLibrarySection("owned"); return; }
+          setLibrarySection("build");
+          setPaletteTab(tab);
+        };
+        const startPlacing = () => {
+          if (placing) return;
+          if (trayTab === "owned") { if (ownedWorldItems[0]) chooseInventoryItem(ownedWorldItems[0]); }
+          else if (trayTab === "ground") chooseEditTool("path");
+          else if (sceneryInTab[0]) chooseSceneryItem(sceneryInTab[0]);
+        };
+        const hint = buildPreview
+          ? buildValid
+            ? isHome ? "House and doorway fit · choose Place to save" : buildingTrain ? "Track ready · tap to place your train" : touchFirst ? "Tap the ground to place · Two fingers to look around" : "Click to place · R to turn · Esc to put it down"
+            : buildingTrain ? "Choose an empty railway track or the station’s rails" : "Red means no room here · choose clear ground"
+          : isGroundTool
+            ? touchFirst ? "Tap or drag the ground to paint · Two fingers to look around" : "Click or drag to paint · Right-drag to turn the view"
+            : isEraseTool
+              ? touchFirst ? "Tap an item or tile to remove it" : "Click an item or tile to remove it"
+              : touchFirst ? "Tap the tray to choose · Drag an item to move it · Drag the ground to look around · Pinch to zoom" : "Pick from the tray · Drag an item to move it · Drag to look around · Scroll to zoom · Q / E to turn";
+        return (
         <>
-        <header className="worldBuilderToolbar" aria-label="World builder toolbar">
-          <div className="worldBuilderTitle"><span>YOUR WORLD</span><strong>Make it yours</strong></div>
-          <div className="worldBuilderToolbarActions">
-            <button type="button" aria-expanded={libraryOpen} aria-controls="world-build-library" onClick={() => setLibraryOpen(value => !value)}><LayoutGrid size={18}/>Library</button>
-            <button type="button" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit"><Undo2 size={18}/>Undo</button>
-            <button type="button" onClick={moveMyHome} aria-pressed={buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY}><Home size={18}/>Move home</button>
-            <button type="button" onClick={() => { setStrokeActive(false); resetDialog.current?.showModal(); resetCancel.current?.focus(); }}><RotateCw size={18}/>Start fresh</button>
-            <button type="button" className="worldBuilderDone" onClick={closeWorldEditor}><Check size={18}/>Done</button>
+        <header className="worldEditBar" aria-label="World builder toolbar">
+          <div className="worldEditTitle">
+            <b>EDIT WORLD</b>
+            <span className="worldEditSaved"><Check size={15} aria-hidden="true" />{preview ? "Preview · this browser only" : "Saved to your account"}</span>
+            <WorldVoiceButton compact label="Read edit world instructions" text="Choose something from the tray at the bottom, then tap the ground to place it. Drag an item to move it. Drag the ground to look around, pinch to zoom, and use two fingers to turn. Erase removes things. Undo brings back your last change. Your world saves by itself." />
+          </div>
+          <div className="worldEditActions">
+            <button type="button" className="worldEditRound" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit" title={`Undo (${undoKeyLabel})`}><Undo2 size={22} /></button>
+            <div className="worldEditMenuWrap">
+              <button type="button" className="worldEditRound" aria-label="More options" aria-haspopup="menu" aria-expanded={menuOpen} aria-pressed={menuOpen} onClick={() => setMenuOpen((open) => !open)}><MoreHorizontal size={22} /></button>
+              {menuOpen ? (
+                <div className="worldEditMenu" role="menu" aria-label="More options">
+                  <button type="button" role="menuitem" onClick={moveMyHome}><Home size={18} />Move my home</button>
+                  <button type="button" role="menuitemcheckbox" aria-checked={arrowControls} onClick={() => {
+                    const next = !arrowControls;
+                    setArrowControls(next);
+                    try { localStorage.setItem(ARROW_CONTROLS_KEY, next ? "1" : "0"); } catch { /* A per-device preference; fine to lose. */ }
+                  }}><Move size={18} />Arrow controls<span className="worldEditMenuState">{arrowControls ? "On" : "Off"}</span></button>
+                  <hr />
+                  <button type="button" role="menuitem" className="worldEditMenuWarn" onClick={() => { setMenuOpen(false); setStrokeActive(false); resetDialog.current?.showModal(); resetCancel.current?.focus(); }}><RotateCw size={18} />Start fresh…</button>
+                </div>
+              ) : null}
+            </div>
+            <button type="button" className="worldEditDone" onClick={closeWorldEditor}><Check size={18} />DONE</button>
           </div>
         </header>
-        <section hidden={!libraryOpen} id="world-build-library" className="centralWorldEditor" aria-label="Edit world controls" style={{ position: "absolute", left: 12, top: 92, bottom: 16, zIndex: 35, width: "min(320px, 90vw)", overflow: "hidden", border: "1px solid #52624d", borderRadius: 16, background: "rgba(19,32,28,.97)", color: "#fff", padding: 14, boxShadow: "0 14px 40px rgba(0,0,0,.25)" }}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h2 style={{fontSize:20,margin:0}}>Build library</h2><button className="worldLibraryClose" type="button" aria-label="Close build library" onClick={() => setLibraryOpen(false)}><X size={20}/></button><WorldVoiceButton compact label="Read edit world instructions" text="Choose a category and an item, then tap the grass to place it. Drag to paint ground or join walls. Use Move to pick up an item, and Erase to remove it. Changes save automatically in this browser. Start fresh clears the layout. Undo brings it back."/></div>
+        <div className="worldEditHint" role="status" data-tone={buildPreview ? (buildValid ? "ok" : "bad") : "info"}>{hint}</div>
 
-          <div className="worldBuilderLibraryTabs" role="group" aria-label="Item library">
-            <button type="button" aria-pressed={librarySection === "build"} onClick={() => setLibrarySection("build")}>Free to build</button>
-            <button type="button" aria-pressed={librarySection === "owned"} onClick={() => setLibrarySection("owned")}>My items ({ownedWorldItems.length})</button>
-          </div>
-          {/* Actions */}
-          <div style={{ marginTop: 8 }}>
+        <div className="worldEditZoom" aria-label="Zoom">
+          <button type="button" className="worldEditRound" onClick={() => zoomView(0.85)} aria-label="Zoom camera in" title="Zoom in (+)"><Plus size={22} /></button>
+          <button type="button" className="worldEditRound" onClick={() => zoomView(1 / 0.85)} aria-label="Zoom camera out" title="Zoom out (−)"><Minus size={22} /></button>
+        </div>
 
-            <div style={{ marginTop: 4, display: "flex", gap: 5 }}>
-              {([["move", "Move", Hand], ["erase", "Erase", Eraser]] as Array<[WorldEditTool, string, LucideIcon]>).map(([tool, label, Icon]) => {
-                const selected = !heldItemKey && editTool === tool;
-                const selectedBg = tool === "erase" ? "#ef4444" : "#efbd61";
-                return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, flex: "1 1 0", padding: "8px 10px", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, background: selected ? selectedBg : debugButton.background, color: selected ? (tool === "erase" ? "#fff" : "#2b2119") : debugButton.color }}><Icon size={17} />{label}</button>;
-              })}
+        {arrowControls ? (
+          <div className="worldEditArrows" aria-label="Arrow controls">
+            <div className="worldEditPad">
+              <button type="button" aria-label={buildPreview ? "Move item forward" : "Pan view forward"} onClick={() => moveBuildPlacement(0, -1)} style={{ gridColumn: 2, gridRow: 1 }}><ArrowUp size={20} /></button>
+              <button type="button" aria-label={buildPreview ? "Move item left" : "Pan view left"} onClick={() => moveBuildPlacement(-1, 0)} style={{ gridColumn: 1, gridRow: 2 }}><ArrowLeft size={20} /></button>
+              <button type="button" aria-label={buildPreview ? "Move item backward" : "Pan view backward"} onClick={() => moveBuildPlacement(0, 1)} style={{ gridColumn: 2, gridRow: 2 }}><ArrowDown size={20} /></button>
+              <button type="button" aria-label={buildPreview ? "Move item right" : "Pan view right"} onClick={() => moveBuildPlacement(1, 0)} style={{ gridColumn: 3, gridRow: 2 }}><ArrowRight size={20} /></button>
+            </div>
+            <div className="worldEditTurnView">
+              <button type="button" aria-label="Spin camera left" onClick={() => orbitCamera(0.5, 0)}><RotateCcw size={18} /></button>
+              <button type="button" aria-label="Tilt camera up" onClick={() => orbitCamera(0, 0.18)}><ChevronUp size={18} /></button>
+              <button type="button" aria-label="Tilt camera down" onClick={() => orbitCamera(0, -0.18)}><ChevronDown size={18} /></button>
+              <button type="button" aria-label="Spin camera right" onClick={() => orbitCamera(-0.5, 0)}><RotateCw size={18} /></button>
             </div>
           </div>
+        ) : null}
 
-          {librarySection === "owned" ? <>
-          <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}><div style={{ display: "flex", alignItems: "center", gap: 6, color: "#f8d477", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}><PackageOpen size={15} />OWNED INVENTORY <span style={{ color: "#fff", letterSpacing: 0 }}>({ownedWorldItems.length})</span></div><button type="button" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")} style={{ border: 0, background: "transparent", color: "#99f6e4", display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 900, cursor: "pointer" }}><ShoppingBag size={14} />Marketplace</button></div>
-          <div className="worldLibraryResults worldOwnedItems" aria-label="Owned world inventory">
-            {ownedWorldItems.length ? ownedWorldItems.map((item) => {
-              const image = inventoryImage(item);
-              const selected = selectedInventoryItemKey === item.item_key;
-              return <button key={item.item_key} type="button" onClick={() => chooseInventoryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ position: "relative", flex: "0 0 126px", height: 58, overflow: "hidden", border: `2px solid ${selected ? "#5eead4" : "rgba(255,255,255,.22)"}`, borderRadius: 5, padding: image ? "0 7px 5px" : "7px", background: selected ? "#0f766e" : "#26332e", color: "#fff", display: "flex", alignItems: "flex-end", justifyContent: "center", fontSize: 10, fontWeight: 950, cursor: "pointer", boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}>{image ? <Image src={image} alt="" fill sizes="126px" style={{ objectFit: "cover", opacity: selected ? 0.64 : 0.48 }} /> : null}<span style={{ position: "relative", zIndex: 1, width: "100%", whiteSpace: "normal", overflowWrap: "anywhere", textShadow: "0 1px 4px #000" }}>{item.name}</span></button>;
-            }) : <div style={{ minHeight: 54, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", border: "1px dashed rgba(255,255,255,.2)", borderRadius: 5, color: "#bfd0c8", fontSize: 11, fontWeight: 800 }}>Your purchased buildings and places will appear here.</div>}
-          </div>
-
-          </> : <>
-          {/* Category tabs */}
-          <div role="tablist" aria-label="Build categories" style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4 }}>
-            {PALETTE_TABS.map(({ key, label, Icon }) => {
-              const active = paletteTab === key;
-              return <button key={key} type="button" role="tab" aria-selected={active} onClick={() => { setPaletteTab(key); setScenerySearch(""); }} style={{ ...debugButton, padding: "7px 2px", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, fontSize: 10, fontWeight: 900, minWidth: 0, background: active ? "#0f766e" : debugButton.background, color: active ? "#eafffb" : debugButton.color, border: active ? "1px solid #5eead4" : debugButton.border, boxShadow: active ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={18} />{label}</button>;
-            })}
-          </div>
-
-          {paletteTab !== "ground" && <select aria-label="Scenery collection" value={sceneryCollection} onChange={event => setSceneryCollection(event.target.value)} style={{width:"100%",marginTop:8,padding:8,background:"#22382e",color:"#fff7e7",border:"1px solid #607b62",borderRadius:6}}><option value="all">All collections · mix freely</option>{Object.entries(WORLD_COLLECTIONS).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select>}
-          {paletteTab !== "ground" && <input aria-label="Search scenery" placeholder={`Search ${CENTRAL_WORLD_STARTER_SCENERY.filter(item => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab).length} items…`} value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} style={{ width: "100%", boxSizing: "border-box", marginTop: 8, padding: "9px 10px", background: "#22382e", color: "#fff7e7", border: "1px solid #607b62", borderRadius: 6 }} />}
-          {/* Only results scroll: categories and search stay in reach. */}
-          <div key={paletteTab} className="worldLibraryResults" aria-label="Available building items" tabIndex={0}>
-          <div className="worldLibraryItemGrid">
-            {paletteTab === "ground"
-              ? GROUND_TOOLS.map(([tool, label, Icon]) => {
-                  const selected = !heldItemKey && editTool === tool;
-                  return <button key={tool} type="button" onClick={() => chooseEditTool(tool)} aria-pressed={selected} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", fontSize: 12, fontWeight: 900, background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border }}><Icon size={18} style={{ flex: "0 0 auto" }} />{label}</button>;
-                })
-              : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)).map((item) => {
-                  const selected = selectedSceneryItemKey === item.item_key;
-                  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? PALETTE_TABS.find(tab => tab.key === paletteTab)?.Icon ?? Sprout;
-                  return <button key={item.item_key} type="button" onClick={() => chooseSceneryItem(item)} aria-pressed={selected} aria-label={`Place ${item.name}`} style={{ ...debugButton, padding: "8px 9px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "flex-start", background: selected ? "#0f766e" : debugButton.background, color: selected ? "#eafffb" : debugButton.color, border: selected ? "1px solid #5eead4" : debugButton.border, boxShadow: selected ? "0 0 0 2px rgba(94,234,212,.24)" : "none" }}><Icon size={19} color={selected ? "#eafffb" : item.accent} strokeWidth={2.4} style={{ flex: "0 0 auto" }} aria-hidden /><span style={{ minWidth: 0, whiteSpace: "normal", overflowWrap: "anywhere", textAlign: "left", lineHeight: 1.3, fontSize: 12, fontWeight: 900 }}>{item.name}</span></button>;
-                })}
-          </div>
-          {paletteTab === "rocks_water" && <button type="button" onClick={()=>{setPaletteTab("ground");chooseEditTool("water");}} style={{...debugButton,width:"100%",marginTop:8,padding:"10px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><Waves size={18}/>Paint your own water · 1 square at a time</button>}
-          {paletteTab === "ground" && isGroundTool && editTool === "water" && <div style={{marginTop:10,color:"#e3ece3",fontSize:12}}>
-            <div style={{display:"flex",gap:5}}>{([[1,"1 square"],[3,"River"],[5,"Lake"]] as const).map(([width,label])=><button key={width} type="button" aria-pressed={waterBrushWidth===width} onClick={()=>{setWaterBrushWidth(width);void speak(width===1?"One square. Tap to place water, or drag to join squares.":`${label} brush selected. Drag to paint a wider area.`,undefined,"manual",{rate:.9});}} style={{...debugButton,flex:1,padding:"8px 4px",background:waterBrushWidth===width?"#287b7e":debugButton.background}}>{label}</button>)}</div>
-            <p>{waterBrushWidth===1?"Tap a grid square to add water. Drag to paint one square at a time.":`Paint a wider area with the ${waterBrushWidth===3?"river":"lake"} brush. Choose 1 square for precise edges.`} Neighbouring water joins automatically, so you can build your own river, lake or moat.</p>
-            <p>Add a bridge from Rocks or a drawbridge from Fortress.</p>
-            <p>Use Erase on clear ground to remove one water square and reshape the banks. Undo restores your last edit. Your home and doorway stay clear.</p>
-          </div>}
-          {paletteTab !== "ground" && !CENTRAL_WORLD_STARTER_SCENERY.some(item => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(scenerySearch.trim().toLowerCase()) && (sceneryCollection === "all" || worldCollectionFor(String(item.metadata.worldAssetKey)) === sceneryCollection)) && <p role="status" style={{ color: "#e1ddce", fontSize: 12 }}>No matching items in this category.</p>}
-          </div>
-          </>}
-          <div className="worldLibrarySelection">
-          {buildPreview && CONNECTED_BOUNDARY_KEYS.has(String(buildItem?.metadata.worldAssetKey)) && <p style={{color:"#e3ece3",fontSize:12}}>Matching fences and walls join automatically in neighbouring squares, including corners. Drag to build a row.</p>}
-          {paletteTab === "ground" && (editTool === "path" || editTool === "road") && <p style={{color:"#e3ece3",fontSize:12}}>Drag to draw. Matching routes join and form corners and junctions automatically.</p>}
-          {buildPreview && isVillageBuilding(buildItem?.metadata.worldAssetKey) && <div style={{marginTop:10,color:"#fff7e7"}}>
-            <p style={{fontSize:12,margin:"0 0 8px"}}>Design unlocked · place as many copies as you like.</p>
-            {buildItem?.metadata.worldAssetKey !== "village_apartments" && <label>Building style
-              <select aria-label="Building style" value={villageStyle(buildPlacement?.buildingStyle)} onChange={event=>{
-                const style=villageStyle(event.target.value);
-                setBuildPlacement(current=>current?{...current,buildingStyle:style}:current);
-                void speak(VILLAGE_STYLES[style],undefined,"manual",{rate:.9});
-              }} style={{display:"block",width:"100%",padding:8,marginTop:5,background:"#22382e",color:"#fff7e7",border:"1px solid #607b62",borderRadius:6}}>
-                {Object.entries(VILLAGE_STYLES).map(([key,label])=><option key={key} value={key}>{label}</option>)}
-              </select>
-            </label>}
-          </div>}
-          {buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey) || isRealmBuilding(buildItem?.metadata.worldAssetKey)) ? (
-            <div style={{ marginTop: 10 }}>
-              <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".12em" }}>COLOUR</div>
-              <div aria-label="Recolour item" style={{ marginTop: 5, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-                <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default" style={{ ...debugButton, minHeight: 30, padding: "0 10px", fontSize: 11, fontWeight: 900, background: !buildPlacement?.tint ? "#efbd61" : debugButton.background, color: !buildPlacement?.tint ? "#2b2119" : debugButton.color }}>Default</button>
-                {SCENERY_TINTS.map((c) => {
-                  const selected = buildPlacement?.tint === c;
-                  return <button key={c} type="button" onClick={() => setHeldTint(c)} aria-pressed={selected} aria-label={`Paint colour ${c}`} style={{ width: 30, height: 30, borderRadius: 8, flex: "0 0 auto", background: c, cursor: "pointer", border: selected ? "2px solid #fff" : "2px solid rgba(255,255,255,.28)", boxShadow: selected ? "0 0 0 3px rgba(94,234,212,.4)" : "inset 0 0 0 1px rgba(0,0,0,.15)" }} />;
-                })}
-              </div>
+        <section className="worldEditTray" data-open={trayOpen ? "true" : "false"} aria-label="Edit world controls">
+          {buildPreview || (isGroundTool && editTool === "water") ? (
+            <div className="worldEditItemBar" aria-label={buildPreview ? "Build mode controls" : "Water brush"}>
+              {buildPreview ? <>
+                <b className="worldEditItemName">{buildPreview.item.name}</b>
+                <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn (R)"><RotateCw size={18} />Turn<kbd>R</kbd></button>
+                {tintable ? (
+                  <div className="worldEditTints" aria-label="Recolour item">
+                    <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default colour" className="worldEditTintDefault" />
+                    {SCENERY_TINTS.map((c) => <button key={c} type="button" onClick={() => setHeldTint(c)} aria-pressed={buildPlacement?.tint === c} aria-label={`Paint colour ${c}`} style={{ background: c }} />)}
+                  </div>
+                ) : null}
+                {styled ? (
+                  <select aria-label="Building style" value={villageStyle(buildPlacement?.buildingStyle)} onChange={(event) => {
+                    const style = villageStyle(event.target.value);
+                    setBuildPlacement((current) => current ? { ...current, buildingStyle: style } : current);
+                    void speak(VILLAGE_STYLES[style], undefined, "manual", { rate: 0.9 });
+                  }}>
+                    {Object.entries(VILLAGE_STYLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                  </select>
+                ) : null}
+                <span className="worldEditItemSpacer" />
+                {selectedInventoryItemKey && !isHome ? <button type="button" className="worldEditDanger" onClick={deleteHeldPlacement} aria-label="Delete item" title="Delete"><Trash2 size={18} /></button> : null}
+                <button type="button" onClick={() => chooseEditTool("move")} title="Put it down (Esc)"><X size={18} />{isHome ? "Cancel" : "Put away"}<kbd>Esc</kbd></button>
+                {!selectedSceneryItemKey ? <button type="button" className="worldEditPlace" disabled={!buildValid} onClick={confirmBuildPlacement}><Check size={18} />Place</button> : null}
+              </> : <>
+                <b className="worldEditItemName">Water brush</b>
+                {([[1, "1 square"], [3, "River"], [5, "Lake"]] as const).map(([width, label]) => <button key={width} type="button" aria-pressed={waterBrushWidth === width} onClick={() => { setWaterBrushWidth(width); void speak(width === 1 ? "One square. Tap to place water, or drag to join squares." : `${label} brush selected. Drag to paint a wider area.`, undefined, "manual", { rate: .9 }); }}>{label}</button>)}
+              </>}
             </div>
           ) : null}
-
+          <div className="worldEditTrayTop">
+            <div className="worldEditTabs" role="tablist" aria-label="Build categories">
+              {TRAY_TABS.map(({ key, label }) => (
+                <button key={key} type="button" role="tab" aria-selected={trayTab === key} onClick={() => chooseTab(key)}>
+                  {label}{key === "owned" ? <em>{ownedWorldItems.length}</em> : null}
+                </button>
+              ))}
+            </div>
+            {trayOpen && trayTab !== "owned" && trayTab !== "ground" ? (
+              <input className="worldEditSearch" aria-label="Search scenery" placeholder="Search…" value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} />
+            ) : null}
+            <div className="worldEditModes" role="group" aria-label="Build tool">
+              <button type="button" aria-pressed={placing} onClick={startPlacing}><Plus size={16} />Place</button>
+              <button type="button" aria-pressed={isMoveTool} onClick={() => chooseEditTool("move")} title="Move (M)"><Hand size={16} />Move<kbd>M</kbd></button>
+              <button type="button" aria-pressed={isEraseTool} data-tone="erase" onClick={() => chooseEditTool("erase")} title="Erase (X)"><Eraser size={16} />Erase<kbd>X</kbd></button>
+            </div>
+            <button type="button" className="worldEditTrayToggle" aria-expanded={trayOpen} aria-label={trayOpen ? "Hide the item tray" : "Show the item tray"} onClick={() => setTrayOpen((open) => !open)}>{trayOpen ? <ChevronDown size={20} /> : <ChevronUp size={20} />}</button>
           </div>
-          <p className="worldLibrarySaved">{preview ? "Preview: changes stay in this browser." : "Saved to your account automatically."}</p>
+          {trayOpen ? (
+            <div className="worldEditCards" key={trayTab} aria-label={trayTab === "owned" ? "Owned world inventory" : "Available building items"}>
+              {trayTab === "owned" ? <>
+                {ownedWorldItems.map((item) => {
+                  const image = inventoryImage(item);
+                  return (
+                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => chooseInventoryItem(item)} aria-pressed={selectedInventoryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                      <span className="worldEditArt">{image ? <Image src={image} alt="" fill sizes="140px" style={{ objectFit: "cover" }} /> : <PackageOpen size={36} />}</span>
+                      <b>{item.name}</b>
+                    </button>
+                  );
+                })}
+                {!ownedWorldItems.length ? <p className="worldEditEmpty">Buildings and places you unlock in the Marketplace appear here.</p> : null}
+                <button type="button" className="worldEditCard worldEditShop" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")}>
+                  <span className="worldEditArt"><ShoppingBag size={34} /></span><b>Get more</b>
+                </button>
+              </> : trayTab === "ground" ? GROUND_TOOLS.map(([tool, label]) => (
+                <button key={tool} type="button" className="worldEditCard" onClick={() => chooseEditTool(tool)} aria-pressed={!heldItemKey && editTool === tool}>
+                  <span className="worldEditArt"><GroundSwatch tool={tool} /></span><b>{label}</b>
+                </button>
+              )) : <>
+                {sceneryInTab.map((item) => {
+                  const art = freeBuildRender(String(item.metadata.worldAssetKey));
+                  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
+                  return (
+                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => chooseSceneryItem(item)} aria-pressed={selectedSceneryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                      <span className="worldEditArt worldEditArtFree">{art ? <Image src={art} alt="" fill sizes="140px" style={{ objectFit: "contain" }} /> : <Icon size={36} color={item.accent} />}</span>
+                      <b>{item.name}</b>
+                    </button>
+                  );
+                })}
+                {paletteTab === "rocks_water" ? (
+                  <button type="button" className="worldEditCard" onClick={() => { setPaletteTab("ground"); chooseEditTool("water"); }}>
+                    <span className="worldEditArt"><GroundSwatch tool="water" /></span><b>Paint water</b>
+                  </button>
+                ) : null}
+                {!sceneryInTab.length ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
+              </>}
+            </div>
+          ) : null}
         </section>
+
         <dialog ref={resetDialog} className="worldBuilderReset" aria-labelledby="world-reset-title" aria-describedby="world-reset-description">
           <h2 id="world-reset-title">A fresh space to build?</h2>
           <p id="world-reset-description">Clear all placed items, paths, roads, stone and water. Your home and the tower stay. Your purchased items, rewards and XP are kept.</p>
@@ -1030,39 +1253,8 @@ export default function CentralWorld() {
           <div className="worldBuilderResetActions"><button type="button" ref={resetCancel} onClick={() => resetDialog.current?.close()}>Keep building</button><button type="button" onClick={startFreshWorld}>Clear my layout</button></div>
         </dialog>
         </>
-      ) : null}
-
-      {/* Floating build controls, always reachable (outside the scrolling panel):
-          object nudge + turn + place at bottom centre, camera pan pad on the right. */}
-      {editorOpen ? (
-        <>
-          <div className="centralWorldBuildControls" style={{ position: "absolute", left: "calc(50% + 165px)", bottom: 16, transform: "translateX(-50%)", zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, pointerEvents: "none" }}>
-            <div role="status" style={{ padding: "4px 12px", borderRadius: 999, background: "rgba(13,24,22,.82)", color: buildPreview ? (buildValid ? "#86efac" : "#fda4af") : "#cfe6d8", fontSize: 12, fontWeight: 850 }}>{buildPreview ? (buildValid ? (buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY ? "House and doorway fit · choose Place to save" : buildingTrain ? "Track ready · tap to place your train" : "Arrows move it · tap the grass to drop it") : buildingTrain ? "Choose an empty railway track or the station’s rails" : "Choose clear, reachable ground with room for the doorway") : isMoveTool ? "Tap an item to pick it up" : isGroundTool ? "Tap or drag the grass to paint" : isEraseTool ? "Tap an item to remove it" : "Pick something to place"}</div>
-            <div style={{ pointerEvents: "auto", display: "flex", alignItems: "center", gap: 10, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
-              <div className="worldBuilderNudge" style={{ display: "grid", gridTemplateColumns: "repeat(3, 38px)", gridTemplateRows: "repeat(2, 38px)", gap: 3 }}>
-                <button type="button" aria-label={buildPreview ? "Move item forward" : "Pan view forward"} onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={18} /></button>
-                <button type="button" aria-label={buildPreview ? "Move item left" : "Pan view left"} onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={18} /></button>
-                <button type="button" aria-label={buildPreview ? "Move item backward" : "Pan view backward"} onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={18} /></button>
-                <button type="button" aria-label={buildPreview ? "Move item right" : "Pan view right"} onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={18} /></button>
-              </div>
-              {buildPreview ? <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn 90 degrees" style={{ ...debugButton, minHeight: 46, padding: "0 12px", display: "inline-flex", alignItems: "center", gap: 6, opacity: buildPreview ? 1 : 0.4 }}><RotateCw size={18} /> Turn</button> : null}
-              {buildPreview && buildPlacement?.itemId !== CENTRAL_WORLD_HOME_KEY ? <button type="button" onClick={deleteHeldPlacement} aria-label="Delete item" title="Delete" style={{ ...debugButton, width: 46, height: 46, padding: 0, display: "grid", placeItems: "center", background: "#ef4444", color: "#fff" }}><Trash2 size={18} /></button> : null}
-              {buildPlacement ? <button type="button" onClick={() => chooseEditTool("move")} style={debugButton}>Cancel</button> : null}
-              {!(isMoveTool && !buildPreview) ? <button type="button" disabled={!isEraseTool && (buildPreview ? !buildValid : !groundPreview?.valid)} onClick={buildPreview ? confirmBuildPlacement : applyGroundTool} style={{ ...debugButton, minHeight: 46, minWidth: 84, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: isEraseTool ? "#ef4444" : "#22c55e", color: "white", visibility: isMoveTool && !buildPreview ? "hidden" : "visible" }}>{isEraseTool ? <Eraser size={18} /> : <Check size={18} />}{isEraseTool ? "Remove" : buildPreview ? "Place" : "Paint"}</button> : null}
-            </div>
-          </div>
-
-          <div className="centralWorldCameraControls" style={{ position: "absolute", right: 16, bottom: 84, zIndex: 40, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "rgba(13,24,22,.92)", border: "1px solid #2f5a49", borderRadius: 12, padding: 8 }}>
-            <div style={{ color: "#a7f3d0", fontSize: 10, fontWeight: 950, letterSpacing: ".14em" }}>CAMERA</div><div style={{display:"flex",gap:4}}><button type="button" onClick={() => setBuildZoom(value => Math.min(38,value+4))} aria-label="Zoom camera out" style={debugButton}><ZoomOut size={18}/></button><button type="button" onClick={() => setBuildZoom(value => Math.max(18,value-4))} aria-label="Zoom camera in" style={debugButton}><ZoomIn size={18}/></button></div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 44px)", gridTemplateRows: "repeat(2, 44px)", gap: 4 }}>
-              <button type="button" aria-label="Tilt camera up" onClick={() => orbitCamera(0, 0.18)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
-              <button type="button" aria-label="Spin camera left" onClick={() => orbitCamera(-0.5, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
-              <button type="button" aria-label="Tilt camera down" onClick={() => orbitCamera(0, -0.18)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={20} /></button>
-              <button type="button" aria-label="Spin camera right" onClick={() => orbitCamera(0.5, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={20} /></button>
-            </div>
-          </div>
-        </>
-      ) : null}
+        );
+      })() : null}
       <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !buildPreview} onAction={runActiveAction} />
 
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
@@ -1072,34 +1264,10 @@ export default function CentralWorld() {
         .centralWorldTag:after{content:"";position:absolute;left:50%;bottom:-6px;width:11px;height:11px;transform:translateX(-50%) rotate(45deg);background:rgba(16,14,24,.66);border-right:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)}
         @keyframes centralWorldTagBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
         @media (prefers-reduced-motion:reduce){.centralWorldTag{animation:none}}
-        .worldBuilderToolbar{position:absolute;inset:12px 12px auto;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:rgba(19,32,28,.97);color:#fff7e7;border:1px solid #52624d;border-radius:16px;box-shadow:0 8px 30px #0003}
-        .worldBuilderTitle{display:grid;gap:2px}.worldBuilderTitle span{font-size:10px;letter-spacing:.16em;color:#efbd61;font-weight:900}.worldBuilderTitle strong{font-size:20px}
-        .worldBuilderToolbarActions{display:flex;gap:8px;flex-wrap:wrap}
-        .worldBuilderToolbar button,.worldBuilderResetActions button,.worldBuilderLibraryTabs button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 12px;border:1px solid #65765d;border-radius:10px;background:#293d32;color:#fff7e7;font-weight:800;cursor:pointer}
-        .worldBuilderToolbar button:disabled{opacity:.4;cursor:default}.worldBuilderToolbar .worldBuilderDone{background:#efbd61;color:#302618;border-color:#efbd61}
-        .centralWorldEditor button:focus-visible,.worldBuilderToolbar button:focus-visible,.worldBuilderReset button:focus-visible{outline:3px solid #efbd61;outline-offset:2px}
-        .worldBuilderLibraryTabs{display:flex;gap:5px;margin-bottom:14px}.worldBuilderLibraryTabs button{flex:1;font-size:12px}.worldBuilderLibraryTabs button[aria-pressed=true]{background:#efbd61;color:#302618;border-color:#efbd61}
-        .centralWorldEditor button{box-shadow:none!important;border-radius:9px!important;min-height:42px}.centralWorldEditor [role=tablist]{gap:6px!important;margin-top:14px!important}.centralWorldEditor [role=tab]{min-height:58px}
-        .centralWorldEditor [role=tab][aria-selected=true],.centralWorldEditor button[aria-pressed=true]{background:#efbd61!important;color:#302618!important;border-color:#efbd61!important;box-shadow:none!important}
-
-        .centralWorldEditor:not([hidden]){display:flex;flex-direction:column;box-sizing:border-box;min-height:0}
-        .centralWorldEditor> *{flex-shrink:0;min-width:0;max-width:100%}
-        .centralWorldEditor .worldBuilderLibraryTabs{margin:10px 0 2px}
-        .centralWorldEditor [role=tablist]{grid-template-columns:repeat(3,minmax(0,1fr))!important;margin-top:10px!important;gap:5px!important}
-        .centralWorldEditor [role=tab]{min-height:36px;flex-direction:row!important;justify-content:center;gap:5px!important;padding:6px 2px!important}
-        .centralWorldEditor select,.centralWorldEditor input{min-width:0;box-sizing:border-box;font-size:12px}
-        .centralWorldEditor .worldLibraryResults{flex:1 1 0;min-height:80px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#73856b transparent;margin-top:10px;padding:3px 6px 6px 2px}
-        .worldLibraryItemGrid,.worldOwnedItems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:start}
-        .worldLibraryItemGrid>button{min-width:0;width:100%;min-height:64px!important;box-sizing:border-box;padding:10px 8px!important;align-items:center!important;white-space:normal}
-        .worldOwnedItems>button{min-width:0;width:100%;height:80px!important}.worldOwnedItems>div{grid-column:1/-1;padding:12px;text-align:center}
-        .worldLibrarySelection{max-height:220px;overflow:auto}.worldLibrarySelection:empty{display:none}
-        .worldLibrarySaved{color:#c8d1bd;font-size:10px;margin:8px 0 0;padding-top:8px;border-top:1px solid #ffffff20}
-        @media(max-height:650px){.centralWorldEditor{top:86px!important;bottom:8px!important}.centralWorldEditor h2{font-size:16px!important}.centralWorldEditor button{min-height:34px}.centralWorldEditor .worldBuilderLibraryTabs{margin-top:4px}.centralWorldEditor .worldLibrarySelection{max-height:72px}.worldLibrarySaved{display:none}}
-        .worldBuilderReset{inset:0;margin:auto;max-width:440px;width:calc(100vw - 48px);padding:24px;border:1px solid #65765d;border-radius:20px;background:#182b22;color:#fff7e7;box-shadow:0 20px 90px #0008}.worldBuilderReset::backdrop{background:#071610b8}.worldBuilderReset h2{margin:0 0 12px;font-size:24px;font-weight:900}.worldBuilderReset p{line-height:1.6;color:#d1dac8}.worldBuilderResetActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.worldBuilderResetActions button:last-child{background:#efbd61;color:#302618}
-        @media(max-width:700px){.worldBuilderToolbar{inset:8px 8px auto;padding:8px;gap:6px}.worldBuilderTitle{display:none}.worldBuilderToolbarActions{width:100%;gap:4px}.worldBuilderToolbar button{flex:1;padding:8px 5px;font-size:11px;gap:4px}.centralWorldEditor{top:76px!important;max-height:none!important}.worldBuilderReset{box-sizing:border-box}}
-        @media(max-height:520px){.centralWorldEditor{overflow-y:auto!important}.centralWorldEditor .worldLibraryResults{flex:none;max-height:220px;min-height:100px}}
+        .worldBuilderReset{inset:0;margin:auto;max-width:440px;width:calc(100vw - 48px);box-sizing:border-box;padding:24px;border:1px solid rgba(255,255,255,.16);border-radius:22px;background:#17131f;color:#fff;font-family:var(--font-sans);box-shadow:0 20px 90px #0008}.worldBuilderReset::backdrop{background:rgba(10,8,16,.7)}.worldBuilderReset h2{margin:0 0 12px;font:900 22px var(--font-display)}.worldBuilderReset p{line-height:1.6;color:#d8d2e4}
+        .worldBuilderResetActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.worldBuilderResetActions button{min-height:48px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:900 14px var(--font-display);cursor:pointer}.worldBuilderResetActions button:last-child{background:#e5484d;border-color:#e5484d}
       `}</style>
-      <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}@media(max-height:520px){.centralWorldEditor{width:min(300px,94vw)!important}}@media(max-width:700px){.centralWorldEditor{width:min(280px,calc(100vw - 90px))!important;bottom:160px!important;max-height:none!important}.centralWorldBuildControls{left:50%!important;width:calc(100vw - 16px);bottom:max(8px,env(safe-area-inset-bottom))!important}.centralWorldBuildControls>div:last-child{gap:5px!important;padding:5px!important;flex-wrap:wrap;justify-content:center}.centralWorldBuildControls [role=status]{font-size:10px!important;text-align:center}.centralWorldCameraControls{right:8px!important;bottom:138px!important}}`}</style>
+      <style>{`@media (pointer:coarse){body:has([data-world3d-root]) .fullscreen-toggle{display:none}}body:has(.worldEditTray) .fullscreen-toggle{display:none}`}</style>
       {transitioning ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "#211914", color: "#fff0c9", fontWeight: 900, letterSpacing: "0.16em", zIndex: 20 }}><div style={{ display: "flex", alignItems: "center", gap: 12 }}><span>ENTERING THE TOWER...</span><WorldVoiceButton text={joinSpeechParts(["Entering the tower"])} label="Read entering tower" /></div></div> : null}
     </main>
   );
