@@ -13,11 +13,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Html, Lightformer } from "@react-three/drei";
 import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
-import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import {
   EMPTY_WORLD_MOVE_INPUT,
   EMPTY_WORLD_LOOK_INPUT,
@@ -276,6 +275,21 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         onEnterHome={onEnterHome}
         onToggleDrawbridge={onToggleDrawbridge}
       />
+      {/* A name tag floats over what the learner is near; the dock's main button acts on it. */}
+      {activeTargetId && !editing && !buildPreview ? (() => {
+        const home = activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
+        const at = home ? getCentralWorldHomeAnchors(homePlacement).entrance : CENTRAL_WORLD_CONFIG.towerMainEntrance;
+        const name = home ? "My Home" : "Tower of Knowledge";
+        return (
+          <Html position={[at[0], at[1] + (home ? 6.2 : 9), at[2]]} center zIndexRange={[20, 0]} style={{ pointerEvents: "auto" }}>
+            <div className="centralWorldTag">
+              {home ? <Home size={15} aria-hidden="true" /> : <Castle size={15} aria-hidden="true" />}
+              <span>{name}</span>
+              <WorldVoiceButton text={home ? "My Home. Your personal RELIQ space." : "Tower of Knowledge. The realm chamber."} compact label={`Read ${name}`} />
+            </div>
+          </Html>
+        );
+      })() : null}
       <SharedThirdPersonPlayer
         initialPosition={spawnTarget ?? CENTRAL_WORLD_CONFIG.spawnPoint}
         spawnTarget={spawnTarget}
@@ -851,7 +865,7 @@ export default function CentralWorld() {
         <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} onBuildCell={selectBuildCell} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} />
       </Canvas>
 
-      {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} navActions={[
+      {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "centre", label: "Centre", icon: <MapPin size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.spawnPoint) },
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "plaza", label: "Plaza", icon: <LayoutGrid size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
@@ -1023,19 +1037,15 @@ export default function CentralWorld() {
           </div>
         </>
       ) : null}
-      {activeTargetId && !editorOpen && !buildPreview ? (
-        <WorldInteractionPrompt
-          location={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "MY HOME" : "TOWER OF KNOWLEDGE"}
-          status={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "Your personal RELIQ space" : "Realm Chamber"}
-          actionLabel={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? "ENTER MY HOME" : "ENTER TOWER"}
-          onAction={runActiveAction}
-        />
-      ) : null}
       <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !buildPreview} onAction={runActiveAction} />
 
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE RELIQ WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The RELIQ World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
       <style>{`
+        .centralWorldTag{position:relative;display:flex;align-items:center;gap:8px;white-space:nowrap;padding:7px 8px 7px 14px;border-radius:999px;background:rgba(16,14,24,.66);border:1px solid rgba(255,255,255,.18);color:#fff;font:800 15px system-ui,sans-serif;box-shadow:0 8px 22px rgba(0,0,0,.3);backdrop-filter:blur(10px);animation:centralWorldTagBob 2.4s ease-in-out infinite}
+        .centralWorldTag:after{content:"";position:absolute;left:50%;bottom:-6px;width:11px;height:11px;transform:translateX(-50%) rotate(45deg);background:rgba(16,14,24,.66);border-right:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)}
+        @keyframes centralWorldTagBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+        @media (prefers-reduced-motion:reduce){.centralWorldTag{animation:none}}
         .worldBuilderToolbar{position:absolute;inset:12px 12px auto;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:rgba(19,32,28,.97);color:#fff7e7;border:1px solid #52624d;border-radius:16px;box-shadow:0 8px 30px #0003}
         .worldBuilderTitle{display:grid;gap:2px}.worldBuilderTitle span{font-size:10px;letter-spacing:.16em;color:#efbd61;font-weight:900}.worldBuilderTitle strong{font-size:20px}
         .worldBuilderToolbarActions{display:flex;gap:8px;flex-wrap:wrap}

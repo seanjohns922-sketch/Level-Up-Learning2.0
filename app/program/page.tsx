@@ -1,5 +1,6 @@
 "use client";
 
+import ReliqRealmLogo from "@/components/brand/ReliqRealmLogo";
 import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
@@ -1340,7 +1341,7 @@ function ProgramPage() {
               </div>
               {isExpeditionWeek && <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} linkClassName={navWidgetClass} linkStyle={navWidgetStyle} />}
             </div>
-            <span className="text-sm text-white/80 font-medium ml-1">{levelLabel}</span>
+            <ReliqRealmLogo realmId={realmId} levelLabel={levelLabel} className="ml-1 shrink-0" />
           </div>
 
           <div className="text-center">
