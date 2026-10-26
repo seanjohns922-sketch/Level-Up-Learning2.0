@@ -198,7 +198,38 @@ export function readCentralWorldPlacements(scope: string) {
 }
 
 export function writeCentralWorldPlacements(scope: string, placements: CentralWorldPlacement[]) {
-  if (typeof window !== "undefined") window.localStorage.setItem(`${STORAGE_PREFIX}:${scope}`, JSON.stringify(normaliseHomes(placements)));
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(`${STORAGE_PREFIX}:${scope}`, JSON.stringify(normaliseHomes(placements)));
+  syncWorldToAccount(scope);
+}
+
+/** Queues a save of this learner's whole world to their account (browser copy stays as the cache). */
+function syncWorldToAccount(scope: string) {
+  void import("./central-world-sync").then(({ isSyncedWorldScope, scheduleWorldLayoutSave }) => {
+    if (!isSyncedWorldScope(scope)) return;
+    scheduleWorldLayoutSave(scope, () => ({
+      placements: readCentralWorldPlacements(scope),
+      groundTiles: readCentralWorldGroundTiles(scope),
+    }));
+  }).catch(() => undefined);
+}
+
+/** Whether this browser holds a world for the scope (used to move an existing build to the account). */
+export function hasLocalCentralWorld(scope: string) {
+  if (typeof window === "undefined") return false;
+  return window.localStorage.getItem(`${STORAGE_PREFIX}:${scope}`) !== null || window.localStorage.getItem(`${GROUND_STORAGE_PREFIX}:${scope}`) !== null;
+}
+
+/** Replaces the browser copy with the account copy, without queuing another save. */
+export function applyAccountCentralWorld(scope: string, layout: { placements: unknown[]; groundTiles: unknown[] }) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(`${STORAGE_PREFIX}:${scope}`, JSON.stringify(layout.placements));
+  window.localStorage.setItem(`${GROUND_STORAGE_PREFIX}:${scope}`, JSON.stringify(layout.groundTiles));
+}
+
+/** Queues a save of whatever this browser holds (first visit after the account save arrived). */
+export function uploadLocalCentralWorld(scope: string) {
+  syncWorldToAccount(scope);
 }
 
 export function validateCentralWorldGroundCell(gridX: number, gridZ: number, placements: CentralWorldPlacement[] = [], tileType?: CentralWorldGroundType) {
@@ -226,7 +257,9 @@ export function readCentralWorldGroundTiles(scope: string) {
 }
 
 export function writeCentralWorldGroundTiles(scope: string, tiles: CentralWorldGroundTile[]) {
-  if (typeof window !== "undefined") window.localStorage.setItem(`${GROUND_STORAGE_PREFIX}:${scope}`, JSON.stringify(tiles));
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(`${GROUND_STORAGE_PREFIX}:${scope}`, JSON.stringify(tiles));
+  syncWorldToAccount(scope);
 }
 
 /** Start fresh affects the layout only; ownership and the current home are retained. */

@@ -16,6 +16,7 @@ import * as THREE from "three";
 import { Environment, Html, Lightformer } from "@react-three/drei";
 import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, LayoutGrid, Leaf, Logs, Mailbox, Map as MapIcon, MapPin, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
+import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import {
   EMPTY_WORLD_MOVE_INPUT,
@@ -59,6 +60,9 @@ import {
   validateCentralWorldPlacement,
   writeCentralWorldGroundTiles,
   writeCentralWorldPlacements,
+  applyAccountCentralWorld,
+  hasLocalCentralWorld,
+  uploadLocalCentralWorld,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
@@ -364,6 +368,28 @@ export default function CentralWorld() {
   const [ownedItemKeys, setOwnedItemKeys] = useState<Set<string>>(() => new Set());
   const [groundTiles, setGroundTiles] = useState<CentralWorldGroundTile[]>(() => readCentralWorldGroundTiles(placementScope));
   const [buildPlacement, setBuildPlacement] = useState<CentralWorldPlacement | null>(null);
+
+  // The learner's world lives on their account: load it here (so it follows them
+  // to any device), or move a world built before that up to the account.
+  useEffect(() => {
+    if (preview || !isSyncedWorldScope(placementScope)) return;
+    let cancelled = false;
+    void fetchServerWorldLayout(placementScope)
+      .then((layout) => {
+        if (cancelled) return;
+        if (!layout) {
+          if (hasLocalCentralWorld(placementScope)) uploadLocalCentralWorld(placementScope);
+          return;
+        }
+        // An edit made while this loaded wins; it is about to be saved anyway.
+        if (hasPendingWorldLayoutSave(placementScope)) return;
+        applyAccountCentralWorld(placementScope, layout);
+        setPlacedCustomisations(readCentralWorldPlacements(placementScope));
+        setGroundTiles(readCentralWorldGroundTiles(placementScope));
+      })
+      .catch((error) => console.warn("[central-world] account world could not be loaded; using this browser's copy", error));
+    return () => { cancelled = true; };
+  }, [placementScope, preview]);
   const [editorOpen, setEditorOpen] = useState(false);
   const resetDialog = useRef<HTMLDialogElement>(null);
   const resetCancel = useRef<HTMLButtonElement>(null);
@@ -994,7 +1020,7 @@ export default function CentralWorld() {
           ) : null}
 
           </div>
-          <p className="worldLibrarySaved">Saved automatically in this browser.</p>
+          <p className="worldLibrarySaved">{preview ? "Preview: changes stay in this browser." : "Saved to your account automatically."}</p>
         </section>
         <dialog ref={resetDialog} className="worldBuilderReset" aria-labelledby="world-reset-title" aria-describedby="world-reset-description">
           <h2 id="world-reset-title">A fresh space to build?</h2>
