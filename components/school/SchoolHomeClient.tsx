@@ -572,7 +572,18 @@ function emptyStudentDraft(classId = ""): SchoolStudentDraft {
   };
 }
 
+type SkippedImport = { row: TemplateStudent; requestId: string; matches: string[]; sameSchool: boolean; selected: boolean };
+
+/** "a Year 4 at Cobram Primary School", "a home learner", for the duplicate summary. */
+function describeMatch(candidate: DuplicateCandidate): string {
+  const who = `${candidate.firstName} ${candidate.lastInitial ?? ""}`.trim();
+  const year = candidate.yearLevel ? `${candidate.yearLevel}, ` : "";
+  const where = candidate.schoolName ?? (candidate.hasHomeAccess ? "home learner" : "no school");
+  return `${who} (${year}${where})`;
+}
+
 function StudentDirectory({
+  schoolName,
   students,
   classes,
   directoryError,
@@ -587,6 +598,7 @@ function StudentDirectory({
   onPreviewExisting,
   onLinkExisting,
 }: {
+  schoolName: string;
   students: SchoolHomeSnapshot["students"];
   classes: SchoolHomeSnapshot["classes"];
   directoryError: string | null;
@@ -627,7 +639,8 @@ function StudentDirectory({
   } | null>(null);
   const [importRows, setImportRows] = useState<TemplateStudent[]>([]);
   const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
-  const [importResult, setImportResult] = useState<{ added: number; skipped: string[]; failed: Array<{ name: string; message: string }> } | null>(null);
+  const [importResult, setImportResult] = useState<{ added: number; skipped: SkippedImport[]; failed: Array<{ name: string; message: string }> } | null>(null);
+  const [addingSkipped, setAddingSkipped] = useState(false);
   const [importFileName, setImportFileName] = useState("");
   const [importMessage, setImportMessage] = useState("");
   const [linkCode, setLinkCode] = useState("");
@@ -913,7 +926,7 @@ function StudentDirectory({
   async function submitImport() {
     const ready = importRows.filter((row) => !templateRowIssue(row, YEAR_LEVELS));
     const added: string[] = [];
-    const skipped: string[] = [];
+    const skipped: SkippedImport[] = [];
     const failed: Array<{ name: string; message: string }> = [];
     setImportProgress({ done: 0, total: ready.length });
     for (let start = 0; start < ready.length; start += 100) {
@@ -929,14 +942,51 @@ function StudentDirectory({
       })));
       added.push(...result.created.map((student) => String((student as { name?: string }).name ?? "")));
       for (const error of result.errors) {
-        if (error.code === "potential_duplicate") skipped.push(error.name);
-        else failed.push({ name: error.name, message: error.message });
+        const row = batch[error.row - 1];
+        if (error.code === "potential_duplicate" && row && error.requestId) {
+          const matches = (error.candidates ?? []).map(describeMatch);
+          const sameSchool = (error.candidates ?? []).some((candidate) => candidate.schoolName === schoolName);
+          // A match at another school or at home is usually a different child, so it's ticked to add.
+          skipped.push({ row, requestId: error.requestId, matches, sameSchool, selected: !sameSchool });
+        } else failed.push({ name: error.name, message: error.message });
       }
       setImportProgress({ done: Math.min(ready.length, start + batch.length), total: ready.length });
     }
     setImportProgress(null);
     setImportRows([]);
     setImportResult({ added: added.length, skipped, failed });
+  }
+
+  // Adds the skipped students the leader has confirmed are different children.
+  async function addSkippedAsNew() {
+    if (!importResult) return;
+    const chosen = importResult.skipped.filter((item) => item.selected);
+    if (!chosen.length) return;
+    setAddingSkipped(true);
+    let added = 0;
+    const failed: Array<{ name: string; message: string }> = [];
+    for (let start = 0; start < chosen.length; start += 100) {
+      const batch = chosen.slice(start, start + 100);
+      const result = await onCreate(batch.map((item) => ({
+        firstName: item.row.firstName,
+        lastName: item.row.lastName,
+        schoolYear: item.row.schoolYear,
+        username: "",
+        pin: "",
+        classId: "",
+        idempotencyKey: crypto.randomUUID(),
+        confirmCreateNew: true,
+        duplicateRequestId: item.requestId,
+      })));
+      added += result.created.length;
+      failed.push(...result.errors.map((error) => ({ name: error.name, message: error.message })));
+    }
+    setImportResult({
+      added: importResult.added + added,
+      skipped: importResult.skipped.filter((item) => !item.selected),
+      failed: [...importResult.failed, ...failed],
+    });
+    setAddingSkipped(false);
   }
 
   return (
@@ -1611,9 +1661,31 @@ function StudentDirectory({
                   <div className="rounded-xl border border-[#E3E5E0] p-4"><p className={`font-display text-3xl font-black ${importResult.failed.length ? "text-red-700" : "text-[#121314]"}`}>{importResult.failed.length}</p><p className="text-xs font-semibold text-slate-600">couldn&apos;t be added</p></div>
                 </div>
                 {importResult.skipped.length ? (
-                  <p className="text-sm text-slate-600">
-                    <b>Skipped because they look like students already in RELIQ:</b> {importResult.skipped.join(", ")}. If one of these really is a different child, add them on their own with <b>Add student</b>.
-                  </p>
+                  <div className="rounded-xl border border-[#E3E5E0]">
+                    <p className="border-b border-[#E3E5E0] px-4 py-3 text-sm text-slate-700">
+                      <b>These names already belong to a student in RELIQ.</b> Tick the ones that are <b>different children</b> and add them. Leave unticked anyone who is already at this school.
+                    </p>
+                    <ul className="max-h-60 divide-y divide-slate-100 overflow-y-auto">
+                      {importResult.skipped.map((item) => (
+                        <li key={item.requestId}>
+                          <label className="flex cursor-pointer items-start gap-3 px-4 py-2.5 text-sm">
+                            <input type="checkbox" className="mt-1 h-4 w-4" checked={item.selected} onChange={(event) => setImportResult((current) => current ? { ...current, skipped: current.skipped.map((entry) => entry.requestId === item.requestId ? { ...entry, selected: event.target.checked } : entry) } : current)} />
+                            <span>
+                              <b>{item.row.firstName} {item.row.lastName}</b> <span className="text-slate-500">({item.row.schoolYear})</span>
+                              <span className={`block text-xs ${item.sameSchool ? "font-semibold text-amber-800" : "text-slate-500"}`}>
+                                {item.sameSchool ? "Already at this school · " : ""}Matches {item.matches.join("; ")}
+                              </span>
+                            </span>
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex justify-end border-t border-[#E3E5E0] px-4 py-3">
+                      <button type="button" disabled={addingSkipped || !importResult.skipped.some((item) => item.selected)} onClick={() => void addSkippedAsNew()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
+                        {addingSkipped ? "Adding..." : `Add ${importResult.skipped.filter((item) => item.selected).length} as new students`}
+                      </button>
+                    </div>
+                  </div>
                 ) : null}
                 {importResult.failed.length ? (
                   <ul className="space-y-1 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -2673,6 +2745,7 @@ export default function SchoolHomeClient({
 
           {tab === "students" ? (
             <StudentDirectory
+              schoolName={snapshot.school.name}
               students={snapshot.students}
               classes={filteredClasses}
               directoryError={snapshot.studentDirectoryError}
