@@ -156,6 +156,24 @@ export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
   return false;
 }
 
+// Free nature and décor (trees, plants, rocks, small furniture, animals) only
+// block the square they stand on, so they can sit side by side and branches can
+// overlap like real bush. Their full footprint still sets how big they look and
+// still keeps them out of buildings, water, bridges, play areas and the home.
+const FULL_SPACE_SCENERY = new Set([
+  "pond", "lily_pond", "bridge", "fountain", "small_jetty", "rowboat", "boardwalk",
+  "rail_straight", "rail_corner", "rail_train",
+  "gazebo", "market_stall", "campsite", "garden_arch", "hedge_arch",
+  "sandpit", "hopscotch", "seesaw", "small_slide", "swing",
+]);
+const COMPACT_GROUPS = new Set(["trees_plants", "rocks_water", "furniture_fun", "animals"]);
+
+export function isCompactScenery(item: EconomyItem) {
+  return item.metadata.marketplaceCategory === "world_basic"
+    && COMPACT_GROUPS.has(String(item.metadata.worldSceneryGroup))
+    && !FULL_SPACE_SCENERY.has(String(item.metadata.worldAssetKey));
+}
+
 export function validateCentralWorldPlacement(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = []) {
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
     const anchors = getCentralWorldHomeAnchors(placement);
@@ -166,11 +184,15 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
     const [x, z] = key.split(":").map(Number);
     if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(x, z)) return false;
   }
-  const occupied = new Set<string>();
+  const compact = isCompactScenery(item);
+  const ownCell = `${placement.gridX}:${placement.gridZ}`;
+  // Squares taken by big things (whole footprint) and by compact things (their one square).
+  const blocked = new Set<string>();
+  const compactCells = new Set<string>();
   const support = isTrainAsset(item.metadata.worldAssetKey) ? trainTrackSupport(placement, placements, itemsById) : null;
   if (isTrainAsset(item.metadata.worldAssetKey) && item.metadata.worldAssetKey !== "rail_train" && !support) return false;
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
-    for (const tile of groundTiles) if (tile.tileType === "water") occupied.add(`${tile.gridX}:${tile.gridZ}`);
+    for (const tile of groundTiles) if (tile.tileType === "water") blocked.add(`${tile.gridX}:${tile.gridZ}`);
   }
   for (const existing of normaliseHomes(placements)) {
     if (support?.source === existing) continue;
@@ -178,9 +200,16 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
     const existingItem = existing.itemId === CENTRAL_WORLD_HOME_KEY ? CENTRAL_WORLD_HOME_ITEM : itemsById.get(existing.itemId);
     // Do not guess an unloaded reward footprint when deciding where a home fits.
     if (!existingItem) return false;
-    occupiedCells(existing, existingItem).forEach((cell) => occupied.add(cell));
+    if (isCompactScenery(existingItem)) {
+      compactCells.add(`${existing.gridX}:${existing.gridZ}`);
+      // A big item still needs the compact item's whole footprint clear.
+      if (!compact) occupiedCells(existing, existingItem).forEach((cell) => blocked.add(cell));
+    } else {
+      occupiedCells(existing, existingItem).forEach((cell) => blocked.add(cell));
+    }
   }
-  return cells.every((cell) => !occupied.has(cell));
+  if (compact) return !compactCells.has(ownCell) && cells.every((cell) => !blocked.has(cell));
+  return cells.every((cell) => !blocked.has(cell) && !compactCells.has(cell));
 }
 
 export function readCentralWorldPlacements(scope: string) {

@@ -172,8 +172,11 @@ console.log('Mature tree proportions, enlarged placement footprints, wall/tower 
 const { validateCentralWorldPlacement }=await import('../lib/world3d/central-world-layout.ts');
 const treeItems=new Map([[birch.item_key,birch]]);
 const savedTree={itemId:birch.item_key,placementId:'scale-tree',gridX:-10,gridZ:20,rotation:0};
-assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'next-tree',gridX:-4},birch,[savedTree],treeItems),false,'Larger canopies reserve space when placing a second tree');
-console.log('Expanded tree footprint blocks formerly clear but now overlapping placements.');
+// Trees only block their own square against other nature items, so a grove can grow
+// branch to branch; two trees still cannot share a square.
+assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'next-tree',gridX:-9},birch,[savedTree],treeItems),true,'Trees can stand side by side');
+assert.equal(validateCentralWorldPlacement({...savedTree,placementId:'same-square'},birch,[savedTree],treeItems),false,'Two trees cannot share a square');
+console.log('Trees stand side by side but never on the same square.');
 
 // Captured from the complete released catalogue using the review page's
 // sequential measurement run. Re-capture native bounds after changing geometry;

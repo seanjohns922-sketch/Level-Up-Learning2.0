@@ -54,6 +54,7 @@ import {
   freshCentralWorldLayout,
   getCentralWorldHomeAnchors,
   gridToWorld,
+  parseGridSize,
   placementOccupiesCell,
   readCentralWorldGroundTiles,
   readCentralWorldPlacements,
@@ -638,8 +639,11 @@ export default function CentralWorld() {
     return { gridX: Math.round(cameraFocus.gridX), gridZ: Math.round(cameraFocus.gridZ) };
   }
 
+  // Last item planted in this drag, so a row of trees gets a gap between each.
+  const strokeLastPlaced = useRef<{ gridX: number; gridZ: number } | null>(null);
   function setStrokeActive(active:boolean) {
     strokeState.current={active,recorded:false};
+    strokeLastPlaced.current=null;
   }
   function recordWorldEdit() {
     if(strokeState.current.active&&strokeState.current.recorded)return;
@@ -857,11 +861,17 @@ export default function CentralWorld() {
 
     const candidate = { ...buildPlacement, gridX, gridZ, placementId: repeat ? newWorldPlacementId(buildPlacement.itemId) : buildPlacement.placementId };
     setEditCursor({ gridX, gridZ });
+    const last = strokeLastPlaced.current;
+    if (repeat && last && Math.max(...parseGridSize(buildItem)) >= 2 && Math.max(Math.abs(gridX - last.gridX), Math.abs(gridZ - last.gridZ)) < 2) {
+      setBuildPlacement({ ...buildPlacement, gridX, gridZ });
+      return;
+    }
     if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById, groundTiles)) {
       setBuildPlacement({...buildPlacement,gridX,gridZ});
       return;
     }
     recordWorldEdit();
+    if (strokeState.current.active) strokeLastPlaced.current = { gridX, gridZ };
     setPlacedCustomisations(current => {
       const remaining=current.filter(p=>p.placementId!==candidate.placementId);
       if(!validateCentralWorldPlacement(candidate,buildItem,remaining,itemsById,groundTiles)) return current;
