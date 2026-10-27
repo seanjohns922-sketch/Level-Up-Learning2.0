@@ -25,7 +25,10 @@ select 3, 'Brain-break XP awards, last 7 days', count(*)::text
   from public.student_economy_transactions where source_type = 'brain_break' and created_at > now() - interval '7 days'
 union all
 select 4, 'Students who earned XP, last 7 days', count(distinct student_id)::text
-  from public.student_economy_transactions where transaction_type = 'earn' and created_at > now() - interval '7 days'
+  from public.student_economy_transactions
+  where transaction_type = 'earn' and xp_delta > 0
+    and source_type not in ('opening_balance', 'legacy_global_xp_backfill')
+    and created_at > now() - interval '7 days'
 union all
 select 5, 'Lessons finished (first time, last 7 days)', count(*)::text
   from first_lesson where first_at > now() - interval '7 days'
