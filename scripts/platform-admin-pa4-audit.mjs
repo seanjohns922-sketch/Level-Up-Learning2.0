@@ -153,6 +153,9 @@ check("school transfer preserves parent and Home records", !functionBody("link_e
 check("creation performs duplicate preview", has(schoolApi, "preview_school_student_creation", "potential_duplicate"));
 check("bulk creation does not silently bypass duplicates", schoolApi.includes("Potential existing student found. Review before creating a new identity."));
 check("creation override is explicit", has(schoolApi, "duplicateRequestId", "approve_school_student_creation_override"));
+check("bulk name matches require an explicit choice even across schools", schoolUi.includes("matches, sameSchool, selected: false") && !schoolUi.includes("selected: !sameSchool"));
+check("bulk review uses school IDs when available", schoolUi.includes("candidate.sameSchool ?? candidate.schoolName === schoolName"));
+
 check("duplicate matching is scoped to active identities", functionBody("preview_school_student_creation").includes("identity_status"));
 
 // Owner-only merge workflow and integrity.

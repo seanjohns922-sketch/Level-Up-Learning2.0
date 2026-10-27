@@ -542,6 +542,7 @@ type DuplicateCandidate = {
   yearLevel: string | null;
   schoolName: string | null;
   hasHomeAccess: boolean;
+  sameSchool?: boolean;
 };
 
 type ExistingStudentPreview = {
@@ -945,9 +946,9 @@ function StudentDirectory({
         const row = batch[error.row - 1];
         if (error.code === "potential_duplicate" && row && error.requestId) {
           const matches = (error.candidates ?? []).map(describeMatch);
-          const sameSchool = (error.candidates ?? []).some((candidate) => candidate.schoolName === schoolName);
-          // A match at another school or at home is usually a different child, so it's ticked to add.
-          skipped.push({ row, requestId: error.requestId, matches, sameSchool, selected: !sameSchool });
+          const sameSchool = (error.candidates ?? []).some((candidate) => candidate.sameSchool ?? candidate.schoolName === schoolName);
+          // A name match does not establish identity, even at a different school.
+          skipped.push({ row, requestId: error.requestId, matches, sameSchool, selected: false });
         } else failed.push({ name: error.name, message: error.message });
       }
       setImportProgress({ done: Math.min(ready.length, start + batch.length), total: ready.length });
@@ -1432,7 +1433,7 @@ function StudentDirectory({
                 <div>
                   <p className="font-bold text-amber-950">Check for an existing account</p>
                   <p className="mt-1 text-sm text-amber-900">
-                    A matching name already exists. Link the existing account with its Explorer Code when it is the same child.
+                    A possible name match was found. Names alone do not confirm identity. Link the existing account with its Explorer Code when it is the same child.
                   </p>
                 </div>
                 <div className="divide-y divide-amber-200 rounded-md border border-amber-200 bg-white">
@@ -1657,13 +1658,13 @@ function StudentDirectory({
               <div className="space-y-4">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{importResult.added}</p><p className="text-xs font-semibold text-slate-600">students added</p></div>
-                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.length}</p><p className="text-xs font-semibold text-slate-600">already in RELIQ, skipped</p></div>
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.length}</p><p className="text-xs font-semibold text-slate-600">possible matches — review</p></div>
                   <div className="rounded-xl border border-[#E3E5E0] p-4"><p className={`font-display text-3xl font-black ${importResult.failed.length ? "text-red-700" : "text-[#121314]"}`}>{importResult.failed.length}</p><p className="text-xs font-semibold text-slate-600">couldn&apos;t be added</p></div>
                 </div>
                 {importResult.skipped.length ? (
                   <div className="rounded-xl border border-[#E3E5E0]">
                     <p className="border-b border-[#E3E5E0] px-4 py-3 text-sm text-slate-700">
-                      <b>These names already belong to a student in RELIQ.</b> Tick the ones that are <b>different children</b> and add them. Leave unticked anyone who is already at this school.
+                      <b>Possible name matches need your review.</b> Names alone do not confirm these are the same children. Only tick a child after confirming they are a <b>different person</b>. For the same child, use their existing account.
                     </p>
                     <ul className="max-h-60 divide-y divide-slate-100 overflow-y-auto">
                       {importResult.skipped.map((item) => (
@@ -1673,7 +1674,7 @@ function StudentDirectory({
                             <span>
                               <b>{item.row.firstName} {item.row.lastName}</b> <span className="text-slate-500">({item.row.schoolYear})</span>
                               <span className={`block text-xs ${item.sameSchool ? "font-semibold text-amber-800" : "text-slate-500"}`}>
-                                {item.sameSchool ? "Already at this school · " : ""}Matches {item.matches.join("; ")}
+                                {item.sameSchool ? "Matching name at this school · " : ""}Matches {item.matches.join("; ")}
                               </span>
                             </span>
                           </label>
@@ -1727,7 +1728,7 @@ function StudentDirectory({
                       <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{ready}</p><p className="text-xs font-semibold text-slate-600">ready to add · {byYear.map(([year, count]) => `${year.replace("Year ", "Y")} ${count}`).join(" · ")}</p></div>
                       <div className={`rounded-xl border p-4 ${issues.length ? "border-red-200 bg-red-50" : "border-[#E3E5E0]"}`}><p className={`font-display text-3xl font-black ${issues.length ? "text-red-700" : "text-[#121314]"}`}>{issues.length}</p><p className="text-xs font-semibold text-slate-600">{issues.length ? "need fixing below (or they'll be left out)" : "need fixing"}</p></div>
                     </div>
-                    <p className="text-xs text-slate-500">Students already in RELIQ are recognised when you add them and skipped, so uploading again is safe.</p>
+                    <p className="text-xs text-slate-500">Possible name matches are held for review before creating accounts. Check them carefully when uploading a list again.</p>
                     {issues.length ? (
                       <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200">
                         <table className="w-full text-left text-xs">
