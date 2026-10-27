@@ -1,5 +1,6 @@
 "use client";
 
+import { useBankedXp } from "@/components/lesson/useBankedXp";
 import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -338,6 +339,7 @@ function LessonPage() {
   // Teacher-set brain-break frequency (per-student override → class default →
   // "normal"). Fetched fresh each lesson so teacher changes apply next session.
   const [brainBreakFrequency, setBrainBreakFrequency] = useState<BrainBreakFrequency>("normal");
+  const prepXp = useBankedXp("lesson");
   useEffect(() => {
     const studentId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_STUDENT_KEY) : null;
     if (!studentId) return;
@@ -812,8 +814,8 @@ function LessonPage() {
           <h2 className="mt-3 text-3xl font-black text-slate-900">{prepSuccessTitle}</h2>
           <p className="mt-2 text-lg font-semibold text-teal-800">{prepUnlockText}</p>
           <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-700">XP Reward</div>
-            <div className="mt-1 text-3xl font-black text-amber-900">10 XP</div>
+            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-700">{prepXp.label}</div>
+            <div className="mt-1 text-3xl font-black text-amber-900">{prepXp.value}{prepXp.value.startsWith("+") ? " XP" : ""}</div>
           </div>
           <div className="mt-5 grid grid-cols-3 gap-3 text-center">
             <div className="rounded-2xl border border-cyan-100 bg-white px-3 py-3">

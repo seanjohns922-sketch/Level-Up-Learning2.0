@@ -9632,7 +9632,7 @@ function SessionPage({
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">
-                      <Zap className="h-3.5 w-3.5" /> {liveCorrectCount} XP
+                      <Zap className="h-3.5 w-3.5" /> {liveCorrectCount} correct
                     </div>
                     <button
                       type="button"

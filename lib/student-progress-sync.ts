@@ -1,5 +1,7 @@
 "use client";
 
+import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
+import { xpAwardDone, xpAwardFailed, xpAwardSaving } from "@/lib/xp-award-store";
 import { YEAR_ORDER } from "@/data/yearOrder";
 import { isProgressRealmScope, type ProgressRealmScope, type StudentProgress, writeProgress } from "@/data/progress";
 import { makeProgramProgressKey, readProgramStore, writeProgramStore, type ProgramProgressStore } from "@/lib/program-progress";
@@ -326,23 +328,34 @@ export async function saveRealmLessonAttempt(
 ) {
   if (isDemoPreviewMode()) return;
 
-  const studentRow = await getStudentRuntimeContext(studentId);
+  xpAwardSaving("lesson");
+  let completed: unknown;
+  try {
+    const studentRow = await getStudentRuntimeContext(studentId);
 
-  const { data: completed, error } = await supabase.rpc("complete_realm_lesson", {
-    p_student_id: studentId,
-    p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: realmId,
-    p_program_key: realmProgramKey(year, realmId),
-    p_school_year_level: studentRow?.school_year_level ?? null,
-    p_working_level: year,
-    p_week: week,
-    p_lesson: lessonNumber,
-    p_lesson_id: lessonId,
-    p_completion_key: completionKey,
-    p_attempt: attempt,
-    p_xp: 40,
-  });
-  if (error) throw error;
+    const result = await supabase.rpc("complete_realm_lesson", {
+      p_student_id: studentId,
+      p_class_id: studentRow?.class_id ?? null,
+      p_realm_id: realmId,
+      p_program_key: realmProgramKey(year, realmId),
+      p_school_year_level: studentRow?.school_year_level ?? null,
+      p_working_level: year,
+      p_week: week,
+      p_lesson: lessonNumber,
+      p_lesson_id: lessonId,
+      p_completion_key: completionKey,
+      p_attempt: attempt,
+      // Ignored by the server once the XP rules migration is applied (it pays LESSON_XP itself).
+      p_xp: LESSON_XP,
+    });
+    if (result.error) throw result.error;
+    completed = result.data;
+  } catch (error) {
+    xpAwardFailed("lesson");
+    throw error;
+  }
+  // true = first completion of this lesson, which banks the lesson's XP.
+  xpAwardDone("lesson", completed === true ? LESSON_XP : 0);
 
   if (completed === true) {
     const { error: discoveryError } = await supabase.rpc("discover_realm_collectible_secure", {
@@ -381,29 +394,38 @@ export async function saveNumberWeeklyQuizAttempt(
 ) {
   if (isDemoPreviewMode()) return;
 
-  const studentRow = await getStudentRuntimeContext(studentId);
+  xpAwardSaving("quiz");
+  let rewardEligible: unknown;
+  try {
+    const studentRow = await getStudentRuntimeContext(studentId);
 
-  const quizId = quizIdForRealm(year, week, realmId);
+    const quizId = quizIdForRealm(year, week, realmId);
 
-  const percent = typeof attempt.percent === "number" ? attempt.percent : 0;
-  const { data: rewardEligible, error } = await supabase.rpc("complete_realm_quiz", {
-    p_student_id: studentId,
-    p_class_id: studentRow?.class_id ?? null,
-    p_realm_id: realmId,
-    p_program_key: realmProgramKey(year, realmId),
-    p_school_year_level: studentRow?.school_year_level ?? null,
-    p_working_level: year,
-    p_week: week,
-    p_quiz_id: quizId,
-    p_completion_key: completionKey,
-    p_attempt: attempt,
-    p_xp: Math.round((percent / 100) * 60),
-  });
-  if (error) throw error;
-
-  if (rewardEligible === true) {
-    void awardAndReveal(studentId, "quiz", completionKey);
+    const percent = typeof attempt.percent === "number" ? attempt.percent : 0;
+    const result = await supabase.rpc("complete_realm_quiz", {
+      p_student_id: studentId,
+      p_class_id: studentRow?.class_id ?? null,
+      p_realm_id: realmId,
+      p_program_key: realmProgramKey(year, realmId),
+      p_school_year_level: studentRow?.school_year_level ?? null,
+      p_working_level: year,
+      p_week: week,
+      p_quiz_id: quizId,
+      p_completion_key: completionKey,
+      p_attempt: attempt,
+      // Ignored by the server once the XP rules migration is applied (it pays QUIZ_PASS_XP on a first pass).
+      p_xp: Math.round((percent / 100) * QUIZ_PASS_XP),
+    });
+    if (result.error) throw result.error;
+    rewardEligible = result.data;
+  } catch (error) {
+    xpAwardFailed("quiz");
+    throw error;
   }
+  // true = this attempt banked the quiz's XP (its first pass).
+  xpAwardDone("quiz", rewardEligible === true ? QUIZ_PASS_XP : 0);
+  // Gems are judged on the server from all attempts, so check after every quiz.
+  void awardAndReveal(studentId, "quiz", completionKey);
 }
 
 export async function saveRealmAssessment(

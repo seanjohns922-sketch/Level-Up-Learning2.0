@@ -2,10 +2,12 @@
 
 import { ChartColumn, Dices, Hourglass, Orbit, Sigma, Zap } from "lucide-react";
 
-const XP_PER_CORRECT = 10;
+// The bar fills as answers come in. XP itself is banked once, when the lesson
+// is finished (LESSON_XP), so the bar counts correct answers, not XP.
+const POINTS_PER_CORRECT = 10;
 
-export function calcXP(correct: number) {
-  return correct * XP_PER_CORRECT;
+function calcPoints(correct: number) {
+  return correct * POINTS_PER_CORRECT;
 }
 
 export function LessonXPBar({
@@ -33,12 +35,12 @@ export function LessonXPBar({
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
   const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
-  const earned = mode === "progress" ? Math.max(0, currentValue ?? 0) : calcXP(correct ?? 0);
+  const earned = mode === "progress" ? Math.max(0, currentValue ?? 0) : calcPoints(correct ?? 0);
   const max = mode === "progress"
     ? Math.max(1, maxValue ?? 1)
-    : Math.max(1, (totalTarget ?? 0) * XP_PER_CORRECT);
+    : Math.max(1, (totalTarget ?? 0) * POINTS_PER_CORRECT);
   const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
-  const leftLabel = valueLabel ?? (mode === "progress" ? `${earned} / ${max}` : `${earned} / ${max} XP`);
+  const leftLabel = valueLabel ?? (mode === "progress" ? `${earned} / ${max}` : `${correct ?? 0} / ${Math.max(1, totalTarget ?? 0)} correct`);
   const defaultRight = isMeasurement
     ? (mode === "progress" ? "Explorer Progress" : "Journey Progress")
     : isStarpath

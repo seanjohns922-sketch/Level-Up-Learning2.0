@@ -1,7 +1,7 @@
 "use client";
 
 import { Trophy, Star, Target, CheckCircle } from "lucide-react";
-import { calcXP } from "./LessonXPBar";
+import { useBankedXp } from "./useBankedXp";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -9,7 +9,6 @@ export function LessonCompleteCard({
   lessonTitle,
   questionsAnswered,
   correctAnswers,
-  xpCorrectAnswers,
   accuracy,
   onExit,
   realmId,
@@ -30,7 +29,7 @@ export function LessonCompleteCard({
   completionMessage?: string;
   exitLabel?: string;
 }) {
-  const xp = calcXP(xpCorrectAnswers ?? correctAnswers);
+  const xp = useBankedXp("lesson");
   const theme = getRealmTheme(realmId);
   const resolvedTitle = completionTitle ?? lessonTitle;
   const resolvedMessage = completionMessage ?? "Nice work. Your progress has been updated.";
@@ -39,7 +38,7 @@ export function LessonCompleteCard({
     "Lesson complete.",
     `${resolvedTitle}.`,
     `${resolvedMessage}`,
-    `You earned ${xp} X P.`,
+    xp.spoken,
     `You answered ${questionsAnswered} questions and got ${correctAnswers} correct.`,
     `Your accuracy was ${Math.round(accuracy)} percent.`,
     `Next button: ${resolvedExitLabel}.`,
@@ -118,10 +117,10 @@ export function LessonCompleteCard({
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Star className="h-3.5 w-3.5 text-amber-200" />
               <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-amber-200">
-                XP Earned
+                {xp.label}
               </span>
             </div>
-            <div className="text-3xl font-bold text-amber-100">{xp} XP</div>
+            <div className="text-3xl font-bold text-amber-100">{xp.value}{xp.value.startsWith("+") ? " XP" : ""}</div>
           </div>
 
           {/* Stats — 3 col, matches HUD aesthetic */}

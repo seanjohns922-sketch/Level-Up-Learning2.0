@@ -5,7 +5,7 @@ import { useEffect, useState, type ComponentType } from "react";
 import { Frown, Meh, Smile, Zap, Star, Flame, Bot, Ruler, Orbit } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ACTIVE_STUDENT_KEY } from "@/data/progress";
-import { calcXP } from "./LessonXPBar";
+import { useBankedXp } from "./useBankedXp";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -159,7 +159,7 @@ function StatChips({
   accuracyValue,
   accuracyLabel,
 }: {
-  xp: number;
+  xp: { value: string; label: string };
   chain: number;
   accuracy: number;
   accuracyBorder: string;
@@ -170,8 +170,8 @@ function StatChips({
   return (
     <div className="mt-5 grid grid-cols-3 gap-3">
       <div className="rounded-2xl border border-amber-300/25 bg-amber-400/10 px-2 py-3">
-        <div className="text-2xl font-black text-amber-200">+{xp}</div>
-        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300/70">XP Earned</div>
+        <div className="text-2xl font-black text-amber-200">{xp.value}</div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300/70">{xp.label}</div>
       </div>
       <div className="rounded-2xl border border-orange-300/25 bg-orange-400/10 px-2 py-3">
         <div className="flex items-center justify-center gap-1 text-2xl font-black text-orange-200">
@@ -205,7 +205,6 @@ export default function LessonReflection({
   week,
   accuracy,
   questionsAnswered,
-  correctAnswers,
   bestChain = 0,
   realmId,
   copy,
@@ -216,9 +215,9 @@ export default function LessonReflection({
   const band = bandFromProps(levelNumber, level);
   const mascot = mascotForRealm(realmId);
   const theme = getRealmTheme(realmId);
-  const xp = calcXP(correctAnswers);
+  const xp = useBankedXp("lesson");
   const stars = accuracy >= 85 ? 3 : accuracy >= 60 ? 2 : 1;
-  const spokenStats = `You earned ${xp} X P. Your best chain was ${bestChain}. Your accuracy was ${Math.round(accuracy)} percent.`;
+  const spokenStats = `${xp.spoken} Your best chain was ${bestChain}. Your accuracy was ${Math.round(accuracy)} percent.`;
 
   const statChipProps = theme.isMeasurement
     ? {

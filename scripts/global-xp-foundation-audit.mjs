@@ -67,11 +67,25 @@ check(
     hardening.indexOf("insert into public.student_economy_transactions") <
       hardening.indexOf("perform public.upsert_student_activity_daily"),
 );
+const xpRules = read("supabase/migrations/20261027120000_server_side_xp_rules.sql");
 check(
-  "Number Nexus and Measurelands share lesson and quiz award amounts",
-  progressSync.includes("p_xp: 40") &&
-    progressSync.includes("p_xp: Math.round((percent / 100) * 60)") &&
-    progressSync.includes('realmId: StudentProgressRealmId = "number"'),
+  "Every realm shares lesson and quiz award amounts, set by the server",
+  progressSync.includes("p_xp: LESSON_XP") &&
+    progressSync.includes('realmId: StudentProgressRealmId = "number"') &&
+    xpRules.includes("lesson_xp constant integer := 40;") &&
+    xpRules.includes("quiz_pass_xp constant integer := 60;") &&
+    !/apply_completion_xp\([\s\S]{0,200}p_xp,/.test(xpRules),
+);
+check(
+  "Quiz XP pays once, on the first pass (80%+)",
+  xpRules.includes("reward_eligible := this_passed and not passed_before;") &&
+    xpRules.includes("quiz_pass_percent constant integer := 80;"),
+);
+check(
+  "Brain-break XP checks the student and limits awards per day",
+  xpRules.includes("perform public.assert_student_write(p_student_id);") &&
+    xpRules.includes("awards_today >= 30") &&
+    xpRules.includes("least(greatest(coalesce(p_xp, 0), 0), 10)"),
 );
 check(
   "Historical XP backfill is cross-realm, conservative, and replay-safe",

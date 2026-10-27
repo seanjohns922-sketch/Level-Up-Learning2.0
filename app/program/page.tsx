@@ -1,5 +1,6 @@
 "use client";
 
+import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
 import ReliqRealmLogo from "@/components/brand/ReliqRealmLogo";
 import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -887,8 +888,10 @@ function ProgramPage() {
     if (nextWeek !== savedWeek) updateProgress({ assignedWeek: nextWeek }, canonicalRealmId);
   }, [isExpeditionWeek, canonicalRealmId, curriculumYear, hasPersonalizedPlan, isStarpathRealm, lastWeek, previewMode, realmId, store, weekComplete, weekNum]);
 
-  const xp = lessonsDoneCount * 10 + (hasWeeklyQuizThisWeek && progress.quizCompleted ? 20 : 0);
-  const totalXp = hasWeeklyQuizThisWeek ? 50 : 30;
+  // Same rules the server pays: LESSON_XP per lesson finished, QUIZ_PASS_XP once the quiz is passed.
+  const weekQuizPassed = hasWeeklyQuizThisWeek && weeklyQuizPassed(progress.quizBestScore ?? progress.quizScore ?? 0);
+  const xp = lessonsDoneCount * LESSON_XP + (weekQuizPassed ? QUIZ_PASS_XP : 0);
+  const totalXp = 3 * LESSON_XP + (hasWeeklyQuizThisWeek ? QUIZ_PASS_XP : 0);
   const percent = Math.round((xp / totalXp) * 100);
   const realmHomeRoute = isStarpathRealm && starpathProgram
     ? buildStarpathWorldHref({ selectedLevel: starpathProgram.definition.id })
@@ -1900,7 +1903,7 @@ function ProgramPage() {
                     {/* Row 3: XP + action button */}
                     <div className={`relative flex items-center justify-between pt-2 border-t ${rt.dividerColor ?? "border-teal-400/15"}`}>
                       <span className={`text-[10px] font-mono font-bold tracking-[0.14em] ${rt.xpLabelColor ?? "text-teal-200/70"}`}>
-                        {isPostTest ? "MASTERY" : isLesson ? "10 XP" : comingSoon ? "QUIZ" : "20 XP"}
+                        {isPostTest ? "MASTERY" : isLesson ? `${LESSON_XP} XP` : comingSoon ? "QUIZ" : `${QUIZ_PASS_XP} XP`}
                       </span>
                       {locked ? (
                         <span className="text-[10px] font-mono font-extrabold text-slate-400">

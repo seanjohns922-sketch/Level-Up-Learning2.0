@@ -1665,7 +1665,7 @@ export function Year2LessonEngine({
                   : status === "correct"
                     ? showMultiStepCalculationFeedback
                       ? "Nice — well worked."
-                      : "✓ Correct! +10 XP"
+                      : "✓ Correct! Keep going!"
                     : showMultiStepCalculationFeedback
                       ? "Check each step carefully."
                       : "✗ Not quite — keep going!"}

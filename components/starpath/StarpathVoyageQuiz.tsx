@@ -1,5 +1,7 @@
 "use client";
 
+import { useBankedXp } from "@/components/lesson/useBankedXp";
+import { QUIZ_PASS_XP } from "@/lib/xp-rules";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {useDemoPreviewMode} from "@/lib/demo-mode";
 import {newLevel7QuizAttempt} from "@/lib/level7-quiz";
@@ -57,7 +59,6 @@ type SavedVoyageQuiz = {
   responses?: Record<string, string>;
 };
 
-const QUIZ_XP = 20;
 
 function taskFeedback(task: PracticeTask) {
   return (task as { feedback?: { correct: string; wrong: string } }).feedback;
@@ -161,6 +162,9 @@ export default function StarpathVoyageQuiz({
   const storageKey = `${realm}-weekly-quiz:${level8Review?"level8-v2":cave7?"v6":"v2"}:${level8Review?"demo":getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
+  const quizXp = useBankedXp("quiz");
+  // What passing banked: the quiz's XP on a first pass, nothing on a later pass.
+  const passXpText = quizXp.banked > 0 ? `earned ${quizXp.banked} XP` : quizXp.label === "XP already earned" ? "already have this quiz's XP" : `earn ${QUIZ_PASS_XP} XP`;
   // Each new attempt gets its own questions; the attempt number is saved so a resume shows the same ones.
   const [attempt, setAttempt] = useState(0);
   const tasks = useMemo(() => (buildTasks ? buildTasks(attempt) : fixedTasks ?? []), [buildTasks, attempt, fixedTasks]);
@@ -215,7 +219,7 @@ export default function StarpathVoyageQuiz({
     resultsTitle,
     `You answered ${finalScore} out of ${total} questions correctly. Your score was ${percent} percent.`,
     passed
-      ? `You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent} percent mark and earned ${QUIZ_XP} X P.`
+      ? `You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent} percent mark and ${passXpText.replace("XP", "X P")}.`
       : `You need ${requiredCorrect} out of ${total} to pass. Week ${quiz.week + 1} is not unlocked yet.`,
     ...lessonScores.map((result) =>
       `${isLessonRealm ? "Lesson" : "Mission"} ${result.lesson}, ${result.title}: ${result.score} out of 5.`
@@ -231,7 +235,7 @@ export default function StarpathVoyageQuiz({
       ? `You can continue to Week ${quiz.week + 1}.`
       : `You can return to Week ${quiz.week}.`,
   ].filter(Boolean).join(" ");
-  const quizIntroduction = `${quiz.title}. Great work completing this week's ${unitLabel}s! It is time to show what you discovered across all three ${unitLabel}s. There are 15 questions, with five questions from each ${unitLabel}. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. You can earn ${QUIZ_XP} XP, chain progress, and gems.`;
+  const quizIntroduction = `${quiz.title}. Great work completing this week's ${unitLabel}s! It is time to show what you discovered across all three ${unitLabel}s. There are 15 questions, with five questions from each ${unitLabel}. The quiz takes approximately 8 to 10 minutes. Work at your own pace. The pass mark is 80 percent. Pass to earn ${QUIZ_PASS_XP} XP, plus chain progress and gems.`;
   const backHref = getWorld3DReturnPathForQuiz({
     realmId: realm,
     level: quiz.level,
@@ -468,7 +472,7 @@ export default function StarpathVoyageQuiz({
                     { icon: BookOpen, value: "15 questions", label: `Five from each ${unitLabel}` },
                     { icon: Clock3, value: "8–10 minutes", label: "Work at your own pace" },
                     { icon: Trophy, value: "80% pass mark", label: "Show your mastery" },
-                    { icon: Gem, value: `${QUIZ_XP} XP`, label: "Plus chain and gems" },
+                    { icon: Gem, value: `${QUIZ_PASS_XP} XP`, label: "For passing · plus gems" },
                   ].map(({ icon: Icon, value, label }) => (
                     <div key={value} className="rounded-lg border border-white/10 bg-white/5 p-4 text-white">
                       <Icon className="h-6 w-6" style={{ color: theme.accent }} />
@@ -609,7 +613,7 @@ export default function StarpathVoyageQuiz({
               <p className="mt-2 text-base font-semibold text-slate-600">
                 You answered {finalScore}/{total} correctly.
                 {passed
-                  ? ` You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% mark and earned ${QUIZ_XP} XP.`
+                  ? ` You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% mark and ${passXpText}.`
                   : ` You need ${requiredCorrect}/${total} to pass and unlock Week ${quiz.week + 1}.`}
               </p>
               {!passed ? (

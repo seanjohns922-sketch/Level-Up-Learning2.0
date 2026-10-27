@@ -38,7 +38,8 @@ const checks = [
   ["retakes remain recorded", (migration.match(/perform public\.save_realm_(?:lesson_attempt|weekly_quiz_attempt)/g) ?? []).length === 2],
   ["XP is gated for lessons and quizzes", (migration.match(/if reward_eligible then/g) ?? []).length === 2],
   ["retakes record activity with zero XP", (migration.match(/perform public\.upsert_student_activity_daily/g) ?? []).length === 2],
-  ["quiz reveals are gated by server eligibility", /if \(rewardEligible === true\)[\s\S]*awardAndReveal\(studentId, "quiz"/.test(syncClient)],
+  // Quiz XP is paid by the server on a first pass; gems are judged on the server from every attempt.
+  ["quiz XP shown is what the server banked, and gems are checked after each quiz", /xpAwardDone\("quiz", rewardEligible === true \? QUIZ_PASS_XP : 0\)[\s\S]*awardAndReveal\(studentId, "quiz"/.test(syncClient)],
   ["lesson reveals are gated by server eligibility", /if \(completed === true\)[\s\S]*awardAndReveal\(studentId, "lesson"/.test(syncClient)],
   [
     "live table distinguishes lesson attempts",

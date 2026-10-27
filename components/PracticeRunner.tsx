@@ -1226,7 +1226,7 @@ export function PracticeRunner({
         : null;
   const statusMessage =
     status === "correct"
-      ? hint ?? (completionMode === "time_only" ? "✓ Correct! Keep going!" : "✓ Correct! +10 XP")
+      ? hint ?? (completionMode === "time_only" ? "✓ Correct! Keep going!" : "✓ Correct! Keep going!")
       : status === "wrong"
         ? hint ?? "✗ Not quite — keep going!"
         : null;
