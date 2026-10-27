@@ -50,6 +50,18 @@ export function getSchoolLogo(school: { name?: string | null; code?: string | nu
   }
 
   if (
+    nameKey === "yarrawongacollege"
+    || nameKey === "yarrawongacollegep12"
+    || nameKey === "yarrawongap12college"
+    || nameKey === "yarrawongap12"
+  ) {
+    return {
+      src: "/schools/yarrawonga-college-logo.png",
+      alt: `${school.name ?? "Yarrawonga College P-12"} logo`,
+    };
+  }
+
+  if (
     nameKey === "stmarysthornbury"
     || nameKey === "stmarysschoolthornbury"
     || nameKey === "stmarysprimaryschoolthornbury"
