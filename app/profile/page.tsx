@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { getLastRealm } from "@/lib/last-realm";
 import { profileRealmSummary } from "@/lib/profile-realm-summary";
-import { getLiveRealmDefinitions, tryCanonicalRealmId, type LiveRealmId } from "@/lib/realms/realm-registry";
+import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
 import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
 import { fetchRealmCompatProgressForStudent, type CompatProgressRow } from "@/lib/realm-progress-compat";
@@ -13,29 +12,14 @@ import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { resolveStudentNameParts } from "@/lib/studentName";
 import { supabase } from "@/lib/supabase";
 import { fetchGlobalXp, getExplorerRank } from "@/lib/economy";
-import {
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Clock,
-  Flame,
-  Lock,
-  LogOut,
-  Medal,
-  Search,
-  Settings,
-  Star,
-  Swords,
-  Target,
-  TrendingUp,
-  Trophy,
-  Users,
-  Zap,
-  BookOpen,
-  House,
-  ShoppingBag,
-} from "lucide-react";
+import { Check, ChevronLeft, Copy, LogOut, Settings, Zap } from "lucide-react";
+import GemIcon, { cutForGem, emblemForGem } from "@/components/gems/GemIcon";
+import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
+import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
+import { useDemoPreviewMode } from "@/lib/demo-mode";
+import { fetchGemVault, type GemDefinition, type GemVault } from "@/lib/gems";
+import { stoneForGem } from "@/lib/gem-stones";
+import { collectedReliqsByRealm, type CollectedReliqs } from "@/lib/reliqs-collected";
 
 const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
@@ -44,39 +28,7 @@ const REALM_IMAGES: Record<string, string> = {
   space: "/images/starpath-home-bg-y3.png", statistics: "/images/statistica-home-y3.png",
   pattern: "/images/patternpeaks-home-bg-y3.jpeg", chance: "/images/chancehollow-home-y3.jpeg",
 };
-const REALMS = [
-  ...getLiveRealmDefinitions().map(realm => ({ id: realm.realmId as string, name: realm.name, icon: BookOpen, status: "active", route: `/${realm.slug}`, image: REALM_IMAGES[realm.realmId] })),
-  ...["Reading Ridge", "Inkwell Wilds", "Runehaven Peaks"].map(name => ({ id: name, name, icon: BookOpen, status: "coming-soon", route: "", image: "" })),
-];
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
-
-const SOCIAL_TEASERS = [
-  {
-    icon: Users,
-    label: "Friends",
-    copy: "Coming soon: add classmates, celebrate progress, and cheer each other on.",
-  },
-  {
-    icon: Swords,
-    label: "Battles",
-    copy: "Coming soon: friendly skill battles where students can challenge others using maths questions.",
-  },
-  {
-    icon: Medal,
-    label: "Rankings",
-    copy: "Coming soon: class and school leaderboards based on effort, streaks and learning progress.",
-  },
-];
-
-type SnapshotRow = {
-  lesson_attempts?: Record<
-    string,
-    {
-      attempts?: Array<Record<string, unknown>>;
-      latestSummary?: Record<string, unknown> | null;
-    }
-  > | null;
-};
 
 function readStudentNameFromStorage() {
   if (typeof window === "undefined") return "Adventurer";
@@ -156,39 +108,6 @@ function formatDurationCompact(totalSeconds: number) {
   return safeSeconds > 0 ? "<1m" : "0m";
 }
 
-function toSafeNumber(value: unknown) {
-  const next = typeof value === "number" ? value : Number(value ?? 0);
-  return Number.isFinite(next) ? next : 0;
-}
-
-function computeOverallLessonAccuracy(rows: SnapshotRow[]) {
-  let totalCorrect = 0;
-  let totalQuestions = 0;
-
-  rows.forEach((row) => {
-    const attemptsByLesson = row.lesson_attempts ?? {};
-    Object.values(attemptsByLesson).forEach((entry) => {
-      const attempts = Array.isArray(entry?.attempts)
-        ? entry.attempts
-        : entry?.latestSummary && typeof entry.latestSummary === "object"
-          ? [entry.latestSummary]
-          : [];
-
-      attempts.forEach((attempt) => {
-        if (typeof attempt?.completedAt !== "string" && typeof attempt?.at !== "string") return;
-        const total = toSafeNumber(attempt?.totalQuestions ?? attempt?.questionsAnswered);
-        const correct = toSafeNumber(attempt?.correctCount ?? attempt?.correctAnswers);
-        if (total <= 0) return;
-        totalQuestions += total;
-        totalCorrect += Math.min(correct, total);
-      });
-    });
-  });
-
-  if (totalQuestions <= 0) return null;
-  return Math.round((totalCorrect / totalQuestions) * 100);
-}
-
 function calculateDayStreak(activityKeys: Set<string>) {
   if (activityKeys.size === 0) return 0;
 
@@ -227,7 +146,7 @@ function formatActivitySummary(row: StudentActivityDailyRow) {
     details.push(`${row.lessons_completed} lesson${row.lessons_completed === 1 ? "" : "s"} completed`);
   }
   if (row.questions_answered > 0) {
-    details.push(`${Math.round((row.correct_answers / row.questions_answered) * 100)}% accuracy`);
+    details.push(`${row.questions_answered} question${row.questions_answered === 1 ? "" : "s"}`);
   }
   return details.length > 0 ? details.join(" • ") : "Started learning";
 }
@@ -238,17 +157,9 @@ export default function ProfilePage() {
   const [realmRows, setRealmRows] = useState<CompatProgressRow[]>([]);
   const [studentName, setStudentName] = useState(readStudentNameFromStorage);
   const [activityRows, setActivityRows] = useState<StudentActivityDailyRow[]>([]);
-  const [persistedAccuracy, setPersistedAccuracy] = useState<number | null>(null);
   const [globalXp, setGlobalXp] = useState<{ balance: number; lifetime: number } | null>(null);
   const [explorerCode, setExplorerCode] = useState<string | null>(null);
   const [explorerCodeCopied, setExplorerCodeCopied] = useState(false);
-  const [openTooltip, setOpenTooltip] = useState<string | null>(null);
-  // Resolved after mount to avoid an SSR/client hydration mismatch on localStorage.
-  const [lastRealm, setLastRealmState] = useState("number-nexus");
-
-  useEffect(() => {
-    queueMicrotask(() => setLastRealmState(getLastRealm() ?? "number-nexus"));
-  }, []);
 
   useEffect(() => {
     const studentId = getActiveStudentProfile()?.studentId;
@@ -260,9 +171,6 @@ export default function ProfilePage() {
     return () => { cancelled = true; };
   }, []);
   const realmSummaries = useMemo(() => Object.fromEntries(getLiveRealmDefinitions().map(realm => [realm.realmId, profileRealmSummary(realm.realmId, realmRows)])), [realmRows]);
-  const currentRealm = realmSummaries[tryCanonicalRealmId(lastRealm) ?? "number"];
-  const lastRealmLabel = currentRealm?.name ?? "realm";
-  const lastRealmRoute = currentRealm?.route ?? "/world";
 
   useEffect(() => {
     const profile = getActiveStudentProfile();
@@ -304,7 +212,6 @@ export default function ProfilePage() {
 
         setActivityRows(daily);
         setRealmRows(snapshotResponse.flat());
-        setPersistedAccuracy(computeOverallLessonAccuracy(snapshotResponse.flat() as SnapshotRow[]));
       } catch (error) {
         console.warn("[Profile] Failed to load activity stats:", error);
       }
@@ -319,7 +226,6 @@ export default function ProfilePage() {
     xp: globalXp?.balance ?? 0, lifetimeXp: globalXp?.lifetime ?? 0,
     completedLessons: Object.values(realmSummaries).reduce((sum, realm) => sum + (realm?.completedLessons ?? 0), 0),
     weeksCompleted: Object.values(realmSummaries).reduce((sum, realm) => sum + (realm?.weeksCompleted ?? 0), 0),
-    accuracy: 0,
   }), [globalXp, realmSummaries]);
 
   const initials = studentName.charAt(0).toUpperCase();
@@ -338,474 +244,454 @@ export default function ProfilePage() {
     () => activityRows.reduce((sum, row) => sum + Math.max(0, row.seconds_active ?? 0), 0),
     [activityRows]
   );
-  const displayedActiveSeconds = useMemo(
-    () => Math.max(totalActiveSeconds, stats.completedLessons * 9 * 60),
-    [stats.completedLessons, totalActiveSeconds]
-  );
   const dayStreak = useMemo(() => calculateDayStreak(activityKeys), [activityKeys]);
-  const dashboardAccuracy = persistedAccuracy ?? (stats.completedLessons > 0 ? stats.accuracy : null);
 
-  const recentActivity = useMemo(() => {
-    const items: { icon: typeof Star; text: string; color: string }[] = [];
-    if (stats.completedLessons > 0) {
-      items.push({
-        icon: BookOpen,
-        text: `Completed ${stats.completedLessons} lesson${stats.completedLessons !== 1 ? "s" : ""}`,
-        color: "text-[#0EA5A4]",
-      });
+  const bestStreak = useMemo(() => longestStreak(activityKeys), [activityKeys]);
+  const weekDays = useMemo(() => currentWeekKeys(), []);
+  const questionsAnswered = useMemo(() => activityRows.reduce((sum, row) => sum + Math.max(0, row.questions_answered ?? 0), 0), [activityRows]);
+  const weekKeySet = useMemo(() => new Set(weekDays.map((day) => day.key)), [weekDays]);
+  const thisWeek = useMemo(() => activityRows.filter((row) => weekKeySet.has(row.activity_date)).reduce(
+    (sum, row) => ({ questions: sum.questions + Math.max(0, row.questions_answered ?? 0), seconds: sum.seconds + Math.max(0, row.seconds_active ?? 0) }),
+    { questions: 0, seconds: 0 },
+  ), [activityRows, weekKeySet]);
+  const learningDaysThisMonth = useMemo(() => {
+    const prefix = `${calendarYear}-${String(monthIndex + 1).padStart(2, "0")}-`;
+    return activityRows.filter((row) => row.activity_date.startsWith(prefix)).length;
+  }, [activityRows, calendarYear, monthIndex]);
+  const xpToNextRank = Math.max(0, explorerRank.nextLevelXp - explorerRank.currentXp);
+
+  const demoPreview = useDemoPreviewMode();
+  const [reliqs, setReliqs] = useState<CollectedReliqs[]>([]);
+  useEffect(() => {
+    // Progress lives in this browser's realm records; read it after mount.
+    queueMicrotask(() => setReliqs(collectedReliqsByRealm(demoPreview)));
+  }, [demoPreview]);
+  const reliqsEarned = reliqs.reduce((sum, realm) => sum + realm.collected, 0);
+  const reliqsTotal = reliqs.reduce((sum, realm) => sum + realm.total, 0);
+
+  const [gemVault, setGemVault] = useState<GemVault | null>(null);
+  useEffect(() => {
+    const studentId = getActiveStudentProfile()?.studentId;
+    if (!studentId) return;
+    let cancelled = false;
+    void fetchGemVault(studentId).then((vault) => { if (!cancelled) setGemVault(vault); })
+      .catch((error) => console.warn("[Profile] Gem Vault could not be loaded", error));
+    return () => { cancelled = true; };
+  }, []);
+  const gems = useMemo(() => {
+    const definitions = gemVault?.definitions ?? [];
+    const byId = new Map(definitions.map((gem) => [gem.id, gem]));
+    const owned = [...(gemVault?.owned ?? [])].sort((a, b) => b.earned_at.localeCompare(a.earned_at));
+    const ownedIds = new Set(owned.map((gem) => gem.gem_id));
+    const latest = owned.map((gem) => ({ gem: byId.get(gem.gem_id), earnedAt: gem.earned_at })).filter((entry): entry is { gem: GemDefinition; earnedAt: string } => Boolean(entry.gem));
+    // The gem they are closest to: the highest share of its target, not yet earned.
+    const next = definitions
+      .filter((gem) => gem.is_active && !ownedIds.has(gem.id) && gem.target > 0 && gem.current > 0 && gem.current < gem.target)
+      .sort((a, b) => b.current / b.target - a.current / a.target)[0] ?? null;
+    return { count: owned.length, latest, next };
+  }, [gemVault]);
+
+  const realmCards = useMemo(() => getLiveRealmDefinitions().map((realm) => {
+    const summary = realmSummaries[realm.realmId];
+    return {
+      id: realm.realmId,
+      name: realm.name,
+      color: reliqRealmColor(realm.realmId),
+      image: REALM_IMAGES[realm.realmId],
+      route: summary?.route ?? `/${realm.slug}`,
+      level: summary ? levelLabel(summary.year) : null,
+      weeksCompleted: summary?.weeksCompleted ?? 0,
+      totalWeeks: summary?.totalWeeks ?? 0,
+    };
+  }), [realmSummaries]);
+
+  const wins = useMemo(() => {
+    const items: Array<{ color: string; title: string; detail: string; when: string }> = [];
+    for (const { gem, earnedAt } of gems.latest.slice(0, 3)) {
+      items.push({ color: "#f5c451", title: "Gem earned", detail: gem.name, when: formatWhen(earnedAt) });
     }
-    if (dashboardAccuracy != null) {
-      items.push({
-        icon: Target,
-        text: `Accuracy at ${dashboardAccuracy}%`,
-        color: "text-[#0EA5A4]",
-      });
+    for (const realm of realmCards) {
+      if (realm.level && realm.totalWeeks > 0 && realm.weeksCompleted >= realm.totalWeeks) {
+        items.push({ color: realm.color, title: realm.name, detail: `Finished ${realm.level}`, when: "" });
+      }
     }
-    if (stats.weeksCompleted > 0) {
-      items.push({
-        icon: Trophy,
-        text: `${stats.weeksCompleted} week${stats.weeksCompleted !== 1 ? "s" : ""} mastered`,
-        color: "text-[#F59E0B]",
-      });
-    }
-    if (items.length === 0) {
-      items.push({ icon: Star, text: "Start your first lesson!", color: "text-[#94A3B8]" });
-    }
-    return items;
-  }, [dashboardAccuracy, stats.completedLessons, stats.weeksCompleted]);
+    if (explorerRank.level > 1) items.push({ color: "#c94df2", title: "Rank up", detail: `${explorerRank.title} · Rank ${explorerRank.level}`, when: "" });
+    if (bestStreak >= 2) items.push({ color: "#ff8a3d", title: "Best streak", detail: `${bestStreak} days in a row`, when: "" });
+    return items.slice(0, 5);
+  }, [bestStreak, explorerRank.level, explorerRank.title, gems.latest, realmCards]);
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[#F7F8FA] p-4 md:p-6">
-      <div className="mx-auto max-w-[1400px] space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#0F172A] transition-all hover:bg-[#F1F5F9]"
-              aria-label="Back"
-            >
-              <ChevronLeft className="h-4 w-4" />
+    <main className="relative min-h-screen overflow-x-hidden bg-[#120e1c] font-sans text-white">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[url('/images/central-world-valley-panorama.png')] bg-cover bg-[center_30%]" aria-hidden="true">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#120e1c]/40 to-[#120e1c]" />
+      </div>
+      <div className="relative mx-auto max-w-[1240px] px-4 pb-12 pt-5 sm:px-8">
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-4">
+            <button type="button" onClick={() => router.push("/world")} className={`${GLASS} inline-flex h-12 items-center gap-2 rounded-full px-5 font-display text-[13px] font-black tracking-[0.04em] hover:bg-white/10`}>
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />BACK TO MY WORLD
             </button>
-            <div className="hidden w-full max-w-md items-center gap-2 rounded-xl border border-[#E6E8EC] bg-white px-4 py-2.5 md:flex">
-              <Search className="h-4 w-4 text-[#94A3B8]" />
-              <span className="text-sm text-[#94A3B8]">Search your journey…</span>
-            </div>
+            <svg viewBox="0 0 279 79" role="img" aria-label="RELIQ" className="hidden h-auto w-[130px] sm:block">
+              <path fill="#FFFFFF" d={RELIQ_LETTERS_PATH} />
+              <path fill="#C94DF2" d={RELIQ_Q_PATH} />
+            </svg>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => router.push("/home-base")}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#F1F5F9] hover:text-[#0F172A]"
-              aria-label="Home Base"
-              title="Home Base"
-            >
-              <House className="h-[18px] w-[18px]" />
+          <div className="relative">
+            <button type="button" onClick={() => setSettingsOpen((open) => !open)} aria-expanded={settingsOpen} aria-label="Settings" title="Settings" className={`${GLASS} grid h-12 w-12 place-items-center rounded-full hover:bg-white/10`}>
+              <Settings className="h-5 w-5" aria-hidden="true" />
             </button>
-            <button
-              onClick={() => router.push("/marketplace")}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#FFF7ED] hover:text-[#B45309]"
-              aria-label="Marketplace"
-              title="Marketplace"
-            >
-              <ShoppingBag className="h-[18px] w-[18px]" />
-            </button>
-            <div className="flex items-center gap-3 rounded-xl border border-[#E6E8EC] bg-white px-3 py-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0F172A] text-sm font-black text-white">
-                {initials}
+            {settingsOpen ? (
+              <div className="absolute right-0 top-14 z-20 w-[300px] rounded-2xl bg-white p-2 text-[#16121f] shadow-2xl" role="dialog" aria-label="Settings">
+                <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-3">
+                  <div>
+                    <p className="font-display text-sm font-black">Auto Read</p>
+                    <p className="text-sm text-[#5f5670]">Read new questions aloud</p>
+                  </div>
+                  <button type="button" role="switch" aria-checked={autoReadEnabled} aria-label="Auto Read" onClick={() => setAutoReadEnabled(!autoReadEnabled)} className={`relative h-7 w-12 rounded-full transition ${autoReadEnabled ? "bg-[#C94DF2]" : "bg-[#d9d4e2]"}`}>
+                    <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${autoReadEnabled ? "left-6" : "left-1"}`} />
+                  </button>
+                </div>
+                {explorerCode ? (
+                  <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-3">
+                    <div className="min-w-0">
+                      <p className="font-display text-sm font-black">Explorer Code</p>
+                      <p className="truncate font-mono text-sm text-[#5f5670]">{explorerCode}</p>
+                    </div>
+                    <button type="button" onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(explorerCode);
+                        setExplorerCodeCopied(true);
+                        window.setTimeout(() => setExplorerCodeCopied(false), 1500);
+                      } catch { /* clipboard unavailable */ }
+                    }} aria-label="Copy Explorer Code" title={explorerCodeCopied ? "Copied" : "Copy Explorer Code"} className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-[#e6e0ee] hover:bg-[#f3eef8]">
+                      {explorerCodeCopied ? <Check className="h-4 w-4 text-[#3D6600]" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  </div>
+                ) : null}
+                <div className="my-1 border-t border-[#eee]" />
+                <button type="button" onClick={() => router.push("/login")} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold hover:bg-[#f3eef8]">
+                  <LogOut className="h-4 w-4" aria-hidden="true" />Log out
+                </button>
               </div>
-              <div className="hidden pr-1 sm:block">
-                <h2 className="text-sm font-bold leading-tight text-[#0F172A]">{studentName}</h2>
-                <p className="text-[10px] font-semibold text-[#64748B]">
-                  {explorerRank.title} · Rank {explorerRank.level}
-                </p>
-              </div>
-              <div title="Global XP available in every realm" className="flex items-center gap-1 rounded-md border border-[#FDE68A] bg-[#FEF3C7] px-2.5 py-1">
-                <Zap className="h-3 w-3 text-[#F59E0B]" />
-                <span className="text-xs font-extrabold text-[#B45309]">{globalXp == null ? "—" : stats.xp.toLocaleString()}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => router.push("/profile")}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#F1F5F9] hover:text-[#0F172A]"
-              aria-label="Settings"
-              title="Settings"
-            >
-              <Settings className="h-[18px] w-[18px]" />
-            </button>
-            <button
-              onClick={() => router.push("/login")}
-              className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E6E8EC] bg-white text-[#64748B] transition-all hover:bg-[#FEF2F2] hover:text-[#DC2626]"
-              aria-label="Logout"
-              title="Logout"
-            >
-              <LogOut className="h-[18px] w-[18px]" />
-            </button>
+            ) : null}
           </div>
-        </div>
+        </header>
 
-        <div className="relative overflow-hidden rounded-2xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-6 md:p-8">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#0EA5A4]/10 blur-3xl" />
-          <div className="relative flex items-center justify-between gap-4">
+        <section className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_1fr_1fr]" aria-label="About me">
+          <div className={`${GLASS} flex items-center gap-4 rounded-3xl p-5 sm:gap-5 sm:p-6`}>
+            <div className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-[20px] sm:h-24 sm:w-24 sm:rounded-[28px] bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-4xl font-black shadow-[0_12px_30px_rgba(140,46,172,0.5)]">{initials}</div>
             <div className="min-w-0 flex-1">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#94A3B8]">
-                {new Date().toLocaleDateString("en-AU", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}
-              </p>
-              <h1 className="text-2xl font-black leading-tight text-white md:text-3xl">
-                Welcome back, {studentName}!
-              </h1>
-              <p className="mt-1.5 max-w-md text-sm text-[#CBD5E1]">
-                {currentRealm ? `Your ${lastRealmLabel} journey continues. ${currentRealm.percent}% through ${currentRealm.year === "Prep" ? "Ground Level" : currentRealm.year.replace("Year", "Level")}.` : "Your learning journey continues."}
-              </p>
-              <button
-                onClick={() => router.push(lastRealmRoute)}
-                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#F59E0B] px-5 py-2.5 text-sm font-extrabold text-[#0F172A] transition-all hover:bg-[#FBBF24] active:scale-95"
-              >
-                Continue {lastRealmLabel} <ChevronRight className="h-4 w-4" />
-              </button>
+              <h1 className="truncate font-display text-2xl font-black leading-tight sm:text-[30px]">{studentName}</h1>
+              <p className="mt-1 font-bold text-[#e9d5ff]">{explorerRank.title} · Rank {explorerRank.level}</p>
+              <div className="mt-3 h-3.5 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label={`Progress to Rank ${explorerRank.level + 1}`} aria-valuenow={explorerRank.progressPercent} aria-valuemin={0} aria-valuemax={100}>
+                <div className="h-full rounded-full bg-gradient-to-r from-[#f5c451] to-[#ffdf7e]" style={{ width: `${Math.min(100, Math.max(0, explorerRank.progressPercent))}%` }} />
+              </div>
+              <div className="mt-1.5 flex justify-between gap-2 text-sm font-bold text-[#d8d2e4]">
+                <span><Zap className="mr-1 inline h-4 w-4 text-[#ffd76a]" aria-hidden="true" /><b className="text-[#ffd76a]">{stats.lifetimeXp} XP</b> earned</span>
+                <span>{xpToNextRank} XP to Rank {explorerRank.level + 1}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <section>
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#0F172A]">Your Stats</h3>
-            <button className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]">See all</button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[
-              { icon: Flame, value: String(dayStreak), label: "Day Streak", accent: "#F59E0B" },
-              { icon: Calendar, value: String(activityRows.length), label: "Days Active", accent: "#0EA5A4" },
-              { icon: Clock, value: formatDurationCompact(displayedActiveSeconds), label: "Time", accent: "#0EA5A4" },
-              {
-                icon: Target,
-                value: dashboardAccuracy == null ? "—" : `${dashboardAccuracy}%`,
-                label: "Accuracy",
-                accent: "#0EA5A4",
-              },
-            ].map((card) => (
-              <div
-                key={card.label}
-                className="cursor-pointer rounded-xl border border-[#E6E8EC] bg-white p-4 transition-all duration-200 hover:border-[#CBD5E1]"
-              >
-                <div className="mb-3 flex items-start justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F1F5F9]">
-                    <card.icon className="h-5 w-5" style={{ color: card.accent }} />
-                  </div>
-                </div>
-                <div className="text-2xl font-black leading-none text-[#0F172A]">{card.value}</div>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <div className="h-0.5 w-5 rounded-full" style={{ backgroundColor: card.accent }} />
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B]">
-                    {card.label}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className={`${GLASS} flex flex-col justify-between rounded-3xl p-6`}>
+            <div className="flex items-center gap-4">
+              <StreakFlame />
               <div>
-                <h3 className="text-base font-bold text-[#0F172A]">Explorer Code</h3>
-                <p className="mt-1 font-mono text-lg font-black tracking-wider text-[#0F172A]">
-                  {explorerCode ?? "Unavailable"}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!explorerCode) return;
-                  void navigator.clipboard.writeText(explorerCode).then(() => {
-                    setExplorerCodeCopied(true);
-                    window.setTimeout(() => setExplorerCodeCopied(false), 1500);
-                  });
-                }}
-                disabled={!explorerCode}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#E6E8EC] text-[#64748B] transition hover:bg-[#F1F5F9] hover:text-[#0F172A] disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label="Copy Explorer Code"
-                title={explorerCodeCopied ? "Copied" : "Copy Explorer Code"}
-              >
-                <Copy className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-base font-bold text-[#0F172A]">Auto Read</h3>
-                <p className="mt-1 text-sm text-[#64748B]">Automatically read new questions aloud</p>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={autoReadEnabled}
-                aria-label="Auto Read"
-                onClick={() => setAutoReadEnabled(!autoReadEnabled)}
-                className={[
-                  "relative inline-flex h-7 w-12 items-center rounded-full transition-colors",
-                  autoReadEnabled ? "bg-[#0EA5A4]" : "bg-[#CBD5E1]",
-                ].join(" ")}
-              >
-                <span
-                  className={[
-                    "inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform",
-                    autoReadEnabled ? "translate-x-6" : "translate-x-1",
-                  ].join(" ")}
-                />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <div className="space-y-5 lg:col-span-2">
-            <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-base font-bold text-[#0F172A]">
-                  <BookOpen className="h-4 w-4 text-[#0EA5A4]" />
-                  Enrolled Realms
-                </h3>
-                <button
-                  onClick={() => router.push("/realms")}
-                  className="text-xs font-semibold text-[#64748B] hover:text-[#0F172A]"
-                >
-                  See all
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {REALMS.map((realm) => {
-                  const isActive = realm.status === "active";
-                  const isComingSoon = realm.status === "coming-soon";
-                  const summary = realmSummaries[realm.id as LiveRealmId];
-                  const realmRoute = summary?.route ?? realm.route;
-                  return (
-                    <div
-                      key={realm.name}
-                      onClick={() => isActive && router.push(realmRoute)}
-                      className={`relative flex items-center gap-3 rounded-lg border p-2.5 transition-all duration-200 ${
-                        isActive
-                          ? "cursor-pointer border-[#E6E8EC] bg-white hover:border-[#0EA5A4]"
-                          : "border-[#E6E8EC] bg-[#F7F8FA] opacity-70"
-                      }`}
-                    >
-                      {isActive ? (
-                        <div
-                          className="h-9 w-9 flex-shrink-0 rounded-md border border-[#E6E8EC] bg-cover bg-center"
-                          style={{ backgroundImage: `url('${realm.image ?? "/images/number-nexus-tile.jpg"}')` }}
-                        />
-                      ) : (
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border border-[#E6E8EC] bg-[#F1F5F9]">
-                          <realm.icon className="h-4 w-4 text-[#94A3B8]" />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className={`truncate text-xs font-bold ${isActive ? "text-[#0F172A]" : "text-[#94A3B8]"}`}>
-                          {realm.name}
-                          {summary && <span className="ml-2 text-[10px] font-normal text-[#64748B]">{summary.year === "Prep" ? "Ground Level" : summary.year.replace("Year", "Level")}</span>}
-                        </div>
-                        {isActive ? (
-                          <div className="mt-1 flex items-center gap-1.5">
-                            <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#E5E7EB]">
-                              <div
-                                className="h-full rounded-full bg-[#0EA5A4] transition-all duration-700"
-                                style={{ width: `${summary?.percent ?? 0}%` }}
-                              />
-                            </div>
-                            <span className="text-[9px] font-extrabold text-[#0EA5A4]">{summary ? `${summary.percent}%` : "—"}</span>
-                          </div>
-                        ) : (
-                          <div className="mt-0.5 inline-flex items-center gap-1">
-                            {isComingSoon ? (
-                              <span className="text-[9px] font-bold uppercase tracking-wider text-[#64748B]">
-                                Coming Soon
-                              </span>
-                            ) : (
-                              <>
-                                <Lock className="h-2.5 w-2.5 text-[#94A3B8]" />
-                                <span className="text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">
-                                  Locked
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                <p className="font-display text-[42px] font-black leading-none">{dayStreak}</p>
+                <p className="font-display text-xs font-black tracking-[0.08em] text-[#ffcf8a]">DAY STREAK</p>
               </div>
             </div>
-
-            <div className="rounded-xl border border-[#E6E8EC] bg-white p-5">
-              <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-[#0F172A]">
-                <Star className="h-4 w-4 text-[#F59E0B]" />
-                Your Wins
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {recentActivity.map((item, index) => (
-                  <div
-                    key={`${item.text}-${index}`}
-                    className="flex items-center gap-2 rounded-lg border border-[#E6E8EC] bg-[#F7F8FA] px-3 py-2"
-                  >
-                    <item.icon className={`h-4 w-4 ${item.color}`} />
-                    <span className="text-xs font-semibold text-[#0F172A]">{item.text}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="mt-4 grid grid-cols-7 gap-1.5" aria-label="This week">
+              {weekDays.map((day) => {
+                const active = activityKeys.has(day.key);
+                return (
+                  <span key={day.key} title={formatActivityDateLabel(day.key)} className={`grid h-10 place-items-center rounded-xl font-display text-xs font-black ${active ? "bg-gradient-to-br from-[#ffb347] to-[#ff7a3d] text-white" : "bg-white/[0.08] text-[#a59cb5]"} ${day.isToday ? "outline outline-2 outline-white" : ""}`}>{day.label}</span>
+                );
+              })}
             </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl border border-[#E6E8EC] bg-white px-6 py-4">
-              {SOCIAL_TEASERS.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  title={item.copy}
-                  onClick={() => setOpenTooltip((current) => (current === item.label ? null : item.label))}
-                  className="group relative flex items-center gap-1.5 opacity-60 transition hover:opacity-100 focus:opacity-100"
-                >
-                  <item.icon className="h-4 w-4 text-[#64748B]" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{item.label}</span>
-                  <div
-                    className={`absolute bottom-full left-1/2 z-10 mb-3 w-60 -translate-x-1/2 rounded-lg bg-[#0F172A] px-3 py-2 text-left text-[11px] font-semibold text-white shadow-xl transition ${
-                      openTooltip === item.label
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100"
-                    }`}
-                  >
-                    {item.copy}
-                  </div>
-                </button>
-              ))}
-              <div className="flex items-center gap-1.5 border-l border-[#E6E8EC] pl-3">
-                <Lock className="h-3 w-3 text-[#94A3B8]" />
-                <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#94A3B8]">Coming Soon</span>
-              </div>
-            </div>
+            <p className="mt-3 text-sm font-bold text-[#cfc7dc]">
+              {bestStreak > 0 ? `Best streak: ${bestStreak} day${bestStreak === 1 ? "" : "s"}` : "Learn today to start a streak"}
+              {dayStreak > 0 ? ` · Come back tomorrow to make it ${dayStreak + 1}!` : ""}
+            </p>
           </div>
 
-          <div className="space-y-5">
-            <div className="rounded-xl border border-[#E6E8EC] bg-white p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A]">
-                  <Calendar className="h-4 w-4 text-[#0EA5A4]" />
-                  Activity
-                </h3>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#64748B]">
-                  {monthName}
+          <div className={`${GLASS} rounded-3xl p-6`}>
+            <div className="flex items-baseline justify-between">
+              <p className={SECTION}>Gems · {gems.count}</p>
+              <button type="button" onClick={() => router.push("/gem-vault")} className="text-sm font-extrabold text-[#e2c6ff] hover:text-white">Gem Vault →</button>
+            </div>
+            <div className="flex gap-2.5">
+              {gems.latest.slice(0, 3).map(({ gem }) => (
+                <span key={gem.id} title={gem.name} className="grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.07]">
+                  <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} emblem={emblemForGem(gem.realm_id, gem.milestone_type)} stone={stoneForGem(gem)} size={52} />
                 </span>
-              </div>
-
-              <div className="mb-1 grid grid-cols-7 gap-1">
-                {DAYS.map((day, index) => (
-                  <div key={`${day}-${index}`} className="text-center text-[9px] font-bold text-[#94A3B8]">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: offset }).map((_, index) => (
-                  <div key={`empty-${index}`} className="aspect-square" />
-                ))}
-                {Array.from({ length: daysInMonth }).map((_, index) => {
-                  const day = index + 1;
-                  const dateKey = `${calendarYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-                  const row = activityByDate.get(dateKey);
-                  const isToday = day === today;
-                  const isActive = Boolean(row);
-                  const isPast = day < today;
-
-                  return (
-                    <div
-                      key={dateKey}
-                      title={`${formatActivityDateLabel(dateKey)} • ${row ? formatActivitySummary(row) : "No learning activity yet"}`}
-                      className={`relative flex aspect-square items-center justify-center rounded-md text-[10px] font-bold transition-all ${
-                        isToday
-                          ? "bg-[#0F172A] text-white"
-                          : isActive
-                            ? "bg-[#CCFBF1] font-extrabold text-[#0F766E]"
-                            : isPast
-                              ? "text-[#64748B]"
-                              : "text-[#CBD5E1]"
-                      }`}
-                    >
-                      {day}
-                      {isActive && !isToday ? (
-                        <span className="absolute bottom-1.5 h-1.5 w-1.5 rounded-full bg-[#0EA5A4]" />
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
+              ))}
+              {gems.count === 0 ? <p className="text-sm font-semibold text-[#cfc7dc]">Finish lessons, quizzes and streaks to earn gems.</p> : null}
             </div>
-
-            <div className="relative overflow-hidden rounded-xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] to-[#1E293B] p-5 text-white">
-              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#0EA5A4]/15 blur-2xl" />
-              <div className="relative">
-                <h4 className="mb-1 text-base font-bold">Daily Challenge</h4>
-                <p className="mb-4 text-xs leading-snug text-[#CBD5E1]">A quick sprint for bonus XP</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-base font-extrabold text-[#F59E0B]">+50 XP</span>
-                  <span className="rounded-full bg-white/[0.06] px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-[#94A3B8]">
-                    Soon
-                  </span>
+            {gems.next ? (
+              <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/[0.05] px-3 py-2.5">
+                <span className="opacity-60"><GemIcon rarity={gems.next.rarity} cut={cutForGem(gems.next.id, gems.next.rarity)} emblem={emblemForGem(gems.next.realm_id, gems.next.milestone_type)} stone={stoneForGem(gems.next)} size={38} locked /></span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-[13px] font-black">Next: {gems.next.name}</p>
+                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-[#D86BF7] to-[#f0b6ff]" style={{ width: `${Math.round((gems.next.current / gems.next.target) * 100)}%` }} /></div>
+                  <p className="mt-1 text-[13px] font-bold text-[#cfc7dc]">{gems.next.current} of {gems.next.target}</p>
                 </div>
               </div>
-            </div>
+            ) : null}
+          </div>
+        </section>
 
-            <div className="rounded-xl border border-[#E6E8EC] bg-white p-4">
-              <h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-[#0F172A]">
-                <TrendingUp className="h-4 w-4 text-[#0EA5A4]" />
-                Level Progress
-              </h4>
-              <div className="flex items-center gap-3">
-                <div className="relative h-[68px] w-[68px] flex-shrink-0">
-                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="15.5"
-                      fill="none"
-                      stroke="#0EA5A4"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeDasharray={`${dashboardAccuracy ?? 0} ${100 - (dashboardAccuracy ?? 0)}`}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-sm font-black leading-none text-[#0F172A]">
-                      {dashboardAccuracy == null ? "—" : `${dashboardAccuracy}%`}
+        <section className="mt-4 grid grid-cols-2 gap-3.5 lg:grid-cols-4" aria-label="My numbers">
+          <StatCard value={String(stats.weeksCompleted)} label="Weeks completed" note="across all realms" />
+          <StatCard value={questionsAnswered.toLocaleString("en-AU")} label="Questions answered" note={`${thisWeek.questions} this week`} />
+          <StatCard value={formatDurationCompact(totalActiveSeconds)} label="Learning time" note={`${formatDurationCompact(thisWeek.seconds)} this week`} />
+          <StatCard value={String(reliqsEarned)} label="RELIQS earned" note="cards in Hall of Legends" />
+        </section>
+
+        <section className="mt-8" aria-label="My realms">
+          <div className="flex items-baseline justify-between">
+            <p className={SECTION}>My realms</p>
+            <button type="button" onClick={() => router.push("/world/tower")} className="text-sm font-extrabold text-[#e2c6ff] hover:text-white">Open the Tower →</button>
+          </div>
+          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+            {realmCards.map((realm) => {
+              const done = realm.totalWeeks > 0 && realm.weeksCompleted >= realm.totalWeeks;
+              return (
+                <button key={realm.id} type="button" onClick={() => router.push(realm.route)} className="overflow-hidden rounded-[22px] border border-white/10 bg-[#161222]/80 text-left transition hover:-translate-y-0.5 hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C94DF2]">
+                  <div className="relative flex h-[150px] flex-col justify-end bg-cover bg-center px-4 pb-3" style={{ backgroundImage: `linear-gradient(180deg, rgba(14,10,22,.05), rgba(14,10,22,.85)), url('${realm.image}')` }}>
+                    <span className="absolute left-3.5 top-3 grid h-10 w-10 place-items-center rounded-xl bg-[#0e0a16]/60 backdrop-blur" aria-hidden="true">
+                      <svg viewBox="236 0 44 79" className="h-7 w-auto"><path fill={realm.color} d={RELIQ_Q_PATH} /></svg>
+                    </span>
+                    <span className="font-display text-xl font-black">{realm.name}</span>
+                    <span className="mt-0.5 font-display text-[13px] font-black uppercase tracking-[0.06em]" style={{ color: realm.color }}>
+                      {realm.level ? (done ? `${realm.level} · complete` : `${realm.level} · Week ${realm.weeksCompleted + 1}`) : "Not started yet"}
                     </span>
                   </div>
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-[#64748B]">Lessons</span>
-                    <span className="font-extrabold text-[#0F172A]">{stats.completedLessons}</span>
+                  <div className="flex items-center gap-3 px-4 pb-3.5 pt-3">
+                    <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full" style={{ width: `${realm.totalWeeks ? Math.round((realm.weeksCompleted / realm.totalWeeks) * 100) : 0}%`, background: realm.color }} /></div>
+                    <span className="whitespace-nowrap text-[13px] font-extrabold text-[#d8d2e4]">{done ? "Level done!" : realm.totalWeeks ? `${realm.weeksCompleted} of ${realm.totalWeeks} weeks` : "Tap to begin"}</span>
                   </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-[#64748B]">Weeks</span>
-                    <span className="font-extrabold text-[#0F172A]">{stats.weeksCompleted}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </section>
+
+        <FriendsAndBattlesPreview initial={initials} />
+
+        <section className="mt-8 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+          <div className={`${GLASS} rounded-3xl p-6`} aria-label="My wins">
+            <p className={SECTION}>My wins</p>
+            {wins.length ? wins.map((win, index) => (
+              <div key={`${win.title}-${index}`} className={`flex items-center gap-3.5 py-3 ${index ? "border-t border-white/[0.08]" : ""}`}>
+                <span className="h-3.5 w-3.5 flex-shrink-0 rounded-[5px]" style={{ background: win.color }} />
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-[15px] font-black">{win.title}</p>
+                  <p className="font-semibold text-[#d8d2e4]">{win.detail}</p>
+                </div>
+                {win.when ? <span className="whitespace-nowrap text-[13px] font-bold text-[#a99fba]">{win.when}</span> : null}
+              </div>
+            )) : null}
+            {wins.length < 3 ? (
+              <div className={wins.length ? "mt-2 border-t border-white/[0.08] pt-3" : ""}>
+                <p className="mb-1 text-sm font-bold text-[#a99fba]">{wins.length ? "Wins to go for" : "Your first win is one lesson away. Wins to go for:"}</p>
+                {WIN_GOALS.slice(0, 4 - wins.length).map((goal) => (
+                  <div key={goal.title} className="flex items-center gap-3.5 py-2 opacity-60">
+                    <span className="h-3.5 w-3.5 flex-shrink-0 rounded-[5px] border-2 border-dashed border-white/40" />
+                    <div><p className="font-display text-[15px] font-black">{goal.title}</p><p className="font-semibold text-[#d8d2e4]">{goal.detail}</p></div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className={`${GLASS} rounded-3xl p-6`} aria-label="Learning calendar">
+            <div className="flex items-baseline justify-between">
+              <p className={SECTION}>{monthName}</p>
+              <span className="text-sm font-bold text-[#bdb3cc]">{learningDaysThisMonth} learning day{learningDaysThisMonth === 1 ? "" : "s"}</span>
+            </div>
+            <div className="mb-1.5 grid grid-cols-7 gap-1.5 text-center font-display text-[11px] font-black text-[#8d84a0]">
+              {DAYS.map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1.5">
+              {Array.from({ length: offset }).map((_, index) => <span key={`empty-${index}`} />)}
+              {Array.from({ length: daysInMonth }).map((_, index) => {
+                const day = index + 1;
+                const dateKey = `${calendarYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                const row = activityByDate.get(dateKey);
+                const isToday = day === today;
+                return (
+                  <span key={dateKey} title={`${formatActivityDateLabel(dateKey)} • ${row ? formatActivitySummary(row) : "No learning yet"}`} className={`grid h-[34px] place-items-center rounded-[10px] text-[13px] font-extrabold ${isToday ? "bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] text-white" : row ? "bg-[#C94DF2]/30 text-white shadow-[inset_0_0_0_1px_rgba(216,107,247,0.6)]" : day < today ? "bg-white/[0.04] text-[#9a90ab]" : "text-[#5f5670]"}`}>{day}</span>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-[13px] font-bold text-[#bdb3cc]"><span className="mr-1.5 inline-block h-[11px] w-[11px] rounded-[4px] bg-[#C94DF2]/45 align-[-1px]" />Learned that day</p>
+          </div>
+        </section>
+
+        <section className={`${GLASS} mt-4 rounded-3xl p-6`} aria-label="Hall of Legends">
+          <div className="flex items-baseline justify-between">
+            <p className={SECTION}>Hall of Legends · {reliqsEarned} of {reliqsTotal} RELIQS</p>
+            <button type="button" onClick={() => router.push("/legends")} className="text-sm font-extrabold text-[#e2c6ff] hover:text-white">Visit Hall of Legends →</button>
+          </div>
+          <p className="-mt-1 mb-3.5 font-semibold text-[#cfc7dc]">Finish a level in a realm to earn its RELIQ card.</p>
+          <div className="grid gap-2.5 md:grid-cols-2">
+            {reliqs.map((realm) => {
+              const color = reliqRealmColor(realm.legendRealm);
+              return (
+                <div key={realm.legendRealm} className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.05] px-3.5 py-2.5">
+                  <span className="min-w-0 font-display text-sm font-black sm:text-[15px]">{realm.name}</span>
+                  <span className="flex flex-shrink-0 items-center gap-0.5 sm:gap-1" aria-label={`${realm.collected} of ${realm.total} RELIQS`}>
+                    {Array.from({ length: realm.total }).map((_, index) => (
+                      <svg key={index} viewBox="236 0 44 79" className="h-5 w-auto sm:h-7" aria-hidden="true"><path fill={index < realm.collected ? color : "#4a4258"} d={RELIQ_Q_PATH} /></svg>
+                    ))}
+                    <span className="ml-1.5 w-9 text-right text-[13px] font-extrabold text-[#d8d2e4] sm:ml-2 sm:w-12">{realm.collected}/{realm.total}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </main>
   );
+}
+
+const WIN_GOALS = [
+  { title: "Finish a week", detail: "Complete the lessons and quiz for a week" },
+  { title: "Earn a gem", detail: "Lessons, perfect scores and streaks earn gems" },
+  { title: "Start a streak", detail: "Learn two days in a row" },
+  { title: "Rank up", detail: "Earn XP to reach the next Explorer rank" },
+];
+
+const GLASS = "border border-white/[0.12] bg-[#161222]/70 shadow-[0_10px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl";
+const SECTION = "mb-3 font-display text-xs font-black uppercase tracking-[0.14em] text-[#d9b8ff]";
+
+function StatCard({ value, label, note }: { value: string; label: string; note: string }) {
+  return (
+    <div className={`${GLASS} rounded-3xl px-5 py-4`}>
+      <p className="font-display text-[30px] font-black leading-tight">{value}</p>
+      <p className="font-display text-[11px] font-black uppercase tracking-[0.1em] text-[#cbb6e6]">{label}</p>
+      <p className="mt-1 text-[13px] font-semibold text-[#a99fba]">{note}</p>
+    </div>
+  );
+}
+
+function StreakFlame() {
+  return (
+    <svg width="54" height="54" viewBox="0 0 24 24" aria-hidden="true" className="drop-shadow-[0_6px_14px_rgba(255,140,40,0.45)]">
+      <defs><linearGradient id="profile-flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#ff5a1f" /><stop offset="1" stopColor="#ffc94a" /></linearGradient></defs>
+      <path fill="url(#profile-flame)" d="M12 2c1 3.5-2.5 5-2.5 8.5 0 1.3.7 2.3 1.6 2.8-.2-1.8.9-3.2 2.4-4.3.4 2.6 3 3.6 3 6.5A4.5 4.5 0 0 1 12 20a5.5 5.5 0 0 1-5.5-5.5C6.5 9 12 7 12 2z" />
+      <path fill="#fff3c4" d="M12 20a2.4 2.4 0 0 1-2.4-2.4c0-1.6 1.4-2.3 2-3.8.9 1.1 2.8 1.9 2.8 3.8A2.4 2.4 0 0 1 12 20z" />
+    </svg>
+  );
+}
+
+// A preview of what is coming, so learners know it is on the way. Nothing here
+// is live: the names and results are examples and the button does nothing yet.
+const PREVIEW_FRIENDS = [
+  { initial: "L", name: "Lily", color: "#f472b6", streak: 6 },
+  { initial: "M", name: "Mason", color: "#38bdf8", streak: 3 },
+  { initial: "A", name: "Ava", color: "#a3e635", streak: 9 },
+  { initial: "J", name: "Jack", color: "#fbbf24", streak: 2 },
+];
+
+function FriendsAndBattlesPreview({ initial }: { initial: string }) {
+  return (
+    <section className="relative mt-8 overflow-hidden rounded-3xl border border-[#D86BF7]/35 bg-gradient-to-br from-[#8C2EAC]/45 via-[#161222]/85 to-[#161222]/85 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.28)]" aria-label="Friends and Battles, coming soon">
+      <span className="absolute right-6 top-5 rounded-full bg-[#ffd76a] px-3.5 py-1.5 font-display text-xs font-black tracking-[0.1em] text-[#2a1a00]">COMING SOON</span>
+      <p className="font-display text-xs font-black uppercase tracking-[0.14em] text-[#ffd76a]">Friends &amp; Battles</p>
+      <h2 className="mt-2 font-display text-[26px] font-black">Challenge your friends!</h2>
+      <p className="mt-1 max-w-[640px] font-semibold text-[#e3dbef]">Add friends from your school, cheer each other on, and battle with maths questions at your own level to win bonus XP.</p>
+      <div className="mt-5 grid gap-3.5 md:grid-cols-[1.2fr_1fr_1fr]" aria-hidden="true">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
+          <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">MY FRIENDS</p>
+          <div className="flex flex-wrap gap-3">
+            {PREVIEW_FRIENDS.map((friend) => (
+              <div key={friend.name} className="flex w-16 flex-col items-center gap-1">
+                <span className="relative grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friend.color }}>
+                  {friend.initial}<span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#1a1426] bg-[#4ade80]" />
+                </span>
+                <span className="text-[13px] font-extrabold">{friend.name}</span>
+                <span className="text-xs font-bold text-[#ffcf8a]">🔥 {friend.streak}</span>
+              </div>
+            ))}
+            <div className="flex w-16 flex-col items-center gap-1">
+              <span className="grid h-[52px] w-[52px] place-items-center rounded-full border-2 border-dashed border-white/35 bg-white/10 text-xl font-black">+</span>
+              <span className="text-[13px] font-extrabold">Add friend</span>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
+          <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">BATTLE</p>
+          <div className="flex items-center justify-center gap-4">
+            <span className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-2xl font-black">{initial}</span>
+            <span className="font-display text-xl font-black text-[#ffd76a]">VS</span>
+            <span className="grid h-16 w-16 place-items-center rounded-full bg-[#f472b6] font-display text-2xl font-black">L</span>
+          </div>
+          <div className="mt-3.5 rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] py-3 text-center font-display text-[13px] font-black tracking-[0.05em] opacity-70">⚔️ CHALLENGE A FRIEND</div>
+          <p className="mt-2 text-center text-[13px] font-semibold text-[#bdb3cc]">Same number of questions · each at your own level</p>
+        </div>
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
+          <p className="mb-2 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">RECENT BATTLES</p>
+          {[["You beat Lily", "8 – 6", "+20 XP"], ["Ava beat you", "7 – 9", "+5 XP"], ["You beat Mason", "10 – 4", "+20 XP"]].map(([who, score, xp], index) => (
+            <div key={who} className={`flex items-center gap-2.5 py-2 ${index ? "border-t border-white/[0.07]" : ""}`}>
+              <span className="flex-1 text-sm font-extrabold">{who}</span>
+              <span className="font-display text-[13px] font-black text-[#d8d2e4]">{score}</span>
+              <span className="w-14 text-right font-display text-xs font-black text-[#ffd76a]">{xp}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function levelLabel(year: string) {
+  return year === "Prep" ? "Ground Level" : year.replace("Year", "Level");
+}
+
+function formatWhen(iso: string) {
+  const then = new Date(iso);
+  if (Number.isNaN(then.getTime())) return "";
+  const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return then.toLocaleDateString("en-AU", { weekday: "short", timeZone: MELBOURNE_TIME_ZONE });
+  return then.toLocaleDateString("en-AU", { day: "numeric", month: "short", timeZone: MELBOURNE_TIME_ZONE });
+}
+
+// Monday-to-Sunday of the current Melbourne week.
+function currentWeekKeys() {
+  const todayKey = getMelbourneDateKey();
+  const [year, month, day] = todayKey.split("-").map(Number);
+  const today = new Date(year, month - 1, day);
+  const mondayOffset = (today.getDay() + 6) % 7;
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(year, month - 1, day - mondayOffset + index);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    return { key, label: DAYS[index], isToday: key === todayKey };
+  });
+}
+
+function longestStreak(activityKeys: Set<string>) {
+  let best = 0;
+  for (const key of activityKeys) {
+    const [year, month, day] = key.split("-").map(Number);
+    const previous = new Date(year, month - 1, day - 1);
+    const previousKey = `${previous.getFullYear()}-${String(previous.getMonth() + 1).padStart(2, "0")}-${String(previous.getDate()).padStart(2, "0")}`;
+    if (activityKeys.has(previousKey)) continue; // only count from the start of each run
+    let run = 0;
+    const cursor = new Date(year, month - 1, day);
+    for (;;) {
+      const cursorKey = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}-${String(cursor.getDate()).padStart(2, "0")}`;
+      if (!activityKeys.has(cursorKey)) break;
+      run += 1;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    best = Math.max(best, run);
+  }
+  return best;
 }
