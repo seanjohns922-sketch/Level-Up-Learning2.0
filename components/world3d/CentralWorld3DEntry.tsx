@@ -42,6 +42,12 @@ export default function CentralWorld3DEntry({ teacherPreview = false }: { teache
           router.replace("/diagnostic");
           return;
         }
+        // Download/parse the scene while canonical progress restores. Importing
+        // does not mount it: the existing diagnostic/access/restore gates still apply.
+        void import("@/components/world3d/CentralWorld").catch(() => {
+          // Speculative loading must not break progress restoration; next/dynamic
+          // remains responsible for loading/rendering the scene when it is needed.
+        });
         const restored = await restoreCanonicalWorldState(profile.studentId);
         if (cancelled) return;
         if (!restored.get("number")?.progress) {

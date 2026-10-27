@@ -3,7 +3,14 @@
 import { encodeAssessmentResponse } from "@/lib/assessment-response";
 import { useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
-import { TaskRenderer } from "@/components/TaskRenderer";
+import dynamic from "next/dynamic";
+
+// The lesson renderer contains every activity type. Load it only for questions
+// that actually use a lesson-native task, rather than for every assessment.
+const TaskRenderer = dynamic(
+  () => import("@/components/TaskRenderer").then((module) => module.TaskRenderer),
+  { loading: () => <div className="grid min-h-[24rem] place-items-center" role="status" aria-busy="true">Loading question…</div> },
+);
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 

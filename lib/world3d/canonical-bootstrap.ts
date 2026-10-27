@@ -11,10 +11,13 @@ export function announceCanonicalWorldStateRestored() {
 }
 
 export async function restoreCanonicalWorldState(studentId: string) {
-  const restored = new Map<ProgressRealmScope, Awaited<ReturnType<typeof restoreStudentStateFromServer>>>();
-  for (const realmId of LIVE_REALM_IDS) {
-    restored.set(realmId, await restoreStudentStateFromServer(studentId, realmId));
-  }
+  // Each restore checks the active student after its reads and synchronously
+  // merges only its realm's cache entries. Independent network reads can overlap;
+  // the world-ready event still waits for every realm to finish successfully.
+  const entries = await Promise.all(LIVE_REALM_IDS.map(async (realmId) =>
+    [realmId, await restoreStudentStateFromServer(studentId, realmId)] as const,
+  ));
+  const restored = new Map<ProgressRealmScope, Awaited<ReturnType<typeof restoreStudentStateFromServer>>>(entries);
   announceCanonicalWorldStateRestored();
   return restored;
 }

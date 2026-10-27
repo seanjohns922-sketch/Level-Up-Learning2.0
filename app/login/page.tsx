@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { brandFontScope } from "@/lib/brand-fonts";
 import ProductTagline from "@/components/brand/ProductTagline";
 import ProductWordmark from "@/components/brand/ProductWordmark";
@@ -871,7 +872,10 @@ export default function LoginPage() {
     <main className="min-h-screen relative overflow-hidden flex">
       {/* ── Full-screen background ── */}
       <div className="absolute inset-0 bg-[#17130f]">
-        <img
+        <Image
+          fill
+          sizes="100vw"
+          priority
           src="/images/Gemini_Generated_Image_1fyweu1fyweu1fyw.png"
           alt=""
           className="absolute inset-0 h-full w-full object-cover object-center"

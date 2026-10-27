@@ -1,4 +1,6 @@
 "use client";
+import dynamic from "next/dynamic";
+import AssessmentLoading from "@/components/assessment/AssessmentLoading";
 import {chanceReleaseVisual,readyReleasedChance} from "@/lib/chance-release-response";
 import {patternReleaseVisual,readyReleasedPattern} from "@/lib/pattern-release-response";
 import {statisticaReleaseVisual,readyReleasedStatistica} from "@/lib/statistica-release-response";
@@ -9,17 +11,11 @@ import {starpathReleaseVisual,readyReleasedStarpath} from "@/lib/starpath-releas
 import {savedStarpathReleaseVersion} from "@/lib/starpath-release-version";
 import { savedYear3MeasurementVersion } from "@/lib/year3-measurement-assessment-version";
 import { savedYear4MeasurementVersion } from "@/lib/year4-measurement-assessment-version";
-import ChanceExtensionAssessment from "@/components/assessment/ChanceExtensionAssessment";
-import PatternExtensionAssessment from "@/components/assessment/PatternExtensionAssessment";
-import StatisticsExtensionAssessment from "@/components/assessment/StatisticsExtensionAssessment";
-import SpaceExtensionAssessment from "@/components/assessment/SpaceExtensionAssessment";
-import MeasurementExtensionAssessment from "@/components/assessment/MeasurementExtensionAssessment";
 import { savedYear1MeasurementVersion } from "@/lib/year1-measurement-assessment-version";
 import { savedYear2MeasurementVersion } from "@/lib/year2-measurement-assessment-version";
 import { savedYear5MeasurementVersion } from "@/lib/year5-measurement-assessment-version";
 import { savedYear6MeasurementVersion } from "@/lib/year6-measurement-assessment-version";
 import { savedGroundMeasurementVersion } from "@/lib/ground-measurement-assessment-version";
-import NumberExtensionAssessment from "@/components/assessment/NumberExtensionAssessment";
 import { assessmentSpokenPrompt } from "@/lib/assessment-spoken-prompt";
 import { savedYear3NumberVersion } from "@/lib/year3-number-assessment-version";
 import { groundNumberHasAnswer } from "@/lib/ground-number-answer";
@@ -71,6 +67,13 @@ import { supabase } from "@/lib/supabase";
 import { saveAssessmentReviewState } from "@/lib/assessment-review-state";
 import { buildAssessmentQuestionSnapshots } from "@/lib/assessment-replay";
 import { curriculumCodesForAssessmentQuestion } from "@/lib/assessment-curriculum";
+
+const ChanceExtensionAssessment = dynamic(() => import("@/components/assessment/ChanceExtensionAssessment"), { loading: () => <AssessmentLoading realmId="chance" /> });
+const PatternExtensionAssessment = dynamic(() => import("@/components/assessment/PatternExtensionAssessment"), { loading: () => <AssessmentLoading realmId="pattern" /> });
+const StatisticsExtensionAssessment = dynamic(() => import("@/components/assessment/StatisticsExtensionAssessment"), { loading: () => <AssessmentLoading realmId="statistics" /> });
+const SpaceExtensionAssessment = dynamic(() => import("@/components/assessment/SpaceExtensionAssessment"), { loading: () => <AssessmentLoading realmId="space" /> });
+const MeasurementExtensionAssessment = dynamic(() => import("@/components/assessment/MeasurementExtensionAssessment"), { loading: () => <AssessmentLoading realmId="measurement" /> });
+const NumberExtensionAssessment = dynamic(() => import("@/components/assessment/NumberExtensionAssessment"), { loading: () => <AssessmentLoading realmId="number" /> });
 
 const PRETEST_PASS_THRESHOLD = ASSESSMENT_THRESHOLDS.pretestPassPercent;
 const YEAR_SEQUENCE = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
@@ -383,9 +386,7 @@ export default function PretestPageWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
-          <p className="text-slate-500">Loading…</p>
-        </div>
+        <AssessmentLoading />
       }
     >
       <AssessmentRoute />
@@ -918,11 +919,13 @@ function PretestPage() {
     return null;
   }
 
+  if (restoreState === "loading") return <AssessmentLoading realmId={progressRealmId} />;
+
   if (restoreState !== "ready") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-slate-950 p-6 text-center">
         <div>
-          <p className="font-bold text-slate-200">{restoreState === "loading" ? "Loading your placement..." : restoreError}</p>
+          <p className="font-bold text-slate-200">{restoreError}</p>
           {restoreState === "error" ? <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-500 px-5 py-3 font-bold text-slate-950">Retry</button> : null}
         </div>
       </main>
