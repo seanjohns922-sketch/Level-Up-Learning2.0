@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowDown, ArrowLeft, ArrowUp, ArrowUpDown, Check, ChevronRight, Lock, MoreHorizontal, X } from "lucide-react";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
+import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import { LEVEL_CATALOG as BASE_LEVEL_CATALOG } from "@/lib/level-catalog";
 import { LEVEL7_LIVE } from "@/lib/level7-release";
 import { cave7Realm } from "@/lib/cave7-config";
@@ -607,7 +608,9 @@ export default function PlacementManager({
     <div className="fixed inset-0 z-50 flex flex-col bg-[#F6F7F4] font-sans">
       {/* Top bar */}
       <div className="flex items-center justify-between gap-4 border-b border-[#E3E5E0] bg-white px-6 py-4">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-4">
+          <ReliqAdultLogo variant="onLight" className="w-[96px] flex-shrink-0" />
+          <span className="h-9 w-px flex-shrink-0 bg-[#E3E5E0]" aria-hidden="true" />
           {realmId ? (
             <button
               onClick={() => { setRealmId(null); setFilter("all"); setYearFilter("all"); setSelected(new Set()); }}
@@ -745,9 +748,10 @@ export default function PlacementManager({
               ))}
               <FillEmpty realms={ACTIVE_REALM_IDS} />
               <span className="ml-auto flex flex-wrap items-center gap-3 text-[13px] font-bold text-[#5A5E63]">
-                <span><span className="mr-1 rounded-full bg-[#E0F2FE] px-2 py-0.5 text-[#075985]">L5</span>above grade</span>
+                <span><span className="mr-1 rounded-full bg-[#E4F8C4] px-2 py-0.5 text-[#3D6600]">L5</span>above grade</span>
                 <span><span className="mr-1 rounded-full bg-[#FEF3C7] px-2 py-0.5 text-[#92400E]">L2</span>below grade</span>
                 <span><span className="mr-1 text-[11px] font-extrabold text-[#B45309]">pre-test</span>still to sit</span>
+                <span><span className="mr-1 inline-block rounded-full px-2 py-0.5 ring-2 ring-[#121314]">L3</span>not saved yet</span>
               </span>
             </div>
             <div className="overflow-auto rounded-2xl border border-[#E3E5E0] bg-white">
@@ -778,7 +782,7 @@ export default function PlacementManager({
                             const level = shownLevel(realm.id, s);
                             const changed = Boolean(pendingAll[realm.id]?.[s.id]);
                             const diff = level ? YEAR_ORDER.indexOf(level) - YEAR_ORDER.indexOf(grade) : 0;
-                            const tone = !level ? "bg-[#FFEDD5] text-[#9A3412]" : diff > 0 ? "bg-[#E0F2FE] text-[#075985]" : diff < 0 ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#F1F2EE] text-[#121314]";
+                            const tone = !level ? "bg-[#FFEDD5] text-[#9A3412]" : diff > 0 ? "bg-[#E4F8C4] text-[#3D6600]" : diff < 0 ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#F1F2EE] text-[#121314]";
                             const waiting = pretestState(realm.id, s.id).state === "waiting";
                             return (
                               <td key={realm.id} className="border-b border-[#F1F2EE] px-3 py-2">
@@ -787,7 +791,7 @@ export default function PlacementManager({
                                     value={level ?? ""}
                                     onChange={(event) => { if (event.target.value) setRowLevel(s.id, event.target.value, realm.id); }}
                                     aria-label={`${s.display_name} ${realm.label} level`}
-                                    className={`cursor-pointer appearance-none rounded-full px-3 py-1 text-[13px] font-extrabold focus:outline-none focus:ring-2 focus:ring-[#83E300] ${tone} ${changed ? "ring-2 ring-[#83E300]" : ""}`}
+                                    className={`cursor-pointer appearance-none rounded-full px-3 py-1 text-[13px] font-extrabold focus:outline-none focus:ring-2 focus:ring-[#121314] ${tone} ${changed ? "ring-2 ring-[#121314]" : ""}`}
                                   >
                                     {!level ? <option value="">Place ▾</option> : null}
                                     {LEVEL_CATALOG.filter((l) => realm.levelLabels.includes(l.id)).map((l) => <option key={l.id} value={l.id}>{shortLevel(l.id)}</option>)}
@@ -803,7 +807,7 @@ export default function PlacementManager({
                 </tbody>
               </table>
             </div>
-            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in green until you save. New students start with the pre-test for their level. Open a realm (click its name) to change how a student starts or to reset.</p>
+            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in black until you save. New students start with the pre-test for their level. Open a realm (click its name) to change how a student starts or to reset.</p>
           </div>
         ) : (
           /* Per-realm table: tick students and set levels together */
@@ -908,7 +912,7 @@ export default function PlacementManager({
                         value={level}
                         onChange={(e) => setRowLevel(s.id, e.target.value, realmId)}
                         aria-label={`${s.display_name} start level`}
-                        className={`rounded-lg border bg-white px-2.5 py-1.5 text-sm font-bold text-[#121314] ${changed ? "border-[#83E300] ring-1 ring-[#83E300]" : "border-[#E3E5E0]"}`}
+                        className={`rounded-lg border bg-white px-2.5 py-1.5 text-sm font-bold text-[#121314] ${changed ? "border-[#121314] ring-1 ring-[#121314]" : "border-[#E3E5E0]"}`}
                       >
                         {activeLevelCatalog.map((l) => (
                           <option key={l.id} value={l.id}>{l.label}</option>
