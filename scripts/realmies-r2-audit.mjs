@@ -15,7 +15,6 @@ const test = read("supabase/tests/realmies_r2.sql");
 const header = read("components/economy/EconomyHeader.tsx");
 const home = read("app/home-base/page.tsx");
 const collectionPage = read("app/my-realmies/page.tsx");
-const collectionService = read("lib/realmies.ts");
 const release = read(
   "supabase/migrations/20260731120000_release_live_realmie_collection_assets.sql",
 );
@@ -148,26 +147,16 @@ check(
   integration.includes("grant_standard_realmie_for_canonical_posttest") &&
     correction.includes("posttest_grants_removed"),
 );
+// The discovery schema remains historical; its application UI was retired in October.
 check(
-  "My Realmies navigation is released",
-  header.includes("My Realmies") &&
-    header.includes("/my-realmies") &&
-    home.includes("/my-realmies"),
+  "retired collection is absent from navigation and My Home",
+  !header.includes("/my-realmies") && !home.includes("/my-realmies"),
 );
 check(
-  "collection route contains the two released realms",
-  collectionPage.includes("Number Nexus") &&
-    collectionPage.includes("Measurelands") &&
-    collectionPage.includes("Starpath Realmies") &&
-    collectionPage.includes("Coming Soon") &&
-    !collectionPage.includes("Fog Collection"),
-);
-check(
-  "collection uses canonical production RPCs and isolated demo preferences",
-  collectionService.includes("get_student_realmies_secure") &&
-    collectionService.includes("set_student_realmie_favourite_secure") &&
-    collectionService.includes("set_student_realmie_display_slot_secure") &&
-    collectionService.includes("isDemoPreviewMode"),
+  "old collection bookmarks return to My Home without collection RPCs",
+  collectionPage.includes('redirect("/home-base")') &&
+    !collectionPage.includes("@/lib/realmies") &&
+    !fs.existsSync(path.join(root, "lib/realmies.ts")),
 );
 check(
   "release migration exposes exactly eight finished digital assets",

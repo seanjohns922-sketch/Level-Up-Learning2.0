@@ -581,9 +581,8 @@ export default function DemoReviewPanel() {
             <button type="button" disabled={!posttestAvailable} onClick={() => posttestAvailable && openResult("post-pass")} className={actionClass(posttestAvailable)}><Sparkles size={16} /> Unlock</button>
             <button type="button" disabled={!posttestAvailable} onClick={() => posttestAvailable && openResult("post-fail")} className={actionClass(posttestAvailable)}><XCircle size={16} /> Post Fail</button>
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <button type="button" onClick={previewGemReveal} disabled={gemLoading} className={actionClass(!gemLoading)}><Gem size={16} /> {gemLoading ? "Loading..." : "Gem Reveal"}</button>
-            <button type="button" onClick={() => open("/my-realmies?review_reveal=1")} className={actionClass()}><Sparkles size={16} /> Realmie Reveal</button>
             <button
               type="button"
               onClick={() => open(realm === "pattern" ? "/legends/pattern-peaks" : "/legends")}

@@ -69,7 +69,7 @@ const MEASURELANDS_BACKGROUNDS: Record<number, string> = {
 
 export const REALM_LESSON_THEMES = {
   space: {
-    realmName:"Starpath",experienceLabel:"Starpath Mission",startLabel:"Begin Mission",videoLabel:"Mission Transmission",rewardLabel:"Mission Rewards",completionLabel:"Mission Complete",legendLabel:"Realmie",intro:"Follow the crystal trail and discover spatial connections.",pageBg:"#100b26",shellBg:"#15102e",panelBg:"#201638",panelBorder:getRealmTheme("space").borderRing,accent:getRealmTheme("space").accentText,accentSoft:getRealmTheme("space").accentTextSoft,secondary:"#c4b5fd",heroOverlay:"linear-gradient(90deg,#100b26ee,#20163899,#20163833)",backdropOverlay:"linear-gradient(180deg,#100b2677,#100b26ee)",videoBg:getRealmTheme("space").cardSurface,buttonBg:getRealmTheme("space").ctaGradientCss,buttonShadow:getRealmTheme("space").ctaShadow,gridColor:getRealmTheme("space").borderRing,ThemeIcon:Star,
+    realmName:"Starpath",experienceLabel:"Starpath Mission",startLabel:"Begin Mission",videoLabel:"Mission Transmission",rewardLabel:"Mission Rewards",completionLabel:"Mission Complete",legendLabel:"RELIQ card",intro:"Follow the crystal trail and discover spatial connections.",pageBg:"#100b26",shellBg:"#15102e",panelBg:"#201638",panelBorder:getRealmTheme("space").borderRing,accent:getRealmTheme("space").accentText,accentSoft:getRealmTheme("space").accentTextSoft,secondary:"#c4b5fd",heroOverlay:"linear-gradient(90deg,#100b26ee,#20163899,#20163833)",backdropOverlay:"linear-gradient(180deg,#100b2677,#100b26ee)",videoBg:getRealmTheme("space").cardSurface,buttonBg:getRealmTheme("space").ctaGradientCss,buttonShadow:getRealmTheme("space").ctaShadow,gridColor:getRealmTheme("space").borderRing,ThemeIcon:Star,
   },
   number: {
     realmName: "Number Nexus",
@@ -132,7 +132,7 @@ export const REALM_LESSON_THEMES = {
     videoLabel: "Data Briefing",
     rewardLabel: "Investigation Rewards",
     completionLabel: "Investigation Complete",
-    legendLabel: "Realmie",
+    legendLabel: "RELIQ card",
     intro:
       "Follow the data trail, look for patterns, and use evidence to explain what you discover.",
     pageBg: "#14231d",

@@ -1,5 +1,18 @@
 # Realmies Master Architecture
 
+## Retired from the application — 27 October 2026
+
+The user resumed retirement of this separate collection feature. Its My Home
+panel, rewards navigation, demo reveal, collection UI and client RPC service are
+removed. Old `/my-realmies` links redirect to `/home-base`. Remaining lesson
+reward labels now say RELIQ card. RELIQ cards, Gems, pets and learning progress
+are unchanged.
+
+Historical database records, migrations, discovery triggers and artwork files
+remain preserved; this application change does not disable database-side discovery
+or delete existing ownership. No production database changes are included.
+The architecture below describes the historical feature, not current UI.
+
 ## Product boundary
 
 Realmies are discoverable supporting creatures earned through canonical learning

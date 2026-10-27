@@ -66,6 +66,14 @@ the work. When resumed, review the final wordmark/font, visual consistency acros
 all roles and outputs, favicon/social assets, separate print artwork, Realmies
 retirement and the chosen domain/email migration. No automatic reminder is set.
 
+# Realmies retirement
+
+On 27 October 2026, the user resumed Realmies retirement. Remove its collection
+UI, navigation and demo reveals; old /my-realmies links redirect to /home-base.
+Keep RELIQ cards, Gems, student progress and historical database records intact.
+Do not restore Realmies entry points. This does not resume the other deferred
+branding or domain work.
+
 # Engineering and release discipline
 
 RELIQ is a production education platform used by students and teachers. Investigate
