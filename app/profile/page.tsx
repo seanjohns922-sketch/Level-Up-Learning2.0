@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 
 import { profileRealmSummary } from "@/lib/profile-realm-summary";
-import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
+import { getLiveRealmDefinitions, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
+import RealmProgressPanel from "@/components/profile/RealmProgressPanel";
 import { useAutoReadSetting } from "@/lib/speak";
 import { fetchStudentActivityDaily, type StudentActivityDailyRow } from "@/lib/student-activity";
 import { fetchRealmCompatProgressForStudent, type CompatProgressRow } from "@/lib/realm-progress-compat";
@@ -302,8 +303,19 @@ export default function ProfilePage() {
       level: summary ? levelLabel(summary.year) : null,
       weeksCompleted: summary?.weeksCompleted ?? 0,
       totalWeeks: summary?.totalWeeks ?? 0,
+      summary,
     };
   }), [realmSummaries]);
+
+  // Tapping a realm opens its progress panel under that card's row.
+  const [openRealm, setOpenRealm] = useState<string | null>(null);
+  const columns = useGridColumns();
+  const openIndex = realmCards.findIndex((realm) => realm.id === openRealm);
+  const openCard = openIndex >= 0 ? realmCards[openIndex] : null;
+  const panelAfter = openIndex >= 0 ? Math.min(realmCards.length - 1, Math.floor(openIndex / columns) * columns + columns - 1) : -1;
+  const panelGems = useMemo(() => openCard
+    ? gems.latest.map((entry) => entry.gem).filter((gem) => tryCanonicalRealmId(gem.realm_id) === openCard.id)
+    : [], [gems.latest, openCard]);
 
   const wins = useMemo(() => {
     const items: Array<{ color: string; title: string; detail: string; when: string }> = [];
@@ -452,14 +464,16 @@ export default function ProfilePage() {
 
         <section className="mt-8" aria-label="My realms">
           <div className="flex items-baseline justify-between">
-            <p className={SECTION}>My realms</p>
+            <p className={SECTION}>My realms · tap a realm to see your weeks</p>
             <button type="button" onClick={() => router.push("/world/tower")} className="text-sm font-extrabold text-[#e2c6ff] hover:text-white">Open the Tower →</button>
           </div>
           <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-            {realmCards.map((realm) => {
+            {realmCards.map((realm, index) => {
               const done = realm.totalWeeks > 0 && realm.weeksCompleted >= realm.totalWeeks;
+              const isOpen = realm.id === openRealm;
               return (
-                <button key={realm.id} type="button" onClick={() => router.push(realm.route)} className="overflow-hidden rounded-[22px] border border-white/10 bg-[#161222]/80 text-left transition hover:-translate-y-0.5 hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C94DF2]">
+                <Fragment key={realm.id}>
+                <button type="button" aria-expanded={realm.summary ? isOpen : undefined} onClick={() => realm.summary ? setOpenRealm(isOpen ? null : realm.id) : router.push(realm.route)} className={`overflow-hidden rounded-[22px] border-2 bg-[#161222]/80 text-left transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C94DF2] ${isOpen ? "" : "border-white/10 hover:border-white/25"}`} style={isOpen ? { borderColor: realm.color, boxShadow: `0 0 0 4px ${realm.color}2e` } : undefined}>
                   <div className="relative flex h-[150px] flex-col justify-end bg-cover bg-center px-4 pb-3" style={{ backgroundImage: `linear-gradient(180deg, rgba(14,10,22,.05), rgba(14,10,22,.85)), url('${realm.image}')` }}>
                     <span className="absolute left-3.5 top-3 grid h-10 w-10 place-items-center rounded-xl bg-[#0e0a16]/60 backdrop-blur" aria-hidden="true">
                       <svg viewBox="236 0 44 79" className="h-7 w-auto"><path fill={realm.color} d={RELIQ_Q_PATH} /></svg>
@@ -474,6 +488,15 @@ export default function ProfilePage() {
                     <span className="whitespace-nowrap text-[13px] font-extrabold text-[#d8d2e4]">{done ? "Level done!" : realm.totalWeeks ? `${realm.weeksCompleted} of ${realm.totalWeeks} weeks` : "Tap to begin"}</span>
                   </div>
                 </button>
+                {index === panelAfter && openCard?.summary && openCard.level ? (
+                  <RealmProgressPanel
+                    realm={{ id: openCard.id, name: openCard.name, color: openCard.color, route: openCard.route, year: openCard.summary.year, levelLabel: openCard.level, weeksCompleted: openCard.weeksCompleted, totalWeeks: openCard.totalWeeks, weeks: openCard.summary.weeks, pretest: openCard.summary.pretest, posttest: openCard.summary.posttest, levelPassed: openCard.summary.levelPassed }}
+                    gems={panelGems}
+                    onContinue={() => router.push(openCard.route)}
+                    onClose={() => setOpenRealm(null)}
+                  />
+                ) : null}
+                </Fragment>
               );
             })}
           </div>
@@ -646,6 +669,19 @@ function FriendsAndBattlesPreview({ initial }: { initial: string }) {
         </div>
       </div>
     </section>
+  );
+}
+
+// How many realm cards sit in a row (matches the grid's sm/lg breakpoints).
+function subscribeToResize(onChange: () => void) {
+  window.addEventListener("resize", onChange);
+  return () => window.removeEventListener("resize", onChange);
+}
+function useGridColumns() {
+  return useSyncExternalStore(
+    subscribeToResize,
+    () => (window.matchMedia("(min-width: 1024px)").matches ? 3 : window.matchMedia("(min-width: 640px)").matches ? 2 : 1),
+    () => 3,
   );
 }
 
