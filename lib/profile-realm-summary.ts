@@ -31,10 +31,17 @@ export function profileRealmSummary(realm: LiveRealmId, rows: CompatProgressRow[
     .sort((a, b) => b.completedAt.localeCompare(a.completedAt))[0] ?? null;
   const pretest = latest("pretest");
   const posttest = latest("posttest");
-  const route = resolveRealmEntryRoute({ realmId: realm, introSeen: true, fallbackYear: row.year, progress: {
-    year: row.year, scorePercent: row.pretest_score ?? 0, status: row.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
-    placementComplete: row.placement_complete === true || row.status === "PASSED", unlockedLegends: [],
-  } });
+  // A level this build cannot open (e.g. Level 7 Starpath while the Level 7
+  // release is off) falls back to the realm's home rather than breaking the page.
+  let route = `/${getRealmDefinition(realm).slug}`;
+  try {
+    route = resolveRealmEntryRoute({ realmId: realm, introSeen: true, fallbackYear: row.year, progress: {
+      year: row.year, scorePercent: row.pretest_score ?? 0, status: row.status === "PASSED" ? "PASSED" : "ASSIGNED_PROGRAM",
+      placementComplete: row.placement_complete === true || row.status === "PASSED", unlockedLegends: [],
+    } });
+  } catch {
+    /* keep the realm home */
+  }
   return {
     name: getRealmDefinition(realm).name, year: row.year, route, completedLessons, weeksCompleted, totalWeeks,
     percent: Math.round(100 * weeksCompleted / totalWeeks), weeks,
