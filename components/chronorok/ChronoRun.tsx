@@ -24,10 +24,10 @@ const JUMP = 13.5;
 const TURN = 2.7; // radians per second
 
 const ERAS = [
-  { name: "Clockwork City", tile: "#3a2a1a", edge: "#ffb02e", fog: "#140a04" },
-  { name: "Crystal Caverns", tile: "#16263a", edge: "#7ff0ff", fog: "#04101a" },
-  { name: "Ember Depths", tile: "#3a1a14", edge: "#ff6a3d", fog: "#160604" },
-  { name: "The Void Rift", tile: "#24163a", edge: "#c79bff", fog: "#0a0418" },
+  { name: "Clockwork City", tile: "#e8c48a", edge: "#ffb02e", fog: "#140a04" },
+  { name: "Crystal Caverns", tile: "#9fc8e8", edge: "#7ff0ff", fog: "#04101a" },
+  { name: "Ember Depths", tile: "#e89a7a", edge: "#ff6a3d", fog: "#160604" },
+  { name: "The Void Rift", tile: "#b8a0e0", edge: "#c79bff", fog: "#0a0418" },
 ] as const;
 const ERA_LENGTH = 600; // metres per era
 
@@ -66,25 +66,6 @@ function makeLevel() {
   };
 }
 
-function tileTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 128;
-  const ctx = canvas.getContext("2d")!;
-  // Multiplied by the era colour: a dim solid face with a bright rim, so the
-  // floor reads as solid and the gaps read as holes into space.
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, 128, 128);
-  const face = ctx.createLinearGradient(0, 0, 0, 128);
-  face.addColorStop(0, "#5a5a5a");
-  face.addColorStop(1, "#3a3a3a");
-  ctx.fillStyle = face;
-  ctx.fillRect(5, 5, 118, 118);
-  ctx.strokeStyle = "rgba(255,255,255,.35)";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(28, 28, 72, 72);
-  return new THREE.CanvasTexture(canvas);
-}
-
 type Game = {
   phase: Phase;
   z: number; // distance travelled (metres, positive)
@@ -98,16 +79,34 @@ type Game = {
   cameraAngle: number;
 };
 
+function useTexture(src: string) {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    new THREE.TextureLoader().load(src, (loaded) => {
+      loaded.colorSpace = THREE.SRGBColorSpace;
+      loaded.anisotropy = 8;
+      if (!cancelled) setTexture(loaded);
+    });
+    return () => { cancelled = true; };
+  }, [src]);
+  return texture;
+}
+
+// Lit stone tiles (they shade differently on every face of the tunnel, which is
+// what gives it depth) plus a glowing rim on each tile's leading edge.
 function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: number) => boolean[]; era: number }) {
   const tiles = useRef<THREE.InstancedMesh>(null);
-  const texture = useMemo(() => tileTexture(), []);
+  const rims = useRef<THREE.InstancedMesh>(null);
+  const stone = useTexture("/images/chronorok/tex-paving.webp");
   const matrix = useMemo(() => new THREE.Object3D(), []);
-  const width = 2 * RADIUS * Math.tan(Math.PI / SIDES) - 0.12;
+  const width = 2 * RADIUS * Math.tan(Math.PI / SIDES) - 0.1;
   const colours = ERAS[era % ERAS.length];
 
   useFrame(() => {
     const mesh = tiles.current;
-    if (!mesh || !game.current) return;
+    const rim = rims.current;
+    if (!mesh || !rim || !game.current) return;
     const base = Math.floor(game.current.z / ROW) - 3;
     let i = 0;
     for (let r = 0; r < VISIBLE_ROWS; r += 1) {
@@ -115,43 +114,64 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
       const present = row(index);
       for (let k = 0; k < SIDES; k += 1) {
         const a = k * FACE;
-        matrix.position.set(Math.sin(a) * RADIUS, -Math.cos(a) * RADIUS, -index * ROW);
+        matrix.position.set(Math.sin(a) * (RADIUS + 0.25), -Math.cos(a) * (RADIUS + 0.25), -index * ROW);
         matrix.rotation.set(0, 0, a);
         matrix.scale.setScalar(present[k] ? 1 : 0);
         matrix.updateMatrix();
         mesh.setMatrixAt(i, matrix.matrix);
+        matrix.position.set(Math.sin(a) * (RADIUS - 0.02), -Math.cos(a) * (RADIUS - 0.02), -index * ROW + ROW / 2 - 0.08);
+        matrix.updateMatrix();
+        rim.setMatrixAt(i, matrix.matrix);
         i += 1;
       }
     }
     mesh.instanceMatrix.needsUpdate = true;
+    rim.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <instancedMesh ref={tiles} args={[undefined, undefined, VISIBLE_ROWS * SIDES]} frustumCulled={false}>
-      <boxGeometry args={[width, 0.3, ROW - 0.12]} />
-      <meshBasicMaterial color={colours.edge} map={texture} toneMapped={false} />
-    </instancedMesh>
+    <>
+      <instancedMesh ref={tiles} args={[undefined, undefined, VISIBLE_ROWS * SIDES]} frustumCulled={false}>
+        <boxGeometry args={[width, 0.5, ROW - 0.1]} />
+        <meshStandardMaterial map={stone ?? undefined} color={colours.tile} roughness={0.75} metalness={0.15} />
+      </instancedMesh>
+      <instancedMesh ref={rims} args={[undefined, undefined, VISIBLE_ROWS * SIDES]} frustumCulled={false}>
+        <boxGeometry args={[width, 0.06, 0.1]} />
+        <meshBasicMaterial color={colours.edge} toneMapped={false} />
+      </instancedMesh>
+    </>
   );
 }
 
 function Runner({ game }: { game: React.RefObject<Game> }) {
   const group = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
     const g = game.current;
-    if (!group.current || !g) return;
-    const r = RADIUS - 0.75 - g.height;
+    if (!group.current || !body.current || !g) return;
+    const r = RADIUS - 0.95 - g.height;
     group.current.position.set(Math.sin(g.angle) * r, -Math.cos(g.angle) * r, -g.z);
     group.current.rotation.set(0, 0, g.angle);
-    const bounce = g.height === 0 && g.phase === "playing" ? Math.abs(Math.sin(clock.elapsedTime * 14)) * 0.12 : 0;
-    group.current.children[0].position.y = bounce;
+    const running = g.height === 0 && g.phase === "playing";
+    body.current.position.y = running ? Math.abs(Math.sin(clock.elapsedTime * 14)) * 0.18 : 0;
+    body.current.rotation.x = g.phase === "playing" ? -0.25 : 0;
+    body.current.rotation.z = (g.left ? 0.25 : 0) + (g.right ? -0.25 : 0);
   });
   return (
     <group ref={group}>
-      <group>
-        <mesh><sphereGeometry args={[0.55, 24, 24]} /><meshBasicMaterial color="#ffb02e" toneMapped={false} /></mesh>
-        <mesh scale={1.6}><sphereGeometry args={[0.55, 16, 16]} /><meshBasicMaterial color="#ffd76a" transparent opacity={0.18} toneMapped={false} /></mesh>
-        <mesh position={[0, 0.05, -0.5]} rotation={[0, 0, 0]}><circleGeometry args={[0.38, 24]} /><meshBasicMaterial color="#fff6e0" side={THREE.DoubleSide} /></mesh>
+      <group ref={body}>
+        <mesh><sphereGeometry args={[0.62, 32, 32]} /><meshStandardMaterial color="#ffa830" roughness={0.35} emissive="#7a3a00" emissiveIntensity={0.35} /></mesh>
+        <mesh position={[0, 0.06, -0.6]}><circleGeometry args={[0.42, 32]} /><meshStandardMaterial color="#fff6e0" side={THREE.DoubleSide} /></mesh>
+        {[-1, 1].map((side) => (
+          <group key={side}>
+            <mesh position={[side * 0.38, 0.62, 0]} rotation={[0, 0, -side * 0.4]}><coneGeometry args={[0.17, 0.45, 12]} /><meshStandardMaterial color="#ffa830" roughness={0.4} /></mesh>
+            <mesh position={[side * 0.16, 0.14, -0.62]}><sphereGeometry args={[0.07, 12, 12]} /><meshStandardMaterial color="#2a1606" /></mesh>
+            <mesh position={[side * 0.28, -0.55, -0.1]} scale={[1, 0.6, 1.3]}><sphereGeometry args={[0.2, 16, 16]} /><meshStandardMaterial color="#d96a14" /></mesh>
+          </group>
+        ))}
       </group>
+      {/* The runner carries its own light: nearby tiles glow, far ones fall into shadow. */}
+      <pointLight position={[0, 1.2, -1.5]} intensity={40} distance={26} decay={1.6} color="#ffd9a0" />
     </group>
   );
 }
@@ -174,6 +194,34 @@ function Stars() {
   const { camera } = useThree();
   useFrame(() => { if (points.current) points.current.position.z = camera.position.z; });
   return <points ref={points} geometry={geometry}><pointsMaterial color="#ffffff" size={1.6} sizeAttenuation={false} /></points>;
+}
+
+// A glowing nebula far outside the tunnel, seen through the gaps.
+function Nebula({ colour }: { colour: string }) {
+  const { camera } = useThree();
+  const group = useRef<THREE.Group>(null);
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 256;
+    const ctx = canvas.getContext("2d")!;
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, "rgba(255,255,255,.55)");
+    g.addColorStop(0.4, "rgba(255,255,255,.18)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+  useFrame(() => { if (group.current) group.current.position.z = camera.position.z; });
+  return (
+    <group ref={group}>
+      {[[-60, 30, -180, 160], [70, -40, -220, 200], [0, 80, -260, 180], [-40, -70, -150, 140]].map(([x, y, z, size], index) => (
+        <sprite key={index} position={[x, y, z]} scale={[size, size, 1]}>
+          <spriteMaterial map={texture} color={colour} transparent depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
+        </sprite>
+      ))}
+    </group>
+  );
 }
 
 // The game loop: steps the run state held in a ref and moves the R3F camera each
@@ -211,8 +259,8 @@ function Step({ game, row, onHud, onOver }: { game: React.RefObject<Game>; row: 
     // The camera turns with the runner, so the side they stand on is always "down".
     g.cameraAngle += (g.angle - g.cameraAngle) * Math.min(1, delta * 8);
     const a = g.cameraAngle;
-    const r = RADIUS - 3.4;
-    camera.position.set(Math.sin(a) * r, -Math.cos(a) * r, -g.z + 6.5);
+    const r = RADIUS - 3.9;
+    camera.position.set(Math.sin(a) * r, -Math.cos(a) * r, -g.z + 7.5);
     camera.up.set(-Math.sin(a), Math.cos(a), 0);
     const lr = RADIUS - 2.2;
     camera.lookAt(Math.sin(a) * lr, -Math.cos(a) * lr, -g.z - 22);
@@ -298,10 +346,13 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
       onPointerUp={(event) => touch(false, event)}
       onPointerCancel={(event) => touch(false, event)}
     >
-      <Canvas camera={{ fov: 72, near: 0.1, far: 260, position: [0, -RADIUS + 3.4, 6.5] }} dpr={[1, 1.5]}>
+      <Canvas camera={{ fov: 74, near: 0.1, far: 400, position: [0, -RADIUS + 3.9, 7.5] }} dpr={[1, 1.5]} gl={{ antialias: true }}>
         <color attach="background" args={[era.fog]} />
-        <fog attach="fog" args={[era.fog, 40, 190]} />
+        <fog attach="fog" args={[era.fog, 30, 150]} />
+        <ambientLight intensity={0.35} />
+        <hemisphereLight args={["#ffe6c8", "#20152e", 0.6]} />
         <Stars />
+        <Nebula colour={era.edge} />
         <Tunnel game={game} row={row} era={hud.era} />
         <Runner game={game} />
         <Step game={game} row={row} onHud={setHud} onOver={over} />
