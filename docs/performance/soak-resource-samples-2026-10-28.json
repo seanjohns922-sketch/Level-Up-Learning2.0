@@ -1,0 +1,1685 @@
+{
+  "environment": "local Docker point samples; not production headroom",
+  "samples": [
+    {
+      "at": "2026-10-28T04:10:48.278Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "14.68%",
+          "memory": "219.9MiB / 7.75GiB",
+          "network": "70.5MB / 738MB",
+          "blockIO": "0B / 485MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "6.15%",
+          "memory": "139.3MiB / 7.75GiB",
+          "network": "782MB / 756MB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.52%",
+          "memory": "248.9MiB / 7.75GiB",
+          "network": "4.09MB / 5.64MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:11:19.527Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "17.63%",
+          "memory": "220.7MiB / 7.75GiB",
+          "network": "73.2MB / 826MB",
+          "blockIO": "0B / 486MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "6.81%",
+          "memory": "139.4MiB / 7.75GiB",
+          "network": "872MB / 844MB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.86%",
+          "memory": "248.9MiB / 7.75GiB",
+          "network": "4.14MB / 5.72MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:11:51.814Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.25%",
+          "memory": "187.4MiB / 7.75GiB",
+          "network": "75.8MB / 913MB",
+          "blockIO": "0B / 487MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.95%",
+          "memory": "139.9MiB / 7.75GiB",
+          "network": "960MB / 931MB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.70%",
+          "memory": "248.9MiB / 7.75GiB",
+          "network": "4.17MB / 5.78MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:12:24.066Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "12.43%",
+          "memory": "186.8MiB / 7.75GiB",
+          "network": "78.5MB / 1GB",
+          "blockIO": "0B / 489MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.45%",
+          "memory": "141MiB / 7.75GiB",
+          "network": "1.05GB / 1.02GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.29%",
+          "memory": "249.2MiB / 7.75GiB",
+          "network": "4.19MB / 5.79MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:12:56.359Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.26%",
+          "memory": "187.2MiB / 7.75GiB",
+          "network": "81.1MB / 1.09GB",
+          "blockIO": "0B / 493MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.55%",
+          "memory": "141.6MiB / 7.75GiB",
+          "network": "1.14GB / 1.11GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.22%",
+          "memory": "248.9MiB / 7.75GiB",
+          "network": "4.2MB / 5.81MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:13:28.648Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "74.81%",
+          "memory": "192MiB / 7.75GiB",
+          "network": "86.7MB / 1.26GB",
+          "blockIO": "0B / 496MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "6.49%",
+          "memory": "142.3MiB / 7.75GiB",
+          "network": "1.32GB / 1.28GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.72%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.22MB / 5.83MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:14:00.937Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "87.39%",
+          "memory": "194.6MiB / 7.75GiB",
+          "network": "92.9MB / 1.44GB",
+          "blockIO": "0B / 500MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.92%",
+          "memory": "142.9MiB / 7.75GiB",
+          "network": "1.49GB / 1.45GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.31%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.23MB / 5.85MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:14:33.250Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "11.77%",
+          "memory": "199.7MiB / 7.75GiB",
+          "network": "99MB / 1.61GB",
+          "blockIO": "0B / 504MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "7.15%",
+          "memory": "143.9MiB / 7.75GiB",
+          "network": "1.67GB / 1.63GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.80%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.24MB / 5.87MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 9
+      }
+    },
+    {
+      "at": "2026-10-28T04:15:05.576Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "5.51%",
+          "memory": "195.5MiB / 7.75GiB",
+          "network": "104MB / 1.78GB",
+          "blockIO": "0B / 507MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.85%",
+          "memory": "144.8MiB / 7.75GiB",
+          "network": "1.85GB / 1.8GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.30%",
+          "memory": "250.8MiB / 7.75GiB",
+          "network": "4.26MB / 5.88MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:15:37.811Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.45%",
+          "memory": "195.4MiB / 7.75GiB",
+          "network": "107MB / 1.87GB",
+          "blockIO": "0B / 507MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.32%",
+          "memory": "145.3MiB / 7.75GiB",
+          "network": "1.94GB / 1.89GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.53%",
+          "memory": "250.8MiB / 7.75GiB",
+          "network": "4.27MB / 5.9MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:16:10.107Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.13%",
+          "memory": "195.7MiB / 7.75GiB",
+          "network": "110MB / 1.96GB",
+          "blockIO": "0B / 508MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.68%",
+          "memory": "145.6MiB / 7.75GiB",
+          "network": "2.03GB / 1.98GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.14%",
+          "memory": "250.8MiB / 7.75GiB",
+          "network": "4.28MB / 5.92MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:16:42.377Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.23%",
+          "memory": "196.3MiB / 7.75GiB",
+          "network": "113MB / 2.05GB",
+          "blockIO": "0B / 509MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.16%",
+          "memory": "146MiB / 7.75GiB",
+          "network": "2.12GB / 2.07GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.50%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.3MB / 5.94MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:17:14.696Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.69%",
+          "memory": "195.7MiB / 7.75GiB",
+          "network": "115MB / 2.14GB",
+          "blockIO": "0B / 510MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.15%",
+          "memory": "146MiB / 7.75GiB",
+          "network": "2.21GB / 2.16GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.09%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.31MB / 5.96MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:17:47.017Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "7.17%",
+          "memory": "195.9MiB / 7.75GiB",
+          "network": "118MB / 2.22GB",
+          "blockIO": "0B / 511MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.68%",
+          "memory": "146.2MiB / 7.75GiB",
+          "network": "2.3GB / 2.25GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.34%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.33MB / 5.97MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:18:18.268Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "5.55%",
+          "memory": "195.6MiB / 7.75GiB",
+          "network": "121MB / 2.31GB",
+          "blockIO": "0B / 512MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.99%",
+          "memory": "146.5MiB / 7.75GiB",
+          "network": "2.39GB / 2.34GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.56%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.34MB / 5.99MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 3
+      }
+    },
+    {
+      "at": "2026-10-28T04:18:50.568Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.77%",
+          "memory": "195.1MiB / 7.75GiB",
+          "network": "123MB / 2.4GB",
+          "blockIO": "0B / 513MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.95%",
+          "memory": "146.4MiB / 7.75GiB",
+          "network": "2.48GB / 2.42GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.36%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.35MB / 6.01MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:19:22.880Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.35%",
+          "memory": "196.7MiB / 7.75GiB",
+          "network": "126MB / 2.49GB",
+          "blockIO": "0B / 514MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.70%",
+          "memory": "146.9MiB / 7.75GiB",
+          "network": "2.57GB / 2.52GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.82%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.37MB / 6.03MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:19:55.159Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.25%",
+          "memory": "196.2MiB / 7.75GiB",
+          "network": "129MB / 2.58GB",
+          "blockIO": "0B / 514MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "4.01%",
+          "memory": "146.5MiB / 7.75GiB",
+          "network": "2.66GB / 2.6GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.34%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.38MB / 6.05MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:20:27.432Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.92%",
+          "memory": "196MiB / 7.75GiB",
+          "network": "131MB / 2.67GB",
+          "blockIO": "0B / 516MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.81%",
+          "memory": "146.5MiB / 7.75GiB",
+          "network": "2.75GB / 2.69GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.24%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.39MB / 6.06MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:20:58.720Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "7.19%",
+          "memory": "195.2MiB / 7.75GiB",
+          "network": "134MB / 2.75GB",
+          "blockIO": "0B / 516MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.84%",
+          "memory": "146.7MiB / 7.75GiB",
+          "network": "2.84GB / 2.78GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.61%",
+          "memory": "250.8MiB / 7.75GiB",
+          "network": "4.41MB / 6.08MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:21:30.004Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.12%",
+          "memory": "195.7MiB / 7.75GiB",
+          "network": "137MB / 2.84GB",
+          "blockIO": "0B / 517MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.34%",
+          "memory": "146.7MiB / 7.75GiB",
+          "network": "2.93GB / 2.87GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "8.20%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.45MB / 6.12MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:22:02.385Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "33.59%",
+          "memory": "289.4MiB / 7.75GiB",
+          "network": "144MB / 2.92GB",
+          "blockIO": "0B / 527MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.63%",
+          "memory": "153.4MiB / 7.75GiB",
+          "network": "3.01GB / 2.94GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.71%",
+          "memory": "250.8MiB / 7.75GiB",
+          "network": "4.69MB / 6.43MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:22:34.696Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.43%",
+          "memory": "289.3MiB / 7.75GiB",
+          "network": "146MB / 2.98GB",
+          "blockIO": "0B / 531MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.57%",
+          "memory": "153MiB / 7.75GiB",
+          "network": "3.08GB / 3.01GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.41%",
+          "memory": "250.9MiB / 7.75GiB",
+          "network": "4.77MB / 6.55MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:23:06.921Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.57%",
+          "memory": "290.2MiB / 7.75GiB",
+          "network": "149MB / 3.05GB",
+          "blockIO": "0B / 534MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.05%",
+          "memory": "153.7MiB / 7.75GiB",
+          "network": "3.14GB / 3.07GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.83%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "4.84MB / 6.65MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:23:38.193Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "6.06%",
+          "memory": "295.1MiB / 7.75GiB",
+          "network": "156MB / 3.12GB",
+          "blockIO": "0B / 545MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.74%",
+          "memory": "158.1MiB / 7.75GiB",
+          "network": "3.22GB / 3.15GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.97%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "5.12MB / 6.99MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:24:10.463Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.87%",
+          "memory": "295.1MiB / 7.75GiB",
+          "network": "159MB / 3.19GB",
+          "blockIO": "0B / 546MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.55%",
+          "memory": "157.8MiB / 7.75GiB",
+          "network": "3.28GB / 3.21GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.91%",
+          "memory": "251MiB / 7.75GiB",
+          "network": "5.19MB / 7.09MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:24:42.765Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "12.10%",
+          "memory": "294.9MiB / 7.75GiB",
+          "network": "161MB / 3.25GB",
+          "blockIO": "0B / 548MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.61%",
+          "memory": "156.4MiB / 7.75GiB",
+          "network": "3.35GB / 3.28GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.51%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "5.25MB / 7.19MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:25:14.901Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.67%",
+          "memory": "294.8MiB / 7.75GiB",
+          "network": "163MB / 3.32GB",
+          "blockIO": "0B / 549MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.23%",
+          "memory": "156.4MiB / 7.75GiB",
+          "network": "3.42GB / 3.34GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.52%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "5.34MB / 7.31MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:25:46.054Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.22%",
+          "memory": "296.9MiB / 7.75GiB",
+          "network": "171MB / 3.39GB",
+          "blockIO": "0B / 559MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.03%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "3.5GB / 3.42GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "3.30%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "5.63MB / 7.66MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:26:18.253Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "10.59%",
+          "memory": "296.9MiB / 7.75GiB",
+          "network": "173MB / 3.46GB",
+          "blockIO": "0B / 561MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "4.58%",
+          "memory": "156.5MiB / 7.75GiB",
+          "network": "3.57GB / 3.48GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.97%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "5.7MB / 7.76MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:26:49.564Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.24%",
+          "memory": "297.4MiB / 7.75GiB",
+          "network": "180MB / 3.53GB",
+          "blockIO": "0B / 570MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.00%",
+          "memory": "159.1MiB / 7.75GiB",
+          "network": "3.64GB / 3.56GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.31%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "5.97MB / 8.1MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 36,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:27:21.838Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "2.75%",
+          "memory": "292.1MiB / 7.75GiB",
+          "network": "183MB / 3.59GB",
+          "blockIO": "0B / 573MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.37%",
+          "memory": "158.9MiB / 7.75GiB",
+          "network": "3.71GB / 3.62GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.10%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.04MB / 8.2MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:27:53.130Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "12.61%",
+          "memory": "292.6MiB / 7.75GiB",
+          "network": "185MB / 3.66GB",
+          "blockIO": "0B / 576MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "4.23%",
+          "memory": "157.8MiB / 7.75GiB",
+          "network": "3.78GB / 3.69GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.07%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.09MB / 8.28MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:28:25.451Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "13.51%",
+          "memory": "292.6MiB / 7.75GiB",
+          "network": "187MB / 3.73GB",
+          "blockIO": "0B / 580MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.60%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "3.85GB / 3.76GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.49%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.15MB / 8.37MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:28:56.744Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.68%",
+          "memory": "292MiB / 7.75GiB",
+          "network": "189MB / 3.79GB",
+          "blockIO": "0B / 582MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.47%",
+          "memory": "159.6MiB / 7.75GiB",
+          "network": "3.91GB / 3.82GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "3.59%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.2MB / 8.45MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 3
+      }
+    },
+    {
+      "at": "2026-10-28T04:29:29.022Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "4.68%",
+          "memory": "292.1MiB / 7.75GiB",
+          "network": "191MB / 3.86GB",
+          "blockIO": "0B / 583MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.74%",
+          "memory": "157.1MiB / 7.75GiB",
+          "network": "3.98GB / 3.89GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.77%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.26MB / 8.53MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 2
+      }
+    },
+    {
+      "at": "2026-10-28T04:30:01.312Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.45%",
+          "memory": "292.3MiB / 7.75GiB",
+          "network": "194MB / 3.92GB",
+          "blockIO": "0B / 584MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.97%",
+          "memory": "157.2MiB / 7.75GiB",
+          "network": "4.05GB / 3.96GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.12%",
+          "memory": "253.1MiB / 7.75GiB",
+          "network": "6.31MB / 8.62MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:30:33.629Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "13.06%",
+          "memory": "292.3MiB / 7.75GiB",
+          "network": "196MB / 3.99GB",
+          "blockIO": "0B / 586MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "43.72%",
+          "memory": "158MiB / 7.75GiB",
+          "network": "4.12GB / 4.02GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.12%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "6.37MB / 8.7MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:31:05.938Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "12.20%",
+          "memory": "292.1MiB / 7.75GiB",
+          "network": "198MB / 4.06GB",
+          "blockIO": "0B / 587MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.25%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "4.19GB / 4.09GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.74%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "6.42MB / 8.79MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:31:38.243Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.62%",
+          "memory": "292MiB / 7.75GiB",
+          "network": "201MB / 4.13GB",
+          "blockIO": "0B / 588MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.85%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "4.25GB / 4.16GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "3.11%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "6.48MB / 8.87MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:32:10.575Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "4.49%",
+          "memory": "292.3MiB / 7.75GiB",
+          "network": "203MB / 4.19GB",
+          "blockIO": "0B / 589MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.96%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "4.32GB / 4.22GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.35%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "6.53MB / 8.95MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:32:42.916Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "4.92%",
+          "memory": "291.9MiB / 7.75GiB",
+          "network": "205MB / 4.26GB",
+          "blockIO": "0B / 590MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.79%",
+          "memory": "158.6MiB / 7.75GiB",
+          "network": "4.39GB / 4.29GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.88%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "6.59MB / 9.04MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:33:14.216Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "7.44%",
+          "memory": "291.9MiB / 7.75GiB",
+          "network": "207MB / 4.32GB",
+          "blockIO": "0B / 591MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.55%",
+          "memory": "158.7MiB / 7.75GiB",
+          "network": "4.46GB / 4.36GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "6.00%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "6.64MB / 9.12MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:33:45.489Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "3.82%",
+          "memory": "292.3MiB / 7.75GiB",
+          "network": "209MB / 4.39GB",
+          "blockIO": "0B / 592MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "1.55%",
+          "memory": "157.9MiB / 7.75GiB",
+          "network": "4.52GB / 4.42GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.60%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "6.7MB / 9.2MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:34:16.761Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "13.24%",
+          "memory": "292.1MiB / 7.75GiB",
+          "network": "212MB / 4.46GB",
+          "blockIO": "0B / 593MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.68%",
+          "memory": "157.8MiB / 7.75GiB",
+          "network": "4.59GB / 4.48GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "2.32%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.75MB / 9.29MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:34:49.051Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "13.57%",
+          "memory": "292.4MiB / 7.75GiB",
+          "network": "214MB / 4.52GB",
+          "blockIO": "0B / 593MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "5.28%",
+          "memory": "158.1MiB / 7.75GiB",
+          "network": "4.66GB / 4.55GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "5.01%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.8MB / 9.37MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:35:20.368Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "12.84%",
+          "memory": "292.5MiB / 7.75GiB",
+          "network": "216MB / 4.59GB",
+          "blockIO": "0B / 595MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.30%",
+          "memory": "158.1MiB / 7.75GiB",
+          "network": "4.72GB / 4.62GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.77%",
+          "memory": "252.7MiB / 7.75GiB",
+          "network": "6.86MB / 9.45MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:35:52.745Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "20.05%",
+          "memory": "292MiB / 7.75GiB",
+          "network": "218MB / 4.66GB",
+          "blockIO": "0B / 596MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.35%",
+          "memory": "158MiB / 7.75GiB",
+          "network": "4.79GB / 4.68GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.19%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "6.91MB / 9.54MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:36:25.065Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "2.50%",
+          "memory": "292.6MiB / 7.75GiB",
+          "network": "220MB / 4.72GB",
+          "blockIO": "0B / 597MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "2.87%",
+          "memory": "158.2MiB / 7.75GiB",
+          "network": "4.86GB / 4.75GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.59%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "6.97MB / 9.62MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 34,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:36:57.392Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "10.12%",
+          "memory": "259.8MiB / 7.75GiB",
+          "network": "222MB / 4.79GB",
+          "blockIO": "0B / 597MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.82%",
+          "memory": "158.3MiB / 7.75GiB",
+          "network": "4.93GB / 4.82GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.28%",
+          "memory": "252.8MiB / 7.75GiB",
+          "network": "6.99MB / 9.65MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:37:28.699Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.31%",
+          "memory": "259.5MiB / 7.75GiB",
+          "network": "224MB / 4.85GB",
+          "blockIO": "0B / 598MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "0.42%",
+          "memory": "158.3MiB / 7.75GiB",
+          "network": "4.99GB / 4.88GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.85%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "7MB / 9.67MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:38:00.882Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.05%",
+          "memory": "259.8MiB / 7.75GiB",
+          "network": "226MB / 4.92GB",
+          "blockIO": "0B / 599MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "4.55%",
+          "memory": "151.9MiB / 7.75GiB",
+          "network": "5.06GB / 4.95GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.75%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "7.02MB / 9.69MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:38:33.199Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "9.80%",
+          "memory": "260MiB / 7.75GiB",
+          "network": "229MB / 4.98GB",
+          "blockIO": "0B / 600MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "4.06%",
+          "memory": "151.8MiB / 7.75GiB",
+          "network": "5.13GB / 5.02GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "1.18%",
+          "memory": "252.9MiB / 7.75GiB",
+          "network": "7.03MB / 9.7MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:39:04.508Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.20%",
+          "memory": "259.6MiB / 7.75GiB",
+          "network": "231MB / 5.05GB",
+          "blockIO": "0B / 601MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "16.49%",
+          "memory": "151.9MiB / 7.75GiB",
+          "network": "5.2GB / 5.08GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.46%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "7.04MB / 9.72MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    },
+    {
+      "at": "2026-10-28T04:39:36.816Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "8.12%",
+          "memory": "260MiB / 7.75GiB",
+          "network": "233MB / 5.11GB",
+          "blockIO": "0B / 602MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.05%",
+          "memory": "152.4MiB / 7.75GiB",
+          "network": "5.26GB / 5.15GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.28%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "7.06MB / 9.74MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 3
+      }
+    },
+    {
+      "at": "2026-10-28T04:39:48.279Z",
+      "containers": [
+        {
+          "name": "supabase_db_reliq-scale-local",
+          "cpu": "0.06%",
+          "memory": "260MiB / 7.75GiB",
+          "network": "234MB / 5.14GB",
+          "blockIO": "0B / 602MB"
+        },
+        {
+          "name": "supabase_rest_reliq-scale-local",
+          "cpu": "3.60%",
+          "memory": "152.4MiB / 7.75GiB",
+          "network": "5.29GB / 5.17GB",
+          "blockIO": "0B / 0B"
+        },
+        {
+          "name": "supabase_realtime_reliq-scale-local",
+          "cpu": "0.35%",
+          "memory": "252.6MiB / 7.75GiB",
+          "network": "7.06MB / 9.75MB",
+          "blockIO": "0B / 0B"
+        }
+      ],
+      "database": {
+        "connections": 27,
+        "activeIncludingObserver": 1
+      }
+    }
+  ]
+}

@@ -370,3 +370,15 @@ without a diagnostic and was stopped; `npm run build -- --webpack` completed.
 The single `20261028170000` migration was applied transactionally to production
 and recorded in `supabase_migrations.schema_migrations`; no other pending migration
 was applied. Student data and existing RLS policies were not changed.
+
+## Sustained-test follow-up
+
+See `SUSTAINED_100_2026-10-28.md` for the 30-minute run and retained before/after
+artifacts. All 6,000 active-time writes were verified, but a teacher socket failure
+made the run fail overall. Mixed completion bursts exposed the local gateway's
+implicit 512-connection limit; a local-only increase to 4,096 was followed by two
+passing identical bursts. Presence assertions were also corrected to require
+actual persisted activity rows rather than merely HTTP success. The corrected
+120-second workload passed all 100 presence checks and 400 activity increments.
+A clean 30-minute repeat with these settings remains outstanding. The deployed
+paging fix and its production migration have both been independently verified.

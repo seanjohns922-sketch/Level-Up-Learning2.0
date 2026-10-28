@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-28T04:40:03.038Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "students": 100,
+  "teachers": 4,
+  "historyEvents": 20000,
+  "durationSeconds": 1800,
+  "requests": 15306,
+  "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+  "snapshotHttpRequests": 32770,
+  "failedRequests": 0,
+  "verifiedActivityWrites": 6000,
+  "failures": [
+    "Expected values to be strictly equal:\n+ actual - expected\n\n+ {\n+   code: '',\n+   details: 'TypeError: fetch failed\\n' +\n+     '\\n' +\n+     'Caused by: SocketError: other side closed (UND_ERR_SOCKET)\\n' +\n+     'SocketError: other side closed\\n' +\n+     '    at Socket.onHttpSocketEnd (node:internal/deps/undici/undici:7611:26)\\n' +\n+     '    at Socket.emit (node:events:520:35)\\n' +\n+     '    at endReadableNT (node:internal/streams/readable:1701:12)\\n' +\n+     '    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)',\n+   hint: '',\n+   message: 'TypeError: fetch failed'\n+ }\n- null\n"
+  ],
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "requests": 4,
+      "failedRequests": 0,
+      "p95Ms": 103,
+      "p99Ms": 103,
+      "maximumMs": 103
+    },
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 355,
+      "p99Ms": 520,
+      "maximumMs": 538
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 324,
+      "p99Ms": 424,
+      "maximumMs": 455
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 200,
+      "failedRequests": 0,
+      "p95Ms": 163,
+      "p99Ms": 236,
+      "maximumMs": 360
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 6000,
+      "failedRequests": 0,
+      "p95Ms": 62,
+      "p99Ms": 151,
+      "maximumMs": 958
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 6000,
+      "failedRequests": 0,
+      "p95Ms": 63,
+      "p99Ms": 194,
+      "maximumMs": 762
+    },
+    {
+      "name": "teacher_event_snapshot",
+      "requests": 2902,
+      "failedRequests": 0,
+      "p95Ms": 163,
+      "p99Ms": 220,
+      "maximumMs": 2407
+    }
+  ],
+  "preliminaryGatePassed": false,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "full six-read teacher snapshots",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-28T04:42:13.757Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "students": 100,
+  "teachers": 4,
+  "historyEvents": 20000,
+  "durationSeconds": 120,
+  "requests": 1632,
+  "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+  "snapshotHttpRequests": 2565,
+  "failedRequests": 0,
+  "verifiedPresenceStudents": 100,
+  "verifiedActivityWrites": 400,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "requests": 4,
+      "failedRequests": 0,
+      "p95Ms": 104,
+      "p99Ms": 104,
+      "maximumMs": 104
+    },
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 336,
+      "p99Ms": 515,
+      "maximumMs": 534
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 321,
+      "p99Ms": 431,
+      "maximumMs": 490
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 318,
+      "p99Ms": 424,
+      "maximumMs": 455
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 200,
+      "failedRequests": 0,
+      "p95Ms": 187,
+      "p99Ms": 273,
+      "maximumMs": 282
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 400,
+      "failedRequests": 0,
+      "p95Ms": 107,
+      "p99Ms": 178,
+      "maximumMs": 337
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 400,
+      "failedRequests": 0,
+      "p95Ms": 71,
+      "p99Ms": 163,
+      "maximumMs": 219
+    },
+    {
+      "name": "teacher_event_snapshot",
+      "requests": 228,
+      "failedRequests": 0,
+      "p95Ms": 273,
+      "p99Ms": 709,
+      "maximumMs": 727
+    },
+    {
+      "name": "get_live_student_activity_secure",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 133,
+      "p99Ms": 164,
+      "maximumMs": 167
+    }
+  ],
+  "preliminaryGatePassed": true,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "full six-read teacher snapshots",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}

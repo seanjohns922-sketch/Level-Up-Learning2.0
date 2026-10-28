@@ -11,10 +11,15 @@ const samples = [], clients = [], failures = [], received = new Map(), sent = ne
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function rpc(name, args, session, expectedDenial = false) {
   const start = performance.now();
-  const response = await fetch(`${config.API_URL}/rest/v1/rpc/${name}`, {
+  let response;
+  try { response = await fetch(`${config.API_URL}/rest/v1/rpc/${name}`, {
     method: 'POST', headers: { apikey: config.ANON_KEY, Authorization: `Bearer ${config.ANON_KEY}`, 'Content-Type': 'application/json', ...(session ? { 'x-student-session': session } : {}) },
     body: JSON.stringify(args), signal: AbortSignal.timeout(15000),
   });
+  } catch(error) {
+    samples.push({name,ms:performance.now()-start,status:0});
+    throw new Error(`${name}: transport failure ${error.cause?.code ?? error.name}`,{cause:error});
+  }
   const text = await response.text();
   const data = text ? JSON.parse(text) : null;
   if (expectedDenial) {
@@ -109,7 +114,7 @@ try {
 finally { await Promise.all(clients.map(client=>client.removeAllChannels())); }
 const endpoints = [...new Set(samples.map(s=>s.name))].map(name=>{
   const rows=samples.filter(s=>s.name===name),times=rows.map(s=>s.ms).sort((a,b)=>a-b);
-  return {name,requests:rows.length,failures:rows.filter(s=>s.status>=400).length,p95Ms:Math.round(times[Math.ceil(times.length*.95)-1]),p99Ms:Math.round(times[Math.ceil(times.length*.99)-1])};
+  return {name,requests:rows.length,failures:rows.filter(s=>s.status<200||s.status>=400).length,p95Ms:Math.round(times[Math.ceil(times.length*.95)-1]),p99Ms:Math.round(times[Math.ceil(times.length*.99)-1])};
 });
 const lag=[...received].filter(([id])=>sent.has(id)).map(([id,t])=>t-sent.get(id)).sort((a,b)=>a-b);
 const report={at:new Date().toISOString(),environment:'local synthetic completion/retry and realtime burst',students:100,verifiedJourneys:checked,teacherVerifiedStudents:teacherVerified,requests:samples.length,expectedStudentDenials:denialChecks,eventsReceived:received.size,realtimeP95Ms:Math.round(lag[Math.ceil(lag.length*.95)-1]??0),realtimeMaximumMs:Math.round(lag.at(-1)??0),failures,endpoints};

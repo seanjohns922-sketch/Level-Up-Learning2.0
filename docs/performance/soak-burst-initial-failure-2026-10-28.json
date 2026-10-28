@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-28T04:21:40.346Z",
+  "environment": "local synthetic completion/retry and realtime burst",
+  "students": 100,
+  "verifiedJourneys": 85,
+  "teacherVerifiedStudents": 0,
+  "requests": 1916,
+  "expectedStudentDenials": 510,
+  "eventsReceived": 82,
+  "realtimeP95Ms": 498,
+  "realtimeMaximumMs": 671,
+  "failures": [
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "fetch failed",
+    "Every student event must reach the correct teacher\n\n82 !== 100\n"
+  ],
+  "endpoints": [
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "failures": 0,
+      "p95Ms": 505,
+      "p99Ms": 722
+    },
+    {
+      "name": "get_student_realm_weekly_quiz_attempts_secure",
+      "requests": 178,
+      "failures": 0,
+      "p95Ms": 415,
+      "p99Ms": 562
+    },
+    {
+      "name": "get_student_realm_assessments_secure",
+      "requests": 176,
+      "failures": 0,
+      "p95Ms": 461,
+      "p99Ms": 606
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 180,
+      "failures": 0,
+      "p95Ms": 454,
+      "p99Ms": 628
+    },
+    {
+      "name": "get_student_realm_lesson_attempts_secure",
+      "requests": 177,
+      "failures": 0,
+      "p95Ms": 400,
+      "p99Ms": 565
+    },
+    {
+      "name": "complete_realm_assessment",
+      "requests": 340,
+      "failures": 0,
+      "p95Ms": 335,
+      "p99Ms": 579
+    },
+    {
+      "name": "complete_realm_lesson",
+      "requests": 510,
+      "failures": 0,
+      "p95Ms": 421,
+      "p99Ms": 688
+    },
+    {
+      "name": "complete_realm_quiz",
+      "requests": 170,
+      "failures": 0,
+      "p95Ms": 407,
+      "p99Ms": 719
+    },
+    {
+      "name": "insert_live_activity_event_secure",
+      "requests": 85,
+      "failures": 0,
+      "p95Ms": 242,
+      "p99Ms": 426
+    }
+  ],
+  "passed": false
+}

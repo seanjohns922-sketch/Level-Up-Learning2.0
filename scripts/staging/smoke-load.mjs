@@ -25,7 +25,8 @@ await Promise.all(fixture.students.map(async student => {
   assert.equal(context[0].class_id, fixture.classId);
   const before = await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session);
   const sum = rows => rows.reduce((total, row) => total + row.seconds_active, 0);
-  await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: fixture.classId }, session);
+  await rpc('upsert_live_student_activity_secure', {p_student_id:student.studentId,p_class_id:fixture.classId,p_data:{current_level:'Year 4',current_strand:'number',current_lesson:'Synthetic smoke session'}}, session);
+  assert.equal(await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: fixture.classId }, session), true);
   await rpc('upsert_student_activity_daily_secure', { p_student_id: student.studentId, p_class_id: fixture.classId, p_seconds_active: 30 }, session);
   const after = await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session);
   assert.equal(sum(after), sum(before) + 30, 'Each synthetic student must retain their own activity write');

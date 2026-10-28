@@ -62,29 +62,48 @@ const students = groups.flatMap(group => group.students.map(student => ({ group,
 const started = Date.now();
 const deadline = started + seconds * 1000;
 let verifiedWrites = 0;
+let completedStudentJourneys = 0;
+let initializedStudents = 0;
+function saveProgress(finished = false) {
+  fs.writeFileSync(`${localDir}/capacity-progress.json`, JSON.stringify({
+    at: new Date().toISOString(), environment: 'isolated local test', finished,
+    plannedSeconds: seconds, elapsedSeconds: Math.round((Date.now()-started)/1000),
+    completedStudentJourneys, initializedStudents, verifiedWrites, recordedOperations: samples.length,
+    snapshotHttpRequests, observedFailedOperations: samples.filter(s=>s.status<200||s.status>=300).length,
+  }, null, 2));
+}
+const progressTimer = setInterval(() => saveProgress(), 30000);
+progressTimer.unref();
+saveProgress();
 async function studentJourney({ group, student }) {
   const login = await rpc('student_login_lookup', { p_class_id: group.classId, p_display_name: student.username, p_pin: student.pin });
   assert.equal(login[0].student_id, student.studentId);
   const session = login[0].session_token;
   const context = await rpc('get_student_runtime_context_secure', { p_student_id: student.studentId }, session);
   assert.equal(context[0].class_id, group.classId);
+  await rpc('upsert_live_student_activity_secure', {p_student_id:student.studentId,p_class_id:group.classId,p_data:{current_level:'Year 4',current_strand:'number',current_lesson:'Synthetic capacity session',last_active_at:'2000-01-01T00:00:00Z'}}, session);
+  initializedStudents++;
   const before = sum(await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session));
   let writes = 0;
   do {
-    await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: group.classId }, session);
+    assert.equal(await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: group.classId }, session), true, 'Heartbeat must update a live activity row');
     await rpc('upsert_student_activity_daily_secure', { p_student_id: student.studentId, p_class_id: group.classId, p_seconds_active: 30 }, session);
     writes++;
     await sleep(Math.min(30000, Math.max(0, deadline - Date.now())));
   } while (Date.now() < deadline);
   const after = sum(await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session));
   assert.equal(after, before + writes * 30, 'Individual activity write integrity');
+  const live = await rpc('get_live_student_activity_secure',{p_student_id:student.studentId,p_class_id:group.classId},session);
+  assert.equal(live.student_id,student.studentId);
+  assert.ok(Date.now()-Date.parse(live.last_active_at)<90000,'Persisted heartbeat must be recent');
   verifiedWrites += writes;
+  completedStudentJourneys++;
 }
 async function teacherJourney({ group, client }) {
   do {
     const start = performance.now();
     const result = await fetchLiveClassEvents(client, {classId:group.classId,eventTypes:['answer_correct','question_loaded']});
-    samples.push({name:'teacher_event_snapshot',ms:performance.now()-start,status:result.status});
+    samples.push({name:'teacher_event_snapshot',ms:performance.now()-start,status:result.error ? (result.status>=400 ? result.status : 0) : result.status});
     assert.equal(result.error,null);
     const rows=result.data;
     assert.ok(rows.length >= 5000, 'Snapshot must include all seeded history, not the first API page');
@@ -96,6 +115,8 @@ async function teacherJourney({ group, client }) {
 }
 const work = [...students.map(studentJourney), ...teachers.map(teacherJourney)];
 const results = await Promise.allSettled(work);
+clearInterval(progressTimer);
+saveProgress(true);
 for (const result of results) if (result.status === 'rejected') failures.push(result.reason.message);
 const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
   const rows = samples.filter(s => s.name === name);
@@ -106,7 +127,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
   students: 100, teachers: 4, historyEvents: 20000, durationSeconds: Math.round((Date.now()-started)/1000),
-  requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedActivityWrites: verifiedWrites, failures, endpoints,
+  requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
 fs.writeFileSync(`${localDir}/capacity-100-result.json`, JSON.stringify(report,null,2));

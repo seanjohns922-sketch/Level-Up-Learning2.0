@@ -56,7 +56,8 @@ const context = await request('/rest/v1/rpc/get_student_runtime_context_secure',
 assert.equal(context[0].class_id, fixture.classId);
 await assert.rejects(request('/rest/v1/rpc/get_student_runtime_context_secure', { p_student_id: fixture.students[1].studentId }, config.ANON_KEY, 'POST', headers));
 await assert.rejects(request('/rest/v1/rpc/get_student_runtime_context_secure', { p_student_id: student.studentId }, config.ANON_KEY));
-await request('/rest/v1/rpc/touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: fixture.classId }, config.ANON_KEY, 'POST', headers);
+await request('/rest/v1/rpc/upsert_live_student_activity_secure', {p_student_id:student.studentId,p_class_id:fixture.classId,p_data:{current_level:'Year 4',current_strand:'number',current_lesson:'Synthetic setup session'}}, config.ANON_KEY, 'POST', headers);
+assert.equal(await request('/rest/v1/rpc/touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: fixture.classId }, config.ANON_KEY, 'POST', headers), true);
 const activityArgs = { p_student_id: student.studentId };
 const before = await request('/rest/v1/rpc/get_student_activity_daily_secure', activityArgs, config.ANON_KEY, 'POST', headers);
 const previousSeconds = before.reduce((sum, row) => sum + row.seconds_active, 0);
