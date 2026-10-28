@@ -70,8 +70,12 @@ function Sky() {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
       scene.background = texture;
+      // Also light the scene from the sky, so shiny avatar outfits and gold
+      // trims reflect something instead of rendering black.
+      scene.environment = texture;
+      scene.environmentIntensity = 0.8;
     });
-    return () => { cancelled = true; scene.background = null; };
+    return () => { cancelled = true; scene.background = null; scene.environment = null; };
   }, [scene]);
   return null;
 }

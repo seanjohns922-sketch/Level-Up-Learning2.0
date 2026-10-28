@@ -4,6 +4,7 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
+import { Environment, Lightformer } from "@react-three/drei";
 import { TrialStudentAvatar } from "@/components/world3d/SharedWorldPlayer";
 import { WORLD_AVATAR_SCALE } from "@/lib/world3d/world-scale";
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCcw } from "lucide-react";
@@ -404,6 +405,11 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
         <fog attach="fog" args={[era.fog, 70, 210]} />
         <ambientLight intensity={0.8} />
         <hemisphereLight args={["#ffe6c8", "#3a2a4e", 1.1]} />
+        {/* reflections for the avatar's outfit (rendered once, no external files) */}
+        <Environment resolution={64} frames={1} background={false} environmentIntensity={0.7}>
+          <Lightformer intensity={1.6} color="#fff2d6" position={[-6, 8, 4]} scale={[10, 10, 1]} />
+          <Lightformer intensity={0.8} color="#cfe6ff" position={[6, 4, -6]} scale={[10, 10, 1]} />
+        </Environment>
         <Stars />
         <Nebula colour={era.edge} />
         <Suspense fallback={null}><Tunnel game={game} row={row} era={hud.era} /></Suspense>
