@@ -24,7 +24,7 @@ const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: st
   arena: { u: 0.17, v: 0.55, color: "#ffc94a", game: "Relic Rider", place: "The Arena Gate", blurb: "Stunt bikes through the castle tracks. Flip in the air to save time.", art: "/images/chronorok/arena-gate.webp" },
   rift: { u: 0.33, v: 0.4, color: "#7ff0ff", game: "Chrono Run", place: "The Rift Portal", blurb: "Run the time tunnels. Turn onto the walls and leap the gaps.", art: "/images/chronorok/rift-portal.webp", href: "/world/chronorok/chrono-run" },
   cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp" },
-  rune: { u: 0.845, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp" },
+  rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp" },
 };
 
 // Depth of the painting at a point (u, v from the top-left): the plaza comes
@@ -135,6 +135,15 @@ function Mist() {
   );
 }
 
+// Keep portal labels on screen when the painting is wider than the view.
+function clampToScreen(object: THREE.Object3D, camera: THREE.Camera, size: { width: number; height: number }) {
+  const point = new THREE.Vector3().setFromMatrixPosition(object.matrixWorld).project(camera);
+  const margin = 95;
+  const x = Math.min(size.width - margin, Math.max(margin, ((point.x + 1) / 2) * size.width));
+  const y = ((1 - point.y) / 2) * size.height;
+  return [x, y];
+}
+
 function PortalGlow({ portal, active, onOpen }: { portal: (typeof PORTALS)[PortalKey]; active: boolean; onOpen: () => void }) {
   const sprite = useRef<THREE.Sprite>(null);
   const texture = useMemo(() => softDot([[0, "rgba(255,255,255,.9)"], [0.25, "rgba(255,255,255,.4)"], [1, "rgba(255,255,255,0)"]], 128), []);
@@ -149,7 +158,7 @@ function PortalGlow({ portal, active, onOpen }: { portal: (typeof PORTALS)[Porta
       <sprite ref={sprite} position={[0, 0, 0.6]}>
         <spriteMaterial map={texture} color={portal.color} transparent depthWrite={false} blending={THREE.AdditiveBlending} opacity={active ? 1 : 0.6} />
       </sprite>
-      <Html position={[0, 1.7, 0.6]} center zIndexRange={[20, 0]}>
+      <Html position={[0, 1.7, 0.6]} center zIndexRange={[20, 0]} calculatePosition={clampToScreen}>
         <button type="button" onClick={onOpen} className="chronoTag" style={{ borderColor: portal.color }} aria-label={`${portal.game}, ${portal.place}`}>
           <b>{portal.game}</b><small>{portal.place}</small>
         </button>
@@ -161,14 +170,15 @@ function PortalGlow({ portal, active, onOpen }: { portal: (typeof PORTALS)[Porta
 // Camera drifts gently and leans toward the pointer, so the painting's depth shows.
 function CameraRig({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
   const { camera, size } = useThree();
-  // Back off far enough that the whole painting fits the screen, whatever its shape.
+  // Sit close enough that the painting always covers the whole screen, with a
+  // margin for the camera's sway, so its edges never show (like CSS "cover").
   const halfFov = THREE.MathUtils.degToRad((camera as THREE.PerspectiveCamera).fov / 2);
-  const fitHeight = (PAINT_H * 0.9) / (2 * Math.tan(halfFov));
-  const fitWidth = (PAINT_W * 0.9) / (2 * Math.tan(halfFov) * (size.width / size.height));
-  const distance = Math.min(fitHeight, Math.max(fitWidth, 16));
+  const coverHeight = (PAINT_H * 0.82) / (2 * Math.tan(halfFov));
+  const coverWidth = (PAINT_W * 0.82) / (2 * Math.tan(halfFov) * (size.width / size.height));
+  const distance = Math.min(coverHeight, coverWidth);
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    const target = new THREE.Vector3(Math.sin(t * 0.18) * 0.6 + (pointer.current?.x ?? 0) * 1.2, -0.6 + (pointer.current?.y ?? 0) * 0.5, distance);
+    const target = new THREE.Vector3(Math.sin(t * 0.18) * 0.5 + (pointer.current?.x ?? 0) * 0.9, -0.6 + (pointer.current?.y ?? 0) * 0.35, distance);
     camera.position.lerp(target, 0.04);
     camera.lookAt(camera.position.x * 0.35, -0.3 + camera.position.y * 0.3, 0);
   });
@@ -187,7 +197,7 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
 
   useEffect(() => {
     const profile = getActiveStudentProfile();
-    queueMicrotask(() => setYearLevel(profile?.yearLevel ?? (preview ? "Year 3" : null)));
+    queueMicrotask(() => setYearLevel(preview ? "Year 3" : profile?.yearLevel ?? null));
     if (preview) {
       queueMicrotask(() => setProgress({ learningDays: 63, open: true, shards: 63 }));
       return;
