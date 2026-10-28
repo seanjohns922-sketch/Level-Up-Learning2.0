@@ -513,6 +513,12 @@ export default function DemoReviewPanel() {
         </section>
 
         <section className="border-t border-white/10 py-6">
+          <h2 className="mb-3 text-base font-black">Chronorok · Games Realm</h2>
+          <p className="mb-3 text-xs text-white/60">The time realm hub with its four game portals. Demo review is always unlocked and shows 63 Time Shards. Replays the arrival video each time.</p>
+          <button type="button" onClick={() => { try { sessionStorage.removeItem("lul:chronorok:intro"); } catch { /* optional */ } router.push("/world/chronorok?teacher_preview=1"); }} className={actionClass()}><Eye size={17} /> Open Chronorok</button>
+        </section>
+
+        <section className="border-t border-white/10 py-6">
           <div className="mb-4 flex items-center gap-2"><Eye size={18} className="text-blue-300" /><h2 className="text-base font-black">Parent Dashboard</h2></div>
           <p className="mb-3 text-xs text-white/50">The real Parent portal rendered with a preview family, including the printable learning report. Use the mock parent account to check real permissions and saving.</p>
           <button type="button" onClick={() => router.push("/demo-review/parent")} className={actionClass()}><Eye size={17} /> Open Parent Dashboard</button>
