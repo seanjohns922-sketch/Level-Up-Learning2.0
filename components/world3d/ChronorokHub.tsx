@@ -1,11 +1,13 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { ArrowLeft, Lock, Play, X } from "lucide-react";
+import { ChronorokWorldScene, CHRONOROK_BOUNDS, CHRONOROK_PORTALS, CHRONOROK_ROAM, CHRONOROK_SPAWN } from "@/components/world3d/ChronorokWorldScene";
+import { EMPTY_WORLD_LOOK_INPUT, EMPTY_WORLD_MOVE_INPUT, KeyboardWorldAction, SharedThirdPersonPlayer, WorldJoystick, WorldLookJoystick, type WorldLookInput, type WorldMoveInput } from "@/components/world3d/SharedWorldPlayer";
+import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { fetchStudentActivityDaily } from "@/lib/student-activity";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
@@ -16,174 +18,15 @@ import { CHRONOROK_OPEN_DAYS, SHARDS_TO_AWAKEN, chronorokForGrade, chronorokProg
  *  glowing portals. Each portal opens its painted close-up scene. The games
  *  behind the portals are still being built. */
 
-const PAINT_W = 34;
-const PAINT_H = (PAINT_W * 937) / 1678;
 
 type PortalKey = "arena" | "rift" | "cave" | "rune";
+const PORTAL_TARGETS = (Object.keys(CHRONOROK_PORTALS) as PortalKey[]).map((id) => ({ id, position: CHRONOROK_PORTALS[id].position, distance: 9 }));
 const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: string; place: string; blurb: string; art: string; href?: string }> = {
   arena: { u: 0.17, v: 0.55, color: "#ffc94a", game: "Relic Rider", place: "The Arena Gate", blurb: "Stunt bikes through the castle tracks. Flip in the air to save time.", art: "/images/chronorok/arena-gate.webp" },
   rift: { u: 0.33, v: 0.4, color: "#7ff0ff", game: "Chrono Run", place: "The Rift Portal", blurb: "Run the time tunnels. Turn onto the walls and leap the gaps.", art: "/images/chronorok/rift-portal.webp", href: "/world/chronorok/chrono-run" },
   cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp" },
   rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp" },
 };
-
-// Depth of the painting at a point (u, v from the top-left): the plaza comes
-// toward the viewer, the horizon sits back, and the spire and gates stand out.
-function depthAt(x: number, up: number) {
-  let z = up < 0.42 ? (0.42 - up) * 7 : -(up - 0.42) * 6;
-  z += Math.exp(-(x ** 2) / (2 * 2.2 ** 2) - (up - 0.62) ** 2 / (2 * 0.18 ** 2)) * 1.2;
-  z += Math.exp(-((x + 11) ** 2) / 18 - (up - 0.42) ** 2 / 0.0288) * 0.8;
-  z += Math.exp(-((x - 12) ** 2) / 18 - (up - 0.42) ** 2 / 0.0288) * 0.8;
-  return z;
-}
-function surfacePoint(u: number, v: number) {
-  const x = (u - 0.5) * PAINT_W;
-  return new THREE.Vector3(x, (0.5 - v) * PAINT_H, depthAt(x, 1 - v));
-}
-
-function softDot(stops: Array<[number, string]>, size = 64) {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  for (const [at, color] of stops) gradient.addColorStop(at, color);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, size, size);
-  return new THREE.CanvasTexture(canvas);
-}
-
-function Painting() {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    new THREE.TextureLoader().load("/images/chronorok/hub.webp", (loaded) => {
-      loaded.colorSpace = THREE.SRGBColorSpace;
-      if (!cancelled) setTexture(loaded);
-    });
-    return () => { cancelled = true; };
-  }, []);
-  const geometry = useMemo(() => {
-    const plane = new THREE.PlaneGeometry(PAINT_W, PAINT_H, 220, 130);
-    const position = plane.attributes.position;
-    for (let i = 0; i < position.count; i += 1) {
-      position.setZ(i, depthAt(position.getX(i), position.getY(i) / PAINT_H + 0.5));
-    }
-    plane.computeVertexNormals();
-    return plane;
-  }, []);
-  if (!texture) return null;
-  return <mesh geometry={geometry}><meshBasicMaterial map={texture} toneMapped={false} /></mesh>;
-}
-
-function Sparks() {
-  const points = useRef<THREE.Points>(null);
-  const { geometry, material } = useMemo(() => {
-    const positions: number[] = [];
-    let seed = 5;
-    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    for (let i = 0; i < 420; i += 1) positions.push((rand() - 0.5) * 34, (rand() - 0.5) * 18, rand() * 8 - 2);
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    const m = new THREE.PointsMaterial({ map: softDot([[0, "rgba(255,240,190,1)"], [0.3, "rgba(255,190,80,.7)"], [1, "rgba(255,160,40,0)"]]), size: 0.2, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-    return { geometry: g, material: m };
-  }, []);
-  useFrame((_, delta) => {
-    // R3F owns these mutable Three objects; updating them each frame is an imperative scene update.
-    const position = geometry.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < position.count; i += 1) {
-      let y = position.getY(i) + delta * 0.35;
-      if (y > 9) y = -9;
-      position.setY(i, y);
-    }
-    // eslint-disable-next-line react-hooks/immutability
-    position.needsUpdate = true;
-  });
-  return <points ref={points} geometry={geometry} material={material} />;
-}
-
-function Mist() {
-  const group = useRef<THREE.Group>(null);
-  const texture = useMemo(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 512;
-    canvas.height = 128;
-    const ctx = canvas.getContext("2d")!;
-    let seed = 9;
-    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    for (let i = 0; i < 40; i += 1) {
-      const x = rand() * 512, y = 64 + rand() * 30 - 15, r = 30 + rand() * 60;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, "rgba(255,240,230,.35)");
-      g.addColorStop(1, "rgba(255,240,230,0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, 512, 128);
-    }
-    const t = new THREE.CanvasTexture(canvas);
-    t.wrapS = THREE.RepeatWrapping;
-    return t;
-  }, []);
-  useFrame((_, delta) => {
-    // R3F owns these mutable Three objects; updating them each frame is an imperative scene update.
-    // eslint-disable-next-line react-hooks/immutability
-    texture.offset.x += delta * 0.006;
-  });
-  return (
-    <group ref={group}>
-      <mesh position={[0, -1.2, 1.6]}><planeGeometry args={[44, 7]} /><meshBasicMaterial map={texture} transparent opacity={0.22} depthWrite={false} /></mesh>
-      <mesh position={[0, 1.2, 0.4]}><planeGeometry args={[44, 7]} /><meshBasicMaterial map={texture} transparent opacity={0.16} depthWrite={false} /></mesh>
-    </group>
-  );
-}
-
-// Keep portal labels on screen when the painting is wider than the view.
-function clampToScreen(object: THREE.Object3D, camera: THREE.Camera, size: { width: number; height: number }) {
-  const point = new THREE.Vector3().setFromMatrixPosition(object.matrixWorld).project(camera);
-  const margin = 95;
-  const x = Math.min(size.width - margin, Math.max(margin, ((point.x + 1) / 2) * size.width));
-  const y = ((1 - point.y) / 2) * size.height;
-  return [x, y];
-}
-
-function PortalGlow({ portal, active, onOpen }: { portal: (typeof PORTALS)[PortalKey]; active: boolean; onOpen: () => void }) {
-  const sprite = useRef<THREE.Sprite>(null);
-  const texture = useMemo(() => softDot([[0, "rgba(255,255,255,.9)"], [0.25, "rgba(255,255,255,.4)"], [1, "rgba(255,255,255,0)"]], 128), []);
-  const point = useMemo(() => surfacePoint(portal.u, portal.v), [portal.u, portal.v]);
-  useFrame(({ clock }) => {
-    if (!sprite.current) return;
-    const pulse = 1 + Math.sin(clock.elapsedTime * 2 + portal.u * 10) * 0.08;
-    sprite.current.scale.setScalar((active ? 4.2 : 2.8) * pulse);
-  });
-  return (
-    <group position={point}>
-      <sprite ref={sprite} position={[0, 0, 0.6]}>
-        <spriteMaterial map={texture} color={portal.color} transparent depthWrite={false} blending={THREE.AdditiveBlending} opacity={active ? 1 : 0.6} />
-      </sprite>
-      <Html position={[0, 1.7, 0.6]} center zIndexRange={[20, 0]} calculatePosition={clampToScreen}>
-        <button type="button" onClick={onOpen} className="chronoTag" style={{ borderColor: portal.color }} aria-label={`${portal.game}, ${portal.place}`}>
-          <b>{portal.game}</b><small>{portal.place}</small>
-        </button>
-      </Html>
-    </group>
-  );
-}
-
-// Camera drifts gently and leans toward the pointer, so the painting's depth shows.
-function CameraRig({ pointer }: { pointer: React.RefObject<{ x: number; y: number }> }) {
-  const { camera, size } = useThree();
-  // Sit close enough that the painting always covers the whole screen, with a
-  // margin for the camera's sway, so its edges never show (like CSS "cover").
-  const halfFov = THREE.MathUtils.degToRad((camera as THREE.PerspectiveCamera).fov / 2);
-  const coverHeight = (PAINT_H * 0.82) / (2 * Math.tan(halfFov));
-  const coverWidth = (PAINT_W * 0.82) / (2 * Math.tan(halfFov) * (size.width / size.height));
-  const distance = Math.min(coverHeight, coverWidth);
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    const target = new THREE.Vector3(Math.sin(t * 0.18) * 0.5 + (pointer.current?.x ?? 0) * 0.9, -0.6 + (pointer.current?.y ?? 0) * 0.35, distance);
-    camera.position.lerp(target, 0.04);
-    camera.lookAt(camera.position.x * 0.35, -0.3 + camera.position.y * 0.3, 0);
-  });
-  return null;
-}
 
 export default function ChronorokHub({ teacherPreview = false }: { teacherPreview?: boolean }) {
   const router = useRouter();
@@ -193,7 +36,10 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
   const [yearLevel, setYearLevel] = useState<string | null>(null);
   const [portal, setPortal] = useState<PortalKey | null>(null);
   const [intro, setIntro] = useState(false);
-  const pointer = useRef({ x: 0, y: 0 });
+  const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
+  const [nearest, setNearest] = useState<string | null>(null);
+  const nearPortal = nearest && nearest in CHRONOROK_PORTALS ? (nearest as PortalKey) : null;
 
   useEffect(() => {
     const profile = getActiveStudentProfile();
@@ -228,16 +74,25 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
   return (
     <main
       className="chronorok fixed inset-0 overflow-hidden bg-[#2a1c30] font-sans text-white"
-      onPointerMove={(event) => {
-        pointer.current = { x: (event.clientX / window.innerWidth - 0.5) * 2, y: -(event.clientY / window.innerHeight - 0.5) * 2 };
-      }}
+      style={{ touchAction: "none" }}
     >
-      <Canvas camera={{ position: [0, -0.6, 21.2], fov: 42 }} dpr={[1, 1.5]} gl={{ antialias: true }} style={{ filter: open ? undefined : "blur(6px) brightness(.7)" }}>
-        <Painting />
-        <Mist />
-        <Sparks />
-        {open ? (Object.keys(PORTALS) as PortalKey[]).map((key) => <PortalGlow key={key} portal={PORTALS[key]} active={portal === key} onOpen={() => setPortal(key)} />) : null}
-        <CameraRig pointer={pointer} />
+      <Canvas shadows camera={{ position: [0, 6, 26], fov: 55, near: 0.1, far: 900 }} dpr={[1, 1.5]} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }} style={{ filter: open ? undefined : "blur(6px) brightness(.7)" }}>
+        <ChronorokWorldScene />
+        <SharedThirdPersonPlayer
+          initialPosition={CHRONOROK_SPAWN}
+          moveInput={active || !open ? EMPTY_WORLD_MOVE_INPUT : moveInput}
+          lookInput={active || !open ? EMPTY_WORLD_LOOK_INPUT : lookInput}
+          bounds={CHRONOROK_BOUNDS}
+          roamEllipse={CHRONOROK_ROAM}
+          interactionTargets={PORTAL_TARGETS}
+          onNearestTargetId={setNearest}
+          initialYaw={0}
+          initialPitch={-0.12}
+          cameraDistance={10.5}
+          cameraTargetHeight={2.6}
+          movementEnabled={open && !active}
+          speed={6}
+        />
       </Canvas>
 
       <header className="pointer-events-none absolute inset-x-5 top-4 z-10 flex items-start justify-between gap-3">
@@ -277,7 +132,18 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
         </div>
       ) : null}
 
-      {open && !active ? <p className="chronoGlass absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full px-5 py-3 text-center text-sm font-bold">Tap a glowing portal to visit its game</p> : null}
+      {open && !active ? (
+        <>
+          <WorldJoystick input={moveInput} onChange={setMoveInput} />
+          <WorldLookJoystick onChange={setLookInput} />
+          {nearPortal ? (
+            <WorldInteractionPrompt location={PORTALS[nearPortal].place.toUpperCase()} status={PORTALS[nearPortal].game} actionLabel="ENTER" onAction={() => setPortal(nearPortal)} />
+          ) : (
+            <p className="chronoGlass pointer-events-none absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full px-5 py-3 text-center text-sm font-bold">Follow a glowing road to a portal</p>
+          )}
+          <KeyboardWorldAction enabled={Boolean(nearPortal)} onAction={() => { if (nearPortal) setPortal(nearPortal); }} />
+        </>
+      ) : null}
 
       {active ? (
         <div className="chronoScene absolute inset-0 z-30" style={{ backgroundImage: `url(${active.art})` }} role="dialog" aria-label={`${active.game}, ${active.place}`}>
