@@ -4,6 +4,8 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
+import { TrialStudentAvatar } from "@/components/world3d/SharedWorldPlayer";
+import { WORLD_AVATAR_SCALE } from "@/lib/world3d/world-scale";
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCcw } from "lucide-react";
 
 /** Chrono Run: a tunnel runner. You run along an eight-sided tunnel floating in
@@ -186,35 +188,31 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
   );
 }
 
+// The runner is the learner's own avatar (same model and outfit as the worlds).
 function Runner({ game }: { game: React.RefObject<Game> }) {
   const group = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
+  const moving = useRef(false);
+  const sprinting = useRef(true);
+  useFrame(() => {
     const g = game.current;
     if (!group.current || !body.current || !g) return;
     const r = RADIUS - 0.95 - g.height;
     group.current.position.set(Math.sin(g.angle) * r, -Math.cos(g.angle) * r, -g.z);
     group.current.rotation.set(0, 0, g.angle);
-    const running = g.height === 0 && g.phase === "playing";
-    body.current.position.y = running ? Math.abs(Math.sin(clock.elapsedTime * 14)) * 0.18 : 0;
-    body.current.rotation.x = g.phase === "playing" ? -0.25 : 0;
-    body.current.rotation.z = (g.left ? 0.25 : 0) + (g.right ? -0.25 : 0);
+    moving.current = g.phase === "playing" && g.height === 0;
+    body.current.rotation.z = (g.left ? 0.18 : 0) + (g.right ? -0.18 : 0);
   });
   return (
     <group ref={group}>
-      <group ref={body}>
-        <mesh><sphereGeometry args={[0.62, 32, 32]} /><meshStandardMaterial color="#ffa830" roughness={0.35} emissive="#7a3a00" emissiveIntensity={0.35} /></mesh>
-        <mesh position={[0, 0.06, -0.6]}><circleGeometry args={[0.42, 32]} /><meshStandardMaterial color="#fff6e0" side={THREE.DoubleSide} /></mesh>
-        {[-1, 1].map((side) => (
-          <group key={side}>
-            <mesh position={[side * 0.38, 0.62, 0]} rotation={[0, 0, -side * 0.4]}><coneGeometry args={[0.17, 0.45, 12]} /><meshStandardMaterial color="#ffa830" roughness={0.4} /></mesh>
-            <mesh position={[side * 0.16, 0.14, -0.62]}><sphereGeometry args={[0.07, 12, 12]} /><meshStandardMaterial color="#2a1606" /></mesh>
-            <mesh position={[side * 0.28, -0.55, -0.1]} scale={[1, 0.6, 1.3]}><sphereGeometry args={[0.2, 16, 16]} /><meshStandardMaterial color="#d96a14" /></mesh>
-          </group>
-        ))}
+      {/* feet on the floor; facing down the tunnel (-z) */}
+      <group ref={body} position={[0, -0.95 + 0.73 * WORLD_AVATAR_SCALE, 0]} rotation={[0, Math.PI, 0]}>
+        <group scale={WORLD_AVATAR_SCALE}>
+          <TrialStudentAvatar movingRef={moving} sprintingRef={sprinting} />
+        </group>
       </group>
-      {/* The runner carries its own light: nearby tiles glow, far ones fall into shadow. */}
-      <pointLight position={[0, 1.2, -1.5]} intensity={40} distance={26} decay={1.6} color="#ffd9a0" />
+      {/* The runner carries its own light, so nearby tiles glow. */}
+      <pointLight position={[0, 1.6, -1.5]} intensity={40} distance={26} decay={1.6} color="#ffd9a0" />
     </group>
   );
 }
