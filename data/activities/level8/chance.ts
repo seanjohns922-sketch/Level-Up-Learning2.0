@@ -205,7 +205,7 @@ const unequalOutcomes: Form[] = [
   },
   (r) => {
     const modes = ["Walk", "Car", "Bus", "Bike"], counts = modes.map(() => r(3, 12)), total = sum(counts), m = r(0, 3);
-    return { prompt: `One student is chosen at random. What is the probability they do not travel by ${modes[m].toLowerCase()}?`, answer: fraction(total - counts[m], total), steps: [`${counts[m]} of ${total} students travel by ${modes[m].toLowerCase()}.`, `P(not ${modes[m].toLowerCase()}) = ${pf(total - counts[m], total)}.`], visual: table("How students travel to school", ["Mode", ...modes], [["Students", ...counts]]) };
+    return { prompt: `One student is chosen at random. What is the probability they do not ${modes[m] === "Walk" ? "walk" : `travel by ${modes[m].toLowerCase()}`}?`, answer: fraction(total - counts[m], total), steps: [`${counts[m]} of ${total} students ${modes[m] === "Walk" ? "walk" : `travel by ${modes[m].toLowerCase()}`}.`, `P(not ${modes[m].toLowerCase()}) = ${pf(total - counts[m], total)}.`], visual: table("How students travel to school", ["Mode", ...modes], [["Students", ...counts]]) };
   },
 ];
 const chooseComplement: Form[] = [
@@ -309,7 +309,7 @@ const TWO_WAY = [
   { row: ["Sport", "No sport"], col: ["Music", "No music"], rowSay: ["play sport", "do not play sport"], colSay: ["learn music", "do not learn music"] },
   { row: ["Dog", "No dog"], col: ["Cat", "No cat"], rowSay: ["own a dog", "do not own a dog"], colSay: ["own a cat", "do not own a cat"] },
   { row: ["Year 7", "Year 8"], col: ["Bus", "Not bus"], rowSay: ["are in Year 7", "are in Year 8"], colSay: ["catch the bus", "do not catch the bus"] },
-  { row: ["Glasses", "No glasses"], col: ["Left-handed", "Right-handed"], rowSay: ["wear glasses", "do not wear glasses"], colSay: ["are left-handed", "are right-handed"] },
+  { row: ["Glasses", "No glasses"], col: ["Sibling", "No sibling"], rowSay: ["wear glasses", "do not wear glasses"], colSay: ["have a sibling", "do not have a sibling"] },
 ] as const;
 function twoWayData(r: R) {
   const t = pick(r, TWO_WAY), a = r(3, 15), b = r(3, 15), c = r(3, 15), d = r(3, 15);
@@ -626,7 +626,7 @@ const experimentalProbability: Form[] = [
   (r) => { const f = coinFreq(r, 100); return { prompt: "What is the experimental probability of two heads, as a decimal?", answer: dec(f.hh / 100), steps: [`HH happened ${f.hh} times in 100 trials.`, `${f.hh} ÷ 100 = ${dec(f.hh / 100)}.`], visual: f.visual }; },
   (r) => { const f = sumFreq(r); return { prompt: "What is the experimental probability of a total of 7?", answer: fraction(f.counts[5], f.total), steps: [`Total 7 occurred ${f.counts[5]} times in ${f.total} trials.`, `${pf(f.counts[5], f.total)}.`], visual: f.visual }; },
   (r) => {
-    const n1 = 10 * r(3, 8), s1 = r(5, n1 - 5), n2 = 10 * r(3, 8), s2 = r(5, n2 - 5);
+    const n1 = 10 * r(3, 8), s1 = r(5, n1 - 5), n2 = 10 * r(3, 8), s2 = Math.min(n2 - 2, Math.max(2, Math.round((s1 / n1) * n2) + r(-3, 3)));
     return { prompt: `Group A had ${s1} successes in ${n1} trials. Group B had ${s2} successes in ${n2} trials. What is the experimental probability using all the results?`, answer: fraction(s1 + s2, n1 + n2), steps: ["Combine successes and combine trials; do not average the two fractions.", `(${s1} + ${s2})/(${n1} + ${n2}) = ${pf(s1 + s2, n1 + n2)}.`] };
   },
   (r) => { const f = coinFreq(r), n = f.hh + f.ht + f.th; return { prompt: "What percentage of trials gave at least one head? Round to one decimal place.", answer: rounded((100 * n) / f.total, 1), unit: "%", steps: [`At least one head: ${n} of ${f.total}.`, `${n} ÷ ${f.total} × 100 ≈ ${rounded((100 * n) / f.total, 1)}%.`], visual: f.visual }; },

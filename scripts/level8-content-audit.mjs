@@ -56,6 +56,23 @@ function checkWording(where, text) {
   for (const [re, label] of WORDING) if (re.test(text)) add(where, "wording", `${label}: ${text}`);
 }
 
+// Real-world sense: would anyone actually write it this way?
+const COUNT_NOUNS = "people|persons|students|children|kids|players|teams|cars|buses|books|eggs|apples|tickets|chairs|tables|boxes|bags|cards|marbles|counters|coins|houses|dogs|cats|trees|plants|pizzas sold|visitors|members|households|days|weeks|games|matches|goals|questions|pages";
+const REALISM = [
+  [/(?<![\d.])\d+(?: \d+)?\/\d+ ?(?:°C|°F|mm|cm|km|m|mL|L|kg|g|t)\b/, "fraction with a metric unit or temperature"],
+  [/\$\d+ \d+\/\d+|\$\d+\/\d+|\d+\/\d+ (?:dollars|cents)/, "fraction of money"],
+  [/\$\d+\.\d(?!\d)|\$\d+\.\d{3,}/, "money not to 2 decimal places"],
+  [/-?\d+\.\d+ ?\$/, "money unit after the number"],
+  [new RegExp(String.raw`(?<![\d.])\d+\.\d+ (?:${COUNT_NOUNS})\b`), "decimal count of whole things"],
+  [new RegExp(String.raw`(?<![\d.])\d+ \d+\/\d+ (?:${COUNT_NOUNS})\b`), "fractional count of whole things"],
+  [/(?<![\d.])\d+\.\d+ (?:hours?|minutes?) (?:late|early|after|before)\b/, "decimal time where clock time is expected"],
+  [/−?\d{3,}(?:\.\d+)?°C|[−-](?:[6-9]\d|\d{3,})(?:\.\d+)?°C|(?<![\d.])(?:[6-9]\d|\d{3,})(?:\.\d+)?°C/, "implausible air temperature"],
+  [/(?<![\d.])(?:1[2-9]\d|[2-9]\d\d)(?:\.\d+)? years old/, "implausible age"],
+];
+function checkRealism(where, text) {
+  for (const [re, label] of REALISM) if (re.test(text)) add(where, "real-world sense", `${label}: ${text}`);
+}
+
 let questions = 0, guides = 0;
 for (const realm of Object.keys(LEVEL8_FACTORIES)) {
   for (let week = 1; week <= LEVEL8_WEEK_COUNTS[realm]; week++) {
@@ -71,10 +88,11 @@ for (const realm of Object.keys(LEVEL8_FACTORIES)) {
         const answer = String(q.answer);
         const all = [q.prompt, ...q.steps].join(" ");
         checkWording(where, q.prompt);
+        checkRealism(where, q.prompt);
         q.steps.forEach((step) => { checkWording(where, step); checkArithmetic(where, step); });
         // the working should reach the answer
         const core = answer.replace(/^\$/, "").replace(/[a-z ²³]+$/i, "").trim();
-        if (core.length >= 1 && !q.steps.join(" ").replace(/,(?=\d{3})/g, "").includes(core.replace(/,(?=\d{3})/g, "")) && !(q.options?.length > 1))
+        if (core.length >= 1 && !q.steps.join(" ").replace(/−/g, "-").replace(/,(?=\d{3})/g, "").includes(core.replace(/,(?=\d{3})/g, "")) && !(q.options?.length > 1))
           add(where, "answer not in working", `answer ${answer} | prompt: ${q.prompt} | last step: ${q.steps.at(-1)}`);
         // answer given away by the question (numbers only, long enough to matter)
         if (/^\$?[−-]?\d[\d.,]*$/.test(answer) && answer.replace(/\D/g, "").length >= 3 && new RegExp(`(?<![\\d.])${answer.replace(/[$.]/g, "\\$&")}(?![\\d.])`).test(q.prompt))

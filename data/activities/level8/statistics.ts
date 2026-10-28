@@ -481,7 +481,7 @@ const estimateCount: Form[] = [
   },
   (r) => {
     const days = 60, wet = pick(r, [12, 15, 18, 20, 24, 30]), month = 30;
-    return { prompt: `It rained on ${wet} of the last ${days} days in April. Use this relative frequency to estimate the number of rainy days in a 30-day April.`, answer: (wet / days) * month, unit: "days", steps: [`Relative frequency: ${wet}/${days} = ${fraction(wet, days)}.`, `${fraction(wet, days)} × 30 = ${(wet / days) * month}.`] };
+    return { prompt: `Over the last two Aprils, it rained on ${wet} of the ${days} days. Use this relative frequency to estimate the number of rainy days in a 30-day April.`, answer: (wet / days) * month, unit: "days", steps: [`Relative frequency: ${wet}/${days} = ${fraction(wet, days)}.`, `${fraction(wet, days)} × 30 = ${(wet / days) * month}.`] };
   },
   (r) => {
     const marked = 10 * r(3, 8), caught = 10 * r(4, 10), again = pick(r, [2, 4, 5, 8, 10].filter((k) => (marked * caught) % k === 0 && k < caught));
@@ -597,7 +597,7 @@ const changeMean: Form[] = [
     return { prompt: `Every value in a data set with mean ${m} is multiplied by ${k}. What is the new mean?`, answer: m * k, steps: [`Multiplying every value by ${k} multiplies the mean by ${k}.`, `${m} × ${k} = ${m * k}.`] };
   },
   (r) => {
-    const n = r(3, 5), m = r(60, 75), target = m + r(2, 5), need = target * (n + 1) - n * m;
+    const n = r(3, 5), m = r(60, 75), target = m + r(2, Math.min(5, Math.floor((100 - m) / (n + 1)))), need = target * (n + 1) - n * m;
     return { prompt: `Ana's mean over ${n} tests is ${m}. What must she score on the next test to raise her mean to ${target}?`, answer: need, unit: "marks", steps: [`Needed total: ${target} × ${n + 1} = ${target * (n + 1)}. Current total: ${n * m}.`, `${target * (n + 1)} − ${n * m} = ${need}.`] };
   },
 ];
@@ -734,7 +734,7 @@ const ethicalFair: Form[] = [
 const collectRecord: Form[] = [
   (r) => {
     const n = r(6, 19), fives = Math.floor(n / 5), ones = n % 5;
-    return { prompt: `A tally shows ${"|||| ".repeat(fives).trim()}${ones ? " " + "|".repeat(ones) : ""} (each |||| is a group of five). What is the frequency?`, answer: n, steps: [`${fives} group${fives === 1 ? "" : "s"} of five and ${ones} single mark${ones === 1 ? "" : "s"}.`, `${fives} × 5 + ${ones} = ${n}.`] };
+    return { prompt: `A tally shows ${"卌 ".repeat(fives).trim()}${ones ? " " + "|".repeat(ones) : ""} (each 卌 is a group of five, with four marks crossed by a fifth). What is the frequency?`, answer: n, steps: [`${fives} group${fives === 1 ? "" : "s"} of five and ${ones} single mark${ones === 1 ? "" : "s"}.`, `${fives} × 5 + ${ones} = ${n}.`] };
   },
   (r) => {
     const h = r(1, 2), m = pick(r, [5, 10, 15, 20, 25, 30, 40, 45, 50]);

@@ -31,7 +31,12 @@ export type Level8Question = MultipleChoiceQuestion & {
   answerSpec?: Level7Answer;
 };
 export type LessonFactory = (seed: number) => QuestionDraft;
-export const rounded = (n: number, places = 2) => Number(n.toFixed(places));
+/** Rounds half away from zero on the decimal value, so 6.7215 → 6.722 (toFixed gives 6.721). */
+export const rounded = (n: number, places = 2) => {
+  const text = String(Math.abs(n));
+  if (text.includes("e")) return Number(n.toFixed(places));
+  return (n < 0 ? -1 : 1) * Number(`${Math.round(Number(`${text}e${places}`))}e-${places}`);
+};
 export function random(seed: number) {
   let state = seed >>> 0;
   return (min: number, max: number) => {
@@ -63,6 +68,8 @@ export const formula = (
 /** Safety net for display text: 509.99999999999994 → 510, 56.00000000000001 → 56. */
 const tidyNumbers = (text: string) =>
   text.replace(/\d+\.\d*?(?:0{7,}|9{7,})\d+/g, (m) => String(Number(Number(m).toPrecision(12))));
+/** Display text shows a true minus sign: "(-2, -5)" → "(−2, −5)". Answers keep "-" for marking. */
+const trueMinus = (text: string) => tidyNumbers(text).replace(/(^|[\s(,=])-(?=\d)/g, "$1−");
 export function question(
   realm: Level8Realm,
   week: number,
@@ -72,9 +79,9 @@ export function question(
 ): Level8Question {
   const draft: QuestionDraft = {
     ...raw,
-    prompt: tidyNumbers(raw.prompt),
+    prompt: trueMinus(raw.prompt),
     answer: typeof raw.answer === "number" ? Number(raw.answer.toPrecision(12)) : tidyNumbers(raw.answer),
-    steps: raw.steps.map(tidyNumbers),
+    steps: raw.steps.map(trueMinus),
     choices: raw.choices?.map(tidyNumbers),
   };
   const answer = String(draft.answer);

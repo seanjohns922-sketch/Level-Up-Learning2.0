@@ -484,7 +484,7 @@ const bothSides: Form[] = [
   (r) => {
     const p = rounded(r(8, 30) / 10, 1), a = r(4, 6), b = r(1, 3), extra = rounded(r(10, 25) / 10, 1);
     const other = rounded((a - b) * p + extra, 2);
-    return { prompt: `Kim bought ${a} pens and a $${extra.toFixed(2)} newspaper. Lee bought ${b} pens and a $${other.toFixed(2)} magazine. They paid the same. How much is one pen?`, answer: p, unit: "$", steps: [`${a}p + ${extra} = ${b}p + ${other}.`, `${a - b}p = ${rounded(other - extra, 2)}, so p = ${p.toFixed(2)}.`] };
+    return { prompt: `Kim bought ${a} pens and a $${extra.toFixed(2)} newspaper. Lee bought ${b} pen${b === 1 ? "" : "s"} and a $${other.toFixed(2)} magazine. They paid the same. How much is one pen?`, answer: p, unit: "$", steps: [`${a}p + ${extra} = ${b}p + ${other}.`, `${a - b}p = ${rounded(other - extra, 2)}, so p = ${p.toFixed(2)}.`] };
   },
   (r) => {
     const c = r(2, 5), a = c + r(1, 3), x = r(4, 12), b = r(2, 15), d = (a - c) * x - b;
@@ -619,7 +619,7 @@ const solveInequality: Form[] = [
   },
   (r) => {
     const k = r(3, 6), card = 5 * r(2, 6), price = r(6, 16) / 4, spent = rounded(card + k * price, 2);
-    return { prompt: `Ella buys ${k} cartons of milk at $c each and a $${card} phone card. She spends more than $${spent}. Solve ${k}c + ${card} > ${spent}. Complete: c > ?`, answer: price, steps: [`Subtract ${card}: ${k}c > ${rounded(spent - card, 2)}.`, `Divide by ${k}: c > ${price}.`] };
+    return { prompt: `Ella buys ${k} cartons of milk at $c each and a $${card} phone card. She spends more than $${spent.toFixed(2)}. Solve ${k}c + ${card} > ${spent}. Complete: c > ?`, answer: price, steps: [`Subtract ${card}: ${k}c > ${rounded(spent - card, 2)}.`, `Divide by ${k}: c > ${price}.`] };
   },
   (r) => {
     const b = r(1, 8), cap = r(25, 60), g = Math.floor((cap - b) / 6);
@@ -762,7 +762,7 @@ const startingValue: Form[] = [
   },
   (r) => {
     const rate = r(2, 5), start = rate * r(5, 12);
-    return { prompt: `The height of water in a tub is H = −${rate}t + ${start} cm after t seconds. What was the height at the start?`, answer: start, unit: "cm", steps: ["The start is t = 0.", `H = −${rate} × 0 + ${start} = ${start}.`] };
+    return { prompt: `The height of water in a tub is H = −${rate}t + ${start} cm after t minutes. What was the height at the start?`, answer: start, unit: "cm", steps: ["The start is t = 0.", `H = −${rate} × 0 + ${start} = ${start}.`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = nz(r, -8, 8), m2 = m + nz(r, -3, 3);
@@ -958,7 +958,7 @@ const useModel: Form[] = [
   },
   (r) => {
     const rate = r(2, 5), t = r(2, 5), start = rate * (t + r(1, 4));
-    return { prompt: `A sink holds ${start} L. After the plug is pulled, V = ${start} − ${rate}t. After how many seconds does it hold ${start - rate * t} L?`, answer: t, unit: "s", steps: [`${start} − ${rate}t = ${start - rate * t}.`, `${rate}t = ${rate * t}, so t = ${t}.`] };
+    return { prompt: `A laundry tub holds ${start} L. After the plug is pulled, V = ${start} − ${rate}t, where t is in minutes. After how many minutes does it hold ${start - rate * t} L?`, answer: t, unit: "min", steps: [`${start} − ${rate}t = ${start - rate * t}.`, `${rate}t = ${rate * t}, so t = ${t}.`] };
   },
   (r) => {
     const rate = r(20, 32), h = pick(r, [4.5, 6.5, 7.5, 8, 9.5]);
@@ -988,7 +988,7 @@ const modelLimits: Form[] = [
   },
   (r) => {
     const rate = r(2, 5), t = r(5, 15);
-    return { prompt: `Water height is H = −${rate}t + ${rate * t} cm after t seconds. How many seconds until the tub is empty?`, answer: t, unit: "s", steps: [`Set H = 0: ${rate}t = ${rate * t}.`, `t = ${t}. After this the model would give a negative height, which is not possible.`] };
+    return { prompt: `Water height is H = −${rate}t + ${rate * t} cm after t minutes. How many minutes until the tub is empty?`, answer: t, unit: "min", steps: [`Set H = 0: ${rate}t = ${rate * t}.`, `t = ${t}. After this the model would give a negative height, which is not possible.`] };
   },
   (r) => {
     const per = pick(r, [40, 45, 48, 52, 57]), students = per * r(2, 5) + r(1, per - 1);
@@ -1014,7 +1014,7 @@ const comparePlans: Form[] = [
     return { prompt: `Gym A: $${a} per visit. Gym B: $${fee} per month plus $${b} per visit. For ${k} visits in a month, how much more does the dearer gym cost?`, answer: Math.abs(a * k - (fee + b * k)), unit: "$", steps: [`A: ${a} × ${k} = $${a * k}. B: ${fee} + ${b} × ${k} = $${fee + b * k}.`, `Difference: $${Math.abs(a * k - (fee + b * k))}.`] };
   },
   (r) => {
-    const a = 5 * r(4, 8), ra = r(10, 20), b = 5 * r(1, 3), rb = ra + r(5, 15), gb = r(2, 6);
+    const a = 5 * r(4, 7), ra = r(1, 3), b = 5 * r(1, 3), rb = ra + r(2, 5), gb = r(2, 8);
     return { prompt: `Use the table of phone plans. What is the cheaper monthly cost for ${gb} GB of data?`, answer: Math.min(a + ra * gb, b + rb * gb), unit: "$", steps: [`Plan X: ${a} + ${ra} × ${gb} = $${a + ra * gb}. Plan Y: ${b} + ${rb} × ${gb} = $${b + rb * gb}.`, `The cheaper is $${Math.min(a + ra * gb, b + rb * gb)}.`], visual: table("Phone plans", ["Plan", "Monthly fee", "Per GB"], [["X", `$${a}`, `$${ra}`], ["Y", `$${b}`, `$${rb}`]]) };
   },
   (r) => {
@@ -1024,7 +1024,7 @@ const comparePlans: Form[] = [
 ];
 const budgetTarget: Form[] = [
   (r) => {
-    const fee = 5 * r(3, 10), rate = r(12, 30), budget = 10 * r(15, 40);
+    const fee = 5 * r(2, 6), rate = r(15, 30), budget = 10 * r(6, 15);
     return { prompt: `Kayak hire is $${fee} plus $${rate} per hour. With a budget of $${budget}, what is the greatest whole number of hours you can hire?`, answer: Math.floor((budget - fee) / rate), unit: "hours", steps: [`${fee} + ${rate}h ≤ ${budget}, so h ≤ ${rounded((budget - fee) / rate, 2)}.`, `Round down: ${Math.floor((budget - fee) / rate)} hours.`] };
   },
   (r) => {
