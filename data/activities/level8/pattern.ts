@@ -105,10 +105,12 @@ const writeExpression: Form[] = [
 ];
 const collectLikeTerms: Form[] = [
   (r) => {
-    const v = pick(r, LETTERS);
-    let a = 0, b = 0, c = 0;
-    while (a + b + c === 0) [a, b, c] = [r(2, 15), r(2, 12), -r(1, 9)];
-    return expanded(`Simplify ${poly([a, v], [b, v], [c, v])}.`, poly([a + b + c, v]), [`All three terms are like terms in ${v}.`, `Add the coefficients: ${a} + ${b} − ${-c} = ${a + b + c}.`]);
+    // Two letters, a constant and negatives, so students must sort like terms.
+    const v = pick(r, LETTERS), w = pick(r, LETTERS.filter((l) => l !== v));
+    let a = 0, b = 0, c = 0, d = 0;
+    while (a + c === 0 || b + d === 0) [a, b, c, d] = [r(2, 9), -r(2, 9), -r(1, 7), r(3, 12)];
+    const k = -r(1, 9);
+    return expanded(`Simplify ${poly([a, v], [b, w], [c, v], [d, w], [k, ""])}.`, poly([a + c, v], [b + d, w], [k, ""]), [`Group like terms: (${a}${v} − ${-c}${v}) and (−${-b}${w} + ${d}${w}); the constant ${k} stays.`, `Combine each group: ${poly([a + c, v], [b + d, w], [k, ""])}.`]);
   },
   (r) => {
     let a = 0, b = 0, c = 0, d = 0;
@@ -496,6 +498,15 @@ const bothSides: Form[] = [
   },
 ];
 const bracketEquations: Form[] = [
+  (r) => {
+    // Year 8 stretch: fractions on both sides. Both sides equal k at the solution, so x is a whole number.
+    const m = pick(r, [2, 3, 4, 5]), n = pick(r, [2, 3, 4, 5].filter((v) => v !== m)), x = r(1, 8), k = r(1, 6);
+    const p = r(2, 5);
+    let sx = r(1, 4);
+    if (n * p === m * sx) sx += 1;
+    const q = m * k - p * x, t = n * k - sx * x, side = (c: number, v: number, d: number) => `(${poly([c, "x"], [v, ""])})/${d}`;
+    return { prompt: `Solve ${side(p, q, m)} = ${side(sx, t, n)}.`, answer: x, steps: [`Multiply both sides by ${m * n}: ${n}(${poly([p, "x"], [q, ""])}) = ${m}(${poly([sx, "x"], [t, ""])}).`, `Expand: ${poly([n * p, "x"], [n * q, ""])} = ${poly([m * sx, "x"], [m * t, ""])}.`, `${poly([n * p - m * sx, "x"])} = ${m * t - n * q}, so x = ${x}.`] };
+  },
   (r) => {
     const a = r(2, 6), b = r(1, 8), x = r(1, 10);
     return { prompt: `Solve ${a}(p + ${b}) = ${a * (x + b)}.`, answer: x, steps: [`Expand: ${a}p + ${a * b} = ${a * (x + b)}, or divide both sides by ${a}: p + ${b} = ${x + b}.`, `p = ${x}.`] };

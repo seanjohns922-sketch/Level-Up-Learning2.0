@@ -491,10 +491,12 @@ const placeVenn: Form[] = [
     return { prompt: `The table is redrawn as a Venn diagram. What number goes in the “${v.labels[1]} only” region?`, answer: v.b, steps: [`${v.labels[1]} only means ${v.labels[1]} and not ${v.labels[0]}.`, `That cell in the table is ${v.b}.`], visual: table("Survey results", ["", v.labels[1], `Not ${v.labels[1]}`], [[v.labels[0], v.both, v.a], [`Not ${v.labels[0]}`, v.b, v.neither]]) };
   },
   (r) => {
+    // Which regions make up a described group (not, or, exactly one): Year 8 set language, not single placement.
     const [x, y] = pick(r, VENN_LABELS), k = r(0, 3);
-    const desc = [`does ${x} but not ${y}`, `does both ${x} and ${y}`, `does ${y} but not ${x}`, `does neither ${x} nor ${y}`][k];
-    const regions = [`${x} only`, "The overlap", `${y} only`, "Outside both circles"];
-    return { prompt: `Where does a student who ${desc} go on the Venn diagram?`, answer: regions[k], choices: regions, steps: ["Inside a circle means yes for that activity; outside means no.", `${regions[k]}.`], ...venn("Activities", [x, y], ["", "", "", ""]) };
+    const desc = [`do not do ${x}`, `do ${x} or ${y} (or both)`, `do exactly one of ${x} and ${y}`, `do ${y}`][k];
+    const regions = [`${y} only and outside both circles`, `${x} only, the overlap and ${y} only`, `${x} only and ${y} only`, `${y} only and the overlap`];
+    const why = [`Not ${x} means outside the ${x} circle: ${y} only, plus outside both.`, `Inclusive "or" means at least one circle, including the overlap.`, `Exactly one excludes the overlap.`, `The ${y} circle includes its overlap with ${x}.`][k];
+    return { prompt: `Which regions of the Venn diagram show the students who ${desc}?`, answer: regions[k], choices: regions, steps: [why, `${regions[k]}.`], ...venn("Activities", [x, y], ["", "", "", ""]) };
   },
 ];
 const vennCounts: Form[] = [

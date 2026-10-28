@@ -72,8 +72,8 @@ const censusOrSample: Form[] = [
     return { prompt: `A sample of ${(pop * pctSampled) / 100} is taken from a population of ${pop}. What percentage of the population is sampled?`, answer: pctSampled, unit: "%", steps: [`${(pop * pctSampled) / 100} ÷ ${pop} = ${pctSampled / 100}.`, `× 100 = ${pctSampled}%.`] };
   },
   (r) => {
-    const made = 100 * r(10, 60), tested = 5 * r(6, 30), askPop = r(0, 1) === 1;
-    return { prompt: `A factory makes ${made} batteries today and tests ${tested} of them. What is the ${askPop ? "population" : "sample"} size?`, answer: askPop ? made : tested, steps: ["The population is every battery the question is about; the sample is the batteries actually tested.", `${askPop ? "Population" : "Sample"} size: ${askPop ? made : tested}.`] };
+    const made = 500 * r(2, 12), pct = pick(r, [2, 4, 5, 10]), tested = (made * pct) / 100, faulty = r(1, Math.max(2, Math.floor(tested / 20)));
+    return { prompt: `A factory makes ${made} batteries today. It tests a sample of ${tested} and finds ${faulty} faulty. Estimate how many of today's batteries are faulty.`, answer: (faulty / tested) * made, unit: "batteries", steps: [`The sample is ${pct}% of the population, so ${faulty} faulty in the sample suggests ${faulty} × ${made / tested} for the population.`, `${faulty} × ${made / tested} = ${(faulty / tested) * made}.`] };
   },
 ];
 const EXPERIMENT_OR_OBSERVATION: [string, "Experiment" | "Observation", string][] = [
@@ -754,9 +754,9 @@ const collectRecord: Form[] = [
     return { prompt: `Which display best suits ${data}?`, answer, choices: ["Dot plot", "Grouped frequency graph", "Line graph"], steps: [why, `So use a ${answer.toLowerCase()}.`] };
   },
   (r) => {
-    const items: [string, "Numerical" | "Categorical"][] = [["favourite fruit", "Categorical"], ["number of pets", "Numerical"], ["travel method", "Categorical"], ["height in cm", "Numerical"], ["eye colour", "Categorical"], ["minutes of sleep", "Numerical"]];
+    const items: [string, "Numerical" | "Categorical"][] = [["a postcode", "Categorical"], ["a player's jersey number", "Categorical"], ["shoe size", "Numerical"], ["time to run 100 m", "Numerical"], ["a phone's model name", "Categorical"], ["number of siblings", "Numerical"]];
     const [item, answer] = pick(r, items);
-    return { prompt: `Is ${item} numerical or categorical data?`, answer, choices: ["Numerical", "Categorical"], steps: ["Numerical data are numbers that can be counted or measured; categorical data are labels.", `${item[0].toUpperCase() + item.slice(1)} is ${answer.toLowerCase()}.`] };
+    return { prompt: `Is ${item} numerical or categorical data?`, answer, choices: ["Numerical", "Categorical"], steps: ["Numerical data are counts or measurements you could average; categorical data are labels, even when the label is a number.", `${item[0].toUpperCase() + item.slice(1)} is ${answer.toLowerCase()}.`] };
   },
 ];
 
