@@ -1,11 +1,12 @@
 import "server-only";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/supabase-config";
 import {EXPEDITION_REALMS,expeditionAccessFromAssessments,type ExpeditionAssessment,type ExpeditionPlacement} from './expedition-access';
 
 // Always use the public role and the caller's validated student-session header.
 // No service-role bypass, browser-supplied placement, or local progress is accepted.
 export async function readStudentExpeditionAccess(studentId:string,token:string){
  const rpc=async(name:string,args:Record<string,unknown>)=>{
-  const response=await fetch(`https://dqncplrxjxvjqbmwcyia.supabase.co/rest/v1/rpc/${name}`,{method:'POST',cache:'no-store',headers:{apikey:'sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo','Content-Type':'application/json','x-student-session':token},body:JSON.stringify(args)});
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json','x-student-session':token},body:JSON.stringify(args)});
   if(!response.ok)throw new Error('Expedition access could not be verified');
   return response.json();
  };

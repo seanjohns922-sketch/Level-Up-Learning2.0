@@ -49,7 +49,7 @@ assert(live.includes('config: { private: true }'), 'Live Class must support priv
 for (const table of ['live_student_activity', 'live_activity_events', 'student_lesson_attempts', 'student_weekly_quiz_attempts']) {
   assert(live.includes(`table: "${table}"`), `Live Class subscription lost: ${table}`);
 }
-assert(live.includes('setInterval(loadRows, 30000)'), 'Keep tracking refresh fallback');
+assert(live.includes('setInterval(refreshWhenVisible, 30000)') && live.includes('refresh.request()'), 'Keep tracking refresh fallback through the visible-tab scheduler');
 const policy = fs.readFileSync('supabase/manual/screen-sharing-retirement/prepare.sql', 'utf8');
 assert(policy.includes("not like 'screen-%'") && policy.includes('as restrictive for all'));
 assert(policy.includes('as restrictive for insert') && policy.includes('with check (false)'));

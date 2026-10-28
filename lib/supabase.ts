@@ -3,9 +3,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { STUDENT_SESSION_TOKEN_KEY } from "@/lib/studentIdentity";
 
-const supabaseUrl = "https://dqncplrxjxvjqbmwcyia.supabase.co";
-const supabaseAnonKey = "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
-const supabaseProjectRef = "dqncplrxjxvjqbmwcyia";
+import {
+  SUPABASE_URL as supabaseUrl,
+  SUPABASE_PUBLISHABLE_KEY as supabaseAnonKey,
+  SUPABASE_PROJECT_REF as supabaseProjectRef,
+} from "@/lib/supabase-config";
 const supabaseAuthStorageKey = `sb-${supabaseProjectRef}-auth-token`;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

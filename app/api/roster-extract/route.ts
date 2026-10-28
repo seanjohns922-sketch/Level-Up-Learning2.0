@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = "https://dqncplrxjxvjqbmwcyia.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/supabase-config";
 const MAX_REQUEST_CHARACTERS = 12_000_000;
 const ALLOWED_IMAGE_PREFIXES = ["data:image/jpeg;base64,", "data:image/png;base64,", "data:image/webp;base64,"];
 

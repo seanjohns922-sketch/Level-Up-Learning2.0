@@ -7,12 +7,7 @@ import {
   strandForRealm,
 } from "@/lib/curriculum/ac-standards";
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  "https://dqncplrxjxvjqbmwcyia.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/supabase-config";
 
 export const SCHOOL_PREVIEW_COOKIE = "lul_school_preview_access";
 

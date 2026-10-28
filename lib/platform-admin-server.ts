@@ -2,12 +2,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import { verifyAdultAccessToken } from "@/lib/school-platform-server";
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  "https://dqncplrxjxvjqbmwcyia.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "sb_publishable_cvaUEdcS16I8T3EqAydiaA_ES8XRgOo";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/lib/supabase-config";
 
 export const PLATFORM_ADMIN_COOKIE = "lul_platform_admin_access";
 

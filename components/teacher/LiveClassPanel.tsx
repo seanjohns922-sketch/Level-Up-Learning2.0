@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { supabase } from "@/lib/supabase";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
@@ -1005,6 +1006,7 @@ export default function LiveClassPanel({
     }
 
     async function loadRows() {
+      if (cancelled || document.visibilityState !== "visible") return;
       if (!selectedClass?.id) {
         if (!cancelled) {
           setRows([]);
@@ -1131,41 +1133,45 @@ export default function LiveClassPanel({
       }
     }
 
-    void ensureLiveSession();
-    void loadRows();
-    intervalId = setInterval(loadRows, 30000);
+    const refresh = createCoalescedRefresh(loadRows, (error) => {
+      console.warn("[LiveClassPanel] Refresh failed", error);
+    });
     const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") void loadRows();
+      if (document.visibilityState === "visible") refresh.request();
     };
-    window.addEventListener("focus", loadRows);
+    void ensureLiveSession();
+    refreshWhenVisible();
+    intervalId = setInterval(refreshWhenVisible, 30000);
+    window.addEventListener("focus", refreshWhenVisible);
     document.addEventListener("visibilitychange", refreshWhenVisible);
     channel = supabase
       .channel(`live-class-${selectedClass?.id ?? "none"}`, { config: { private: true } })
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "live_student_activity", filter: `class_id=eq.${selectedClass?.id}` },
-        () => void loadRows(),
+        refreshWhenVisible,
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "live_activity_events", filter: `class_id=eq.${selectedClass?.id}` },
-        () => void loadRows(),
+        refreshWhenVisible,
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "student_lesson_attempts", filter: `class_id=eq.${selectedClass?.id}` },
-        () => void loadRows(),
+        refreshWhenVisible,
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "student_weekly_quiz_attempts", filter: `class_id=eq.${selectedClass?.id}` },
-        () => void loadRows(),
+        refreshWhenVisible,
       )
       .subscribe();
     return () => {
       cancelled = true;
+      refresh.dispose();
       if (intervalId) clearInterval(intervalId);
-      window.removeEventListener("focus", loadRows);
+      window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
       if (channel) void supabase.removeChannel(channel);
     };
