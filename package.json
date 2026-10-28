@@ -23,6 +23,7 @@
     "staging:seed": "node scripts/staging/seed-local.mjs",
     "staging:smoke": "node scripts/staging/smoke-load.mjs",
     "qa:staging-config": "node scripts/staging-config-test.mjs",
+    "qa:live-class-event-read": "node --experimental-strip-types scripts/live-class-event-read-test.mjs",
     "qa:live-class-refresh": "node --experimental-strip-types scripts/live-class-refresh-test.mjs",
     "qa:world-startup-performance": "NODE_ENV=test node scripts/world-startup-performance-test.mjs",
     "qa:central-world3d": "node scripts/central-world-3d-audit.mjs",

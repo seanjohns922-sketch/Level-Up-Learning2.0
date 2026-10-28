@@ -9,7 +9,7 @@ const groups = {
     'qa:canonical-progression', 'qa:teacher-canonical-snapshot',
     'qa:live-maths-progression', 'qa:completion-rewards',
     'qa:activity-marking', 'qa:quiz-math-integrity', 'qa:lint-interactions',
-    'qa:assessment-question-results', 'qa:world-startup-performance', 'qa:live-class-refresh', 'qa:staging-config',
+    'qa:assessment-question-results', 'qa:world-startup-performance', 'qa:live-class-refresh', 'qa:staging-config', 'qa:live-class-event-read',
   ],
   // Source checks only: not a substitute for deployed role/RLS tests.
   'security-source': ['qa:screen-recording-safety', 'qa:student-session-isolation', 'qa:student-diagnostic-permissions', 'qa:school-teacher-learning-access'],

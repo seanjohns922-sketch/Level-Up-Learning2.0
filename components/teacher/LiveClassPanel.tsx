@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react"
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { supabase } from "@/lib/supabase";
+import { fetchLiveClassEvents } from "@/lib/live-class-events";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
   aggregateLearningScores,
@@ -1025,11 +1026,9 @@ export default function LiveClassPanel({
           .select("*")
           .eq("class_id", selectedClass.id)
           .order("last_active_at", { ascending: false }),
-        supabase
-          .from("live_activity_events")
-          .select("id,student_id,class_id,event_type,created_at,payload")
-          .eq("class_id", selectedClass.id)
-          .in("event_type", [
+        fetchLiveClassEvents(supabase, {
+          classId: selectedClass.id,
+          eventTypes: [
             "activity_started",
             "lesson_started",
             "quiz_started",
@@ -1040,8 +1039,8 @@ export default function LiveClassPanel({
             "lesson_completed",
             "quiz_completed",
             "idle_detected",
-          ])
-          .order("created_at", { ascending: true }),
+          ],
+        }),
         studentIds.length > 0
           ? supabase
             .from("student_lesson_attempts")
@@ -1185,13 +1184,12 @@ export default function LiveClassPanel({
     }
 
     async function loadStudentEvents() {
-      const { data, error } = await supabase
-        .from("live_activity_events")
-        .select("id,event_type,created_at,payload")
-        .eq("class_id", selectedClassId)
-        .eq("student_id", selectedStudentId)
-        .order("created_at", { ascending: false })
-        .limit(15);
+      const { data, error } = await fetchLiveClassEvents(supabase, {
+        classId: selectedClassId!,
+        studentIds: [selectedStudentId!],
+        newestFirst: true,
+        limit: 15,
+      });
       if (error) {
         console.warn("[LiveClassPanel] Failed to load student timeline", error);
       }

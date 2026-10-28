@@ -6,6 +6,7 @@ import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, Clipboard
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { fetchLiveClassEvents } from "@/lib/live-class-events";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
@@ -481,12 +482,10 @@ export default function TeacherDashboardPage() {
             ),
           ),
           supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
-          supabase
-            .from("live_activity_events")
-            .select("student_id,class_id,event_type,created_at,payload")
-            .in("student_id", ids)
-            .eq("class_id", classId)
-            .in("event_type", [
+          fetchLiveClassEvents(supabase, {
+            classId,
+            studentIds: ids,
+            eventTypes: [
               "lesson_started",
               "quiz_started",
               "question_loaded",
@@ -494,8 +493,8 @@ export default function TeacherDashboardPage() {
               "answer_incorrect",
               "lesson_completed",
               "quiz_completed",
-            ])
-            .order("created_at", { ascending: true }),
+            ],
+          }),
         ]);
         newProg = realmProgress.flat();
         if (liveError) {
