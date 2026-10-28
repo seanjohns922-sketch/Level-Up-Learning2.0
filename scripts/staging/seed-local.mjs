@@ -5,9 +5,12 @@ import assert from 'node:assert/strict';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
-const fixturePath = path.join(localDir, 'synthetic-accounts.json');
+const group = process.env.SCALE_FIXTURE_GROUP ?? '';
+assert.ok(group === '' || /^[2-4]$/.test(group), 'Only isolated fixture groups 2–4 are supported');
+const suffix = group ? `-${group}` : '';
+const fixturePath = path.join(localDir, `synthetic-accounts${suffix}.json`);
 const fixture = fs.existsSync(fixturePath) ? JSON.parse(fs.readFileSync(fixturePath, 'utf8')) : {
-  email: 'scale.teacher@example.invalid', password: crypto.randomBytes(24).toString('base64url'), students: [],
+  email: `scale.teacher${suffix}@example.invalid`, password: crypto.randomBytes(24).toString('base64url'), students: [],
 };
 function save() { fs.writeFileSync(fixturePath, JSON.stringify(fixture, null, 2), { mode: 0o600 }); }
 save();
@@ -31,14 +34,14 @@ await upsert('platform_roles', { user_id: fixture.teacherId, role: 'platform_own
 const auth = await request('/auth/v1/token?grant_type=password', { email: fixture.email, password: fixture.password }, config.ANON_KEY);
 const rpc = (name, args) => request(`/rest/v1/rpc/${name}`, args, auth.access_token);
 const year = new Date().getFullYear();
-fixture.schoolId = await rpc('platform_owner_create_school', { p_name: 'Synthetic Scale School', p_school_code: 'SCALETEST', p_calendar_year: year, p_seat_limit: 100, p_status: 'active', p_idempotency_key: 'scale-school-v1' });
+fixture.schoolId = await rpc('platform_owner_create_school', { p_name: 'Synthetic Scale School', p_school_code: `SCALETEST${group}`, p_calendar_year: year, p_seat_limit: 100, p_status: 'active', p_idempotency_key: `scale-school${suffix}-v1` });
 save();
 await upsert('school_memberships', { school_id: fixture.schoolId, user_id: fixture.teacherId, role: 'school_admin', status: 'active' });
 const years = await request(`/rest/v1/academic_years?school_id=eq.${fixture.schoolId}&select=id`, undefined, config.SERVICE_ROLE_KEY, 'GET');
-fixture.classId = await rpc('create_class', { p_school_id: fixture.schoolId, p_academic_year_id: years[0].id, p_name: 'Synthetic Class', p_class_code: 'SCALE01', p_year_levels: ['Year 4'], p_idempotency_key: 'scale-class-v1' });
-fixture.classCode = 'SCALE01'; save();
+fixture.classId = await rpc('create_class', { p_school_id: fixture.schoolId, p_academic_year_id: years[0].id, p_name: 'Synthetic Class', p_class_code: `SCALE0${group || '1'}`, p_year_levels: ['Year 4'], p_idempotency_key: `scale-class${suffix}-v1` });
+fixture.classCode = `SCALE0${group || '1'}`; save();
 for (let i = 1; i <= 25; i++) {
-  const student = await rpc('create_school_student', { p_school_id: fixture.schoolId, p_class_id: fixture.classId, p_first_name: 'Synthetic', p_last_name: `Student${i}`, p_school_year_level: 'Year 4', p_username: `scale${i}`, p_pin: String(1000 + i), p_idempotency_key: `scale-student-${i}-v1` });
+  const student = await rpc('create_school_student', { p_school_id: fixture.schoolId, p_class_id: fixture.classId, p_first_name: 'Synthetic', p_last_name: `Student${i}`, p_school_year_level: 'Year 4', p_username: `scale${group}${i}`, p_pin: String(1000 + i), p_idempotency_key: `scale-student${suffix}-${i}-v1` });
   fixture.students[i - 1] = student; save();
 }
 // Remove provisioning privileges: runtime checks use an ordinary class teacher.
@@ -63,4 +66,4 @@ assert.equal(after.reduce((sum, row) => sum + row.seconds_active, 0), previousSe
 const live = await rpc('get_live_class_activity_today', { p_class_id: fixture.classId });
 assert.ok(Array.isArray(live));
 console.log('PASS: local synthetic school, teacher and 25 students; real login, scoped context, denied cross-student/missing sessions, presence and persisted activity.');
-console.log('Local-only account details saved to .local-archive/scale-local/synthetic-accounts.json');
+console.log(`Local-only account details saved to ${fixturePath}`);

@@ -180,3 +180,63 @@ The next capacity stage needs realistic historical fixture volumes, actual lesso
 and assessment completion/retry checks, live realtime delivery, teacher fan-out,
 bell-time bursts and a cloud environment matching production resources. Do not
 extrapolate the small local smoke result to a supported production user count.
+
+## 100-student local checkpoint — 28 October 2026
+
+The next protocol rehearsal passed on the isolated local stack: 100 distinct
+students across four synthetic schools/classes, four ordinary teachers, and
+5,000 synthetic historical events per class. The event-read migration was already
+installed locally. No production traffic or cloud changes were made.
+
+A synchronized student login burst was followed by 120 seconds of presence and
+activity writes every 30 seconds, with each teacher requesting class events every
+two seconds. The run recorded 1,440 expected requests, zero HTTP failures, zero
+journey assertion failures, and all 400 activity writes read back with the exact
+expected per-student increase. Cross-school teacher requests were denied before
+the run; returned event rows were checked for class/student scope throughout.
+
+| Endpoint | Requests | p95 | p99 |
+| --- | ---: | ---: | ---: |
+| Student login | 100 | 414 ms | 440 ms |
+| Runtime context | 100 | 269 ms | 281 ms |
+| Teacher event read | 236 | 51 ms | 185 ms |
+| Daily activity read | 200 | 150 ms | 217 ms |
+| Presence update | 400 | 100 ms | 187 ms |
+| Daily activity write | 400 | 73 ms | 142 ms |
+
+Four teacher logins also passed (maximum 114 ms). Machine-readable aggregate
+results are in `capacity-local-100-2026-10-28.json`; no identities or credentials
+are included. A single during-run resource sample showed local PostgreSQL using
+168.2 MiB and 0.24% CPU; another sample showed 27 total connections and one active
+connection including the observer. These are point samples, not peak/headroom
+measurements, and must not be extrapolated to production.
+
+Repeat after preparing the original local fixture and installing the local
+event-read migration:
+
+```sh
+SCALE_FIXTURE_GROUP=2 node scripts/staging/seed-local.mjs
+SCALE_FIXTURE_GROUP=3 node scripts/staging/seed-local.mjs
+SCALE_FIXTURE_GROUP=4 node scripts/staging/seed-local.mjs
+node scripts/staging/capacity-local.mjs
+```
+
+Fixtures use separate private credential files and deterministic history IDs so
+repeat provisioning does not duplicate events. Run only one workload against
+these fixtures at a time; concurrent runs would invalidate exact activity-delta
+assertions. Synthetic events/accounts/activity remain in the isolated database
+for repeat tests. The original 25-student fixture and smoke command remain usable.
+`SCALE_DURATION_SECONDS` can set a duration from 60 to 1,800 seconds; the result
+above used the default 120 seconds, **not** a 30-minute sustained test.
+
+This checkpoint covers protocol login/context, activity persistence and the
+optimized event feed. It excludes canonical lesson/assessment completion and
+retry integrity, the other five dashboard reads, realtime propagation, browser
+rendering and production-equivalent resources. Complete those workload paths and
+resource monitoring before increasing load or claiming 10,000-user readiness.
+The existing cloud staging project's schema/configuration/compute parity remains
+unverified. The deferred security follow-up remains outstanding for wider rollout.
+
+Validation for this test-only change: JavaScript syntax checks, `lint:qa`, fixture
+provisioning/permission smoke and the actual two-minute rehearsal passed. No
+production application code changed; a new app build was not required.

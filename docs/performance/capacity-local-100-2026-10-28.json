@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-28T03:40:28.740Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "students": 100,
+  "teachers": 4,
+  "historyEvents": 20000,
+  "durationSeconds": 120,
+  "requests": 1440,
+  "failedRequests": 0,
+  "verifiedActivityWrites": 400,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "requests": 4,
+      "failedRequests": 0,
+      "p95Ms": 114,
+      "p99Ms": 114,
+      "maximumMs": 114
+    },
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 414,
+      "p99Ms": 440,
+      "maximumMs": 532
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 269,
+      "p99Ms": 281,
+      "maximumMs": 367
+    },
+    {
+      "name": "teacher_event_read",
+      "requests": 236,
+      "failedRequests": 0,
+      "p95Ms": 51,
+      "p99Ms": 185,
+      "maximumMs": 485
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 200,
+      "failedRequests": 0,
+      "p95Ms": 150,
+      "p99Ms": 217,
+      "maximumMs": 333
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 400,
+      "failedRequests": 0,
+      "p95Ms": 100,
+      "p99Ms": 187,
+      "maximumMs": 264
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 400,
+      "failedRequests": 0,
+      "p95Ms": 73,
+      "p99Ms": 142,
+      "maximumMs": 222
+    }
+  ],
+  "preliminaryGatePassed": true,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "full six-read teacher snapshots",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}
