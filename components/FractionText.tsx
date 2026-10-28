@@ -115,6 +115,29 @@ function FractionToken({
   return <>{token}</>;
 }
 
+// Unicode superscripts come from two blocks: ¹²³ are in most fonts, but ⁰⁴-⁹ⁿ
+// fall back to another font at a different size. Draw every run as <sup> with
+// ordinary characters so powers like 2¹⁸ and ((2³)³)² look consistent.
+const SUPERSCRIPTS: Record<string, string> = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁺": "+", "⁻": "−", "⁼": "=", "⁽": "(", "⁾": ")", "ⁿ": "n", "ˣ": "x" };
+const SUPERSCRIPT_RUN = /([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿˣ]+)/;
+
+export function SuperscriptText({ text }: { text: string }) {
+  if (!SUPERSCRIPT_RUN.test(text)) return <>{text}</>;
+  return (
+    <>
+      {text.split(SUPERSCRIPT_RUN).map((part, index) =>
+        index % 2 === 1 ? (
+          <sup key={index} className="relative top-[-0.05em] align-super text-[0.68em] leading-none">
+            {[...part].map((ch) => SUPERSCRIPTS[ch] ?? ch).join("")}
+          </sup>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 export function MathFormattedText({
   text,
   compactFractions = false,
@@ -135,7 +158,7 @@ export function MathFormattedText({
             {isFractionToken(part) ? (
               <FractionToken token={part} compact={compactFractions} size={fractionSize} />
             ) : (
-              <span>{part}</span>
+              <span><SuperscriptText text={part} /></span>
             )}
           </Fragment>
         );
