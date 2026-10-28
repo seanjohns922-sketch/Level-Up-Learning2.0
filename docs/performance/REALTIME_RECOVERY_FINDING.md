@@ -1,6 +1,6 @@
 # Realtime recovery regression — 28 October 2026
 
-Status: reproduced locally; unresolved. Do not treat the previous throughput and
+Status: fixed and verified locally by paginated event reads (28 October 2026). The original failing result below is retained as evidence. Do not treat the previous throughput and
 completion checks as proof of event-snapshot recovery or increase the capacity
 claim on their basis.
 
@@ -32,8 +32,7 @@ Run against the existing local fixtures and event publication:
 node --experimental-strip-types scripts/staging/reconnect-local.mjs
 ```
 
-The command intentionally exits nonzero while the recovery assertions fail. It is
-not included in critical QA as a passing check. Results contain no credentials or
+The command exits nonzero if recovery assertions fail. It now passes against the paginated application helper; it remains a local integration check outside critical QA. Results contain no credentials or
 student identifiers. Test events remain in the isolated local database.
 
 Impact: the class event snapshot can omit recent activity. The dashboard also
@@ -41,7 +40,7 @@ uses current-activity rows and canonical attempts, so this does not establish
 that every live card is stale or that student saves are lost. Its event-derived
 current-attempt calculations cannot safely rely on a truncated history.
 
-Next fix: define a complete, bounded current-attempt event read per student and
+Further scale optimisation: define a complete, bounded current-attempt event read per student and
 preserve canonical saved-score/history semantics. Inspect both dashboard consumers
 before choosing pagination or server aggregation. Merely reversing the sort to
 return the newest 1,000 class events can still drop quieter students or truncate

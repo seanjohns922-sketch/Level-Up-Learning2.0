@@ -27,11 +27,21 @@ begin
     from public.get_live_class_events_secure(class_id) e;
     assert rpc_rows=direct_rows, 'RPC must return exactly the same authorized events';
     assert jsonb_array_length(rpc_rows)>0, 'Allowed fixture must have evidence';
+    select coalesce(jsonb_agg(to_jsonb(e) order by e.id),'[]') into rpc_rows
+    from public.get_live_class_event_page_secure(class_id,null,null,null,null,'2099-01-01','ffffffff-ffff-ffff-ffff-ffffffffffff') e;
+    select coalesce(jsonb_agg(to_jsonb(e) order by e.id),'[]') into direct_rows
+    from (select * from public.live_activity_events where live_activity_events.class_id=assert_event_access.class_id order by created_at,id limit 500)e;
+    assert rpc_rows=direct_rows, 'Page must match the same authorized RLS rows';
   else
     assert jsonb_array_length(direct_rows)=0, 'Direct RLS must deny the fixture';
     begin
       perform * from public.get_live_class_events_secure(class_id);
       raise exception 'Expected RPC access denial';
+    exception when insufficient_privilege then null;
+    end;
+    begin
+      perform * from public.get_live_class_event_page_secure(class_id,null,null,null,null,'2099-01-01','ffffffff-ffff-ffff-ffff-ffffffffffff');
+      raise exception 'Expected page access denial';
     exception when insufficient_privilege then null;
     end;
   end if;

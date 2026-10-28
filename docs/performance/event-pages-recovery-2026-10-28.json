@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-28T04:01:02.102Z",
+  "environment": "isolated local reconnect and application event-read regression",
+  "checks": {
+    "initialDelivery": true,
+    "subscriptionRemoved": true,
+    "pollRecoversMissedEvent": true,
+    "timelineContainsMissedEvent": true,
+    "reconnectedDelivery": true,
+    "refreshContainsLatestEvent": true
+  },
+  "failures": [],
+  "snapshotRows": 5058,
+  "legacySnapshotRows": 1000,
+  "legacyAlsoOmitsMissedEvent": true,
+  "passed": true
+}

@@ -319,3 +319,54 @@ resolved and retested.
 Validation: new runner syntax, existing event-read QA and lint:qa passed. The new
 recovery runner intentionally remains failing on its two missing-event assertions.
 No production application code changed; no new production build was needed.
+
+## Recovery fix and complete-snapshot load check — 28 October 2026
+
+The shared app reader now retrieves complete event history in keyset pages ordered
+by `(created_at, id)`. An initial newest-row query fixes the upper cursor for the
+refresh, so incoming events cannot extend it indefinitely. Each new authenticated
+RPC page checks the existing class permission once and returns at most 500 rows.
+A smaller API cap does not terminate the loop early. Tied timestamps advance by
+ID; errors discard partial results. Explicit latest-15 timelines retain their
+existing endpoint and limits. If the new endpoint is not deployed yet, equivalent
+RLS-protected table pages provide the same complete result.
+
+The migration adds only `get_live_class_event_page_secure`, with authenticated
+EXECUTE and no PUBLIC/anon grant. No tables, indexes, student records or policies
+change. The current production event policy was checked read-only and still uses
+`can_view_class(class_id)`. Rollback is documented in
+`supabase/manual/live-event-reads/rollback-pages.sql`; keep paginated fallback in
+the app rather than restoring the known truncated reader.
+
+The formerly failing recovery test now passes with 5,058 rows, including missed
+and post-reconnect events. Additional actual-API tests insert and remove 1,201
+equal-timestamp synthetic rows and verify every row, a quiet student's row,
+unique page boundaries, empty filters, and exact migration-free fallback parity.
+Role-parity tests cover teachers, assigned support, principal, school/platform
+admin, legacy ownership and revoked/unrelated access; real HTTP anon access is
+denied. Unit tests also cover short API pages, a fixed upper cursor, deleted upper
+rows, fail-closed partial reads and unchanged timeline limits.
+
+A 120-second run now uses the **actual application helper** for teacher snapshots,
+asserting at least 5,000 seeded events per class. It passed with 100 students,
+four teachers, zero failures and all 400 activity increments verified. There were
+1,204 student/teacher-login HTTP requests and 228 logical class snapshots, which
+made 2,569 HTTP requests: 3,773 HTTP requests in total. Full-snapshot p95 was
+202 ms and p99 647 ms; login p95 was 383 ms. Timestamp-boundary fixtures were
+created/deleted during this run, and the local production build was also running,
+so this remains a development-machine checkpoint rather than a controlled cloud
+benchmark. Results: `event-pages-recovery-2026-10-28.json` and
+`event-pages-capacity-2026-10-28.json`.
+
+This fixes truncation while preserving existing historical semantics. Total bytes
+and requests still grow with history: it is **not** the final bounded
+current-attempt aggregation needed for very large deployments. No 10,000-user
+claim, 30-minute soak or production performance result follows from this test.
+
+Release validation: all 16 critical checks, teacher canonical/live-realm QA,
+shared-reader lint, lint:qa, typecheck, actual API cursor/role checks and the
+production webpack build passed. The initial sandboxed Turbopack build stalled
+without a diagnostic and was stopped; `npm run build -- --webpack` completed.
+The single `20261028170000` migration was applied transactionally to production
+and recorded in `supabase_migrations.schema_migrations`; no other pending migration
+was applied. Student data and existing RLS policies were not changed.

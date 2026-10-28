@@ -2,6 +2,8 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
+import { createClient } from '@supabase/supabase-js';
+import { fetchLiveClassEvents } from '../../lib/live-class-events.ts';
 import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
 const seconds = Number(process.env.SCALE_DURATION_SECONDS ?? 120);
@@ -9,6 +11,7 @@ assert.ok(Number.isInteger(seconds) && seconds >= 60 && seconds <= 1800);
 const groups = ['', '-2', '-3', '-4'].map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
 assert.equal(new Set(groups.flatMap(g => g.students.map(s => s.studentId))).size, 100);
 const samples = [];
+let snapshotHttpRequests = 0;
 const failures = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function request(path, body, token, session, name) {
@@ -48,7 +51,7 @@ for (const group of groups) {
 console.log('Prepared 100 distinct students, four ordinary teachers and 20,000 synthetic history events.');
 const teachers = await Promise.all(groups.map(async group => {
   const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, 'teacher_login');
-  return { group, token: auth.access_token };
+  return { group, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: (...args) => { snapshotHttpRequests++; return fetch(...args); } } }) };
 }));
 // Verify cross-school denial before sending load; never use owner/service tokens below.
 for (let i = 0; i < teachers.length; i++) {
@@ -77,12 +80,14 @@ async function studentJourney({ group, student }) {
   assert.equal(after, before + writes * 30, 'Individual activity write integrity');
   verifiedWrites += writes;
 }
-async function teacherJourney({ group, token }) {
+async function teacherJourney({ group, client }) {
   do {
-    const rows = await request('/rest/v1/rpc/get_live_class_events_secure?order=created_at.asc&select=id,student_id,class_id,event_type,created_at,payload', {
-      p_class_id: group.classId, p_student_ids: null,
-      p_event_types: ['answer_correct','question_loaded'], p_newest_first: false, p_limit: null,
-    }, token, null, 'teacher_event_read');
+    const start = performance.now();
+    const result = await fetchLiveClassEvents(client, {classId:group.classId,eventTypes:['answer_correct','question_loaded']});
+    samples.push({name:'teacher_event_snapshot',ms:performance.now()-start,status:result.status});
+    assert.equal(result.error,null);
+    const rows=result.data;
+    assert.ok(rows.length >= 5000, 'Snapshot must include all seeded history, not the first API page');
     assert.ok(rows.length > 0);
     const ids = new Set(group.students.map(s => s.studentId));
     assert.ok(rows.every(row => row.class_id === group.classId && ids.has(row.student_id)), 'Teacher event isolation');
@@ -101,7 +106,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
   students: 100, teachers: 4, historyEvents: 20000, durationSeconds: Math.round((Date.now()-started)/1000),
-  requests: samples.length, failedRequests, verifiedActivityWrites: verifiedWrites, failures, endpoints,
+  requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
 fs.writeFileSync(`${localDir}/capacity-100-result.json`, JSON.stringify(report,null,2));

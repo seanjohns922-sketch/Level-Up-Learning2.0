@@ -58,3 +58,20 @@ statistics over a fresh observation window, rather than lifetime averages.
 To roll back, revert the app change, then run `rollback.sql` and reload PostgREST's
 schema cache. No data restoration is required. Do not run a blanket database push
 that includes unrelated pending migrations.
+
+## Complete snapshots follow-up
+
+`20261028170000_page_live_class_events.sql` adds authenticated keyset pages with
+mandatory upper timestamp/ID and optional complete lower cursor, ordered by timestamp
+and ID, capped at 500 per page. The application fixes its upper cursor first and
+continues until reaching that row or an empty page, even if the API returns fewer
+than 500 rows. This removes the oldest-1,000 truncation in class snapshots while
+preserving all history and explicit latest-15 timelines. Missing-function fallback
+uses equivalent RLS table pages; access errors do not trigger fallback.
+
+Run `node --experimental-strip-types scripts/staging/event-pages-local.mjs` for
+actual API tied-timestamp/quiet-student/fallback parity, and
+`node --experimental-strip-types scripts/staging/reconnect-local.mjs` for the
+recovery regression. The access runner now installs both migrations locally.
+Use `rollback-pages.sql` for the new function only. These pages still transfer full
+history across multiple requests; they do not solve long-term history growth.
