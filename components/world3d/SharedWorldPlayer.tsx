@@ -38,7 +38,7 @@ export function ExplorerAvatarModel({avatar,...props}:AvatarMotionProps & {avata
     : fallback;
 }
 
-function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: AvatarMotionProps & {avatar:Required<AvatarOutfit>}) {
+export function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: AvatarMotionProps & {avatar:Required<AvatarOutfit>}) {
   const bodyRef = useRef<THREE.Group>(null);
   const leftLegRef = useRef<THREE.Group>(null);
   const rightLegRef = useRef<THREE.Group>(null);
