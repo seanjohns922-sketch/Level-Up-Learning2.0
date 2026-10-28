@@ -1,7 +1,7 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCcw } from "lucide-react";
@@ -79,25 +79,26 @@ type Game = {
   cameraAngle: number;
 };
 
+// Loaded through R3F's loader (Suspense) so the material is built with its map.
 function useTexture(src: string) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    new THREE.TextureLoader().load(src, (loaded) => {
-      loaded.colorSpace = THREE.SRGBColorSpace;
-      loaded.anisotropy = 8;
-      if (!cancelled) setTexture(loaded);
-    });
-    return () => { cancelled = true; };
-  }, [src]);
-  return texture;
+  const base = useLoader(THREE.TextureLoader, src);
+  return useMemo(() => {
+    const texture = base.clone();
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    texture.needsUpdate = true;
+    return texture;
+  }, [base]);
 }
 
 // Lit stone tiles (they shade differently on every face of the tunnel, which is
-// what gives it depth) plus a glowing rim on each tile's leading edge.
+// what gives it depth) plus a glowing rim on each tile's leading edge. Every
+// edge that borders a gap gets a hot warning lip, so holes read from far away.
 function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: number) => boolean[]; era: number }) {
   const tiles = useRef<THREE.InstancedMesh>(null);
   const rims = useRef<THREE.InstancedMesh>(null);
+  const lips = useRef<THREE.InstancedMesh>(null);
+  const sideLips = useRef<THREE.InstancedMesh>(null);
   const stone = useTexture("/images/chronorok/tex-paving.webp");
   const matrix = useMemo(() => new THREE.Object3D(), []);
   const width = 2 * RADIUS * Math.tan(Math.PI / SIDES) - 0.1;
@@ -106,9 +107,11 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
   useFrame(() => {
     const mesh = tiles.current;
     const rim = rims.current;
-    if (!mesh || !rim || !game.current) return;
+    const lip = lips.current;
+    const side = sideLips.current;
+    if (!mesh || !rim || !lip || !side || !game.current) return;
     const base = Math.floor(game.current.z / ROW) - 3;
-    let i = 0;
+    let i = 0, l = 0, sl = 0;
     for (let r = 0; r < VISIBLE_ROWS; r += 1) {
       const index = Math.max(0, base + r);
       const present = row(index);
@@ -123,8 +126,38 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
         matrix.updateMatrix();
         rim.setMatrixAt(i, matrix.matrix);
         i += 1;
+        if (!present[k]) continue;
+        const deeper = row(index + 1)[k];
+        const nearer = index > 0 ? row(index - 1)[k] : true;
+        for (const [missing, zEdge] of [[!deeper, -ROW / 2 + 0.1], [!nearer, ROW / 2 - 0.1]] as Array<[boolean, number]>) {
+          if (!missing) continue;
+          matrix.position.set(Math.sin(a) * (RADIUS - 0.05), -Math.cos(a) * (RADIUS - 0.05), -index * ROW + zEdge);
+          matrix.rotation.set(0, 0, a);
+          matrix.scale.setScalar(1);
+          matrix.updateMatrix();
+          lip.setMatrixAt(l, matrix.matrix);
+          l += 1;
+        }
+        for (const dir of [-1, 1]) {
+          if (present[(k + dir + SIDES) % SIDES]) continue;
+          const along = { x: Math.cos(a), y: Math.sin(a) };
+          const half = width / 2 - 0.08;
+          matrix.position.set(Math.sin(a) * (RADIUS - 0.05) + along.x * half * dir, -Math.cos(a) * (RADIUS - 0.05) + along.y * half * dir, -index * ROW);
+          matrix.rotation.set(0, 0, a);
+          matrix.scale.setScalar(1);
+          matrix.updateMatrix();
+          side.setMatrixAt(sl, matrix.matrix);
+          sl += 1;
+        }
       }
     }
+    // hide unused warning lips
+    matrix.scale.setScalar(0);
+    matrix.updateMatrix();
+    for (; l < lip.count; l += 1) lip.setMatrixAt(l, matrix.matrix);
+    for (; sl < side.count; sl += 1) side.setMatrixAt(sl, matrix.matrix);
+    lip.instanceMatrix.needsUpdate = true;
+    side.instanceMatrix.needsUpdate = true;
     mesh.instanceMatrix.needsUpdate = true;
     rim.instanceMatrix.needsUpdate = true;
   });
@@ -133,12 +166,22 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
     <>
       <instancedMesh ref={tiles} args={[undefined, undefined, VISIBLE_ROWS * SIDES]} frustumCulled={false}>
         <boxGeometry args={[width, 0.5, ROW - 0.1]} />
-        <meshStandardMaterial map={stone ?? undefined} color={colours.tile} roughness={0.75} metalness={0.15} />
+        <meshStandardMaterial map={stone} color={colours.tile} roughness={0.75} metalness={0.15} />
       </instancedMesh>
       <instancedMesh ref={rims} args={[undefined, undefined, VISIBLE_ROWS * SIDES]} frustumCulled={false}>
         <boxGeometry args={[width, 0.06, 0.1]} />
         <meshBasicMaterial color={colours.edge} toneMapped={false} />
       </instancedMesh>
+      <instancedMesh ref={lips} args={[undefined, undefined, VISIBLE_ROWS * SIDES * 2]} frustumCulled={false}>
+        <boxGeometry args={[width, 0.14, 0.22]} />
+        <meshBasicMaterial color="#ff3b2a" toneMapped={false} />
+      </instancedMesh>
+      <instancedMesh ref={sideLips} args={[undefined, undefined, VISIBLE_ROWS * SIDES * 2]} frustumCulled={false}>
+        <boxGeometry args={[0.18, 0.14, ROW - 0.1]} />
+        <meshBasicMaterial color="#ff3b2a" toneMapped={false} />
+      </instancedMesh>
+      {/* a glowing void outside the tunnel, seen through every hole */}
+      <VoidGlow game={game} colour="#0b0620" />
     </>
   );
 }
@@ -194,6 +237,18 @@ function Stars() {
   const { camera } = useThree();
   useFrame(() => { if (points.current) points.current.position.z = camera.position.z; });
   return <points ref={points} geometry={geometry}><pointsMaterial color="#ffffff" size={1.6} sizeAttenuation={false} /></points>;
+}
+
+// A dim glowing shell outside the tunnel so holes show colour, not black.
+function VoidGlow({ game, colour }: { game: React.RefObject<Game>; colour: string }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  useFrame(() => { if (mesh.current && game.current) mesh.current.position.z = -game.current.z - 80; });
+  return (
+    <mesh ref={mesh} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[16, 16, 260, 24, 1, true]} />
+      <meshBasicMaterial color={colour} transparent opacity={0.92} side={THREE.BackSide} toneMapped={false} fog={false} />
+    </mesh>
+  );
 }
 
 // A glowing nebula far outside the tunnel, seen through the gaps.
@@ -348,12 +403,12 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
     >
       <Canvas camera={{ fov: 74, near: 0.1, far: 400, position: [0, -RADIUS + 3.9, 7.5] }} dpr={[1, 1.5]} gl={{ antialias: true }}>
         <color attach="background" args={[era.fog]} />
-        <fog attach="fog" args={[era.fog, 30, 150]} />
-        <ambientLight intensity={0.35} />
-        <hemisphereLight args={["#ffe6c8", "#20152e", 0.6]} />
+        <fog attach="fog" args={[era.fog, 70, 210]} />
+        <ambientLight intensity={0.8} />
+        <hemisphereLight args={["#ffe6c8", "#3a2a4e", 1.1]} />
         <Stars />
         <Nebula colour={era.edge} />
-        <Tunnel game={game} row={row} era={hud.era} />
+        <Suspense fallback={null}><Tunnel game={game} row={row} era={hud.era} /></Suspense>
         <Runner game={game} />
         <Step game={game} row={row} onHud={setHud} onOver={over} />
       </Canvas>
