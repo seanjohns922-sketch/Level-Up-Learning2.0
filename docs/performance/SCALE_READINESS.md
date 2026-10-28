@@ -295,3 +295,27 @@ six-read dashboard traffic, other realms and diagnostics, real browser saves and
 rendering, a 30-minute sustained run, and cloud resource/configuration parity.
 This checkpoint does not certify 10,000-user capacity or complete the deferred
 security audit.
+
+## Five-minute workload and recovery regression — 28 October 2026
+
+The 100-student/four-teacher activity workload completed 300 seconds with 2,996
+expected requests, zero failures and all 1,000 activity increments verified.
+Student login p95 was 315 ms, presence p95 96 ms, activity write p95 71 ms and
+teacher event-read p95 57 ms. Aggregate results are in
+`capacity-local-five-minute-2026-10-28.json`. This is five minutes, not the planned
+30-minute sustained gate. The reconnect runner issued additional synthetic events
+during this run, outside these request counts; it did not alter activity totals.
+
+**Overall next-stage result: failed recovery, despite passing throughput.**
+The actual application class-event query returned only the oldest 1,000 events,
+omitting events written while disconnected and after resubscription. Initial and
+reconnected event delivery passed; the latest-15 student timeline contained the
+missed record. The original direct-table query reproduced the same truncation.
+See `REALTIME_RECOVERY_FINDING.md` and `reconnect-local-2026-10-28.json` for the
+reproducer, precise scope and proposed follow-up. No production fix was applied.
+Do not increase the supported-capacity claim until this correctness issue is
+resolved and retested.
+
+Validation: new runner syntax, existing event-read QA and lint:qa passed. The new
+recovery runner intentionally remains failing on its two missing-event assertions.
+No production application code changed; no new production build was needed.
