@@ -147,6 +147,7 @@ function TowerScene({
 
 function buildProgressSummary(realmId: CanonicalRealmId, preview: boolean) {
   void preview;
+  if (realmId === "time") return "TIME SHARDS · GAMES";
   if (!isLiveRealmId(realmId)) return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";
@@ -247,6 +248,11 @@ export default function TowerRealmChamber() {
 
   const runActiveAction = useCallback(() => {
     if(atExpedition){router.push(preview?'/demo-review/number-adventure/3d':'/world/expedition');return;}
+    if (activePortal?.realmId === "time") {
+      // Chronorok is the games realm: its own world, not a curriculum realm.
+      router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok");
+      return;
+    }
     if (activePortal) {
       void enterRealm(activePortal.realmId);
       return;
@@ -284,7 +290,7 @@ export default function TowerRealmChamber() {
 
       <WorldMovePad input={moveInput} onChange={setMoveInput} />
       {atExpedition?<WorldInteractionPrompt location="THE SHATTERED REALMS" status="Six realms · A new challenge" actionLabel="ENTER EXPEDITION" onAction={runActiveAction}/>:null}
-      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
+      {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal?.realmId === "time" ? "ENTER CHRONOROK" : activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realmId !== "time" && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit || atExpedition)} onAction={runActiveAction} />
 
       {entryMessage ? <div role="status" style={{ position: "absolute", left: "50%", top: 105, transform: "translateX(-50%)", zIndex: 35, border: "1px solid rgba(255,214,147,.55)", borderRadius: 6, padding: "10px 14px", background: "rgba(44,28,22,.96)", color: "#fff1d1", fontWeight: 850, display: "flex", alignItems: "center", gap: 8 }}>{entryMessage}<WorldVoiceButton text={entryMessage} compact label="Read message" /></div> : null}

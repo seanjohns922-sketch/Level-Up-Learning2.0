@@ -186,7 +186,7 @@ export const REALM_REGISTRY = {
     realmId: "time",
     portalId: "chronorok",
     slug: "chronoscape",
-    name: "Chronoscape",
+    name: "Chronorok",
     shortName: "Chrono",
     activityCode: "CS",
     programSuffix: "chronoscape",
