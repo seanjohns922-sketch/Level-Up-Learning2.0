@@ -147,7 +147,7 @@ function TowerScene({
 
 function buildProgressSummary(realmId: CanonicalRealmId, preview: boolean) {
   void preview;
-  if (realmId === "time") return "TIME SHARDS · GAMES";
+  if (realmId === "time") return "CHRONO CRYSTALS · GAMES";
   if (!isLiveRealmId(realmId)) return "COMING SOON";
   const progress = readProgress(realmId);
   if (!progress) return "BEGIN JOURNEY";

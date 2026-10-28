@@ -100,7 +100,7 @@ const PORTAL_PRESENTATION: readonly TowerPortalPresentation[] = [
   },
   {
     realmId: "time",
-    subject: "TIME SHARDS & GAMES",
+    subject: "CHRONO CRYSTALS & GAMES",
     position: [12.7, 0, 20.4],
     rotationY: -2.58,
     returnSpawn: [10.6, 0.75, 17],

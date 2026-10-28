@@ -11,7 +11,7 @@ import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPro
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { fetchStudentActivityDaily } from "@/lib/student-activity";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import { CHRONOROK_OPEN_DAYS, SHARDS_TO_AWAKEN, chronorokForGrade, chronorokProgress, gradeName } from "@/lib/chronorok";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokForGrade, chronorokProgress, gradeName } from "@/lib/chronorok";
 
 /** Chronorok hub: Sean's painted Chronorok art turned into a 3D depth surface
  *  (near plaza, far cliffs and spire) with mist, drifting time sparks and four
@@ -32,7 +32,7 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
   const router = useRouter();
   const demo = useDemoPreviewMode();
   const preview = teacherPreview || demo;
-  const [progress, setProgress] = useState<{ learningDays: number; open: boolean; shards: number } | null>(null);
+  const [progress, setProgress] = useState<{ learningDays: number; open: boolean; crystals: number } | null>(null);
   const [yearLevel, setYearLevel] = useState<string | null>(null);
   const [portal, setPortal] = useState<PortalKey | null>(null);
   const [intro, setIntro] = useState(false);
@@ -45,14 +45,14 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
     const profile = getActiveStudentProfile();
     queueMicrotask(() => setYearLevel(preview ? "Year 3" : profile?.yearLevel ?? null));
     if (preview) {
-      queueMicrotask(() => setProgress({ learningDays: 63, open: true, shards: 63 }));
+      queueMicrotask(() => setProgress({ learningDays: 63, open: true, crystals: 63 }));
       return;
     }
     if (!profile?.studentId) { router.replace("/login"); return; }
     let cancelled = false;
     void fetchStudentActivityDaily(profile.studentId)
       .then((rows) => { if (!cancelled) setProgress(chronorokProgress(rows)); })
-      .catch(() => { if (!cancelled) setProgress({ learningDays: 0, open: false, shards: 0 }); });
+      .catch(() => { if (!cancelled) setProgress({ learningDays: 0, open: false, crystals: 0 }); });
     return () => { cancelled = true; };
   }, [preview, router]);
 
@@ -106,11 +106,11 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
         {progress ? (
           <div className="chronoGlass pointer-events-auto w-[min(340px,60vw)] rounded-2xl px-4 py-3">
             <div className="flex items-baseline justify-between">
-              <span className="font-display text-[11px] font-black tracking-[0.14em] text-[#ffd9a0]">TIME SHARDS{yearLevel ? ` · ${gradeName(yearLevel).toUpperCase()}` : ""}</span>
-              <span className="font-display text-2xl font-black text-[#ffd76a]">{progress.shards}<span className="text-sm text-[#f6e7c8]"> / {SHARDS_TO_AWAKEN}</span></span>
+              <span className="font-display text-[11px] font-black tracking-[0.14em] text-[#ffd9a0]">CHRONO CRYSTALS{yearLevel ? ` · ${gradeName(yearLevel).toUpperCase()}` : ""}</span>
+              <span className="font-display text-2xl font-black text-[#ffd76a]">{progress.crystals}<span className="text-sm text-[#f6e7c8]"> / {CRYSTALS_TO_AWAKEN}</span></span>
             </div>
-            <div className="my-2 h-2.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-gradient-to-r from-[#ffb347] to-[#ffe08a]" style={{ width: `${(progress.shards / SHARDS_TO_AWAKEN) * 100}%` }} /></div>
-            <p className="text-[13px] font-bold">One shard for every day you learn. At {SHARDS_TO_AWAKEN}, <b className="text-[#ffd76a]">{next.name}</b> awakens.</p>
+            <div className="my-2 h-2.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-gradient-to-r from-[#ffb347] to-[#ffe08a]" style={{ width: `${(progress.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></div>
+            <p className="text-[13px] font-bold">One crystal for every day you learn. At {CRYSTALS_TO_AWAKEN}, <b className="text-[#ffd76a]">{next.name}</b> awakens.</p>
           </div>
         ) : null}
       </header>

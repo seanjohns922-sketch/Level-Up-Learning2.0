@@ -1,5 +1,6 @@
 "use client";
 
+import { checkChronoCrystal } from "@/lib/chrono-crystals";
 import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
 import { xpAwardDone, xpAwardFailed, xpAwardSaving } from "@/lib/xp-award-store";
 import { YEAR_ORDER } from "@/data/yearOrder";
@@ -356,6 +357,7 @@ export async function saveRealmLessonAttempt(
   }
   // true = first completion of this lesson, which banks the lesson's XP.
   xpAwardDone("lesson", completed === true ? LESSON_XP : 0);
+  void checkChronoCrystal(studentId);
 
   if (completed === true) {
     const { error: discoveryError } = await supabase.rpc("discover_realm_collectible_secure", {
@@ -424,6 +426,7 @@ export async function saveNumberWeeklyQuizAttempt(
   }
   // true = this attempt banked the quiz's XP (its first pass).
   xpAwardDone("quiz", rewardEligible === true ? QUIZ_PASS_XP : 0);
+  void checkChronoCrystal(studentId);
   // Gems are judged on the server from all attempts, so check after every quiz.
   void awardAndReveal(studentId, "quiz", completionKey);
 }

@@ -1,13 +1,13 @@
 import type { StudentActivityDailyRow } from "@/lib/student-activity";
 
-/** Chronorok, the games realm. Kids earn Time Shards for learning:
- *  one shard per learning day (a day with a finished lesson or quiz), counted
+/** Chronorok, the games realm. Kids earn Chrono Crystals for learning:
+ *  one crystal per learning day (a day with a finished lesson or quiz), counted
  *  over the school year (Australian school years run January to December).
- *  The world opens after CHRONOROK_OPEN_DAYS learning days; 100 shards in a
+ *  The world opens after CHRONOROK_OPEN_DAYS learning days; 100 crystals in a
  *  school year awakens that grade's Chronorok. */
 
 export const CHRONOROK_OPEN_DAYS = 5;
-export const SHARDS_TO_AWAKEN = 100;
+export const CRYSTALS_TO_AWAKEN = 100;
 
 export const CHRONOROKS = [
   { grade: "Prep", name: "Chronorok Spark" },
@@ -26,11 +26,11 @@ export function isLearningDay(row: StudentActivityDailyRow) {
 export function chronorokProgress(rows: StudentActivityDailyRow[], now = new Date()) {
   const learningDays = rows.filter(isLearningDay);
   const year = String(now.getFullYear());
-  const shards = Math.min(SHARDS_TO_AWAKEN, learningDays.filter((row) => row.activity_date.startsWith(year)).length);
+  const crystals = Math.min(CRYSTALS_TO_AWAKEN, learningDays.filter((row) => row.activity_date.startsWith(year)).length);
   return {
     learningDays: learningDays.length,
     open: learningDays.length >= CHRONOROK_OPEN_DAYS,
-    shards,
+    crystals,
   };
 }
 

@@ -514,7 +514,7 @@ export default function DemoReviewPanel() {
 
         <section className="border-t border-white/10 py-6">
           <h2 className="mb-3 text-base font-black">Chronorok · Games Realm</h2>
-          <p className="mb-3 text-xs text-white/60">The time realm hub with its four game portals. Demo review is always unlocked and shows 63 Time Shards. Replays the arrival video each time.</p>
+          <p className="mb-3 text-xs text-white/60">The time realm hub with its four game portals. Demo review is always unlocked and shows 63 Chrono Crystals. Replays the arrival video each time.</p>
           <button type="button" onClick={() => { try { sessionStorage.removeItem("lul:chronorok:intro"); } catch { /* optional */ } router.push("/world/chronorok?teacher_preview=1"); }} className={actionClass()}><Eye size={17} /> Open Chronorok</button>
         </section>
 
