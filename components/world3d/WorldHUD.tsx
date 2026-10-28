@@ -12,6 +12,8 @@ import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { fetchStudentEconomy } from "@/lib/economy";
+import { fetchStudentActivityDaily } from "@/lib/student-activity";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokProgress } from "@/lib/chronorok";
 import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { TOWER_REALM_PORTALS } from "@/lib/world3d/tower-realm-chamber-config";
@@ -86,6 +88,7 @@ export function WorldHUD({
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [xp, setXp] = useState<number | null>(null);
+  const [crystals, setCrystals] = useState<{ crystals: number; open: boolean; learningDays: number } | null>(null);
 
   const refreshJourney = useCallback(() => {
     void resolveWorldJourney().then(setJourney).catch(() => setJourney(fallbackJourney));
@@ -106,6 +109,18 @@ export function WorldHUD({
       .catch(() => { if (!cancelled) setXp(null); });
     return () => { cancelled = true; };
   }, []);
+
+  // Chrono Crystals: one per learning day this school year (see lib/chronorok).
+  useEffect(() => {
+    const profile = getActiveStudentProfile();
+    if (preview) { queueMicrotask(() => setCrystals({ crystals: 63, open: true, learningDays: 63 })); return; }
+    if (!profile?.studentId) return;
+    let cancelled = false;
+    void fetchStudentActivityDaily(profile.studentId)
+      .then((rows) => { if (!cancelled) setCrystals(chronorokProgress(rows)); })
+      .catch(() => { if (!cancelled) setCrystals(null); });
+    return () => { cancelled = true; };
+  }, [preview]);
 
   async function quickStart() {
     if (quickStartBusy) return;
@@ -227,6 +242,15 @@ export function WorldHUD({
             </div>
           ) : null}
           <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}<WorldVoiceButton text={`Experience points. ${compactXp(xp)}.`} compact label="Read XP" /></div>
+          {crystals ? (
+            <button type="button" className="worldHudCrystals" onClick={() => router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok")}
+              title={crystals.open ? `Chrono Crystals: ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}` : `Learn on ${Math.max(0, CHRONOROK_OPEN_DAYS - crystals.learningDays)} more days to open Chronorok`}
+              aria-label={crystals.open ? `Chrono Crystals, ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}. Open Chronorok.` : `Chrono Crystals, ${crystals.crystals}. Chronorok opens after ${CHRONOROK_OPEN_DAYS} learning days.`}>
+              <svg width="15" height="19" viewBox="0 0 80 100" aria-hidden="true"><polygon points="40,2 66,30 56,94 24,94 14,30" fill="#ffc94a" /><polygon points="40,2 66,30 40,40" fill="#fff8e0" /><polygon points="40,40 66,30 56,94" fill="#d9770f" /><polygon points="40,40 14,30 24,94" fill="#ffd77a" /></svg>
+              <span>{crystals.crystals}<small>/{CRYSTALS_TO_AWAKEN}</small></span>
+              <i aria-hidden="true"><b style={{ width: `${(crystals.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></i>
+            </button>
+          ) : null}
           <button type="button" className="worldHudIcon" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
           <WorldVoiceButton text="Profile. Opens your profile." compact label="Read profile" />
         </div>
@@ -293,7 +317,10 @@ export function WorldHUD({
         .worldHudMission{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));width:min(340px,calc(100vw - 32px));display:flex;align-items:flex-start;gap:10px;border-left:3px solid var(--world-accent);padding:10px 11px 10px 13px;background:rgba(19,24,23,.78);box-shadow:0 12px 30px rgba(0,0,0,.23);backdrop-filter:blur(9px)}
         .worldHudMissionText{min-width:0;flex:1}.worldHudRead{flex:0 0 auto;margin-top:1px}
         .worldHudMission span{display:block;color:var(--world-accent);font-size:10px;font-weight:950;letter-spacing:.16em}.worldHudMission strong{display:block;margin-top:4px;font-size:18px;line-height:1.15}.worldHudMission small{display:block;margin-top:4px;color:rgba(255,248,232,.76);font-size:12px;font-weight:650;line-height:1.3}
-        .worldHudIdentity{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));display:flex;gap:7px;pointer-events:auto}.worldHudXp,.worldHudIcon{height:40px;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:rgba(24,22,21,.82);color:#fff4dd;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudXp{display:flex;align-items:center;gap:6px;padding:0 8px 0 11px;font-size:12px;font-weight:900}.worldHudXp svg{color:var(--world-accent)}.worldHudXp .worldVoiceButton{margin-left:2px}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
+        .worldHudIdentity{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));display:flex;gap:7px;pointer-events:auto}.worldHudXp,.worldHudIcon{height:40px;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:rgba(24,22,21,.82);color:#fff4dd;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudXp{display:flex;align-items:center;gap:6px;padding:0 8px 0 11px;font-size:12px;font-weight:900}.worldHudXp svg{color:var(--world-accent)}.worldHudXp .worldVoiceButton{margin-left:2px}
+        .worldHud .worldHudCrystals{position:relative;display:flex;align-items:center;gap:7px;height:44px;padding:0 13px 0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(16,14,24,.78);color:#ffe9b0;font:900 14px var(--font-display);box-shadow:0 8px 20px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.1);backdrop-filter:blur(9px);cursor:pointer;white-space:nowrap}
+        .worldHud .worldHudCrystals svg{filter:drop-shadow(0 0 6px rgba(255,190,70,.9))}.worldHud .worldHudCrystals small{font-size:10px;opacity:.7;margin-left:1px}
+        .worldHud .worldHudCrystals i{position:absolute;left:14px;right:14px;bottom:5px;height:3px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}.worldHud .worldHudCrystals i b{display:block;height:100%;background:linear-gradient(90deg,#ffb347,#ffe08a)}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
         .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button:not(.worldVoiceButton){min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
         .worldHud[data-world-hud="central"] .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px)}
         .worldHudEditInline{margin-left:8px;background:rgba(24,22,21,.66)!important}

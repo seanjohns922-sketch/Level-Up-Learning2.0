@@ -16,6 +16,7 @@ import { fetchGlobalXp, getExplorerRank } from "@/lib/economy";
 import { Check, ChevronLeft, Copy, LogOut, Settings, Zap } from "lucide-react";
 import GemIcon, { cutForGem, emblemForGem } from "@/components/gems/GemIcon";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokForGrade, chronorokProgress } from "@/lib/chronorok";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { fetchGemVault, type GemDefinition, type GemVault } from "@/lib/gems";
@@ -259,6 +260,9 @@ export default function ProfilePage() {
     const prefix = `${calendarYear}-${String(monthIndex + 1).padStart(2, "0")}-`;
     return activityRows.filter((row) => row.activity_date.startsWith(prefix)).length;
   }, [activityRows, calendarYear, monthIndex]);
+  const demoPreviewMode = useDemoPreviewMode();
+  const crystals = useMemo(() => (demoPreviewMode ? { crystals: 63, open: true, learningDays: 63 } : chronorokProgress(activityRows)), [activityRows, demoPreviewMode]);
+  const [yearLevel] = useState(() => getActiveStudentProfile()?.yearLevel ?? null);
   const xpToNextRank = Math.max(0, explorerRank.nextLevelXp - explorerRank.currentXp);
 
   const demoPreview = useDemoPreviewMode();
@@ -391,7 +395,7 @@ export default function ProfilePage() {
           </div>
         </header>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_1fr_1fr]" aria-label="About me">
+        <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-[1.35fr_1fr_1fr_1fr]" aria-label="About me">
           <div className={`${GLASS} flex items-center gap-4 rounded-3xl p-5 sm:gap-5 sm:p-6`}>
             <div className="grid h-16 w-16 flex-shrink-0 place-items-center rounded-[20px] sm:h-24 sm:w-24 sm:rounded-[28px] bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-4xl font-black shadow-[0_12px_30px_rgba(140,46,172,0.5)]">{initials}</div>
             <div className="min-w-0 flex-1">
@@ -453,6 +457,24 @@ export default function ProfilePage() {
               </div>
             ) : null}
           </div>
+          <button type="button" onClick={() => router.push(demoPreview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok")} className={`${GLASS} rounded-3xl p-6 text-left`} aria-label="Chrono Crystals. Open Chronorok.">
+            <div className="flex items-baseline justify-between">
+              <p className={SECTION}>Chrono Crystals</p>
+              <span className="whitespace-nowrap text-sm font-extrabold text-[#e2c6ff]">Open →</span>
+            </div>
+            <div className="flex items-center gap-3.5">
+              <svg width="42" height="52" viewBox="0 0 80 100" aria-hidden="true" className="drop-shadow-[0_0_12px_rgba(255,190,70,0.8)]"><polygon points="40,2 66,30 56,94 24,94 14,30" fill="#ffc94a" /><polygon points="40,2 66,30 40,40" fill="#fff8e0" /><polygon points="40,40 66,30 56,94" fill="#d9770f" /><polygon points="40,40 14,30 24,94" fill="#ffd77a" /></svg>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-[34px] font-black leading-none">{crystals.crystals}<span className="text-base text-[#f6e7c8]"> / {CRYSTALS_TO_AWAKEN}</span></p>
+                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-[#ffb347] to-[#ffe08a]" style={{ width: `${(crystals.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></div>
+              </div>
+            </div>
+            <p className="mt-3 text-[13px] font-bold text-[#cfc7dc]">
+              {crystals.open
+                ? <>One for every day you learn · {Math.max(0, CRYSTALS_TO_AWAKEN - crystals.crystals)} more to awaken <b className="text-[#ffd76a]">{chronorokForGrade(demoPreviewMode ? "Year 3" : yearLevel).name}</b></>
+                : <>Learn on {Math.max(0, CHRONOROK_OPEN_DAYS - crystals.learningDays)} more day{CHRONOROK_OPEN_DAYS - crystals.learningDays === 1 ? "" : "s"} to open Chronorok</>}
+            </p>
+          </button>
         </section>
 
         <section className="mt-4 grid grid-cols-2 gap-3.5 lg:grid-cols-4" aria-label="My numbers">
