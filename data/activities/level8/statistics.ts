@@ -194,7 +194,7 @@ const spotBias: Form[] = [
   },
   (r) => {
     const calls = 50 * r(4, 12), yes = r(Math.round(calls * 0.6), Math.round(calls * 0.95));
-    return { prompt: `A TV poll invites viewers to phone in. ${yes} of ${calls} callers vote yes. What percentage voted yes, to one decimal place?`, answer: pct(yes, calls), unit: "%", steps: [`${yes} ÷ ${calls} × 100 = ${pct(yes, calls)}%.`, "Callers chose themselves, so the result may not represent all viewers."] };
+    return { prompt: `A TV poll invites viewers to phone in. ${yes} of ${calls} callers vote yes. What percentage voted yes, to one decimal place?`, answer: pct(yes, calls), unit: "%", steps: [`${yes} ÷ ${calls} × 100 ${(100 * yes) / calls === pct(yes, calls) ? "=" : "≈"} ${pct(yes, calls)}%.`, "Callers chose themselves, so the result may not represent all viewers."] };
   },
   (r) => {
     const true1 = r(30, 60), off = pick(r, [0.5, 1, 1.5, 2]);
@@ -240,7 +240,7 @@ const sources: Form[] = [
   },
   (r) => {
     const sizes = [r(30, 60), r(80, 140), r(60, 110), r(30, 60), r(10, 30)], k = r(0, 4), total = sum(sizes);
-    return { prompt: `This secondary data table shows household sizes in a suburb. What percentage of households have ${k + 1 === 5 ? "5 or more" : k + 1} ${k === 0 ? "person" : "people"}, to one decimal place?`, answer: pct(sizes[k], total), unit: "%", steps: [`Total households: ${total}.`, `${sizes[k]} ÷ ${total} × 100 = ${pct(sizes[k], total)}%.`], visual: table("Household size (secondary data)", ["People", "1", "2", "3", "4", "5+"], [["Households", ...sizes]]) };
+    return { prompt: `This secondary data table shows household sizes in a suburb. What percentage of households have ${k + 1 === 5 ? "5 or more" : k + 1} ${k === 0 ? "person" : "people"}, to one decimal place?`, answer: pct(sizes[k], total), unit: "%", steps: [`Total households: ${total}.`, `${sizes[k]} ÷ ${total} × 100 ${(100 * sizes[k]) / total === pct(sizes[k], total) ? "=" : "≈"} ${pct(sizes[k], total)}%.`], visual: table("Household size (secondary data)", ["People", "1", "2", "3", "4", "5+"], [["Households", ...sizes]]) };
   },
   (r) => {
     const sports = ["Badminton", "Water polo", "Handball"], classes = ["8A", "8B", "8C", "8D"];
@@ -338,7 +338,7 @@ const chooseMethod: Form[] = [
 const display: Form[] = [
   (r) => {
     const xs = list(r, 14, 1, 6), k = pick(r, [...new Set(xs)]);
-    return { prompt: `Make a frequency table for these data. What is the frequency of ${k}?`, answer: xs.filter((x) => x === k).length, steps: [`Tally each value as you read through the list.`, `${k} appears ${xs.filter((x) => x === k).length} times.`], visual: dataVisual("Survey results", xs) };
+    return { prompt: `Make a frequency table for these data. What is the frequency of ${k}?`, answer: xs.filter((x) => x === k).length, steps: [`Tally each value as you read through the list.`, `${k} appears ${xs.filter((x) => x === k).length} time${xs.filter((x) => x === k).length === 1 ? "" : "s"}.`], visual: dataVisual("Survey results", xs) };
   },
   (r) => {
     const xs = list(r, 16, 0, 8), k = r(2, 6);
@@ -354,7 +354,7 @@ const display: Form[] = [
   },
   (r) => {
     const xs = list(r, 18, 130, 196), lo = pick(r, [140, 150, 160, 170]);
-    return { prompt: `Group these heights in intervals of 10 cm. How many people are in the ${lo}–${lo + 9} cm group?`, answer: xs.filter((x) => x >= lo && x <= lo + 9).length, steps: [`Count heights from ${lo} to ${lo + 9} inclusive.`, `${xs.filter((x) => x >= lo && x <= lo + 9).length} people.`], visual: dataVisual("Heights", xs, "cm") };
+    return { prompt: `Group these heights in intervals of 10 cm. How many people are in the ${lo}–${lo + 9} cm group?`, answer: xs.filter((x) => x >= lo && x <= lo + 9).length, steps: [`Count heights from ${lo} to ${lo + 9} inclusive.`, `${xs.filter((x) => x >= lo && x <= lo + 9).length} ${xs.filter((x) => x >= lo && x <= lo + 9).length === 1 ? "person" : "people"}.`], visual: dataVisual("Heights", xs, "cm") };
   },
   (r) => {
     const vals = [0, 1, 2, 3, 4, 5], cs = vals.map(() => r(0, 5));
@@ -422,7 +422,7 @@ const conclusions: Form[] = [
   },
   (r) => {
     const a = list(r, 9, 2, 12), b = list(r, 9, 4, 16);
-    return { prompt: "What is the difference between the medians of Class A and Class B? (Larger minus smaller.)", answer: Math.abs(median(b) - median(a)), unit: "hours", steps: [`Class A median: ${median(a)}. Class B median: ${median(b)}.`, `Difference: ${Math.abs(median(b) - median(a))} hours.`], visual: dots("Hours of homework per week", "Hours", 2, 16, [{ label: "Class A", values: a }, { label: "Class B", values: b }]) };
+    return { prompt: "What is the difference between the medians of Class A and Class B? (Larger minus smaller.)", answer: Math.abs(median(b) - median(a)), unit: "hours", steps: [`Class A median: ${median(a)}. Class B median: ${median(b)}.`, `Difference: ${Math.abs(median(b) - median(a))} hour${Math.abs(median(b) - median(a)) === 1 ? "" : "s"}.`], visual: dots("Hours of homework per week", "Hours", 2, 16, [{ label: "Class A", values: a }, { label: "Class B", values: b }]) };
   },
 ];
 
@@ -463,11 +463,11 @@ const proportions: Form[] = [
   },
   (r) => {
     const a = r(20, 30);
-    return yesNo(`In a random sample of 50 students, ${a} favour a uniform change. Is this a majority of the sample?`, a > 25, [`${a} ÷ 50 = ${(a / 50) * 100}%.`, a > 25 ? "More than 50% is a majority." : "A majority needs more than 50%."]);
+    return yesNo(`In a random sample of 50 students, ${a} favour a uniform change. Is this a majority of the sample?`, a > 25, [`${a} ÷ 50 × 100 = ${a * 2}%.`, a > 25 ? "More than 50% is a majority." : "A majority needs more than 50%."]);
   },
   (r) => {
     const cs = [r(10, 30), r(10, 30), r(10, 30)];
-    return { prompt: "Three random samples of 50 are combined. What percentage of all 150 students are in favour, to one decimal place?", answer: pct(sum(cs), 150), unit: "%", steps: [`Total in favour: ${cs.join(" + ")} = ${sum(cs)}.`, `${sum(cs)} ÷ 150 × 100 = ${pct(sum(cs), 150)}%.`], visual: table("In favour (out of 50)", ["Sample", "1", "2", "3"], [["In favour", ...cs]]) };
+    return { prompt: "Three random samples of 50 are combined. What percentage of all 150 students are in favour, to one decimal place?", answer: pct(sum(cs), 150), unit: "%", steps: [`Total in favour: ${cs.join(" + ")} = ${sum(cs)}.`, `${sum(cs)} ÷ 150 × 100 ${(100 * sum(cs)) / 150 === pct(sum(cs), 150) ? "=" : "≈"} ${pct(sum(cs), 150)}%.`], visual: table("In favour (out of 50)", ["Sample", "1", "2", "3"], [["In favour", ...cs]]) };
   },
   (r) => {
     const n = 40, a = r(8, 30), b = r(8, 30);
@@ -776,7 +776,7 @@ const organise: Form[] = [
   },
   (r) => {
     const cs = [r(2, 12), r(2, 12), r(2, 12), r(2, 12)], k = r(0, 3), names = ["Summer", "Autumn", "Winter", "Spring"];
-    return { prompt: `What percentage of responses chose ${names[k]}, to one decimal place?`, answer: pct(cs[k], sum(cs)), unit: "%", steps: [`${cs[k]} of ${sum(cs)} responses.`, `${cs[k]} ÷ ${sum(cs)} × 100 = ${pct(cs[k], sum(cs))}%.`], visual: table("Favourite season", ["Season", ...names], [["Frequency", ...cs]]) };
+    return { prompt: `What percentage of responses chose ${names[k]}, to one decimal place?`, answer: pct(cs[k], sum(cs)), unit: "%", steps: [`${cs[k]} of ${sum(cs)} responses.`, `${cs[k]} ÷ ${sum(cs)} × 100 ${(100 * cs[k]) / sum(cs) === pct(cs[k], sum(cs)) ? "=" : "≈"} ${pct(cs[k], sum(cs))}%.`], visual: table("Favourite season", ["Season", ...names], [["Frequency", ...cs]]) };
   },
   (r) => {
     const xs = list(r, 11, 1, 40);
@@ -805,7 +805,7 @@ const analyse: Form[] = [
   (r) => {
     const vals = [1, 2, 3, 4, 5, 6], cs = vals.map(() => r(1, 8)), top = Math.max(...cs);
     if (cs.filter((c) => c === top).length > 1) cs[cs.indexOf(top)]++;
-    return { prompt: "What is the most common number of people per household in the sample?", answer: vals[cs.indexOf(Math.max(...cs))], steps: ["Find the tallest bar.", `${vals[cs.indexOf(Math.max(...cs))]} people (${Math.max(...cs)} households).`], visual: freqGraph("Household size", vals, cs, "People in household") };
+    return { prompt: "What is the most common number of people per household in the sample?", answer: vals[cs.indexOf(Math.max(...cs))], steps: ["Find the tallest bar.", `${vals[cs.indexOf(Math.max(...cs))]} ${vals[cs.indexOf(Math.max(...cs))] === 1 ? "person" : "people"} (${Math.max(...cs)} households).`], visual: freqGraph("Household size", vals, cs, "People in household") };
   },
 ];
 const report: Form[] = [

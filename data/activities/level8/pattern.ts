@@ -847,7 +847,7 @@ const readSolution: Form[] = [
   },
   (r) => {
     const rate = pick(r, [2, 3, 4, 5]), t = r(1, 4), start = rate * r(5, 6), target = start - rate * t;
-    return { prompt: `A tank holds ${start} L and drains at ${rate} L per minute. Use the graph to find when it holds ${target} L.`, answer: t, unit: "min", steps: [`Find ${target} L on the vertical axis.`, `Read across and down: t = ${t} minutes. Check: ${start} − ${rate} × ${t} = ${target}.`], algebraVisual: graph("Volume over time", [{ m: -rate, c: start, label: `V = ${start} − ${rate}t` }], { xMin: 0, xMax: 6, yMin: 0, yMax: start, xLabel: "t (min)", yLabel: "V (L)", yStep: rate }) };
+    return { prompt: `A tank holds ${start} L and drains at ${rate} L per minute. Use the graph to find when it holds ${target} L.`, answer: t, unit: "min", steps: [`Find ${target} L on the vertical axis.`, `Read across and down: t = ${t} minute${t === 1 ? "" : "s"}. Check: ${start} − ${rate} × ${t} = ${target}.`], algebraVisual: graph("Volume over time", [{ m: -rate, c: start, label: `V = ${start} − ${rate}t` }], { xMin: 0, xMax: 6, yMin: 0, yMax: start, xLabel: "t (min)", yLabel: "V (L)", yStep: rate }) };
   },
 ];
 const intersections: Form[] = [
@@ -1051,7 +1051,7 @@ const unitsAssumptions: Form[] = [
   },
   (r) => {
     const cents = pick(r, [10, 12, 15, 20, 25]), mins = 10 * r(2, 9);
-    return { prompt: `Calls cost ${cents} cents per minute. What does a ${mins}-minute call cost, in dollars?`, answer: rounded((cents * mins) / 100, 2), unit: "$", steps: [`${cents} × ${mins} = ${cents * mins} cents.`, `÷ 100 = $${((cents * mins) / 100).toFixed(2)}.`] };
+    return { prompt: `Calls cost ${cents} cents per minute. What does ${/^(8|11|18)/.test(String(mins)) ? "an" : "a"} ${mins}-minute call cost, in dollars?`, answer: rounded((cents * mins) / 100, 2), unit: "$", steps: [`${cents} × ${mins} = ${cents * mins} cents.`, `÷ 100 = $${((cents * mins) / 100).toFixed(2)}.`] };
   },
   (r) => {
     const ms = pick(r, [5, 10, 15, 20, 25]);

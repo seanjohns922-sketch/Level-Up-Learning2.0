@@ -60,13 +60,23 @@ export const formula = (
   value: string,
   meaning = "",
 ): Cave7Visual => ({ kind: "formula", title, formula: value, meaning });
+/** Safety net for display text: 509.99999999999994 → 510, 56.00000000000001 → 56. */
+const tidyNumbers = (text: string) =>
+  text.replace(/\d+\.\d*?(?:0{7,}|9{7,})\d+/g, (m) => String(Number(Number(m).toPrecision(12))));
 export function question(
   realm: Level8Realm,
   week: number,
   lesson: number,
   seed: number,
-  draft: QuestionDraft,
+  raw: QuestionDraft,
 ): Level8Question {
+  const draft: QuestionDraft = {
+    ...raw,
+    prompt: tidyNumbers(raw.prompt),
+    answer: typeof raw.answer === "number" ? Number(raw.answer.toPrecision(12)) : tidyNumbers(raw.answer),
+    steps: raw.steps.map(tidyNumbers),
+    choices: raw.choices?.map(tidyNumbers),
+  };
   const answer = String(draft.answer);
   if (
     !draft.prompt ||
