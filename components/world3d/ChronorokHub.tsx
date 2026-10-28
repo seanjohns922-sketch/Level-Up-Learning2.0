@@ -22,10 +22,10 @@ import { CHRONOROK_OPEN_DAYS, SHARDS_TO_AWAKEN, chronorokForGrade, chronorokProg
 type PortalKey = "arena" | "rift" | "cave" | "rune";
 const PORTAL_TARGETS = (Object.keys(CHRONOROK_PORTALS) as PortalKey[]).map((id) => ({ id, position: CHRONOROK_PORTALS[id].position, distance: 9 }));
 const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: string; place: string; blurb: string; art: string; href?: string }> = {
-  arena: { u: 0.17, v: 0.55, color: "#ffc94a", game: "Relic Rider", place: "The Arena Gate", blurb: "Stunt bikes through the castle tracks. Flip in the air to save time.", art: "/images/chronorok/arena-gate.webp" },
+  arena: { u: 0.17, v: 0.55, color: "#ffc94a", game: "Relic Rider", place: "The Arena Gate", blurb: "Stunt bikes through the castle tracks. Flip in the air to save time.", art: "/images/chronorok/arena-gate.webp", href: "/world/chronorok/relic-rider" },
   rift: { u: 0.33, v: 0.4, color: "#7ff0ff", game: "Chrono Run", place: "The Rift Portal", blurb: "Run the time tunnels. Turn onto the walls and leap the gaps.", art: "/images/chronorok/rift-portal.webp", href: "/world/chronorok/chrono-run" },
-  cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp" },
-  rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp" },
+  cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp", href: "/world/chronorok/time-slope" },
+  rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp", href: "/world/chronorok/rune-blocks" },
 };
 
 export default function ChronorokHub({ teacherPreview = false }: { teacherPreview?: boolean }) {

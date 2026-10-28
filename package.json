@@ -305,7 +305,8 @@
     "qa:world-scale": "node scripts/world-scale-suite.mjs",
     "qa:weekly-quiz-theme": "NODE_ENV=test node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/weekly-quiz-theme-test.mjs",
     "qa:upper-skill-guides": "NODE_ENV=test node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/upper-skill-guides-test.mjs",
-    "qa:profile-realm-summary": "NEXT_PUBLIC_LEVEL7_LIVE=true node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/profile-realm-summary-test.mjs && node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/profile-realm-summary-test.mjs"
+    "qa:profile-realm-summary": "NEXT_PUBLIC_LEVEL7_LIVE=true node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/profile-realm-summary-test.mjs && node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/profile-realm-summary-test.mjs",
+    "qa:chronorok-games": "node --no-warnings --experimental-strip-types scripts/rune-blocks-levels-test.mjs && node --no-warnings --experimental-strip-types scripts/relic-rider-tracks-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
