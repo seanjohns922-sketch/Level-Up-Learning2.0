@@ -20,9 +20,9 @@ const PAINT_W = 34;
 const PAINT_H = (PAINT_W * 937) / 1678;
 
 type PortalKey = "arena" | "rift" | "cave" | "rune";
-const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: string; place: string; blurb: string; art: string }> = {
+const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: string; place: string; blurb: string; art: string; href?: string }> = {
   arena: { u: 0.17, v: 0.55, color: "#ffc94a", game: "Relic Rider", place: "The Arena Gate", blurb: "Stunt bikes through the castle tracks. Flip in the air to save time.", art: "/images/chronorok/arena-gate.webp" },
-  rift: { u: 0.33, v: 0.4, color: "#7ff0ff", game: "Chrono Run", place: "The Rift Portal", blurb: "Run the time tunnels. Turn onto the walls and leap the gaps.", art: "/images/chronorok/rift-portal.webp" },
+  rift: { u: 0.33, v: 0.4, color: "#7ff0ff", game: "Chrono Run", place: "The Rift Portal", blurb: "Run the time tunnels. Turn onto the walls and leap the gaps.", art: "/images/chronorok/rift-portal.webp", href: "/world/chronorok/chrono-run" },
   cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp" },
   rune: { u: 0.845, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp" },
 };
@@ -277,9 +277,15 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
             <p className="font-display text-xs font-black tracking-[0.2em]" style={{ color: active.color }}>{active.place.toUpperCase()}</p>
             <h2 className="chronoTitle mt-1 text-4xl">{active.game}</h2>
             <p className="mt-1 font-bold text-[#f3ead9]">{active.blurb}</p>
-            <button type="button" disabled className="mt-4 inline-flex h-14 items-center gap-2 rounded-full bg-white/90 px-8 font-display text-[15px] font-black text-[#16121f] opacity-80">
-              <Play className="h-4 w-4" />COMING SOON
-            </button>
+            {active.href ? (
+              <button type="button" onClick={() => router.push(preview ? `${active.href}?teacher_preview=1` : active.href!)} className="mt-4 inline-flex h-14 items-center gap-2 rounded-full bg-white px-8 font-display text-[15px] font-black text-[#16121f]">
+                <Play className="h-4 w-4" />ENTER
+              </button>
+            ) : (
+              <button type="button" disabled className="mt-4 inline-flex h-14 items-center gap-2 rounded-full bg-white/90 px-8 font-display text-[15px] font-black text-[#16121f] opacity-80">
+                <Play className="h-4 w-4" />COMING SOON
+              </button>
+            )}
           </div>
         </div>
       ) : null}
