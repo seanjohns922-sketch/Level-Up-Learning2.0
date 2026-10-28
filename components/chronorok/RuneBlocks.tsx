@@ -204,6 +204,7 @@ export default function RuneBlocks({ backHref }: { backHref: string }) {
                 <p className="mt-2 font-bold text-[#f3ead9]">{moves} rolls · best possible {par}</p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   <button type="button" onClick={restart} className="chronoGlass h-12 rounded-full px-5 font-display text-sm font-black">TRY AGAIN</button>
+                  <button type="button" onClick={() => router.push(backHref)} className="chronoGlass h-12 rounded-full px-5 font-display text-sm font-black">BACK TO CHRONOROK</button>
                   {levelIndex + 1 < RUNE_LEVELS.length ? <button type="button" onClick={() => startLevel(levelIndex + 1)} className="h-12 rounded-full bg-white px-6 font-display text-sm font-black text-[#16121f]">NEXT LEVEL <kbd>Space</kbd></button> : <button type="button" onClick={() => setLevelIndex(null)} className="h-12 rounded-full bg-white px-6 font-display text-sm font-black text-[#16121f]">ALL LEVELS DONE!</button>}
                 </div>
               </div>

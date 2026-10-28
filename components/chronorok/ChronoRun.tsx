@@ -411,7 +411,7 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
         <Step game={game} row={row} onHud={setHud} onOver={over} />
       </Canvas>
 
-      <header className="pointer-events-none absolute inset-x-4 top-4 flex items-start justify-between gap-3">
+      <header className="pointer-events-none absolute inset-x-4 top-4 z-30 flex items-start justify-between gap-3">
         <button type="button" onClick={() => router.push(backHref)} className="chronoGlass pointer-events-auto flex h-12 items-center gap-2 rounded-full px-5 font-display text-[13px] font-black tracking-[0.05em]"><ArrowLeft className="h-4 w-4" />CHRONOROK</button>
         <div className="chronoGlass rounded-2xl px-6 pb-2 pt-1.5 text-center">
           <p className="font-display text-[11px] font-black tracking-[0.16em]" style={{ color: era.edge }}>CHRONO RUN · {era.name.toUpperCase()}</p>
@@ -422,7 +422,7 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
       </header>
 
       {phase !== "playing" ? (
-        <div className="absolute inset-0 grid place-items-center bg-black/45 p-6">
+        <div className="absolute inset-0 z-20 grid place-items-center bg-black/45 p-6">
           <div className="chronoGlass w-[min(460px,92vw)] rounded-3xl p-7 text-center">
             {phase === "ready" ? (
               <>
@@ -444,6 +444,7 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
             <button type="button" onClick={start} className="mt-5 inline-flex h-14 items-center gap-2 rounded-full bg-white px-8 font-display text-[15px] font-black text-[#16121f]">
               {phase === "ready" ? "RUN" : <><RotateCcw className="h-4 w-4" />RUN AGAIN</>}<kbd className="ml-1">Space</kbd>
             </button>
+            <div className="mt-3"><button type="button" onClick={() => router.push(backHref)} className="chronoGlass h-12 rounded-full px-5 font-display text-sm font-black">BACK TO CHRONOROK</button></div>
           </div>
         </div>
       ) : null}

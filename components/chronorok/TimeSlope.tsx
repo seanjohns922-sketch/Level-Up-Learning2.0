@@ -260,11 +260,11 @@ export default function TimeSlope({ backHref }: { backHref: string }) {
       <GameHeader backHref={backHref} title="TIME SLOPE · THE EMBER CAVE" accent="#7ff0ff" value={score.toLocaleString("en-AU")} sub={`Best ${best.toLocaleString("en-AU")}`} />
       {phase === "playing" && near > 0 ? <p key={near} className="chronoPop pointer-events-none absolute left-1/2 top-[28%] z-10 -translate-x-1/2 font-display text-4xl font-black text-[#7ff0ff]">CLOSE CALL!</p> : null}
       {phase === "ready" ? (
-        <GameCard kicker="THE EMBER CAVE" kickerColour="#ff9a5a" title="Time Slope" action="ROLL" onAction={start}
+        <GameCard backHref={backHref} kicker="THE EMBER CAVE" kickerColour="#ff9a5a" title="Time Slope" action="ROLL" onAction={start}
           body={<><p>Steer the time orb down the stream. Don&apos;t fall off and dodge the red blocks. It only gets faster.</p><p className="mt-3 text-sm text-[#e8dcc8]"><kbd>←</kbd> <kbd>→</kbd> steer · Tablet: hold the left or right side</p></>} />
       ) : null}
       {phase === "over" ? (
-        <GameCard kicker={newBest ? "NEW BEST!" : "LOST IN TIME"} kickerColour="#ffd76a" title={score.toLocaleString("en-AU")} action="↻ ROLL AGAIN" onAction={start} body={<p>Best {best.toLocaleString("en-AU")}</p>} />
+        <GameCard backHref={backHref} kicker={newBest ? "NEW BEST!" : "LOST IN TIME"} kickerColour="#ffd76a" title={score.toLocaleString("en-AU")} action="↻ ROLL AGAIN" onAction={start} body={<p>Best {best.toLocaleString("en-AU")}</p>} />
       ) : null}
       {phase === "playing" ? (
         <div className="chronoTouch pointer-events-none absolute inset-x-0 bottom-5 flex justify-between px-6 opacity-70">

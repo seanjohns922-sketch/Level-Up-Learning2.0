@@ -263,6 +263,7 @@ export default function RelicRider({ backHref }: { backHref: string }) {
                   <button type="button" onClick={() => start(index)} className="chronoGlass flex h-12 items-center gap-2 rounded-full px-5 font-display text-sm font-black"><RotateCcw className="h-4 w-4" />RETRY <kbd>R</kbd></button>
                   {result.kind === "finish" && index + 1 < RIDER_TRACKS.length ? <button type="button" onClick={() => start(index + 1)} className="h-12 rounded-full bg-white px-6 font-display text-sm font-black text-[#16121f]">NEXT TRACK <kbd>Space</kbd></button> : null}
                   <button type="button" onClick={() => setIndex(null)} className="chronoGlass h-12 rounded-full px-5 font-display text-sm font-black">TRACKS</button>
+                  <button type="button" onClick={() => router.push(backHref)} className="chronoGlass h-12 rounded-full px-5 font-display text-sm font-black">BACK TO CHRONOROK</button>
                 </div>
               </div>
             </div>

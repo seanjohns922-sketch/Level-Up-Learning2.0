@@ -28,7 +28,7 @@ export function useBest(game: string) {
 export function GameHeader({ backHref, title, accent, value, sub }: { backHref: string; title: string; accent: string; value: string; sub?: string }) {
   const router = useRouter();
   return (
-    <header className="pointer-events-none absolute inset-x-4 top-4 z-10 flex items-start justify-between gap-3">
+    <header className="pointer-events-none absolute inset-x-4 top-4 z-30 flex items-start justify-between gap-3">
       <button type="button" onClick={() => router.push(backHref)} className="chronoGlass pointer-events-auto flex h-12 items-center gap-2 rounded-full px-5 font-display text-[13px] font-black tracking-[0.05em]"><ArrowLeft className="h-4 w-4" />CHRONOROK</button>
       <div className="chronoGlass rounded-2xl px-6 pb-2 pt-1.5 text-center">
         <p className="font-display text-[11px] font-black tracking-[0.16em]" style={{ color: accent }}>{title}</p>
@@ -40,7 +40,8 @@ export function GameHeader({ backHref, title, accent, value, sub }: { backHref: 
   );
 }
 
-export function GameCard({ kicker, kickerColour, title, body, action, onAction, extra }: { kicker: string; kickerColour: string; title: string; body: React.ReactNode; action: string; onAction: () => void; extra?: React.ReactNode }) {
+export function GameCard({ kicker, kickerColour, title, body, action, onAction, extra, backHref }: { kicker: string; kickerColour: string; title: string; body: React.ReactNode; action: string; onAction: () => void; extra?: React.ReactNode; backHref?: string }) {
+  const router = useRouter();
   return (
     <div className="absolute inset-0 z-20 grid place-items-center bg-black/45 p-6">
       <div className="chronoGlass w-[min(480px,92vw)] rounded-3xl p-7 text-center">
@@ -52,6 +53,7 @@ export function GameCard({ kicker, kickerColour, title, body, action, onAction, 
             {action.startsWith("↻") ? <RotateCcw className="h-4 w-4" /> : null}{action.replace("↻ ", "")}<kbd className="ml-1">Space</kbd>
           </button>
           {extra}
+          {backHref ? <button type="button" onClick={() => router.push(backHref)} className="chronoGlass h-14 rounded-full px-6 font-display text-sm font-black">BACK TO CHRONOROK</button> : null}
         </div>
       </div>
     </div>
