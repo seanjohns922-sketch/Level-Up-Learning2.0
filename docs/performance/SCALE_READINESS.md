@@ -240,3 +240,58 @@ unverified. The deferred security follow-up remains outstanding for wider rollou
 Validation for this test-only change: JavaScript syntax checks, `lint:qa`, fixture
 provisioning/permission smoke and the actual two-minute rehearsal passed. No
 production application code changed; a new app build was not required.
+
+## Completion, retry and realtime checkpoint — 28 October 2026
+
+The 100-student protocol test now exercises the actual completion endpoints using
+anon plus each student's validated session. Every student follows pretest, three
+ordered lessons, weekly quiz and posttest. Each completion is submitted twice
+concurrently with the same completion key. Secure reads assert exactly three new
+lesson attempts, one quiz attempt and two assessment attempts, preserved lesson
+scores, and the exact daily XP delta. Missing-session and cross-student lesson
+writes are explicitly denied (600 checks per run).
+
+The first successful run verified 100 journeys and 2,200 expected RPC requests
+with no failures. Assessment/lesson/quiz completion p95 was 410/403/502 ms. All
+100 explicit lesson-completed events reached the four authenticated teacher
+subscriptions: p95 638 ms, maximum 756 ms, measured from event request start.
+The second run used new completion keys against the same activities, verified
+retakes were stored while no additional lesson/quiz XP was paid, and checked all
+100 students' pre/post scores through the teacher's canonical class-progress RPC.
+It again passed: 2,200 expected student RPC requests, 600 expected denials, zero
+journey failures and all 100 events delivered (p95 732 ms, maximum 898 ms).
+Teacher login/subscription setup and four final class-progress reads are outside
+the 2,200-request count. Aggregate reports are saved alongside this document as
+`completion-realtime-first-2026-10-28.json` and
+`completion-realtime-repeat-2026-10-28.json`.
+
+Initial harness runs correctly failed: the fixture attempted a lesson before
+placement, triggering the canonical pathway lock. The harness was corrected to
+submit a pretest and finish all three lessons before the quiz. No application
+permissions, sequence guards or assertions were weakened. This is a protocol
+completion test using synthetic results, not simulated question answering in a
+browser or a complete twelve-week curriculum journey.
+
+The schema-only local clone initially had an empty realtime publication.
+`public.live_activity_events` was added to `supabase_realtime` **locally only**.
+It remains enabled for repeat tests; undo locally with `ALTER PUBLICATION
+supabase_realtime DROP TABLE public.live_activity_events` if needed. Do not apply
+this command blindly to production. The runner requires this publication, the
+four existing fixture groups and the local event-read migration:
+
+```sh
+node scripts/staging/completion-realtime-local.mjs
+```
+
+Only localhost:56521 is accepted. Workload traffic uses student sessions and
+ordinary teacher tokens, with no service-role calls. Synthetic attempts, receipts,
+activity and session records remain in the isolated database. Do not run multiple
+workloads on the same fixture accounts simultaneously.
+
+Syntax validation, the actual first-completion and repeat runs, completion-reward
+QA (23 checks) and lint:qa passed. No application code or production configuration
+changed. Still outstanding: subscription reconnect/fallback recovery, complete
+six-read dashboard traffic, other realms and diagnostics, real browser saves and
+rendering, a 30-minute sustained run, and cloud resource/configuration parity.
+This checkpoint does not certify 10,000-user capacity or complete the deferred
+security audit.
