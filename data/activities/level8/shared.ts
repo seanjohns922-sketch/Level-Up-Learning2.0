@@ -138,7 +138,8 @@ export function question(
     prompt,
     answer,
     options,
-    explanation: draft.steps.join(" "),
+    // A step that continues the last calculation ("= 72 cubes") joins it without a full stop between.
+    explanation: draft.steps.reduce((text, step, i) => (i && /^[=×÷+−≈]/.test(step) ? `${text.replace(/\.$/, "")} ${step}` : i ? `${text} ${step}` : step), ""),
     steps: draft.steps,
     cave7Visual: draft.visual,
     space8Visual: draft.spaceVisual,

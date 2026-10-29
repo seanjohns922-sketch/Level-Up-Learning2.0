@@ -124,7 +124,7 @@ const collectLikeTerms: Form[] = [
     return expanded(`Simplify ${poly([p, ""], [a, "x"], [q, ""], [b, "x"])}.`, poly([a + b, "x"], [p + q, ""]), [`x terms: ${a}x − ${-b}x = ${poly([a + b, "x"])}.`, `Constants: ${p} + ${q} = ${p + q}.`]);
   },
   (r) => {
-    const a = r(6, 14), b = r(1, 5), c = r(2, 7);
+    const a = r(6, 14), b = r(2, 5), c = r(2, 7);
     return expanded(`Simplify ${a}xy − ${b}yx + ${c}xy.`, poly([a - b + c, "xy"]), [`yx and xy are like terms because multiplication can happen in any order.`, `${a} − ${b} + ${c} = ${a - b + c}, so the answer is ${poly([a - b + c, "xy"])}.`]);
   },
   (r) => {
@@ -283,7 +283,7 @@ const expandCollect: Form[] = [
     return expanded(`Expand and simplify ${a}(x + ${b}) − ${c}(x − ${d}).`, poly([a - c, "x"], [a * b + c * d, ""]), [`${a}(x + ${b}) = ${a}x + ${a * b}. −${c}(x − ${d}) = −${c}x + ${c * d}.`, `Collect: ${poly([a - c, "x"], [a * b + c * d, ""])}.`]);
   },
   (r) => {
-    const k = r(2, 6), m = r(2, 5), j = r(1, 6);
+    const k = r(2, 6), m = r(2, 5), j = r(2, 6);
     return expanded(`Expand and simplify ${k}a(${m} + b) + ${j}ab.`, poly([k * m, "a"], [k + j, "ab"]), [`${k}a × ${m} = ${k * m}a and ${k}a × b = ${k}ab.`, `${k}ab + ${j}ab = ${k + j}ab.`]);
   },
   (r) => {

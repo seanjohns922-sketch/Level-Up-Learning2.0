@@ -56,7 +56,7 @@
   .active [data-lesson-question-card] :global(.question-read-aloud-boundary),
   .active [data-lesson-question-card] :global(.question-read-aloud-content) { flex: 1; display: flex; flex-direction: column; }
   .active [data-lesson-multiple-choice] { flex: 1; }
-  .active [data-lesson-answer-options] { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(112px, 1fr); }
+  .active [data-lesson-answer-options] { flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(112px, 150px); align-content: start; }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-multiple-choice] { padding: 22px; }
   .active [data-lesson-question-card]:has([data-lesson-wrong-feedback]) [data-lesson-answer-options] { grid-template-columns: 1fr; gap: 10px; grid-auto-rows: auto; }

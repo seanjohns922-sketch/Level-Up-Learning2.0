@@ -1,5 +1,6 @@
 "use client";
 import NarratedLessonGuide from "./NarratedLessonGuide";
+import { MathFormattedText } from "@/components/FractionText";
 import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "./LowerLessonGuide";
 import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
 import {level7Answer} from '@/lib/level7-answer';
@@ -615,6 +616,28 @@ function scoreQuestionCandidate(
     reused,
     fallbackReason,
   };
+}
+
+/** Feedback values read like the question: true minus signs and stacked fractions. */
+function FeedbackValue({ value, unit, labels }: { value: unknown; unit?: string; labels?: string[] }) {
+  let text = String(value ?? "").trim();
+  // Two-box times and durations read as a time, not a list: "17, 0" → "17:00", "12, 15" → "12 min 15 s".
+  const pair = labels?.length === 2 ? text.match(/^(\d+),\s*(\d+)$/) : null;
+  if (pair && labels) {
+    const [a, b] = [Number(pair[1]), Number(pair[2])];
+    if (/24-hour/i.test(labels[0])) text = `${a}:${String(b).padStart(2, "0")}`;
+    else if (/^hours?$/i.test(labels[0]) && /^minutes?$/i.test(labels[1])) text = [a ? `${a} h` : "", b ? `${b} min` : ""].filter(Boolean).join(" ") || "0 min";
+    else if (/^minutes?$/i.test(labels[0]) && /^seconds?$/i.test(labels[1])) text = [a ? `${a} min` : "", b ? `${b} s` : ""].filter(Boolean).join(" ") || "0 s";
+  }
+  const number = /^-?\d+(\.\d+)?$/.test(text) ? Number(text) : null;
+  if (number !== null && unit === "$") {
+    const abs = Math.abs(number).toLocaleString("en-AU", { minimumFractionDigits: Number.isInteger(number) ? 0 : 2, maximumFractionDigits: 2 });
+    text = `${number < 0 ? "-" : ""}$${abs}`;
+  } else if (number !== null && unit) {
+    text = unit === "%" || unit === "°C" || unit === "°F" ? `${text}${unit}` : `${text} ${unit}`;
+  }
+  text = text.replace(/(^|[\s(,])-(?=[\d$])/g, "$1−");
+  return <MathFormattedText text={text} compactFractions />;
 }
 
 export function Year2LessonEngine({
@@ -1327,6 +1350,8 @@ export function Year2LessonEngine({
   // Prefer the actual question kind so a slot seeded as multiple choice that
   // renders a typed "?" input is labelled correctly (and vice versa).
   const isConstructedAnswer=currentQuestion?.kind==='multiple_choice'&&!!level7Answer(currentQuestion);
+  const feedbackUnit=currentQuestion?.kind==='multiple_choice'?level7Answer(currentQuestion)?.unit:undefined;
+  const feedbackLabels=currentQuestion?.kind==='multiple_choice'?level7Answer(currentQuestion)?.labels:undefined;
   const activityLabel = (() => {
     if(currentQuestion?.kind==='multiple_choice'&&level7Answer(currentQuestion))return "YOUR ANSWER";
     const kind = currentQuestion?.kind;
@@ -1839,10 +1864,10 @@ export function Year2LessonEngine({
                     </div>
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
                       <div className="rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-800">
-                        <span className="font-black">You entered:</span> {wrongFeedback.studentAnswer}
+                        <span className="font-black">{isConstructedAnswer ? "You entered:" : "You chose:"}</span> <FeedbackValue value={wrongFeedback.studentAnswer} unit={feedbackUnit} labels={feedbackLabels} />
                       </div>
                       <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
-                        <span className="font-black">Correct answer:</span> {wrongFeedback.correctAnswer}
+                        <span className="font-black">Correct answer:</span> <FeedbackValue value={wrongFeedback.correctAnswer} unit={feedbackUnit} labels={feedbackLabels} />
                       </div>
                     </div>
                     <p className="mt-3 whitespace-pre-line text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>

@@ -223,7 +223,11 @@ export default function MultipleChoiceActivity({
         ? "lg:grid-cols-3"
         : "md:grid-cols-2 xl:grid-cols-4"
     : "";
-  const missingRelationshipVisual = !questionData.cave7Visual && !questionData.spaceVisual && !questionData.space8Visual && !questionData.measurement8Visual && !questionData.number8Visual && !questionData.algebra8Visual && !questionData.chance8Visual && !hasRequiredRelationshipVisual(
+  // Level 7–8 generated questions are written to stand alone; the younger-level rule
+  // ("pattern", "quadrant", "new coordinates" need a pattern/grid visual) misfires on
+  // a quarter-circle "quadrant" or a car-park bay.
+  const isUpperGenerated = "lessonId" in questionData && /^y[78]-/.test(String(questionData.lessonId));
+  const missingRelationshipVisual = !isUpperGenerated && !questionData.cave7Visual && !questionData.spaceVisual && !questionData.space8Visual && !questionData.measurement8Visual && !questionData.number8Visual && !questionData.algebra8Visual && !questionData.chance8Visual && !hasRequiredRelationshipVisual(
     questionData.prompt,
     questionData.visual?.type,
     "multiple_choice",

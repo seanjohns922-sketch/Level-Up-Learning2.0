@@ -492,7 +492,7 @@ const estimateCount: Form[] = [
     return { prompt: `${o} of ${n} surveyed visitors to a gallery came from overseas. The gallery has ${visitors} visitors a month. Estimate the overseas visitors per month.`, answer: (o / n) * visitors, unit: "visitors", steps: [`Proportion: ${o}/${n} = ${o / n}.`, `${o / n} × ${visitors} = ${(o / n) * visitors}.`] };
   },
   (r) => {
-    const pop = 100 * r(8, 20), p = pick(r, [10, 20, 25, 40]), k = pick(r, [20, 40, 50, 60]);
+    const pop = 100 * r(8, 20), p = pick(r, [10, 20, 25, 40]), k = pick(r, [20, 40, 60, 80]);
     return { prompt: `About ${p}% of ${pop} students cycle. In a random sample of ${k}, how many would you expect to cycle?`, answer: (p * k) / 100, unit: "students", steps: [`Expect the sample to match the population proportion.`, `${p}% of ${k} = ${(p * k) / 100}.`] };
   },
 ];
@@ -681,16 +681,16 @@ const questionPopulation: Form[] = [
     return { prompt: `A question is about all Year 8 students at a school with ${classes} Year 8 classes of ${size}. What is the population size?`, answer: classes * size, unit: "students", steps: ["Every Year 8 student is in the population.", `${classes} × ${size} = ${classes * size}.`] };
   },
   (r) => {
-    const qs: [string, boolean][] = [
-      ["Are you rich?", false],
-      ["How many hours did you sleep last night?", true],
-      ["Are you old?", false],
-      ["How many siblings do you have?", true],
-      ["You like sport, don't you?", false],
-      ["How many minutes does your trip to school take?", true],
+    const qs: [string, boolean, string][] = [
+      ["Are you rich?", false, "“Rich” means different things to different people, and the question is personal. A better question: “How much pocket money do you get each week?”"],
+      ["How many hours did you sleep last night?", true, "It asks for one number that everyone can answer the same way."],
+      ["Are you old?", false, "“Old” is vague, so answers can’t be compared. A better question: “How old are you, in years?”"],
+      ["How many siblings do you have?", true, "It asks for a clear count that everyone can answer the same way."],
+      ["You like sport, don't you?", false, "It is leading: the wording pushes people to say yes. A better question: “How many hours of sport do you play each week?”"],
+      ["How many minutes does your trip to school take?", true, "It asks for one measured number, so answers can be compared."],
     ];
-    const [q, good] = pick(r, qs);
-    return yesNo(`Is "${q}" a good survey question?`, good, [good ? "It asks for a clear, measurable fact." : "It is vague or leading, so answers cannot be compared fairly.", good ? "So it is suitable." : "Rewrite it with a clear measurable answer."]);
+    const [q, good, why] = pick(r, qs);
+    return yesNo(`Is "${q}" a good survey question?`, good, [why, good ? "So it is a good survey question." : "So it is not a good survey question."]);
   },
   (r) => {
     const pop = 10 * r(10, 30), p = pick(r, [10, 20]);

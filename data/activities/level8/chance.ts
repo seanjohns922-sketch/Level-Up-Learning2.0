@@ -389,7 +389,7 @@ const tableProbability: Form[] = [
   },
   (r) => {
     const g = twoWayData(r);
-    return { prompt: `What percentage of students ${g.t.rowSay[1]} and ${g.t.colSay[1]}? Round to one decimal place.`, answer: rounded((100 * g.d) / g.total, 1), unit: "%", steps: [`${g.d} of ${g.total} students.`, `${g.d} ÷ ${g.total} × 100 ≈ ${rounded((100 * g.d) / g.total, 1)}%.`], visual: g.show() };
+    return { prompt: `What percentage of students ${g.t.rowSay[1]} and ${g.t.colSay[1]}? Round to one decimal place.`, answer: rounded((100 * g.d) / g.total, 1), unit: "%", steps: [`${g.d} of ${g.total} students.`, `${g.d} ÷ ${g.total} × 100 ${(100 * g.d) / g.total === rounded((100 * g.d) / g.total, 1) ? "=" : "≈"} ${rounded((100 * g.d) / g.total, 1)}%.`], visual: g.show() };
   },
 ];
 
@@ -511,7 +511,7 @@ const vennProbability: Form[] = [
   (r) => { const v = vennData(r), n = v.a + v.both + v.b; return { prompt: `One student is chosen at random. What is P(${v.labels[0]} or ${v.labels[1]})?`, answer: fraction(n, v.total), steps: [`Inside the circles: ${v.a} + ${v.both} + ${v.b} = ${n}. Total: ${v.total}.`, `P = ${pf(n, v.total)}.`], ...venn("Activities", v.labels, [v.a, v.both, v.b, v.neither]) }; },
   (r) => { const v = vennData(r); return { prompt: "One student is chosen at random. What is the probability they do neither activity?", answer: fraction(v.neither, v.total), steps: [`Neither: ${v.neither}. Total: ${v.total}.`, `P = ${fraction(v.neither, v.total)}.`], ...venn("Activities", v.labels, [v.a, v.both, v.b, v.neither]) }; },
   (r) => { const v = vennData(r), n = v.a + v.neither; return { prompt: `One student is chosen at random. What is P(not ${v.labels[1]})?`, answer: fraction(n, v.total), steps: [`Outside the ${v.labels[1]} circle: ${v.a} + ${v.neither} = ${n}.`, `P = ${pf(n, v.total)}.`], ...venn("Activities", v.labels, [v.a, v.both, v.b, v.neither]) }; },
-  (r) => { const v = vennData(r); return { prompt: `What percentage of students do ${v.labels[0]} only? Round to one decimal place.`, answer: rounded((100 * v.a) / v.total, 1), unit: "%", steps: [`${v.labels[0]} only: ${v.a} of ${v.total}.`, `${v.a} ÷ ${v.total} × 100 ≈ ${rounded((100 * v.a) / v.total, 1)}%.`], ...venn("Activities", v.labels, [v.a, v.both, v.b, v.neither]) }; },
+  (r) => { const v = vennData(r); return { prompt: `What percentage of students do ${v.labels[0]} only? Round to one decimal place.`, answer: rounded((100 * v.a) / v.total, 1), unit: "%", steps: [`${v.labels[0]} only: ${v.a} of ${v.total}.`, `${v.a} ÷ ${v.total} × 100 ${(100 * v.a) / v.total === rounded((100 * v.a) / v.total, 1) ? "=" : "≈"} ${rounded((100 * v.a) / v.total, 1)}%.`], ...venn("Activities", v.labels, [v.a, v.both, v.b, v.neither]) }; },
 ];
 
 /* ---------- Week 7: and, or, not, at least ---------- */
@@ -631,7 +631,7 @@ const experimentalProbability: Form[] = [
     const n1 = 10 * r(3, 8), s1 = r(5, n1 - 5), n2 = 10 * r(3, 8), s2 = Math.min(n2 - 2, Math.max(2, Math.round((s1 / n1) * n2) + r(-3, 3)));
     return { prompt: `Group A had ${s1} successes in ${n1} trials. Group B had ${s2} successes in ${n2} trials. What is the experimental probability using all the results?`, answer: fraction(s1 + s2, n1 + n2), steps: ["Combine successes and combine trials; do not average the two fractions.", `(${s1} + ${s2})/(${n1} + ${n2}) = ${pf(s1 + s2, n1 + n2)}.`] };
   },
-  (r) => { const f = coinFreq(r), n = f.hh + f.ht + f.th; return { prompt: "What percentage of trials gave at least one head? Round to one decimal place.", answer: rounded((100 * n) / f.total, 1), unit: "%", steps: [`At least one head: ${n} of ${f.total}.`, `${n} ÷ ${f.total} × 100 ≈ ${rounded((100 * n) / f.total, 1)}%.`], visual: f.visual }; },
+  (r) => { const f = coinFreq(r), n = f.hh + f.ht + f.th; return { prompt: "What percentage of trials gave at least one head? Round to one decimal place.", answer: rounded((100 * n) / f.total, 1), unit: "%", steps: [`At least one head: ${n} of ${f.total}.`, `${n} ÷ ${f.total} × 100 ${(100 * n) / f.total === rounded((100 * n) / f.total, 1) ? "=" : "≈"} ${rounded((100 * n) / f.total, 1)}%.`], visual: f.visual }; },
 ];
 
 /* ---------- Week 9: compare simulation and prediction ---------- */
