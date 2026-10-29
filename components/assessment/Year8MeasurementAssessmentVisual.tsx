@@ -17,7 +17,10 @@ function uprightText(nodes:ReactNode,sx:number,sy:number):ReactNode{return Child
  return el.props.children?cloneElement(el,{},uprightText(el.props.children,sx,sy)):el;
  });}
 function Frame({children,horizontalOnly=false}:{children:ReactNode;horizontalOnly?:boolean}){const o=useContext(Orientation),sx=o%2?-1:1,sy=!horizontalOnly&&o>1?-1:1;return <svg viewBox="0 0 560 350" aria-hidden="true" data-orientation={o} style={{width:'100%',maxWidth:650,maxHeight:290,display:'block',margin:'auto'}}><g transform={`translate(${sx<0?560:0} ${sy<0?350:0}) scale(${sx} ${sy})`}>{uprightText(children,sx,sy)}</g></svg>;}
-function LPlan({n}:{n:number[]}){const[w,h,cw,ch]=n,s=Math.min(320/w,205/h),x=110,y=60;return <Frame><polygon points={[[0,0],[w-cw,0],[w-cw,ch],[w,ch],[w,h],[0,h]].map(([a,b])=>`${x+a*s},${y+b*s}`).join(' ')} fill="#d6e8bd" stroke="#58763c" strokeWidth="3"/>{txt(x+(w-cw)*s/2,y-18,`${w-cw} m`)}{txt(x+(w-cw)*s+15,y+ch*s/2,`${ch} m`,'start')}{txt(x+(w-cw/2)*s,y+ch*s-15,`${cw} m`)}{txt(x+w*s+18,y+(h+ch)*s/2,`${h-ch} m`,'start')}{txt(x+w*s/2,y+h*s+30,`${w} m`)}{txt(x-18,y+h*s/2,`${h} m`,'end')}</Frame>;}
+/** Edge labels in order: top, inner vertical, inner horizontal, lower right, bottom, left. A custom label (e.g. "x") replaces the length. */
+function lPlanLabels(n:number[],labels?:string[]){ // labels = edgeLabels
+ const[w,h,cw,ch]=n;return [w-cw,ch,cw,h-ch,w,h].map((len,i)=>labels?.[i]??`${len} m`);}
+function LPlan({n,labels}:{n:number[];labels?:string[]}){const[w,h,cw,ch]=n,s=Math.min(320/w,205/h),x=110,y=60,l=lPlanLabels(n,labels);return <Frame><polygon points={[[0,0],[w-cw,0],[w-cw,ch],[w,ch],[w,h],[0,h]].map(([a,b])=>`${x+a*s},${y+b*s}`).join(' ')} fill="#d6e8bd" stroke="#58763c" strokeWidth="3"/>{txt(x+(w-cw)*s/2,y-18,l[0])}{txt(x+(w-cw)*s-10,y+ch*s/2+7,l[1],'end')}{txt(x+(w-cw/2)*s,y+ch*s-15,l[2])}{txt(x+w*s+18,y+(h+ch)*s/2,l[3],'start')}{txt(x+w*s/2,y+h*s+30,l[4])}{txt(x-18,y+h*s/2,l[5],'end')}</Frame>;}
 function NotchedPlan({n}:{n:number[]}){
  const[w,h,cw,ch]=n,s=Math.min(350/w,210/h),x=90,y=50,arm=(w-cw)/2;
  const pts=[[0,0],[arm,0],[arm,ch],[arm+cw,ch],[arm+cw,0],[w,0],[w,h],[0,h]];
@@ -67,7 +70,7 @@ function MapRoute({v}:{v:Measurement8Visual}){
 }
 export function measurement8Speech(v:Measurement8Visual){
  const n=v.values,u=v.unit??'';let detail='';
- if(v.task==='composite'){const[w,h,cw,ch]=n;detail=v.variant==='notch'?`Outer width ${w} metres. Outer height ${h} metres on each side. Each short outer arm is ${(w-cw)/2} metres. Notch width ${cw} metres. Each inward vertical edge is ${ch} metres.`:`Six boundary edges in order: ${w-cw}, ${ch}, ${cw}, ${h-ch}, ${w}, and ${h} metres.`;}
+ if(v.task==='composite'){const[w,h,cw,ch]=n;detail=v.variant==='notch'?`Outer width ${w} metres. Outer height ${h} metres on each side. Each short outer arm is ${(w-cw)/2} metres. Notch width ${cw} metres. Each inward vertical edge is ${ch} metres.`:`Six boundary edges in order: ${lPlanLabels(n,v.edgeLabels).join(', ')}.`;}
  if(v.task==='packing')detail=`Shipping carton, internal length ${n[0]}, width ${n[1]}, height ${n[2]} centimetres. One tissue box, external length ${n[3]}, width ${n[4]}, height ${n[5]} centimetres.`;
  if(v.task==='house')detail=`Base width ${n[0]} metres. Rectangular wall height ${n[1]} metres. Gable perpendicular height ${n[2]} metres.`;
  if(v.task==='prism')detail=v.variant==='triangular'?`Triangular end base ${n[0]} ${u}, perpendicular height ${n[1]} ${u}. Prism length ${n[2]} ${u}.`:`Length ${n[0]} ${u}. Width ${n[1]} ${u}. Height ${n[2]} ${u}.`;
@@ -80,7 +83,7 @@ export function measurement8Speech(v:Measurement8Visual){
 export default function Year8MeasurementAssessmentVisual({visual:v}:{visual:Measurement8Visual}){
  const n=v.values;let content:ReactNode;
  switch(v.task){
- case 'composite':content=v.variant==='notch'?<NotchedPlan n={n}/>:<LPlan n={n}/>;break;
+ case 'composite':content=v.variant==='notch'?<NotchedPlan n={n}/>:<LPlan n={n} labels={v.edgeLabels}/>;break;
  case 'packing':content=<PackingScene n={n}/>;break;
  case 'house':content=<House n={n}/>;break;
  case 'prism':content=v.variant==='triangular'?<TriPrism n={n} unit={v.unit??'cm'}/>:<RectPrism dims={n} unit={v.unit??'cm'}/>;break;

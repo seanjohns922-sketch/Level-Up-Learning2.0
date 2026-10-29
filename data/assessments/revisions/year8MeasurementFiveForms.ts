@@ -1,7 +1,7 @@
 import {createUncalibratedItemStatistics} from '../assessmentItemStandard';
 import type {MeasurelandsAnswerFormat} from '../measurelandsPresentation';
 export const YEAR8_MEASUREMENT_FORMS=['pretest','posttest','start','mid','end'] as const;
-export type Measurement8Visual={type:'measurement_year8_panel';task:'composite'|'prism'|'circle'|'timezone'|'rate'|'rightTriangle'|'model'|'house'|'diagonal'|'packing';orientation?:number;values:number[];description:string;labels?:string[];unit?:string;variant?:string;unknown?:'height'|'hypotenuse';rows?:{label:string;offset:number;detail:string}[]};
+export type Measurement8Visual={type:'measurement_year8_panel';task:'composite'|'prism'|'circle'|'timezone'|'rate'|'rightTriangle'|'model'|'house'|'diagonal'|'packing';orientation?:number;values:number[];description:string;labels?:string[];edgeLabels?:string[];unit?:string;variant?:string;unknown?:'height'|'hypotenuse';rows?:{label:string;offset:number;detail:string}[]};
 const slots=[
  [1,'Area of a composite shape','easy'],[2,'Prism capacity in litres','easy'],[3,'Circle area from radius','easy'],[4,'Convert between time zones','easy'],[5,'Calculate a rate','easy'],[6,'Find a hypotenuse','easy'],[7,'Interpret a map scale','moderate'],
  [1,'Perimeter of an L-shaped region','moderate'],[2,'Triangular prism capacity','moderate'],[3,'Circumference from diameter','moderate'],[4,'Convert 12-hour time across a half-hour zone','moderate'],[5,'Rate with mixed time units','moderate'],[6,'Find a shorter side using Pythagoras','moderate'],[7,'Plan material quantities and round appropriately','moderate'],
