@@ -32,8 +32,11 @@ export default function SkillGuide({
   const hasVisual = Boolean(q.cave7Visual || q.measurement8Visual || q.space8Visual || q.number8Visual || q.algebra8Visual || q.chance8Visual);
   const unit = q.answerSpec?.unit;
   const isClock = q.answerSpec?.kind === 'list' && q.answerSpec.labels?.[0] === 'Hours (24-hour time)';
-  const answer = isClock ? q.answer.split(',').map(part => part.trim().padStart(2, '0')).join(':')
-    : unit === '$' ? `$${q.answer}` : `${q.answer}${unit ? ` ${unit}` : ''}`;
+  const raw = String(q.answer).trim(), negative = /^-/.test(raw);
+  const answer = (isClock ? raw.split(',').map(part => part.trim().padStart(2, '0')).join(':')
+    : unit === '$' ? `${negative ? '-' : ''}$${raw.replace(/^-/, '')}`
+    : `${raw}${unit ? (unit === '%' || unit.startsWith('°') ? unit : ` ${unit}`) : ''}`)
+    .replace(/(^|[\s(,])-(?=[\d$])/g, '$1−');
   return (
     <section
       className="rounded-2xl border bg-[#fffdf8] p-5 text-slate-900 sm:p-7"

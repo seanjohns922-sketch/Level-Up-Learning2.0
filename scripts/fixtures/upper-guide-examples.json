@@ -49,7 +49,7 @@
   },
   "8/number/5/1": {
     "title": "Add and subtract signed numbers",
-    "signature": "5fbc8f36e2857bd6462bd6e31e09819ffbe962775ab434692e00459a9658c840"
+    "signature": "5c875429563722e503829efb5c85c701e19d004c1b762879a06ccd78ec6f435c"
   },
   "8/number/5/2": {
     "title": "Multiply and divide signed numbers",
@@ -77,7 +77,7 @@
   },
   "8/number/7/2": {
     "title": "Multiply and divide decimal numbers",
-    "signature": "8ec628d25baf2542fd87d03a4cb214158cdfbc54fd64dc00f6e72710fc3367b7"
+    "signature": "5b76cb840692d4072967e95017ecdd5d7c2f40d70f7519db1e705b5122abac5f"
   },
   "8/number/7/3": {
     "title": "Choose fractions or decimals to calculate",
@@ -293,7 +293,7 @@
   },
   "8/space/1/2": {
     "title": "Recognise congruent shapes after a movement",
-    "signature": "054ff04c4dd13c3a0728f444811ca6d138d62f7a83fd1a7371d6a0ffa4b3155b"
+    "signature": "a821374224888690941e8935d25c3798fd693709c70408ccc3872e68a7fb5dd7"
   },
   "8/space/1/3": {
     "title": "Test congruence by overlaying shapes",
@@ -333,7 +333,7 @@
   },
   "8/space/4/3": {
     "title": "Check what a transformation preserves",
-    "signature": "3c826d86cc75e1ff2c592e8b597ca7fa45610c80b0519c9e93a0ea589504e296"
+    "signature": "d54ff2a8ad7e789b10629135d60d191fb6297ec8276b97967833cbc613ca1ea8"
   },
   "8/space/5/1": {
     "title": "Compare sides and angles",
@@ -341,7 +341,7 @@
   },
   "8/space/5/2": {
     "title": "Compare diagonals and symmetry",
-    "signature": "d89e6cb0696239d8b57b2a29528c1c71bcbaf8c805da0935e544d37cb378c029"
+    "signature": "9f011557591fbe61582d4a4963bf4f2fef663bfce15ff91319bab889c2f6274e"
   },
   "8/space/5/3": {
     "title": "Classify quadrilaterals using their properties",
@@ -373,7 +373,7 @@
   },
   "8/space/8/1": {
     "title": "Follow a route through a 3D grid",
-    "signature": "965c1fad247a868b67a13aa3bf9e7d9213d2be261cc3a7739aebd44955550566"
+    "signature": "284433c3f72ae91c2403837c6ee8d21c43e1319555736ee8f31c52a3f05c531d"
   },
   "8/space/8/2": {
     "title": "Locate vertices and vertical columns",
@@ -381,7 +381,7 @@
   },
   "8/space/8/3": {
     "title": "Describe a practical 3D position",
-    "signature": "f346ad4064834813f68d619b1dbc90f8394e2a0818331f2d488485ca52a9ee29"
+    "signature": "5a8940ac40fc4bf19a84a415a5a4b2ce3b14929ce9d9ccbfde21d87b71d2bce2"
   },
   "8/space/9/1": {
     "title": "Trace a congruence or similarity flowchart",
@@ -553,7 +553,7 @@
   },
   "8/statistics/1/1": {
     "title": "Choose a census or a sample",
-    "signature": "33e3c2a6ae86a9be14977b4b986f1b2f2088261427266c2f4c2901ff4645c075"
+    "signature": "b61208b966ef41c0ab191defa7253b2c2f8623b65d1c657eded8a012e8a67448"
   },
   "8/statistics/1/2": {
     "title": "Choose an experiment or observation",
@@ -645,7 +645,7 @@
   },
   "8/statistics/8/3": {
     "title": "Choose a collection and recording method",
-    "signature": "edf0f67bb4fa223245d15c91f896b2961d25aff8590773c93abb06b0876ed29a"
+    "signature": "f47e8285f7a6e9cf634d1e09cd59a0fb8ff212ef52618bc61ceb1073ea372262"
   },
   "8/statistics/9/1": {
     "title": "Collect and organise sample data",
@@ -709,15 +709,15 @@
   },
   "8/chance/4/1": {
     "title": "Complete an outcome table",
-    "signature": "1249d19a0ff425fb75dae1818a0800d4a4993b0833fcb0ee436ae494eca9f6c9"
+    "signature": "ffb3ce71002e551cd5fdf2947c3178a3963090b0cc2ec35f83c498963e59dc77"
   },
   "8/chance/4/2": {
     "title": "Read row, column and joint totals",
-    "signature": "7edee99c2f8c918ff8090adc7dafb52b3d7c91c33b0560467b65aff0ca0188be"
+    "signature": "67b7c6f577854635842c9a91614b2310cfb3c6c6a246864bbb49289cd8d67790"
   },
   "8/chance/4/3": {
     "title": "Calculate probabilities from a two-way table",
-    "signature": "ab69715a5d1d2212cf6da0371407a3fe87259a242ea6636a1e093c7aea146890"
+    "signature": "28d944be280ef1cd6be4ca9f5a51d323bd4543b0519beba44d7b784fdb9da450"
   },
   "8/chance/5/1": {
     "title": "Build a tree for two events",
@@ -733,7 +733,7 @@
   },
   "8/chance/6/1": {
     "title": "Place outcomes into four regions",
-    "signature": "efe3a6c4d9bb46bc74a4c10c14c3b0c9fddc3058e3458e9001f800a5f2c0d403"
+    "signature": "68a94a3fec869a24b79f6ac189e9c7f23d647b82a2e440c2739e4b73a49bd18f"
   },
   "8/chance/6/2": {
     "title": "Find both, neither and either event",

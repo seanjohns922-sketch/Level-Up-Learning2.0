@@ -55,6 +55,32 @@ for(let seed=0;seed<1000;seed++){
  systematicCases++;
 }
 assert(systematicCases>100,'Exercise the repaired systematic-sampling variant');
+// These generated examples changed during the Level 8 content audit. Check
+// the authored working as well as the question signature: re-pinning a question
+// must not silently retain the previous example's calculation or table labels.
+const signed=level8TeachingGuide('number',5,1);
+assert.equal(Number(signed.example.answer),11-15+5);
+assert(signed.steps.join(' ').includes('11 − 15 = −4'));
+assert(signed.steps.join(' ').includes('−4 + 5 = 1'));
+const distance=level8TeachingGuide('space',8,3);
+assert.equal(distance.example.answer,Math.hypot(4-3,3-2).toFixed(2));
+assert(distance.steps.join(' ').includes('√2 ≈ 1.41 m'));
+const sample=level8TeachingGuide('statistics',1,1);
+assert.equal(Number(sample.example.answer),5500/275);
+assert(sample.steps.join(' ').includes('275 ÷ 5500 = 1/20'));
+assert(sample.steps.join(' ').includes('1 × 20 = 20'));
+for(const lesson of [2,3]){
+ const table=level8TeachingGuide('chance',4,lesson);
+ assert.equal(table.example.cave7Visual.headers[2],'No sibling');
+ assert(table.steps.join(' ').includes('No sibling'));
+ assert(!table.steps.join(' ').includes('right-handed'));
+}
+assert.equal(Number(level8TeachingGuide('chance',4,3).example.answer),Number((13/33*100).toFixed(1)));
+const venn=level8TeachingGuide('chance',6,1);
+assert.equal(venn.example.answer,'Choir only and Band only');
+assert(venn.steps.join(' ').includes('Choir only and Band only'));
+assert(venn.steps.join(' ').includes('leave it out'));
+
 // Render every guide with real React. Stub decorative/interactive artwork and
 // speech playback, but inspect the actual text delivered to speech controls.
 const speech=({text,label='Read'})=>React.createElement('button',{'data-speech':text},label);
