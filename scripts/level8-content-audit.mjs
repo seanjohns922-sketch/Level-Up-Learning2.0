@@ -4,7 +4,8 @@
 //   node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-content-audit.mjs
 import { LEVEL8_FACTORIES, level8Question } from "../data/activities/level8/questions.ts";
 import { LEVEL8_PROGRAMS } from "../data/activities/level8/program.ts";
-import { LEVEL8_TEACHING } from "../data/activities/level8/teaching/index.ts";
+import { LEVEL8_TEACHING, level8TeachingGuide } from "../data/activities/level8/teaching/index.ts";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { LEVEL8_WEEK_COUNTS } from "../lib/level8-config.ts";
 
 const SEEDS = 40;
@@ -110,6 +111,23 @@ for (const realm of Object.keys(LEVEL8_FACTORIES)) {
   }
 }
 
+// Guide worked examples without a fixed example come from the generator (seed 7007),
+// and their steps are hand-written for that question. If a generator change alters the
+// example, the steps must be rewritten: fail until the snapshot is updated deliberately.
+const SNAP = new URL("../data/activities/level8/teaching/example-snapshot.json", import.meta.url);
+const current = {};
+for (const realm of Object.keys(LEVEL8_TEACHING)) LEVEL8_TEACHING[realm].forEach((ls, w) => ls.forEach((g, l) => {
+  if (g.example) return;
+  const ex = level8TeachingGuide(realm, w + 1, l + 1).example;
+  current[`${realm} W${w + 1}L${l + 1}`] = `${ex.prompt} → ${ex.answer}`;
+}));
+let drift = 0;
+if (process.argv.includes("--update-guide-snapshot") || !existsSync(SNAP)) writeFileSync(SNAP, JSON.stringify(current, null, 1) + "\n");
+else {
+  const saved = JSON.parse(readFileSync(SNAP, "utf8"));
+  for (const [k, v] of Object.entries(current)) if (saved[k] !== v) { drift++; add(k + " (guide)", "guide example changed", `steps were written for "${saved[k]}" but the example is now "${v}". Rewrite the steps, then run with --update-guide-snapshot.`); }
+}
+
 const byKind = {};
 for (const f of findings) (byKind[f.kind] ??= []).push(f);
 console.log(`Checked ${questions} generated questions and ${guides} skill guides.`);
@@ -121,3 +139,4 @@ for (const [kind, list] of Object.entries(byKind)) {
   for (const f of [...seen.values()].slice(0, 60)) console.log(`- ${f.where}: ${f.detail}`);
 }
 if (!findings.length) console.log("No content problems found.");
+if (drift) { console.error(`\n${drift} guide example(s) changed without updating their steps.`); process.exit(1); }

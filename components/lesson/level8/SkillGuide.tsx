@@ -28,13 +28,15 @@ export default function SkillGuide({
   const plan = LEVEL8_CURRICULUM[realm][week - 1].lessons[lesson - 1];
   const teaching = level8TeachingGuide(realm, week, lesson);
   const q = teaching.example,
-    theme = getRealmTheme(realm);
+    theme = getRealmTheme(realm),
+    // Realm tints are tuned for dark screens; the guide card is light, so mix the realm colour into white.
+    lightTint = `color-mix(in srgb, ${theme.ctaFrom} 12%, white)`;
   const hasVisual = Boolean(q.cave7Visual || q.measurement8Visual || q.space8Visual || q.number8Visual || q.algebra8Visual || q.chance8Visual);
   const unit = q.answerSpec?.unit;
   const isClock = q.answerSpec?.kind === 'list' && q.answerSpec.labels?.[0] === 'Hours (24-hour time)';
   const raw = String(q.answer).trim(), negative = /^-/.test(raw);
   const answer = (isClock ? raw.split(',').map(part => part.trim().padStart(2, '0')).join(':')
-    : unit === '$' ? `${negative ? '-' : ''}$${raw.replace(/^-/, '')}`
+    : unit === '$' ? `${negative ? '-' : ''}$${/^-?\d+\.\d$/.test(raw) ? `${raw.replace(/^-/, '')}0` : raw.replace(/^-/, '')}`
     : `${raw}${unit ? (unit === '%' || unit.startsWith('°') ? unit : ` ${unit}`) : ''}`)
     .replace(/(^|[\s(,])-(?=[\d$])/g, '$1−');
   return (
@@ -49,7 +51,7 @@ export default function SkillGuide({
         <h2 className="text-2xl font-bold">{plan.title}</h2>
         <ReadAloudBtn text={plan.title} />
       </div>
-      <div className="mt-4 flex items-start justify-between gap-3 rounded-xl p-4" style={{background: theme.surfaceTint}}>
+      <div className="mt-4 flex items-start justify-between gap-3 rounded-xl p-4" style={{background: lightTint}}>
         <div><h3 className="font-bold">The key idea</h3><p className="mt-2 leading-relaxed"><MathFormattedText text={teaching.idea} /></p></div>
         <ReadAloudBtn text={`The key idea. ${teaching.idea}`} />
       </div>
@@ -89,7 +91,7 @@ export default function SkillGuide({
           </ol>
           <div
             className="mt-4 flex items-center justify-between gap-3 rounded-lg p-3 font-bold"
-            style={{ background: theme.surfaceTint }}
+            style={{ background: lightTint }}
           >
             <p>
               Answer: <MathFormattedText text={answer} />

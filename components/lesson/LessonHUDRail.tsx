@@ -135,8 +135,9 @@ export function LessonHUDRail({
           />
         ) : null}
         {/* Compact crumb + title */}
+        {/* Below laptop width the banner already shows the title; save space for the question. */}
         {showCrumb && (
-          <div>
+          <div className="hidden lg:block">
             <div
               className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em]"
               style={isMeasurement ? {
@@ -227,7 +228,7 @@ export function LessonHUDRail({
         </div>
 
         {/* Stats strip */}
-        <div data-lesson-stats className="lg:[&>div]:!grid-cols-1">
+        <div data-lesson-stats className="hidden lg:block lg:[&>div]:!grid-cols-1">
           <LessonStatStrip
             questionsAnswered={questionsAnswered}
             correctAnswers={correctAnswers}
@@ -236,13 +237,15 @@ export function LessonHUDRail({
           />
         </div>
 
-        {/* Combo chain counter */}
+        {/* Combo chain counter (on tablets and phones only once a streak is running) */}
+        <div className={comboCount > 0 ? undefined : "hidden lg:block"}>
         <ComboCounter
           count={comboCount}
           cave={levelNumber === 7}
           chainLabel={levelNumber === 7 ? "CRYSTAL STREAK" : isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
           realmId={realmId}
         />
+        </div>
 
         {/* Collapsible hint */}
         {hint ? (
