@@ -4,7 +4,8 @@ export type Level7QuizRole = typeof LEVEL7_QUIZ_ROLES[number];
 
 /** A prompt with its numbers and single-letter variables blanked, so two questions of the same form match. */
 export function promptTemplate(prompt: string) {
-  return prompt.replace(/−/g, '-').replace(/\$?-?\d+(?:[.,/]\d+)*/g, '#').replace(/\b[a-z]\b/g, 'v').replace(/\s+/g, ' ').trim();
+  // Mixed numbers and number lists collapse to one slot, so "slept 6 1/4, 8, 5 hours" matches "slept 7, 8 1/2, 5 hours".
+  return prompt.replace(/−/g, '-').replace(/\$?-?\d+(?:[.,/]\d+)*/g, '#').replace(/#(?:(?:,\s*|\s+|\s*(?:and|or)\s+)#)+/g, '#').replace(/\b[a-z]\b/g, 'v').replace(/\s+/g, ' ').trim();
 }
 
 /** Seeds the skill guides use for their worked examples; quizzes never reuse those questions. */
@@ -40,7 +41,8 @@ export function pickLevel7LessonQuiz<Q extends { prompt: string; answer: string 
       fallback ??= q;
       // After 120 tries the lesson has no unused form for this role, so accept a repeat form;
       // a repeated answer is tolerated after 200 tries (some lessons have only a few answers).
-      if (forms.has(promptTemplate(q.prompt)) && attempt < 120) continue;
+      // Also avoid a question type another lesson in this quiz already used.
+      if ((forms.has(promptTemplate(q.prompt)) || seen.has('form:' + promptTemplate(q.prompt))) && attempt < 120) continue;
       if (answers.has(q.answer) && attempt < 200) continue;
       fallback = q;
       break;
@@ -50,6 +52,7 @@ export function pickLevel7LessonQuiz<Q extends { prompt: string; answer: string 
     picked.push(fallback);
     seen.add(fingerprint(fallback));
     forms.add(promptTemplate(fallback.prompt));
+    seen.add('form:' + promptTemplate(fallback.prompt));
     answers.add(fallback.answer);
   });
   return picked;

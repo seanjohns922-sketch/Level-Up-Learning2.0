@@ -1,5 +1,8 @@
 "use client";
 
+import FeedbackValue from "@/components/FeedbackValue";
+import { MathFormattedText } from "@/components/FractionText";
+import { level7Answer } from "@/lib/level7-answer";
 import { useBankedXp } from "@/components/lesson/useBankedXp";
 import { QUIZ_PASS_XP } from "@/lib/xp-rules";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
@@ -85,6 +88,14 @@ function categoryLabel(task: PracticeTask, categoryId: string) {
   const row = rows.find((candidate) => candidate.id === categoryId);
   return row && "label" in row && typeof row.label === "string" ? row.label : categoryId;
 }
+
+/** Level 7–8 answer specs carry the unit and box labels used to format review values. */
+function reviewSpec(task: PracticeTask) {
+  const question = "question" in task ? (task as { question?: unknown }).question : undefined;
+  return question && typeof question === "object" && (question as { kind?: string }).kind === "multiple_choice" ? level7Answer(question as Parameters<typeof level7Answer>[0]) : undefined;
+}
+const reviewUnit = (task: PracticeTask) => reviewSpec(task)?.unit;
+const reviewLabels = (task: PracticeTask) => reviewSpec(task)?.labels;
 
 function studentAnswerForReview(task: PracticeTask, response?: string) {
   if (!response?.trim()) return "Incorrect attempt";
@@ -716,17 +727,17 @@ export default function StarpathVoyageQuiz({
                           className="!border-[var(--quiz-border)] !bg-white !text-[var(--quiz-ink)] hover:!bg-[var(--quiz-tint)]"
                         />
                       </div>
-                      <div className="mt-2 text-lg font-black text-slate-950">{taskPrompt(reviewTask)}</div>
+                      <div className="mt-2 text-lg font-black text-slate-950"><MathFormattedText text={taskPrompt(reviewTask)} compactFractions /></div>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         <div className="rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-800">
-                          <span className="font-black">Your answer:</span> {studentAnswerForReview(reviewTask, responses[String(questionIndex)])}
+                          <span className="font-black">Your answer:</span> <FeedbackValue value={studentAnswerForReview(reviewTask, responses[String(questionIndex)])} unit={reviewUnit(reviewTask)} labels={reviewLabels(reviewTask)} />
                         </div>
                         <div className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
-                          <span className="font-black">Correct answer:</span> {correctAnswerForReview(reviewTask)}
+                          <span className="font-black">Correct answer:</span> <FeedbackValue value={correctAnswerForReview(reviewTask)} unit={reviewUnit(reviewTask)} labels={reviewLabels(reviewTask)} />
                         </div>
                       </div>
                       <div className="mt-2 rounded-lg border px-3 py-2 font-semibold border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
-                        {taskFeedback(reviewTask)?.wrong ?? "Review this question and try the quiz again."}
+                        <MathFormattedText text={taskFeedback(reviewTask)?.wrong ?? "Review this question and try the quiz again."} compactFractions />
                       </div>
                     </div>
                   );
