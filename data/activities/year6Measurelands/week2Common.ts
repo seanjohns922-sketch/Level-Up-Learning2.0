@@ -91,8 +91,14 @@ export function splitChooseTask(): AreaTask {
   // a horizontal decoy inside the notch band (leaves an L), and a vertical one.
   const top = l.corner === "TR" || l.corner === "TL";
   const right = l.corner === "TR" || l.corner === "BR";
-  const hDecoyRow = top ? Math.max(1, l.hSplit - 1) : Math.min(l.gridH - 1, l.hSplit + 1);
-  const vDecoyCol = right ? Math.min(l.gridW - 1, l.vSplit + 1) : Math.max(1, l.vSplit - 1);
+  // A decoy must never land on a real split line: when the notch is one square
+  // wide the preferred spot is clamped onto the split, giving two identical options.
+  const decoyAt = (preferred: number, split: number, max: number) =>
+    preferred !== split && preferred >= 1 && preferred <= max
+      ? preferred
+      : choose(Array.from({ length: max }, (_, i) => i + 1).filter((p) => p !== split));
+  const hDecoyRow = decoyAt(top ? l.hSplit - 1 : l.hSplit + 1, l.hSplit, l.gridH - 1);
+  const vDecoyCol = decoyAt(right ? l.vSplit + 1 : l.vSplit - 1, l.vSplit, l.gridW - 1);
   decoys.push({ id: "dh", orient: "h", pos: hDecoyRow });
   decoys.push({ id: "dv", orient: "v", pos: vDecoyCol });
   const candidates = shuffle([{ ...valid, valid: true }, { ...decoys[0]!, valid: false }, { ...decoys[1]!, valid: false }]);
