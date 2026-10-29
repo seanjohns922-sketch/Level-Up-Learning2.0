@@ -872,12 +872,14 @@ export function Year2LessonEngine({
   }
 
   useEffect(() => {
-    if (lessonPool.violations.length === 0) return;
+    // Levels 7–8 build each lesson from one question generator by design, so the
+    // Year 2 three-activity rotation contract does not apply to them.
+    if (lessonPool.violations.length === 0 || isCave7) return;
     const summary = lessonPool.violations
       .map((v) => `${v.reason}: ${v.message}`)
       .join(" | ");
     console.error(`[Year2LessonPool] ${lesson.title}: ${summary}`);
-  }, [lesson.title, lessonPool.violations]);
+  }, [lesson.title, lessonPool.violations, isCave7]);
 
   useEffect(() => {
     if (finished || activities.length === 0) return;

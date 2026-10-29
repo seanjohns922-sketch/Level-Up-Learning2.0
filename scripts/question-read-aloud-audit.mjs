@@ -4,7 +4,7 @@ const checks = [
   {
     name: "shared prompt controls are marked",
     file: "components/ReadAloudBtn.tsx",
-    patterns: ['data-read-aloud-button="true"', "data-read-aloud-kind={kind}"],
+    patterns: ['"data-read-aloud-button": "true"', '"data-read-aloud-kind": kind', 'role="button"'],
   },
   {
     name: "answer-choice controls are marked separately",

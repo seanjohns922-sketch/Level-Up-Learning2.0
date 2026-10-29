@@ -415,20 +415,25 @@ const rationalSolutions: Form[] = [
     return { prompt: `Solve ${a}x + ${b} = ${c}. Give your answer as a fraction.`, answer: fraction(c - b, a), steps: [`Subtract ${b}: ${a}x = ${c - b}.`, `Divide by ${a}: x = ${fraction(c - b, a)}.`] };
   },
   (r) => {
-    const k = r(2, 7), d = r(3, 9), q = r(1, 6);
-    return { prompt: `Solve ${k}m ÷ ${d} = ${k * q}.`, answer: d * q, steps: [`Multiply both sides by ${d}: ${k}m = ${k * q * d}.`, `Divide by ${k}: m = ${d * q}.`] };
+    let k = 0, d = 0, n = 0;
+    while (!k || (d * n) % k === 0) [k, d, n] = [r(2, 7), r(3, 9), r(1, 12)];
+    return { prompt: `Solve ${k}m ÷ ${d} = ${n}. Give your answer as a fraction.`, answer: fraction(d * n, k), steps: [`Multiply both sides by ${d}: ${k}m = ${d * n}.`, `Divide by ${k}: m = ${fraction(d * n, k)}.`] };
   },
   (r) => {
-    const a = r(2, 5), b = r(1, 9), c = r(2, 10);
-    return { prompt: `Solve (x + ${b}) ÷ ${a} = ${c}.`, answer: a * c - b, steps: [`Multiply both sides by ${a}: x + ${b} = ${a * c}.`, `Subtract ${b}: x = ${a * c - b}.`] };
+    const a = pick(r, [2, 3, 4]), b = r(1, 9);
+    let m = 0;
+    while (!m || (a * m) % 10 === 0) m = r(11, 59);
+    const c = m / 10, x = rounded(a * c - b, 2);
+    return { prompt: `Solve (x + ${b}) ÷ ${a} = ${c}. Give your answer as a decimal.`, answer: x, steps: [`Multiply both sides by ${a}: x + ${b} = ${rounded(a * c, 2)}.`, `Subtract ${b}: x = ${x}.`] };
   },
   (r) => {
-    const a = r(2, 5), x = r(1, 8), d = pick(r, [2, 3, 5]), q = Math.ceil((a * x + 1) / d) + r(0, 3), b = d * q - a * x;
-    return { prompt: `Solve (${a}y + ${b}) ÷ ${d} = ${(a * x + b) / d}.`, answer: x, steps: [`Multiply by ${d}: ${a}y + ${b} = ${a * x + b}.`, `Subtract ${b}, then divide by ${a}: y = ${x}.`] };
+    let a = 0, b = 0, d = 0, e = 0;
+    while (!a || (d * e - b) % a === 0 || d * e - b <= 0) [a, b, d, e] = [r(2, 6), r(1, 9), pick(r, [2, 3, 5]), r(3, 12)];
+    return { prompt: `Solve (${a}y + ${b}) ÷ ${d} = ${e}. Give your answer as a fraction.`, answer: fraction(d * e - b, a), steps: [`Multiply by ${d}: ${a}y + ${b} = ${d * e}.`, `Subtract ${b}, then divide by ${a}: y = ${fraction(d * e - b, a)}.`] };
   },
   (r) => {
-    const k = r(1, 9), mean = r(k + 2, 25);
-    return { prompt: `The average of x and ${k} is ${mean}. Write and solve an equation to find x.`, answer: 2 * mean - k, steps: [`(x + ${k}) ÷ 2 = ${mean}.`, `Multiply by 2: x + ${k} = ${2 * mean}. Subtract ${k}: x = ${2 * mean - k}.`] };
+    const k1 = r(1, 9), k2 = r(1, 9), mean = r(Math.max(k1, k2) + 2, 20) + 0.5, x = rounded(3 * mean - k1 - k2, 1);
+    return { prompt: `The mean of x, ${k1} and ${k2} is ${mean}. Write and solve an equation to find x.`, answer: x, steps: [`(x + ${k1} + ${k2}) ÷ 3 = ${mean}.`, `Multiply by 3: x + ${k1 + k2} = ${rounded(3 * mean, 1)}. Subtract ${k1 + k2}: x = ${x}.`] };
   },
   (r) => {
     const cups = r(3, 6), price = rounded(r(28, 55) / 10, 1);

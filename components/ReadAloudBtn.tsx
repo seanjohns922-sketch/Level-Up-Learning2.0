@@ -48,25 +48,43 @@ export default function ReadAloudBtn({
   const isCurrentSpeech = isSpeaking && currentText === normalizedText;
   for (const piece of parts?.length ? parts : [text]) captureSpeech(prepareSpeechText(piece), kind);
 
-  return (
-    <button
-      type="button"
-      data-read-aloud-button="true"
-      data-read-aloud-kind={kind}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (isCurrentSpeech) {
-          stopSpeaking();
-          return;
-        }
-        void speak(text, speechKey, "manual", { rate: speechRate, parts });
-      }}
-      aria-label={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
-      title={isCurrentSpeech ? "Stop read aloud" : "Read aloud"}
-      className={`inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition ${px} ${className}`}
-    >
+  const activate = () => {
+    if (isCurrentSpeech) {
+      stopSpeaking();
+      return;
+    }
+    void speak(text, speechKey, "manual", { rate: speechRate, parts });
+  };
+  const shared = {
+    "data-read-aloud-button": "true",
+    "data-read-aloud-kind": kind,
+    "aria-label": isCurrentSpeech ? "Stop read aloud" : "Read aloud",
+    title: isCurrentSpeech ? "Stop read aloud" : "Read aloud",
+    className: `inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary/40 transition ${px} ${className}`,
+  };
+  const content = (
+    <>
       {isCurrentSpeech ? <Square className={icon} /> : <Volume2 className={icon} />}
       {label ? <span className="text-xs font-black">{isCurrentSpeech ? "Stop" : label}</span> : null}
+    </>
+  );
+  // Answer options are themselves buttons, so the option speaker must not be a
+  // nested <button> (invalid HTML and a hydration error). It keeps button behaviour.
+  if (kind === "option")
+    return (
+      <span
+        {...shared}
+        role="button"
+        tabIndex={0}
+        onClick={(e) => { e.stopPropagation(); activate(); }}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); activate(); } }}
+      >
+        {content}
+      </span>
+    );
+  return (
+    <button type="button" {...shared} onClick={(e) => { e.stopPropagation(); activate(); }}>
+      {content}
     </button>
   );
 }
