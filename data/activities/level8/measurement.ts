@@ -256,6 +256,8 @@ const flight = (r: R) => {
   return [zone(from), zone(to), dur] as const;
 };
 /** "8 h", "3 h 45 min" or "45 min", never "8 h 0 min". */
+// "an 8 h flight", "an 11 h flight", "a 2 h flight".
+const aOrAn = (text: string) => `${/^(8|11|18)\b/.test(text) ? "an" : "a"} ${text}`;
 const hmText = (m: number) => (m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m / 60} h`);
 const zonePair = (r: R, pool: readonly Zone[]) => { const a = choose(r, pool); let b = choose(r, pool); while (b[1] === a[1]) b = choose(r, pool); return [a, b] as const; };
 const zoneVisual = (a: Zone, aTime: string, b: Zone) => diagram("timezone", [], { description: "Use the UTC offsets to convert the time.", rows: [{ label: a[0], offset: a[1], detail: aTime }, { label: b[0], offset: b[1], detail: "?" }] });
@@ -271,7 +273,7 @@ const w9l2: Form[] = [
   (r) => { const [a, b, dur] = flight(r), dep = r(6, 14) * 60 + choose(r, [0, 15, 30, 45]), arr = dep + dur + (b[1] - a[1]) * 60; return q(`A flight leaves ${a[0]} (${off(a[1])}) at ${clock(dep)} local time and lands in ${b[0]} (${off(b[1])}) at ${clock(arr)} local time${arr >= 1440 ? " the next day" : ""}. How long was the flight?`, `${Math.floor(dur / 60)}, ${dur % 60}`, undefined, [`Change the landing time to ${a[0]} time: ${clock(arr - (b[1] - a[1]) * 60)}.`, `Flight time: ${hmText(dur)}.`], DUR); },
   (r) => { const [a, b, dur] = flight(r), dep = r(6, 14) * 60 + choose(r, [0, 30]), arr = dep + dur + (b[1] - a[1]) * 60; return q(`A flight leaves ${a[0]} (${off(a[1])}) at ${clock(dep)} local time and takes ${hmText(dur)}. What is the local time when it lands in ${b[0]} (${off(b[1])})? Enter the time in 24-hour time.`, hm(arr), undefined, [`Landing in ${a[0]} time: ${clock(dep + dur)}.`, `Adjust by ${fmt(b[1] - a[1])} h: ${clock(arr)}${arr >= 1440 ? " the next day" : ""}.`], HM); },
   (r) => { const [a, b, dur] = flight(r), land = r(15, 21) * 60 + choose(r, [0, 30]), dep = land - dur - (b[1] - a[1]) * 60; return q(`You must land in ${b[0]} (${off(b[1])}) by ${clock(land)} local time. The flight from ${a[0]} (${off(a[1])}) takes ${hmText(dur)}. What is the latest departure time, in ${a[0]} local time? Enter the time in 24-hour time.`, hm(dep), undefined, [`${clock(land)} in ${b[0]} is ${clock(land - (b[1] - a[1]) * 60)} in ${a[0]}.`, `Take away the flight time: ${clock(dep)}${dep < 0 ? " the day before" : ""}.`], HM); },
-  (r) => { const [a, b, d1] = flight(r), stop = r(1, 3) * 60 + choose(r, [0, 15, 30, 45]), d2 = r(2, 6) * 60 + choose(r, [0, 15, 30, 45]), total = d1 + stop + d2; return q(`A trip from ${a[0]} has a ${hmText(d1)} flight to ${b[0]}, a ${hmText(stop)} stopover, then a ${hmText(d2)} flight. What is the total travel time?`, `${Math.floor(total / 60)}, ${total % 60}`, undefined, ["Add the hours and the minutes separately, then regroup 60 minutes as 1 hour.", `Total: ${hmText(total)}.`], DUR); },
+  (r) => { const [a, b, d1] = flight(r), stop = r(1, 3) * 60 + choose(r, [0, 15, 30, 45]), d2 = r(2, 6) * 60 + choose(r, [0, 15, 30, 45]), total = d1 + stop + d2; return q(`A trip from ${a[0]} has ${aOrAn(hmText(d1))} flight to ${b[0]}, ${aOrAn(hmText(stop))} stopover, then ${aOrAn(hmText(d2))} flight. What is the total travel time?`, `${Math.floor(total / 60)}, ${total % 60}`, undefined, ["Add the hours and the minutes separately, then regroup 60 minutes as 1 hour.", `Total: ${hmText(total)}.`], DUR); },
 ];
 
 const w9l3: Form[] = [
