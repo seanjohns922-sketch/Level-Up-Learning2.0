@@ -99,14 +99,6 @@ type LiveStudentActivityRow = {
   updated_at?: string | null;
 };
 
-type LiveActivityEventRow = {
-  student_id: string;
-  class_id: string;
-  event_type: string;
-  created_at: string;
-  payload: Record<string, unknown> | null;
-};
-
 type LessonCardPerformance = {
   lessonId: string;
   status: "Completed" | "In Progress" | "Not Started";
@@ -139,7 +131,7 @@ type Props = {
   students: StudentRow[];
   progress: ProgressRow[];
   liveRows: LiveStudentActivityRow[];
-  liveEvents: LiveActivityEventRow[];
+  progressLoading?: boolean;
   onRealmChange?: (realmId: LiveRealmId) => void;
   onProgressChanged?: () => Promise<void> | void;
   progressAvailable?: boolean;
@@ -715,7 +707,7 @@ function resolveDisplayedWeek(prog?: ProgressRow) {
   return prog?.week ?? null;
 }
 
-export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true, report }: Props) {
+export default function StrandStudentsPanel({ yearLabel, students, progress, liveRows, onRealmChange, onProgressChanged, progressAvailable = true, progressLoading = false, report }: Props) {
   const strandCatalogYear = highestRosterCurriculumYear(
     yearLabel,
     students.map((student) => student.school_year_level ?? student.year_level),
@@ -966,7 +958,11 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
           })}
         </div>
 
-        {students.length === 0 ? (
+        {progressLoading ? (
+          <div role="status" aria-live="polite" aria-busy="true" className="px-6 py-12 text-center text-sm font-semibold text-[#5A5E63]">
+            Loading student progress…
+          </div>
+        ) : students.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-[#5A5E63]">
             No students enrolled yet.
           </div>

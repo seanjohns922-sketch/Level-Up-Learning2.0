@@ -296,6 +296,7 @@
     "qa:g6-question-integrity": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/g6-question-integrity-test.mjs",
     "qa:g6-reliability": "node scripts/g6-reliability-audit.mjs",
     "typecheck": "next typegen && tsc --noEmit",
+    "qa:teacher-dashboard-loading": "node scripts/teacher-dashboard-loading-test.mjs",
     "qa:critical": "node scripts/qa-runner.mjs critical",
     "qa:assessment-question-results": "node scripts/assessment-question-results-audit.mjs",
     "qa:security-source": "node scripts/qa-runner.mjs security-source",

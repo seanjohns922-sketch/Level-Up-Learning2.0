@@ -41,6 +41,8 @@ type EventCursor = { id: string; created_at: string };
 async function fetchCompleteSnapshot(
   client: Pick<SupabaseClient, "rpc" | "from">,
   options: EventRead,
+  startAfter: EventCursor | null = null,
+  isActive = () => true,
 ) {
   const columns = "id,student_id,class_id,event_type,created_at,payload";
   const filteredTable = () => {
@@ -54,10 +56,12 @@ async function fetchCompleteSnapshot(
     .order("id", { ascending: false }).limit(1);
   if (head.error || !head.data?.length) return head;
   const through = head.data[0] as EventCursor;
+  if (startAfter && through.id === startAfter.id) return { ...head, data: [], count: null };
   const rows: NonNullable<typeof head.data> = [];
-  let after: EventCursor | null = null;
+  let after: EventCursor | null = startAfter;
   let useLegacy = false;
   for (;;) {
+    if (!isActive()) throw new Error("Live event read cancelled");
     const afterCursor: EventCursor | null = after;
     let page;
     if (!useLegacy) {
@@ -91,4 +95,45 @@ async function fetchCompleteSnapshot(
   }
   if (options.newestFirst) rows.reverse();
   return { ...head, data: rows, count: null };
+}
+
+/** One reader per mounted class; never share private event data between sessions.
+ * Realtime mutations/reconnects invalidate the snapshot. A periodic full read
+ * also reconciles missed notifications and transactions committed out of order.
+ */
+export function createLiveClassEventReader(
+  client: Pick<SupabaseClient, "rpc" | "from">,
+  options: Omit<EventRead, "limit" | "newestFirst">,
+) {
+  let snapshot: Awaited<ReturnType<typeof fetchCompleteSnapshot>>["data"] = null;
+  let cursor: EventCursor | null = null;
+  let reconciledAt = 0;
+  let generation = 0;
+  let active = true;
+  return {
+    dispose() { active = false; },
+    invalidate() { generation += 1; cursor = null; snapshot = null; },
+    inserted(createdAt: unknown) {
+      // Backdated/delayed commits cannot be recovered by an exclusive cursor.
+      if (cursor && typeof createdAt === "string" && Date.parse(createdAt) <= Date.parse(cursor.created_at)) {
+        generation += 1; cursor = null; snapshot = null;
+      }
+    },
+    async read() {
+      if (!active) throw new Error("Live event read cancelled");
+      const version = generation;
+      const full = !snapshot || Date.now() - reconciledAt >= 5 * 60_000;
+      const result = await fetchCompleteSnapshot(client, options, full ? null : cursor, () => active);
+      if (!active || version !== generation) throw new Error("Live event snapshot invalidated");
+      if (result.error || !result.data) return result;
+      const data = full ? result.data : result.data.length ? [...(snapshot ?? []), ...result.data] : (snapshot ?? []);
+      // Do not install a snapshot invalidated while a page was in flight.
+      if (version === generation) {
+        snapshot = data;
+        cursor = (data.at(-1) as EventCursor | undefined) ?? null;
+        if (full) reconciledAt = Date.now();
+      }
+      return { ...result, data };
+    },
+  };
 }

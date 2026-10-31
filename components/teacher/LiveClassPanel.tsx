@@ -5,7 +5,7 @@ import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react"
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { supabase } from "@/lib/supabase";
-import { fetchLiveClassEvents } from "@/lib/live-class-events";
+import { createLiveClassEventReader, fetchLiveClassEvents } from "@/lib/live-class-events";
 import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import {
   aggregateLearningScores,
@@ -1006,6 +1006,24 @@ export default function LiveClassPanel({
       });
     }
 
+    const eventReader = createLiveClassEventReader(supabase, {
+      classId: selectedClass?.id ?? "",
+      studentIds,
+      eventTypes: [
+        "activity_started", "lesson_started", "quiz_started", "question_loaded",
+        "answer_correct", "answer_incorrect", "hint_used", "lesson_completed",
+        "quiz_completed", "idle_detected",
+      ],
+    });
+    let connectedBefore = false;
+
+    async function loadEvents() {
+      if (cancelled || document.visibilityState !== "visible" || !selectedClass?.id || !studentIds.length) return;
+      const result = await eventReader.read();
+      if (result.error) console.warn("[LiveClassPanel] Failed to load live activity events", result.error);
+      else if (!cancelled) setEvents((result.data ?? []) as LiveActivityEventRow[]);
+    }
+
     async function loadRows() {
       if (cancelled || document.visibilityState !== "visible") return;
       if (!selectedClass?.id) {
@@ -1020,27 +1038,12 @@ export default function LiveClassPanel({
       }
       // Note: don't flip `loading` on refreshes — only the initial load shows the
       // spinner, so periodic polls update in place without flashing the panel.
-      const [activityResult, eventResult, lessonAttemptResult, quizAttemptResult, assessmentResult, dailyActivityResult] = await Promise.all([
+      const [activityResult, lessonAttemptResult, quizAttemptResult, assessmentResult, dailyActivityResult] = await Promise.all([
         supabase
           .from("live_student_activity")
           .select("*")
           .eq("class_id", selectedClass.id)
           .order("last_active_at", { ascending: false }),
-        fetchLiveClassEvents(supabase, {
-          classId: selectedClass.id,
-          eventTypes: [
-            "activity_started",
-            "lesson_started",
-            "quiz_started",
-            "question_loaded",
-            "answer_correct",
-            "answer_incorrect",
-            "hint_used",
-            "lesson_completed",
-            "quiz_completed",
-            "idle_detected",
-          ],
-        }),
         studentIds.length > 0
           ? supabase
             .from("student_lesson_attempts")
@@ -1063,16 +1066,12 @@ export default function LiveClassPanel({
         supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
       ]);
       const { data, error } = activityResult;
-      const { data: eventData, error: eventError } = eventResult;
       const { data: lessonAttemptData, error: lessonAttemptError } = lessonAttemptResult;
       const { data: quizAttemptData, error: quizAttemptError } = quizAttemptResult;
       const { data: assessmentData, error: assessmentError } = assessmentResult;
       const { data: dailyActivityData, error: dailyActivityError } = dailyActivityResult;
       if (error) {
         console.warn("[LiveClassPanel] Failed to load live student activity", error);
-      }
-      if (eventError) {
-        console.warn("[LiveClassPanel] Failed to load live activity events", eventError);
       }
       if (lessonAttemptError) {
         console.warn("[LiveClassPanel] Failed to load completed lesson attempts", lessonAttemptError);
@@ -1087,9 +1086,8 @@ export default function LiveClassPanel({
         console.warn("[LiveClassPanel] Failed to load today's class activity", dailyActivityError);
       }
       if (!cancelled) {
-        setRows((data ?? []) as LiveStudentActivityRow[]);
-        setEvents((eventData ?? []) as LiveActivityEventRow[]);
-        setCompletedAttempts([
+        if (!error) setRows((data ?? []) as LiveStudentActivityRow[]);
+        if (!lessonAttemptError && !quizAttemptError && !assessmentError) setCompletedAttempts([
           ...((lessonAttemptData ?? []) as Omit<CompletedActivityAttemptRow, "activity_type">[]).map((attempt) => ({
             ...attempt,
             activity_type: "lesson" as const,
@@ -1127,7 +1125,7 @@ export default function LiveClassPanel({
             activity_type: attempt.assessment_type,
           })),
         ]);
-        setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
+        if (!dailyActivityError) setDailyActivity((dailyActivityData ?? []) as DailyClassActivityRow[]);
         setLoading(false);
       }
     }
@@ -1135,8 +1133,11 @@ export default function LiveClassPanel({
     const refresh = createCoalescedRefresh(loadRows, (error) => {
       console.warn("[LiveClassPanel] Refresh failed", error);
     });
+    const eventRefresh = createCoalescedRefresh(loadEvents, (error) => {
+      console.warn("[LiveClassPanel] Event refresh failed", error);
+    }, 30_000);
     const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") refresh.request();
+      if (document.visibilityState === "visible") { refresh.request(); eventRefresh.request(); }
     };
     void ensureLiveSession();
     refreshWhenVisible();
@@ -1153,7 +1154,11 @@ export default function LiveClassPanel({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "live_activity_events", filter: `class_id=eq.${selectedClass?.id}` },
-        refreshWhenVisible,
+        (payload) => {
+          if (payload.eventType !== "INSERT") eventReader.invalidate();
+          else eventReader.inserted(payload.new.created_at);
+          refreshWhenVisible();
+        },
       )
       .on(
         "postgres_changes",
@@ -1165,10 +1170,18 @@ export default function LiveClassPanel({
         { event: "*", schema: "public", table: "student_weekly_quiz_attempts", filter: `class_id=eq.${selectedClass?.id}` },
         refreshWhenVisible,
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          if (connectedBefore) eventReader.invalidate();
+          connectedBefore = true;
+          refreshWhenVisible();
+        }
+      });
     return () => {
       cancelled = true;
       refresh.dispose();
+      eventRefresh.dispose();
+      eventReader.dispose();
       if (intervalId) clearInterval(intervalId);
       window.removeEventListener("focus", refreshWhenVisible);
       document.removeEventListener("visibilitychange", refreshWhenVisible);

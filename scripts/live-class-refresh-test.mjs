@@ -56,12 +56,17 @@ try {
 
   const source = fs.readFileSync('components/teacher/LiveClassPanel.tsx', 'utf8');
   assert.ok(source.includes('if (cancelled || document.visibilityState !== "visible") return;'));
-  assert.equal((source.match(/refreshWhenVisible,\n      \)/g) ?? []).length, 4, 'all realtime subscriptions share the scheduler');
+  assert.equal((source.match(/refreshWhenVisible,\n      \)/g) ?? []).length, 3, 'presence and attempt subscriptions share the scheduler');
   assert.ok(source.includes('setInterval(refreshWhenVisible, 30000)'));
   assert.ok(source.includes('window.addEventListener("focus", refreshWhenVisible)'));
   assert.ok(source.includes('document.addEventListener("visibilitychange", refreshWhenVisible)'));
   assert.ok(source.includes('refresh.dispose()'));
-  assert.ok(source.includes('if (!cancelled) {\n        setRows('), 'old class response cannot publish after cleanup');
+  assert.ok(source.includes('if (!cancelled) {\n        if (!error) setRows('), 'old class response cannot publish after cleanup');
+  assert.ok(source.includes('eventRefresh.dispose()'));
+  assert.ok(source.includes('if (payload.eventType !== "INSERT") eventReader.invalidate()'));
+  assert.ok(source.includes('const result = await eventReader.read()'));
+  const loadRows = source.slice(source.indexOf('async function loadRows()'), source.indexOf('const refresh = createCoalescedRefresh'));
+  assert.ok(!loadRows.includes('eventReader') && !loadRows.includes('fetchLiveClassEvents'), 'current rows never wait for historical events');
   console.log('PASS: burst coalescing, no overlapping reads, trailing freshness, errors, cleanup and visible-tab wiring.');
 } finally {
   refresh.dispose();

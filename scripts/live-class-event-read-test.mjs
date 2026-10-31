@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchLiveClassEvents } from '../lib/live-class-events.ts';
+import { createLiveClassEventReader, fetchLiveClassEvents } from '../lib/live-class-events.ts';
 const a={id:'a',created_at:'2026-01-01T00:00:00Z'}, b={id:'b',created_at:a.created_at}, c={id:'c',created_at:'2026-01-02T00:00:00Z'};
 const ok=data=>({data,error:null});
 function mock(tableResults,rpcResults){
@@ -51,3 +51,56 @@ assert.ok(timelineFallback.calls.some(c=>c[0]==='table'&&c[1]==='limit'&&c[2]===
 const deletedHead=mock([ok([c])],[ok([a,b]),ok([])]);
 assert.deepEqual((await fetchLiveClassEvents(deletedHead.client,options)).data,[a,b]);
 console.log('PASS: complete keyset pages, tied timestamps, fixed upper cursor, smaller API caps, fail-closed partial reads, rollout fallback and latest-15 timeline.');
+
+const deltaMock = mock([ok([b]), ok([c]), ok([c]), ok([c])], [ok([a,b]), ok([c]), ok([a,b,c])]);
+const reader = createLiveClassEventReader(deltaMock.client, options);
+assert.deepEqual((await reader.read()).data, [a,b]);
+assert.deepEqual((await reader.read()).data, [a,b,c]);
+assert.equal(deltaMock.calls.filter(c=>c[0]==='rpc' && c[1]==='get_live_class_event_page_secure')[1][2].p_after_id, 'b', 'refresh reads only new events');
+assert.deepEqual((await reader.read()).data, [a,b,c]);
+assert.equal(deltaMock.calls.filter(c=>c[0]==='rpc' && c[1]==='get_live_class_event_page_secure').length, 2, 'unchanged history needs no page download');
+reader.invalidate();
+assert.deepEqual((await reader.read()).data, [a,b,c]);
+assert.equal(deltaMock.calls.filter(c=>c[0]==='rpc' && c[1]==='get_live_class_event_page_secure')[2][2].p_after_id, null, 'mutations and reconnects reconcile full history');
+const retryMock = mock([ok([b]),ok([c]),ok([c])], [ok([a,b]),{data:null,error:{code:'57014'}},ok([c])]);
+const retryReader = createLiveClassEventReader(retryMock.client,options);
+await retryReader.read();
+assert.equal((await retryReader.read()).error.code,'57014');
+assert.deepEqual((await retryReader.read()).data,[a,b,c], 'failed delta does not advance cursor or lose history');
+console.log('PASS: incremental refresh, unchanged-head short circuit, invalidation and failed-delta recovery.');
+
+const lateMock = mock([ok([c]),ok([c])],[ok([a,b,c]),ok([a,b,c])]);
+const lateReader = createLiveClassEventReader(lateMock.client,options);
+await lateReader.read();
+lateReader.inserted(a.created_at);
+await lateReader.read();
+assert.equal(lateMock.calls.filter(c=>c[0]==='rpc' && c[1]==='get_live_class_event_page_secure')[1][2].p_after_id,null,'late inserts reconcile historical events');
+lateReader.dispose();
+await assert.rejects(()=>lateReader.read(),/cancelled/,'unmounted readers cannot start more page downloads');
+const originalNow = Date.now;
+try {
+  let now = 1_000_000;
+  Date.now = () => now;
+  const periodicMock = mock([ok([c]),ok([c])],[ok([a,b,c]),ok([a,c])]);
+  const periodicReader = createLiveClassEventReader(periodicMock.client,options);
+  await periodicReader.read();
+  now += 300_001;
+  assert.deepEqual((await periodicReader.read()).data,[a,c],'periodic reconciliation repairs missed deletes');
+} finally { Date.now = originalNow; }
+console.log('PASS: late inserts, disposal and periodic repair of missed notifications.');
+const stableMock = mock([ok([c]),ok([c])],[ok([a,b,c])]);
+const stableReader = createLiveClassEventReader(stableMock.client,options);
+const firstSnapshot = (await stableReader.read()).data;
+assert.equal((await stableReader.read()).data,firstSnapshot,'unchanged history preserves reference to avoid expensive card recalculation');
+let finishPage;
+const pendingPage = new Promise(resolve => { finishPage = resolve; });
+const raceMock = mock([ok([b]),ok([c]),ok([c])],[ok([a,b]),pendingPage,ok([a,b,c])]);
+const raceReader = createLiveClassEventReader(raceMock.client,options);
+await raceReader.read();
+const pendingRead = raceReader.read();
+await new Promise(resolve => setImmediate(resolve));
+raceReader.invalidate();
+finishPage(ok([c]));
+await assert.rejects(()=>pendingRead,/invalidated/,'invalidated delta must not publish only the tail of a cleared snapshot');
+assert.deepEqual((await raceReader.read()).data,[a,b,c]);
+console.log('PASS: stable snapshots avoid recalculation; invalidation races cannot publish partial history.');

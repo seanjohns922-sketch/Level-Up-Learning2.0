@@ -32,7 +32,7 @@ export default function AdultScreensReview() {
       ) : view === "curriculum" ? (
         <CurriculumExplorer yearLabel="Year 3" studentCount={STUDENTS.length} studentIds={[]} progress={[]} progressAvailable={false} />
       ) : (
-        <StrandStudentsPanel yearLabel="Year 3" students={STUDENTS} progress={[]} liveRows={[]} liveEvents={[]} progressAvailable={false} />
+        <StrandStudentsPanel yearLabel="Year 3" students={STUDENTS} progress={[]} liveRows={[]} progressAvailable={false} />
       )}
     </main>
   );

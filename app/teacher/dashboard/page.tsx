@@ -6,7 +6,6 @@ import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, Clipboard
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { fetchLiveClassEvents } from "@/lib/live-class-events";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
@@ -24,7 +23,6 @@ import { formatAccuracy } from "@/lib/learning-score";
 import {
   getRealmDefinition,
   LIVE_REALM_IDS,
-  tryCanonicalRealmId,
   type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 import { getSchoolLogo } from "@/lib/school-logos";
@@ -74,14 +72,6 @@ type LiveStudentActivityRow = {
   current_lesson_status?: string | null;
   last_active_at?: string | null;
   updated_at?: string | null;
-};
-
-type LiveActivityEventRow = {
-  student_id: string;
-  class_id: string;
-  event_type: string;
-  created_at: string;
-  payload: Record<string, unknown> | null;
 };
 
 function TeacherDashboardSkeleton() {
@@ -163,12 +153,6 @@ function parseLessonAttempts(raw: unknown): Record<string, LessonAttemptRecord> 
     }
   }
   return {};
-}
-
-function isRecentIso(value: unknown, cutoffMs: number) {
-  if (typeof value !== "string" || !value) return false;
-  const time = new Date(value).getTime();
-  return Number.isFinite(time) && time >= cutoffMs;
 }
 
 function weekCompletionCount(completedIds: string[], week: number): number {
@@ -296,7 +280,7 @@ export default function TeacherDashboardPage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [progressLoadError, setProgressLoadError] = useState<string | null>(null);
   const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
-  const [liveEvents, setLiveEvents] = useState<LiveActivityEventRow[]>([]);
+  const [progressLoading, setProgressLoading] = useState(true);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "diagnostic" | "curriculum">("live");
@@ -322,6 +306,8 @@ export default function TeacherDashboardPage() {
   const mountedRef = useRef(false);
   const selectedClassRef = useRef<string | null>(null);
   const fetchingRef = useRef(false);
+  const classLoadVersionRef = useRef(0);
+  const classLoadRef = useRef<{ classId: string; version: number; promise: Promise<void> } | null>(null);
   const renderCount = useRef(0);
   renderCount.current++;
   if (process.env.NODE_ENV === "development") {
@@ -435,7 +421,7 @@ export default function TeacherDashboardPage() {
         setStudents([]);
         setProgress([]);
         setLiveRows([]);
-        setLiveEvents([]);
+        setProgressLoading(false);
       }
       setLoading(false);
     } finally {
@@ -443,104 +429,85 @@ export default function TeacherDashboardPage() {
     }
   }
 
-  async function loadClassData(classId: string, diffOnly: boolean) {
-    const selected = classes.find((c) => c.id === classId);
-    console.log(
-      "[TeacherDashboard] loadClassData() class_id:",
-      classId,
-      "code:",
-      selected?.class_code,
-      diffOnly ? "(diff)" : ""
-    );
-    try {
-      const { data: studs, error: studErr } = await supabase
-        .from("students")
-        .select("*")
-        .eq("class_id", classId)
-        .is("archived_at", null);
-      if (studErr) throw studErr;
-      const newStuds = studs ?? [];
-      console.log("[TeacherDashboard] students fetched for selectedClassId:", classId, "count:", newStuds.length);
-
-      // The roster drives the visible class shell and is useful without the
-      // heavier canonical-progress and activity history payloads.
-      if (!diffOnly) setStudents(newStuds);
-
-      let newProg: ProgressRow[] = [];
-      let newLiveRows: LiveStudentActivityRow[] = [];
-      let newLiveEvents: LiveActivityEventRow[] = [];
-      if (newStuds.length > 0) {
-        const ids = newStuds.map((s) => s.id);
-        const [
-          realmProgress,
-          { data: live, error: liveError },
-          { data: events, error: eventsError },
-        ] = await Promise.all([
-          Promise.all(
-            LIVE_REALM_IDS.map((realmId) =>
-              fetchRealmCompatProgressForClass(realmId, classId, ids),
-            ),
-          ),
-          supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId),
-          fetchLiveClassEvents(supabase, {
-            classId,
-            studentIds: ids,
-            eventTypes: [
-              "lesson_started",
-              "quiz_started",
-              "question_loaded",
-              "answer_correct",
-              "answer_incorrect",
-              "lesson_completed",
-              "quiz_completed",
-            ],
-          }),
-        ]);
-        newProg = realmProgress.flat();
-        if (liveError) {
-          console.warn("[TeacherDashboard] live student activity unavailable", liveError);
-        } else {
-          newLiveRows = (live ?? []) as LiveStudentActivityRow[];
-        }
-        if (eventsError) {
-          console.warn("[TeacherDashboard] live activity events unavailable", eventsError);
-        } else {
-          newLiveEvents = (events ?? []) as LiveActivityEventRow[];
-        }
-      }
-
-      if (diffOnly) {
-        const studJson = JSON.stringify(newStuds);
-        const progJson = JSON.stringify(newProg);
-        const liveJson = JSON.stringify(newLiveRows);
-        const eventsJson = JSON.stringify(newLiveEvents);
-        setStudents((prev) => JSON.stringify(prev) === studJson ? prev : newStuds);
-        setProgress((prev) => JSON.stringify(prev) === progJson ? prev : newProg);
-        setLiveRows((prev) => JSON.stringify(prev) === liveJson ? prev : newLiveRows);
-        setLiveEvents((prev) => JSON.stringify(prev) === eventsJson ? prev : newLiveEvents);
-      } else {
-        setProgress(newProg);
-        setLiveRows(newLiveRows);
-        setLiveEvents(newLiveEvents);
-      }
+  function loadClassData(classId: string, diffOnly: boolean): Promise<void> {
+    // Focus and polling must not multiply an in-flight class read. An explicit
+    // refresh after an edit starts a new generation, superseding older results.
+    if (diffOnly && classLoadRef.current?.classId === classId) return classLoadRef.current.promise;
+    const version = ++classLoadVersionRef.current;
+    const isCurrent = () => selectedClassRef.current === classId && classLoadVersionRef.current === version;
+    if (!diffOnly) {
+      setProgressLoading(true);
       setProgressLoadError(null);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : error && typeof error === "object" && "message" in error &&
-              typeof error.message === "string"
-            ? error.message
-            : "Canonical student progress could not be loaded.";
-      console.error("[TeacherDashboard] canonical progress load failed", error);
-      setProgressLoadError(message);
+      setProgress([]);
+      setLiveRows([]);
     }
+    const promise = (async () => {
+      try {
+        const { data: studs, error: studErr } = await supabase
+          .from("students")
+          .select("*")
+          .eq("class_id", classId)
+          .is("archived_at", null);
+        if (studErr) throw studErr;
+        if (!isCurrent()) return;
+        const newStuds = studs ?? [];
+        setStudents((previous) => JSON.stringify(previous) === JSON.stringify(newStuds) ? previous : newStuds);
+        const ids = newStuds.map((student) => student.id);
+
+        // Publish canonical results as soon as they arrive. Live status is a
+        // separate stream; the Students panel needs no activity-event history.
+        const progressTask = async () => {
+          try {
+            const realmProgress = ids.length ? await Promise.all(LIVE_REALM_IDS.map(
+              (realmId) => fetchRealmCompatProgressForClass(realmId, classId, ids),
+            )) : [];
+            if (!isCurrent()) return;
+            const rows = realmProgress.flat();
+            setProgress((previous) => JSON.stringify(previous) === JSON.stringify(rows) ? previous : rows);
+            setProgressLoadError(null);
+          } catch (error) {
+            if (isCurrent()) setProgressLoadError(error instanceof Error ? error.message : "Canonical student progress could not be loaded.");
+          } finally {
+            if (isCurrent()) setProgressLoading(false);
+          }
+        };
+        const activityTask = async () => {
+          try {
+            if (!ids.length) {
+              if (isCurrent()) setLiveRows([]);
+              return;
+            }
+            const { data, error } = await supabase.from("live_student_activity").select("*").in("student_id", ids).eq("class_id", classId);
+            if (error) throw error;
+            if (isCurrent()) {
+              const rows = (data ?? []) as LiveStudentActivityRow[];
+              setLiveRows((previous) => JSON.stringify(previous) === JSON.stringify(rows) ? previous : rows);
+            }
+          } catch (error) {
+            console.warn("[TeacherDashboard] live student activity unavailable", error);
+          }
+        };
+        await Promise.all([progressTask(), activityTask()]);
+      } catch (error) {
+        if (!isCurrent()) return;
+        const message = error && typeof error === "object" && "message" in error
+          ? String(error.message) : "Student data could not be loaded.";
+        setProgressLoadError(message);
+        setProgressLoading(false);
+      }
+    })().finally(() => {
+      if (classLoadRef.current?.version === version) classLoadRef.current = null;
+    });
+    classLoadRef.current = { classId, version, promise };
+    return promise;
   }
 
   function selectClass(classId: string) {
     const cls = classes.find(c => c.id === classId);
     console.log("[TeacherDashboard] selectedClassId:", classId, "code:", cls?.class_code);
+    selectedClassRef.current = classId;
     setSelectedClassId(classId);
+    setStudents([]);
     setActiveYear(normalizeClassCurriculumYear(cls?.year_level));
     setExpandedStudent(null);
     loadClassData(classId, false);
@@ -933,55 +900,6 @@ export default function TeacherDashboardPage() {
     return <TeacherDashboardSkeleton />;
   }
 
-  // Whole-class KPI strip — never filter by active year/strand/tab.
-  const classStudentIds = new Set(classStudents.map((student) => student.id));
-  const classProgressRows = classStudents
-    .map((student) => selectCanonicalTeacherProgressRow(student.id, analyticsRealmId, progress))
-    .filter((row): row is ProgressRow => row != null);
-  const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
-  const activeStudentsThisWeek = new Set<string>();
-
-  classProgressRows.forEach((row) => {
-    const lessonAttempts = parseLessonAttempts(row.lesson_attempts);
-    const quizScores = parseQuizScores(row.quiz_scores);
-
-    Object.values(lessonAttempts).forEach((attempt) => {
-      const attempts = Array.isArray(attempt?.attempts) ? attempt.attempts : [];
-      attempts.forEach((entry) => {
-        if (isRecentIso(entry?.completedAt, sevenDaysAgoMs)) {
-          activeStudentsThisWeek.add(row.student_id);
-        }
-      });
-      if (isRecentIso(attempt?.latestSummary?.completedAt, sevenDaysAgoMs)) {
-        activeStudentsThisWeek.add(row.student_id);
-      }
-    });
-
-    Object.values(quizScores).forEach((quiz) => {
-      if (isRecentIso(quiz?.completedAt, sevenDaysAgoMs)) {
-        activeStudentsThisWeek.add(row.student_id);
-      }
-      const attempts = Array.isArray(quiz?.attempts) ? quiz.attempts : [];
-      attempts.forEach((attempt) => {
-        if (attempt && typeof attempt === "object" && isRecentIso((attempt as Record<string, unknown>).completedAt, sevenDaysAgoMs)) {
-          activeStudentsThisWeek.add(row.student_id);
-        }
-      });
-    });
-
-    if (isRecentIso(row.updated_at, sevenDaysAgoMs)) {
-      activeStudentsThisWeek.add(row.student_id);
-    }
-  });
-
-  liveEvents.forEach((event) => {
-    const strand = typeof event.payload?.strand === "string" ? event.payload.strand : null;
-    const eventRealm = tryCanonicalRealmId(strand);
-    if (eventRealm === analyticsRealmId && classStudentIds.has(event.student_id) && isRecentIso(event.created_at, sevenDaysAgoMs)) {
-      activeStudentsThisWeek.add(event.student_id);
-    }
-  });
-
   const isDev = process.env.NODE_ENV !== "production";
 
   async function openSchoolPreview(destinationSchoolId?: string | null) {
@@ -1321,6 +1239,7 @@ export default function TeacherDashboardPage() {
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
             {activeTab === "live" ? (
               <LiveClassPanel
+                key={selectedClass?.id ?? "none"}
                 selectedClass={selectedClass ?? null}
                 students={classStudents as any}
                 progressRows={progress}
@@ -1331,7 +1250,7 @@ export default function TeacherDashboardPage() {
                 studentCount={classStudents.length}
                 studentIds={classStudents.map((student) => student.id)}
                 progress={progress as any}
-                progressAvailable={!progressLoadError}
+                progressAvailable={!progressLoading && !progressLoadError}
               />
             ) : activeTab === "diagnostic" ? (
               <WholeMathsDiagnosticPanel
@@ -1346,10 +1265,10 @@ export default function TeacherDashboardPage() {
                 students={classStudents as any}
                 progress={progress as any}
                 liveRows={liveRows as any}
-                liveEvents={liveEvents as any}
+                progressLoading={progressLoading}
                 onRealmChange={setAnalyticsRealmId}
                 onProgressChanged={() => selectedClassId ? loadClassData(selectedClassId, false) : undefined}
-                progressAvailable={!progressLoadError}
+                progressAvailable={!progressLoading && !progressLoadError}
                 report={{ className: selectedClass?.name ?? null, schoolName, schoolLogo }}
               />
             )}

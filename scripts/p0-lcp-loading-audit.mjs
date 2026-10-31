@@ -8,7 +8,7 @@ const schoolClient = read("components/school/SchoolHomeClient.tsx");
 const studentHome = read("app/home/page.tsx");
 
 assert.match(teacher, /function TeacherDashboardSkeleton/);
-assert.match(teacher, /if \(!diffOnly\) setStudents\(newStuds\)/);
+assert.match(teacher, /setStudents\(\(previous\) => JSON\.stringify\(previous\) === JSON\.stringify\(newStuds\) \? previous : newStuds\)/);
 assert.match(teacher, /return <TeacherDashboardSkeleton \/>/);
 
 const initialSchoolLoader = schoolServer.slice(

@@ -6,7 +6,7 @@ const groups = {
   critical: [
     'qa:screen-recording-safety', 'qa:student-session-isolation',
     'qa:student-diagnostic-permissions', 'qa:realm-release-gate',
-    'qa:canonical-progression', 'qa:teacher-canonical-snapshot',
+    'qa:canonical-progression', 'qa:teacher-canonical-snapshot', 'qa:teacher-dashboard-loading',
     'qa:live-maths-progression', 'qa:completion-rewards',
     'qa:activity-marking', 'qa:quiz-math-integrity', 'qa:lint-interactions',
     'qa:assessment-question-results', 'qa:world-startup-performance', 'qa:live-class-refresh', 'qa:staging-config', 'qa:live-class-event-read',
