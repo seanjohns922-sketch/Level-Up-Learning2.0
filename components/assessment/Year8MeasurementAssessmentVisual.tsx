@@ -68,10 +68,28 @@ function MapRoute({v}:{v:Measurement8Visual}){
  <p className="text-center text-base font-bold">{two?'A — School → B — Library → C — Park':'A — School → B — Library'}</p>
  </div>;
 }
+/** Simple labelled plans for worded perimeter and area questions. They show only what the question states. */
+function ShapePlan({v}:{v:Measurement8Visual}){
+ const n=v.values,u=v.unit??'cm',box=(a:number,b:number)=>{const s=Math.min(320/a,190/b),w=a*s,h=b*s;return{s,w,h,x:(560-w)/2,y:(330-h)/2};};
+ const tick=(x1:number,y1:number,x2:number,y2:number)=>{const mx=(x1+x2)/2,my=(y1+y2)/2,d=Math.hypot(x2-x1,y2-y1),px=-(y2-y1)/d*9,py=(x2-x1)/d*9;return <path d={`M${mx-px} ${my-py}L${mx+px} ${my+py}`} stroke={ink} strokeWidth="3"/>;};
+ switch(v.variant){
+ case 'fence':{const[l,w,g]=n,b=box(l,w),gap=g?Math.max(g*b.s,34):0,gx=b.x+b.w/2-gap/2,post=b.y+b.h;return <Frame><rect x={b.x} y={b.y} width={b.w} height={b.h} fill="#d6e8bd"/><path d={g?`M${gx} ${post}H${b.x}V${b.y}H${b.x+b.w}V${post}H${gx+gap}`:`M${b.x} ${b.y}H${b.x+b.w}V${post}H${b.x}Z`} fill="none" stroke="#8a5a2b" strokeWidth="6"/>{g?<path d={`M${gx} ${post}L${gx+gap*.8} ${post+22}`} stroke={ink} strokeWidth="4"/>:null}{txt(280,b.y-14,`${l} ${u}`)}{txt(b.x+b.w+14,b.y+b.h/2+7,`${w} ${u}`,'start')}{g?txt(280,post+46,`gate ${g} ${u}`):null}</Frame>;}
+ case 'surround':{const[l,w,f]=n,b=box(l+2*f,w+2*f),band=Math.max(f*b.s,18);return <Frame><rect x={b.x} y={b.y} width={b.w} height={b.h} fill={fill} stroke={line} strokeWidth="3"/><rect x={b.x+band} y={b.y+band} width={b.w-2*band} height={b.h-2*band} fill="#fffaf0" stroke={line} strokeWidth="3"/>{txt(280,b.y+band+28,`${l} ${u}`)}{txt(280,b.y+b.h/2+14,v.edgeLabels?.[0]??'')}{txt(b.x+b.w-band-10,b.y+b.h/2+7,`${w} ${u}`,'end')}<path d={`M${b.x-4} ${b.y+b.h/2}h${band+8}`} stroke={ink} strokeWidth="2"/>{txt(b.x-12,b.y+b.h/2+7,`${f} ${u}`,'end')}</Frame>;}
+ case 'wordRect':return <Frame><rect x="130" y="85" width="300" height="150" fill="#d6e8bd" stroke="#58763c" strokeWidth="3"/>{txt(280,70,'length')}{txt(442,167,'width','start')}</Frame>;
+ case 'isosceles':{const L=130,R=430,B=280,T=60;return <Frame><path d={`M${L} ${B}H${R}L280 ${T}Z`} fill={fill} stroke={line} strokeWidth="3"/>{tick(L,B,280,T)}{tick(R,B,280,T)}{txt(280,B+30,`${n[0]} ${u}`)}{txt(190,160,'?','end')}{txt(370,160,'?','start')}</Frame>;}
+ case 'trapezium':{const[a,b]=n,s=340/b,bw=b*s,aw=a*s,L=110,B=255,T=85,tl=L+(bw-aw)/2;return <Frame><path d={`M${L} ${B}H${L+bw}L${tl+aw} ${T}H${tl}Z`} fill={fill} stroke={line} strokeWidth="3"/>{tick(L,B,tl,T)}{tick(L+bw,B,tl+aw,T)}{txt(280,T-14,`${a} ${u}`)}{txt(280,B+30,`${b} ${u}`)}{txt(L+(tl-L)/2-14,(B+T)/2+7,'?','end')}{txt(L+bw-(tl-L)/2+14,(B+T)/2+7,'?','start')}</Frame>;}
+ case 'joined':{const sides=n[0],side=120,bx=340,by=115;// shared side runs from (bx,by) to (bx,by+side); the triangle sits to its right
+  const pts:[number,number][]=[[bx,by+side],[bx,by]];let a=-Math.PI/2;for(let i=2;i<sides;i++){a-=2*Math.PI/sides;const[px,py]=pts[i-1];pts.push([px+side*Math.cos(a),py+side*Math.sin(a)]);}
+  const apex:[number,number]=[bx+side*Math.sqrt(3)/2,by+side/2],outer=[pts[1],...pts.slice(2),pts[0],apex,pts[1]];
+  return <Frame><polygon points={pts.map(p=>p.join(',')).join(' ')} fill={fill}/><polygon points={`${bx},${by} ${apex.join(',')} ${bx},${by+side}`} fill="#d6e8bd"/><path d={`M${outer.map(p=>p.join(' ')).join('L')}Z`} fill="none" stroke={line} strokeWidth="3"/><path d={`M${bx} ${by}V${by+side}`} stroke={ink} strokeWidth="2" strokeDasharray="7 6"/>{outer.slice(0,-1).map((p,i)=><g key={i}>{tick(p[0],p[1],outer[i+1][0],outer[i+1][1])}</g>)}{txt(apex[0]+14,by+side/2-34,'?','start')}</Frame>;}
+ default:return null;
+ }
+}
 export function measurement8Speech(v:Measurement8Visual){
  const n=v.values,u=v.unit??'';let detail='';
  if(v.task==='composite'){const[w,h,cw,ch]=n;detail=v.variant==='notch'?`Outer width ${w} metres. Outer height ${h} metres on each side. Each short outer arm is ${(w-cw)/2} metres. Notch width ${cw} metres. Each inward vertical edge is ${ch} metres.`:`Six boundary edges in order: ${lPlanLabels(n,v.edgeLabels).join(', ')}.`;}
  if(v.task==='packing')detail=`Shipping carton, internal length ${n[0]}, width ${n[1]}, height ${n[2]} centimetres. One tissue box, external length ${n[3]}, width ${n[4]}, height ${n[5]} centimetres.`;
+ if(v.task==='plan'){const name=v.edgeLabels?.[0]??'Inside shape';detail=v.variant==='fence'?`Rectangle ${n[0]} ${u} by ${n[1]} ${u}.${n[2]?` A ${n[2]} ${u} gap in the fence is the gate.`:' The fence goes all the way around.'}`:v.variant==='surround'?`${name} ${n[0]} ${u} by ${n[1]} ${u}, with a strip ${n[2]} ${u} wide all the way around it.`:v.variant==='wordRect'?'A rectangle with its length and width marked.':v.variant==='isosceles'?`Base ${n[0]} ${u}. The two equal sides are marked and their length is unknown.`:v.variant==='trapezium'?`Parallel sides ${n[0]} ${u} and ${n[1]} ${u}. The two slanted sides are equal and unknown.`:'The shared side is dashed and is inside the shape. All the outside sides are marked as equal.';}
  if(v.task==='house')detail=`Base width ${n[0]} metres. Rectangular wall height ${n[1]} metres. Gable perpendicular height ${n[2]} metres.`;
  if(v.task==='prism')detail=v.variant==='triangular'?`Triangular end base ${n[0]} ${u}, perpendicular height ${n[1]} ${u}. Prism length ${n[2]} ${u}.`:`Length ${n[0]} ${u}. Width ${n[1]} ${u}. Height ${n[2]} ${u}.`;
  if(v.task==='rightTriangle')detail=`Horizontal side ${n[0]} ${u}. Vertical side ${v.unknown==='height'?'x':n[1]} ${u}. Hypotenuse ${v.unknown==='hypotenuse'?'x':n[2]} ${u}. The square marks the right angle.`;
@@ -84,6 +102,7 @@ export default function Year8MeasurementAssessmentVisual({visual:v}:{visual:Meas
  const n=v.values;let content:ReactNode;
  switch(v.task){
  case 'composite':content=v.variant==='notch'?<NotchedPlan n={n}/>:<LPlan n={n} labels={v.edgeLabels}/>;break;
+ case 'plan':content=<ShapePlan v={v}/>;break;
  case 'packing':content=<PackingScene n={n}/>;break;
  case 'house':content=<House n={n}/>;break;
  case 'prism':content=v.variant==='triangular'?<TriPrism n={n} unit={v.unit??'cm'}/>:<RectPrism dims={n} unit={v.unit??'cm'}/>;break;
