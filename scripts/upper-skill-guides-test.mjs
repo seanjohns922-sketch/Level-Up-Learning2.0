@@ -23,7 +23,9 @@ for(const [realm,weeks] of Object.entries(LEVEL8_TEACHING)){
  for(let w=1;w<=weeks.length;w++)for(let l=1;l<=3;l++){
   const g=level8TeachingGuide(realm,w,l);
   if(g.example===weeks[w-1][l-1].example){
-   for(const key of ['cave7Visual','measurement8Visual','number8Visual','algebra8Visual','chance8Visual','space8Visual','answerSpec'])assert(!(key in g.example),'Replacement example must not inherit unrelated visual or answer metadata');
+   // Measurement Week 1 draws its L-shaped plans from the example's own numbers (checked below).
+   const ownPlan=realm==='measurement'&&w===1;
+   for(const key of ['cave7Visual','measurement8Visual','number8Visual','algebra8Visual','chance8Visual','space8Visual','answerSpec'])if(!(ownPlan&&key==='measurement8Visual'))assert(!(key in g.example),'Replacement example must not inherit unrelated visual or answer metadata');
   }
  }
 }
@@ -55,6 +57,17 @@ for(let seed=0;seed<1000;seed++){
  systematicCases++;
 }
 assert(systematicCases>100,'Exercise the repaired systematic-sampling variant');
+// L-shaped plans must draw the same garden their example describes.
+const plan=lesson=>level8TeachingGuide('measurement',1,lesson).example;
+assert.deepEqual(plan(1).measurement8Visual.values,[12,8,Number.parseInt(plan(1).answer),3]);
+assert.deepEqual(plan(1).measurement8Visual.edgeLabels,['7 m','3 m','x',plan(1).answer,'12 m','8 m']);
+assert.equal(7+Number.parseInt(plan(1).answer),12);
+for(const lesson of [2,3]){
+ assert.deepEqual(plan(lesson).measurement8Visual.values,[12,8,7,3]);
+ assert(plan(lesson).prompt.includes('12 m by 8 m')&&plan(lesson).prompt.includes('7 m by 3 m'));
+}
+assert.equal(Number.parseInt(plan(2).answer),2*(12+8));
+assert.equal(Number.parseInt(plan(3).answer),12*8-7*3);
 // These generated examples changed during the Level 8 content audit. Check
 // the authored working as well as the question signature: re-pinning a question
 // must not silently retain the previous example's calculation or table labels.
