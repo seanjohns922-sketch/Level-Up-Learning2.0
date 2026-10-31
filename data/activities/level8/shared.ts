@@ -2,7 +2,7 @@ import type { MultipleChoiceQuestion } from "@/data/activities/year2/lessonEngin
 import type { Cave7Visual } from "@/data/activities/cave7/shared";
 import type { Level7Answer } from "@/lib/level7-answer";
 import type { Level8Realm } from "@/lib/level8-config";
-export const LEVEL8_CONTENT_REVISION = 2;
+export const LEVEL8_CONTENT_REVISION = 3;
 
 export type QuestionDraft = {
   prompt: string;

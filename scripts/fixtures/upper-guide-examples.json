@@ -157,19 +157,19 @@
   },
   "8/measurement/2/1": {
     "title": "Estimate area using a grid",
-    "signature": "d608a212e235d5ad7ec39c7abdfe0e400f1e0e2f2470a63e5bc25455ea07d570"
+    "signature": "20641ca84a29844587eaad6c5c0bd07d81c1f2fed18572029dacd22017dac258"
   },
   "8/measurement/2/2": {
     "title": "Improve an irregular-area estimate",
-    "signature": "0635cb8d09979f791f5c880d1f08b643ca4b6f9f9e696b48346d815849df4f10"
+    "signature": "ebbc76d29110899d4dfd215984fde3249f6ba31fb62b335202779b8015d56154"
   },
   "8/measurement/2/3": {
     "title": "Choose perimeter or area for a practical task",
-    "signature": "3345b9bbacc87d0edf4763daef9375fc749928fd736088e7a2e752e1ac45e488"
+    "signature": "3c99822ade0778b823d45e5e0c1b9b345019b3030623056f466d48e7b180d9d7"
   },
   "8/measurement/3/1": {
     "title": "Connect cubic units with litres",
-    "signature": "5054887cbeaa4ff4a63098be1275b2b27799e62d83c9f8330f91a6a8c829cf1a"
+    "signature": "04a2044facdd1b1d0d62a8769902a5992258cd7d63b0ac118d67b826d4961046"
   },
   "8/measurement/3/2": {
     "title": "Calculate the volume of a right prism",
@@ -177,83 +177,83 @@
   },
   "8/measurement/3/3": {
     "title": "Find capacity and compare containers",
-    "signature": "5f16b1a59b2b04133a39909a59f38180c2688a1fc742f1594caa352eb03b5ca8"
+    "signature": "da126ee5a12d45179714679f8ab7ecdc3df1bb896d99b379052be5ace7808095"
   },
   "8/measurement/4/1": {
     "title": "Find a missing prism dimension",
-    "signature": "37d4635a5b9e7a48e10c2ddf16f91e54c30e02d7bc63812c797ca1c03faad777"
+    "signature": "709b8e5555305f347ed37a7d731e08a73fbf0ea666c5b8121abfea90fab045cc"
   },
   "8/measurement/4/2": {
     "title": "Work out how many boxes fit",
-    "signature": "3fdf2326f51eda178530c5ad02f82dc0e491c5ee5ca6d70ec633341e8d3c97cd"
+    "signature": "935c4efbe9c88886c95568cf792a0f0d4086e9d7f0b4085f6d2ed9f5dd8db1f1"
   },
   "8/measurement/4/3": {
     "title": "Model filling a tank",
-    "signature": "47cf0bd04352c1e8b4432910added1b7ccee5ed8cc0b206cc708de2e854af89e"
+    "signature": "e8817cbd2395a07cb47dcf3f0c718a6fe387e1d81d55f193d63cd8f868e42b45"
   },
   "8/measurement/5/1": {
     "title": "Connect radius and diameter",
-    "signature": "caec175b8bd3e45251467595e3a47a0536f2289e0a8cdbc477785face7dbb295"
+    "signature": "545abb4f452e00bc030d608d45a2424a53240d077d9482c304d813125fc339c2"
   },
   "8/measurement/5/2": {
     "title": "Calculate circumference",
-    "signature": "b28a412639d06aba5926b8521522f4353397ed1c109e9cca5271ca67de89bde3"
+    "signature": "b26f3ef4f71e33a9d9f48b000f528fcb396c1a796977a8cc940a92519292bc64"
   },
   "8/measurement/5/3": {
     "title": "Calculate the area of a circle",
-    "signature": "adb0b5cabb2b896a08ae2d7334412d35bdb6cd96fdc27bd639e2e9561094a504"
+    "signature": "e84b6f254a70c88f071a3c9579d0ef8a79f7655f9dfb0e95e39ec420878f56ff"
   },
   "8/measurement/6/1": {
     "title": "Find a radius from area or circumference",
-    "signature": "cfe6520e770ced950c4a7fb942204b4e3b8ef3c1e2c48ba5f23b084e735989fb"
+    "signature": "3d0483c3275c437eb5563d181bbf8a1672a9d6385aa83006101707d10d2435ba"
   },
   "8/measurement/6/2": {
     "title": "Measure semicircles and rings",
-    "signature": "c6ff33ed9c6e653ae37e38a0b31bd165fd3bcaddbf9e10529e46bda0169ddf00"
+    "signature": "36704dbe60b4327964ab1efdeca77f0d9d849ca47476c48ded3138cd0280d2e8"
   },
   "8/measurement/6/3": {
     "title": "Choose a formula for a circular design",
-    "signature": "6d1c7c4b6bbd3b859657c7722146d4fd9bf50b8653323d46ee9c56c15d5ce1c9"
+    "signature": "7f81ad0a7f5618afd3b8803844105f39d723fb7d669c4138f0ba33ab433faf85"
   },
   "8/measurement/7/1": {
     "title": "Identify the hypotenuse",
-    "signature": "8eb33986f4fdc9332160ec4acf594a671b499bc7abef5d5ca729883a819b3288"
+    "signature": "5c1bd5343ce9a16d08859eb20381739b72b12aa8e857ad258804d60b3a1b5381"
   },
   "8/measurement/7/2": {
     "title": "Explain the squares on a right triangle",
-    "signature": "fe6e011bb543a43fc018c0022ec3f65aad5f3c571b5cfca21db1e8001225e804"
+    "signature": "9acdefdb7dd1a70626aa8bff4e3436ccd996c9a4d9bda0ac8b36c79c027da626"
   },
   "8/measurement/7/3": {
     "title": "Calculate the hypotenuse",
-    "signature": "4d90ffd9947286e9e5e4e6399914e1568f02beac66845a259567171d73fedbc2"
+    "signature": "dab1842cd287e195ad9d4ec334f15cffa555d7f48942c0a0d17a18acee211e4b"
   },
   "8/measurement/8/1": {
     "title": "Find a shorter side",
-    "signature": "303e09875b930523d7822ea0c109d7f72d5d7e696684a196e6233e768e042070"
+    "signature": "2fd712497e487faef1fda2c746f713c8821244aef53ec0efd8e1e0165e72f7a0"
   },
   "8/measurement/8/2": {
     "title": "Calculate a ladder length or diagonal",
-    "signature": "bdc1c9bf069595b49719c1b7d5c7b074ce74ee6a44fc14affc61a5716c81b9e7"
+    "signature": "f9e60a832d983e8da4742fb3f0a7ab238d27397b9f7502318f9b3a02db1aea1e"
   },
   "8/measurement/8/3": {
     "title": "Recognise and check Pythagorean triples",
-    "signature": "e6d6110c113f194074007bd84fd0ac4b9c7bd16e162219d3112ec11178caea34"
+    "signature": "5ee6b871564a97e130a4767d93f885e8155828a14c53617fe9f8fdb11ad64c3c"
   },
   "8/measurement/9/1": {
     "title": "Convert times using supplied UTC offsets",
-    "signature": "c0a5928d39820a11d3fe6eca370f8d1f1f7abc39ef87b28a3ea86f0843232b49"
+    "signature": "38ca93a3e0a80a2e32d8a0680255362c290347f87e96fdd6f3c52fa42d3729d5"
   },
   "8/measurement/9/2": {
     "title": "Calculate travel time across zones",
-    "signature": "17f1a614bc19d87dff2207c378c8e61d615646976dc27aacb6bcd0f29618cc4f"
+    "signature": "21a55a92011885619c3286468de2e06435d79bec175f400a4b391050e40d7670"
   },
   "8/measurement/9/3": {
     "title": "Plan a meeting across dates and time zones",
-    "signature": "a23f050ee3ce9df9cb9ac1223f552ccbf3f2ae233e9ab270c59280279dadbda0"
+    "signature": "af67a74cb16ca65f8c7808e06cd5e88850117b7ebec144caaec91238151bb600"
   },
   "8/measurement/10/1": {
     "title": "Read a rate and its units",
-    "signature": "a54ab28f13821c114bf360ee59e6b5dc13e2d8cd877cd5691439d6a9e5aa1ac4"
+    "signature": "d8d50369a6c6cfa69e86a224108780bf370fcdd4422a48c0f2e7e5684b827926"
   },
   "8/measurement/10/2": {
     "title": "Calculate speed, distance and time",
@@ -261,7 +261,7 @@
   },
   "8/measurement/10/3": {
     "title": "Compare flow and consumption rates",
-    "signature": "e5ab6539c43f3f2c18c373681f98e64c07d945779e7c399377f8a140b77da0e1"
+    "signature": "3c7f5c7f7d4b1e79e116a23742be6f1bdae7a3da05b09dbe6c153388ad7d585b"
   },
   "8/measurement/11/1": {
     "title": "Use a map scale",
@@ -269,11 +269,11 @@
   },
   "8/measurement/11/2": {
     "title": "Scale a mixture or material plan",
-    "signature": "2f33db3ee2ab9be1dccf6388b0cae6349781a60783d072d62b8f2334de643fd4"
+    "signature": "9dd822de645af0b1425b1ef7190b4e6acafc9544d7c06740b1c6eb945c32e195"
   },
   "8/measurement/11/3": {
     "title": "Build and check a ratio or rate model",
-    "signature": "319d23b4d10a54148bc8c69e698f266a89e2a1d37ae3c93f014b87b87bf2bb7a"
+    "signature": "7a94e288add8f21696a9c3b098edcfda847ae923fc208acf83a97989f19b35cc"
   },
   "8/measurement/12/1": {
     "title": "Plan a shape or container design",
@@ -281,7 +281,7 @@
   },
   "8/measurement/12/2": {
     "title": "Combine duration and rate calculations",
-    "signature": "20fe1f834146d9af2dc0c80afc20d242bedce0e906a5a696812e1eaeb3f4a292"
+    "signature": "403500d736ba00275dbb5c65b25ccda45af24d7714915651aab2b1b7f7371b10"
   },
   "8/measurement/12/3": {
     "title": "Review a practical measurement model",

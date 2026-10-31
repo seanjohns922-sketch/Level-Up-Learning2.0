@@ -209,3 +209,6 @@ assert.equal(picturedMeal.answer, "12");
 assert(markLevel7Answer(level7Answer(picturedMeal), "12"));
 assert(!markLevel7Answer(level7Answer(picturedMeal), "13.2"));
 console.log("PASS: all five GST variants state 10%; inclusive-tax working and the $132 → $12 marking regression checked.");
+
+// Cover every Measurement form, not just whichever variant the lesson seed picks.
+await import("./measurement8-visuals-test.mjs");

@@ -23,8 +23,9 @@ for(const [realm,weeks] of Object.entries(LEVEL8_TEACHING)){
  for(let w=1;w<=weeks.length;w++)for(let l=1;l<=3;l++){
   const g=level8TeachingGuide(realm,w,l);
   if(g.example===weeks[w-1][l-1].example){
-   // Measurement Week 1 draws its L-shaped plans from the example's own numbers (checked below).
-   const ownPlan=realm==='measurement'&&w===1;
+   // Fixed Measurement diagrams are authored from their own example facts; the
+   // visual audit checks all 36 guides and pins these properties in the fixture.
+   const ownPlan=realm==='measurement' && (w===1 || new Set(['2/1','4/2','5/1','6/2','9/2','12/2']).has(`${w}/${l}`));
    for(const key of ['cave7Visual','measurement8Visual','number8Visual','algebra8Visual','chance8Visual','space8Visual','answerSpec'])if(!(ownPlan&&key==='measurement8Visual'))assert(!(key in g.example),'Replacement example must not inherit unrelated visual or answer metadata');
   }
  }

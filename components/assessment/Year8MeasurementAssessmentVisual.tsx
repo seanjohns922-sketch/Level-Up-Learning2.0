@@ -1,4 +1,5 @@
 "use client";
+import MeasurementDiagram, {measurementLessonDescription} from "@/components/lesson/level8/MeasurementDiagram";
 import {Children,cloneElement,createContext,isValidElement,useContext,type ReactNode,type ReactElement} from 'react';
 import {CityScene,WaterFlow,PackingScene} from './Measurement8ContextScenes';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
@@ -87,6 +88,7 @@ function ShapePlan({v}:{v:Measurement8Visual}){
 }
 export function measurement8Speech(v:Measurement8Visual){
  const n=v.values,u=v.unit??'';let detail='';
+ if(v.task==='lesson')detail=measurementLessonDescription(v);
  if(v.task==='composite'){const[w,h,cw,ch]=n;detail=v.variant==='notch'?`Outer width ${w} metres. Outer height ${h} metres on each side. Each short outer arm is ${(w-cw)/2} metres. Notch width ${cw} metres. Each inward vertical edge is ${ch} metres.`:`Six boundary edges in order: ${lPlanLabels(n,v.edgeLabels).join(', ')}.`;}
  if(v.task==='packing')detail=`Shipping carton, internal length ${n[0]}, width ${n[1]}, height ${n[2]} centimetres. One tissue box, external length ${n[3]}, width ${n[4]}, height ${n[5]} centimetres.`;
  if(v.task==='plan'){const name=v.edgeLabels?.[0]??'Inside shape';detail=v.variant==='fence'?`Rectangle ${n[0]} ${u} by ${n[1]} ${u}.${n[2]?` A ${n[2]} ${u} gap in the fence is the gate.`:' The fence goes all the way around.'}`:v.variant==='surround'?`${name} ${n[0]} ${u} by ${n[1]} ${u}, with a strip ${n[2]} ${u} wide all the way around it.`:v.variant==='wordRect'?'A rectangle with its length and width marked.':v.variant==='isosceles'?`Base ${n[0]} ${u}. The two equal sides are marked and their length is unknown.`:v.variant==='trapezium'?`Parallel sides ${n[0]} ${u} and ${n[1]} ${u}. The two slanted sides are equal and unknown.`:'The shared side is dashed and is inside the shape. All the outside sides are marked as equal.';}
@@ -101,11 +103,12 @@ export function measurement8Speech(v:Measurement8Visual){
 export default function Year8MeasurementAssessmentVisual({visual:v}:{visual:Measurement8Visual}){
  const n=v.values;let content:ReactNode;
  switch(v.task){
+ case 'lesson':content=<MeasurementDiagram visual={v}/>;break;
  case 'composite':content=v.variant==='notch'?<NotchedPlan n={n}/>:<LPlan n={n} labels={v.edgeLabels}/>;break;
  case 'plan':content=<ShapePlan v={v}/>;break;
  case 'packing':content=<PackingScene n={n}/>;break;
  case 'house':content=<House n={n}/>;break;
- case 'prism':content=v.variant==='triangular'?<TriPrism n={n} unit={v.unit??'cm'}/>:<RectPrism dims={n} unit={v.unit??'cm'}/>;break;
+ case 'prism':content=v.variant==='triangular'?<TriPrism n={n} unit={v.unit??'cm'}/>:<RectPrism dims={n} unit={v.unit??'cm'} normalise/>;break;
  case 'circle':content=<Circle v={v}/>;break;
  case 'rightTriangle':content=<RightTriangle v={v}/>;break;
  case 'diagonal':{const s=Math.min(320/n[0],210/n[1]),x=110,y=45,w=n[0]*s,h=n[1]*s;content=<Frame><rect x={x} y={y} width={w} height={h} fill={fill} stroke={line} strokeWidth="3"/><path d={`M${x} ${y+h}L${x+w} ${y}`} stroke={ink} strokeWidth="3" strokeDasharray="7 5"/>{txt(x+w/2,y+h+30,`${n[0]} m`)}{txt(x+w+18,y+h/2,`${n[1]} m`,'start')}{txt(x+w/2+20,y+h/2+25,'x')}</Frame>;break;}

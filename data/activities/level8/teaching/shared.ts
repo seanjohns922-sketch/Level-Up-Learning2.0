@@ -5,8 +5,8 @@ export type TeachingGuide = {
   example?: { prompt: string; answer: string; measurement8Visual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual };
 };
 // These are authored teaching examples, not assessment questions. A replacement
-// example deliberately has no generated diagram: its quantities must not be
-// paired with a diagram belonging to the old seeded assessment question.
+// example has no inherited diagram: an explicitly authored diagram must use its
+// own quantities, never those of the old seeded assessment question.
 export function g(idea: string, working: string, check: string, prompt?: string, answer?: string): TeachingGuide {
   if ((prompt === undefined) !== (answer === undefined)) throw new Error('Incomplete teaching example');
   return { idea, steps: working.split('|'), check, ...(prompt === undefined ? {} : { example: { prompt, answer: answer! } }) };

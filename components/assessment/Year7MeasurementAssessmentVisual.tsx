@@ -11,14 +11,15 @@ function Area({b,h,unit,parallel=false,unknown=false}:{b:number;h:number;unit:st
  const scale=Math.min(320/b,220/h),w=b*scale,height=h*scale,left=(640-w)/2-25,bottom=305,top=bottom-height,shift=65;
  return <Frame viewBox={`${left-12} ${top-18} ${w+185} ${height+72}`}><path d={parallel?`M${left} ${bottom}h${w}l${shift} ${-height}h${-w}Z`:`M${left} ${bottom}h${w}L${left+w*.35} ${top}Z`} fill={fill} stroke={purple} strokeWidth="4"/><path d={`M${left+(parallel?shift:w*.35)} ${top}V${bottom}`} stroke={edge} strokeWidth="2.5" strokeDasharray="7 5"/><path d={`M${left+(parallel?shift:w*.35)} ${bottom-16}h16v16`} fill="none" stroke={edge} strokeWidth="2"/>{text(left+w/2,bottom+38,`${b} ${unit}`)}<path d={`M${left+w+shift+25} ${top}h10m-5 0V${bottom}m-5 0h10`} fill="none" stroke={edge}/>{text(left+w+shift+40,(top+bottom)/2,`${unknown?'?':h} ${unit}`,'start')}</Frame>;
 }
-export function RectPrism({dims,unit,unknown=false}:{dims:number[];unit:string;unknown?:boolean}){
- const [l,w,h]=dims;
+export function RectPrism({dims,unit,unknown=false,normalise=false}:{dims:number[];unit:string;unknown?:boolean;normalise?:boolean}){
+ const factor=normalise?10/Math.max(...dims.slice(0,3)):1;
+ const [l,w,h]=dims.map(value=>value*factor);
  // Reuse the lesson volume engine's isometric projection and bounds, without unit-cube counting.
  const {ox,oy,VW,VH}=volumeViewBox({l,w,h});
  const p=(x:number,y:number,z:number)=>[ox+(x-y)*20,oy+(x+y)*10-z*22];
  const polygon=(points:number[][],colour:string)=><polygon points={points.map(v=>v.join(',')).join(' ')} fill={colour} stroke={edge} strokeWidth="2"/>;
  const font=Math.max(25,(VW+145)/22),A=p(0,w,0),B=p(l,w,0),C=p(l,0,0),D=p(l,0,h);
- return <svg viewBox={`-65 -35 ${VW+145} ${VH+115}`} aria-hidden="true" style={{width:'100%',maxWidth:590,maxHeight:340,display:'block',margin:'auto'}}>{polygon([p(0,0,h),p(l,0,h),p(l,w,h),p(0,w,h)],'#f1dfb3')}{polygon([p(0,w,0),p(l,w,0),p(l,w,h),p(0,w,h)],'#cba8df')}{polygon([p(l,0,0),p(l,w,0),p(l,w,h),p(l,0,h)],'#aa7bc2')}<g fill={ink} fontSize={font} fontWeight="700"><text x={(A[0]+B[0])/2-15} y={(A[1]+B[1])/2+font+12} textAnchor="middle">{unknown?'?':l} {unit}</text><text x={(B[0]+C[0])/2+25} y={(B[1]+C[1])/2+font+12} textAnchor="middle">{w} {unit}</text><text x={C[0]+17} y={(C[1]+D[1])/2}>{h} {unit}</text></g></svg>;
+ return <svg viewBox={`-65 -35 ${VW+145} ${VH+115}`} aria-hidden="true" style={{width:'100%',maxWidth:590,maxHeight:340,display:'block',margin:'auto'}}>{polygon([p(0,0,h),p(l,0,h),p(l,w,h),p(0,w,h)],'#f1dfb3')}{polygon([p(0,w,0),p(l,w,0),p(l,w,h),p(0,w,h)],'#cba8df')}{polygon([p(l,0,0),p(l,w,0),p(l,w,h),p(l,0,h)],'#aa7bc2')}<g fill={ink} fontSize={font} fontWeight="700"><text x={(A[0]+B[0])/2-15} y={(A[1]+B[1])/2+font+12} textAnchor="middle">{unknown?'?':dims[0]} {unit}</text><text x={(B[0]+C[0])/2+25} y={(B[1]+C[1])/2+font+12} textAnchor="middle">{dims[1]} {unit}</text><text x={C[0]+17} y={(C[1]+D[1])/2}>{dims[2]} {unit}</text></g></svg>;
 }
 export function TriPrism({n,unit}:{n:number[];unit:string}){
  const [b,h,d]=n,scale=Math.min(210/b,200/h),w=b*scale,height=h*scale,x=125,y=310,dx=d*scale*.65,dy=-d*scale*.32;
