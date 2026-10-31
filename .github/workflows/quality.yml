@@ -71,5 +71,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # npm automatically runs the existing complete prebuild release suite.
+      # Match Vercel for both prebuild QA and Next compilation. Keep npm ci
+      # outside production mode so the QA development dependencies are installed.
       - run: npm run build
+        env:
+          NODE_ENV: production

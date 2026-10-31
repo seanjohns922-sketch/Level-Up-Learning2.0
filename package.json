@@ -290,7 +290,7 @@
     "voice:crawl": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/voice/crawl-fixed-text.mjs",
     "voice:upload": "node --no-warnings scripts/voice/upload-clips.mjs",
     "voice:clips": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/voice/generate-clips.mjs",
-    "qa:level8-lessons": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-lessons-test.mjs",
+    "qa:level8-lessons": "NODE_ENV=test node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-lessons-test.mjs",
     "qa:lesson-start-guides": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/lower-lesson-guides-test.mjs",
     "qa:activity-marking": "node scripts/activity-marking-test.mjs",
     "qa:g6-question-integrity": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/g6-question-integrity-test.mjs",
