@@ -26,7 +26,7 @@ export type Chance8Visual =
 
 export function gridCell(v: Extract<Chance8Visual, { kind: "grid" }>, r: number, c: number): string {
   const a = v.rows[r], b = v.cols[c], x = Number(a), y = Number(b);
-  if (v.cell === "pair") return Number.isNaN(x) || Number.isNaN(y) ? `${a}${b}` : `${a},${b}`;
+  if (v.cell === "pair") return `${a}, ${b}`;
   if (v.cell === "sum") return String(x + y);
   if (v.cell === "difference") return String(Math.abs(x - y));
   return String(x * y);

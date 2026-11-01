@@ -100,7 +100,7 @@ function BranchTree({v}:{v:V<"branchTree">}) {
   const build=(path:string[]):Node=>{const choices=v.stages[path.length]?.outcomes.filter(s=>!v.withoutReplacement||!path.includes(s))??[];const children=choices.map(s=>build([...path,s]));return {path,children,y:children.length?children.reduce((n,c)=>n+c.y,0)/children.length:40+leaf++*32};};
   const root=build([]),nodes:Node[]=[];const visit=(n:Node)=>{nodes.push(n);n.children.forEach(visit);};visit(root);
   const x=(depth:number)=>20+depth*95;
-  return <svg viewBox={`0 0 ${v.stages.length*95+140} ${leaf*32+35}`} className="mx-auto w-full max-w-xl" role="img" aria-label={chance8VisualSpeech(v)}>
+  return <svg viewBox={`0 0 ${v.stages.length*95+140} ${leaf*32+35}`} className="mx-auto w-full max-w-xl" style={{maxHeight:430}} role="img" aria-label={chance8VisualSpeech(v)}>
     {v.stages.map((s,i)=><text key={i} x={x(i+1)} y="16" textAnchor="middle" fontSize="12">{s.label}</text>)}
     {nodes.map((node,i)=><g key={i}>{node.children.map((child,j)=><line key={j} x1={x(node.path.length)+8} y1={node.y} x2={x(child.path.length)-12} y2={child.y} stroke={EDGE} strokeWidth="1.5"/>)}{node.path.length>0?<><rect x={x(node.path.length)-13} y={node.y-11} width="26" height="22" rx="5" fill="#ede9fe"/><text x={x(node.path.length)} y={node.y+5} textAnchor="middle" fontSize="13">{node.path.at(-1)}</text></>:<circle cx={20} cy={node.y} r="4"/>}{!node.children.length&&<text x={x(node.path.length)+30} y={node.y+5} fontSize="13">{node.path.join(", ")}</text>}</g>)}
   </svg>;
@@ -169,7 +169,7 @@ function Grid({ v }: { v: V<"grid"> }) {
 
 export default function ChanceVisual({ visual }: { visual: Chance8Visual }) {
   return (
-    <div className="rounded-xl border border-violet-300 bg-white p-4 text-slate-900">
+    <div className="rounded-2xl bg-[#f6f3fb] p-3 text-slate-900 sm:p-4">
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="font-bold">{visual.title}</p>
         <ReadAloudBtn text={chance8VisualSpeech(visual)} label="Read diagram" />

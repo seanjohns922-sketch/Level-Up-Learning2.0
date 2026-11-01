@@ -886,7 +886,7 @@ const intersections: Form[] = [
     return { ...lessonPlot([{m:fast,c:0,label:"Tom"},{m:slow,c:head,label:"Nia"}],[],{xMin:0,xMax:10,yMin:0,yMax:Math.max(fast*10,head+slow*10)+5,xLabel:"Time (s)",yLabel:"Distance (m)"}), prompt: `Tom runs at ${fast} m/s. Nia gets a ${head} m head start and runs at ${slow} m/s. After how many seconds does Tom catch Nia?`, answer: t, unit: "s", steps: [`${fast}t = ${head} + ${slow}t.`, `${fast - slow}t = ${head}, so t = ${t}.`] };
   },
   (r) => {
-    const m = nz(r, -5, 5), c = r(-6, 6), c2 = c + nz(r, -5, 5);
+    const m = nz(r, -3, 3), c = r(-6, 0), c2 = c + Math.abs(m) * r(2, 3);
     return ({...expr(`Write the rule of the line parallel to ${rule(m, c)} that passes through (0, ${n(c2)}). y = ?`, poly([m, "x"], [c2, ""]), ["Parallel lines share the x-coefficient.", `Starting value ${n(c2)}: ${rule(m, c2)}.`]), ...lessonPlot([{m,c,label:"Given line"},{m,c:c2,label:"Parallel line"}],[{x:0,y:c2,label:"P"}])});
   },
   (r) => {

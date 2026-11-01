@@ -190,7 +190,7 @@ const w6l2: Form[] = [
   (r) => { const a = r(2, 4), x = r(20, Math.min(40,Math.floor(170/(a+1)))), b = a + 1, c = (b - a) * x, opp = a * x + c; return { ...shapes(angleQuad(opp,180-opp,opp,"Parallelogram",[`(${a}x + ${c})°`,"",`${b}x°`,""])), prompt: `Opposite angles of a parallelogram are (${a}x + ${c})° and ${b}x°. Find x.`, answer: x, steps: ["Opposite angles of a parallelogram are equal.", `${a}x + ${c} = ${b}x, so x = ${c}. (Each angle is ${opp}°.)`] }; },
   (r) => { const a = r(40, 140); return { ...shapes(quad([[0,0],[5,0],[5+5*Math.cos(deg(a)),5*Math.sin(deg(a))],[5*Math.cos(deg(a)),5*Math.sin(deg(a))]],"Rhombus",{diagonal:[0,2],angles:[`${a}°`,"","",""]})), prompt: `One angle of a rhombus is ${a}°. A diagonal is drawn from that corner. What angle does it make with each side at that corner?`, answer: a / 2, unit: "°", steps: ["The diagonals of a rhombus bisect its angles.", `${a} ÷ 2 = ${a / 2}°.`] }; },
   (r) => { const x = r(2, 9), a = r(2, 4), c = a + r(1, 3), b = r(1, 9), d = c * x - a * x - b; return d <= 0 ? { ...shapes(namedQuad("rectangle",`Diagonal expressions: ${a}x + ${b}, ${c}x${d>0?` − ${d}`:""}`,{diagonals:true})), prompt: `The diagonals of a rectangle are (${a}x + ${b}) cm and (${c}x) cm. Find x.`, answer: fraction(b, c - a), steps: ["The diagonals of a rectangle are equal.", `${c}x = ${a}x + ${b}, so ${c - a}x = ${b} and x = ${fraction(b, c - a)}.`] } : { ...shapes(namedQuad("rectangle",`Diagonal expressions: ${a}x + ${b}, ${c}x${d>0?` − ${d}`:""}`,{diagonals:true})), prompt: `The diagonals of a rectangle are (${a}x + ${b}) cm and (${c}x − ${d}) cm. Find x.`, answer: x, steps: ["The diagonals of a rectangle are equal, so the two expressions are equal.", `${c}x − ${d} = ${a}x + ${b}, so ${c - a}x = ${b + d} and x = ${x}.`] }; },
-  (r) => { const base = r(55, 80); return { ...shapes(angleQuad(base,base,180-base,"Isosceles trapezium",[`${base}°`,`${base}°`,"?","?"])), prompt: `An isosceles trapezium has base angles of ${base}°. Find each of its top angles.`, answer: 180 - base, unit: "°", steps: ["Each top angle is co-interior with a base angle on the same slanted side.", `180 − ${base} = ${180 - base}°.`] }; },
+  (r) => { const base = r(55, 80); return { ...shapes({...angleQuad(base,base,180-base,"Isosceles trapezium",[`${base}°`,`${base}°`,"?","?"]),points:[{x:0,y:0},{x:8,y:0},{x:8-3.2/Math.tan(base*Math.PI/180),y:-3.2},{x:3.2/Math.tan(base*Math.PI/180),y:-3.2}]}), prompt: `An isosceles trapezium has base angles of ${base}°. Find each of its top angles.`, answer: 180 - base, unit: "°", steps: ["Each top angle is co-interior with a base angle on the same slanted side.", `180 − ${base} = ${180 - base}°.`] }; },
 ];
 
 const w6l3: Form[] = [
@@ -290,6 +290,10 @@ export const spaceLessons: LessonFactory[] = [w1l1, w1l2, w1l3, w2l1, w2l2, w2l3
 // These helpers use only supplied labels; computed dimensions stay hidden.
 const rect = (w:number,h:number,caption:string,labels=[String(w),String(h),'','']): Polygon8 => quad([[0,0],[w,0],[w,h],[0,h]],caption,{sideLabels:labels});
 function angleQuad(a:number,b:number,c:number,caption:string,labels:string[]): Polygon8 {
+  // Parallel sides stay horizontal so the shape looks like what the question names.
+  const rad=(deg:number)=>deg*Math.PI/180,rise=3.2;
+  if(caption==="Parallelogram"){const run=rise/Math.tan(rad(a));return {points:[{x:0,y:0},{x:7,y:0},{x:7+run,y:-rise},{x:run,y:-rise}],caption,angles:labels,vertices:["A","B","C","D"]};}
+  if(caption==="Trapezium"){return {points:[{x:0,y:0},{x:8,y:0},{x:8-rise/Math.tan(rad(b)),y:-rise},{x:rise/Math.tan(rad(a)),y:-rise}],caption,angles:labels,vertices:["A","B","C","D"]};}
   const d=360-a-b-c, split=(Math.max(0,a+d-180)+Math.min(a,180-b))/2;
   const upper=aasTri(6,split,180-split-b,'').points[2];
   const lower=aasTri(6,a-split,180-(a-split)-d,'').points[2];

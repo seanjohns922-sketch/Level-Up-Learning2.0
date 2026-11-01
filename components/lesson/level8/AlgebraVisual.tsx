@@ -35,7 +35,7 @@ function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
     const xs: number[] = [];
     for (let x = v.xMin; x <= v.xMax + 1e-9; x += 0.1) if (inside(x)) xs.push(x);
     if (!xs.length) return { x: R - 4, y: T + 14 + i * 16, anchor: "end" as const };
-    const x = xs[0] + (xs[xs.length - 1] - xs[0]) * (i % 2 ? 0.12 : 0.88), px = X(x), py = Y(l.m * x + l.c);
+    const x = xs[0] + (xs[xs.length - 1] - xs[0]) * (i % 2 ? 0.12 : l.m < 0 && v.yMin >= 0 ? 0.55 : 0.88), px = X(x), py = Y(l.m * x + l.c);
     if (l.m === 0) return { x: R - 4, y: py - 7, anchor: "end" as const };
     // Text runs rightwards, so put it right of a line only when there is room.
     const right = px < R - 110;
@@ -53,7 +53,7 @@ function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
       {xs.filter((x) => x !== 0).map((x) => <text key={`tx${x}`} x={X(x)} y={Math.min(ax + 18, H - 6)} textAnchor="middle" fontSize={15} fill={MUTED}>{minus(x)}</text>)}
       {ys.filter((y) => y !== 0).map((y) => <text key={`ty${y}`} x={ay - 5} y={Y(y) + 5} textAnchor="end" fontSize={15} fill={MUTED}>{minus(y)}</text>)}
       {v.xMin <= 0 && v.yMin <= 0 && <text x={ay - 5} y={ax + 18} textAnchor="end" fontSize={15} fill={MUTED}>0</text>}
-      <text x={R} y={ax - 6} textAnchor="end" fontSize={16} fontWeight={700} fill={INK}>{v.xLabel ?? "x"}</text>
+      <text x={R} y={v.yMin >= 0 ? ax - 6 - 14 : ax - 6} textAnchor="end" fontSize={16} fontWeight={700} fill={INK} stroke="#fff" strokeWidth={4} paintOrder="stroke">{v.xLabel ?? "x"}</text>
       <text x={ay + 6} y={T + 10} fontSize={16} fontWeight={700} fill={INK}>{v.yLabel ?? "y"}</text>
       <g clipPath={`url(#${clip})`}>
         {v.lines.map((l, i) => { const [x1, y1, x2, y2] = ends(l); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={LINES[i % 3]} strokeWidth={2.8} strokeDasharray={v.shade?.line === i && v.shade.strict ? "7 5" : undefined} />; })}
@@ -147,13 +147,13 @@ function Geometry({v}:{v:Extract<Algebra8Visual,{kind:"geometry"}>}) {
   const pts=v.shape==='triangle'?[[45,155],[315,155],[180,35]]:[[65,55],[295,55],[295,155],[65,155]];
   const theta=(v.angle??60)*Math.PI/180, dx=130*Math.cos(theta),dy=130*Math.sin(theta);
   return <><svg viewBox="0 0 360 210" role="img" aria-label={algebra8VisualSpeech(v)} className="mx-auto w-full max-w-xl">
-    {v.shape==='crossedLines'?<><path d={`M30 105 H330 M${180-dx} ${105+dy} L${180+dx} ${105-dy}`} fill="none" stroke={LINES[0]} strokeWidth="3"/><text x={180+80*Math.cos(theta/2)} y={105-80*Math.sin(theta/2)} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[0]}</text><text x={180-80*Math.cos(theta/2)} y={105+80*Math.sin(theta/2)+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[1]}</text></>:<><polygon points={pts.map(p=>p.join(',')).join(' ')} fill="#ede9fe" stroke={LINES[0]} strokeWidth="2"/>{v.labels.map((label,i)=>{const a=pts[i],b=pts[(i+1)%pts.length],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;return <text key={i} x={x+(x-180)*.18} y={y+(y-105)*.42+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{label}</text>;})}</>}
+    {v.shape==='crossedLines'?<><path d={`M30 105 H330 M${180-dx} ${105+dy} L${180+dx} ${105-dy}`} fill="none" stroke={LINES[0]} strokeWidth="3"/><text x={180+80*Math.cos(theta/2)} y={105-80*Math.sin(theta/2)} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[0]}</text><text x={180-80*Math.cos(theta/2)} y={105+80*Math.sin(theta/2)+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[1]}</text></>:<><polygon points={pts.map(p=>p.join(',')).join(' ')} fill="#ede9fe" stroke={LINES[0]} strokeWidth="2"/>{v.labels.map((label,i)=>{const a=pts[i],b=pts[(i+1)%pts.length],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;return <text key={i} x={x+(x-180)*.36} y={y+(y-105)*.5+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{label}</text>;})}</>}
   </svg><p className="mt-2 text-sm">{v.caption}</p></>;
 }
 
 export default function AlgebraVisual({ visual }: { visual: Algebra8Visual }) {
   return (
-    <div className="rounded-xl border border-violet-300 bg-white p-4 text-slate-900">
+    <div className="rounded-2xl bg-[#f6f3fb] p-3 text-slate-900 sm:p-4">
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="font-bold">{visual.title}</p>
         <ReadAloudBtn text={algebra8VisualSpeech(visual)} label="Read diagram" />

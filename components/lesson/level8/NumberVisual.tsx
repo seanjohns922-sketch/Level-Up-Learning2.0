@@ -18,7 +18,7 @@ function NumberLine({ v }: { v: Extract<Number8Visual, { kind: "numberline" }> }
       {ticks.map((n) => (
         <g key={n}>
           <line x1={x(n)} x2={x(n)} y1={62} y2={78} stroke={INK} strokeWidth={1.6} />
-          {v.labelTicks !== false && <text x={x(n)} y={100} textAnchor="middle" fontSize={17} fill={INK}>{n < 0 ? `−${-n}` : n}</text>}
+          {v.labelTicks !== false && (ticks.length <= 9 || Math.round((n - v.min) / v.step) % 2 === 0) && <text x={x(n)} y={100} textAnchor="middle" fontSize={17} fill={INK}>{n < 0 ? `−${-n}` : n}</text>}
         </g>
       ))}
       {v.points.map((p, i) => (
@@ -125,7 +125,7 @@ function Tally({v}:{v:Extract<Number8Visual,{kind:"tally"}>}) {
 
 export default function NumberVisual({ visual }: { visual: Number8Visual }) {
   return (
-    <div className="rounded-xl border border-teal-300 bg-white p-4 text-slate-900">
+    <div className="rounded-2xl bg-[#f6f3fb] p-3 text-slate-900 sm:p-4">
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="font-bold">{visual.title}</p>
         <ReadAloudBtn text={number8VisualSpeech(visual)} label="Read diagram" />
