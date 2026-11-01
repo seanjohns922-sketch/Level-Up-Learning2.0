@@ -402,6 +402,7 @@ export default function NumberLineActivity({
   const [typedCorrect, setTypedCorrect] = useState<boolean | null>(null);
   const [placed, setPlaced] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
+  const [typedMisses, setTypedMisses] = useState(0);
   const [isCorrect, setIsCorrect] = useState(false);
 
   const displayConfig = useMemo(() => getDisplayConfig(questionData), [questionData]);
@@ -435,6 +436,7 @@ export default function NumberLineActivity({
       setTimeout(() => setRoundingStep("place"), 800);
     } else {
       setTypedCorrect(false);
+      setTypedMisses((count) => count + 1);
     }
   }
 
@@ -499,7 +501,7 @@ export default function NumberLineActivity({
             </div>
             {typedCorrect === false ? (
               <p className="mt-3 text-center text-sm font-bold text-destructive">
-                Not quite. Try again.
+                {typedMisses >= 2 ? `Not quite. The answer is ${questionData.expected}. Type it to carry on.` : "Not quite. Try again."}
               </p>
             ) : null}
             {typedCorrect === true ? (

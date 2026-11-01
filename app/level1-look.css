@@ -1,4 +1,4 @@
-/* Level 1 lessons only: the same activities with a brighter, bigger look. Nothing here changes how a task works. */
+/* Level 1 and 2 lessons only: the same activities with a brighter, bigger look. Nothing here changes how a task works. */
 [data-level1-look] {
   --l1-ink: #16302d;
   --l1-edge: #c8e6df;
@@ -38,3 +38,17 @@
 [data-level1-look="statistics"] [data-statistica-plot] .text-\[\#f2bc45\]\/60 { top: 0; padding-right: 0.5rem; color: #17331f; font-size: 1rem; line-height: 1; }
 [data-level1-look="statistics"] [data-statistica-plot] .bg-\[\#f2bc45\]\/40 { height: 3px; background: #17331f; }
 [data-level1-look="statistics"] .bg-\[\#17281f\] { background: #fff; border-color: #c7e2b4; color: #17331f; box-shadow: 0 2px 0 #c7e2b4; }
+
+/* Level 2 Number runs on its own lesson screen */
+[data-number-nexus-level="2"] { --l1-ink: #16302d; --l1-edge: #c8e6df; }
+[data-number-nexus-level="2"] h2, [data-number-nexus-level="2"] h3 { color: var(--l1-ink); }
+[data-number-nexus-level="2"] [data-mcq-option], [data-number-nexus-level="2"] button.w-full.text-left { min-height: 60px; border-radius: 14px; font-size: 1.4rem; font-weight: 800; box-shadow: 0 0 0 1px var(--l1-edge), 0 5px 0 var(--l1-edge); }
+/* Statistica panels were dark, so their text was light */
+[data-level1-look="statistics"] .bg-\[\#17281f\] *:not(button):not(button *) { color: #17331f; }
+/* Level 2 Number: solid hundreds, tens and ones */
+[data-number-nexus-level="2"] .h-10.w-10.border-teal-300 { height: 3.25rem; width: 3.25rem; border: 0; background: repeating-linear-gradient(0deg, #15a896 0 4.8px, #0d8f82 4.8px 5.2px), #15a896; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.45); }
+[data-number-nexus-level="2"] .h-3.w-16.border-cyan-300 { height: 1rem; width: 5.5rem; border: 0; border-radius: 4px; background: repeating-linear-gradient(90deg, #38bdf8 0 7.8px, #0284c7 7.8px 8.8px); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5); }
+[data-number-nexus-level="2"] .h-4.w-4.border-emerald-300 { height: 1.25rem; width: 1.25rem; border: 0; background: linear-gradient(135deg, #ffcf6b, #f59e0b); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.55); }
+[data-level1-look="statistics"] .bg-\[\#17281f\] button:not([data-read-aloud-button]), [data-level1-look="statistics"] .bg-\[\#17281f\] button:not([data-read-aloud-button]) * { color: #17331f; }
+/* Star map place names */
+[data-level1-look="space"] [data-direction-grid] .text-\[6px\], [data-level1-look="space"] [data-direction-grid] .text-\[7px\] { font-size: 0.625rem; line-height: 1.1; color: #fff; white-space: normal; text-align: center; }

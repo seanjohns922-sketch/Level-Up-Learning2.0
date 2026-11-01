@@ -663,7 +663,7 @@ export function PracticeRunner({
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   // Ground students may not read yet, so their questions are always spoken.
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
-  const isLevel1Lesson = /^y1-/.test(liveContext?.lessonId ?? "");
+  const isLevel1Lesson = /^y[12]-/.test(liveContext?.lessonId ?? "");
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
