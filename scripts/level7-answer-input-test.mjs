@@ -54,3 +54,20 @@ assert.equal(tip({kind:'fraction',expected:'2',prompt:''},'8/4').simplified,'2')
 assert.equal(tip({kind:'ratio',expected:'2:3',prompt:'',format:'simplest'},'4:6').required,true);
 assert.equal(tip({kind:'number',expected:'0.5',prompt:'',format:'decimal'},'2/4'),null);
 console.log('PASS simplification feedback: correct credit, optional steps, unpenalised simplest-form retry, preserved fields, wrong-answer isolation, negative fractions, zero, whole results and ratios.');
+// Rate labels must reach the visible answer box and its read-aloud instructions.
+const {pattern7Question}=loadCave7('data/activities/cave7/pattern-questions.ts');
+const rateCases=new Map();
+for(let seed=1;seed<=25;seed++){
+ const q=pattern7Question(7,3,seed*7919,'apply_create'),s=contract.level7Answer(q);rateCases.set(s.unit,s);
+}
+const speed=contract.level7Answer(pattern7Question(11,1,7919,'reasoning'));rateCases.set(speed.unit,speed);
+assert.equal(rateCases.size,5);
+for(const [unit,spec] of rateCases){
+ setup(spec.kind,spec.expected);props.spec=spec;
+ assert.ok(words(render()).includes(unit),`Visible unit: ${unit}`);
+ const speech=walk(render(),e=>e.props?.label==='Read answer instructions')[0];
+ assert.ok(speech.props.text.includes(`Unit: ${unit}.`),`Spoken unit: ${unit}`);
+ enter(0,`${spec.expected} ${unit}`);submit();assert.equal(answers.at(-1)[0],true);
+ enter(0,`${Number(spec.expected)+1} ${unit}`);submit();assert.equal(answers.at(-1)[0],false);
+}
+console.log('PASS Level 7 rate units: five contexts show and narrate complete units; typed units accepted with correct values only.');

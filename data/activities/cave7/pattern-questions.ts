@@ -19,7 +19,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  const g=cave7Guide('pattern',week,lesson);if(!g)throw Error('Unknown Algebra lesson');
  const int=random(seed),pick=<T,>(xs:readonly T[])=>xs[int(0,xs.length-1)];
  const a=int(2,7),rawB=int(2,9),b=rawB===a?rawB+1:rawB,x=int(2,10),c=int(2,5),key=(week-1)*3+lesson,F=role==='fast_thinking',R=role==='reasoning';
- let prompt='',answer:string|number='',wrong:(string|number)[]=[],explanation='',visual:Cave7Visual|undefined;
+ let prompt='',answer:string|number='',wrong:(string|number)[]=[],explanation='',visual:Cave7Visual|undefined,answerUnit:string|undefined;
  const choose=(p:string,n:string|number,ws:(string|number)[],e:string)=>{prompt=p;answer=n;wrong=ws;explanation=e;};
  // Wrong values come from real errors first; numericWrong only fills any gap.
  const num=(p:string,n:number,e:string,errors:number[]=[])=>choose(p,round(n),[...errors.map(round),...numericWrong(n)],e);
@@ -163,7 +163,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   const {ctx,points}=graph(true);
   if(F){const rise=Math.max(...points.slice(1).map((p,i)=>p[1]-points[i][1]));num(`What was the greatest increase in the ${ctx.noun} during one 2-${ctx.time.replace(/s$/,'')} interval? Answer in ${ctx.unit}.`,rise,`Every interval is 2 ${ctx.time} long, so compare how much the line rises in each one. The biggest rise is ${rise} ${ctx.unit}.`,[rise+ctx.step,rise/2,Math.max(...points.map(p=>p[1]))]);}
   else if(R){const i=int(0,3),mid=points[i][0]+1;choose(`Measurements were recorded every 2 ${ctx.time}. What can the line tell you about the ${ctx.noun} at ${mid} ${ctx.time}?`,'Only an estimate, because nothing was recorded at that time.',['The exact value, because the line passes through that time.','Nothing at all, because only points can be read.','The exact value, because graphs are always accurate.'],'Joining lines connect recorded points; values between them are estimates.');}
-  else{const i=int(0,2),j=i+2,rate=(points[j][1]-points[i][1])/(points[j][0]-points[i][0]);num(`What was the average rate of change of the ${ctx.noun} from ${points[i][0]} to ${points[j][0]} ${ctx.time}, in ${ctx.unit} per ${ctx.time.replace(/s$/,'')}? Give a decrease as a negative number.`,rate,`Change ÷ time = (${points[j][1]} − ${points[i][1]}) ÷ ${points[j][0]-points[i][0]} = ${signed(round(rate))}.`,[points[j][1]-points[i][1],-rate,rate*2]);}
+  else{answerUnit=`${ctx.unit} per ${ctx.time.replace(/s$/,'')}`;const i=int(0,2),j=i+2,rate=(points[j][1]-points[i][1])/(points[j][0]-points[i][0]);num(`What was the average rate of change of the ${ctx.noun} from ${points[i][0]} to ${points[j][0]} ${ctx.time}, in ${ctx.unit} per ${ctx.time.replace(/s$/,'')}? Give a decrease as a negative number.`,rate,`Change ÷ time = (${points[j][1]} − ${points[i][1]}) ÷ ${points[j][0]-points[i][0]} = ${signed(round(rate))}.`,[points[j][1]-points[i][1],-rate,rate*2]);}
   break;}
  // ── Week 8: visual growing patterns (AC9M7A05)
  case 22:{
@@ -222,6 +222,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   break;}
  // ── Week 11: investigating formulas with a spreadsheet (AC9M7A06)
  case 31:{
+  if(R)answerUnit='km/h';
   const v=a*10,dt=pick([1,2]),times=[1,2,3,4].map(n=>n*dt);
   table('Spreadsheet: d = v × t',['Time t (h)','Distance d (km)'],times.map(t=>[t,v*t]));
   if(F)num('By how many kilometres does d increase from one row to the next?',v*dt,`Each row adds ${dt} hour${dt>1?'s':''} at the same speed: ${v} × ${dt} = ${v*dt} km.`,[v,dt,v*dt*2]);
@@ -292,5 +293,5 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
   default:visual=before;
   }
  }
- return makeQuestion({realm:'pattern',week,lesson,seed,role,prompt,answer,wrong,explanation,idea:g.idea,visual});
+ return makeQuestion({realm:'pattern',week,lesson,seed,role,prompt,answer,wrong,explanation,idea:g.idea,visual,answerUnit});
 }
