@@ -171,8 +171,8 @@ export default function MoneyContextVisual({
         {visual.boardLabel ? `${visual.title} Receipt` : visual.title}
       </div>
       <div className="mt-3 rounded-2xl bg-white p-4 shadow-sm">
-        <div className="overflow-hidden rounded-xl border border-slate-100">
-          <div className="grid grid-cols-[1.25fr_52px_72px_88px] bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500">
+        <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="grid min-w-[340px] grid-cols-[1.25fr_52px_72px_88px] bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500">
             <div>Item</div>
             <div>Qty</div>
             <div className="text-right">Unit</div>
@@ -181,7 +181,7 @@ export default function MoneyContextVisual({
           {visual.lines.map((line) => (
             <div
               key={`${line.label}-${line.price}-${line.quantity ?? 1}`}
-              className="grid grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-100 px-3 py-3"
+              className="grid min-w-[340px] grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-100 px-3 py-3"
             >
               <div>
                 <div className="text-base font-black text-slate-900">{line.label}</div>
@@ -196,7 +196,7 @@ export default function MoneyContextVisual({
               </div>
             </div>
           ))}
-          <div className="grid grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-200 bg-slate-50/70 px-3 py-3">
+          <div className="grid min-w-[340px] grid-cols-[1.25fr_52px_72px_88px] items-center border-t border-slate-200 bg-slate-50/70 px-3 py-3">
             <div className="text-sm font-black uppercase tracking-wide text-slate-700">
               Total Cost
             </div>

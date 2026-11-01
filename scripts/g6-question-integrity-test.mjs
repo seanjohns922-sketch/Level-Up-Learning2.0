@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { checkIndependentTaskMath } from './test-support/independent-task-math.mjs';
 import fs from 'node:fs';
+import { isPracticeTaskSafe, isLessonQuestionSafe } from '../lib/task-safety.ts';
 import { programs } from '../data/programs/index.ts';
 import { buildLessonActivityPool, generateQuestion, getLevelForLesson } from '../data/activities/year2/lessonEngine.ts';
 import { PATTERN_PEAKS_PROGRAMS } from '../data/programs/patternPeaks.ts';
@@ -10,8 +12,19 @@ const seedStart = Number(process.env.AUDIT_SEED ?? 20261008);
 let seed = seedStart;
 Math.random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
 const report = { seed: seedStart, samples: 0, mathematicalChecks: 0, lessons: {}, kinds: {}, issues: [], examples: {} };
+const snapshots = {};
 function inspect(task, context) {
+  if (process.env.AUDIT_SNAPSHOTS) {
+    const key = context.replace(/:\d+$/, "") + ":" + task.kind + ":" + (task.mode ?? task.scene ?? "");
+    snapshots[key] ??= { context, task };
+  }
   assert(task && typeof task.kind === 'string', `${context}: missing task`);
+  const [realm, level] = context.split(':');
+  const modern = realm === 'pattern' || (realm === 'number' && Number(level) >= 2);
+  if (!(modern ? isLessonQuestionSafe({ activityType: task.kind, weight: 1, config: {} }, task) : isPracticeTaskSafe(task))) {
+    report.issues.push(`${context}: lesson rejects generated ${task.kind} task: ${JSON.stringify(task)}`);
+  }
+  checkIndependentTaskMath(task, (passed, detail) => { report.mathematicalChecks++; if (!passed) report.issues.push(`${context}: ${detail}: ${JSON.stringify(task)}`); });
   report.samples++;
   report.kinds[task.kind] = (report.kinds[task.kind] ?? 0) + 1;
   report.examples[`${task.kind}:${task.mode ?? task.scene ?? ''}`] ??= {context, task};
@@ -104,8 +117,9 @@ for (let level = 0; level <= 6; level++) {
     }
   }
 }
+if (process.env.AUDIT_SNAPSHOTS) fs.writeFileSync(process.env.AUDIT_SNAPSHOTS, JSON.stringify(snapshots));
 const target = process.env.AUDIT_OUTPUT;
 if (target) fs.writeFileSync(target,JSON.stringify(report,null,2));
 console.log(`${Object.keys(report.lessons).length} lessons; ${report.samples} samples; ${Object.keys(report.kinds).length} task kinds; seed ${seedStart}.`);
 assert.equal(report.issues.length,0,report.issues.slice(0,15).join('\n'));
-console.log('PASS: G–6 generated task structure, finite numeric data, and primitive choice answer availability/uniqueness. This does not certify mathematical correctness of every task kind.');
+console.log(`PASS: G–6 task acceptance, structure, choice uniqueness and ${report.mathematicalChecks} independent mathematical checks. Unsupported mathematical families are not certified.`);

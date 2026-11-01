@@ -42,7 +42,7 @@ function TurnVisual({ task }: { task: Task }) {
           strokeLinecap="round"
           strokeWidth="8"
           strokeDasharray={`${(turn / 360) * circumference} ${circumference}`}
-          transform={`rotate(${start - 90} 96 96)`}
+          transform={`rotate(${start} 96 96)${task.clockwise === false ? " translate(0 192) scale(1 -1)" : ""}`}
         />
       </svg>
       <div className="absolute left-1/2 top-1/2 h-1.5 w-16 origin-left rounded-full bg-amber-500" style={{ transform: `rotate(${start}deg)` }} />

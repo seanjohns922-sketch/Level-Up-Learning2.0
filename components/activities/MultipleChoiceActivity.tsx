@@ -6,7 +6,7 @@ import Algebra8Visual from '@/components/lesson/level8/AlgebraVisual';
 import Chance8Visual from '@/components/lesson/level8/ChanceVisual';
 import Number7RatioVisual from './Number7RatioVisual';
 import {number7RatioVisual} from '@/lib/number7-ratio-visual';
-import Number7ContextArt from './Number7ContextArt';
+import Number7ContextArt, { Number7AreaModel } from './Number7ContextArt';
 import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
 import Year8MeasurementAssessmentVisual from '@/components/assessment/Year8MeasurementAssessmentVisual';
@@ -212,6 +212,8 @@ export default function MultipleChoiceActivity({
   );
   const compactPatternOptions =
     isPattern &&
+    !questionData.cave7Visual &&
+    !questionData.algebra8Visual &&
     !isMultiSelect &&
     questionData.options.length >= 2 &&
     questionData.options.length <= 4 &&
@@ -368,6 +370,7 @@ export default function MultipleChoiceActivity({
       {questionData.visual?.type === "decimal_shift" ? (
         <DecimalShiftVisual visual={questionData.visual} />
       ) : null}
+      {isNumber7Question && <Number7AreaModel prompt={questionData.prompt}/>}
       {ratioVisual && <Number7RatioVisual model={ratioVisual}/>}
       {questionData.paintContext && <PaintTinsVisual {...questionData.paintContext} />}
       {questionData.visual?.type === "fraction_number_line" ? (

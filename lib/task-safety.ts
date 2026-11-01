@@ -107,6 +107,7 @@ export function isLessonQuestionSafe(
 }
 
 const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
+  "fractionTurn",
   "matchPairs",
   "countObjects",
   "fillTheJar",
@@ -345,6 +346,14 @@ const SUPPORTED_PRACTICE_TASK_KINDS = new Set<string>([
 
 export function isPracticeTaskSafe(task: PracticeTask | null | undefined): boolean {
   if (!task || !hasText(task.kind) || !SUPPORTED_PRACTICE_TASK_KINDS.has(task.kind)) return false;
+  if (task.kind === "fractionTurn") {
+    if (!hasText(task.prompt) || !Array.isArray(task.options) || task.options.length < 2 || new Set(task.options).size !== task.options.length
+      || !task.options.every(hasText) || !task.options.includes(task.correctOption)) return false;
+    if (task.scene === "fraction") return [2, 4, 8].includes(task.parts ?? 0)
+      && Number.isInteger(task.shadedParts) && task.shadedParts! >= 0 && task.shadedParts! <= task.parts!;
+    return task.scene === "turn" && ["quarter", "half", "three-quarter", "full"].includes(task.turnFraction ?? "")
+      && ["up", "right", "down", "left"].includes(task.startDirection ?? "");
+  }
   if (task.kind === "level8Question") return hasText(task.prompt) && hasText(task.answer) && hasText(task.speakText) && hasText(task.feedback.correct) && (!!task.question.answerSpec || (task.options.length >= 2 && task.options.includes(task.answer)));
   if (task.kind === "chanceQuizQuestion" || task.kind === "space7Question" || task.kind === "cave7Question") {
     return hasText(task.prompt)

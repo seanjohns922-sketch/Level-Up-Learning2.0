@@ -1,0 +1,1219 @@
+level,realm,week,lesson,lesson_id,samples_per_seed,rendered_scenes,kinds,coverage
+0,measurement,1,1,y0-measurement-w1-l1,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,1,2,y0-measurement-w1-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,1,3,y0-measurement-w1-l3,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,2,1,y0-measurement-w2-l1,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,2,2,y0-measurement-w2-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,2,3,y0-measurement-w2-l3,30,1,balanceScale,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,3,1,y0-measurement-w3-l1,30,4,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,3,2,y0-measurement-w3-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,3,3,y0-measurement-w3-l3,30,4,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,4,1,y0-measurement-w4-l1,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,4,2,y0-measurement-w4-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,4,3,y0-measurement-w4-l3,30,4,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,5,1,y0-measurement-w5-l1,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,5,2,y0-measurement-w5-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,5,3,y0-measurement-w5-l3,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,6,1,y0-measurement-w6-l1,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,6,2,y0-measurement-w6-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,6,3,y0-measurement-w6-l3,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,7,1,y0-measurement-w7-l1,30,4,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,7,2,y0-measurement-w7-l2,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,7,3,y0-measurement-w7-l3,30,3,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,8,1,y0-measurement-w8-l1,30,9,balanceScale;measurePath;measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,8,2,y0-measurement-w8-l2,30,6,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,measurement,8,3,y0-measurement-w8-l3,30,6,measurementCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,1,1,y0-w1-l1,30,4,groundBuild;groundCollect;groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,1,2,y0-w1-l2,30,7,groundBuild;groundFeed;groundFlash;groundMatch;groundMoveCount;groundSoundCount;groundTapCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,1,3,y0-w1-l3,30,1,groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,2,1,y0-w2-l1,30,5,groundFlash;groundHunt;groundMatch;groundSequence;groundTapCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,2,2,y0-w2-l2,30,5,groundBuild;groundFeed;groundFlash;groundMatch;groundTapCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,2,3,y0-w2-l3,30,2,groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,3,1,y0-w3-l1,30,4,groundFlash;groundGrowingCount;groundOrderTap;groundSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,3,2,y0-w3-l2,30,3,groundFlash;groundOrderTap;groundSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,3,3,y0-w3-l3,30,3,groundFlash;groundMatch;groundTapCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,4,1,y0-w4-l1,30,3,groundBuild;groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,4,2,y0-w4-l2,30,3,groundBuild;groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,4,3,y0-w4-l3,30,4,groundBuild;groundFlash;groundMatch;groundSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,5,1,y0-w5-l1,30,2,groundBuild;groundCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,5,2,y0-w5-l2,30,2,groundBuild;groundCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,5,3,y0-w5-l3,30,3,groundCompare;groundOrderTap;groundSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,6,1,y0-w6-l1,30,1,groundBuild,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,6,2,y0-w6-l2,30,1,groundBuild,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,6,3,y0-w6-l3,30,1,groundBuild,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,7,1,y0-w7-l1,30,7,groundBuild;groundFeed;groundFlash;groundGrowingCount;groundMatch;groundMoveCount;groundTapCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,7,2,y0-w7-l2,30,4,groundBuild;groundCompare;groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,7,3,y0-w7-l3,30,5,groundBuild;groundCompare;groundFlash;groundMatch;groundMoveCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,8,1,y0-w8-l1,30,5,groundCompare;groundFlash;groundMatch;groundOrderTap;groundSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,8,2,y0-w8-l2,30,3,groundFlash;groundMatch;groundOrderTap,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,8,3,y0-w8-l3,30,2,groundMatch;groundOrderTap,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,9,1,y0-w9-l1,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,9,2,y0-w9-l2,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,9,3,y0-w9-l3,30,2,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,10,1,y0-w10-l1,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,10,2,y0-w10-l2,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,10,3,y0-w10-l3,30,2,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,11,1,y0-w11-l1,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,11,2,y0-w11-l2,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,11,3,y0-w11-l3,30,1,groundFoundation,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,12,1,y0-w12-l1,30,3,groundBuild;groundFlash;groundMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,12,2,y0-w12-l2,30,1,groundBuild,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,number,12,3,y0-w12-l3,30,6,groundFoundation;groundOrderTap,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,1,1,ground-space-w1-l1,120,4,starpathShapeIntro;starpathShapeMatch;starpathShapeName;starpathShapeSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,1,2,ground-space-w1-l2,120,4,starpathObjectShape;starpathShapeIntro;starpathShapeScene;starpathShapeTapAll,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,1,3,ground-space-w1-l3,120,4,starpathCollectMission;starpathOddOneOut;starpathShapeIntro;starpathShapeSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,2,1,ground-space-w2-l1,120,4,starpathBuildShapeIdentify;starpathFinishPicture;starpathShapeBuilder;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,2,2,ground-space-w2-l2,120,4,starpathFinishPicture;starpathShapeBuilder;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,2,3,ground-space-w2-l3,120,4,starpathBuildMatch;starpathShapeBuilder;starpathShapeIntro;starpathSpaceMuseum,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,3,1,ground-space-w3-l1,120,4,starpathCollectMission;starpathFamilySort;starpathOddOneOut;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,3,2,ground-space-w3-l2,120,4,starpathShapeCompare;starpathShapeIntro;starpathShapeMatch;starpathWhatChanged,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,3,3,ground-space-w3-l3,120,4,starpathCollectMission;starpathShapeCompare;starpathShapeIntro;starpathShapeSprint,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,4,1,ground-space-w4-l1,120,4,starpathPositionFind;starpathPositionPicture;starpathPositionPlace;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,4,2,ground-space-w4-l2,120,4,starpathPositionFind;starpathPositionPicture;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,4,3,ground-space-w4-l3,120,3,starpathPositionSequence;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,5,1,ground-space-w5-l1,120,4,starpathPositionPicture;starpathPositionPlace;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,5,2,ground-space-w5-l2,120,4,starpathPositionPicture;starpathPositionPlace;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,5,3,ground-space-w5-l3,120,4,starpathPositionPicture;starpathPositionPlace;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,6,1,ground-space-w6-l1,120,4,starpathPositionFind;starpathPositionPicture;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,6,2,ground-space-w6-l2,120,4,starpathPositionFind;starpathPositionPicture;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,6,3,ground-space-w6-l3,120,3,starpathPositionPicture;starpathPositionSequence;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,7,1,ground-space-w7-l1,120,4,starpathBuildShapeIdentify;starpathFinishPicture;starpathShapeBuilder;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,7,2,ground-space-w7-l2,120,4,starpathPositionPicture;starpathPositionPlace;starpathShapeBuilder;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,7,3,ground-space-w7-l3,120,4,starpathPositionFind;starpathPositionWord;starpathShapeIntro;starpathSpaceMuseum,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,8,1,ground-space-w8-l1,120,4,starpathOddOneOut;starpathShapeCompare;starpathShapeIntro;starpathShapeMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,8,2,ground-space-w8-l2,120,4,starpathPositionFind;starpathPositionPlace;starpathPositionWord;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+0,space,8,3,ground-space-w8-l3,150,5,starpathFamilySort;starpathPositionPicture;starpathPositionSequence;starpathShapeCompare;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,1,1,y1-measurement-w1-l1,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,1,2,y1-measurement-w1-l2,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,1,3,y1-measurement-w1-l3,30,4,measureValidity,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,2,1,y1-measurement-w2-l1,30,3,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,2,2,y1-measurement-w2-l2,30,4,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,2,3,y1-measurement-w2-l3,30,4,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,3,1,y1-measurement-w3-l1,30,3,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,3,2,y1-measurement-w3-l2,30,4,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,3,3,y1-measurement-w3-l3,30,2,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,4,1,y1-measurement-w4-l1,30,4,durationUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,4,2,y1-measurement-w4-l2,30,2,durationUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,4,3,y1-measurement-w4-l3,30,4,durationUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,5,1,y1-measurement-w5-l1,30,4,weekCycle,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,5,2,y1-measurement-w5-l2,30,4,weekCycle,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,5,3,y1-measurement-w5-l3,30,4,weekCycle,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,6,1,y1-measurement-w6-l1,30,4,calendarFind,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,6,2,y1-measurement-w6-l2,30,4,calendarNavigate,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,6,3,y1-measurement-w6-l3,30,4,calendarEvent,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,7,1,y1-measurement-w7-l1,30,4,timeSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,7,2,y1-measurement-w7-l2,30,4,timeSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,7,3,y1-measurement-w7-l3,30,3,timeSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,8,1,y1-measurement-w8-l1,30,4,routineSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,8,2,y1-measurement-w8-l2,30,5,routineSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,measurement,8,3,y1-measurement-w8-l3,30,5,routineSequence,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,1,1,y1-w1-l1,30,3,audioPick;matchPairs;numberHunt,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,1,2,y1-w1-l2,30,3,countCircle;countObjects;fillTheJar,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,1,3,y1-w1-l3,30,3,numberLadder;order3;typeNumber,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,2,1,y1-w2-l1,30,3,audioPick;matchPairs;numberHunt,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,2,2,y1-w2-l2,30,2,mcq;order3,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,2,3,y1-w2-l3,30,3,chartFill;numberLineJump;numberLineTap,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,3,1,y1-w3-l1,30,2,mabBuild;tensOnesMcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,3,2,y1-w3-l2,30,3,partitionTwoWays;placeValueDice;splitStepper,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,3,3,y1-w3-l3,30,2,mabBuild;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,4,1,y1-w4-l1,30,3,equalGroups;equalGroupsMcq;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,4,2,y1-w4-l2,30,2,groupCountVisual;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,4,3,y1-w4-l3,30,3,groupBoxes;groupCountVisual;groupingEstimate,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,5,1,y1-w5-l1,30,1,addDots,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,5,2,y1-w5-l2,30,3,ppw,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,5,3,y1-w5-l3,30,1,mentalAdd,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,6,1,y1-w6-l1,30,3,subtractTakeAway,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,6,2,y1-w6-l2,30,3,subtractBar;subtractMissingPart;subtractMoveToTaken,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,6,3,y1-w6-l3,30,1,mentalSubtract,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,7,1,y1-w7-l1,30,2,missingOperation;storyOpChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,7,2,y1-w7-l2,30,1,storySolve,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,7,3,y1-w7-l3,30,2,moneyEnough;moneyMakeAmount,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,8,1,y1-w8-l1,30,5,buildStory;twoMats;whatHappened,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,8,2,y1-w8-l2,30,3,barModel;compareBars;ppw,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,8,3,y1-w8-l3,30,3,moneyAddPrices;moneyChangeUp;moneyHowMuchMore,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,9,1,y1-w9-l1,30,3,shareDeal;shareDrag;shareFair,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,9,2,y1-w9-l2,30,3,groupBoxesInput;groupBoxesTap;missingGroupSize,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,9,3,y1-w9-l3,30,3,groupGrabBags;howManyGroups;packBoxes,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,10,1,y1-w10-l1,30,3,buildGroupsSkipCount;chooseSkipCount;tapGroupsSkipCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,10,2,y1-w10-l2,30,3,arrayBuilder;barGroupModel;missingGroupCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,10,3,y1-w10-l3,30,3,groupStory;howManyGroupsStory;twoStepGrouping,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,11,1,y1-w11-l1,30,1,repeatingPattern,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,11,2,y1-w11-l2,30,1,repeatingPattern,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,11,3,y1-w11-l3,30,1,repeatingPattern,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,12,1,y1-w12-l1,30,2,mixedReviewSprint;strategyChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,12,2,y1-w12-l2,30,1,targetedRevision,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,number,12,3,y1-w12-l3,30,1,funGames,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,1,1,y1-space-w1-l1,120,4,starpathShapeDisguise;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,1,2,y1-space-w1-l2,120,4,starpathShapeFaceOff;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,1,3,y1-space-w1-l3,120,4,starpathMysteryShape;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,2,1,y1-space-w2-l1,120,2,starpathShapeClassify;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,2,2,y1-space-w2-l2,120,2,starpathShapeClassify;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,2,3,y1-space-w2-l3,120,3,starpathShapeClassify;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,3,1,y1-space-w3-l1,120,2,starpathShapeHunt;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,3,2,y1-space-w3-l2,120,2,starpathShapeHunt;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,3,3,y1-space-w3-l3,120,2,starpathShapeHunt;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,4,1,y1-space-w4-l1,120,2,starpathObjectSpotter;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,4,2,y1-space-w4-l2,120,3,starpathObjectCompare;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,4,3,y1-space-w4-l3,120,3,starpathObjectMatch;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,5,1,y1-space-w5-l1,120,2,starpathShapeIntro;starpathShapeWorkshop,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,5,2,y1-space-w5-l2,120,2,starpathShapeIntro;starpathShapeWorkshop,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,5,3,y1-space-w5-l3,120,2,starpathShapeIntro;starpathShapeWorkshop,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,6,1,y1-space-w6-l1,120,2,starpathRouteBuild;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,6,2,y1-space-w6-l2,120,2,starpathRouteBuild;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,6,3,y1-space-w6-l3,120,2,starpathRouteBuild;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,7,1,y1-space-w7-l1,120,2,starpathRouteDebug;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,7,2,y1-space-w7-l2,120,2,starpathRouteBuild;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,7,3,y1-space-w7-l3,120,3,starpathRouteBuild;starpathRouteDebug;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,8,1,y1-space-w8-l1,150,5,starpathObjectCompare;starpathShapeClassify;starpathShapeHunt;starpathShapeIntro;starpathShapeWorkshop,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,8,2,y1-space-w8-l2,120,4,starpathDirectionPath;starpathRouteBuild;starpathRouteDebug;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,space,8,3,y1-space-w8-l3,120,5,starpathDirectionChoice;starpathRouteBuild;starpathShapeClassify;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,1,1,y1-statistics-w1-l1,120,2,statisticaCollect;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,1,2,y1-statistics-w1-l2,120,2,statisticaCollect;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,1,3,y1-statistics-w1-l3,120,3,statisticaCollect;statisticaSort;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,2,1,y1-statistics-w2-l1,120,3,statisticaSort;statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,2,2,y1-statistics-w2-l2,120,2,statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,2,3,y1-statistics-w2-l3,120,2,statisticaGraph;statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,3,1,y1-statistics-w3-l1,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,3,2,y1-statistics-w3-l2,120,2,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,3,3,y1-statistics-w3-l3,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,4,1,y1-statistics-w4-l1,120,3,statisticaGap;statisticaRank;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,4,2,y1-statistics-w4-l2,120,3,statisticaGap;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,4,3,y1-statistics-w4-l3,120,4,statisticaGraph;statisticaRank;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,5,1,y1-statistics-w5-l1,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,5,2,y1-statistics-w5-l2,120,2,statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,5,3,y1-statistics-w5-l3,120,3,statisticaGraph;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,6,1,y1-statistics-w6-l1,120,3,statisticaCollect;statisticaSort;statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,6,2,y1-statistics-w6-l2,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+1,statistics,6,3,y1-statistics-w6-l3,120,3,statisticaGap;statisticaGraph;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,1,1,y2-measurement-w1-l1,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,1,2,y2-measurement-w1-l2,30,5,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,1,3,y2-measurement-w1-l3,30,4,toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,2,1,y2-measurement-w2-l1,30,4,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,2,2,y2-measurement-w2-l2,30,4,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,2,3,y2-measurement-w2-l3,30,4,massMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,3,1,y2-measurement-w3-l1,30,4,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,3,2,y2-measurement-w3-l2,30,4,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,3,3,y2-measurement-w3-l3,30,2,capacityMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,4,1,y2-measurement-w4-l1,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,4,2,y2-measurement-w4-l2,30,4,measurePath,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,4,3,y2-measurement-w4-l3,30,3,toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,5,1,y2-measurement-w5-l1,30,1,analogClock,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,5,2,y2-measurement-w5-l2,30,1,analogClock,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,5,3,y2-measurement-w5-l3,30,1,fractionTurn,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,6,1,y2-measurement-w6-l1,30,2,analogClock,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,6,2,y2-measurement-w6-l2,30,2,analogClock,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,6,3,y2-measurement-w6-l3,30,1,fractionTurn,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,7,1,y2-measurement-w7-l1,30,4,calendarNavigate,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,7,2,y2-measurement-w7-l2,30,4,calendarNavigate,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,7,3,y2-measurement-w7-l3,30,5,calendarNavigate,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,8,1,y2-measurement-w8-l1,30,10,calendarNavigate;capacityMeasure;fractionTurn;massMeasure;measurePath;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,8,2,y2-measurement-w8-l2,30,12,calendarNavigate;capacityMeasure;fractionTurn;massMeasure;measurePath;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,measurement,8,3,y2-measurement-w8-l3,30,9,calendarNavigate;capacityMeasure;fractionTurn;massMeasure;measurePath;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,1,1,y2-w1-l1,90,3,number_order;place_value_builder;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,1,2,y2-w1-l2,90,3,partition_expand;place_value_builder;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,1,3,y2-w1-l3,90,3,number_line;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,2,1,y2-w2-l1,90,3,multiple_choice;partition_expand;place_value_builder,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,2,2,y2-w2-l2,90,3,multiple_choice;partition_expand;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,2,3,y2-w2-l3,90,3,partition_expand;place_value_builder;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,3,1,y2-w3-l1,90,3,multiple_choice;number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,3,2,y2-w3-l2,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,3,3,y2-w3-l3,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,4,1,y2-w4-l1,90,3,multiple_choice;odd_even_sort;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,4,2,y2-w4-l2,90,3,multiple_choice;odd_even_sort;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,4,3,y2-w4-l3,90,3,multiple_choice;odd_even_sort;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,5,1,y2-w5-l1,90,3,addition_strategy;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,5,2,y2-w5-l2,90,3,addition_strategy;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,5,3,y2-w5-l3,90,3,addition_strategy;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,6,1,y2-w6-l1,90,3,multiple_choice;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,6,2,y2-w6-l2,90,3,multiple_choice;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,6,3,y2-w6-l3,90,3,fact_family;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,7,1,y2-w7-l1,90,3,fact_family;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,7,2,y2-w7-l2,90,3,fact_family;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,7,3,y2-w7-l3,90,3,fact_family;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,8,1,y2-w8-l1,90,2,fact_family;skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,8,2,y2-w8-l2,90,3,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,8,3,y2-w8-l3,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,9,1,y2-w9-l1,90,2,arrays;equal_groups,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,9,2,y2-w9-l2,90,1,arrays,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,9,3,y2-w9-l3,90,2,arrays;fact_family,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,10,1,y2-w10-l1,90,2,arrays;division_groups,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,10,2,y2-w10-l2,90,2,arrays;division_groups,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,10,3,y2-w10-l3,90,2,division_groups;fact_family,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,11,1,y2-w11-l1,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,11,2,y2-w11-l2,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,11,3,y2-w11-l3,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,12,1,y2-w12-l1,90,3,area_model_select,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,12,2,y2-w12-l2,90,1,area_model_select,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,number,12,3,y2-w12-l3,90,3,area_model_select,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,1,1,y2-space-w1-l1,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,1,2,y2-space-w1-l2,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,1,3,y2-space-w1-l3,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,2,1,y2-space-w2-l1,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,2,2,y2-space-w2-l2,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,2,3,y2-space-w2-l3,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,3,1,y2-space-w3-l1,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,3,2,y2-space-w3-l2,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,3,3,y2-space-w3-l3,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,4,1,y2-space-w4-l1,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,4,2,y2-space-w4-l2,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,4,3,y2-space-w4-l3,120,2,starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,5,1,y2-space-w5-l1,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,5,2,y2-space-w5-l2,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,5,3,y2-space-w5-l3,120,3,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,6,1,y2-space-w6-l1,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,6,2,y2-space-w6-l2,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,6,3,y2-space-w6-l3,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,7,1,y2-space-w7-l1,120,2,starpathMapRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,7,2,y2-space-w7-l2,120,2,starpathMapRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,7,3,y2-space-w7-l3,120,2,starpathMapRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,8,1,y2-space-w8-l1,120,4,starpathMapLocate;starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,8,2,y2-space-w8-l2,120,4,starpathMapLocate;starpathMapRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,space,8,3,y2-space-w8-l3,120,5,starpathMapRoute;starpathShapeFeature;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,1,1,y2-statistics-w1-l1,120,3,statisticaCollect;statisticaSort;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,1,2,y2-statistics-w1-l2,120,3,statisticaCollect;statisticaSort;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,1,3,y2-statistics-w1-l3,120,3,statisticaCollect;statisticaSort;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,2,1,y2-statistics-w2-l1,120,3,statisticaSort;statisticaTable;statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,2,2,y2-statistics-w2-l2,120,2,statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,2,3,y2-statistics-w2-l3,120,3,statisticaGraph;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,3,1,y2-statistics-w3-l1,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,3,2,y2-statistics-w3-l2,120,2,statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,3,3,y2-statistics-w3-l3,120,2,statisticaGraph;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,4,1,y2-statistics-w4-l1,120,2,statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,4,2,y2-statistics-w4-l2,120,3,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,4,3,y2-statistics-w4-l3,120,3,statisticaGraph;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,5,1,y2-statistics-w5-l1,120,3,statisticaGap;statisticaRank;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,5,2,y2-statistics-w5-l2,120,2,statisticaGap;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,5,3,y2-statistics-w5-l3,120,3,statisticaGraph;statisticaRank;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,6,1,y2-statistics-w6-l1,120,3,statisticaCollect;statisticaTable;statisticaTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,6,2,y2-statistics-w6-l2,120,2,statisticaGraph;statisticaTapGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+2,statistics,6,3,y2-statistics-w6-l3,120,3,statisticaGraph;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,1,1,y3-chance-w1-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,1,2,y3-chance-w1-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,1,3,y3-chance-w1-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,2,1,y3-chance-w2-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,2,2,y3-chance-w2-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,2,3,y3-chance-w2-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,3,1,y3-chance-w3-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,3,2,y3-chance-w3-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,3,3,y3-chance-w3-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,4,1,y3-chance-w4-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,4,2,y3-chance-w4-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,4,3,y3-chance-w4-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,5,1,y3-chance-w5-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,5,2,y3-chance-w5-l2,120,1,chanceSpinTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,5,3,y3-chance-w5-l3,120,1,chanceAutoTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,6,1,y3-chance-w6-l1,120,2,chanceAutoTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,6,2,y3-chance-w6-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,chance,6,3,y3-chance-w6-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,1,1,y3-measurement-w1-l1,30,4,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,1,2,y3-measurement-w1-l2,30,4,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,1,3,y3-measurement-w1-l3,30,3,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,2,1,y3-measurement-w2-l1,30,4,unitChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,2,2,y3-measurement-w2-l2,30,4,unitChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,2,3,y3-measurement-w2-l3,30,3,estimateMeasure;unitChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,3,1,y3-measurement-w3-l1,30,4,massUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,3,2,y3-measurement-w3-l2,30,4,massScale,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,3,3,y3-measurement-w3-l3,30,4,massScale,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,4,1,y3-measurement-w4-l1,30,4,capacity,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,4,2,y3-measurement-w4-l2,30,4,capacity,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,4,3,y3-measurement-w4-l3,30,4,capacity,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,5,1,y3-measurement-w5-l1,30,4,duration,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,5,2,y3-measurement-w5-l2,30,3,duration,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,5,3,y3-measurement-w5-l3,30,4,duration,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,6,1,y3-measurement-w6-l1,30,4,clockMinute,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,6,2,y3-measurement-w6-l2,30,4,clockMinute,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,6,3,y3-measurement-w6-l3,30,4,clockMinute,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,7,1,y3-measurement-w7-l1,30,2,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,7,2,y3-measurement-w7-l2,30,4,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,7,3,y3-measurement-w7-l3,30,4,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,8,1,y3-measurement-w8-l1,30,3,estimateMeasure;unitChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,8,2,y3-measurement-w8-l2,30,4,duration,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,measurement,8,3,y3-measurement-w8-l3,30,4,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,1,1,y3-w1-l1,90,3,number_line;place_value_builder;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,1,2,y3-w1-l2,90,3,partition_expand;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,1,3,y3-w1-l3,90,3,number_line;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,2,1,y3-w2-l1,90,2,mixed_word_problem;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,2,2,y3-w2-l2,90,3,multiple_choice;number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,2,3,y3-w2-l3,90,3,number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,3,1,y3-w3-l1,90,3,addition_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,3,2,y3-w3-l2,90,3,addition_strategy;multiple_choice;number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,3,3,y3-w3-l3,90,3,addition_strategy;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,4,1,y3-w4-l1,90,3,multiple_choice;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,4,2,y3-w4-l2,90,3,multiple_choice;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,4,3,y3-w4-l3,90,3,multiple_choice;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,5,1,y3-w5-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,5,2,y3-w5-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,5,3,y3-w5-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,6,1,y3-w6-l1,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,6,2,y3-w6-l2,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,6,3,y3-w6-l3,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,7,1,y3-w7-l1,90,3,arrays;equal_groups;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,7,2,y3-w7-l2,90,3,arrays;equal_groups;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,7,3,y3-w7-l3,90,3,division_groups;equal_groups;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,8,1,y3-w8-l1,90,3,division_groups;fact_family,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,8,2,y3-w8-l2,90,3,division_groups;fact_family;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,8,3,y3-w8-l3,90,3,fact_family;mixed_word_problem;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,9,1,y3-w9-l1,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,9,2,y3-w9-l2,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,9,3,y3-w9-l3,90,1,mixed_word_problem,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,10,1,y3-w10-l1,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,10,2,y3-w10-l2,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,10,3,y3-w10-l3,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,11,1,y3-w11-l1,90,3,area_model_select,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,11,2,y3-w11-l2,90,3,set_model_select,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,11,3,y3-w11-l3,90,3,build_the_whole,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,12,1,y3-w12-l1,90,3,area_model_select;build_the_whole;fraction_compare,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,12,2,y3-w12-l2,90,3,number_line_place,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,number,12,3,y3-w12-l3,90,3,fraction_compare,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,1,1,y3-algebra-w1-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,1,2,y3-algebra-w1-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,1,3,y3-algebra-w1-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,2,1,y3-algebra-w2-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,2,2,y3-algebra-w2-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,2,3,y3-algebra-w2-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,3,1,y3-algebra-w3-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,3,2,y3-algebra-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,3,3,y3-algebra-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,4,1,y3-algebra-w4-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,4,2,y3-algebra-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,4,3,y3-algebra-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,5,1,y3-algebra-w5-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,5,2,y3-algebra-w5-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,5,3,y3-algebra-w5-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,6,1,y3-algebra-w6-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,6,2,y3-algebra-w6-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,6,3,y3-algebra-w6-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,7,1,y3-algebra-w7-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,7,2,y3-algebra-w7-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,7,3,y3-algebra-w7-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,8,1,y3-algebra-w8-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,8,2,y3-algebra-w8-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,pattern,8,3,y3-algebra-w8-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,1,1,y3-space-w1-l1,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,1,2,y3-space-w1-l2,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,1,3,y3-space-w1-l3,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,2,1,y3-space-w2-l1,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,2,2,y3-space-w2-l2,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,2,3,y3-space-w2-l3,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,3,1,y3-space-w3-l1,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,3,2,y3-space-w3-l2,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,3,3,y3-space-w3-l3,120,2,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,4,1,y3-space-w4-l1,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,4,2,y3-space-w4-l2,120,2,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,4,3,y3-space-w4-l3,120,4,starpathMapLocate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,5,1,y3-space-w5-l1,120,2,starpathMapCreate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,5,2,y3-space-w5-l2,120,2,starpathMapCreate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,5,3,y3-space-w5-l3,120,2,starpathMapCreate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,6,1,y3-space-w6-l1,120,2,starpathShapeIntro;starpathSteer,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,6,2,y3-space-w6-l2,120,2,starpathShapeIntro;starpathSteer,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,6,3,y3-space-w6-l3,120,2,starpathShapeIntro;starpathSteer,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,7,1,y3-space-w7-l1,120,6,starpathMapLocate;starpathMapRoute;starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,7,2,y3-space-w7-l2,120,4,starpathMapLocate;starpathMapRoute;starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,7,3,y3-space-w7-l3,120,4,starpathMapRoute;starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,8,1,y3-space-w8-l1,120,6,starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,8,2,y3-space-w8-l2,120,6,starpathMapCreate;starpathMapLocate;starpathMapRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,space,8,3,y3-space-w8-l3,120,4,starpathMapCreate;starpathMapRoute;starpathObject;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,1,1,y3-statistics-w1-l1,120,3,statisticaClassify;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,1,2,y3-statistics-w1-l2,120,3,statisticaClassify;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,1,3,y3-statistics-w1-l3,120,2,statisticaClassify;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,2,1,y3-statistics-w2-l1,120,3,statisticaClassify;statisticaGraph;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,2,2,y3-statistics-w2-l2,120,3,statisticaClassify;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,2,3,y3-statistics-w2-l3,120,3,statisticaGraph;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,3,1,y3-statistics-w3-l1,120,2,statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,3,2,y3-statistics-w3-l2,120,2,statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,3,3,y3-statistics-w3-l3,120,2,statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,4,1,y3-statistics-w4-l1,120,2,statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,4,2,y3-statistics-w4-l2,120,2,statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,4,3,y3-statistics-w4-l3,120,3,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,5,1,y3-statistics-w5-l1,120,2,statisticaGraph;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,5,2,y3-statistics-w5-l2,120,3,statisticaGap;statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,5,3,y3-statistics-w5-l3,120,3,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,6,1,y3-statistics-w6-l1,120,3,statisticaClassify;statisticaGraph;statisticaTable,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,6,2,y3-statistics-w6-l2,120,2,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+3,statistics,6,3,y3-statistics-w6-l3,120,3,statisticaGraph;statisticaInference;statisticaRank,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,1,1,y4-chance-w1-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,1,2,y4-chance-w1-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,1,3,y4-chance-w1-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,2,1,y4-chance-w2-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,2,2,y4-chance-w2-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,2,3,y4-chance-w2-l3,120,1,chanceCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,3,1,y4-chance-w3-l1,120,1,chanceDependentDraw,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,3,2,y4-chance-w3-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,3,3,y4-chance-w3-l3,120,1,chanceDependentDraw,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,4,1,y4-chance-w4-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,4,2,y4-chance-w4-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,4,3,y4-chance-w4-l3,120,1,chanceBuildFair,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,5,1,y4-chance-w5-l1,120,2,chanceCompare;chancePredictCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,5,2,y4-chance-w5-l2,120,1,chanceCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,5,3,y4-chance-w5-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,6,1,y4-chance-w6-l1,120,1,chanceAutoTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,6,2,y4-chance-w6-l2,120,1,chanceAutoTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,chance,6,3,y4-chance-w6-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,1,1,y4-measurement-w1-l1,30,2,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,1,2,y4-measurement-w1-l2,30,4,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,1,3,y4-measurement-w1-l3,30,4,rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,2,1,y4-measurement-w2-l1,30,3,massScale,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,2,2,y4-measurement-w2-l2,30,3,capacity,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,2,3,y4-measurement-w2-l3,30,5,capacity;massScale,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,3,1,y4-measurement-w3-l1,30,4,temperature,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,3,2,y4-measurement-w3-l2,30,3,temperature,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,3,3,y4-measurement-w3-l3,30,3,temperature,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,4,1,y4-measurement-w4-l1,30,4,perimeterCalc;rulerMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,4,2,y4-measurement-w4-l2,30,4,perimeterCalc,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,4,3,y4-measurement-w4-l3,30,2,perimeterCalc,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,5,1,y4-measurement-w5-l1,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,5,2,y4-measurement-w5-l2,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,5,3,y4-measurement-w5-l3,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,6,1,y4-measurement-w6-l1,30,4,timeQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,6,2,y4-measurement-w6-l2,30,4,timeQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,6,3,y4-measurement-w6-l3,30,4,timeQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,7,1,y4-measurement-w7-l1,30,2,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,7,2,y4-measurement-w7-l2,30,4,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,7,3,y4-measurement-w7-l3,30,5,angleQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,8,1,y4-measurement-w8-l1,30,6,area;perimeterCalc;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,8,2,y4-measurement-w8-l2,30,12,capacity;massScale;temperature,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,measurement,8,3,y4-measurement-w8-l3,30,16,angleQuest;area;capacity;perimeterCalc;rulerMeasure;temperature;timeQuest;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,1,1,y4-w1-l1,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,1,2,y4-w1-l2,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,1,3,y4-w1-l3,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,2,1,y4-w2-l1,90,3,multiple_choice;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,2,2,y4-w2-l2,90,3,multiple_choice;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,2,3,y4-w2-l3,90,1,number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,3,1,y4-w3-l1,90,2,multiple_choice;odd_even_sort,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,3,2,y4-w3-l2,90,3,multiple_choice;odd_even_sort;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,3,3,y4-w3-l3,90,3,multiple_choice;odd_even_sort;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,4,1,y4-w4-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,4,2,y4-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,4,3,y4-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,5,1,y4-w5-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,5,2,y4-w5-l2,90,3,addition_strategy;subtraction_strategy;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,5,3,y4-w5-l3,90,3,addition_strategy;multiple_choice;subtraction_strategy,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,6,1,y4-w6-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,6,2,y4-w6-l2,90,2,arrays;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,6,3,y4-w6-l3,90,3,division_groups;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,7,1,y4-w7-l1,90,2,multiple_choice;number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,7,2,y4-w7-l2,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,7,3,y4-w7-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,8,1,y4-w8-l1,90,2,mixed_word_problem;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,8,2,y4-w8-l2,90,2,mixed_word_problem;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,8,3,y4-w8-l3,90,2,mixed_word_problem;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,9,1,y4-w9-l1,90,3,area_model_select;equivalent_fraction_build;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,9,2,y4-w9-l2,90,3,area_model_select;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,9,3,y4-w9-l3,90,3,equivalent_fraction_build;equivalent_fraction_yes_no;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,10,1,y4-w10-l1,90,3,multiple_choice;number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,10,2,y4-w10-l2,90,3,multiple_choice;number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,10,3,y4-w10-l3,90,3,number_line_place,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,11,1,y4-w11-l1,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,11,2,y4-w11-l2,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,11,3,y4-w11-l3,90,1,skip_count,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,12,1,y4-w12-l1,90,3,area_model_select;multiple_choice;number_line_place,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,12,2,y4-w12-l2,90,2,mixed_word_problem;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,number,12,3,y4-w12-l3,90,3,multiple_choice;skip_count;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,1,1,y4-algebra-w1-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,1,2,y4-algebra-w1-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,1,3,y4-algebra-w1-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,2,1,y4-algebra-w2-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,2,2,y4-algebra-w2-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,2,3,y4-algebra-w2-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,3,1,y4-algebra-w3-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,3,2,y4-algebra-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,3,3,y4-algebra-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,4,1,y4-algebra-w4-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,4,2,y4-algebra-w4-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,4,3,y4-algebra-w4-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,5,1,y4-algebra-w5-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,5,2,y4-algebra-w5-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,5,3,y4-algebra-w5-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,6,1,y4-algebra-w6-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,6,2,y4-algebra-w6-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,6,3,y4-algebra-w6-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,7,1,y4-algebra-w7-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,7,2,y4-algebra-w7-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,7,3,y4-algebra-w7-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,8,1,y4-algebra-w8-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,8,2,y4-algebra-w8-l2,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,pattern,8,3,y4-algebra-w8-l3,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,1,1,y4-space-w1-l1,120,4,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,1,2,y4-space-w1-l2,120,4,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,1,3,y4-space-w1-l3,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,2,1,y4-space-w2-l1,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,2,2,y4-space-w2-l2,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,2,3,y4-space-w2-l3,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,3,1,y4-space-w3-l1,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,3,2,y4-space-w3-l2,120,3,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,3,3,y4-space-w3-l3,120,4,starpathComposite;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,4,1,y4-space-w4-l1,120,4,starpathGridReference;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,4,2,y4-space-w4-l2,120,4,starpathGridReference;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,4,3,y4-space-w4-l3,120,4,starpathGridReference;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,5,1,y4-space-w5-l1,120,4,starpathGridRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,5,2,y4-space-w5-l2,120,3,starpathGridRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,5,3,y4-space-w5-l3,120,4,starpathGridRoute;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,6,1,y4-space-w6-l1,120,3,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,6,2,y4-space-w6-l2,120,2,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,6,3,y4-space-w6-l3,120,3,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,7,1,y4-space-w7-l1,120,3,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,7,2,y4-space-w7-l2,120,3,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,7,3,y4-space-w7-l3,120,4,starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,8,1,y4-space-w8-l1,120,4,starpathComposite;starpathGridRoute;starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,8,2,y4-space-w8-l2,120,4,starpathComposite;starpathGridRoute;starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,space,8,3,y4-space-w8-l3,120,4,starpathComposite;starpathGridRoute;starpathShapeIntro;starpathSymmetry,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,1,1,y4-statistics-w1-l1,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,1,2,y4-statistics-w1-l2,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,1,3,y4-statistics-w1-l3,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,2,1,y4-statistics-w2-l1,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,2,2,y4-statistics-w2-l2,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,2,3,y4-statistics-w2-l3,120,3,statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,3,1,y4-statistics-w3-l1,120,2,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,3,2,y4-statistics-w3-l2,120,3,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,3,3,y4-statistics-w3-l3,120,2,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,4,1,y4-statistics-w4-l1,120,3,statisticaGraph;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,4,2,y4-statistics-w4-l2,120,3,statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,4,3,y4-statistics-w4-l3,120,3,statisticaGraph;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,5,1,y4-statistics-w5-l1,120,3,statisticaGraph;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,5,2,y4-statistics-w5-l2,120,3,statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,5,3,y4-statistics-w5-l3,120,3,statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,6,1,y4-statistics-w6-l1,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,6,2,y4-statistics-w6-l2,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+4,statistics,6,3,y4-statistics-w6-l3,120,3,statisticaGraph;statisticaInference;statisticaPictograph,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,1,1,y5-chance-w1-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,1,2,y5-chance-w1-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,1,3,y5-chance-w1-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,2,1,y5-chance-w2-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,2,2,y5-chance-w2-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,2,3,y5-chance-w2-l3,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,3,1,y5-chance-w3-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,3,2,y5-chance-w3-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,3,3,y5-chance-w3-l3,120,2,chanceDiceRace;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,4,1,y5-chance-w4-l1,120,1,chanceSpinTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,4,2,y5-chance-w4-l2,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,4,3,y5-chance-w4-l3,120,2,chanceAutoTally;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,5,1,y5-chance-w5-l1,120,2,chanceCompare;chancePredictCount,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,5,2,y5-chance-w5-l2,120,2,chanceAutoTally;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,5,3,y5-chance-w5-l3,120,2,chanceCompare;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,6,1,y5-chance-w6-l1,120,1,mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,6,2,y5-chance-w6-l2,120,3,chanceAutoTally;chanceSpinTally,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,chance,6,3,y5-chance-w6-l3,120,2,chanceDiceRace;mcq,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,1,1,y5-measurement-w1-l1,30,4,metricUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,1,2,y5-measurement-w1-l2,30,2,metricUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,1,3,y5-measurement-w1-l3,30,4,metricUnit,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,2,1,y5-measurement-w2-l1,30,3,precisionMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,2,2,y5-measurement-w2-l2,30,4,precisionMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,2,3,y5-measurement-w2-l3,30,3,precisionMeasure,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,3,1,y5-measurement-w3-l1,30,4,perimeterCalc,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,3,2,y5-measurement-w3-l2,30,4,perimeterCalc,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,3,3,y5-measurement-w3-l3,30,2,perimeterCalc,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,4,1,y5-measurement-w4-l1,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,4,2,y5-measurement-w4-l2,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,4,3,y5-measurement-w4-l3,30,3,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,5,1,y5-measurement-w5-l1,30,3,metricUnit;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,5,2,y5-measurement-w5-l2,30,3,area;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,5,3,y5-measurement-w5-l3,30,3,area;perimeterCalc;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,6,1,y5-measurement-w6-l1,30,4,time24,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,6,2,y5-measurement-w6-l2,30,4,time24,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,6,3,y5-measurement-w6-l3,30,4,time24,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,7,1,y5-measurement-w7-l1,30,4,protractor,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,7,2,y5-measurement-w7-l2,30,1,protractor,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,7,3,y5-measurement-w7-l3,30,1,protractor,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,8,1,y5-measurement-w8-l1,30,5,area;perimeterCalc;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,8,2,y5-measurement-w8-l2,30,13,area;massScale;metricUnit;perimeterCalc;precisionMeasure;protractor;temperature;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,measurement,8,3,y5-measurement-w8-l3,30,12,area;capacity;metricUnit;perimeterCalc;protractor;time24;toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,1,1,y5-w1-l1,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,1,2,y5-w1-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,1,3,y5-w1-l3,90,2,multiple_choice;number_line,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,2,1,y5-w2-l1,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,2,2,y5-w2-l2,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,2,3,y5-w2-l3,90,3,multiple_choice;number_line;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,3,1,y5-w3-l1,90,3,arrays;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,3,2,y5-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,3,3,y5-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,4,1,y5-w4-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,4,2,y5-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,4,3,y5-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,5,1,y5-w5-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,5,2,y5-w5-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,5,3,y5-w5-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,6,1,y5-w6-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,6,2,y5-w6-l2,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,6,3,y5-w6-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,7,1,y5-w7-l1,90,3,equivalent_fraction_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,7,2,y5-w7-l2,90,3,fraction_compare;number_line_place,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,7,3,y5-w7-l3,90,3,number_line_place,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,8,1,y5-w8-l1,90,3,multiple_choice;number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,8,2,y5-w8-l2,90,3,multiple_choice;number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,8,3,y5-w8-l3,90,3,multiple_choice;number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,9,1,y5-w9-l1,90,3,fraction_decimal_percent_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,9,2,y5-w9-l2,90,2,benchmark_sort;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,9,3,y5-w9-l3,90,3,fraction_decimal_percent_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,10,1,y5-w10-l1,90,3,fraction_decimal_percent_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,10,2,y5-w10-l2,90,2,benchmark_sort;multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,10,3,y5-w10-l3,90,3,fraction_decimal_percent_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,11,1,y5-w11-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,11,2,y5-w11-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,11,3,y5-w11-l3,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,12,1,y5-w12-l1,90,2,number_line_place;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,12,2,y5-w12-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,number,12,3,y5-w12-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,1,1,y5-algebra-w1-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,1,2,y5-algebra-w1-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,1,3,y5-algebra-w1-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,2,1,y5-algebra-w2-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,2,2,y5-algebra-w2-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,2,3,y5-algebra-w2-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,3,1,y5-algebra-w3-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,3,2,y5-algebra-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,3,3,y5-algebra-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,4,1,y5-algebra-w4-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,4,2,y5-algebra-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,4,3,y5-algebra-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,5,1,y5-algebra-w5-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,5,2,y5-algebra-w5-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,5,3,y5-algebra-w5-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,6,1,y5-algebra-w6-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,6,2,y5-algebra-w6-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,6,3,y5-algebra-w6-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,7,1,y5-algebra-w7-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,7,2,y5-algebra-w7-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,7,3,y5-algebra-w7-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,8,1,y5-algebra-w8-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,8,2,y5-algebra-w8-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,pattern,8,3,y5-algebra-w8-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,1,1,y5-space-w1-l1,120,2,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,1,2,y5-space-w1-l2,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,1,3,y5-space-w1-l3,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,2,1,y5-space-w2-l1,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,2,2,y5-space-w2-l2,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,2,3,y5-space-w2-l3,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,3,1,y5-space-w3-l1,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,3,2,y5-space-w3-l2,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,3,3,y5-space-w3-l3,120,3,starpathNet;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,4,1,y5-space-w4-l1,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,4,2,y5-space-w4-l2,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,4,3,y5-space-w4-l3,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,5,1,y5-space-w5-l1,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,5,2,y5-space-w5-l2,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,5,3,y5-space-w5-l3,120,3,starpathCoordinate;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,6,1,y5-space-w6-l1,120,3,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,6,2,y5-space-w6-l2,120,4,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,6,3,y5-space-w6-l3,120,3,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,7,1,y5-space-w7-l1,120,3,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,7,2,y5-space-w7-l2,120,3,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,7,3,y5-space-w7-l3,120,3,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,8,1,y5-space-w8-l1,120,4,starpathCoordinate;starpathNet;starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,8,2,y5-space-w8-l2,120,4,starpathCoordinate;starpathNet;starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,space,8,3,y5-space-w8-l3,120,4,starpathCoordinate;starpathNet;starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,1,1,y5-statistics-w1-l1,120,2,statisticaClassify;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,1,2,y5-statistics-w1-l2,120,2,statisticaClassify;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,1,3,y5-statistics-w1-l3,120,2,statisticaClassify;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,2,1,y5-statistics-w2-l1,120,1,statisticaClassify,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,2,2,y5-statistics-w2-l2,120,1,statisticaClassify,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,2,3,y5-statistics-w2-l3,120,1,statisticaClassify,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,3,1,y5-statistics-w3-l1,120,3,statisticaClassify;statisticaConcept;statisticaGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,3,2,y5-statistics-w3-l2,120,3,statisticaGraph;statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,3,3,y5-statistics-w3-l3,120,3,statisticaGraph;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,4,1,y5-statistics-w4-l1,120,2,statisticaLineGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,4,2,y5-statistics-w4-l2,120,2,statisticaLineGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,4,3,y5-statistics-w4-l3,120,3,statisticaLineGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,5,1,y5-statistics-w5-l1,120,2,statisticaDisplayStudio,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,5,2,y5-statistics-w5-l2,120,2,statisticaDisplayStudio,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,5,3,y5-statistics-w5-l3,120,2,statisticaDisplayStudio,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,6,1,y5-statistics-w6-l1,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,6,2,y5-statistics-w6-l2,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+5,statistics,6,3,y5-statistics-w6-l3,120,3,statisticaClassify;statisticaGraph;statisticaLineGraph,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,1,1,y6-chance-w1-l1,120,1,chanceScalePortal,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,1,2,y6-chance-w1-l2,120,1,chanceFormMatch,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,1,3,y6-chance-w1-l3,120,1,chanceScalePortal,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,2,1,y6-chance-w2-l1,120,1,chanceProbabilityForge,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,2,2,y6-chance-w2-l2,120,1,chanceProbabilityForge,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,2,3,y6-chance-w2-l3,120,1,chanceProbabilityForge,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,3,1,y6-chance-w3-l1,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,3,2,y6-chance-w3-l2,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,3,3,y6-chance-w3-l3,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,4,1,y6-chance-w4-l1,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,4,2,y6-chance-w4-l2,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,4,3,y6-chance-w4-l3,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,5,1,y6-chance-w5-l1,120,1,chanceCompare,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,5,2,y6-chance-w5-l2,120,1,chanceProbabilityForge,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,5,3,y6-chance-w5-l3,120,1,chanceProbabilityForge,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,6,1,y6-chance-w6-l1,120,1,chanceModelDebugger,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,6,2,y6-chance-w6-l2,120,1,chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,chance,6,3,y6-chance-w6-l3,120,2,chanceMasterTrial;chanceSimulationLab,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,1,1,y6-measurement-w1-l1,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,1,2,y6-measurement-w1-l2,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,1,3,y6-measurement-w1-l3,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,2,1,y6-measurement-w2-l1,30,3,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,2,2,y6-measurement-w2-l2,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,2,3,y6-measurement-w2-l3,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,3,1,y6-measurement-w3-l1,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,3,2,y6-measurement-w3-l2,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,3,3,y6-measurement-w3-l3,30,4,area,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,4,1,y6-measurement-w4-l1,30,4,metricConvert,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,4,2,y6-measurement-w4-l2,30,3,metricConvert,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,4,3,y6-measurement-w4-l3,30,3,metricConvert,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,5,1,y6-measurement-w5-l1,30,3,timetable,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,5,2,y6-measurement-w5-l2,30,3,timeQuest,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,5,3,y6-measurement-w5-l3,30,3,time24;timeQuest;timetable,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,6,1,y6-measurement-w6-l1,30,4,angleReason,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,6,2,y6-measurement-w6-l2,30,3,angleReason,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,6,3,y6-measurement-w6-l3,30,3,angleReason,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,7,1,y6-measurement-w7-l1,30,2,toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,7,2,y6-measurement-w7-l2,30,2,toolChoice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,7,3,y6-measurement-w7-l3,30,1,investigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,8,1,y6-measurement-w8-l1,30,1,investigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,8,2,y6-measurement-w8-l2,30,1,investigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,measurement,8,3,y6-measurement-w8-l3,30,1,investigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,1,1,y6-w1-l1,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,1,2,y6-w1-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,1,3,y6-w1-l3,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,2,1,y6-w2-l1,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,2,2,y6-w2-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,2,3,y6-w2-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,3,1,y6-w3-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,3,2,y6-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,3,3,y6-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,4,1,y6-w4-l1,90,3,multiple_choice;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,4,2,y6-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,4,3,y6-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,5,1,y6-w5-l1,90,3,equivalent_fraction_match;equivalent_fraction_yes_no;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,5,2,y6-w5-l2,90,3,fraction_compare;multiple_choice;number_order,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,5,3,y6-w5-l3,90,3,multiple_choice;number_order;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,6,1,y6-w6-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,6,2,y6-w6-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,6,3,y6-w6-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,7,1,y6-w7-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,7,2,y6-w7-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,7,3,y6-w7-l3,90,3,fraction_decimal_percent_match;multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,8,1,y6-w8-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,8,2,y6-w8-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,8,3,y6-w8-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,9,1,y6-w9-l1,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,9,2,y6-w9-l2,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,9,3,y6-w9-l3,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,10,1,y6-w10-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,10,2,y6-w10-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,10,3,y6-w10-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,11,1,y6-w11-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,11,2,y6-w11-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,11,3,y6-w11-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,12,1,y6-w12-l1,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,12,2,y6-w12-l2,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,number,12,3,y6-w12-l3,90,1,multiple_choice,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,1,1,y6-algebra-w1-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,1,2,y6-algebra-w1-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,1,3,y6-algebra-w1-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,2,1,y6-algebra-w2-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,2,2,y6-algebra-w2-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,2,3,y6-algebra-w2-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,3,1,y6-algebra-w3-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,3,2,y6-algebra-w3-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,3,3,y6-algebra-w3-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,4,1,y6-algebra-w4-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,4,2,y6-algebra-w4-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,4,3,y6-algebra-w4-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,5,1,y6-algebra-w5-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,5,2,y6-algebra-w5-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,5,3,y6-algebra-w5-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,6,1,y6-algebra-w6-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,6,2,y6-algebra-w6-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,6,3,y6-algebra-w6-l3,90,1,typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,7,1,y6-algebra-w7-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,7,2,y6-algebra-w7-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,7,3,y6-algebra-w7-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,8,1,y6-algebra-w8-l1,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,8,2,y6-algebra-w8-l2,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,pattern,8,3,y6-algebra-w8-l3,90,2,multiple_choice;typed_response,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,1,1,y6-space-w1-l1,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,1,2,y6-space-w1-l2,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,1,3,y6-space-w1-l3,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,2,1,y6-space-w2-l1,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,2,2,y6-space-w2-l2,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,2,3,y6-space-w2-l3,120,2,starpathCrossSection;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,3,1,y6-space-w3-l1,120,3,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,3,2,y6-space-w3-l2,120,3,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,3,3,y6-space-w3-l3,120,3,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,4,1,y6-space-w4-l1,120,2,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,4,2,y6-space-w4-l2,120,2,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,4,3,y6-space-w4-l3,120,2,starpathCartesian;starpathShapeIntro,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,5,1,y6-space-w5-l1,120,2,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,5,2,y6-space-w5-l2,120,2,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,5,3,y6-space-w5-l3,120,2,starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,6,1,y6-space-w6-l1,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,6,2,y6-space-w6-l2,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,6,3,y6-space-w6-l3,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,7,1,y6-space-w7-l1,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,7,2,y6-space-w7-l2,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,7,3,y6-space-w7-l3,120,2,starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,8,1,y6-space-w8-l1,120,4,starpathCartesian;starpathCrossSection;starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,8,2,y6-space-w8-l2,120,4,starpathCartesian;starpathCrossSection;starpathShapeIntro;starpathTransform,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,space,8,3,y6-space-w8-l3,120,4,starpathCartesian;starpathCrossSection;starpathShapeIntro;starpathTessellation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,1,1,y6-statistics-w1-l1,120,1,statisticaClassify,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,1,2,y6-statistics-w1-l2,120,2,statisticaClassify;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,1,3,y6-statistics-w1-l3,120,3,statisticaClassify;statisticaShape;statisticaSort,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,2,1,y6-statistics-w2-l1,120,2,statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,2,2,y6-statistics-w2-l2,120,4,statisticaConcept;statisticaGraph;statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,2,3,y6-statistics-w2-l3,120,3,statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,3,1,y6-statistics-w3-l1,120,2,statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,3,2,y6-statistics-w3-l2,120,2,statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,3,3,y6-statistics-w3-l3,120,2,statisticaInference;statisticaShape,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,4,1,y6-statistics-w4-l1,120,4,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,4,2,y6-statistics-w4-l2,120,3,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,4,3,y6-statistics-w4-l3,120,3,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,5,1,y6-statistics-w5-l1,120,4,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,5,2,y6-statistics-w5-l2,120,2,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,5,3,y6-statistics-w5-l3,120,2,statisticaClassify;statisticaMediaAnalysis,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,6,1,y6-statistics-w6-l1,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,6,2,y6-statistics-w6-l2,120,1,statisticaInvestigation,Generated task acceptance + sampled independent maths + SSR/browser layout
+6,statistics,6,3,y6-statistics-w6-l3,120,3,statisticaClassify;statisticaGraph;statisticaInference,Generated task acceptance + sampled independent maths + SSR/browser layout
+7,chance,1,1,y7-chance-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,1,2,y7-chance-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,1,3,y7-chance-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,2,1,y7-chance-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,2,2,y7-chance-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,2,3,y7-chance-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,3,1,y7-chance-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,3,2,y7-chance-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,3,3,y7-chance-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,4,1,y7-chance-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,4,2,y7-chance-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,4,3,y7-chance-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,5,1,y7-chance-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,5,2,y7-chance-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,5,3,y7-chance-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,6,1,y7-chance-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,6,2,y7-chance-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,6,3,y7-chance-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,7,1,y7-chance-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,7,2,y7-chance-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,7,3,y7-chance-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,8,1,y7-chance-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,8,2,y7-chance-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,chance,8,3,y7-chance-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,1,1,y7-measurement-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,1,2,y7-measurement-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,1,3,y7-measurement-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,2,1,y7-measurement-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,2,2,y7-measurement-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,2,3,y7-measurement-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,3,1,y7-measurement-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,3,2,y7-measurement-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,3,3,y7-measurement-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,4,1,y7-measurement-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,4,2,y7-measurement-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,4,3,y7-measurement-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,5,1,y7-measurement-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,5,2,y7-measurement-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,5,3,y7-measurement-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,6,1,y7-measurement-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,6,2,y7-measurement-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,6,3,y7-measurement-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,7,1,y7-measurement-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,7,2,y7-measurement-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,7,3,y7-measurement-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,8,1,y7-measurement-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,8,2,y7-measurement-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,8,3,y7-measurement-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,9,1,y7-measurement-w9-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,9,2,y7-measurement-w9-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,9,3,y7-measurement-w9-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,10,1,y7-measurement-w10-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,10,2,y7-measurement-w10-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,10,3,y7-measurement-w10-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,11,1,y7-measurement-w11-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,11,2,y7-measurement-w11-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,11,3,y7-measurement-w11-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,12,1,y7-measurement-w12-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,12,2,y7-measurement-w12-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,measurement,12,3,y7-measurement-w12-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,1,1,y7-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,1,2,y7-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,1,3,y7-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,2,1,y7-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,2,2,y7-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,2,3,y7-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,3,1,y7-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,3,2,y7-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,3,3,y7-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,4,1,y7-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,4,2,y7-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,4,3,y7-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,5,1,y7-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,5,2,y7-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,5,3,y7-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,6,1,y7-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,6,2,y7-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,6,3,y7-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,7,1,y7-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,7,2,y7-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,7,3,y7-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,8,1,y7-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,8,2,y7-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,8,3,y7-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,9,1,y7-w9-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,9,2,y7-w9-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,9,3,y7-w9-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,10,1,y7-w10-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,10,2,y7-w10-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,10,3,y7-w10-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,11,1,y7-w11-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,11,2,y7-w11-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,11,3,y7-w11-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,12,1,y7-w12-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,12,2,y7-w12-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,number,12,3,y7-w12-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,1,1,y7-pattern-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,1,2,y7-pattern-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,1,3,y7-pattern-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,2,1,y7-pattern-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,2,2,y7-pattern-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,2,3,y7-pattern-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,3,1,y7-pattern-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,3,2,y7-pattern-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,3,3,y7-pattern-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,4,1,y7-pattern-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,4,2,y7-pattern-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,4,3,y7-pattern-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,5,1,y7-pattern-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,5,2,y7-pattern-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,5,3,y7-pattern-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,6,1,y7-pattern-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,6,2,y7-pattern-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,6,3,y7-pattern-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,7,1,y7-pattern-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,7,2,y7-pattern-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,7,3,y7-pattern-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,8,1,y7-pattern-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,8,2,y7-pattern-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,8,3,y7-pattern-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,9,1,y7-pattern-w9-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,9,2,y7-pattern-w9-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,9,3,y7-pattern-w9-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,10,1,y7-pattern-w10-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,10,2,y7-pattern-w10-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,10,3,y7-pattern-w10-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,11,1,y7-pattern-w11-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,11,2,y7-pattern-w11-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,11,3,y7-pattern-w11-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,12,1,y7-pattern-w12-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,12,2,y7-pattern-w12-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,pattern,12,3,y7-pattern-w12-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,1,1,y7-space-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,1,2,y7-space-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,1,3,y7-space-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,2,1,y7-space-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,2,2,y7-space-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,2,3,y7-space-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,3,1,y7-space-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,3,2,y7-space-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,3,3,y7-space-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,4,1,y7-space-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,4,2,y7-space-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,4,3,y7-space-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,5,1,y7-space-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,5,2,y7-space-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,5,3,y7-space-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,6,1,y7-space-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,6,2,y7-space-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,6,3,y7-space-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,7,1,y7-space-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,7,2,y7-space-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,7,3,y7-space-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,8,1,y7-space-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,8,2,y7-space-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,8,3,y7-space-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,9,1,y7-space-w9-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,9,2,y7-space-w9-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,9,3,y7-space-w9-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,10,1,y7-space-w10-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,10,2,y7-space-w10-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,space,10,3,y7-space-w10-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,1,1,y7-statistics-w1-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,1,2,y7-statistics-w1-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,1,3,y7-statistics-w1-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,2,1,y7-statistics-w2-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,2,2,y7-statistics-w2-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,2,3,y7-statistics-w2-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,3,1,y7-statistics-w3-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,3,2,y7-statistics-w3-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,3,3,y7-statistics-w3-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,4,1,y7-statistics-w4-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,4,2,y7-statistics-w4-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,4,3,y7-statistics-w4-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,5,1,y7-statistics-w5-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,5,2,y7-statistics-w5-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,5,3,y7-statistics-w5-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,6,1,y7-statistics-w6-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,6,2,y7-statistics-w6-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,6,3,y7-statistics-w6-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,7,1,y7-statistics-w7-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,7,2,y7-statistics-w7-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,7,3,y7-statistics-w7-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,8,1,y7-statistics-w8-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,8,2,y7-statistics-w8-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,8,3,y7-statistics-w8-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,9,1,y7-statistics-w9-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,9,2,y7-statistics-w9-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,9,3,y7-statistics-w9-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,10,1,y7-statistics-w10-l1,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,10,2,y7-statistics-w10-l2,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+7,statistics,10,3,y7-statistics-w10-l3,,6,multiple_choice,Three roles / two seeds rendered + Level 7 release/readability checks
+8,chance,1,1,y8-chance-w1-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,1,2,y8-chance-w1-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,1,3,y8-chance-w1-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,2,1,y8-chance-w2-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,2,2,y8-chance-w2-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,2,3,y8-chance-w2-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,3,1,y8-chance-w3-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,3,2,y8-chance-w3-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,3,3,y8-chance-w3-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,4,1,y8-chance-w4-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,4,2,y8-chance-w4-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,4,3,y8-chance-w4-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,5,1,y8-chance-w5-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,5,2,y8-chance-w5-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,5,3,y8-chance-w5-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,6,1,y8-chance-w6-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,6,2,y8-chance-w6-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,6,3,y8-chance-w6-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,7,1,y8-chance-w7-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,7,2,y8-chance-w7-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,7,3,y8-chance-w7-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,8,1,y8-chance-w8-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,8,2,y8-chance-w8-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,8,3,y8-chance-w8-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,9,1,y8-chance-w9-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,9,2,y8-chance-w9-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,9,3,y8-chance-w9-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,10,1,y8-chance-w10-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,10,2,y8-chance-w10-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,chance,10,3,y8-chance-w10-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,1,1,y8-number-w1-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,1,2,y8-number-w1-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,1,3,y8-number-w1-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,2,1,y8-number-w2-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,2,2,y8-number-w2-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,2,3,y8-number-w2-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,3,1,y8-number-w3-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,3,2,y8-number-w3-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,3,3,y8-number-w3-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,4,1,y8-number-w4-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,4,2,y8-number-w4-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,4,3,y8-number-w4-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,5,1,y8-number-w5-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,5,2,y8-number-w5-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,5,3,y8-number-w5-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,6,1,y8-number-w6-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,6,2,y8-number-w6-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,6,3,y8-number-w6-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,7,1,y8-number-w7-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,7,2,y8-number-w7-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,7,3,y8-number-w7-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,8,1,y8-number-w8-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,8,2,y8-number-w8-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,8,3,y8-number-w8-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,9,1,y8-number-w9-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,9,2,y8-number-w9-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,9,3,y8-number-w9-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,10,1,y8-number-w10-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,10,2,y8-number-w10-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,10,3,y8-number-w10-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,11,1,y8-number-w11-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,11,2,y8-number-w11-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,11,3,y8-number-w11-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,12,1,y8-number-w12-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,12,2,y8-number-w12-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,number,12,3,y8-number-w12-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,1,1,y8-pattern-w1-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,1,2,y8-pattern-w1-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,1,3,y8-pattern-w1-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,2,1,y8-pattern-w2-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,2,2,y8-pattern-w2-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,2,3,y8-pattern-w2-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,3,1,y8-pattern-w3-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,3,2,y8-pattern-w3-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,3,3,y8-pattern-w3-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,4,1,y8-pattern-w4-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,4,2,y8-pattern-w4-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,4,3,y8-pattern-w4-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,5,1,y8-pattern-w5-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,5,2,y8-pattern-w5-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,5,3,y8-pattern-w5-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,6,1,y8-pattern-w6-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,6,2,y8-pattern-w6-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,6,3,y8-pattern-w6-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,7,1,y8-pattern-w7-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,7,2,y8-pattern-w7-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,7,3,y8-pattern-w7-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,8,1,y8-pattern-w8-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,8,2,y8-pattern-w8-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,8,3,y8-pattern-w8-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,9,1,y8-pattern-w9-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,9,2,y8-pattern-w9-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,9,3,y8-pattern-w9-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,10,1,y8-pattern-w10-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,10,2,y8-pattern-w10-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,10,3,y8-pattern-w10-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,11,1,y8-pattern-w11-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,11,2,y8-pattern-w11-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,11,3,y8-pattern-w11-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,12,1,y8-pattern-w12-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,12,2,y8-pattern-w12-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,pattern,12,3,y8-pattern-w12-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,1,1,y8-space-w1-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,1,2,y8-space-w1-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,1,3,y8-space-w1-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,2,1,y8-space-w2-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,2,2,y8-space-w2-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,2,3,y8-space-w2-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,3,1,y8-space-w3-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,3,2,y8-space-w3-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,3,3,y8-space-w3-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,4,1,y8-space-w4-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,4,2,y8-space-w4-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,4,3,y8-space-w4-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,5,1,y8-space-w5-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,5,2,y8-space-w5-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,5,3,y8-space-w5-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,6,1,y8-space-w6-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,6,2,y8-space-w6-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,6,3,y8-space-w6-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,7,1,y8-space-w7-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,7,2,y8-space-w7-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,7,3,y8-space-w7-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,8,1,y8-space-w8-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,8,2,y8-space-w8-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,8,3,y8-space-w8-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,9,1,y8-space-w9-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,9,2,y8-space-w9-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,9,3,y8-space-w9-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,10,1,y8-space-w10-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,10,2,y8-space-w10-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,space,10,3,y8-space-w10-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,1,1,y8-statistics-w1-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,1,2,y8-statistics-w1-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,1,3,y8-statistics-w1-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,2,1,y8-statistics-w2-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,2,2,y8-statistics-w2-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,2,3,y8-statistics-w2-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,3,1,y8-statistics-w3-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,3,2,y8-statistics-w3-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,3,3,y8-statistics-w3-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,4,1,y8-statistics-w4-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,4,2,y8-statistics-w4-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,4,3,y8-statistics-w4-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,5,1,y8-statistics-w5-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,5,2,y8-statistics-w5-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,5,3,y8-statistics-w5-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,6,1,y8-statistics-w6-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,6,2,y8-statistics-w6-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,6,3,y8-statistics-w6-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,7,1,y8-statistics-w7-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,7,2,y8-statistics-w7-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,7,3,y8-statistics-w7-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,8,1,y8-statistics-w8-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,8,2,y8-statistics-w8-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,8,3,y8-statistics-w8-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,9,1,y8-statistics-w9-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,9,2,y8-statistics-w9-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,9,3,y8-statistics-w9-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,10,1,y8-statistics-w10-l1,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,10,2,y8-statistics-w10-l2,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report
+8,statistics,10,3,y8-statistics-w10-l3,,,,Prior full form/visual review retained; 827-form regression rerun; see Level 8 report

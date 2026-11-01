@@ -278,17 +278,18 @@ function createEqualTask(lessonId: string, difficulty: Difficulty): PracticeTask
 
 function createQuickCompareTask(lessonId: string, difficulty: Difficulty): PracticeTask {
   const memory = getMemory(lessonId);
-  const [a, b] = comparePair(memory, difficulty, Math.random() < 0.5 ? "more" : "less");
+  const wantsMore = Math.random() < 0.5;
+  const [a, b] = comparePair(memory, difficulty, wantsMore ? "more" : "less");
   const left = makeGroup(memory, a, pickObject(memory), pickLayout(memory, a));
   const right = makeGroup(memory, b, pickObject(memory), pickLayout(memory, b));
   return makeCompareTask({
-    prompt: left.quantity > right.quantity ? "Quick eyes! Which has more?" : "Quick eyes! Which has less?",
-    speakText: left.quantity > right.quantity ? "Quick eyes! Which group has more?" : "Quick eyes! Which group has less?",
-    targetNumber: Math.max(a, b),
-    comparisonType: left.quantity > right.quantity ? "more" : "less",
+    prompt: wantsMore ? "Quick eyes! Which has more?" : "Quick eyes! Which has less?",
+    speakText: wantsMore ? "Quick eyes! Which group has more?" : "Quick eyes! Which group has less?",
+    targetNumber: wantsMore ? Math.max(a, b) : Math.min(a, b),
+    comparisonType: wantsMore ? "more" : "less",
     helperVariant: "flash",
     groups: [left, right],
-    correctGroupId: left.quantity > right.quantity ? left.id : right.id,
+    correctGroupId: wantsMore ? (a > b ? left.id : right.id) : (a < b ? left.id : right.id),
     feedback: { correct: "Amazing noticing!", wrong: "Quick eyes. Look again." },
   });
 }

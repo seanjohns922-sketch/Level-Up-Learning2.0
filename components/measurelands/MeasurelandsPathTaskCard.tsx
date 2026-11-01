@@ -200,25 +200,26 @@ export function MeasuredObject({
   label,
   length,
   compact = false,
+  unitPx: overrideUnitPx,
 }: {
   imageSrc: string;
   label?: string;
   length: number;
   compact?: boolean;
+  unitPx?: number;
 }) {
-  const unitPx = compact ? COMPACT_UNIT_PX : UNIT_PX;
+  const unitPx = overrideUnitPx ?? (compact ? COMPACT_UNIT_PX : UNIT_PX);
   const depth = rodDepth(unitPx);
   const rodWidth = length * unitPx + depth;
   const visibleRatio = visibleRatioForImage(imageSrc);
-  const width = rodWidth / visibleRatio;
   return (
     <div className="mb-1 flex flex-col items-center">
-      <div style={{ width }}>
+      <div style={{ width: rodWidth, maxWidth: "100%", overflow: "hidden" }}>
         <img
           src={imageSrc}
           alt={label ?? "Object to measure"}
-          className="h-auto w-full object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
-          style={{ maxHeight: compact ? 64 : 108 }}
+          className="h-auto object-contain drop-shadow-[0_8px_14px_rgba(76,40,10,0.18)]"
+          style={{ width: `${100 / visibleRatio}%`, maxWidth: "none", marginLeft: `${(100 - 100 / visibleRatio) / 2}%`, maxHeight: compact ? 64 : 108 }}
         />
       </div>
       {label ? (
@@ -290,12 +291,14 @@ function UnitsDisplay({
   unitEmoji,
   highlight = false,
   compact = false,
+  unitPx,
 }: {
   length: number;
   unitLabel?: string;
   unitEmoji?: string;
   highlight?: boolean;
   compact?: boolean;
+  unitPx?: number;
 }) {
   const kind = unitKindFromHints(unitLabel, unitEmoji);
   if (kind === "block") {
@@ -307,7 +310,7 @@ function UnitsDisplay({
           background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,232,0.96))",
         }}
       >
-        <BlockRod length={length} unitPx={compact ? COMPACT_UNIT_PX : UNIT_PX} />
+        <BlockRod length={length} unitPx={unitPx ?? (compact ? COMPACT_UNIT_PX : UNIT_PX)} />
       </div>
     );
   }
@@ -346,8 +349,15 @@ function MeasurementText({
   );
 }
 
+// Use one unit size for every object in a comparison; independent shrinking
+// can otherwise make a long and short object appear the same length.
+function commonPathUnit(paths: Array<{ length: number }>, extraLength = 0) {
+  return Math.min(COMPACT_UNIT_PX, 160 / Math.max(1, extraLength, ...paths.map(path => path.length)));
+}
+
 /* ── Intro / teaching sequence ── */
 function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () => void }) {
+  const unitPx = commonPathUnit(task.teachingPaths ?? []);
   return (
     <PathShell badge={task.badgeLabel ?? "Meazurex Mission"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
@@ -370,9 +380,9 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           {(task.teachingPaths ?? []).map((path, idx) => (
             <div key={idx} className="rounded-[26px] border border-[rgba(214,184,108,0.28)] bg-[rgba(255,252,245,0.92)] p-4">
               {path.objectImageSrc ? (
-                <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
+                <MeasuredObject unitPx={unitPx} imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} />
               ) : null}
-              <UnitsDisplay length={path.length} unitEmoji={path.unitEmoji} />
+              <UnitsDisplay unitPx={unitPx} length={path.length} unitEmoji={path.unitEmoji} />
               <div className="mt-3 text-center text-sm font-bold text-[#5f4725]">{path.caption}</div>
             </div>
           ))}
@@ -409,13 +419,14 @@ function IntroScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
 
 /* ── Activity A: count the units along the path ── */
 function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const unitPx = commonPathUnit([], task.pathLength ?? 0);
   return (
     <PathShell badge={task.badgeLabel ?? "Count the Blocks"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
         {task.objectImageSrc ? (
-          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
+          <MeasuredObject unitPx={unitPx} imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
-        <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
+        <UnitsDisplay unitPx={unitPx} length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((value) => (
@@ -438,10 +449,11 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
 
 /* ── Activity B: which path is longer? ── */
 function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const unitPx = commonPathUnit(task.paths ?? []);
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="measurelands-path-compare-list grid gap-4">
+      <div className="measurelands-path-compare-list grid grid-cols-1! sm:grid-cols-2! gap-4">
         {paths.map((path, idx) => (
           <button
             key={path.id}
@@ -457,9 +469,9 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
             </div>
             <div className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
               {path.objectImageSrc ? (
-                <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} />
+                <MeasuredObject unitPx={unitPx} imageSrc={path.objectImageSrc} length={path.length} />
               ) : null}
-              <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+              <UnitsDisplay unitPx={unitPx} length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
               <MeasurementText length={path.length} unitLabel={path.unitLabel} />
             </div>
           </button>
@@ -470,6 +482,7 @@ function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onC
 }
 
 function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const unitPx = commonPathUnit(task.paths ?? []);
   const paths = task.paths ?? [];
   const expected = task.correctOrderIds ?? [];
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -541,9 +554,9 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
                   </div>
                 ) : null}
                 {path.objectImageSrc ? (
-                  <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
+                  <MeasuredObject unitPx={unitPx} imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
                 ) : null}
-                <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
+                <UnitsDisplay unitPx={unitPx} length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
                 <MeasurementText length={path.length} unitLabel={path.unitLabel} />
               </div>
             </button>
@@ -555,14 +568,15 @@ function OrderScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
 }
 
 function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const unitPx = commonPathUnit(task.paths ?? [], task.pathLength ?? 0);
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "Find the Same Length"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="measurelands-path-target rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
         {task.objectImageSrc ? (
-          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
+          <MeasuredObject unitPx={unitPx} imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.pathLength ?? 0} />
         ) : null}
-        <UnitsDisplay length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
+        <UnitsDisplay unitPx={unitPx} length={task.pathLength ?? 0} unitLabel={task.unitLabel} unitEmoji={task.unitEmoji} />
         <MeasurementText length={task.pathLength ?? 0} unitLabel={task.unitLabel} />
       </div>
       <div className="measurelands-option-bank grid gap-4 md:grid-cols-3">
@@ -577,9 +591,9 @@ function SameScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorr
               <OptionReadAloudButton text={`${path.objectLabel ?? "Path"}, ${path.length} ${path.unitLabel ?? task.unitLabel ?? "blocks"}`} />
             </span>
             {path.objectImageSrc ? (
-              <MeasuredObject imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
+              <MeasuredObject unitPx={unitPx} imageSrc={path.objectImageSrc} label={path.objectLabel} length={path.length} compact />
             ) : null}
-            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
+            <UnitsDisplay unitPx={unitPx} length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} compact />
             <MeasurementText length={path.length} unitLabel={path.unitLabel} />
           </button>
         ))}
@@ -684,17 +698,18 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
 
 /* ── Year 2: how many MORE / fewer units? (two measured objects + number MCQ) ── */
 function DifferenceScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
+  const unitPx = commonPathUnit(task.paths ?? []);
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "How Many More?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="measurelands-path-difference-list grid gap-3">
+      <div className="measurelands-path-difference-list grid grid-cols-1! sm:grid-cols-2! gap-3">
         {paths.map((path, idx) => (
           <div key={path.id} className="rounded-[26px] border border-[rgba(214,184,108,0.3)] bg-[rgba(255,252,245,0.9)] p-3">
             <div className="mb-1 px-1 text-xs font-black uppercase tracking-[0.16em] text-[#7c3aed]">
               {path.objectLabel ?? `Path ${idx === 0 ? "A" : "B"}`}
             </div>
-            {path.objectImageSrc ? <MeasuredObject imageSrc={path.objectImageSrc} length={path.length} /> : null}
-            <UnitsDisplay length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
+            {path.objectImageSrc ? <MeasuredObject unitPx={unitPx} imageSrc={path.objectImageSrc} length={path.length} /> : null}
+            <UnitsDisplay unitPx={unitPx} length={path.length} unitLabel={path.unitLabel} unitEmoji={path.unitEmoji} />
             <MeasurementText length={path.length} unitLabel={path.unitLabel} />
           </div>
         ))}

@@ -3380,65 +3380,65 @@ export default function TypedResponseActivity({
 
       {writtenMethod && !isColumnMultiplication ? (
         <div className="mt-6 rounded-2xl border border-teal-100 bg-teal-50 p-5">
-          <div className="w-fit rounded-xl bg-white p-4 shadow-sm">
-            <div className="mb-2 grid w-fit grid-flow-col gap-2">
-              <div className="w-8" />
+          <div className="max-w-full overflow-x-auto rounded-xl bg-white p-4 shadow-sm">
+            <div className="mb-2 grid w-fit grid-flow-col gap-1 sm:gap-2">
+              <div className="w-6 sm:w-8" />
               {writtenMethod.placeValueLabels.map((label, index) => (
                 <div
                   key={`label-${index}`}
-                  className="flex h-7 w-12 items-center justify-center text-xs font-black tracking-wide text-slate-500"
+                  className="flex h-7 w-8 sm:w-12 items-center justify-center text-xs font-black tracking-wide text-slate-500"
                 >
                   {label}
                 </div>
               ))}
             </div>
             {isGuidedAddition && carryDisplay.some(Boolean) ? (
-              <div className="mb-1 grid w-fit grid-flow-col gap-2">
-                <div className="w-8" />
+              <div className="mb-1 grid w-fit grid-flow-col gap-1 sm:gap-2">
+                <div className="w-6 sm:w-8" />
                 {carryDisplay.map((digit, index) => (
-                  <div key={`carry-${index}`} className="flex h-8 w-12 items-center justify-center text-sm font-black text-amber-600">
+                  <div key={`carry-${index}`} className="flex h-8 w-8 sm:w-12 items-center justify-center text-sm font-black text-amber-600">
                     {digit}
                   </div>
                 ))}
               </div>
             ) : writtenMethod.carryRow ? (
-              <div className="mb-1 grid w-fit grid-flow-col gap-2">
-                <div className="w-8" />
+              <div className="mb-1 grid w-fit grid-flow-col gap-1 sm:gap-2">
+                <div className="w-6 sm:w-8" />
                 {writtenMethod.carryRow.map((digit, index) => (
-                  <div key={`carry-${index}`} className="flex h-8 w-12 items-center justify-center text-sm font-black text-amber-600">
+                  <div key={`carry-${index}`} className="flex h-8 w-8 sm:w-12 items-center justify-center text-sm font-black text-amber-600">
                     {digit}
                   </div>
                 ))}
               </div>
             ) : null}
             {isGuidedSubtraction && borrowDisplay.some(Boolean) ? (
-              <div className="mb-1 grid w-fit grid-flow-col gap-2">
-                <div className="w-8" />
+              <div className="mb-1 grid w-fit grid-flow-col gap-1 sm:gap-2">
+                <div className="w-6 sm:w-8" />
                 {borrowDisplay.map((digit, index) => (
-                  <div key={`borrow-${index}`} className="flex h-8 w-12 items-center justify-center text-sm font-black text-red-500">
+                  <div key={`borrow-${index}`} className="flex h-8 w-8 sm:w-12 items-center justify-center text-sm font-black text-red-500">
                     {digit}
                   </div>
                 ))}
               </div>
             ) : !isGuidedSubtraction && writtenMethod.borrowRow ? (
-              <div className="mb-1 grid w-fit grid-flow-col gap-2">
-                <div className="w-8" />
+              <div className="mb-1 grid w-fit grid-flow-col gap-1 sm:gap-2">
+                <div className="w-6 sm:w-8" />
                 {writtenMethod.borrowRow.map((digit, index) => (
-                  <div key={`borrow-${index}`} className="flex h-8 w-12 items-center justify-center text-sm font-black text-red-500">
+                  <div key={`borrow-${index}`} className="flex h-8 w-8 sm:w-12 items-center justify-center text-sm font-black text-red-500">
                     {digit}
                   </div>
                 ))}
               </div>
             ) : null}
-            <div className="grid w-fit grid-flow-col gap-2">
-              <div className="w-8" />
+            <div className="grid w-fit grid-flow-col gap-1 sm:gap-2">
+              <div className="w-6 sm:w-8" />
               {writtenMethod.top.map((digit, index) => (
                 <div
                   key={`top-${index}`}
                   className={[
                     digit === "."
-                      ? "relative flex h-12 w-12 items-center justify-center text-2xl font-black"
-                      : "relative flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black",
+                      ? "relative flex h-12 w-8 sm:w-12 items-center justify-center text-2xl font-black"
+                      : "relative flex h-12 w-8 sm:w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black",
                     currentColumn === index && isGuidedWrittenMethod
                       ? "ring-2 ring-teal-400"
                       : "",
@@ -3456,8 +3456,8 @@ export default function TypedResponseActivity({
                 </div>
               ))}
             </div>
-            <div className="mt-2 grid w-fit grid-flow-col gap-2">
-              <div className="flex h-12 w-8 items-center justify-center text-3xl font-black text-slate-700">
+            <div className="mt-2 grid w-fit grid-flow-col gap-1 sm:gap-2">
+              <div className="flex h-12 w-6 sm:w-8 items-center justify-center text-3xl font-black text-slate-700">
                 {writtenMethod.operation}
               </div>
               {writtenMethod.bottom.map((digit, index) => (
@@ -3465,8 +3465,8 @@ export default function TypedResponseActivity({
                   key={`bottom-${index}`}
                   className={[
                     digit === "."
-                      ? "flex h-12 w-12 items-center justify-center text-2xl font-black text-slate-900"
-                      : "flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900",
+                      ? "flex h-12 w-8 sm:w-12 items-center justify-center text-2xl font-black text-slate-900"
+                      : "flex h-12 w-8 sm:w-12 items-center justify-center rounded-lg bg-slate-100 text-2xl font-black text-slate-900",
                     currentColumn === index && isGuidedWrittenMethod ? "ring-2 ring-teal-400" : "",
                   ].join(" ")}
                 >
@@ -3476,13 +3476,13 @@ export default function TypedResponseActivity({
             </div>
             <div className="mt-3 h-1 w-full rounded bg-slate-300" />
             {isColumnMultiplication ? null : (
-              <div className="mt-3 grid w-fit grid-flow-col gap-2">
-                <div className="w-8" />
+              <div className="mt-3 grid w-fit grid-flow-col gap-1 sm:gap-2">
+                <div className="w-6 sm:w-8" />
                 {digitInputs.map((digit, index) => (
                   isStaticWrittenMethodCell(writtenMethod, index) ? (
                     <div
                       key={`answer-static-${index}`}
-                      className="flex h-12 w-12 items-center justify-center text-2xl font-black text-slate-700"
+                      className="flex h-12 w-8 sm:w-12 items-center justify-center text-2xl font-black text-slate-700"
                     >
                       {writtenMethod.fixedAnswerCells?.[index] ?? ""}
                     </div>
@@ -3502,7 +3502,7 @@ export default function TypedResponseActivity({
                         );
                       }}
                       className={[
-                        "h-12 w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
+                        "h-12 w-8 sm:w-12 rounded-lg border border-teal-300 bg-white text-center text-2xl font-black text-slate-900 outline-none focus:border-teal-500",
                         isGuidedWrittenMethod && index === currentColumn ? "ring-2 ring-teal-400" : "",
                         isGuidedWrittenMethod && (index !== currentColumn || guidedPhase !== "input")
                           ? "bg-slate-50 text-slate-500"

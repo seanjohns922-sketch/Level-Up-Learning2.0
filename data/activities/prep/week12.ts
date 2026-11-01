@@ -227,7 +227,8 @@ function clonePracticeTask<T extends PracticeTask>(task: T): T {
 
 function tightenFlashTask(task: PracticeTask, memory: Week12Memory, difficulty: Difficulty, mode: "flash" | "memory") {
   if (task.kind !== "groundFlash") return task;
-  const target = Math.max(4, pickTarget(memory, difficulty));
+  // Keep the source question's quantity and answer options together.
+  const target = task.targetNumber;
   const baseReveal = mode === "memory" ? 1350 : 1280;
   const scaledReveal = difficulty === "hard" ? baseReveal - 80 : difficulty === "easy" ? baseReveal + 120 : baseReveal;
   return {
@@ -260,7 +261,6 @@ function createNumberImageMemoryTask(lessonId: string, difficulty: Difficulty): 
 }
 
 function createRepresentationSwitchTask(lessonId: string, difficulty: Difficulty): PracticeTask {
-  const memory = getMemory(lessonId);
   const options = [
     generatePrepWeek11TaskByKind("y0-w11-l2", difficulty, "double_ten_frame_match"),
     generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "teen_number_match"),
@@ -268,13 +268,11 @@ function createRepresentationSwitchTask(lessonId: string, difficulty: Difficulty
   ] as const;
   const task = chooseVariant(options);
   if (task.kind === "groundMatch") {
-    const teenTarget = Math.max(11, pickTarget(memory, difficulty));
     return {
       ...task,
       prompt: chooseVariant(["Which number matches?", "Find the matching number."]),
       speakText: "Which number matches?",
       introPrompt: "Switch the representation.",
-      targetNumber: teenTarget,
       feedback: { correct: "Switch complete!", wrong: "Match the structure to the number." },
     } satisfies PracticeTask;
   }
@@ -556,8 +554,7 @@ function createPracticalApplicationTask(lessonId: string, difficulty: Difficulty
   if (pick === 1) {
     const task = generatePrepWeek10TaskByKind("y0-w10-l1", difficulty, "match_collection");
     if (task.kind === "groundMatch") {
-      const memory = getMemory(lessonId);
-      const target = Math.max(12, pickTarget(memory, difficulty));
+      const target = task.targetNumber;
       return {
         ...task,
         prompt: `Which collection matches ${target}?`,

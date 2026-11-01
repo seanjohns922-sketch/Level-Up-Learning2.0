@@ -61,7 +61,7 @@ export default function ArrayVisual({
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+    <div className="mt-4 max-w-full overflow-x-auto rounded-2xl border border-teal-100 bg-teal-50 p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
           {title}

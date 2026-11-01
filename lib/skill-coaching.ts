@@ -24,6 +24,26 @@ export type SkillCoaching = {
 };
 
 const TABLE: Record<string, SkillCoaching> = {
+  pattern_rule: {
+    tip: "Check that your rule works for every step in the pattern.",
+    strengthLine: "You used pattern rules well today!",
+    focusLine: "Test your rule on more than one step.",
+  },
+  algebra_equation: {
+    tip: "Keep both sides equal, then check your solution in the original equation.",
+    strengthLine: "You worked carefully with equations!",
+    focusLine: "Use the same operation on both sides and check your answer.",
+  },
+  algebra_expression: {
+    tip: "Keep track of each term and check the order of operations.",
+    strengthLine: "You worked well with expressions!",
+    focusLine: "Identify the terms before combining or evaluating them.",
+  },
+  algebra_graph: {
+    tip: "Read both axes and their scales before interpreting a point.",
+    strengthLine: "You connected the graph and its values well!",
+    focusLine: "Check the horizontal value first, then the vertical value.",
+  },
   // Measurelands — length
   length_compare: {
     tip: "Compare the ends after checking the starts are lined up.",
@@ -709,6 +729,13 @@ export function resolveCoachingKey(input: {
     .toLowerCase();
 
   // ── Realm-specific fallbacks ──
+  if (input.realmId === "pattern" || /^y\d+-(?:algebra|pattern)-/.test(input.lessonId ?? "")) {
+    if (/graph|coordinate|axis|axes|ordered pair/.test(hay)) return "algebra_graph";
+    if (/equation|balance|unknown|inverse|solve/.test(hay)) return "algebra_equation";
+    if (/expression|substitut|expand|factoris|like term/.test(hay)) return "algebra_expression";
+    return "pattern_rule";
+  }
+  if ((input.realmId === "number" || /^y\d+-w/.test(input.lessonId ?? "")) && /unit fraction/.test(hay)) return "fractions";
   if (input.realmId === "chance") {
     if (/variation|trial|tally|experiment|result/.test(hay)) return "chance_variation";
     if (/predict|prediction/.test(hay)) return "chance_prediction";

@@ -166,9 +166,10 @@ const DEBUG_POOLS: Record<"choose" | "debug" | "audit", { correct: string[]; wro
 function debuggerTask(prompt: string, purpose: "choose" | "debug" | "audit"): Gen {
   return fresh(() => {
     const target = pick(DEBUG_TARGETS);
-    const answerId = `machine-${randInt(1000, 9999)}`;
-    const wrongA = `machine-${randInt(1000, 9999)}`;
-    const wrongB = `machine-${randInt(1000, 9999)}`;
+    const machineSet = `machine-${randInt(1000, 9999)}`;
+    const answerId = `${machineSet}-1`;
+    const wrongA = `${machineSet}-0`;
+    const wrongB = `${machineSet}-2`;
     const pool = DEBUG_POOLS[purpose];
     const correct = pick(pool.correct).replace("{t}", target);
     const [w1, w2] = shuffle(pool.wrong).slice(0, 2);

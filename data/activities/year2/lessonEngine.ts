@@ -7535,9 +7535,9 @@ function generateInteractiveQuestion(
           { id: "a", numerator: 1, denominator, shadedParts: buildShadedParts(1) },
           {
             id: "b",
-            numerator: Math.min(denominator - 1, 2),
+            numerator: 2,
             denominator,
-            shadedParts: buildShadedParts(Math.min(denominator - 1, 2)),
+            shadedParts: buildShadedParts(2),
           },
           {
             id: "c",
@@ -7836,7 +7836,7 @@ function generateInteractiveQuestion(
         { target: "3/5", denominator: 5, points: ["2/5", "3/5", "4/5"] },
         { target: "5/8", denominator: 8, points: ["3/8", "5/8", "7/8"] },
         { target: "7/10", denominator: 10, points: ["3/10", "7/10", "9/10"] },
-        { target: "2/3", denominator: 15, points: ["3/5", "2/3", "4/6"] },
+        { target: "2/3", denominator: 15, points: ["3/5", "2/3", "4/5"] },
       ] as const;
       const chosen = pointBank[randInt(0, pointBank.length - 1)] ?? pointBank[0]!;
       const ids = ["A", "B", "C"] as const;
@@ -8144,7 +8144,7 @@ function generateInteractiveQuestion(
             (option) =>
               option.numerator > 0 &&
               option.numerator < option.denominator &&
-              !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
+              option.numerator * chosen.source.denominator !== chosen.source.numerator * option.denominator &&
               !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
           )
         : [];
@@ -8155,7 +8155,7 @@ function generateInteractiveQuestion(
           .flatMap((pair) => [pair.source, pair.equivalent])
           .filter(
             (option) =>
-              !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator) &&
+              option.numerator * chosen.source.denominator !== chosen.source.numerator * option.denominator &&
               !(option.numerator === chosen.source.numerator && option.denominator === chosen.source.denominator)
           ),
       ].filter(
@@ -8222,7 +8222,7 @@ function generateInteractiveQuestion(
         .map((pair) => pair.equivalent)
         .filter(
           (option) =>
-            !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator)
+            option.numerator * chosen.source.denominator !== chosen.source.numerator * option.denominator
         )
     ).slice(0, 2);
     const options = shuffle([
@@ -8263,7 +8263,7 @@ function generateInteractiveQuestion(
             .map((pair) => pair.equivalent)
             .filter(
               (option) =>
-                !(option.numerator === chosen.equivalent.numerator && option.denominator === chosen.equivalent.denominator)
+                option.numerator * chosen.source.denominator !== chosen.source.numerator * option.denominator
             )
         )[0] ?? { numerator: 3, denominator: 10 });
     return {
