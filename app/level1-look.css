@@ -21,9 +21,6 @@
 [data-level1-look="number"] button.w-10.h-20.border-teal-600 { background: repeating-linear-gradient(180deg, #22b8a7 0 9px, #0d8f82 9px 10.4px); box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.5); }
 [data-level1-look="number"] button.w-10.h-10 { border: 0; border-radius: 7px; background: #e7f8f4; }
 [data-level1-look="number"] button.w-10.h-10.border-teal-600 { background: linear-gradient(135deg, #ffcf6b, #f59e0b); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.55); }
-/* Real Australian money, shown larger */
-[data-level1-look="number"] img.h-11.w-11 { height: 3.75rem; width: 3.75rem; }
-[data-level1-look="number"] img.h-11.w-20 { height: 3.75rem; width: 7rem; }
 
 /* Measurelands */
 [data-level1-look="measurement"] .measurelands-path-compare-list [data-level1-object] { margin-left: 0; }

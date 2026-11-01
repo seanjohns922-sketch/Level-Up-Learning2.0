@@ -460,7 +460,7 @@ function TaskRendererInner({
     case "missingOperation":
       return <MissingOperation key={k} story={t.story} a={t.a} b={t.b} result={t.result} answer={t.answer} onCorrect={onC} onWrong={onW} />;
     case "storySolve":
-      return <StorySolve key={k} story={t.story} a={t.a} b={t.b} op={t.op} answer={t.answer} options={t.options} requireOpChoice={t.requireOpChoice} hideEquation={t.hideEquation} allowEquationInput={t.allowEquationInput} onCorrect={onC} onWrong={onW} />;
+      return <StorySolve key={k} moneyItems={t.moneyItems} story={t.story} a={t.a} b={t.b} op={t.op} answer={t.answer} options={t.options} requireOpChoice={t.requireOpChoice} hideEquation={t.hideEquation} allowEquationInput={t.allowEquationInput} onCorrect={onC} onWrong={onW} />;
     case "moneyMakeAmount":
       return <MoneyMakeAmount key={k} target={t.target} allowTen={t.allowTen} onCorrect={onC} onWrong={onW} />;
     case "moneyChange":

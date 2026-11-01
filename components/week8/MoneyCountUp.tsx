@@ -4,18 +4,6 @@ import { Volume2 } from "lucide-react";
 import { renderCoins } from "@/components/week7/moneyAssets";
 import { speak } from "@/lib/speak";
 
-function JumpRow({ from, jump, to }: { from: number; jump: number; to: number }) {
-  return (
-    <div className="flex items-center gap-3 text-sm font-bold text-slate-700">
-      <div className="px-3 py-1 rounded-lg bg-slate-100">${from}</div>
-      <div className="text-slate-500">→</div>
-      <div className="px-3 py-1 rounded-lg bg-teal-50 text-teal-700">+{jump}</div>
-      <div className="text-slate-500">→</div>
-      <div className="px-3 py-1 rounded-lg bg-slate-100">${to}</div>
-    </div>
-  );
-}
-
 export default function MoneyCountUp({
   have,
   cost,
@@ -23,7 +11,9 @@ export default function MoneyCountUp({
   answer,
   onCorrect,
   onWrong,
-  promptPrefix,
+  prompt: customPrompt,
+  haveLabel = "You have",
+  costLabel = "Cost",
 }: {
   have: number;
   cost: number;
@@ -31,15 +21,11 @@ export default function MoneyCountUp({
   answer: number;
   onCorrect?: () => void;
   onWrong?: () => void;
-  promptPrefix?: string;
+  prompt?: string;
+  haveLabel?: string;
+  costLabel?: string;
 }) {
-  const prompt = promptPrefix
-    ? `${promptPrefix} You only have $${have} and the cost is $${cost}. How much more do you need?`
-    : `You only have $${have} and the cost is $${cost}. How much more do you need?`;
-
-  const jump1 = Math.min(5 - (have % 5 || 5), cost - have);
-  const mid = have + jump1;
-  const jump2 = cost - mid;
+  const prompt = customPrompt ?? `You have $${have}. It costs $${cost}. How much more do you need?`;
 
   function choose(opt: string) {
     if (Number(opt) === answer) onCorrect?.();
@@ -61,18 +47,13 @@ export default function MoneyCountUp({
 
       <div className="grid md:grid-cols-2 gap-4 mb-4">
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <div className="text-xs font-bold text-slate-600 mb-2">You have</div>
+          <div className="text-xs font-bold text-slate-600 mb-2">{haveLabel}</div>
           {renderCoins(have)}
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <div className="text-xs font-bold text-slate-600 mb-2">Cost</div>
+          <div className="text-xs font-bold text-slate-600 mb-2">{costLabel}</div>
           {renderCoins(cost)}
         </div>
-      </div>
-
-      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 mb-4 grid gap-2">
-        <JumpRow from={have} jump={jump1} to={mid} />
-        {jump2 > 0 ? <JumpRow from={mid} jump={jump2} to={cost} /> : null}
       </div>
 
       <div className="mt-2 grid gap-2">

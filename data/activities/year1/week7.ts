@@ -85,7 +85,7 @@ export function generateWeek7Task(
       const a = randInt(lo, hi); const b = randInt(lo, hi);
       const story = `You buy an apple ($${a}) and a banana ($${b}). How much altogether?`;
       const answer = a + b;
-      return { kind: "storySolve", story, a, b, op: "add", answer, options: makeStoryOptions(answer), hideEquation: true, allowEquationInput: false, difficulty: d };
+      return { kind: "storySolve", story, a, b, op: "add", answer, options: makeStoryOptions(answer), hideEquation: true, allowEquationInput: false, moneyItems: [{ label: "Apple", price: a }, { label: "Banana", price: b }], difficulty: d };
     }
     if (modePick === 1) {
       if (Math.random() < 0.5) {

@@ -3,6 +3,8 @@ import type { PracticeTask } from "@/data/activities/year1/practice-task";
 const then = (items: unknown[]) => items.join(", then ");
 const each = (n: number, word: string) => `${n} ${n === 1 ? word.replace(/s$/, "") : word}`;
 const ordinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+/** "Apple" becomes "an apple"; things bought by amount, like juice, take no "a". */
+export const shopItem = (label: string) => { const word = label.toLowerCase(); return ["juice", "chips", "milk"].includes(word) ? word : `${/^[aeiou]/.test(word) ? "an" : "a"} ${word}`; };
 const tokenWords = (ids: string[]) => ids.map((id) => id.replace(/-/g, " ")).join(", ");
 
 type Cell = { r: number; c: number };
@@ -180,7 +182,7 @@ export function level1Speech(task: PracticeTask): string {
     case "barModel": return `The whole is ${t.total}. One part is ${t.part}. What is the missing part?`;
     case "moneyMakeAmount": return `Make ${t.target} dollars.`;
     case "moneyEnough": return `You have ${t.have} dollars. The toy costs ${t.cost} dollars. Do you have enough?`;
-    case "moneyAddPrices": return `You buy ${t.itemA} for ${t.priceA} dollars and ${t.itemB} for ${t.priceB} dollars. How much altogether?`;
+    case "moneyAddPrices": return `You buy ${shopItem(t.itemA)} for ${t.priceA} dollars and ${shopItem(t.itemB)} for ${t.priceB} dollars. How much altogether?`;
     case "moneyHowMuchMore": return `You have ${t.have} dollars. It costs ${t.cost} dollars. How much more do you need?`;
     case "moneyChangeUp": return `You pay ${t.paid} dollars. It costs ${t.cost} dollars. How much change do you get?`;
     case "shareDrag": case "shareDeal": case "groupBoxesTap": return `Share ${t.total} equally into ${t.groups} groups.`;

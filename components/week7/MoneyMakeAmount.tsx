@@ -3,7 +3,7 @@
 import { Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 /* eslint-disable @next/next/no-img-element */
-import { COINS } from "./moneyAssets";
+import { COINS, moneyClass } from "./moneyAssets";
 import { speak } from "@/lib/speak";
 
 export default function MoneyMakeAmount({
@@ -82,7 +82,7 @@ export default function MoneyMakeAmount({
         </div>
       ) : null}
       <div className="text-xs text-slate-500 mt-1">
-        {allowTen ? "Use $10, $5, $2, and $1 coins." : "Use $5, $2, and $1 coins."}
+        {allowTen ? "Use the $10 and $5 notes and the $2 and $1 coins." : "Use the $5 note and the $2 and $1 coins."}
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {pickedCoins.length === 0 ? (
@@ -96,29 +96,25 @@ export default function MoneyMakeAmount({
                 key={`${v}-${i}`}
                 src={coin.src}
                 alt={coin.label}
-                className={
-                  coin.type === "note"
-                    ? "h-11 w-20 object-contain"
-                    : "h-11 w-11 object-contain"
-                }
+                className={moneyClass(coin)}
               />
             );
           })
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-3">
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
         {COINS.filter((c) => (allowTen ? c.value <= 10 : c.value <= 5)).map((coin) => (
           <button
             key={coin.value}
             onClick={() => add(coin.value)}
-            className="px-4 py-3 rounded-lg border hover:bg-slate-50 flex items-center gap-3 justify-center"
+            className="px-4 py-3 rounded-lg border hover:bg-slate-50 flex flex-col items-center gap-1 justify-center"
             type="button"
           >
             <img
               src={coin.src}
               alt={coin.label}
-              className={coin.type === "note" ? "h-12 w-20 object-contain" : "h-12 w-12 object-contain"}
+              className={moneyClass(coin)}
             />
             <span className="text-xl font-black">{coin.label}</span>
           </button>

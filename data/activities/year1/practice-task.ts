@@ -2472,6 +2472,8 @@ export type PracticeTask = (
     }
   | {
       kind: "storySolve";
+      /** Priced items, shown with real Australian money. */
+      moneyItems?: { label: string; price: number }[];
       story: string;
       a: number;
       b: number;

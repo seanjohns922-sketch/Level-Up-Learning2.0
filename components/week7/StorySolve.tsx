@@ -1,5 +1,6 @@
 "use client";
 
+import { renderCoins } from "./moneyAssets";
 import { Volume2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { speak } from "@/lib/speak";
@@ -14,6 +15,7 @@ export default function StorySolve({
   requireOpChoice,
   hideEquation,
   allowEquationInput,
+  moneyItems,
   onCorrect,
   onWrong,
 }: {
@@ -26,6 +28,7 @@ export default function StorySolve({
   requireOpChoice?: boolean;
   hideEquation?: boolean;
   allowEquationInput?: boolean;
+  moneyItems?: { label: string; price: number }[];
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
@@ -61,6 +64,17 @@ export default function StorySolve({
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-800">
         {story}
       </div>
+
+      {moneyItems ? (
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {moneyItems.map((item) => (
+            <div key={item.label} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <div className="mb-2 text-sm font-bold text-slate-600">{item.label}: ${item.price}</div>
+              {renderCoins(item.price)}
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {requireOpChoice ? (
         <div className="mt-4 grid md:grid-cols-2 gap-3">
@@ -133,7 +147,7 @@ export default function StorySolve({
               ].join(" ")}
               type="button"
             >
-              {opt}
+              {moneyItems ? `$${opt}` : opt}
             </button>
           ))}
         </div>

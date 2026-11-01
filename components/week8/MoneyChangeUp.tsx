@@ -19,13 +19,15 @@ export default function MoneyChangeUp({
 }) {
   return (
     <MoneyCountUp
-      have={cost}
-      cost={paid}
+      have={paid}
+      cost={cost}
+      haveLabel="You pay"
+      costLabel="It costs"
       options={options}
       answer={answer}
       onCorrect={onCorrect}
       onWrong={onWrong}
-      promptPrefix={`You pay $${paid} for a $${cost} item.`}
+      prompt={`You pay $${paid} for a $${cost} toy. How much change do you get?`}
     />
   );
 }

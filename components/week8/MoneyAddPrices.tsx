@@ -3,6 +3,7 @@
 import { Volume2 } from "lucide-react";
 import { renderCoins } from "@/components/week7/moneyAssets";
 import { speak } from "@/lib/speak";
+import { shopItem } from "@/lib/level1-answer";
 
 export default function MoneyAddPrices({
   itemA,
@@ -23,7 +24,7 @@ export default function MoneyAddPrices({
   onCorrect?: () => void;
   onWrong?: () => void;
 }) {
-  const prompt = `You buy ${itemA} for $${priceA} and ${itemB} for $${priceB}. How much altogether?`;
+  const prompt = `You buy ${shopItem(itemA)} for $${priceA} and ${shopItem(itemB)} for $${priceB}. How much altogether?`;
 
   function choose(opt: string) {
     if (Number(opt) === answer) onCorrect?.();
