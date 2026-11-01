@@ -5,7 +5,6 @@ import { Bot, Check, Flag } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import GroundDragPiece from "./GroundDragPiece";
-import { groundBlip } from "./GroundCheer";
 import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -1190,7 +1189,6 @@ export function GroundTapCountTaskCard({
   const [tappedIds, setTappedIds] = useState<number[]>([]);
 
   function tapObject(id: number) {
-    groundBlip(460 + tappedIds.length * 50);
     setTappedIds((current) => (current.includes(id) ? current : [...current, id]));
   }
 
