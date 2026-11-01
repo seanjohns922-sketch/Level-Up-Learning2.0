@@ -67,10 +67,15 @@ export default function GroundLessonGuide({ guide, title, realm, onContinue, rev
   return <section data-ground-guide className="rounded-3xl border-4 bg-[#fffdf5] p-4 text-center text-slate-900 sm:p-6" style={{ borderColor: theme.borderRing }}>
     <h2 className="text-2xl font-black sm:text-3xl">{title}</h2>
     <div className="mx-auto mt-4 flex max-w-3xl items-center justify-center gap-3"><p className="text-2xl font-bold leading-snug sm:text-3xl">{guide.say}</p><ReadAloudBtn text={guide.say} size="md" /></div>
-    <div className="my-5 flex flex-wrap items-center justify-center gap-3">{guide.panels.map((panel, i) => <Fragment key={i}>
+    {guide.lineUp ? <div className="relative mx-auto my-5 max-w-2xl space-y-2 border-l-8 border-[#3c2a63] bg-white py-2 pl-0 pr-4 text-left">
+      {guide.panels.map((panel) => <div key={panel.img} className="flex items-center gap-3">
+        <Image src={`/images/measurelands/${panel.img}`} alt="" width={560} height={120} className="h-20 object-fill" style={{ width: `${(panel.scale ?? 1) * 80}%`, marginLeft: panel.img?.includes("crayon") ? "-9%" : 0 }} />
+        <span className="text-xl font-black text-[#3c2a63]">{panel.note}</span>
+      </div>)}
+    </div> : <div className="my-5 flex flex-wrap items-center justify-center gap-3">{guide.panels.map((panel, i) => <Fragment key={i}>
       {i > 0 && guide.join && <span aria-hidden="true" className="text-4xl font-black text-[#3c2a63]">{i === guide.panels.length - 1 ? guide.result ?? guide.join : guide.join}</span>}
       <Panel panel={panel} compact={compact} />
-    </Fragment>)}</div>
+    </Fragment>)}</div>}
     <button autoFocus type="button" onClick={onContinue} className="min-h-20 rounded-2xl px-12 py-4 text-3xl font-black text-white shadow-lg focus-visible:outline focus-visible:outline-offset-4" style={{ background: theme.ctaGradientCss }}>{review ? 'Back to the game' : 'Let’s play!'}</button>
   </section>;
 }

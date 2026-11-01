@@ -18,7 +18,7 @@ export type GroundPanel = {
   fill?: number;
 };
 /** join sits between panels; result is the sign before the last panel when it differs. */
-export type GroundGuide = { say: string; panels: GroundPanel[]; join?: string; result?: string };
+export type GroundGuide = { say: string; panels: GroundPanel[]; join?: string; result?: string; lineUp?: boolean };
 
 const big = (b: string, note?: string, win?: boolean): GroundPanel => ({ big: b, note, win });
 const num = (...n: (string | number)[]) => n.map(v => big(String(v)));
@@ -64,8 +64,8 @@ export const GROUND_GUIDES: Record<string, GroundGuide> = {
   "number:12:2": { say: "Build a number your own way. 5 and 3 make 8. 4 and 4 make 8 too.", panels: [items("block", 5, "5 and 3", { b: 3, cols: 4 }), items("block", 4, "4 and 4", { b: 4, cols: 4 })] },
   "number:12:3": { say: "This is your final mission. Use everything you have learned. You can do it!", panels: [items("gem", 3), items("gem", 2), big("5", undefined, true)], join: "+", result: "=" },
 
-  "measurement:1:1": { say: "Line them up at the start. The one that goes further is longer.", panels: [img(`${MO}/snake.png`, "longer", 1.15, true), img(`${MO}/worm.png`, "shorter", .55)] },
-  "measurement:1:2": { say: "Put them in order, from shortest to longest.", panels: [img(`${MO}/worm.png`, "shortest", .55), img(`${MO}/crayon.png`, undefined, .8), img(`${MO}/snake.png`, "longest", 1.15)], join: "→" },
+  "measurement:1:1": { say: "Line them up at the start. The one that goes further is longer.", panels: [img(`${MO}/snake.png`, "longer", 1, true), img(`${MO}/worm.png`, "shorter", .45)], lineUp: true },
+  "measurement:1:2": { say: "Put them in order, from shortest to longest.", panels: [img(`${MO}/worm.png`, "shortest", .45), img(`${MO}/crayon.png`, "next", .7), img(`${MO}/snake.png`, "longest", 1)], lineUp: true },
   "measurement:1:3": { say: "Count the equal steps along each path. 6 steps is longer than 4 steps.", panels: [items("block", 6, "6 steps", { cols: 6 }), items("block", 4, "4 steps", { cols: 4 })] },
   "measurement:2:1": { say: "An elephant is heavy. A feather is light.", panels: [img(`${W2}/elephant.png`, "heavy", 1.15, true), img(`${W2}/feather-v2.png`, "light", .7)] },
   "measurement:2:2": { say: "Put them in order, from lightest to heaviest.", panels: [img(`${W2}/feather-v2.png`, "lightest", .7), img(`${W2}/apple.png`, undefined, .8), img(`${W2}/rock.png`, "heaviest", 1)], join: "→" },

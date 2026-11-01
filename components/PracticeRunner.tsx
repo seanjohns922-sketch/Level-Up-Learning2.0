@@ -1538,7 +1538,6 @@ export function PracticeRunner({
         <aside className="lg:sticky lg:top-4 lg:self-start">
           {(groundGuide || lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
-            simple={isGroundLesson}
             levelNumber={levelNumber}
             week={liveContext?.week}
             lessonNumber={Number.isFinite(hudLessonNumber) ? hudLessonNumber : undefined}
@@ -1629,7 +1628,7 @@ export function PracticeRunner({
             style={taskSurfaceStyle}
           >
         {/* Activity type label */}
-        <div className="mb-3" data-activity-label>
+        <div className="mb-3">
           <span
             className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
             style={isMeasurement ? {
