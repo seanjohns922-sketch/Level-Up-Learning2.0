@@ -652,6 +652,8 @@ export function PracticeRunner({
   const { autoReadEnabled } = useAutoReadSetting();
   const speechInteractionReady = useSpeechInteractionReady();
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
+  // Ground students may not read yet, so their questions are always spoken.
+  const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -874,7 +876,7 @@ export function PracticeRunner({
   }, [activityNoun, completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
-    if (helpOpen || !autoReadEnabled || !speechInteractionReady) return;
+    if (helpOpen || (!autoReadEnabled && !alwaysSpeak) || !speechInteractionReady) return;
     if (!autoReadPrompt) return;
 
     const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
@@ -1264,6 +1266,11 @@ export function PracticeRunner({
     });
   }, [completionMode, correctAnswers, finished, liveContext, minutes, safeQuestionsAnswered]);
 
+  const wrongAnswerToSay = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
+  useEffect(() => {
+    if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(typeof wrongAnswerToSay === "string" && wrongAnswerToSay ? `Good try! The answer is ${wrongAnswerToSay}.` : "Good try! Have another look.", undefined, "auto");
+  }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, wrongAnswerToSay]);
+
   // ── Finished state ──
   if (finished) {
     // Coach Review (performance guidance) shows first for every lesson —
@@ -1448,6 +1455,7 @@ export function PracticeRunner({
 
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
   const currentCorrectAnswer = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
+
   const currentWrongExplanation = currentWrongFeedback?.explanation ?? getPracticeTaskWrongExplanation(task);
   const incorrectFeedbackSpeech = buildIncorrectFeedbackSpeech({
     prompt: currentWrongFeedback?.prompt ?? getPracticeTaskPrompt(task),

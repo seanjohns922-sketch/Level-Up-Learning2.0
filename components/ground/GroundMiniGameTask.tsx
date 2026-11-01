@@ -122,7 +122,7 @@ function StructuredReveal({ quantity, objectType, patternLayout }: { quantity: n
     return (
       <div className="flex flex-wrap justify-center gap-3">
         {Array.from({ length: quantity }).map((_, index) => (
-          <GroundObjectToken key={`${objectType}-${index}`} objectType={objectType} size="sm" />
+          <GroundObjectToken key={`${objectType}-${index}`} objectType={objectType} size="md" />
         ))}
       </div>
     );
@@ -863,8 +863,7 @@ export function GroundCompareTaskCard({
   const [tug, setTug] = useState(0);
   const hasReferenceMemory = Boolean(task.referenceGroup);
   const answersEnabled = !hasReferenceMemory || memoryPhase === "hidden";
-  const orderDirectionLabel = task.orderDirection === "DESC" ? "Biggest to smallest" : "Smallest to biggest";
-
+  
   function tapGroup(groupId: string) {
     if (task.comparisonType === "order") {
       if (orderProgress.includes(groupId)) return;
@@ -946,32 +945,18 @@ export function GroundCompareTaskCard({
           </div>
         ) : null}
         {task.comparisonType === "order" ? (
-          <>
-            <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-              {task.orderDirection === "DESC" ? "Tap from biggest to smallest" : "Tap from smallest to biggest"}
-            </div>
-            <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3">
-              <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-teal-800">
-                {orderDirectionLabel}
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                {sortedOrder.map((_, index) => {
-                  const chosenId = orderProgress[index];
-                  const chosenGroup = task.groups.find((group) => group.id === chosenId);
-                  return (
-                    <div
-                      key={`slot-${index}`}
-                      className={`flex min-h-[52px] min-w-[72px] items-center justify-center rounded-lg border-2 px-3 text-sm font-black shadow-sm ${
-                        chosenGroup ? "border-teal-300 bg-white text-teal-900" : "border-dashed border-cyan-300 bg-white/70 text-cyan-400"
-                      }`}
-                    >
-                      {chosenGroup ? chosenGroup.quantity : index + 1}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </>
+          <div className="mb-4 flex flex-wrap items-stretch justify-center gap-3 rounded-2xl bg-cyan-50 p-3">
+            {sortedOrder.map((_, index) => {
+              const chosen = task.groups.find((group) => group.id === orderProgress[index]);
+              const label = index === 0 ? (task.orderDirection === "DESC" ? "Most" : "Least") : index === sortedOrder.length - 1 ? (task.orderDirection === "DESC" ? "Least" : "Most") : "";
+              return <div key={index} className="flex min-w-[150px] flex-1 flex-col items-center gap-1">
+                <div className="flex h-9 items-center gap-1 text-xl font-black text-teal-900">{label}{label ? <OptionReadAloudButton text={label} /> : null}</div>
+                <div data-ground-drop={`order-${index}`} className={`flex min-h-24 w-full flex-wrap items-center justify-center gap-1 rounded-xl border-4 p-2 ${chosen ? "border-teal-400 bg-white" : index === orderProgress.length ? "border-dashed border-amber-400 bg-amber-50" : "border-dashed border-cyan-200 bg-white/70"}`}>
+                  {chosen ? <StructuredReveal quantity={chosen.quantity} objectType={chosen.objectType} /> : null}
+                </div>
+              </div>;
+            })}
+          </div>
         ) : null}
         {(task.comparisonType === "more" || task.comparisonType === "less") && task.groups.length === 2 ? <div aria-hidden="true" className="relative mb-3 h-10 overflow-hidden rounded-full bg-amber-100">
           <div className="absolute inset-x-[-10%] top-1/2 h-3 -translate-y-1/2 rounded bg-[#a16207] transition-transform duration-500" style={{ transform: `translate(${tug * 34}%,-50%)` }}><span className="absolute left-1/2 top-1/2 h-8 w-4 -translate-x-1/2 -translate-y-1/2 rounded bg-red-500" /></div>
@@ -981,7 +966,11 @@ export function GroundCompareTaskCard({
             answersEnabled ? "" : "pointer-events-none opacity-40"
           }`}
         >
-          {task.groups.map((group) => (
+          {task.comparisonType === "order" ? task.groups.filter((group) => !orderProgress.includes(group.id)).map((group) => (
+            <GroundDragPiece key={group.id} label={`Group of ${group.quantity}`} disabled={!answersEnabled} onPlace={(target) => { if (target === null || target === `order-${orderProgress.length}`) tapGroup(group.id); }} className="flex min-h-24 w-full items-center justify-center rounded-2xl border-2 border-b-[6px] border-teal-300 bg-white p-3">
+              <StructuredReveal quantity={group.quantity} objectType={group.objectType} />
+            </GroundDragPiece>
+          )) : task.groups.map((group) => (
             <button
               key={group.id}
               type="button"
@@ -993,8 +982,6 @@ export function GroundCompareTaskCard({
                 quantity={group.quantity}
                 objectType={group.objectType}
                 patternLayout={group.patternLayout}
-                emphasized={orderProgress.includes(group.id)}
-                orderIndex={orderProgress.indexOf(group.id) >= 0 ? orderProgress.indexOf(group.id) : undefined}
                 visualStyle={getCompareVisualStyle(task)}
               />
             </button>
@@ -1004,22 +991,12 @@ export function GroundCompareTaskCard({
 
       {task.comparisonType === "equal" || task.comparisonType === "statement" ? (
         <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => answerYesNo(true)}
-            disabled={!answersEnabled}
-            className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
-          >
-            Yes
-          </button>
-          <button
-            type="button"
-            onClick={() => answerYesNo(false)}
-            disabled={!answersEnabled}
-            className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black uppercase text-teal-900 transition hover:border-cyan-300 hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-cyan-200 disabled:hover:bg-white"
-          >
-            No
-          </button>
+          {[true, false].map((value) => <div key={String(value)} className="relative">
+            <button type="button" onClick={() => answerYesNo(value)} disabled={!answersEnabled} aria-label={value ? "Yes" : "No"} className={`flex min-h-24 w-full items-center justify-center gap-3 rounded-2xl border-2 border-b-[7px] text-3xl font-black ${value ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-rose-400 bg-rose-50 text-rose-800"}`}>
+              <span aria-hidden="true" className="text-5xl">{value ? "✓" : "✗"}</span>{value ? "Yes" : "No"}
+            </button>
+            <span className="absolute right-3 top-3"><OptionReadAloudButton text={value ? "Yes" : "No"} /></span>
+          </div>)}
         </div>
       ) : null}
     </GroundMiniShell>
@@ -1516,8 +1493,9 @@ export function GroundOrderTapTaskCard({
             {index === progressIndex ? <span data-ground-hop key={progressIndex} className="absolute -top-14"><GroundObjectToken objectType="robots" size="lg" /></span> : null}
           </div>)}
         </div> : null}
+        {isOrderMode ? <div className="mb-1 flex items-center justify-center gap-3 text-xl font-black text-teal-900"><span>{direction === "DESC" ? "Biggest" : "Smallest"}</span><span aria-hidden="true">→</span><span>{direction === "DESC" ? "Smallest" : "Biggest"}</span><OptionReadAloudButton text={direction === "DESC" ? "Biggest to smallest" : "Smallest to biggest"} /></div> : null}
         {isOrderMode ? <div className="mb-3 flex items-end justify-center gap-2">
-          {orderedNumerals.map((numeral, index) => <div key={numeral} data-ground-drop={`podium-${index}`} className="grid w-24 place-items-center rounded-t-xl border-2 border-amber-500 bg-gradient-to-b from-amber-200 to-amber-400 text-3xl font-black text-amber-950" style={{ height: 56 + (orderedNumerals.length - index) * 14 }}>{index < progressIndex ? numeral : ""}</div>)}
+          {orderedNumerals.map((numeral, index) => <div key={numeral} data-ground-drop={`podium-${index}`} className="grid w-24 place-items-center rounded-t-xl border-2 border-amber-500 bg-gradient-to-b from-amber-200 to-amber-400 text-3xl font-black text-amber-950" style={{ height: 56 + (direction === "DESC" ? orderedNumerals.length - 1 - index : index) * 16 }}>{index < progressIndex ? numeral : ""}</div>)}
         </div> : null}
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {task.tiles.map((tile) => {
