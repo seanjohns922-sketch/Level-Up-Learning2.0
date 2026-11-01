@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import DataIcon from "@/components/statistica/DataIcon";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
+import { useLevel1Look } from "@/lib/level1-look";
 
 export type PlotCat = { id: string; label: string; color: string; count: number };
 
@@ -31,6 +32,7 @@ type Props = {
 // tracks, a grounded baseline, interval gridlines and adaptive cell sizing so
 // small data gets big icons and tall columns still fit.
 export default function StatisticaPlot({ categories, display, values, onColumnClick, selectedIds = [], statusById = {}, footer, cell, labelReadAloud = true, axisMax, dense = false }: Props) {
+  const bright = useLevel1Look();
   const heights = categories.map((c, i) => values?.[i] ?? c.count);
   const maxVal = Math.max(1, axisMax ?? 0, ...categories.map((c) => c.count), ...heights);
   // Round the axis top up to a whole number of steps so the scale is always
@@ -41,12 +43,12 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   // Columns can pack tighter than object/picture icons, so a tall by-10s scale
   // (rows up to ~40) still renders at the same ~360px height as a small graph.
   const minUnit = display === "columns" ? 9 : 14;
-  const unit = Math.max(minUnit, Math.min(34, Math.floor(360 / rows)));
+  const unit = Math.max(minUnit, Math.min(bright ? 46 : 34, Math.floor((bright ? 420 : 360) / rows)));
   const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
   const cellSize = unit - cellGap;
   const plotH = rows * unit;
   const isColumns = display === "columns";
-  const colWidth = isColumns ? Math.min(dense ? 38 : 64, cellSize + (dense ? 22 : 40)) : cellSize + 22;
+  const colWidth = isColumns ? Math.min(dense ? 38 : 64, cellSize + (dense ? 22 : 40)) : bright ? Math.max(84, cellSize + 22) : cellSize + 22;
   const AXIS = 24;
   const COL_GAP = dense ? 10 : 20; // spacing between columns, so every graph matches
   const stops: number[] = [];
@@ -61,7 +63,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
     );
 
   return (
-    <div className={`mx-auto ${dense ? "max-w-[300px]" : "max-w-lg"} rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] ${dense ? "p-3 pt-2" : "p-4 pt-3"} shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]`}>
+    <div data-statistica-plot={bright ? "bright" : undefined} className={`mx-auto ${dense ? "max-w-[300px]" : "max-w-lg"} rounded-2xl border border-[#f2bc45]/35 bg-gradient-to-b from-[#1c3226] to-[#101d15] ${dense ? "p-3 pt-2" : "p-4 pt-3"} shadow-[inset_0_1px_0_rgba(255,240,199,0.14),0_12px_32px_rgba(0,0,0,0.32)]`}>
       <div className="relative mx-auto" style={{ height: plotH }}>
         {stops.map((v) => (
           <div key={v} className="pointer-events-none absolute right-0 flex items-center" style={{ left: AXIS, bottom: v * unit }}>

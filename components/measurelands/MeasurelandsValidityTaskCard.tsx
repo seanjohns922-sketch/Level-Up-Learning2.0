@@ -104,7 +104,7 @@ function IntroScene({ task, onCorrect }: { task: ValidityTask; onCorrect: () => 
 
         {task.objectImageSrc ? (
           <div className="mb-3">
-            <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} compact />
+            <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} unitPx={28} />
           </div>
         ) : null}
 
@@ -140,7 +140,7 @@ function ChooseScene({ task, onCorrect, onWrong }: { task: ValidityTask; onCorre
     <PathShell badge={task.badgeLabel ?? "Which Is Correct?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {task.objectImageSrc ? (
         <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-3 shadow-sm">
-          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} compact />
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} unitPx={28} />
         </div>
       ) : null}
       <div className="grid gap-3">
@@ -176,7 +176,7 @@ function DiagnoseScene({ task, onCorrect, onWrong }: { task: ValidityTask; onCor
     <PathShell badge={task.badgeLabel ?? "Find the Problem"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
         {task.objectImageSrc ? (
-          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} compact />
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} unitPx={28} />
         ) : null}
         <RodFrame>
           <FlawedRod length={task.length} flaw={task.flaw ?? "none"} flawIndex={task.flawIndex} unitPx={34} />
@@ -213,7 +213,7 @@ function FixScene({ task, onCorrect }: { task: ValidityTask; onCorrect: () => vo
     <PathShell badge={task.badgeLabel ?? "Fix the Measurement"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">
         {task.objectImageSrc ? (
-          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} compact />
+          <MeasuredObject imageSrc={task.objectImageSrc} label={task.objectLabel} length={task.length} unitPx={28} />
         ) : null}
         <button type="button" onClick={fix} disabled={fixed} className="w-full" title="Tap to snap the blocks together">
           <RodFrame tone={fixed ? "good" : "bad"}>

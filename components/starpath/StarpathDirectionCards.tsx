@@ -62,7 +62,7 @@ export function DirectionGrid({
       className={`relative mx-auto w-full ${cols >= rows * 2 ? "max-w-3xl" : "max-w-md"}`}
       style={{ aspectRatio: `${cols} / ${rows}` }}
     >
-      <div className={`absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner ${SURFACE_BG[surface]}`}>
+      <div data-direction-grid className={`absolute inset-0 overflow-hidden rounded-2xl border-2 border-violet-200 shadow-inner ${SURFACE_BG[surface]}`}>
         <div
           className="grid h-full w-full"
           style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}

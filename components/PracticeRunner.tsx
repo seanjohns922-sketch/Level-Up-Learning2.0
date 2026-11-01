@@ -3,6 +3,8 @@
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
 import { level1Answer, level1Speech } from "@/lib/level1-answer";
+import { Level1LookContext } from "@/lib/level1-look";
+import "@/app/level1-look.css";
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
 import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
@@ -660,7 +662,8 @@ export function PracticeRunner({
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   // Ground students may not read yet, so their questions are always spoken.
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
-  const speakEveryQuestion = alwaysSpeak || /^y1-/.test(liveContext?.lessonId ?? "");
+  const isLevel1Lesson = /^y1-/.test(liveContext?.lessonId ?? "");
+  const speakEveryQuestion = alwaysSpeak || isLevel1Lesson;
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -1497,9 +1500,11 @@ export function PracticeRunner({
         };
 
   return (
+    <Level1LookContext.Provider value={isLevel1Lesson}>
     <div
       className="relative"
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
+      data-level1-look={isLevel1Lesson ? (isMeasurement ? "measurement" : isStarpath ? "space" : isStatistics ? "statistics" : "number") : undefined}
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>
         {/* A written lesson guide explains the method, so it comes before a one-line intro scene. */}
@@ -1845,5 +1850,6 @@ export function PracticeRunner({
         </div>
       </div>
     </div>
+    </Level1LookContext.Provider>
   );
 }

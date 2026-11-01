@@ -1,5 +1,6 @@
 "use client";
 
+import { useLevel1Look } from "@/lib/level1-look";
 import { useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { Check } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -58,6 +59,7 @@ export function PositionObjectVisual({
 }) {
   const svgId = useId().replace(/:/g, "");
   const gradient = (name: string) => `url(#${svgId}-${name})`;
+  const level1 = useLevel1Look();
 
   return (
     <svg
@@ -128,7 +130,17 @@ export function PositionObjectVisual({
           <path d="M56 98h8l-4 8Z" fill="#fef08a" />
         </>
       ) : null}
-      {objectId === "flag" ? (
+      {level1 && objectId === "flag" ? (
+        <g transform="translate(10 5)">
+          <defs><linearGradient id={`${svgId}-l1flag`} x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#ff5d73" /><stop offset="0.5" stopColor="#ff8a5c" /><stop offset="1" stopColor="#ffc83d" /></linearGradient></defs>
+          <ellipse cx="30" cy="100" rx="24" ry="7" fill="#8b7cf0" />
+          <ellipse cx="30" cy="97" rx="24" ry="7" fill="#c6bbff" />
+          <rect x="27" y="8" width="6" height="90" rx="3" fill="#e8edf7" />
+          <circle cx="30" cy="8" r="6" fill="#ffd23f" />
+          <path d="M33 14c14-8 24 8 38 2s16-4 20-4l-6 21 6 22c-8-3-14-3-20 0-14 6-24-10-38-2z" fill={`url(#${svgId}-l1flag)`} />
+          <path d="M60 21l4 9 10 1-7 6 2 10-9-5-9 5 2-10-7-6 10-1z" fill="#fff" />
+        </g>
+      ) : objectId === "flag" ? (
         <>
           <path d="M29 103V17" stroke="#ddd6fe" strokeWidth="9" strokeLinecap="round" />
           <path d="M29 103V17" stroke="#7c3aed" strokeWidth="5" strokeLinecap="round" />
@@ -195,7 +207,21 @@ export function PositionObjectVisual({
           <path d="M48 24q12-11 24 0-12 13-24 0Z" fill={gradient("gold")} stroke="#312e81" strokeWidth="4" />
         </>
       ) : null}
-      {objectId === "rover" ? (
+      {level1 && objectId === "rover" ? (
+        <g transform="translate(0 8)">
+          <defs><linearGradient id={`${svgId}-l1body`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" /><stop offset="1" stopColor="#b9c8e6" /></linearGradient><linearGradient id={`${svgId}-l1solar`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#3fa9f5" /><stop offset="1" stopColor="#1b4fa8" /></linearGradient></defs>
+          <path d="M76 40V18" stroke="#c9d6ee" strokeWidth="5" />
+          <rect x="66" y="6" width="26" height="15" rx="6" fill={`url(#${svgId}-l1body)`} />
+          <circle cx="84" cy="13.5" r="5" fill="#17324d" />
+          <circle cx="85.5" cy="12" r="1.8" fill="#7fe3ff" />
+          <path d="M12 32h50l-4 10H16z" fill={`url(#${svgId}-l1solar)`} stroke="#dfe9ff" strokeWidth="2" />
+          <path d="M28 32v10M44 32v10" stroke="#dfe9ff" strokeWidth="1.5" />
+          <path d="M14 44h88c5 0 8 4 8 9v8c0 5-4 8-8 8H14c-5 0-8-3-8-8v-8c0-5 3-9 8-9z" fill={`url(#${svgId}-l1body)`} />
+          <path d="M6 58h104v3c0 5-4 8-8 8H14c-5 0-8-3-8-8z" fill="#ff9f1c" />
+          <circle cx="96" cy="52" r="3.5" fill="#ffd23f" />
+          {[22, 60, 98].map((x) => <g key={x}><circle cx={x} cy="84" r="16" fill="#1c2438" /><circle cx={x} cy="84" r="7" fill="#aab9d6" /></g>)}
+        </g>
+      ) : objectId === "rover" ? (
         <>
           <circle cx="38" cy="92" r="14" fill="#1e293b" stroke="#312e81" strokeWidth="5" />
           <circle cx="82" cy="92" r="14" fill="#1e293b" stroke="#312e81" strokeWidth="5" />

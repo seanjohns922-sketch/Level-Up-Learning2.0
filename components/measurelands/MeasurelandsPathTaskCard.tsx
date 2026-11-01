@@ -1,5 +1,6 @@
 "use client";
 
+import { useLevel1Look } from "@/lib/level1-look";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import GroundDragPiece from "@/components/ground/GroundDragPiece";
@@ -154,6 +155,19 @@ const MEASURE_OBJECT_VISIBLE_RATIO: Record<string, number> = {
   "worm.png": 742 / 768,
 };
 
+// Level 1 crops each picture to its real edges, so an object starts and ends exactly with its blocks.
+// [left, top, right, bottom] of the visible object, then the picture's height over its width.
+const MEASURE_OBJECT_BOUNDS: Record<string, number[]> = {
+  "carrot.png": [0.0417, 0.3086, 0.9596, 0.6797, 0.3333],
+  "crayon.png": [0.1823, 0.4102, 0.8477, 0.6523, 0.3333],
+  "cucumber.png": [0.0898, 0.375, 0.9193, 0.6836, 0.3333],
+  "pencil.png": [0.0299, 0.4297, 0.974, 0.5859, 0.3333],
+  "plank.png": [0.0091, 0.4141, 0.9935, 0.6406, 0.3333],
+  "snake.png": [0.0247, 0.3828, 0.9779, 0.6211, 0.3333],
+  "vine.png": [0.0117, 0.4336, 0.9883, 0.582, 0.3333],
+  "worm.png": [0.0195, 0.4141, 0.9857, 0.6445, 0.3333],
+};
+
 function visibleRatioForImage(imageSrc: string) {
   const filename = imageSrc.split("/").pop() ?? "";
   return MEASURE_OBJECT_VISIBLE_RATIO[filename] ?? 1;
@@ -214,6 +228,22 @@ export function MeasuredObject({
   const depth = rodDepth(unitPx);
   const rodWidth = length * unitPx + depth;
   const visibleRatio = visibleRatioForImage(imageSrc);
+  const level1 = useLevel1Look();
+  const bounds = MEASURE_OBJECT_BOUNDS[imageSrc.split("/").pop() ?? ""];
+  if (level1 && bounds) {
+    const [left, top, right, bottom, ratio] = bounds;
+    const width = length * unitPx;
+    const imageWidth = width / (right - left);
+    const imageHeight = imageWidth * ratio;
+    return (
+      <div data-level1-object className="mx-auto mb-1 flex flex-col items-start" style={{ width: rodWidth }}>
+        <div style={{ width, height: imageHeight * (bottom - top), overflow: "hidden" }}>
+          <img src={imageSrc} alt={label ?? "Object to measure"} style={{ width: imageWidth, maxWidth: "none", height: imageHeight, maxHeight: "none", marginLeft: -left * imageWidth, marginTop: -top * imageHeight }} />
+        </div>
+        {label ? <div className="mt-1 text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}</div> : null}
+      </div>
+    );
+  }
   return (
     <div className="mb-1 flex flex-col items-center">
       <div style={{ width: rodWidth, maxWidth: "100%", overflow: "hidden" }}>
@@ -303,6 +333,8 @@ function UnitsDisplay({
   unitPx?: number;
 }) {
   const kind = unitKindFromHints(unitLabel, unitEmoji);
+  const level1 = useLevel1Look();
+  if (kind === "block" && level1) return <div data-level1-object className="mx-auto w-fit"><BlockRod length={length} unitPx={unitPx ?? (compact ? COMPACT_UNIT_PX : UNIT_PX)} /></div>;
   if (kind === "block") {
     return (
       <div
@@ -451,11 +483,12 @@ function CountScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCor
 
 /* ── Activity B: which path is longer? ── */
 function CompareScene({ task, onCorrect, onWrong }: { task: MeasurePathTask; onCorrect: () => void; onWrong: () => void }) {
-  const unitPx = commonPathUnit(task.paths ?? []);
+  const level1 = useLevel1Look();
+  const unitPx = level1 ? Math.min(40, 420 / Math.max(1, ...(task.paths ?? []).map((path) => path.length))) : commonPathUnit(task.paths ?? []);
   const paths = task.paths ?? [];
   return (
     <PathShell badge={task.badgeLabel ?? "Which Is Longer?"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
-      <div className="measurelands-path-compare-list grid grid-cols-1! sm:grid-cols-2! gap-4">
+      <div className={`measurelands-path-compare-list grid grid-cols-1! gap-4 ${level1 ? "" : "sm:grid-cols-2!"}`}>
         {paths.map((path, idx) => (
           <button
             key={path.id}

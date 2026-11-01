@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Compass, Check, Scale } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { useLevel1Look } from "@/lib/level1-look";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
 type MassTask = Extract<PracticeTask, { kind: "massMeasure" }>;
@@ -31,6 +32,34 @@ function BalanceCube({ size = 30 }: { size?: number }) {
       <path d="M40 15l-16 9v16l16-9Z" fill="url(#cube-right)" stroke="#5f4715" strokeWidth="1.4" strokeLinejoin="round" />
       {/* rivet on the top face — reads as a weight */}
       <circle cx="24" cy="15" r="2.4" fill="#fff3cf" stroke="#8a6a22" strokeWidth="1" />
+    </svg>
+  );
+}
+
+/* ── Level 1 balance: a level brass beam, with both pans hanging from it ── */
+function BrassBalance() {
+  const pans = [118, 442];
+  return (
+    <svg viewBox="0 0 560 330" className="block h-auto w-full" aria-hidden>
+      <defs>
+        <linearGradient id="l1-brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f4d58d" /><stop offset="0.55" stopColor="#d9a441" /><stop offset="1" stopColor="#9c6d1f" /></linearGradient>
+        <linearGradient id="l1-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9a6a3a" /><stop offset="1" stopColor="#5e3a1c" /></linearGradient>
+      </defs>
+      <path d="M176 306h208l18 20H158z" fill="url(#l1-wood)" />
+      <rect x="150" y="322" width="260" height="8" rx="4" fill="#4a2c14" />
+      <path d="M270 60h20l10 248h-40z" fill="url(#l1-brass)" />
+      <rect x="110" y="56" width="340" height="16" rx="8" fill="url(#l1-brass)" />
+      <circle cx="280" cy="62" r="20" fill="url(#l1-brass)" stroke="#8a6a35" strokeWidth="3" />
+      <path d="M280 8l9 38h-18z" fill="#c0392b" />
+      <circle cx="280" cy="62" r="6" fill="#6a4a16" />
+      {pans.map((x) => (
+        <g key={x}>
+          <path d={`M${x} 66L${x - 66} 190M${x} 66L${x + 66} 190`} stroke="#8a6a35" strokeWidth="2.5" />
+          <circle cx={x} cy="66" r="6" fill="url(#l1-brass)" />
+          <path d={`M${x - 78} 190h156c-6 26-40 34-78 34s-72-8-78-34z`} fill="url(#l1-brass)" />
+          <ellipse cx={x} cy="190" rx="78" ry="8" fill="#f6dc9c" />
+        </g>
+      ))}
     </svg>
   );
 }
@@ -105,6 +134,22 @@ function BalanceScale({
   const objSize = compact ? 52 : 66;
   const cubeSize = compact ? 22 : 28;
   const sizes = unitSizes ?? Array.from({ length: cubes }, () => cubeSize);
+  const level1 = useLevel1Look();
+
+  if (level1) return (
+    <div className="measurelands-balance-scale mx-auto w-full max-w-[460px]">
+      <div className="relative">
+        <BrassBalance />
+        <div className="absolute bottom-[41%] left-[7%] flex w-[28%] items-end justify-center">
+          {imageSrc ? <img src={imageSrc} alt={label} className="w-[78%] object-contain drop-shadow-[0_4px_4px_rgba(76,40,10,0.3)]" style={{ maxHeight: objSize * 1.5 }} /> : <span className="text-sm font-black text-[#5f4725]">{label}</span>}
+        </div>
+        <div className="absolute bottom-[41%] right-[7%] flex w-[28%] flex-wrap-reverse items-end justify-center">
+          {sizes.map((s, i) => <BalanceCube key={i} size={s} />)}
+        </div>
+      </div>
+      <div className="mt-2 text-center text-sm font-black uppercase tracking-[0.14em] text-[#7c4a12]">{label}{showCount ? ` · ${cubes} cubes` : ""}</div>
+    </div>
+  );
 
   return (
     <div className="measurelands-balance-scale relative mx-auto max-w-[440px] rounded-[24px] border border-[rgba(214,184,108,0.4)] bg-white p-4 shadow-sm">

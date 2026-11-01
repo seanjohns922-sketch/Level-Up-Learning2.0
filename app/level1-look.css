@@ -1,0 +1,41 @@
+/* Level 1 lessons only: the same activities with a brighter, bigger look. Nothing here changes how a task works. */
+[data-level1-look] {
+  --l1-ink: #16302d;
+  --l1-edge: #c8e6df;
+  --l1-gloss: radial-gradient(circle at 34% 28%, #fff 0 12%, #ffd27a 24%, #ff9e1f 70%, #d97706);
+}
+
+/* Number */
+[data-level1-look="number"] .rounded-lg.border.border-slate-200.bg-white { border: 0; border-radius: 18px; box-shadow: 0 2px 0 var(--l1-edge), 0 8px 20px rgba(15, 118, 110, 0.06); }
+[data-level1-look="number"] .text-2xl.font-extrabold, [data-level1-look="number"] .text-lg.font-extrabold { font-size: 1.75rem; line-height: 1.2; font-weight: 800; color: var(--l1-ink); }
+[data-level1-look="number"] .text-sm.text-slate-600, [data-level1-look="number"] .text-sm.font-bold { font-size: 1rem; }
+[data-level1-look="number"] .text-4xl.font-black, [data-level1-look="number"] .text-3xl.font-black { font-size: 2.75rem; color: var(--l1-ink); }
+/* Answer buttons: taller, rounded and raised */
+[data-level1-look="number"] button.w-full.text-left, [data-level1-look="number"] button.rounded-xl.border:not(:has(svg)):not([style]), [data-level1-look="number"] button.rounded-lg.border:not(.w-10):not(:has(svg)):not([style]) { min-height: 60px; border: 0; border-radius: 14px; background: #fff; color: var(--l1-ink); font-size: 1.5rem; font-weight: 800; text-align: center; box-shadow: 0 0 0 1px var(--l1-edge), 0 5px 0 var(--l1-edge); transition: transform 0.08s; }
+[data-level1-look="number"] button.w-full.text-left:active, [data-level1-look="number"] button.rounded-xl.border:active, [data-level1-look="number"] button.rounded-lg.border:active { transform: translateY(3px); }
+/* Counters */
+[data-level1-look="number"] button.rounded-full.border-teal-600, [data-level1-look="number"] .rounded-full.bg-teal-600 { border: 0; background: var(--l1-gloss); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2); transform: scale(1.12); }
+/* Tens rods and ones cubes */
+[data-level1-look="number"] button.w-10.h-20 { height: 104px; border: 0; border-radius: 6px; background: #e7f8f4; }
+[data-level1-look="number"] button.w-10.h-20 > div { visibility: hidden; }
+[data-level1-look="number"] button.w-10.h-20.border-teal-600 { background: repeating-linear-gradient(180deg, #22b8a7 0 9px, #0d8f82 9px 10.4px); box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.5); }
+[data-level1-look="number"] button.w-10.h-10 { border: 0; border-radius: 7px; background: #e7f8f4; }
+[data-level1-look="number"] button.w-10.h-10.border-teal-600 { background: linear-gradient(135deg, #ffcf6b, #f59e0b); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.55); }
+/* Real Australian money, shown larger */
+[data-level1-look="number"] img.h-11.w-11 { height: 3.75rem; width: 3.75rem; }
+[data-level1-look="number"] img.h-11.w-20 { height: 3.75rem; width: 7rem; }
+
+/* Measurelands */
+[data-level1-look="measurement"] .measurelands-path-compare-list [data-level1-object] { margin-left: 0; }
+[data-level1-look="measurement"] .measurelands-path-compare-list > button > div:last-child { padding-left: 0; border-radius: 0 20px 20px 0; border: 0; border-left: 3px dashed #c98d3a; background: #fff; }
+
+/* Starpath */
+[data-level1-look="space"] [data-direction-grid] { border-color: #8b7cf0; background: radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1.5px 1.5px at 72% 30%, #fff, transparent), radial-gradient(2px 2px at 40% 76%, #cfe0ff, transparent), radial-gradient(1.5px 1.5px at 88% 82%, #fff, transparent), linear-gradient(180deg, #191a52, #3a2a8c); }
+[data-level1-look="space"] [data-direction-grid] .border-amber-300\/70 { border: 2px solid #ffc83d; background: rgba(255, 200, 61, 0.16); box-shadow: 0 0 16px rgba(255, 200, 61, 0.5); }
+[data-level1-look="space"] [data-direction-grid] .border-amber-300\/70 svg { height: 88%; width: 88%; }
+
+/* Statistica */
+[data-level1-look="statistics"] [data-statistica-plot] { --tw-gradient-from: #fff; --tw-gradient-to: #f3f9ee; --tw-gradient-stops: #fff, #f3f9ee; border-color: #c7e2b4; box-shadow: 0 2px 0 #c7e2b4; }
+[data-level1-look="statistics"] [data-statistica-plot] .text-white\/90 { color: #17331f; font-size: 0.9rem; }
+[data-level1-look="statistics"] [data-statistica-plot] .text-\[\#f2bc45\]\/60 { color: #5b7a5e; font-size: 0.75rem; }
+[data-level1-look="statistics"] .bg-\[\#17281f\] { background: #fff; border-color: #c7e2b4; color: #17331f; box-shadow: 0 2px 0 #c7e2b4; }
