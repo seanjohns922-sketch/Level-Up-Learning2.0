@@ -150,13 +150,10 @@ assert(productionVisualSources.every((source) => !/bg-gradient-to-(?:br|r)/.test
 assert(!/[🤖🚀🛸🪐⭐💎🏁✨]/u.test(productionVisualSources.join("\n")), "A production Ground surface renders platform-dependent emoji artwork.");
 assert(tokenVisualSource.includes("lucide-react") && tokenVisualSource.includes("TOKEN_TONES"), "The shared Ground token renderer is not using the premium icon and colour system.");
 assert(
-  lessonSource.includes('requireManualCorrectAdvance={isGroundCustomLesson && realmId !== "measurement"}'),
-  "Ground Number Nexus lessons do not require students to confirm a correct answer before advancing.",
-);
-assert(
-  practiceRunnerSource.includes("if (!isStructuredRealm && !requireManualCorrectAdvance)") &&
-    practiceRunnerSource.includes('? "Next Question"'),
-  "The lesson runner can auto-advance Ground Number Nexus after a correct answer.",
+  practiceRunnerSource.includes('{status === "correct" && !softCorrect && !transitionError ? (') &&
+    practiceRunnerSource.includes(': "Next Question"}') &&
+    !practiceRunnerSource.includes("setTimeout(() => nextTask()"),
+  "The lesson runner can auto-advance after a correct answer.",
 );
 
 const blueprint = NUMBER_NEXUS_ASSESSMENT_BLUEPRINTS.find((item) => item.level === 0);

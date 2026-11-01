@@ -488,7 +488,6 @@ export function PracticeRunner({
   showCoachReview = true,
   showMistakeReview = true,
   activityNoun = "Question",
-  requireManualCorrectAdvance = false,
   lessonHelp,
 }: {
   minutes?: number;
@@ -520,7 +519,6 @@ export function PracticeRunner({
   showCoachReview?: boolean;
   showMistakeReview?: boolean;
   activityNoun?: string;
-  requireManualCorrectAdvance?: boolean;
   lessonHelp?: ReactNode;
 }) {
   const isMeasurement = realmId === "measurement";
@@ -650,6 +648,8 @@ export function PracticeRunner({
     transition: PracticeTaskTransition;
   } | null>(null);
   const [awaitingWrongNext, setAwaitingWrongNext] = useState(false);
+  // A step inside a multi-step activity: only the finished activity needs Next Question.
+  const [softCorrect, setSoftCorrect] = useState(false);
   const [currentWrongFeedback, setCurrentWrongFeedback] = useState<MistakeReviewItem | null>(null);
   const [typed, setTyped] = useState("");
   const [order, setOrder] = useState<number[]>([]);
@@ -1162,16 +1162,14 @@ export function PracticeRunner({
     }
     bumpSessionCounters(true);
     clearPendingTimeout();
-    if (!isStructuredRealm && !requireManualCorrectAdvance) {
-      timeoutRef.current = setTimeout(() => nextTask(), 600);
-    }
   }
 
   function markCorrectSoft() {
     if (finished || status !== "idle" || scoredThisTurnRef.current) return;
     setStatus("correct");
+    setSoftCorrect(true);
     clearPendingTimeout();
-    timeoutRef.current = setTimeout(() => setStatus("idle"), 500);
+    timeoutRef.current = setTimeout(() => { setSoftCorrect(false); setStatus("idle"); }, 500);
   }
 
   const callbacks = { markCorrect, markCorrectSoft, markWrong, advanceIntro };
@@ -1830,7 +1828,7 @@ export function PracticeRunner({
             </button>
           </div>
         ) : null}
-        {(isStructuredRealm || requireManualCorrectAdvance) && status === "correct" && !transitionError ? (
+        {status === "correct" && !softCorrect && !transitionError ? (
           <div className="mt-5 flex justify-end">
             <button
               type="button"
@@ -1840,9 +1838,7 @@ export function PracticeRunner({
             >
               {isAdvancingTask
                 ? "Loading..."
-                : requireManualCorrectAdvance
-                  ? "Next Question"
-                  : "Next Challenge"}
+                : "Next Question"}
             </button>
           </div>
         ) : null}

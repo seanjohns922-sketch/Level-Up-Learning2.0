@@ -27,11 +27,10 @@ check(
     !advanceIntroBody.includes("markCorrect"),
 );
 check(
-  "Measurelands correct answers wait for Next Challenge",
-  runner.includes('(isStructuredRealm || requireManualCorrectAdvance) && status === "correct"') &&
-    runner.includes("const isStructuredRealm = isMeasurement || isStarpath || isStatistics") &&
+  "Measurelands correct answers wait for Next Question",
+  runner.includes('{status === "correct" && !softCorrect && !transitionError ? (') &&
     runner.includes("onClick={continueAfterCorrect}") &&
-    markCorrectBody.includes("if (!isStructuredRealm && !requireManualCorrectAdvance)"),
+    !markCorrectBody.includes("nextTask()"),
 );
 check(
   "Wrong answers retain an explicit next action",
