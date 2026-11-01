@@ -485,7 +485,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     reset: resetY2MeasurelandsWeek7Lesson1TaskSessionState,
     quizContributionBuilder: buildY2MeasurelandsWeek7Lesson1QuizTasks,
     practisedSkills: [
-      "Counting the days between two dates (counting the jumps)",
+      "Counting the days from one date to another (counting the jumps)",
       "Recognising the fence-post error (not counting the start day)",
       "Naming months and the number of days in each month",
     ],
@@ -524,7 +524,7 @@ const Y2_MEASURELANDS_LESSONS: Y2MeasurelandsLessonEntry[] = [
     practisedSkills: [
       "Solving calendar mysteries from event dates",
       "Finding missing dates using before and after clues",
-      "Counting days between events",
+      "Counting days from one event to another",
       "Choosing first, next and last events from a calendar",
     ],
     completionTitle: "Calendar Detective Complete!",

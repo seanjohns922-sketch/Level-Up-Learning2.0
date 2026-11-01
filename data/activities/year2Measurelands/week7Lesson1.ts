@@ -4,7 +4,8 @@ const nth = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th",
 
 // ── Measurelands · Level 2 (Year 2) · Week 7 · Lesson 1 — "Count the Days" ──
 // AC9M2M03: months of the year + days in each month, and the number of days
-// BETWEEN two dates. Days between = count the JUMPS (exclusive of the start):
+// from one date to another, worded "from the 3rd to the 7th" because "between"
+// would mean only the days in the middle. Count the JUMPS (exclusive of the start):
 // the 3rd to the 7th is 4 days, not 5. Everything stays within one month.
 // THREE rotating activities:
 //   1. between    — tap each day from the start+1 to the finish; count the jumps.
@@ -72,9 +73,9 @@ function buildIntroTask(): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "intro",
-    prompt: "Counting the days between.",
+    prompt: "Counting the days from one date to another.",
     speakText:
-      "Professor Gauge says: to count the days between two dates, start on the first date and count each jump forward. Count the jumps, not the start day. From the 3rd to the 7th is 4 days.",
+      "Professor Gauge says: to count the days from one date to another, start on the first date and count each jump forward. Count the jumps, not the start day. From the 3rd to the 7th is 4 days.",
     badgeLabel: "Meazurex Mission",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
@@ -89,16 +90,16 @@ function buildBetweenTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "between",
-    prompt: `How many days are between the ${nth(from)} and the ${nth(to)}?`,
+    prompt: `How many days is it from the ${nth(from)} to the ${nth(to)}?`,
     speakText: `Count the jumps from the ${nth(from)} to the ${nth(to)}. Tap each day after the ${nth(from)}.`,
-    badgeLabel: "Count the Days Between",
+    badgeLabel: "Count the Days",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
     monthLabel: GRID.monthLabel,
     fromDate: from,
     toDate: to,
     correctAnswer: to - from,
-    feedback: { correct: `${to - from} days between — you counted the jumps!`, wrong: "Count one jump at a time — don't count the start day." },
+    feedback: { correct: `${to - from} days from the ${nth(from)} to the ${nth(to)} — you counted the jumps!`, wrong: "Count one jump at a time — don't count the start day." },
   };
 }
 
@@ -109,8 +110,8 @@ function buildWhichCountTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "whichCount",
-    prompt: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are between the ${nth(from)} and the ${nth(to)}?`,
-    speakText: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are really between the ${nth(from)} and the ${nth(to)}?`,
+    prompt: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days is it from the ${nth(from)} to the ${nth(to)}?`,
+    speakText: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days is it really from the ${nth(from)} to the ${nth(to)}?`,
     badgeLabel: "Which Count Is Correct?",
     days: GRID.days,
     startWeekday: GRID.startWeekday,

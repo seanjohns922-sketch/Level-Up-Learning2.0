@@ -165,7 +165,7 @@ const SKILL_TASKS: ToolTask[] = [
       skillOption("length", "Length", "ruler"),
     ]),
     correctToolId: "calendar",
-    feedback: { correct: "A calendar helps solve date and days-between problems.", wrong: "A calendar challenge uses dates and events." },
+    feedback: { correct: "A calendar helps solve date problems.", wrong: "A calendar challenge uses dates and events." },
   },
 ];
 

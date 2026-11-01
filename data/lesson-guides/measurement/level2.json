@@ -294,7 +294,7 @@
   "tip": "A full turn brings you back to where you started."
  },
  "7:1": {
-  "idea": "Count the days between dates by counting the jumps.",
+  "idea": "Count the days from one date to another by counting the jumps.",
   "example": "4th to 7th → 3 days",
   "steps": [
    "Start on the first date.",

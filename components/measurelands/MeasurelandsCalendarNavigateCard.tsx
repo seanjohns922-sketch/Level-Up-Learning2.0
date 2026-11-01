@@ -6,6 +6,8 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 
+const ordinalDate = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+
 type NavTask = Extract<PracticeTask, { kind: "calendarNavigate" }>;
 
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -334,7 +336,7 @@ function BetweenScene({ task, onCorrect, onWrong }: { task: NavTask; onCorrect: 
         {done ? "Now type how many days you counted." : `Days counted: ${tapped.length}`}
       </div>
       <CalendarGrid days={task.days} startWeekday={task.startWeekday} monthLabel={task.monthLabel} start={from} endDate={to} pathDates={path} tappedOrder={tapped} onTapDate={tap} />
-      <div className="text-center text-sm font-bold text-[#5f4725]">Start on the {from}. Tap each day after it, up to the {to} — count the jumps.</div>
+      <div className="text-center text-sm font-bold text-[#5f4725]">Start on the {ordinalDate(from)}. Tap each day after it, up to the {ordinalDate(to)}, and count the jumps.</div>
       <div className="mx-auto flex max-w-[520px] items-center justify-center gap-3 rounded-[24px] border border-[rgba(214,184,108,0.45)] bg-[#fffaf0] p-3">
         <label className="text-sm font-black uppercase tracking-[0.12em] text-[#7c4a12]" htmlFor="days-between-answer">
           Days

@@ -200,12 +200,12 @@ function buildBusyWeekTask(memory: LessonMemory): NavTask {
   let prompt = "Which event happens next?";
   let answer = events[0]!;
   if (mode === 1) {
-    prompt = `How many days between ${events[0]!.label} and ${events[1]!.label}?`;
+    prompt = `How many days is it from ${events[0]!.label} to ${events[1]!.label}?`;
     return {
       kind: "calendarNavigate",
       scene: "whichCount",
       prompt,
-      speakText: `${prompt} Count the jumps between the two event dates.`,
+      speakText: `${prompt} Count the jumps from one event date to the other.`,
       badgeLabel: "My Busy Week",
       days: GRID.days,
       startWeekday: GRID.startWeekday,
@@ -216,8 +216,8 @@ function buildBusyWeekTask(memory: LessonMemory): NavTask {
       options: shuffle([2, 3, 4]),
       correctAnswer: 2,
       feedback: {
-        correct: "2 days between those events.",
-        wrong: "There are 2 days between those events. Count the jumps, not the start day.",
+        correct: `It is 2 days from ${events[0]!.label} to ${events[1]!.label}.`,
+        wrong: `It is 2 days from ${events[0]!.label} to ${events[1]!.label}. Count the jumps, not the start day.`,
       },
     };
   }

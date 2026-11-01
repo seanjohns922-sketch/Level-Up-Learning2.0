@@ -86,7 +86,7 @@ const PARALLEL_POST_VARIANTS: readonly Partial<ItemSpec>[] = [
     "visual": undefined
   },
   {
-    "prompt": "A book is borrowed on 4 April and returned on 9 April. How many days between the dates?",
+    "prompt": "A book is borrowed on 4 April and returned on 9 April. How many days is it from 4 April to 9 April?",
     "correctAnswer": "5",
     "visual": undefined
   },
@@ -164,7 +164,7 @@ const PARALLEL_POST_VARIANTS: readonly Partial<ItemSpec>[] = [
     ]
   },
   {
-    "prompt": "A project begins on 17 October and ends on 24 October. How many days between the dates?",
+    "prompt": "A project begins on 17 October and ends on 24 October. How many days is it from 17 October to 24 October?",
     "correctAnswer": "7",
     "visual": undefined
   },
@@ -188,7 +188,7 @@ const PARALLEL_POST_VARIANTS: readonly Partial<ItemSpec>[] = [
     "visual": undefined
   },
   {
-    "prompt": "Camp begins on 8 July and ends on 12 July. A student counts both dates and says 5 days between. How many days between the dates?",
+    "prompt": "Camp begins on 8 July and ends on 12 July. A student counts both dates and says 5 days. How many days is it from 8 July to 12 July?",
     "correctAnswer": "4",
     "visual": undefined
   },
