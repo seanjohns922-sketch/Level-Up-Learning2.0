@@ -1569,7 +1569,7 @@ export function PracticeRunner({
             </div>
           )}
 
-          {isGroundLesson && status === "correct" ? <GroundCheer key={questionsAnswered} kind={task.kind} seed={questionsAnswered} /> : null}
+          {(isGroundLesson || /^ground-space-/.test(liveContext?.lessonId ?? "")) && status === "correct" ? <GroundCheer key={questionsAnswered} kind={task.kind} seed={questionsAnswered} /> : null}
           {awaitingWrongNext && currentWrongFeedback && isGroundLesson ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-2 font-bold text-amber-950 shadow-sm">
               <p className="text-xl leading-snug">

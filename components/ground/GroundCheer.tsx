@@ -39,7 +39,7 @@ function chime() {
 const LINES: Record<string, string[]> = {
   groundFeed: ['Yum!', 'Tasty!'], groundCollect: ['Got them!'], groundBuild: ['You built it!', 'Nice build!'], groundTapCount: ['Pop pop!', 'You counted!'],
   groundOrderTap: ['Blast off!', 'In order!'], groundSequence: ['All aboard!'], groundCompare: ['You spotted it!'], groundFoundation: ['Well done!', 'Fair and square!'],
-  groundMatch: ['A match!'], measurementCompare: ['Great exploring!', 'You got it!'], measurePath: ['Good measuring!'], balanceScale: ['Balanced!'],
+  groundMatch: ['A match!'], starpathShapeMatch: ['Perfect fit!'], starpathOddOneOut: ['Yum, thanks!'], measurementCompare: ['Great exploring!', 'You got it!'], measurePath: ['Good measuring!'], balanceScale: ['Balanced!'],
 };
 
 export default function GroundCheer({ kind, seed = 0 }: { kind?: string; seed?: number }) {

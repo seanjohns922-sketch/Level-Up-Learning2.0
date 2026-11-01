@@ -1,5 +1,6 @@
 "use client";
 
+import GroundDragPiece from "@/components/ground/GroundDragPiece";
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { Check } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -128,17 +129,20 @@ export function StarpathOddOneOutCard({
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
+      <div data-ground-drop="alien" className="mx-auto mb-4 flex max-w-md items-center justify-center gap-3 rounded-2xl border-4 border-dashed border-lime-300 bg-gradient-to-b from-indigo-950 to-violet-900 p-3">
+        <svg viewBox="0 0 80 80" aria-hidden="true" className="h-20 w-20"><path d="M24 12L18 2M56 12l6-10" stroke="#84cc16" strokeWidth="5" strokeLinecap="round" /><ellipse cx="40" cy="44" rx="30" ry="32" fill="#84cc16" stroke="#3f6212" strokeWidth="3" /><ellipse cx="28" cy="38" rx="8" ry="11" fill="#1e293b" /><ellipse cx="52" cy="38" rx="8" ry="11" fill="#1e293b" /><circle cx="30" cy="34" r="3" fill="#fff" /><circle cx="54" cy="34" r="3" fill="#fff" /><path d="M28 60q12 10 24 0" fill="none" stroke="#1e293b" strokeWidth="4" strokeLinecap="round" /></svg>
+        <span className="text-lg font-black text-lime-100">Give me the odd one out!</span>
+      </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {task.options.map((option) => (
           <div key={option.id} className="relative">
-            <button
-              type="button"
-              aria-label={option.shape}
-              onClick={() => (option.id === task.oddOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id)))}
-              className="relative h-full w-full flex min-h-40 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            <GroundDragPiece
+              label={option.shape}
+              onPlace={(target) => { if (target === "alien" || target === null) { if (option.id === task.oddOptionId) onCorrect(String(option.id)); else onWrong(String(option.id)); } }}
+              className="relative flex h-full min-h-40 w-full items-center justify-center rounded-2xl border-2 border-b-[7px] border-violet-300 bg-white p-4"
             >
               <ShapeVisual shape={option.shape} colour={option.colour} className="h-24 w-24" />
-            </button>
+            </GroundDragPiece>
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
           </div>
         ))}

@@ -1,5 +1,6 @@
 "use client";
 
+import GroundDragPiece from "@/components/ground/GroundDragPiece";
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -785,23 +786,22 @@ export function StarpathShapeMatchCard({
   return (
     <div>
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
-      <div className="mx-auto mb-5 flex w-full max-w-xs flex-col items-center rounded-2xl border-2 border-cyan-300 bg-cyan-50 p-3 shadow-sm">
-        <div className="text-xs font-black uppercase tracking-[0.16em] text-cyan-800">Target shape</div>
-        <ShapeVisual shape={task.targetShape} colour="#a5f3fc" className="mt-1 h-24 w-24" />
+      <div data-ground-drop="silhouette" className="mx-auto mb-5 flex w-full max-w-sm flex-col items-center rounded-2xl border-4 border-dashed border-cyan-300 bg-gradient-to-b from-indigo-950 to-violet-900 p-3 shadow-sm">
+        <div className="text-sm font-black text-cyan-100">Drag the matching shape here</div>
+        <div style={{ filter: "brightness(0) invert(1) opacity(.85)" }}><ShapeVisual shape={task.targetShape} colour="#a5f3fc" className="mt-1 h-24 w-24" /></div>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {task.options.map((option) => (
           <div key={option.id} className="relative">
-            <button
-              type="button"
-              onClick={() => option.id === task.correctOptionId ? onCorrect(String(option.id)) : onWrong(String(option.id))}
-              aria-label={option.shape}
-              className="relative h-full w-full flex min-h-44 items-center justify-center rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-lg active:scale-[0.98]"
+            <GroundDragPiece
+              label={option.shape}
+              onPlace={(target) => { if (target === "silhouette" || target === null) { if (option.id === task.correctOptionId) onCorrect(String(option.id)); else onWrong(String(option.id)); } }}
+              className="relative flex h-full min-h-44 w-full items-center justify-center rounded-2xl border-2 border-b-[7px] border-violet-300 bg-white p-4"
             >
               <div style={{ transform: `rotate(${option.rotation ?? 0}deg)` }}>
                 <ShapeVisual shape={option.shape} colour={option.colour} scale={option.scale} className="h-28 w-28" />
               </div>
-            </button>
+            </GroundDragPiece>
             <OptionReadAloudButton text={option.shape} className="absolute right-3 top-3" />
           </div>
         ))}
