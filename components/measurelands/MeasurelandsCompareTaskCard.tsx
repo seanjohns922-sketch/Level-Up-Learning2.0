@@ -450,7 +450,7 @@ function TeachingMomentRow({ moment }: { moment: TeachingMoment }) {
       </div>
       {trioObjects && trioObjects.length > 0 ? (
         <div
-          className={`grid gap-3 ${trioObjects.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}
+          className={`grid gap-3 ${trioObjects.length === 4 ? "grid-cols-2 lg:grid-cols-4" : trioObjects.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}
         >
           {trioObjects.map((item, index) => (
             <CompareVisual
@@ -807,6 +807,30 @@ function SequenceScene({
   );
 }
 
+/** One teaching moment at a time, so young students never have to scroll to reach the button. */
+function IntroMoments({ moments, onDone, header }: { moments: NonNullable<MeasurelandsCompareTask["teachingMoments"]>; onDone: () => void; header: React.ReactNode }) {
+  const [page, setPage] = useState(0);
+  const moment = moments[page];
+  const last = page >= moments.length - 1;
+  return (
+    <>
+      {page === 0 ? header : null}
+      {moment ? <TeachingMomentRow key={moment.id} moment={moment} /> : null}
+      <div className="mt-5 flex items-center justify-center gap-4">
+        {moments.length > 1 ? <span className="flex gap-2" aria-label={`Example ${page + 1} of ${moments.length}`}>{moments.map((m, i) => <span key={m.id} className={`h-3 w-3 rounded-full ${i === page ? "bg-[#78350f]" : "bg-[#e5d3a8]"}`} />)}</span> : null}
+        <button
+          type="button"
+          onClick={() => (last ? onDone() : setPage((value) => value + 1))}
+          className="min-h-16 rounded-full px-8 py-3 text-xl font-black uppercase tracking-[0.1em] text-[#fff8e1] shadow-[0_16px_32px_rgba(180,120,20,0.22)] transition hover:brightness-110"
+          style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))" }}
+        >
+          {last ? "Start Exploring" : "Next"}
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function MeasurelandsCompareTaskCard({
   task,
   onCorrect,
@@ -832,12 +856,13 @@ export function MeasurelandsCompareTaskCard({
         prompt={task.prompt}
         speakText={task.speakText ?? task.prompt}
       >
-        <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-5 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
-          <div className="mb-4 flex items-start gap-4 rounded-[26px] border border-[rgba(167,139,250,0.22)] bg-[rgba(109,40,217,0.08)] p-4">
+        <div className="rounded-[30px] border border-[rgba(214,184,108,0.36)] bg-[rgba(255,248,232,0.98)] p-3 shadow-[0_18px_38px_rgba(180,120,20,0.08)]">
+          <IntroMoments moments={task.teachingMoments ?? []} onDone={onCorrect} header={
+          <div className="mb-3 flex items-start gap-3 rounded-[26px] border border-[rgba(167,139,250,0.22)] bg-[rgba(109,40,217,0.08)] p-3">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#6d28d9,#4c1d95)] text-3xl shadow-[0_10px_24px_rgba(109,40,217,0.24)]">
               {task.introIcon ?? "⏳"}
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="text-sm font-black uppercase tracking-[0.16em] text-[#5b21b6]">
                 Meazurex
               </div>
@@ -848,31 +873,14 @@ export function MeasurelandsCompareTaskCard({
               ]).map((line, i) => (
                 <p
                   key={i}
-                  className={`text-base font-semibold leading-relaxed ${i === 0 ? "text-[#2c1c07]" : "text-[#5f4725]"}`}
+                  className={`text-base font-semibold leading-snug ${i === 0 ? "text-[#2c1c07]" : "text-[#5f4725]"}`}
                 >
                   {line}
                 </p>
               ))}
             </div>
           </div>
-          <div className="space-y-4">
-            {task.teachingMoments?.map((moment) => (
-              <TeachingMomentRow key={moment.id} moment={moment} />
-            ))}
-          </div>
-          <div className="mt-5 flex justify-center">
-            <button
-              type="button"
-              onClick={onCorrect}
-              className="rounded-full px-6 py-3 text-lg font-black uppercase tracking-[0.12em] text-[#fff8e1] shadow-[0_16px_32px_rgba(180,120,20,0.22)] transition hover:-translate-y-0.5"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96), rgba(214,184,108,0.92))",
-              }}
-            >
-              Start Exploring
-            </button>
-          </div>
+          } />
         </div>
       </MeasurementShell>
     );

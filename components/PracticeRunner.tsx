@@ -618,8 +618,17 @@ export function PracticeRunner({
   // Ground runs on levelNumber 1, but Level 1's guides are far too hard for it.
   const isGroundLesson = /^y0-/.test(liveContext?.lessonId ?? "");
   const groundGuide = isGroundLesson ? getGroundGuide(realmId ?? "number", liveContext?.week, lessonNumberFromId(liveContext?.lessonId)) : null;
+  // Small children should not have to scroll past the page header to reach each new question.
+  const groundStageRef = useRef<HTMLDivElement | null>(null);
+  const attachGroundStage = useCallback((node: HTMLDivElement | null) => {
+    groundStageRef.current = node;
+    if (node && /^y0-/.test(liveContext?.lessonId ?? "")) requestAnimationFrame(() => node.scrollIntoView({ block: "start" }));
+  }, [liveContext?.lessonId]);
   const lowerGuide = isGroundLesson ? null : getLowerLessonGuide(realmId ?? "number", levelNumber, liveContext?.week, lessonNumberFromId(liveContext?.lessonId));
   const [nativeGuide] = useState(() => levelNumber && levelNumber >= 1 && levelNumber <= 6 && isNativeLessonIntro(task) ? task : null);
+  useEffect(() => {
+    if (isGroundLesson) requestAnimationFrame(() => groundStageRef.current?.scrollIntoView({ block: "start" }));
+  }, [isGroundLesson, task]);
   const [helpOpen, setHelpOpen] = useState(false);
   const helpOpenRef = useRef(false);
   const closeHelp = () => { helpOpenRef.current = false; setHelpOpen(false); };
@@ -1516,10 +1525,11 @@ export function PracticeRunner({
       )}
 
       {/* Two-column landscape: sticky HUD rail + question workspace */}
-      <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
+      <div ref={attachGroundStage} data-ground-lesson={isGroundLesson ? "true" : undefined} className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
           {(groundGuide || lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
+            simple={isGroundLesson}
             levelNumber={levelNumber}
             week={liveContext?.week}
             lessonNumber={Number.isFinite(hudLessonNumber) ? hudLessonNumber : undefined}
@@ -1558,7 +1568,15 @@ export function PracticeRunner({
             </div>
           )}
 
-          {awaitingWrongNext && currentWrongFeedback ? (
+          {awaitingWrongNext && currentWrongFeedback && isGroundLesson ? (
+            <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-2 font-bold text-amber-950 shadow-sm">
+              <p className="text-xl leading-snug">
+                <span className="font-black">Good try!</span>{" "}
+                {currentCorrectAnswer ? <>The answer is <span className="font-black">{typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer}</span>.</> : "Have another look."}
+              </p>
+              <ReadAloudBtn text={incorrectFeedbackSpeech} speechKey={`incorrect-feedback:${currentWrongFeedback.id}`} size="md" className="shrink-0 border-amber-300 bg-white text-amber-900" />
+            </div>
+          ) : awaitingWrongNext && currentWrongFeedback ? (
             <div className="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>Not quite.</div>
@@ -1601,7 +1619,7 @@ export function PracticeRunner({
             style={taskSurfaceStyle}
           >
         {/* Activity type label */}
-        <div className="mb-3">
+        <div className="mb-3" data-activity-label>
           <span
             className="inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
             style={isMeasurement ? {

@@ -11,6 +11,7 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 
 export function LessonHUDRail({
   levelNumber,
+  simple = false,
   week,
   lessonNumber,
   lessonTitle,
@@ -32,6 +33,8 @@ export function LessonHUDRail({
   realmId,
 }: {
   levelNumber?: number;
+  /** Ground: leave out the numbers a five-year-old cannot use. */
+  simple?: boolean;
   week?: number;
   lessonNumber?: number;
   lessonTitle?: string | null;
@@ -228,14 +231,14 @@ export function LessonHUDRail({
         </div>
 
         {/* Stats strip */}
-        <div data-lesson-stats className="hidden lg:block lg:[&>div]:!grid-cols-1">
+        {simple ? null : <div data-lesson-stats className="hidden lg:block lg:[&>div]:!grid-cols-1">
           <LessonStatStrip
             questionsAnswered={questionsAnswered}
             correctAnswers={correctAnswers}
             accuracy={accuracy}
             realmId={realmId}
           />
-        </div>
+        </div>}
 
         {/* Combo chain counter (on tablets and phones only once a streak is running) */}
         <div className={comboCount > 0 ? undefined : "hidden lg:block"}>

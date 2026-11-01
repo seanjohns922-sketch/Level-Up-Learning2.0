@@ -14,7 +14,7 @@ function Token({ object, muted = false, newlyAdded = false }: { object: ObjectNa
 }
 
 function PatternToken({ token }: { token: string }) {
-  return <GroundObjectToken objectType={token} size="md" />;
+  return <GroundObjectToken objectType={token} size="lg" />;
 }
 
 function Frame({ children }: { children: React.ReactNode }) {
@@ -96,7 +96,7 @@ export default function GroundFoundationTaskCard({
               </div>
               <div className="flex min-h-36 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-cyan-300 bg-cyan-50/60 p-3">
                 <GroundObjectToken objectType={task.object} size="md" />
-                <button type="button" onClick={() => setCount((value) => Math.min(value + 1, task.change + 2))} className="inline-flex h-11 items-center gap-2 rounded-lg bg-cyan-700 px-4 font-bold text-white shadow-sm transition hover:bg-cyan-600 active:scale-[0.98]">
+                <button type="button" onClick={() => setCount((value) => Math.min(value + 1, task.change + 2))} className="inline-flex h-14 items-center gap-2 rounded-xl px-5 text-lg bg-cyan-700 px-4 font-bold text-white shadow-sm transition hover:bg-cyan-600 active:scale-[0.98]">
                   <Plus className="h-5 w-5" /> Add {task.object.slice(0, -1)}
                 </button>
               </div>
@@ -120,21 +120,21 @@ export default function GroundFoundationTaskCard({
           <div className="space-y-4">
             <Frame>
               <div className="flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
-                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundObjectToken key={index} objectType="crystals" />)}
+                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundObjectToken key={index} objectType="crystals" size="lg" />)}
               </div>
             </Frame>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: task.mode === "equal_share" ? task.groups : boxCount }, (_, group) => (
-                <button key={group} type="button" disabled={!canAssign} onClick={() => setAssignments((values) => [...values, group])} className="min-h-32 rounded-lg border-2 border-cyan-500 bg-white p-3 disabled:opacity-60">
+                <button key={group} type="button" disabled={!canAssign} onClick={() => setAssignments((values) => [...values, group])} className="min-h-40 rounded-xl border-2 border-cyan-500 bg-white p-3 disabled:opacity-60">
                   <span className="text-sm font-bold text-slate-600">Group {group + 1}</span>
                   <span className="mt-3 flex flex-wrap justify-center gap-2">
-                    {assignments.filter((value) => value === group).map((_, index) => <GroundObjectToken key={index} objectType="crystals" size="sm" />)}
+                    {assignments.filter((value) => value === group).map((_, index) => <GroundObjectToken key={index} objectType="crystals" size="md" />)}
                   </span>
                 </button>
               ))}
             </div>
             {task.mode === "equal_group" && assignments.length < task.total ? (
-              <button type="button" onClick={() => setBoxCount((value) => Math.min(value + 1, task.total))} className="inline-flex h-11 items-center gap-2 rounded-lg border-2 border-cyan-700 bg-white px-4 font-bold text-cyan-900">
+              <button type="button" onClick={() => setBoxCount((value) => Math.min(value + 1, task.total))} className="inline-flex h-14 items-center gap-2 rounded-xl px-5 text-lg border-2 border-cyan-700 bg-white px-4 font-bold text-cyan-900">
                 <Plus className="h-5 w-5" /> New group
               </button>
             ) : null}
@@ -173,7 +173,7 @@ export default function GroundFoundationTaskCard({
             <Frame>
               <div className="flex min-h-20 flex-wrap items-center justify-center gap-3">
                 {task.sequence.map((token, index) => token === "?"
-                  ? <span key={index} className="grid h-14 w-14 place-items-center rounded-lg border-2 border-dashed border-slate-400 text-2xl font-black">?</span>
+                  ? <span key={index} className="grid h-16 w-16 place-items-center rounded-lg border-2 border-dashed border-slate-400 text-2xl font-black">?</span>
                   : <PatternToken key={index} token={token} />)}
               </div>
             </Frame>
@@ -193,7 +193,7 @@ export default function GroundFoundationTaskCard({
               <div className="flex min-h-20 flex-wrap items-center justify-center gap-3">
                 {expectedPattern.map((_, index) => builtPattern[index]
                   ? <PatternToken key={index} token={builtPattern[index]!} />
-                  : <span key={index} className="h-14 w-14 rounded-lg border-2 border-dashed border-slate-400" />)}
+                  : <span key={index} className="h-16 w-16 rounded-lg border-2 border-dashed border-slate-400" />)}
               </div>
             </Frame>
             <div className="flex justify-center gap-3">
@@ -207,12 +207,12 @@ export default function GroundFoundationTaskCard({
         ) : null}
       </div>
 
-      <div className="mt-6 flex justify-between gap-3">
-        <button type="button" onClick={reset} className="grid h-12 w-12 place-items-center rounded-lg border-2 border-slate-300 bg-white" aria-label="Reset">
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button type="button" onClick={reset} className="grid h-16 w-16 place-items-center rounded-lg border-2 border-slate-300 bg-white" aria-label="Reset">
           <RotateCcw className="h-5 w-5" />
         </button>
-        <button type="button" onClick={check} className="inline-flex h-12 items-center gap-2 rounded-lg bg-emerald-700 px-6 font-extrabold text-white">
-          <Check className="h-5 w-5" /> Check
+        <button type="button" onClick={check} className="inline-flex h-16 items-center gap-2 rounded-xl bg-emerald-700 px-12 text-xl font-extrabold text-white">
+          <Check className="h-6 w-6" /> Check
         </button>
       </div>
     </div>

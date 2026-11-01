@@ -248,7 +248,7 @@ function QuantityBoard({
   const sections = [];
   for (let start = 0; start < totalSlots; start += config.sectionSize) sections.push(start);
   return (
-    <div className={`space-y-3 ${config.panelClass}`}>
+    <div className={`flex flex-wrap items-start justify-center gap-4 ${config.panelClass}`}>
       {sections.map((start) => {
         const end = Math.min(totalSlots, start + config.sectionSize);
         const sectionCount = end - start;
@@ -256,7 +256,7 @@ function QuantityBoard({
         return (
           <div key={`${style ?? "default"}-${start}`} className="space-y-2">
             {sectionLabel ? <div className="text-center text-[10px] font-black uppercase tracking-[0.16em] text-teal-700">{sectionLabel}</div> : null}
-            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${config.columns}, minmax(0, 1fr))` }}>
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${config.columns}, var(--ground-cell, 64px))` }}>
               {Array.from({ length: sectionCount }).map((_, localIndex) => {
                 const index = start + localIndex;
                 const state = filledStates[index] ?? "empty";
@@ -281,10 +281,12 @@ function QuantityBoard({
                     key={`${style ?? "board"}-${index}`}
                     type={onCellClick ? "button" : undefined}
                     onClick={onCellClick ? () => onCellClick(index) : undefined}
-                    className={`flex h-12 w-full items-center justify-center border-2 text-2xl transition sm:h-14 ${config.cellClass} ${tone}`}
+                    data-ground-cell
+                    style={{ width: "var(--ground-cell, 64px)", height: "var(--ground-cell, 64px)" }}
+                    className={`flex items-center justify-center overflow-hidden border-2 text-2xl transition ${config.cellClass} ${tone}`}
                   >
                     {filled ? (
-                      <GroundObjectToken objectType={objectType} size="sm" className={contentClass} />
+                      <GroundObjectToken objectType={objectType} size="md" className={contentClass} />
                     ) : (
                       <span className="h-6 w-6 rounded-full border border-cyan-200 bg-cyan-50" />
                     )}
@@ -365,7 +367,7 @@ export function GroundCollectTaskCard({
         <button
           type="button"
           onClick={check}
-          className="rounded-lg bg-teal-700 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          className="min-h-20 rounded-xl bg-teal-700 px-4 text-2xl font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
         >
           Done
         </button>
@@ -465,7 +467,7 @@ function TenFrameBuilder({
         <button
           type="button"
           onClick={() => onSelectPart("left")}
-          className={`rounded-lg border-2 px-3 py-2 text-sm font-black transition ${
+          className={`min-h-14 rounded-xl border-2 px-3 py-2 text-lg font-black transition ${
             activePart === "left"
               ? "border-teal-400 bg-teal-100 text-teal-900 shadow-[0_0_16px_rgba(20,184,166,0.16)]"
               : "border-cyan-200 bg-white text-slate-700"
@@ -476,13 +478,13 @@ function TenFrameBuilder({
         <button
           type="button"
           onClick={() => onSelectPart("right")}
-          className={`rounded-lg border-2 px-3 py-2 text-sm font-black transition ${
+          className={`min-h-14 rounded-xl border-2 px-3 py-2 text-lg font-black transition ${
             activePart === "right"
               ? "border-orange-300 bg-orange-100 text-orange-900 shadow-[0_0_16px_rgba(251,146,60,0.16)]"
               : "border-cyan-200 bg-white text-slate-700"
           }`}
         >
-          Red part
+          Orange part
         </button>
       </div>
       <QuantityBoard
@@ -527,7 +529,8 @@ export function GroundBuildTaskCard({
   const splitHasTwoParts = leftBuilt > 0 && rightBuilt > 0;
   const splitDifferentFromExample = !task.requireDifferentFromExample || builtKey !== exampleKey;
   const splitValid = splitHitsTarget && splitHasTwoParts && splitDifferentFromExample;
-  const hideSplitSupport = task.hideSplitSupport === true;
+  // The tray already does this job; a second set of + and − buttons is too much for this age.
+  const hideSplitSupport = true;
   const hasInteractedRef = useRef(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -575,10 +578,10 @@ export function GroundBuildTaskCard({
       <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
         <div className="rounded-lg border border-cyan-200 bg-slate-50 p-4 shadow-sm">
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-cyan-200 bg-white px-4 py-3">
-              <div>
-                <div className="text-xs font-black uppercase tracking-[0.16em] text-teal-700">Target</div>
-                <div className={`mt-1 text-4xl font-black transition ${splitValid ? "scale-105 text-emerald-700" : "text-teal-900"}`}>{task.targetNumber}</div>
+            <div data-ground-reference className="flex flex-wrap items-center justify-center gap-6 rounded-lg border border-cyan-200 bg-white px-4 py-2">
+              <div className="flex items-baseline gap-3">
+                <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-700">Make</div>
+                <div className={`text-5xl font-black transition ${splitValid ? "scale-105 text-emerald-700" : "text-teal-900"}`}>{task.targetNumber}</div>
               </div>
               <div className={`rounded-lg border-2 px-3 py-2 transition ${splitValid ? "border-emerald-300 bg-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.18)]" : "border-teal-300 bg-white shadow-[0_0_16px_rgba(45,212,191,0.12)]"}`}>
                 <StructuredReveal
@@ -664,7 +667,7 @@ export function GroundBuildTaskCard({
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -672,7 +675,7 @@ export function GroundBuildTaskCard({
                     setRightBuilt(0);
                     setActivePart("left");
                   }}
-                  className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+                  className="min-h-16 rounded-xl border-2 border-cyan-200 bg-white px-6 text-lg font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
                 >
                   Clear
                 </button>
@@ -680,7 +683,7 @@ export function GroundBuildTaskCard({
                   type="button"
                   onClick={check}
                   disabled={!hasInteracted}
-                  className="rounded-lg bg-teal-700 px-5 py-3 text-sm font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="min-h-16 rounded-xl bg-teal-700 px-10 text-xl font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   Done
                 </button>
@@ -695,13 +698,9 @@ export function GroundBuildTaskCard({
   return (
     <GroundMiniShell badge="Build Game" prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 flex items-center justify-between rounded-lg bg-cyan-50 px-4 py-2">
-          <div className="text-sm font-black uppercase tracking-[0.16em] text-teal-800">Your Build</div>
-          <div className="text-sm font-black uppercase tracking-[0.16em] text-cyan-600">Count with your eyes</div>
-        </div>
-        {task.referenceGroup ? (
-          <div className="mb-4 rounded-lg border-2 border-cyan-200 bg-cyan-50 p-3">
-            <div className="mb-2 text-center text-xs font-black uppercase tracking-[0.16em] text-teal-800">Match this group</div>
+        <div className="flex flex-wrap items-center justify-center gap-4">{task.referenceGroup ? (
+          <div data-ground-reference className="w-full rounded-lg border-2 border-cyan-200 bg-cyan-50 p-2">
+            <div className="mb-1 text-center text-sm font-black text-teal-800">Match this group</div>
             <CompareGroupCard
               quantity={task.referenceGroup.quantity}
               objectType={task.referenceGroup.objectType}
@@ -720,28 +719,28 @@ export function GroundBuildTaskCard({
           totalSlots={traySize}
           filledStates={tray.map((_, index) => (index < built ? "filled" : "empty"))}
           style={visualStyle}
-        />
+        /></div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <button
           type="button"
           onClick={() => { markInteracted(); setBuilt((current) => Math.max(0, current - 1)); }}
-          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="min-h-20 rounded-xl border-2 border-cyan-200 bg-white px-4 text-4xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           −
         </button>
         <button
           type="button"
           onClick={() => { markInteracted(); setBuilt((current) => Math.min(traySize, current + 1)); }}
-          className="rounded-lg border-2 border-cyan-200 bg-white px-4 py-4 text-2xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+          className="min-h-20 rounded-xl border-2 border-cyan-200 bg-white px-4 text-4xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
         >
           +
         </button>
         <button
           type="button"
           onClick={check}
-          className="rounded-lg bg-teal-700 px-4 py-4 text-base font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
+          className="min-h-20 rounded-xl bg-teal-700 px-4 text-2xl font-black text-white shadow-[0_10px_24px_rgba(13,148,136,0.18)] transition hover:brightness-110"
         >
           Done
         </button>
