@@ -21,6 +21,8 @@ const TOOLS: Record<string, { label: string; reach: number }> = {
 };
 
 // Object pool (wide from day one), each with a size 1=small, 2=medium, 3=large.
+const whyToolIs = (label: string) => (label.endsWith("s") ? `Why are ${label.toLowerCase()}` : `Why is a ${label.toLowerCase()}`);
+
 type Obj = { id: string; label: string; size: 1 | 2 | 3 };
 const OBJECTS: Obj[] = [
   { id: "eraser", label: "Eraser", size: 1 },
@@ -131,8 +133,8 @@ function buildWhyBadTask(memory: LessonMemory): ToolTask {
   return {
     kind: "toolChoice",
     scene: "whyBad",
-    prompt: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
-    speakText: `Why is a ${TOOLS[wrongId]!.label.toLowerCase()} a bad tool for the ${obj.label.toLowerCase()}?`,
+    prompt: `${whyToolIs(TOOLS[wrongId]!.label)} a bad tool for the ${obj.label.toLowerCase()}?`,
+    speakText: `${whyToolIs(TOOLS[wrongId]!.label)} a bad tool for the ${obj.label.toLowerCase()}?`,
     badgeLabel: "Why Is This Tool Bad?",
     object: toObject(obj),
     wrongTool: { label: TOOLS[wrongId]!.label, iconKey: wrongId, imageSrc: toolImg(wrongId) },

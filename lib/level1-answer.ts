@@ -43,7 +43,7 @@ function fullRoute(t: Record<string, any>) { // eslint-disable-line @typescript-
   return moves.join(", ");
 }
 
-/** A true, child-readable answer for each Level 1 question. Teaching screens return null. */
+/** A true, child-readable answer for each Level 1 and Level 2 question. Teaching screens return null. */
 export function level1Answer(task: PracticeTask): string | null {
   const t = task as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (t.scene === "intro") return null;
@@ -84,6 +84,12 @@ export function level1Answer(task: PracticeTask): string | null {
       if (t.scene === "compare" && t.correctPathId) { const hit = t.paths.find((p: { id: string }) => p.id === t.correctPathId); return hit ? label(hit) : null; }
       if (t.scene === "order" && t.correctOrderIds) return then(t.correctOrderIds.map((id: string) => t.paths.find((p: { id: string }) => p.id === id).objectLabel));
       if (t.scene === "same") { const hit = t.paths.find((p: { length: number }) => p.length === t.pathLength); return hit ? label(hit) : null; }
+      if (t.scene === "difference") return each(t.correctAnswer, "blocks");
+      if (t.scene === "measureYourWay") return each(t.correctAnswer, "small blocks");
+      if (t.scene === "reMeasure") return each(t.correctAnswer, "big blocks");
+      if (t.scene === "estimateSlider" || t.scene === "estimateGuess") return `About ${each(t.correctAnswer, "blocks")}`;
+      if (t.scene === "compareAccuracy") return t.correctTextOption;
+      if (t.scene === "estimateLonger") return t.estimatePair.find((p: { id: string }) => p.id === t.correctItemId)?.label ?? null;
       return null;
     }
     case "measureValidity":
@@ -91,14 +97,16 @@ export function level1Answer(task: PracticeTask): string | null {
       if (t.scene === "diagnose") return t.flaw === "gap" ? "There is a gap" : t.flaw === "overlap" ? "The blocks overlap" : "Nothing is wrong";
       return "Blocks lined up end to end, with no gaps or overlaps";
     case "massMeasure":
-      if (t.scene === "count") return each(t.correctAnswer, "cubes");
+      if (t.scene === "count" || t.scene === "difference") return each(t.correctAnswer, "cubes");
+      if (t.scene === "reason") return t.correctTextOption;
       if (t.scene === "order") return orderedItems();
       if (t.scene === "fairChoose") return "The one that uses the same cubes";
       if (t.scene === "fairJudge") return t.fair ? "Yes, it is fair" : "No, it is not fair";
       if (t.scene === "fairFix") return "Use cubes that are all the same";
       return itemLabel();
     case "capacityMeasure":
-      if (t.scene === "count") return each(t.correctAnswer, "cups");
+      if (t.scene === "count" || t.scene === "difference") return each(t.correctAnswer, "cups");
+      if (t.scene === "fairJudge") return t.correctProblem;
       if (t.scene === "order") return orderedItems();
       if (t.scene === "betterUnit") return t.sensibleUnits.find((u: { id: string }) => u.id === t.correctOptionId)?.label ?? null;
       return itemLabel();
@@ -117,7 +125,10 @@ export function level1Answer(task: PracticeTask): string | null {
       if (t.scene === "find") return `The ${ordinal(t.targetDate)}`;
       if (t.scene === "event") return `The ${ordinal(t.events.find((e: { label: string }) => e.label === t.askEventLabel).date)}`;
       return `The ${ordinal(t.correctAnswer)}`;
-    case "calendarNavigate": return `The ${ordinal(t.correctAnswer ?? t.targetDate)}`;
+    case "calendarNavigate":
+      if (t.correctTextOption) return t.correctTextOption;
+      if (["between", "whichCount", "until", "months"].includes(t.scene)) return each(t.correctAnswer, "days");
+      return `The ${ordinal(t.correctAnswer ?? t.targetDate)}`;
     case "calendarEvent":
       if (t.scene === "place") return `The ${ordinal(t.targetDate)}`;
       if (t.scene === "compare") return t.correctTextOption;
@@ -133,6 +144,32 @@ export function level1Answer(task: PracticeTask): string | null {
       if (t.scene === "build" || t.scene === "fix") return then(byOrder(t.scene === "fix" ? t.brokenItems : t.buildItems).map((i) => i.label));
       return t.buildItems?.find((i: { id: string }) => i.id === t.correctTextOption)?.label ?? t.correctTextOption;
     }
+    case "toolChoice":
+      if (t.scene === "best") return t.tools.find((tool: { id: string }) => tool.id === t.correctToolId)?.label ?? null;
+      if (t.scene === "whyBad" || t.scene === "whyBest") return t.correctReason;
+      if (t.scene === "estimateReveal") return t.measurementRows.map((row: { count: number; unitLabel: string }) => `${row.count} ${row.unitLabel}`).join(", ");
+      if (t.scene === "measureIt") return `${t.correctCount} ${t.completeMeasurement.unitLabel}`;
+      return null;
+    case "analogClock": {
+      if (t.correctOptionId) return optionLabel();
+      if (t.targetMinute === 0) return `${t.targetHour} o'clock`;
+      if (t.targetMinute === 30) return `Half past ${t.targetHour}`;
+      if (t.targetMinute === 15) return `Quarter past ${t.targetHour}`;
+      return `Quarter to ${t.targetHour === 12 ? 1 : t.targetHour + 1}`;
+    }
+    case "fractionTurn": return t.correctOption ?? null;
+    case "starpathShapeFeature": return optionLabel();
+    case "starpathMapLocate":
+      if (t.correctLandmarkId) return t.landmarks.find((l: { id: string }) => l.id === t.correctLandmarkId)?.label ?? null;
+      return optionLabel();
+    case "starpathMapRoute":
+      if (t.mode === "follow") return t.steps.map((s: { direction: string }) => s.direction).join(", ");
+      if (t.mode === "debug") { const i = t.debugSteps.findIndex((s: { id: string }) => s.id === t.wrongStepId); return `Step ${i + 1}, ${t.debugSteps[i].direction}`; }
+      if (t.mode === "choose") return t.options.find((o: { id: string }) => o.id === t.correctOptionId)?.direction ?? null;
+      return fullRoute(t);
+    case "statisticaTable":
+      if (t.mode === "count") return String(t.answerCount);
+      return t.rows.find((r: { id: string }) => r.id === t.correctRowId)?.label ?? null;
     case "starpathShapeClassify": case "starpathObjectCompare": return optionLabel();
     case "starpathShapeHunt": case "starpathObjectSpotter":
       return t.hunts.map((h: { shape: string; count: number }) => `${h.count} ${h.shape}${h.count === 1 ? "" : "s"}`).join(", ");

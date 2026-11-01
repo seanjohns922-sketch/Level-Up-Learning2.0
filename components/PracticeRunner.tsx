@@ -1276,7 +1276,7 @@ export function PracticeRunner({
 
   const groundWrongAnswer = alwaysSpeak ? groundAnswer(task) : null;
   const groundWrongLine = `Good try! ${groundWrongAnswer?.say ?? "Have another look."}`;
-  const level1WrongLine = /^y1-/.test(liveContext?.lessonId ?? "") && currentWrongFeedback?.correctAnswer ? `Not quite. The answer is ${currentWrongFeedback.correctAnswer}.` : null;
+  const level1WrongLine = /^y[12]-/.test(liveContext?.lessonId ?? "") && currentWrongFeedback?.correctAnswer ? `Not quite. The answer is ${currentWrongFeedback.correctAnswer}.` : null;
   useEffect(() => {
     if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(groundWrongLine, undefined, "auto");
   }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, groundWrongLine]);

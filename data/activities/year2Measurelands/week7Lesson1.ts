@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const nth = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+
 // ── Measurelands · Level 2 (Year 2) · Week 7 · Lesson 1 — "Count the Days" ──
 // AC9M2M03: months of the year + days in each month, and the number of days
 // BETWEEN two dates. Days between = count the JUMPS (exclusive of the start):
@@ -87,8 +89,8 @@ function buildBetweenTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "between",
-    prompt: `How many days are between the ${from} and the ${to}?`,
-    speakText: `Count the jumps from the ${from} to the ${to}. Tap each day after the ${from}.`,
+    prompt: `How many days are between the ${nth(from)} and the ${nth(to)}?`,
+    speakText: `Count the jumps from the ${nth(from)} to the ${nth(to)}. Tap each day after the ${nth(from)}.`,
     badgeLabel: "Count the Days Between",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
@@ -107,8 +109,8 @@ function buildWhichCountTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "whichCount",
-    prompt: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are between the ${from} and the ${to}?`,
-    speakText: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are really between the ${from} and the ${to}?`,
+    prompt: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are between the ${nth(from)} and the ${nth(to)}?`,
+    speakText: `Professor Gauge counted ${answer + 1}. Pebble counted ${answer}. How many days are really between the ${nth(from)} and the ${nth(to)}?`,
     badgeLabel: "Which Count Is Correct?",
     days: GRID.days,
     startWeekday: GRID.startWeekday,

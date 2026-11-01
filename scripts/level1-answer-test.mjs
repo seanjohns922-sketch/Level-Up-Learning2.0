@@ -56,5 +56,33 @@ for (const id of STATISTICA_LEVEL1_LESSON_IDS) for (let i = 0; i < 12; i++) {
   const set = getStatisticaLevel1TaskSet(id);
   for (const gen of [...(set.activities ?? []), ...(set.mixedPractice ?? [])]) check(gen(ctx), id);
 }
+// Level 2 uses the same answers, and must never leave a child with an empty or garbled one.
+const level2Bad = /undefined|null|NaN|\[object|^\s*$|^[a-z]+-[a-z0-9-]+$/;
+const { getStatisticaLevel2TaskSet, STATISTICA_LEVEL2_LESSON_IDS } = await import('../data/activities/statistica/level2.ts');
+const { LEVEL_TWO_LESSON_CONTENT } = await import('../data/activities/starpath/level2/index.ts');
+const measure2 = await import('../data/activities/year2Measurelands/registry.ts');
+let level2 = 0;
+function check2(t, where) {
+  if (!t || t.scene === 'intro') return;
+  const answer = level1Answer(t);
+  assert(answer, `${where}: ${t.kind}/${t.scene ?? t.mode ?? ''} has no answer`);
+  assert(!level2Bad.test(answer), `${where}: bad answer "${answer}"`);
+  assert(!/Why is a (cubes|footsteps)/.test(t.prompt ?? ''), `${where}: ${t.prompt}`);
+  level2 += 1;
+}
+for (let w = 1; w <= 8; w++) for (const l of [1, 2, 3]) {
+  measure2.resetY2MeasurelandsLessonSessionState?.();
+  for (let i = 0; i < 90; i++) check2(measure2.resolveY2MeasurelandsLessonTask(`y2-measurement-w${w}-l${l}`, levels[i % 3]), `L2 M${w}.${l}`);
+}
+for (const [id, content] of Object.entries(LEVEL_TWO_LESSON_CONTENT)) for (let i = 0; i < 12; i++) {
+  const set = content.createTaskSet();
+  for (const gen of [...(set.activities ?? []), ...(set.mixedPractice ?? [])]) check2(gen(ctx), id);
+}
+for (const id of STATISTICA_LEVEL2_LESSON_IDS) for (let i = 0; i < 12; i++) {
+  const set = getStatisticaLevel2TaskSet(id);
+  for (const gen of [...(set.activities ?? []), ...(set.mixedPractice ?? [])]) check2(gen(ctx), id);
+}
+assert(level2 > 3000, `Only ${level2} Level 2 questions checked`);
+console.log(`PASS: ${level2} Level 2 questions give a real answer`);
 assert(checked > 5000 && seen.size > 90, `Only ${checked} questions across ${seen.size} types`);
 console.log(`PASS: ${checked} Level 1 questions across ${seen.size} types can be read aloud and answered`);

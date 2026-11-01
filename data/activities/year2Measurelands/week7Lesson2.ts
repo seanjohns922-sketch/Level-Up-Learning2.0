@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const nth = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+
 // ── Measurelands · Level 2 (Year 2) · Week 7 · Lesson 2 — "How Many Days Until?" ──
 // AC9M2M03: use a monthly calendar to count forward to familiar events.
 // Core rule: start at today, count the next date as 1, and keep moving forward.
@@ -109,8 +111,8 @@ function buildUntilTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "until",
-    prompt: `Today is the ${today}. How many days until ${event.label}?`,
-    speakText: `Today is the ${today}. ${event.label} is on the ${targetDate}. Count forward to find how many days until ${event.label}.`,
+    prompt: `Today is the ${nth(today)}. How many days until ${event.label}?`,
+    speakText: `Today is the ${nth(today)}. ${event.label} is on the ${nth(targetDate)}. Count forward to find how many days until ${event.label}.`,
     badgeLabel: "Count the Days Until",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
@@ -136,7 +138,7 @@ function buildEventCompareTask(memory: LessonMemory): NavTask {
     kind: "calendarNavigate",
     scene: "eventCompare",
     prompt: "Which event happens first?",
-    speakText: `Today is the ${today}. Look at the event dates. Which event happens first?`,
+    speakText: `Today is the ${nth(today)}. Look at the event dates. Which event happens first?`,
     badgeLabel: "Which Happens First?",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
@@ -159,16 +161,16 @@ function buildEventPlanTask(memory: LessonMemory): NavTask {
   const events = withEventDates(today, gaps, chooseEvents(3));
   let prompt = "Which event happens next?";
   let answer = events[0]!;
-  let speakText = `Today is the ${today}. Which event happens next?`;
+  let speakText = `Today is the ${nth(today)}. Which event happens next?`;
   if (mode === 1) {
     const targetGap = gaps[1]!;
     answer = events.find((event) => event.date - today === targetGap)!;
     prompt = `Which event is in ${targetGap} days?`;
-    speakText = `Today is the ${today}. Which event is in ${targetGap} days?`;
+    speakText = `Today is the ${nth(today)}. Which event is in ${targetGap} days?`;
   } else if (mode === 2) {
     answer = events[events.length - 1]!;
     prompt = "Which event is furthest away?";
-    speakText = `Today is the ${today}. Which event is furthest away?`;
+    speakText = `Today is the ${nth(today)}. Which event is furthest away?`;
   }
   return {
     kind: "calendarNavigate",

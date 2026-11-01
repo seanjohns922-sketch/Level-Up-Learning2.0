@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const nth = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+
 // ── Measurelands · Level 2 (Year 2) · Week 7 · Lesson 3 — "Calendar Challenge" ──
 // AC9M2M03: apply calendar knowledge to real-world date problems.
 
@@ -171,8 +173,8 @@ function buildMissingDateTask(memory: LessonMemory): NavTask {
   return {
     kind: "calendarNavigate",
     scene: "missingDate",
-    prompt: `${target} is ${Math.abs(offset)} days ${afterMode ? "after" : "before"} ${known}. ${known} is on the ${libraryDate}. Tap ${target}'s date.`,
-    speakText: `${target} is ${Math.abs(offset)} days ${afterMode ? "after" : "before"} ${known}. ${known} is on the ${libraryDate}. Tap ${target}'s date.`,
+    prompt: `${target} is ${Math.abs(offset)} days ${afterMode ? "after" : "before"} ${known}. ${known} is on the ${nth(libraryDate)}. Tap ${target}'s date.`,
+    speakText: `${target} is ${Math.abs(offset)} days ${afterMode ? "after" : "before"} ${known}. ${known} is on the ${nth(libraryDate)}. Tap ${target}'s date.`,
     badgeLabel: "Missing Date",
     days: GRID.days,
     startWeekday: GRID.startWeekday,
@@ -181,8 +183,8 @@ function buildMissingDateTask(memory: LessonMemory): NavTask {
     targetDate,
     events: [{ date: libraryDate, label: known, icon: afterMode ? "library" : "bookfair" }],
     feedback: {
-      correct: `${target} is on the ${targetDate}.`,
-      wrong: `${target} is on the ${targetDate}. Count ${afterMode ? "forward" : "back"} from the ${libraryDate}.`,
+      correct: `${target} is on the ${nth(targetDate)}.`,
+      wrong: `${target} is on the ${nth(targetDate)}. Count ${afterMode ? "forward" : "back"} from the ${nth(libraryDate)}.`,
     },
   };
 }
