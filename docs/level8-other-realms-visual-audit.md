@@ -170,3 +170,11 @@ The checks cover actual diagram rendering, read-aloud text presence, finite coor
 | chance | 10 | 3 | Run and explain a probability investigation | 19/30 | Visual |
 
 Run npm run qa:level8-lessons for regressions. Add --report when invoking scripts/level8-realm-visuals-test.mjs with the TypeScript alias loader to regenerate this inventory and /tmp/level8-realm-visual-review.html.
+
+## Findings and corrections
+
+Visual support increased from 247 to 439 inventoried forms (+192). Number now has 48/205 visual forms, Space 147/149, Pattern 77/199, Statistics 63/138 and Chance 104/136. A visual may be a diagram, graph, number line, outcome grid or structured data table; conceptual and symbolic questions are not counted as missing pictures merely because they are text-only.
+
+Corrections include shared-scale geometry, random-branch-specific similarity examples, signed coordinate grids, valid polygon angles and triangle dimensions, hidden reverse-percentage amounts, probability trees with and without replacement, simulation mappings, tally drawings and rounding-bound wording. Teaching examples use their own quantities and corresponding working. Read-aloud text describes visible evidence rather than supplying a hidden angle or outcome count.
+
+The local browser review rendered 527 question/example cards at a 390 px viewport. Contact sheets were visually inspected; the final checks found no horizontal card overflow or SVG text outside its viewBox. Desktop horizontal-overflow checks at 1280 px also passed. Wide data tables retain their existing horizontal scrolling. The review corrected clipped 3D axis labels, crowded coordinate ticks and angle-label placement. Speech text and controls were checked; audible playback and every authenticated production journey were not exercised.
