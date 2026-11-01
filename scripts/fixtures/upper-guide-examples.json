@@ -161,15 +161,15 @@
   },
   "8/measurement/2/2": {
     "title": "Improve an irregular-area estimate",
-    "signature": "ebbc76d29110899d4dfd215984fde3249f6ba31fb62b335202779b8015d56154"
+    "signature": "27babe03772cde106c9fd69dd35121f0bf8c1354bbff511f737ff368fc74dfd0"
   },
   "8/measurement/2/3": {
     "title": "Choose perimeter or area for a practical task",
-    "signature": "3c99822ade0778b823d45e5e0c1b9b345019b3030623056f466d48e7b180d9d7"
+    "signature": "1438180cbe8bbeab087e572b15ceac46744778e2c90a0aed68ddd2502e0143ab"
   },
   "8/measurement/3/1": {
     "title": "Connect cubic units with litres",
-    "signature": "04a2044facdd1b1d0d62a8769902a5992258cd7d63b0ac118d67b826d4961046"
+    "signature": "390629d5beee7c8e527a3b593d925a0ab749dfe79d7fa02f34456d663f7099ea"
   },
   "8/measurement/3/2": {
     "title": "Calculate the volume of a right prism",
@@ -177,7 +177,7 @@
   },
   "8/measurement/3/3": {
     "title": "Find capacity and compare containers",
-    "signature": "da126ee5a12d45179714679f8ab7ecdc3df1bb896d99b379052be5ace7808095"
+    "signature": "5c89845eb1e4cdd1b1dd9e45ef8b3fca5a51b2f6fc1da9f72d1e511f0e5bb646"
   },
   "8/measurement/4/1": {
     "title": "Find a missing prism dimension",
@@ -189,7 +189,7 @@
   },
   "8/measurement/4/3": {
     "title": "Model filling a tank",
-    "signature": "e8817cbd2395a07cb47dcf3f0c718a6fe387e1d81d55f193d63cd8f868e42b45"
+    "signature": "1491e766a1df642d40fa8d5c15fbe3ab8284b59024cde3c48e054db7d49dedd0"
   },
   "8/measurement/5/1": {
     "title": "Connect radius and diameter",
