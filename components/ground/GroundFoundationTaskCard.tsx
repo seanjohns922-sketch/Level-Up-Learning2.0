@@ -91,15 +91,15 @@ export default function GroundFoundationTaskCard({
         {task.mode === "add_to" ? (
           <Frame>
             <div className="grid gap-4 sm:grid-cols-[1fr_136px]">
-              <div className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
+              <div data-ground-drop="cart" className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-2xl border-b-[10px] border-[#7a4f27] bg-gradient-to-b from-[#fbe7c6] to-[#e6c28f] p-4">
                 {Array.from({ length: task.start }, (_, index) => <Token key={`start-${index}`} object={task.object} />)}
                 {Array.from({ length: count }, (_, index) => <Token key={`added-${index}`} object={task.object} newlyAdded={index === count - 1} />)}
               </div>
               <div className="flex min-h-36 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-cyan-300 bg-cyan-50/60 p-3">
-                <GroundObjectToken objectType={task.object} size="md" />
-                <button type="button" onClick={() => setCount((value) => Math.min(value + 1, task.change + 2))} className="inline-flex h-14 items-center gap-2 rounded-xl px-5 text-lg bg-cyan-700 px-4 font-bold text-white shadow-sm transition hover:bg-cyan-600 active:scale-[0.98]">
-                  <Plus className="h-5 w-5" /> Add {task.object.slice(0, -1)}
-                </button>
+                <GroundDragPiece label={`Drag one more ${task.object.slice(0, -1)} on`} onPlace={(target) => { if (target === "cart" || target === null) setCount((value) => Math.min(value + 1, task.change + 2)); }} className="flex flex-col items-center gap-1 rounded-xl p-2">
+                  <GroundObjectToken objectType={task.object} size="lg" />
+                  <span className="text-base font-black text-teal-900">Drag me on</span>
+                </GroundDragPiece>
               </div>
             </div>
           </Frame>
@@ -107,11 +107,12 @@ export default function GroundFoundationTaskCard({
 
         {task.mode === "take_away" ? (
           <Frame>
-            <div className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white p-4">
+            <div data-ground-drop="away" className="mb-3 grid min-h-16 place-items-center rounded-2xl border-4 border-dashed border-amber-500 bg-amber-50 text-lg font-black text-amber-900">Drag them away to here</div>
+            <div className="flex min-h-36 flex-wrap content-center items-center justify-center gap-3 rounded-2xl border-b-[10px] border-[#7a4f27] bg-gradient-to-b from-[#fbe7c6] to-[#e6c28f] p-4">
               {Array.from({ length: task.total }, (_, index) => (
-                <button key={index} type="button" onClick={() => setRemoved((values) => values.includes(index) ? values.filter((value) => value !== index) : [...values, index])} aria-label={`${removed.includes(index) ? "Restore" : "Remove"} ${task.object.slice(0, -1)} ${index + 1}`}>
-                  <Token object={task.object} muted={removed.includes(index)} />
-                </button>
+                removed.includes(index)
+                  ? <button key={index} type="button" aria-label="Put it back" onClick={() => setRemoved((values) => values.filter((value) => value !== index))}><Token object={task.object} muted /></button>
+                  : <GroundDragPiece key={index} label="Take this one away" onPlace={(target) => { if (target === "away" || target === null) setRemoved((values) => [...values, index]); }}><Token object={task.object} /></GroundDragPiece>
               ))}
             </div>
           </Frame>
@@ -121,7 +122,7 @@ export default function GroundFoundationTaskCard({
           <div className="space-y-4">
             <Frame>
               <div className="flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
-                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundDragPiece key={index} label="Drag this crystal to a group" onPlace={(target) => { if (target !== null) setAssignments((values) => [...values, Number(target)]); }}><GroundObjectToken objectType="crystals" size="lg" /></GroundDragPiece>)}
+                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundDragPiece key={index} label="Drag this crystal to a group" onPlace={(target) => { if (target === null) return; const group = Number(target); setAssignments((values) => { const next = [...values, group]; if (task.mode === "equal_group" && next.filter((value) => value === boxCount - 1).length >= task.groupSize) setBoxCount((value) => Math.min(value + 1, Math.ceil(task.total / task.groupSize))); return next; }); }}><GroundObjectToken objectType="crystals" size="lg" /></GroundDragPiece>)}
               </div>
             </Frame>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -172,17 +173,17 @@ export default function GroundFoundationTaskCard({
         {task.mode === "continue_pattern" ? (
           <div className="space-y-5">
             <Frame>
-              <div className="flex min-h-20 flex-wrap items-center justify-center gap-3">
+              <div data-ground-drop="next-bead" style={{ backgroundImage: "linear-gradient(transparent 48%,#a16207 48%,#a16207 52%,transparent 52%)" }} className="flex min-h-20 flex-wrap items-center justify-center gap-3 rounded-2xl">
                 {task.sequence.map((token, index) => token === "?"
-                  ? <span key={index} className="grid h-16 w-16 place-items-center rounded-lg border-2 border-dashed border-slate-400 text-2xl font-black">?</span>
+                  ? <span key={index} className="grid h-16 w-16 place-items-center rounded-full border-4 border-dashed border-amber-500 bg-amber-50 text-2xl font-black">{selectedPattern ? <PatternToken token={selectedPattern} /> : "?"}</span>
                   : <PatternToken key={index} token={token} />)}
               </div>
             </Frame>
             <div className="flex justify-center gap-3">
               {task.options.map((token) => (
-                <button key={token} type="button" onClick={() => setSelectedPattern(token)} className={`rounded-lg p-1 ${selectedPattern === token ? "outline outline-4 outline-cyan-600" : ""}`} aria-label={`Choose ${token}`}>
+                <GroundDragPiece key={token} label={`Choose ${token}`} onPlace={(target) => { if (target === "next-bead" || target === null) setSelectedPattern(token); }} className={`rounded-xl p-1 ${selectedPattern === token ? "outline outline-4 outline-cyan-600" : ""}`}>
                   <PatternToken token={token} />
-                </button>
+                </GroundDragPiece>
               ))}
             </div>
           </div>
@@ -191,7 +192,7 @@ export default function GroundFoundationTaskCard({
         {task.mode === "create_pattern" ? (
           <div className="space-y-5">
             <Frame>
-              <div className="flex min-h-20 flex-wrap items-center justify-center gap-3">
+              <div data-ground-drop="necklace" style={{ backgroundImage: "linear-gradient(transparent 48%,#a16207 48%,#a16207 52%,transparent 52%)" }} className="flex min-h-20 flex-wrap items-center justify-center gap-3 rounded-2xl">
                 {expectedPattern.map((_, index) => builtPattern[index]
                   ? <PatternToken key={index} token={builtPattern[index]!} />
                   : <span key={index} className="h-16 w-16 rounded-lg border-2 border-dashed border-slate-400" />)}
@@ -199,9 +200,9 @@ export default function GroundFoundationTaskCard({
             </Frame>
             <div className="flex justify-center gap-3">
               {[...new Set(task.repeatUnit)].map((token) => (
-                <button key={token} type="button" disabled={builtPattern.length >= expectedPattern.length} onClick={() => setBuiltPattern((values) => [...values, token])} className="rounded-lg p-1 disabled:opacity-50" aria-label={`Place ${token}`}>
+                <GroundDragPiece key={token} label={`Add ${token}`} disabled={builtPattern.length >= expectedPattern.length} onPlace={(target) => { if (target === "necklace" || target === null) setBuiltPattern((values) => [...values, token]); }}>
                   <PatternToken token={token} />
-                </button>
+                </GroundDragPiece>
               ))}
             </div>
           </div>

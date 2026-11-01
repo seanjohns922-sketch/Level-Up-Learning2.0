@@ -362,8 +362,8 @@ export function createGroundBuildTask(lessonId: string): GroundBuildTask {
 
   return {
     kind: "groundBuild",
-    prompt: `Build ${target} ${objectLabel(objectType)}.`,
-    speakText: `Build ${numberWord(target)} ${objectLabel(objectType)}.`,
+    prompt: `Build ${target} ${target === 1 ? objectLabel(objectType).replace(/s$/, "") : objectLabel(objectType)}.`,
+    speakText: `Build ${numberWord(target)} ${target === 1 ? objectLabel(objectType).replace(/s$/, "") : objectLabel(objectType)}.`,
     targetNumber: target,
     objectType,
     feedback: {
@@ -539,7 +539,7 @@ export function createGroundTapCountTask(lessonId: string): GroundTapCountTask {
 
   const prompts = [
     `Tap and count the ${objectLabel(objectType)}.`,
-    `Count each ${objectLabel(objectType)}.`,
+    `Count each ${objectLabel(objectType).replace(/s$/, "")}.`,
     `Tap each ${objectLabel(objectType)} once.`,
   ];
 

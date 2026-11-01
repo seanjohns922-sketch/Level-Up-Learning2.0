@@ -1080,3 +1080,13 @@ body:has([data-teacher-dashboard]) .fullscreen-toggle:not([data-inline="true"]) 
 [data-ground-rocket=go]{transform:translateY(-320px)}
 @media (prefers-reduced-motion:reduce){[data-ground-bubble],[data-ground-numbot]{animation:none}}
 [data-ground-cheer-word]{text-shadow:0 4px 0 #6d3bd1,0 0 18px #6d3bd1;animation:ground-pop .35s ease-out}
+[data-ground-numbot=dance]{animation:ground-dance .5s ease-in-out infinite alternate}
+@keyframes ground-dance{from{transform:rotate(-7deg)}to{transform:rotate(7deg) translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){[data-ground-numbot=dance]{animation:none}}
+[data-ground-hop]{animation:ground-hop .35s ease-out}
+@keyframes ground-hop{from{transform:translateY(-26px)}}
+@media (prefers-reduced-motion:reduce){[data-ground-hop]{animation:none}}
+[data-day-train]{background:linear-gradient(transparent calc(100% - 10px),#64748b calc(100% - 10px));padding-bottom:16px}
+[data-day-train] .measurelands-order-slot{border-color:#6d3bd1!important;background:#efe8fb}
+[data-ground-flip]{animation:ground-flip .5s ease-out}
+@keyframes ground-flip{from{transform:rotateX(70deg)}}

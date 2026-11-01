@@ -52,6 +52,7 @@ function Panel({ panel, compact }: { panel: GroundPanel; compact: boolean }) {
     {panel.img && <Image src={`/images/measurelands/${panel.img}`} alt="" width={size} height={size} className="object-contain" style={{ width: size, height: size }} />}
     {panel.seq && <div className="flex gap-2">{panel.seq.map((c, i) => c === '?' ? <span key={i} className="grid h-14 w-14 place-items-center rounded-full border-4 border-dashed border-amber-500 text-2xl font-black text-amber-700">?</span> : <span key={i} className="block h-14 w-14 rounded-full shadow" style={{ background: COLOURS[c] }} />)}</div>}
     {panel.balance && <Balance tilt={panel.balance} />}
+    {panel.fill !== undefined && <span className="relative block h-40 w-32 overflow-hidden rounded-b-3xl rounded-t-lg border-4 border-[#3c2a63] bg-sky-50"><span className="absolute inset-x-0 bottom-0 bg-gradient-to-b from-sky-300 to-blue-600" style={{ height: `${panel.fill * 100}%` }} /></span>}
     {panel.days && <div className="flex flex-wrap justify-center gap-2">{DAYS.slice(panel.days.from ?? 0, panel.days.to ?? 7).map((d, i) => <span key={d} className={`rounded-xl px-4 py-3 text-2xl font-black ${panel.days!.highlight.includes(i + (panel.days!.from ?? 0)) ? 'bg-amber-300 text-amber-950' : i + (panel.days!.from ?? 0) > 4 ? 'bg-emerald-100 text-emerald-900' : 'bg-violet-100 text-violet-900'}`}>{d}</span>)}</div>}
     {panel.note && <span className="text-xl font-black text-[#3c2a63]">{panel.note}</span>}
   </div>;

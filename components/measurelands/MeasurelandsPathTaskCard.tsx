@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import GroundDragPiece from "@/components/ground/GroundDragPiece";
 import { Compass, Undo2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -620,6 +622,8 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
     }
   }
 
+  const lessonIdFromUrl = useSearchParams().get("lessonId");
+  const ground = /^y0-/.test(lessonIdFromUrl ?? "");
   function addUnit() {
     if (locked || count >= maxUnits) return;
     const next = count + 1;
@@ -644,6 +648,7 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
           <span>/ {target} {task.unitLabel ?? "blocks"}</span>
         </div>
         <div
+          data-ground-drop="path"
           className="flex min-h-[88px] flex-wrap items-center justify-center gap-1.5 rounded-[22px] border-2 border-dashed px-3 py-4"
           style={{
             borderColor: complete ? "rgba(94,234,212,0.85)" : "rgba(214,184,108,0.6)",
@@ -675,14 +680,14 @@ function BuildScene({ task, onCorrect }: { task: MeasurePathTask; onCorrect: () 
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button
+        {ground ? <GroundDragPiece label="Drag a step onto the path" disabled={locked || count >= maxUnits} onPlace={(target) => { if (target === "path" || target === null) addUnit(); }} className="flex min-h-[72px] items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-[rgba(214,184,108,0.8)] bg-[#fffaf0] text-xl font-black text-[#5f4725]"><UnitGlyph kind={kind} size={32} /> Drag me</GroundDragPiece> : <button
           type="button"
           onClick={addUnit}
           disabled={locked || count >= maxUnits}
           className="flex min-h-[72px] items-center justify-center gap-2 rounded-[22px] border-2 border-[rgba(214,184,108,0.6)] bg-[#fffaf0] text-xl font-black text-[#2c1c07] shadow-sm transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-40"
         >
           <UnitGlyph kind={kind} size={32} /> Add
-        </button>
+        </button>}
         <button
           type="button"
           onClick={removeUnit}

@@ -1128,8 +1128,8 @@ export function generatePrepWeek9Task(lessonId: string, difficulty: Difficulty):
     return {
       kind: "groundFoundation",
       mode: "add_to",
-      prompt: `${start} ${label} are here. ${change} more arrive. Show what happens.`,
-      speakText: `${start} ${label} are here. ${change} more arrive. Show what happens.`,
+      prompt: `${start} ${label} are here. ${change} more ${change === 1 ? "arrives" : "arrive"}. Show what happens.`,
+      speakText: `${start} ${label} are here. ${change} more ${change === 1 ? "arrives" : "arrive"}. Show what happens.`,
       start,
       change,
       object,
@@ -1142,8 +1142,8 @@ export function generatePrepWeek9Task(lessonId: string, difficulty: Difficulty):
   return {
     kind: "groundFoundation",
     mode: "take_away",
-    prompt: `${total} ${label} are here. ${change} leave. Show what happens.`,
-    speakText: `${total} ${label} are here. ${change} leave. Show what happens.`,
+    prompt: `${total} ${label} are here. ${change} ${change === 1 ? "leaves" : "leave"}. Show what happens.`,
+    speakText: `${total} ${label} are here. ${change} ${change === 1 ? "leaves" : "leave"}. Show what happens.`,
     total,
     change,
     object,

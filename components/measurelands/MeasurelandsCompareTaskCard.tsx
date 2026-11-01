@@ -539,12 +539,18 @@ function SortScene({
     >
       {item ? (
         <div className="mx-auto max-w-[260px]">
-          <CompareVisual item={item} showWater />
+          <GroundDragPiece
+            label={`Drag ${item.label} to a basket`}
+            className="w-full rounded-[28px]"
+            onPlace={(target) => { if (target) (target === task.correctOptionId ? onCorrect() : onWrong()); }}
+          >
+            <CompareVisual item={item} showWater />
+          </GroundDragPiece>
         </div>
       ) : null}
-        <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
+      {bins.every((bin) => ["morning", "afternoon", "evening", "night"].includes(String(bin.icon))) ? <SunSlider bins={bins} onChoose={(id) => (id === task.correctOptionId ? onCorrect() : onWrong())} /> : <div className={`mt-4 grid gap-4 ${bins.length >= 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2"}`}>
         {bins.map((bin) => (
-          <div key={bin.id} className="relative">
+          <div key={bin.id} className="relative" data-ground-drop={bin.id}>
             <button
               type="button"
               onClick={() => (bin.id === task.correctOptionId ? onCorrect() : onWrong())}
@@ -588,7 +594,7 @@ function SortScene({
             <OptionReadAloudButton text={bin.label} className="absolute right-3 top-3 z-10" />
           </div>
         ))}
-      </div>
+      </div>}
     </MeasurementShell>
   );
 }
@@ -682,6 +688,7 @@ function OrderScene({
       {/* Ordered slots */}
       <div
         data-ground-drop="order-slots"
+        data-day-train={isDay ? "true" : undefined}
         className={`measurelands-order-slots grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"} ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
       >
         {Array.from({ length: slotCount }).map((_, index) => {
@@ -809,6 +816,36 @@ function SequenceScene({
   );
 }
 
+/** Ground comparisons: the child carries the answer to a small scene, which then acts it out. */
+function PairStage({ axis, acted }: { axis?: string; acted: boolean }) {
+  const label = axis === "mass" ? "Put it on the scale" : axis === "capacity" ? "Bring it to the tap" : axis === "duration" ? "Bring it to the race" : "Bring it to the start line";
+  return <div data-ground-drop="pair-stage" className="relative mb-4 flex min-h-[116px] items-center justify-center overflow-hidden rounded-[26px] border-4 border-dashed border-[#d6b86c] bg-[#fff5dc]">
+    {axis === "mass" ? <svg viewBox="0 0 240 100" aria-hidden="true" className="h-24 w-56"><path d="M120 34v58M84 94h72" stroke="#3c2a63" strokeWidth="7" strokeLinecap="round" /><g className="transition-transform duration-500" style={{ transform: acted ? "rotate(-10deg)" : "none", transformOrigin: "120px 34px" }}><path d="M36 34h168" stroke="#3c2a63" strokeWidth="7" strokeLinecap="round" /><path d="M18 52h36l-7 16H25zM186 52h36l-7 16h-22z" fill="#a78bfa" stroke="#3c2a63" strokeWidth="3" /></g></svg>
+    : axis === "capacity" ? <svg viewBox="0 0 200 100" aria-hidden="true" className="h-24 w-48"><path d="M20 14h90q14 0 14 14v14" fill="none" stroke="#8f98a8" strokeWidth="13" /><path d="M124 48v42" stroke="#5cc4ee" strokeWidth="7" strokeLinecap="round" className={acted ? "opacity-100" : "opacity-0"} /></svg>
+    : axis === "duration" ? <div className="h-6 w-3/4 overflow-hidden rounded-full bg-white"><div className="h-full bg-gradient-to-r from-amber-300 to-amber-500 transition-all duration-700" style={{ width: acted ? "100%" : "4%" }} /></div>
+    : <div className="absolute inset-y-2 left-6 w-2 rounded bg-[#3c2a63]" />}
+    <span className="absolute bottom-1 text-sm font-black text-[#5f4725]">{label}</span>
+  </div>;
+}
+
+/** Ground times of day: the sun moves across the sky and the child stops it at the right part of the day. */
+function SunSlider({ bins, onChoose }: { bins: NonNullable<MeasurelandsCompareTask["bins"]>; onChoose: (id: string) => void }) {
+  const [spot, setSpot] = useState(0);
+  const sky = useRef<HTMLDivElement>(null);
+  const move = (x: number) => { const r = sky.current?.getBoundingClientRect(); if (r) setSpot(Math.max(0, Math.min(bins.length - 1, Math.floor(((x - r.left) / r.width) * bins.length)))); };
+  const colours = ["#ffd9a8", "#8fd3ff", "#ff9d6e", "#1e2a5a"];
+  return <div className="mt-4">
+    <div ref={sky} data-sun-sky role="slider" tabIndex={0} aria-label="Time of day" aria-valuemin={1} aria-valuemax={bins.length} aria-valuenow={spot + 1} aria-valuetext={bins[spot]?.label}
+      onKeyDown={(e) => { if (e.key === "ArrowRight") setSpot((v) => Math.min(bins.length - 1, v + 1)); if (e.key === "ArrowLeft") setSpot((v) => Math.max(0, v - 1)); }}
+      onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); move(e.clientX); }} onPointerMove={(e) => { if (e.buttons || e.pointerType === "touch") move(e.clientX); }}
+      className="relative h-36 cursor-grab touch-none select-none overflow-hidden rounded-[26px] transition-colors duration-300" style={{ background: colours[spot] ?? colours[0] }}>
+      <span className="absolute h-20 w-20 -translate-x-1/2 rounded-full shadow-lg transition-all duration-200" style={{ left: `${((spot + .5) / bins.length) * 100}%`, top: `${16 + Math.abs(spot - (bins.length - 1) / 2) * 22}px`, background: spot === bins.length - 1 ? "#e5e7eb" : "radial-gradient(circle at 35% 30%,#fff3a0,#ffc62e 65%,#f08c00)" }} />
+    </div>
+    <div className="mt-3 flex flex-wrap items-center justify-center gap-4"><span className="text-3xl font-black text-[#3c2a63]">{bins[spot]?.label}</span>
+      <button type="button" onClick={() => onChoose(bins[spot]!.id)} className="min-h-16 rounded-2xl px-10 text-xl font-black text-[#fff8e1]" style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96))" }}>This one</button></div>
+  </div>;
+}
+
 /** Ground Filling the Springs: the child makes the water level instead of only spotting it. */
 const FILL_MARKS = [0, 0.18, 0.5, 0.82, 1];
 function FillDragScene({ task, onCorrect, onWrong }: { task: MeasurelandsCompareTask; onCorrect: () => void; onWrong: () => void }) {
@@ -868,6 +905,9 @@ export function MeasurelandsCompareTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  // Tied to the task, so a finished animation never carries into the next question.
+  const [actedOn, setActedOn] = useState<{ task: MeasurelandsCompareTask; id: string } | null>(null);
+  const acted = actedOn?.task === task ? actedOn.id : null;
   if (task.scene === "trio" && task.fillState) {
     return <FillDragScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }
@@ -918,6 +958,13 @@ export function MeasurelandsCompareTaskCard({
   }
 
   const promptVerb = task.targetMode === "taller" ? "Which is taller?" : task.prompt;
+  const playable = task.scene === "pair";
+  const pick = (id: string) => {
+    if (id !== task.correctOptionId) return onWrong();
+    if (!playable && task.objects[0]?.axis !== "day") return onCorrect();
+    setActedOn({ task, id });
+    window.setTimeout(onCorrect, 750);
+  };
 
   return (
     <MeasurementShell
@@ -925,18 +972,25 @@ export function MeasurelandsCompareTaskCard({
       prompt={promptVerb}
       speakText={task.speakText ?? promptVerb}
     >
+      {playable ? <PairStage axis={task.objects[0]?.axis} acted={acted !== null} /> : null}
       <div
         className={`grid gap-4 ${task.scene === "trio" ? "md:grid-cols-3" : "md:grid-cols-2"}`}
       >
         {task.objects.map((item) => (
-          <div key={item.id} className="relative">
-            <button
-              type="button"
-              onClick={() => (item.id === task.correctOptionId ? onCorrect() : onWrong())}
-              className="group w-full rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)]"
+          <div key={item.id} className="relative" data-ground-flip={acted === item.id && item.axis === "day" ? "" : undefined}>
+            {playable ? <GroundDragPiece
+              label={`Choose ${item.label}`}
+              className="w-full rounded-[28px]"
+              onPlace={(target) => { if (target === "pair-stage" || target === null) pick(item.id); }}
             >
               <CompareVisual item={item} showWater={Boolean(task.fillState)} />
-            </button>
+            </GroundDragPiece> : <button
+              type="button"
+              onClick={() => pick(item.id)}
+              className="group w-full rounded-[28px] border border-transparent text-left transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(124,58,237,0.3)]"
+            >
+              <CompareVisual item={item} showWater={Boolean(task.fillState)} />
+            </button>}
             <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
           </div>
         ))}

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import GroundDragPiece from "@/components/ground/GroundDragPiece";
 import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -211,18 +212,16 @@ function GroundOptionButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="relative flex min-h-[132px] w-full items-center justify-center rounded-lg border-2 border-cyan-200 bg-white px-3 py-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:min-h-[148px] sm:px-4 sm:py-4"
-    >
+    <div className="relative">
+      <GroundDragPiece label={speakText ?? "Choose this answer"} onPlace={(target) => { if (target === "parcel" || target === null) onClick(); }} className="flex min-h-[132px] w-full items-center justify-center rounded-2xl border-2 border-b-[7px] border-teal-300 bg-white px-3 py-3 text-center">
+        {children}
+      </GroundDragPiece>
       {speakText ? (
         <span className="absolute right-3 top-3 z-10">
           <OptionReadAloudButton text={speakText} />
         </span>
       ) : null}
-      {children}
-    </button>
+    </div>
   );
 }
 
@@ -397,7 +396,7 @@ export default function GroundMatchTaskCard({
         </div>
         {renderHelperVisual(task)}
         {questionVisual ? (
-          <div className="mt-4 flex justify-center">{questionVisual}</div>
+          <div data-ground-drop="parcel" className="mt-4 flex justify-center rounded-2xl border-4 border-dashed border-amber-400 bg-amber-50 p-3">{questionVisual}</div>
         ) : null}
       </div>
 

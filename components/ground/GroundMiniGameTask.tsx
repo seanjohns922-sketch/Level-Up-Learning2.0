@@ -5,6 +5,7 @@ import { Bot, Check, Flag } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import GroundDragPiece from "./GroundDragPiece";
+import { groundBlip } from "./GroundCheer";
 import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -440,11 +441,10 @@ function TenFrameBuilder({
   target,
   leftCount,
   rightCount,
-  activePart,
   objectType,
   visualStyle,
-  onSelectPart,
   onToggleDot,
+  onAddPart,
 }: {
   target: number;
   leftCount: number;
@@ -454,6 +454,7 @@ function TenFrameBuilder({
   visualStyle?: BuildVisualStyle;
   onSelectPart: (part: "left" | "right") => void;
   onToggleDot: (index: number) => void;
+  onAddPart: (part: "left" | "right") => void;
 }) {
   const totalSlots = target > 10 ? 20 : 10;
   const builderStyle: NonNullable<BuildVisualStyle> = target > 10 ? "double_ten_frame" : visualStyle ?? "build_trays";
@@ -466,29 +467,11 @@ function TenFrameBuilder({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => onSelectPart("left")}
-          className={`min-h-14 rounded-xl border-2 px-3 py-2 text-lg font-black transition ${
-            activePart === "left"
-              ? "border-teal-400 bg-teal-100 text-teal-900 shadow-[0_0_16px_rgba(20,184,166,0.16)]"
-              : "border-cyan-200 bg-white text-slate-700"
-          }`}
-        >
-          Green part
-        </button>
-        <button
-          type="button"
-          onClick={() => onSelectPart("right")}
-          className={`min-h-14 rounded-xl border-2 px-3 py-2 text-lg font-black transition ${
-            activePart === "right"
-              ? "border-orange-300 bg-orange-100 text-orange-900 shadow-[0_0_16px_rgba(251,146,60,0.16)]"
-              : "border-cyan-200 bg-white text-slate-700"
-          }`}
-        >
-          Orange part
-        </button>
+        {(["left", "right"] as const).map((part) => <GroundDragPiece key={part} label={`Drag a ${part === "left" ? "green" : "orange"} piece onto the tray`} onPlace={(target) => { if (target === "split-tray" || target === null) onAddPart(part); }} className={`flex min-h-16 items-center justify-center gap-2 rounded-xl border-2 border-dashed text-lg font-black ${part === "left" ? "border-teal-400 bg-teal-100 text-teal-900" : "border-orange-400 bg-orange-100 text-orange-900"}`}>
+          <span className={`h-9 w-9 rounded-full shadow ${part === "left" ? "bg-teal-500" : "bg-orange-500"}`} /> Drag {part === "left" ? "green" : "orange"}
+        </GroundDragPiece>)}
       </div>
+      <div data-ground-drop="split-tray">
       <QuantityBoard
         objectType={objectType}
         totalSlots={totalSlots}
@@ -496,8 +479,6 @@ function TenFrameBuilder({
         style={builderStyle}
         onCellClick={onToggleDot}
       />
-      <div className="text-center text-xs font-black uppercase tracking-[0.16em] text-teal-700">
-        Tap cells to build {target} with two colours
       </div>
     </div>
   );
@@ -609,6 +590,7 @@ export function GroundBuildTaskCard({
               visualStyle={visualStyle}
               onSelectPart={setActivePart}
               onToggleDot={toggleSplitDot}
+              onAddPart={(part) => { if (splitTotal >= task.targetNumber) return; setActivePart(part); markInteracted(); if (part === "left") setLeftBuilt((n) => n + 1); else setRightBuilt((n) => n + 1); }}
             />
 
             {!hideSplitSupport ? (
@@ -879,6 +861,7 @@ export function GroundCompareTaskCard({
   // When a reference group must be memorised, the student controls the reveal
   // and hide timing (no auto-timeout); answers stay locked until they've hidden
   // it, so a delayed glance never costs accuracy.
+  const [tug, setTug] = useState(0);
   const hasReferenceMemory = Boolean(task.referenceGroup);
   const answersEnabled = !hasReferenceMemory || memoryPhase === "hidden";
   const orderDirectionLabel = task.orderDirection === "DESC" ? "Biggest to smallest" : "Smallest to biggest";
@@ -901,8 +884,14 @@ export function GroundCompareTaskCard({
       return;
     }
 
-    if (groupId === task.correctGroupId) onCorrect();
-    else onWrong();
+    if (groupId !== task.correctGroupId) return onWrong();
+    // The rope pulls towards the right group before the question moves on.
+    if ((task.comparisonType === "more" || task.comparisonType === "less") && task.groups.length === 2) {
+      setTug(groupId === task.groups[0]?.id ? -1 : 1);
+      window.setTimeout(onCorrect, 750);
+      return;
+    }
+    onCorrect();
   }
 
   function answerYesNo(answer: boolean) {
@@ -985,6 +974,9 @@ export function GroundCompareTaskCard({
             </div>
           </>
         ) : null}
+        {(task.comparisonType === "more" || task.comparisonType === "less") && task.groups.length === 2 ? <div aria-hidden="true" className="relative mb-3 h-10 overflow-hidden rounded-full bg-amber-100">
+          <div className="absolute inset-x-[-10%] top-1/2 h-3 -translate-y-1/2 rounded bg-[#a16207] transition-transform duration-500" style={{ transform: `translate(${tug * 34}%,-50%)` }}><span className="absolute left-1/2 top-1/2 h-8 w-4 -translate-x-1/2 -translate-y-1/2 rounded bg-red-500" /></div>
+        </div> : null}
         <div
           className={`grid gap-3 ${task.groups.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"} ${
             answersEnabled ? "" : "pointer-events-none opacity-40"
@@ -1149,40 +1141,36 @@ export function GroundSequenceTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  const choose = (id: string) => (id === task.correctOptionId ? onCorrect() : onWrong());
   return (
-    <GroundMiniShell badge="Missing Number" prompt={task.prompt} speakText={task.speakText}>
-      <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+    <GroundMiniShell badge="Number Train" prompt={task.prompt} speakText={task.speakText}>
+      <div className="overflow-x-auto rounded-2xl bg-gradient-to-b from-sky-200 to-sky-50 px-3 pb-3 pt-5">
+        <div className="flex min-w-max items-end justify-center gap-1.5">
+          <svg viewBox="0 0 90 80" aria-hidden="true" className="h-20 w-[90px] shrink-0"><path d="M6 66V30h40V12h30v54z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="3" strokeLinejoin="round" /><rect x="52" y="20" width="18" height="16" rx="3" fill="#bae6fd" /><rect x="14" y="8" width="14" height="22" fill="#334155" /><circle cx="26" cy="68" r="9" fill="#1e293b" /><circle cx="62" cy="68" r="9" fill="#1e293b" /></svg>
           {task.sequence.map((value, index) => (
             <div
               key={`${task.targetNumber}-seq-${index}`}
-              className={`flex h-16 min-w-[72px] items-center justify-center rounded-lg border-2 px-4 text-3xl font-black shadow-sm sm:h-20 sm:min-w-[88px] sm:text-4xl ${
-                value === "__"
-                  ? "border-dashed border-cyan-300 bg-cyan-50 text-cyan-500"
-                  : "border-cyan-200 bg-white text-teal-900"
+              data-ground-drop={value === "__" ? "gap" : undefined}
+              className={`relative flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border-4 text-4xl font-black shadow-md ${
+                value === "__" ? "border-dashed border-amber-500 bg-amber-50 text-amber-600" : "border-[#4a249f] bg-gradient-to-b from-[#a98bf5] to-[#6d3bd1] text-white"
               }`}
             >
               {value === "__" ? "?" : value}
             </div>
           ))}
         </div>
+        <div className="mt-1 h-2 rounded bg-slate-500" />
       </div>
-
       <div className="grid grid-cols-3 gap-3">
         {task.options.map((option) => {
           const label = Array.isArray(option.numerals) ? option.numerals.join(", ") : String(option.numeral ?? "");
           return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => (option.id === task.correctOptionId ? onCorrect() : onWrong())}
-              className="relative flex min-h-[112px] items-center justify-center rounded-lg border-2 border-cyan-200 bg-white px-3 text-center text-3xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98] sm:text-4xl"
-            >
-              <span className="absolute right-3 top-3 z-10">
-                <OptionReadAloudButton text={label} />
-              </span>
-              {label}
-            </button>
+            <div key={option.id} className="relative">
+              <GroundDragPiece label={`Number ${label}`} onPlace={(target) => { if (target === "gap" || target === null) choose(option.id); }} className="flex min-h-[112px] w-full items-center justify-center rounded-2xl border-2 border-b-[7px] border-[#4a249f] bg-gradient-to-b from-[#a98bf5] to-[#6d3bd1] px-3 text-4xl font-black text-white">
+                {label}
+              </GroundDragPiece>
+              <span className="absolute right-3 top-3 z-10"><OptionReadAloudButton text={label} /></span>
+            </div>
           );
         })}
       </div>
@@ -1202,6 +1190,7 @@ export function GroundTapCountTaskCard({
   const [tappedIds, setTappedIds] = useState<number[]>([]);
 
   function tapObject(id: number) {
+    groundBlip(460 + tappedIds.length * 50);
     setTappedIds((current) => (current.includes(id) ? current : [...current, id]));
   }
 
@@ -1365,7 +1354,7 @@ export function GroundFeedTaskCard({
           ))}
         </div>
         <div data-ground-drop="numbot" className="relative rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1] p-3 text-center">
-          <svg key={fedIds.length} viewBox="0 0 200 190" aria-hidden="true" data-ground-numbot className="mx-auto h-44 w-44">
+          <svg key={fedIds.length} viewBox="0 0 200 190" aria-hidden="true" data-ground-numbot={fedIds.length === task.targetNumber ? "dance" : "chomp"} className="mx-auto h-44 w-44">
             <path d="M100 6v22" stroke="#cbd5e1" strokeWidth="7" /><circle cx="100" cy="8" r="9" fill="#f43f5e" />
             <rect x="20" y="28" width="160" height="150" rx="34" fill="#f8fafc" stroke="#94a3b8" strokeWidth="5" />
             <circle cx="66" cy="78" r="17" fill="#1e293b" /><circle cx="134" cy="78" r="17" fill="#1e293b" /><circle cx="71" cy="72" r="6" fill="#22d3ee" /><circle cx="139" cy="72" r="6" fill="#22d3ee" />
@@ -1523,22 +1512,30 @@ export function GroundOrderTapTaskCard({
             <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">{isOrderMode ? "Keep sorting" : "Keep moving"}</span>
           </div>
         </div>}
+        {!isCountdown && !isOrderMode ? <div className="relative mb-3 flex items-end justify-center gap-2 rounded-2xl bg-gradient-to-b from-sky-200 to-teal-300 px-3 pb-4 pt-16">
+          {[task.startNumber ?? null, ...orderedNumerals].map((numeral, index) => numeral === null ? null : <div key={`${numeral}-${index}`} className="relative grid h-14 w-20 place-items-center rounded-[50%] bg-gradient-to-b from-stone-200 to-stone-400 text-2xl font-black text-stone-800 shadow-md">
+            {index <= progressIndex ? numeral : "?"}
+            {index === progressIndex ? <span data-ground-hop key={progressIndex} className="absolute -top-14"><GroundObjectToken objectType="robots" size="lg" /></span> : null}
+          </div>)}
+        </div> : null}
+        {isOrderMode ? <div className="mb-3 flex items-end justify-center gap-2">
+          {orderedNumerals.map((numeral, index) => <div key={numeral} data-ground-drop={`podium-${index}`} className="grid w-24 place-items-center rounded-t-xl border-2 border-amber-500 bg-gradient-to-b from-amber-200 to-amber-400 text-3xl font-black text-amber-950" style={{ height: 56 + (orderedNumerals.length - index) * 14 }}>{index < progressIndex ? numeral : ""}</div>)}
+        </div> : null}
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {task.tiles.map((tile) => {
             const completedIndex = orderedNumerals.indexOf(tile.numeral);
             const isCompleted = completedIndex >= 0 && completedIndex < progressIndex;
+            if (isOrderMode && !isCompleted) return <GroundDragPiece key={tile.id} label={`Number ${tile.numeral}`} onPlace={(target) => { if (target === null || target === `podium-${progressIndex}`) tapTile(tile.numeral); else if (target) onWrong(); }} className="flex min-h-[88px] items-center justify-center rounded-2xl border-2 border-b-[6px] border-teal-400 bg-white text-4xl font-black text-teal-900">{tile.numeral}</GroundDragPiece>;
+            if (isOrderMode) return null;
             return (
               <button
                 key={tile.id}
                 type="button"
                 onClick={() => tapTile(tile.numeral)}
-                className={`relative flex min-h-[88px] items-center justify-center rounded-lg border-2 text-4xl font-black shadow-sm transition ${
-                  isCompleted
-                    ? "border-teal-400 bg-teal-100 text-teal-900"
-                    : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
+                className={`relative flex min-h-[88px] items-center justify-center rounded-2xl border-2 border-b-[6px] text-4xl font-black transition ${
+                  isCompleted ? "border-teal-400 bg-teal-100 text-teal-900" : "border-teal-300 bg-white text-teal-900"
                 }`}
               >
-                {isCompleted ? <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-emerald-600 text-white"><Check className="h-4 w-4" /></span> : null}
                 {tile.numeral}
               </button>
             );

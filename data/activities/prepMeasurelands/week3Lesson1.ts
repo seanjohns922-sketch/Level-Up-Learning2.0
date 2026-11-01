@@ -244,8 +244,8 @@ function buildSortContainersTask(memory: LessonMemory): CompareTask {
   return {
     kind: "measurementCompare",
     scene: "order",
-    prompt: "Put the containers in order: smallest capacity to largest capacity.",
-    speakText: "Put the containers in order from smallest capacity to largest capacity.",
+    prompt: "Put the containers in order: holds the least to holds the most.",
+    speakText: "Put the containers in order, from holds the least to holds the most.",
     badgeLabel: "Sort the Containers",
     objects: shuffle(ordered),
     orderedIds: ordered.map((item) => item.id),
@@ -336,7 +336,7 @@ export function buildMeasurelandsWeek3Lesson1QuizTasks(): PracticeTask[] {
     {
       kind: "measurementCompare",
       scene: "trio",
-      prompt: "Which container has the smallest capacity?",
+      prompt: "Which container holds the least?",
       speakText: "Which container holds the least?",
       badgeLabel: "Smallest Capacity",
       objects: shuffle(smallestObjects),

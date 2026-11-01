@@ -14,6 +14,8 @@ export type GroundPanel = {
   scale?: number;
   days?: { highlight: number[]; from?: number; to?: number };
   balance?: "left" | "level";
+  /** A container of water: 0 is empty, 1 is full. */
+  fill?: number;
 };
 /** join sits between panels; result is the sign before the last panel when it differs. */
 export type GroundGuide = { say: string; panels: GroundPanel[]; join?: string; result?: string };
@@ -70,7 +72,7 @@ export const GROUND_GUIDES: Record<string, GroundGuide> = {
   "measurement:2:3": { say: "The heavy side goes down. When the scales are level, both sides are the same.", panels: [{ balance: "left", note: "left is heavier" }, { balance: "level", note: "the same" }] },
   "measurement:3:1": { say: "A bucket holds more. A cup holds less.", panels: [img(`${C}/bucket.png`, "holds more", 1.15, true), img(`${C}/cup.png`, "holds less", .6)] },
   "measurement:3:2": { say: "Put them in order, from holds the least to holds the most.", panels: [img(`${C}/cup.png`, "least", .6), img(`${C}/bottle.png`, undefined, .85), img(`${C}/bucket.png`, "most", 1.15)], join: "→" },
-  "measurement:3:3": { say: "Big containers need more to fill them up. A bucket needs many cups of water.", panels: [img(`${C}/cup.png`, "small", .6), img(`${C}/bucket.png`, "many cups", 1.15, true)], join: "→" },
+  "measurement:3:3": { say: "Look at the water. This one is empty. This one is half full. This one is full.", panels: [{ fill: 0, note: "empty" }, { fill: .5, note: "half full" }, { fill: 1, note: "full" }] },
   "measurement:4:1": { say: "Washing your hands is quick. A school day takes much longer.", panels: [img(`${D}/school-day.png`, "takes longer", 1.1, true), img(`${D}/wash-hands.png`, "quick", .9)] },
   "measurement:4:2": { say: "Put them in order, from the shortest time to the longest time.", panels: [img(`${D}/brush-teeth.png`, "shortest"), img(`${D}/lunch.png`), img(`${D}/school-day.png`, "longest")], join: "→" },
   "measurement:4:3": { say: "Quick things are over soon. Slow things take a long time.", panels: [img(`${D}/shoes.png`, "quick"), img(`${D}/sleeping.png`, "slow")] },
