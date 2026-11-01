@@ -32,5 +32,11 @@ for (let w = 1; w <= 12; w++) {
 for (let w = 1; w <= 8; w++) for (const l of [1, 2, 3]) { source = `level1/measurement/${w}:${l}`; measure.resetY1MeasurelandsLessonSessionState?.(); for (let i = 0; i < 150; i++) task(measure.resolveY1MeasurelandsLessonTask(`y1-measurement-w${w}-l${l}`, levels[i % 3])); }
 for (const [id, content] of Object.entries(LEVEL_ONE_LESSON_CONTENT)) { source = `level1/${id}`; for (let i = 0; i < 20; i++) { const s = content.createTaskSet(); for (const gen of [...(s.activities ?? []), ...(s.mixedPractice ?? [])]) task(gen(ctx)); } }
 for (const id of STATISTICA_LEVEL1_LESSON_IDS) { source = `level1/${id}`; for (let i = 0; i < 20; i++) { const s = getStatisticaLevel1TaskSet(id); for (const gen of [...(s.activities ?? []), ...(s.mixedPractice ?? [])]) task(gen(ctx)); } }
+const { getStatisticaLevel2TaskSet, STATISTICA_LEVEL2_LESSON_IDS } = await import('../../data/activities/statistica/level2.ts');
+const { LEVEL_TWO_LESSON_CONTENT } = await import('../../data/activities/starpath/level2/index.ts');
+const measure2 = await import('../../data/activities/year2Measurelands/registry.ts');
+for (let w = 1; w <= 8; w++) for (const l of [1, 2, 3]) { source = `level2/measurement/${w}:${l}`; measure2.resetY2MeasurelandsLessonSessionState?.(); for (let i = 0; i < 150; i++) task(measure2.resolveY2MeasurelandsLessonTask(`y2-measurement-w${w}-l${l}`, levels[i % 3])); }
+for (const [id, content] of Object.entries(LEVEL_TWO_LESSON_CONTENT)) { source = `level2/${id}`; for (let i = 0; i < 20; i++) { const s = content.createTaskSet(); for (const gen of [...(s.activities ?? []), ...(s.mixedPractice ?? [])]) task(gen(ctx)); } }
+for (const id of STATISTICA_LEVEL2_LESSON_IDS) { source = `level2/${id}`; for (let i = 0; i < 20; i++) { const s = getStatisticaLevel2TaskSet(id); for (const gen of [...(s.activities ?? []), ...(s.mixedPractice ?? [])]) task(gen(ctx)); } }
 fs.writeFileSync(file, JSON.stringify(lines, null, 2) + '\n');
-console.log(`Level 1: ${Object.keys(lines).length - before} new lines queued for recording`);
+console.log(`Levels 1 and 2: ${Object.keys(lines).length - before} new lines queued for recording`);
