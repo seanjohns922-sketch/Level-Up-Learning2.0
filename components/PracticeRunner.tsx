@@ -2,6 +2,7 @@
 
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
+import { level1Answer, level1Speech } from "@/lib/level1-answer";
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
 import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
@@ -162,10 +163,12 @@ function getPracticeTaskSpeechText(task: PracticeTask) {
   if ("speakText" in task && typeof task.speakText === "string" && task.speakText.trim()) {
     return task.speakText;
   }
-  return getPracticeTaskPrompt(task);
+  return level1Speech(task) || getPracticeTaskPrompt(task).replace(/_{2,}/g, "how many").replace(/\s*\((\w+) → (\w+)\)/, ", $1 to $2");
 }
 
 function getPracticeTaskCorrectAnswer(task: PracticeTask) {
+  const level1 = level1Answer(task);
+  if (level1) return level1;
   if (task.kind === "mcq") return task.answer ?? null;
   if (task.kind === "count") return String(task.count);
   if (task.kind === "order3") return task.direction === "ASC"
@@ -292,6 +295,8 @@ function getPracticeTaskCorrectAnswer(task: PracticeTask) {
   return null;
 }
 
+const GENERIC_WRONG_EXPLANATION = "Look at the clue in the question, then try again.";
+
 function getPracticeTaskWrongExplanation(task: PracticeTask) {
   if ("feedback" in task && task.feedback && typeof task.feedback === "object" && "wrong" in task.feedback) {
     const wrong = task.feedback.wrong;
@@ -321,7 +326,7 @@ function getPracticeTaskWrongExplanation(task: PracticeTask) {
     default:
       break;
   }
-  return "Look at the clue in the question, then try again.";
+  return GENERIC_WRONG_EXPLANATION;
 }
 
 function normalizeScalar(value: unknown): Scalar | undefined {
@@ -655,6 +660,7 @@ export function PracticeRunner({
   const lastAutoReadTaskKeyRef = useRef<string | null>(null);
   // Ground students may not read yet, so their questions are always spoken.
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
+  const speakEveryQuestion = alwaysSpeak || /^y1-/.test(liveContext?.lessonId ?? "");
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -877,7 +883,7 @@ export function PracticeRunner({
   }, [activityNoun, completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
-    if (helpOpen || (!autoReadEnabled && !alwaysSpeak) || !speechInteractionReady) return;
+    if (helpOpen || (!autoReadEnabled && !speakEveryQuestion) || !speechInteractionReady) return;
     if (!autoReadPrompt) return;
 
     const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
@@ -1269,9 +1275,13 @@ export function PracticeRunner({
 
   const groundWrongAnswer = alwaysSpeak ? groundAnswer(task) : null;
   const groundWrongLine = `Good try! ${groundWrongAnswer?.say ?? "Have another look."}`;
+  const level1WrongLine = /^y1-/.test(liveContext?.lessonId ?? "") && currentWrongFeedback?.correctAnswer ? `Not quite. The answer is ${currentWrongFeedback.correctAnswer}.` : null;
   useEffect(() => {
     if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(groundWrongLine, undefined, "auto");
   }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, groundWrongLine]);
+  useEffect(() => {
+    if (level1WrongLine && awaitingWrongNext) void speak(level1WrongLine, undefined, "auto");
+  }, [awaitingWrongNext, level1WrongLine]);
 
   // ── Finished state ──
   if (finished) {
@@ -1598,15 +1608,17 @@ export function PracticeRunner({
                   className="shrink-0 border-red-200 bg-white text-red-800"
                 />
               </div>
-              <div className="mt-1">
-                Your answer: <span className="font-black">{currentWrongFeedback.studentAnswer || "Incorrect attempt"}</span>
-              </div>
+              {currentWrongFeedback.studentAnswer && currentWrongFeedback.studentAnswer !== "Incorrect attempt" ? (
+                <div className="mt-1">
+                  Your answer: <span className="font-black">{currentWrongFeedback.studentAnswer}</span>
+                </div>
+              ) : null}
               {currentCorrectAnswer ? (
                 <div className="mt-1 text-emerald-800">
                   Correct answer: <span className="font-black">{typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer}</span>
                 </div>
               ) : null}
-              <div className="mt-1 text-red-900">{currentWrongExplanation}</div>
+              {level1WrongLine && currentWrongExplanation === GENERIC_WRONG_EXPLANATION ? null : <div className="mt-1 text-red-900">{currentWrongExplanation}</div>}
             </div>
           ) : null}
 
@@ -1777,7 +1789,6 @@ export function PracticeRunner({
                   <button key={n} type="button" onClick={() => { if (!hasPlayed) return; if (n === t.targetNumber) { markCorrect(); } else { markWrong(n); } }} className="px-4 py-6 rounded-lg border border-border bg-card hover:bg-muted transition text-3xl font-extrabold">{n}</button>
                 ))}
               </div>
-              {!hasPlayed && <div className="text-sm text-muted-foreground">Tip: On iPads, audio will only play after a button tap (that&apos;s normal).</div>}
             </div>
           );
         })()}

@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const eventName = (label: string) => (/ Day$/.test(label) ? label : `the ${label.toLowerCase()}`);
+
 // ── Measurelands · Level 1 · Week 6 · Lesson 3 — "Event Planner" ──
 // AC9M1M03: use a calendar to plan and organise events. Calendars are tools —
 // people put birthdays, sports days and excursions on them. Dates decide the
@@ -109,8 +111,8 @@ function buildWhenTask(memory: LessonMemory): EventTask {
   return {
     kind: "calendarEvent",
     scene: "when",
-    prompt: `When is ${ask.label}?`,
-    speakText: `Look at the calendar. When is ${ask.label}?`,
+    prompt: `When is ${eventName(ask.label)}?`,
+    speakText: `Look at the calendar. When is ${eventName(ask.label)}?`,
     badgeLabel: "When Is the Event?",
     days: m.days,
     startWeekday: m.start,

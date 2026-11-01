@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const withArticle = (label: string) => `${label.endsWith("s") ? "the" : "a"} ${label.toLowerCase()}`;
+
 // ── Measurelands · Level 1 · Week 4 · Lesson 1 — "Hour, Day, Week" ──
 // AC9M1M03: describe duration using hour/day/week. Ground Level asked "which
 // takes longer?"; Level 1 connects familiar activities to duration UNITS and
@@ -101,8 +103,8 @@ function buildClassifyTask(memory: LessonMemory): DurationTask {
   return {
     kind: "durationUnit",
     scene: "classify",
-    prompt: `How long does ${a.label.toLowerCase()} usually take?`,
-    speakText: `How long does ${a.label.toLowerCase()} usually take? An hour, a day, or a week?`,
+    prompt: `How long does ${withArticle(a.label)} usually take?`,
+    speakText: `How long does ${withArticle(a.label)} usually take? An hour, a day, or a week?`,
     badgeLabel: "Hour, Day or Week?",
     activity: { imageSrc: a.image, label: a.label, unit: a.unit },
     feedback: { correct: "That's about right!", wrong: "Think about how long it usually takes." },

@@ -10,11 +10,13 @@ export default function EqualGroupsMCQ({
   options,
   correctIndex,
   onCorrect,
+  onWrong,
 }: {
   prompt: string;
   options: Option[];
   correctIndex: number;
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [status, setStatus] = useState<"idle" | "wrong" | "correct">("idle");
@@ -24,6 +26,7 @@ export default function EqualGroupsMCQ({
     const ok = idx === correctIndex;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(null, "The picture where every group has the same number");
   }
 
   return (

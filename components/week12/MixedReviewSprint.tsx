@@ -69,7 +69,7 @@ export default function MixedReviewSprint({
   durationSeconds: number;
   onCorrect?: () => void;
   onStepCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [timeLeft, setTimeLeft] = useState(durationSeconds);
   const [q, setQ] = useState<SprintQ>(() => makeQuestion());
@@ -103,7 +103,7 @@ export default function MixedReviewSprint({
       onStepCorrect?.();
       nextQ();
     } else {
-      onWrong?.();
+      onWrong?.(opt, String(q.answer));
     }
   }
 

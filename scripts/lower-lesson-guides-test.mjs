@@ -102,3 +102,4 @@ for (const part of ['Step ${i + 1}', 'Tip. ${guide.tip}', 'Worked example.', 'Ho
 console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific, ${visuals} with diagrams). Ground and Levels 7–8 excluded.`);
 
 await import('./ground-answer-test.mjs');
+await import('./level1-answer-test.mjs');

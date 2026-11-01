@@ -85,23 +85,23 @@ export function generateWeek7Task(
       const a = randInt(lo, hi); const b = randInt(lo, hi);
       const story = `You buy an apple ($${a}) and a banana ($${b}). How much altogether?`;
       const answer = a + b;
-      return { kind: "storySolve", story, a, b, op: "add", answer, options: makeStoryOptions(answer), hideEquation: true, allowEquationInput: true, difficulty: d };
+      return { kind: "storySolve", story, a, b, op: "add", answer, options: makeStoryOptions(answer), hideEquation: true, allowEquationInput: false, difficulty: d };
     }
     if (modePick === 1) {
       if (Math.random() < 0.5) {
         const [lo, hi] = diffRange(d, [3, 8], [5, 10], [5, 12]);
         const a = randInt(lo, hi); const b = randInt(1, Math.min(hi, 20 - a));
         const story = `There were ${a} kids on the playground. ${b} more came. How many altogether?`;
-        return { kind: "storySolve", story, a, b, op: "add", answer: a + b, options: makeStoryOptions(a + b), hideEquation: true, allowEquationInput: true, difficulty: d };
+        return { kind: "storySolve", story, a, b, op: "add", answer: a + b, options: makeStoryOptions(a + b), hideEquation: true, allowEquationInput: false, difficulty: d };
       }
       const [lo, hi] = diffRange(d, [5, 10], [8, 13], [8, 15]);
       const a = randInt(lo, hi); const b = randInt(1, Math.min(8, a));
       const story = `There were ${a} birds in a tree. ${b} flew away. How many left?`;
-      return { kind: "storySolve", story, a, b, op: "subtract", answer: a - b, options: makeStoryOptions(a - b), hideEquation: true, allowEquationInput: true, difficulty: d };
+      return { kind: "storySolve", story, a, b, op: "subtract", answer: a - b, options: makeStoryOptions(a - b), hideEquation: true, allowEquationInput: false, difficulty: d };
     }
     const op2: "add" | "subtract" = Math.random() < 0.5 ? "add" : "subtract";
     const s = makeStory(op2, d);
-    return { kind: "storySolve", story: s.story, a: s.a, b: s.b, op: s.op, answer: s.answer, options: makeStoryOptions(s.answer), requireOpChoice: true, hideEquation: true, allowEquationInput: true, difficulty: d };
+    return { kind: "storySolve", story: s.story, a: s.a, b: s.b, op: s.op, answer: s.answer, options: makeStoryOptions(s.answer), requireOpChoice: true, hideEquation: true, allowEquationInput: false, difficulty: d };
   }
 
   if (lessonId === "y1-w7-l3") {

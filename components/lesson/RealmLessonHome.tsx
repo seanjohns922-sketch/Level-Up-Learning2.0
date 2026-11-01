@@ -509,7 +509,7 @@ export function RealmLessonHome({
   if (guideOpen && groundGuide) return <div className="mx-auto max-w-5xl py-4"><GroundLessonGuide guide={groundGuide} title={lessonTitle} realm={realm} onContinue={onStart} /></div>;
   if (guideOpen && lowerGuide) return <div className="mx-auto max-w-6xl py-4">
     <button type="button" onClick={() => setGuideOpen(false)} className="mb-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900">Back to lesson overview</button>
-    <LowerLessonGuide guide={lowerGuide} title={lessonTitle} realm={realm} onContinue={onStart} />
+    <LowerLessonGuide guide={lowerGuide} title={lessonTitle} realm={realm} onContinue={onStart} autoRead={levelNumber === 1} />
   </div>;
 
   return (

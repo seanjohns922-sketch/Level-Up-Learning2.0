@@ -32,12 +32,14 @@ export default function NumberLineTap({
   target,
   onComplete,
   onAttempt,
+  onWrong,
 }: {
   min: number;
   max: number;
   target: number;
   onComplete: () => void;
   onAttempt?: (value: number) => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [value, setValue] = useState<number | null>(null);
   const [correct, setCorrect] = useState(false);
@@ -85,6 +87,8 @@ export default function NumberLineTap({
     if (acceptedValue === target) {
       setCorrect(true);
       setTimeout(() => onComplete(), 600);
+    } else {
+      onWrong?.(acceptedValue, String(target));
     }
   }
 

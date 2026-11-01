@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const eventName = (label: string) => (/ Day$/.test(label) ? label : `the ${label.toLowerCase()}`);
+
 // ── Measurelands · Level 1 · Week 6 · Lesson 1 — "Find the Date" ──
 // AC9M1M03: use a calendar to find/read dates and connect events to dates.
 // The date is the NUMBER in the cell (not the day of the week). Highly visual:
@@ -155,7 +157,7 @@ function buildEventTask(memory: LessonMemory): CalendarTask {
   return {
     kind: "calendarFind",
     scene: "event",
-    prompt: `When is ${ask.label}?`,
+    prompt: `When is ${eventName(ask.label)}?`,
     speakText: `Find ${ask.label} on the calendar. Tap the date it is on.`,
     badgeLabel: "Find the Event",
     days: m.days,

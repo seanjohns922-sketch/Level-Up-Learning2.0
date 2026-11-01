@@ -35,7 +35,7 @@ export default function GroupBoxesTap({
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="text-lg font-extrabold text-slate-900 mb-2">
-        Share {total} into {groups} groups (diagram).
+        Share {total} into {groups} groups.
       </div>
       <div className="text-xs text-slate-500 mb-3">Remaining: {remaining}</div>
 

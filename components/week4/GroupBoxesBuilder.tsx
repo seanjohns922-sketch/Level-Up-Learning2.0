@@ -7,10 +7,12 @@ export default function GroupBoxesBuilder({
   groups,
   perGroup,
   onCorrect,
+  onWrong,
 }: {
   groups: number;
   perGroup: number;
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const total = useMemo(() => groups * perGroup, [groups, perGroup]);
   const [counts, setCounts] = useState<number[]>(
@@ -45,6 +47,7 @@ export default function GroupBoxesBuilder({
     const ok = counts.every((c) => c === perGroup) && remaining === 0;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(counts.join(", "), `${perGroup} in each group`);
   }
 
   return (

@@ -47,8 +47,10 @@ function DiceFace({ value, label }: { value: number; label: string }) {
 
 export default function PlaceValueDiceMat({
   onCorrect,
+  onWrong,
 }: {
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [seed, setSeed] = useState(0);
 
@@ -74,6 +76,7 @@ export default function PlaceValueDiceMat({
     const ok = tensPick === roll.tens && onesPick === roll.ones;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(`${tensPick} tens and ${onesPick} ones`, `${roll.tens} tens and ${roll.ones} ones`);
     if (ok) setTimeout(resetRound, 600);
   }
 

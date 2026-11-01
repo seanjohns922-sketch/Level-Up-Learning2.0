@@ -104,7 +104,9 @@ function buildIntroTask(): CapacityTask {
 
 // Activity A / B — count the cups.
 function buildCountTask(memory: LessonMemory, reading: boolean): CapacityTask {
-  const c = pickContainer(memory);
+  let c = pickContainer(memory);
+  // "How many cups does the cup hold?" makes no sense, so the cup is never the one counted.
+  if (c.id === "cup") c = pickContainer(memory);
   return {
     kind: "capacityMeasure",
     scene: "count",

@@ -63,8 +63,8 @@ function continuePatternTask(difficulty: Difficulty): PracticeTask {
   return {
     kind: "repeatingPattern",
     mode: "continue",
-    prompt: `Build the next ${answer.length} ${answer.length === 1 ? "part" : "parts"}.`,
-    speakText: `Build the next ${answer.length} ${answer.length === 1 ? "part" : "parts"} in the repeating pattern.`,
+    prompt: answer.length === 1 ? "Build the next part." : `Build the next ${answer.length} parts.`,
+    speakText: answer.length === 1 ? "Build the next part in the repeating pattern." : `Build the next ${answer.length} parts in the repeating pattern.`,
     sequence,
     palette: paletteFor(unit),
     answer,

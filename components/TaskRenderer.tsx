@@ -410,33 +410,33 @@ function TaskRendererInner({
     case "fillTheJar":
       return <FillTheJar key={k} config={t.config} onComplete={onC} />;
     case "countCircle":
-      return <CountAndCircle key={k} config={t.config} onComplete={onC} />;
+      return <CountAndCircle key={k} config={t.config} onComplete={onC} onWrong={onW} />;
     case "typeNumber":
-      return <TypeTheNumber key={k} min={t.min} max={t.max} rounds={1} answer={t.answer} mode="number" onComplete={onC} />;
+      return <TypeTheNumber key={k} min={t.min} max={t.max} rounds={1} answer={t.answer} mode="number" onComplete={onC} onWrong={onW} />;
     case "numberLadder":
       return <NumberLadder key={k} start={t.start} target={t.target} onComplete={onC} />;
     case "numberLineTap":
-      return <NumberLineTap key={k} min={t.min} max={t.max} target={t.target} onComplete={onC} />;
+      return <NumberLineTap key={k} min={t.min} max={t.max} target={t.target} onComplete={onC} onWrong={onW} />;
     case "numberLineJump":
       return <NumberLineJump key={k} min={t.min} max={t.max} start={t.start} target={t.target} steps={t.steps ?? [1, -1]} onComplete={onC} />;
     case "chartFill":
       return <NumberChartFill key={k} min={t.min} max={t.max} missing={t.missing} onComplete={onC} />;
     case "tensOnesMcq":
-      return <TensOnesMCQ key={k} min={t.min} max={t.max} onCorrect={onC} />;
+      return <TensOnesMCQ key={k} min={t.min} max={t.max} onCorrect={onC} onWrong={onW} />;
     case "partitionTwoWays":
-      return <PartitionTwoWays key={k} min={t.min} max={t.max} onCorrect={onC} />;
+      return <PartitionTwoWays key={k} min={t.min} max={t.max} onCorrect={onC} onWrong={onW} />;
     case "splitStepper":
-      return <SplitStepper key={k} target={t.target} max={t.max ?? t.target} onCorrect={onC} />;
+      return <SplitStepper key={k} target={t.target} max={t.max ?? t.target} onCorrect={onC} onWrong={onW} />;
     case "mabBuild":
       return <MabBuild key={k} target={t.target} maxTens={Math.min(t.maxTens ?? 9, 9)} maxOnes={Math.min(t.maxOnes ?? 9, 9)} onCorrect={onC} />;
     case "placeValueDice":
-      return <PlaceValueDiceMat key={k} onCorrect={onC} />;
+      return <PlaceValueDiceMat key={k} onCorrect={onC} onWrong={onW} />;
     case "equalGroups":
-      return <EqualGroupsMaker key={k} onCorrect={onC} />;
+      return <EqualGroupsMaker key={k} onCorrect={onC} onWrong={onW} />;
     case "equalGroupsMcq":
-      return <EqualGroupsMCQ key={k} prompt={t.prompt} options={t.options} correctIndex={t.correctIndex} onCorrect={onC} />;
+      return <EqualGroupsMCQ key={k} prompt={t.prompt} options={t.options} correctIndex={t.correctIndex} onCorrect={onC} onWrong={onW} />;
     case "groupBoxes":
-      return <GroupBoxesBuilder key={k} groups={t.groups} perGroup={t.perGroup} onCorrect={onC} />;
+      return <GroupBoxesBuilder key={k} groups={t.groups} perGroup={t.perGroup} onCorrect={onC} onWrong={onW} />;
     case "groupingEstimate":
       return <GroupingEstimate key={k} tensGroups={t.tensGroups} ones={t.ones} options={t.options} answer={t.answer} onCorrect={onC} onWrong={onW} />;
     case "addDots":

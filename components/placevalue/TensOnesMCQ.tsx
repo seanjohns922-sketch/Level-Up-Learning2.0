@@ -22,10 +22,12 @@ export default function TensOnesMCQ({
   min = 10,
   max = 99,
   onCorrect,
+  onWrong,
 }: {
   min?: number;
   max?: number;
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const target = useMemo(() => randInt(min, max), [min, max]);
   const tens = Math.floor(target / 10);
@@ -52,6 +54,7 @@ export default function TensOnesMCQ({
     const ok = opt.tens === tens && opt.ones === ones;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(null, `${tens} ${tens === 1 ? "ten" : "tens"} and ${ones} ${ones === 1 ? "one" : "ones"}`);
   }
 
   return (

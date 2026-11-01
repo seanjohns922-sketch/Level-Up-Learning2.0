@@ -389,7 +389,7 @@ function teachGraphTask(round: number, target: number, display: "objects" | "pic
   const top = [...categories].sort((x, y) => y.count - x.count)[0]!;
   return {
     kind: "statisticaGraph", mode: "read", target, display, categories,
-    prompt: `Let's read the graph. ${survey.question} Which column is the tallest?`,
+    prompt: "Let's read the graph. Which column is the tallest?",
     speakText: `This is a one-to-one ${display === "objects" ? "object display" : "picture graph"}. Each ${display === "objects" ? "object" : "picture"} stands for one vote. The tallest column had the most votes. Tap it.`,
     options: order(categories.map((c) => ({ id: c.id, label: c.label })), round), correctOptionIds: [top.id],
     feedback: { correct: "That's the tallest column — the most votes.", wrong: "The tallest column is the one with the most pictures." },

@@ -23,7 +23,7 @@ export default function DoubleDetective({
 }: {
   onCorrect?: () => void;
   onStepCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [idx, setIdx] = useState(0);
   const p = prompts[idx % prompts.length];
@@ -37,7 +37,7 @@ export default function DoubleDetective({
         setIdx((v) => v + 1);
       }
     } else {
-      onWrong?.();
+      onWrong?.(opt, p.strategy);
     }
   }
 

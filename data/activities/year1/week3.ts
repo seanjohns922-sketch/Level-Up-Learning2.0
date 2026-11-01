@@ -71,7 +71,7 @@ function genMatchRepresentation(d: Difficulty): PracticeTask {
   const ones = target % 10;
   const distractors = uniqueInts(3, lo, hi, [target]);
   const options = shuffle([target, ...distractors]).map(String);
-  return { kind: "mcq", prompt: `${tens} tens and ${ones} ones is:`, options, answer: String(target), difficulty: d };
+  return { kind: "mcq", prompt: `${tens} ${tens === 1 ? "ten" : "tens"} and ${ones} ${ones === 1 ? "one" : "ones"} is:`, options, answer: String(target), difficulty: d };
 }
 
 export function generateWeek3Task(lessonId: string, d: Difficulty = "easy"): PracticeTask {

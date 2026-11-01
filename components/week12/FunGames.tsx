@@ -98,7 +98,7 @@ export default function FunGames({
   onWrong,
 }: {
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [stage, setStage] = useState<"tournament" | "grid" | "boss">("tournament");
 
@@ -123,7 +123,7 @@ export default function FunGames({
         nextTournament();
       }
     } else {
-      onWrong?.();
+      onWrong?.(opt, String(tEq.answer));
     }
   }
 
@@ -146,7 +146,7 @@ export default function FunGames({
       if (next.size >= 5) setStage("boss");
       else nextGrid();
     } else {
-      onWrong?.();
+      onWrong?.(n, String(gEq.answer));
     }
   }
 
@@ -162,7 +162,7 @@ export default function FunGames({
       if (bossIdx + 1 >= 3) onCorrect?.();
       else setBossIdx((v) => v + 1);
     } else {
-      onWrong?.();
+      onWrong?.(opt, String(bossQ.answer));
     }
   }
 

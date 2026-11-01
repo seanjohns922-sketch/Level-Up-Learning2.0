@@ -6,7 +6,7 @@ function randInt(min: number, max: number) {
 }
 
 function makeAddends(d: Difficulty) {
-  const [lo, hi] = diffRange(d, [0, 10], [0, 15], [10, 20]);
+  const [lo, hi] = diffRange(d, [2, 10], [2, 15], [10, 20]);
   const maxDots = d === "hard" ? 20 : 10;
   const target = randInt(lo, hi);
   if (d === "hard") {
@@ -14,13 +14,13 @@ function makeAddends(d: Difficulty) {
     const b = target - a;
     if (b >= 0 && b <= maxDots) return { a, b, maxDots };
     const safeA = randInt(10, maxDots);
-    const safeB = randInt(0, maxDots);
+    const safeB = randInt(1, maxDots);
     return { a: safeA, b: safeB, maxDots };
   }
   for (let i = 0; i < 20; i += 1) {
-    const a = randInt(0, Math.min(target, maxDots));
+    const a = randInt(1, Math.min(target - 1, maxDots));
     const b = target - a;
-    if (b <= maxDots) return { a, b, maxDots };
+    if (b >= 1 && b <= maxDots) return { a, b, maxDots };
   }
   const a = Math.min(maxDots, target);
   return { a, b: target - a, maxDots };
@@ -29,7 +29,7 @@ function makeAddends(d: Difficulty) {
 function makeParts(d: Difficulty): { a: number; b: number; whole: number } {
   if (d === "hard") {
     const whole = randInt(10, 20);
-    const a = randInt(0, whole);
+    const a = randInt(1, whole - 1);
     const b = whole - a;
     return { a, b, whole };
   }
@@ -46,8 +46,8 @@ function makeParts(d: Difficulty): { a: number; b: number; whole: number } {
   }
   let a = 0, b = 0, whole = 0;
   for (let i = 0; i < 30; i += 1) {
-    a = randInt(0, Math.min(10, maxWhole));
-    b = randInt(0, Math.min(10, maxWhole));
+    a = randInt(1, Math.min(10, maxWhole));
+    b = randInt(1, Math.min(10, maxWhole));
     whole = a + b;
     if (whole <= maxWhole && !(a === 0 && b === 0)) break;
   }

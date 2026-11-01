@@ -610,7 +610,7 @@ const YEAR1_PROGRAM_RAW: WeekPlan[] = [
         id: "y1-w12-l3",
         week: 12, lesson: 3,
         title: "Fun games and consolidation",
-        focus: "Fun games and consolidation",
+        focus: "Practise number facts through fun games",
         activityIdeas: ["Quiz games", "Rotations", "Treasure map tasks"],
         curriculum: ["ALL"],
         activities: [no(1, 120, 5, true), add(1, 20, "near_doubles"), tr({ min: 1, max: 100 })],

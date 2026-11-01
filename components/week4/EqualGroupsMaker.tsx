@@ -31,8 +31,10 @@ function makePrompt(): Prompt {
 
 export default function EqualGroupsMaker({
   onCorrect,
+  onWrong,
 }: {
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [seed, setSeed] = useState(0);
   const prompt = useMemo(() => {
@@ -72,6 +74,7 @@ export default function EqualGroupsMaker({
     const ok = allAssigned && equal;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(null, `${prompt.perGroup} in each of the ${prompt.groups} groups`);
     if (ok) setTimeout(reset, 650);
   }
 

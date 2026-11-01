@@ -71,6 +71,7 @@ export default function TypeTheNumber({
   answer,
   mode = "word",
   onComplete,
+  onWrong,
 }: {
   min?: number;
   max?: number;
@@ -78,6 +79,7 @@ export default function TypeTheNumber({
   answer?: number;
   mode?: "word" | "number";
   onComplete?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [round, setRound] = useState(1);
   const fixedAnswer = typeof answer === "number" ? answer : null;
@@ -111,6 +113,7 @@ export default function TypeTheNumber({
       setTimeout(nextRound, 500);
     } else {
       setStatus("wrong");
+      onWrong?.(typed, mode === "word" ? correctWord : String(currentAnswer));
       setTimeout(() => setStatus("idle"), 500);
     }
   }

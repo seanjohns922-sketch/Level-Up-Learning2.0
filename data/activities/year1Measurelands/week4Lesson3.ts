@@ -5,6 +5,8 @@ import {
   type DurationUnit,
 } from "@/data/activities/year1Measurelands/week4Lesson1";
 
+const withArticle = (label: string) => `${label.endsWith("s") ? "the" : "a"} ${label.toLowerCase()}`;
+
 // ── Measurelands · Level 1 · Week 4 · Lesson 3 — "Sort by Duration" ──
 // AC9M1M03: apply hour/day/week by CLASSIFYING events into duration groups
 // (not just comparing). Reuses the durationUnit card + Lesson 1 scene library.
@@ -93,8 +95,8 @@ function buildClassifyTask(memory: LessonMemory): DurationTask {
   return {
     kind: "durationUnit",
     scene: "classify",
-    prompt: `Which duration fits ${a.label.toLowerCase()} best?`,
-    speakText: `Which duration fits ${a.label.toLowerCase()} best? An hour, a day, or a week?`,
+    prompt: `Which duration fits ${withArticle(a.label)} best?`,
+    speakText: `Which duration fits ${withArticle(a.label)} best? An hour, a day, or a week?`,
     badgeLabel: "Choose the Best Duration",
     activity: { imageSrc: a.image, label: a.label, unit: a.unit },
     feedback: { correct: "That's the best fit!", wrong: "Think about how long it usually takes." },

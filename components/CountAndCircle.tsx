@@ -17,9 +17,11 @@ function randInt(min: number, max: number) {
 export default function CountAndCircle({
   config,
   onComplete,
+  onWrong,
 }: {
   config?: CountCircleConfig;
   onComplete?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const minTarget = config?.minTarget ?? 5;
   const maxTarget = config?.maxTarget ?? 50;
@@ -55,6 +57,7 @@ export default function CountAndCircle({
       setTimeout(nextRound, 600);
     } else {
       setStatus("wrong");
+      onWrong?.(selectedCount, String(target));
       setTimeout(() => setStatus("idle"), 600);
     }
   }

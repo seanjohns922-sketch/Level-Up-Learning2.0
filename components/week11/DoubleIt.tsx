@@ -23,7 +23,7 @@ export default function DoubleIt({
 }: {
   onCorrect?: () => void;
   onStepCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [idx, setIdx] = useState(0);
   const a = doubles[idx % doubles.length];
@@ -39,7 +39,7 @@ export default function DoubleIt({
         setIdx((v) => v + 1);
       }
     } else {
-      onWrong?.();
+      onWrong?.(opt, String(answer));
     }
   }
 

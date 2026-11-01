@@ -28,7 +28,7 @@ export default function NearDouble({
 }: {
   onCorrect?: () => void;
   onStepCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [idx, setIdx] = useState(0);
   const p = problems[idx % problems.length];
@@ -44,7 +44,7 @@ export default function NearDouble({
         setIdx((v) => v + 1);
       }
     } else {
-      onWrong?.();
+      onWrong?.(opt, String(answer));
     }
   }
 

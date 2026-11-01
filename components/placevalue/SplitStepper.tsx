@@ -7,10 +7,12 @@ export default function SplitStepper({
   target,
   max,
   onCorrect,
+  onWrong,
 }: {
   target: number;
   max: number;
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const [a, setA] = useState(0);
   const [b, setB] = useState(0);
@@ -24,6 +26,7 @@ export default function SplitStepper({
       onCorrect?.();
     } else {
       setStatus("wrong");
+      onWrong?.(`${a} + ${b}`, `${Math.floor(target / 10) * 10} + ${target % 10}`);
       setTimeout(() => setStatus("idle"), 500);
     }
   }

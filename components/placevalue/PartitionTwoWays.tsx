@@ -22,10 +22,12 @@ export default function PartitionTwoWays({
   min = 20,
   max = 99,
   onCorrect,
+  onWrong,
 }: {
   min?: number;
   max?: number;
   onCorrect?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const target = useMemo(() => randInt(min, max), [min, max]);
 
@@ -56,6 +58,7 @@ export default function PartitionTwoWays({
     const ok = p.a + p.b === target;
     setStatus(ok ? "correct" : "wrong");
     if (ok) onCorrect?.();
+    else onWrong?.(`${p.a} + ${p.b}`, `${correctPair.a} + ${correctPair.b}`);
   }
 
   return (

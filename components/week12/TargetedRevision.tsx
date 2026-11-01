@@ -50,7 +50,7 @@ export default function TargetedRevision({
   onWrong,
 }: {
   onCorrect?: () => void;
-  onWrong?: () => void;
+  onWrong?: (studentAnswer?: string | number | null, correctAnswer?: string | null) => void;
 }) {
   const areas: Area[] = ["Addition", "Subtraction", "Doubles", "Sharing", "Grouping"];
   const [area, setArea] = useState<Area | null>(null);
@@ -82,18 +82,18 @@ export default function TargetedRevision({
       if (fixIsCorrect) setStep("missing");
       else setFixStage("solve");
     } else {
-      onWrong?.();
+      onWrong?.(choice === "correct" ? "Correct" : "Not correct", "Not correct");
     }
   }
 
   function chooseFixSolve(opt: number) {
     if (opt === fixAnswer) setStep("missing");
-    else onWrong?.();
+    else onWrong?.(opt, String(fixAnswer));
   }
 
   function chooseMissing(opt: number) {
     if (opt === missAnswer) onCorrect?.();
-    else onWrong?.();
+    else onWrong?.(opt, String(missAnswer));
   }
 
   function renderBooster() {
@@ -102,14 +102,16 @@ export default function TargetedRevision({
     if (area === "Addition") {
       const mode = boosterSeed % 3;
       if (mode === 0) {
+        const a = randInt(3, 10);
+        const b = randInt(2, 9);
         return (
           <AddDotsMatch
             key={`booster-add-${boosterSeed}`}
-            a={randInt(3, 10)}
-            b={randInt(2, 9)}
+            a={a}
+            b={b}
             maxDots={20}
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, `${a} dots and ${b} dots`)}
           />
         );
       }
@@ -125,7 +127,7 @@ export default function TargetedRevision({
             b={b}
             whole={whole}
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, String(whole))}
           />
         );
       }
@@ -143,7 +145,7 @@ export default function TargetedRevision({
           options={buildOptions(answer)}
           answer={answer}
           onCorrect={advanceBooster}
-          onWrong={() => onWrong?.()}
+          onWrong={() => onWrong?.(null, String(answer))}
         />
       );
     }
@@ -160,7 +162,7 @@ export default function TargetedRevision({
             remove={remove}
             mode="takeAway"
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, String(total - remove))}
           />
         );
       }
@@ -173,7 +175,7 @@ export default function TargetedRevision({
             total={total}
             remove={remove}
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, String(total - remove))}
           />
         );
       }
@@ -187,7 +189,7 @@ export default function TargetedRevision({
           part={part}
           options={options}
           onCorrect={advanceBooster}
-          onWrong={() => onWrong?.()}
+          onWrong={() => onWrong?.(null, String(total - part))}
         />
       );
     }
@@ -195,12 +197,12 @@ export default function TargetedRevision({
     if (area === "Doubles") {
       const mode = boosterSeed % 3;
       if (mode === 0) {
-        return <DoubleIt key={`booster-double-${boosterSeed}`} onCorrect={advanceBooster} onWrong={() => onWrong?.()} />;
+        return <DoubleIt key={`booster-double-${boosterSeed}`} onCorrect={advanceBooster} onWrong={onWrong} />;
       }
       if (mode === 1) {
-        return <NearDouble key={`booster-near-${boosterSeed}`} onCorrect={advanceBooster} onWrong={() => onWrong?.()} />;
+        return <NearDouble key={`booster-near-${boosterSeed}`} onCorrect={advanceBooster} onWrong={onWrong} />;
       }
-      return <DoubleDetective key={`booster-detect-${boosterSeed}`} onCorrect={advanceBooster} onWrong={() => onWrong?.()} />;
+      return <DoubleDetective key={`booster-detect-${boosterSeed}`} onCorrect={advanceBooster} onWrong={onWrong} />;
     }
 
     if (area === "Sharing") {
@@ -213,7 +215,7 @@ export default function TargetedRevision({
             total={total}
             groups={groups}
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, `${total / groups} in each group`)}
           />
         );
       }
@@ -225,7 +227,7 @@ export default function TargetedRevision({
             total={total}
             groups={groups}
             onCorrect={advanceBooster}
-            onWrong={() => onWrong?.()}
+            onWrong={() => onWrong?.(null, `${total / groups} in each group`)}
           />
         );
       }
@@ -240,7 +242,7 @@ export default function TargetedRevision({
           distribution={distribution}
           isFair={false}
           onCorrect={advanceBooster}
-          onWrong={() => onWrong?.()}
+          onWrong={() => onWrong?.(null, "No")}
         />
       );
     }
@@ -258,7 +260,7 @@ export default function TargetedRevision({
           options={optionsForAnswer(answer)}
           answer={String(answer)}
           onCorrect={advanceBooster}
-          onWrong={() => onWrong?.()}
+          onWrong={() => onWrong?.(null, String(answer))}
         />
       );
     }
@@ -274,7 +276,7 @@ export default function TargetedRevision({
           options={optionsForAnswer(total)}
           answer={String(total)}
           onCorrect={advanceBooster}
-          onWrong={() => onWrong?.()}
+          onWrong={() => onWrong?.(null, String(total))}
         />
       );
     }
@@ -291,7 +293,7 @@ export default function TargetedRevision({
         options={options}
         answer={answer}
         onCorrect={advanceBooster}
-        onWrong={() => onWrong?.()}
+        onWrong={() => onWrong?.(null, answer)}
       />
     );
   }
@@ -412,7 +414,7 @@ export default function TargetedRevision({
             {missPrompt}
           </div>
           <div className="text-sm text-slate-600 mb-3 text-center">
-            Jump back to 10 (−5), then −2
+            Jump back to 10, then −2
           </div>
           <div className="text-sm font-bold text-slate-700 mb-2">What was the first jump?</div>
           <div className="grid gap-2">

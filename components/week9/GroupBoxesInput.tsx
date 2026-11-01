@@ -28,7 +28,7 @@ export default function GroupBoxesInput({
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5">
       <div className="text-lg font-extrabold text-slate-900 mb-3">
-        {total} shared into {groups} groups (diagram).
+        {total} shared into {groups} groups.
       </div>
       <div className="grid md:grid-cols-3 gap-4">
         {Array.from({ length: groups }).map((_, i) => (
