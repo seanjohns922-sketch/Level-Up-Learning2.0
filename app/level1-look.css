@@ -32,7 +32,9 @@
 [data-level1-look="space"] [data-direction-grid] .border-amber-300\/70 svg { height: 88%; width: 88%; }
 
 /* Statistica */
-[data-level1-look="statistics"] [data-statistica-plot] { --tw-gradient-from: #fff; --tw-gradient-to: #f3f9ee; --tw-gradient-stops: #fff, #f3f9ee; border-color: #c7e2b4; box-shadow: 0 2px 0 #c7e2b4; }
-[data-level1-look="statistics"] [data-statistica-plot] .text-white\/90 { color: #17331f; font-size: 0.9rem; }
-[data-level1-look="statistics"] [data-statistica-plot] .text-\[\#f2bc45\]\/60 { color: #5b7a5e; font-size: 0.75rem; }
+[data-level1-look="statistics"] [data-statistica-plot] { background: #fff; border-color: #c7e2b4; box-shadow: 0 2px 0 #c7e2b4; padding-left: 1.5rem; }
+[data-level1-look="statistics"] [data-statistica-plot] .text-white\/90 { color: #17331f; font-size: 1rem; }
+/* The scale: each number sits exactly on its line */
+[data-level1-look="statistics"] [data-statistica-plot] .text-\[\#f2bc45\]\/60 { top: 0; padding-right: 0.5rem; color: #17331f; font-size: 1rem; line-height: 1; }
+[data-level1-look="statistics"] [data-statistica-plot] .bg-\[\#f2bc45\]\/40 { height: 3px; background: #17331f; }
 [data-level1-look="statistics"] .bg-\[\#17281f\] { background: #fff; border-color: #c7e2b4; color: #17331f; box-shadow: 0 2px 0 #c7e2b4; }

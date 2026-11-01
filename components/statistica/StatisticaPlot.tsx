@@ -44,7 +44,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   // (rows up to ~40) still renders at the same ~360px height as a small graph.
   const minUnit = display === "columns" ? 9 : 14;
   const unit = Math.max(minUnit, Math.min(bright ? 46 : 34, Math.floor((bright ? 420 : 360) / rows)));
-  const cellGap = Math.max(2, Math.min(6, Math.round(unit * 0.16)));
+  const cellGap = bright ? 0 : Math.max(2, Math.min(6, Math.round(unit * 0.16)));
   const cellSize = unit - cellGap;
   const plotH = rows * unit;
   const isColumns = display === "columns";
@@ -55,8 +55,11 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
   for (let v = step; v <= rows; v += step) stops.push(v);
   const cellShape = display === "pictures" ? "rounded-full" : "rounded-[3px]";
 
+  // Bright graphs fill each space between two lines with one picture tile, so the top tile reads off the scale.
   const defaultCell = (cat: PlotCat, key: number) =>
-    display === "pictures" ? (
+    bright && display === "pictures" ? (
+      <div key={key} className="grid place-items-center rounded-md" style={{ height: unit - 2, width: "88%", margin: "1px 0", background: `${cat.color}22`, boxShadow: `inset 0 0 0 1.5px ${cat.color}77` }}><DataIcon name={cat.label} color={cat.color} size={Math.round(unit * 0.72)} /></div>
+    ) : display === "pictures" ? (
       <div key={key} className="grid place-items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]" style={{ height: cellSize, width: cellSize }}><DataIcon name={cat.label} color={cat.color} size={cellSize} /></div>
     ) : (
       <div key={key} className={`${cellShape} shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]`} style={{ height: cellSize, width: cellSize, background: cat.color }} />
@@ -68,7 +71,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
         {stops.map((v) => (
           <div key={v} className="pointer-events-none absolute right-0 flex items-center" style={{ left: AXIS, bottom: v * unit }}>
             <span className="absolute -translate-x-full -translate-y-1/2 pr-1.5 text-right text-[9px] font-black tabular-nums text-[#f2bc45]/60" style={{ left: 0 }}>{v}</span>
-            <div className="h-px w-full" style={{ borderTop: "1px dashed rgba(242,188,69,0.16)" }} />
+            <div className="h-px w-full" style={{ borderTop: bright ? "1.5px solid #dbe7d3" : "1px dashed rgba(242,188,69,0.16)" }} />
           </div>
         ))}
         <div className="absolute bottom-0 h-[2px] rounded-full bg-[#f2bc45]/40" style={{ left: AXIS - 4, right: 0 }} />
@@ -80,7 +83,7 @@ export default function StatisticaPlot({ categories, display, values, onColumnCl
             const selected = selectedIds.includes(cat.id);
             const shadow = status === "correct" ? "0 0 0 3px #34d399" : status === "wrong" ? "0 0 0 3px #f87171" : selected ? `0 0 0 3px ${cat.color}` : `inset 0 -3px 0 ${cat.color}66`;
             const track = (
-              <div className={`relative flex h-full w-full flex-col-reverse items-center overflow-hidden rounded-t-lg ${isColumns ? "" : "pt-1"}`} style={{ gap: isColumns ? 0 : cellGap, background: `${cat.color}14` }}>
+              <div className={`relative flex h-full w-full flex-col-reverse items-center overflow-hidden rounded-t-lg ${isColumns || bright ? "" : "pt-1"}`} style={{ gap: isColumns ? 0 : cellGap, background: bright ? "transparent" : `${cat.color}14` }}>
                 {isColumns ? (
                   <div className="w-full rounded-t-md shadow-[inset_0_2px_0_rgba(255,255,255,0.28)]" style={{ height: value * unit, background: `linear-gradient(to top, ${cat.color}, ${cat.color}cc)` }} />
                 ) : (
