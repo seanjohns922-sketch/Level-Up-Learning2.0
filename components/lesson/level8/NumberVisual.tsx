@@ -4,7 +4,7 @@ import type { Number8Visual } from "@/data/activities/level8/number-visual";
 import { number8VisualSpeech } from "@/data/activities/level8/number-visual";
 
 // Level 8 Number diagrams. Each one supports the question without showing its answer.
-const INK = "#1f2a37", MUTED = "#64748b", ACCENT = "#0f766e", WARM = "#c2410c";
+const INK = "#3c2a63", MUTED = "#5b5078", ACCENT = "#0f766e", WARM = "#c2410c";
 
 function NumberLine({ v }: { v: Extract<Number8Visual, { kind: "numberline" }> }) {
   const W = 360, L = 24, R = 336, span = v.max - v.min, x = (n: number) => L + ((n - v.min) / span) * (R - L);
@@ -23,7 +23,7 @@ function NumberLine({ v }: { v: Extract<Number8Visual, { kind: "numberline" }> }
       ))}
       {v.points.map((p, i) => (
         <g key={i}>
-          <circle cx={x(p.value)} cy={70} r={7} fill={p.colour ?? WARM} stroke="#fff" strokeWidth={2} />
+          <circle cx={x(p.value)} cy={70} r={9} fill={p.colour ?? WARM} stroke="#fff" strokeWidth={2.5} />
           <text x={x(p.value)} y={v.points.some((other,j)=>j!==i&&Math.abs(x(other.value)-x(p.value))<75)?(i%2?22:46):46} textAnchor="middle" fontSize={18} fontWeight={700} fill={p.colour ?? WARM}>{p.label}</text>
         </g>
       ))}
@@ -40,7 +40,7 @@ function Squares({ v }: { v: Extract<Number8Visual, { kind: "squares" }> }) {
     <svg viewBox={`0 0 ${cursor} 170`} className="mx-auto w-full max-w-xl" role="img" aria-label={number8VisualSpeech(v)}>
       {placed.map((s, i) => (
         <g key={i}>
-          <rect x={s.at} y={150 - s.side} width={s.side} height={s.side} fill={s.highlight ? "#fde7d8" : "#e0f2f1"} stroke={s.highlight ? WARM : ACCENT} strokeWidth={2} />
+          <rect x={s.at} y={150 - s.side} width={s.side} height={s.side} fill={s.highlight ? "#ffb12e" : "#d3c0f7"} stroke={INK} strokeWidth={2.5} />
           <text x={s.at + s.side / 2} y={150 - s.side / 2 + 5} textAnchor="middle" fontSize={15} fontWeight={700} fill={INK}>{s.label}</text>
           {s.sideLabel && <text x={s.at + s.side / 2} y={166} textAnchor="middle" fontSize={13} fill={MUTED}>side {s.sideLabel}</text>}
         </g>
@@ -97,12 +97,12 @@ function PercentBar({ v }: { v: Extract<Number8Visual, { kind: "percentbar" }> }
   const whole = v.direction > 0 ? 100 + v.percent : 100;
   return (
     <div role="img" aria-label={number8VisualSpeech(v)} className="py-2">
-      <p className="mb-2 text-sm font-bold">Original 100% = {amount}; {v.direction > 0 ? "+" : "−"}{v.percent}%</p>
-      <div className="flex h-12 w-full" aria-hidden="true">
-        <div className="relative border-2" style={{ width: `${10000 / whole}%`, borderColor: ACCENT, background: "#e0f2f1" }}>
-          {v.direction < 0 && <div className="absolute inset-y-0 right-0 border-l-2 border-dashed" style={{ width: `${v.percent}%`, borderColor: WARM, background: "#fde7d8" }}/>}
+      <p className="mb-2 text-base font-bold" style={{ color: INK }}>Original 100% = {amount}; {v.direction > 0 ? "+" : "−"}{v.percent}%</p>
+      <div className="flex h-16 w-full overflow-hidden rounded-lg shadow-md" aria-hidden="true">
+        <div className="relative border-2" style={{ width: `${10000 / whole}%`, borderColor: INK, background: "linear-gradient(135deg,#9a6cf0,#6d3bd1)" }}>
+          {v.direction < 0 && <div className="absolute inset-y-0 right-0 border-l-2 border-dashed" style={{ width: `${v.percent}%`, borderColor: "#c76f00", background: "#ffb12e" }}/>}
         </div>
-        {v.direction > 0 && <div className="border-2 border-dashed" style={{ width: `${v.percent / whole * 100}%`, borderColor: WARM, background: "#fde7d8" }}/>}
+        {v.direction > 0 && <div className="border-2 border-dashed" style={{ width: `${v.percent / whole * 100}%`, borderColor: "#c76f00", background: "#ffb12e" }}/>}
       </div>
       {v.caption && <p className="mt-2 text-sm" style={{ color: MUTED }}>{v.caption}</p>}
     </div>
@@ -116,7 +116,7 @@ function Lengths({v}:{v:Extract<Number8Visual,{kind:"lengths"}>}) {
     {v.object==='timber'&&<path d={`M${x+4} 39 Q${x+w/2} 33 ${x+w-4} 41 M${x+4} 53 Q${x+w/2} 58 ${x+w-4} 51`} fill="none" stroke="#ac8047"/>}
     {v.object==='fence'&&[0,.25,.5,.75,1].map((t,j)=><line key={j} x1={x+t*w} x2={x+t*w} y1="18" y2="70" stroke="#654b31" strokeWidth="3"/>)}
     {v.object==='pipe'&&<ellipse cx={x+w-5} cy="45" rx="5" ry="19" fill="#94a3b8" stroke="#475569"/>}
-    <text x={x+w/2} y="91" textAnchor="middle" fontSize="15">{v.labels[i]}</text></g>;})}</svg><p className="mt-2 text-sm">{v.caption}</p></>;
+    <text x={x+w/2} y="91" textAnchor="middle" fontSize="17" fontWeight="700" fill={INK}>{v.labels[i]}</text></g>;})}</svg><p className="mt-2 text-sm">{v.caption}</p></>;
 }
 
 function Tally({v}:{v:Extract<Number8Visual,{kind:"tally"}>}) {

@@ -24,7 +24,7 @@ export default function SpaceVisual({
         <>
           <div className={`mx-auto grid gap-2 ${many?"grid-cols-3":polys.length>1?"grid-cols-2":"max-w-md grid-cols-1"}`}>
             {polys.map((p, i) => (
-              <Polygon key={i} p={p} scale={fit} compact={many} big={polys.length===2} />
+              <Polygon key={i} p={p} scale={fit} compact={many} big={polys.length>=2&&!many} />
             ))}
           </div>
           <ReadAloudBtn

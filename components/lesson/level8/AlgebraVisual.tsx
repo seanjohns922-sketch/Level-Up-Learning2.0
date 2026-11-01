@@ -5,7 +5,7 @@ import type { Algebra8Visual, GraphLine } from "@/data/activities/level8/algebra
 import { algebra8VisualSpeech } from "@/data/activities/level8/algebra-visual";
 
 // Level 8 Algebra diagrams. Each one supports the question without showing its answer.
-const INK = "#1f2a37", MUTED = "#64748b", GRID = "#e2e8f0", LINES = ["#7c3aed", "#c2410c", "#0f766e"], NEG = "#dc2626";
+const INK = "#3c2a63", MUTED = "#5b5078", GRID = "#ddd6f3", LINES = ["#7c3aed", "#c2410c", "#0f766e"], NEG = "#dc2626";
 const minus = (n: number) => (n < 0 ? `−${-n}` : String(n));
 
 function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
@@ -48,15 +48,15 @@ function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
       {xs.map((x) => <line key={`gx${x}`} x1={X(x)} x2={X(x)} y1={T} y2={B} stroke={GRID} />)}
       {ys.map((y) => <line key={`gy${y}`} x1={L} x2={R} y1={Y(y)} y2={Y(y)} stroke={GRID} />)}
       {v.shade && <polygon points={region()!} fill={LINES[0]} opacity={0.14} clipPath={`url(#${clip})`} />}
-      <line x1={L} x2={R} y1={ax} y2={ax} stroke={INK} strokeWidth={1.6} />
-      <line x1={ay} x2={ay} y1={T} y2={B} stroke={INK} strokeWidth={1.6} />
+      <line x1={L} x2={R} y1={ax} y2={ax} stroke={INK} strokeWidth={2.2} />
+      <line x1={ay} x2={ay} y1={T} y2={B} stroke={INK} strokeWidth={2.2} />
       {xs.filter((x) => x !== 0).map((x) => <text key={`tx${x}`} x={X(x)} y={Math.min(ax + 18, H - 6)} textAnchor="middle" fontSize={15} fill={MUTED}>{minus(x)}</text>)}
       {ys.filter((y) => y !== 0).map((y) => <text key={`ty${y}`} x={ay - 5} y={Y(y) + 5} textAnchor="end" fontSize={15} fill={MUTED}>{minus(y)}</text>)}
       {v.xMin <= 0 && v.yMin <= 0 && <text x={ay - 5} y={ax + 18} textAnchor="end" fontSize={15} fill={MUTED}>0</text>}
       <text x={R} y={v.yMin >= 0 ? ax - 6 - 14 : ax - 6} textAnchor="end" fontSize={16} fontWeight={700} fill={INK} stroke="#fff" strokeWidth={4} paintOrder="stroke">{v.xLabel ?? "x"}</text>
       <text x={ay + 6} y={T + 10} fontSize={16} fontWeight={700} fill={INK}>{v.yLabel ?? "y"}</text>
       <g clipPath={`url(#${clip})`}>
-        {v.lines.map((l, i) => { const [x1, y1, x2, y2] = ends(l); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={LINES[i % 3]} strokeWidth={2.8} strokeDasharray={v.shade?.line === i && v.shade.strict ? "7 5" : undefined} />; })}
+        {v.lines.map((l, i) => { const [x1, y1, x2, y2] = ends(l); return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={LINES[i % 3]} strokeWidth={3.6} strokeDasharray={v.shade?.line === i && v.shade.strict ? "7 5" : undefined} />; })}
         {v.points?.filter((p) => p.guide).map((p, i) => (
           <g key={`g${i}`} stroke={MUTED} strokeDasharray="4 4" strokeWidth={1.4}>
             <line x1={X(p.x)} x2={X(p.x)} y1={Y(p.y)} y2={ax} />
@@ -67,7 +67,7 @@ function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
       {v.lines.map((l, i) => { const at = labelAt(l, i); return <text key={`l${i}`} x={at.x} y={at.y} textAnchor={at.anchor} fontSize={16} fontWeight={700} fill={LINES[i % 3]} stroke="#fff" strokeWidth={4} paintOrder="stroke">{l.label}</text>; })}
       {v.points?.map((p, i) => (
         <g key={`p${i}`}>
-          <circle cx={X(p.x)} cy={Y(p.y)} r={5.5} fill={INK} stroke="#fff" strokeWidth={1.5} />
+          <circle cx={X(p.x)} cy={Y(p.y)} r={7.5} fill={INK} stroke="#fff" strokeWidth={2.5} />
           {p.label && <text x={X(p.x) + 7} y={Y(p.y) - 7} fontSize={16} fontWeight={700} fill={INK} stroke="#fff" strokeWidth={4} paintOrder="stroke">{p.label}</text>}
         </g>
       ))}

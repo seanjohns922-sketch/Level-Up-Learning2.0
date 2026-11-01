@@ -19,7 +19,7 @@ export default function MeasurementDiagram({ visual: v }: { visual: Measurement8
       content = <Frame k={k}><rect x={ox} y={oy} width={cols * size} height={rows * size} fill="#fffdf7"/>
         {cells.slice(0, total).map(({ c, r }, i) => { const x = ox + c * size, y = oy + r * size; if (i < full) return <rect key={i} x={x} y={y} width={size} height={size} fill="#4f9e46"/>; const cx = c + .5 < cols / 2, cy = r + .5 < rows / 2, ax = cx ? x + size : x, ay = cy ? y + size : y, bx = cx ? x : x + size, by = cy ? y : y + size; return <path key={i} d={`M${ax} ${ay}L${bx} ${ay}L${ax} ${by}Z`} fill="#a9d68f"/>; })}
         <path d={Array.from({ length: cols + 1 }, (_, i) => `M${ox + i * size} ${oy}v${rows * size}`).join('') + Array.from({ length: rows + 1 }, (_, i) => `M${ox} ${oy + i * size}h${cols * size}`).join('')} stroke="#8d80ab" strokeWidth="1.2"/>
-        <g fontSize="21" fontWeight="700" fill={INK}><rect x="520" y="120" width="34" height="34" fill="#4f9e46" stroke="#8d80ab"/><text x="566" y="145">{full} full</text><path d="M520 190h34v-0L520 224Z" fill="#a9d68f"/><rect x="520" y="190" width="34" height="34" fill="none" stroke="#8d80ab"/><text x="566" y="215">{partial} half covered</text></g>
+        <g fontSize="27" fontWeight="700" fill={INK}><rect x="520" y="120" width="34" height="34" fill="#4f9e46" stroke="#8d80ab"/><text x="566" y="147">{full} full</text><path d="M520 190h34v-0L520 224Z" fill="#a9d68f"/><rect x="520" y="190" width="34" height="34" fill="none" stroke="#8d80ab"/><text x="566" y="206">{partial} half</text><text x="566" y="236">covered</text></g>
       </Frame>;
       facts = labels;
       break;

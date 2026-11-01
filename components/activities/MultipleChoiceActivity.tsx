@@ -158,7 +158,7 @@ function SameDenominatorOperationVisual({
 function VisualAnswerLayout({visual,children}:{visual?:ReactNode;children:ReactNode}){
   if(!visual)return <>{children}</>;
   // Container query, not viewport: the card narrows when the feedback panel opens beside it.
-  return <div className="@container mt-4"><div data-visual-answer-layout className="grid items-start gap-5 @2xl:grid-cols-[minmax(0,1.6fr)_minmax(260px,1fr)]">
+  return <div className="@container mt-4"><div data-visual-answer-layout className="grid items-start gap-5 @2xl:grid-cols-[minmax(0,2fr)_minmax(232px,1fr)]">
     <div className="min-w-0 [&>*:first-child]:mt-0">{visual}</div>
     <div className="min-w-0 [&>*:first-child]:mt-0">{children}</div>
   </div></div>;

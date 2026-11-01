@@ -45,16 +45,17 @@ export function Frame({k,children,horizontalOnly=false,height=H}:{k:Kit;children
 
 const isUnknown=(t:string)=>t.includes('?')||/^x\b/.test(t);
 /** A measurement on the drawing. Unknowns are always the orange chip. */
-export function Lab(x:number,y:number,text:string,{bg=PANEL,size=24}:{bg?:string;size?:number}={}){
- const un=isUnknown(text),w=text.length*size*.54+18;
+export function Lab(x:number,y:number,text:string,{bg=PANEL,size:base=24}:{bg?:string;size?:number}={}){
+ // Labels are sized for an iPad, where a diagram is about half the width of its 760-unit drawing.
+ const size=Math.max(base*1.25,26),un=isUnknown(text),w=text.length*size*.54+18;
  return <g><rect x={x-w/2} y={y-size*.75} width={w} height={size*1.5} rx="8" fill={un?ORANGE:bg}/><text x={x} y={y+size*.36} data-flipdy={-size*.72} textAnchor="middle" fontSize={size} fontWeight="700" fill={un?ORANGE_TEXT:INK}>{text}</text></g>;
 }
 const head=(x:number,y:number,dx:number,dy:number,c:string)=>{const l=Math.hypot(dx,dy)||1,ux=dx/l,uy=dy/l;return <path d={`M${x} ${y}L${x-ux*11-uy*5} ${y-uy*11+ux*5}L${x-ux*11+uy*5} ${y-uy*11-ux*5}Z`} fill={c}/>;};
 /** A dimension line with arrowheads and its value in the middle. */
 export function Dim(x1:number,y1:number,x2:number,y2:number,text:string,o:{bg?:string}={}){
- const un=isUnknown(text),c=un?ORANGE_LINE:INK,len=Math.hypot(x2-x1,y2-y1),chip=text.length*13+18,tight=len<chip+14,dir=x2-x1||0;
+ const un=isUnknown(text),c=un?ORANGE_LINE:INK,len=Math.hypot(x2-x1,y2-y1),chip=text.length*16+24,tight=len<chip+14,dir=x2-x1||0;
  // A short edge keeps its arrows clear and carries the value just outside the line.
- const lx=(x1+x2)/2+(tight&&!dir?-(chip/2+10):0),ly=(y1+y2)/2+(tight&&dir?-26:0);
+ const lx=(x1+x2)/2+(tight&&!dir?-(chip/2+10):0),ly=(y1+y2)/2+(tight&&dir?-30:0);
  return <g><path d={`M${x1} ${y1}L${x2} ${y2}`} stroke={c} strokeWidth={un?3:2.5}/>{head(x1,y1,x1-x2,y1-y2,c)}{head(x2,y2,x2-x1,y2-y1,c)}{text?Lab(lx,ly,text,o):null}</g>;
 }
 export const matFill=(k:Kit,m?:Material)=>m==='grass'||m==='timber'||m==='paving'||m==='brick'?k.u(m):m==='water'?k.u('water'):k.u('violet');
@@ -161,7 +162,7 @@ export function ShapePlan({v}:{v:Measurement8Visual}){
  switch(v.variant){
  case 'fence':{const[l,w,g]=n,b=fit(l,w),gap=g?Math.max(g*b.s,46):0,gx=b.x+b.w/2-gap/2,base=b.y+b.h,path=g?`M${gx} ${base}H${b.x}V${b.y}H${b.x+b.w}V${base}H${gx+gap}`:`M${b.x} ${b.y}H${b.x+b.w}V${base}H${b.x}Z`,posts=[[b.x,b.y],[b.x+b.w,b.y],[b.x,base],[b.x+b.w,base],...(g?[[gx,base],[gx+gap,base]]:[])];
   return <Frame k={k}><g {...shade(k)}><rect x={b.x} y={b.y} width={b.w} height={b.h} fill={k.u('grass')}/></g><path d={path} fill="none" stroke="#7a4f27" strokeWidth="11"/><path d={path} fill="none" stroke="#c28d55" strokeWidth="7" strokeDasharray="13 4"/>{posts.map(([x,y],i)=><rect key={i} x={x-7} y={y-7} width="14" height="14" rx="2" fill="#5b3b20"/>)}{g?<path d={`M${gx} ${base}L${gx+gap*.65} ${base+30}`} stroke={ORANGE_LINE} strokeWidth="9" strokeLinecap="round"/>:null}
-  {Dim(b.x,b.y-30,b.x+b.w,b.y-30,`${l} ${u}`)}{Dim(b.x+b.w+34,b.y,b.x+b.w+34,base,`${w} ${u}`)}{g?<text x={W/2} y={base+44} data-flipdy={-18} textAnchor="start" fontSize="24" fontWeight="700" fill="#9a5400" dx="30">gate {g} {u}</text>:null}</Frame>;}
+  {Dim(b.x,b.y-30,b.x+b.w,b.y-30,`${l} ${u}`)}{Dim(b.x+b.w+34,b.y,b.x+b.w+34,base,`${w} ${u}`)}{g?<text x={W/2} y={base+44} data-flipdy={-18} textAnchor="start" fontSize="30" fontWeight="700" fill="#9a5400" dx="30">gate {g} {u}</text>:null}</Frame>;}
  case 'surround':{const[l,w,f]=n,b=fit(l+2*f,w+2*f),band=Math.max(f*b.s,24),lawn=v.edgeLabels?.[0]==='Lawn';
   return <Frame k={k}><g {...shade(k)}><rect x={b.x} y={b.y} width={b.w} height={b.h} fill={lawn?k.u('paving'):k.u('timber')} stroke={lawn?'#6d6978':'#7a4f27'} strokeWidth="3"/></g><rect x={b.x+band} y={b.y+band} width={b.w-2*band} height={b.h-2*band} fill={lawn?k.u('grass'):'#efeaf8'} stroke={INK} strokeWidth="2.5"/>
   {Lab(W/2,b.y+band+30,`${l} ${u}`,{bg:'#fff'})}{Lab(W/2,b.y+b.h/2+16,v.edgeLabels?.[0]??'',{bg:'#fff',size:20})}{Lab(b.x+b.w-band-48,b.y+b.h/2+16,`${w} ${u}`,{bg:'#fff'})}<path d={`M${b.x} ${b.y+b.h+8}v18M${b.x+band} ${b.y+b.h+8}v18M${b.x} ${b.y+b.h+18}h${band}`} stroke={INK} strokeWidth="2.5"/>{Lab(b.x+band/2,b.y+b.h+46,`${f} ${u}`)}</Frame>;}

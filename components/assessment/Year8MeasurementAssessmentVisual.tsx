@@ -9,8 +9,8 @@ const ink='#583714';
 function MapRoute({v}:{v:Measurement8Visual}){
  const two=v.variant==='mapRoute',unit=two?26:40,a=two?v.values[0]:v.values[1],b=two?v.values[1]:0,x=two?112:(560-a*unit)/2,y=two?278:204,bx=x+a*unit,cy=y-b*unit;
  const route=two?`M${x} ${y}H${bx}V${cy}`:`M${x} ${y}H${bx}`;
- const pin=(px:number,py:number,label:string)=><g key={label}><path d={`M${px} ${py}c-5-8-12-15-12-23a12 12 0 1 1 24 0c0 8-7 15-12 23Z`} fill="#a33c41" stroke="white" strokeWidth="2"/><text x={px} y={py-20} textAnchor="middle" fontSize="14" fontWeight="800" fill="white">{label}</text></g>;
- const badge=(px:number,py:number,label:string)=><g><rect x={px-36} y={py-18} width="72" height="27" rx="6" fill="#fffaf0" stroke="#8051a8"/><text x={px} y={py+1} textAnchor="middle" fontSize="19" fontWeight="700" fill={ink}>{label}</text></g>;
+ const pin=(px:number,py:number,label:string)=><g key={label}><path d={`M${px} ${py}c-5-8-12-15-12-23a12 12 0 1 1 24 0c0 8-7 15-12 23Z`} fill="#a33c41" stroke="white" strokeWidth="2"/><text x={px} y={py-20} textAnchor="middle" fontSize="20" fontWeight="800" fill="white">{label}</text></g>;
+ const badge=(px:number,py:number,label:string)=><g><rect x={px-36} y={py-18} width="72" height="27" rx="6" fill="#fffaf0" stroke="#8051a8"/><text x={px} y={py+1} textAnchor="middle" fontSize="25" fontWeight="700" fill={ink}>{label}</text></g>;
  return <div className="w-full">
  <svg viewBox="0 0 560 390" aria-hidden="true" style={{width:'100%',maxWidth:620,maxHeight:320,display:'block',margin:'auto'}}>
  <rect x="20" y="20" width="520" height="302" rx="14" fill="#e6e9e8"/>
@@ -27,7 +27,7 @@ function MapRoute({v}:{v:Measurement8Visual}){
  {pin(x,y,'A')}{pin(bx,y,'B')}{two&&pin(bx,cy,'C')}
  {badge((x+bx)/2,y-50,`${a} cm`)}{two&&badge(bx+50,(y+cy)/2,`${b} cm`)}
  <path d={`M42 350h${unit}m-${unit}-5v10m${unit}-10v10`} stroke={ink} strokeWidth="2"/>
- <text x={60+unit} y="356" fill={ink} fontSize="18" fontWeight="700">1 cm on the original map</text>
+ <text x={60+unit} y="356" fill={ink} fontSize="24" fontWeight="700">1 cm on the original map</text>
  </svg>
  <p className="text-center text-base font-bold">{two?'A — School → B — Library → C — Park':'A — School → B — Library'}</p>
  </div>;
