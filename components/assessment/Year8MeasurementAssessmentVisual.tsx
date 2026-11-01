@@ -1,10 +1,9 @@
 "use client";
 import MeasurementDiagram, {measurementLessonDescription} from "@/components/lesson/level8/MeasurementDiagram";
 import type {ReactNode} from 'react';
-import {CityScene,WaterFlow} from './Measurement8ContextScenes';
+import {FlowScene,FuelScene,JourneyScene,TimeZoneBoard,WallArea} from './Measurement8Scenes';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {CirclePlan,DiagonalPlan,Facts,House,WallPlan,INK,LPlan,lPlanLabels,NotchedPlan,Orientation,PackingPlan,RectPrismPlan,RightTrianglePlan,ShapePlan,TriPrismPlan} from './Measurement8Kit';
-import {TravelScene} from './Measurement5Scenes';
 import type {Measurement8Visual} from '@/data/assessments/revisions/year8MeasurementFiveForms';
 const ink='#583714';
 function MapRoute({v}:{v:Measurement8Visual}){
@@ -59,9 +58,8 @@ export default function Year8MeasurementAssessmentVisual({visual:v}:{visual:Meas
  case 'circle':content=<CirclePlan v={v}/>;break;
  case 'rightTriangle':content=<RightTrianglePlan v={v}/>;break;
  case 'diagonal':content=<DiagonalPlan n={n}/>;break;
- case 'timezone':content=<div className="flex flex-wrap justify-center gap-3">{v.rows?.map(row=><div key={row.label} className="min-w-0 flex-1 rounded-xl bg-white p-4 text-center shadow-md" style={{flexBasis:210}}><CityScene city={row.label}/><p className="text-lg font-bold">{row.label}</p><p className="my-2 font-semibold">UTC{row.offset>=0?'+':'−'}{Math.floor(Math.abs(row.offset))}{Math.abs(row.offset)%1?':30':''}</p><p className="inline-block rounded-lg px-3 py-1 text-2xl font-black" style={row.detail==='?'?{background:'#ffb12e',color:'#2b1800'}:{color:INK}}>{row.detail}</p></div>)}</div>;break;
- case 'rate':case 'model':if(v.variant==='paint'){content=<><WallPlan n={n}/><Facts items={(v.labels??[]).slice(1)}/></>;break;}
- content=<div className="flex flex-col items-center gap-3">{v.variant==='map'||v.variant==='mapRoute'?<MapRoute v={v}/>:v.variant==='coach'||v.variant==='train'?<TravelScene coach={v.variant==='coach'}/>:v.variant==='fuel'?<img src="/images/measurelands/everyday-3d/object-car.png" alt="" className="h-32 w-44 object-contain"/>:<WaterFlow tank={v.task==='model'}/>}<Facts items={v.labels??[]}/></div>;break;
+ case 'timezone':content=<TimeZoneBoard rows={v.rows??[]}/>;break;
+ case 'rate':case 'model':content=v.variant==='map'||v.variant==='mapRoute'?<div className="flex flex-col items-center gap-3"><MapRoute v={v}/><Facts items={v.labels??[]}/></div>:v.variant==='paint'?(v.task==='rate'?<><WallPlan n={n}/><Facts items={(v.labels??[]).slice(1)}/></>:<WallArea v={v}/>):v.variant==='coach'||v.variant==='train'?<JourneyScene v={v}/>:v.variant==='fuel'?<FuelScene v={v}/>:<FlowScene v={v}/>;break;
  }
  const extras=['rate','model','lesson'].includes(v.task)?[]:v.labels??[];
  return <Orientation.Provider value={v.orientation??0}><div className="relative w-full rounded-2xl p-3 sm:p-4" style={{background:'#f6f3fb',color:INK}}><div className="mb-1 flex justify-end"><ReadAloudBtn text={measurement8Speech(v)} label="Read diagram" size="sm"/></div>{content}<Facts items={extras}/><p className="mt-2 text-center text-sm font-semibold opacity-70">{v.description}</p></div></Orientation.Provider>;

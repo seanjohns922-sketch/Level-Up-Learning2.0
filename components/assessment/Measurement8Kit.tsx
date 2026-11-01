@@ -130,9 +130,9 @@ export function RectPrismPlan({n,unit,water}:{n:number[];unit:string;water?:bool
 }
 export function TriPrismPlan({n,unit}:{n:number[];unit:string}){const k=useKit();return <Frame k={k}>{TriPrism(k,`${n[0]} ${unit}`,`${n[1]} ${unit}`,`${n[2]} ${unit}`,n[0],n[1],n[2])}</Frame>;}
 export function PackingPlan({n}:{n:number[]}){
- const k=useKit(),[l,w,h,a,b,c]=n,f=boxFit(l,w,h,340,260),x=70,y=370,s=f.w/l,ax=Math.max(a*s,26),aw=Math.max(c*s,26),ad=Math.max(b*s,26);
+ const k=useKit(),[l,w,h,a,b,c]=n,f=boxFit(l,w,h,300,250),x=156,y=366,s=f.w/l,ax=Math.max(a*s,26),aw=Math.max(c*s,26),ad=Math.max(b*s,26);
  return <Frame k={k}>{Box(k,x,y,f.w,f.h,f.d,{mat:'timber'})}{Dim(x,y+30,x+f.w,y+30,`${l} cm`)}{Dim(x-32,y,x-32,y-f.h,`${h} cm`)}{Dim(x+f.w+24,y+12,x+f.w+f.d*.62+24,y-f.d*.42+12,`${w} cm`)}
-  {Box(k,590,300,ax,aw,ad)}{Lab(630,348,a===b&&b===c?`${a} cm cube`:`${a} × ${b} × ${c} cm`,{size:20})}
+  {Box(k,600,300,ax,aw,ad)}{Lab(640,348,a===b&&b===c?`${a} cm cube`:`${a} × ${b} × ${c} cm`,{size:20})}
  </Frame>;
 }
 export function RightTrianglePlan({v}:{v:Measurement8Visual}){
