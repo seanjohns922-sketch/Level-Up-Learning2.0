@@ -325,7 +325,7 @@ export function createGroundCollectTask(lessonId: string): GroundCollectTask {
   memory.taskCounter += 1;
 
   const prompts = [
-    `Collect ${target} ${collectLabel(objectType)}.`,
+    `Collect ${target} ${target === 1 ? collectLabel(objectType).replace(/s$/, "") : collectLabel(objectType)}.`,
     `Tap ${target} ${collectLabel(objectType)}.`,
     `Feed Numbot ${target} ${collectLabel(objectType)}.`,
   ];
@@ -540,7 +540,7 @@ export function createGroundTapCountTask(lessonId: string): GroundTapCountTask {
   const prompts = [
     `Tap and count the ${objectLabel(objectType)}.`,
     `Count each ${objectLabel(objectType).replace(/s$/, "")}.`,
-    `Tap each ${objectLabel(objectType)} once.`,
+    `Tap each ${objectLabel(objectType).replace(/s$/, "")} once.`,
   ];
 
   return {

@@ -100,3 +100,5 @@ for (const part of ['Read whole guide', 'Read example', 'said.steps[i]', 'said.t
 const guideSpeech = fs.readFileSync('data/lesson-guides/guide-speech.ts', 'utf8');
 for (const part of ['Step ${i + 1}', 'Tip. ${guide.tip}', 'Worked example.', 'How to solve it.']) assert(guideSpeech.includes(part), `Missing narration: ${part}`);
 console.log(`PASS: ${covered} lesson starts; ${native} existing guides retained; ${added} written guides (${own} lesson-specific, ${visuals} with diagrams). Ground and Levels 7–8 excluded.`);
+
+await import('./ground-answer-test.mjs');

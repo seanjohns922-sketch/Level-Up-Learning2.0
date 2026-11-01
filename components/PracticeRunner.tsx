@@ -6,6 +6,7 @@ import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/
 import { getGroundGuide } from "@/data/lesson-guides/ground";
 import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
 import GroundCheer from "@/components/ground/GroundCheer";
+import { groundAnswer } from "@/lib/ground-answer";
 import { Volume2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -1266,10 +1267,11 @@ export function PracticeRunner({
     });
   }, [completionMode, correctAnswers, finished, liveContext, minutes, safeQuestionsAnswered]);
 
-  const wrongAnswerToSay = currentWrongFeedback?.correctAnswer ?? getPracticeTaskCorrectAnswer(task);
+  const groundWrongAnswer = alwaysSpeak ? groundAnswer(task) : null;
+  const groundWrongLine = `Good try! ${groundWrongAnswer?.say ?? "Have another look."}`;
   useEffect(() => {
-    if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(typeof wrongAnswerToSay === "string" && wrongAnswerToSay ? `Good try! The answer is ${wrongAnswerToSay}.` : "Good try! Have another look.", undefined, "auto");
-  }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, wrongAnswerToSay]);
+    if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(groundWrongLine, undefined, "auto");
+  }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, groundWrongLine]);
 
   // ── Finished state ──
   if (finished) {
@@ -1577,13 +1579,13 @@ export function PracticeRunner({
           )}
 
           {(isGroundLesson || /^ground-space-/.test(liveContext?.lessonId ?? "")) && status === "correct" ? <GroundCheer key={questionsAnswered} kind={task.kind} seed={questionsAnswered} /> : null}
-          {awaitingWrongNext && currentWrongFeedback && isGroundLesson ? (
-            <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-2 font-bold text-amber-950 shadow-sm">
-              <p className="text-xl leading-snug">
-                <span className="font-black">Good try!</span>{" "}
-                {currentCorrectAnswer ? <>The answer is <span className="font-black">{typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer}</span>.</> : "Have another look."}
-              </p>
-              <ReadAloudBtn text={incorrectFeedbackSpeech} speechKey={`incorrect-feedback:${currentWrongFeedback.id}`} size="md" className="shrink-0 border-amber-300 bg-white text-amber-900" />
+          {awaitingWrongNext && currentWrongFeedback && alwaysSpeak ? (
+            <div className="rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-2 font-bold text-amber-950 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xl leading-snug"><span className="font-black">Good try!</span> {groundWrongAnswer?.say ?? "Have another look."}</p>
+                <ReadAloudBtn text={groundWrongLine} speechKey={`incorrect-feedback:${currentWrongFeedback.id}`} size="md" className="shrink-0 border-amber-300 bg-white text-amber-900" />
+              </div>
+              {groundWrongAnswer?.pictures ? <div className="mt-2 flex items-end justify-center gap-4">{groundWrongAnswer.pictures.map((picture, index) => <img key={index} src={picture.src} alt={picture.label} className="object-contain" style={{ height: 36 + picture.size * 5 }} />)}</div> : null}
             </div>
           ) : awaitingWrongNext && currentWrongFeedback ? (
             <div className="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
