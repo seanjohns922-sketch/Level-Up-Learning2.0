@@ -1,6 +1,7 @@
 // Level 8 Algebra diagram data. Rendered by components/lesson/level8/AlgebraVisual.tsx.
 export type GraphLine = { m: number; c: number; label: string } | { x: number; label: string };
 export type Algebra8Visual =
+  | {kind:"geometry";title:string;shape:"rectangle"|"triangle"|"crossedLines";labels:string[];caption:string;angle?:number}
   | {
       kind: "graph";
       title: string;
@@ -38,10 +39,11 @@ const tileSaid = (g: { x: number; units: number }) =>
 /** Narrates only what the diagram shows. */
 export function algebra8VisualSpeech(v: Algebra8Visual): string {
   switch (v.kind) {
+    case "geometry": return `${v.title}. ${v.shape==="crossedLines"?"Vertically opposite angle labels":"Side labels around the shape"}: ${v.labels.join(", ")}. ${v.caption}`;
     case "graph": {
       const pts = v.points?.length ? ` Marked points: ${v.points.map((p) => p.label ?? `(${said(p.x)}, ${said(p.y)})`).join(", ")}.` : "";
       const shade = v.shade ? ` The region ${v.shade.side} ${lineSaid(v.lines[v.shade.line])} is shaded${v.shade.strict ? ", and the boundary is dashed" : ""}.` : "";
-      return `${v.title}. Axes from x ${said(v.xMin)} to ${said(v.xMax)} and y ${said(v.yMin)} to ${said(v.yMax)}. Shows ${v.lines.map(lineSaid).join(" and ")}.${pts}${shade}`;
+      return `${v.title}. Axes ${v.xLabel??"x"} and ${v.yLabel??"y"}, from x ${said(v.xMin)} to ${said(v.xMax)} and y ${said(v.yMin)} to ${said(v.yMax)}. Shows ${v.lines.map(lineSaid).join(" and ")}.${pts}${shade}`;
     }
     case "inequality": {
       const end = (e: { value: number; closed: boolean }) => `${e.closed ? "a closed dot" : "an open circle"} at ${said(e.value)}`;

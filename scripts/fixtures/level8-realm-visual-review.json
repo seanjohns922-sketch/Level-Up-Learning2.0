@@ -1,0 +1,3698 @@
+{
+  "number/w1l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Is √243 rational or irrational?"
+  },
+  "number/w1l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Is √0.25 rational or irrational?"
+  },
+  "number/w1l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "0.825 is rational. Write it as a fraction in simplest form."
+  },
+  "number/w1l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Which of these numbers is irrational?"
+  },
+  "number/w1l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Mia says 0.272727… is irrational because its digits never end. Is she correct?"
+  },
+  "number/w1l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write −2.8 as a fraction in simplest form."
+  },
+  "number/w1l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The middle square has area 165 cm². Its side length is √165 cm. Between which two consecutive whole numbers does √165 lie? Enter the smaller, then the larger."
+  },
+  "number/w1l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the table to write √37 correct to one decimal place."
+  },
+  "number/w1l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point P is at √140. Which whole number is P closest to?"
+  },
+  "number/w1l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which is larger: √164 or 12.9?"
+  },
+  "number/w1l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A square garden bed has an area of 251 m². Its side length is between which two consecutive whole numbers of metres? Enter the smaller, then the larger."
+  },
+  "number/w1l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "π = 3.14159265358979… Round π to 5 decimal places."
+  },
+  "number/w1l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A circle has diameter 11 cm. Its exact circumference is kπ cm. What is k?"
+  },
+  "number/w1l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "22/7 is often used as an approximation for π. Is 22/7 rational or irrational?"
+  },
+  "number/w1l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use π ≈ 3.14 to find the circumference of a circle with diameter 39 cm."
+  },
+  "number/w1l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A circle has diameter 42 cm. How much larger is the circumference using π ≈ 22/7 than using π ≈ 3.14?"
+  },
+  "number/w1l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Is π exactly equal to 3.14?"
+  },
+  "number/w2l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Write 9⁵ × 9³ as 9ⁿ. What is n?"
+  },
+  "number/w2l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 9⁷ × 9⁵ × 9 as 9ⁿ. What is n?"
+  },
+  "number/w2l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate 2⁴ × 2³."
+  },
+  "number/w2l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "9⁸ × 9ᵏ = 9¹⁴. What is k?"
+  },
+  "number/w2l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Kai writes 5⁴ × 5³ = 25⁷. The correct answer is 5ⁿ. What is n?"
+  },
+  "number/w2l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Simplify k¹¹ × k⁸ to kⁿ. What is n?"
+  },
+  "number/w2l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Write 9¹⁰ ÷ 9⁴ as 9ⁿ. What is n?"
+  },
+  "number/w2l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate 10¹² ÷ 10⁸."
+  },
+  "number/w2l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "9ᵏ ÷ 9⁵ = 9⁷. What is k?"
+  },
+  "number/w2l2/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A calculator shows an error for 5⁷⁶³⁹ because it is too large. Use the index laws to evaluate 5⁷⁶³⁹ ÷ 5⁷⁶³⁷."
+  },
+  "number/w2l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write (9⁸ × 9⁴) ÷ 9² as 9ⁿ. What is n?"
+  },
+  "number/w2l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Simplify t¹⁸ ÷ t⁵ to tⁿ. What is n?"
+  },
+  "number/w2l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate 29 × 26⁰."
+  },
+  "number/w2l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "9⁶ ÷ 9⁶ = 9ⁿ. What is n?"
+  },
+  "number/w2l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Each line of the table is divided by 2. Use the pattern to find 2⁰."
+  },
+  "number/w2l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate −9⁰."
+  },
+  "number/w2l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate 9 × 8⁰ + 3³."
+  },
+  "number/w2l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate (12x)⁰, where x is not zero."
+  },
+  "number/w3l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write (9⁶)⁴ as 9ⁿ. What is n?"
+  },
+  "number/w3l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "(9ᵏ)⁴ = 9²⁴. What is k?"
+  },
+  "number/w3l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write ((2³)⁴)³ as 2ⁿ. What is n?"
+  },
+  "number/w3l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate (2²)³."
+  },
+  "number/w3l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Is (2⁶)⁶ equal to (2²)¹⁷?"
+  },
+  "number/w3l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Sam simplifies (9⁵)⁴ as 9⁹. The correct answer is 9ⁿ. What is n?"
+  },
+  "number/w3l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write (9⁴)³ × 9 ÷ 9⁵ as 9ⁿ. What is n?"
+  },
+  "number/w3l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write (9⁸ × 9⁶) ÷ (9²)² as 9ⁿ. What is n?"
+  },
+  "number/w3l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A large cube has side length 20 cm. How many small cubes with side length 4 cm fit inside it?"
+  },
+  "number/w3l2/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 9⁵ × 3⁴ as a power of 3. What is the index?"
+  },
+  "number/w3l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Lena simplifies (3⁴)⁵ × 3 as 3¹⁰. The correct answer is 3ⁿ. What is n?"
+  },
+  "number/w3l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate (2⁵ × 2⁵) ÷ 2⁸."
+  },
+  "number/w3l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate −9²."
+  },
+  "number/w3l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate (−2)⁶."
+  },
+  "number/w3l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate (−1)⁹⁵⁴."
+  },
+  "number/w3l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Can 5⁴ × 7³ be written as a single power using the index laws?"
+  },
+  "number/w3l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate 2⁴ × 3³."
+  },
+  "number/w3l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate −80 ÷ (−2)³."
+  },
+  "number/w4l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 71/125 as a decimal."
+  },
+  "number/w4l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 6 21/25 as a decimal."
+  },
+  "number/w4l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 0.045 as a fraction in simplest form."
+  },
+  "number/w4l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "In a survey, 21/25 of students said they walk to school. Write this fraction as a decimal."
+  },
+  "number/w4l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Which is larger: 11/20 or 1/4?"
+  },
+  "number/w4l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write −33/40 as a decimal."
+  },
+  "number/w4l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 0.888888… as a fraction in simplest form. The digit 8 repeats forever."
+  },
+  "number/w4l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 0.94949494… as a fraction in simplest form. The block 94 repeats forever."
+  },
+  "number/w4l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 2/3 as a recurring decimal. What block of digits repeats? Type the digits only."
+  },
+  "number/w4l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "6/7 = 0.857142857142… What digit is in decimal place 27?"
+  },
+  "number/w4l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 7/12 as a decimal correct to two decimal places."
+  },
+  "number/w4l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 0.988888… as a fraction in simplest form. Only the digit 8 repeats."
+  },
+  "number/w4l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Does 19/60 have a terminating or recurring decimal?"
+  },
+  "number/w4l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Write 2000 in the form 2ᵃ × 5ᵇ. Enter a, then b."
+  },
+  "number/w4l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Does 10/24 have a terminating or recurring decimal?"
+  },
+  "number/w4l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Which denominator makes 1/■ a terminating decimal?"
+  },
+  "number/w4l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Without dividing, how many decimal places does 1/4000 have?"
+  },
+  "number/w4l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Andrew says every fraction of two integers is either a terminating or a recurring decimal. Is he correct?"
+  },
+  "number/w5l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 39 + (−18)."
+  },
+  "number/w5l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "? + (−9) = 11. What is the missing number?"
+  },
+  "number/w5l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "The maximum temperature was 35°C and the minimum was −16°C. What was the temperature range?"
+  },
+  "number/w5l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A bank account starts at $290. Use the transactions in the table. What is the final balance in dollars? (Write a negative number if the account is overdrawn.)"
+  },
+  "number/w5l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Jo writes 20 − (−17) = 3. What is the correct answer?"
+  },
+  "number/w5l1/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Start at 12 on a number line. Move 22 to the left, then 2 to the right. Where do you finish?"
+  },
+  "number/w5l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 12 × (−8)."
+  },
+  "number/w5l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 12 × (−6) ÷ 3."
+  },
+  "number/w5l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "? ÷ (−8) = 12. What is the missing number?"
+  },
+  "number/w5l2/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Find the average of −8, −11, −17."
+  },
+  "number/w5l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "At midnight the temperature was 10°C. It fell by 5°C every hour for 6 hours. What was the temperature then?"
+  },
+  "number/w5l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "The product of two integers is −72 and their sum is −1. Enter the smaller number, then the larger."
+  },
+  "number/w5l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 15 + 6 × (−2)."
+  },
+  "number/w5l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate (6 + (−42)) ÷ 6."
+  },
+  "number/w5l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate (5 − 5²) × (−2)."
+  },
+  "number/w5l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Evaluate ab − 4a when a = −6 and b = 7."
+  },
+  "number/w5l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A mountain hut is 18°C at 9 pm. The temperature drops 3°C per hour for 9 hours, then rises 1°C per hour for 3 hours. What is the final temperature?"
+  },
+  "number/w5l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 5 × (9 − 2 × 3)."
+  },
+  "number/w6l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 7/9 + 1/6."
+  },
+  "number/w6l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 7/9 + (−1/6)."
+  },
+  "number/w6l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 3 2/5 − 2 5/8."
+  },
+  "number/w6l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A town’s average maximum temperature is 25.75°C and its average minimum is −5.25°C. What is the average temperature range?"
+  },
+  "number/w6l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Xiao aims for 8 hours of sleep each night. Over four nights he slept 8 3/4, 7, 6 2/3, 7 hours. How many hours ahead (+) or behind (−) his goal is he?"
+  },
+  "number/w6l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "7/9 + ? = 1/6. What is the missing fraction?"
+  },
+  "number/w6l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate −7/9 × 1/6."
+  },
+  "number/w6l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate −7/9 ÷ 1/6."
+  },
+  "number/w6l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate −1 4/5 × (−1/5)."
+  },
+  "number/w6l2/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A jug holds 28 cups. How many 2/5-cup serves can be poured from it?"
+  },
+  "number/w6l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Without calculating, is (−1/6) × (−1/2) × (−3/4) × (−1/6) positive or negative?"
+  },
+  "number/w6l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "What is the reciprocal of −4 4/7?"
+  },
+  "number/w6l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 7/9 + 1/5 + 2/9."
+  },
+  "number/w6l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Which is greater: −4/9 or −1/2?"
+  },
+  "number/w6l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Find the mean of 2 3/4, 2 1/4, 3/4, −2."
+  },
+  "number/w6l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A fete needs 9 volunteer shifts of 3 3/4 hours each. Volunteers have offered 32 1/2 hours so far. How many more hours are needed?"
+  },
+  "number/w6l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Find 5/6 of 4/5 of 150."
+  },
+  "number/w6l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 5/6 + 1/4 × (−2/3)."
+  },
+  "number/w7l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 8.55 + (−9.56)."
+  },
+  "number/w7l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 9.6 − (−0.2) + (−5.9)."
+  },
+  "number/w7l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "An account balance is −$57.35. Then $78.79 is deposited and $44.22 is spent. What is the new balance in dollars?"
+  },
+  "number/w7l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Four pieces of timber are 1.89 m, 1.75 m, 1.4 m, 0.75 m long. They are laid end to end. What is their total length?"
+  },
+  "number/w7l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "9.6 + ? = −0.2. What is the missing number?"
+  },
+  "number/w7l1/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "The temperature is 5.8°C. It falls by 12.8°C overnight. What is the new temperature?"
+  },
+  "number/w7l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 21.25 ÷ 0.25."
+  },
+  "number/w7l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 9.5 × 6.1."
+  },
+  "number/w7l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate −23.75 ÷ 2.5."
+  },
+  "number/w7l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Fence panels are 1.2 m wide. How many panels are needed for a 63.6 m boundary fence?"
+  },
+  "number/w7l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Dividing by 0.05 gives the same result as multiplying by what number?"
+  },
+  "number/w7l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Over a week, a pedometer records 70,000 paces. Each pace is 0.9 m. How many kilometres is that?"
+  },
+  "number/w7l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 0.4 × 105. Use a fraction to make it easier."
+  },
+  "number/w7l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 0.9 × 0.8 by writing each decimal as a fraction."
+  },
+  "number/w7l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 5/8 + 0.125. Give your answer as a decimal."
+  },
+  "number/w7l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 2/9 + 0.75. Give an exact answer as a fraction."
+  },
+  "number/w7l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Which is larger: 4/7 or 0.63?"
+  },
+  "number/w7l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 1.25 × 5/6. Give an exact answer."
+  },
+  "number/w8l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 8 × 84 × 125 by regrouping."
+  },
+  "number/w8l1/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate −9.5 + 8.56 + 9.5."
+  },
+  "number/w8l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 8.6 + 8.56 + 1.4."
+  },
+  "number/w8l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 12 × 19.9 using 12 × 20 − 12 × 0.1."
+  },
+  "number/w8l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 0.125 × 84 × 16."
+  },
+  "number/w8l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 9.99 + 8.99 + 6.02 by rounding and adjusting."
+  },
+  "number/w8l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Estimate 14.324 + 12.758 − 5.563 by first rounding each number to one decimal place."
+  },
+  "number/w8l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Estimate 19.2 × 10.4 by rounding each number to the nearest whole number."
+  },
+  "number/w8l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Ana says 99.2 ÷ 8.9 = 111.5. Estimate the answer by rounding each number to the nearest whole number to check her."
+  },
+  "number/w8l2/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Round 83.305242 to 4 decimal places."
+  },
+  "number/w8l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Two sprinters run 100 m in 13.91 s and 13.99 s. If the timer could only show times to the nearest tenth of a second, what time difference would it show?"
+  },
+  "number/w8l2/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A student rounds 7.4951 to 1 decimal place and writes 7.4. What is the correct answer?"
+  },
+  "number/w8l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Jamal’s account has $192.75. He spends $160.79 on a jacket and $77.04 on shoes, then gets a refund of $12.07. What is his balance in dollars? (Write a negative number if he is overdrawn.)"
+  },
+  "number/w8l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Daily minimum temperatures were 3.8°C, 2.1°C, −1.1°C, 2°C. What was the mean minimum temperature?"
+  },
+  "number/w8l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A 11.048 m steel pipe is cut into 5 equal lengths. Each cut removes 2 mm. How long is each piece?"
+  },
+  "number/w8l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate (49 − 8) ÷ 6. Give an exact answer."
+  },
+  "number/w8l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Lucy spends 3/4 of $96.80 on a game, then $7.63 on snacks from the remainder. How much money is left?"
+  },
+  "number/w8l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A freezer is at 5.9°C. It cools by 2.5°C every 15 minutes. What is its temperature after 1 hour?"
+  },
+  "number/w9l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Increase 580 by 40%."
+  },
+  "number/w9l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "What single number do you multiply by to increase an amount by 43%?"
+  },
+  "number/w9l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A shop buys a microwave for $435 and marks it up by 30%. What is the selling price?"
+  },
+  "number/w9l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A town of 78,000 people grows by 4% in a year. What is the new population?"
+  },
+  "number/w9l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A salesperson earns $590 a week plus 2.5% commission on sales. This week the sales were $50,000. What is the total pay?"
+  },
+  "number/w9l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Decrease 580 by 40%."
+  },
+  "number/w9l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "What single number do you multiply by to decrease an amount by 43%?"
+  },
+  "number/w9l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A $865 television is discounted by 40%. What is the sale price?"
+  },
+  "number/w9l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A $44,000 car loses 20% of its value in its first year. What is it worth after one year?"
+  },
+  "number/w9l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Shoes priced at $290 are reduced by 35%. How much money is saved?"
+  },
+  "number/w9l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A quantity changes from 195 to 302.25. What is the percentage increase?"
+  },
+  "number/w9l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Gari buys a concert ticket for $290 and sells it for $435. What is the percentage profit?"
+  },
+  "number/w9l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Albert measures a length as 76 cm. The actual length is 80 cm. What is the percentage error?"
+  },
+  "number/w9l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "$75 rising to $100 is a 33.33% increase. What percentage decrease takes $100 back to $75?"
+  },
+  "number/w9l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Store A sells jeans for $180, now $135. Store B sells jeans for $134, now $117.25. What is the larger percentage discount?"
+  },
+  "number/w9l3/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A town’s population changed from 29,000 to 34,800. What was the percentage increase?"
+  },
+  "number/w10l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A $954.10 jacket is discounted by 35%. What is the sale price?"
+  },
+  "number/w10l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A pair of shoes is discounted by 40%. The sale price is $408. What was the original price?"
+  },
+  "number/w10l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Ski goggles have a price of $975. They are discounted by 25%, then a further 40% is taken off the reduced price. What is the final price?"
+  },
+  "number/w10l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Store A sells a bike for $3,000 with no discount. Store B sells it for $3,600 with 20% off. Store C sells it for $3,400 with 15% off. What is the cheapest price?"
+  },
+  "number/w10l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Ben sells cars and is paid 6% commission. This week he sold $52,000 worth of cars. What is his pay?"
+  },
+  "number/w10l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A cricket bat costs $1,428.70 before GST. Add 10% GST. What is the price including GST?"
+  },
+  "number/w10l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A hair dryer costs $214.50 including 10% GST. What was its price before GST?"
+  },
+  "number/w10l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A meal costs $126.50 including 10% GST. How much of that is GST?"
+  },
+  "number/w10l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Prices in the table do not include GST. What is the total bill including 10% GST?"
+  },
+  "number/w10l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "An item costs $946 including 10% GST. Tom says its pre-GST price is 90% of $946. What is the correct pre-GST price?"
+  },
+  "number/w10l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "$490 rises by 30%, then the new amount falls by 30%. What is the final amount?"
+  },
+  "number/w10l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A price is increased by 50% and the new price is then decreased by 50%. What is the overall percentage decrease?"
+  },
+  "number/w10l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A savings balance grows by 50%, then the new balance grows by 40%. What is the overall percentage increase?"
+  },
+  "number/w10l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A city of 87,000 people grows by 5% each year. What will the population be after 2 years? Round to the nearest whole number."
+  },
+  "number/w10l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Increasing by 30% and then decreasing by 40% is the same as multiplying by what single number?"
+  },
+  "number/w11l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Priya works 38 hours at $38 an hour, plus 7 hours of overtime at time-and-a-half. What is her total pay?"
+  },
+  "number/w11l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the weekly budget. How much money is left after these expenses?"
+  },
+  "number/w11l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Sam earns $1,600 a week and pays $640 rent. What percentage of the income is spent on rent?"
+  },
+  "number/w11l1/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Mei saves $53 a week towards a $1,160 bike. How many weeks will it take to have enough?"
+  },
+  "number/w11l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "An annual salary is $107,000. What is the weekly pay, to the nearest cent? (Use 52 weeks in a year.)"
+  },
+  "number/w11l1/6": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Dylan earns $40 an hour. He gets a 5% pay rise and works 28 hours a week. What is his new weekly pay?"
+  },
+  "number/w11l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. How much tax is payable on a taxable income of $43,000?"
+  },
+  "number/w11l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. How much tax is payable on a taxable income of $116,000?"
+  },
+  "number/w11l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. What percentage of a $145,000 income is paid as tax? Round to one decimal place."
+  },
+  "number/w11l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. A worker’s taxable income is $164,000. How much do they keep after tax?"
+  },
+  "number/w11l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. A worker earning $42,000 gets a $1,000 raise. How much extra tax will they pay?"
+  },
+  "number/w11l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Plan A costs $9 per visit. Plan B costs $25 plus $6 per visit. For 4 visits, how much cheaper is the cheaper plan?"
+  },
+  "number/w11l3/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Gym A charges $11 per visit. Gym B charges a $70 membership plus $6 per visit. After how many visits do the two gyms cost the same?"
+  },
+  "number/w11l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A drum kit costs $580 to buy or $36 a week to hire. After how many weeks of hiring would buying have been cheaper?"
+  },
+  "number/w11l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A 500 g box of cereal costs $7.20 and a 1000 g box costs $13.60. What is the lower price per 100 g? Round to the nearest cent."
+  },
+  "number/w11l3/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A laptop costs $1,450 cash, or 24 monthly payments of $70. How much more does the payment plan cost?"
+  },
+  "number/w12l1/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Round √434 to 2 decimal places."
+  },
+  "number/w12l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A circle has diameter 11 cm. Its exact circumference is kπ cm. What is k?"
+  },
+  "number/w12l1/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Calculate 2/9 + 1/3. Give an exact answer."
+  },
+  "number/w12l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A square garden bed has an area of 251 m². Its side length is between which two consecutive whole numbers of metres? Enter the smaller, then the larger."
+  },
+  "number/w12l1/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Round 22/7 to 3 decimal places. How much larger is it than π rounded to 3 decimal places?"
+  },
+  "number/w12l2/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "There are 7 pizzas, each cut into 8 slices. 9 children each eat 3/8 of a pizza. How many pizzas are left?"
+  },
+  "number/w12l2/2": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A recipe for 6 people uses 5/8 cup of oil. How much oil is needed for 15 people?"
+  },
+  "number/w12l2/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "Daily minimum temperatures were 3.8°C, 2.1°C, −1.1°C, 2°C. What was the mean minimum temperature?"
+  },
+  "number/w12l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A town’s average maximum temperature is 25.75°C and its average minimum is −5.25°C. What is the average temperature range?"
+  },
+  "number/w12l2/5": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "An account balance is −$57.35. Then $78.79 is deposited and $44.22 is spent. What is the new balance in dollars?"
+  },
+  "number/w12l3/1": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "An item is $770 before GST. It is discounted by 25%, then 10% GST is added. What is the final price?"
+  },
+  "number/w12l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A pair of shoes is discounted by 40%. The sale price is $408. What was the original price?"
+  },
+  "number/w12l3/3": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A savings balance grows by 50%, then the new balance grows by 40%. What is the overall percentage increase?"
+  },
+  "number/w12l3/4": {
+    "visualRequired": false,
+    "reason": "Numerical or symbolic calculation/classification; all quantities and operations are stated in the prompt.",
+    "reviewedPrompt": "A town’s population changed from 29,000 to 34,800. What was the percentage increase?"
+  },
+  "number/w12l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the tax table. What percentage of a $145,000 income is paid as tax? Round to one decimal place."
+  },
+  "space/w1l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "These triangles are congruent. Find the length x."
+  },
+  "space/w1l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "△LMN ≡ △XZY. Which vertex corresponds to L?"
+  },
+  "space/w1l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "△ABC ≡ △MLN. In △ABC, side AC is 9 cm. How long is side MN?"
+  },
+  "space/w1l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "These quadrilaterals are congruent. Find the angle marked a°."
+  },
+  "space/w1l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "△ABC ≡ △XYZ. AB = 9 cm, BC = 12 cm and CA = 14 cm. What is the perimeter of △XYZ?"
+  },
+  "space/w1l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle B is shown in a different orientation. Are the triangles congruent?"
+  },
+  "space/w1l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which transformation moves shape A onto shape B?"
+  },
+  "space/w1l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A shape with perimeter 39 cm is rotated 90° twice. What is the perimeter of the image?"
+  },
+  "space/w1l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A shape has an angle of 135°. It is reflected and then enlarged by a scale factor of 5. What is the size of the matching angle in the image?"
+  },
+  "space/w1l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point (6, -4) is reflected in the y-axis. What are the coordinates of its image?"
+  },
+  "space/w1l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle A has sides 9, 12, 14 cm. Triangle B has sides 12, 15, 9 cm. Would they overlap exactly after moving one of them?"
+  },
+  "space/w1l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A square and a non-square rhombus both have four sides of 9 cm. Are they congruent?"
+  },
+  "space/w1l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "These parallelograms are congruent. Find x."
+  },
+  "space/w1l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A trapezium is cut along one of its diagonals. Are the two triangles congruent?"
+  },
+  "space/w1l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point (5, 5) is translated 1 unit right and 5 units down. What are the coordinates of its image?"
+  },
+  "space/w2l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which test shows that these triangles are congruent?"
+  },
+  "space/w2l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "△ABC has sides 9 cm, 12 cm, 14 cm. △DEF has sides 14 cm, 9 cm, 13 cm. Are they congruent?"
+  },
+  "space/w2l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "△ABC ≡ △DEF by SSS. Find x and y."
+  },
+  "space/w2l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Can a triangle with sides 9 cm, 12 cm, 14 cm be drawn in more than one shape?"
+  },
+  "space/w2l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Ben says triangles with sides 3, 4, 5 and 12, 16, 20 are congruent because their angles match. Is he correct?"
+  },
+  "space/w2l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which test shows that these triangles are congruent?"
+  },
+  "space/w2l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "In this triangle, is the marked angle between the two labelled sides?"
+  },
+  "space/w2l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "These triangles are congruent by SAS. Find x."
+  },
+  "space/w2l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "In △ABC, AB = 6 cm, ∠B = 107° and BC = 5 cm. △LMN has the same two side lengths in matching positions. At which vertex of △LMN must the 107° angle be for SAS?"
+  },
+  "space/w2l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two triangles have two pairs of equal sides and an equal angle that is NOT between those sides. Is that enough to prove they are congruent?"
+  },
+  "space/w2l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which test shows that these right-angled triangles are congruent?"
+  },
+  "space/w2l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which test shows that these triangles are congruent?"
+  },
+  "space/w2l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two triangles both have angles of 69°, 74° and 37°. Must they be congruent?"
+  },
+  "space/w2l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two right-angled triangles are congruent by RHS. Each has a hypotenuse of 25 cm and a shorter side of 7 cm. How long is the third side?"
+  },
+  "space/w2l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two triangles each have angles of 74° and 74°. What is the third angle in each triangle?"
+  },
+  "space/w3l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Are these triangles congruent, similar but not congruent, or neither?"
+  },
+  "space/w3l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Rectangle A is 12 cm by 18 cm. Rectangle B is 24 cm by 34 cm. Are they similar?"
+  },
+  "space/w3l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "True or false? All right-angled triangles are similar."
+  },
+  "space/w3l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A shape is enlarged by a scale factor of 5. One of its angles is 145°. What is the matching angle in the enlarged shape?"
+  },
+  "space/w3l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Are these rectangles similar?"
+  },
+  "space/w3l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the scale factor from triangle A to triangle B?"
+  },
+  "space/w3l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle B is a reduction of triangle A. What is the scale factor from A to B?"
+  },
+  "space/w3l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Rectangle A is 9 cm by 15 cm. Rectangle B is similar, with a shorter side of 22.5 cm. What is the scale factor from A to B?"
+  },
+  "space/w3l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "One circle has a circumference of 32π cm. Another has a circumference of 80π cm. What is the scale factor from the first circle to the second?"
+  },
+  "space/w3l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two rectangular frames are similar. The smaller frame is 80 cm by 70 cm. The longer side of the larger frame is 200 cm. What is the perimeter of the larger frame?"
+  },
+  "space/w3l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The triangles are similar. Find x."
+  },
+  "space/w3l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The shapes are similar. Find x."
+  },
+  "space/w3l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two similar triangles have a scale factor of 5/3 from the smaller to the larger. A side of the larger triangle is 30 cm. How long is the matching side of the smaller triangle?"
+  },
+  "space/w3l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "At the same time of day, a 2 m stick casts a 3 m shadow and a tree casts a 19.5 m shadow. How tall is the tree?"
+  },
+  "space/w3l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A junior orienteering course is a triangle with sides 60 m, 80 m and 100 m. The senior course is similar, with sides 180 m, 240 m, 300 m. How many laps of the junior course cover the same distance as one lap of the senior course?"
+  },
+  "space/w4l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle A has angles 78° and 72°. Triangle B has angles 30° and 78°. Are they similar?"
+  },
+  "space/w4l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two similar triangles each have angles of 78° and 77°. What is the third angle?"
+  },
+  "space/w4l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two triangles both have angles 69°, 70° and 41°. Their shortest sides are 6 cm and 9 cm. Are they congruent, similar but not congruent, or neither?"
+  },
+  "space/w4l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "To find the width of a river, two similar triangles are marked out with trees. The small triangle has sides 8 m and 15 m. The matching side of 15 m in the large triangle is 45 m. How long is the side matching 8 m, which is the river’s width?"
+  },
+  "space/w4l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two triangles are similar because both have a right angle and the hypotenuses and one other pair of sides are in the same ratio. Which similarity test is this?"
+  },
+  "space/w4l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Are these triangles congruent, similar but not congruent, or neither?"
+  },
+  "space/w4l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "True or false? All similar shapes are congruent."
+  },
+  "space/w4l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two similar shapes have a scale factor of 1. What else can you say about them? Are they congruent?"
+  },
+  "space/w4l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rectangle measuring 8 cm by 12 cm is enlarged by a scale factor of 3. How long is the longer side of the image?"
+  },
+  "space/w4l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two similar triangles have a scale factor of 3. The smaller has a perimeter of 36 cm. What is the perimeter of the larger?"
+  },
+  "space/w4l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A 15 cm side of a shape is enlarged by a scale factor of 3. How long is its image?"
+  },
+  "space/w4l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A shape has an angle of 135°. It is reflected and then enlarged by a scale factor of 5. What is the size of the matching angle in the image?"
+  },
+  "space/w4l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rectangle measuring 8 cm by 12 cm is enlarged by a scale factor of 3. How long is the longer side of the image?"
+  },
+  "space/w4l3/4": {
+    "visualRequired": false,
+    "reason": "Conceptual transformation/scale-factor rule; no particular unshown shape or point is needed.",
+    "reviewedPrompt": "Which transformation does NOT always produce a congruent image?"
+  },
+  "space/w4l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point (6, -4) is reflected in the y-axis. What are the coordinates of its image?"
+  },
+  "space/w5l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the angle marked a°."
+  },
+  "space/w5l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "One angle of a parallelogram is 84°. Find the size of the opposite angle."
+  },
+  "space/w5l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A kite has angles of 119° and 91° at the ends of its line of symmetry. The other two angles are equal. Find one of them."
+  },
+  "space/w5l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rhombus has a side of 15 cm. What is its perimeter?"
+  },
+  "space/w5l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A trapezium has one pair of parallel sides. One angle between them is 127°. Find the co-interior angle on the same slanted side."
+  },
+  "space/w5l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Do the diagonals of a trapezium always bisect each other (cut each other in half)?"
+  },
+  "space/w5l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of rectangle ABCD meet at E. AE = 8.5 cm. How long is the diagonal BD?"
+  },
+  "space/w5l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of a rhombus are 16 cm and 18 cm. What is its area?"
+  },
+  "space/w5l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A quadrilateral has 1 line of symmetry and rotational symmetry of order 1. Its diagonals do not meet at right angles. Which special quadrilateral is it?"
+  },
+  "space/w5l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A quadrilateral has exactly one pair of parallel sides. What is its most specific name?"
+  },
+  "space/w5l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "True or false? A kite is a type of parallelogram."
+  },
+  "space/w5l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Name this quadrilateral using its most specific name."
+  },
+  "space/w5l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which special quadrilateral has exactly one pair of parallel sides?"
+  },
+  "space/w5l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many of these are parallelograms: square, rectangle, rhombus, kite, trapezium?"
+  },
+  "space/w6l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A diagonal splits a parallelogram into two congruent triangles. One triangle has an area of 39 cm². What is the area of the parallelogram?"
+  },
+  "space/w6l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of parallelogram ABCD meet at E. AE = 12 cm. How long is the diagonal AC?"
+  },
+  "space/w6l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "In rectangle ABCD, which test shows that △ABC and △CDA are congruent?"
+  },
+  "space/w6l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of a rhombus meet at O. What is the size of the angle between them at O?"
+  },
+  "space/w6l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Kite ABCD has AB = AD and CB = CD. Which pair of angles is equal?"
+  },
+  "space/w6l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The angles of a quadrilateral are x°, 3x°, 5x°, 3x°. Find x."
+  },
+  "space/w6l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Opposite angles of a parallelogram are (4x + 32)° and 5x°. Find x."
+  },
+  "space/w6l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One angle of a rhombus is 136°. A diagonal is drawn from that corner. What angle does it make with each side at that corner?"
+  },
+  "space/w6l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of a rectangle are (4x + 1) cm and (6x − 17) cm. Find x."
+  },
+  "space/w6l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "An isosceles trapezium has base angles of 79°. Find each of its top angles."
+  },
+  "space/w6l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Claim: “A quadrilateral with two pairs of equal sides is a parallelogram.” Which shape is a counterexample?"
+  },
+  "space/w6l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A 12 cm by 9 cm rectangle has equal diagonals. Does having equal diagonals prove it is a square?"
+  },
+  "space/w6l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A quadrilateral’s diagonals are equal, bisect each other and meet at right angles. Must it be a square?"
+  },
+  "space/w6l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Mia says a parallelogram with one 118° angle has all four angles equal to 118°. What is the size of an angle next to the 118° angle?"
+  },
+  "space/w6l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "The exterior angles of a quadrilateral are 80°, 95°, 100°, ?. Find the missing exterior angle."
+  },
+  "space/w7l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "What are the coordinates of P? Enter x, then y, then z."
+  },
+  "space/w7l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point P is at (4, 4, 3). How many units is it above the floor (the x–y plane)?"
+  },
+  "space/w7l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many coordinates are needed to describe the position of a drone flying above a city?"
+  },
+  "space/w7l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point P is on the floor. What are its coordinates? Enter x, then y, then z."
+  },
+  "space/w7l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "On which axis does the point (0, 0, 4) lie? Type x, y or z."
+  },
+  "space/w7l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "What are the coordinates of point Q? Enter x, then y, then z."
+  },
+  "space/w7l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A box has one corner at the origin and the opposite corner at P(4, 4, 3). What is its volume?"
+  },
+  "space/w7l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which point is higher: A(4, 4, 3) or B(0, 1, 4)? Type A or B."
+  },
+  "space/w7l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone can only fly east (x), north (y) or up (z). What is the shortest distance it can travel from the origin to (18, 24, 12) metres?"
+  },
+  "space/w7l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What are the coordinates of the point on the floor directly below P(4, 4, 3)?"
+  },
+  "space/w7l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Turn the view using the rotate button. What is P’s height, z?"
+  },
+  "space/w7l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "When you rotate the view of a 3D grid, do the coordinates of a point change?"
+  },
+  "space/w7l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A box sits with one corner at the origin. What are the coordinates of the top corner furthest from the origin?"
+  },
+  "space/w7l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "On a street map, a building is at (9, 8). An office is on level 5 of that building. Using z for the level, what are the office’s 3D coordinates?"
+  },
+  "space/w7l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "P is at (4, 4, 3). After the view is rotated a quarter turn, what is P’s x-coordinate?"
+  },
+  "space/w8l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone moves −2 in x, −1 in y and +2 in z. It finishes at (2, 3, 5). Where did it start?"
+  },
+  "space/w8l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A robot moves from (4, 4, 2) to (0, 1, 4). How far does it move in x, in y and in z? Use negative numbers for backwards or down."
+  },
+  "space/w8l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone moves only east–west, north–south or up–down. What is the shortest distance from (29, 26, 11) to (1, 9, 17) metres?"
+  },
+  "space/w8l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "In a car park, a bay is given as (column, row, level). A car in bay (4, 3, 3) moves 1 column west, 1 row south and 1 level up. What are its new coordinates?"
+  },
+  "space/w8l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone flies along the axes from (5, 17, 9) to (-5, 6, 13) metres. What is the total distance flown?"
+  },
+  "space/w8l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point A is (4, 4, 2). Point B is directly above A at a height of 3. What are B’s coordinates?"
+  },
+  "space/w8l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A cuboid has one corner at the origin and the opposite corner at (4, 4, 3). How many of its corners have z = 3?"
+  },
+  "space/w8l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A cuboid runs from (0, 0, 0) to (4, 4, 3). How long are its edges parallel to the x-axis?"
+  },
+  "space/w8l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which point is directly above (4, 4, 0)?"
+  },
+  "space/w8l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A vertical pole stands from (4, 4, 0) to (4, 4, 4). What are the coordinates of its midpoint?"
+  },
+  "space/w8l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone is 9 m east, 8 m north and 6 m above its launch point. East is x, north is y and up is z. What are its coordinates?"
+  },
+  "space/w8l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "In 3D noughts and crosses, counters are at (1, 1, 1) and (2, 2, 1). Continue from the first counter through the second, using the same step. Where does the third counter go?"
+  },
+  "space/w8l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A car park uses (column, row, level). A car is in column 7, row 4 on level 6. It drives down 5 levels. What are its new coordinates?"
+  },
+  "space/w8l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A 3D printer nozzle moves along the axes from (4, 4, 2) to (0, 1, 4) and then to (3, 0, 0) cm. How far does it move in total?"
+  },
+  "space/w8l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two lights hang at the same height: (3, 3, 2) and (5, 4, 2) m. What is the straight-line distance between them, correct to two decimal places?"
+  },
+  "space/w9l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Run the algorithm. Triangle A has sides 9, 12, 14. Triangle B has matching sides 9, 12, 14. What does it output?"
+  },
+  "space/w9l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Run the algorithm on triangles with sides 9, 12, 14 and 9, 12, 14. At which step does it give its output?"
+  },
+  "space/w9l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Step 1 of the algorithm is run on triangles with sides 9, 12, 14 and 18, 24, 28. What ratio does it find for each pair of sides?"
+  },
+  "space/w9l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "An angles-first algorithm says: “If two pairs of angles match, the triangles are similar. Then, if one pair of matching sides is equal, they are congruent.” Both triangles have angles 54° and 77°. Their matching shortest sides are 4 cm and 4 cm. What does it output?"
+  },
+  "space/w9l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle A: 9, 12, 14. Triangle B: 9, 12, 14. Use the algorithm to classify the pair."
+  },
+  "space/w9l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A faulty algorithm says “matching angles ⇒ congruent”. Its angles are correct, so the triangles' angles match. Triangle A has sides 4, 6, 7 and triangle B has sides 12, 18, 21. What should the correct output be?"
+  },
+  "space/w9l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A faulty rule only checks that two pairs of sides have the same ratio. Which pair of triangles breaks it? A: 4, 6, 8 and 12, 18, 27; B: 4, 6, 8 and 12, 18, 24"
+  },
+  "space/w9l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rule says: “Two pairs of equal sides and any equal angle ⇒ congruent.” Does this rule always work?"
+  },
+  "space/w9l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rule says “same perimeter ⇒ congruent”. Triangles with sides 5, 6, 7 and 4, 6, 8 both have a perimeter of 18. Are they congruent?"
+  },
+  "space/w9l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "An algorithm outputs “Similar” for a pair whose scale factor is 1. What should it output?"
+  },
+  "space/w9l3/1": {
+    "visualRequired": false,
+    "reason": "Conceptual transformation/scale-factor rule; no particular unshown shape or point is needed.",
+    "reviewedPrompt": "You are testing a sorting algorithm. What scale factor should a test pair have so that the correct output is Congruent?"
+  },
+  "space/w9l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "To test the “Similar” output, you need a triangle similar to one with sides 9, 12, 14 using a scale factor of 2. What should its longest side be?"
+  },
+  "space/w9l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "The algorithm is run on the four pairs in the table. How many outputs are Congruent?"
+  },
+  "space/w9l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the algorithm to classify pair 2 in the table."
+  },
+  "space/w9l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A student claims every pair of squares is similar, including pairs that are also congruent. Is this always true?"
+  },
+  "space/w10l1/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The triangles are similar. Find x."
+  },
+  "space/w10l1/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which test shows that these triangles are congruent?"
+  },
+  "space/w10l1/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Triangle A has angles 78° and 72°. Triangle B has angles 30° and 78°. Are they similar?"
+  },
+  "space/w10l1/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "These triangles are congruent. Find the length x."
+  },
+  "space/w10l1/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Are these triangles congruent, similar but not congruent, or neither?"
+  },
+  "space/w10l2/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of a rectangle are (4x + 1) cm and (6x − 17) cm. Find x."
+  },
+  "space/w10l2/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The diagonals of a rhombus are 16 cm and 18 cm. What is its area?"
+  },
+  "space/w10l2/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "What are the coordinates of P? Enter x, then y, then z."
+  },
+  "space/w10l2/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone moves only east–west, north–south or up–down. What is the shortest distance from (29, 26, 11) to (1, 9, 17) metres?"
+  },
+  "space/w10l2/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "The angles of a quadrilateral are x°, 3x°, 5x°, 3x°. Find x."
+  },
+  "space/w10l3/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Run the algorithm. Triangle A has sides 9, 12, 14. Triangle B has matching sides 9, 12, 14. What does it output?"
+  },
+  "space/w10l3/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A faulty algorithm says “matching angles ⇒ congruent”. Its angles are correct, so the triangles' angles match. Triangle A has sides 4, 6, 7 and triangle B has sides 12, 18, 21. What should the correct output be?"
+  },
+  "space/w10l3/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "To test the “Similar” output, you need a triangle similar to one with sides 9, 12, 14 using a scale factor of 2. What should its longest side be?"
+  },
+  "space/w10l3/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rule says “same perimeter ⇒ congruent”. Triangles with sides 5, 6, 7 and 4, 6, 8 both have a perimeter of 18. Are they congruent?"
+  },
+  "space/w10l3/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A drone moves −2 in x, −1 in y and +2 in z. It finishes at (2, 3, 5). Where did it start?"
+  },
+  "pattern/writeExpression/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A plumber charges a $80 call-out fee plus $90 per hour. Write an expression for the total cost, in dollars, for n hours."
+  },
+  "pattern/writeExpression/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A number t has 9 added to it and the result is multiplied by 5. Write an expression for the result."
+  },
+  "pattern/writeExpression/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rectangle is x cm wide and its length is 9 cm more than its width. Write an expression for its perimeter in simplest form."
+  },
+  "pattern/writeExpression/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Towels cost $c each. Ana buys 6 towels, Ben buys 7 and Cai buys 3. Write a simplified expression for the total amount spent."
+  },
+  "pattern/writeExpression/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "An electrician charges a $50 call-out fee and $95 per hour. Which expression gives the total cost, in dollars, for x hours?"
+  },
+  "pattern/writeExpression/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A number x is multiplied by 5, then 8 is subtracted. Write an expression for the result."
+  },
+  "pattern/collectLikeTerms/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Simplify 6y − 2w − 3y + 11w − 6."
+  },
+  "pattern/collectLikeTerms/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Simplify 5a + 8b + 2a − 6b."
+  },
+  "pattern/collectLikeTerms/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Simplify 12 + 6x + 8 − 2x."
+  },
+  "pattern/collectLikeTerms/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Simplify 14xy − 5yx + 5xy."
+  },
+  "pattern/collectLikeTerms/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "What number goes in the box? 14x + 6y − □x + y = 6x + 7y"
+  },
+  "pattern/collectLikeTerms/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Write the simplified expression shown by these algebra tiles. Red tiles are negative."
+  },
+  "pattern/collectLikeTerms/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "For x > 3, a triangle has sides 5x + 3, 4x − 1, 3x + 1. Write its perimeter in simplest form."
+  },
+  "pattern/equivalence/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Are 8x − 8 + x and 9x − 8 equivalent?"
+  },
+  "pattern/equivalence/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Test whether 6a + 6b is equivalent to 12ab. Find both values when a = 4 and b = 5."
+  },
+  "pattern/equivalence/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "What number goes in the box? 6x + □ + 7x = 13x + 6"
+  },
+  "pattern/equivalence/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Which law shows that 9(x + 8) = 9x + 72?"
+  },
+  "pattern/equivalence/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Simplify 6x − 8 + 3x + 3 − x."
+  },
+  "pattern/equivalence/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Substitute x = 6 into 5(x + 6) and into 5x + 30. What value do both give?"
+  },
+  "pattern/expandSingle/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand 9(6x + 6)."
+  },
+  "pattern/expandSingle/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand 8(6 − 5j)."
+  },
+  "pattern/expandSingle/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand 8u(5r − 4q)."
+  },
+  "pattern/expandSingle/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The area model shows 9(6x + 6). Write the expanded expression."
+  },
+  "pattern/expandSingle/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand 6(8x + 6y + 14z)."
+  },
+  "pattern/expandSingle/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rectangle is 9 cm wide and (x + 8) cm long. Write an expanded expression for its area."
+  },
+  "pattern/expandNegative/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand −9(x + 8)."
+  },
+  "pattern/expandNegative/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand −8(5x − 6)."
+  },
+  "pattern/expandNegative/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand −(x − 12)."
+  },
+  "pattern/expandNegative/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Sam expanded −9(x − 8) and wrote −9x − 72. What should the constant term be?"
+  },
+  "pattern/expandNegative/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Use the distributive law to calculate 38 × 96. Hint: 38 × 96 = 38 × (100 − 4)."
+  },
+  "pattern/expandNegative/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand −7(1 + 6q − 4r)."
+  },
+  "pattern/expandNegative/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "The area model shows −6(5x − 6). Write the expanded expression."
+  },
+  "pattern/expandCollect/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand and simplify 9(8f + 7) + 2f."
+  },
+  "pattern/expandCollect/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand and simplify 7(x + 8) + 5(x + 2)."
+  },
+  "pattern/expandCollect/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand and simplify 9(x + 5) − 7(x − 2)."
+  },
+  "pattern/expandCollect/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand and simplify 6a(5 + b) + 4ab."
+  },
+  "pattern/expandCollect/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Each student has 6 pencils and each teacher has 4. Pencils cost $3 each. Write and expand an expression for the cost of pencils for s students and t teachers."
+  },
+  "pattern/expandCollect/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "What is the value of k? k(x + 7) + 3x = 10x + 49"
+  },
+  "pattern/commonFactor/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the highest common factor of 45 and 54."
+  },
+  "pattern/commonFactor/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the highest common factor of 21 and 28x."
+  },
+  "pattern/commonFactor/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the highest common factor of 21xy and 28x."
+  },
+  "pattern/commonFactor/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the highest common factor of 20x, 15x and 10x."
+  },
+  "pattern/commonFactor/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the highest common factor of 18a and 24ab."
+  },
+  "pattern/factorise/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Factorise 9v + 72 fully."
+  },
+  "pattern/factorise/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Factorise 30 − 24f fully."
+  },
+  "pattern/factorise/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Factorise 20cn + 12n fully."
+  },
+  "pattern/factorise/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Factorise 27x − 36y fully."
+  },
+  "pattern/factorise/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A photo has 8 rows of x students. Then 40 more students join, so there are 8x + 40 students. Factorise 8x + 40 fully."
+  },
+  "pattern/factorise/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "A rectangle has area 35a + 28 and one side is 7. Write an expression for the other side."
+  },
+  "pattern/factorise/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "The tiles show equal groups. Write the expression they make in factorised form."
+  },
+  "pattern/factoriseCheck/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Ari factorised 30x + 24 as 6(5x + 4). Expand 6(5x + 4) to check."
+  },
+  "pattern/factoriseCheck/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Mia factorised 50x + 30 as 2(25x + 15). It expands correctly but is not fully factorised. Factorise 50x + 30 fully."
+  },
+  "pattern/factoriseCheck/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Is 7(5x + 4) the factorised form of 35x + 4?"
+  },
+  "pattern/factoriseCheck/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "What goes in the box? 30x + 30 = 6(□ + 5)"
+  },
+  "pattern/factoriseCheck/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Expand and simplify 5(x + 3) + 6(x + 3), then factorise your answer fully."
+  },
+  "pattern/factoriseCheck/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Write a fully factorised expression that expands to 30a − 24b."
+  },
+  "pattern/inverseOps/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Solve 9x + 13 = 76."
+  },
+  "pattern/inverseOps/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 9u − 11 = 61."
+  },
+  "pattern/inverseOps/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 61 − 7d = 12."
+  },
+  "pattern/inverseOps/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve p ÷ 6 + 6 = 14."
+  },
+  "pattern/inverseOps/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "When r is multiplied by 5 and 8 is added, the result is 53. Write and solve an equation to find r."
+  },
+  "pattern/inverseOps/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Solve 9y + 11 = −43."
+  },
+  "pattern/rationalSolutions/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 9x + 11 = 15. Give your answer as a fraction."
+  },
+  "pattern/rationalSolutions/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 5m ÷ 3 = 1. Give your answer as a fraction."
+  },
+  "pattern/rationalSolutions/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve (x + 8) ÷ 4 = 3.8. Give your answer as a decimal."
+  },
+  "pattern/rationalSolutions/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve (6y + 8) ÷ 3 = 3. Give your answer as a fraction."
+  },
+  "pattern/rationalSolutions/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "The mean of x, 9 and 8 is 16.5. Write and solve an equation to find x."
+  },
+  "pattern/rationalSolutions/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Jo buys 6 cups of coffee for $30.60. Solve 6c = 30.6 to find the cost of one cup."
+  },
+  "pattern/verify/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Is x = 3 a solution of 4x + 10 = 2x + 16?"
+  },
+  "pattern/verify/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Check x = 6 in 6(x + 6) = 72. What does the left-hand side equal?"
+  },
+  "pattern/verify/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Use the rule U = 9a + 8. Find a when U = 80."
+  },
+  "pattern/verify/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "This solution of 6x + 8 = 44 contains one error. Which line is the first wrong line?"
+  },
+  "pattern/verify/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use P = 2l + 2w to find l when P = 48 and w = 9."
+  },
+  "pattern/verify/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 9x + 8 = 9x + 12. How many solutions does it have?"
+  },
+  "pattern/bothSides/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Solve 11s + 1 = 6s + 31."
+  },
+  "pattern/bothSides/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 10n + 5 = 6n − 11."
+  },
+  "pattern/bothSides/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 4t + 6 = 10t − 24."
+  },
+  "pattern/bothSides/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Multiplying a number by 3 and adding 17 gives the same result as multiplying it by 4 and adding 6. Find the number."
+  },
+  "pattern/bothSides/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Kim bought 6 pens and a $1.00 newspaper. Lee bought 2 pens and a $12.60 magazine. They paid the same. How much is one pen?"
+  },
+  "pattern/bothSides/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Opposite sides of a rectangle are (8x − 2) cm and (5x + 25) cm. Find x."
+  },
+  "pattern/bothSides/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two vertically opposite angles are (9x − 1)° and (5x + 47)°. Find x."
+  },
+  "pattern/bracketEquations/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve (3x − 10)/5 = (4x − 16)/4."
+  },
+  "pattern/bracketEquations/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 6(p + 7) = 78."
+  },
+  "pattern/bracketEquations/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 5(4j − 4) = 20."
+  },
+  "pattern/bracketEquations/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve −6(4u + 4) = 120."
+  },
+  "pattern/bracketEquations/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 5(y + 6) + 3y = 38."
+  },
+  "pattern/bracketEquations/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 7(k + 1) = 49."
+  },
+  "pattern/bracketEquations/7": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "In 6 years' time, double Dev's age will be 42. Write and solve an equation to find Dev's age now."
+  },
+  "pattern/bracketEquations/8": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Nina earns $w per hour for 6 hours, then $(w + 3) per hour for 3 more hours. She earns $279. Find w."
+  },
+  "pattern/fixErrors/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the first wrong line in this solution of 8x + 1 = 4x + 21."
+  },
+  "pattern/fixErrors/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "This working for 5(x + 7) = 60 has an error. What is the correct solution?"
+  },
+  "pattern/fixErrors/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "How many solutions does 6(x + 8) = 6x + 48 have?"
+  },
+  "pattern/fixErrors/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Kai's first step for 9x − 6 = 5x + 10 was 14x − 6 = 10. Is that step correct?"
+  },
+  "pattern/fixErrors/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Lee solved 7 − 5x = 42 and wrote −5x = 35, so x = 7. What should x be?"
+  },
+  "pattern/readInequality/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which inequality does the number line show?"
+  },
+  "pattern/readInequality/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The number line shows the values of x. What are the smallest and largest integers included?"
+  },
+  "pattern/readInequality/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the smallest integer that satisfies x > 14?"
+  },
+  "pattern/readInequality/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many integers satisfy 3 < x ≤ 11?"
+  },
+  "pattern/readInequality/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Children younger than 16 travel free. What is the oldest whole-number age that travels free?"
+  },
+  "pattern/readInequality/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the grade table. What grade does a score of 95 earn?"
+  },
+  "pattern/readInequality/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "Does x = 11 satisfy x < 10?"
+  },
+  "pattern/solveInequality/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 9x + 11 > 74. Complete: x > ?"
+  },
+  "pattern/solveInequality/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 9g − 11 > 52. Complete: g > ?"
+  },
+  "pattern/solveInequality/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve (y + 8) ÷ 5 > 7. Complete: y > ?"
+  },
+  "pattern/solveInequality/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 6(x + 6) > 72. Complete: x > ?"
+  },
+  "pattern/solveInequality/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Ella buys 6 cartons of milk at $c each and a $30 phone card. She spends more than $48.00. Solve 6c + 30 > 48. Complete: c > ?"
+  },
+  "pattern/solveInequality/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "An AFL score is 6g + b (g goals, b behinds). A team kicked 8 behinds and scored at most 55 points. What is the greatest number of goals they could have kicked?"
+  },
+  "pattern/solveInequality/7": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Solve 7x + 8 > 21. Complete: x > ? (Give a fraction.)"
+  },
+  "pattern/checkInequality/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Is x = 5 a solution of 6x + 8 > 38?"
+  },
+  "pattern/checkInequality/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "What is the largest integer that satisfies 5x + 8 ≤ 29?"
+  },
+  "pattern/checkInequality/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Hall hire costs $80 plus $14 per guest. A discount applies when the total is at least $300. What is the smallest number of guests for the discount?"
+  },
+  "pattern/checkInequality/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "x > 12 and x ≥ 6. Write this as one inequality. Complete: x > ?"
+  },
+  "pattern/checkInequality/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Tia's age satisfies 22 ≤ a ≤ 26. Nell's age satisfies 26 ≤ a ≤ 29. They are twins. What are the youngest and oldest possible ages?"
+  },
+  "pattern/checkInequality/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Does the number line show the solution of 5x + 6 > 36?"
+  },
+  "pattern/differences/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Is the relationship in this table linear?"
+  },
+  "pattern/differences/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the constant first difference in this table?"
+  },
+  "pattern/differences/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One y-value in this linear table was calculated incorrectly. What should that value be?"
+  },
+  "pattern/differences/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the rule for this table. y = ?"
+  },
+  "pattern/differences/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "This table shows a matchstick pattern. How many matchsticks are in shape 21?"
+  },
+  "pattern/differences/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "The table is linear. What is y when x = 8?"
+  },
+  "pattern/plotLinear/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Does the point (2, 11) lie on y = 4x + 4?"
+  },
+  "pattern/plotLinear/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "For y = 5x + 4, complete the table entry: what is y when x = 0?"
+  },
+  "pattern/plotLinear/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Where does y = −2x + 6 cross the x-axis? Give the coordinates."
+  },
+  "pattern/plotLinear/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the y-intercept of y = 5x + 6? Complete: (0, ?)"
+  },
+  "pattern/plotLinear/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which point is NOT on the line y = −2x + 3? Type its letter."
+  },
+  "pattern/horizontalVertical/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The graph shows a horizontal line. What is its rule? Complete: y = ?"
+  },
+  "pattern/horizontalVertical/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The graph shows a vertical line. What is its rule? Complete: x = ?"
+  },
+  "pattern/horizontalVertical/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Does the point (5, 5) lie on the line y = 5?"
+  },
+  "pattern/horizontalVertical/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the area of the rectangle enclosed by x = 1, x = 5, y = −1 and y = 1."
+  },
+  "pattern/horizontalVertical/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A vertical line passes through (6, 4). Complete its rule: x = ?"
+  },
+  "pattern/startingValue/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Line A is y = −x + 2. Line B is parallel to it: y = −x + c. Use the graph to find c."
+  },
+  "pattern/startingValue/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "At what value does y = 6x + 8 cross the y-axis?"
+  },
+  "pattern/startingValue/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "The graph of y = 5x + 4 is moved up 1 unit. Write the new rule. y = ?"
+  },
+  "pattern/startingValue/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A straight line passes through (0, 6) and (1, 10). Write its rule. y = ?"
+  },
+  "pattern/startingValue/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "The height of water in a tub is H = −5t + 55 cm after t minutes. What was the height at the start?"
+  },
+  "pattern/startingValue/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Write the rule of a line with the same y-intercept as y = 5x + 6 but with x-coefficient 2. y = ?"
+  },
+  "pattern/rateDirection/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Reading from left to right, does the graph of y = 4 slope up or down, or is it flat?"
+  },
+  "pattern/rateDirection/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "By how much does y change each time x increases by 1? (Use a negative number for a decrease.)"
+  },
+  "pattern/rateDirection/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A line passes through (0, 5) and (3, 20). By how much does y change when x increases by 1?"
+  },
+  "pattern/rateDirection/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which line is steeper?"
+  },
+  "pattern/rateDirection/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the rule for this table. y = ?"
+  },
+  "pattern/rateDirection/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph. By how much does y change each time x increases by 1?"
+  },
+  "pattern/conjecture/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Conjecture: lines with a negative x-coefficient slope down. Test y = −4x + 8 by finding y at x = 0 and at x = 2."
+  },
+  "pattern/conjecture/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The lines y = 2x, y = 4x, y = −2x all pass through one point. What point is it?"
+  },
+  "pattern/conjecture/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Find the whole-number solution of 4x + 5y = 34 when x = 1. What is y?"
+  },
+  "pattern/conjecture/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many pairs of whole numbers (x, y), with x ≥ 0 and y ≥ 0, satisfy 3x + 5y = 30?"
+  },
+  "pattern/conjecture/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Ravi claims every line through (0, 0) has the rule y = x. The line through (0, 0) and (3, −9) has rule y = mx. Find m."
+  },
+  "pattern/conjecture/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Sam's conjecture: for y = mx + c, each time x increases by 1, y changes by m. Test it on y = 5x + 4: by how much does y change from x = 1 to x = 2? (Use a negative number for a decrease.)"
+  },
+  "pattern/readSolution/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph of y = −2x + 3 to solve −2x + 3 = 1."
+  },
+  "pattern/readSolution/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A cyclist travels at a constant speed. Use the graph to find how long it takes to travel 75 km."
+  },
+  "pattern/readSolution/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph to solve −2x + 4 = 0."
+  },
+  "pattern/readSolution/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Point P on the graph shows the solution x = 1 of −2x + 3 = k. What is k?"
+  },
+  "pattern/readSolution/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A tank holds 30 L and drains at 5 L per minute. Use the graph to find when it holds 10 L."
+  },
+  "pattern/intersections/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph. At what point do the two lines intersect?"
+  },
+  "pattern/intersections/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Do the lines y = 4x + 4 and y = 3x + 5 intersect?"
+  },
+  "pattern/intersections/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Ana has saved $23 and earns $4 per hour. Ben has saved $5 and earns $7 per hour. After how many hours worked will their savings be equal?"
+  },
+  "pattern/intersections/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Tom runs at 8 m/s. Nia gets a 18 m head start and runs at 5 m/s. After how many seconds does Tom catch Nia?"
+  },
+  "pattern/intersections/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Write the rule of the line parallel to y = 5x + 4 that passes through (0, 5). y = ?"
+  },
+  "pattern/intersections/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "y = 5x − 6 and y = x + 2 meet where x = ?"
+  },
+  "pattern/graphInequality/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which inequality describes the shaded region? A dashed boundary is not included."
+  },
+  "pattern/graphInequality/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Is the point (4, 6) in the region x ≥ 3?"
+  },
+  "pattern/graphInequality/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph of y = 3x + 2 to solve 3x + 2 > 5. Complete: x > ?"
+  },
+  "pattern/graphInequality/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the graph of y = −2x + 3 to solve −2x + 3 ≥ 1. Complete: x ≤ ?"
+  },
+  "pattern/graphInequality/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Is the point (0, 0) above the line y = −x + 3?"
+  },
+  "pattern/graphInequality/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Is the point (−1, 5) in the shaded region? A dashed boundary is not included."
+  },
+  "pattern/writeModel/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A taxi charges $5.40 flagfall plus $2.40 per km. Write a rule for the cost C, in dollars, of a d km trip. C = ?"
+  },
+  "pattern/writeModel/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A tank holds 660 L and leaks 60 L per hour. Write a rule for the volume V, in litres, after t hours. V = ?"
+  },
+  "pattern/writeModel/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "An electrician quotes a $120 call-out fee plus $95 per hour. Write a rule for the cost C, in dollars, of an h-hour job. C = ?"
+  },
+  "pattern/writeModel/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A car travels at a constant 80 km/h. Write a rule for the distance d, in km, after t hours. d = ?"
+  },
+  "pattern/writeModel/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A weather balloon at 800 m descends at 150 m per minute. Write a rule for its height h, in metres, after t minutes. h = ?"
+  },
+  "pattern/writeModel/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A roast cooks for 50 minutes per kg, then rests for 20 minutes. Write a rule for the total time T, in minutes, for a roast of mass m kg. T = ?"
+  },
+  "pattern/writeModel/7": {
+    "visualRequired": true,
+    "reviewedPrompt": "The table shows pay P, in dollars, for h hours, including a fixed allowance. Write a rule. P = ?"
+  },
+  "pattern/useModel/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A plumber charges C = 80 + 90h dollars for h hours. Find the cost of a 4-hour job."
+  },
+  "pattern/useModel/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Hiring a plumber costs C = 80 + 80h dollars. You have $280. How many hours can you hire the plumber for?"
+  },
+  "pattern/useModel/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Use F = 1.8C + 32. Find C when F = 104."
+  },
+  "pattern/useModel/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A laundry tub holds 40 L. After the plug is pulled, V = 40 − 5t, where t is in minutes. After how many minutes does it hold 15 L?"
+  },
+  "pattern/useModel/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Pay is P = 32h dollars for h hours. How much is earned for 9.5 hours?"
+  },
+  "pattern/useModel/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Cooking time is T = 50m + 20 minutes for a roast of m kg. How long for a 2.5 kg roast?"
+  },
+  "pattern/modelLimits/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A gas bottle holds 6.75 kg and the barbecue uses 0.75 kg per hour, so M = 6.75 − 0.75t. After how many hours is the bottle empty?"
+  },
+  "pattern/modelLimits/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A tank's volume is V = 480 − 60t litres. Does the model give a sensible volume at t = 7?"
+  },
+  "pattern/modelLimits/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "V = 178 − 40t litres. What is the largest whole number of minutes t for which V is not negative?"
+  },
+  "pattern/modelLimits/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A cyclist rides 92 km at 24 km/h. How long does it take? Give hours and minutes."
+  },
+  "pattern/modelLimits/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Water height is H = −5t + 70 cm after t minutes. How many minutes until the tub is empty?"
+  },
+  "pattern/modelLimits/6": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "317 students need buses that seat 57 each. A model gives 317 ÷ 57 ≈ 5.56. How many buses should be booked?"
+  },
+  "pattern/comparePlans/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Plan A costs $11 per visit. Plan B costs $40 to join plus $6 per visit. After how many visits do they cost the same?"
+  },
+  "pattern/comparePlans/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Deal 1: $10 entry, then $5 per ride. Deal 2: $30 entry, then $2 per ride. Which deal is cheaper for 2 rides?"
+  },
+  "pattern/comparePlans/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Gym A: $12 per visit. Gym B: $45 per month plus $7 per visit. For 2 visits in a month, how much more does the dearer gym cost?"
+  },
+  "pattern/comparePlans/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Use the table of phone plans. What is the cheaper monthly cost for 4 GB of data?"
+  },
+  "pattern/comparePlans/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Deal 1 costs $15 plus $6 per ride. Deal 3 costs $46 with free rides. What is the largest number of rides for which Deal 1 is cheaper?"
+  },
+  "pattern/budgetTarget/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Kayak hire is $30 plus $28 per hour. With a budget of $110, what is the greatest whole number of hours you can hire?"
+  },
+  "pattern/budgetTarget/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Sam earns $28 per hour and needs at least $750. What is the smallest whole number of hours Sam must work?"
+  },
+  "pattern/budgetTarget/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A car travels at 100 km/h. How many minutes does it take to travel 80 km?"
+  },
+  "pattern/budgetTarget/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A car uses 9 L of fuel per 100 km. How far can it travel on 72 L?"
+  },
+  "pattern/budgetTarget/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Lia has $100 and saves $40 per week. After how many whole weeks will she first have at least $305?"
+  },
+  "pattern/unitsAssumptions/1": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A tap fills a tank at 20 L per minute. How many litres flow in 3 hours?"
+  },
+  "pattern/unitsAssumptions/2": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Calls cost 25 cents per minute. What does an 80-minute call cost, in dollars?"
+  },
+  "pattern/unitsAssumptions/3": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Convert 25 m/s to km/h."
+  },
+  "pattern/unitsAssumptions/4": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "A model V = 350 − 50t gives V = 0 L at t = 7 minutes. Is this value sensible?"
+  },
+  "pattern/unitsAssumptions/5": {
+    "visualRequired": false,
+    "reason": "Symbolic manipulation, substitution or numerical model; all evidence is explicit in the wording.",
+    "reviewedPrompt": "Which equation could give a sensible number of people in a room?"
+  },
+  "statistics/censusOrSample/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A school records the attendance of every student each day. Is a census or a sample more appropriate?"
+  },
+  "statistics/censusOrSample/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Each survey costs $9 to run. How much is saved by surveying a sample of 190 instead of all 7900 people?"
+  },
+  "statistics/censusOrSample/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Each interview takes 6 minutes. How many hours would a census of 1080 people take?"
+  },
+  "statistics/censusOrSample/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A sample of 975 is taken from a population of 3900. What percentage of the population is sampled?"
+  },
+  "statistics/censusOrSample/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A factory makes 6000 batteries today. It tests a sample of 600 and finds 18 faulty. Estimate how many of today's batteries are faulty."
+  },
+  "statistics/experimentObservation/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Traffic past the school gate is counted between 8 am and 9 am. Is this an experiment or an observation?"
+  },
+  "statistics/experimentObservation/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "An experiment tests 5 different amounts of water, with 8 plants for each amount. How many plants are needed?"
+  },
+  "statistics/experimentObservation/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which group is the control group? Type its letter."
+  },
+  "statistics/experimentObservation/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Two groups of seedlings get different light levels. Both are watered at the same time, in the same room, with the same soil. Is the comparison fair?"
+  },
+  "statistics/experimentObservation/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Mean growth: control group 39 mm, treated group 52 mm. How much more did the treated group grow on average?"
+  },
+  "statistics/practicalLimits/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "You have 5 hours to survey people and each survey takes 7 minutes. What is the greatest number of people you can survey?"
+  },
+  "statistics/practicalLimits/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A survey budget is $1000 and each response costs $9. What is the largest sample you can afford?"
+  },
+  "statistics/practicalLimits/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Could a company use a census to test the taste of every biscuit it bakes?"
+  },
+  "statistics/practicalLimits/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A survey is sent to 580 people and 467 reply. What is the response rate, to one decimal place?"
+  },
+  "statistics/practicalLimits/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Surveying 60 people took 3 hours. At the same rate, how many hours would 180 people take?"
+  },
+  "statistics/randomSample/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Students are numbered 001 to 600. A random number generator gives 504, 828, 025, 504, 500. Numbers out of range or repeated are skipped. How many students are selected?"
+  },
+  "statistics/randomSample/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A systematic sample of 50 is taken from a list of 550 students by choosing every kth name. What is k?"
+  },
+  "statistics/randomSample/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A systematic sample starts at student 9 and then takes every 14th student. What is the number of the 6th student chosen?"
+  },
+  "statistics/randomSample/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A sample is chosen by letting students volunteer through an online link. Does every student have the same chance of being chosen?"
+  },
+  "statistics/randomSample/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "10 names are drawn at random from a hat holding all 180 names. What is the probability that a particular student is chosen? Give a fraction."
+  },
+  "statistics/spotBias/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Only students with email addresses on the school list are surveyed online. Is the main problem selection bias or measurement bias?"
+  },
+  "statistics/spotBias/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "At a gym, 38 of 40 people said they exercise daily. In a random sample of 60 residents, 22 said so. What is the difference in percentage points?"
+  },
+  "statistics/spotBias/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is this a leading question? \"Wouldn't a longer lunch break be better?\""
+  },
+  "statistics/spotBias/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A TV poll invites viewers to phone in. 537 of 600 callers vote yes. What percentage voted yes, to one decimal place?"
+  },
+  "statistics/spotBias/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A stopwatch starts 2 s late every time. A recorded time is 59 s. What was the true time?"
+  },
+  "statistics/precision/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A measurement is recorded to the nearest millimetre. What is the largest possible error?"
+  },
+  "statistics/precision/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A length is recorded as 173 cm to the nearest centimetre. Give the lower and upper rounding bounds. The lower bound is included; the upper bound is excluded."
+  },
+  "statistics/precision/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A scale reads 0.5 kg too heavy. It shows 73.6 kg. What is the true mass?"
+  },
+  "statistics/precision/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Every value in a data set was measured 4 cm too long. The recorded mean is 78 cm. What is the true mean?"
+  },
+  "statistics/precision/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Stopwatch A records to the nearest 1 s and stopwatch B to the nearest 0.1 s. What is the largest possible error for the more precise stopwatch?"
+  },
+  "statistics/sources/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "You read sports results published in a newspaper. Is this primary or secondary data for your investigation?"
+  },
+  "statistics/sources/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "This secondary data table shows household sizes in a suburb. What percentage of households have 5 or more people, to one decimal place?"
+  },
+  "statistics/sources/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students in total voted for Water polo?"
+  },
+  "statistics/sources/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The graph shows how many pets each surveyed household has. How many more households have the most common number of pets than the least common?"
+  },
+  "statistics/sources/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "The table shows a currency's value, in cents, over 6 months. By how many cents did it fall from month 0 to month 2?"
+  },
+  "statistics/randomVsNon/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A teacher chooses students she thinks are typical. Is this a random or non-random sample?"
+  },
+  "statistics/randomVsNon/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A school has 160, 200, 240 students in Years 7, 8 and 9. A stratified sample of 60 is taken in proportion. How many Year 7 students are chosen?"
+  },
+  "statistics/randomVsNon/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A cluster sample randomly chooses 5 classes and surveys every student in them. Each class has 29 students. What is the sample size?"
+  },
+  "statistics/randomVsNon/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Ask the first 24 students you see at lunch. Which sampling method is this?"
+  },
+  "statistics/randomVsNon/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "To take a systematic sample of 80 from 1920 names, every kth name is chosen after a random start. What is k?"
+  },
+  "statistics/chooseMethod/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Inspectors check bottles on a production line at regular intervals. Which method is most suitable?"
+  },
+  "statistics/chooseMethod/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Years 7, 8 and 9 have 120, 120, 100 students. A stratified sample takes 10% of each year. How many students come from each year?"
+  },
+  "statistics/chooseMethod/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is this claim reasonable? \"Surveying 5 random students from every class can represent the school.\""
+  },
+  "statistics/chooseMethod/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A random sample of 50 students found 20 walk to school. A convenience sample at a bus stop found almost none. Use the random sample to estimate how many of the school's 1350 students walk."
+  },
+  "statistics/chooseMethod/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A survey will use 20% of a population of 2900. What is the sample size?"
+  },
+  "statistics/display/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Make a frequency table for these data. What is the frequency of 3?"
+  },
+  "statistics/display/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many observations are greater than 6?"
+  },
+  "statistics/display/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many matches are recorded in this frequency graph?"
+  },
+  "statistics/display/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "These are people's ages. How many people are aged 40 to 49?"
+  },
+  "statistics/display/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Group these heights in intervals of 10 cm. How many people are in the 160–169 cm group?"
+  },
+  "statistics/display/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "A tennis player records double faults per match. How many double faults did they serve in total?"
+  },
+  "statistics/centreSpread/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the mean of these values."
+  },
+  "statistics/centreSpread/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the median of these values."
+  },
+  "statistics/centreSpread/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the mode of the data in the dot plot?"
+  },
+  "statistics/centreSpread/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the range of these values."
+  },
+  "statistics/centreSpread/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Describe the shape of this distribution."
+  },
+  "statistics/centreSpread/6": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the mean score, to two decimal places."
+  },
+  "statistics/conclusions/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Egg masses in grams from two shops are shown. By how many grams is the heavier shop's mean greater?"
+  },
+  "statistics/conclusions/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Runs scored by two cricketers are shown. Based on range, who is more consistent? Type their name."
+  },
+  "statistics/conclusions/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Claim: \"Most students in the sample sleep at least 8 hours.\" Does the dot plot support this claim?"
+  },
+  "statistics/conclusions/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "What percentage of the sample read more than 4 books?"
+  },
+  "statistics/conclusions/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the difference between the medians of Class A and Class B? (Larger minus smaller.)"
+  },
+  "statistics/sameSize/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Five random samples of 30 students each give these mean heights (cm). What is the range of the sample means?"
+  },
+  "statistics/sameSize/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The population mean height is 160 cm. Which sample mean is furthest from it? Type the letter."
+  },
+  "statistics/sameSize/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Four random samples give these mean reaction times (hundredths of a second). What is the mean of the four sample means?"
+  },
+  "statistics/sameSize/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Two random samples of 30 students gave mean heights of 154 cm and 159 cm. Does this mean one sample was collected incorrectly?"
+  },
+  "statistics/sameSize/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two random samples of 11 students record hours of exercise. What is the difference between the two sample medians? (Larger minus smaller.)"
+  },
+  "statistics/proportions/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "In a random sample of 50 students, 36 support a uniform change. What percentage is this?"
+  },
+  "statistics/proportions/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Three random samples of 50 students were asked about a uniform change. What is the range of the percentages in favour?"
+  },
+  "statistics/proportions/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "In a random sample of 50 students, 30 favour a uniform change. Is this a majority of the sample?"
+  },
+  "statistics/proportions/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Three random samples of 50 are combined. What percentage of all 150 students are in favour, to one decimal place?"
+  },
+  "statistics/proportions/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Sample A: 29 of 40 chose cycling. Sample B: 27 of 40 chose cycling. What is the difference in percentage points? (Larger minus smaller.)"
+  },
+  "statistics/estimateCount/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "26 of 50 randomly sampled students cycle to school. Estimate how many of the school's 1350 students cycle."
+  },
+  "statistics/estimateCount/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Over the last two Aprils, it rained on 30 of the 60 days. Use this relative frequency to estimate the number of rainy days in a 30-day April."
+  },
+  "statistics/estimateCount/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Rangers tag 80 turtles and release them. Later they catch 90 turtles and 5 are tagged. Estimate the turtle population."
+  },
+  "statistics/estimateCount/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "116 of 200 surveyed visitors to a gallery came from overseas. The gallery has 22000 visitors a month. Estimate the overseas visitors per month."
+  },
+  "statistics/estimateCount/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "About 40% of 2000 students cycle. In a random sample of 60, how many would you expect to cycle?"
+  },
+  "statistics/sizeRuns/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Five samples of size 10 and five of size 100 estimate the percentage of students who walk. What is the range of the size-10 estimates?"
+  },
+  "statistics/sizeRuns/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which sample size gave the smaller range of estimates? Enter the sample size."
+  },
+  "statistics/sizeRuns/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A simulation takes 18 samples of 50 students. How many selections are recorded altogether?"
+  },
+  "statistics/sizeRuns/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is this statement true? \"Doubling the sample size removes all sampling variation.\""
+  },
+  "statistics/sizeRuns/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "The dot plots show estimates from samples of size 10 and size 100. How much greater is the range for size 10?"
+  },
+  "statistics/compareVariation/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Four samples of 20 people were asked if they own a pet. What is the range of the sample percentages?"
+  },
+  "statistics/compareVariation/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "One batch used samples of 200 and the other used samples of 20. Which batch most likely used samples of 200? Type P or Q."
+  },
+  "statistics/compareVariation/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A sample estimates 69% with a margin of error of ±6%. What is the likely interval for the population percentage?"
+  },
+  "statistics/compareVariation/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Six samples of size 10 gave estimates 78, 71, 54, 22, 39, 70%. Six of size 100 gave 52, 45, 44, 45, 44, 46%. What is the difference between the two ranges?"
+  },
+  "statistics/compareVariation/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Sample A has 25 people and sample B has 250. How many times larger is sample B?"
+  },
+  "statistics/uncertainty/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A sample estimates 59% ± 5% of 4000 residents use the library. Give the likely range for the number of residents."
+  },
+  "statistics/uncertainty/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A poll estimates 58% ± 7% support a proposal. Can we be confident whether a majority supports it?"
+  },
+  "statistics/uncertainty/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which sample size gave the smallest range of estimates? Enter the sample size."
+  },
+  "statistics/uncertainty/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Report A says 60% from a sample of 25. Report B says 53% from a random sample of 400. Which report is more reliable?"
+  },
+  "statistics/uncertainty/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "61 of 80 sampled students prefer online homework. Estimate the number of the school's 2960 students who prefer it, rounded to the nearest 10."
+  },
+  "statistics/changeMean/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A data set of 7 values has mean 27. The value 35 is added. What is the new mean?"
+  },
+  "statistics/changeMean/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The value 34 is removed from this data set. What is the new mean?"
+  },
+  "statistics/changeMean/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "The mean of 15, 13, 9 and one more value is 11. Find the missing value."
+  },
+  "statistics/changeMean/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Each of 6 values with mean 39 is increased by 8. What is the new mean?"
+  },
+  "statistics/changeMean/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Every value in a data set with mean 15 is multiplied by 5. What is the new mean?"
+  },
+  "statistics/changeMean/6": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Ana's mean over 5 tests is 73. What must she score on the next test to raise her mean to 76?"
+  },
+  "statistics/changeMedianRange/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The largest value, 29, is changed to 106. What is the new median?"
+  },
+  "statistics/changeMedianRange/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The value 13 is added to these 6 values. What is the new median?"
+  },
+  "statistics/changeMedianRange/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "The smallest value is removed. What is the new range?"
+  },
+  "statistics/changeMedianRange/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "House prices in a street (in $10 000s) include one mansion at 810. What is the median price, in $10 000s?"
+  },
+  "statistics/changeMedianRange/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "The smallest value is made even smaller. Which of the mean and median change?"
+  },
+  "statistics/chooseSummary/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "House prices in a suburb include one mansion. Which summary best describes a typical value?"
+  },
+  "statistics/chooseSummary/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "These are minutes spent on homework, including one outlier. Find the median, which describes a typical student better than the mean."
+  },
+  "statistics/chooseSummary/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the modal way of travelling to school?"
+  },
+  "statistics/chooseSummary/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "One outlier is in these data. By how much is the mean greater than the median? Round to one decimal place."
+  },
+  "statistics/chooseSummary/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Sam's working hours for five days are shown. Find the mean, median and mode."
+  },
+  "statistics/questionPopulation/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Investigation question: \"What is the most popular lunch item in our canteen?\" What is the target population?"
+  },
+  "statistics/questionPopulation/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A question is about all Year 8 students at a school with 9 Year 8 classes of 28. What is the population size?"
+  },
+  "statistics/questionPopulation/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is \"How many minutes does your trip to school take?\" a good survey question?"
+  },
+  "statistics/questionPopulation/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A sample will be 20% of a population of 290. How many people should be sampled?"
+  },
+  "statistics/questionPopulation/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "To study pocket money, 5 students are chosen at random from each of 8 classes. What is the sample size?"
+  },
+  "statistics/ethicalFair/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is it ethical to only collect the information needed to answer the question?"
+  },
+  "statistics/ethicalFair/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A school has 120 boys and 180 girls. A sample of 50 is taken in proportion. How many girls are chosen?"
+  },
+  "statistics/ethicalFair/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Which sampling plan is fairest for a study of pocket money across the whole school?"
+  },
+  "statistics/ethicalFair/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A survey about pocket money asks for these details. Which one should be left out?"
+  },
+  "statistics/ethicalFair/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Students are asked how often they break school rules. The 200 responses are anonymous. Are students likely to answer honestly?"
+  },
+  "statistics/collectRecord/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Each crossed group has five marks. What is the frequency shown by the tally?"
+  },
+  "statistics/collectRecord/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "One student wrote their travel time as 2 h 45 min. Everyone else used minutes. Convert this time to minutes."
+  },
+  "statistics/collectRecord/3": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Heights range from 140 cm to 207 cm. They are grouped in intervals of 10 cm starting at 140 (140–149, …). How many intervals are needed?"
+  },
+  "statistics/collectRecord/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Which display best suits how a puppy's mass changes each week?"
+  },
+  "statistics/collectRecord/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Is number of siblings numerical or categorical data?"
+  },
+  "statistics/organise/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "These are survey responses about travel to school. How many students chose Bus?"
+  },
+  "statistics/organise/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Group these quiz scores in intervals 0–9, 10–19 and 20–29. How many scores are in 10–19?"
+  },
+  "statistics/organise/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many responses are recorded in this frequency table altogether?"
+  },
+  "statistics/organise/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "What percentage of responses chose Autumn, to one decimal place?"
+  },
+  "statistics/organise/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Order these results and find the median."
+  },
+  "statistics/analyse/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the mean of the sample."
+  },
+  "statistics/analyse/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the range of the sample."
+  },
+  "statistics/analyse/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which group has the higher median screen time? Type Year 7 or Year 9."
+  },
+  "statistics/analyse/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "29 of the 40 sampled students bring a water bottle. Estimate the number of the school's 1080 students who do."
+  },
+  "statistics/analyse/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the most common number of people per household in the sample?"
+  },
+  "statistics/report/1": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "32 of a random sample of 50 students walk to school. Which conclusion is best?"
+  },
+  "statistics/report/2": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "Your survey estimates 59% ± 6% of 1100 students want a later start. Report the likely number of students as a range."
+  },
+  "statistics/report/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Claim: \"At least half the sample ate 3 or more pieces of fruit.\" Does the data support this?"
+  },
+  "statistics/report/4": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "39 of 50 sampled students support a new club. About how many of the school's 1800 students might support it?"
+  },
+  "statistics/report/5": {
+    "visualRequired": false,
+    "reason": "Survey-method reasoning or calculation from explicitly stated counts; no unshown distribution is referenced.",
+    "reviewedPrompt": "A report says: \"Most students like the new timetable.\" The question asked: 'Don't you love the new timetable?' What is the main limitation?"
+  },
+  "chance/identifyNotEvent/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The spinner is spun once. Event A is “landing on an even number”. How many sections are in “not A”?"
+  },
+  "chance/identifyNotEvent/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A die is rolled. Event A is “rolling a number greater than 5”. Which describes “not A”?"
+  },
+  "chance/identifyNotEvent/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Cards are numbered 1 to 30. Event A is “drawing a multiple of 6”. How many cards are in “not A”?"
+  },
+  "chance/identifyNotEvent/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A die is rolled once. Are “rolling a 1 or a 2” and “rolling a number greater than 2” complementary events?"
+  },
+  "chance/identifyNotEvent/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "One counter is taken from the bag. Event A is “taking a red counter”. How many counters are in “not A”?"
+  },
+  "chance/complementFraction/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "P(A) = 10/12. Find P(not A)."
+  },
+  "chance/complementFraction/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The spinner is spun once. What is the probability it does not land on red?"
+  },
+  "chance/complementFraction/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One counter is taken at random. What is the probability it is not blue?"
+  },
+  "chance/complementFraction/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "The probability that a seed sprouts is 4/5. What is the probability that the seed does not sprout?"
+  },
+  "chance/complementFraction/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "P(not A) = 12/15. Find P(A)."
+  },
+  "chance/complementDecimal/1": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "P(A) = 0.95. Find P(not A) as a decimal."
+  },
+  "chance/complementDecimal/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "The forecast gives a 91% chance of rain. What is the chance of no rain?"
+  },
+  "chance/complementDecimal/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "The probability of winning a prize is 0.2. What is the percentage chance of not winning?"
+  },
+  "chance/complementDecimal/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The bar shows P(A). What is P(not A)? Give a decimal."
+  },
+  "chance/complementDecimal/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Which pair could be the probabilities of an event and its complement?"
+  },
+  "chance/missingProbability/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A spinner can only land on red, blue or green. Find P(green) as a decimal."
+  },
+  "chance/missingProbability/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Tomorrow will be sunny, cloudy or rainy. P(sunny) = 49% and P(cloudy) = 36%. What is P(rainy)?"
+  },
+  "chance/missingProbability/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A bag of 60 counters holds red, blue and green counters. P(red) = 1/4 and P(blue) = 2/5. How many counters are green?"
+  },
+  "chance/missingProbability/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A biased die has the probabilities shown. Find P(6) as a decimal."
+  },
+  "chance/missingProbability/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "P(not A) = 0.91. Find P(A)."
+  },
+  "chance/unequalOutcomes/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The spinner has 8 equal sections. What is the probability it does not land on blue?"
+  },
+  "chance/unequalOutcomes/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A die is weighted so that P(6) = 0.39. What is P(not 6)?"
+  },
+  "chance/unequalOutcomes/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One counter is taken at random. What is the probability it is not green?"
+  },
+  "chance/unequalOutcomes/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A spinner is a quarter red and half blue. The rest is split equally between green and yellow. What is P(not green)?"
+  },
+  "chance/unequalOutcomes/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is the probability they do not travel by car?"
+  },
+  "chance/chooseComplement/1": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A number from 1 to 105 is chosen at random. What is the probability it is not a multiple of 11?"
+  },
+  "chance/chooseComplement/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "500 raffle tickets are sold for one prize. You buy 7. What is the probability you do not win?"
+  },
+  "chance/chooseComplement/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled. You lose only if the total is 11 or 12. What is the probability you do not lose?"
+  },
+  "chance/chooseComplement/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A number from 1 to 150 is chosen. Which is the quickest way to find P(not a multiple of 25)?"
+  },
+  "chance/chooseComplement/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A jar holds 100 lollies and 8 are green. One is taken at random. What is the probability it is not green?"
+  },
+  "chance/orderedPairs/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A coin is tossed and a spinner numbered 1 to 6 is spun. How many outcomes are in the sample space?"
+  },
+  "chance/orderedPairs/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "The highlighted cell is one outcome. Write it as an ordered pair: first die, then second die."
+  },
+  "chance/orderedPairs/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Two cards are dealt into your hand and only which cards you hold matters. Is getting card 5 then card 6 the same hand as card 6 then card 5?"
+  },
+  "chance/orderedPairs/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A café offers 5 mains and 4 drinks. A meal is one main and one drink. How many different meals are possible?"
+  },
+  "chance/orderedPairs/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Spinner A has 4 colours and spinner B is numbered 1 to 6. How many ordered pairs can the two spinners give?"
+  },
+  "chance/listAll/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many different meals of one main and one drink does the tree show?"
+  },
+  "chance/listAll/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A captain and a vice-captain are chosen from 6 students. One person cannot be both. How many ways are there?"
+  },
+  "chance/listAll/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A double scoop uses two different flavours from 6. Order does not matter. How many different double scoops are there?"
+  },
+  "chance/listAll/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Mia lists the outcomes of tossing two coins as HH, HT and TH. Which outcome is missing? Use H for heads and T for tails."
+  },
+  "chance/listAll/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A locker code is one letter from the first 5 letters of the alphabet, then one digit from 0 to 9. How many codes are possible?"
+  },
+  "chance/countCondition/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled. How many of the 36 outcomes give a total of 11?"
+  },
+  "chance/countCondition/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled. How many outcomes have a difference of 4?"
+  },
+  "chance/countCondition/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A coin is tossed and a die is rolled. How many outcomes show a tail and a number greater than 4?"
+  },
+  "chance/countCondition/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Spinner A (1 to 5) and spinner B (1 to 5) are spun and the numbers multiplied. How many outcomes give a product greater than 7?"
+  },
+  "chance/countCondition/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled. How many outcomes show a first die larger than the second?"
+  },
+  "chance/completeTable/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the missing number in the table."
+  },
+  "chance/completeTable/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Find the missing total."
+  },
+  "chance/completeTable/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do not wear glasses and do not have a sibling?"
+  },
+  "chance/completeTable/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "33 students were surveyed. 23 wear glasses, 16 have a sibling and 13 do both. How many students do not wear glasses and do not have a sibling?"
+  },
+  "chance/completeTable/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many people were surveyed altogether?"
+  },
+  "chance/readTable/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students wear glasses and have a sibling?"
+  },
+  "chance/readTable/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do not have a sibling?"
+  },
+  "chance/readTable/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students wear glasses or have a sibling (or both)?"
+  },
+  "chance/readTable/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do not wear glasses and do not have a sibling?"
+  },
+  "chance/readTable/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What does the number 10 in the table tell you?"
+  },
+  "chance/tableProbability/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is the probability they wear glasses and have a sibling?"
+  },
+  "chance/tableProbability/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is the probability they do not wear glasses?"
+  },
+  "chance/tableProbability/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is P(they do not have a sibling)?"
+  },
+  "chance/tableProbability/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is the probability they wear glasses or have a sibling?"
+  },
+  "chance/tableProbability/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What percentage of students do not wear glasses and do not have a sibling? Round to one decimal place."
+  },
+  "chance/buildTree/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many complete paths (outcomes) does this tree have?"
+  },
+  "chance/buildTree/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "The first stage of a tree has 4 branches and there are 20 complete paths. How many branches come from each first-stage branch?"
+  },
+  "chance/buildTree/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A coin is tossed three times. How many paths does the tree diagram have?"
+  },
+  "chance/buildTree/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which tree matches “toss a coin, then spin a spinner with 6 sections”?"
+  },
+  "chance/buildTree/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A bag holds 5 different coloured counters. One is taken and put back, then a second is taken. How many paths does the tree have?"
+  },
+  "chance/readTree/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A spinner is spun twice. How many outcomes show the same colour both times?"
+  },
+  "chance/readTree/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A spinner is spun twice. How many outcomes have exactly one Y?"
+  },
+  "chance/readTree/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many outcomes on this tree have a total greater than 5?"
+  },
+  "chance/readTree/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "A coin is tossed three times. How many outcomes include at least one head?"
+  },
+  "chance/readTree/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which outcome is NOT on this tree?"
+  },
+  "chance/treeProbability/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "All paths are equally likely. What is P(J, 1)?"
+  },
+  "chance/treeProbability/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A fair spinner is spun twice. What is the probability of the same colour both times?"
+  },
+  "chance/treeProbability/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A fair coin is tossed three times. What is the probability of exactly one head?"
+  },
+  "chance/treeProbability/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Both spinners are fair. What is the probability that the total is greater than 5?"
+  },
+  "chance/treeProbability/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A family has two children. Assume each child is equally likely to be a girl (G) or a boy (B). What is P(at least one boy)?"
+  },
+  "chance/placeVenn/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Numbers 1 to 40 are sorted into “multiples of 3” and “multiples of 5”. How many numbers go in the overlap?"
+  },
+  "chance/placeVenn/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "27 students were asked. 19 do Choir, 9 do Band and 6 do both. How many do Choir only?"
+  },
+  "chance/placeVenn/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "27 students were asked. 19 do Choir, 9 do Band and 6 do both. How many do neither?"
+  },
+  "chance/placeVenn/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "The table is redrawn as a Venn diagram. What number goes in the “Band only” region?"
+  },
+  "chance/placeVenn/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which regions of the Venn diagram show the students who do Band?"
+  },
+  "chance/vennCounts/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do both Choir and Band?"
+  },
+  "chance/vennCounts/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do Choir or Band (or both)?"
+  },
+  "chance/vennCounts/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do neither activity?"
+  },
+  "chance/vennCounts/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do exactly one of the activities?"
+  },
+  "chance/vennCounts/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do not do Choir?"
+  },
+  "chance/vennProbability/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is P(both Choir and Band)?"
+  },
+  "chance/vennProbability/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is P(Choir or Band)?"
+  },
+  "chance/vennProbability/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is the probability they do neither activity?"
+  },
+  "chance/vennProbability/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "One student is chosen at random. What is P(not Band)?"
+  },
+  "chance/vennProbability/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What percentage of students do Choir only? Round to one decimal place."
+  },
+  "chance/andOr/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A card is drawn from cards numbered 1 to 20. How many outcomes are an even number and a number less than 17?"
+  },
+  "chance/andOr/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "A card is drawn from cards numbered 1 to 20. How many outcomes are an even number or a number less than 17 (or both)?"
+  },
+  "chance/andOr/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A card is drawn from cards numbered 1 to 20. What is P(an even number or a number less than 17)?"
+  },
+  "chance/andOr/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which event does the shaded region show?"
+  },
+  "chance/andOr/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A card is drawn from cards numbered 1 to 20. What is P(an even number and a number less than 17)?"
+  },
+  "chance/mutuallyExclusive/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A card is drawn from cards numbered 1 to 20. Are “an even number” and “a number less than 17” mutually exclusive?"
+  },
+  "chance/mutuallyExclusive/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A spinner lands on red with probability 0.44 and on blue with probability 0.4. It cannot land on both. What is P(red or blue)?"
+  },
+  "chance/mutuallyExclusive/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many students do Choir or Band but not both?"
+  },
+  "chance/mutuallyExclusive/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "No student does both activities. What is P(Choir or Band)?"
+  },
+  "chance/mutuallyExclusive/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Which regions of a Venn diagram make up “A or B” in the exclusive sense (but not both)?"
+  },
+  "chance/atLeastOne/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A fair coin is tossed three times. What is P(at least one head)?"
+  },
+  "chance/atLeastOne/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled. What is the probability of at least one 6?"
+  },
+  "chance/atLeastOne/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two fair spinners have 6 and 6 equal sections. Each has one red section. What is P(at least one red)?"
+  },
+  "chance/atLeastOne/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Two trials are done. What is the complement of “at least one red”?"
+  },
+  "chance/atLeastOne/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Spinner A (1 to 5) and spinner B (1 to 5) are spun. What is P(at least one even number)?"
+  },
+  "chance/designSimulation/1": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A program simulates a fair 10-section spinner with random whole numbers from 1 to what?"
+  },
+  "chance/designSimulation/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Random digits 0 to 9 simulate a 90% chance of rain. How many of the ten digits should mean “rain”?"
+  },
+  "chance/designSimulation/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Random whole numbers from 1 to 100 simulate an event with probability 0.91. A trial counts as a success when the number is at most what?"
+  },
+  "chance/designSimulation/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two coins are simulated with one random number from 1 to 3: 1 = two heads, 2 = one head, 3 = no heads. Is this a fair model?"
+  },
+  "chance/designSimulation/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Each trial of a simulation uses 2 dice rolls. How many dice rolls are needed for 180 trials?"
+  },
+  "chance/recordTrials/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many trials were recorded?"
+  },
+  "chance/recordTrials/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many trials gave at least one head?"
+  },
+  "chance/recordTrials/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "A simulation rolled two dice 20 times. How many results were doubles?"
+  },
+  "chance/recordTrials/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many trials had a total of at least 9?"
+  },
+  "chance/recordTrials/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "How many trials had a total less than 5?"
+  },
+  "chance/experimentalProbability/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the experimental probability of exactly one head?"
+  },
+  "chance/experimentalProbability/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the experimental probability of two heads, as a decimal?"
+  },
+  "chance/experimentalProbability/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "What is the experimental probability of a total of 7?"
+  },
+  "chance/experimentalProbability/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Group A had 64 successes in 80 trials. Group B had 45 successes in 60 trials. What is the experimental probability using all the results?"
+  },
+  "chance/experimentalProbability/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "What percentage of trials gave at least one head? Round to one decimal place."
+  },
+  "chance/predict/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two fair coins are tossed 232 times. How many times would you expect two heads?"
+  },
+  "chance/predict/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled 324 times. How many times would you expect a total of 10?"
+  },
+  "chance/predict/3": {
+    "visualRequired": true,
+    "reviewedPrompt": "Spinner A (1 to 5) and spinner B (1 to 5) are spun. What is the theoretical probability of a total of 7?"
+  },
+  "chance/predict/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A fair coin gave 69 heads in 100 tosses. What is the theoretical probability of heads on the next toss?"
+  },
+  "chance/predict/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two dice are rolled 234 times. How many doubles would you expect?"
+  },
+  "chance/smallLarge/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "The theoretical probability is 0.5. Which batch has an experimental probability closer to 0.5? Enter A, B or Equal."
+  },
+  "chance/smallLarge/2": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two coins were tossed 116 times and two heads came up 35 times. By how many does this differ from the expected count?"
+  },
+  "chance/smallLarge/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Is this statement true? “Two groups using the same fair coin can get different results.”"
+  },
+  "chance/smallLarge/4": {
+    "visualRequired": true,
+    "reviewedPrompt": "Two coins were tossed in runs of different sizes. Which number of trials gave an experimental P(two heads) closest to the theoretical 1/4? Enter the number of trials."
+  },
+  "chance/smallLarge/5": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Group A ran 40 trials of a simulation and Group B ran 900. Whose experimental probability is likely to be more reliable?"
+  },
+  "chance/explainVariation/1": {
+    "visualRequired": true,
+    "reviewedPrompt": "A simulation of two fair coins gives two heads in 414 of 1000 trials (theory says 1/4). What is the most likely explanation?"
+  },
+  "chance/explainVariation/2": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "A die is rolled 600 times and a 6 appears 99 times. How many fewer 6s is that than the expected number?"
+  },
+  "chance/explainVariation/3": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Is this statement true? “If a simulation is far from the theory after thousands of trials, the model should be checked.”"
+  },
+  "chance/explainVariation/4": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "Which change would make a simulation's estimate more reliable?"
+  },
+  "chance/explainVariation/5": {
+    "visualRequired": true,
+    "reviewedPrompt": "A fair two-coin simulation is run 388 times. About how many trials should give exactly one head?"
+  },
+  "chance/chooseRepresentation/1": {
+    "visualRequired": false,
+    "reason": "Probability rule, stated-count calculation or evaluation of a simulation; no unshown outcome display is referenced.",
+    "reviewedPrompt": "People are asked whether they own a cat and whether they own a dog, and the overlap matters. Which representation shows the outcomes most clearly?"
+  }
+}

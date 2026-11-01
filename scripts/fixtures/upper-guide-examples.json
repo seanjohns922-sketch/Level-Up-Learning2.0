@@ -5,7 +5,7 @@
   },
   "8/number/1/2": {
     "title": "Locate square roots on a number line",
-    "signature": "44bc04be024fbb68e575b9d764f4ea07b0922fb559d0fbcfaa2fcd6e62575e08"
+    "signature": "b49f9e3e6da7ddd925ecc86057541263a6adb2d8993a3e7d3911e54a8c7d7ec8"
   },
   "8/number/1/3": {
     "title": "Understand pi as an irrational number",
@@ -49,7 +49,7 @@
   },
   "8/number/5/1": {
     "title": "Add and subtract signed numbers",
-    "signature": "5c875429563722e503829efb5c85c701e19d004c1b762879a06ccd78ec6f435c"
+    "signature": "15b9b1557ee85f46862765ecea99b1fbae408fdc5566b9ca18f8d0a4d421a4c8"
   },
   "8/number/5/2": {
     "title": "Multiply and divide signed numbers",
@@ -73,7 +73,7 @@
   },
   "8/number/7/1": {
     "title": "Add and subtract signed decimals",
-    "signature": "e7db59f2e42fdb664ac52d98d5acc96eb98135b53891af08bba4799b301d4457"
+    "signature": "f94466d4776d08b5c3e496f0ce9e236c37cb444caf04560bb4ef44a660f69fe3"
   },
   "8/number/7/2": {
     "title": "Multiply and divide decimal numbers",
@@ -113,7 +113,7 @@
   },
   "8/number/10/2": {
     "title": "Calculate tax-inclusive and tax-exclusive prices",
-    "signature": "5dbe5e069e80c40d8e5e8c77c3c0746a1a7b1a20e2c4e187825c1a9e59c0222d"
+    "signature": "b8d0bbd49a69711f3170ea59f9780b38a75e967adb1936aa4c417951087e0102"
   },
   "8/number/10/3": {
     "title": "Explain successive percentage changes",
@@ -289,27 +289,27 @@
   },
   "8/space/1/1": {
     "title": "Match corresponding sides and angles",
-    "signature": "1391b67fd0fa27805a66c29da0dfc441cc5113189284390846230eee625b8606"
+    "signature": "9c8526370d67ad4a284da7075921c0d8f3c43a6e0c901d328c3ba5c103642df0"
   },
   "8/space/1/2": {
     "title": "Recognise congruent shapes after a movement",
-    "signature": "a821374224888690941e8935d25c3798fd693709c70408ccc3872e68a7fb5dd7"
+    "signature": "ae368768aef4722674c3364ddc2864215a8594cee65db0966b6fdd2c200a8f27"
   },
   "8/space/1/3": {
     "title": "Test congruence by overlaying shapes",
-    "signature": "dd3b209987a260d934d75eb133b5d8df87066265caa89a16212ffd80f8552a38"
+    "signature": "f7001d0d4d2752ccf7529315e0c2d31e2aec36d1549b983c53014c8ae43c0133"
   },
   "8/space/2/1": {
     "title": "Use three sides to test congruence",
-    "signature": "421eeb011aa31bd065e4133fa73dee958f31f1225e125ecdaaa9e4df52853336"
+    "signature": "2edb5d97ab49c966bace363a7abfa0a477f1c74fa665971cc65057fd8bff568f"
   },
   "8/space/2/2": {
     "title": "Use sides and an included angle",
-    "signature": "afc05028152c3190c519f4d9a2acb97fff58f76817c5b9b7baca31d4d3125bb7"
+    "signature": "67edc4db007e1403749812ee22cb4733418797842b055acaec3ddcff120bee42"
   },
   "8/space/2/3": {
     "title": "Use angles or a right triangle to test congruence",
-    "signature": "e785a69cae1ac2a1cbae680acb6dd964a76f4c0ad2390d941a4921906db7cb93"
+    "signature": "88bb6f9deee3cba643b8a65bcbf31ddde32e985240dd8d7eeec35af384e957a7"
   },
   "8/space/3/1": {
     "title": "Recognise similar shapes",
@@ -317,55 +317,55 @@
   },
   "8/space/3/2": {
     "title": "Calculate a scale factor",
-    "signature": "efd35a68d4469f6a9d2eff7854569388f69e44a7d5e436c3c88ba404c7c617d1"
+    "signature": "c6b6a0b2d1b335d00d4d81f55eebedd772f3d95d3ad34ad3e525a326df524598"
   },
   "8/space/3/3": {
     "title": "Find missing corresponding lengths",
-    "signature": "329a527deaa0d5313836bb180367a8232f9df3eb952c4e4fef0f604553833e62"
+    "signature": "a915dd7cd9fcf927631db02065f15516f91fa65fc15cd14775ba7aa619fd6107"
   },
   "8/space/4/1": {
     "title": "Use triangle angles to test similarity",
-    "signature": "a4e3985592e8ebbe520894b31533668113a919e65059229496e1b5607bec51c1"
+    "signature": "65d0df91cc52a3e9ca015d400282a5a88b2b21b39f5a21cea9927287d1ab9fc1"
   },
   "8/space/4/2": {
     "title": "Compare congruence and similarity",
-    "signature": "b008e0e83f18d96a839363c0fdfc040b51ae4153d0e96094b634634562a28204"
+    "signature": "f1ddb1bc862113328895f054ec0d6b69be6c98aeaf961ffc56bc17914bbdd503"
   },
   "8/space/4/3": {
     "title": "Check what a transformation preserves",
-    "signature": "d54ff2a8ad7e789b10629135d60d191fb6297ec8276b97967833cbc613ca1ea8"
+    "signature": "97f450374e13704c8453588b0302c841912df0ad0c10d89ea375580fdbed54bb"
   },
   "8/space/5/1": {
     "title": "Compare sides and angles",
-    "signature": "54f3baf388d58905b9ace0ea42c67712d67a5f3e4c385c103240d64c64ec4cf6"
+    "signature": "bb12df73b5e36df12f03a63f240fa1657f6898701403b6ed05298d1af4e23e25"
   },
   "8/space/5/2": {
     "title": "Compare diagonals and symmetry",
-    "signature": "9f011557591fbe61582d4a4963bf4f2fef663bfce15ff91319bab889c2f6274e"
+    "signature": "db9fc8c7e77956cf810f4a3fe801f315826e98f67bd504fbd3733441d24a10cc"
   },
   "8/space/5/3": {
     "title": "Classify quadrilaterals using their properties",
-    "signature": "eb24db8685f49eaecbddec45e088e3aadde262d3457898dc93053caa9b111e7e"
+    "signature": "511c815fedacfe30a98e66825ad074b07cf3fd5aaa7ac2c8c6aea80aa2b5cd06"
   },
   "8/space/6/1": {
     "title": "Use congruent triangles to explain properties",
-    "signature": "80d0811b78880fe78af086aaf657f9f4bf16c43cf552a3bf7a044570fce043b2"
+    "signature": "8c76e96f12666aca6a8717a0fe21c4e3c336a91854840d4f0c49e537fd9cd9e1"
   },
   "8/space/6/2": {
     "title": "Find unknown angles and lengths",
-    "signature": "ed12ca0e2b5a37da4a197154df22a84337e98bdac4044b5e75c0932f20b0434e"
+    "signature": "1fa6ac662ec96d56fb4951495cabe270df33c6cfc92d3ea87b2c175a525ea71b"
   },
   "8/space/6/3": {
     "title": "Test a quadrilateral claim with a counterexample",
-    "signature": "3a023bb19879b90365ae3e9aad0de62959f8da3ba29a9f4e08b719f3293b6f7c"
+    "signature": "84513ec056e2d0f389a39e4e5748d5fd032d62a31c99562b5fb1976633b1642f"
   },
   "8/space/7/1": {
     "title": "Read three coordinates in order",
-    "signature": "b9b4ac19671df0e8504479145de060af672cb9957d2745e672a8fae7cb1603e3"
+    "signature": "b934f48cec3055b216b1b09b7cd7d532305d6086bcebe77313ac020c351a5e01"
   },
   "8/space/7/2": {
     "title": "Place a point in a 3D grid",
-    "signature": "e68d2476d0f6a6a28aebd809074abe53a65171bf80dbf224b4a809ee018cc7a5"
+    "signature": "e46df4c7e793641225d6b445b78f41497471ab24c247a860a7a610e74aa284af"
   },
   "8/space/7/3": {
     "title": "Rotate a view without changing position",
@@ -373,15 +373,15 @@
   },
   "8/space/8/1": {
     "title": "Follow a route through a 3D grid",
-    "signature": "284433c3f72ae91c2403837c6ee8d21c43e1319555736ee8f31c52a3f05c531d"
+    "signature": "50baae3279c3cf6561943bee0408d3a252c229327bf0b9ebef8b7868b471d836"
   },
   "8/space/8/2": {
     "title": "Locate vertices and vertical columns",
-    "signature": "0600630e3782c9595a25067a2ac23e3d438a9a661ed9c493fdf1dc82d28b1777"
+    "signature": "eb5fe0f102b572855cd067c3c98ad9ad7c26d061cc86bac1f21d67cc1644f26d"
   },
   "8/space/8/3": {
     "title": "Describe a practical 3D position",
-    "signature": "5a8940ac40fc4bf19a84a415a5a4b2ce3b14929ce9d9ccbfde21d87b71d2bce2"
+    "signature": "859f3eb217258c7e3f5ed1005cf889cae6d14eebb330935973bfe0bc1485f59e"
   },
   "8/space/9/1": {
     "title": "Trace a congruence or similarity flowchart",
@@ -389,11 +389,11 @@
   },
   "8/space/9/2": {
     "title": "Find and repair a faulty decision",
-    "signature": "116f3f7cd1b0243ac636311a8aefc1cc5733e7a51b4ac8dd06ff9be62088562b"
+    "signature": "9a64778c42927813787351d02c3f451b265f50cd16b774ee748913071acde6df"
   },
   "8/space/9/3": {
     "title": "Create and test a sorting algorithm",
-    "signature": "9d14ce1e9bd3b15ec013a3013208f031eb4a08d9dc2155432b63e2b3f26903e9"
+    "signature": "58c7c1504171224b49a277fffb7339455cc9308d3d83cc42d4197d9e46981eea"
   },
   "8/space/10/1": {
     "title": "Explain a shape comparison",
@@ -401,11 +401,11 @@
   },
   "8/space/10/2": {
     "title": "Solve a quadrilateral or 3D-location task",
-    "signature": "cf59f44870fdcd3012daeb4faa710ac03a20ab4291d12d068cab38e6e647f405"
+    "signature": "6dec627c8bb74b8a0b41805e4c92e6bcc909ed13ab9f29ca2da6dd496e89660a"
   },
   "8/space/10/3": {
     "title": "Test and improve a shape algorithm",
-    "signature": "398eae83f47e1877179669dd38265d96035cc6b4c1eecfbbde23a950e68a44a7"
+    "signature": "329c3a1d71515f1ece24a13be916402115bee59fdb9ef4fe8e6bfb647ecce228"
   },
   "8/pattern/1/1": {
     "title": "Write an expression from a situation",
@@ -413,7 +413,7 @@
   },
   "8/pattern/1/2": {
     "title": "Collect like terms with integer coefficients",
-    "signature": "fcf1d178dbe14eca148bc2a2837b721f6596ea9b42858d8bb822c05c1e9fb185"
+    "signature": "39aeb1a24b960c8cda3bf5e504506742845458d75b14bef8e24f8dab9a424db2"
   },
   "8/pattern/1/3": {
     "title": "Use algebraic properties to rearrange terms",
@@ -421,7 +421,7 @@
   },
   "8/pattern/2/1": {
     "title": "Expand a single bracket",
-    "signature": "c14f7f4b0d3dfd01775b2b6c109b53ecd8d918fbfb43b057acca7efb1d839a14"
+    "signature": "71b9abdc3ebca4bc59c54ed9b23eaf35b9b7163aaf390567b255a93bfed62ca1"
   },
   "8/pattern/2/2": {
     "title": "Expand with negative coefficients",
@@ -457,7 +457,7 @@
   },
   "8/pattern/5/1": {
     "title": "Collect variable terms on one side",
-    "signature": "39599613cc4f043bfa8659327c96260e73aeb4b76faf38225644815c83397452"
+    "signature": "1b3e45e0ecb060bf1e0f7c3e06b2840c5d737ebc63c959f5142a054adc939964"
   },
   "8/pattern/5/2": {
     "title": "Solve equations containing brackets",
@@ -469,7 +469,7 @@
   },
   "8/pattern/6/1": {
     "title": "Read strict and inclusive inequalities",
-    "signature": "1bc85f2c62dbd0780f2c90eeaf1b916841e4a255a3c16d11e5ca09f8b83c52ce"
+    "signature": "b95399489b6dc4a761f4ba34c04c0bee383fad7aa0a1b48d3e0856a9174437f0"
   },
   "8/pattern/6/2": {
     "title": "Solve one-variable inequalities with positive coefficients",
@@ -485,15 +485,15 @@
   },
   "8/pattern/7/2": {
     "title": "Plot a linear relation from a table",
-    "signature": "bf488dd99bfa95d2fd138afc2af7be7c76eb073e5a971a951a5bc52e04ebb403"
+    "signature": "fee5e0ad6175ff0898a543c885dc6bbcb67915c5593c03029b1fb8dd1c0ce282"
   },
   "8/pattern/7/3": {
     "title": "Read horizontal and vertical relations",
-    "signature": "7006cf7cece21a62d03e3b2cedc7af386ae22e275fd68bfbbaa89c65c7fa68f9"
+    "signature": "3a65a796f2e439221ba81c2124dbc2763b885a0666686a27a0881d16844ea456"
   },
   "8/pattern/8/1": {
     "title": "Change the starting value of a line",
-    "signature": "b0ddd85ce8cb0562345b304019768ffd2fe6f1117c26807ba5df33bd13176d3d"
+    "signature": "661ec364d824639c4cf8687946d9a54c1068e32d5ef19a0aaf9c0085dcfd1370"
   },
   "8/pattern/8/2": {
     "title": "Change the rate and direction of a line",
@@ -501,7 +501,7 @@
   },
   "8/pattern/8/3": {
     "title": "Make and test a graph conjecture",
-    "signature": "5e21b151102a5542f6266ef97e3905a226de02949b21932c63fcf8c4667f513d"
+    "signature": "aa25f6af3c02b0646fd80c978d64c0e41f6f61b172f5793aea3066d09f6e233c"
   },
   "8/pattern/9/1": {
     "title": "Read equation solutions from a graph",
@@ -509,7 +509,7 @@
   },
   "8/pattern/9/2": {
     "title": "Compare intersections and parallel lines",
-    "signature": "2a541c1014d7c589cd75e522e807396fb8e145572079fab04299877d71ddbd97"
+    "signature": "e4fe77391589b1e8784958e955c718d41746f79f141edb151fc42684a8142f1f"
   },
   "8/pattern/9/3": {
     "title": "Investigate inequalities using a graph",
@@ -541,7 +541,7 @@
   },
   "8/pattern/12/1": {
     "title": "Choose an expression or equation strategy",
-    "signature": "1613d0be195cc9f3be37735bfd9869595f087125a6d3b4a1b2dff17d0f8ea072"
+    "signature": "27ce94e58c0d7846a0b58e808cd0d9979ec46b2980e676da953a6070e1c159dd"
   },
   "8/pattern/12/2": {
     "title": "Build and check a practical linear model",
@@ -549,7 +549,7 @@
   },
   "8/pattern/12/3": {
     "title": "Test and explain a graph conjecture",
-    "signature": "00379f8561f10bf871246397631c7d8ea799cb8e5521771630e00f42870d1206"
+    "signature": "e67d8f33644d3cc09dd37d7ba668d4bcbe823b462e71a9c6d064034259f61621"
   },
   "8/statistics/1/1": {
     "title": "Choose a census or a sample",
@@ -573,7 +573,7 @@
   },
   "8/statistics/2/3": {
     "title": "Consider measurement precision and error",
-    "signature": "170e2637ca82744b78930486886f66d6ce10daf7c65cc043b30fa6c0ac145bf7"
+    "signature": "ea435db790d6ad96b75407ab86467f86d68e51c7a542138348554c2e60e92144"
   },
   "8/statistics/3/1": {
     "title": "Compare primary and secondary sources",
@@ -697,11 +697,11 @@
   },
   "8/chance/3/1": {
     "title": "Write ordered pairs",
-    "signature": "32a6abf1dbf0bd19e83f4d64f660718cc6dd89b2b1795be505535761345ff87c"
+    "signature": "2d419d231fcbaa1e34628afbee4767f394affdb67dca51ed3c5e8bd19863950a"
   },
   "8/chance/3/2": {
     "title": "List all combinations without missing any",
-    "signature": "a56c6f7b43d375ce215eb1b6c910bbbb5d29d1fd156cba9eb8fe19600f55736d"
+    "signature": "6eab4fb70c3f395c4f4fbfae0bf1bcb77ba0f395ae374627868a560427220810"
   },
   "8/chance/3/3": {
     "title": "Count outcomes that meet a condition",
@@ -721,7 +721,7 @@
   },
   "8/chance/5/1": {
     "title": "Build a tree for two events",
-    "signature": "d1dd7733defeb622dddddfc38d82987087ca8e4731d11f6f4717f499a9bf8573"
+    "signature": "112f58412467cedeb84b561ace14f35a3f3461e022c66149f59bca149e97997c"
   },
   "8/chance/5/2": {
     "title": "Read outcomes along branches",
@@ -745,11 +745,11 @@
   },
   "8/chance/7/1": {
     "title": "Distinguish and from inclusive or",
-    "signature": "9714af349c1ddf7a498724a5d276b839e4ede65905887a569d9a614ffd2691ba"
+    "signature": "d9184fea4031573b90239bb88b1b9c557e7f0538b0bde58be1dd9069d84bf212"
   },
   "8/chance/7/2": {
     "title": "Compare exclusive or and mutually exclusive events",
-    "signature": "bcd75e5154891786f8431058eece5ff43f3b42c5b4ff77cbf832879d432495ad"
+    "signature": "52588123f13d172bf61cd30f60f88443d05e49eadbdd079ce013eb6cbac3dc14"
   },
   "8/chance/7/3": {
     "title": "Find at least one using outcomes or complements",
@@ -769,7 +769,7 @@
   },
   "8/chance/9/1": {
     "title": "Calculate a theoretical prediction",
-    "signature": "08227b01470b058970dc096ba4f32ec2cba2e8a94a154588adb446a333903918"
+    "signature": "2436e05643161995af9c66f743c36889b2ed3748ce3628873eaa54d1aa5d8606"
   },
   "8/chance/9/2": {
     "title": "Compare small and large trial runs",
@@ -777,7 +777,7 @@
   },
   "8/chance/9/3": {
     "title": "Explain variation and review a simulation model",
-    "signature": "d75e0b97157f1457851293c9c64717f975e04cbb94041ac1e284912b3d6016ed"
+    "signature": "782b05a8a1d619ee03270f7c61d377e58ceeccc56ad1e31a3079a1e762cb3dff"
   },
   "8/chance/10/1": {
     "title": "Choose a useful event representation",
@@ -785,11 +785,11 @@
   },
   "8/chance/10/2": {
     "title": "Solve a compound-event probability problem",
-    "signature": "f3352bccc02ac1c2c66e828811c1a99062e73814479a4bd2876632ad8fb9066d"
+    "signature": "d36c2e8aa870983a7deef98a6e288848f96ff3b4405dc87c73f368d9ab33df8c"
   },
   "8/chance/10/3": {
     "title": "Run and explain a probability investigation",
-    "signature": "9f2653afd71811432a2d7c33a2dfd4b716aa17c340d947c971add4bc57b66101"
+    "signature": "cb4b986729a46e681161edac2b94d53c358e300778eb8362c671d817c4d0b8d0"
   },
   "7/number/1/1": {
     "title": "Build square numbers",

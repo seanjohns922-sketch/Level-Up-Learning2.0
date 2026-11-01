@@ -1,4 +1,5 @@
 import {g} from './shared';
+import {spaceTeachingDiagrams as d} from '../space';
 export const spaceTeaching = [
 [
 g("Congruent shapes have the same shape and size. Their names indicate matching vertices: ABC corresponds to XYZ, so A matches X, B matches Y and C matches Z.", "Match AB with XY, BC with YZ, and AC with XZ.|The congruent triangle therefore has the same three side lengths: 9, 11 and 12.|Add the three outside edges: perimeter = 9 + 11 + 12 = 32.", "A rotation or reflection may change where a side appears, but not which vertices it connects."),
@@ -51,3 +52,15 @@ g("The angles in a simple quadrilateral total 360°. Translate the labelled angl
 g("A good shape algorithm tests all the properties needed by its output. A counterexample reveals a missing test.", "A rhombus can have four equal sides but angles of 60° and 120°.|It passes 'four equal sides' but is not a square, so the original rule fails.|Repair it: if four sides are equal, also ask whether all four angles are 90°.|Output Square only when both tests pass; otherwise use Rhombus.", "Test a square, a non-square rhombus and a non-square rectangle to check both branches.", "A sorter says 'If a quadrilateral has four equal sides, output Square.' Find the error and repair it.", "Also test for four right angles")
 ]
 ];
+
+// Fixed examples get diagrams using their own stated quantities.
+const diagrams:Record<string,NonNullable<import('../shared').QuestionDraft['spaceVisual']>>={
+ '1/3':{coordinate:{dimensions:2,points:[{label:'A',values:[0,0]},{label:'B',values:[3,0]},{label:'C',values:[0,2]},{label:'P',values:[5,2]},{label:'Q',values:[8,2]},{label:'R',values:[5,4]}],edges:[[0,1],[1,2],[2,0],[3,4],[4,5],[5,3]],caption:'Triangles ABC and PQR on the same coordinate grid.'}},
+ '2/3':{polygons:[d.aasTri(10,69,63,'Triangle ABC'),d.aasTri(10,69,63,'Triangle XYZ',['X','Y','Z'])]},
+ '3/3':{polygons:[d.tri([60,80,100],'Junior course'),d.tri([180,240,300],'Senior course',['D','E','F'],['180','?','?'])]},
+ '4/1':{polygons:[d.aasTri(5,40,65,'First triangle',undefined,['','','']),d.aasTri(7,65,75,'Second triangle',undefined,['','',''])]},
+ '6/3':{polygons:[{...d.rect(6,4,'Counterexample: rectangle'),diagonals:true}]},
+ '9/3':{polygons:[d.rect(3,2,'Reference'),d.rect(3,2,'Test A'),d.rect(6,4,'Test B'),d.rect(7,4,'Test C')]},
+ '10/3':{polygons:[d.namedQuad('rhombus','A non-square rhombus',{sideLabels:['5','5','5','5']}),d.namedQuad('square','A square',{sideLabels:['4','4','4','4']})]},
+};
+for(const [key,visual] of Object.entries(diagrams)){const [w,l]=key.split('/').map(Number),guide=spaceTeaching[w-1][l-1];if(!guide.example)throw Error(`Missing fixed Space example ${key}`);guide.example.space8Visual=visual;}

@@ -1,6 +1,7 @@
 // Level 8 Probability diagram data. Rendered by components/lesson/level8/ChanceVisual.tsx.
 export type VennRegion = "a" | "both" | "b" | "neither";
 export type Chance8Visual =
+  | {kind:"branchTree";title:string;stages:{label:string;outcomes:string[]}[];withoutReplacement?:boolean}
   /** Equal sectors, drawn in order clockwise from the pointer. */
   | { kind: "spinner"; title: string; sectors: { label: string; color: string }[] }
   | { kind: "bag"; title: string; groups: { label: string; color: string; count: number }[] }
@@ -40,6 +41,7 @@ const regionNames = (labels: [string, string]): Record<VennRegion, string> => ({
 /** Narrates only what the diagram shows. */
 export function chance8VisualSpeech(v: Chance8Visual): string {
   switch (v.kind) {
+    case "branchTree": return `${v.title}. ${v.stages.map(s=>`${s.label}: ${s.outcomes.join(", ")}`).join(". ")}. ${v.withoutReplacement?"A previously selected outcome is omitted from the next stage.":"Every branch continues to each outcome of the next stage."}`;
     case "spinner": {
       const counts = new Map<string, number>();
       for (const s of v.sectors) counts.set(s.label, (counts.get(s.label) ?? 0) + 1);
@@ -50,13 +52,15 @@ export function chance8VisualSpeech(v: Chance8Visual): string {
     case "bar":
       return `${v.title}. A bar from 0 to 1. ${v.event}: ${v.pText}.${v.hideNot ? " The rest of the bar is not labelled." : ` Not ${v.event}: ${v.notText}.`}`;
     case "tree":
-      return `${v.title}. ${v.firstLabel}: ${v.first.join(", ")}. Each splits into ${v.secondLabel}: ${v.second.join(", ")}. ${v.first.length * v.second.length} paths.${v.highlight?.length ? ` Highlighted paths: ${v.highlight.join("; ")}.` : ""}`;
+      return `${v.title}. ${v.firstLabel}: ${v.first.join(", ")}. Each splits into ${v.secondLabel}: ${v.second.join(", ")}.${v.highlight?.length ? ` Highlighted paths: ${v.highlight.join("; ")}.` : ""}`;
     case "venn": {
       const names = regionNames(v.labels);
       const order: VennRegion[] = ["a", "both", "b", "neither"];
       return `${v.title}. ${order.map((r, i) => `${names[r]}: ${v.counts[i]}`).join(". ")}.${v.shade?.length ? ` Shaded: ${v.shade.map((r) => names[r]).join(", ")}.` : ""}`;
     }
-    case "grid":
-      return `${v.title}. Rows: ${v.rowLabel} ${v.rows.join(", ")}. Columns: ${v.colLabel} ${v.cols.join(", ")}. ${v.rows.length * v.cols.length} cells${v.hidden ? "" : ` showing the ${v.cell === "pair" ? "outcome pair" : v.cell}`}.${v.crossed?.length ? ` ${v.crossed.length} cells are crossed out.` : ""}${v.highlight?.length ? ` ${v.highlight.length} cells are highlighted.` : ""}`;
+    case "grid": {
+      const marked=(cells:[number,number][]|undefined)=>cells?.map(([r,c])=>`row ${v.rows[r]}, column ${v.cols[c]}`).join("; ");
+      return `${v.title}. Rows: ${v.rowLabel} ${v.rows.join(", ")}. Columns: ${v.colLabel} ${v.cols.join(", ")}. ${v.hidden?"Cells are blank.":v.rows.map((r,i)=>`Row ${r}: ${v.cols.map((_,j)=>v.crossed?.some(([a,b])=>a===i&&b===j)?"crossed out":gridCell(v,i,j)).join("; ")}.`).join(" ")}${v.crossed?.length?` Crossed cells: ${marked(v.crossed)}.`:""}${v.highlight?.length?` Highlighted cells: ${marked(v.highlight)}.`:""}`;
+    }
   }
 }

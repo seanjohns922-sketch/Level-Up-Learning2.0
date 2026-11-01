@@ -2,7 +2,7 @@ import {GROUND_STARPATH_FORMS,type GroundStarpathForm} from './groundStarpathFiv
 import {rotate as order} from './level2StarpathFiveForms';
 import type {Polygon7} from './level7StarpathFiveForms';
 export type Point3={x:number;y:number;z:number};
-export type Polygon8=Polygon7&{vertices?:string[];diagonals?:boolean;centreLabel?:string};
+export type Polygon8=Polygon7&{exteriorAngles?:string[];vertices?:string[];diagonals?:boolean;diagonal?:[number,number];centreLabel?:string};
 export type Option8={id:string;label:string;polygons?:Polygon8[]};
 export type Space8={point?:Point3;pointLabel?:string;readCoordinates?:boolean;extraPoints?:{point:Point3;label:string}[];box?:{min:Point3;max:Point3};caption:string};
 export type Task8={mode:'choice'|'multi'|'number'|'triple'|'place3d'|'sort'|'decisions';instruction:string;vocabulary?:string;polygons?:Polygon8[];flow?:string[];space?:Space8;options?:Option8[];correctIds?:string[];answer?:number;answerLabel?:string;unit?:string;expectedPoint?:Point3;sortRows?:{id:string;label:string;polygons:Polygon8[];answer:string}[];categories?:string[];decisionLabels?:string[];decisionChoices?:string[];decisionAnswers?:string[];evidence?:{sides?:number[][];angles?:number[];factor?:number;start?:Point3;steps?:Point3[]}};

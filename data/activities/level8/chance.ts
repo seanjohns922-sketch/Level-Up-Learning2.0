@@ -192,7 +192,7 @@ const unequalOutcomes: Form[] = [
   },
   (r) => {
     const p = r(15, 40) / 100;
-    return { prompt: `A die is weighted so that P(6) = ${p}. What is P(not 6)?`, answer: dec(1 - p), steps: ["Weighting changes the probabilities, but complements still add to 1.", `1 − ${p} = ${dec(1 - p)}.`] };
+    return { ...bar("Weighted die","rolling 6",p,String(p),"?"), prompt: `A die is weighted so that P(6) = ${p}. What is P(not 6)?`, answer: dec(1 - p), steps: ["Weighting changes the probabilities, but complements still add to 1.", `1 − ${p} = ${dec(1 - p)}.`] };
   },
   (r) => {
     const counts: [Colour, number][] = [["red", r(2, 9)], ["blue", r(2, 9)], ["green", r(1, 4)]], total = sum(counts.map((c) => c[1])), g = counts[2][1];
@@ -201,7 +201,7 @@ const unequalOutcomes: Form[] = [
   (r) => {
     const [redText, red, blueText, blue] = pick(r, [["half", 1 / 2, "a quarter", 1 / 4], ["a third", 1 / 3, "a third", 1 / 3], ["half", 1 / 2, "a sixth", 1 / 6], ["a quarter", 1 / 4, "half", 1 / 2]] as const);
     const green = (1 - red - blue) / 2, d = Math.round(1 / green);
-    return { prompt: `A spinner is ${redText} red and ${blueText} blue. The rest is split equally between green and yellow. What is P(not green)?`, answer: fraction(d - 1, d), steps: [`Green and yellow share 1 − ${fraction(Math.round(red * 12), 12)} − ${fraction(Math.round(blue * 12), 12)} = ${fraction(Math.round(2 * green * 12), 12)}, so P(green) = 1/${d}.`, `P(not green) = 1 − 1/${d} = ${fraction(d - 1, d)}.`] };
+    return { ...spinner("Given colour proportions",[["red",Math.round(red*d)],["blue",Math.round(blue*d)],["green",Math.round(green*d)],["yellow",Math.round(green*d)]]), prompt: `A spinner is ${redText} red and ${blueText} blue. The rest is split equally between green and yellow. What is P(not green)?`, answer: fraction(d - 1, d), steps: [`Green and yellow share 1 − ${fraction(Math.round(red * 12), 12)} − ${fraction(Math.round(blue * 12), 12)} = ${fraction(Math.round(2 * green * 12), 12)}, so P(green) = 1/${d}.`, `P(not green) = 1 − 1/${d} = ${fraction(d - 1, d)}.`] };
   },
   (r) => {
     const modes = ["Walk", "Car", "Bus", "Bike"], counts = modes.map(() => r(3, 12)), total = sum(counts), m = r(0, 3);
@@ -251,11 +251,11 @@ const orderedPairs: Form[] = [
   },
   (r) => {
     const a = r(2, 5), b = r(2, 4);
-    return { prompt: `A café offers ${a} mains and ${b} drinks. A meal is one main and one drink. How many different meals are possible?`, answer: a * b, steps: [`Each main can be paired with each of the ${b} drinks.`, `${a} × ${b} = ${a * b} meals.`] };
+    return { ...grid("Meal combinations","Main","Drink",range(1,a).map(i=>`M${i}`),range(1,b).map(i=>`D${i}`),"pair",{hidden:true}), prompt: `A café offers ${a} mains and ${b} drinks. A meal is one main and one drink. How many different meals are possible?`, answer: a * b, steps: [`Each main can be paired with each of the ${b} drinks.`, `${a} × ${b} = ${a * b} meals.`] };
   },
   (r) => {
     const n = r(2, 4), m = r(3, 6);
-    return { prompt: `Spinner A has ${n} colours and spinner B is numbered 1 to ${m}. How many ordered pairs can the two spinners give?`, answer: n * m, steps: ["List spinner A's result first, then spinner B's.", `${n} × ${m} = ${n * m} ordered pairs.`] };
+    return { ...grid("Spinner combinations","Spinner A","Spinner B",["R","B","G","Y"].slice(0,n),range(1,m),"pair",{hidden:true}), prompt: `Spinner A has ${n} colours and spinner B is numbered 1 to ${m}. How many ordered pairs can the two spinners give?`, answer: n * m, steps: ["List spinner A's result first, then spinner B's.", `${n} × ${m} = ${n * m} ordered pairs.`] };
   },
 ];
 const listAll: Form[] = [
@@ -273,11 +273,11 @@ const listAll: Form[] = [
   },
   (r) => {
     const all = ["HH", "HT", "TH", "TT"], miss = r(0, 3), shown = all.filter((_, i) => i !== miss);
-    return { prompt: `Mia lists the outcomes of tossing two coins as ${listed(shown)}. Which outcome is missing? Write it like HT.`, answer: all[miss], steps: ["Fix the first coin, then list every second coin: HH, HT, then TH, TT.", `Missing: ${all[miss]}.`] };
+    return { ...grid("Coin outcomes","First coin","Second coin",["H","T"],["H","T"],"pair",{hidden:true}), prompt: `Mia lists the outcomes of tossing two coins as ${listed(shown)}. Which outcome is missing? Use H for heads and T for tails.`, answer: all[miss], steps: ["Fix the first coin, then list every second coin: HH, HT, then TH, TT.", `Missing: ${all[miss]}.`] };
   },
   (r) => {
     const letters = r(2, 5), digits = pick(r, [4, 5, 10]);
-    return { prompt: `A locker code is one letter from the first ${letters} letters of the alphabet, then one digit from ${digits === 10 ? "0 to 9" : `1 to ${digits}`}. How many codes are possible?`, answer: letters * digits, steps: [`Each of the ${letters} letters pairs with each of the ${digits} digits.`, `${letters} × ${digits} = ${letters * digits} codes.`] };
+    return { ...grid("Letter-digit codes","Letter","Digit","ABCDE".slice(0,letters).split(""),digits===10?range(0,9):range(1,digits),"pair",{hidden:true}), prompt: `A locker code is one letter from the first ${letters} letters of the alphabet, then one digit from ${digits === 10 ? "0 to 9" : `1 to ${digits}`}. How many codes are possible?`, answer: letters * digits, steps: [`Each of the ${letters} letters pairs with each of the ${digits} digits.`, `${letters} × ${digits} = ${letters * digits} codes.`] };
   },
 ];
 const countCondition: Form[] = [
@@ -341,7 +341,7 @@ const completeTable: Form[] = [
   },
   (r) => {
     const g = twoWayData(r), rowYes = g.a + g.b, colYes = g.a + g.c;
-    return { prompt: `${g.total} students were surveyed. ${rowYes} ${g.t.rowSay[0]}, ${colYes} ${g.t.colSay[0]} and ${g.a} do both. How many students ${g.t.rowSay[1]} and ${g.t.colSay[1]}?`, answer: g.d, steps: [`Put ${g.a} in the “both” cell. Then ${rowYes} − ${g.a} = ${g.b} and ${colYes} − ${g.a} = ${g.c}.`, `${g.total} − ${g.a} − ${g.b} − ${g.c} = ${g.d}.`] };
+    return { ...{visual:g.show(["b","c","d","r1","c1"])}, prompt: `${g.total} students were surveyed. ${rowYes} ${g.t.rowSay[0]}, ${colYes} ${g.t.colSay[0]} and ${g.a} do both. How many students ${g.t.rowSay[1]} and ${g.t.colSay[1]}?`, answer: g.d, steps: [`Put ${g.a} in the “both” cell. Then ${rowYes} − ${g.a} = ${g.b} and ${colYes} − ${g.a} = ${g.c}.`, `${g.total} − ${g.a} − ${g.b} − ${g.c} = ${g.d}.`] };
   },
   (r) => {
     const g = twoWayData(r);
@@ -406,15 +406,15 @@ const buildTree: Form[] = [
   },
   (r) => {
     const n = r(2, 3);
-    return { prompt: `A coin is tossed ${n === 2 ? "twice" : "three times"}. How many paths does the tree diagram have?`, answer: 2 ** n, steps: ["Each toss doubles the number of branches.", `${Array(n).fill(2).join(" × ")} = ${2 ** n}.`] };
+    return { ...coinTree(n), prompt: `A coin is tossed ${n === 2 ? "twice" : "three times"}. How many paths does the tree diagram have?`, answer: 2 ** n, steps: ["Each toss doubles the number of branches.", `${Array(n).fill(2).join(" × ")} = ${2 ** n}.`] };
   },
   (r) => {
     const k = r(4, 6), answer = `2 branches, then ${k} from each`;
-    return { prompt: `Which tree matches “toss a coin, then spin a spinner with ${k} sections”?`, answer, choices: [answer, `${k} branches, then 2 from each`, `2 branches, then ${k} in total`, `${k + 2} branches`], steps: ["The first event gives the first branches.", `Coin first: 2 branches, each splitting into ${k}: ${2 * k} paths.`] };
+    return { ...tree("Coin then spinner","Coin","Spinner",["H","T"],range(1,k).map(String)), prompt: `Which tree matches “toss a coin, then spin a spinner with ${k} sections”?`, answer, choices: [answer, `${k} branches, then 2 from each`, `2 branches, then ${k} in total`, `${k + 2} branches`], steps: ["The first event gives the first branches.", `Coin first: 2 branches, each splitting into ${k}: ${2 * k} paths.`] };
   },
   (r) => {
     const n = r(3, 5), back = r(0, 1) === 1;
-    return { prompt: `A bag holds ${n} different coloured counters. One is taken${back ? " and put back" : " and not put back"}, then a second is taken. How many paths does the tree have?`, answer: back ? n * n : n * (n - 1), steps: [back ? `The counter is replaced, so the second stage still has ${n} branches.` : `The counter is not replaced, so the second stage has only ${n - 1} branches.`, back ? `${n} × ${n} = ${n * n}.` : `${n} × ${n - 1} = ${n * (n - 1)}.`] };
+    return { ...{chanceVisual:{kind:"branchTree",title:back?"Draw with replacement":"Draw without replacement",stages:[{label:"First draw",outcomes:["R","B","G","Y","P"].slice(0,n)},{label:"Second draw",outcomes:["R","B","G","Y","P"].slice(0,n)}],withoutReplacement:!back}}, prompt: `A bag holds ${n} different coloured counters. One is taken${back ? " and put back" : " and not put back"}, then a second is taken. How many paths does the tree have?`, answer: back ? n * n : n * (n - 1), steps: [back ? `The counter is replaced, so the second stage still has ${n} branches.` : `The counter is not replaced, so the second stage has only ${n - 1} branches.`, back ? `${n} × ${n} = ${n * n}.` : `${n} × ${n - 1} = ${n * (n - 1)}.`] };
   },
 ];
 const readTree: Form[] = [
@@ -433,7 +433,7 @@ const readTree: Form[] = [
   },
   (r) => {
     const n = r(2, 3);
-    return { prompt: `A coin is tossed ${n === 2 ? "twice" : "three times"}. How many outcomes include at least one head?`, answer: 2 ** n - 1, steps: [`There are ${2 ** n} outcomes and only one has no heads (${"T".repeat(n)}).`, `${2 ** n} − 1 = ${2 ** n - 1}.`] };
+    return { ...coinTree(n), prompt: `A coin is tossed ${n === 2 ? "twice" : "three times"}. How many outcomes include at least one head?`, answer: 2 ** n - 1, steps: [`There are ${2 ** n} outcomes and only one has no heads (${"T".repeat(n)}).`, `${2 ** n} − 1 = ${2 ** n - 1}.`] };
   },
   (r) => {
     const [l1, f] = pick(r, TREE_SETS), [l2, s] = pick(r, TREE_SETS.filter(([l]) => l !== l1 && l !== "Drink"));
@@ -454,7 +454,7 @@ const treeProbability: Form[] = [
   },
   (r) => {
     const n = r(2, 3), ways = n === 2 ? 2 : 3;
-    return { prompt: `A fair coin is tossed ${n === 2 ? "twice" : "three times"}. What is the probability of exactly one head?`, answer: fraction(ways, 2 ** n), steps: [n === 2 ? "Outcomes with one head: HT, TH." : "Outcomes with one head: HTT, THT, TTH.", `P = ${ways}/${2 ** n}${fraction(ways, 2 ** n) === `${ways}/${2 ** n}` ? "" : ` = ${fraction(ways, 2 ** n)}`}.`] };
+    return { ...coinTree(n), prompt: `A fair coin is tossed ${n === 2 ? "twice" : "three times"}. What is the probability of exactly one head?`, answer: fraction(ways, 2 ** n), steps: [n === 2 ? "Outcomes with one head: HT, TH." : "Outcomes with one head: HTT, THT, TTH.", `P = ${ways}/${2 ** n}${fraction(ways, 2 ** n) === `${ways}/${2 ** n}` ? "" : ` = ${fraction(ways, 2 ** n)}`}.`] };
   },
   (r) => {
     const f = range(1, 3).map(String), s = range(1, r(3, 4)).map(String), k = r(3, 5);
@@ -522,20 +522,20 @@ function twoEvents(r: R) {
   return { n, A, B, where, a, b, and, or };
 }
 const andOr: Form[] = [
-  (r) => { const e = twoEvents(r); return { prompt: `${e.where}. How many outcomes are ${e.A.text} and ${e.B.text}?`, answer: e.and.length, steps: [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, `In both: {${e.and.join(", ") || "none"}}, so ${e.and.length}.`] }; },
-  (r) => { const e = twoEvents(r); return { prompt: `${e.where}. How many outcomes are ${e.A.text} or ${e.B.text} (or both)?`, answer: e.or.length, steps: [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, `Combine, counting shared outcomes once: {${e.or.join(", ")}}, so ${e.or.length}.`] }; },
-  (r) => { const e = twoEvents(r); return { prompt: `${e.where}. What is P(${e.A.text} or ${e.B.text})?`, answer: fraction(e.or.length, e.n), steps: [`Either event: {${e.or.join(", ")}} — ${e.or.length} outcomes.`, `P = ${pf(e.or.length, e.n)}.`] }; },
+  (r) => { const e = twoEvents(r); return { ...eventLists(e), prompt: `${e.where}. How many outcomes are ${e.A.text} and ${e.B.text}?`, answer: e.and.length, steps: [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, `In both: {${e.and.join(", ") || "none"}}, so ${e.and.length}.`] }; },
+  (r) => { const e = twoEvents(r); return { ...eventLists(e), prompt: `${e.where}. How many outcomes are ${e.A.text} or ${e.B.text} (or both)?`, answer: e.or.length, steps: [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, `Combine, counting shared outcomes once: {${e.or.join(", ")}}, so ${e.or.length}.`] }; },
+  (r) => { const e = twoEvents(r); return { ...eventLists(e), prompt: `${e.where}. What is P(${e.A.text} or ${e.B.text})?`, answer: fraction(e.or.length, e.n), steps: [`Either event: {${e.or.join(", ")}} — ${e.or.length} outcomes.`, `P = ${pf(e.or.length, e.n)}.`] }; },
   (r) => {
     const v = vennData(r), [x, y] = v.labels, opts: [string, VennRegion[]][] = [[`${x} and ${y}`, ["both"]], [`${x} or ${y}`, ["a", "both", "b"]], [`${x} only`, ["a"]], [`Neither ${x} nor ${y}`, ["neither"]]];
     const [answer, shade] = pick(r, opts);
     return { prompt: "Which event does the shaded region show?", answer, choices: opts.map((o) => o[0]), steps: ["“And” is only the overlap. “Or” is everything inside the circles.", `The shading shows ${answer}.`], ...venn("Shaded region", v.labels, [v.a, v.both, v.b, v.neither], shade) };
   },
-  (r) => { const e = twoEvents(r); return { prompt: `${e.where}. What is P(${e.A.text} and ${e.B.text})?`, answer: fraction(e.and.length, e.n), steps: [`Both events: {${e.and.join(", ") || "none"}} — ${e.and.length} outcome${e.and.length === 1 ? "" : "s"}.`, `P = ${e.and.length ? pf(e.and.length, e.n) : `0/${e.n} = 0`}.`] }; },
+  (r) => { const e = twoEvents(r); return { ...eventLists(e), prompt: `${e.where}. What is P(${e.A.text} and ${e.B.text})?`, answer: fraction(e.and.length, e.n), steps: [`Both events: {${e.and.join(", ") || "none"}} — ${e.and.length} outcome${e.and.length === 1 ? "" : "s"}.`, `P = ${e.and.length ? pf(e.and.length, e.n) : `0/${e.n} = 0`}.`] }; },
 ];
 const mutuallyExclusive: Form[] = [
   (r) => {
     const e = twoEvents(r), yes = e.and.length === 0;
-    return yesNo(`${e.where}. Are “${e.A.text}” and “${e.B.text}” mutually exclusive?`, yes, [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, yes ? "No outcome is in both, so they cannot happen together: mutually exclusive." : `${listed(e.and)} ${e.and.length === 1 ? "is" : "are"} in both, so they are not mutually exclusive.`]);
+    return ({...yesNo(`${e.where}. Are “${e.A.text}” and “${e.B.text}” mutually exclusive?`, yes, [`${cap(e.A.text)}: {${e.a.join(", ")}}. ${cap(e.B.text)}: {${e.b.join(", ")}}.`, yes ? "No outcome is in both, so they cannot happen together: mutually exclusive." : `${listed(e.and)} ${e.and.length === 1 ? "is" : "are"} in both, so they are not mutually exclusive.`]), ...eventLists(e)});
   },
   (r) => {
     const p = r(10, 45), q = r(10, 45);
@@ -548,13 +548,13 @@ const mutuallyExclusive: Form[] = [
   },
   (r) => {
     const exclusive = r(0, 1) === 1, answer = exclusive ? "A only and B only" : "A only, both and B only";
-    return { prompt: `Which regions of a Venn diagram make up “A or B”${exclusive ? " in the exclusive sense (but not both)" : " in the inclusive sense (or both)"}?`, answer, choices: ["A only, both and B only", "A only and B only", "Only the overlap", "Everything outside the circles"], steps: ["Inclusive or keeps the overlap; exclusive or removes it.", answer + "."] };
+    return { ...venn("Regions of two events",["A","B"],["A only","Both","B only","Neither"]), prompt: `Which regions of a Venn diagram make up “A or B”${exclusive ? " in the exclusive sense (but not both)" : " in the inclusive sense (or both)"}?`, answer, choices: ["A only, both and B only", "A only and B only", "Only the overlap", "Everything outside the circles"], steps: ["Inclusive or keeps the overlap; exclusive or removes it.", answer + "."] };
   },
 ];
 const atLeastOne: Form[] = [
   (r) => {
     const n = r(2, 3);
-    return { prompt: `A fair coin is tossed ${n === 2 ? "twice" : "three times"}. What is P(at least one head)?`, answer: fraction(2 ** n - 1, 2 ** n), steps: [`The complement is “no heads”: only ${"T".repeat(n)}, so P = 1/${2 ** n}.`, `1 − 1/${2 ** n} = ${fraction(2 ** n - 1, 2 ** n)}.`] };
+    return { ...coinTree(n), prompt: `A fair coin is tossed ${n === 2 ? "twice" : "three times"}. What is P(at least one head)?`, answer: fraction(2 ** n - 1, 2 ** n), steps: [`The complement is “no heads”: only ${"T".repeat(n)}, so P = 1/${2 ** n}.`, `1 − 1/${2 ** n} = ${fraction(2 ** n - 1, 2 ** n)}.`] };
   },
   (r) => {
     const k = r(1, 6);
@@ -562,7 +562,7 @@ const atLeastOne: Form[] = [
   },
   (r) => {
     const a = r(3, 6), b = r(3, 6);
-    return { prompt: `Two fair spinners have ${a} and ${b} equal sections. Each has one red section. What is P(at least one red)?`, answer: fraction(a * b - (a - 1) * (b - 1), a * b), steps: [`No red: ${a - 1} × ${b - 1} = ${(a - 1) * (b - 1)} of the ${a * b} outcomes.`, `At least one red: ${pf(a * b - (a - 1) * (b - 1), a * b)}.`] };
+    return { ...grid("Two spinners","Spinner A","Spinner B",range(1,a).map(i=>i===1?"Red":String(i)),range(1,b).map(i=>i===1?"Red":String(i)),"pair"), prompt: `Two fair spinners have ${a} and ${b} equal sections. Each has one red section. What is P(at least one red)?`, answer: fraction(a * b - (a - 1) * (b - 1), a * b), steps: [`No red: ${a - 1} × ${b - 1} = ${(a - 1) * (b - 1)} of the ${a * b} outcomes.`, `At least one red: ${pf(a * b - (a - 1) * (b - 1), a * b)}.`] };
   },
   (r) => {
     const [ev, answer] = pick(r, [["at least one head", "No heads"], ["at least one six", "No sixes"], ["at least one red", "No reds"]] as const);
@@ -598,7 +598,14 @@ const designSimulation: Form[] = [
       ["Two coins are simulated with one random number from 1 to 3: 1 = two heads, 2 = one head, 3 = no heads.", false, "One head has 2 outcomes (HT, TH) out of 4, so it should be twice as likely as two heads."],
     ];
     const [text, fair, why] = pick(r, CASES);
-    return yesNo(`${text} Is this a fair model?`, fair, ["A fair model gives each real outcome its correct chance.", why]);
+    const model = text.startsWith("A die")
+      ? table("Die simulation mapping",["Die face","Model outcome"],range(1,6).map(n=>[n,n<=(fair?3:4)?"Heads":"Tails"]))
+      : text.startsWith("The total")
+        ? table("Proposed simulation",["Random numbers","Recorded result"],[["2 to 12, each equally likely","The selected number"]])
+        : text.startsWith("Two dice")
+          ? table("Proposed simulation",["Stage","Action"],[["First die","Choose 1 to 6 equally likely"],["Second die","Choose 1 to 6 separately"],["Result","Add the two numbers"]])
+          : table("Proposed simulation",["Random number","Recorded outcome"],[[1,"Two heads"],[2,"One head"],[3,"No heads"]]);
+    return {...yesNo(`${text} Is this a fair model?`, fair, ["A fair model gives each real outcome its correct chance.", why]), visual:model};
   },
   (r) => {
     const [per, item] = pick(r, [[2, "coin tosses"], [3, "coin tosses"], [2, "dice rolls"]] as const), n = 10 * r(3, 20);
@@ -636,7 +643,7 @@ const experimentalProbability: Form[] = [
 
 /* ---------- Week 9: compare simulation and prediction ---------- */
 const predict: Form[] = [
-  (r) => { const n = 4 * r(10, 60); return { prompt: `Two fair coins are tossed ${n} times. How many times would you expect two heads?`, answer: n / 4, steps: ["P(HH) = 1/4.", `Expected = ${n} × 1/4 = ${n / 4}. This is a prediction, not a guarantee.`] }; },
+  (r) => { const n = 4 * r(10, 60); return { ...coinTree(2), prompt: `Two fair coins are tossed ${n} times. How many times would you expect two heads?`, answer: n / 4, steps: ["P(HH) = 1/4.", `Expected = ${n} × 1/4 = ${n / 4}. This is a prediction, not a guarantee.`] }; },
   (r) => {
     const s = r(4, 10), ways = diceCount((a, b) => a + b === s), n = 36 * r(2, 10);
     return { prompt: `Two dice are rolled ${n} times. How many times would you expect a total of ${s}?`, answer: (n * ways) / 36, steps: [`${ways} of the 36 outcomes give ${s}, so P = ${fraction(ways, 36)}.`, `${n} × ${ways}/36 = ${(n * ways) / 36}.`], ...grid("Totals of two dice", "First die", "Second die", DICE, DICE, "sum") };
@@ -646,14 +653,14 @@ const predict: Form[] = [
     return { prompt: `Spinner A (1 to ${a}) and spinner B (1 to ${b}) are spun. What is the theoretical probability of a total of ${s}?`, answer: fraction(ways, a * b), steps: [`${ways} of the ${a * b} cells show ${s}.`, `P = ${pf(ways, a * b)}.`], ...grid("Totals", "Spinner A", "Spinner B", range(1, a), range(1, b), "sum") };
   },
   (r) => { const n = r(30, 70); return { prompt: `A fair coin gave ${n} heads in 100 tosses. What is the theoretical probability of heads on the next toss?`, answer: "1/2", steps: ["The coin is still fair, and each toss is independent.", "Past results do not change the theoretical probability: 1/2."] }; },
-  (r) => { const n = 6 * r(10, 40); return { prompt: `Two dice are rolled ${n} times. How many doubles would you expect?`, answer: n / 6, steps: ["6 of the 36 outcomes are doubles, so P = 1/6.", `${n} × 1/6 = ${n / 6}.`] }; },
+  (r) => { const n = 6 * r(10, 40); return { ...grid("Two dice","First die","Second die",DICE,DICE,"pair"), prompt: `Two dice are rolled ${n} times. How many doubles would you expect?`, answer: n / 6, steps: ["6 of the 36 outcomes are doubles, so P = 1/6.", `${n} × 1/6 = ${n / 6}.`] }; },
 ];
 const smallLarge: Form[] = [
   (r) => {
     const small = r(2, 8), large = r(42, 58), ds = Math.abs(small / 10 - 0.5), dl = Math.abs(large / 100 - 0.5);
     return { prompt: "The theoretical probability is 0.5. Which batch has an experimental probability closer to 0.5? Enter A, B or Equal.", answer: ds < dl ? "A" : ds > dl ? "B" : "Equal", steps: [`Batch A: ${small}/10 = ${small / 10}. Batch B: ${large}/100 = ${large / 100}.`, "Compare each distance from 0.5."], visual: table("Observed batches", ["Batch", "Successes", "Trials"], [["A", small, 10], ["B", large, 100]]) };
   },
-  (r) => { const n = 4 * r(10, 30), k = n / 4 + r(-8, 8); return { prompt: `Two coins were tossed ${n} times and two heads came up ${k} times. By how many does this differ from the expected count?`, answer: Math.abs(k - n / 4), steps: [`Expected: ${n} × 1/4 = ${n / 4}.`, `Difference: |${k} − ${n / 4}| = ${Math.abs(k - n / 4)}.`] }; },
+  (r) => { const n = 4 * r(10, 30), k = n / 4 + r(-8, 8); return { ...coinTree(2), prompt: `Two coins were tossed ${n} times and two heads came up ${k} times. By how many does this differ from the expected count?`, answer: Math.abs(k - n / 4), steps: [`Expected: ${n} × 1/4 = ${n / 4}.`, `Difference: |${k} − ${n / 4}| = ${Math.abs(k - n / 4)}.`] }; },
   (r) => {
     const CASES: [string, boolean, string][] = [
       ["With more trials, the experimental probability usually gets closer to the theoretical probability.", true, "Random variation evens out over many trials."],
@@ -687,7 +694,7 @@ const explainVariation: Form[] = [
   (r) => {
     const big = r(0, 1) === 1, n = big ? 1000 : 20, k = big ? r(380, 420) : r(6, 8);
     const answer = big ? "The simulation model is probably wrong" : "Random variation in a small number of trials";
-    return { prompt: `A simulation of two fair coins gives two heads in ${k} of ${n} trials (theory says 1/4). What is the most likely explanation?`, answer, choices: ["The simulation model is probably wrong", "Random variation in a small number of trials", "Theoretical probabilities are always wrong", "The coins remembered earlier results"], steps: [`${k}/${n} ≈ ${rounded(k / n, 2)}, compared with 0.25.`, big ? "With 1000 trials this gap is too big for chance, so check the model." : "With only 20 trials, a gap this size is normal random variation."] };
+    return { ...coinTree(2), prompt: `A simulation of two fair coins gives two heads in ${k} of ${n} trials (theory says 1/4). What is the most likely explanation?`, answer, choices: ["The simulation model is probably wrong", "Random variation in a small number of trials", "Theoretical probabilities are always wrong", "The coins remembered earlier results"], steps: [`${k}/${n} ≈ ${rounded(k / n, 2)}, compared with 0.25.`, big ? "With 1000 trials this gap is too big for chance, so check the model." : "With only 20 trials, a gap this size is normal random variation."] };
   },
   (r) => {
     const n = 600, k = r(85, 99);
@@ -709,7 +716,7 @@ const explainVariation: Form[] = [
   },
   (r) => {
     const n = 4 * r(25, 100);
-    return { prompt: `A fair two-coin simulation is run ${n} times. About how many trials should give exactly one head?`, answer: n / 2, steps: ["Exactly one head is HT or TH: 2 of 4 outcomes, so P = 1/2.", `${n} × 1/2 = ${n / 2}. The actual count will vary a little.`] };
+    return { ...coinTree(2), prompt: `A fair two-coin simulation is run ${n} times. About how many trials should give exactly one head?`, answer: n / 2, steps: ["Exactly one head is HT or TH: 2 of 4 outcomes, so P = 1/2.", `${n} × 1/2 = ${n / 2}. The actual count will vary a little.`] };
   },
 ];
 
@@ -751,3 +758,6 @@ export const chanceLessons: LessonFactory[] = [
   review(W.slice(6, 21)),
   review(W.slice(21, 27)),
 ];
+
+const coinTree=(n:number):Partial<QuestionDraft>=>({chanceVisual:{kind:'branchTree',title:'Coin-toss outcomes',stages:Array.from({length:n},(_,i)=>({label:`Toss ${i+1}`,outcomes:['H','T']}))}});
+const eventLists=(e:ReturnType<typeof twoEvents>):Partial<QuestionDraft>=>({visual:table('Event outcomes',['Event','Outcomes'],[[e.A.text,e.a.join(', ')],[e.B.text,e.b.join(', ')]])});

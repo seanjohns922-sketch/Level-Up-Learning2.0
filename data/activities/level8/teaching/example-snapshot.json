@@ -81,7 +81,7 @@
  "space W10L1": "Are these triangles congruent, similar but not congruent, or neither? → Congruent",
  "space W10L2": "The angles of a quadrilateral are x°, 3x°, 5x°, 3x°. Find x. → 30",
  "pattern W1L1": "6 is subtracted from a number x and the result is multiplied by 5. Write an expression for the result. → 5(x − 6)",
- "pattern W1L2": "A triangle has sides 5x + 4, x − 2, 3x + 6. Write its perimeter in simplest form. → 9x + 8",
+ "pattern W1L2": "For x > 3, a triangle has sides 5x + 2, 3x − 1, 3x + 3. Write its perimeter in simplest form. → 11x + 4",
  "pattern W1L3": "Substitute x = 2 into 5(x + 4) and into 5x + 20. What value do both give? → 30",
  "pattern W2L1": "A rectangle is 8 cm wide and (x + 6) cm long. Write an expanded expression for its area. → 8x + 48",
  "pattern W2L2": "The area model shows −6(4x − 2). Write the expanded expression. → −24x + 12",

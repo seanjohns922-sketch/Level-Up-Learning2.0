@@ -212,3 +212,6 @@ console.log("PASS: all five GST variants state 10%; inclusive-tax working and th
 
 // Cover every Measurement form, not just whichever variant the lesson seed picks.
 await import("./measurement8-visuals-test.mjs");
+
+// Review all other realms at form level, including random branches.
+await import("./level8-realm-visuals-test.mjs");

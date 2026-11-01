@@ -23,10 +23,11 @@ for(const [realm,weeks] of Object.entries(LEVEL8_TEACHING)){
  for(let w=1;w<=weeks.length;w++)for(let l=1;l<=3;l++){
   const g=level8TeachingGuide(realm,w,l);
   if(g.example===weeks[w-1][l-1].example){
-   // Fixed Measurement diagrams are authored from their own example facts; the
-   // visual audit checks all 36 guides and pins these properties in the fixture.
-   const ownPlan=realm==='measurement' && (w===1 || new Set(['2/1','4/2','5/1','6/2','9/2','12/2']).has(`${w}/${l}`));
-   for(const key of ['cave7Visual','measurement8Visual','number8Visual','algebra8Visual','chance8Visual','space8Visual','answerSpec'])if(!(ownPlan&&key==='measurement8Visual'))assert(!(key in g.example),'Replacement example must not inherit unrelated visual or answer metadata');
+   // Fixed examples have their own explicitly authored diagrams. Never inherit
+   // unrelated visual or answer metadata from the generated question.
+   const fixedVisuals={measurement:{key:'measurement8Visual',lessons:new Set(['1/1','1/2','1/3','2/1','4/2','5/1','6/2','9/2','12/2'])},space:{key:'space8Visual',lessons:new Set(['1/3','2/3','3/3','4/1','6/3','9/3','10/3'])},pattern:{key:'algebra8Visual',lessons:new Set(['7/2','12/3'])},chance:{key:'chance8Visual',lessons:new Set(['10/3'])}};
+   const own=fixedVisuals[realm];
+   for(const key of ['cave7Visual','measurement8Visual','number8Visual','algebra8Visual','chance8Visual','space8Visual','answerSpec'])if(!(own?.lessons.has(`${w}/${l}`)&&key===own.key))assert(!(key in g.example),'Replacement example must not inherit unrelated visual or answer metadata');
   }
  }
 }

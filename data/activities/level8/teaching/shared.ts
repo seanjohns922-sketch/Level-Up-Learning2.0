@@ -2,7 +2,7 @@ export type TeachingGuide = {
   idea: string;
   steps: string[];
   check: string;
-  example?: { prompt: string; answer: string; measurement8Visual?: import("@/data/assessments/revisions/year8MeasurementFiveForms").Measurement8Visual };
+  example?: { prompt: string; answer: string } & Partial<Pick<import("../shared").Level8Question,"measurement8Visual"|"space8Visual"|"algebra8Visual"|"chance8Visual"|"number8Visual"|"cave7Visual">>;
 };
 // These are authored teaching examples, not assessment questions. A replacement
 // example has no inherited diagram: an explicitly authored diagram must use its

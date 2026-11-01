@@ -24,7 +24,7 @@ function NumberLine({ v }: { v: Extract<Number8Visual, { kind: "numberline" }> }
       {v.points.map((p, i) => (
         <g key={i}>
           <circle cx={x(p.value)} cy={70} r={7} fill={p.colour ?? WARM} stroke="#fff" strokeWidth={2} />
-          <text x={x(p.value)} y={46} textAnchor="middle" fontSize={18} fontWeight={700} fill={p.colour ?? WARM}>{p.label}</text>
+          <text x={x(p.value)} y={v.points.some((other,j)=>j!==i&&Math.abs(x(other.value)-x(p.value))<75)?(i%2?22:46):46} textAnchor="middle" fontSize={18} fontWeight={700} fill={p.colour ?? WARM}>{p.label}</text>
         </g>
       ))}
     </svg>
@@ -55,7 +55,7 @@ function Factors({ v }: { v: Extract<Number8Visual, { kind: "factors" }> }) {
       {v.groups.map((g, i) => (
         <div key={i} className="flex items-center gap-2">
           {g.operator && <span className="text-2xl font-bold" style={{ color: MUTED }}>{g.operator}</span>}
-          <div className="flex items-center gap-1 rounded-lg border-2 px-2 py-1" style={{ borderColor: ACCENT }}>
+          <div className="flex flex-wrap items-center gap-1 rounded-lg border-2 px-2 py-1" style={{ borderColor: ACCENT }}>
             <span className="text-lg" style={{ color: MUTED }}>(</span>
             {Array.from({ length: g.count }, (_, k) => (
               <span key={k} className="flex items-center gap-1">
@@ -93,21 +93,34 @@ function Division({ v }: { v: Extract<Number8Visual, { kind: "division" }> }) {
 }
 
 function PercentBar({ v }: { v: Extract<Number8Visual, { kind: "percentbar" }> }) {
-  // Laid out with HTML so the labels stay readable on a phone.
-  const unit = v.unit ?? "", amount = unit === "$" ? `$${v.base}` : `${v.base}${unit ? ` ${unit}` : ""}`;
-  const change = Math.max(30, v.percent), whole = v.direction > 0 ? 100 + change : 100;
+  const unit = v.unit ?? "", amount = v.hideBase ? "?" : unit === "$" ? `$${v.base}` : `${v.base}${unit ? ` ${unit}` : ""}`;
+  const whole = v.direction > 0 ? 100 + v.percent : 100;
   return (
     <div role="img" aria-label={number8VisualSpeech(v)} className="py-2">
-      <div className="flex h-14 w-full text-xs font-bold sm:text-base">
-        <div className="relative flex items-center justify-center rounded-lg border-2" style={{ width: `${(100 / whole) * 100}%`, borderColor: ACCENT, background: "#e0f2f1", color: INK }}>
-          {v.direction < 0 && <div className="absolute inset-y-0 right-0 flex items-center justify-center rounded-r-md border-l-2 border-dashed" style={{ width: `${change}%`, borderColor: WARM, background: "#fde7d8", color: WARM }}>−{v.percent}%</div>}
-          <span className="px-1" style={v.direction < 0 ? { marginRight: `${change}%` } : undefined}>100% = {amount}</span>
+      <p className="mb-2 text-sm font-bold">Original 100% = {amount}; {v.direction > 0 ? "+" : "−"}{v.percent}%</p>
+      <div className="flex h-12 w-full" aria-hidden="true">
+        <div className="relative border-2" style={{ width: `${10000 / whole}%`, borderColor: ACCENT, background: "#e0f2f1" }}>
+          {v.direction < 0 && <div className="absolute inset-y-0 right-0 border-l-2 border-dashed" style={{ width: `${v.percent}%`, borderColor: WARM, background: "#fde7d8" }}/>}
         </div>
-        {v.direction > 0 && <div className="ml-1 flex items-center justify-center rounded-lg border-2 border-dashed" style={{ width: `${(change / whole) * 100}%`, borderColor: WARM, background: "#fde7d8", color: WARM }}>+{v.percent}%</div>}
+        {v.direction > 0 && <div className="border-2 border-dashed" style={{ width: `${v.percent / whole * 100}%`, borderColor: WARM, background: "#fde7d8" }}/>}
       </div>
       {v.caption && <p className="mt-2 text-sm" style={{ color: MUTED }}>{v.caption}</p>}
     </div>
   );
+}
+
+function Lengths({v}:{v:Extract<Number8Visual,{kind:"lengths"}>}) {
+  const total=v.lengths.reduce((a,b)=>a+b,0),gap=v.object==='pipe'?8:2,scale=(400-gap*(v.lengths.length-1))/total;
+  return <><svg viewBox="0 0 440 100" role="img" aria-label={number8VisualSpeech(v)} className="mx-auto w-full max-w-xl">{v.lengths.map((len,i)=>{const x=20+v.lengths.slice(0,i).reduce((a,b)=>a+b,0)*scale+i*gap,w=len*scale;return <g key={i}>
+    <rect x={x} y="25" width={w} height="40" rx={v.object==='pipe'?8:1} fill={v.object==='pipe'?'#cbd5e1':'#e5c28b'} stroke="#654b31" strokeWidth="2"/>
+    {v.object==='timber'&&<path d={`M${x+4} 39 Q${x+w/2} 33 ${x+w-4} 41 M${x+4} 53 Q${x+w/2} 58 ${x+w-4} 51`} fill="none" stroke="#ac8047"/>}
+    {v.object==='fence'&&[0,.25,.5,.75,1].map((t,j)=><line key={j} x1={x+t*w} x2={x+t*w} y1="18" y2="70" stroke="#654b31" strokeWidth="3"/>)}
+    {v.object==='pipe'&&<ellipse cx={x+w-5} cy="45" rx="5" ry="19" fill="#94a3b8" stroke="#475569"/>}
+    <text x={x+w/2} y="91" textAnchor="middle" fontSize="15">{v.labels[i]}</text></g>;})}</svg><p className="mt-2 text-sm">{v.caption}</p></>;
+}
+
+function Tally({v}:{v:Extract<Number8Visual,{kind:"tally"}>}) {
+  return <svg viewBox="0 0 360 90" className="mx-auto w-full max-w-lg" role="img" aria-label={number8VisualSpeech(v)}>{Array.from({length:v.groups+1},(_,g)=><g key={g} stroke={INK} strokeWidth="3">{Array.from({length:g<v.groups?4:v.singles},(_,i)=><line key={i} x1={20+g*80+i*16} x2={20+g*80+i*16} y1="18" y2="70"/>)}{g<v.groups&&<line x1={12+g*80} x2={76+g*80} y1="60" y2="28"/>}</g>)}</svg>;
 }
 
 export default function NumberVisual({ visual }: { visual: Number8Visual }) {
@@ -117,6 +130,8 @@ export default function NumberVisual({ visual }: { visual: Number8Visual }) {
         <p className="font-bold">{visual.title}</p>
         <ReadAloudBtn text={number8VisualSpeech(visual)} label="Read diagram" />
       </div>
+      {visual.kind === "tally" && <Tally v={visual} />}
+      {visual.kind === "lengths" && <Lengths v={visual} />}
       {visual.kind === "numberline" && <NumberLine v={visual} />}
       {visual.kind === "squares" && <Squares v={visual} />}
       {visual.kind === "factors" && <Factors v={visual} />}

@@ -80,7 +80,7 @@ const writeExpression: Form[] = [
   },
   (r) => {
     const k = r(2, 9);
-    return expanded(`A rectangle is x cm wide and its length is ${k} cm more than its width. Write an expression for its perimeter in simplest form.`, poly([4, "x"], [2 * k, ""]), [`Length = x + ${k}.`, `Perimeter = 2 × width + 2 × length = 2x + 2x + ${2 * k} = ${poly([4, "x"], [2 * k, ""])}.`]);
+    return ({...expanded(`A rectangle is x cm wide and its length is ${k} cm more than its width. Write an expression for its perimeter in simplest form.`, poly([4, "x"], [2 * k, ""]), [`Length = x + ${k}.`, `Perimeter = 2 × width + 2 × length = 2x + 2x + ${2 * k} = ${poly([4, "x"], [2 * k, ""])}.`]), ...geometry("rectangle",[`x + ${k} cm`,"x cm",`x + ${k} cm`,"x cm"])});
   },
   (r) => {
     const a = r(2, 6), b = r(2, 7), d = r(1, 5);
@@ -142,9 +142,9 @@ const collectLikeTerms: Form[] = [
     return expanded("Write the simplified expression shown by these algebra tiles. Red tiles are negative.", poly([x, "x"], [u, ""]), [`Each x tile cancels with a −x tile, leaving ${n(x)} x tile${Math.abs(x) === 1 ? "" : "s"}.`, `Each unit tile cancels with a negative unit tile, leaving ${n(u)}.`, `So the expression is ${poly([x, "x"], [u, ""])}.`], { algebraVisual: { kind: "tiles", title: "Algebra tiles", groups: g } });
   },
   (r) => {
-    const s = [[r(2, 5), r(1, 6)], [r(1, 4), -r(1, 4)], [r(1, 3), r(2, 8)]];
+    const s = [[r(3, 5), r(1, 3)], [r(3, 5), -1], [r(3, 5), r(1, 3)]];
     const a = s.reduce((t, [c]) => t + c, 0), b = s.reduce((t, [, k]) => t + k, 0);
-    return expanded(`A triangle has sides ${s.map(([c, k]) => poly([c, "x"], [k, ""])).join(", ")}. Write its perimeter in simplest form.`, poly([a, "x"], [b, ""]), ["Add all three sides.", `x terms: ${s.map(([c]) => c).join(" + ")} = ${a}. Constants: ${poly(...s.map(([, k]): [number, string] => [k, ""])).replace(/(\d) ([+−]) (\d)/g, "$1 $2 $3")} = ${b}.`]);
+    return ({...expanded(`For x > 3, a triangle has sides ${s.map(([c, k]) => poly([c, "x"], [k, ""])).join(", ")}. Write its perimeter in simplest form.`, poly([a, "x"], [b, ""]), ["Add all three sides.", `x terms: ${s.map(([c]) => c).join(" + ")} = ${a}. Constants: ${poly(...s.map(([, k]): [number, string] => [k, ""])).replace(/(\d) ([+−]) (\d)/g, "$1 $2 $3")} = ${b}.`]), ...geometry("triangle",s.map(([c,k])=>poly([c,"x"],[k,""])))});
   },
 ];
 const equivalence: Form[] = [
@@ -226,7 +226,7 @@ const expandSingle: Form[] = [
   },
   (r) => {
     const a = r(3, 9), b = r(2, 9);
-    return expanded(`A rectangle is ${a} cm wide and (x + ${b}) cm long. Write an expanded expression for its area.`, poly([a, "x"], [a * b, ""]), [`Area = width × length = ${a}(x + ${b}).`, `Expand: ${poly([a, "x"], [a * b, ""])}.`]);
+    return ({...expanded(`A rectangle is ${a} cm wide and (x + ${b}) cm long. Write an expanded expression for its area.`, poly([a, "x"], [a * b, ""]), [`Area = width × length = ${a}(x + ${b}).`, `Expand: ${poly([a, "x"], [a * b, ""])}.`]), ...{algebraVisual:{kind:"area",title:"Rectangle area model",outer:`${a} cm`,parts:["x cm",`${b} cm`],cells:["?","?"]}}});
   },
 ];
 const expandNegative: Form[] = [
@@ -462,7 +462,7 @@ const verify: Form[] = [
   },
   (r) => {
     const w = r(3, 9), l = r(w + 1, 15);
-    return { prompt: `Use P = 2l + 2w to find l when P = ${2 * (l + w)} and w = ${w}.`, answer: l, steps: [`${2 * (l + w)} = 2l + ${2 * w}.`, `Subtract ${2 * w}: 2l = ${2 * l}, so l = ${l}.`] };
+    return { ...geometry("rectangle",["l",String(w),"l",String(w)],`Perimeter: ${2*(l+w)}. Diagram not to scale.`), prompt: `Use P = 2l + 2w to find l when P = ${2 * (l + w)} and w = ${w}.`, answer: l, steps: [`${2 * (l + w)} = 2l + ${2 * w}.`, `Subtract ${2 * w}: 2l = ${2 * l}, so l = ${l}.`] };
   },
   (r) => {
     const a = r(2, 9), b = r(1, 9);
@@ -494,12 +494,12 @@ const bothSides: Form[] = [
     return { prompt: `Kim bought ${a} pens and a $${extra.toFixed(2)} newspaper. Lee bought ${b} pen${b === 1 ? "" : "s"} and a $${other.toFixed(2)} magazine. They paid the same. How much is one pen?`, answer: p, unit: "$", steps: [`${a}p + ${extra} = ${b}p + ${other}.`, `${a - b}p = ${rounded(other - extra, 2)}, so p = ${p.toFixed(2)}.`] };
   },
   (r) => {
-    const c = r(2, 5), a = c + r(1, 3), x = r(4, 12), b = r(2, 15), d = (a - c) * x - b;
-    return { prompt: `Opposite sides of a rectangle are (${a}x − ${b}) cm and (${poly([c, "x"], [d, ""])}) cm. Find x.`, answer: x, steps: [`Opposite sides are equal: ${a}x − ${b} = ${poly([c, "x"], [d, ""])}.`, `${a - c}x = ${d + b}, so x = ${x}.`] };
+    const c = r(2, 5), a = c + r(1, 3), x = r(4, 12), b = r(2, Math.min(15,a*x-1)), d = (a - c) * x - b;
+    return { ...geometry("rectangle",[`${a}x − ${b}`,"",poly([c,"x"],[d,""]),""]), prompt: `Opposite sides of a rectangle are (${a}x − ${b}) cm and (${poly([c, "x"], [d, ""])}) cm. Find x.`, answer: x, steps: [`Opposite sides are equal: ${a}x − ${b} = ${poly([c, "x"], [d, ""])}.`, `${a - c}x = ${d + b}, so x = ${x}.`] };
   },
   (r) => {
-    const c = r(2, 5), a = c + r(1, 4), x = r(5, 25), b = r(1, 10), d = (a - c) * x - b;
-    return { prompt: `Two vertically opposite angles are (${a}x − ${b})° and (${poly([c, "x"], [d, ""])})°. Find x.`, answer: x, steps: [`Vertically opposite angles are equal.`, `${a}x − ${b} = ${poly([c, "x"], [d, ""])}, so ${a - c}x = ${d + b} and x = ${x}.`] };
+    const c = r(2, 5), a = c + r(1, 4), x = r(5, Math.min(25,Math.floor(170/a))), b = r(1, 10), d = (a - c) * x - b;
+    return { ...geometry("crossedLines",[`${a}x − ${b}°`,`${poly([c,"x"],[d,""])}°`],"Labels identify the vertically opposite angles.",a*x-b), prompt: `Two vertically opposite angles are (${a}x − ${b})° and (${poly([c, "x"], [d, ""])})°. Find x.`, answer: x, steps: [`Vertically opposite angles are equal.`, `${a}x − ${b} = ${poly([c, "x"], [d, ""])}, so ${a - c}x = ${d + b} and x = ${x}.`] };
   },
 ];
 const bracketEquations: Form[] = [
@@ -591,19 +591,19 @@ const readInequality: Form[] = [
   (r) => {
     const a = r(-5, 2), b = a + r(3, 6), lc = r(0, 1) === 1, rc = r(0, 1) === 1;
     const lo = lc ? a : a + 1, hi = rc ? b : b - 1;
-    return { prompt: "The number line shows the values of x. What are the smallest and largest whole numbers included?", answer: `${lo}, ${hi}`, input: "list", labels: ["Smallest", "Largest"], steps: [`Left end at ${n(a)} is ${lc ? "closed, so included" : "open, so excluded"}: smallest is ${n(lo)}.`, `Right end at ${n(b)} is ${rc ? "closed, so included" : "open, so excluded"}: largest is ${n(hi)}.`], algebraVisual: { kind: "inequality", title: "Number line", min: a - 2, max: b + 2, from: { value: a, closed: lc }, to: { value: b, closed: rc } } };
+    return { prompt: "The number line shows the values of x. What are the smallest and largest integers included?", answer: `${lo}, ${hi}`, input: "list", labels: ["Smallest", "Largest"], steps: [`Left end at ${n(a)} is ${lc ? "closed, so included" : "open, so excluded"}: smallest is ${n(lo)}.`, `Right end at ${n(b)} is ${rc ? "closed, so included" : "open, so excluded"}: largest is ${n(hi)}.`], algebraVisual: { kind: "inequality", title: "Number line", min: a - 2, max: b + 2, from: { value: a, closed: lc }, to: { value: b, closed: rc } } };
   },
   (r) => {
     const v = r(-9, 15), strict = r(0, 1) === 1;
-    return { prompt: `What is the smallest integer that satisfies x ${strict ? ">" : "≥"} ${n(v)}?`, answer: strict ? v + 1 : v, steps: [strict ? `${n(v)} itself is excluded.` : `${n(v)} is included.`, `Smallest integer: ${n(strict ? v + 1 : v)}.`] };
+    return { ...{algebraVisual:line(strict?">":"≥",v)}, prompt: `What is the smallest integer that satisfies x ${strict ? ">" : "≥"} ${n(v)}?`, answer: strict ? v + 1 : v, steps: [strict ? `${n(v)} itself is excluded.` : `${n(v)} is included.`, `Smallest integer: ${n(strict ? v + 1 : v)}.`] };
   },
   (r) => {
     const a = r(-6, 3), b = a + r(3, 9);
-    return { prompt: `How many integers satisfy ${n(a)} < x ≤ ${n(b)}?`, answer: b - a, steps: [`${n(a)} is excluded and ${n(b)} is included.`, `The integers run from ${n(a + 1)} to ${n(b)}: ${b - a} of them.`] };
+    return { ...{algebraVisual:{kind:"inequality",title:"Given interval",min:a-2,max:b+2,from:{value:a,closed:false},to:{value:b,closed:true}}}, prompt: `How many integers satisfy ${n(a)} < x ≤ ${n(b)}?`, answer: b - a, steps: [`${n(a)} is excluded and ${n(b)} is included.`, `The integers run from ${n(a + 1)} to ${n(b)}: ${b - a} of them.`] };
   },
   (r) => {
     const age = r(3, 16), strict = r(0, 1) === 1;
-    return { prompt: strict ? `Children younger than ${age} travel free. What is the oldest whole-number age that travels free?` : `Riders must be at least ${age} years old. What is the youngest whole-number age allowed?`, answer: strict ? age - 1 : age, unit: "years", steps: [strict ? `Younger than ${age} means a < ${age}.` : `At least ${age} means a ≥ ${age}.`, `So the answer is ${strict ? age - 1 : age}.`] };
+    return { ...{algebraVisual:line(strict?"<":"≥",age)}, prompt: strict ? `Children younger than ${age} travel free. What is the oldest whole-number age that travels free?` : `Riders must be at least ${age} years old. What is the youngest whole-number age allowed?`, answer: strict ? age - 1 : age, unit: "years", steps: [strict ? `Younger than ${age} means a < ${age}.` : `At least ${age} means a ≥ ${age}.`, `So the answer is ${strict ? age - 1 : age}.`] };
   },
   (r) => {
     const score = pick(r, [15, 39, 40, 59, 60, 79, 80, 95, r(0, 100)]);
@@ -613,7 +613,7 @@ const readInequality: Form[] = [
   (r) => {
     const v = r(-8, 10), x = v + pick(r, [-1, 0, 0, 1]), sym = pick(r, SYMS);
     const ok = sym === ">" ? x > v : sym === "≥" ? x >= v : sym === "<" ? x < v : x <= v;
-    return yesNo(`Does x = ${n(x)} satisfy x ${sym} ${n(v)}?`, ok, [x === v ? `The endpoint ${n(v)} is ${sym === "≥" || sym === "≤" ? "included" : "excluded"}.` : `Compare ${n(x)} with ${n(v)}.`, ok ? "Yes, it satisfies the inequality." : "No, it does not."]);
+    return ({...yesNo(`Does x = ${n(x)} satisfy x ${sym} ${n(v)}?`, ok, [x === v ? `The endpoint ${n(v)} is ${sym === "≥" || sym === "≤" ? "included" : "excluded"}.` : `Compare ${n(x)} with ${n(v)}.`, ok ? "Yes, it satisfies the inequality." : "No, it does not."]), ...{algebraVisual:line(sym,v)}});
   },
 ];
 const solveInequality: Form[] = [
@@ -714,19 +714,19 @@ const differences: Form[] = [
 const plotLinear: Form[] = [
   (r) => {
     const m = nz(r, -3, 4), c = r(-3, 5), x = r(-3, 6), on = r(0, 1) === 1, y = m * x + c + (on ? 0 : pick(r, [-2, -1, 1, 2]));
-    return yesNo(`Does the point (${n(x)}, ${n(y)}) lie on ${rule(m, c)}?`, on, [`Substitute x = ${n(x)}: y = ${n(m * x + c)}.`, on ? "That matches, so the point is on the line." : `${n(y)} ≠ ${n(m * x + c)}, so it is not on the line.`]);
+    return ({...yesNo(`Does the point (${n(x)}, ${n(y)}) lie on ${rule(m, c)}?`, on, [`Substitute x = ${n(x)}: y = ${n(m * x + c)}.`, on ? "That matches, so the point is on the line." : `${n(y)} ≠ ${n(m * x + c)}, so it is not on the line.`]), ...lessonPlot([{m,c,label:rule(m,c)}],[{x,y,label:"P"}])});
   },
   (r) => {
     const m = nz(r, -4, 5), c = r(-6, 6), x = r(-3, 3);
-    return { prompt: `For ${rule(m, c)}, complete the table entry: what is y when x = ${n(x)}?`, answer: m * x + c, steps: [`Substitute: ${n(m)} × ${x < 0 ? `(${n(x)})` : x} ${c < 0 ? "−" : "+"} ${Math.abs(c)}.`, `y = ${n(m * x + c)}.`] };
+    return { ...{visual:table("Complete the table",["x","y"],[[x,"?"]])}, prompt: `For ${rule(m, c)}, complete the table entry: what is y when x = ${n(x)}?`, answer: m * x + c, steps: [`Substitute: ${n(m)} × ${x < 0 ? `(${n(x)})` : x} ${c < 0 ? "−" : "+"} ${Math.abs(c)}.`, `y = ${n(m * x + c)}.`] };
   },
   (r) => {
     const m = pick(r, [1, 2, 3, -1, -2]), xi = r(-3, 4), c = -m * xi;
-    return { prompt: `Where does ${rule(m, c)} cross the x-axis? Give the coordinates.`, answer: `${xi}, 0`, input: "list", labels: ["x", "y"], steps: ["On the x-axis, y = 0.", `0 = ${poly([m, "x"], [c, ""])} gives x = ${n(xi)}, so the point is (${n(xi)}, 0).`] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `Where does ${rule(m, c)} cross the x-axis? Give the coordinates.`, answer: `${xi}, 0`, input: "list", labels: ["x", "y"], steps: ["On the x-axis, y = 0.", `0 = ${poly([m, "x"], [c, ""])} gives x = ${n(xi)}, so the point is (${n(xi)}, 0).`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = r(-9, 9);
-    return { prompt: `What is the y-intercept of ${rule(m, c)}? Complete: (0, ?)`, answer: c, steps: ["At the y-axis, x = 0.", `y = ${n(m)} × 0 ${c < 0 ? "−" : "+"} ${Math.abs(c)} = ${n(c)}.`] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `What is the y-intercept of ${rule(m, c)}? Complete: (0, ?)`, answer: c, steps: ["At the y-axis, x = 0.", `y = ${n(m)} × 0 ${c < 0 ? "−" : "+"} ${Math.abs(c)} = ${n(c)}.`] };
   },
   (r) => {
     const m = pick(r, [1, 2, -1, -2]), c = r(-2, 3), xs = [-2, 0, 2], bad = r(0, 2), name = ["A", "B", "C"];
@@ -746,7 +746,7 @@ const horizontalVertical: Form[] = [
   (r) => {
     const px = r(-4, 5), py = r(-4, 6), kind = pick(r, ["x", "y"] as const), k = kind === "x" ? px + pick(r, [0, 0, 1, -1]) : py + pick(r, [0, 0, 1, -1]);
     const on = kind === "x" ? px === k : py === k;
-    return yesNo(`Does the point (${n(px)}, ${n(py)}) lie on the line ${kind} = ${n(k)}?`, on, [`On ${kind} = ${n(k)}, every point has ${kind}-coordinate ${n(k)}.`, `This point has ${kind} = ${n(kind === "x" ? px : py)}, so ${on ? "it lies on the line" : "it does not"}.`]);
+    return ({...yesNo(`Does the point (${n(px)}, ${n(py)}) lie on the line ${kind} = ${n(k)}?`, on, [`On ${kind} = ${n(k)}, every point has ${kind}-coordinate ${n(k)}.`, `This point has ${kind} = ${n(kind === "x" ? px : py)}, so ${on ? "it lies on the line" : "it does not"}.`]), ...lessonPlot([kind==="x"?{x:k,label:`x = ${k}`}:{m:0,c:k,label:`y = ${k}`}],[{x:px,y:py,label:"P"}])});
   },
   (r) => {
     const x1 = r(-4, 1), x2 = x1 + r(2, 4), y1 = r(-4, 1), y2 = y1 + r(2, 5);
@@ -754,7 +754,7 @@ const horizontalVertical: Form[] = [
   },
   (r) => {
     const px = nz(r, -6, 6), py = nz(r, -6, 6), vertical = r(0, 1) === 1;
-    return { prompt: `A ${vertical ? "vertical" : "horizontal"} line passes through (${n(px)}, ${n(py)}). Complete its rule: ${vertical ? "x" : "y"} = ?`, answer: vertical ? px : py, steps: [vertical ? "A vertical line keeps x fixed." : "A horizontal line keeps y fixed.", `So ${vertical ? "x" : "y"} = ${n(vertical ? px : py)}.`] };
+    return { ...lessonPlot([vertical?{x:px,label:"Line"}:{m:0,c:py,label:"Line"}],[{x:px,y:py,label:"P"}]), prompt: `A ${vertical ? "vertical" : "horizontal"} line passes through (${n(px)}, ${n(py)}). Complete its rule: ${vertical ? "x" : "y"} = ?`, answer: vertical ? px : py, steps: [vertical ? "A vertical line keeps x fixed." : "A horizontal line keeps y fixed.", `So ${vertical ? "x" : "y"} = ${n(vertical ? px : py)}.`] };
   },
 ];
 
@@ -766,30 +766,30 @@ const startingValue: Form[] = [
   },
   (r) => {
     const m = nz(r, -6, 6), c = nz(r, -12, 12);
-    return { prompt: `At what value does ${rule(m, c)} cross the y-axis?`, answer: c, steps: ["Substitute x = 0.", `The ${n(m)}x term becomes 0, leaving y = ${n(c)}.`] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `At what value does ${rule(m, c)} cross the y-axis?`, answer: c, steps: ["Substitute x = 0.", `The ${n(m)}x term becomes 0, leaving y = ${n(c)}.`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = r(-6, 6), up = nz(r, -5, 6);
-    return expr(`The graph of ${rule(m, c)} is moved ${up > 0 ? "up" : "down"} ${Math.abs(up)} unit${Math.abs(up) === 1 ? "" : "s"}. Write the new rule. y = ?`, poly([m, "x"], [c + up, ""]), ["Moving up or down changes only the starting value.", `${n(c)} ${up > 0 ? "+" : "−"} ${Math.abs(up)} = ${n(c + up)}, so ${rule(m, c + up)}.`]);
+    return ({...expr(`The graph of ${rule(m, c)} is moved ${up > 0 ? "up" : "down"} ${Math.abs(up)} unit${Math.abs(up) === 1 ? "" : "s"}. Write the new rule. y = ?`, poly([m, "x"], [c + up, ""]), ["Moving up or down changes only the starting value.", `${n(c)} ${up > 0 ? "+" : "−"} ${Math.abs(up)} = ${n(c + up)}, so ${rule(m, c + up)}.`]), ...lessonPlot([{m,c,label:"Original"},{m,c:c+up,label:"Moved"}])});
   },
   (r) => {
     const a = r(-5, 6), m = nz(r, -4, 5);
-    return expr(`A straight line passes through (0, ${n(a)}) and (1, ${n(a + m)}). Write its rule. y = ?`, poly([m, "x"], [a, ""]), [`Starting value at x = 0: ${n(a)}.`, `y changes by ${n(m)} from x = 0 to x = 1. Rule: ${rule(m, a)}.`]);
+    return ({...expr(`A straight line passes through (0, ${n(a)}) and (1, ${n(a + m)}). Write its rule. y = ?`, poly([m, "x"], [a, ""]), [`Starting value at x = 0: ${n(a)}.`, `y changes by ${n(m)} from x = 0 to x = 1. Rule: ${rule(m, a)}.`]), ...lessonPlot([{m,c:a,label:"Line"}],[{x:0,y:a,label:`(0, ${n(a)})`},{x:1,y:a+m,label:`(1, ${n(a+m)})`}])});
   },
   (r) => {
     const rate = r(2, 5), start = rate * r(5, 12);
-    return { prompt: `The height of water in a tub is H = −${rate}t + ${start} cm after t minutes. What was the height at the start?`, answer: start, unit: "cm", steps: ["The start is t = 0.", `H = −${rate} × 0 + ${start} = ${start}.`] };
+    return { ...lessonPlot([{m:-rate,c:start,label:"Water height"}],[],{xMin:0,xMax:12,yMin:0,yMax:start+rate,xLabel:"t (min)",yLabel:"H (cm)"}), prompt: `The height of water in a tub is H = −${rate}t + ${start} cm after t minutes. What was the height at the start?`, answer: start, unit: "cm", steps: ["The start is t = 0.", `H = −${rate} × 0 + ${start} = ${start}.`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = nz(r, -8, 8), m2 = m + nz(r, -3, 3);
-    return expr(`Write the rule of a line with the same y-intercept as ${rule(m, c)} but with x-coefficient ${n(m2)}. y = ?`, poly([m2, "x"], [c, ""]), [`Keep the starting value ${n(c)}.`, `Change the rate to ${n(m2)}: ${rule(m2, c)}.`]);
+    return ({...expr(`Write the rule of a line with the same y-intercept as ${rule(m, c)} but with x-coefficient ${n(m2)}. y = ?`, poly([m2, "x"], [c, ""]), [`Keep the starting value ${n(c)}.`, `Change the rate to ${n(m2)}: ${rule(m2, c)}.`]), ...lessonPlot([{m,c,label:"Given line"},{m:m2,c,label:"New line"}])});
   },
 ];
 const rateDirection: Form[] = [
   (r) => {
     const m = pick(r, [-4, -3, -2, -1, 1, 2, 3, 4, 0]), c = r(-5, 5);
     const answer = m > 0 ? "Up" : m < 0 ? "Down" : "Flat";
-    return { prompt: `Reading from left to right, does the graph of ${m === 0 ? `y = ${n(c)}` : rule(m, c)} slope up or down, or is it flat?`, answer, choices: ["Up", "Down", "Flat"], steps: ["The sign of the x-coefficient sets the direction.", m > 0 ? "Positive: y increases, so it slopes up." : m < 0 ? "Negative: y decreases, so it slopes down." : "Zero: y stays the same, so it is flat."] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `Reading from left to right, does the graph of ${m === 0 ? `y = ${n(c)}` : rule(m, c)} slope up or down, or is it flat?`, answer, choices: ["Up", "Down", "Flat"], steps: ["The sign of the x-coefficient sets the direction.", m > 0 ? "Positive: y increases, so it slopes up." : m < 0 ? "Negative: y decreases, so it slopes down." : "Zero: y stays the same, so it is flat."] };
   },
   (r) => {
     const m = -r(1, 6), c = r(5, 20);
@@ -797,13 +797,13 @@ const rateDirection: Form[] = [
   },
   (r) => {
     const m = nz(r, -4, 5), c = r(-4, 6), x2 = r(2, 4);
-    return { prompt: `A line passes through (0, ${n(c)}) and (${x2}, ${n(c + m * x2)}). By how much does y change when x increases by 1?`, answer: m, steps: [`Over ${x2} steps, y changes by ${n(m * x2)}.`, `Per step: ${n(m * x2)} ÷ ${x2} = ${n(m)}.`] };
+    return { ...lessonPlot([{m,c,label:"Line"}],[{x:0,y:c,label:`(0, ${n(c)})`},{x:x2,y:c+m*x2,label:`(${x2}, ${n(c+m*x2)})`}]), prompt: `A line passes through (0, ${n(c)}) and (${x2}, ${n(c + m * x2)}). By how much does y change when x increases by 1?`, answer: m, steps: [`Over ${x2} steps, y changes by ${n(m * x2)}.`, `Per step: ${n(m * x2)} ÷ ${x2} = ${n(m)}.`] };
   },
   (r) => {
     let a = 0, b = 0;
     while (Math.abs(a) === Math.abs(b)) [a, b] = [nz(r, -6, 6), nz(r, -6, 6)];
-    const ra = rule(a, r(-5, 5)), rb = rule(b, r(-5, 5));
-    return { prompt: `Which line is steeper?`, answer: Math.abs(a) > Math.abs(b) ? ra : rb, choices: [ra, rb], steps: ["Steepness depends on the size of the x-coefficient, ignoring its sign.", `|${n(a)}| = ${Math.abs(a)} and |${n(b)}| = ${Math.abs(b)}.`] };
+    const ca=r(-5,5),cb=r(-5,5),ra = rule(a, ca), rb = rule(b, cb);
+    return { ...lessonPlot([{m:a,c:ca,label:ra},{m:b,c:cb,label:rb}]), prompt: `Which line is steeper?`, answer: Math.abs(a) > Math.abs(b) ? ra : rb, choices: [ra, rb], steps: ["Steepness depends on the size of the x-coefficient, ignoring its sign.", `|${n(a)}| = ${Math.abs(a)} and |${n(b)}| = ${Math.abs(b)}.`] };
   },
   (r) => {
     const m = -r(1, 5), c = r(2, 12);
@@ -817,11 +817,11 @@ const rateDirection: Form[] = [
 const conjecture: Form[] = [
   (r) => {
     const m = -r(1, 4), c = r(2, 9);
-    return { prompt: `Conjecture: lines with a negative x-coefficient slope down. Test ${rule(m, c)} by finding y at x = 0 and at x = 2.`, answer: `${c}, ${c + 2 * m}`, input: "list", labels: ["y at x = 0", "y at x = 2"], steps: [`x = 0 gives ${c}; x = 2 gives ${n(c + 2 * m)}.`, "y decreased, which supports the conjecture."] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `Conjecture: lines with a negative x-coefficient slope down. Test ${rule(m, c)} by finding y at x = 0 and at x = 2.`, answer: `${c}, ${c + 2 * m}`, input: "list", labels: ["y at x = 0", "y at x = 2"], steps: [`x = 0 gives ${c}; x = 2 gives ${n(c + 2 * m)}.`, "y decreased, which supports the conjecture."] };
   },
   (r) => {
     const ms = [pick(r, [1, 2]), pick(r, [3, 4]), -pick(r, [1, 2, 3])];
-    return { prompt: `The lines ${ms.map((m) => rule(m, 0)).join(", ")} all pass through one point. What point is it?`, answer: "0, 0", input: "list", labels: ["x", "y"], steps: ["None of the rules has a constant term.", "When x = 0, every rule gives y = 0, so all pass through (0, 0)."] };
+    return { ...lessonPlot(ms.map(m=>({m,c:0,label:rule(m,0)}))), prompt: `The lines ${ms.map((m) => rule(m, 0)).join(", ")} all pass through one point. What point is it?`, answer: "0, 0", input: "list", labels: ["x", "y"], steps: ["None of the rules has a constant term.", "When x = 0, every rule gives y = 0, so all pass through (0, 0)."] };
   },
   (r) => {
     const a = pick(r, [2, 3, 4]), b = pick(r, [3, 5]), y = r(1, 10), x = r(1, 10);
@@ -831,15 +831,15 @@ const conjecture: Form[] = [
     const a = pick(r, [2, 3]), b = pick(r, [3, 4, 5]), total = a * b * r(1, 3);
     let count = 0;
     for (let x = 0; a * x <= total; x++) if ((total - a * x) % b === 0) count++;
-    return { prompt: `How many pairs of whole numbers (x, y), with x ≥ 0 and y ≥ 0, satisfy ${a}x + ${b}y = ${total}?`, answer: count, steps: [`Try x = 0, 1, 2, … while ${a}x ≤ ${total}.`, `Keep the cases where ${total} − ${a}x divides exactly by ${b}: ${count} pairs.`] };
+    return { ...lessonPlot([{m:-a/b,c:total/b,label:`${a}x + ${b}y = ${total}`}],[],{xMin:0,xMax:total/a+1,yMin:0,yMax:total/b+1}), prompt: `How many pairs of whole numbers (x, y), with x ≥ 0 and y ≥ 0, satisfy ${a}x + ${b}y = ${total}?`, answer: count, steps: [`Try x = 0, 1, 2, … while ${a}x ≤ ${total}.`, `Keep the cases where ${total} − ${a}x divides exactly by ${b}: ${count} pairs.`] };
   },
   (r) => {
     const m = pick(r, [2, 3, 4, -2, -3]), x = r(1, 3);
-    return { prompt: `Ravi claims every line through (0, 0) has the rule y = x. The line through (0, 0) and (${x}, ${n(m * x)}) has rule y = mx. Find m.`, answer: m, steps: [`y = mx at (${x}, ${n(m * x)}): ${n(m * x)} = m × ${x}.`, `m = ${n(m)}, so Ravi's claim is false.`] };
+    return { ...lessonPlot([{m,c:0,label:"Line"}],[{x:0,y:0,label:"O"},{x,y:m*x,label:`(${x}, ${n(m*x)})`}]), prompt: `Ravi claims every line through (0, 0) has the rule y = x. The line through (0, 0) and (${x}, ${n(m * x)}) has rule y = mx. Find m.`, answer: m, steps: [`y = mx at (${x}, ${n(m * x)}): ${n(m * x)} = m × ${x}.`, `m = ${n(m)}, so Ravi's claim is false.`] };
   },
   (r) => {
     const m = nz(r, -4, 5), c = r(-6, 6), x = r(-2, 4);
-    return { prompt: `Sam's conjecture: for y = mx + c, each time x increases by 1, y changes by m. Test it on ${rule(m, c)}: by how much does y change from x = ${n(x)} to x = ${n(x + 1)}? (Use a negative number for a decrease.)`, answer: m, steps: [`At x = ${n(x)}: y = ${n(m * x + c)}. At x = ${n(x + 1)}: y = ${n(m * (x + 1) + c)}.`, `Change: ${n(m * (x + 1) + c)} − ${n(m * x + c)} = ${n(m)}, the x-coefficient, so the conjecture holds here.`] };
+    return { ...lessonPlot([{m,c,label:rule(m,c)}]), prompt: `Sam's conjecture: for y = mx + c, each time x increases by 1, y changes by m. Test it on ${rule(m, c)}: by how much does y change from x = ${n(x)} to x = ${n(x + 1)}? (Use a negative number for a decrease.)`, answer: m, steps: [`At x = ${n(x)}: y = ${n(m * x + c)}. At x = ${n(x + 1)}: y = ${n(m * (x + 1) + c)}.`, `Change: ${n(m * (x + 1) + c)} − ${n(m * x + c)} = ${n(m)}, the x-coefficient, so the conjecture holds here.`] };
   },
 ];
 
@@ -875,25 +875,25 @@ const intersections: Form[] = [
   },
   (r) => {
     const m = nz(r, -4, 4), c1 = r(-5, 5), c2 = c1 + nz(r, -5, 5), same = r(0, 1) === 1, m2 = same ? m : m + nz(r, -2, 2);
-    return yesNo(`Do the lines ${rule(m, c1)} and ${rule(m2, c2)} intersect?`, !same, [same ? "Both have the same x-coefficient, so they are parallel." : "Their x-coefficients differ, so they must cross.", same ? "Parallel lines with different starting values never meet." : "So they intersect at exactly one point."]);
+    return ({...yesNo(`Do the lines ${rule(m, c1)} and ${rule(m2, c2)} intersect?`, !same, [same ? "Both have the same x-coefficient, so they are parallel." : "Their x-coefficients differ, so they must cross.", same ? "Parallel lines with different starting values never meet." : "So they intersect at exactly one point."]), ...lessonPlot([{m,c:c1,label:rule(m,c1)},{m:m2,c:c2,label:rule(m2,c2)}])});
   },
   (r) => {
     const a = r(2, 4), b = a + r(1, 3), t = r(3, 9), sb = r(5, 15), sa = sb + (b - a) * t;
-    return { prompt: `Ana has saved $${sa} and earns $${a} per hour. Ben has saved $${sb} and earns $${b} per hour. After how many hours worked will their savings be equal?`, answer: t, unit: "hours", steps: [`${sa} + ${a}n = ${sb} + ${b}n.`, `${sa - sb} = ${b - a}n, so n = ${t}.`] };
+    return { ...lessonPlot([{m:a,c:sa,label:"Ana"},{m:b,c:sb,label:"Ben"}],[],{xMin:0,xMax:12,yMin:0,yMax:Math.max(sa+a*12,sb+b*12)+5,xLabel:"Hours",yLabel:"Savings ($)"}), prompt: `Ana has saved $${sa} and earns $${a} per hour. Ben has saved $${sb} and earns $${b} per hour. After how many hours worked will their savings be equal?`, answer: t, unit: "hours", steps: [`${sa} + ${a}n = ${sb} + ${b}n.`, `${sa - sb} = ${b - a}n, so n = ${t}.`] };
   },
   (r) => {
     const fast = r(5, 8), slow = fast - r(1, 3), t = r(3, 8), head = (fast - slow) * t;
-    return { prompt: `Tom runs at ${fast} m/s. Nia gets a ${head} m head start and runs at ${slow} m/s. After how many seconds does Tom catch Nia?`, answer: t, unit: "s", steps: [`${fast}t = ${head} + ${slow}t.`, `${fast - slow}t = ${head}, so t = ${t}.`] };
+    return { ...lessonPlot([{m:fast,c:0,label:"Tom"},{m:slow,c:head,label:"Nia"}],[],{xMin:0,xMax:10,yMin:0,yMax:Math.max(fast*10,head+slow*10)+5,xLabel:"Time (s)",yLabel:"Distance (m)"}), prompt: `Tom runs at ${fast} m/s. Nia gets a ${head} m head start and runs at ${slow} m/s. After how many seconds does Tom catch Nia?`, answer: t, unit: "s", steps: [`${fast}t = ${head} + ${slow}t.`, `${fast - slow}t = ${head}, so t = ${t}.`] };
   },
   (r) => {
     const m = nz(r, -5, 5), c = r(-6, 6), c2 = c + nz(r, -5, 5);
-    return expr(`Write the rule of the line parallel to ${rule(m, c)} that passes through (0, ${n(c2)}). y = ?`, poly([m, "x"], [c2, ""]), ["Parallel lines share the x-coefficient.", `Starting value ${n(c2)}: ${rule(m, c2)}.`]);
+    return ({...expr(`Write the rule of the line parallel to ${rule(m, c)} that passes through (0, ${n(c2)}). y = ?`, poly([m, "x"], [c2, ""]), ["Parallel lines share the x-coefficient.", `Starting value ${n(c2)}: ${rule(m, c2)}.`]), ...lessonPlot([{m,c,label:"Given line"},{m,c:c2,label:"Parallel line"}],[{x:0,y:c2,label:"P"}])});
   },
   (r) => {
     let m1 = 0, m2 = 0;
     while (m1 === m2) [m1, m2] = [r(2, 5), r(-2, 1)];
     const x = r(-3, 6), c1 = r(-6, 6), c2 = (m1 - m2) * x + c1;
-    return { prompt: `${rule(m1, c1)} and ${rule(m2, c2)} meet where x = ?`, answer: x, steps: [`Set them equal: ${poly([m1, "x"], [c1, ""])} = ${poly([m2, "x"], [c2, ""])}.`, `${m1 - m2}x = ${n(c2 - c1)}, so x = ${n(x)}.`] };
+    return { ...lessonPlot([{m:m1,c:c1,label:rule(m1,c1)},{m:m2,c:c2,label:rule(m2,c2)}]), prompt: `${rule(m1, c1)} and ${rule(m2, c2)} meet where x = ?`, answer: x, steps: [`Set them equal: ${poly([m1, "x"], [c1, ""])} = ${poly([m2, "x"], [c2, ""])}.`, `${m1 - m2}x = ${n(c2 - c1)}, so x = ${n(x)}.`] };
   },
 ];
 const graphInequality: Form[] = [
@@ -905,7 +905,7 @@ const graphInequality: Form[] = [
   (r) => {
     const px = r(-4, 4), py = r(-4, 7), vertical = r(0, 1) === 1, k = (vertical ? px : py) + pick(r, [-1, 0, 1, 2]), sym = pick(r, SYMS), val = vertical ? px : py;
     const ok = sym === ">" ? val > k : sym === "≥" ? val >= k : sym === "<" ? val < k : val <= k;
-    return yesNo(`Is the point (${n(px)}, ${n(py)}) in the region ${vertical ? "x" : "y"} ${sym} ${n(k)}?`, ok, [`Only the ${vertical ? "x" : "y"}-coordinate matters: ${n(val)}.`, `${n(val)} ${sym} ${n(k)} is ${ok ? "true" : "false"}.`]);
+    return ({...yesNo(`Is the point (${n(px)}, ${n(py)}) in the region ${vertical ? "x" : "y"} ${sym} ${n(k)}?`, ok, [`Only the ${vertical ? "x" : "y"}-coordinate matters: ${n(val)}.`, `${n(val)} ${sym} ${n(k)} is ${ok ? "true" : "false"}.`]), ...lessonPlot([vertical?{x:k,label:`x = ${k}`}:{m:0,c:k,label:`y = ${k}`}],[{x:px,y:py,label:"P"}],{shade:{line:0,side:vertical?(sym===">"||sym==="≥"?"right":"left"):(sym===">"||sym==="≥"?"above":"below"),strict:sym===">"||sym==="<"}})});
   },
   (r) => {
     const m = pick(r, [1, 2, 3]), c = r(-2, 2), x = r(-1, 2), k = m * x + c, sym = pick(r, SYMS);
@@ -917,7 +917,7 @@ const graphInequality: Form[] = [
   },
   (r) => {
     const m = pick(r, [1, 2, -1]), c = r(-2, 3), x = r(-3, 3), y = m * x + c + nz(r, -3, 3);
-    return yesNo(`Is the point (${n(x)}, ${n(y)}) above the line ${rule(m, c)}?`, y > m * x + c, [`On the line at x = ${n(x)}, y = ${n(m * x + c)}.`, `${n(y)} is ${y > m * x + c ? "greater, so the point is above" : "smaller, so the point is below"}.`]);
+    return ({...yesNo(`Is the point (${n(x)}, ${n(y)}) above the line ${rule(m, c)}?`, y > m * x + c, [`On the line at x = ${n(x)}, y = ${n(m * x + c)}.`, `${n(y)} is ${y > m * x + c ? "greater, so the point is above" : "smaller, so the point is below"}.`]), ...lessonPlot([{m,c,label:rule(m,c)}],[{x,y,label:"P"}])});
   },
   (r) => {
     const m = pick(r, [1, 2, -1]), c = r(-1, 2), above = r(0, 1) === 1, strict = r(0, 1) === 1, x = r(-3, 3), y = m * x + c + pick(r, [-2, -1, 0, 1, 2]);
@@ -1108,3 +1108,12 @@ export const patternLessons: LessonFactory[] = [
   review(W.slice(27, 33)),
   review(W.slice(18, 27)),
 ];
+
+/** Fit supplied lines/points, including intersections, without labelling solutions. */
+function lessonPlot(lines:Extract<Algebra8Visual,{kind:'graph'}>['lines'],points:Extract<Algebra8Visual,{kind:'graph'}>['points']=[],more:Partial<Extract<Algebra8Visual,{kind:'graph'}>>={}):Partial<QuestionDraft> {
+  const fit=[...(points??[])];
+  for(let i=0;i<lines.length;i++)for(let j=i+1;j<lines.length;j++) {const a=lines[i],b=lines[j];if('m'in a&&'m'in b&&a.m!==b.m){const x=(b.c-a.c)/(a.m-b.m);fit.push({x,y:a.m*x+a.c});}}
+  const xs=fit.map(p=>p.x),ys=fit.map(p=>p.y);for(const l of lines)if('m'in l)ys.push(l.c,l.c-l.m*2,l.c+l.m*2);else xs.push(l.x);
+  return {algebraVisual:graph('Coordinate graph',lines,{xMin:Math.min(-6,...xs)-1,xMax:Math.max(6,...xs)+1,yMin:Math.min(-6,...ys)-2,yMax:Math.max(8,...ys)+2,points,...more})};
+}
+const geometry=(shape:'rectangle'|'triangle'|'crossedLines',labels:string[],caption='Schematic: use the labelled expressions.',angle?:number):Partial<QuestionDraft>=>({algebraVisual:{kind:'geometry',title:shape==='crossedLines'?'Intersecting straight lines':'Shape and dimensions',shape,labels,caption,angle}});

@@ -204,11 +204,11 @@ const spotBias: Form[] = [
 const precision: Form[] = [
   (r) => {
     const [unit, step, label] = pick(r, [["cm", 1, "the nearest centimetre"], ["kg", 0.1, "the nearest 0.1 kg"], ["g", 5, "the nearest 5 g"], ["s", 0.01, "the nearest 0.01 s"], ["mm", 1, "the nearest millimetre"]] as const);
-    return { prompt: `A measurement is recorded to ${label}. What is the largest possible error?`, answer: rounded(step / 2, 3), unit, steps: [`Values within half a step round to the recorded value.`, `Half of ${step} ${unit} is ${rounded(step / 2, 3)} ${unit}.`] };
+    return { ...{numberVisual:{kind:"numberline",title:`Recorded measurements (${unit})`,min:0,max:step*4,step,points:[]}}, prompt: `A measurement is recorded to ${label}. What is the largest possible error?`, answer: rounded(step / 2, 3), unit, steps: [`Values within half a step round to the recorded value.`, `Half of ${step} ${unit} is ${rounded(step / 2, 3)} ${unit}.`] };
   },
   (r) => {
     const v = r(20, 180);
-    return { prompt: `A length is recorded as ${v} cm to the nearest centimetre. What are the smallest and largest possible actual lengths?`, answer: `${v - 0.5}, ${v + 0.5}`, input: "list", labels: ["Smallest (cm)", "Largest (cm)"], steps: ["Rounding to the nearest centimetre allows an error of up to 0.5 cm either way.", `${v} − 0.5 = ${v - 0.5} and ${v} + 0.5 = ${v + 0.5}.`] };
+    return { ...{numberVisual:{kind:"numberline",title:"Recorded length (cm)",min:v-2,max:v+2,step:1,points:[{value:v,label:String(v)}]}}, prompt: `A length is recorded as ${v} cm to the nearest centimetre. Give the lower and upper rounding bounds. The lower bound is included; the upper bound is excluded.`, answer: `${v - 0.5}, ${v + 0.5}`, input: "list", labels: ["Lower bound (cm)", "Upper bound (cm)"], steps: ["Rounding to the nearest centimetre allows an error of up to 0.5 cm either way.", `${v} − 0.5 = ${v - 0.5} and ${v} + 0.5 = ${v + 0.5}. The actual length is at least the lower bound and less than the upper bound.`] };
   },
   (r) => {
     const off = pick(r, [0.2, 0.3, 0.4, 0.5]), shown = rounded(r(400, 800) / 10, 1);
@@ -220,7 +220,7 @@ const precision: Form[] = [
   },
   (r) => {
     const a = pick(r, [0.1, 1]), b = a / 10;
-    return { prompt: `Stopwatch A records to the nearest ${a} s and stopwatch B to the nearest ${b} s. What is the largest possible error for the more precise stopwatch?`, answer: rounded(b / 2, 3), unit: "s", steps: [`Stopwatch B has the smaller step, ${b} s, so it is more precise.`, `Largest error: ${b} ÷ 2 = ${rounded(b / 2, 3)} s.`] };
+    return { ...{visual:table("Stopwatch precision",["Stopwatch","Rounding step (s)"],[["A",a],["B",b]])}, prompt: `Stopwatch A records to the nearest ${a} s and stopwatch B to the nearest ${b} s. What is the largest possible error for the more precise stopwatch?`, answer: rounded(b / 2, 3), unit: "s", steps: [`Stopwatch B has the smaller step, ${b} s, so it is more precise.`, `Largest error: ${b} ÷ 2 = ${rounded(b / 2, 3)} s.`] };
   },
 ];
 
@@ -312,7 +312,7 @@ const chooseMethod: Form[] = [
   },
   (r) => {
     const ys = [r(3, 6) * 20, r(3, 6) * 20, r(3, 6) * 20], per = pick(r, [10, 20]), total = sum(ys), s = (total * per) / 100;
-    return { prompt: `Years 7, 8 and 9 have ${ys.join(", ")} students. A stratified sample takes ${per}% of each year. How many students come from each year?`, answer: ys.map((y) => (y * per) / 100).join(", "), input: "list", labels: ["Year 7", "Year 8", "Year 9"], steps: [`${per}% of each year level.`, `${ys.map((y) => `${per}% of ${y} = ${(y * per) / 100}`).join("; ")}. Total ${s}.`] };
+    return { ...{visual:table("Stratified sample",["Year","Population","Sample rate"],ys.map((y,i)=>[i+7,y,`${per}%`]))}, prompt: `Years 7, 8 and 9 have ${ys.join(", ")} students. A stratified sample takes ${per}% of each year. How many students come from each year?`, answer: ys.map((y) => (y * per) / 100).join(", "), input: "list", labels: ["Year 7", "Year 8", "Year 9"], steps: [`${per}% of each year level.`, `${ys.map((y) => `${per}% of ${y} = ${(y * per) / 100}`).join("; ")}. Total ${s}.`] };
   },
   (r) => {
     const groups: [string, boolean][] = [
@@ -540,11 +540,11 @@ const compareVariation: Form[] = [
   },
   (r) => {
     const est = r(30, 70), m = pick(r, [3, 4, 5, 6]);
-    return { prompt: `A sample estimates ${est}% with a margin of error of ±${m}%. What is the likely interval for the population percentage?`, answer: `${est - m}, ${est + m}`, input: "list", labels: ["Lowest %", "Highest %"], steps: [`${est} − ${m} = ${est - m}.`, `${est} + ${m} = ${est + m}.`] };
+    return { ...{numberVisual:{kind:"numberline",title:`Estimated ${est}% with margin ±${m} percentage points`,min:0,max:100,step:10,points:[{value:est,label:`${est}%`}]}}, prompt: `A sample estimates ${est}% with a margin of error of ±${m}%. What is the likely interval for the population percentage?`, answer: `${est - m}, ${est + m}`, input: "list", labels: ["Lowest %", "Highest %"], steps: [`${est} − ${m} = ${est - m}.`, `${est} + ${m} = ${est + m}.`] };
   },
   (r) => {
     const s10 = list(r, 6, 20, 80), s100 = list(r, 6, 44, 56);
-    return { prompt: `Six samples of size 10 gave estimates ${s10.join(", ")}%. Six of size 100 gave ${s100.join(", ")}%. What is the difference between the two ranges?`, answer: range(s10) - range(s100), unit: "percentage points", steps: [`Size 10 range: ${range(s10)}. Size 100 range: ${range(s100)}.`, `Difference: ${range(s10) - range(s100)}.`] };
+    return { ...{visual:{kind:"dotplot",title:"Repeated sample estimates",unit:"%",min:0,max:100,groups:[{label:"Sample size 10",values:s10},{label:"Sample size 100",values:s100}]}}, prompt: `Six samples of size 10 gave estimates ${s10.join(", ")}%. Six of size 100 gave ${s100.join(", ")}%. What is the difference between the two ranges?`, answer: range(s10) - range(s100), unit: "percentage points", steps: [`Size 10 range: ${range(s10)}. Size 100 range: ${range(s100)}.`, `Difference: ${range(s10) - range(s100)}.`] };
   },
   (r) => {
     const n1 = pick(r, [10, 20, 25]), k = pick(r, [4, 5, 10]);
@@ -554,11 +554,11 @@ const compareVariation: Form[] = [
 const uncertainty: Form[] = [
   (r) => {
     const p = r(20, 60), m = pick(r, [4, 5]), pop = 1000 * r(2, 6);
-    return { prompt: `A sample estimates ${p}% ± ${m}% of ${pop} residents use the library. Give the likely range for the number of residents.`, answer: `${((p - m) * pop) / 100}, ${((p + m) * pop) / 100}`, input: "list", labels: ["Lowest", "Highest"], steps: [`${p - m}% to ${p + m}% of ${pop}.`, `${((p - m) * pop) / 100} to ${((p + m) * pop) / 100} residents.`] };
+    return { ...{numberVisual:{kind:"numberline",title:`Estimate ${p}% ± ${m} percentage points; population ${pop}`,min:0,max:100,step:10,points:[{value:p,label:`${p}%`}]}}, prompt: `A sample estimates ${p}% ± ${m}% of ${pop} residents use the library. Give the likely range for the number of residents.`, answer: `${((p - m) * pop) / 100}, ${((p + m) * pop) / 100}`, input: "list", labels: ["Lowest", "Highest"], steps: [`${p - m}% to ${p + m}% of ${pop}.`, `${((p - m) * pop) / 100} to ${((p + m) * pop) / 100} residents.`] };
   },
   (r) => {
     const est = r(42, 58), m = r(3, 7), lo = est - m, hi = est + m, sure = lo > 50 || hi < 50;
-    return yesNo(`A poll estimates ${est}% ± ${m}% support a proposal. Can we be confident whether a majority supports it?`, sure, [`The likely interval is ${lo}% to ${hi}%.`, sure ? `The whole interval is ${lo > 50 ? "above" : "below"} 50%, so yes.` : "The interval includes 50%, so we cannot be sure."]);
+    return ({...yesNo(`A poll estimates ${est}% ± ${m}% support a proposal. Can we be confident whether a majority supports it?`, sure, [`The likely interval is ${lo}% to ${hi}%.`, sure ? `The whole interval is ${lo > 50 ? "above" : "below"} 50%, so yes.` : "The interval includes 50%, so we cannot be sure."]), ...{numberVisual:{kind:"numberline",title:`Estimate ${est}% ± ${m} percentage points`,min:0,max:100,step:10,points:[{value:est,label:`Estimate ${est}%`},{value:50,label:"50%"}]}}});
   },
   (r) => {
     const sizes = [10, 50, 200], ranges = [r(25, 40), r(10, 20), r(2, 8)];
@@ -734,7 +734,7 @@ const ethicalFair: Form[] = [
 const collectRecord: Form[] = [
   (r) => {
     const n = r(6, 19), fives = Math.floor(n / 5), ones = n % 5;
-    return { prompt: `A tally shows ${"卌 ".repeat(fives).trim()}${ones ? " " + "|".repeat(ones) : ""} (each 卌 is a group of five, with four marks crossed by a fifth). What is the frequency?`, answer: n, steps: [`${fives} group${fives === 1 ? "" : "s"} of five and ${ones} single mark${ones === 1 ? "" : "s"}.`, `${fives} × 5 + ${ones} = ${n}.`] };
+    return { ...{numberVisual:{kind:"tally",title:"Recorded tally",groups:fives,singles:ones}}, prompt: `Each crossed group has five marks. What is the frequency shown by the tally?`, answer: n, steps: [`${fives} group${fives === 1 ? "" : "s"} of five and ${ones} single mark${ones === 1 ? "" : "s"}.`, `${fives} × 5 + ${ones} = ${n}.`] };
   },
   (r) => {
     const h = r(1, 2), m = pick(r, [5, 10, 15, 20, 25, 30, 40, 45, 50]);

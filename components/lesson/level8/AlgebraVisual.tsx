@@ -14,7 +14,8 @@ function Graph({ v }: { v: Extract<Algebra8Visual, { kind: "graph" }> }) {
   const X = (x: number) => L + ((x - v.xMin) / (v.xMax - v.xMin)) * (R - L);
   const Y = (y: number) => B - ((y - v.yMin) / (v.yMax - v.yMin)) * (B - T);
   const xs: number[] = [], ys: number[] = [];
-  const xStep = v.xMax - v.xMin > 12 ? 2 : 1, yStep = v.yStep ?? (v.yMax - v.yMin > 24 ? 5 : v.yMax - v.yMin > 12 ? 2 : 1);
+  const tickStep=(span:number)=>{const base=10**Math.floor(Math.log10(Math.max(1,span/10)));return Math.max(1,[1,2,5,10].find(k=>k*base>=span/12)!*base);};
+  const xStep = tickStep(v.xMax-v.xMin), yStep=v.yStep??tickStep(v.yMax-v.yMin);
   for (let x = Math.ceil(v.xMin / xStep) * xStep; x <= v.xMax; x += xStep) xs.push(x);
   for (let y = Math.ceil(v.yMin / yStep) * yStep; y <= v.yMax; y += yStep) ys.push(y);
   const ax = v.yMin <= 0 && v.yMax >= 0 ? Y(0) : B, ay = v.xMin <= 0 && v.xMax >= 0 ? X(0) : L;
@@ -142,6 +143,14 @@ function Steps({ v }: { v: Extract<Algebra8Visual, { kind: "steps" }> }) {
   );
 }
 
+function Geometry({v}:{v:Extract<Algebra8Visual,{kind:"geometry"}>}) {
+  const pts=v.shape==='triangle'?[[45,155],[315,155],[180,35]]:[[65,55],[295,55],[295,155],[65,155]];
+  const theta=(v.angle??60)*Math.PI/180, dx=130*Math.cos(theta),dy=130*Math.sin(theta);
+  return <><svg viewBox="0 0 360 210" role="img" aria-label={algebra8VisualSpeech(v)} className="mx-auto w-full max-w-xl">
+    {v.shape==='crossedLines'?<><path d={`M30 105 H330 M${180-dx} ${105+dy} L${180+dx} ${105-dy}`} fill="none" stroke={LINES[0]} strokeWidth="3"/><text x={180+80*Math.cos(theta/2)} y={105-80*Math.sin(theta/2)} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[0]}</text><text x={180-80*Math.cos(theta/2)} y={105+80*Math.sin(theta/2)+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{v.labels[1]}</text></>:<><polygon points={pts.map(p=>p.join(',')).join(' ')} fill="#ede9fe" stroke={LINES[0]} strokeWidth="2"/>{v.labels.map((label,i)=>{const a=pts[i],b=pts[(i+1)%pts.length],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;return <text key={i} x={x+(x-180)*.18} y={y+(y-105)*.42+5} textAnchor="middle" fontSize="15" fill={INK} stroke="white" strokeWidth={4} paintOrder="stroke">{label}</text>;})}</>}
+  </svg><p className="mt-2 text-sm">{v.caption}</p></>;
+}
+
 export default function AlgebraVisual({ visual }: { visual: Algebra8Visual }) {
   return (
     <div className="rounded-xl border border-violet-300 bg-white p-4 text-slate-900">
@@ -149,6 +158,7 @@ export default function AlgebraVisual({ visual }: { visual: Algebra8Visual }) {
         <p className="font-bold">{visual.title}</p>
         <ReadAloudBtn text={algebra8VisualSpeech(visual)} label="Read diagram" />
       </div>
+      {visual.kind === "geometry" && <Geometry v={visual} />}
       {visual.kind === "graph" && <Graph v={visual} />}
       {visual.kind === "inequality" && <Inequality v={visual} />}
       {visual.kind === "tiles" && <Tiles v={visual} />}

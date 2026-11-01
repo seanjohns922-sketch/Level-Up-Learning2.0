@@ -2,7 +2,7 @@ import {g} from './shared';
 export const patternTeaching = [
 [
 g("Translate operations in their stated order. Brackets keep an earlier calculation together when a later operation acts on its whole result.", "Start with x. Subtract 6 to get x − 6.|The instruction then multiplies that whole result by 5, so enclose x − 6 in brackets.|The expression is 5(x − 6).", "With x = 10, the story gives (10 − 6) × 5 = 20. The expression gives 20 too."),
-g("Like terms have the same variable part. Add their coefficients; combine constants separately.", "Perimeter adds all sides: (5x + 4) + (x − 2) + (3x + 6).|Group x terms: 5x + x + 3x = (5 + 1 + 3)x = 9x.|Group constants: 4 − 2 + 6 = 8.|The simplified perimeter is 9x + 8.", "x has coefficient 1. Do not combine 9x and 8 into 17x."),
+g("Like terms have the same variable part. Add their coefficients; combine constants separately.", "Perimeter adds all sides: (5x + 2) + (3x − 1) + (3x + 3).|Group x terms: 5x + 3x + 3x = (5 + 3 + 3)x = 11x.|Group constants: 2 − 1 + 3 = 4.|The simplified perimeter is 11x + 4.", "Do not combine 11x and 4 into 15x; they are unlike terms."),
 g("The distributive property multiplies every term in a bracket. It proves equivalence for all values; a substitution is a useful check for one value.", "Distribute 5: 5(x + 4) = 5x + 5 × 4 = 5x + 20.|At x = 2, the bracket form gives 5(2 + 4) = 5 × 6 = 30.|The expanded form gives 5 × 2 + 20 = 10 + 20 = 30.", "Agreement at x = 2 checks this substitution. The distributive argument, rather than one test value, establishes equivalence for every x.")
 ],
 [
@@ -61,3 +61,9 @@ g("A linear model separates a fixed starting amount from a constant rate. Explai
 g("Test a conjecture with several examples, then use the rule to explain why it must hold or find a counterexample.", "Conjecture: every graph y = 2x + c rises by 2 when x rises by 1.|For c = 3, x = 0 gives y = 3 and x = 1 gives y = 5: rise 2.|For c = −4, the same inputs give −4 and −2: rise 2.|Generally, [2(x + 1) + c] − [2x + c] = 2, so changing c moves the line without changing its rate.", "The examples support the conjecture; cancellation of c explains it for every starting value.", "Investigate whether changing c in y = 2x + c changes the rate of the line.", "No; the rate stays 2")
 ]
 ];
+
+const fixedGraphs:Record<string,import('../algebra-visual').Algebra8Visual>={
+ '7/2':{kind:'graph',title:'Plot the table points',xMin:-3,xMax:3,yMin:-6,yMax:6,lines:[{m:-2,c:1,label:'y = −2x + 1'}],points:[{x:-1,y:3,label:'(−1, 3)'},{x:0,y:1,label:'(0, 1)'},{x:1,y:-1,label:'(1, −1)'}]},
+ '12/3':{kind:'graph',title:'Compare the same rate with different starting values',xMin:-3,xMax:3,yMin:-10,yMax:10,lines:[{m:2,c:3,label:'y = 2x + 3'},{m:2,c:-4,label:'y = 2x − 4'}]},
+};
+for(const [key,visual]of Object.entries(fixedGraphs)){const [w,l]=key.split('/').map(Number),guide=patternTeaching[w-1][l-1];if(!guide.example)throw Error(`Missing fixed Algebra example ${key}`);guide.example.algebra8Visual=visual;}

@@ -10,6 +10,8 @@ export type QuestionDraft = {
   steps: string[];
   visual?: Cave7Visual;
   spaceVisual?: {
+    circles?: {radius:number;label:string}[];
+    coordinate?: {edges?:[number,number][];showCoordinates?:boolean;dimensions:2|3;points:{values:number[];label:string}[];caption:string};
     polygons?: import("@/data/assessments/revisions/level8StarpathFiveForms").Polygon8[];
     space?: import("@/data/assessments/revisions/level8StarpathFiveForms").Space8;
   };

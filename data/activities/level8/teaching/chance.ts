@@ -51,3 +51,7 @@ g("Choose an outcome list or Venn intersection for an 'and' event. Test each can
 g("A probability investigation defines a model and event, records complete trials, then compares observed proportions with a prediction.", "Define one trial as two independent fair coin tosses. Count exactly one head as a success.|Theory gives HT and TH among four equally likely outcomes: P = 1/2.|Suppose an actual recorded run has 46 successes in 100 trials. Observed probability = 46/100 = 0.46.|Report the gap 0.50 − 0.46 = 0.04 and explain that random variation is possible; retain the real count.", "Further trials must be genuinely run and recorded. Do not replace observations with the expected 50 successes.", "Explain how to investigate the probability of exactly one head in two coin tosses. Use a recorded example of 46 successes in 100 trials.", "Theoretical 0.5; observed 0.46 in the stated run")
 ]
 ];
+
+const investigation=chanceTeaching[9][2];
+if(!investigation.example)throw Error('Missing fixed probability investigation');
+investigation.example.chance8Visual={kind:'tree',title:'One trial: two coin tosses',firstLabel:'First coin',secondLabel:'Second coin',first:['H','T'],second:['H','T']};
