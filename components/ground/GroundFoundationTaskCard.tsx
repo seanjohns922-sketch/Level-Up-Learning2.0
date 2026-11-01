@@ -4,6 +4,7 @@ import { Check, Plus, RotateCcw, Volume2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { speak } from "@/lib/speak";
+import GroundDragPiece from "./GroundDragPiece";
 import GroundObjectToken from "@/components/ground/GroundObjectToken";
 
 type GroundFoundationTask = Extract<PracticeTask, { kind: "groundFoundation" }>;
@@ -120,12 +121,12 @@ export default function GroundFoundationTaskCard({
           <div className="space-y-4">
             <Frame>
               <div className="flex min-h-24 flex-wrap content-center justify-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
-                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundObjectToken key={index} objectType="crystals" size="lg" />)}
+                {Array.from({ length: task.total - assignments.length }, (_, index) => <GroundDragPiece key={index} label="Drag this crystal to a group" onPlace={(target) => { if (target !== null) setAssignments((values) => [...values, Number(target)]); }}><GroundObjectToken objectType="crystals" size="lg" /></GroundDragPiece>)}
               </div>
             </Frame>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: task.mode === "equal_share" ? task.groups : boxCount }, (_, group) => (
-                <button key={group} type="button" disabled={!canAssign} onClick={() => setAssignments((values) => [...values, group])} className="min-h-40 rounded-xl border-2 border-cyan-500 bg-white p-3 disabled:opacity-60">
+                <button key={group} type="button" data-ground-drop={group} disabled={!canAssign} onClick={() => setAssignments((values) => [...values, group])} className="min-h-40 rounded-xl border-2 border-cyan-500 bg-white p-3 disabled:opacity-60">
                   <span className="text-sm font-bold text-slate-600">Group {group + 1}</span>
                   <span className="mt-3 flex flex-wrap justify-center gap-2">
                     {assignments.filter((value) => value === group).map((_, index) => <GroundObjectToken key={index} objectType="crystals" size="md" />)}

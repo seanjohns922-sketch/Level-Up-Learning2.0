@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import GroundDragPiece from "@/components/ground/GroundDragPiece";
 import { Rabbit, Turtle, Volume2, School, House, Sunrise, Sun, Sunset, Moon, Star, CalendarDays, ArrowLeft, ArrowRight } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -680,6 +681,7 @@ function OrderScene({
     >
       {/* Ordered slots */}
       <div
+        data-ground-drop="order-slots"
         className={`measurelands-order-slots grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"} ${shake ? "animate-[shake_0.4s_ease-in-out]" : ""}`}
       >
         {Array.from({ length: slotCount }).map((_, index) => {
@@ -723,19 +725,19 @@ function OrderScene({
       {/* Object bank */}
       <div className="measurelands-option-bank mt-4 rounded-[26px] border border-[rgba(214,184,108,0.34)] bg-[rgba(255,252,245,0.92)] p-3">
         <div className="mb-2 text-center text-[11px] font-black uppercase tracking-[0.16em] text-[#5f4725]">
-          {bank.length > 0 ? "Tap an object to place it" : allCorrect ? "Perfect order!" : "Tap a slot to undo"}
+          {bank.length > 0 ? "Drag each one into place" : allCorrect ? "Perfect order!" : "Tap a slot to undo"}
         </div>
         <div className={`grid gap-3 ${slotCount === 4 ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
           {bank.map((item) => (
             <div key={item.id} className="relative">
-              <button
-                type="button"
-                onClick={() => placeObject(item.id)}
+              <GroundDragPiece
+                label={`Place ${item.label}`}
                 disabled={locked}
-                className="w-full rounded-[28px] border border-transparent transition hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-[rgba(167,139,250,0.25)] disabled:opacity-50"
+                onPlace={(target) => { if (target === "order-slots" || target === null) placeObject(item.id); }}
+                className="w-full rounded-[28px] border border-transparent transition focus:outline-none focus:ring-4"
               >
                 <CompareVisual item={item} compact showWater={isFill} />
-              </button>
+              </GroundDragPiece>
               <OptionReadAloudButton text={item.label} className="absolute right-3 top-3 z-10" />
             </div>
           ))}
@@ -807,6 +809,32 @@ function SequenceScene({
   );
 }
 
+/** Ground Filling the Springs: the child makes the water level instead of only spotting it. */
+const FILL_MARKS = [0, 0.18, 0.5, 0.82, 1];
+function FillDragScene({ task, onCorrect, onWrong }: { task: MeasurelandsCompareTask; onCorrect: () => void; onWrong: () => void }) {
+  const target = task.objects.find((o) => o.id === task.correctOptionId)?.waterLevel ?? 0.5;
+  const word = target === 0 ? "empty" : target < 0.3 ? "nearly empty" : target < 0.7 ? "half full" : target < 1 ? "nearly full" : "full";
+  const prompt = `Drag the water until the spring is ${word}.`;
+  const [level, setLevel] = useState(target < 0.3 ? 1 : 0);
+  const track = useRef<HTMLDivElement>(null);
+  const setFrom = (y: number) => { const r = track.current?.getBoundingClientRect(); if (r) setLevel(Math.max(0, Math.min(1, (r.bottom - y) / r.height))); };
+  const nearest = FILL_MARKS.reduce((a, b) => (Math.abs(b - level) < Math.abs(a - level) ? b : a));
+  return <MeasurementShell badge={task.badgeLabel ?? "Fill the Spring"} prompt={prompt} speakText={prompt}>
+    <div className="flex flex-wrap items-center justify-center gap-6 rounded-[26px] bg-[#e8f7ff] p-4">
+      <div className="relative h-64 w-44 overflow-hidden rounded-b-[34px] border-[6px] border-t-0 border-[#3c2a63] bg-white/70"><div className="absolute inset-x-0 bottom-0 bg-gradient-to-b from-sky-300 to-blue-600" style={{ height: `${level * 100}%` }} /></div>
+      <div ref={track} data-fill-track role="slider" tabIndex={0} aria-label="Water level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level * 100)}
+        onKeyDown={(e) => { if (e.key === "ArrowUp") setLevel((v) => Math.min(1, v + 0.05)); if (e.key === "ArrowDown") setLevel((v) => Math.max(0, v - 0.05)); }}
+        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setFrom(e.clientY); }}
+        onPointerMove={(e) => { if (e.buttons || e.pointerType === "touch") setFrom(e.clientY); }}
+        className="relative h-64 w-20 cursor-grab touch-none select-none">
+        <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 rounded-full bg-[#caa55c]" />
+        <div className="absolute left-1/2 h-20 w-20 -translate-x-1/2 translate-y-1/2 rounded-full shadow-lg" style={{ bottom: `${level * 100}%`, background: "radial-gradient(circle at 35% 30%,#ffe29c,#ffb12e 60%,#c76f00)" }} />
+      </div>
+      <button type="button" onClick={() => (nearest === target ? onCorrect() : onWrong())} className="min-h-20 rounded-2xl px-10 text-2xl font-black text-[#fff8e1]" style={{ background: "linear-gradient(135deg, rgba(120,53,15,0.96), rgba(180,120,20,0.96))" }}>Check</button>
+    </div>
+  </MeasurementShell>;
+}
+
 /** One teaching moment at a time, so young students never have to scroll to reach the button. */
 function IntroMoments({ moments, onDone, header }: { moments: NonNullable<MeasurelandsCompareTask["teachingMoments"]>; onDone: () => void; header: React.ReactNode }) {
   const [page, setPage] = useState(0);
@@ -840,6 +868,9 @@ export function MeasurelandsCompareTaskCard({
   onCorrect: () => void;
   onWrong: () => void;
 }) {
+  if (task.scene === "trio" && task.fillState) {
+    return <FillDragScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
+  }
   if (task.scene === "sort") {
     return <SortScene task={task} onCorrect={onCorrect} onWrong={onWrong} />;
   }

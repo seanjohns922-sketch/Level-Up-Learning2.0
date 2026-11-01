@@ -5,6 +5,7 @@ import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/componen
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
 import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
+import GroundCheer from "@/components/ground/GroundCheer";
 import { Volume2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -1568,6 +1569,7 @@ export function PracticeRunner({
             </div>
           )}
 
+          {isGroundLesson && status === "correct" ? <GroundCheer key={questionsAnswered} /> : null}
           {awaitingWrongNext && currentWrongFeedback && isGroundLesson ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-2 font-bold text-amber-950 shadow-sm">
               <p className="text-xl leading-snug">

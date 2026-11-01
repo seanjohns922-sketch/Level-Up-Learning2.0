@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, Check, Flag } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import GroundDragPiece from "./GroundDragPiece";
 import GroundObjectToken from "@/components/ground/GroundObjectToken";
 import { speak } from "@/lib/speak";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
@@ -191,8 +192,9 @@ function GroundNumeralOption({
   return (
     <button
       type="button"
+      data-ground-numeral
       onClick={onClick}
-      className="relative flex min-h-[112px] items-center justify-center rounded-lg border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
+      className="relative flex min-h-[112px] items-center justify-center rounded-2xl border-2 border-cyan-200 bg-white text-5xl font-black text-teal-900 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-[0_0_18px_rgba(34,211,238,0.14)] active:scale-[0.98]"
     >
       {speakText ? (
         <span className="absolute right-3 top-3 z-10">
@@ -286,7 +288,7 @@ function QuantityBoard({
                     className={`flex items-center justify-center overflow-hidden border-2 text-2xl transition ${config.cellClass} ${tone}`}
                   >
                     {filled ? (
-                      <GroundObjectToken objectType={objectType} size="md" className={contentClass} />
+                      <GroundObjectToken objectType={objectType} size="md" className={state === "left" || state === "right" ? contentClass : ""} />
                     ) : (
                       <span className="h-6 w-6 rounded-full border border-cyan-200 bg-cyan-50" />
                     )}
@@ -714,12 +716,13 @@ export function GroundBuildTaskCard({
             {compareMode === "more_than" ? `Make more than ${compareBase}` : `Make less than ${compareBase}`}
           </div>
         ) : null}
+        <div data-ground-drop="tray" className="min-w-0">
         <QuantityBoard
           objectType={task.objectType}
           totalSlots={traySize}
           filledStates={tray.map((_, index) => (index < built ? "filled" : "empty"))}
           style={visualStyle}
-        /></div>
+        /></div></div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -730,13 +733,14 @@ export function GroundBuildTaskCard({
         >
           −
         </button>
-        <button
-          type="button"
-          onClick={() => { markInteracted(); setBuilt((current) => Math.min(traySize, current + 1)); }}
-          className="min-h-20 rounded-xl border-2 border-cyan-200 bg-white px-4 text-4xl font-black text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50"
+        <GroundDragPiece
+          label="Drag one onto the tray"
+          className="flex min-h-20 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-teal-400 bg-teal-50"
+          onPlace={(target) => { if (target === "tray" || target === null) { markInteracted(); setBuilt((current) => Math.min(traySize, current + 1)); } }}
         >
-          +
-        </button>
+          <GroundObjectToken objectType={task.objectType} size="lg" />
+          <span className="text-lg font-black text-teal-900">Drag me</span>
+        </GroundDragPiece>
         <button
           type="button"
           onClick={check}
@@ -1208,20 +1212,29 @@ export function GroundTapCountTaskCard({
       <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={tappedIds.length} target={task.targetNumber} />
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-          {Array.from({ length: task.targetNumber }).map((_, index) => (
-            <GroundToken
-              key={`${task.objectType}-${index}`}
-              objectType={task.objectType}
-              selected={tappedIds.includes(index)}
-              onClick={() => tapObject(index)}
-            />
-          ))}
+          {Array.from({ length: task.targetNumber }).map((_, index) => {
+            const popped = tappedIds.includes(index);
+            return (
+              <button
+                key={`${task.objectType}-${index}`}
+                type="button"
+                data-ground-bubble={popped ? "popped" : "ready"}
+                aria-label={popped ? `${index + 1} counted` : "Pop bubble"}
+                disabled={popped}
+                onClick={() => tapObject(index)}
+                style={{ animationDelay: `${index * 0.25}s` }}
+                className="mx-auto grid h-24 w-24 place-items-center rounded-full"
+              >
+                {popped ? <span className="text-4xl font-black text-teal-700">{tappedIds.indexOf(index) + 1}</span> : <GroundObjectToken objectType={task.objectType} size="md" />}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <div className="mb-3 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-          {allTapped ? "How many?" : "Tap each one first"}
+          {allTapped ? "How many?" : "Pop every bubble"}
         </div>
         <div className="grid grid-cols-3 gap-3">
           {task.options.map((option) => (
@@ -1343,28 +1356,22 @@ export function GroundFeedTaskCard({
 
   return (
     <GroundMiniShell badge="Feed Numbot" prompt={task.prompt} speakText={task.speakText}>
-      <div className="grid gap-4 lg:grid-cols-[1fr_240px]">
-        <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
-          <GroundCountBadge count={fedIds.length} target={task.targetNumber} />
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-            {Array.from({ length: task.totalObjects }).map((_, index) => (
-              <GroundToken
-                key={`${task.objectType}-${index}`}
-                objectType={task.objectType}
-                selected={fedIds.includes(index)}
-                onClick={() => feedObject(index)}
-              />
-            ))}
-          </div>
+      <div className="grid gap-4 sm:grid-cols-[1fr_240px]">
+        <div className="flex flex-wrap content-center items-center justify-center gap-3 rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1] p-4">
+          {Array.from({ length: task.totalObjects }).map((_, index) => fedIds.includes(index) ? null : (
+            <GroundDragPiece key={index} label="Feed Numbot" onPlace={(target) => { if (target === "numbot" || target === null) feedObject(index); }}>
+              <GroundObjectToken objectType={task.objectType} size="lg" />
+            </GroundDragPiece>
+          ))}
         </div>
-        <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-4 shadow-sm">
-          <div className="mb-2 text-center text-sm font-black uppercase tracking-[0.16em] text-teal-800">
-            Numbot Bouncer
-          </div>
-          <div className="mb-3 flex justify-center"><GroundObjectToken objectType="robots" size="lg" /></div>
-          <div className="rounded-full bg-white px-4 py-2 text-center text-xl font-black text-teal-900 shadow-sm">
-            {fedIds.length} / {task.targetNumber}
-          </div>
+        <div data-ground-drop="numbot" className="relative rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1] p-3 text-center">
+          <svg key={fedIds.length} viewBox="0 0 200 190" aria-hidden="true" data-ground-numbot className="mx-auto h-44 w-44">
+            <path d="M100 6v22" stroke="#cbd5e1" strokeWidth="7" /><circle cx="100" cy="8" r="9" fill="#f43f5e" />
+            <rect x="20" y="28" width="160" height="150" rx="34" fill="#f8fafc" stroke="#94a3b8" strokeWidth="5" />
+            <circle cx="66" cy="78" r="17" fill="#1e293b" /><circle cx="134" cy="78" r="17" fill="#1e293b" /><circle cx="71" cy="72" r="6" fill="#22d3ee" /><circle cx="139" cy="72" r="6" fill="#22d3ee" />
+            <rect x="58" y="118" width="84" height="42" rx="20" fill="#7f1d1d" />
+          </svg>
+          <div className="text-4xl font-black text-white">{fedIds.length}</div>
         </div>
       </div>
 
@@ -1470,8 +1477,10 @@ export function GroundOrderTapTaskCard({
   onWrong: () => void;
 }) {
   const [progressIndex, setProgressIndex] = useState(0);
+  const [launched, setLaunched] = useState(false);
   const direction = task.direction ?? "ASC";
   const isOrderMode = task.uiMode === "order";
+  const isCountdown = direction === "DESC" && !isOrderMode;
   const orderedNumerals = (task.pathNumerals?.length ? [...task.pathNumerals] : [...task.tiles].map((tile) => tile.numeral))
     .sort((a, b) => (direction === "DESC" ? b - a : a - b));
   const expectedNumeral = orderedNumerals[progressIndex] ?? orderedNumerals[orderedNumerals.length - 1] ?? task.targetNumber;
@@ -1489,6 +1498,12 @@ export function GroundOrderTapTaskCard({
 
     const nextIndex = progressIndex + 1;
     if (nextIndex >= orderedNumerals.length) {
+      if (isCountdown) {
+        setProgressIndex(nextIndex);
+        setLaunched(true);
+        window.setTimeout(onCorrect, 1300);
+        return;
+      }
       onCorrect();
       return;
     }
@@ -1499,7 +1514,7 @@ export function GroundOrderTapTaskCard({
     <GroundMiniShell badge={task.badgeLabel ?? (isOrderMode ? "Number Order" : "Number Path")} prompt={task.prompt} speakText={task.speakText}>
       <div className="rounded-lg border border-cyan-200 bg-white p-4 shadow-sm">
         <GroundCountBadge count={progressIndex} target={orderedNumerals.length} />
-        <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
+        {isCountdown ? <div className="relative mb-4 h-40 overflow-hidden rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1]"><div data-ground-rocket={launched ? "go" : "ready"} className="absolute bottom-1 left-1/2 -ml-16"><GroundObjectToken objectType="rockets" size="lg" className="!h-32 !w-32" /></div></div> : <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
           <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">{isOrderMode ? "Sorting Tray" : "Numbot Trail"}</div>
           <div className="mt-2 flex items-center justify-center gap-3 text-base font-black text-teal-900 sm:text-lg">
             <span className="grid h-11 w-11 place-items-center rounded-lg border-2 border-teal-300 bg-white text-teal-800 shadow-sm">{isOrderMode ? <Flag className="h-6 w-6" /> : <Bot className="h-6 w-6" />}</span>
@@ -1507,7 +1522,7 @@ export function GroundOrderTapTaskCard({
             <span className="text-cyan-400">→</span>
             <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">{isOrderMode ? "Keep sorting" : "Keep moving"}</span>
           </div>
-        </div>
+        </div>}
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
           {task.tiles.map((tile) => {
             const completedIndex = orderedNumerals.indexOf(tile.numeral);
