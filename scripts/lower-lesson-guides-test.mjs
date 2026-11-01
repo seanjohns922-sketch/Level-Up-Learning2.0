@@ -73,6 +73,12 @@ for (const key of seen) {
 }
 for (const level of [0, 7, 8, undefined]) assert.equal(getLowerLessonGuide('number', level, 1, 1), null);
 assert.equal(getLowerLessonGuide('number', 1, 99, 1), null);
+// Ground runs on levelNumber 1, so both start screens must choose its own guides by year.
+const { GROUND_GUIDES, getGroundGuide } = await import('../data/lesson-guides/ground.ts');
+assert.equal(Object.keys(GROUND_GUIDES).length, 60);
+for (let week = 1; week <= 12; week++) for (let lesson = 1; lesson <= 3; lesson++) assert(getGroundGuide('number', week, lesson)?.say, `Ground Number ${week}:${lesson}`);
+for (let week = 1; week <= 8; week++) for (let lesson = 1; lesson <= 3; lesson++) assert(getGroundGuide('measurement', week, lesson)?.say, `Ground Measurement ${week}:${lesson}`);
+for (const file of ['components/PracticeRunner.tsx', 'components/lesson/RealmLessonHome.tsx']) assert(fs.readFileSync(file, 'utf8').includes('getGroundGuide('), `${file} must use Ground guides`);
 assert.equal(lessonNumberFromId('y6-measurement-w8-l3'), 3);
 assert.equal(isNativeLessonIntro({ kind: 'area', scene: 'formulaIntro' }), true);
 assert.equal(isNativeLessonIntro({ kind: 'area', scene: 'breakIntro' }), true);

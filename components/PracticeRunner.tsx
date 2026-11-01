@@ -3,6 +3,8 @@
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
+import { getGroundGuide } from "@/data/lesson-guides/ground";
+import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
 import { Volume2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -613,7 +615,10 @@ export function PracticeRunner({
     safeTask.difficulty = ctx.difficulty;
     return safeTask;
   });
-  const lowerGuide = getLowerLessonGuide(realmId ?? "number", levelNumber, liveContext?.week, lessonNumberFromId(liveContext?.lessonId));
+  // Ground runs on levelNumber 1, but Level 1's guides are far too hard for it.
+  const isGroundLesson = /^y0-/.test(liveContext?.lessonId ?? "");
+  const groundGuide = isGroundLesson ? getGroundGuide(realmId ?? "number", liveContext?.week, lessonNumberFromId(liveContext?.lessonId)) : null;
+  const lowerGuide = isGroundLesson ? null : getLowerLessonGuide(realmId ?? "number", levelNumber, liveContext?.week, lessonNumberFromId(liveContext?.lessonId));
   const [nativeGuide] = useState(() => levelNumber && levelNumber >= 1 && levelNumber <= 6 && isNativeLessonIntro(task) ? task : null);
   const [helpOpen, setHelpOpen] = useState(false);
   const helpOpenRef = useRef(false);
@@ -1468,7 +1473,7 @@ export function PracticeRunner({
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>
         {/* A written lesson guide explains the method, so it comes before a one-line intro scene. */}
-        {lessonHelp || (nativeGuide && !lowerGuide) ? <div className="bg-white p-5 text-slate-900">
+        {groundGuide && !lessonHelp ? <GroundLessonGuide guide={groundGuide} title={lessonTitle ?? "Learn the skill"} realm={realmId ?? "number"} review onContinue={closeHelp} /> : lessonHelp || (nativeGuide && !lowerGuide) ? <div className="bg-white p-5 text-slate-900">
           <NarratedLessonGuide title={lessonTitle}>{lessonHelp ?? (nativeGuide && <TaskRenderer task={nativeGuide} taskNonce={-1} callbacks={{markCorrect: closeHelp, markCorrectSoft: () => {}, markWrong: () => {}, advanceIntro: closeHelp}} />)}</NarratedLessonGuide>
           <div className="mt-5 flex flex-wrap items-center gap-3"><button type="button" onClick={closeHelp} className={`rounded-xl px-5 py-3 font-bold text-white ${primaryActionClass}`}>Back to practice</button><ReadAloudBtn text="Your practice timer is paused. Choose Back to practice when ready." label="Read instructions" /></div>
         </div> : lowerGuide ? <LowerLessonGuide guide={lowerGuide} title={lessonTitle ?? "Learn the skill"} realm={realmId ?? "number"} review onContinue={closeHelp} /> : null}
@@ -1513,7 +1518,7 @@ export function PracticeRunner({
       {/* Two-column landscape: sticky HUD rail + question workspace */}
       <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
         <aside className="lg:sticky lg:top-4 lg:self-start">
-          {(lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
+          {(groundGuide || lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
             levelNumber={levelNumber}
             week={liveContext?.week}

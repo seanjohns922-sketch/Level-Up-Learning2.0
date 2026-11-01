@@ -3,6 +3,8 @@
 import { useState } from "react";
 import LowerLessonGuide from "./LowerLessonGuide";
 import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
+import { getGroundGuide } from "@/data/lesson-guides/ground";
+import GroundLessonGuide from "./GroundLessonGuide";
 import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import {getRealmTheme} from "@/lib/useRealmTheme";
@@ -476,9 +478,11 @@ export function RealmLessonHome({
   onStart,
 }: RealmLessonHomeProps) {
   const [guideOpen, setGuideOpen] = useState(false);
-  const lowerGuide = getLowerLessonGuide(realm, levelNumber, week, lessonNumber);
+  // Ground runs on levelNumber 1, but Level 1's guides are far too hard for it.
+  const groundGuide = year === "Prep" ? getGroundGuide(realm, week, lessonNumber) : null;
+  const lowerGuide = year === "Prep" ? null : getLowerLessonGuide(realm, levelNumber, week, lessonNumber);
   const startLesson = () => {
-    if (lowerGuide && !hasNativeStartGuide) setGuideOpen(true);
+    if ((lowerGuide || groundGuide) && !hasNativeStartGuide) setGuideOpen(true);
     else onStart();
   };
   const isCave=levelNumber >= 7;
@@ -502,6 +506,7 @@ export function RealmLessonHome({
     : "";
   const readAllText = `${lessonTitle}. ${theme.intro} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
 
+  if (guideOpen && groundGuide) return <div className="mx-auto max-w-5xl py-4"><GroundLessonGuide guide={groundGuide} title={lessonTitle} realm={realm} onContinue={onStart} /></div>;
   if (guideOpen && lowerGuide) return <div className="mx-auto max-w-6xl py-4">
     <button type="button" onClick={() => setGuideOpen(false)} className="mb-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900">Back to lesson overview</button>
     <LowerLessonGuide guide={lowerGuide} title={lessonTitle} realm={realm} onContinue={onStart} />
