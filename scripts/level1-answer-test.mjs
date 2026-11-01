@@ -5,7 +5,7 @@ import { LEVEL_ONE_LESSON_CONTENT } from '../data/activities/starpath/level1/ind
 import * as measure from '../data/activities/year1Measurelands/registry.ts';
 
 // These cannot be failed (they step to the answer) or say their own answer, or read the answer from another field.
-const OWN_ANSWER = new Set(['fillTheJar', 'numberLadder', 'numberLineJump', 'chartFill', 'matchPairs', 'countObjects', 'mabBuild', 'tensOnesMcq', 'partitionTwoWays', 'splitStepper', 'placeValueDice', 'equalGroups', 'equalGroupsMcq', 'groupBoxes', 'countCircle', 'typeNumber', 'mixedReviewSprint', 'targetedRevision', 'funGames', 'starpathShapeDisguise', 'starpathShapeFaceOff', 'starpathMysteryShape']);
+const OWN_ANSWER = new Set(['fillTheJar', 'numberLadder', 'numberLineJump', 'chartFill', 'matchPairs', 'countObjects', 'mabBuild', 'tensOnesMcq', 'partitionTwoWays', 'splitStepper', 'placeValueDice', 'equalGroupsMcq', 'groupBoxes', 'countCircle', 'typeNumber', 'mixedReviewSprint', 'targetedRevision', 'funGames', 'starpathShapeDisguise', 'starpathShapeFaceOff', 'starpathMysteryShape']);
 const GENERIC = ['answer', 'correctAnswer', 'targetNumber', 'numbers'];
 const bad = /undefined|null|NaN|\[object|^\s*$/;
 const seen = new Set(); let checked = 0;

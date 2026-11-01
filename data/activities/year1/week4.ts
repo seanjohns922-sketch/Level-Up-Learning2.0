@@ -59,7 +59,8 @@ function uniqueInts(n: number, min: number, max: number, avoid: number[] = []) {
 }
 
 function genEqualGroups(d: Difficulty): PracticeTask {
-  return { kind: "equalGroups", prompt: "Make equal groups.", difficulty: d };
+  const [groups, perGroup] = [[3, 2], [3, 3], [4, 2], [4, 3], [5, 2], [5, 3]][randInt(0, 5)];
+  return { kind: "equalGroups", prompt: "Make equal groups.", groups, perGroup, difficulty: d };
 }
 
 function genEqualGroupsMcq(d: Difficulty): PracticeTask {
@@ -100,7 +101,7 @@ function genMissingGroupSize(d: Difficulty): PracticeTask {
   const perGroup = randInt(pLo, pHi);
   const total = groups * perGroup;
   const options = shuffle(uniqueInts(3, 2, 6, [perGroup]).concat(perGroup)).map(String);
-  return { kind: "mcq", prompt: `${groups} groups of __ make ${total}`, options, answer: String(perGroup), difficulty: d };
+  return { kind: "mcq", prompt: `${groups} groups of __ make ${total}`, options, answer: String(perGroup), groupPicture: { groups, total }, difficulty: d };
 }
 
 function genSkipCountMissing(d: Difficulty, config?: { step: number; start: number; length: number; minOption: number; maxOption: number }): PracticeTask {

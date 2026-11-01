@@ -4,6 +4,7 @@ import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
 import { level1Answer, level1Speech } from "@/lib/level1-answer";
 import { Level1LookContext } from "@/lib/level1-look";
+import GroupPicture from "@/components/week4/GroupPicture";
 import "@/app/level1-look.css";
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
@@ -1671,11 +1672,12 @@ export function PracticeRunner({
             <div className="text-xl font-extrabold leading-tight text-foreground md:text-2xl">
               {task.kind === "mcq" ? <MathFormattedText text={task.prompt} /> : task.prompt}
             </div>
-            <ReadAloudBtn text={task.prompt} />
+            <ReadAloudBtn text={autoReadPrompt || task.prompt} />
           </div>
         )}
 
         {/* ── Builtin task renderers ── */}
+        {task.kind === "mcq" && (task as McqTask).groupPicture && <GroupPicture {...(task as McqTask).groupPicture!} />}
         {task.kind === "mcq" && (task as McqTask).visual && (
           <ChanceVisual visual={(task as McqTask).visual!} />
         )}

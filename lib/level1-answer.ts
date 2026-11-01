@@ -52,6 +52,7 @@ export function level1Answer(task: PracticeTask): string | null {
   const groupsAnswer = (perGroup: number) => `${perGroup} in each group`;
   switch (task.kind) {
     case "numberLineTap": return String(t.target);
+    case "equalGroups": return `${t.perGroup} in each group`;
     case "addDots": return `${t.a} dots and ${t.b} dots`;
     case "ppw":
       if (t.mode === "build") return `${t.a} and ${t.b}`;
@@ -165,6 +166,7 @@ export function level1Speech(task: PracticeTask): string {
   switch (task.kind) {
     case "numberLadder": return `Climb from ${t.start} to ${t.target}.`;
     case "tensOnesMcq": return "Tap the tens and ones that match the number.";
+    case "equalGroups": return `Share ${t.groups * t.perGroup} counters equally into ${t.groups} groups.`;
     case "addDots": return `Show ${t.a} and ${t.b} with dots.`;
     case "subtractTakeAway": return t.mode === "startWith" ? `Start with ${t.total}. Take away ${t.remove}. How many are left?` : `${t.total} take away ${t.remove}. How many are left?`;
     case "subtractMoveToTaken": return `${t.total} take away ${t.remove}. Move ${t.remove} into the taken away box.`;

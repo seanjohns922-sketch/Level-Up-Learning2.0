@@ -194,6 +194,8 @@ export type PracticeTask = (
     }
   | {
       kind: "mcq";
+      /** Week 4: the counters and empty groups a "groups of" question is about. */
+      groupPicture?: { groups: number; total: number };
       prompt: string;
       options: string[];
       answer: string;
@@ -2250,6 +2252,8 @@ export type PracticeTask = (
     }
   | {
       kind: "equalGroups";
+      groups: number;
+      perGroup: number;
       prompt: string;
     }
   | {

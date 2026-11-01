@@ -432,7 +432,7 @@ function TaskRendererInner({
     case "placeValueDice":
       return <PlaceValueDiceMat key={k} onCorrect={onC} onWrong={onW} />;
     case "equalGroups":
-      return <EqualGroupsMaker key={k} onCorrect={onC} onWrong={onW} />;
+      return <EqualGroupsMaker key={k} groups={t.groups} perGroup={t.perGroup} onCorrect={onC} onWrong={onW} />;
     case "equalGroupsMcq":
       return <EqualGroupsMCQ key={k} prompt={t.prompt} options={t.options} correctIndex={t.correctIndex} onCorrect={onC} onWrong={onW} />;
     case "groupBoxes":
