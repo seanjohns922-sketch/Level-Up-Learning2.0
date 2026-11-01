@@ -25,6 +25,7 @@ import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
+import { NewLookScope } from "@/lib/level1-look";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed, ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import { writeStarpathDemoJourney } from "@/lib/starpath-demo-state";
 import { restoreStudentStateFromServer, saveNumberWeeklyQuizAttempt } from "@/lib/student-progress-sync";
@@ -525,6 +526,7 @@ export default function StarpathVoyageQuiz({
 
               {task ? (
                 <div className={!answersAreEditable && currentAnswer !== undefined ? "pointer-events-none opacity-75" : ""}>
+                  <NewLookScope level={levelNumber} realm={realm}>
                   <TaskRenderer
                     key={`${index}-${nonce}`}
                     task={task}
@@ -539,6 +541,7 @@ export default function StarpathVoyageQuiz({
                       recordAssessmentAnswer: (correct, response) => answer(correct, response),
                     }}
                   />
+                  </NewLookScope>
                 </div>
               ) : null}
 

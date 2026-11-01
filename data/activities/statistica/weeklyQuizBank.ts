@@ -37,7 +37,10 @@ function yearOneOrTwoTask(level: 1 | 2, week: number, lesson: number, variant: n
   const largest = [...rows].sort((a, b) => b.count - a.count)[0]!;
   const smallest = [...rows].sort((a, b) => a.count - b.count)[0]!;
   const title = STATISTICA_PROGRAMS[level][week - 1]!.lessons[lesson - 1]!.title;
-  const stem = `Year ${level} ${title}: ${context}, set ${variant + 1}.`;
+  // Children see this, so it names the data, not the lesson or the form number.
+  // Level 2 numbers its surveys after Level 1's, so no two quiz questions are the same.
+  const stem = `Survey ${(level - 1) * 3 * CONTEXTS.length + (lesson - 1) * CONTEXTS.length + variant + 1}: ${context}.`;
+  void title;
 
   if (week === 1) {
     const validQuestion = variant % 2 === 0

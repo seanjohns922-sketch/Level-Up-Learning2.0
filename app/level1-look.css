@@ -52,3 +52,10 @@
 [data-level1-look="statistics"] .bg-\[\#17281f\] button:not([data-read-aloud-button]), [data-level1-look="statistics"] .bg-\[\#17281f\] button:not([data-read-aloud-button]) * { color: #17331f; }
 /* Star map place names */
 [data-level1-look="space"] [data-direction-grid] .text-\[6px\], [data-level1-look="space"] [data-direction-grid] .text-\[7px\] { font-size: 0.625rem; line-height: 1.1; color: #fff; white-space: normal; text-align: center; }
+/* Level 1 and 2 Number weekly quizzes: the same raised answer buttons as the lessons */
+[data-level1-look="number"] button[data-quiz-option]:not(.border-trust-blue) { min-height: 60px; border: 0; border-radius: 14px; background: #fff; color: var(--l1-ink); font-size: 1.4rem; font-weight: 800; text-align: center; box-shadow: 0 0 0 1px var(--l1-edge), 0 5px 0 var(--l1-edge); }
+[data-level1-look="number"] div[data-quiz-option] { border-radius: 14px; box-shadow: 0 5px 0 var(--l1-edge); }
+[data-level1-look="number"] button[data-quiz-option].border-trust-blue { min-height: 60px; border-radius: 14px; font-size: 1.4rem; font-weight: 800; text-align: center; box-shadow: 0 0 0 3px #0d9488, 0 5px 0 #0b6b63; }
+/* Other dark Statistica panels (quiz pictographs and sorting) */
+[data-level1-look="statistics"] .from-\[\#1c3226\] { background: #fff; border-color: #c7e2b4; box-shadow: 0 2px 0 #c7e2b4; }
+[data-level1-look="statistics"] .from-\[\#1c3226\] .text-white, [data-level1-look="statistics"] .from-\[\#1c3226\] .text-white\/90, [data-level1-look="statistics"] .from-\[\#1c3226\] .text-\[\#f2bc45\]\/80, [data-level1-look="statistics"] .from-\[\#1c3226\] .text-\[\#f2bc45\]\/70 { color: #17331f; }
