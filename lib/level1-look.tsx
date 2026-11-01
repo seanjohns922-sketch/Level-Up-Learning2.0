@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import "@/app/level1-look.css";
 
 /** True inside a Level 1 or Level 2 lesson, so shared cards can show the new look without touching other levels. */
 export const Level1LookContext = createContext(false);

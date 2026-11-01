@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
+import "./level1-look.css";
 import "./reliq-adult.css";
 import { brandBody, brandHeading } from "@/lib/brand-fonts";
 import { ErrorBoundary } from "@/components/ErrorBoundary";

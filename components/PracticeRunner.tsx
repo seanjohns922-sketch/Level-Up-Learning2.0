@@ -5,7 +5,6 @@ import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/componen
 import { level1Answer, level1Speech } from "@/lib/level1-answer";
 import { Level1LookContext } from "@/lib/level1-look";
 import GroupPicture from "@/components/week4/GroupPicture";
-import "@/app/level1-look.css";
 import { getLowerLessonGuide, isNativeLessonIntro, lessonNumberFromId } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
 import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
