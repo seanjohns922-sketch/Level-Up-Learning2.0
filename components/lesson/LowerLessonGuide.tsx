@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import { MathFormattedText } from '@/components/FractionText';
 import { getRealmTheme } from '@/lib/useRealmTheme';
-import { speak, stopSpeaking } from '@/lib/speak';
+import { stopSpeaking } from '@/lib/speak';
 import type { LowerLessonGuide as GuideData } from '@/data/lesson-guides/lower-level';
 import GuideVisual from '@/components/lesson/GuideVisual';
 import { GUIDE_TIMER_TEXT, guideAction, lowerGuideSpeech } from '@/data/lesson-guides/guide-speech';
@@ -24,13 +24,10 @@ export function LessonHelpButton({ realm, onClick, label = "Learn the skill · o
   return <button type="button" onClick={onClick} className="mb-3 min-h-12 w-full rounded-xl border px-4 py-3 font-bold text-white focus-visible:outline focus-visible:outline-offset-4" style={{ background: theme.ctaGradientCss, borderColor: theme.borderRing }}>{label}</button>;
 }
 
-export default function LowerLessonGuide({ guide, title, realm, onContinue, review = false, autoRead = false }: {
-  guide: GuideData; title: string; realm: string; onContinue: () => void; review?: boolean; autoRead?: boolean;
+export default function LowerLessonGuide({ guide, title, realm, onContinue, review = false }: {
+  guide: GuideData; title: string; realm: string; onContinue: () => void; review?: boolean;
 }) {
-  useEffect(() => {
-    if (autoRead) { const whole = lowerGuideSpeech(guide, review).whole; void speak(whole.join(" "), undefined, "auto", { parts: whole }); }
-    return () => stopSpeaking();
-  }, [autoRead, guide, review]);
+  useEffect(() => () => stopSpeaking(), []);
   const theme = getRealmTheme(realm);
   const action = guideAction(review);
   const timerText = GUIDE_TIMER_TEXT;

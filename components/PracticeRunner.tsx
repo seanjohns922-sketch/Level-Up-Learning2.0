@@ -664,7 +664,6 @@ export function PracticeRunner({
   // Ground students may not read yet, so their questions are always spoken.
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
   const isLevel1Lesson = /^y1-/.test(liveContext?.lessonId ?? "");
-  const speakEveryQuestion = alwaysSpeak || isLevel1Lesson;
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -887,7 +886,7 @@ export function PracticeRunner({
   }, [activityNoun, completionMode, elapsedSeconds, totalSeconds]);
 
   useEffect(() => {
-    if (helpOpen || (!autoReadEnabled && !speakEveryQuestion) || !speechInteractionReady) return;
+    if (helpOpen || (!autoReadEnabled && !alwaysSpeak) || !speechInteractionReady) return;
     if (!autoReadPrompt) return;
 
     const currentTaskKey = `${task.kind}:${taskNonce}:${autoReadPrompt}`;
@@ -1281,9 +1280,6 @@ export function PracticeRunner({
   useEffect(() => {
     if (alwaysSpeak && awaitingWrongNext && currentWrongFeedback) void speak(groundWrongLine, undefined, "auto");
   }, [alwaysSpeak, awaitingWrongNext, currentWrongFeedback, groundWrongLine]);
-  useEffect(() => {
-    if (level1WrongLine && awaitingWrongNext) void speak(level1WrongLine, undefined, "auto");
-  }, [awaitingWrongNext, level1WrongLine]);
 
   // ── Finished state ──
   if (finished) {
@@ -1606,7 +1602,7 @@ export function PracticeRunner({
               <div className="flex items-center justify-between gap-3">
                 <div>Not quite.</div>
                 <ReadAloudBtn
-                  text={incorrectFeedbackSpeech}
+                  text={level1WrongLine ?? incorrectFeedbackSpeech}
                   speechKey={`incorrect-feedback:${currentWrongFeedback.id}`}
                   label="Read feedback"
                   className="shrink-0 border-red-200 bg-white text-red-800"

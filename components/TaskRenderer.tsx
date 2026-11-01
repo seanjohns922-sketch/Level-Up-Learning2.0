@@ -4,6 +4,7 @@ import { isNativeLessonIntro } from "@/data/lesson-guides/lower-level";
 import { memo, useEffect, useRef, type ReactNode } from "react";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 import { PatternPeaksQuestionCard } from "@/components/pattern-peaks/PatternPeaksQuestionCard";
+import { level1Speech } from "@/lib/level1-answer";
 import QuestionReadAloudBoundary from "@/components/QuestionReadAloudBoundary";
 import MatchThePair from "@/components/MatchThePair";
 import CountObjects from "@/components/CountObjects";
@@ -855,8 +856,10 @@ function getTaskReadAloudText(task: PracticeTask): string {
   if ("speechText" in task && typeof task.speechText === "string" && task.speechText.trim()) {
     return task.speechText;
   }
+  const spoken = level1Speech(task);
+  if (spoken) return spoken;
   if ("prompt" in task && typeof task.prompt === "string" && task.prompt.trim()) {
-    return task.prompt;
+    return task.prompt.replace(/_{2,}/g, "how many").replace(/\s*\((\w+) → (\w+)\)/, ", $1 to $2");
   }
   return "Listen to the question, then complete the activity.";
 }
