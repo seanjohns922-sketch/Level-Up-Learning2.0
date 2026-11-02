@@ -1987,6 +1987,8 @@ export default function TypedResponseActivity({
   function displayTopDigit(index: number) {
     const original = writtenMethod?.top[index] ?? "";
     const current = workingTopDigits[index];
+    // A regrouped digit stays as written and is crossed out; its new value sits above it.
+    if (crossedDigits[index] && original !== "") return original;
     if (original === "" && current === 0 && !borrowDisplay[index]) return "";
     return String(current ?? 0);
   }
@@ -3401,7 +3403,7 @@ export default function TypedResponseActivity({
                   </div>
                 ))}
               </div>
-            ) : writtenMethod.carryRow ? (
+            ) : !isGuidedAddition && writtenMethod.carryRow ? (
               <div className="mb-1 grid w-fit grid-flow-col gap-1 sm:gap-2">
                 <div className="w-6 sm:w-8" />
                 {writtenMethod.carryRow.map((digit, index) => (
@@ -3587,7 +3589,7 @@ export default function TypedResponseActivity({
                 </p>
               )}
               {guidedFeedback ? (
-                <p className="mt-3 text-sm font-bold text-rose-600">{guidedFeedback}</p>
+                <p className={`mt-3 text-sm font-bold ${guidedFeedback.startsWith("Good.") ? "text-emerald-700" : "text-rose-600"}`}>{guidedFeedback}</p>
               ) : null}
             </div>
           ) : (

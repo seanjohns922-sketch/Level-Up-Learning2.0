@@ -112,7 +112,7 @@ export default function ArrayVisual({
         </div>
       )}
       <div className="mt-3 text-sm font-bold text-teal-800" aria-live="polite">
-        {displayRows} rows of {displayCols} = {displayRows * displayCols}
+        {displayRows} rows of {displayCols}
         {rotatable ? (turned ? " — turned" : " — original") : null}
       </div>
       {hasSplit ? (

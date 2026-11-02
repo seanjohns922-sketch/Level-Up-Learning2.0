@@ -19,7 +19,7 @@ function FractionGrid({
 }) {
   const active = interactive ? selectedParts ?? [] : shadedParts;
   return (
-    <div className={`grid gap-2 rounded-lg bg-white p-3 shadow-sm ${denominator === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+    <div data-fraction-grid data-parts={denominator} className={`grid gap-2 rounded-lg bg-white p-3 shadow-sm ${denominator === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
       {Array.from({ length: denominator }).map((_, index) => {
         const filled = active.includes(index);
         const cellClass = [
@@ -98,10 +98,9 @@ export default function AreaModelSelect({
   }
 
   function checkShade() {
-    const chosen = [...selectedParts].sort((a, b) => a - b);
-    const expected = Array.from({ length: questionData.numerator }, (_, index) => index);
-    const correct =
-      chosen.length === expected.length && chosen.every((value, index) => value === expected[index]);
+    // Any parts count: 1/4 is one part of four, whichever one is shaded.
+    const chosen = selectedParts;
+    const correct = chosen.length === questionData.numerator;
     if (correct) onCorrect?.();
     else onWrong?.(`${chosen.length} shaded part${chosen.length === 1 ? "" : "s"}`);
   }

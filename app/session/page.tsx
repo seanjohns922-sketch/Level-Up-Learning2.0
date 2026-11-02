@@ -8000,7 +8000,7 @@ function SessionPage({
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
   const isGroundNumberQuiz = quizRealmId === "number" && year === "Prep";
   const isLevelTwoNumberQuiz = quizRealmId === "number" && year === "Year 2";
-  const newLookLevel = year === "Year 1" ? 1 : year === "Year 2" ? 2 : 0;
+  const newLookLevel = year === "Year 1" ? 1 : year === "Year 2" ? 2 : year === "Year 3" ? 3 : 0;
   const isLevelThreeNumberQuiz = quizRealmId === "number" && year === "Year 3";
   const isLevelFourNumberQuiz = quizRealmId === "number" && year === "Year 4";
   const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";
@@ -9675,7 +9675,7 @@ function SessionPage({
             <div className="mb-6 rounded-lg border border-border bg-white/90 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.12)] sm:p-6">
 
               {quizQuestions.length ? (
-                <div data-level1-look={newLookLevel && quizRealmId === "number" ? "number" : undefined} className="rounded-lg border border-border/60 bg-white/75 p-3 sm:p-5">
+                <div data-level1-look={(newLookLevel === 1 || newLookLevel === 2) && quizRealmId === "number" ? "number" : undefined} data-number-nexus-level={newLookLevel === 3 && quizRealmId === "number" ? "3" : undefined} className="rounded-lg border border-border/60 bg-white/75 p-3 sm:p-5">
                   {!isMoneyQuiz && currentQuiz?.kind !== "lessonActivity" ? (
                     <div
                       className={[

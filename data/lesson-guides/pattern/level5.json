@@ -51,13 +51,13 @@
  },
  "2:3": {
   "idea": "Apply an extended fact family to a grouping problem.",
-  "example": "1 080 counters, 12 per group → 90 groups",
+  "example": "1,080 counters, 12 per group → 90 groups",
   "steps": [
-   "Divide the total by the group size: 1 080 ÷ 12.",
+   "Divide the total by the group size: 1,080 ÷ 12.",
    "Use 108 ÷ 12 = 9, then scale by 10.",
    "90 groups."
   ],
-  "tip": "Check: 90 × 12 = 1 080."
+  "tip": "Check: 90 × 12 = 1,080."
  },
  "3:1": {
   "idea": "Decide if the missing number is a product or a factor.",

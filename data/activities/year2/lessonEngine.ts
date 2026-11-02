@@ -5787,7 +5787,7 @@ function buildYear3Week4SubtractionQuestion(
       const steps =
         bridgeToTen < total
           ? [`${remove} -> ${bridgeToTen} (+${bridgeToTen - remove})`, `${bridgeToTen} -> ${total} (+${total - bridgeToTen})`]
-          : [`${remove} -> ${total} (+${answer})`];
+          : [`${remove} -> ${total} (+?)`];
       return {
         kind: "subtraction_strategy",
         prompt: `Solve ${total} - ${remove}. Which is better here: count back or count up?`,
@@ -5809,8 +5809,8 @@ function buildYear3Week4SubtractionQuestion(
     const ones = remove % 10;
     const afterTens = total - tens;
     const steps = tens > 0
-      ? [`${total} -> ${afterTens} (-${tens})`, `${afterTens} -> ${answer} (-${ones})`]
-      : [`${total} -> ${answer} (-${ones})`];
+      ? [`${total} -> ${afterTens} (-${tens})`, `${afterTens} -> ? (-${ones})`]
+      : [`${total} -> ? (-${ones})`];
     return {
       kind: "subtraction_strategy",
       prompt: `Solve ${total} - ${remove}. Which is better here: count back or count up?`,
@@ -5842,7 +5842,7 @@ function buildYear3Week4SubtractionQuestion(
       options: uniqueNumberOptions(answer, 12).map(Number),
       mode,
       strategyLabel: compareMode ? "Difference strategy" : "Compare the gap",
-      strategySteps: [`Start at ${remove}.`, `Count on to ${total}.`, `The total jump is ${answer}.`],
+      strategySteps: [`Start at ${remove}.`, `Count on to ${total}.`, "How big is the total jump?"],
     };
   }
 
@@ -5862,7 +5862,7 @@ function buildYear3Week4SubtractionQuestion(
     options: uniqueNumberOptions(answer, 12).map(Number),
     mode,
     strategyLabel: "Inverse fact strategy",
-    strategySteps: [`Think of ${remove} + ? = ${total}.`, `The missing part is ${answer}.`, `So ${total} - ${remove} = ${answer}.`],
+    strategySteps: [`Think of ${remove} + ? = ${total}.`, "Find the missing part.", `That missing part is ${total} - ${remove}.`],
   };
 }
 

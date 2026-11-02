@@ -89,6 +89,8 @@ export default function MoneyContextVisual({
   visual: MoneyVisualData;
 }) {
   if (visual.type === "shopping_list") {
+    // Only show the type column when it tells items apart.
+    const showType = visual.items.some((item) => item.detail && item.detail !== "Standard");
     return (
       <div className="mt-4 rounded-2xl border border-teal-100 bg-teal-50 p-4">
         <div className="text-xs font-bold uppercase tracking-wide text-teal-700">
@@ -101,18 +103,18 @@ export default function MoneyContextVisual({
             </div>
           ) : null}
           <div className="overflow-hidden rounded-xl border border-slate-100">
-            <div className="grid grid-cols-[1.4fr_1fr_88px] bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500">
+            <div className={`grid ${showType ? "grid-cols-[1.4fr_1fr_88px]" : "grid-cols-[1fr_88px]"} bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500`}>
               <div>Item</div>
-              <div>Type</div>
+              {showType ? <div>Type</div> : null}
               <div className="text-right">Price</div>
             </div>
             {visual.items.map((item) => (
               <div
                 key={`${item.label}-${item.price}-${item.quantity ?? 1}`}
-                className="grid grid-cols-[1.4fr_1fr_88px] items-center border-t border-slate-100 px-3 py-3"
+                className={`grid ${showType ? "grid-cols-[1.4fr_1fr_88px]" : "grid-cols-[1fr_88px]"} items-center border-t border-slate-100 px-3 py-3`}
               >
                 <div className="text-base font-black text-slate-900">{item.label}</div>
-                <div className="text-sm text-slate-500">{item.detail ?? "Standard"}</div>
+                {showType ? <div className="text-sm text-slate-500">{item.detail ?? "Standard"}</div> : null}
                 <div className="text-right text-sm font-black text-slate-700">
                   {formatDollars(item.price)}
                 </div>
