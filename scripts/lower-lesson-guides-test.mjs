@@ -60,12 +60,37 @@ for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, 
   assert(guide.example.trim().length > 2 && guide.tip.length > 12, `Incomplete ${realm}:${level}:${key}`);
   assert(guide.steps.length >= 2 && guide.steps.length <= 4 && guide.steps.every(step => step.trim().length > 8 && step.length <= 170), `Steps ${realm}:${level}:${key}`);
   if (guide.visual) {
-    assert(['thermometer','clock','ruler','gauge','angle','grid','gridRef','shapes','net','spinner','diceGrid','blocks','areaGrid','perimeter','calendar','numberLine','bars','dots'].includes(guide.visual.kind), `Unknown diagram ${realm}:${level}:${key}`);
+    assert(['thermometer','clock','ruler','gauge','angle','grid','gridRef','shapes','net','spinner','diceGrid','blocks','areaGrid','perimeter','calendar','numberLine','bars','dots','scene'].includes(guide.visual.kind), `Unknown diagram ${realm}:${level}:${key}`);
     assert(guideVisualSpeech(guide.visual).length > 10, `Diagram needs a spoken description ${realm}:${level}:${key}`);
+    if (guide.visual.kind === 'scene') {
+      // Every reveal and highlight must point at a step the guide really has, and the last step must show something.
+      const stepsUsed = JSON.stringify(guide.visual.rows).match(/"(?:step|crossStep|ringStep|fillStep|answerStep|shadeStep|markStep)":\d+/g) ?? [];
+      for (const used of stepsUsed) assert(Number(used.split(':')[1]) <= guide.steps.length, `Picture step beyond the guide's steps ${realm}:${level}:${key}`);
+      for (const part of guide.visual.rows.flat()) for (const f of part.focus ?? []) assert(f >= 1 && f <= guide.steps.length, `Picture focus beyond the guide's steps ${realm}:${level}:${key}`);
+    }
     visuals++;
   }
   own++;
 }
+// Prevent an interrupted diagram import from silently leaving early-years guides without visuals.
+let earlyVisuals = 0;
+for (const realm of ['number', 'measurement', 'space', 'statistics']) for (const level of [1, 2]) {
+  for (const [key, guide] of Object.entries(LESSON_GUIDES[realm][level])) {
+    assert(guide.visual, `Missing early-years diagram ${realm}:${level}:${key}`);
+    earlyVisuals++;
+    if (guide.visual.kind !== 'scene') continue;
+    for (const part of guide.visual.rows.flat()) {
+      if (part.type === 'image') assert(fs.existsSync(`public/images/measurelands/${part.src}`), `Missing guide image ${part.src}`);
+      if (part.type === 'money') for (const item of part.items) assert(fs.existsSync(`public/coins/${item}.png`), `Missing money image ${item}`);
+      if (part.type === 'barModel') {
+        const whole = Number.parseFloat(part.unknown === 'whole' ? part.answer : part.whole);
+        const parts = part.parts.map((value, i) => Number.parseFloat(part.unknown === i ? part.answer : value));
+        assert.equal(parts.reduce((sum, value) => sum + value, 0), whole, `Incorrect part-whole model ${realm}:${level}:${key}`);
+      }
+    }
+  }
+}
+assert.equal(earlyVisuals, 204);
 // Every Level 1–6 lesson in every realm has its own written guide; intro scenes no longer stand alone.
 for (const key of seen) {
   const [realm, level, week, lesson] = key.split(':');

@@ -44,7 +44,61 @@
    "Check blocks touch with no gaps.",
    "Check no blocks overlap."
   ],
-  "tip": "Gaps make the count too small; overlaps make it too big."
+  "tip": "Gaps make the count too small; overlaps make it too big.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "measure-objects-3d/pencil.png",
+      "alt": "A pencil",
+      "crop": {
+       "width": 300,
+       "x": [
+        0.029947916666666668,
+        0.97265625
+       ],
+       "y": [
+        0.390625,
+        0.625
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "units",
+      "unit": "block",
+      "n": 4,
+      "width": 300,
+      "gapAt": 2,
+      "label": "Gap: wrong count",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "units",
+      "unit": "block",
+      "n": 5,
+      "width": 300,
+      "label": "Touching, no gaps",
+      "focus": [
+       1,
+       2,
+       3
+      ],
+      "step": 2
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Measure mass with balance cubes.",
@@ -54,7 +108,35 @@
    "Add cubes to the other side until it is level.",
    "Count the cubes."
   ],
-  "tip": "The balance must be level before you count."
+  "tip": "The balance must be level before you count.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "balance",
+      "object": "📕 Book",
+      "cubes": 8,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "8 cubes",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Compare masses by comparing cube counts.",
@@ -86,7 +168,56 @@
    "If the cubes differ, the counts can't be compared.",
    "Measure again with matching cubes."
   ],
-  "tip": "Same unit, every time."
+  "tip": "Same unit, every time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "balance",
+      "object": "🍎 Apple",
+      "cubes": 3,
+      "label": "Big cubes",
+      "focus": [
+       1
+      ],
+      "cubeSize": "big"
+     },
+     {
+      "type": "balance",
+      "object": "🍊 Orange",
+      "cubes": 6,
+      "label": "Small cubes",
+      "focus": [
+       1
+      ],
+      "cubeSize": "small"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Different cubes can't be compared",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Use matching cubes",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Measure capacity by filling with the same cup each time.",
@@ -96,7 +227,64 @@
    "Pour it into the container and count.",
    "Keep going until the container is full."
   ],
-  "tip": "Fill the cup the same way every time."
+  "tip": "Fill the cup the same way every time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "containers-3d/cup.png",
+      "alt": "A cup",
+      "size": 80,
+      "label": "Fill",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→"
+     },
+     {
+      "type": "image",
+      "src": "containers-3d/mug.png",
+      "alt": "A mug",
+      "size": 90,
+      "label": "Pour",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 cup",
+       "2 cups",
+       "3 cups"
+      ],
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3 cups",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Compare capacities by comparing cup counts.",
@@ -128,7 +316,45 @@
    "Small containers suit small units.",
    "Big containers suit big units."
   ],
-  "tip": "A tiny unit for a big container takes too long."
+  "tip": "A tiny unit for a big container takes too long.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "containers-3d/bathtub.png",
+      "alt": "A bathtub",
+      "size": 110,
+      "label": "Big container",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A spoon is too small",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "image",
+      "src": "containers-3d/bucket.png",
+      "alt": "A bucket",
+      "size": 90,
+      "label": "Use a bucket",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Some things last about an hour, some a day, some a week.",
@@ -138,7 +364,36 @@
    "Match it to hour, day or week.",
    "Check it makes sense."
   ],
-  "tip": "An hour is shorter than a day; a day is shorter than a week."
+  "tip": "An hour is shorter than a day; a day is shorter than a week.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "duration-3d/movie.png",
+      "alt": "A movie",
+      "size": 100,
+      "label": "A movie: about an hour",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "image",
+      "src": "duration-3d/holidays.png",
+      "alt": "School holidays",
+      "size": 100,
+      "label": "School holidays: weeks",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Compare how long events last.",
@@ -148,7 +403,53 @@
    "Use hours, days and weeks to compare.",
    "Say which is longer or shorter."
   ],
-  "tip": "Think about the whole event, from start to finish."
+  "tip": "Think about the whole event, from start to finish.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "duration-3d/school-day.png",
+      "alt": "A school day",
+      "size": 100,
+      "label": "School day",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "sign",
+      "text": ">",
+      "step": 3
+     },
+     {
+      "type": "image",
+      "src": "duration-3d/movie.png",
+      "alt": "A movie",
+      "size": 100,
+      "label": "Movie",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A school day is longer",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Sort activities into hour, day and week groups.",
@@ -158,7 +459,36 @@
    "Decide how long it lasts.",
    "Put it in the matching group."
   ],
-  "tip": "Order from shortest to longest to check."
+  "tip": "Order from shortest to longest to check.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "duration-3d/brush-teeth.png",
+      "alt": "Brushing teeth",
+      "size": 100,
+      "label": "Less than an hour",
+      "focus": [
+       2,
+       3
+      ]
+     },
+     {
+      "type": "image",
+      "src": "duration-3d/camping.png",
+      "alt": "A camp",
+      "size": 100,
+      "label": "Days",
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Seven days make a week, Monday to Sunday.",
@@ -168,7 +498,47 @@
    "Say the days in order to Sunday.",
    "After Sunday, a new week begins."
   ],
-  "tip": "There are always 7 days in a week."
+  "tip": "There are always 7 days in a week.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Mon",
+       "Tue",
+       "Wed",
+       "Thu",
+       "Fri",
+       "Sat",
+       "Sun"
+      ],
+      "focus": [
+       1,
+       2
+      ],
+      "marked": [
+       0
+      ],
+      "markStep": 1
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Mon"
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ],
+      "label": "A new week begins"
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "About four weeks make a month.",
@@ -178,7 +548,62 @@
    "Count the rows.",
    "About four rows make a month."
   ],
-  "tip": "Months are a little longer than 4 weeks."
+  "tip": "Months are a little longer than 4 weeks.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "calendar",
+       "days": 28,
+       "startDay": 0,
+       "highlight": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Week 1",
+       "Week 2",
+       "Week 3",
+       "Week 4"
+      ],
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "About a month",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Twelve months make a year, always in the same order.",
@@ -188,7 +613,53 @@
    "Say the months in order.",
    "After December, the year starts again."
   ],
-  "tip": "Use the order to find a missing month."
+  "tip": "Use the order to find a missing month.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Jan",
+       "Feb",
+       "Mar",
+       "Apr",
+       "May",
+       "Jun",
+       "Jul",
+       "Aug",
+       "Sep",
+       "Oct",
+       "Nov",
+       "Dec"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Nov",
+       "Dec",
+       "Jan"
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ],
+      "marked": [
+       2
+      ],
+      "label": "The year starts again"
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "A calendar shows the dates of a month.",
@@ -257,7 +728,54 @@
    "Go back one day.",
    "That is yesterday."
   ],
-  "tip": "Yesterday has already happened."
+  "tip": "Yesterday has already happened.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Mon",
+       "Tue",
+       "Wed",
+       "Thu",
+       "Fri"
+      ],
+      "marked": [
+       2
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "← one day back"
+      ],
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Tuesday",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Today is happening now.",
@@ -267,7 +785,41 @@
    "That is today.",
    "Yesterday is before; tomorrow is after."
   ],
-  "tip": "Sort events into yesterday, today and tomorrow."
+  "tip": "Sort events into yesterday, today and tomorrow.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Yesterday",
+       "Today",
+       "Tomorrow"
+      ],
+      "marked": [
+       1
+      ],
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "image",
+      "src": "routine-3d/routine-school.png",
+      "alt": "At school",
+      "size": 100,
+      "label": "We are at school now",
+      "focus": [
+       1
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Tomorrow is the day after today.",
@@ -277,7 +829,53 @@
    "Go forward one day.",
    "That is tomorrow."
   ],
-  "tip": "Tomorrow hasn't happened yet."
+  "tip": "Tomorrow hasn't happened yet.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Thu",
+       "Fri",
+       "Sat",
+       "Sun"
+      ],
+      "marked": [
+       1
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "one day forward →"
+      ],
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Saturday",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "Put events in order using first, next and last.",
@@ -287,7 +885,56 @@
    "Find what comes next.",
    "Finish with what happens last."
   ],
-  "tip": "Think about your own morning."
+  "tip": "Think about your own morning.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "routine-3d/routine-wakeup.png",
+      "alt": "Waking up",
+      "size": 88,
+      "label": "First",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→",
+      "step": 2
+     },
+     {
+      "type": "image",
+      "src": "routine-3d/routine-breakfast.png",
+      "alt": "Breakfast",
+      "size": 88,
+      "label": "Next",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→",
+      "step": 3
+     },
+     {
+      "type": "image",
+      "src": "routine-3d/routine-school.png",
+      "alt": "School",
+      "size": 88,
+      "label": "Last",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "A day has a morning, afternoon and evening.",
@@ -297,7 +944,41 @@
    "Morning is early; evening is late.",
    "Put the day in order."
   ],
-  "tip": "Breakfast is in the morning."
+  "tip": "Breakfast is in the morning.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "routine-3d/routine-bed.png",
+      "alt": "Going to bed",
+      "size": 100,
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Morning",
+       "Afternoon",
+       "Evening"
+      ],
+      "marked": [
+       2
+      ],
+      "markStep": 3,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Some events always happen in the same order.",
@@ -307,6 +988,67 @@
    "Find what must happen next.",
    "Keep going to the last step."
   ],
-  "tip": "Ask: could this step happen before the other?"
+  "tip": "Ask: could this step happen before the other?",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🌰",
+      "label": "Plant",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→",
+      "step": 2
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "💧",
+      "label": "Water",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→",
+      "step": 3
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🌱",
+      "label": "Sprout",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→",
+      "step": 3
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🌸",
+      "label": "Flower",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

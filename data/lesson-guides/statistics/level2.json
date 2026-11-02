@@ -7,7 +7,99 @@
    "Ask many people, not just one.",
    "Count the answers for each choice."
   ],
-  "tip": "'How old am I?' has only one answer, so it is not a statistical question."
+  "tip": "'How old am I?' has only one answer, so it is not a statistical question.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Which pet do children in our class keep?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐶",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐱",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐟",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐶",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🐶",
+      "rows": [
+       {
+        "label": "Dog",
+        "n": 2
+       }
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ]
+     },
+     {
+      "type": "pictograph",
+      "icon": "🐱",
+      "rows": [
+       {
+        "label": "Cat",
+        "n": 1
+       }
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ]
+     },
+     {
+      "type": "pictograph",
+      "icon": "🐟",
+      "rows": [
+       {
+        "label": "Fish",
+        "n": 1
+       }
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Good categories cover every answer, with no overlaps.",
@@ -17,7 +109,32 @@
    "Make one category for each kind.",
    "Add 'other' so every answer has a place."
   ],
-  "tip": "Each answer should fit exactly one category."
+  "tip": "Each answer should fit exactly one category.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Fruit",
+       "Vegetable",
+       "Drink",
+       "Other"
+      ],
+      "marked": [
+       3
+      ],
+      "markStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Sort each response into its category, then count each group.",
@@ -27,7 +144,41 @@
    "Put it in the matching category.",
    "Count each category when you finish."
   ],
-  "tip": "The category counts should add to the total responses."
+  "tip": "The category counts should add to the total responses.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "dog",
+       "cat",
+       "dog",
+       "fish"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "dog 2",
+       "cat 1",
+       "fish 1"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "A list keeps every answer before it is counted.",
@@ -37,7 +188,73 @@
    "Then sort the list into groups.",
    "Tally or count each group."
   ],
-  "tip": "Cross off each list item once it is counted."
+  "tip": "Cross off each list item once it is counted.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "apple",
+       "pear",
+       "apple",
+       "banana"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🍎",
+      "rows": [
+       {
+        "label": "Apple",
+        "n": 2
+       }
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     },
+     {
+      "type": "pictograph",
+      "icon": "🍐",
+      "rows": [
+       {
+        "label": "Pear",
+        "n": 1
+       }
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     },
+     {
+      "type": "pictograph",
+      "icon": "🍌",
+      "rows": [
+       {
+        "label": "Banana",
+        "n": 1
+       }
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "A table shows each category and its count in rows.",
@@ -47,7 +264,45 @@
    "Read across to its number.",
    "That number is how many chose it."
   ],
-  "tip": "Read across the same row; don't jump rows."
+  "tip": "Read across the same row; don't jump rows.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Pets chosen",
+       "categories": [
+        "Rabbit",
+        "Mouse"
+       ],
+       "values": [
+        6,
+        2
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "6 chose rabbit",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Complete a table by counting, and use it to find most and fewest.",
@@ -75,13 +330,50 @@
  },
  "3:1": {
   "idea": "A picture graph uses one picture for each vote.",
-  "example": "Ball ●●●, Kite ●● → 3 and 2",
+  "example": "Ball 3, Kite 2 → 3 and 2",
   "steps": [
    "Put one picture per vote in each row.",
    "Start every row at the same line.",
    "Check each row matches its count."
   ],
-  "tip": "Line the pictures up so rows compare fairly."
+  "tip": "Line the pictures up so rows compare fairly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "pictograph",
+      "icon": "⚽",
+      "rows": [
+       {
+        "label": "Ball",
+        "n": 3
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     },
+     {
+      "type": "pictograph",
+      "icon": "🪁",
+      "rows": [
+       {
+        "label": "Kite",
+        "n": 2
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "A column graph shows each count as the height of a bar.",
@@ -91,7 +383,34 @@
    "Make its bar reach its count on the side scale.",
    "Do the same for every category."
   ],
-  "tip": "The scale on the side tells you how tall to make each bar."
+  "tip": "The scale on the side tells you how tall to make each bar.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Favourite toy",
+       "categories": [
+        "Blocks",
+        "Dolls"
+       ],
+       "values": [
+        5,
+        3
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Read a column graph using the scale on the side.",
@@ -101,7 +420,45 @@
    "Look across from the top of the bar to the scale.",
    "Read the number there."
   ],
-  "tip": "Use a ruler or your finger to read across straight."
+  "tip": "Use a ruler or your finger to read across straight.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Favourite pet",
+       "categories": [
+        "Dog",
+        "Cat"
+       ],
+       "values": [
+        7,
+        4
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "7 chose dog",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "The same data can be shown as a picture graph or a column graph.",
@@ -111,7 +468,44 @@
    "Picture graph: one picture per vote.",
    "Column graph: a bar up to the count."
   ],
-  "tip": "Both displays must show the same numbers."
+  "tip": "Both displays must show the same numbers.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "pictograph",
+      "icon": "🍎",
+      "rows": [
+       {
+        "label": "Apple",
+        "n": 4
+       }
+      ],
+      "label": "Picture graph",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Column graph",
+       "categories": [
+        "Apple"
+       ],
+       "values": [
+        4
+       ]
+      },
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Compare a picture graph and a column graph that show the same data.",
@@ -121,7 +515,50 @@
    "Check the same category is biggest in the other.",
    "Both displays should agree."
   ],
-  "tip": "Different displays, same data, same answer."
+  "tip": "Different displays, same data, same answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "pictograph",
+      "icon": "🍎",
+      "rows": [
+       {
+        "label": "Apple",
+        "n": 6
+       },
+       {
+        "label": "Pear",
+        "n": 3
+       }
+      ],
+      "label": "Longest row",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Tallest bar",
+       "categories": [
+        "Apple",
+        "Pear"
+       ],
+       "values": [
+        6,
+        3
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Choose the display that shows the data most clearly.",
@@ -131,7 +568,45 @@
    "Pictures suit small counts you can see.",
    "Columns with a scale suit bigger counts."
   ],
-  "tip": "Whichever you choose, label it clearly."
+  "tip": "Whichever you choose, label it clearly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "pictograph",
+      "icon": "⭐",
+      "rows": [
+       {
+        "label": "Small",
+        "n": 4
+       }
+      ],
+      "label": "Small counts",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Bigger counts",
+       "categories": [
+        "Big"
+       ],
+       "values": [
+        20
+       ]
+      },
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Rank categories by their counts.",
@@ -203,13 +678,57 @@
  },
  "6:1": {
   "idea": "Plan an investigation: ask a question and record the answers with tallies.",
-  "example": "Apple |||| |, Banana |||",
+  "example": "Apple 6, Banana 3",
   "steps": [
    "Write the question and the choices.",
    "Ask each person and add a tally mark.",
    "Count the tallies at the end."
   ],
-  "tip": "Ask each person only once."
+  "tip": "Ask each person only once.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Which fruit do you like?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "tally",
+      "n": 6,
+      "label": "Apple",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "tally",
+      "n": 3,
+      "label": "Banana",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Apple 6, Banana 3",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Display the data you collected so others can read it.",
@@ -219,7 +738,34 @@
    "Label the categories.",
    "Draw each one to match its count."
   ],
-  "tip": "Give the display a title."
+  "tip": "Give the display a title.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "bars",
+       "title": "Votes",
+       "categories": [
+        "Ball",
+        "Kite"
+       ],
+       "values": [
+        5,
+        3
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Compare categories and report what you found.",

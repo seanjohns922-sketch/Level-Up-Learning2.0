@@ -1,5 +1,6 @@
 import type { GuideVisual as Visual, ShapeName } from "@/data/lesson-guides/guide-visual";
 import { guideVisualSpeech } from "@/data/lesson-guides/guide-visual";
+import GuideScene from "@/components/lesson/GuideScene";
 
 // Static worked-example diagrams for Learn the Skill guides. Nothing here is interactive.
 const INK = "#1f2a37", MUTED = "#64748b", LINE = "#cbd5e1", ACCENT = "#0f766e", WARM = "#c2410c", FILL = "#e0f2f1";
@@ -202,8 +203,9 @@ function Dots({ v }: { v: Extract<Visual, { kind: "dots" }> }) {
   </Svg>;
 }
 
-export default function GuideVisual({ visual }: { visual: Visual }) {
+export default function GuideVisual({ visual, step = null }: { visual: Visual; step?: number | null }) {
   switch (visual.kind) {
+    case "scene": return <GuideScene rows={visual.rows} step={step} />;
     case "thermometer": return <Thermometer v={visual} />;
     case "clock": return <Clock v={visual} />;
     case "ruler": return <Ruler v={visual} />;

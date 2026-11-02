@@ -19,8 +19,70 @@ export type GuideVisual =
   | { kind: "calendar"; days: number; startDay: number; highlight: number[]; label?: string }
   | { kind: "numberLine"; min: number; max: number; step: number; marks: { value: number; label: string }[]; labelEvery?: number }
   | { kind: "bars"; title: string; categories: string[]; values: number[] }
-  | { kind: "dots"; title: string; min: number; max: number; values: number[] };
+  | { kind: "dots"; title: string; min: number; max: number; values: number[] }
+  | { kind: "scene"; rows: ScenePart[][] };
 
+/**
+ * Picture-led worked examples (Levels 1–2): the lesson's own objects, drawn from the example's numbers.
+ * Every part is visible at rest. `step` hides a part until that step is chosen; `focus` lists the steps
+ * that light it up. Numbers here must match the guide's example and steps (checked by the guide test).
+ */
+type PartBase = { step?: number; focus?: number[]; label?: string };
+export type ScenePart = PartBase & (
+  | { type: "counters"; n: number; icon?: string; cols?: number; second?: number; crossed?: number; crossStep?: number; frame?: boolean; ring?: number; ringStep?: number }
+  | { type: "groups"; groups: number; each: number; fillStep?: number; object?: "counter" | "cube" }
+  | { type: "array"; rows: number; cols: number }
+  | { type: "blocks"; hundreds?: number; tens?: number; ones?: number }
+  | { type: "money"; items: string[] }
+  | { type: "image"; src: string; size?: number; alt: string; crop?: { width: number; x: [number, number]; y: [number, number] } }
+  | { type: "units"; unit: "block" | "domino" | "clip"; n: number; width: number; gapAt?: number }
+  | { type: "picture"; name: "robot" | "house" | "castle" | "pizza" | "clock" }
+  | { type: "text"; text: string; big?: boolean; tone?: "answer" | "unknown"; then?: { step: number; text: string } }
+  | { type: "sign"; text: string }
+  | { type: "seq"; items: string[] }
+  | { type: "tally"; n: number }
+  | { type: "barModel"; whole: string; parts: string[]; unknown?: "whole" | number; answer?: string; answerStep?: number }
+  | { type: "fraction"; shape: "square" | "circle" | "bar"; parts: number; shaded: number; shadeStep?: number }
+  | { type: "line"; min: number; max: number; tick: number; labelEvery?: number; jumps?: { from: number; to: number; text?: string; step?: number }[]; marks?: { value: number; text?: string; step?: number; tone?: "answer" | "unknown" }[] }
+  | { type: "pictograph"; icon: string; rows: { label: string; n: number }[] }
+  | { type: "balance"; object: string; cubes: number; cubeSize?: "big" | "small" }
+  | { type: "chips"; items: string[]; marked?: number[]; markStep?: number; arrows?: boolean }
+  | { type: "visual"; visual: Exclude<GuideVisual, { kind: "scene" }> }
+  | { type: "compass"; from: "north" | "east" | "south" | "west"; turns: number; turnStep?: number }
+);
+
+const MONEY: Record<string, string> = { "coin-5c": "5 cent coin", "coin-10c": "10 cent coin", "coin-20c": "20 cent coin", "coin-50c": "50 cent coin", "coin-1": "$1 coin", "coin-2": "$2 coin", "note-5": "$5 note", "note-10": "$10 note", "note-20": "$20 note", "note-50": "$50 note", "note-100": "$100 note" };
+export const moneyName = (item: string) => MONEY[item] ?? item;
+const blocksSaid = (b: { hundreds?: number; tens?: number; ones?: number }) => [b.hundreds ? plural(b.hundreds, "hundred") : "", b.tens ? plural(b.tens, "ten") : "", b.ones ? plural(b.ones, "one") : ""].filter(Boolean).join(", ");
+
+/** Narrates one scene part, only from what is drawn. */
+export function scenePartSpeech(p: ScenePart): string {
+  const lead = p.label ? `${p.label}: ` : "";
+  switch (p.type) {
+    case "counters": return `${lead}${p.icon ? plural(p.n + (p.second ?? 0), "picture") : plural(p.n + (p.second ?? 0), "counter")}${p.second && p.n ? `, ${p.n} of one colour and ${p.second} of another` : ""}${p.frame ? " in a ten frame" : ""}${p.crossed ? `, with ${p.crossed} crossed out` : ""}.`;
+    case "groups": return `${lead}${plural(p.groups, "group")} with ${p.each} in each.`;
+    case "array": return `${lead}${plural(p.rows, "row")} of ${p.cols}.`;
+    case "blocks": return `${lead}Base ten blocks: ${blocksSaid(p)}.`;
+    case "money": return `${lead}${p.items.map(moneyName).join(", ")}.`;
+    case "image": return `${lead}${p.alt}.`;
+    case "units": return `${lead}${plural(p.n, UNIT_NAMES[p.unit])}${p.gapAt ? ", with a gap" : ""}.`;
+    case "picture": return `${lead}A picture of a ${p.name}.`;
+    case "text": return `${lead}${p.then ? p.then.text : p.text}.`;
+    case "sign": return "";
+    case "seq": return `${lead}A pattern: ${p.items.map((x) => (x === "?" ? "a gap" : x)).join(", ")}.`;
+    case "tally": return `${lead}Tally marks for ${p.n}.`;
+    case "barModel": return `${lead}A bar model. The whole is ${p.unknown === "whole" ? (p.answer ?? "unknown") : p.whole}. The parts are ${p.parts.map((x, i) => (p.unknown === i ? (p.answer ?? "unknown") : x)).join(" and ")}.`;
+    case "fraction": return `${lead}A ${p.shape} split into ${p.parts} equal parts, ${p.shaded} shaded.`;
+    case "line": return `${lead}A number line from ${said(p.min)} to ${said(p.max)}.${(p.jumps ?? []).map((j) => ` A jump from ${said(j.from)} to ${said(j.to)}${j.text ? `, ${j.text}` : ""}.`).join("")}${(p.marks ?? []).map((m) => ` ${m.text ?? said(m.value)} is marked.`).join("")}`;
+    case "pictograph": return `${lead}A picture graph. ${p.rows.map((r) => `${r.label}: ${r.n}`).join(", ")}.`;
+    case "balance": return `${lead}A balance: ${p.object} on one side and ${plural(p.cubes, "cube")} on the other, level.`;
+    case "chips": return `${lead}${p.items.join(p.arrows ? ", then " : ", ")}${p.marked?.length ? `. Marked: ${p.marked.map((i) => p.items[i]).join(", ")}` : ""}.`;
+    case "visual": return lead + guideVisualSpeech(p.visual);
+    case "compass": return `${lead}A compass. Starting facing ${p.from}, ${plural(p.turns, "quarter turn")} clockwise.`;
+  }
+}
+
+const UNIT_NAMES = { block: "block", domino: "domino", clip: "paper clip" };
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const said = (n: number) => (n < 0 ? `negative ${-n}` : String(n));
 const timeSaid = (h: number, m: number) => (m === 0 ? `${h} o'clock` : `${h}:${String(m).padStart(2, "0")}`);
@@ -46,6 +108,7 @@ export function guideVisualSpeech(v: GuideVisual): string {
     case "numberLine": return `A number line from ${said(v.min)} to ${said(v.max)}. ${v.marks.map((m) => `${m.label} at ${said(m.value)}`).join(". ")}.`;
     case "bars": return `${v.title}. ${v.categories.map((c, i) => `${c}: ${v.values[i]}`).join(", ")}.`;
     case "dots": return `${v.title}. A dot plot from ${v.min} to ${v.max} with ${plural(v.values.length, "dot")}.`;
+    case "scene": return v.rows.flat().map(scenePartSpeech).filter(Boolean).join(" ");
   }
 }
 function countWords(xs: string[]) {

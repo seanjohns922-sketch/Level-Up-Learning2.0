@@ -55,7 +55,31 @@
    "Decide: straight sides or curved edges?",
    "Answer for each shape."
   ],
-  "tip": "Check every edge before deciding."
+  "tip": "Check every edge before deciding.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "oval",
+         "label": "curved edges"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Count each straight side once.",
@@ -251,7 +275,60 @@
    "Look across the map for that label.",
    "Tap the place."
   ],
-  "tip": "Read every label, not just the first one you see."
+  "tip": "Read every label, not just the first one you see.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D3",
+         "label": "🚩"
+        },
+        {
+         "ref": "C2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Name the place at a marked spot on the map.",
@@ -261,7 +338,71 @@
    "Read the label there.",
    "Say the place's name."
   ],
-  "tip": "Check the marker is on the place, not next to it."
+  "tip": "Check the marker is on the place, not next to it.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D3",
+         "label": "🚩"
+        },
+        {
+         "ref": "C2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Flag Point",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Read the map both ways: find a place, or name a place.",
@@ -271,7 +412,60 @@
    "Find the place, or read the name at the mark.",
    "Check your answer on the map."
   ],
-  "tip": "Take your time reading the labels."
+  "tip": "Take your time reading the labels.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D3",
+         "label": "🚩"
+        },
+        {
+         "ref": "C2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Places can be to the left or right of each other.",
@@ -281,7 +475,73 @@
    "Look straight to its left or right.",
    "Name the place next to it."
   ],
-  "tip": "Left and right are as you look at the map."
+  "tip": "Left and right are as you look at the map.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D3",
+         "label": "🚩"
+        },
+        {
+         "ref": "C2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Flag Point",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Places can be above or below each other.",
@@ -291,7 +551,73 @@
    "Look straight up or straight down from it.",
    "Name the place there."
   ],
-  "tip": "Above means higher on the map."
+  "tip": "Above means higher on the map.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D3",
+         "label": "🚩"
+        },
+        {
+         "ref": "C2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Rocket Base",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Use two clues together to find one place.",
@@ -301,7 +627,70 @@
    "Check which of them also fit clue 2.",
    "The one that fits both is the answer."
   ],
-  "tip": "The answer must match every clue."
+  "tip": "The answer must match every clue.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B3",
+         "label": "💎"
+        },
+        {
+         "ref": "D2",
+         "label": "🚩"
+        },
+        {
+         "ref": "B2",
+         "label": "🪐"
+        },
+        {
+         "ref": "C1",
+         "label": "🚀"
+        },
+        {
+         "ref": "A1",
+         "label": "🛰️"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "💎 Crystal Caves",
+       "🚩 Flag Point",
+       "🪐 Planet Plaza",
+       "🚀 Rocket Base",
+       "🛰️ Nebula Station"
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "The place that fits both clues",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Follow directions step by step across the map.",
@@ -311,7 +700,66 @@
    "Follow each direction in order.",
    "See where you end up."
   ],
-  "tip": "Count each square as you move."
+  "tip": "Count each square as you move.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B1",
+         "label": "🤖"
+        },
+        {
+         "ref": "C3",
+         "label": "🪐"
+        }
+       ],
+       "path": [
+        "B1",
+        "B2",
+        "B3",
+        "C3"
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Up 2",
+       "Right 1"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Planet Plaza",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Plan a route that follows the mission rules.",
@@ -321,7 +769,54 @@
    "Plan moves around the asteroids through the checkpoint.",
    "Run the route to test it."
   ],
-  "tip": "Check every rule before running."
+  "tip": "Check every rule before running.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "A1",
+         "label": "🤖"
+        },
+        {
+         "ref": "B2",
+         "label": "🪨"
+        },
+        {
+         "ref": "C3",
+         "label": "✅"
+        },
+        {
+         "ref": "E3",
+         "label": "🚩"
+        }
+       ],
+       "path": [
+        "A1",
+        "A2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "E3"
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Find the step that breaks a route.",
@@ -331,7 +826,59 @@
    "Watch where each step takes it.",
    "Find the step that heads the wrong way."
   ],
-  "tip": "Compare each step with the direction of the goal."
+  "tip": "Compare each step with the direction of the goal.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "C1",
+         "label": "🤖"
+        },
+        {
+         "ref": "E3",
+         "label": "🚩"
+        }
+       ],
+       "path": [
+        "C1",
+        "D1",
+        "E1",
+        "D1"
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Right",
+       "Right",
+       "Left"
+      ],
+      "marked": [
+       2
+      ],
+      "markStep": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "Use shape skills and map skills together.",
@@ -341,7 +888,52 @@
    "Read the map position.",
    "Answer each part of the mission."
   ],
-  "tip": "Use the same rules you learned before."
+  "tip": "Use the same rules you learned before.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "circle",
+         "label": "curved"
+        }
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "B2",
+         "label": "●"
+        },
+        {
+         "ref": "C2",
+         "label": "🚩"
+        }
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Read the map, follow a path and plan your own route.",
@@ -351,7 +943,43 @@
    "Follow given directions.",
    "Plan and test your own route."
   ],
-  "tip": "Check each part before moving on."
+  "tip": "Check each part before moving on.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "A1",
+         "label": "🤖"
+        },
+        {
+         "ref": "C2",
+         "label": "📍"
+        }
+       ],
+       "path": [
+        "A1",
+        "B1",
+        "C1",
+        "C2"
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Put everything together: compare shapes, read the map and navigate.",
@@ -361,6 +989,60 @@
    "Read the map.",
    "Plan and run a route."
   ],
-  "tip": "Do one part at a time."
+  "tip": "Do one part at a time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square"
+        },
+        {
+         "shape": "rectangle"
+        }
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gridRef",
+       "cols": 5,
+       "rows": 3,
+       "marks": [
+        {
+         "ref": "A1",
+         "label": "🤖"
+        },
+        {
+         "ref": "C2",
+         "label": "🚩"
+        }
+       ],
+       "path": [
+        "A1",
+        "B1",
+        "C1",
+        "C2"
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

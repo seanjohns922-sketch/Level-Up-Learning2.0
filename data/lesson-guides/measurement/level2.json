@@ -53,7 +53,64 @@
    "Small things suit cubes or a ruler.",
    "Long distances suit a metre stick or trundle wheel."
   ],
-  "tip": "A tool that is too big or too small gives a poor measure."
+  "tip": "A tool that is too big or too small gives a poor measure.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "everyday-3d/object-pencilcase.png",
+      "alt": "A pencil case",
+      "size": 88,
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→"
+     },
+     {
+      "type": "image",
+      "src": "tools-3d/tool-ruler.png",
+      "alt": "A ruler",
+      "size": 88,
+      "label": "Ruler",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "image",
+      "src": "everyday-3d/object-playground.png",
+      "alt": "A playground",
+      "size": 88,
+      "focus": [
+       1,
+       3
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→"
+     },
+     {
+      "type": "image",
+      "src": "tools-3d/tool-wheel.png",
+      "alt": "A trundle wheel",
+      "size": 88,
+      "label": "Trundle wheel",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Measure mass with cubes, then find how many more.",
@@ -175,7 +232,49 @@
    "Small containers suit small units, like a cup or spoon.",
    "Big containers suit big units, like a jug or bucket."
   ],
-  "tip": "Too small a unit means too many fills to count."
+  "tip": "Too small a unit means too many fills to count.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "containers-3d/fish-tank.png",
+      "alt": "A fish tank",
+      "size": 110,
+      "label": "Big container",
+      "focus": [
+       1,
+       3
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "→"
+     },
+     {
+      "type": "image",
+      "src": "containers-3d/jug.png",
+      "alt": "A jug",
+      "size": 90,
+      "label": "Use a jug",
+      "focus": [
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A spoon suits small containers",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "If big blocks don't fit exactly, finish with smaller blocks.",
@@ -201,7 +300,46 @@
    "Measure it.",
    "Compare your estimate with the measurement."
   ],
-  "tip": "Use a known length to help you guess."
+  "tip": "Use a known length to help you guess.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Guess: 6 blocks",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "units",
+      "unit": "block",
+      "n": 7,
+      "width": 294,
+      "label": "Measure: 7 blocks",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Close: just 1 off",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Smaller units give bigger counts for the same object.",
@@ -211,7 +349,69 @@
    "Compare the counts.",
    "Smaller units need more to cover the same length."
   ],
-  "tip": "The object's length doesn't change."
+  "tip": "The object's length doesn't change.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "measure-objects-3d/crayon.png",
+      "alt": "A crayon",
+      "crop": {
+       "width": 300,
+       "x": [
+        0.18229166666666666,
+        0.84765625
+       ],
+       "y": [
+        0.37109375,
+        0.69140625
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "units",
+      "unit": "domino",
+      "n": 3,
+      "width": 300,
+      "label": "3 dominoes",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "units",
+      "unit": "clip",
+      "n": 6,
+      "width": 300,
+      "label": "6 paper clips",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Smaller units: more of them",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "When the minute hand points to 12, it is o'clock.",
@@ -251,7 +451,38 @@
    "Count the equal parts: that is the bottom number.",
    "Count the shaded parts: that is the top number."
   ],
-  "tip": "Unequal parts are not halves or quarters."
+  "tip": "Unequal parts are not halves or quarters.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "fraction",
+      "shape": "square",
+      "parts": 4,
+      "shaded": 1,
+      "shadeStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1/4",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "When the minute hand points to 3, it is quarter past.",
@@ -291,7 +522,37 @@
    "Check the direction: clockwise goes the way clock hands move.",
    "Count quarter turns: 1 = quarter, 2 = half, 3 = three-quarter, 4 = full."
   ],
-  "tip": "A full turn brings you back to where you started."
+  "tip": "A full turn brings you back to where you started.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "compass",
+      "from": "north",
+      "turns": 1,
+      "turnStep": 2,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Facing east",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Count the days from one date to another by counting the jumps.",
@@ -361,7 +622,40 @@
    "Choose the tool that measures that.",
    "Measure and answer."
   ],
-  "tip": "Read the question twice."
+  "tip": "Read the question twice.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "balance",
+      "object": "🪨 Rock",
+      "cubes": 6,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Length",
+       "Mass",
+       "Capacity",
+       "Time"
+      ],
+      "marked": [
+       1
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Read the mission, choose the measuring skill, then solve.",
@@ -371,7 +665,35 @@
    "Name what is being measured.",
    "Use that skill to solve it."
   ],
-  "tip": "Different missions need different skills."
+  "tip": "Different missions need different skills.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "containers-3d/watering-can.png",
+      "alt": "A watering can",
+      "size": 110,
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Capacity",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Use every measuring skill in the final trial.",
@@ -381,6 +703,42 @@
    "Choose the right skill.",
    "Check your answer."
   ],
-  "tip": "Take each challenge one at a time."
+  "tip": "Take each challenge one at a time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "tools-3d/tool-ruler.png",
+      "alt": "A ruler",
+      "size": 72,
+      "label": "Length",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "image",
+      "src": "tools-3d/tool-cubes.png",
+      "alt": "Cubes",
+      "size": 72,
+      "label": "Mass",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "compass",
+      "from": "north",
+      "turns": 1,
+      "label": "Turns",
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  }
 }
