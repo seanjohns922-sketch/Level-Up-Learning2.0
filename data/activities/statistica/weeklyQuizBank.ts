@@ -151,11 +151,11 @@ function yearThreeTask(week: number, lesson: number, variant: number): PracticeT
     const numerical = (variant + lesson + week) % 2 === 0;
     return {
       kind: "statisticaClassify",
-      prompt: `${title}: classify the ${context} data in case ${variant + 1}.`,
+      prompt: `${title}: classify the ${context} data.`,
       speakText: `Decide whether the responses are names or labels, or numbers that count something.`,
       target: 1,
       variable: numerical ? `Number of ${context} choices per student` : `Favourite ${context} choice`,
-      examples: numerical ? "2, 5, 3, 4" : "A, C, B, A",
+      examples: numerical ? "2, 5, 3, 4" : "yes, no, yes, maybe",
       supportingDetails: [{ label: "Purpose", value: week === 2 ? "Answer a question where responses can vary." : "Choose the correct data type." }],
       options: options(["Categorical", "Discrete numerical"]),
       correctOptionIds: [numerical ? "1" : "0"],
@@ -177,7 +177,7 @@ function yearThreeTask(week: number, lesson: number, variant: number): PracticeT
   }
   return {
     kind: "statisticaInference",
-    prompt: `${title}: which conclusion answers the ${context} question in case ${variant + 1}?`,
+    prompt: `${title}: which conclusion answers the ${context} question?`,
     speakText: `Compare the complete display before selecting a conclusion.`,
     target: largest.count,
     display: lesson === 1 ? "pictures" : "columns",

@@ -663,6 +663,8 @@ export function PracticeRunner({
   // Ground students may not read yet, so their questions are always spoken.
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
   const isLevel1Lesson = /^y[12]-/.test(liveContext?.lessonId ?? "");
+  // Level 3 Statistics shares the bright graphs; the look is scoped by its own attribute.
+  const brightPlots = isLevel1Lesson || (isStatistics && levelNumber === 3);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -1494,12 +1496,13 @@ export function PracticeRunner({
         };
 
   return (
-    <Level1LookContext.Provider value={isLevel1Lesson}>
+    <Level1LookContext.Provider value={brightPlots}>
     <div
       className="relative"
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
       data-chance-level={isChance && levelNumber === 3 ? "3" : undefined}
-      data-level1-look={isLevel1Lesson ? (isMeasurement ? "measurement" : isStarpath ? "space" : isStatistics ? "statistics" : "number") : undefined}
+      data-statistica-level={isStatistics && levelNumber === 3 ? "3" : undefined}
+      data-level1-look={brightPlots ? (isMeasurement ? "measurement" : isStarpath ? "space" : isStatistics ? "statistics" : "number") : undefined}
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>
         {/* A written lesson guide explains the method, so it comes before a one-line intro scene. */}
