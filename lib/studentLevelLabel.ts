@@ -1,4 +1,4 @@
-export const SCHOOL_YEAR_LEVEL_OPTIONS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
+export const SCHOOL_YEAR_LEVEL_OPTIONS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6", "Year 7", "Year 8"] as const;
 
 export function normalizeSchoolYearLabel(value?: string | null) {
   const trimmed = value?.trim();
@@ -12,7 +12,7 @@ export function normalizeSchoolYearLabel(value?: string | null) {
 const SCHOOL_YEAR_INDEX_MAX = SCHOOL_YEAR_LEVEL_OPTIONS.length - 1;
 
 /** Read one year token ("Prep", "F", "Year 3", "Yr 3", "3") as an index into
- * SCHOOL_YEAR_LEVEL_OPTIONS, or null when it is not a primary school year. */
+ * SCHOOL_YEAR_LEVEL_OPTIONS, or null when it is not a supported school year. */
 function schoolYearIndex(token: string) {
   const trimmed = token.trim();
   if (/^(prep|foundation|f|p)$/i.test(trimmed)) return 0;

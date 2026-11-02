@@ -55,6 +55,28 @@ export async function POST(
 
   try {
     switch (payload.action) {
+      case "getSchoolYearRollover":
+        return NextResponse.json(await runSchoolCommand(schoolId, "get_school_year_rollover", {
+          p_school_id: schoolId,
+        }, accessToken));
+      case "saveSchoolYearRollover": {
+        if (!Number.isInteger(payload.highestYear) || !Number.isInteger(payload.targetYear)
+          || typeof payload.enabled !== "boolean" || !Array.isArray(payload.retainedStudentIds)
+          || payload.retainedStudentIds.some((id) => typeof id !== "string")) {
+          return errorResponse("Rollover settings are incomplete");
+        }
+        return NextResponse.json(await runSchoolCommand(schoolId, "save_school_year_rollover", {
+          p_school_id: schoolId, p_highest_year: payload.highestYear, p_enabled: payload.enabled,
+          p_target_year: payload.targetYear, p_retained_student_ids: payload.retainedStudentIds,
+        }, accessToken));
+      }
+      case "retainStudentAfterRollover":
+        if (!Number.isInteger(payload.targetYear) || !stringValue(payload.studentId)) {
+          return errorResponse("Student and rollover year are required");
+        }
+        return NextResponse.json(await runSchoolCommand(schoolId, "retain_student_after_rollover", {
+          p_school_id: schoolId, p_student_id: stringValue(payload.studentId), p_target_year: payload.targetYear,
+        }, accessToken));
       case "createClass": {
         const academicYearId = stringValue(payload.academicYearId);
         const name = stringValue(payload.name);

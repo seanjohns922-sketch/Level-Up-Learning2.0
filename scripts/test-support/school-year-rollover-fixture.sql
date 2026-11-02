@@ -1,0 +1,12 @@
+CREATE ROLE authenticated NOLOGIN;
+CREATE ROLE anon NOLOGIN;
+CREATE ROLE service_role NOLOGIN;
+CREATE SCHEMA auth;
+CREATE TABLE auth.users(id uuid PRIMARY KEY);
+CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql AS $$ SELECT nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+CREATE TABLE schools(id uuid PRIMARY KEY,status text);
+CREATE TABLE students(id uuid PRIMARY KEY,school_id uuid,class_id uuid,school_year_level text,year_level text,display_name text,archived_at timestamptz,identity_status text,working_level text,rewards int);
+CREATE FUNCTION can_manage_school(uuid) RETURNS boolean LANGUAGE sql AS $$ SELECT auth.uid()=$1 $$;
+CREATE TABLE fixture_audit(action text);
+CREATE FUNCTION write_school_audit(uuid,text,text,text,jsonb,jsonb,jsonb) RETURNS void LANGUAGE sql AS $$ INSERT INTO fixture_audit VALUES($2) $$;
+GRANT USAGE ON SCHEMA public,auth TO authenticated;

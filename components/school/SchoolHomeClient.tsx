@@ -1,5 +1,7 @@
 "use client";
 
+import SchoolYearRolloverPanel from "@/components/school/SchoolYearRolloverPanel";
+
 import {
   BarChart3,
   Archive,
@@ -50,7 +52,7 @@ import HomeTrends from "./HomeTrends";
 import MyClassSummary from "./MyClassSummary";
 import TeacherClassDashboard from "./TeacherClassDashboard";
 import ClassGroupsPanel from "./ClassGroupsPanel";
-import { formatClassYearLevels, normalizeClassYearLevels } from "@/lib/studentLevelLabel";
+import { formatClassYearLevels, normalizeClassYearLevels, SCHOOL_YEAR_LEVEL_OPTIONS } from "@/lib/studentLevelLabel";
 
 const SchoolAnalyticsDashboard = dynamic(
   () => import("./SchoolAnalyticsDashboard"),
@@ -166,15 +168,7 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
   { id: "support", label: "Support", icon: HelpCircle },
 ];
 
-const YEAR_LEVELS = [
-  "Prep",
-  "Year 1",
-  "Year 2",
-  "Year 3",
-  "Year 4",
-  "Year 5",
-  "Year 6",
-];
+const YEAR_LEVELS: string[] = [...SCHOOL_YEAR_LEVEL_OPTIONS];
 
 const SCHOOL_ROLE_LABELS: Record<string, string> = {
   school_admin: "School administrator",
@@ -2964,6 +2958,7 @@ export default function SchoolHomeClient({
 
           {tab === "administration" ? (
             <section className="space-y-6">
+              {snapshot.permissions.canManageSchool ? <SchoolYearRolloverPanel schoolId={snapshot.school.id} onChanged={() => { void loadStudentDirectory(); router.refresh(); }} /> : null}
               <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
                 <div className="border border-slate-200 bg-white p-5">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">

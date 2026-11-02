@@ -1,4 +1,4 @@
-import { normalizeSchoolYearLabel } from "@/lib/studentLevelLabel";
+import { normalizeSchoolYearLabel, SCHOOL_YEAR_LEVEL_OPTIONS } from "@/lib/studentLevelLabel";
 
 export type RosterImportSource = "spreadsheet" | "image";
 
@@ -66,9 +66,9 @@ function normalizeImportedYear(value: unknown, fallback = "") {
   const raw = cleanCell(value);
   if (!raw) return normalizeSchoolYearLabel(fallback) ?? "";
   if (/^(p|prep|foundation|kindergarten)$/i.test(raw)) return "Prep";
-  if (/^[1-6]$/.test(raw)) return `Year ${raw}`;
+  if (/^[1-8]$/.test(raw)) return `Year ${raw}`;
   const normalized = normalizeSchoolYearLabel(raw);
-  return normalized && ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].includes(normalized)
+  return normalized && (SCHOOL_YEAR_LEVEL_OPTIONS as readonly string[]).includes(normalized)
     ? normalized
     : normalizeSchoolYearLabel(fallback) ?? "";
 }
