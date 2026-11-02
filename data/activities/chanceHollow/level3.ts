@@ -25,7 +25,10 @@ type ChanceCase = {
   correct: string;
   wrong: string;
   visual?: ChanceVisual;
+  optionIcons?: Record<string, string>;
 };
+
+const aNumber = (n: number) => `${n === 8 || n === 11 || n === 18 ? "an" : "a"} ${n}`;
 
 const FOUR_SCALE = ["Certain", "Likely", "Unlikely", "Impossible"] as const;
 
@@ -37,6 +40,7 @@ function caseToTask(c: ChanceCase, optionSeed: number, lead?: string): PracticeT
     answer: c.answer,
     feedback: { correct: c.correct, wrong: c.wrong },
     ...(c.visual ? { visual: c.visual } : {}),
+    ...(c.optionIcons ? { optionIcons: c.optionIcons } : {}),
   };
 }
 
@@ -366,7 +370,7 @@ function certainOrImpossibleMaker(): ChanceCase {
     options: FOUR_SCALE,
     correct: `Yes. It is ${answer.toLowerCase()} because ${reason}.`,
     wrong: `${cap(answer)} means it ${isCertain ? "must happen" : "cannot happen"}; ${reason}.`,
-    visual: { type: "scale", highlight: answer.toLowerCase() as "certain" | "impossible" },
+    visual: { type: "scale" },
   };
 }
 const w1l1 = randGen([certainOrImpossibleMaker]);
@@ -379,7 +383,7 @@ function explainChanceWordMaker(): ChanceCase {
   if (mode === "die") {
     const impossible = randInt(7, 12);
     const answer = "Impossible — a die only has 1 to 6";
-    return { prompt: `You roll a ${impossible} on a normal die. Which chance word and why?`, answer, options: [answer, `Unlikely — ${impossible} is a big number`, `Likely — ${impossible} is on most dice`, `Certain — ${impossible} always comes up`], correct: `Correct. A die has no ${impossible}, so it can never happen.`, wrong: `The die faces are 1 to 6. There is no ${impossible}, so it is impossible.`, visual: { type: "die", face: randInt(1, 6) } };
+    return { prompt: `You roll ${aNumber(impossible)} on a normal die. Which chance word and why?`, answer, options: [answer, `Unlikely — ${impossible} is a big number`, `Likely — ${impossible} is on most dice`, `Certain — ${impossible} always comes up`], correct: `Correct. A die has no ${impossible}, so it can never happen.`, wrong: `The die faces are 1 to 6. There is no ${impossible}, so it is impossible.`, visual: { type: "die", face: randInt(1, 6) } };
   }
   if (mode === "coin") {
     const face = choice(["heads", "tails"] as const);
@@ -402,6 +406,13 @@ const LIKELY_DAILY_EVENTS = ["You will eat some food today", "You will sleep ton
 const UNUSUAL_EVENTS = ["You will grow 10 cm taller today", "Everyone will wear identical shoes", "It will snow inside the classroom", "You will visit the moon this afternoon"] as const;
 const IMPOSSIBLE_DAILY_EVENTS = ["You will eat a bicycle", "A real dragon will visit class", "A fish will do your homework", "You will fly home without a machine"] as const;
 
+const EVENT_ICONS: Record<string, string> = {
+  "You will eat some food today": "🍎", "You will sleep tonight": "😴", "Your teacher will take the roll": "📋", "You will have a drink today": "🥤",
+  "You will grow 10 cm taller today": "📏", "Everyone will wear identical shoes": "👟", "It will snow inside the classroom": "❄️", "You will visit the moon this afternoon": "🌙",
+  "You will eat a bicycle": "🚲", "A real dragon will visit class": "🐉", "A fish will do your homework": "🐟", "You will fly home without a machine": "🦸",
+  "The sun will set this evening": "🌅", "You will get one year older on your next birthday": "🎂", "A week will have seven days": "📅", "A normal die will show a number from 1 to 6": "🎲",
+};
+
 function compareEverydayChanceMaker(): ChanceCase {
   const askLeast = Math.random() < 0.5;
   const likely = choice(LIKELY_DAILY_EVENTS);
@@ -409,7 +420,7 @@ function compareEverydayChanceMaker(): ChanceCase {
   const unusual = shuffleArr(UNUSUAL_EVENTS).slice(0, 2);
   const options = shuffleArr([likely, ...unusual, impossible]);
   const answer = askLeast ? impossible : likely;
-  return { prompt: `Which event is ${askLeast ? "LEAST" : "MOST"} likely to happen?`, answer, options, correct: `Right. ${answer} is the ${askLeast ? "least" : "most"} likely event here.`, wrong: `Compare what usually happens with what cannot happen. Choose ${answer}.`, visual: { type: "scale" } };
+  return { optionIcons: EVENT_ICONS, prompt: `Which event is ${askLeast ? "LEAST" : "MOST"} likely to happen?`, answer, options, correct: `Right. ${answer} is the ${askLeast ? "least" : "most"} likely event here.`, wrong: `Compare what usually happens with what cannot happen. Choose ${answer}.`, visual: { type: "scale" } };
 }
 const w2l1 = randGen([compareEverydayChanceMaker]);
 
@@ -421,7 +432,7 @@ function sortChanceEventMaker(): ChanceCase {
     unlikely: choice(UNUSUAL_EVENTS),
     impossible: choice(IMPOSSIBLE_DAILY_EVENTS),
   };
-  return { prompt: `Sort the cards. Which one belongs in the ${category.toUpperCase()} pile?`, answer: examples[category], options: shuffleArr(Object.values(examples)), correct: `Right. That event is ${category}.`, wrong: `The ${category} pile needs an event that ${category === "certain" ? "must happen" : category === "impossible" ? "cannot happen" : category === "likely" ? "usually happens" : "can happen but rarely does"}.`, visual: { type: "scale", highlight: category } };
+  return { optionIcons: EVENT_ICONS, prompt: `Sort the cards. Which one belongs in the ${category.toUpperCase()} pile?`, answer: examples[category], options: shuffleArr(Object.values(examples)), correct: `Right. That event is ${category}.`, wrong: `The ${category} pile needs an event that ${category === "certain" ? "must happen" : category === "impossible" ? "cannot happen" : category === "likely" ? "usually happens" : "can happen but rarely does"}.`, visual: { type: "scale", highlight: category } };
 }
 const w2l2 = randGen([sortChanceEventMaker]);
 
@@ -462,7 +473,7 @@ function impossibleOutcomeMaker(): ChanceCase {
   const mode = choice(["die", "coin", "spinner", "bag"] as const);
   if (mode === "die") {
     const impossible = randInt(7, 12);
-    return { prompt: "You roll one die. Which result is NOT possible?", answer: `A ${impossible}`, options: shuffleArr([`A ${impossible}`, `A ${randInt(1, 2)}`, `A ${randInt(3, 4)}`, `A ${randInt(5, 6)}`]), correct: `Right. A die has no ${impossible}.`, wrong: `A normal die only has 1 to 6, so ${impossible} is not possible.`, visual: { type: "die", face: randInt(1, 6) } };
+    return { prompt: "You roll one die. Which result is NOT possible?", answer: cap(aNumber(impossible)), options: shuffleArr([cap(aNumber(impossible)), `A ${randInt(1, 2)}`, `A ${randInt(3, 4)}`, `A ${randInt(5, 6)}`]), correct: `Right. A die has no ${impossible}.`, wrong: `A normal die only has 1 to 6, so ${impossible} is not possible.`, visual: { type: "die", face: randInt(1, 6) } };
   }
   if (mode === "coin") return { prompt: "You toss a coin. Which result is NOT possible?", answer: "It lands on a number", options: ["It lands on a number", "It lands on heads", "It lands on tails", "It shows tails facing up"], correct: "Correct. A coin has heads and tails, not numbers.", wrong: "A coin can show heads or tails; it has no numbered face.", visual: { type: "coin", face: choice(["heads", "tails"] as const) } };
   const selected = shuffleArr(PAINTS).slice(0, 3);

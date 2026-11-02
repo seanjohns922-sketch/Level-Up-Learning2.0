@@ -6,8 +6,9 @@ import { createContext, useContext, type ReactNode } from "react";
 export const Level1LookContext = createContext(false);
 export const useLevel1Look = () => useContext(Level1LookContext);
 
-/** Turns the new look on for one quiz question area, in Levels 1 and 2 only. */
+/** Turns the new look on for one quiz question area, in Levels 1 and 2, and Level 3 Chance. */
 export function NewLookScope({ level, realm, children }: { level: number; realm: string; children: ReactNode }) {
+  if (level === 3 && realm === "chance") return <div data-chance-level="3">{children}</div>;
   if (level !== 1 && level !== 2) return <>{children}</>;
   const look = realm === "measurement" ? "measurement" : realm === "space" ? "space" : realm === "statistics" ? "statistics" : "number";
   return (

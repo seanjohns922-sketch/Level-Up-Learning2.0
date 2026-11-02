@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
 import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getChanceHollowWeeklyQuizTasks } from "@/data/activities/chanceHollow/weeklyQuizBank";
@@ -39,7 +40,7 @@ export default async function ChanceHollowQuizPage({ params, searchParams }: {
         realm="chance"
         quiz={{
           level: year,
-          levelLabel: year,
+          levelLabel: formatStudentLevelLabel(year),
           week,
           title: `${weekPlan.topic} Quiz`,
           coverage: `15 independent questions: five from each lesson`,

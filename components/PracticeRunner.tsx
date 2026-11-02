@@ -1498,6 +1498,7 @@ export function PracticeRunner({
     <div
       className="relative"
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
+      data-chance-level={isChance && levelNumber === 3 ? "3" : undefined}
       data-level1-look={isLevel1Lesson ? (isMeasurement ? "measurement" : isStarpath ? "space" : isStatistics ? "statistics" : "number") : undefined}
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>
@@ -1677,7 +1678,7 @@ export function PracticeRunner({
           <ChanceVisual visual={(task as McqTask).visual!} />
         )}
         {task.kind === "mcq" && (
-          <div className="grid gap-3">
+          <div className={`grid gap-3 ${(task as McqTask).optionIcons ? "sm:grid-cols-2" : ""}`}>
             {(task as McqTask).options.map((opt: string, idx: number) => (
               <button
                 key={`${opt}-${idx}`}
@@ -1694,7 +1695,8 @@ export function PracticeRunner({
               >
                 {isChance ? (
                   <>
-                    <span><MathFormattedText text={opt} fractionSize="lg" /></span>
+                    {(task as McqTask).optionIcons?.[opt] && <span aria-hidden className="text-4xl leading-none">{(task as McqTask).optionIcons![opt]}</span>}
+                    <span className="flex-1"><MathFormattedText text={opt} fractionSize="lg" /></span>
                     <OptionReadAloudButton text={opt} />
                   </>
                 ) : (

@@ -114,7 +114,7 @@ function buildLesson(week: number, lesson: Lesson): Draft[] {
       if (lesson === 1) {
         const count = [37, 44, 58, 63, 76][index]!;
         const estimate = Math.round(count / 10) * 10;
-        return choice(qid, lesson, "About how many counters are shown? Choose the nearest 10.", estimate, [estimate - 10, estimate + 10, count], dots(count));
+        return choice(qid, lesson, "About how many counters are shown? Choose the nearest 10.", estimate, [estimate - 10, estimate + 10, estimate + 20], dots(count));
       }
       if (lesson === 2) {
         const n = [348, 762, 1_249, 2_651, 4_482][index]!;

@@ -202,6 +202,8 @@ export type PracticeTask = (
       feedback?: { correct: string; wrong: string };
       // Optional apparatus drawn above the options (used by Chance Hollow).
       visual?: ChanceVisual;
+      // Optional picture for each option, keyed by the option text.
+      optionIcons?: Record<string, string>;
     }
   | {
       // Chance Hollow: run a chance tool `spins` times and record each result by

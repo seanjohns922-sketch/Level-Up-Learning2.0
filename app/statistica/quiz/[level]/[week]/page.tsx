@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
 import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getStatisticaWeeklyQuizTasks } from "@/data/activities/statistica/weeklyQuizBank";
@@ -42,7 +43,7 @@ export default async function StatisticaQuizPage({
         realm="statistics"
         quiz={{
         level: year,
-        levelLabel: year,
+        levelLabel: formatStudentLevelLabel(year),
         week,
         title: `${weekPlan.topic} Quiz`,
         coverage: `15 evidence questions from ${weekPlan.lessons.map((lesson) => lesson.title).join(", ")}`,
