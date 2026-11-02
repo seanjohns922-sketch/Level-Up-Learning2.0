@@ -303,7 +303,16 @@ export default function WholeMathsDiagnosticPanel({
   const [diagnosticError, setDiagnosticError] = useState<string | null>(null);
   const [assignmentOpen, setAssignmentOpen] = useState(false);
   const [assignmentCheckpoint, setAssignmentCheckpoint] = useState<FormalCheckpoint>("end");
-  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [selectedStudentDraftIds, setSelectedStudentIds] = useState<string[]>([]);
+  const rosterStudentIds = useMemo(() => new Set(students.map((student) => student.id)), [students]);
+  const selectedStudentIds = useMemo(
+    () => selectedStudentDraftIds.filter((id) => rosterStudentIds.has(id)),
+    [selectedStudentDraftIds, rosterStudentIds],
+  );
+  useEffect(() => {
+    setSelectedStudentIds((current) => current.every((id) => rosterStudentIds.has(id))
+      ? current : current.filter((id) => rosterStudentIds.has(id)));
+  }, [rosterStudentIds]);
   const [assignmentBusy, setAssignmentBusy] = useState(false);
   const [assignmentMessage, setAssignmentMessage] = useState<string | null>(null);
   const [schoolSession, setSchoolSession] = useState<DiagnosticSchoolSession | null>(null);

@@ -109,6 +109,13 @@ function placementErrorMessage(error: unknown, realmLabel: string) {
 }
 
 type Edit = { level: string; entry: PlacementEntryMode };
+
+function retainRosterEdits(drafts: Record<string, Record<string, Edit>>, rosterIds: Set<string>) {
+  if (Object.values(drafts).every((edits) => Object.keys(edits).every((id) => rosterIds.has(id)))) return drafts;
+  return Object.fromEntries(Object.entries(drafts).map(([realm, edits]) => [realm,
+    Object.fromEntries(Object.entries(edits).filter(([id]) => rosterIds.has(id))),
+  ]));
+}
 type PretestState = "done" | "waiting" | "skipped" | null;
 
 // Level chips: lighter for lower levels, so a class's spread reads at a glance.
@@ -144,7 +151,7 @@ export default function PlacementManager({
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   // Unsaved changes for every realm, keyed realm -> student.
-  const [pendingAll, setPendingAll] = useState<Record<string, Record<string, Edit>>>({});
+  const [pendingDrafts, setPendingAll] = useState<Record<string, Record<string, Edit>>>({});
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [filter, setFilter] = useState<"all" | "needs" | "waiting">("all");
@@ -193,6 +200,18 @@ export default function PlacementManager({
     () => new Set(students.map((student) => student.id)),
     [students],
   );
+
+  // Never display or submit queued edits for students who left the active roster.
+  const pendingAll = useMemo(
+    () => retainRosterEdits(pendingDrafts, rosterStudentIds),
+    [pendingDrafts, rosterStudentIds],
+  );
+
+  useEffect(() => {
+    setPendingAll((current) => retainRosterEdits(current, rosterStudentIds));
+    setSelected((current) => [...current].every((id) => rosterStudentIds.has(id))
+      ? current : new Set([...current].filter((id) => rosterStudentIds.has(id))));
+  }, [rosterStudentIds]);
 
   const placedIdsByRealm = useMemo(() => {
     const out: Record<string, Set<string>> = {};
