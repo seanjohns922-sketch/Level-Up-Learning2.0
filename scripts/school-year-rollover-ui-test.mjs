@@ -23,6 +23,8 @@ try {
  const Panel=h.load('components/school/SchoolYearRolloverPanel.tsx').default;
  await h.render(Panel,{schoolId:'school',onChanged(){}});
  assert(h.document.body.textContent.includes('School leaver — review'));
+ assert(h.document.body.textContent.includes('Automatic yearly rollover is disabled.'));
+ assert(!h.document.body.textContent.includes('Enable automatic yearly rollover'));
  const select=h.document.querySelector('select');
  await h.act(async()=>{select.value='8';select.dispatchEvent(new h.document.defaultView.Event('change',{bubbles:true}));});
  const row=[...h.document.querySelectorAll('tr')].find(row=>row.textContent.includes('Year Seven Child'));
@@ -33,6 +35,8 @@ try {
  const saved=calls.find(c=>c.action==='saveSchoolYearRollover');
  assert.equal(saved.highestYear,8);assert.equal(saved.enabled,true);assert.deepEqual(saved.retainedStudentIds,['a']);
  assert.equal(saved.targetYear,2027);
+ assert(h.document.body.textContent.includes('School years will not advance automatically.'));
+ assert(!calls.some(c=>c.action==='runSchoolYearRollover'), 'saving preparation must not run rollover');
  await h.click([...h.document.querySelectorAll('button')].find(b=>b.textContent.includes('Keep Retained Child')));
  assert.deepEqual(calls.at(-1),{action:'retainStudentAfterRollover',studentId:'d',targetYear:2026});
  console.log('PASS preview, school years 7–8, retention selection, settings payload and post-rollover correction.');

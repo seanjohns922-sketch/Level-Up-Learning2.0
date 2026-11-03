@@ -40,7 +40,7 @@ export default function SchoolYearRolloverPanel({ schoolId, onChanged }: { schoo
     try {
       accept(await rolloverCommand(schoolId, { action: "saveSchoolYearRollover", highestYear, enabled,
         targetYear: data.targetYear, retainedStudentIds: [...retained] }));
-      setMessage(enabled ? `Saved. School years will advance automatically from 1 January ${data.targetYear}.` : "Automatic rollover is paused. Your settings are saved.");
+      setMessage(enabled ? `Saved preparation settings for ${data.targetYear}. School years will not advance automatically.` : "Rollover preparation is paused. Your settings are saved.");
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Settings could not be saved."); }
     finally { setBusy(false); }
   }
@@ -55,7 +55,7 @@ export default function SchoolYearRolloverPanel({ schoolId, onChanged }: { schoo
   const shown = data?.students.filter(student => student.name.toLowerCase().includes(query.toLowerCase())) ?? [];
   return <section className="border border-slate-200 bg-white p-5" aria-labelledby="school-rollover-heading">
     <h2 id="school-rollover-heading" className="text-xl font-bold text-slate-950">New school year</h2>
-    <p className="mt-2 text-sm text-slate-600">School years advance automatically each January once enabled. Maths working levels, results and rewards stay unchanged. Class assignments are managed separately.</p>
+    <p className="mt-2 text-sm text-slate-600">Automatic yearly rollover is disabled. Save the school’s preparation settings here; saving does not advance student years. Maths working levels, results and rewards stay unchanged. Class assignments are managed separately.</p>
     {error ? <p role="alert" className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
     {message ? <p role="status" className="mt-3 text-sm font-semibold text-emerald-800">{message}</p> : null}
     {!data && !error ? <p className="mt-4 text-sm" role="status">Loading school-year settings…</p> : null}
@@ -66,7 +66,7 @@ export default function SchoolYearRolloverPanel({ schoolId, onChanged }: { schoo
             {[6, 7, 8].map(year => <option key={year} value={year}>Year {year}</option>)}
           </select>
         </label>
-        <label className="flex items-center gap-2 pb-2 text-sm font-semibold"><input type="checkbox" checked={enabled} disabled={busy} onChange={event => setEnabled(event.target.checked)} />Enable automatic yearly rollover</label>
+        <label className="flex items-center gap-2 pb-2 text-sm font-semibold"><input type="checkbox" checked={enabled} disabled={busy} onChange={event => setEnabled(event.target.checked)} />Prepare this school for rollover</label>
       </div>
       <p className="mt-3 text-sm text-slate-600">Preview for {data.targetYear}. Select “Keep same year” for any student staying in their current school year. Students at the school’s final year are flagged for review; they are not automatically archived.</p>
       <label className="mt-4 block text-sm font-semibold">Find a student<input value={query} onChange={event => setQuery(event.target.value)} className="mt-1 block w-full max-w-sm rounded-md border border-slate-300 p-2" placeholder="Student name" /></label>
