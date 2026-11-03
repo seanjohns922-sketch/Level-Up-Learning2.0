@@ -660,7 +660,8 @@ for (const visualFile of ["FunctionMachineCardVisual.tsx", "InputOutputTableVisu
 const towerPortalConfig = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-chamber-config.ts"), "utf8");
 assert(towerPortalConfig.includes('posterAsset: "/images/patternpeaks-home-bg-y6.jpeg"'), "Pattern Peaks tower portal must use the Level 6 realm background, not a card asset.");
 const towerChamber = fs.readFileSync(path.join(root, "components/world3d/TowerRealmChamber.tsx"), "utf8");
-assert(towerChamber.includes('realmId !== "pattern"'), "Pattern Peaks tower portal must report canonical progress as a live realm.");
+const realmRegistry = fs.readFileSync(path.join(root, "lib/realms/realm-registry.ts"), "utf8");
+assert(towerChamber.includes("isLiveRealmId(realmId)") && /LiveRealmId = [^;]*"pattern"/.test(realmRegistry), "Pattern Peaks tower portal must report canonical progress as a live realm.");
 const towerEntry = fs.readFileSync(path.join(root, "lib/world3d/tower-realm-entry.ts"), "utf8");
 assert(!towerEntry.includes('level=Year%206'), "Pattern Peaks tower entry must not bypass canonical placement with a fixed preview level.");
 assert(towerEntry.includes("resolveRealmEntryRoute"), "Pattern Peaks tower entry must use the canonical placement resolver.");
