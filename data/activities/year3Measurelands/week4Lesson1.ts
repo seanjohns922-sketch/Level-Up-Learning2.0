@@ -1,6 +1,8 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 import { ML_OBJECTS, L_OBJECTS, ALL_CAP_OBJECTS, type CapObject } from "@/data/activities/year3Measurelands/capacityObjects";
 
+const withArticle = (word: string) => `${/^[aeiou]/i.test(word) ? "an" : "a"} ${word}`;
+
 // ── Measurelands · L3 · Week 4 · Lesson 1 — "Meet mL & L" (Learn) ──
 // AC9M3M01: recognise millilitres and litres and choose the sensible unit.
 // THREE rotating activities: chooseUnit · sort · spotMistake.
@@ -96,7 +98,7 @@ function buildSpotMistake(memory: LessonMemory): CapTask {
     statement: `A ${o.label} holds ${sillyVal} ${wrongUnit}.`,
     options: ["No, that's not sensible", "Yes, that makes sense"],
     correctOption: "No, that's not sensible",
-    feedback: { correct: `Yes — a ${o.label} should be measured in ${o.unit}, about ${o.capacity} ${o.unit}.`, wrong: `Look again — ${sillyVal} ${wrongUnit} is silly for a ${o.label}. It holds about ${o.capacity} ${o.unit}.` },
+    feedback: { correct: `Yes — ${withArticle(o.label)} should be measured in ${o.unit}, about ${o.capacity} ${o.unit}.`, wrong: `Look again — ${sillyVal} ${wrongUnit} is silly for a ${o.label}. It holds about ${o.capacity} ${o.unit}.` },
   };
 }
 

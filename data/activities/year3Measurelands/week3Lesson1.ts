@@ -7,6 +7,8 @@ import {
   type Y3MassObject,
 } from "@/data/activities/year3Measurelands/massObjects";
 
+const withArticle = (word: string) => `${/^[aeiou]/i.test(word) ? "an" : "a"} ${word}`;
+
 // Measurelands · Level 3 · Week 3 · Lesson 1 — Meet Grams and Kilograms.
 // AC9M3M01: recognise grams and kilograms as sensible formal mass units.
 
@@ -84,7 +86,7 @@ function buildChooseUnitTask(memory: LessonMemory): MassUnitTask {
   return {
     kind: "massUnit",
     scene: "chooseUnit",
-    prompt: `Would you use g or kg for a ${object.label}?`,
+    prompt: `Would you use g or kg for ${withArticle(object.label)}?`,
     speakText: `Would you measure a ${object.label} in grams or kilograms?`,
     badgeLabel: "Which Unit?",
     object: taskObject(object),
@@ -142,11 +144,11 @@ function buildMistakeTask(memory: LessonMemory, forceCorrectStatement = false): 
     correctOption,
     feedback: {
       correct: statementIsCorrect
-        ? `Yes — ${shownMass} is sensible for a ${object.label}.`
+        ? `Yes — ${shownMass} is sensible for ${withArticle(object.label)}.`
         : `Correct — a ${object.label} should use ${unitOption(object.unit).toLowerCase()}.`,
       wrong: statementIsCorrect
-        ? `${shownMass} is sensible for a ${object.label}.`
-        : `${shownMass} is not sensible for a ${object.label}. Choose ${unitOption(object.unit).toLowerCase()}.`,
+        ? `${shownMass} is sensible for ${withArticle(object.label)}.`
+        : `${shownMass} is not sensible for ${withArticle(object.label)}. Choose ${unitOption(object.unit).toLowerCase()}.`,
     },
   };
 }

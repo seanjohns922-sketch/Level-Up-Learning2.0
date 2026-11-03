@@ -136,3 +136,12 @@
 [data-pattern-level="3"] [data-pattern-strip] .min-w-\[64px\] { min-width: 52px; padding: 0.6rem 0.7rem; }
 [data-pattern-level="3"] [data-pattern-strip] .text-\[10px\] { font-size: 8px; letter-spacing: 0.04em; }
 
+/* Level 3 Space and Measurement: the pictures are already strong, so only small text and symbols grow. */
+[data-l3-look="space"] span.min-w-24.border-cyan-300 { font-size: 1.5rem; }
+[data-l3-look="space"] span.text-xl.font-black.text-amber-200 { font-size: 2.4rem; }
+[data-l3-look="space"] .text-\[7px\] { font-size: 11px; }
+[data-l3-look="space"] span.text-\[11px\].font-bold.text-slate-500 { font-size: 0.85rem; }
+/* Order cards: bigger picture and label */
+[data-l3-look="measurement"] button.rounded-\[20px\] > span:first-child { font-size: 2.4rem; line-height: 1; }
+[data-l3-look="measurement"] button.rounded-\[20px\] > span:last-child { font-size: 0.95rem; }
+

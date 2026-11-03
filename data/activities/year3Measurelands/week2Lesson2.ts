@@ -1,5 +1,7 @@
 import type { Difficulty, PracticeTask } from "@/data/activities/year1/practice-task";
 
+const withArticle = (word: string) => `${/^[aeiou]/i.test(word) ? "an" : "a"} ${word}`;
+
 // ── Measurelands · Level 3 (Year 3) · Week 2 · Lesson 2 — "Choose cm or m" ──
 // AC9M3M01: choose the sensible formal unit (cm or m) for a familiar object.
 // Selecting the unit, not calculating. THREE rotating activities:
@@ -154,7 +156,7 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
       options: ["Yes, that makes sense", `No — use ${wrongWord}`],
       correctOption: "Yes, that makes sense",
       feedback: {
-        correct: `Right — ${rightWord} is the sensible unit for a ${object.label}.`,
+        correct: `Right — ${rightWord} is the sensible unit for ${withArticle(object.label)}.`,
         wrong: `That one is fine — a ${object.label} really is measured in ${rightWord}.`,
       },
     };
@@ -174,7 +176,7 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
     correctOption: `No — use ${rightWord}`,
     feedback: {
       correct: `Yes — a ${object.label} should be measured in ${rightWord}, not ${wrongWord}.`,
-      wrong: `Look again — ${size} ${wrongWord} is silly for a ${object.label}. Use ${rightWord}.`,
+      wrong: `Look again — ${size} ${wrongWord} is silly for ${withArticle(object.label)}. Use ${rightWord}.`,
     },
   };
 }
