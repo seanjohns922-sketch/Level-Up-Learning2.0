@@ -93,23 +93,23 @@
 [data-number-nexus-level="3"] div[data-quiz-option], [data-number-nexus-level="4"] div[data-quiz-option] { border-radius: 14px; box-shadow: 0 5px 0 var(--l1-edge); }
 
 /* Level 3 Chance: same activities, brighter look. Size and colour only. */
-[data-chance-level="3"] { --l3c-ink: #2c2140; --l3c-edge: #e4d8f5; }
+[data-chance-level="3"], [data-chance-level="4"] { --l3c-ink: #2c2140; --l3c-edge: #e4d8f5; }
 /* Answer buttons: taller, rounded and raised. Marked colours still come from the activity. */
-[data-chance-level="3"] button.w-full.text-left, [data-chance-level="3"] button[data-quiz-option] { min-height: 64px; border-radius: 14px; color: var(--l3c-ink); box-shadow: 0 0 0 1px var(--l3c-edge), 0 5px 0 var(--l3c-edge); }
-[data-chance-level="3"] button.w-full.text-left:active { transform: translateY(3px); box-shadow: 0 0 0 1px var(--l3c-edge), 0 2px 0 var(--l3c-edge); }
+[data-chance-level="3"] button.w-full.text-left, [data-chance-level="3"] button[data-quiz-option], [data-chance-level="4"] button.w-full.text-left, [data-chance-level="4"] button[data-quiz-option] { min-height: 64px; border-radius: 14px; color: var(--l3c-ink); box-shadow: 0 0 0 1px var(--l3c-edge), 0 5px 0 var(--l3c-edge); }
+[data-chance-level="3"] button.w-full.text-left:active, [data-chance-level="4"] button.w-full.text-left:active { transform: translateY(3px); box-shadow: 0 0 0 1px var(--l3c-edge), 0 2px 0 var(--l3c-edge); }
 /* Chance tools: large and easy to read, on a white panel */
-[data-chance-level="3"] .chance-visual { border-width: 0; background: #fff; box-shadow: 0 0 0 1px var(--l3c-edge), 0 3px 0 var(--l3c-edge); }
-[data-chance-level="3"] [data-chance-visual="scale"] svg { width: 100%; max-width: 620px; }
-[data-chance-level="3"] [data-chance-visual="spinner"] svg { width: 230px; height: auto; }
-[data-chance-level="3"] [data-chance-visual="die"] svg, [data-chance-level="3"] [data-chance-visual="bag"] svg { transform-origin: center; width: auto; height: 180px; }
-[data-chance-level="3"] [data-chance-visual] .text-sm { font-size: 1rem; }
+[data-chance-level="3"] .chance-visual, [data-chance-level="4"] .chance-visual { border-width: 0; background: #fff; box-shadow: 0 0 0 1px var(--l3c-edge), 0 3px 0 var(--l3c-edge); }
+[data-chance-level="3"] [data-chance-visual="scale"] svg, [data-chance-level="4"] [data-chance-visual="scale"] svg { width: 100%; max-width: 620px; }
+[data-chance-level="3"] [data-chance-visual="spinner"] svg, [data-chance-level="4"] [data-chance-visual="spinner"] svg { width: 230px; height: auto; }
+[data-chance-level="3"] [data-chance-visual="die"] svg, [data-chance-level="3"] [data-chance-visual="bag"] svg, [data-chance-level="4"] [data-chance-visual="die"] svg, [data-chance-level="4"] [data-chance-visual="bag"] svg { transform-origin: center; width: auto; height: 180px; }
+[data-chance-level="3"] [data-chance-visual] .text-sm, [data-chance-level="4"] [data-chance-visual] .text-sm { font-size: 1rem; }
 /* Spin and tally: bigger tool and buttons */
-[data-chance-level="3"] .rounded-xl.border.bg-\[\#faf7ff\] { background: #fff; }
-[data-chance-level="3"] button.rounded-lg.border-2 { min-height: 52px; border-radius: 12px; box-shadow: 0 3px 0 var(--l3c-edge); }
-[data-chance-level="3"] button.h-11 { height: 52px; border-radius: 12px; box-shadow: 0 4px 0 #4b2a70; }
+[data-chance-level="3"] .rounded-xl.border.bg-\[\#faf7ff\], [data-chance-level="4"] .rounded-xl.border.bg-\[\#faf7ff\] { background: #fff; }
+[data-chance-level="3"] button.rounded-lg.border-2, [data-chance-level="4"] button.rounded-lg.border-2 { min-height: 52px; border-radius: 12px; box-shadow: 0 3px 0 var(--l3c-edge); }
+[data-chance-level="3"] button.h-11, [data-chance-level="4"] button.h-11 { height: 52px; border-radius: 12px; box-shadow: 0 4px 0 #4b2a70; }
 /* Keep the answers on screen on short displays such as iPad landscape */
 @media (max-height: 900px) {
-  [data-chance-level="3"] [data-chance-visual="spinner"] svg, [data-chance-level="3"] [data-chance-visual="die"] svg, [data-chance-level="3"] [data-chance-visual="bag"] svg { width: auto; height: 140px; }
+  [data-chance-level="3"] [data-chance-visual="spinner"] svg, [data-chance-level="3"] [data-chance-visual="die"] svg, [data-chance-level="3"] [data-chance-visual="bag"] svg, [data-chance-level="4"] [data-chance-visual="spinner"] svg, [data-chance-level="4"] [data-chance-visual="die"] svg, [data-chance-level="4"] [data-chance-visual="bag"] svg { width: auto; height: 140px; }
 }
 
 /* Level 3 Statistics: Level 1's bright graphs, plus fixes for the Level 3 cards */
