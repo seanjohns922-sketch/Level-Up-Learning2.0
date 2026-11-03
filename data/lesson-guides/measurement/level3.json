@@ -39,7 +39,60 @@
    "Compare the measurements.",
    "Subtract to find the difference."
   ],
-  "tip": "If a reading looks wrong, check it started at 0."
+  "tip": "If a reading looks wrong, check it started at 0.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 15,
+       "end": 14,
+       "label": "Leaf"
+      },
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 15,
+       "end": 9,
+       "label": "Twig"
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "14 cm and 9 cm",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "14 − 9 = 5 cm longer",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "A metre is 100 centimetres.",
@@ -49,7 +102,42 @@
    "Compare the object to it.",
    "Say shorter, about or longer than a metre."
   ],
-  "tip": "Use a metre stick or tape for long things."
+  "tip": "Use a metre stick or tape for long things.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "week2-3d/backpack.png",
+      "alt": "A backpack",
+      "size": 90,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "text",
+      "text": "1 metre ≈ one big step",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Less than 1 m",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Use centimetres for small objects and metres for big ones.",
@@ -59,7 +147,33 @@
    "Small things: centimetres.",
    "Long things: metres."
   ],
-  "tip": "Check the answer makes sense."
+  "tip": "Check the answer makes sense.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🖌️",
+      "label": "Paintbrush → cm",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "image",
+      "src": "everyday-3d/object-classroom.png",
+      "alt": "A classroom",
+      "size": 90,
+      "label": "Classroom → m",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Estimate first, then measure to check.",
@@ -69,7 +183,48 @@
    "Measure the object.",
    "Compare and see how close you were."
   ],
-  "tip": "A good estimate is close, not exact."
+  "tip": "A good estimate is close, not exact.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Estimate: 20 cm",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 20,
+       "end": 18,
+       "label": "Toothbrush"
+      },
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Measured 18 cm: close!",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Use grams for light objects and kilograms for heavy ones.",
@@ -79,7 +234,32 @@
    "Light things: grams.",
    "Heavy things: kilograms."
   ],
-  "tip": "1 kg = 1000 g."
+  "tip": "1 kg = 1000 g.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "📎",
+      "label": "Paper clip → g",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🧳",
+      "label": "Suitcase → kg",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Read the number where the needle points on the scale.",
@@ -129,7 +309,33 @@
    "Small amounts: mL.",
    "Large amounts: L."
   ],
-  "tip": "1 L = 1000 mL."
+  "tip": "1 L = 1000 mL.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🥄",
+      "label": "Teaspoon → mL",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "image",
+      "src": "containers-3d/bathtub.png",
+      "alt": "A bathtub",
+      "size": 90,
+      "label": "Bathtub → L",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Read a measuring jug at the water level.",
@@ -157,7 +363,45 @@
    "Compare them.",
    "Subtract to find how much more."
   ],
-  "tip": "Use the same unit for both."
+  "tip": "Use the same unit for both.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "image",
+      "src": "containers-3d/mug.png",
+      "alt": "A mug",
+      "size": 80,
+      "label": "Mug: 300 mL",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🥄",
+      "label": "Teaspoon: 5 mL",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "300 − 5 = 295 mL more",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Time is measured in seconds, minutes and hours. 60 minutes make 1 hour.",
@@ -167,7 +411,42 @@
    "Very short: seconds. Short: minutes. Long: hours.",
    "Check: 60 seconds = 1 minute, 60 minutes = 1 hour."
   ],
-  "tip": "Sleeping overnight takes hours."
+  "tip": "Sleeping overnight takes hours.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "👁️",
+      "label": "Blink → seconds",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🪥",
+      "label": "Brushing teeth → minutes",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "60 seconds = 1 minute, 60 minutes = 1 hour",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Estimate how long an activity takes.",
@@ -177,7 +456,41 @@
    "Choose a sensible unit.",
    "Pick a sensible number."
   ],
-  "tip": "Compare with something you know."
+  "tip": "Compare with something you know.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🪥",
+      "label": "Brushing teeth",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2 seconds",
+       "2 minutes",
+       "2 hours"
+      ],
+      "marked": [
+       1
+      ],
+      "markStep": 3,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Compare how long activities take.",
@@ -187,7 +500,30 @@
    "Compare them.",
    "Subtract to find how much longer."
   ],
-  "tip": "Convert hours to minutes first if needed."
+  "tip": "Convert hours to minutes first if needed.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "90 min football game",
+      "parts": [
+       "2 min",
+       "88 min"
+      ],
+      "unknown": 1,
+      "answer": "88 min",
+      "answerStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Read the clock by counting in fives with the minute hand.",
@@ -286,7 +622,48 @@
    "Measure it.",
    "Compare the two."
   ],
-  "tip": "Choose sensible units."
+  "tip": "Choose sensible units.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Estimate: 12 cm",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 15,
+       "end": 13,
+       "label": "Marker"
+      },
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Measured 13 cm: 1 cm off",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Compare how long activities take.",
@@ -296,7 +673,44 @@
    "Compare them.",
    "Find the difference."
   ],
-  "tip": "Use seconds for very quick events."
+  "tip": "Use seconds for very quick events.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🤧",
+      "label": "Sneeze: about 1 s",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🫰",
+      "label": "Click fingers: about 1 s",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "About the same",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Classify angles using a right angle.",

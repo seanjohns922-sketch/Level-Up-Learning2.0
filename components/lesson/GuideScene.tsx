@@ -4,6 +4,12 @@ import Image from "next/image";
 import type { GuideVisual, ScenePart } from "@/data/lesson-guides/guide-visual";
 import { moneyName } from "@/data/lesson-guides/guide-visual";
 import GuideVisualView from "@/components/lesson/GuideVisual";
+import { L3_OBJECTS } from "@/data/activities/starpath/level3/l3-objects";
+import ChanceTool from "@/components/chance-hollow/ChanceVisual";
+import { DirectionGrid, GridMarker } from "@/components/starpath/StarpathDirectionCards";
+import { PositionObjectVisual } from "@/components/starpath/StarpathPositionCards";
+import StatisticaPlot from "@/components/statistica/StatisticaPlot";
+import { Level1LookContext } from "@/lib/level1-look";
 
 // Picture-led worked examples for Levels 1–2, drawn with the lessons' own objects (glossy counters,
 // striped tens rods, amber ones cubes, dashed group circles). `step` is the step the child has
@@ -73,7 +79,7 @@ function NumberLineView({ p, step }: { p: Extract<ScenePart, { type: "line" }>; 
   const onTick = (v: number) => Math.abs(((v - p.min) / every) % 1) < 1e-6;
   return <svg viewBox={`0 0 ${W} 144`} className="block w-full max-w-[520px]" aria-hidden>
     <line x1={L - 8} x2={R + 8} y1={y} y2={y} stroke={INK} strokeWidth={3} />
-    {ticks.map((t) => { const big = Math.abs(((t - p.min) / every) % 1) < 1e-6; return <g key={t}><line x1={x(t)} x2={x(t)} y1={y - (big ? 9 : 6)} y2={y + (big ? 9 : 6)} stroke={INK} strokeWidth={big ? 2 : 1.2} />{big && <text x={x(t)} y={y + 30} textAnchor="middle" fontSize={15} fontWeight={800} fill={INK}>{t}</text>}</g>; })}
+    {ticks.map((t) => { const big = Math.abs(((t - p.min) / every) % 1) < 1e-6; return <g key={t}><line x1={x(t)} x2={x(t)} y1={y - (big ? 9 : 6)} y2={y + (big ? 9 : 6)} stroke={INK} strokeWidth={big ? 2 : 1.2} />{big && <text x={x(t)} y={y + 30} textAnchor="middle" fontSize={15} fontWeight={800} fill={INK}>{t.toLocaleString("en-AU")}</text>}</g>; })}
     {(p.jumps ?? []).map((j, i) => { const a = x(j.from), b = x(j.to), mid = (a + b) / 2, h = Math.min(54, Math.abs(b - a) * 0.42 + 6), hide = !after(j.step, step);
       return <g key={i} style={{ opacity: hide ? 0 : 1, transition: "opacity .3s" }}><path d={`M${a} ${y - 4} Q${mid} ${y - 4 - h * 1.6} ${b} ${y - 4}`} fill="none" stroke={j.step && step === j.step ? ORANGE : TEAL} strokeWidth={3.5} /><path d={`M${b} ${y - 4} l${b > a ? -9 : 9} -7 M${b} ${y - 4} l${b > a ? -2 : 2} -11`} stroke={j.step && step === j.step ? ORANGE : TEAL} strokeWidth={3} fill="none" strokeLinecap="round" />{j.text && <text x={mid} y={y - 10 - h * 0.85} textAnchor="middle" fontSize={14} fontWeight={800} fill={TEAL}>{j.text}</text>}</g>; })}
     {(p.marks ?? []).map((m, i) => { const hide = !after(m.step, step), c = m.tone === "unknown" ? ORANGE : m.tone === "answer" ? ORANGE : TEAL;
@@ -152,6 +158,58 @@ function PictureView({ name }: { name: Extract<ScenePart, { type: "picture" }>["
   </svg>;
 }
 
+// Written method laid out like the lesson: place-value columns, a rule, answer boxes and carries above.
+function Column({ p, step }: { p: Extract<ScenePart, { type: "column" }>; step: Step }) {
+  const width = Math.max(p.top.length, p.bottom.length, p.answer?.length ?? 0);
+  const pad = (v: string) => v.padStart(width, " ").split("");
+  const showAnswer = p.answer !== undefined && after(p.answerStep, step), showCarry = p.carries && after(p.carryStep, step);
+  // One carry or regroup value per column, so a two-digit value like 12 stays in its own column.
+  const carryCells = p.carries ? [...Array(Math.max(0, width - p.carries.length)).fill(" "), ...p.carries] : Array(width).fill(" ");
+  const crossed = (i: number) => p.op === "-" && !!showCarry && !!carryCells[i]?.trim();
+  const cell = (d: string, key: string, tone: "plain" | "answer" | "empty" = "plain", cross = false) => <span key={key} className="relative grid h-12 w-11 place-items-center rounded-lg text-2xl font-black" style={{ background: tone === "plain" ? (d.trim() ? "#fff" : "transparent") : tone === "answer" ? ORANGE : "#fff", color: tone === "answer" ? "#fff" : INK, border: tone === "empty" ? `2px dashed ${ORANGE}` : undefined }}>{d.trim()}{cross && d.trim() ? <span className="absolute h-0.5 w-9 rotate-[58deg] rounded" style={{ background: CROSS }} /> : null}</span>;
+  return <div className="grid gap-1.5" style={{ gridTemplateColumns: `28px repeat(${width}, 44px)` }}>
+    <span />{carryCells.map((d: string, i: number) => <span key={`c${i}`} className="grid h-5 place-items-center text-sm font-black" style={{ color: ORANGE_INK, opacity: showCarry ? 1 : 0 }}>{d.trim()}</span>)}
+    <span />{pad(p.top).map((d, i) => cell(d, `t${i}`, "plain", crossed(i)))}
+    <span className="grid place-items-center text-2xl font-black" style={{ color: INK }}>{p.op === "-" ? "−" : "+"}</span>{pad(p.bottom).map((d, i) => cell(d, `b${i}`))}
+    <span /><span className="h-1 rounded" style={{ gridColumn: `span ${width}`, background: INK }} />
+    <span />{pad(p.answer ?? "".padStart(width, " ")).map((d, i) => showAnswer && d.trim() ? cell(d, `a${i}`, "answer") : cell("", `a${i}`, "empty"))}
+  </div>;
+}
+
+// The lesson's own Level 3 solids, drawn from trusted SVG constants in the repo (no user content).
+function Object3d({ p }: { p: Extract<ScenePart, { type: "object3d" }> }) {
+  const o = L3_OBJECTS[p.id];
+  return <div className="flex flex-col items-center"><svg viewBox="0 0 120 120" className="h-20 w-20" aria-hidden dangerouslySetInnerHTML={{ __html: o.inner }} /><span className="text-xs font-bold" style={{ color: INK }}>{p.name ?? o.spaceName}</span></div>;
+}
+
+function Machine({ p, step }: { p: Extract<ScenePart, { type: "machine" }>; step: Step }) {
+  const out = p.output !== undefined && after(p.outputStep, step);
+  const box = (label: string, value: string, dark = false, unknown = false) => <div className="grid min-w-20 place-items-center rounded-xl px-3 py-2" style={{ background: dark ? "#0f172a" : "#fff", color: dark ? "#fff" : INK, border: unknown ? `2px dashed ${ORANGE}` : `1px solid #c8e6df` }}><span className="text-[10px] font-black uppercase tracking-widest opacity-70">{label}</span><span className="text-2xl font-black" style={{ color: unknown ? ORANGE_INK : undefined }}>{value}</span></div>;
+  return <div className="flex items-center gap-2">{box("In", p.input)}<span style={{ color: TEAL }}>→</span>{box("Rule", p.rule, true)}<span style={{ color: TEAL }}>→</span>{out ? box("Out", p.output!) : box("Out", "?", false, true)}</div>;
+}
+
+// The lesson's own star map: the same grid, landmark art, symbols and explorer marker.
+const FACING: Record<string, number> = { N: 0, E: 90, S: 180, W: 270 };
+function StarMap({ p, step }: { p: Extract<ScenePart, { type: "starmap" }>; step: Step }) {
+  const pt = (c: { r: number; c: number }) => `${((c.c + 0.5) / p.cols) * 100},${((c.r + 0.5) / p.rows) * 100}`;
+  return <div className="w-full max-w-[460px]"><DirectionGrid cols={p.cols} rows={p.rows}>
+    {p.path && after(p.pathStep, step) ? <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 z-[15] h-full w-full" aria-hidden><polyline points={p.path.map(pt).join(" ")} fill="none" stroke="#fcd34d" strokeWidth="1.6" strokeDasharray="3 2" vectorEffect="non-scaling-stroke" style={{ strokeWidth: 3 }} /></svg> : null}
+    {p.places.map((x, i) => <GridMarker key={i} cell={x} cols={p.cols} rows={p.rows} z={10}><div className="flex h-full w-full flex-col items-center justify-center gap-0.5 transition-opacity duration-300" style={{ opacity: after(x.step, step) ? 1 : 0 }}>
+      {x.symbol ? <span className="text-2xl font-black text-amber-200">{x.symbol}</span> : <><PositionObjectVisual objectId={x.object ?? "star"} className="h-3/5 w-3/5" />{x.label ? <span className="max-w-full truncate px-0.5 text-[10px] font-black leading-tight text-cyan-100">{x.label}</span> : null}</>}
+    </div></GridMarker>)}
+    {p.explorer ? <GridMarker cell={p.explorer} cols={p.cols} rows={p.rows} z={20}><div className="relative flex h-[94%] w-[94%] items-center justify-center rounded-xl border-2 border-amber-300/80 bg-amber-400/15">
+      {p.explorer.facing ? <svg viewBox="0 0 40 40" className="pointer-events-none absolute inset-0 h-full w-full" style={{ transform: `rotate(${FACING[p.explorer.facing]}deg)` }} aria-hidden><path d="M20 1.5 L27 13 L20 9.5 L13 13 Z" fill="#fde047" stroke="#a16207" strokeWidth="1.4" strokeLinejoin="round" /></svg> : null}
+      <PositionObjectVisual objectId="rocket" className="h-1/2 w-1/2" />
+    </div></GridMarker> : null}
+  </DirectionGrid></div>;
+}
+
+const PLOT_COLOURS = ["#22c55e", "#3b82f6", "#a855f7", "#ec4899", "#f97316", "#14b8a6"];
+// The lesson's own bright column graph (the same component and look the Statistics lessons use).
+function Plot({ p }: { p: Extract<ScenePart, { type: "plot" }> }) {
+  return <Level1LookContext.Provider value><div className="guide-plot w-full" data-level1-look="statistics" style={{ zoom: 0.8 }}><style>{`.guide-plot .min-h-\\[68px\\]{min-height:0}.guide-plot [data-statistica-plot]{padding-bottom:.5rem}`}</style><StatisticaPlot display="columns" labelReadAloud={false} categories={p.categories.map((x, i) => ({ id: `${i}`, label: x.label, count: x.count, color: PLOT_COLOURS[i % PLOT_COLOURS.length] }))} /></div></Level1LookContext.Provider>;
+}
+
 function Compass({ p, step }: { p: Extract<ScenePart, { type: "compass" }>; step: Step }) {
   const dirs = ["north", "east", "south", "west"], start = dirs.indexOf(p.from), turns = after(p.turnStep, step) ? p.turns : 0, a = (start + turns) * 90;
   return <svg viewBox="0 0 160 160" className="h-40 w-40" aria-hidden>
@@ -179,6 +237,13 @@ function Part({ p, step }: { p: ScenePart; step: Step }) {
       break; }
     case "units": body = <Units p={p} />; break;
     case "picture": body = <PictureView name={p.name} />; break;
+    case "column": body = <Column p={p} step={step} />; break;
+    case "starmap": body = <StarMap p={p} step={step} />; break;
+    case "plot": body = <Plot p={p} />; break;
+    case "object3d": body = <Object3d p={p} />; break;
+    case "machine": body = <Machine p={p} step={step} />; break;
+    case "chance": { const v = p.visual.type === "scale" && !after(p.highlightStep, step) ? { ...p.visual, highlight: undefined } : p.visual;
+      body = <ChanceTool visual={v} />; break; }
     case "text": { const t = p.then && after(p.then.step, step) ? p.then.text : p.text;
       body = <span className={`${p.big ? "text-4xl" : "text-xl"} font-black leading-tight`} style={{ color: p.tone ? ORANGE_INK : INK }}>{t}</span>; break; }
     case "sign": body = <span className="text-3xl font-black" style={{ color: TEAL }}>{p.text}</span>; break;
@@ -195,7 +260,7 @@ function Part({ p, step }: { p: ScenePart; step: Step }) {
     case "visual": body = <div className="w-full max-w-[360px]"><GuideVisualView visual={p.visual as GuideVisual} /></div>; break;
   }
   if (p.type === "sign") return <div className="self-center transition-opacity duration-300" style={{ opacity: shown(p, step) ? 1 : 0 }}>{body}</div>;
-  return <div data-scene-part className={`flex max-w-full min-w-0 flex-col items-center gap-1.5 rounded-2xl p-2 ${["line", "visual", "barModel", "pictograph"].includes(p.type) ? "w-full" : ""} transition-all duration-300 ${lit(p, step) ? "bg-[#fff6d6] shadow-[0_0_0_3px_#ffd95a]" : ""}`} style={{ opacity: shown(p, step) ? 1 : 0 }}>
+  return <div data-scene-part className={`flex max-w-full min-w-0 flex-col items-center gap-1.5 rounded-2xl p-2 ${["line", "visual", "barModel", "pictograph", "chance", "starmap", "plot"].includes(p.type) ? "w-full" : ""} transition-all duration-300 ${lit(p, step) ? "bg-[#fff6d6] shadow-[0_0_0_3px_#ffd95a]" : ""}`} style={{ opacity: shown(p, step) ? 1 : 0 }}>
     {body}
     {p.label && <span className="text-sm font-bold" style={{ color: INK }}>{p.label}</span>}
   </div>;

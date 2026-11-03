@@ -1,3 +1,4 @@
+import type { ChanceVisual as ChanceToolVisual } from "@/data/activities/year1/practice-task";
 // Static diagrams for Learn the Skill worked examples. Each one is drawn from the guide's own
 // numbers, so the picture always matches the steps. Rendered by components/lesson/GuideVisual.tsx.
 export type ShapeName = "circle" | "oval" | "triangle" | "square" | "rectangle" | "pentagon" | "hexagon" | "octagon" | "rhombus" | "kite" | "trapezium" | "parallelogram";
@@ -37,6 +38,12 @@ export type ScenePart = PartBase & (
   | { type: "image"; src: string; size?: number; alt: string; crop?: { width: number; x: [number, number]; y: [number, number] } }
   | { type: "units"; unit: "block" | "domino" | "clip"; n: number; width: number; gapAt?: number }
   | { type: "picture"; name: "robot" | "house" | "castle" | "pizza" | "clock" }
+  | { type: "column"; op: "+" | "-"; top: string; bottom: string; answer?: string; answerStep?: number; carries?: string[]; carryStep?: number }
+  | { type: "object3d"; id: "cube" | "sphere" | "cylinder" | "cone" | "prism" | "pyramid"; name?: string }
+  | { type: "machine"; input: string; rule: string; output?: string; outputStep?: number }
+  | { type: "chance"; visual: ChanceToolVisual; highlightStep?: number }
+  | { type: "starmap"; cols: number; rows: number; places: { r: number; c: number; object?: string; symbol?: string; label?: string; step?: number }[]; explorer?: { r: number; c: number; facing?: "N" | "E" | "S" | "W" }; path?: { r: number; c: number }[]; pathStep?: number }
+  | { type: "plot"; categories: { label: string; count: number }[] }
   | { type: "text"; text: string; big?: boolean; tone?: "answer" | "unknown"; then?: { step: number; text: string } }
   | { type: "sign"; text: string }
   | { type: "seq"; items: string[] }
@@ -67,6 +74,12 @@ export function scenePartSpeech(p: ScenePart): string {
     case "image": return `${lead}${p.alt}.`;
     case "units": return `${lead}${plural(p.n, UNIT_NAMES[p.unit])}${p.gapAt ? ", with a gap" : ""}.`;
     case "picture": return `${lead}A picture of a ${p.name}.`;
+    case "column": return `${lead}${p.top} ${p.op === "+" ? "plus" : "minus"} ${p.bottom}, set out in columns.`;
+    case "object3d": return `${lead}${p.name ?? `A ${p.id}`}.`;
+    case "machine": return `${lead}A number machine. ${p.input} goes in, the rule is ${p.rule}.`;
+    case "chance": return lead + chanceSaid(p.visual);
+    case "starmap": return `${lead}A star map with ${p.places.map((x) => x.label ?? x.symbol ?? x.object).join(", ")}.`;
+    case "plot": return `${lead}A column graph. ${p.categories.map((x) => `${x.label}: ${x.count}`).join(", ")}.`;
     case "text": return `${lead}${p.then ? p.then.text : p.text}.`;
     case "sign": return "";
     case "seq": return `${lead}A pattern: ${p.items.map((x) => (x === "?" ? "a gap" : x)).join(", ")}.`;
@@ -82,6 +95,7 @@ export function scenePartSpeech(p: ScenePart): string {
   }
 }
 
+const chanceSaid = (v: ChanceToolVisual) => v.type === "scale" ? "A likelihood scale from impossible to certain." : v.type === "die" ? `A die showing ${v.face}.` : v.type === "coin" ? "A coin with heads and tails." : v.type === "spinner" ? `A spinner with ${countWords(v.wedges)}.` : v.type === "bag" ? `A bag with ${countWords(v.counters)}.` : "";
 const UNIT_NAMES = { block: "block", domino: "domino", clip: "paper clip" };
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const said = (n: number) => (n < 0 ? `negative ${-n}` : String(n));

@@ -7,7 +7,50 @@
    "If they are words or groups, the data is categorical.",
    "Count how many are in each category."
   ],
-  "tip": "Numbers used as labels, like a shirt number, are still categorical."
+  "tip": "Numbers used as labels, like a shirt number, are still categorical.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "pop",
+       "rock",
+       "pop"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Words: categorical",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "pop: 2",
+       "rock: 1"
+      ],
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Numerical data is counts or measurements.",
@@ -17,7 +60,48 @@
    "If they are numbers you could count or measure, the data is numerical.",
    "The most common value is the one that appears most."
   ],
-  "tip": "Numerical data can be ordered from smallest to largest."
+  "tip": "Numerical data can be ordered from smallest to largest.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2",
+       "0",
+       "3",
+       "2"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Numbers: numerical",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Most common value: 2",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Decide if data is categorical or numerical, then read it.",
@@ -27,7 +111,67 @@
    "Numbers that count something are numerical.",
    "Read the graph or table to answer the question."
   ],
-  "tip": "'How many' questions give numerical data."
+  "tip": "'How many' questions give numerical data.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "0",
+       "2",
+       "3",
+       "3"
+      ],
+      "label": "Pets per family",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "0",
+        "count": 1
+       },
+       {
+        "label": "1",
+        "count": 0
+       },
+       {
+        "label": "2",
+        "count": 1
+       },
+       {
+        "label": "3",
+        "count": 2
+       }
+      ],
+      "focus": [
+       3
+      ],
+      "step": 3
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2 families had 3",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "A question of interest is one we can answer by collecting data.",
@@ -37,7 +181,37 @@
    "Decide who to ask.",
    "Collect and display the answers to find the most common."
   ],
-  "tip": "Make sure the question can be answered with data."
+  "tip": "Make sure the question can be answered with data.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "How do students in our class travel to school?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "🚗 Car",
+       "🚌 Bus",
+       "🚲 Bike",
+       "🚶 Walk"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Decide what data you need to answer the question.",
@@ -47,7 +221,46 @@
    "Decide if you need words (categories) or numbers (counts).",
    "Decide how to record it: a tally or a table."
   ],
-  "tip": "Collect only what the question needs."
+  "tip": "Collect only what the question needs.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "How many books do we read?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Ava: 3",
+       "Ben: 5",
+       "Cy: 2"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Numbers, so record in a table",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "A frequency table shows how many had each value.",
@@ -57,7 +270,42 @@
    "Read across to the frequency column.",
    "That is how many had that value."
   ],
-  "tip": "Frequency means 'how many times'."
+  "tip": "Frequency means 'how many times'.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "3 books → 2",
+       "4 books → 5",
+       "5 books → 1"
+      ],
+      "marked": [
+       1
+      ],
+      "markStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "5 students read 4 books",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Tallies turn a list into counts.",
@@ -67,7 +315,71 @@
    "Make a tally mark next to that value.",
    "Count the tallies for each value."
   ],
-  "tip": "Cross off each value as you tally it."
+  "tip": "Cross off each value as you tally it.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2",
+       "3",
+       "2",
+       "2",
+       "4"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2"
+     },
+     {
+      "type": "tally",
+      "n": 3,
+      "step": 2,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "text",
+      "text": "3"
+     },
+     {
+      "type": "tally",
+      "n": 1,
+      "step": 2
+     },
+     {
+      "type": "text",
+      "text": "4"
+     },
+     {
+      "type": "tally",
+      "n": 1,
+      "step": 2
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2: 3, 3: 1, 4: 1",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "A frequency table lists every value or category with its count.",
@@ -101,7 +413,42 @@
    "Read its frequency.",
    "If a frequency is missing, count it from the data."
   ],
-  "tip": "Check the total of the frequencies."
+  "tip": "Check the total of the frequencies.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "0 pets → 3",
+       "1 pet → 6",
+       "2 pets → 4"
+      ],
+      "marked": [
+       2
+      ],
+      "markStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4 families had 2 pets",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Choose a graph that shows the data clearly.",
@@ -111,7 +458,50 @@
    "A column graph shows counts clearly.",
    "Read it to find the most and least."
   ],
-  "tip": "Label both axes."
+  "tip": "Label both axes.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Car",
+        "count": 6
+       },
+       {
+        "label": "Bus",
+        "count": 4
+       },
+       {
+        "label": "Bike",
+        "count": 3
+       },
+       {
+        "label": "Walk",
+        "count": 7
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Most: Walk. Least: Bike",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Build a column graph from a frequency table.",
@@ -165,7 +555,55 @@
    "Read the bar's height.",
    "Use that number as your evidence."
   ],
-  "tip": "Answer with the number, then explain where it came from."
+  "tip": "Answer with the number, then explain where it came from.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "0",
+        "count": 2
+       },
+       {
+        "label": "1",
+        "count": 5
+       },
+       {
+        "label": "2",
+        "count": 6
+       },
+       {
+        "label": "3",
+        "count": 4
+       },
+       {
+        "label": "4",
+        "count": 1
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Bar at 3 reaches 4: 4 families",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "An inference is a conclusion the data supports.",
@@ -199,7 +637,55 @@
    "Find the data that answers it.",
    "Give the answer and the evidence."
   ],
-  "tip": "The answer should link back to the question."
+  "tip": "The answer should link back to the question.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Favourite lunch?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Pizza",
+        "count": 8
+       },
+       {
+        "label": "Pasta",
+        "count": 5
+       },
+       {
+        "label": "Salad",
+        "count": 3
+       }
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Pizza, with 8 votes",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Plan an investigation: question, data type and recording.",
@@ -209,7 +695,46 @@
    "Decide if the data is categorical or numerical.",
    "Plan a table to record it."
   ],
-  "tip": "Decide how you will record before collecting."
+  "tip": "Decide how you will record before collecting.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Hours of screen time?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "0 h",
+       "1 h",
+       "2 h",
+       "3 h"
+      ],
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Numerical: record in a frequency table",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Represent the data, then read what it shows.",
@@ -219,7 +744,51 @@
    "Check each bar matches its frequency.",
    "Find the most common value."
   ],
-  "tip": "A graph should match the table exactly."
+  "tip": "A graph should match the table exactly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 3
+       },
+       {
+        "label": "2",
+        "count": 5
+       },
+       {
+        "label": "3",
+        "count": 4
+       },
+       {
+        "label": "4",
+        "count": 2
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Most common: 2 books",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Report your findings with evidence.",
@@ -229,6 +798,50 @@
    "Give the numbers that support it.",
    "Answer the investigation question."
   ],
-  "tip": "Include numbers in your report."
+  "tip": "Include numbers in your report.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Pop",
+        "count": 9
+       },
+       {
+        "label": "Rock",
+        "count": 5
+       },
+       {
+        "label": "Jazz",
+        "count": 4
+       },
+       {
+        "label": "Other",
+        "count": 2
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Most students like pop: 9 of 20",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

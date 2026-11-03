@@ -7,7 +7,77 @@
    "Test the same change on the next pair: 10 to 20.",
    "If it works every time, that is the rule: double."
   ],
-  "tip": "Check the rule works for every step, not just the first."
+  "tip": "Check the rule works for every step, not just the first.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 0,
+      "max": 80,
+      "tick": 5,
+      "labelEvery": 10,
+      "jumps": [
+       {
+        "from": 5,
+        "to": 10,
+        "text": "×2",
+        "step": 1
+       },
+       {
+        "from": 10,
+        "to": 20,
+        "text": "×2",
+        "step": 2
+       },
+       {
+        "from": 20,
+        "to": 40,
+        "text": "×2",
+        "step": 3
+       },
+       {
+        "from": 40,
+        "to": 80,
+        "text": "×2",
+        "step": 3
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "5",
+       "10",
+       "20",
+       "40",
+       "80"
+      ],
+      "arrows": true
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Double each term",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Doubling and halving rules make terms grow or shrink quickly.",
@@ -17,7 +87,50 @@
    "Double the term before the gap: 40 × 2 = 80.",
    "Check: 80 doubled is 160."
   ],
-  "tip": "To go backwards in a doubling sequence, halve."
+  "tip": "To go backwards in a doubling sequence, halve.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "10",
+       "20",
+       "40",
+       "?",
+       "160"
+      ],
+      "arrows": true,
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "40 × 2 = 80",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "80 (check: 80 × 2 = 160)",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Find the term that breaks the rule, then repair it.",
@@ -27,7 +140,55 @@
    "Test each step: 12 doubled is 24, not 25.",
    "Replace the broken term: 24."
   ],
-  "tip": "Use several steps to find the rule before judging one term."
+  "tip": "Use several steps to find the rule before judging one term.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "3",
+       "6",
+       "12",
+       "25",
+       "48"
+      ],
+      "arrows": true,
+      "marked": [
+       3
+      ],
+      "markStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "12 doubled is 24, not 25",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "25 should be 24",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Multiples come from adding the same number each time.",
@@ -37,7 +198,58 @@
    "Add 3 to the term before the gap: 9 + 3 = 12.",
    "Check: 12 + 3 = 15."
   ],
-  "tip": "Multiples of 3 are the 3 times table."
+  "tip": "Multiples of 3 are the 3 times table.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 0,
+      "max": 15,
+      "tick": 1,
+      "labelEvery": 3,
+      "jumps": [
+       {
+        "from": 3,
+        "to": 6,
+        "text": "+3"
+       },
+       {
+        "from": 6,
+        "to": 9,
+        "text": "+3"
+       },
+       {
+        "from": 9,
+        "to": 12,
+        "text": "+3",
+        "step": 2
+       },
+       {
+        "from": 12,
+        "to": 15,
+        "text": "+3",
+        "step": 3
+       }
+      ],
+      "marks": [
+       {
+        "value": 12,
+        "text": "12",
+        "tone": "answer",
+        "step": 2
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "A decision path sends numbers different ways depending on a test.",
@@ -47,7 +259,40 @@
    "Even numbers end in 0, 2, 4, 6 or 8.",
    "Follow the matching path and do its step."
   ],
-  "tip": "Only one path is followed for each number."
+  "tip": "Only one path is followed for each number.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "15",
+       "Even? No",
+       "Odd path"
+      ],
+      "arrows": true,
+      "marked": [
+       2
+      ],
+      "markStep": 3,
+      "focus": [
+       1,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Even numbers end in 0, 2, 4, 6 or 8",
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Follow a two-step algorithm in order.",
@@ -57,7 +302,49 @@
    "Do the second step on the new number: 16 + 6 = 22.",
    "The output is 22."
   ],
-  "tip": "The order matters: + 6 then × 2 gives 28, not 22."
+  "tip": "The order matters: + 6 then × 2 gives 28, not 22.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "machine",
+      "input": "8",
+      "rule": "× 2",
+      "output": "16",
+      "outputStep": 1,
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "machine",
+      "input": "16",
+      "rule": "+ 6",
+      "output": "22",
+      "outputStep": 2,
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Output: 22",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "A function machine does the same thing to every input.",
@@ -67,7 +354,37 @@
    "Apply it to the input: 6 + 5.",
    "The output is 11."
   ],
-  "tip": "Use the same rule for every input."
+  "tip": "Use the same rule for every input.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "machine",
+      "input": "6",
+      "rule": "+ 5",
+      "output": "11",
+      "outputStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "6 + 5 = 11",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Discover a rule by testing it on every input–output pair.",
@@ -77,7 +394,49 @@
    "Test on the next pair: 5 + 2 = 7, not 10; 5 × 2 = 10.",
    "× 2 works for every pair."
   ],
-  "tip": "A rule must work for all pairs, not just one."
+  "tip": "A rule must work for all pairs, not just one.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2 → 4",
+       "5 → 10",
+       "7 → 14"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "+ 2? 5 + 2 = 7, not 10 ✗",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "× 2 works every time",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Build a rule machine that gives the right outputs.",
@@ -87,7 +446,38 @@
    "Find the change that is always the same.",
    "Write it as the rule and test it."
   ],
-  "tip": "Test your rule on every input."
+  "tip": "Test your rule on every input.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 → 4",
+       "2 → 5",
+       "5 → 8"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Rule: + 3",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Addition and subtraction undo each other.",
@@ -97,7 +487,47 @@
    "Take one part away from the total.",
    "You get the other part back."
   ],
-  "tip": "Use the inverse to check an answer."
+  "tip": "Use the inverse to check an answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "58",
+      "parts": [
+       "42",
+       "16"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "42 + 16 = 58",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "58 − 16 = 42",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Multiplication facts give related division facts.",
@@ -107,7 +537,43 @@
    "The product, 28, is split back into equal groups.",
    "28 ÷ 4 = 7 and 28 ÷ 7 = 4."
   ],
-  "tip": "The same array shows both facts."
+  "tip": "The same array shows both facts.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 4,
+      "cols": 7,
+      "label": "4 rows of 7",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "7 × 4 = 28",
+       "28 ÷ 4 = 7",
+       "28 ÷ 7 = 4"
+      ],
+      "marked": [
+       1,
+       2
+      ],
+      "markStep": 3,
+      "focus": [
+       1,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Check a calculation by doing the inverse.",
@@ -117,7 +583,45 @@
    "Apply the inverse operation to your answer.",
    "If you get back to the start, the answer is right."
   ],
-  "tip": "Division is checked with multiplication."
+  "tip": "Division is checked with multiplication.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "18 ÷ 3 = 6?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "groups",
+      "groups": 3,
+      "each": 6,
+      "label": "3 groups of 6",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3 × 6 = 18 ✓",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "The equals sign means both sides have the same value.",
@@ -127,7 +631,43 @@
    "The other side must also make 15.",
    "4 + 11 = 15, so the missing number is 11."
   ],
-  "tip": "Equals means 'is the same as', not 'write the answer'."
+  "tip": "Equals means 'is the same as', not 'write the answer'.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "9 + 6 = 4 + ?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "15 = 4 + ?",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 11",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Decide if a number sentence is true by working out both sides.",
@@ -137,7 +677,52 @@
    "Work out the right side: 20.",
    "Equal values mean the sentence is true."
   ],
-  "tip": "Work out both sides before deciding."
+  "tip": "Work out both sides before deciding.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "12 + 8 = 15 + 5",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Left: 20",
+       "Right: 20"
+      ],
+      "marked": [
+       0,
+       1
+      ],
+      "markStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "20 = 20, true",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Make an equivalent sentence by moving amounts between parts.",
@@ -147,7 +732,43 @@
    "So the other part must be 12 more: 11 + 12 = 23.",
    "Both sides make 31."
   ],
-  "tip": "Whatever one part loses, the other must gain."
+  "tip": "Whatever one part loses, the other must gain.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "20 + 11 = 8 + ?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "20 is 12 more than 8, so ? is 12 more than 11",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 23. Both sides make 31",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Find a missing addend by subtracting the known part from the total.",
@@ -157,7 +778,39 @@
    "28 − 13 = 15.",
    "Check: 13 + 15 = 28."
   ],
-  "tip": "Use the inverse: take the known part away from the total."
+  "tip": "Use the inverse: take the known part away from the total.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "28",
+      "parts": [
+       "13",
+       "15"
+      ],
+      "unknown": 1,
+      "answer": "15",
+      "answerStep": 2,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Check: 13 + 15 = 28",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Find a missing factor using a division fact.",
@@ -167,7 +820,53 @@
    "Divide: 70 ÷ 10 = 7.",
    "Check: 10 × 7 = 70."
   ],
-  "tip": "Missing factor? Divide the product by the known factor."
+  "tip": "Missing factor? Divide the product by the known factor.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "70",
+      "parts": [
+       "10",
+       "10",
+       "10",
+       "10",
+       "10",
+       "10",
+       "10"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "70 ÷ 10 = 7, so □ = 7",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Check: 10 × 7 = 70",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Explain why a missing value is correct by checking it.",
@@ -177,7 +876,41 @@
    "Put it back into the sentence.",
    "If both sides match, it is proven."
   ],
-  "tip": "Substitution proves the answer."
+  "tip": "Substitution proves the answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "39",
+      "parts": [
+       "31",
+       "8"
+      ],
+      "unknown": 1,
+      "answer": "8",
+      "answerStep": 1,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "31 + 8 = 39 ✓",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "A known fact can build bigger facts with the same pattern.",
@@ -187,7 +920,36 @@
    "Adding 10 to a part adds 10 to the total.",
    "The ones digits stay the same each time."
   ],
-  "tip": "Look at what stays the same and what changes."
+  "tip": "Look at what stays the same and what changes.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "6 + 4 = 10",
+       "16 + 4 = 20",
+       "26 + 4 = 30"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "The ones digits stay the same",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Multiplication facts grow by the same amount each step.",
@@ -197,7 +959,52 @@
    "Each extra group adds one more 4.",
    "The products go up by 4 each time."
   ],
-  "tip": "The step size is the number being multiplied."
+  "tip": "The step size is the number being multiplied.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "4 × 3 = 12",
+       "4 × 4 = 16",
+       "4 × 5 = 20"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "line",
+      "min": 12,
+      "max": 20,
+      "tick": 1,
+      "labelEvery": 4,
+      "jumps": [
+       {
+        "from": 12,
+        "to": 16,
+        "text": "+4",
+        "step": 3
+       },
+       {
+        "from": 16,
+        "to": 20,
+        "text": "+4",
+        "step": 3
+       }
+      ],
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Use one fact to find the next by adding one group.",
@@ -207,7 +1014,50 @@
    "One more group of 5 makes 5 groups.",
    "20 + 5 = 25."
   ],
-  "tip": "Moving to the next fact adds one group."
+  "tip": "Moving to the next fact adds one group.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "groups",
+      "groups": 4,
+      "each": 5,
+      "label": "4 groups of 5 = 20",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "+",
+      "step": 2
+     },
+     {
+      "type": "groups",
+      "groups": 1,
+      "each": 5,
+      "label": "1 more group",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "20 + 5 = 25",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "Plan and test a pattern by recording each step.",
@@ -217,7 +1067,67 @@
    "Apply the rule and record each value.",
    "Check every step follows the rule."
   ],
-  "tip": "Record values in order so mistakes are easy to spot."
+  "tip": "Record values in order so mistakes are easy to spot.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 10,
+      "max": 30,
+      "tick": 1,
+      "labelEvery": 5,
+      "jumps": [
+       {
+        "from": 30,
+        "to": 25,
+        "text": "−5",
+        "step": 2
+       },
+       {
+        "from": 25,
+        "to": 20,
+        "text": "−5",
+        "step": 2
+       },
+       {
+        "from": 20,
+        "to": 15,
+        "text": "−5",
+        "step": 2
+       }
+      ],
+      "marks": [
+       {
+        "value": 30,
+        "text": "start"
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "30",
+       "25",
+       "20",
+       "15"
+      ],
+      "arrows": true,
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Compare two rules by running both for the same number of steps.",
@@ -227,7 +1137,59 @@
    "Run Rule B four times: 8, 16, 32, 64.",
    "Compare: Rule B is larger by 48."
   ],
-  "tip": "Multiplying usually overtakes adding."
+  "tip": "Multiplying usually overtakes adding.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "4",
+       "7",
+       "10",
+       "13",
+       "16"
+      ],
+      "arrows": true,
+      "label": "Rule A: + 3",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "4",
+       "8",
+       "16",
+       "32",
+       "64"
+      ],
+      "arrows": true,
+      "label": "Rule B: × 2",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "64 − 16 = 48",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Test a claim and fix it using evidence.",
@@ -237,6 +1199,42 @@
    "Find the value that makes the other side 22.",
    "Explain why it works."
   ],
-  "tip": "Give a reason, not just the answer."
+  "tip": "Give a reason, not just the answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "13 + 9 = 9 + ?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 13",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Order doesn't change a sum: both make 22",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }
