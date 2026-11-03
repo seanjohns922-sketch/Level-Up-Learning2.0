@@ -1533,6 +1533,7 @@ export function Year2LessonEngine({
             : "relative"}
       data-number-nexus-level={isModernNumber ? String(levelNumber) : undefined}
       data-lesson-realm={realmId ?? "number"}
+      data-pattern-level={realmId === "pattern" && levelNumber === 3 ? "3" : undefined}
       data-cave-level={isCave7 ? "7" : undefined}
     >
       {showLessonResume && (

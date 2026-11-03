@@ -124,3 +124,15 @@
   [data-statistica-level="3"] [data-statistica-plot] { zoom: 0.72; }
 }
 
+/* Level 3 Pattern: same activities, brighter look. Size and colour only. */
+[data-pattern-level="3"] { --l3p-edge: #ddd6fe; --l3p-gloss: radial-gradient(circle at 34% 28%, #fff 0 12%, #ffd27a 24%, #ff9e1f 70%, #d97706); }
+[data-pattern-level="3"] button.group.relative.w-full.rounded-2xl, [data-pattern-level="3"] button[data-quiz-option] { box-shadow: 0 0 0 1px var(--l3p-edge), 0 5px 0 var(--l3p-edge); }
+[data-pattern-level="3"] button.group.relative.w-full.rounded-2xl:not(:disabled):active { transform: translateY(3px); box-shadow: 0 0 0 1px var(--l3p-edge), 0 2px 0 var(--l3p-edge); }
+[data-pattern-level="3"] button.rounded-xl.bg-teal-600:not(:disabled) { box-shadow: 0 4px 0 #0b6d64; }
+[data-pattern-level="3"] input.rounded-xl { min-height: 56px; font-size: 1.25rem; }
+[data-pattern-level="3"] .h-5.w-5.rounded-full.bg-teal-600 { height: 1.6rem; width: 1.6rem; background: var(--l3p-gloss); box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2); }
+/* Sequences stay on one line, so the missing term sits in its place */
+[data-pattern-level="3"] [data-pattern-strip] { flex-wrap: nowrap; align-items: center; gap: 0.35rem; }
+[data-pattern-level="3"] [data-pattern-strip] .min-w-\[64px\] { min-width: 52px; padding: 0.6rem 0.7rem; }
+[data-pattern-level="3"] [data-pattern-strip] .text-\[10px\] { font-size: 8px; letter-spacing: 0.04em; }
+

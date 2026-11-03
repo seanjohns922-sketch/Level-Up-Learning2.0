@@ -310,7 +310,6 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
         decision: "Is the number even?",
         passLabel: "Yes: halve it",
         failLabel: "No: add 1",
-        activeBranch: even ? "pass" : "fail",
       });
       if (role === "reasoning") {
         return mcq(
@@ -385,7 +384,9 @@ function year3Question(week: number, lessonNumber: number, role: RotationRole): 
     const shown = lessonNumber === 3 ? [values[0]!, values[1]!, doubling ? values[2]! + 2 : values[2]! - 1, values[3]!] : values;
     const visual = sequenceVisual(lessonNumber === 3 ? "Find the broken step" : "Follow the pattern", [...shown, "?"], [rule, rule, rule, null]);
     if (role === "fast_thinking") {
-      return mcq("Which rule controls this sequence?", rule, [doubling ? "Add 2 each time" : "Subtract 2 each time", doubling ? "Halve each term" : "Double each term"], "Compare one term with the next, then test the same rule again.", visual);
+      // The arrows stay unlabelled here: the rule is the answer.
+      const unlabelled = sequenceVisual("Follow the pattern", [...shown, "?"], [null, null, null, null]);
+      return mcq("Which rule controls this sequence?", rule, [doubling ? "Add 2 each time" : "Subtract 2 each time", doubling ? "Halve each term" : "Double each term"], "Compare one term with the next, then test the same rule again.", unlabelled);
     }
     if (role === "reasoning") {
       if (lessonNumber === 3) {

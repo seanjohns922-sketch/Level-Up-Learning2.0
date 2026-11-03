@@ -20,7 +20,7 @@ export default function PatternSequenceStripVisual({
       <div className="text-xs font-black uppercase tracking-[0.18em] text-cyan-800">
         {visual.title}
       </div>
-      <div className="mt-4 flex flex-wrap items-start gap-2 md:gap-3">
+      <div data-pattern-strip className="mt-4 flex flex-wrap items-start gap-2 md:gap-3">
         {visual.terms.map((term, index) => (
           <div key={`${visual.title}-${term}-${index}`} className="flex items-start gap-2 md:gap-3">
             {term === "?" && onMissingTermChange ? (
