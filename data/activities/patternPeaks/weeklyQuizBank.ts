@@ -116,7 +116,7 @@ function sequenceQuestion(level: PatternQuizLevel, week: number, lesson: number,
       const knownFactor = [4, 6, 7, 9][(lesson + variant) % 4]!;
       const groups = 4 + (seed % 8);
       const product = knownFactor * groups;
-      if (week === 5) return typed("Use the related fact. What is the missing quotient?", groups, { type: "inverse_step_card", title: "Related facts", equation: `${knownFactor} × ${groups} = ${product}`, inverseOperation: `${product} ÷ ${knownFactor}` });
+      if (week === 5) return typed(`Use the related fact to work out ${product} ÷ ${knownFactor}.`, groups, { type: "inverse_step_card", title: "Related facts", equation: `${knownFactor} × ${groups} = ${product}`, inverseOperation: `${product} ÷ ${knownFactor}` });
       const base = week === 6 ? (knownFactor === 9 ? 10 : Math.max(5, knownFactor - 1)) : knownFactor;
       return typed("Use a known fact strategy to calculate the product.", product, { type: "expression_flow", title: "Derive a harder fact", cards: [{ tokens: [String(base), "×", String(groups)], result: String(base * groups) }, { tokens: [String(knownFactor), "×", String(groups)], result: "?", note: knownFactor > base ? `Add ${(knownFactor - base) * groups}` : "Scale the known fact" }] });
     }

@@ -914,7 +914,7 @@ function year4Question(
         return typed(
           `The grid shows ${factor} × ${n} = ${product}. What is ${factor} × ${n + 1}?`,
           product + factor,
-          `One more column adds another row of ${factor}: ${product} + ${factor}.`,
+          `One more column adds ${factor} more to ${product}.`,
           visual,
         );
       }
