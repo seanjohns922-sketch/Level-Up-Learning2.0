@@ -187,6 +187,8 @@ export default function MultipleChoiceActivity({
   const isCoreHunt = renderMode === "lesson" && (isNumber7Question || ("lessonId" in questionData && /^y7-(measurement|space|pattern|statistics|chance)-/.test(String(questionData.lessonId))));
   const isMeasurement = realmId === "measurement";
   const isPattern = realmId === "pattern";
+  // Money questions set a prefix such as "$" on their numeric options.
+  const optionPrefix = (questionData as { optionPrefix?: string }).optionPrefix ?? "";
   const isSpace = realmId === "space";
   const ratioVisual=number7RatioVisual(questionData as MultipleChoiceQuestion & {lessonId?:string});
   const answerSpec=level7Answer(questionData as MultipleChoiceQuestion & {lessonId?:string});
@@ -531,7 +533,7 @@ export default function MultipleChoiceActivity({
               ].join(" ")}
             >
               <span className="absolute right-3 top-3 z-10">
-                <OptionReadAloudButton text={option} />
+                <OptionReadAloudButton text={`${optionPrefix}${option}`} />
               </span>
               {/* Left accent bar */}
               <span
@@ -554,7 +556,7 @@ export default function MultipleChoiceActivity({
               />
               {isCoreHunt && <span data-core-answer-letter aria-hidden="true">{String.fromCharCode(65 + index)}</span>}
               <div className="pr-10">
-                <MathFormattedText text={option} fractionSize="md" />
+                <MathFormattedText text={`${optionPrefix}${option}`} fractionSize="md" />
               </div>
             </button>
           );

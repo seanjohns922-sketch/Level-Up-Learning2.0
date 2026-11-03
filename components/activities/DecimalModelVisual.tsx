@@ -70,10 +70,8 @@ export default function DecimalModelVisual({
               })}
             </div>
           </div>
-          <div className="mt-3 text-sm font-medium text-teal-800">
-            {fullTenthsColumns} tenths and {extraHundredths} hundredths
-          </div>
-          <div className="mt-1 text-xs text-teal-700">
+          {/* No count caption: reading the model is the question, so it must not be answered here. */}
+          <div className="mt-3 text-xs text-teal-700">
             Each full column shows 1 tenth. Each small square shows 1 hundredth.
           </div>
         </div>

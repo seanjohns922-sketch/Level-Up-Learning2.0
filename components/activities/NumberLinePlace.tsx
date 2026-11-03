@@ -339,10 +339,13 @@ export default function NumberLinePlace({
                 </div>
               ) : null}
             </div>
-            <div className="mt-2 flex justify-between text-sm font-bold text-slate-700">
-              <span>0</span>
-              <span>{maxWhole}</span>
-            </div>
+            {renderMode === "lesson" ? null : (
+              // Lessons already label 0 and the whole on the line itself.
+              <div className="mt-2 flex justify-between text-sm font-bold text-slate-700">
+                <span>0</span>
+                <span>{maxWhole}</span>
+              </div>
+            )}
             {renderMode === "lesson" && animatedFraction && animatedFraction !== "0" ? (
               <div className="mt-3 text-sm font-bold text-emerald-700">
                 Jumped to <FractionText value={animatedFraction} compact />

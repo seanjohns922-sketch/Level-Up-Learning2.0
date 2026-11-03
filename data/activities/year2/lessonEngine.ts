@@ -5646,7 +5646,8 @@ function buildYear4Week8ShopQuestion(config: GenericConfig): MixedWordProblemQue
       const item = board.items[2];
       const quantity = 5;
       const total = item.price * quantity;
-      const payment = total;
+      // The money shown must not equal the total, or the picture gives the answer away.
+      const payment = Math.floor(total / 10) * 10 + 10;
       return {
         prompt: `Use the ${board.title}. A student buys ${formatWeek8ItemLabel(item, quantity)}. What is the total cost?`,
         answer: total,
@@ -13834,7 +13835,7 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: chosen.prompt,
-          options: chosen.options ?? ["Yes", "No", "Maybe", "Not sure"],
+          options: chosen.options ?? ["Yes", "No"],
           answer: chosen.answer,
           helper: chosen.helper ?? "Check whether the decimal places and size make sense.",
           visual: "visual" in chosen ? chosen.visual : undefined,
@@ -25097,7 +25098,7 @@ function generateGenericQuestion(
       ? {
           kind: "multiple_choice",
           prompt: chosen.prompt,
-          options: ["Yes", "No", "Maybe", "Not sure"],
+          options: ["Yes", "No"],
           answer: chosen.answer,
           helper: "Estimate mentally first, then decide whether the result fits.",
         }
@@ -25359,17 +25360,18 @@ function generateGenericQuestion(
   if (explicitMode === "powers_of_ten_compare") {
     const base = randInt(2, 90);
     const leftFactor = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 10;
-    const rightFactor = ([10, 100, 1000] as const)[randInt(0, 2)] ?? 100;
+    // Two different factors, so the two sides are never the same calculation.
+    const rightFactor = ([10, 100, 1000] as const).filter((factor) => factor !== leftFactor)[randInt(0, 1)] ?? 100;
     const divide = randInt(0, 1) === 0;
     const dividendBase = base * 1000;
     const leftValue = divide ? dividendBase : base;
     const rightValue = divide ? dividendBase : base;
     const leftPrompt = divide
-      ? `${formatMathNumber(leftValue)} ÷ ${leftFactor}`
-      : `${formatMathNumber(base)} × ${leftFactor}`;
+      ? `${formatMathNumber(leftValue)} ÷ ${formatMathNumber(leftFactor)}`
+      : `${formatMathNumber(base)} × ${formatMathNumber(leftFactor)}`;
     const rightPrompt = divide
-      ? `${formatMathNumber(rightValue)} ÷ ${rightFactor}`
-      : `${formatMathNumber(base)} × ${rightFactor}`;
+      ? `${formatMathNumber(rightValue)} ÷ ${formatMathNumber(rightFactor)}`
+      : `${formatMathNumber(base)} × ${formatMathNumber(rightFactor)}`;
     const leftAnswer = divide ? leftValue / leftFactor : base * leftFactor;
     const rightAnswer = divide ? rightValue / rightFactor : base * rightFactor;
     const answer = leftAnswer > rightAnswer ? leftPrompt : rightAnswer > leftAnswer ? rightPrompt : "They are equal";
@@ -26267,7 +26269,7 @@ function generateGenericQuestion(
     return asMultipleChoice
       ? {
           kind: "multiple_choice",
-          prompt: `Is ${value} odd or even?`,
+          prompt: `Is ${formatMathNumber(value)} odd or even?`,
           options: ["odd", "even"],
           answer,
         }
@@ -26474,6 +26476,7 @@ function generateGenericQuestion(
           answer: String(sourceQuestion.answer),
           helper: sourceQuestion.showStrategyClue === false ? sourceQuestion.helper : undefined,
           visual: sourceQuestion.visual,
+          ...(sourceQuestion.optionPrefix ? { optionPrefix: sourceQuestion.optionPrefix } : {}),
         }
       : {
           kind: "typed_response",
