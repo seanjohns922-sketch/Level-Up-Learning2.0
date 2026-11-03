@@ -11,7 +11,7 @@ export function NewLookScope({ level, realm, children }: { level: number; realm:
   if (level === 3 && realm === "chance") return <div data-chance-level="3">{children}</div>;
   if (level === 3 && realm === "pattern") return <div data-pattern-level="3">{children}</div>;
   if (level === 3 && (realm === "space" || realm === "measurement")) return <div data-l3-look={realm === "space" ? "space-quiz" : realm}>{children}</div>;
-  if (level === 3 && realm === "statistics") return <Level1LookContext.Provider value><div data-level1-look="statistics" data-statistica-level="3">{children}</div></Level1LookContext.Provider>;
+  if ((level === 3 || level === 4) && realm === "statistics") return <Level1LookContext.Provider value><div data-level1-look="statistics" data-statistica-level={String(level)}>{children}</div></Level1LookContext.Provider>;
   if (level !== 1 && level !== 2) return <>{children}</>;
   const look = realm === "measurement" ? "measurement" : realm === "space" ? "space" : realm === "statistics" ? "statistics" : "number";
   return (

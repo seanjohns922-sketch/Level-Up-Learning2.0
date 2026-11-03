@@ -166,7 +166,7 @@ function yearThreeTask(week: number, lesson: number, variant: number): PracticeT
     return {
       kind: "statisticaTable",
       mode: lesson === 2 ? "count" : "select",
-      prompt: `${title}: read the ${context} frequency table, case ${variant + 1}.`,
+      prompt: `${title}: read the ${context} frequency table.`,
       speakText: `Use the row labels and frequencies together.`,
       target: largest.count,
       rows,
@@ -199,7 +199,7 @@ function yearFourTask(week: number, lesson: number, variant: number): PracticeTa
     return {
       kind: "statisticaPictograph",
       mode,
-      prompt: `${title}: ${mode === "build" ? "build the pictograph from the frequencies" : `use the key to find the frequency for ${largest.label}`}, ${context} case ${variant + 1}.`,
+      prompt: `${title}: ${mode === "build" ? "build the pictograph from the frequencies" : `use the key to find the frequency for ${largest.label}`}, ${context} data.`,
       speakText: `One symbol represents ${step} responses. Use the key before answering.`,
       target: largest.count,
       keyUnits: step,
@@ -215,7 +215,7 @@ function yearFourTask(week: number, lesson: number, variant: number): PracticeTa
     return {
       kind: "statisticaGraph",
       mode: lesson === 2 ? "build" : "read",
-      prompt: `${title}: analyse the scaled column graph for ${context}, case ${variant + 1}.`,
+      prompt: `${title}: analyse the scaled column graph for ${context}.`,
       speakText: `The vertical scale counts in fives.`,
       target: largest.count,
       display: "columns",
@@ -230,7 +230,7 @@ function yearFourTask(week: number, lesson: number, variant: number): PracticeTa
   return {
     kind: "statisticaShape",
     mode: week === 5 ? "variation" : "compare",
-    prompt: `${title}: compare the shape and variation of ${context}, case ${variant + 1}.`,
+    prompt: `${title}: compare the shape and variation of ${context}.`,
     speakText: `Look across the whole distribution, not only the tallest column.`,
     target: 1,
     display: "columns",
@@ -268,7 +268,7 @@ function yearFiveTask(week: number, lesson: number, variant: number): PracticeTa
     return {
       kind: "statisticaShape",
       mode: lesson === 3 ? "concentrated" : "compare",
-      prompt: `${title}: identify the mode and describe the ${context} distribution, case ${variant + 1}.`,
+      prompt: `${title}: identify the mode and describe the ${context} distribution.`,
       speakText: `Find the most frequent value, then inspect the distribution as a whole.`,
       target: largest.count,
       display: "columns",
@@ -324,7 +324,7 @@ function yearSixTask(week: number, lesson: number, variant: number): PracticeTas
     const continuous = (variant + lesson) % 2 === 0;
     return {
       kind: "statisticaClassify",
-      prompt: `${title}: decide how to collect and compare ${context}, case ${variant + 1}.`,
+      prompt: `${title}: decide how to collect and compare ${context}.`,
       speakText: `Distinguish measurements from counts and check that the comparison is fair.`,
       target: 1,
       variable: continuous ? `Time spent on ${context}` : `Number of ${context} events`,
@@ -343,7 +343,7 @@ function yearSixTask(week: number, lesson: number, variant: number): PracticeTas
     return {
       kind: "statisticaShape",
       mode: week === 2 ? "variation" : "compare",
-      prompt: `${title}: compare both ${context} distributions, case ${variant + 1}.`,
+      prompt: `${title}: compare both ${context} distributions.`,
       speakText: `Use mode, range and shape together before selecting a conclusion.`,
       target: 1,
       display: "columns",
@@ -362,7 +362,7 @@ function yearSixTask(week: number, lesson: number, variant: number): PracticeTas
   return {
     kind: "statisticaMediaAnalysis",
     mode: week === 4 ? (lesson === 1 ? "method" : lesson === 2 ? "conclusion" : "defend") : lesson === 1 ? "distortion" : lesson === 2 ? "quantify" : "repair",
-    prompt: `${title}: evaluate the ${context} report, case ${variant + 1}.`,
+    prompt: `${title}: evaluate the ${context} report.`,
     speakText: `Compare the claim, collection method, exact values and visual scale.`,
     target: 1,
     claim: `The current result is unbelievably better than before.`,

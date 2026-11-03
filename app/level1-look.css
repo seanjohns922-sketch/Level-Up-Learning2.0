@@ -113,15 +113,15 @@
 }
 
 /* Level 3 Statistics: Level 1's bright graphs, plus fixes for the Level 3 cards */
-[data-statistica-level="3"] .text-white\/85 { color: #17331f; font-size: 1.1rem; }
-[data-statistica-level="3"] [data-statistica-plot] [class*="overflow-wrap"] { overflow-wrap: normal; white-space: nowrap; font-size: 0.82rem; }
-[data-statistica-level="3"] [data-statistica-plot] .text-amber-300 { color: #b45309; font-size: 0.8rem; }
-[data-statistica-level="3"] [data-statistica-plot] .text-emerald-300 { color: #15803d; font-size: 0.8rem; }
-[data-statistica-level="3"] button.h-7.w-7, [data-statistica-level="3"] button.h-7.w-10 { height: 2.5rem; width: 2.2rem; border: 2px solid #c7e2b4; border-radius: 10px; background: #fff; color: #17331f; box-shadow: 0 3px 0 #c7e2b4; }
-[data-statistica-level="3"] button.h-7.w-10 { background: #f2bc45; border-color: #d99e1f; box-shadow: 0 3px 0 #b5851a; }
+[data-statistica-level="3"] .text-white\/85, [data-statistica-level="4"] .text-white\/85 { color: #17331f; font-size: 1.1rem; }
+[data-statistica-level="3"] [data-statistica-plot] [class*="overflow-wrap"], [data-statistica-level="4"] [data-statistica-plot] [class*="overflow-wrap"] { overflow-wrap: normal; white-space: nowrap; font-size: 0.82rem; }
+[data-statistica-level="3"] [data-statistica-plot] .text-amber-300, [data-statistica-level="4"] [data-statistica-plot] .text-amber-300 { color: #b45309; font-size: 0.8rem; }
+[data-statistica-level="3"] [data-statistica-plot] .text-emerald-300, [data-statistica-level="4"] [data-statistica-plot] .text-emerald-300 { color: #15803d; font-size: 0.8rem; }
+[data-statistica-level="3"] button.h-7.w-7, [data-statistica-level="3"] button.h-7.w-10, [data-statistica-level="4"] button.h-7.w-7, [data-statistica-level="4"] button.h-7.w-10 { height: 2.5rem; width: 2.2rem; border: 2px solid #c7e2b4; border-radius: 10px; background: #fff; color: #17331f; box-shadow: 0 3px 0 #c7e2b4; }
+[data-statistica-level="3"] button.h-7.w-10, [data-statistica-level="4"] button.h-7.w-10 { background: #f2bc45; border-color: #d99e1f; box-shadow: 0 3px 0 #b5851a; }
 /* Keep the answers on screen on short displays such as iPad landscape. Zoom scales the whole graph, so its scale stays true. */
 @media (max-height: 900px) {
-  [data-statistica-level="3"] [data-statistica-plot] { zoom: 0.72; }
+  [data-statistica-level="3"] [data-statistica-plot], [data-statistica-level="4"] [data-statistica-plot] { zoom: 0.72; }
 }
 
 /* Level 3 Pattern: same activities, brighter look. Size and colour only. */
@@ -144,4 +144,12 @@
 /* Order cards: bigger picture and label */
 [data-l3-look="measurement"] button.rounded-\[20px\] > span:first-child { font-size: 2.4rem; line-height: 1; }
 [data-l3-look="measurement"] button.rounded-\[20px\] > span:last-child { font-size: 0.95rem; }
+
+/* Level 3 and 4 Statistics: pictograph build rows and paired-graph labels on the light panels */
+:is([data-statistica-level="3"], [data-statistica-level="4"]) .bg-black\/15 { background: #f1f6ee; }
+:is([data-statistica-level="3"], [data-statistica-level="4"]) .text-amber-300 { color: #b45309; }
+:is([data-statistica-level="3"], [data-statistica-level="4"]) .text-emerald-300 { color: #15803d; }
+:is([data-statistica-level="3"], [data-statistica-level="4"]) button.h-8.w-8 { height: 2.5rem; width: 2.2rem; border: 2px solid #c7e2b4; background: #fff; color: #17331f; box-shadow: 0 3px 0 #c7e2b4; }
+:is([data-statistica-level="3"], [data-statistica-level="4"]) button.h-8.w-10 { height: 2.5rem; width: 2.5rem; border: 2px solid #d99e1f; background: #f2bc45; color: #17331f; box-shadow: 0 3px 0 #b5851a; }
+:is([data-statistica-level="3"], [data-statistica-level="4"]) figcaption.text-\[\#f2bc45\]\/75, :is([data-statistica-level="3"], [data-statistica-level="4"]) .text-\[\#f2bc45\]\/70 { color: #17331f; font-size: 0.85rem; }
 
