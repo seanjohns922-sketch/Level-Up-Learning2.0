@@ -42,14 +42,14 @@ function buildChooseUnit(memory: LessonMemory): CapTask {
   const correct = o.unit === "L" ? "Litres (L)" : "Millilitres (mL)";
   return {
     kind: "capacity", scene: "chooseUnit",
-    prompt: `Would you measure a ${o.label} in millilitres or litres?`,
-    speakText: `Would you measure a ${o.label} in millilitres or litres?`,
+    prompt: `Would you measure ${withArticle(o.label)} in millilitres or litres?`,
+    speakText: `Would you measure ${withArticle(o.label)} in millilitres or litres?`,
     badgeLabel: "Which Unit?",
     object: { label: o.label, emoji: o.emoji },
     options: ["Millilitres (mL)", "Litres (L)"],
     correctOption: correct,
     feedback: {
-      correct: o.unit === "L" ? `Yes — a ${o.label} holds a lot, so use litres.` : `Yes — a ${o.label} holds a little, so use millilitres.`,
+      correct: o.unit === "L" ? `Yes — ${withArticle(o.label)} holds a lot, so use litres.` : `Yes — ${withArticle(o.label)} holds a little, so use millilitres.`,
       wrong: o.unit === "L" ? `A ${o.label} holds a lot — litres is the sensible unit.` : `A ${o.label} holds a little — millilitres is the sensible unit.`,
     },
   };
@@ -77,13 +77,13 @@ function buildSpotMistake(memory: LessonMemory): CapTask {
     return {
       kind: "capacity", scene: "spotMistake",
       prompt: "Does that make sense?",
-      speakText: `Professor Gauge says a ${o.label} holds about ${o.capacity} ${o.unit}. Does that make sense?`,
+      speakText: `Professor Gauge says ${withArticle(o.label)} holds about ${o.capacity} ${o.unit}. Does that make sense?`,
       badgeLabel: "Does That Make Sense?",
       object: { label: o.label, emoji: o.emoji },
       statement: `A ${o.label} holds about ${o.capacity} ${o.unit}.`,
       options: ["Yes, that makes sense", "No, that's not sensible"],
       correctOption: "Yes, that makes sense",
-      feedback: { correct: `Right — a ${o.label} holds about ${o.capacity} ${o.unit}.`, wrong: `That one is fine — a ${o.label} really holds about ${o.capacity} ${o.unit}.` },
+      feedback: { correct: `Right — ${withArticle(o.label)} holds about ${o.capacity} ${o.unit}.`, wrong: `That one is fine — ${withArticle(o.label)} really holds about ${o.capacity} ${o.unit}.` },
     };
   }
   // silly claim: swap to the wrong unit + an odd value
@@ -92,13 +92,13 @@ function buildSpotMistake(memory: LessonMemory): CapTask {
   return {
     kind: "capacity", scene: "spotMistake",
     prompt: "Does that make sense?",
-    speakText: `Professor Gauge says a ${o.label} holds ${sillyVal} ${wrongUnit}. Does that make sense?`,
+    speakText: `Professor Gauge says ${withArticle(o.label)} holds ${sillyVal} ${wrongUnit}. Does that make sense?`,
     badgeLabel: "Does That Make Sense?",
     object: { label: o.label, emoji: o.emoji },
     statement: `A ${o.label} holds ${sillyVal} ${wrongUnit}.`,
     options: ["No, that's not sensible", "Yes, that makes sense"],
     correctOption: "No, that's not sensible",
-    feedback: { correct: `Yes — ${withArticle(o.label)} should be measured in ${o.unit}, about ${o.capacity} ${o.unit}.`, wrong: `Look again — ${sillyVal} ${wrongUnit} is silly for a ${o.label}. It holds about ${o.capacity} ${o.unit}.` },
+    feedback: { correct: `Yes — ${withArticle(o.label)} should be measured in ${o.unit}, about ${o.capacity} ${o.unit}.`, wrong: `Look again — ${sillyVal} ${wrongUnit} is silly for ${withArticle(o.label)}. It holds about ${o.capacity} ${o.unit}.` },
   };
 }
 

@@ -104,14 +104,14 @@ function buildWhichUnitTask(memory: LessonMemory): UnitTask {
   return {
     kind: "unitChoice",
     scene: "whichUnit",
-    prompt: `Should we measure a ${object.label} in centimetres or metres?`,
-    speakText: `Should we measure a ${object.label} in centimetres or metres? Think about how long it is.`,
+    prompt: `Should we measure ${withArticle(object.label)} in centimetres or metres?`,
+    speakText: `Should we measure ${withArticle(object.label)} in centimetres or metres? Think about how long it is.`,
     badgeLabel: "Which Unit?",
     object: { label: object.label, icon: object.icon },
     options: ["Centimetres", "Metres"],
     correctOption: correct,
     feedback: {
-      correct: object.unit === "m" ? `Yes — a ${object.label} is long, so use metres.` : `Yes — a ${object.label} is small, so use centimetres.`,
+      correct: object.unit === "m" ? `Yes — ${withArticle(object.label)} is long, so use metres.` : `Yes — ${withArticle(object.label)} is small, so use centimetres.`,
       wrong: object.unit === "m" ? `A ${object.label} is long — metres is the sensible unit.` : `A ${object.label} is small — centimetres is the sensible unit.`,
     },
   };
@@ -149,7 +149,7 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
       kind: "unitChoice",
       scene: "spotMistake",
       prompt: "Is Professor Gauge's measurement sensible?",
-      speakText: `Professor Gauge says a ${object.label} is ${size} ${rightWord} ${verb}. Is that sensible?`,
+      speakText: `Professor Gauge says ${withArticle(object.label)} is ${size} ${rightWord} ${verb}. Is that sensible?`,
       badgeLabel: "Professor Gauge's Mistake",
       object: { label: object.label, icon: object.icon },
       statement: `The ${object.label} is ${size} ${rightWord} ${verb}.`,
@@ -157,7 +157,7 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
       correctOption: "Yes, that makes sense",
       feedback: {
         correct: `Right — ${rightWord} is the sensible unit for ${withArticle(object.label)}.`,
-        wrong: `That one is fine — a ${object.label} really is measured in ${rightWord}.`,
+        wrong: `That one is fine — ${withArticle(object.label)} really is measured in ${rightWord}.`,
       },
     };
   }
@@ -168,14 +168,14 @@ function buildSpotMistakeTask(memory: LessonMemory): UnitTask {
     kind: "unitChoice",
     scene: "spotMistake",
     prompt: "Is Professor Gauge's measurement sensible?",
-    speakText: `Professor Gauge says a ${object.label} is ${size} ${wrongWord} ${verb}. Is that sensible?`,
+    speakText: `Professor Gauge says ${withArticle(object.label)} is ${size} ${wrongWord} ${verb}. Is that sensible?`,
     badgeLabel: "Professor Gauge's Mistake",
     object: { label: object.label, icon: object.icon },
     statement: `The ${object.label} is ${size} ${wrongWord} ${verb}.`,
     options: [`No — use ${rightWord}`, "Yes, that makes sense"],
     correctOption: `No — use ${rightWord}`,
     feedback: {
-      correct: `Yes — a ${object.label} should be measured in ${rightWord}, not ${wrongWord}.`,
+      correct: `Yes — ${withArticle(object.label)} should be measured in ${rightWord}, not ${wrongWord}.`,
       wrong: `Look again — ${size} ${wrongWord} is silly for ${withArticle(object.label)}. Use ${rightWord}.`,
     },
   };

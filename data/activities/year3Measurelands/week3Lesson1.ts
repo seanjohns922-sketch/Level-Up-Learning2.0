@@ -87,13 +87,13 @@ function buildChooseUnitTask(memory: LessonMemory): MassUnitTask {
     kind: "massUnit",
     scene: "chooseUnit",
     prompt: `Would you use g or kg for ${withArticle(object.label)}?`,
-    speakText: `Would you measure a ${object.label} in grams or kilograms?`,
+    speakText: `Would you measure ${withArticle(object.label)} in grams or kilograms?`,
     badgeLabel: "Which Unit?",
     object: taskObject(object),
     options: ["Grams (g)", "Kilograms (kg)"],
     correctOption: unitOption(object.unit),
     feedback: {
-      correct: `Yes — ${unitOption(object.unit).toLowerCase()} suits a ${object.label}.`,
+      correct: `Yes — ${unitOption(object.unit).toLowerCase()} suits ${withArticle(object.label)}.`,
       wrong:
         object.unit === "kg"
           ? `A ${object.label} is heavier, so kilograms is more sensible.`
@@ -145,7 +145,7 @@ function buildMistakeTask(memory: LessonMemory, forceCorrectStatement = false): 
     feedback: {
       correct: statementIsCorrect
         ? `Yes — ${shownMass} is sensible for ${withArticle(object.label)}.`
-        : `Correct — a ${object.label} should use ${unitOption(object.unit).toLowerCase()}.`,
+        : `Correct — ${withArticle(object.label)} should use ${unitOption(object.unit).toLowerCase()}.`,
       wrong: statementIsCorrect
         ? `${shownMass} is sensible for ${withArticle(object.label)}.`
         : `${shownMass} is not sensible for ${withArticle(object.label)}. Choose ${unitOption(object.unit).toLowerCase()}.`,
