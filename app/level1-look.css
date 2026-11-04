@@ -158,3 +158,8 @@
 [data-l3-look="space"] .text-\[9px\].text-amber-200 { font-size: 12px; }
 [data-l3-look="space"] .text-\[7px\].text-cyan-200 { font-size: 10px; }
 
+/* Level 5 Statistics: line graph titles and scales readable on the light panel */
+[data-statistica-level="5"] .text-\[\#f2bc45\]\/70 { color: #17331f; font-size: 0.75rem; }
+[data-statistica-level="5"] .from-\[\#1c3226\] svg text { fill: #17331f; font-weight: 700; }
+[data-statistica-level="5"] .from-\[\#1c3226\] svg rect[fill="#101d15"] { fill: #ffffff; }
+

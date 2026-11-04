@@ -535,7 +535,7 @@ export function lineReadTask(round: number, target: number): PracticeTask {
   const step = ctx.unit === "°C" ? 2 : 5;
   return lineTask("read", ctx, points, {
     target,
-    prompt: `${ctx.y}: what was the ${ctx.y.toLowerCase()} at ${p.label}?`,
+    prompt: `${ctx.y}: what was the reading at ${p.label}?`,
     speakText: `Find ${p.label} on the bottom, go up to the line, then across to the scale.`,
     options: lineNumOptions(p.value, round, step),
     correctOptionIds: [`n${p.value}`],
@@ -569,7 +569,7 @@ export function lineInferTask(round: number, target: number): PracticeTask {
   const ans = points[idx]!;
   return lineTask("infer", ctx, points, {
     target,
-    prompt: `${ctx.y}: when was the ${ctx.y.toLowerCase()} ${askHigh ? "HIGHEST" : "LOWEST"}?`,
+    prompt: `${ctx.y}: when was the reading ${askHigh ? "HIGHEST" : "LOWEST"}?`,
     speakText: askHigh ? "Find the highest point on the line, then read the time below it." : "Find the lowest point on the line, then read the time below it.",
     options: order(points.map((p) => ({ id: p.label, label: p.label })), round),
     correctOptionIds: [ans.label],
