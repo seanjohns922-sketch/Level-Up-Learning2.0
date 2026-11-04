@@ -162,4 +162,6 @@
 [data-statistica-level="5"] .text-\[\#f2bc45\]\/70, [data-statistica-level="6"] .text-\[\#f2bc45\]\/70 { color: #17331f; font-size: 0.75rem; }
 [data-statistica-level="5"] .from-\[\#1c3226\] svg text, [data-statistica-level="6"] .from-\[\#1c3226\] svg text { fill: #17331f; font-weight: 700; }
 [data-statistica-level="5"] .from-\[\#1c3226\] svg rect[fill="#101d15"], [data-statistica-level="6"] .from-\[\#1c3226\] svg rect[fill="#101d15"] { fill: #ffffff; }
+/* Level 6 Statistics: evidence-card labels were pale yellow on the light panel */
+[data-statistica-level="6"] dt.text-\[\#f2bc45\]\/75 { color: #3f6212; font-size: 0.7rem; }
 
