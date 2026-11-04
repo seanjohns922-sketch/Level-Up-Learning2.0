@@ -99,8 +99,8 @@ function figureCompare(round: number, targetNumber: number): CompositeTask {
     correctOptionId: correctFirst ? "a" : "b",
     reasonOptions: rotate([
       { id: "whole", label: `It keeps every part of the ${fig.name}.` },
-      { id: "colour", label: "It uses the brightest colours." },
-      { id: "big", label: "It is the bigger picture." },
+      { id: "colour", label: "It uses more colours." },
+      { id: "big", label: "It has more shapes than it needs." },
     ], round % 3),
     correctReasonId: "whole",
     feedback: { correct: `Right — a complete ${fig.name} keeps every part.`, wrong: `Look for the build with no glowing gap — it keeps every part.` },

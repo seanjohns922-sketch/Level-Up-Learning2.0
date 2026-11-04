@@ -153,3 +153,8 @@
 :is([data-statistica-level="3"], [data-statistica-level="4"]) button.h-8.w-10 { height: 2.5rem; width: 2.5rem; border: 2px solid #d99e1f; background: #f2bc45; color: #17331f; box-shadow: 0 3px 0 #b5851a; }
 :is([data-statistica-level="3"], [data-statistica-level="4"]) figcaption.text-\[\#f2bc45\]\/75, :is([data-statistica-level="3"], [data-statistica-level="4"]) .text-\[\#f2bc45\]\/70 { color: #17331f; font-size: 0.85rem; }
 
+/* Level 4 Space: grid-reference and route maps keep their grid; only their tiny labels grow */
+[data-l3-look="space"] .sm\:text-\[9px\] { font-size: 11px; }
+[data-l3-look="space"] .text-\[9px\].text-amber-200 { font-size: 12px; }
+[data-l3-look="space"] .text-\[7px\].text-cyan-200 { font-size: 10px; }
+
