@@ -191,7 +191,8 @@ export const REALM_REGISTRY = {
     activityCode: "CS",
     programSuffix: "chronoscape",
     strand: "Time & Temporal Reasoning",
-    status: "coming_soon",
+    status: "live",
+    // Games are live but must not enter curriculum placement/assessment selectors.
     isSelectable: false,
     totalWeeks: null,
     lessonsPerWeek: null,

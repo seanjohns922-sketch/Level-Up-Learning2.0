@@ -2,7 +2,8 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { CRYSTALS_TO_AWAKEN } from "@/lib/chronorok";
+import Image from "next/image";
+import { CHRONOROKS, CRYSTALS_TO_AWAKEN } from "@/lib/chronorok";
 import { dismissCrystalReveal, getCrystalReveal, subscribeCrystalReveal } from "@/lib/chrono-crystals";
 import { getRevealQueue, subscribeReveal } from "@/lib/gem-reveal";
 
@@ -43,6 +44,7 @@ export default function ChronoCrystalReveal() {
   }, [showing, big]);
 
   if (!showing) return null;
+  const awakened = showing.milestone === "awaken" ? CHRONOROKS.find(card => card.name === showing.chronorok) : null;
   const left = Math.max(0, CRYSTALS_TO_AWAKEN - showing.crystals);
   const headline =
     showing.milestone === "awaken" ? `${showing.chronorok} awakens!`
@@ -51,7 +53,7 @@ export default function ChronoCrystalReveal() {
     : showing.milestone === "quarter" ? `${showing.crystals} Chrono Crystals!`
     : "+1 Chrono Crystal";
   const line =
-    showing.milestone === "awaken" ? "Go to the Awakening Spire in Chronorok."
+    showing.milestone === "awaken" ? "Your Chronorok RELIQ card is ready to view."
     : showing.milestone === "open" ? "Your portal to the Chronorok games awaits in the Tower."
     : showing.milestone === "first" ? `You earn one every day you learn. Collect ${CRYSTALS_TO_AWAKEN} to awaken ${showing.chronorok}.`
     : `${left} more learning day${left === 1 ? "" : "s"} to awaken ${showing.chronorok}.`;
@@ -60,7 +62,7 @@ export default function ChronoCrystalReveal() {
     <div className={`chronoCrystal ${big ? "isBig" : ""}`} role="status" aria-live="polite" onClick={() => !big && dismissCrystalReveal()}>
       <div className="chronoCrystalCard">
         <div className="chronoCrystalGlow" />
-        <Crystal size={big ? 130 : 84} />
+        {awakened ? <Image src={awakened.images.cardFront} alt={`${awakened.name} RELIQ card`} width={180} height={252} className="relative mx-auto max-h-[35svh] w-auto object-contain" /> : <Crystal size={big ? 130 : 84} />}
         <p className="chronoCrystalKicker">CHRONO CRYSTALS · {showing.crystals} / {CRYSTALS_TO_AWAKEN}</p>
         <h2 className="chronoCrystalTitle">{headline}</h2>
         <div className="chronoCrystalBar"><i style={{ width: `${(showing.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></div>
@@ -68,7 +70,7 @@ export default function ChronoCrystalReveal() {
         {big ? (
           <div className="chronoCrystalActions">
             {showing.milestone === "open" || showing.milestone === "awaken" ? (
-              <button type="button" onClick={() => { dismissCrystalReveal(); router.push("/world/chronorok"); }}>GO TO CHRONOROK</button>
+              <button type="button" onClick={() => { dismissCrystalReveal(); router.push(awakened ? "/legends/chronorok" : "/world/chronorok"); }}>GO TO CHRONOROK</button>
             ) : null}
             <button type="button" className="isQuiet" onClick={() => dismissCrystalReveal()}>NICE!</button>
           </div>
@@ -78,7 +80,7 @@ export default function ChronoCrystalReveal() {
         .chronoCrystal{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;pointer-events:auto;background:rgba(10,6,20,.35);animation:ccFade .35s ease-out}
         .chronoCrystal:not(.isBig){background:transparent;pointer-events:none;align-items:end;padding-bottom:12vh}
         .chronoCrystal:not(.isBig) .chronoCrystalCard{pointer-events:auto;cursor:pointer}
-        .chronoCrystalCard{position:relative;width:min(400px,90vw);padding:22px 24px 20px;border-radius:26px;text-align:center;color:#fff;font-family:var(--font-sans);background:rgba(28,16,8,.88);border:1px solid rgba(255,214,120,.45);box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 60px rgba(255,180,60,.25);animation:ccPop .5s cubic-bezier(.2,1.4,.4,1)}
+        .chronoCrystalCard{position:relative;width:min(400px,90vw);max-height:94svh;overflow-y:auto;padding:22px 24px 20px;border-radius:26px;text-align:center;color:#fff;font-family:var(--font-sans);background:rgba(28,16,8,.88);border:1px solid rgba(255,214,120,.45);box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 60px rgba(255,180,60,.25);animation:ccPop .5s cubic-bezier(.2,1.4,.4,1)}
         .isBig .chronoCrystalCard{width:min(460px,92vw);padding:30px 28px 24px}
         .chronoCrystalGlow{position:absolute;left:50%;top:18px;width:200px;height:200px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,200,80,.55),rgba(255,160,40,0) 65%);pointer-events:none;animation:ccPulse 1.6s ease-in-out infinite}
         .chronoCrystalGem{position:relative;display:block;margin:0 auto;filter:drop-shadow(0 0 18px rgba(255,190,70,.8));animation:ccSpin 1.1s cubic-bezier(.2,1.2,.4,1)}

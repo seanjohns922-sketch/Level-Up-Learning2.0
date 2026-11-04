@@ -5,18 +5,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { ArrowLeft, Lock, Play, X } from "lucide-react";
-import { ChronorokWorldScene, CHRONOROK_BOUNDS, CHRONOROK_PORTALS, CHRONOROK_ROAM, CHRONOROK_SPAWN } from "@/components/world3d/ChronorokWorldScene";
+import { ChronorokWorldScene, CHRONOROK_BOUNDS, CHRONOROK_PORTALS, CHRONOROK_ROAM, CHRONOROK_SPAWN, CHRONOROK_SPIRE } from "@/components/world3d/ChronorokWorldScene";
 import { EMPTY_WORLD_LOOK_INPUT, EMPTY_WORLD_MOVE_INPUT, KeyboardWorldAction, SharedThirdPersonPlayer, WorldJoystick, WorldLookJoystick, type WorldLookInput, type WorldMoveInput } from "@/components/world3d/SharedWorldPlayer";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
-import { useDemoPreviewMode } from "@/lib/demo-mode";
-import { fetchStudentActivityDaily } from "@/lib/student-activity";
-import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokForGrade, chronorokProgress, gradeName } from "@/lib/chronorok";
+import { useChronorokProgress } from "@/lib/useChronorokProgress";
+import { CHRONOROK_VIDEOS } from "@/data/chronorok-artwork";
+import Image from "next/image";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, gradeName } from "@/lib/chronorok";
 
 /** Chronorok hub: Sean's painted Chronorok art turned into a 3D depth surface
  *  (near plaza, far cliffs and spire) with mist, drifting time sparks and four
- *  glowing portals. Each portal opens its painted close-up scene. The games
- *  behind the portals are still being built. */
+ *  glowing portals leading to the four games. */
 
 
 type PortalKey = "arena" | "rift" | "cave" | "rune";
@@ -28,12 +27,9 @@ const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: st
   rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp", href: "/world/chronorok/rune-blocks" },
 };
 
-export default function ChronorokHub({ teacherPreview = false }: { teacherPreview?: boolean }) {
+export default function ChronorokHub() {
   const router = useRouter();
-  const demo = useDemoPreviewMode();
-  const preview = teacherPreview || demo;
-  const [progress, setProgress] = useState<{ learningDays: number; open: boolean; crystals: number } | null>(null);
-  const [yearLevel, setYearLevel] = useState<string | null>(null);
+  const { preview, progress, grade: yearLevel, chronorok: next, loading, error, signedIn } = useChronorokProgress();
   const [portal, setPortal] = useState<PortalKey | null>(null);
   const [intro, setIntro] = useState(false);
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
@@ -42,22 +38,12 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
   const nearPortal = nearest && nearest in CHRONOROK_PORTALS ? (nearest as PortalKey) : null;
 
   useEffect(() => {
-    const profile = getActiveStudentProfile();
-    queueMicrotask(() => setYearLevel(preview ? "Year 3" : profile?.yearLevel ?? null));
-    if (preview) {
-      queueMicrotask(() => setProgress({ learningDays: 63, open: true, crystals: 63 }));
-      return;
-    }
-    if (!profile?.studentId) { router.replace("/login"); return; }
-    let cancelled = false;
-    void fetchStudentActivityDaily(profile.studentId)
-      .then((rows) => { if (!cancelled) setProgress(chronorokProgress(rows)); })
-      .catch(() => { if (!cancelled) setProgress({ learningDays: 0, open: false, crystals: 0 }); });
-    return () => { cancelled = true; };
-  }, [preview, router]);
+    if (!loading && !signedIn && !preview) router.replace("/login");
+  }, [loading, signedIn, preview, router]);
 
   // The arrival video plays once per visit session.
   useEffect(() => {
+    if (!CHRONOROK_VIDEOS.arrival) return;
     try {
       if (sessionStorage.getItem("lul:chronorok:intro") !== "1") {
         sessionStorage.setItem("lul:chronorok:intro", "1");
@@ -67,7 +53,7 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
   }, []);
 
   const back = () => router.push(preview ? "/world/tower?teacher_preview=1" : "/world/tower");
-  const next = chronorokForGrade(yearLevel);
+  const cards = () => router.push(preview ? "/legends/chronorok?teacher_preview=1" : "/legends/chronorok");
   const open = progress?.open ?? false;
   const active = portal ? PORTALS[portal] : null;
 
@@ -84,7 +70,7 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
           lookInput={active || !open ? EMPTY_WORLD_LOOK_INPUT : lookInput}
           bounds={CHRONOROK_BOUNDS}
           roamEllipse={CHRONOROK_ROAM}
-          interactionTargets={PORTAL_TARGETS}
+          interactionTargets={[...PORTAL_TARGETS, { id: "spire", position: CHRONOROK_SPIRE, distance: 10 }]}
           onNearestTargetId={setNearest}
           initialYaw={0}
           initialPitch={-0.12}
@@ -110,10 +96,16 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
               <span className="font-display text-2xl font-black text-[#ffd76a]">{progress.crystals}<span className="text-sm text-[#f6e7c8]"> / {CRYSTALS_TO_AWAKEN}</span></span>
             </div>
             <div className="my-2 h-2.5 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-gradient-to-r from-[#ffb347] to-[#ffe08a]" style={{ width: `${(progress.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></div>
+            <button type="button" onClick={cards} className="flex min-h-16 w-full items-center gap-3 text-left" aria-label={`View ${next.name} and the Chronorok cards`}>
+              <Image src={next.images.avatar} alt={next.name} width={64} height={64} className="h-16 w-16 shrink-0 object-contain" />
+              <span className="font-bold text-amber-100">{next.name} · View cards →</span>
+            </button>
             <p className="text-[13px] font-bold">One crystal for every day you learn. At {CRYSTALS_TO_AWAKEN}, <b className="text-[#ffd76a]">{next.name}</b> awakens.</p>
           </div>
         ) : null}
       </header>
+
+      {loading || error ? <div className="absolute inset-0 z-20 grid place-items-center"><p role="status" className="chronoGlass rounded-2xl p-6">{error ?? "Loading Chronorok…"}</p></div> : null}
 
       {progress && !open ? (
         <div className="absolute inset-0 z-20 grid place-items-center p-6">
@@ -136,12 +128,12 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
         <>
           <WorldJoystick input={moveInput} onChange={setMoveInput} />
           <WorldLookJoystick onChange={setLookInput} />
-          {nearPortal ? (
+          {nearest === "spire" ? <WorldInteractionPrompt location="AWAKENING SPIRE" status={`${next.name} · Chronorok RELIQS`} actionLabel="VIEW CARDS" onAction={cards} /> : nearPortal ? (
             <WorldInteractionPrompt location={PORTALS[nearPortal].place.toUpperCase()} status={PORTALS[nearPortal].game} actionLabel="ENTER" onAction={() => setPortal(nearPortal)} />
           ) : (
             <p className="chronoGlass pointer-events-none absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full px-5 py-3 text-center text-sm font-bold">Follow a glowing road to a portal</p>
           )}
-          <KeyboardWorldAction enabled={Boolean(nearPortal)} onAction={() => { if (nearPortal) setPortal(nearPortal); }} />
+          <KeyboardWorldAction enabled={Boolean(nearPortal) || nearest === "spire"} onAction={() => { if (nearest === "spire") cards(); else if (nearPortal) setPortal(nearPortal); }} />
         </>
       ) : null}
 
@@ -166,9 +158,9 @@ export default function ChronorokHub({ teacherPreview = false }: { teacherPrevie
         </div>
       ) : null}
 
-      {intro ? (
+      {intro && CHRONOROK_VIDEOS.arrival ? (
         <div className="absolute inset-0 z-40 bg-black">
-          <video src="/videos/realms/chronorok.mp4" autoPlay muted playsInline onEnded={() => setIntro(false)} className="h-full w-full object-cover" />
+          <video src={CHRONOROK_VIDEOS.arrival} autoPlay muted playsInline onEnded={() => setIntro(false)} onError={() => setIntro(false)} className="h-full w-full object-cover" />
           <div className="absolute inset-x-0 bottom-16 text-center">
             <p className="chronoTitle text-5xl sm:text-6xl">CHRONOROK</p>
             <p className="mt-1 font-display text-sm font-black tracking-[0.4em] text-[#fff4dc]">THE REALM OF TIME</p>

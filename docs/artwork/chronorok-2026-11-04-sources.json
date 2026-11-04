@@ -1,0 +1,140 @@
+[
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_00_Ground_Spark.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-spark-y0.png",
+    "sourceSha256": "f049089552d2a62064a653b5bd9117d8ebfe129ef4aea42de12814d92c0c843d",
+    "outputSha256": "f049089552d2a62064a653b5bd9117d8ebfe129ef4aea42de12814d92c0c843d"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_01_Level_1_Ember.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-ember-y1.png",
+    "sourceSha256": "1856fec1cd1c966571bfce188c3e319ed0177d33a9eedfbd1201487163ff4d0d",
+    "outputSha256": "1856fec1cd1c966571bfce188c3e319ed0177d33a9eedfbd1201487163ff4d0d"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_02_Level_2_Pulse.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-pulse-y2.png",
+    "sourceSha256": "e9efeee08b44fed94f8bc2949c0468796643c39016713a5fd10f470edd959f2d",
+    "outputSha256": "e9efeee08b44fed94f8bc2949c0468796643c39016713a5fd10f470edd959f2d"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_03_Level_3_Current.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-current-y3.png",
+    "sourceSha256": "eca1b3d7c94868103a4bab34725a4d20a5b131924d155e9cfbfc00ced81556cf",
+    "outputSha256": "eca1b3d7c94868103a4bab34725a4d20a5b131924d155e9cfbfc00ced81556cf"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_04_Level_4_Rift.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-rift-y4.png",
+    "sourceSha256": "20a7803f9a0298415424d583ec74e07e85573b3c1e46c848830a17ef2f46f85e",
+    "outputSha256": "20a7803f9a0298415424d583ec74e07e85573b3c1e46c848830a17ef2f46f85e"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_05_Level_5_Blaze.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-blaze-y5.png",
+    "sourceSha256": "72f735befb022ff4a733fdb180fd699ac023912365570e938b0edc7dab1d9004",
+    "outputSha256": "72f735befb022ff4a733fdb180fd699ac023912365570e938b0edc7dab1d9004"
+  },
+  {
+    "source": "Chronorok_Avatars.zip/Chronorok_Avatars/Chronorok_06_Level_6_Eternal.png",
+    "output": "guides/chronorok-2026-11-04-v1/chronorok-eternal-y6.png",
+    "sourceSha256": "2d27c01fb76e4b6e2e56c71159487153c4369bced04090f76a7630d5415939b0",
+    "outputSha256": "2d27c01fb76e4b6e2e56c71159487153c4369bced04090f76a7630d5415939b0"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_01_Ground_Spark_CMYK.pdf",
+    "sourceSha256": "91d842782b85dcf9e13d78e1f1809e69b479e7f139a264517437d324fc5ac876",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-spark-y0-front.webp",
+    "outputSha256": "6b4a06512cdbc0e26cb0a085e773b0399c21e45e9b3a3021b954028bbf669467"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_02_L1_Ember_CMYK.pdf",
+    "sourceSha256": "e6a694d25005d8b4a79ef30ce79d16733feb0d1282264c60173e4fd0e71aca10",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-ember-y1-front.webp",
+    "outputSha256": "ee7e8c99eb9cdf6339aa0c2d9d7133a089ee08c7756f6f187cdc6048fcf6d586"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_03_L2_Pulse_CMYK.pdf",
+    "sourceSha256": "6d0135f8a4eaf81201302137358be92b8d10debad676393cb53237b881af721d",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-pulse-y2-front.webp",
+    "outputSha256": "b8c001f8db1031545e49778f799b4ba1e8ba720dd20d69a0926201417a5300bf"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_04_L3_Current_CMYK.pdf",
+    "sourceSha256": "31a63a345e104db261b35d81e9f5b670fcbe85d470a77b106b58f75b8f40c361",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-current-y3-front.webp",
+    "outputSha256": "4bdf6ac33a1fecb1bf489531ff82bf5377e842a1d4db1e9cf4eb40149ecd3799"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_05_L4_Rift_CMYK.pdf",
+    "sourceSha256": "d03bb3abc505b51e4678f1c0da68ef521bd27d4e5d1da7b06d315012dc637fda",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-rift-y4-front.webp",
+    "outputSha256": "6e30b3422c359826bfffd8ad4ce87e97a9ed30132e610f63b476776774593730"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_06_L5_Blaze_CMYK.pdf",
+    "sourceSha256": "9ecfa5492e346a2919bec4ab17cfdac3dd4654dc2ee898ad9b4d9e49ea30e923",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-blaze-y5-front.webp",
+    "outputSha256": "04654edf301f06fe725ad2dd5ddab840869e06e9cd175c3e3550885afaf5d73c"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_07_L6_Eternal_CMYK.pdf",
+    "sourceSha256": "c75a9166f0c8221878b9922e3ed8c72ac5c2c1b17a0daa347aaead0f81f2d8c3",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/chronorok-eternal-y6-front.webp",
+    "outputSha256": "c54ecd6f082daa49f3f1a5241d689eb4d965fc8af411f6580b53c0c57ad86326"
+  },
+  {
+    "source": "RELIQ_Chronorok_Print_Pack 2/Chronorok/Chronorok_08_Shared_Amber_Q_Back_CMYK.pdf",
+    "sourceSha256": "dd605f20b5ae205085cd4f0f332bba7fab08e87cf09d0d93a4a5b5e8c36e94d3",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/chronorok-2026-11-04-v1/back.webp",
+    "outputSha256": "818c2c88578faac515decd6987685ca235eceeca0878b80b75001a74deefeead"
+  }
+]

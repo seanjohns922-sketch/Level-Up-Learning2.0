@@ -42,7 +42,7 @@ const ALL_REALMS = [
   { id: "measurelands", name: "Measurelands", symbol: "◈", description: "Length, mass, capacity & more", color: "rgb(96,165,250)", colorDim: "rgba(96,165,250,0.2)" },
   { id: "statistica", name: "Statistica", symbol: "▣", description: "Data, graphs & interpretation", color: "rgb(240,107,100)", colorDim: "rgba(240,107,100,0.22)" },
   { id: "chance-hollow", name: "Chance Hollow", symbol: "◉", description: "Probability & chance", color: "rgb(251,113,133)", colorDim: "rgba(251,113,133,0.2)" },
-  { id: "chronorok", name: "Chronorok", symbol: "⧖", description: "Time & duration", color: "rgb(103,232,249)", colorDim: "rgba(103,232,249,0.2)", comingSoon: true },
+  { id: "chronorok", name: "Chronorok", symbol: "⧖", description: "Chrono Crystals & games", comingSoon: false, color: "rgb(103,232,249)", colorDim: "rgba(103,232,249,0.2)" },
   { id: "starpath-realm", name: "Starpath Realm", symbol: "✦", description: "Space & spatial reasoning", color: "rgb(129,140,248)", colorDim: "rgba(129,140,248,0.2)" },
   { id: "reading-ridge", name: "Reading Ridge", symbol: "▧", description: "Reading comprehension & fluency", color: "rgb(250,204,21)", colorDim: "rgba(250,204,21,0.2)" },
   { id: "inkwell-wilds", name: "Inkwell Wilds", symbol: "✎", description: "Writing, grammar & spelling", color: "rgb(163,230,53)", colorDim: "rgba(163,230,53,0.2)" },
@@ -158,11 +158,11 @@ export default function RealmCarousel() {
   const focusRealm = focusLock ? realms.find((r) => tryCanonicalRealmId(r.id) === focusLock.focusRealmId) ?? null : null;
   // Realms below the learner's reach stay shut, but they stay visible: the
   // card says when it opens instead of sending them to a missing pre-test.
-  const unlockState = previewMode || DEMO_MODE
+  const unlockState = current.id === "chronorok" || previewMode || DEMO_MODE
     ? ({ unlocked: true } as const)
     : realmUnlockState(current.id, [...reachedLevels, profileLevel]);
   const isActive =
-    (DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
+    (current.id === "chronorok" || DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
     !blockedByFocus &&
     unlockState.unlocked;
   const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm || isChanceRealm);
@@ -197,6 +197,12 @@ export default function RealmCarousel() {
 
   async function enterRealm() {
     if (!isActive || enteringRealm) return;
+    if (current.id === "chronorok") {
+      setLastRealm(current.id);
+      exitReviewMode();
+      router.push(previewMode ? "/world/chronorok?teacher_preview=1" : "/world/chronorok");
+      return;
+    }
     if (isStatisticaPreview) {
       setLastRealm(current.id);
       exitReviewMode();

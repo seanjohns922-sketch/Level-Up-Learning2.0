@@ -1,3 +1,4 @@
+import { CHRONOROK_CARDS } from "../data/chronorok-artwork";
 import type { StudentActivityDailyRow } from "@/lib/student-activity";
 
 /** Chronorok, the games realm. Kids earn Chrono Crystals for learning:
@@ -9,15 +10,7 @@ import type { StudentActivityDailyRow } from "@/lib/student-activity";
 export const CHRONOROK_OPEN_DAYS = 5;
 export const CRYSTALS_TO_AWAKEN = 100;
 
-export const CHRONOROKS = [
-  { grade: "Prep", name: "Chronorok Spark" },
-  { grade: "Year 1", name: "Chronorok Ember" },
-  { grade: "Year 2", name: "Chronorok Pulse" },
-  { grade: "Year 3", name: "Chronorok Current" },
-  { grade: "Year 4", name: "Chronorok Rift" },
-  { grade: "Year 5", name: "Chronorok Blaze" },
-  { grade: "Year 6", name: "Chronorok Eternal" },
-] as const;
+export const CHRONOROKS = CHRONOROK_CARDS;
 
 export function isLearningDay(row: StudentActivityDailyRow) {
   return (row.lessons_completed ?? 0) > 0 || (row.quizzes_completed ?? 0) > 0;

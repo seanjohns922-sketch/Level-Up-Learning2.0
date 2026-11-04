@@ -1,5 +1,6 @@
 "use client";
 
+import ChronorokAccess from "./ChronorokAccess";
 import dynamic from "next/dynamic";
 
 const loading = () => <div className="grid min-h-screen place-items-center bg-black font-bold text-amber-100">Opening the portal…</div>;
@@ -11,5 +12,5 @@ const GAMES = {
 
 export default function ChronorokGameEntry({ game, backHref }: { game: keyof typeof GAMES; backHref: string }) {
   const Game = GAMES[game];
-  return <Game backHref={backHref} />;
+  return <ChronorokAccess><Game backHref={backHref} /></ChronorokAccess>;
 }

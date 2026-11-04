@@ -1,3 +1,4 @@
+import { CHRONOROK_VIDEOS } from "@/data/chronorok-artwork";
 import {
   REALM_REGISTRY,
   type CanonicalRealmId,
@@ -104,8 +105,8 @@ const PORTAL_PRESENTATION: readonly TowerPortalPresentation[] = [
     position: [12.7, 0, 20.4],
     rotationY: -2.58,
     returnSpawn: [10.6, 0.75, 17],
-    posterAsset: "/images/tower-portal-sealed.jpg",
-    previewVideo: "/videos/realms/chronorok.mp4",
+    posterAsset: "/images/chronorok/hub.webp",
+    previewVideo: CHRONOROK_VIDEOS.portal ?? undefined,
     accent: "#71deef",
     accentSoft: "#315d6b",
     symbol: "T",

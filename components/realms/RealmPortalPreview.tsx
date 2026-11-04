@@ -1,5 +1,6 @@
 "use client";
 
+import { CHRONOROK_VIDEOS } from "@/data/chronorok-artwork";
 import { useEffect, useRef, useState } from "react";
 
 export const REALM_PORTAL_VIDEOS: Record<string, string | undefined> = {
@@ -12,7 +13,7 @@ export const REALM_PORTAL_VIDEOS: Record<string, string | undefined> = {
   "reading-ridge": "/videos/realms/reading-ridge.mp4",
   "inkwell-wilds": "/videos/realms/inkwell-wilds.mp4",
   "runehaven-peaks": "/videos/realms/runehaven-peaks.mp4",
-  chronorok: "/videos/realms/chronorok.mp4",
+  chronorok: CHRONOROK_VIDEOS.portal ?? undefined,
 };
 
 type RealmPortalPreviewProps = {

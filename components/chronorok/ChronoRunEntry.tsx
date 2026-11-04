@@ -1,5 +1,6 @@
 "use client";
 
+import ChronorokAccess from "./ChronorokAccess";
 import dynamic from "next/dynamic";
 
 const ChronoRun = dynamic(() => import("@/components/chronorok/ChronoRun"), {
@@ -8,5 +9,5 @@ const ChronoRun = dynamic(() => import("@/components/chronorok/ChronoRun"), {
 });
 
 export default function ChronoRunEntry({ backHref }: { backHref: string }) {
-  return <ChronoRun backHref={backHref} />;
+  return <ChronorokAccess><ChronoRun backHref={backHref} /></ChronorokAccess>;
 }

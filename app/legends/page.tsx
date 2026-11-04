@@ -10,6 +10,8 @@ import { Lightbulb } from "lucide-react";
 import { getAllLegends, getEffectiveUnlockedLegendIds } from "@/data/legends";
 import { readProgress } from "@/data/progress";
 import RealmCard from "@/components/legends/RealmCard";
+import { useChronorokProgress } from "@/lib/useChronorokProgress";
+import { CRYSTALS_TO_AWAKEN } from "@/lib/chronorok";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 
 export type RealmDef = {
@@ -35,7 +37,8 @@ const REALMS: RealmDef[] = [
     name: "Chronorok",
     legendLine: "Time Legends",
     totalLegends: 7,
-    status: "coming-soon",
+    status: "open",
+    route: "/legends/chronorok",
   },
   {
     id: "measurelands",
@@ -123,6 +126,8 @@ export default function LegendsPage() {
     [hydrated],
   );
   const demoPreview = useDemoPreviewMode();
+  const chrono = useChronorokProgress();
+  const chronorokCollected = demoPreview ? 7 : (chrono.progress?.crystals ?? 0) >= CRYSTALS_TO_AWAKEN ? 1 : 0;
 
   const unlockedIds = useMemo(
     () => getEffectiveUnlockedLegendIds(numberProgress?.year, numberProgress?.unlockedLegends, "number-nexus"),
@@ -183,13 +188,14 @@ export default function LegendsPage() {
   );
 
   const totalCollected =
+    chronorokCollected +
     numbotCollected +
     measurelandsCollected +
     starpathCollected +
     patternPeaksCollected +
     chanceHollowCollected +
     statisticaCollected;
-  const totalLegends = getAllLegends().length;
+  const totalLegends = getAllLegends().length + 7;
   const pct = totalLegends > 0 ? Math.round((totalCollected / totalLegends) * 100) : 0;
 
   return (
@@ -297,6 +303,8 @@ export default function LegendsPage() {
                         ? chanceHollowCollected
                       : realm.id === "statistica"
                         ? statisticaCollected
+                      : realm.id === "chronorok"
+                        ? chronorokCollected
                       : 0
                 }
                 onClick={realm.route ? () => router.push(demoPreview ? `${realm.route}?teacher_preview=1` : realm.route!) : undefined}
