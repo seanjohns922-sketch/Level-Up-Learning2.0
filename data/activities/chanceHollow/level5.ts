@@ -80,9 +80,10 @@ function spinner(target: number, total: number, targetColour = RED, otherColour 
   return { type: "spinner", wedges: shuffle([...Array(target).fill(targetColour), ...Array(total - target).fill(otherColour)] as string[]) };
 }
 
-function frequency(labels: string[], counts: number[]): ChanceVisual {
-  return { type: "frequency", labels, counts, total: counts.reduce((sum, count) => sum + count, 0) };
+function frequency(labels: string[], counts: number[], totalLabel?: string): ChanceVisual {
+  return { type: "frequency", labels, counts, total: counts.reduce((sum, count) => sum + count, 0), ...(totalLabel ? { totalLabel } : {}) };
 }
+const regions = (n: number) => `${n} region${n === 1 ? "" : "s"}`;
 
 function spreadTotal(total: number, buckets: number): number[] {
   const base = Math.floor(total / buckets);
@@ -214,8 +215,8 @@ const unequalSpinner = fresh(() => {
   const [a, b] = colourPair();
   const big = randInt(3, 5);
   const small = randInt(1, big - 1);
-  return mcq(`Which colour is more likely, and why?`, `${cap(NAMES[a]!)} because it has ${big} regions`,
-    [`${cap(NAMES[b]!)} because it is brighter`, "They are equally likely", `${cap(NAMES[b]!)} because it has ${small} regions`],
+  return mcq(`Which colour is more likely, and why?`, `${cap(NAMES[a]!)} because it has ${regions(big)}`,
+    [`${cap(NAMES[b]!)} because it is brighter`, "They are equally likely", `${cap(NAMES[b]!)} because it has ${regions(small)}`],
     "Correct. More equal regions create more winning outcomes.", "Count the equal regions for each colour.", spinner(big, big + small, a, b));
 });
 
@@ -243,7 +244,7 @@ const promotionBias = fresh(() => {
   const commonCount = randInt(6, 10);
   return mcq(`A promotion prints ${commonCount} ${common} tokens and ${rareCount} ${rare} tokens in every batch. What is the hidden advantage?`, `${cap(common)} is easier to collect`,
     [`${cap(rare)} is easier to collect`, "Both are equally likely", "Neither token can be collected"],
-    "Correct. The more common token has more possible winning items.", "Compare how many copies of each token exist.", frequency([common, rare], [commonCount, rareCount]));
+    "Correct. The more common token has more possible winning items.", "Compare how many copies of each token exist.", frequency([common, rare], [commonCount, rareCount], `${commonCount + rareCount} tokens in each batch`));
 });
 
 const spinnerBias = fresh(() => unequalSpinner());
@@ -277,10 +278,9 @@ const compareDifferences = fresh(() => {
   const answer = differenceCounts[a] === differenceCounts[b]
     ? "They are equally likely"
     : differenceCounts[a] > differenceCounts[b] ? `Difference ${a}` : `Difference ${b}`;
-  const highlight = answer === "They are equally likely" ? a : Number(answer.split(" ")[1]);
   return mcq(`Which result is more likely: a difference of ${a} or ${b}?`, answer,
     [`Difference ${a}`, `Difference ${b}`, "They are equally likely", "Neither difference is possible"],
-    `Correct. The grid gives ${differenceCounts[a]} pairs for ${a} and ${differenceCounts[b]} pairs for ${b}.`, "Compare the number of ordered pairs that make each difference.", { type: "diceGrid", mode: "difference", highlight });
+    `Correct. The grid gives ${differenceCounts[a]} pairs for ${a} and ${differenceCounts[b]} pairs for ${b}.`, "Compare the number of ordered pairs that make each difference.", { type: "diceGrid", mode: "difference", highlight: -1 });
 });
 
 const mostLikelyDifference = fresh(() => {
@@ -379,7 +379,7 @@ const compareRuns = fresh(() => {
   if (second === first) second = Math.min(total - 1, second + 1);
   return mcq(`Trial A recorded ${first} heads out of ${total}; Trial B recorded ${second} heads out of ${total}. What is the best conclusion?`, "Repeated fair trials can have different frequencies",
     ["The coin must change between trials", "Both trials must always match", "Heads is now impossible"],
-    "Correct. Chance creates variation between repeated trials.", "Different short-run frequencies can both come from a fair coin.", frequency(["Trial A heads", "Trial B heads"], [first, second]));
+    "Correct. Chance creates variation between repeated trials.", "Different short-run frequencies can both come from a fair coin.", frequency(["Trial A", "Trial B"], [first, second], `Heads in each trial of ${total} tosses`));
 });
 
 const compareTrialsInteractive = fresh(() => {
