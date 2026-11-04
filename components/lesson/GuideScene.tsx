@@ -223,6 +223,20 @@ function Tiles({ p, step }: { p: Extract<ScenePart, { type: "tiles" }>; step: St
   </div>;
 }
 
+// The lesson's line graph: white panel, faint gridlines, a teal line through dark points.
+function LineGraph({ p, step }: { p: Extract<ScenePart, { type: "linegraph" }>; step: Step }) {
+  const W = 420, H = 210, L = 40, R = W - 16, T = 30, B = H - 30, n = p.points.length;
+  const x = (i: number) => L + (i / (n - 1)) * (R - L), y = (v: number) => B - (v / p.max) * (B - T);
+  const ticks: number[] = []; for (let v = 0; v <= p.max; v += p.tick) ticks.push(v);
+  const marked = p.mark !== undefined && after(p.markStep, step);
+  return <svg viewBox={`0 0 ${W} ${H}`} className="block w-full max-w-[460px] rounded-xl bg-white" aria-hidden>
+    <text x={W / 2} y={18} textAnchor="middle" fontSize={12} fontWeight={800} fill={INK} letterSpacing="1.5">{p.title.toUpperCase()}</text>
+    {ticks.map((v) => <g key={v}><line x1={L} x2={R} y1={y(v)} y2={y(v)} stroke="#e2e8e0" strokeDasharray="3 3" /><text x={L - 8} y={y(v) + 4} textAnchor="end" fontSize={11} fontWeight={700} fill={INK}>{v}</text></g>)}
+    <polyline points={p.points.map((q, i) => `${x(i)},${y(q.value)}`).join(" ")} fill="none" stroke="#14b8a6" strokeWidth={3} />
+    {p.points.map((q, i) => <g key={q.label}><circle cx={x(i)} cy={y(q.value)} r={marked && p.mark === i ? 8 : 5} fill={marked && p.mark === i ? ORANGE : INK} stroke="#14b8a6" strokeWidth={2} /><text x={x(i)} y={H - 10} textAnchor="middle" fontSize={11} fontWeight={700} fill={INK}>{q.label}</text></g>)}
+  </svg>;
+}
+
 function Compass({ p, step }: { p: Extract<ScenePart, { type: "compass" }>; step: Step }) {
   const dirs = ["north", "east", "south", "west"], start = dirs.indexOf(p.from), turns = after(p.turnStep, step) ? p.turns : 0, a = (start + turns) * 90;
   return <svg viewBox="0 0 160 160" className="h-40 w-40" aria-hidden>
@@ -253,6 +267,7 @@ function Part({ p, step }: { p: ScenePart; step: Step }) {
     case "column": body = <Column p={p} step={step} />; break;
     case "starmap": body = <StarMap p={p} step={step} />; break;
     case "plot": body = <Plot p={p} />; break;
+    case "linegraph": body = <LineGraph p={p} step={step} />; break;
     case "tiles": body = <Tiles p={p} step={step} />; break;
     case "object3d": body = <Object3d p={p} />; break;
     case "machine": body = <Machine p={p} step={step} />; break;
@@ -274,7 +289,7 @@ function Part({ p, step }: { p: ScenePart; step: Step }) {
     case "visual": body = <div className="w-full max-w-[360px]"><GuideVisualView visual={p.visual as GuideVisual} /></div>; break;
   }
   if (p.type === "sign") return <div className="self-center transition-opacity duration-300" style={{ opacity: shown(p, step) ? 1 : 0 }}>{body}</div>;
-  return <div data-scene-part className={`flex max-w-full min-w-0 flex-col items-center gap-1.5 rounded-2xl p-2 ${["line", "visual", "barModel", "pictograph", "chance", "starmap", "plot"].includes(p.type) ? "w-full" : ""} transition-all duration-300 ${lit(p, step) ? "bg-[#fff6d6] shadow-[0_0_0_3px_#ffd95a]" : ""}`} style={{ opacity: shown(p, step) ? 1 : 0 }}>
+  return <div data-scene-part className={`flex max-w-full min-w-0 flex-col items-center gap-1.5 rounded-2xl p-2 ${["line", "visual", "barModel", "pictograph", "chance", "starmap", "plot", "linegraph"].includes(p.type) ? "w-full" : ""} transition-all duration-300 ${lit(p, step) ? "bg-[#fff6d6] shadow-[0_0_0_3px_#ffd95a]" : ""}`} style={{ opacity: shown(p, step) ? 1 : 0 }}>
     {body}
     {p.label && <span className="text-sm font-bold" style={{ color: INK }}>{p.label}</span>}
   </div>;

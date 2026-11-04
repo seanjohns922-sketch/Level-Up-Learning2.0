@@ -7,7 +7,54 @@
    "Divide by one factor to get the other.",
    "91 ÷ 7 = 13 and 91 ÷ 13 = 7."
   ],
-  "tip": "The same three numbers make the whole fact family."
+  "tip": "The same three numbers make the whole fact family.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "91",
+      "parts": [
+       "13",
+       "13",
+       "13",
+       "13",
+       "13",
+       "13",
+       "13"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "7 groups of 13 = 91",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "91 ÷ 7 = 13",
+       "91 ÷ 13 = 7"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Check a division by multiplying.",
@@ -17,7 +64,33 @@
    "If you get the dividend back, the division is right.",
    "6 × 13 = 78, so it checks."
   ],
-  "tip": "Quotient × divisor = dividend."
+  "tip": "Quotient × divisor = dividend.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "78 ÷ 13 = 6?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "6 × 13 = 78 ✓",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Use fact families in equal groups, and fix reversed divisions.",
@@ -27,7 +100,36 @@
    "Divide the total by the group size.",
    "117 ÷ 13 = 9."
   ],
-  "tip": "Division starts with the total: 13 ÷ 91 is backwards."
+  "tip": "Division starts with the total: 13 ÷ 91 is backwards.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "groups",
+      "groups": 9,
+      "each": 13,
+      "label": "117 in groups of 13",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "9 groups",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Scale a known fact to larger numbers.",
@@ -37,7 +139,28 @@
    "Multiply one factor by 10, so the product is 10 times bigger.",
    "The related division uses the new numbers."
   ],
-  "tip": "Keep track of where the extra zero goes."
+  "tip": "Keep track of where the extra zero goes.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "12 × 6 = 72",
+       "120 × 6 = 720",
+       "720 ÷ 120 = 6"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Check larger divisions with the related multiplication.",
@@ -47,7 +170,33 @@
    "60 × 11 = 660.",
    "It matches, so the division is right."
   ],
-  "tip": "Large numbers follow the same inverse rules."
+  "tip": "Large numbers follow the same inverse rules.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "660 ÷ 11 = 60",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "60 × 11 = 660 ✓",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Apply an extended fact family to a grouping problem.",
@@ -57,7 +206,38 @@
    "Use 108 ÷ 12 = 9, then scale by 10.",
    "90 groups."
   ],
-  "tip": "Check: 90 × 12 = 1,080."
+  "tip": "Check: 90 × 12 = 1,080.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "108 ÷ 12 = 9",
+       "1,080 ÷ 12 = 90"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "90 groups",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Decide if the missing number is a product or a factor.",
@@ -67,7 +247,44 @@
    "If a factor is missing, divide the product by the other factor.",
    "64 ÷ 8 = 8."
   ],
-  "tip": "Name each part: factor × factor = product."
+  "tip": "Name each part: factor × factor = product.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "64",
+      "parts": [
+       "8",
+       "8",
+       "8",
+       "8",
+       "8",
+       "8",
+       "8",
+       "8"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 8",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "In division, find a missing dividend or divisor.",
@@ -77,7 +294,36 @@
    "Missing divisor: divide dividend ÷ quotient.",
    "4 × 6 = 24."
   ],
-  "tip": "Dividend ÷ divisor = quotient."
+  "tip": "Dividend ÷ divisor = quotient.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "groups",
+      "groups": 6,
+      "each": 4,
+      "label": "6 groups of 4",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 24",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Use a small fact to solve a large inverse.",
@@ -87,7 +333,27 @@
    "Scale by the power of 10 in the larger number.",
    "60 × 6 = 360."
   ],
-  "tip": "Divide large numbers using the small fact, then fix the zeros."
+  "tip": "Divide large numbers using the small fact, then fix the zeros.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "6 × 6 = 36",
+       "60 × 6 = 360"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Different expressions can have the same value.",
@@ -97,7 +363,44 @@
    "Order of factors doesn't change the product.",
    "Other factor pairs can give the same value."
   ],
-  "tip": "Compare values, not how the expressions look."
+  "tip": "Compare values, not how the expressions look.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 3,
+      "cols": 8,
+      "label": "3 × 8"
+     },
+     {
+      "type": "array",
+      "rows": 8,
+      "cols": 3,
+      "label": "8 × 3"
+     },
+     {
+      "type": "array",
+      "rows": 6,
+      "cols": 4,
+      "label": "6 × 4"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "All make 24",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Judge whether a multiplicative equation is true.",
@@ -107,7 +410,37 @@
    "Compare the values.",
    "If they differ, the equation is false."
   ],
-  "tip": "× and + give very different results."
+  "tip": "× and + give very different results.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "4 × 10 = 40",
+       "4 + 10 = 14"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "40 ≠ 14: false",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Build an equivalent expression by halving one factor and doubling the other.",
@@ -117,7 +450,48 @@
    "Halve 4 to get 2.",
    "The product stays 20."
   ],
-  "tip": "If one factor doubles, the other must halve."
+  "tip": "If one factor doubles, the other must halve.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 5,
+      "cols": 4,
+      "label": "5 × 4",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "="
+     },
+     {
+      "type": "array",
+      "rows": 10,
+      "cols": 2,
+      "label": "10 × 2",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Both make 20",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Turning an array swaps rows and columns but keeps the product.",
@@ -127,7 +501,44 @@
    "After turning, they swap.",
    "The total stays 24."
   ],
-  "tip": "Division doesn't work this way: 24 ÷ 3 ≠ 3 ÷ 24."
+  "tip": "Division doesn't work this way: 24 ÷ 3 ≠ 3 ÷ 24.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 3,
+      "cols": 8,
+      "label": "3 rows of 8",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "array",
+      "rows": 8,
+      "cols": 3,
+      "label": "8 rows of 3",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Both 24",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "You can regroup three factors without changing the product.",
@@ -137,7 +548,37 @@
    "Multiply that pair.",
    "Multiply by the last factor."
   ],
-  "tip": "This is the associative property."
+  "tip": "This is the associative property.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "(2 × 3) × 7",
+       "2 × (3 × 7)"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "42 either way",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Division gives different results when grouped differently.",
@@ -147,7 +588,36 @@
    "(64 ÷ 8) ÷ 4 = 8 ÷ 4 = 2.",
    "64 ÷ (8 ÷ 4) = 64 ÷ 2 = 32."
   ],
-  "tip": "Brackets matter in division."
+  "tip": "Brackets matter in division.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "(64 ÷ 8) ÷ 4 = 2",
+       "64 ÷ (8 ÷ 4) = 32"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Brackets change the answer for division",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Split an array into two easier parts.",
@@ -157,7 +627,50 @@
    "Find each part: 40 and 12.",
    "Add the parts: 52."
   ],
-  "tip": "Split at 10 to make an easy part."
+  "tip": "Split at 10 to make an easy part.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 4,
+      "cols": 10,
+      "label": "4 × 10 = 40",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "sign",
+      "text": "+"
+     },
+     {
+      "type": "array",
+      "rows": 4,
+      "cols": 3,
+      "label": "4 × 3 = 12",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "52",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Use a friendly ten fact, then add or subtract the rest.",
@@ -167,7 +680,38 @@
    "Find the extra part: 3 × 4 = 12.",
    "30 + 12 = 42."
   ],
-  "tip": "For 9 or 19, subtract instead: 3 × 9 = 30 − 3."
+  "tip": "For 9 or 19, subtract instead: 3 × 9 = 30 − 3.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "3 × 14",
+      "parts": [
+       "3 × 10 = 30",
+       "3 × 4 = 12"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "42",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Find a hidden shared factor in a distributed equation.",
@@ -177,7 +721,38 @@
    "Combine: ? × 13 = 52.",
    "52 ÷ 13 = 4."
   ],
-  "tip": "The shared factor multiplies every part."
+  "tip": "The shared factor multiplies every part.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "? × 10 + ? × 3 = 52",
+       "? × 13 = 52"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "? = 4",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Find factors systematically by testing in order.",
@@ -187,7 +762,29 @@
    "If it divides exactly, write the pair.",
    "Stop when the pairs start repeating."
   ],
-  "tip": "Factors come in pairs."
+  "tip": "Factors come in pairs.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 × 48",
+       "2 × 24",
+       "3 × 16",
+       "4 × 12",
+       "6 × 8"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Generate multiples by skip counting, then apply the clues.",
@@ -197,7 +794,42 @@
    "Apply the clue: greater than 88.",
    "The first one is 96."
   ],
-  "tip": "Check every condition in the clue."
+  "tip": "Check every condition in the clue.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 78,
+      "max": 100,
+      "tick": 2,
+      "labelEvery": 8,
+      "marks": [
+       {
+        "value": 80,
+        "text": "80"
+       },
+       {
+        "value": 88,
+        "text": "88"
+       },
+       {
+        "value": 96,
+        "text": "96",
+        "tone": "answer",
+        "step": 3
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Find every factor pair, and know when you're done.",
@@ -207,7 +839,40 @@
    "Stop at 6, where the pairs meet.",
    "Count the pairs: 5."
   ],
-  "tip": "Once the factors meet, there are no new pairs."
+  "tip": "Once the factors meet, there are no new pairs.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 × 36",
+       "2 × 18",
+       "3 × 12",
+       "4 × 9",
+       "6 × 6"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "5 pairs",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "Use arrays and fact families to recover missing values.",
@@ -217,7 +882,36 @@
    "4 × ? = 16.",
    "16 ÷ 4 = 4."
   ],
-  "tip": "Use the inverse to recover a missing factor."
+  "tip": "Use the inverse to recover a missing factor.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "array",
+      "rows": 4,
+      "cols": 4,
+      "label": "4 rows",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "16 ÷ 4 = 4 columns",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Solve connected equations in order.",
@@ -227,7 +921,38 @@
    "Use its answer in the second.",
    "Solve the second."
   ],
-  "tip": "The first answer feeds the next step."
+  "tip": "The first answer feeds the next step.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "machine",
+      "input": "6 × 7",
+      "rule": "=",
+      "output": "42",
+      "outputStep": 1,
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "machine",
+      "input": "42",
+      "rule": "÷ 7",
+      "output": "6",
+      "outputStep": 3,
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Find the misused property and fix the argument.",
@@ -237,6 +962,35 @@
    "Each part must keep the same factor.",
    "Fix the part, then recalculate the total."
   ],
-  "tip": "In distribution, every part is multiplied."
+  "tip": "In distribution, every part is multiplied.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "7 × 4 + 4 ✗"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "7 × 4 + 7 × 4 = 56",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

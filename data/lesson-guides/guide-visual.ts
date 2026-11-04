@@ -44,6 +44,7 @@ export type ScenePart = PartBase & (
   | { type: "chance"; visual: ChanceToolVisual; highlightStep?: number }
   | { type: "starmap"; cols: number; rows: number; places: { r: number; c: number; object?: string; symbol?: string; label?: string; step?: number }[]; explorer?: { r: number; c: number; facing?: "N" | "E" | "S" | "W" }; path?: { r: number; c: number }[]; pathStep?: number }
   | { type: "plot"; categories: { label: string; count: number }[] }
+  | { type: "linegraph"; title: string; points: { label: string; value: number }[]; max: number; tick: number; mark?: number; markStep?: number }
   | { type: "tiles"; size: number; line?: "vertical" | "diagonal"; tiles: { r: number; c: number; colour: "orange" | "purple" | "teal"; step?: number }[] }
   | { type: "text"; text: string; big?: boolean; tone?: "answer" | "unknown"; then?: { step: number; text: string } }
   | { type: "sign"; text: string }
@@ -81,6 +82,7 @@ export function scenePartSpeech(p: ScenePart): string {
     case "chance": return lead + chanceSaid(p.visual);
     case "starmap": return `${lead}A star map with ${p.places.map((x) => x.label ?? x.symbol ?? x.object).join(", ")}.`;
     case "tiles": return `${lead}A tile board with ${plural(p.tiles.length, "coloured tile")}${p.line ? `, and a ${p.line} mirror line` : ""}.`;
+    case "linegraph": return `${lead}A line graph of ${p.title.toLowerCase()}. ${p.points.map((x) => `${x.label}: ${x.value}`).join(", ")}.`;
     case "plot": return `${lead}A column graph. ${p.categories.map((x) => `${x.label}: ${x.count}`).join(", ")}.`;
     // Pictures inside text (a pictograph key) are read as "1 symbol", not by their emoji names.
     case "text": return `${lead}${(p.then ? p.then.text : p.text).replace(/\p{Extended_Pictographic}\uFE0F?/gu, "1 symbol").replace(/◐/g, "a half symbol")}.`;

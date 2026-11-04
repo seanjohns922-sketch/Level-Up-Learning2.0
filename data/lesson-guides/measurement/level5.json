@@ -7,7 +7,42 @@
    "Pick the unit that gives a sensible number.",
    "Check the answer makes sense."
   ],
-  "tip": "Too big a unit gives tiny decimals."
+  "tip": "Too big a unit gives tiny decimals.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐜",
+      "label": "Ant → mm"
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "📱",
+      "label": "Smartphone → cm"
+     },
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🛣️",
+      "label": "Road → km"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Pick the unit that gives a sensible number",
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Smaller units measure more accurately.",
@@ -17,7 +52,39 @@
    "Choose the smaller unit for precise work.",
    "Measure in that unit."
   ],
-  "tip": "1 cm = 10 mm."
+  "tip": "1 cm = 10 mm.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "💍",
+      "label": "Jeweller's ring",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 3,
+       "end": 1.8,
+       "label": "Millimetres"
+      },
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Choose the tool first, then the unit.",
@@ -27,7 +94,41 @@
    "Choose the tool for it.",
    "Choose a unit that suits the size."
   ],
-  "tip": "Explain why the unit is sensible."
+  "tip": "Explain why the unit is sensible.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "counters",
+      "n": 1,
+      "icon": "🐶",
+      "label": "Puppy",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 10,
+       "step": 1,
+       "value": 4,
+       "unit": "kg"
+      },
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Use two units together for a more accurate length.",
@@ -37,7 +138,39 @@
    "Read the extra centimetres.",
    "Write both: 2 m 35 cm."
   ],
-  "tip": "2 m 35 cm = 235 cm."
+  "tip": "2 m 35 cm = 235 cm.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 3,
+       "end": 2.35,
+       "label": "2 m 35 cm"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2 m 35 cm",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Some measurements need two units.",
@@ -47,7 +180,41 @@
    "Read the smaller unit left over.",
    "Write both, or convert to one unit."
   ],
-  "tip": "1 kg = 1000 g; 1 L = 1000 mL."
+  "tip": "1 kg = 1000 g; 1 L = 1000 mL.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 5,
+       "step": 0.5,
+       "value": 2.5,
+       "unit": "kg"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2 kg 500 g = 2.5 kg",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Use precise mixed units to solve problems.",
@@ -57,7 +224,37 @@
    "Compare them.",
    "Decide and explain."
   ],
-  "tip": "Convert before comparing."
+  "tip": "Convert before comparing.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Board: 185 cm",
+       "Gap: 180 cm"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "185 > 180: long enough",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "If opposite sides are equal, measure once and use the value twice.",
@@ -87,7 +284,42 @@
    "Write every side length.",
    "Add them all."
   ],
-  "tip": "Don't add inside lines."
+  "tip": "Don't add inside lines.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "5 m",
+       "3 m",
+       "2 m",
+       "4 m",
+       "3 m",
+       "7 m"
+      ],
+      "label": "Every side of the L-shape",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "5 + 3 + 2 + 4 + 3 + 7 = 24 m",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Use perimeter to solve fencing and path problems.",
@@ -163,7 +395,44 @@
    "Around: perimeter.",
    "Inside: area."
   ],
-  "tip": "Ribbon around a box lid → perimeter."
+  "tip": "Ribbon around a box lid → perimeter.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        8,
+        5,
+        8,
+        5
+       ],
+       "unit": "m"
+      },
+      "label": "Pool fence: perimeter",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 4,
+       "cols": 6,
+       "unit": "m²"
+      },
+      "label": "Lawn: area",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Shapes can have the same area but different perimeters.",
@@ -173,7 +442,54 @@
    "Find each perimeter: 3 + 4 + 3 + 4 = 14 and 2 + 6 + 2 + 6 = 16.",
    "Same area, but the longer, thinner shape needs more fencing."
   ],
-  "tip": "Area is inside the shape; perimeter is around the edge."
+  "tip": "Area is inside the shape; perimeter is around the edge.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 3,
+       "cols": 4,
+       "unit": "m²"
+      },
+      "label": "Area 12, perimeter 14",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 2,
+       "cols": 6,
+       "unit": "m²"
+      },
+      "label": "Area 12, perimeter 16",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Same area, more fencing",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Decide if a job needs area or perimeter, then calculate.",
@@ -218,7 +534,40 @@
    "If it is under 12, it is am.",
    "12:xx is pm."
   ],
-  "tip": "5:50 am is 05:50."
+  "tip": "5:50 am is 05:50.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "19:15",
+       "− 12",
+       "7:15 pm"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 7,
+       "minute": 15
+      },
+      "focus": [
+       1
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Use 24-hour conversions to solve problems.",
@@ -228,7 +577,38 @@
    "Convert using + 12 or − 12.",
    "Check the answer is between 00:00 and 23:59."
   ],
-  "tip": "12 pm is midday, so it stays 12."
+  "tip": "12 pm is midday, so it stays 12.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 12,
+       "minute": 0
+      },
+      "label": "Midday",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "12:00 pm → 12:00",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Measure an angle with a protractor.",
@@ -282,7 +662,45 @@
    "Choose the measurement and tool.",
    "Solve each part."
   ],
-  "tip": "Small precise parts need small units."
+  "tip": "Small precise parts need small units.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 6,
+       "end": 4.5,
+       "label": "Bolt: mm"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        4,
+        3,
+        4,
+        3
+       ],
+       "unit": "cm"
+      },
+      "label": "Frame: perimeter",
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Engineers trust measurements, not guesses.",
@@ -292,7 +710,40 @@
    "Convert units where needed.",
    "Make the decision from the numbers."
   ],
-  "tip": "Check every unit."
+  "tip": "Check every unit.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 2,
+       "step": 0.25,
+       "value": 1.25,
+       "unit": "kg"
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1 kg 250 g = 1.25 kg",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Use every skill in the final builder mission.",
@@ -302,6 +753,53 @@
    "Decide every measurement it needs.",
    "Solve each part."
   ],
-  "tip": "Some jobs need two measurements."
+  "tip": "Some jobs need two measurements.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 4,
+       "cols": 6,
+       "unit": "m²"
+      },
+      "label": "Turf inside: area",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        6,
+        4,
+        6,
+        4
+       ],
+       "unit": "m"
+      },
+      "label": "Fence around: perimeter",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "This job needs both",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

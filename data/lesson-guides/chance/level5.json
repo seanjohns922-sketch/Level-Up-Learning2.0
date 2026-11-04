@@ -7,7 +7,46 @@
    "If it records colour, list each colour once.",
    "If it records each counter, count every counter."
   ],
-  "tip": "Read the question before listing."
+  "tip": "Read the question before listing.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "bag",
+       "counters": [
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#22c55e",
+        "#22c55e",
+        "#22c55e"
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Colour: blue, green",
+       "Each counter: 7 outcomes"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "List every possible outcome once.",
@@ -17,7 +56,40 @@
    "List each outcome in order.",
    "Stop at the last one that fits; don't repeat any."
   ],
-  "tip": "Check for missing or repeated outcomes."
+  "tip": "Check for missing or repeated outcomes.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "die",
+       "face": 4
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1",
+       "2",
+       "3",
+       "4"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Decide whether outcomes are equally likely by comparing counts.",
@@ -27,7 +99,44 @@
    "Compare the counts.",
    "Equal counts mean equally likely."
   ],
-  "tip": "On a fair die, every number has one face."
+  "tip": "On a fair die, every number has one face.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "bag",
+       "counters": [
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#22c55e",
+        "#22c55e",
+        "#22c55e"
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Equally likely",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Equal regions or counts give equal chances.",
@@ -79,7 +188,43 @@
    "Compare them.",
    "The type with more is easier to get; that is the hidden advantage."
   ],
-  "tip": "Unequal counts make a game or prize unfair."
+  "tip": "Unequal counts make a game or prize unfair.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "map",
+        "count": 7
+       },
+       {
+        "label": "crystal",
+        "count": 1
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Map tokens are much easier to get",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "With two dice, list ordered pairs. There are 6 × 6 = 36.",
@@ -179,7 +324,51 @@
    "Move results until both have 18 pairs.",
    "Check the counts are equal."
   ],
-  "tip": "Count pairs, not just the difference values."
+  "tip": "Count pairs, not just the difference values.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "diceGrid",
+       "mode": "difference",
+       "highlight": -1
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Player A: 16 pairs",
+       "Player B: 20 pairs"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Adjust to 18 and 18",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Run a trial and record every result.",
@@ -189,7 +378,52 @@
    "Record each result straight away.",
    "Check the total matches the number of trials."
   ],
-  "tip": "A missed record spoils the data."
+  "tip": "A missed record spoils the data.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "coin"
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Heads"
+     },
+     {
+      "type": "tally",
+      "n": 11,
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Tails"
+     },
+     {
+      "type": "tally",
+      "n": 9,
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Relative frequency = times it happened ÷ total trials.",
@@ -199,7 +433,43 @@
    "Count the total trials.",
    "Write it as a fraction: times ÷ total."
   ],
-  "tip": "Compare fractions with the same total by their tops."
+  "tip": "Compare fractions with the same total by their tops.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Target",
+        "count": 17
+       },
+       {
+        "label": "Other",
+        "count": 13
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "17/30",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Compare relative frequencies from repeated runs.",
@@ -209,7 +479,37 @@
    "Compare them.",
    "Explain that fair trials can still vary."
   ],
-  "tip": "Different results don't mean the coin is unfair."
+  "tip": "Different results don't mean the coin is unfair.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Trial A: 14/20",
+       "Trial B: 12/20"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Fair trials can vary",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Inspect the design to predict which outcome is more likely.",
@@ -219,7 +519,60 @@
    "Compare the shares.",
    "The bigger share should happen more often."
   ],
-  "tip": "Compare shares, not just counts."
+  "tip": "Compare shares, not just counts.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "bag",
+       "counters": [
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#22c55e"
+       ]
+      },
+      "label": "Bag A: 3 of 4",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "chance",
+      "visual": {
+       "type": "bag",
+       "counters": [
+        "#3b82f6",
+        "#3b82f6",
+        "#22c55e",
+        "#22c55e"
+       ]
+      },
+      "label": "Bag B: 2 of 4",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Bag A",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Use recorded frequencies to estimate likelihood.",
@@ -229,7 +582,43 @@
    "Compare them.",
    "The bigger relative frequency suggests a bigger chance."
   ],
-  "tip": "If the counts are equal, the estimates are equal."
+  "tip": "If the counts are equal, the estimates are equal.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "A",
+        "count": 10
+       },
+       {
+        "label": "B",
+        "count": 30
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "B is more likely",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Results can suggest whether a tool is fair or loaded.",
@@ -239,7 +628,60 @@
    "Compare the real results with that.",
    "A big difference suggests bias; a small one fits fair."
   ],
-  "tip": "More trials give stronger evidence."
+  "tip": "More trials give stronger evidence.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 6
+       },
+       {
+        "label": "2",
+        "count": 6
+       },
+       {
+        "label": "3",
+        "count": 6
+       },
+       {
+        "label": "4",
+        "count": 6
+       },
+       {
+        "label": "5",
+        "count": 6
+       },
+       {
+        "label": "6",
+        "count": 30
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "6 came up far too often: may be loaded",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Plan an investigation that repeated trials can answer.",
@@ -249,7 +691,25 @@
    "Check it can be answered by repeating trials.",
    "Plan how many trials and how to record."
   ],
-  "tip": "Opinions can't be tested with trials."
+  "tip": "Opinions can't be tested with trials.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Is this spinner fair? ✓",
+       "Which looks nicest? ✗"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Run the investigation and record every result.",
@@ -259,7 +719,69 @@
    "Record every result.",
    "Total the results at the end."
   ],
-  "tip": "Keep the method the same for every trial."
+  "tip": "Keep the method the same for every trial.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#3b82f6",
+        "#e5484d",
+        "#22c55e",
+        "#3b82f6",
+        "#e5484d",
+        "#22c55e"
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Blue"
+     },
+     {
+      "type": "tally",
+      "n": 18,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Red"
+     },
+     {
+      "type": "tally",
+      "n": 17,
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "text",
+      "text": "Green"
+     },
+     {
+      "type": "tally",
+      "n": 15,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Defend a verdict using the frequencies.",
@@ -269,6 +791,46 @@
    "Find what the data actually shows.",
    "State a verdict that doesn't claim more than the data shows."
   ],
-  "tip": "Say 'in this investigation', not 'always'."
+  "tip": "Say 'in this investigation', not 'always'.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Blue",
+        "count": 18
+       },
+       {
+        "label": "Red",
+        "count": 12
+       },
+       {
+        "label": "Green",
+        "count": 10
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Blue came up most in this investigation",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

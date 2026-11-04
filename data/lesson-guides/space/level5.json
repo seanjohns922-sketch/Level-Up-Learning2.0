@@ -7,7 +7,75 @@
    "Picture folding them up.",
    "Name the solid they make."
   ],
-  "tip": "Each face of the net becomes a face of the solid."
+  "tip": "Each face of the net becomes a face of the solid.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2 triangles",
+       "3 rectangles"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "triangle",
+         "label": "end",
+         "color": "#fde047"
+        },
+        {
+         "shape": "rectangle",
+         "label": "side",
+         "color": "#f9a8d4"
+        },
+        {
+         "shape": "rectangle",
+         "label": "side",
+         "color": "#f9a8d4"
+        },
+        {
+         "shape": "rectangle",
+         "label": "side",
+         "color": "#f9a8d4"
+        },
+        {
+         "shape": "triangle",
+         "label": "end",
+         "color": "#fde047"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Triangular prism",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Only some arrangements of six squares fold into a cube.",
@@ -95,7 +163,36 @@
    "Name each shape.",
    "The count is the number of faces."
   ],
-  "tip": "Match the face shapes to the solid."
+  "tip": "Match the face shapes to the solid.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 square",
+       "4 triangles"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "object3d",
+      "id": "pyramid",
+      "name": "5 faces",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Follow one face through the fold to see where it lands.",
@@ -206,7 +303,36 @@
    "Match them to a solid.",
    "Fold to check."
   ],
-  "tip": "Prisms have two matching ends."
+  "tip": "Prisms have two matching ends.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 square",
+       "4 triangles"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "object3d",
+      "id": "pyramid",
+      "name": "Square pyramid",
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Build your own cube net.",
@@ -255,7 +381,61 @@
    "Watch for faces landing on the same side.",
    "Watch for an open side with no face."
   ],
-  "tip": "A good net closes perfectly."
+  "tip": "A good net closes perfectly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "net",
+       "cells": [
+        [
+         0,
+         0
+        ],
+        [
+         0,
+         1
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1,
+         2
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Two faces land on the same side: overlap",
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Coordinates give the distance across, then up, from the origin.",
@@ -385,7 +565,86 @@
    "Detour only where a block is in the way.",
    "Count the moves and try for fewer."
   ],
-  "tip": "Diagonal moves aren't allowed unless stated."
+  "tip": "Diagonal moves aren't allowed unless stated.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "starmap",
+      "cols": 6,
+      "rows": 4,
+      "places": [
+       {
+        "r": 0,
+        "c": 5,
+        "object": "star",
+        "label": "Goal"
+       },
+       {
+        "r": 1,
+        "c": 2,
+        "symbol": "✕"
+       },
+       {
+        "r": 2,
+        "c": 2,
+        "symbol": "✕"
+       }
+      ],
+      "explorer": {
+       "r": 3,
+       "c": 0,
+       "facing": "E"
+      },
+      "path": [
+       {
+        "r": 3,
+        "c": 0
+       },
+       {
+        "r": 3,
+        "c": 1
+       },
+       {
+        "r": 3,
+        "c": 2
+       },
+       {
+        "r": 3,
+        "c": 3
+       },
+       {
+        "r": 2,
+        "c": 3
+       },
+       {
+        "r": 1,
+        "c": 3
+       },
+       {
+        "r": 0,
+        "c": 3
+       },
+       {
+        "r": 0,
+        "c": 4
+       },
+       {
+        "r": 0,
+        "c": 5
+       }
+      ],
+      "pathStep": 2,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "A translation slides every point the same distance.",
@@ -499,7 +758,70 @@
    "Check the shape faces the same way.",
    "If it is flipped or turned, it is not a translation."
   ],
-  "tip": "Compare the direction one corner points."
+  "tip": "Compare the direction one corner points.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "tiles",
+      "size": 6,
+      "tiles": [
+       {
+        "r": 2,
+        "c": 0,
+        "colour": "teal"
+       },
+       {
+        "r": 3,
+        "c": 0,
+        "colour": "teal"
+       },
+       {
+        "r": 3,
+        "c": 1,
+        "colour": "teal"
+       },
+       {
+        "r": 2,
+        "c": 4,
+        "colour": "purple",
+        "step": 2
+       },
+       {
+        "r": 3,
+        "c": 4,
+        "colour": "purple",
+        "step": 2
+       },
+       {
+        "r": 3,
+        "c": 3,
+        "colour": "purple",
+        "step": 2
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Flipped: not a slide",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "A reflection flips a shape across a mirror line.",
@@ -565,7 +887,57 @@
    "Turn each point the same amount around it.",
    "Each point stays the same distance from the centre."
   ],
-  "tip": "Clockwise goes the way clock hands move."
+  "tip": "Clockwise goes the way clock hands move.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "tiles",
+      "size": 5,
+      "tiles": [
+       {
+        "r": 1,
+        "c": 2,
+        "colour": "teal"
+       },
+       {
+        "r": 0,
+        "c": 2,
+        "colour": "teal"
+       },
+       {
+        "r": 2,
+        "c": 3,
+        "colour": "purple",
+        "step": 2
+       },
+       {
+        "r": 2,
+        "c": 4,
+        "colour": "purple",
+        "step": 2
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Quarter turn clockwise about the centre",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Name the transformation: slide, flip or turn.",
@@ -575,7 +947,31 @@
    "Mirrored → flip.",
    "Rotated → turn."
   ],
-  "tip": "Look at which way a corner points."
+  "tip": "Look at which way a corner points.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Same facing → slide",
+       "Mirrored → flip",
+       "Turned → turn"
+      ],
+      "marked": [
+       1
+      ],
+      "markStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "A design brief combines a net, a coordinate and a transformation.",
@@ -585,7 +981,69 @@
    "Read where it goes.",
    "Read how it moves."
   ],
-  "tip": "Handle each part separately."
+  "tip": "Handle each part separately.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "net",
+       "cells": [
+        [
+         0,
+         1
+        ],
+        [
+         1,
+         0
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      "label": "Cube net",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "grid",
+       "min": 0,
+       "max": 8,
+       "points": [
+        {
+         "x": 6,
+         "y": 2,
+         "label": "(6, 2)"
+        }
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Build the net, place it, then transform it.",
@@ -595,7 +1053,74 @@
    "Plot the position.",
    "Apply the transformation."
   ],
-  "tip": "Every part must be right."
+  "tip": "Every part must be right.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "net",
+       "cells": [
+        [
+         0,
+         1
+        ],
+        [
+         1,
+         0
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      "label": "Build and test",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "grid",
+       "min": 0,
+       "max": 8,
+       "points": [
+        {
+         "x": 6,
+         "y": 2,
+         "label": "start"
+        },
+        {
+         "x": 8,
+         "y": 3,
+         "label": "end"
+        }
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Prove every part works with evidence.",
@@ -605,6 +1130,27 @@
    "Recount the coordinate.",
    "Check the image keeps its size and facing."
   ],
-  "tip": "Only submit when all three pass."
+  "tip": "Only submit when all three pass.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Fold the net",
+       "Recount the coordinate",
+       "Check size and facing"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }
