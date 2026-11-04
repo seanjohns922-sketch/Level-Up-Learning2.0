@@ -1,4 +1,5 @@
 "use client";
+import NumbotArtwork from "@/components/legends/NumbotArtwork";
 import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import { useEffect, useState, type ComponentType } from "react";
@@ -214,6 +215,8 @@ export default function LessonReflection({
   // Reflection is celebration + confidence only (no performance recap).
   const band = bandFromProps(levelNumber, level);
   const mascot = mascotForRealm(realmId);
+  const mascotLevel = /^(Prep|Ground)/i.test(level) ? 0 : (levelNumber ?? Number(level.replace(/\D/g, "")));
+  const showNumbot = (!realmId || realmId === "number" || realmId === "number-nexus") && mascotLevel >= 0 && mascotLevel <= 6;
   const theme = getRealmTheme(realmId);
   const xp = useBankedXp("lesson");
   const stars = accuracy >= 85 ? 3 : accuracy >= 60 ? 2 : 1;
@@ -298,7 +301,7 @@ export default function LessonReflection({
         <Confetti colors={theme.confetti} />
         <div className="relative">
           <div className="flex animate-bounce justify-center" aria-hidden>
-            <mascot.Icon className="h-16 w-16 text-white" />
+            {showNumbot ? <NumbotArtwork level={mascotLevel} className="h-16 w-16" /> : <mascot.Icon className="h-16 w-16 text-white" />}
           </div>
           <div
             className="mt-1 text-[11px] font-mono font-bold uppercase tracking-[0.22em]"

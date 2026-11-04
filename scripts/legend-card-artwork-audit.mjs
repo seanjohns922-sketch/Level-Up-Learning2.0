@@ -11,7 +11,7 @@ const hall = read("components/home/HallOfLegendsWidget.tsx");
 const checks = [
   ["Shared artwork renderer always contains the full image", artwork.includes("object-contain")],
   ["Unlock reveal uses the shared artwork renderer", reveal.includes("<LegendCardArtwork")],
-  ["Unlock reveal uses the canonical card stage ratio", reveal.includes("aspect-[2/3]")],
+  ["Unlock reveal uses the 63 × 88 mm trimmed card ratio", reveal.includes("aspect-[63/88]")],
   ["Unlock reveal no longer crops card artwork", !reveal.includes('className="w-full h-full object-cover"')],
   ["Binder uses the shared artwork renderer", binder.includes("<LegendCardArtwork")],
   ["Detail and enlarged views use the shared artwork renderer", (detail.match(/<LegendCardArtwork/g) ?? []).length === 2],

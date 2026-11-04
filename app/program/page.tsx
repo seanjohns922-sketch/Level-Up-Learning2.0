@@ -1,5 +1,6 @@
 "use client";
 
+import { getLegendForYear } from "@/data/legends";
 import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
 import ReliqRealmLogo from "@/components/brand/ReliqRealmLogo";
 import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
@@ -1114,7 +1115,7 @@ function ProgramPage() {
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/numbot-bouncer-overlay.png"
+              src={getLegendForYear("Prep", "number-nexus").images.avatar}
               alt=""
               className="relative h-[28vh] lg:h-[32vh] w-auto"
               style={{

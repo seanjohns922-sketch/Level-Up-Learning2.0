@@ -1,5 +1,7 @@
 "use client";
 
+import NumbotArtwork from "@/components/legends/NumbotArtwork";
+
 import { useMemo, useState } from "react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -116,7 +118,7 @@ function SceneToken({ character, onClick }: { character: SpatialCharacter; onCli
           "0 0 12px rgba(56,230,200,0.45), inset 0 1px 0 rgba(255,255,255,0.85)",
       }}
     >
-      <div className="text-3xl sm:text-4xl drop-shadow">{character.emoji}</div>
+      <div className="text-3xl sm:text-4xl drop-shadow">{character.id === "numbot" ? <NumbotArtwork className="mx-auto h-10 w-10" /> : character.emoji}</div>
       <div className="mt-0.5 text-[11px] font-black text-teal-900 sm:text-xs">{character.label}</div>
     </button>
   );
@@ -268,7 +270,7 @@ export function GroundSpatialTaskCard({ task, onCorrect, onWrong }: { task: Grou
                       onClick={() => (id === task.targetCharacterId ? onCorrect() : onWrong())}
                       className="flex min-h-[96px] w-full flex-col items-center justify-center rounded-[22px] border-2 border-cyan-200 bg-white px-3 py-3 text-center text-teal-900 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
                     >
-                      <div className="text-4xl">{character.emoji}</div>
+                      <div className="text-4xl">{character.id === "numbot" ? <NumbotArtwork className="mx-auto h-10 w-10" /> : character.emoji}</div>
                       <div className="mt-1 text-sm font-black">{character.label}</div>
                     </button>
                     <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />
@@ -297,7 +299,7 @@ export function GroundSpatialTaskCard({ task, onCorrect, onWrong }: { task: Grou
                           selectedBankId === id ? "border-teal-400 bg-teal-100 text-teal-900" : "border-cyan-200 bg-white text-teal-900 hover:border-cyan-300 hover:bg-cyan-50"
                         }`}
                       >
-                        <div className="text-3xl">{character.emoji}</div>
+                        <div className="text-3xl">{character.id === "numbot" ? <NumbotArtwork className="mx-auto h-10 w-10" /> : character.emoji}</div>
                         <div className="mt-1 text-sm font-black">{character.label}</div>
                       </button>
                       <OptionReadAloudButton text={character.label} className="absolute right-3 top-3 z-10" />

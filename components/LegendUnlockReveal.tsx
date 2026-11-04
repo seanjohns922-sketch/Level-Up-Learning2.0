@@ -6,7 +6,6 @@ import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
 import ReliqsWordmark from "@/components/brand/ReliqsWordmark";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { Legend } from "@/data/legends";
-import { RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { markLegendUnlockVideoSeen } from "@/lib/legend-video-state";
 import { getReliqsColor } from "@/lib/reliqs-brand";
 import styles from "./LegendUnlockReveal.module.css";
@@ -229,14 +228,9 @@ export default function LegendUnlockReveal({
                 <div className={`${styles.cardWrap} ${stage === "seal" ? styles.cardEnter : stage === "charge" ? styles.cardCharging : ""}`}>
                   <div className={styles.cardHalo} aria-hidden />
                   <div ref={tiltRef} className={styles.tilt}>
-                    <div className={`${styles.flipper} aspect-[2/3] ${flipped ? styles.flipped : ""}`}>
+                    <div className={`${styles.flipper} aspect-[63/88] ${flipped ? styles.flipped : ""}`}>
                       <div className={`${styles.face} ${styles.faceSealed}`} aria-hidden>
-                        <div className={styles.sealedPattern} />
-                        <svg viewBox="209 0 72 80" className={styles.emblem}>
-                          <path d={RELIQ_Q_PATH} className={styles.emblemFill} />
-                          <path d={RELIQ_Q_PATH} className={styles.emblemStroke} pathLength={1} />
-                        </svg>
-                        <span className={styles.sealedLabel}>RELIQ</span>
+                        <LegendCardArtwork src={legend.images.cardBack} alt="" className="h-full w-full" />
                         <div className={styles.foil} />
                       </div>
                       <div className={`${styles.face} ${styles.faceFront}`}>

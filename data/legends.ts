@@ -1,3 +1,5 @@
+import { getLegendArtwork } from "./legend-artwork";
+
 export type LegendRealmId =
   | "number-nexus"
   | "measurelands"
@@ -35,39 +37,6 @@ export type Legend = {
 
 const YEAR_LABELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"] as const;
 
-const DEFAULT_IMAGES: Record<LegendRealmId, LegendImages> = {
-  "number-nexus": {
-    avatar: "/cards/numbot-solver-y4-front.png",
-    cardFront: "/cards/numbot-solver-y4-front.png",
-    cardBack: "/cards/numbot-solver-y4-back.png",
-  },
-  measurelands: {
-    avatar: "/cards/meazurex-balancer-y4-front.png",
-    cardFront: "/cards/meazurex-balancer-y4-front.png",
-    cardBack: "/cards/meazurex-balancer-y4-back.png",
-  },
-  starpath: {
-    avatar: "/cards/geospin-shapeshifter-y4-front.png",
-    cardFront: "/cards/geospin-shapeshifter-y4-front.png",
-    cardBack: "/cards/geospin-shapeshifter-y4-back.png",
-  },
-  "pattern-peaks": {
-    avatar: "/cards/patternox-sequencer-y4-front.png",
-    cardFront: "/cards/patternox-sequencer-y4-front.png",
-    cardBack: "/cards/patternox-sequencer-y4-back.png",
-  },
-  "chance-hollow": {
-    avatar: "/cards/chanzia-spin-y3-front.png",
-    cardFront: "/cards/chanzia-spin-y3-front.png",
-    cardBack: "/cards/chanzia-spin-y3-back.png",
-  },
-  statistica: {
-    avatar: "/cards/datara-analyst-y4-front.png",
-    cardFront: "/cards/datara-analyst-y4-front.png",
-    cardBack: "/cards/datara-analyst-y4-back.png",
-  },
-};
-
 function legendVideoUrl(slug: string) {
   return `/videos/legends/${slug}.mp4`;
 }
@@ -79,8 +48,6 @@ function numberLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -92,11 +59,7 @@ function numberLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("number-nexus", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -109,8 +72,6 @@ function measurelandsLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -122,11 +83,7 @@ function measurelandsLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("measurelands", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -139,8 +96,6 @@ function starpathLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -152,11 +107,7 @@ function starpathLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("starpath", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -169,8 +120,6 @@ function statisticaLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -182,11 +131,7 @@ function statisticaLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("statistica", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -199,8 +144,6 @@ function patternPeaksLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -212,11 +155,7 @@ function patternPeaksLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("pattern-peaks", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -229,8 +168,6 @@ function chanceHollowLegend(
   description: string,
   stars: number,
   stats: LegendStats,
-  front: string,
-  back: string,
   videoSlug: string,
 ): Legend {
   return {
@@ -242,11 +179,7 @@ function chanceHollowLegend(
     description,
     stars,
     stats,
-    images: {
-      avatar: front,
-      cardFront: front,
-      cardBack: back,
-    },
+    images: getLegendArtwork("chance-hollow", yearLabel),
     unlockVideoUrl: legendVideoUrl(videoSlug),
     showcaseVideoUrl: legendVideoUrl(videoSlug),
   };
@@ -260,8 +193,6 @@ const LEGENDS: Legend[] = [
     "Foundation number champion in training.",
     0.5,
     { calculation: 35, speed: 30, accuracy: 40 },
-    "/cards/numbot-bouncer-y0-front.png",
-    "/cards/numbot-bouncer-y0-back.png",
     "numbot-bouncer",
   ),
   numberLegend(
@@ -271,8 +202,6 @@ const LEGENDS: Legend[] = [
     "Counts, orders, and groups with confidence.",
     1,
     { calculation: 40, speed: 40, accuracy: 45 },
-    "/cards/numbot-counter-y1-front.png",
-    "/cards/numbot-counter-y1-back.png",
     "numbot-counter",
   ),
   numberLegend(
@@ -282,8 +211,6 @@ const LEGENDS: Legend[] = [
     "Builds strategies and partitions numbers efficiently.",
     2,
     { calculation: 50, speed: 50, accuracy: 50 },
-    "/cards/numbot-builder-y2-front.png",
-    "/cards/numbot-builder-y2-back.png",
     "numbot-builder",
   ),
   numberLegend(
@@ -293,8 +220,6 @@ const LEGENDS: Legend[] = [
     "Processes number tasks quickly with growing accuracy.",
     3,
     { calculation: 55, speed: 60, accuracy: 55 },
-    "/cards/numbot-processor-y3-front.png",
-    "/cards/numbot-processor-y3-back.png",
     "numbot-processor",
   ),
   numberLegend(
@@ -304,8 +229,6 @@ const LEGENDS: Legend[] = [
     "Solves multi-step number problems using efficient strategies and precision.",
     4,
     { calculation: 65, speed: 70, accuracy: 60 },
-    "/cards/numbot-solver-y4-front.png",
-    "/cards/numbot-solver-y4-back.png",
     "numbot-solver",
   ),
   numberLegend(
@@ -315,8 +238,6 @@ const LEGENDS: Legend[] = [
     "Calculates efficiently and explains strategies clearly.",
     5,
     { calculation: 75, speed: 70, accuracy: 75 },
-    "/cards/numbot-calculator-y5-front.png",
-    "/cards/numbot-calculator-y5-back.png",
     "numbot-calculator",
   ),
   numberLegend(
@@ -326,8 +247,6 @@ const LEGENDS: Legend[] = [
     "Masters complex number thinking and equations.",
     6,
     { calculation: 85, speed: 80, accuracy: 85 },
-    "/cards/numbot-equationator-y6-front.png",
-    "/cards/numbot-equationator-y6-back.png",
     "numbot-equationator",
   ),
   measurelandsLegend(
@@ -337,8 +256,6 @@ const LEGENDS: Legend[] = [
     "Begins the measuring journey by noticing size, weight, and capacity in the world around them.",
     0.5,
     { calculation: 30, speed: 34, accuracy: 42 },
-    "/cards/meazurex-pebble-y0-front.png",
-    "/cards/meazurex-pebble-y0-back.png",
     "meazurex-pebble",
   ),
   measurelandsLegend(
@@ -348,8 +265,6 @@ const LEGENDS: Legend[] = [
     "Measures with informal units and compares lengths, mass, capacity, and time with growing confidence.",
     1,
     { calculation: 40, speed: 42, accuracy: 48 },
-    "/cards/meazurex-ticklet-y1-front.png",
-    "/cards/meazurex-ticklet-y1-back.png",
     "meazurex-ticklet",
   ),
   measurelandsLegend(
@@ -359,8 +274,6 @@ const LEGENDS: Legend[] = [
     "Uses stronger measuring strategies and clearer comparisons across the Measurelands realms.",
     2,
     { calculation: 50, speed: 48, accuracy: 55 },
-    "/cards/meazurex-measurer-y2-front.png",
-    "/cards/meazurex-measurer-y2-back.png",
     "meazurex-measurer",
   ),
   measurelandsLegend(
@@ -370,8 +283,6 @@ const LEGENDS: Legend[] = [
     "Tracks changing quantities and reads measurement clues with precision.",
     3,
     { calculation: 58, speed: 56, accuracy: 60 },
-    "/cards/meazurex-tracker-y3-front.png",
-    "/cards/meazurex-tracker-y3-back.png",
     "meazurex-tracker",
   ),
   measurelandsLegend(
@@ -381,8 +292,6 @@ const LEGENDS: Legend[] = [
     "Balances units, scale, and reasoned measurement decisions across complex tasks.",
     4,
     { calculation: 66, speed: 62, accuracy: 68 },
-    "/cards/meazurex-balancer-y4-front.png",
-    "/cards/meazurex-balancer-y4-back.png",
     "meazurex-balancer",
   ),
   measurelandsLegend(
@@ -392,8 +301,6 @@ const LEGENDS: Legend[] = [
     "Calibrates measurements carefully and chooses efficient tools with expert judgement.",
     5,
     { calculation: 76, speed: 70, accuracy: 78 },
-    "/cards/meazurex-calibrator-y5-front.png",
-    "/cards/meazurex-calibrator-y5-back.png",
     "meazurex-calibrator",
   ),
   measurelandsLegend(
@@ -403,8 +310,6 @@ const LEGENDS: Legend[] = [
     "Commands advanced measurement, scale, and time with legendary control.",
     6,
     { calculation: 84, speed: 78, accuracy: 86 },
-    "/cards/meazurex-timewielder-y6-front.png",
-    "/cards/meazurex-timewielder-y6-back.png",
     "meazurex-timewielder",
   ),
   starpathLegend(
@@ -414,8 +319,6 @@ const LEGENDS: Legend[] = [
     "Begins exploring familiar shapes and positions across the Starpath realm.",
     0.5,
     { calculation: 35, speed: 30, accuracy: 40 },
-    "/cards/geospin-explorer-y0-front.png",
-    "/cards/geospin-explorer-y0-back.png",
     "geospin-explorer",
   ),
   starpathLegend(
@@ -425,8 +328,6 @@ const LEGENDS: Legend[] = [
     "Begins the Starpath journey by recognising, sorting, and creating shapes with confidence.",
     1,
     { calculation: 40, speed: 42, accuracy: 48 },
-    "/cards/geospin-roller-y1-front.png",
-    "/cards/geospin-roller-y1-back.png",
     "geospin-roller",
   ),
   starpathLegend(
@@ -436,8 +337,6 @@ const LEGENDS: Legend[] = [
     "Maps shapes, positions, and spatial relationships across the Starpath realm.",
     2,
     { calculation: 50, speed: 48, accuracy: 55 },
-    "/cards/geospin-mapper-y2-front.png",
-    "/cards/geospin-mapper-y2-back.png",
     "geospin-mapper",
   ),
   starpathLegend(
@@ -447,8 +346,6 @@ const LEGENDS: Legend[] = [
     "Navigates increasingly complex spatial challenges with precision and insight.",
     3,
     { calculation: 58, speed: 56, accuracy: 60 },
-    "/cards/geospin-navigator-y3-front.png",
-    "/cards/geospin-navigator-y3-back.png",
     "geospin-navigator",
   ),
   starpathLegend(
@@ -458,8 +355,6 @@ const LEGENDS: Legend[] = [
     "Transforms and reasons about shapes across challenging Starpath missions.",
     4,
     { calculation: 66, speed: 62, accuracy: 68 },
-    "/cards/geospin-shapeshifter-y4-front.png",
-    "/cards/geospin-shapeshifter-y4-back.png",
     "geospin-shapeshifter",
   ),
   starpathLegend(
@@ -469,8 +364,6 @@ const LEGENDS: Legend[] = [
     "Crafts sophisticated spatial strategies and geometric solutions.",
     5,
     { calculation: 76, speed: 70, accuracy: 78 },
-    "/cards/geospin-galaxycrafter-y5-front.png",
-    "/cards/geospin-galaxycrafter-y5-back.png",
     "geospin-galaxycrafter",
   ),
   starpathLegend(
@@ -480,8 +373,6 @@ const LEGENDS: Legend[] = [
     "Weaves advanced geometric reasoning into legendary Starpath discoveries.",
     6,
     { calculation: 84, speed: 78, accuracy: 86 },
-    "/cards/geospin-starweaver-y6-front.png",
-    "/cards/geospin-starweaver-y6-back.png",
     "geospin-starweaver",
   ),
   patternPeaksLegend(
@@ -491,8 +382,6 @@ const LEGENDS: Legend[] = [
     "Spots changing patterns and follows rules through every twist in the trail.",
     3,
     { calculation: 58, speed: 56, accuracy: 62 },
-    "/cards/patternox-wigglecode-y3-front.png",
-    "/cards/patternox-wigglecode-y3-back.png",
     "patternox-wigglecode",
   ),
   patternPeaksLegend(
@@ -502,8 +391,6 @@ const LEGENDS: Legend[] = [
     "Connects number sequences, equivalent statements, and efficient algebraic rules.",
     4,
     { calculation: 67, speed: 63, accuracy: 70 },
-    "/cards/patternox-sequencer-y4-front.png",
-    "/cards/patternox-sequencer-y4-back.png",
     "patternox-sequencer",
   ),
   patternPeaksLegend(
@@ -513,8 +400,6 @@ const LEGENDS: Legend[] = [
     "Uses inverse operations and number properties to solve unknown values with confidence.",
     5,
     { calculation: 77, speed: 71, accuracy: 80 },
-    "/cards/patternox-solver-y5-front.png",
-    "/cards/patternox-solver-y5-back.png",
     "patternox-solver",
   ),
   patternPeaksLegend(
@@ -524,8 +409,6 @@ const LEGENDS: Legend[] = [
     "Masters growing patterns, algorithms, brackets, and multi-operation equations.",
     6,
     { calculation: 86, speed: 80, accuracy: 88 },
-    "/cards/patternox-codemaster-y6-front.png",
-    "/cards/patternox-codemaster-y6-back.png",
     "patternox-codemaster",
   ),
   chanceHollowLegend(
@@ -535,8 +418,6 @@ const LEGENDS: Legend[] = [
     "Reads chance clues, lists possible outcomes, and notices how trial results can vary.",
     3,
     { calculation: 56, speed: 58, accuracy: 62 },
-    "/cards/chanzia-spin-y3-front.png",
-    "/cards/chanzia-spin-y3-back.png",
     "chanzia-spin",
   ),
   chanceHollowLegend(
@@ -546,8 +427,6 @@ const LEGENDS: Legend[] = [
     "Builds fair games and compares probability fractions with sharp precision.",
     4,
     { calculation: 66, speed: 70, accuracy: 72 },
-    "/cards/chanzia-flick-y4-front.png",
-    "/cards/chanzia-flick-y4-back.png",
     "chanzia-flick",
   ),
   chanceHollowLegend(
@@ -557,8 +436,6 @@ const LEGENDS: Legend[] = [
     "Maps complex outcomes and tests probability claims with frequency evidence.",
     5,
     { calculation: 76, speed: 75, accuracy: 80 },
-    "/cards/chanzia-roller-y5-front.png",
-    "/cards/chanzia-roller-y5-back.png",
     "chanzia-roller",
   ),
   chanceHollowLegend(
@@ -568,8 +445,6 @@ const LEGENDS: Legend[] = [
     "Commands probability scales, simulations, and long-run evidence.",
     6,
     { calculation: 88, speed: 84, accuracy: 92 },
-    "/cards/chanzia-master-y6-front.png",
-    "/cards/chanzia-master-y6-back.png",
     "chanzia-master",
   ),
   statisticaLegend(
@@ -579,8 +454,6 @@ const LEGENDS: Legend[] = [
     "Collects facts, observations, and details that begin every great discovery.",
     1,
     { calculation: 42, speed: 40, accuracy: 48 },
-    "/cards/datara-picker-y1-front.png",
-    "/cards/datara-picker-y1-back.png",
     "datara-picker",
   ),
   statisticaLegend(
@@ -590,8 +463,6 @@ const LEGENDS: Legend[] = [
     "Sorts and organises information so useful patterns can emerge.",
     2,
     { calculation: 50, speed: 48, accuracy: 56 },
-    "/cards/datara-sorter-y2-front.png",
-    "/cards/datara-sorter-y2-back.png",
     "datara-solver",
   ),
   statisticaLegend(
@@ -601,8 +472,6 @@ const LEGENDS: Legend[] = [
     "Turns collected information into clear displays that reveal a story.",
     3,
     { calculation: 58, speed: 55, accuracy: 62 },
-    "/cards/datara-grapher-y3-front.png",
-    "/cards/datara-grapher-y3-back.png",
     "datara-grapher",
   ),
   statisticaLegend(
@@ -612,8 +481,6 @@ const LEGENDS: Legend[] = [
     "Compares data displays and uses evidence to explain meaningful findings.",
     4,
     { calculation: 66, speed: 62, accuracy: 69 },
-    "/cards/datara-analyst-y4-front.png",
-    "/cards/datara-analyst-y4-back.png",
     "datara-analyst",
   ),
   statisticaLegend(
@@ -623,8 +490,6 @@ const LEGENDS: Legend[] = [
     "Decodes complex datasets and identifies the patterns hidden within them.",
     5,
     { calculation: 76, speed: 70, accuracy: 78 },
-    "/cards/datara-decoder-y5-front.png",
-    "/cards/datara-decoder-y5-back.png",
     "datara-decoder",
   ),
   statisticaLegend(
@@ -634,8 +499,6 @@ const LEGENDS: Legend[] = [
     "Evaluates data with expert judgement and protects the insights it reveals.",
     6,
     { calculation: 85, speed: 79, accuracy: 87 },
-    "/cards/datara-insightkeeper-y6-front.png",
-    "/cards/datara-insightkeeper-y6-back.png",
     "datara-insightkeeper",
   ),
 ];
@@ -651,6 +514,11 @@ export function normalizeLegendRealmId(realmId?: string | null): LegendRealmId {
   }
   if (realmId === "statistica" || realmId === "statistics") return "statistica";
   return "number-nexus";
+}
+
+/** Character appearances always use cutouts, independently of card-front filenames. */
+export function getLegendGuideImage(legend: Legend): string | null {
+  return legend.images.avatar;
 }
 
 export function getAllLegends(realmId?: LegendRealmId): Legend[] {
@@ -686,7 +554,7 @@ export function getLegendForYear(
       description: "Legend data missing for this year.",
       stars: 1,
       stats: { calculation: 0, speed: 0, accuracy: 0 },
-      images: DEFAULT_IMAGES[realmId],
+      images: getLegendArtwork(realmId, yearLabel),
       unlockVideoUrl: undefined,
       showcaseVideoUrl: undefined,
     }

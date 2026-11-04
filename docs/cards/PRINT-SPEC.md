@@ -38,19 +38,25 @@ Production rules:
 
 ## Current Number Nexus design brief
 
-The user rejected the redesign that mixed other realms into Number Nexus.
-Keep Number Nexus's own Numbot robot and arithmetic identity. Use original
-Number Nexus artwork as the identity and theme reference. Newer realm artwork
-may inform illustration quality, detail and polish only; do not import its
-character anatomy, costumes or realm-specific props. The precise upgraded look
-is pending visual review; no replacement style has been approved.
+Updated by the user on 4 November 2026. The approved direction is a new sci-fi
+Numbot family: emerald/teal armour, silver trim, graphite joints, mint eyes and
+energy cores, with springy Bouncer through the three-fin flight-equipped
+Equationator. Keep each stage distinct and recognisably part of this family.
 
-- Front: avatar artwork with a subtle Number Nexus background; no small print,
-  statistics, badges, title or decorative card frame.
-- Back: character name and level, three prominent attributes, card number, and
-  one short sentence. No dense rules or lore paragraphs.
-- Attribute values must match the canonical Legends data in `data/legends.ts`.
-- Preserve original assets or use versioned paths when replacing a collection.
+- Front: full-art realm illustration, name, stage, level and three attributes;
+  clean cream typography and a consistent near-black charcoal attribute strip.
+- Back: shared black/charcoal clocktower artwork with white RELI and a
+  Number Nexus-coloured castle Q. No character attributes on the back.
+- Number attributes: Calculation / Speed / Accuracy. User-confirmed progression:
+  Ground 10/10/10; L1 20/25/15; L2 35/40/30; L3 50/55/45;
+  L4 65/70/60; L5 80/85/75; L6 95/100/90. These supersede old card values.
+- Display review previews at trimmed size. Clearly label any bleed-page proof.
+- Keep web cutouts separate from card artwork; never use CMYK PDFs as web assets.
+- Preserve original assets and use versioned replacement paths.
 
-The Number Nexus visual brief is specific to that redesign; the physical print
-specification above applies to every future card.
+Approved transparent teal guide assets are in `public/guides/numbot-teal-2026-11-04-v1/`.
+The prior emerald sci-fi pack remains preserved for recovery. Card fronts and
+realm backs now use trimmed sRGB exports in `public/cards/approved-2026-11-04-v1/`.
+The original CMYK proofs are unchanged. Existing unlock/showcase videos still
+contain the old artwork and require separate replacements. Browser integration
+does not constitute supplier approval of print masters.

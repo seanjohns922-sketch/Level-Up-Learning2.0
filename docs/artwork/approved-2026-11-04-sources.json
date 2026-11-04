@@ -1,0 +1,598 @@
+[
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_Ground_Bouncer_CMYK_PROOF.pdf",
+    "sourceSha256": "23a11e64822b01fea5a445694dea83c7f30440755799343b96d38c7dfacf208b",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-bouncer-y0-front.webp",
+    "outputSha256": "3b2a11557b8df11df22c5c3532fa564fe3c267b3e84208bae40db9dd0c7ed5ae"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L1_Counter_CMYK_PROOF.pdf",
+    "sourceSha256": "d263512b8ccbff46d7d412103fd5a5b27fed11328f0ec6d5d52d24a7b9e26cd7",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-counter-y1-front.webp",
+    "outputSha256": "d1a8b7d89c2011581357f0e3c13797e54c1710388c60d07bf9e631901dba2ee6"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L2_Builder_CMYK_PROOF.pdf",
+    "sourceSha256": "beb6170de3e49522fd2771f2f7560f110cad3b77ba093bcdfbc202a4b24e30d3",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-builder-y2-front.webp",
+    "outputSha256": "201df6e08c3a4f5e46c5aa72a21cdc04e25082f5afbc00faa9279c1ac71f5a94"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L3_Processor_CMYK_PROOF.pdf",
+    "sourceSha256": "664b34a77a59af62026da5fd8576c9173042cabdbeae989ec0730b6a304dd4c7",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-processor-y3-front.webp",
+    "outputSha256": "c4ccdc2ad24121f5499f988ac58e1e23d6885a5dba84a52f84bc1d84e68dd8be"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L4_Solver_CMYK_PROOF.pdf",
+    "sourceSha256": "df8dedebcc54cc4d2d79d19651c7d70c78589d28ba88151ec3366fcabf25fd24",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-solver-y4-front.webp",
+    "outputSha256": "9a3bf96f9537e871e38316a4cf0625c7bdbf1d17ac4774266e81d0395a98fd8f"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L5_Calculator_CMYK_PROOF.pdf",
+    "sourceSha256": "5bf9238389a6440def55e7dbc1d55e855f94b52f5bda9bda3d395feb1f613f82",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-calculator-y5-front.webp",
+    "outputSha256": "9bff7b1de0fadb09eb41e30dcbc2f2a98de988b8a5f2c767233ba5ef86a63705"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Fronts/Numbot_L6_Equationator_CMYK_PROOF.pdf",
+    "sourceSha256": "e8958c26dd5e9e9e79402fbc4276464ca455c321bd2437dc9ee88bdb6f7690e8",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/numbot-equationator-y6-front.webp",
+    "outputSha256": "1c730f028096b2c8db959cd2478b9da8a70378f2c177cfa273f1ba7393dc7cc5"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Number_Nexus_Cards/Back/Numbot_Shared_Teal_RELIQ_Back_CMYK_PROOF.pdf",
+    "sourceSha256": "a508c89a7ed609543747b8c00e30f261c7e2961250a08555e5795d16973071f0",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/number-nexus/back.webp",
+    "outputSha256": "5ac73515534d80522f1a5dc631bcd3a3c27fe55fa0856048b33ad2bc545d5ad6"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_Ground_Pebble_FRONT_PROOF.pdf",
+    "sourceSha256": "8b1ee29fa1e7a5cfd41402d82a65d2f9ca95e34bb25074619af3cb339514aa73",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-pebble-y0-front.webp",
+    "outputSha256": "f32373fa4496ade485b270a3f87c62894a02b09186679e99b8640d3f1f5a31ce"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L1_Ticklet_FRONT_PROOF.pdf",
+    "sourceSha256": "8102621c09df8c39f6a60fff1ca860b15470dc2a0755ecd05d9c48189a71ae10",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-ticklet-y1-front.webp",
+    "outputSha256": "c324b24dd48546a5a11b883a73c55f9b9c262db8d2a1e90b4422f0014aa73e44"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L2_Measurer_FRONT_PROOF.pdf",
+    "sourceSha256": "d93e69a168a326cc3eeda145be309d58f1d76c4650fa47378aa610b7f2afa4b1",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-measurer-y2-front.webp",
+    "outputSha256": "947a26f68c2b49f751cdd9a5242db2f17ac1344a4f36e9c0193affea43ade558"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L3_Tracker_FRONT_PROOF.pdf",
+    "sourceSha256": "cdffb27f805da6cd99894a993d9ef660afa815a74bf46ba82421202269a85ad0",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-tracker-y3-front.webp",
+    "outputSha256": "878e84954246360244c05ce0ca8357964cc2c2f2274b115e05c310a73552bc0a"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L4_Balancer_FRONT_PROOF.pdf",
+    "sourceSha256": "f36d0ce81c2543c97bcd1770327354226121774ccecd2377fddaf686e0cb7957",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-balancer-y4-front.webp",
+    "outputSha256": "2616d7f266915647ff2ba1faf8002e32c003f95a233cd9799bb5d381e707ac6d"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L5_Calibrator_FRONT_PROOF.pdf",
+    "sourceSha256": "c81aeb8076e244dbd088b88c97af5d28d7af8b730ee883b7857d38c962dfc734",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-calibrator-y5-front.webp",
+    "outputSha256": "bcc9ce454b9fb7b414cb57afc8fa486f0c066aa3fafc8178ab7f2bcbf607451c"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Fronts/Meazurex_L6_Timewielder_FRONT_PROOF.pdf",
+    "sourceSha256": "c0270328e2613212e8b2a96f4b479dc115d2ac217636a9cc803ae0c582fb5738",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/meazurex-timewielder-y6-front.webp",
+    "outputSha256": "dd9ed21e97d6efd8b09eae1b60c7f2be5105155139ddb3ec8439294421727df4"
+  },
+  {
+    "realm": "measurelands",
+    "source": "Measurelands_Proofs/Backs/Measurelands_SHARED_GOLD_BACK_PROOF.pdf",
+    "sourceSha256": "11dc924bf4e49c65b030c826d7e6648ae5c0210427c2d9de55294a7b2dfd712b",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/measurelands/back.webp",
+    "outputSha256": "0494dbcacfaa629c1d6d3af9df75d3ecdffb67c2ded6c0f66ca7e3f7255980d0"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_Ground_Explorer_FRONT_PROOF.pdf",
+    "sourceSha256": "5fee9ac62aca2f846d4448abf287f2ec1430a3b000783efc553169433eadb962",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-explorer-y0-front.webp",
+    "outputSha256": "69ca48a5f2e27f32bab36dced69384385a86e2cf5914aacd75c68b5e49b326d9"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L1_Roller_FRONT_PROOF.pdf",
+    "sourceSha256": "f43eb2b2e043bd62091323794cab2c9e71f1fc99f90ddbbbcfbae5e07236a096",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-roller-y1-front.webp",
+    "outputSha256": "2329720819ee0784e4d3fb6fdc97f36d25c765500462fbb6291ae2aefb8d8567"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L2_Mapper_FRONT_PROOF.pdf",
+    "sourceSha256": "93548b7f46813fb82b6d56f4f8c9ffa2214dc690e47fbec0b845202b39eb88d4",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-mapper-y2-front.webp",
+    "outputSha256": "1efc0e8755e7866b6f46de0d450cee03153f4697f589a1f97b7af9c3e4e902aa"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L3_Navigator_FRONT_PROOF.pdf",
+    "sourceSha256": "a4c923f35cd56466a38850c6c44532b199f2e54da9509f4adf3c748856504ff3",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-navigator-y3-front.webp",
+    "outputSha256": "273796f1d6e3d5aaf5fc8f5332959fd4f86c3fdea7ae42ac1f086ff25dc1633e"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L4_Shapeshifter_FRONT_PROOF.pdf",
+    "sourceSha256": "5fb9b2a867e81af03b676de765572de4537f3dd042916eaabc3d548d0a081bb0",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-shapeshifter-y4-front.webp",
+    "outputSha256": "edae08554682d8cb650d3c4ae74cbe41c41ca479143d7a1e37c4b571c6724c1d"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L5_Galaxycrafter_FRONT_PROOF.pdf",
+    "sourceSha256": "58d74952ea8f746d080ce23639ec7ad4e8f1459c18f62a99e6daca534083dca4",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-galaxycrafter-y5-front.webp",
+    "outputSha256": "c41989d44ce56ca3d87cbfab218265d59bef318b7050773f2a9bb1c040f0fa5c"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Fronts/Geospin_L6_Starweaver_FRONT_PROOF.pdf",
+    "sourceSha256": "8a4c1f85cf704eacd2467fb5ea73ed4a635accf5fc32f3ebb5026c1a79a5ad13",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/geospin-starweaver-y6-front.webp",
+    "outputSha256": "7a8d9b2938b5757c11efbdb7626d1401121715abfb690edd2cbba0757b5ab089"
+  },
+  {
+    "realm": "starpath",
+    "source": "Starpath_Proofs/Backs/Starpath_SHARED_BACK_PROOF.pdf",
+    "sourceSha256": "a09cb663513da531587dc1bc7bfedf38049c9de38e3e4ceaaeed65796509e00d",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/starpath/back.webp",
+    "outputSha256": "078804417959dd53e5fbe166a340d816db35dd81ec09b8ce51d2b8df65617236"
+  },
+  {
+    "realm": "pattern-peaks",
+    "source": "Pattern_Peaks_Proofs_v2/Fronts/Patternox_L3_Wigglecode_FRONT_PROOF.pdf",
+    "sourceSha256": "1435b728d17109d011b29428579768609b9a51280433badb9e82535ffc07c0cc",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/pattern-peaks/patternox-wigglecode-y3-front.webp",
+    "outputSha256": "372c5e5b3f554038cfb97f67d36a1062f2841a2a59e9b761a0c3a646c57c2912"
+  },
+  {
+    "realm": "pattern-peaks",
+    "source": "Pattern_Peaks_Proofs_v2/Fronts/Patternox_L4_Sequencer_FRONT_PROOF.pdf",
+    "sourceSha256": "2a5fda93fc37c3b87342c2d2bc664113d1d1d30dd7e590ae8abcc904dc78061d",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/pattern-peaks/patternox-sequencer-y4-front.webp",
+    "outputSha256": "8d39c9621a879c738269f506f0f26cbc8b0eff5c2310bb3a33a6f257d6d37b95"
+  },
+  {
+    "realm": "pattern-peaks",
+    "source": "Pattern_Peaks_Proofs_v2/Fronts/Patternox_L5_Solver_FRONT_PROOF.pdf",
+    "sourceSha256": "ddedd275bf72d6491e9edef5b470ff9bb79d1c964fa34eec01d39ab9116847cd",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/pattern-peaks/patternox-solver-y5-front.webp",
+    "outputSha256": "ade1cf9232dddf818764ff39f52fd15b2be280b66a49008b84681a5720048cba"
+  },
+  {
+    "realm": "pattern-peaks",
+    "source": "Pattern_Peaks_Proofs_v2/Fronts/Patternox_L6_Codemaster_FRONT_PROOF.pdf",
+    "sourceSha256": "594d85c1bced75f0dbe7698f9deecd7c5679c5d74c4597b4bd8a98b93bd83959",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/pattern-peaks/patternox-codemaster-y6-front.webp",
+    "outputSha256": "6c476c78917138d7ef14e91e7acc5d49f98c49796cf5790aaa40d2c3f85451d9"
+  },
+  {
+    "realm": "pattern-peaks",
+    "source": "Pattern_Peaks_Proofs_v2/Backs/Pattern_Peaks_SHARED_BACK_PROOF.pdf",
+    "sourceSha256": "bfe0f148b132da100ae07f18b6695fce7cf8e81ea718039bd7f955b941cf3c55",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/pattern-peaks/back.webp",
+    "outputSha256": "fb8f6355de8374d5a669ade0b1644a0190582225cb2a1d831aca691d51d63575"
+  },
+  {
+    "realm": "chance-hollow",
+    "source": "Chance_Hollow_Proofs/Fronts/Chanzia_L3_Spin_FRONT_PROOF.pdf",
+    "sourceSha256": "cefb0b521d490753d068db5793615bf9eff9ef3544f291e836be590a57cd9cef",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/chance-hollow/chanzia-spin-y3-front.webp",
+    "outputSha256": "026e796c5202c8fe942200ce5d6e40c7bed1cfb7102bb6468a39fbb5197e6391"
+  },
+  {
+    "realm": "chance-hollow",
+    "source": "Chance_Hollow_Proofs/Fronts/Chanzia_L4_Flick_FRONT_PROOF.pdf",
+    "sourceSha256": "4c2db6c8a383900d0f407d82ec77afad8c1f088f749669979a234fd2a59ce887",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/chance-hollow/chanzia-flick-y4-front.webp",
+    "outputSha256": "2cd1a79937cb140bd5947210bc9313715ec02e13b69f610a56275e75ccfb2d7d"
+  },
+  {
+    "realm": "chance-hollow",
+    "source": "Chance_Hollow_Proofs/Fronts/Chanzia_L5_Roller_FRONT_PROOF.pdf",
+    "sourceSha256": "c020404a8b4c3d361caa61b3553d4fc5bcdef3071d7f64999e115a85a807933f",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/chance-hollow/chanzia-roller-y5-front.webp",
+    "outputSha256": "ca82fe31eab2ed2d54c4f7937600af7ccb284fbdf830aa96cb10bda2d43ee1b5"
+  },
+  {
+    "realm": "chance-hollow",
+    "source": "Chance_Hollow_Proofs/Fronts/Chanzia_L6_Master_FRONT_PROOF.pdf",
+    "sourceSha256": "5c8c321c42f7df3cb484505b67fe55700e781326f9d90f25175a0a78ae8d7583",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/chance-hollow/chanzia-master-y6-front.webp",
+    "outputSha256": "06a9322e4975df9f4f21403d0eed3ed5e52938305b6258e508ba7dda629cc0fe"
+  },
+  {
+    "realm": "chance-hollow",
+    "source": "Chance_Hollow_Proofs/Backs/Chance_Hollow_SHARED_BACK_PROOF.pdf",
+    "sourceSha256": "fd3f512b724a2ae9d4fd59194d5405f0f798838847c8e55032d395e5583129d4",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/chance-hollow/back.webp",
+    "outputSha256": "f72243392449f5b666c2a682cbf30e4c05093327cc2a71affdf793aadd8641f6"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L1_Picker_FRONT_PROOF.pdf",
+    "sourceSha256": "8a3aa11ddb406fd2a02b54a564427202c8df0a8364e79fa7dd811c9710e33621",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-picker-y1-front.webp",
+    "outputSha256": "4ea27914b8411a0cb7352c232294503f6963ac8299f805032e037de9e068b7e5"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L2_Sorter_FRONT_PROOF.pdf",
+    "sourceSha256": "164974c6ab752df72fffcf5d76a106b3b2df9dbbe72b2598cd5ffdd04dca2ee6",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-sorter-y2-front.webp",
+    "outputSha256": "be5d7ba9d6ccb98a696712dea1733df92efd052f8ce2a3e58b18662340a14025"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L3_Grapher_FRONT_PROOF.pdf",
+    "sourceSha256": "c6b34e44a8ee47a9e532c12bef9860deebdceeebc64eef430feeb29fa5a2d030",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-grapher-y3-front.webp",
+    "outputSha256": "aac1f90d66694c2b9ab1ec57d2e61c4a95b08341c6a5e41055e9a41a6d5bc70a"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L4_Analyst_FRONT_PROOF.pdf",
+    "sourceSha256": "0f9ee429aea7c3ca1fb280607b45c10de6c933a51b5b23baf774b73cbe6ada6d",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-analyst-y4-front.webp",
+    "outputSha256": "43f955cfe7b6800b67de15983faa72e71da2a99533514802d022bd5919dbec11"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L5_Decoder_FRONT_PROOF.pdf",
+    "sourceSha256": "ef34380fce660ec3a3a29345b691c86c79f720c798378b75e42e941cf01019ab",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-decoder-y5-front.webp",
+    "outputSha256": "af6f27714bb85c4563a63f7ed6a57a2f894b09d8e89003b911d16e0ebeea200a"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Fronts/Datara_L6_Insightkeeper_FRONT_PROOF.pdf",
+    "sourceSha256": "364d70aa897e21f6265d42f6a915b6a27b8064836af0793ce2fc0e5e7142398b",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/datara-insightkeeper-y6-front.webp",
+    "outputSha256": "7677e12f2b35b069fd835febc9222cb5ff98a61b7fc7637fb5f063da3c1fabb8"
+  },
+  {
+    "realm": "statistica",
+    "source": "Statistica_Proofs/Backs/Statistica_SHARED_BACK_PROOF.pdf",
+    "sourceSha256": "61dc220092e40a45aff90aed2edcdf89a23324209a2269ad223431a0e386c2db",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/approved-2026-11-04-v1/statistica/back.webp",
+    "outputSha256": "316f05001c0b9cde0fa6aab6ba119548ae8091d4194530bcd4a3dbd47f632915"
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/00_Ground_Numbot_Bouncer.png",
+    "sourceSha256": "89d17f2876876037507f52d89a57c77070a7caf294a240f41f2fdb8d45fe9093",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-bouncer-y0.png",
+    "outputSha256": "89d17f2876876037507f52d89a57c77070a7caf294a240f41f2fdb8d45fe9093",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/01_Level_1_Numbot_Counter.png",
+    "sourceSha256": "542952fbcd869504d16ad0dc192a81bd0f241839e0faaee1f6ebb6a2455b2a7c",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-counter-y1.png",
+    "outputSha256": "542952fbcd869504d16ad0dc192a81bd0f241839e0faaee1f6ebb6a2455b2a7c",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/02_Level_2_Numbot_Builder.png",
+    "sourceSha256": "44416066b0296437064321fefe311fae1eb92d745214f600c8654bf1601d3f0e",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-builder-y2.png",
+    "outputSha256": "44416066b0296437064321fefe311fae1eb92d745214f600c8654bf1601d3f0e",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/03_Level_3_Numbot_Processor.png",
+    "sourceSha256": "4f4bd761251acc2f07f5f96bba7d7a212d7e97aa9ecc8c3345b9062e0a92f9a1",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-processor-y3.png",
+    "outputSha256": "4f4bd761251acc2f07f5f96bba7d7a212d7e97aa9ecc8c3345b9062e0a92f9a1",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/04_Level_4_Numbot_Solver.png",
+    "sourceSha256": "d203a56bcf4892cfb10e1cf4c902650feb005fe6da3803b38a1068edb1e34e55",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-solver-y4.png",
+    "outputSha256": "d203a56bcf4892cfb10e1cf4c902650feb005fe6da3803b38a1068edb1e34e55",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/05_Level_5_Numbot_Calculator.png",
+    "sourceSha256": "6daa66a0c84b3bea56ebbdac939508797416218542dbf12b1ac0556b3814289f",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-calculator-y5.png",
+    "outputSha256": "6daa66a0c84b3bea56ebbdac939508797416218542dbf12b1ac0556b3814289f",
+    "width": 1254,
+    "height": 1254
+  },
+  {
+    "realm": "number-nexus",
+    "source": "Numbot_Teal_Avatars/06_Level_6_Numbot_Equationator.png",
+    "sourceSha256": "2250ae9d4c9bfaf13afada825351c8f1277c7394136a5487a04821b71edf9f9d",
+    "output": "guides/numbot-teal-2026-11-04-v1/numbot-equationator-y6.png",
+    "outputSha256": "2250ae9d4c9bfaf13afada825351c8f1277c7394136a5487a04821b71edf9f9d",
+    "width": 1254,
+    "height": 1254
+  }
+]

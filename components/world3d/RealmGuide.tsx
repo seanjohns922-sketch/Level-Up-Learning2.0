@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import { getLegendForYear, normalizeLegendRealmId } from "@/data/legends";
+import { getLegendForYear, getLegendGuideImage, normalizeLegendRealmId } from "@/data/legends";
 
 // 3D world labels use drei's Html layer (z-index up to 16777271), so the guide sits just above it.
 // The realm guide for Levels G–6: the Legend for the student's current level welcomes them as they
@@ -19,11 +19,6 @@ export type GuideWorld = {
   weekNodes: { week: number; nextActivityType?: "lesson" | "quiz" }[];
   nextActivity: { label: string };
 };
-
-function guideImage(avatar: string) {
-  const key = avatar.split("/").pop()?.replace(/-front\.png$/, "");
-  return key ? `/guides/${key}.webp` : null;
-}
 
 function levelTitle(level: string) {
   return level === "Prep" ? "Ground Level" : level.replace("Year", "Level");
@@ -54,7 +49,7 @@ export function guideLines(world: GuideWorld, realmName: string, legendName: str
 
 export default function RealmGuide({ realmId, level, realmName, accent, world }: { realmId: string; level: string; realmName: string; accent: string; world: GuideWorld }) {
   const legend = useMemo(() => getLegendForYear(level, normalizeLegendRealmId(realmId)), [level, realmId]);
-  const image = guideImage(legend.images.avatar);
+  const image = getLegendGuideImage(legend);
   const lines = useMemo(() => guideLines(world, realmName, legend.name), [world, realmName, legend.name]);
   const arrivalKey = `reliq:guide-arrival:${realmId}:${level}`;
   const [arriving, setArriving] = useState(false);

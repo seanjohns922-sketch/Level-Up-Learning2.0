@@ -1,5 +1,7 @@
 "use client";
 
+import NumbotArtwork from "@/components/legends/NumbotArtwork";
+
 import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
@@ -295,7 +297,7 @@ function renderHelperVisual(task: GroundMatchTask) {
   if (task.helperVariant === "numbot") {
     return (
       <div className="mt-4 flex items-center justify-center gap-3 rounded-lg border border-cyan-200 bg-white/90 px-4 py-3 shadow-sm">
-        <GroundObjectToken objectType="robots" size="lg" />
+        <NumbotArtwork className="h-16 w-16" />
         <div className="rounded-full bg-cyan-50 px-4 py-2 text-sm font-black uppercase tracking-[0.16em] text-teal-800">
           Numbot says
         </div>

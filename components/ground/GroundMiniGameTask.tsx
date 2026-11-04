@@ -1,7 +1,9 @@
 "use client";
 
+import NumbotArtwork from "@/components/legends/NumbotArtwork";
+
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bot, Check, Flag } from "lucide-react";
+import { Check, Flag } from "lucide-react";
 import OptionReadAloudButton from "@/components/OptionReadAloudButton";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import GroundDragPiece from "./GroundDragPiece";
@@ -1329,12 +1331,7 @@ export function GroundFeedTaskCard({
           ))}
         </div>
         <div data-ground-drop="numbot" className="relative rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1] p-3 text-center">
-          <svg key={fedIds.length} viewBox="0 0 200 190" aria-hidden="true" data-ground-numbot={fedIds.length === task.targetNumber ? "dance" : "chomp"} className="mx-auto h-44 w-44">
-            <path d="M100 6v22" stroke="#cbd5e1" strokeWidth="7" /><circle cx="100" cy="8" r="9" fill="#f43f5e" />
-            <rect x="20" y="28" width="160" height="150" rx="34" fill="#f8fafc" stroke="#94a3b8" strokeWidth="5" />
-            <circle cx="66" cy="78" r="17" fill="#1e293b" /><circle cx="134" cy="78" r="17" fill="#1e293b" /><circle cx="71" cy="72" r="6" fill="#22d3ee" /><circle cx="139" cy="72" r="6" fill="#22d3ee" />
-            <rect x="58" y="118" width="84" height="42" rx="20" fill="#7f1d1d" />
-          </svg>
+          <NumbotArtwork key={fedIds.length} aria-hidden="true" data-ground-numbot={fedIds.length === task.targetNumber ? "dance" : "chomp"} className="mx-auto h-44 w-44" />
           <div className="text-4xl font-black text-white">{fedIds.length}</div>
         </div>
       </div>
@@ -1481,7 +1478,7 @@ export function GroundOrderTapTaskCard({
         {isCountdown ? <div className="relative mb-4 h-40 overflow-hidden rounded-2xl bg-gradient-to-b from-[#22104f] to-[#6d3bd1]"><div data-ground-rocket={launched ? "go" : "ready"} className="absolute bottom-1 left-1/2 -ml-16"><GroundObjectToken objectType="rockets" size="lg" className="!h-32 !w-32" /></div></div> : <div className="mb-4 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-center shadow-sm">
           <div className="text-[11px] font-black uppercase tracking-[0.18em] text-teal-700">{isOrderMode ? "Sorting Tray" : "Numbot Trail"}</div>
           <div className="mt-2 flex items-center justify-center gap-3 text-base font-black text-teal-900 sm:text-lg">
-            <span className="grid h-11 w-11 place-items-center rounded-lg border-2 border-teal-300 bg-white text-teal-800 shadow-sm">{isOrderMode ? <Flag className="h-6 w-6" /> : <Bot className="h-6 w-6" />}</span>
+            <span className="grid h-11 w-11 place-items-center rounded-lg border-2 border-teal-300 bg-white text-teal-800 shadow-sm">{isOrderMode ? <Flag className="h-6 w-6" /> : <NumbotArtwork className="h-10 w-10" />}</span>
             <span>{isOrderMode ? `Placed ${progressIndex}` : `On ${currentNumeral}`}</span>
             <span className="text-cyan-400">→</span>
             <span className="rounded-full bg-white px-4 py-2 text-cyan-700 shadow-sm">{isOrderMode ? "Keep sorting" : "Keep moving"}</span>
@@ -1490,7 +1487,7 @@ export function GroundOrderTapTaskCard({
         {!isCountdown && !isOrderMode ? <div className="relative mb-3 flex items-end justify-center gap-2 rounded-2xl bg-gradient-to-b from-sky-200 to-teal-300 px-3 pb-4 pt-16">
           {[task.startNumber ?? null, ...orderedNumerals].map((numeral, index) => numeral === null ? null : <div key={`${numeral}-${index}`} className="relative grid h-14 w-20 place-items-center rounded-[50%] bg-gradient-to-b from-stone-200 to-stone-400 text-2xl font-black text-stone-800 shadow-md">
             {index <= progressIndex ? numeral : "?"}
-            {index === progressIndex ? <span data-ground-hop key={progressIndex} className="absolute -top-14"><GroundObjectToken objectType="robots" size="lg" /></span> : null}
+            {index === progressIndex ? <span data-ground-hop key={progressIndex} className="absolute -top-14"><NumbotArtwork className="h-16 w-16" /></span> : null}
           </div>)}
         </div> : null}
         {isOrderMode ? <div className="mb-1 flex items-center justify-center gap-3 text-xl font-black text-teal-900"><span>{direction === "DESC" ? "Biggest" : "Smallest"}</span><span aria-hidden="true">→</span><span>{direction === "DESC" ? "Smallest" : "Biggest"}</span><OptionReadAloudButton text={direction === "DESC" ? "Biggest to smallest" : "Smallest to biggest"} /></div> : null}

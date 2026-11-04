@@ -575,7 +575,7 @@ function CollectionGroup({ title, emptyText, children }: { title: string; emptyT
 function ParentLegendCard({ legend }: { legend: Legend }) {
   return (
     <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-      <div className="flex aspect-[2/3] items-center justify-center overflow-hidden rounded-md bg-slate-950 p-1.5">
+      <div className="flex aspect-[63/88] items-center justify-center overflow-hidden rounded-md bg-slate-950 p-1.5">
         <LegendCardArtwork src={legend.images.cardFront} alt={`${legend.name} Legend Card`} className="h-full w-full" />
       </div>
       <div className="min-w-0 self-center"><p className="font-black leading-snug">{legend.name}</p><p className="mt-1 text-xs font-semibold text-slate-500">{realmName(legend.realmId)}</p><p className="mt-1 text-xs text-slate-500">{legend.yearLabel}</p></div>

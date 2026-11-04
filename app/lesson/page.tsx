@@ -1,4 +1,5 @@
 "use client";
+import NumbotArtwork from "@/components/legends/NumbotArtwork";
 
 import { useBankedXp } from "@/components/lesson/useBankedXp";
 import { Suspense } from "react";
@@ -805,7 +806,7 @@ function LessonPage() {
     return (
       <div className="rounded-[28px] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-teal-50 p-6 shadow-[0_12px_30px_rgba(13,148,136,0.08)]">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-200 to-teal-300 text-3xl shadow-[0_0_20px_rgba(45,212,191,0.25)]">
-          ☆
+          {realmId === "number" ? <NumbotArtwork className="h-16 w-16" /> : "☆"}
         </div>
         <div className="text-center">
           <div className="inline-flex items-center rounded-full bg-teal-100 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-teal-800">

@@ -1,3 +1,4 @@
+import { getLegendArtwork } from "@/data/legend-artwork";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 
 const BACKGROUNDS: Partial<Record<RealmLevelId, string>> = {
@@ -12,11 +13,6 @@ export function getPatternPeaksBackground(level: RealmLevelId) {
 }
 
 export function getPatternoxCard(level: RealmLevelId, side: "front" | "back" = "front") {
-  const cards: Partial<Record<RealmLevelId, string>> = {
-    "Year 3": `patternox-wigglecode-y3-${side}.png`,
-    "Year 4": `patternox-sequencer-y4-${side}.png`,
-    "Year 5": `patternox-solver-y5-${side}.png`,
-    "Year 6": `patternox-codemaster-y6-${side}.png`,
-  };
-  return `/cards/${cards[level] ?? cards["Year 3"]}`;
+  const images = getLegendArtwork("pattern-peaks", level);
+  return side === "front" ? images.cardFront : images.cardBack;
 }
