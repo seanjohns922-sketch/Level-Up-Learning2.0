@@ -252,6 +252,8 @@ export default function StarpathNetCard({ task, onCorrect, onWrong, assessmentMo
       <div className="space-y-4">
         <TaskHeading prompt={task.prompt} speech={task.speakText} />
         <p className="text-center text-sm font-bold text-slate-500">Tap squares to place faces ({built.length}/{task.buildFaces ?? 6}). Fold it to test.</p>
+        {/* The build board shares the dark stage; include its style so the empty squares show. */}
+        <style>{`.l4sym-stage{background:radial-gradient(120% 90% at 50% 2%, #2a2a6e 0%, #16123f 45%, #0b0a24 100%);box-shadow:0 14px 34px -16px rgba(10,8,40,.6), inset 0 0 0 1px rgba(148,163,255,.14);}`}</style>
         <div className="l4sym-stage mx-auto max-w-xs rounded-3xl p-4">
           {folded && ready ? (
             <FoldStage cells={built} coloured folded size={44} height={210} />

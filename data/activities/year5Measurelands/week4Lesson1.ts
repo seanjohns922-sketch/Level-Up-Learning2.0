@@ -71,7 +71,8 @@ function buildColumnsTask(ctx: Ctx): AreaTask {
 }
 
 function buildArrayTask(ctx: Ctx): AreaTask {
-  const { w, h } = rectDims(2, 7);
+  // At least 3 by 4, so multiplying beats counting at Level 5.
+  const { w, h } = rectDims(4, 8);
   const { options, correct } = areaOptions(w, h);
   return {
     kind: "area",
