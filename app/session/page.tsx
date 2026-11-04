@@ -8000,7 +8000,7 @@ function SessionPage({
   const quizRealmId = isMeasurementRealm ? "measurement" : "number";
   const isGroundNumberQuiz = quizRealmId === "number" && year === "Prep";
   const isLevelTwoNumberQuiz = quizRealmId === "number" && year === "Year 2";
-  const newLookLevel = year === "Year 1" ? 1 : year === "Year 2" ? 2 : year === "Year 3" ? 3 : year === "Year 4" ? 4 : year === "Year 5" ? 5 : 0;
+  const newLookLevel = year === "Year 1" ? 1 : year === "Year 2" ? 2 : year === "Year 3" ? 3 : year === "Year 4" ? 4 : year === "Year 5" ? 5 : year === "Year 6" ? 6 : 0;
   const isLevelThreeNumberQuiz = quizRealmId === "number" && year === "Year 3";
   const isLevelFourNumberQuiz = quizRealmId === "number" && year === "Year 4";
   const isLevelFiveNumberQuiz = quizRealmId === "number" && year === "Year 5";

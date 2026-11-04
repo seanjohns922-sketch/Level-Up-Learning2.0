@@ -176,6 +176,8 @@ export type IntegerNumberLineVisualData = {
   highlightedValues?: readonly number[];
   startValue?: number;
   movement?: number;
+  /** Leave the landing point off the line when finding it is the question. */
+  hideEnd?: boolean;
   interactive?: boolean;
   target?: number;
   highlights?: readonly number[];
@@ -15234,27 +15236,27 @@ function generateGenericQuestion(
 
   if (explicitMode === "y6_integer_apply_think") {
     const templates = [
-      { prompt: "You start at 0 and move 4 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, end: -4, jump: -4, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at -2 and move 5 spaces right. Where are you?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, end: 3, jump: 5, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at 4 and move 6 spaces left. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: 4, end: -2, jump: -6, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at -5 and move 3 spaces right. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: -5, end: -2, jump: 3, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at 1 and move 4 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, end: -3, jump: -4, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at -1 and move 7 spaces right. Where are you?", answer: "6", visual: { type: "integer_number_line", min: -6, max: 6, start: -1, end: 6, jump: 7, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 0 and move 4 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -2 and move 5 spaces right. Where are you?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, jump: 5, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 4 and move 6 spaces left. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: 4, jump: -6, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -5 and move 3 spaces right. Where are you?", answer: "-2", visual: { type: "integer_number_line", min: -6, max: 6, start: -5, jump: 3, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 1 and move 4 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -1 and move 7 spaces right. Where are you?", answer: "6", visual: { type: "integer_number_line", min: -6, max: 6, start: -1, jump: 7, showArrow: true, emphasis: "movement" } },
       { prompt: "Which integer is further from zero: -7 or 4? Type the integer.", answer: "-7", visual: { type: "integer_number_line", min: -8, max: 6, highlights: [-7, 0, 4], emphasis: "distance" } },
       { prompt: "Which integer is closer to zero: -2 or -8? Type the integer.", answer: "-2", visual: { type: "integer_number_line", min: -8, max: 2, highlights: [-8, -2, 0], emphasis: "distance" } },
       { prompt: "Enter the missing number: -5, -4, __, -2, -1", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 1, highlights: [-5, -4, -3, -2, -1], emphasis: "position" } },
-      { prompt: "You start at 2 and move 6 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 2, end: -4, jump: -6, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at -6 and move 3 spaces right. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: -6, end: -3, jump: 3, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 2 and move 6 spaces left. Where are you?", answer: "-4", visual: { type: "integer_number_line", min: -6, max: 6, start: 2, jump: -6, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -6 and move 3 spaces right. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: -6, jump: 3, showArrow: true, emphasis: "movement" } },
       { prompt: "How far is -9 from zero?", answer: "9", visual: { type: "integer_number_line", min: -10, max: 2, highlights: [-9, 0], emphasis: "distance" } },
-      { prompt: "Which integer is 5 spaces to the right of -2?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, end: 3, jump: 5, showArrow: true, emphasis: "movement" } },
-      { prompt: "Which integer is 4 spaces to the left of 1?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, end: -3, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "Which integer is 5 spaces to the right of -2?", answer: "3", visual: { type: "integer_number_line", min: -6, max: 6, start: -2, jump: 5, showArrow: true, emphasis: "movement" } },
+      { prompt: "Which integer is 4 spaces to the left of 1?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 1, jump: -4, showArrow: true, emphasis: "movement" } },
       { prompt: "Enter the missing number: -1, 0, 1, __, 3", answer: "2", visual: { type: "integer_number_line", min: -2, max: 4, highlights: [-1, 0, 1, 2, 3], emphasis: "position" } },
       { prompt: "How far is 7 from zero?", answer: "7", visual: { type: "integer_number_line", min: -2, max: 8, highlights: [0, 7], emphasis: "distance" } },
-      { prompt: "You start at -1 and move 4 spaces left. Where are you?", answer: "-5", visual: { type: "integer_number_line", min: -6, max: 4, start: -1, end: -5, jump: -4, showArrow: true, emphasis: "movement" } },
-      { prompt: "You start at 5 and move 8 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 5, end: -3, jump: -8, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at -1 and move 4 spaces left. Where are you?", answer: "-5", visual: { type: "integer_number_line", min: -6, max: 4, start: -1, jump: -4, showArrow: true, emphasis: "movement" } },
+      { prompt: "You start at 5 and move 8 spaces left. Where are you?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 5, jump: -8, showArrow: true, emphasis: "movement" } },
       { prompt: "Which integer is greater, -3 or 1? Type the greater integer.", answer: "1", visual: { type: "integer_number_line", min: -4, max: 2, highlights: [-3, 1], emphasis: "compare" } },
       { prompt: "Which integer is smaller, -6 or -2? Type the smaller integer.", answer: "-6", visual: { type: "integer_number_line", min: -6, max: 2, highlights: [-6, -2], emphasis: "compare" } },
-      { prompt: "What number is 3 spaces from zero on the left?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, end: -3, jump: -3, showArrow: true, emphasis: "movement" } },
+      { prompt: "What number is 3 spaces from zero on the left?", answer: "-3", visual: { type: "integer_number_line", min: -6, max: 6, start: 0, jump: -3, showArrow: true, emphasis: "movement" } },
       { prompt: "Enter the missing number: 2, 1, 0, __, -2", answer: "-1", visual: { type: "integer_number_line", min: -3, max: 3, highlights: [2, 1, 0, -1, -2], emphasis: "position" } },
     ] as const;
     const chosen = templates[randInt(0, templates.length - 1)] ?? templates[0]!;
@@ -15306,6 +15308,7 @@ function generateGenericQuestion(
         max: chosen.max,
         startValue: chosen.start,
         movement: chosen.movement,
+        hideEnd: true,
         interactive: false,
         showArrow: true,
         emphasis: "movement",
@@ -15351,6 +15354,7 @@ function generateGenericQuestion(
         max: chosen.max,
         startValue: chosen.start,
         movement: chosen.movement,
+        hideEnd: true,
         interactive: false,
         showArrow: true,
         emphasis: "movement",
@@ -15406,6 +15410,7 @@ function generateGenericQuestion(
       max: chosen.max,
       startValue: chosen.start,
       movement: chosen.movement,
+      hideEnd: true,
       interactive: false,
       showArrow: true,
       emphasis: "movement",
@@ -22269,7 +22274,7 @@ function generateGenericQuestion(
         prompt: "Which snack pack is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $3 per bar. Second is about $2.92 per bar.",
+        helper: "Work out the price per bar for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22284,7 +22289,7 @@ function generateGenericQuestion(
         prompt: "Which battery pack is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is about $3.33 per battery. Second is $3.20 per battery.",
+        helper: "Work out the price per battery for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22314,7 +22319,7 @@ function generateGenericQuestion(
         prompt: "Which sports drink is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $3 per litre. Second is $2.80 per litre.",
+        helper: "Work out the price per litre for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22329,7 +22334,7 @@ function generateGenericQuestion(
         prompt: "Which cereal box is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $1.60 per 100 g. Second is $1.50 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22344,7 +22349,7 @@ function generateGenericQuestion(
         prompt: "Which can pack is better value?",
         options: ["First", "Second", "Same"],
         answer: "First",
-        helper: "First is $2 per can. Second is $2.20 per can.",
+        helper: "Work out the price per can for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22359,7 +22364,7 @@ function generateGenericQuestion(
         prompt: "Which rice bag is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $2.80 per 100 g. Second is $2.50 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22374,7 +22379,7 @@ function generateGenericQuestion(
         prompt: "Which notebook pack is better value?",
         options: ["First", "Second", "Same"],
         answer: "First",
-        helper: "First is $2.50 per notebook. Second is $2.625 per notebook.",
+        helper: "Work out the price per notebook for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22404,7 +22409,7 @@ function generateGenericQuestion(
         prompt: "Which drink bottle deal is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $4.50 per litre. Second is $3.80 per litre.",
+        helper: "Work out the price per litre for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22419,7 +22424,7 @@ function generateGenericQuestion(
         prompt: "Which snack bar deal is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is about $2.22 per bar. Second is about $2.14 per bar.",
+        helper: "Work out the price per bar for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22434,7 +22439,7 @@ function generateGenericQuestion(
         prompt: "Which pasta deal is better value?",
         options: ["First", "Second", "Same"],
         answer: "Second",
-        helper: "First is $4 per 100 g. Second is $3.60 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Supermarket Compare",
@@ -22477,7 +22482,7 @@ function generateGenericQuestion(
         prompt: "Which rice option is better value?",
         options: ["First", "Second", "They are the same"],
         answer: "Second",
-        helper: "First is $3 per 100 g. Second is $2.40 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",
@@ -22536,7 +22541,7 @@ function generateGenericQuestion(
         prompt: "Which cereal bag gives better value?",
         options: ["First", "Second", "They are the same"],
         answer: "First",
-        helper: "First is $1.20 per 100 g. Second is $1.30 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",
@@ -22573,7 +22578,7 @@ function generateGenericQuestion(
         prompt: "Which sauce bottle is better value?",
         options: ["First", "Second", "They are the same"],
         answer: "First",
-        helper: "First is $3 per litre. Second is $3.20 per litre.",
+        helper: "Work out the price per litre for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",
@@ -22625,7 +22630,7 @@ function generateGenericQuestion(
         prompt: "Which pack gives the better value?",
         options: ["First", "Second", "They are the same"],
         answer: "First",
-        helper: "First is $2 per item. Second is $2.25 per item.",
+        helper: "Work out the price per item for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",
@@ -22647,7 +22652,7 @@ function generateGenericQuestion(
         prompt: "Which drink refill is better value?",
         options: ["First", "Second", "They are the same"],
         answer: "Second",
-        helper: "First is $2.80 per litre. Second is $2.50 per litre.",
+        helper: "Work out the price per litre for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",
@@ -22677,7 +22682,7 @@ function generateGenericQuestion(
         prompt: "Which granola bag is better value?",
         options: ["First", "Second", "They are the same"],
         answer: "Second",
-        helper: "First is $2 per 100 g. Second is about $1.82 per 100 g.",
+        helper: "Work out the price per 100 g for each, then compare.",
         visual: {
           type: "best_buy_card_comparison",
           title: "Best-Buy Decision",

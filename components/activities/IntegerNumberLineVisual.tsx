@@ -51,7 +51,7 @@ export default function IntegerNumberLineVisual({
   const endValue =
     typeof visual.end === "number"
       ? clampValue(visual.end)
-      : startValue !== undefined && typeof movement === "number"
+      : startValue !== undefined && typeof movement === "number" && !visual.hideEnd
         ? clampValue(startValue + movement)
         : undefined;
 
