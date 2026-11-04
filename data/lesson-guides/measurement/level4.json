@@ -39,7 +39,53 @@
    "Compare or order them.",
    "Subtract to find differences."
   ],
-  "tip": "Line up the decimal points when subtracting."
+  "tip": "Line up the decimal points when subtracting.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 20,
+       "end": 18.4,
+       "label": "Paintbrush"
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 20,
+       "end": 15.2,
+       "label": "Pencil"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "18.4 − 15.2 = 3.2 cm longer",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Read the scale where the needle rests, even between numbers.",
@@ -85,7 +131,57 @@
    "Compare the readings.",
    "Subtract to find how much more."
   ],
-  "tip": "Units must match before comparing."
+  "tip": "Units must match before comparing.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 5,
+       "step": 0.5,
+       "value": 4.5,
+       "unit": "kg"
+      },
+      "label": "Backpack",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 5,
+       "step": 0.5,
+       "value": 1.2,
+       "unit": "kg"
+      },
+      "label": "Lunchbox",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4.5 − 1.2 = 3.3 kg heavier",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "A thermometer measures temperature in degrees Celsius.",
@@ -228,7 +324,51 @@
    "Compare the counts.",
    "Different shapes can have the same area."
   ],
-  "tip": "Look at the count, not the outline."
+  "tip": "Look at the count, not the outline.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 1,
+       "cols": 12
+      },
+      "label": "12 squares",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 3,
+       "cols": 4
+      },
+      "label": "12 squares",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Same area",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Use area to decide how much is needed to cover something.",
@@ -238,7 +378,52 @@
    "Compare them.",
    "The bigger area needs more covering."
   ],
-  "tip": "Land is measured in square metres."
+  "tip": "Land is measured in square metres.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 4,
+       "cols": 5,
+       "unit": "m²"
+      },
+      "label": "Garden A: 20 m²",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 3,
+       "cols": 5,
+       "unit": "m²"
+      },
+      "label": "Garden B: 15 m²",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A needs more grass",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Time units are connected: 60 s = 1 min, 60 min = 1 h, 24 h = 1 day.",
@@ -248,7 +433,45 @@
    "Divide to change to a bigger unit.",
    "Multiply to change to a smaller unit."
   ],
-  "tip": "Time doesn't use 100s; it uses 60s."
+  "tip": "Time doesn't use 100s; it uses 60s.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "60 minutes = 1 hour"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "120 ÷ 60 = 2",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "120 minutes = 2 hours",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Elapsed time is how long passes from start to finish.",
@@ -258,7 +481,50 @@
    "Count on to the finish time.",
    "Add up the jumps."
   ],
-  "tip": "Count on to the next hour first if it helps."
+  "tip": "Count on to the next hour first if it helps.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 3,
+       "minute": 15
+      },
+      "label": "Start 3:15",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 3,
+       "minute": 40
+      },
+      "label": "Finish 3:40",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "25 minutes",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Use time to plan and compare events.",
@@ -268,7 +534,50 @@
    "Work out each duration.",
    "Compare or order the events."
   ],
-  "tip": "Earlier finish times come first."
+  "tip": "Earlier finish times come first.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 8,
+       "minute": 10
+      },
+      "label": "Bus leaves 8:10",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 8,
+       "minute": 45
+      },
+      "label": "Arrives 8:45",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "35 minutes",
+      "big": true,
+      "tone": "answer",
+      "step": 2,
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "An angle measures the amount of turn between two arms.",
@@ -322,7 +631,45 @@
    "Decide: length, perimeter, area, time or angle?",
    "Choose the tool and solve."
   ],
-  "tip": "Around = perimeter; inside = area."
+  "tip": "Around = perimeter; inside = area.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        8,
+        5,
+        8,
+        5
+       ],
+       "unit": "m"
+      },
+      "label": "Fence around: perimeter",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 5,
+       "cols": 8,
+       "unit": "m²"
+      },
+      "label": "Grass inside: area",
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Scientists read several instruments carefully.",
@@ -332,7 +679,70 @@
    "Check the units.",
    "Compare the readings."
   ],
-  "tip": "Every instrument has its own scale."
+  "tip": "Every instrument has its own scale.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 5,
+       "step": 0.5,
+       "value": 3.5,
+       "unit": "kg"
+      },
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "jug",
+       "max": 3,
+       "step": 0.5,
+       "value": 2,
+       "unit": "L"
+      },
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "thermometer",
+       "min": 0,
+       "max": 40,
+       "step": 5,
+       "value": 18
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "3.5 kg",
+       "2 L",
+       "18°C"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Mix every skill in the final mission.",
@@ -342,6 +752,63 @@
    "Pick the right skill.",
    "Solve and check the units."
   ],
-  "tip": "Take each part one at a time."
+  "tip": "Take each part one at a time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        6,
+        4,
+        6,
+        4
+       ],
+       "unit": "m"
+      },
+      "label": "Perimeter",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 10,
+       "minute": 30
+      },
+      "label": "Time",
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "angle",
+       "degrees": 90
+      },
+      "label": "Angle",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Pick the right skill, then check the units",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

@@ -44,6 +44,7 @@ export type ScenePart = PartBase & (
   | { type: "chance"; visual: ChanceToolVisual; highlightStep?: number }
   | { type: "starmap"; cols: number; rows: number; places: { r: number; c: number; object?: string; symbol?: string; label?: string; step?: number }[]; explorer?: { r: number; c: number; facing?: "N" | "E" | "S" | "W" }; path?: { r: number; c: number }[]; pathStep?: number }
   | { type: "plot"; categories: { label: string; count: number }[] }
+  | { type: "tiles"; size: number; line?: "vertical" | "diagonal"; tiles: { r: number; c: number; colour: "orange" | "purple" | "teal"; step?: number }[] }
   | { type: "text"; text: string; big?: boolean; tone?: "answer" | "unknown"; then?: { step: number; text: string } }
   | { type: "sign"; text: string }
   | { type: "seq"; items: string[] }
@@ -79,8 +80,10 @@ export function scenePartSpeech(p: ScenePart): string {
     case "machine": return `${lead}A number machine. ${p.input} goes in, the rule is ${p.rule}.`;
     case "chance": return lead + chanceSaid(p.visual);
     case "starmap": return `${lead}A star map with ${p.places.map((x) => x.label ?? x.symbol ?? x.object).join(", ")}.`;
+    case "tiles": return `${lead}A tile board with ${plural(p.tiles.length, "coloured tile")}${p.line ? `, and a ${p.line} mirror line` : ""}.`;
     case "plot": return `${lead}A column graph. ${p.categories.map((x) => `${x.label}: ${x.count}`).join(", ")}.`;
-    case "text": return `${lead}${p.then ? p.then.text : p.text}.`;
+    // Pictures inside text (a pictograph key) are read as "1 symbol", not by their emoji names.
+    case "text": return `${lead}${(p.then ? p.then.text : p.text).replace(/\p{Extended_Pictographic}\uFE0F?/gu, "1 symbol").replace(/◐/g, "a half symbol")}.`;
     case "sign": return "";
     case "seq": return `${lead}A pattern: ${p.items.map((x) => (x === "?" ? "a gap" : x)).join(", ")}.`;
     case "tally": return `${lead}Tally marks for ${p.n}.`;
@@ -95,7 +98,9 @@ export function scenePartSpeech(p: ScenePart): string {
   }
 }
 
-const chanceSaid = (v: ChanceToolVisual) => v.type === "scale" ? "A likelihood scale from impossible to certain." : v.type === "die" ? `A die showing ${v.face}.` : v.type === "coin" ? "A coin with heads and tails." : v.type === "spinner" ? `A spinner with ${countWords(v.wedges)}.` : v.type === "bag" ? `A bag with ${countWords(v.counters)}.` : "";
+const COLOUR_NAMES: Record<string, string> = { "#e5484d": "red", "#3b82f6": "blue", "#22c55e": "green", "#eab308": "yellow", "#8b5cf6": "purple" };
+const colourWords = (xs: string[]) => countWords(xs.map((x) => COLOUR_NAMES[x.toLowerCase()] ?? x));
+const chanceSaid = (v: ChanceToolVisual) => v.type === "scale" ? "A likelihood scale from impossible to certain." : v.type === "die" ? `A die showing ${v.face}.` : v.type === "coin" ? "A coin with heads and tails." : v.type === "spinner" ? `A spinner with ${colourWords(v.wedges)}.` : v.type === "bag" ? `A bag with ${colourWords(v.counters)}.` : "";
 const UNIT_NAMES = { block: "block", domino: "domino", clip: "paper clip" };
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const said = (n: number) => (n < 0 ? `negative ${-n}` : String(n));

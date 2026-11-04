@@ -64,7 +64,9 @@ for (const [realm, levels] of Object.entries(LESSON_GUIDES)) for (const [level, 
     assert(guideVisualSpeech(guide.visual).length > 10, `Diagram needs a spoken description ${realm}:${level}:${key}`);
     if (guide.visual.kind === 'scene') {
       // Every reveal and highlight must point at a step the guide really has, and the last step must show something.
-      const stepsUsed = JSON.stringify(guide.visual.rows).match(/"(?:step|crossStep|ringStep|fillStep|answerStep|shadeStep|markStep)":\d+/g) ?? [];
+      // A nested diagram's own "step" is its tick spacing, not a guide step, so leave nested diagrams out.
+      const rowsWithoutDiagrams = guide.visual.rows.map((row) => row.map((part) => (part.type === 'visual' ? { ...part, visual: undefined } : part)));
+      const stepsUsed = JSON.stringify(rowsWithoutDiagrams).match(/"(?:step|crossStep|ringStep|fillStep|answerStep|shadeStep|markStep)":\d+/g) ?? [];
       for (const used of stepsUsed) assert(Number(used.split(':')[1]) <= guide.steps.length, `Picture step beyond the guide's steps ${realm}:${level}:${key}`);
       for (const part of guide.visual.rows.flat()) for (const f of part.focus ?? []) assert(f >= 1 && f <= guide.steps.length, `Picture focus beyond the guide's steps ${realm}:${level}:${key}`);
     }

@@ -1,63 +1,301 @@
 {
  "1:1": {
   "idea": "In a many-to-one display, each symbol stands for more than one.",
-  "example": "Key: ● = 4. Shop A: ●●● → 3 × 4 = 12",
+  "example": "Key: 1 apple = 4. Shop A has 3 apples → 3 × 4 = 12",
   "steps": [
    "Read the key: one symbol is worth 4.",
    "Count the symbols: 3.",
    "Multiply: 3 × 4 = 12."
   ],
-  "tip": "Always read the key before counting."
+  "tip": "Always read the key before counting.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 🍎 = 4",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🍎",
+      "rows": [
+       {
+        "label": "Shop A",
+        "n": 3
+       }
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3 × 4 = 12",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Use the key to find each total.",
-  "example": "Key: ● = 5. Level 3: ●●●● → 20 cars",
+  "example": "Key: 1 car = 5. Level 3 has 4 cars → 20 cars",
   "steps": [
    "Count the symbols in the row: 4.",
    "Multiply by the key value: 4 × 5.",
    "Level 3 has 20 cars."
   ],
-  "tip": "Don't just count symbols; multiply by the key."
+  "tip": "Don't just count symbols; multiply by the key.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 🚗 = 5",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🚗",
+      "rows": [
+       {
+        "label": "Level 3",
+        "n": 4
+       }
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4 × 5 = 20 cars",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Calculate and compare frequencies using the key.",
-  "example": "Key: ● = 2. Boat 4 ●●●●●● (12), Boat 3 ●●●● (8) → 4 more",
+  "example": "Key: 1 fish = 2. Boat 4 has 6 (12), Boat 3 has 4 (8) → 4 more",
   "steps": [
    "Work out each total: 6 × 2 = 12 and 4 × 2 = 8.",
    "Subtract: 12 − 8.",
    "Boat 4 caught 4 more."
   ],
-  "tip": "Find both totals before comparing."
+  "tip": "Find both totals before comparing.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 🐟 = 2",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🐟",
+      "rows": [
+       {
+        "label": "Boat 3",
+        "n": 4
+       },
+       {
+        "label": "Boat 4",
+        "n": 6
+       }
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "12 − 8 = 4 more",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "The key tells you how many symbols to draw.",
-  "example": "Key: ● = 4. Total 16 → 16 ÷ 4 = 4 symbols",
+  "example": "Key: 1 kite = 4. Total 16 → 16 ÷ 4 = 4 symbols",
   "steps": [
    "Read the key value: 4.",
    "Divide the total by it: 16 ÷ 4.",
    "Draw 4 symbols."
   ],
-  "tip": "Number of symbols = total ÷ key value."
+  "tip": "Number of symbols = total ÷ key value.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 🪁 = 4. Total: 16",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "🪁",
+      "rows": [
+       {
+        "label": "Row",
+        "n": 4
+       }
+      ],
+      "step": 3,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "16 ÷ 4 = 4 symbols",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Build a many-to-one display so each row matches its total.",
-  "example": "Key: ● = 3. Crate 2 = 15 → 5 symbols",
+  "example": "Key: 1 crate = 3. Crate 2 = 15 → 5 symbols",
   "steps": [
    "Divide each total by the key value.",
    "Draw that many symbols in the row.",
    "Check: symbols × key value = total."
   ],
-  "tip": "Every row uses the same key."
+  "tip": "Every row uses the same key.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 📦 = 3. Crate 2 = 15",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "📦",
+      "rows": [
+       {
+        "label": "Crate 2",
+        "n": 5
+       }
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "A part symbol stands for part of the key value.",
-  "example": "Key: ● = 4. ●●◐ → 4 + 4 + 2 = 10",
+  "example": "Key: 1 cookie = 4. 2 cookies and a half → 4 + 4 + 2 = 10",
   "steps": [
    "Count the whole symbols: 2 × 4 = 8.",
    "A half symbol is half the key: 2.",
    "8 + 2 = 10."
   ],
-  "tip": "Half a symbol is worth half the key value."
+  "tip": "Half a symbol is worth half the key value.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 🍪 = 4",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "🍪 🍪 ◐",
+      "big": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4 + 4 + 2 = 10",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Read a column graph using the scale on the side.",
@@ -67,7 +305,48 @@
    "Read across from its top to the scale.",
    "If it is between marks, use the halfway point."
   ],
-  "tip": "Check what each line on the scale is worth."
+  "tip": "Check what each line on the scale is worth.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "9am",
+        "count": 20
+       },
+       {
+        "label": "10am",
+        "count": 35
+       },
+       {
+        "label": "11am",
+        "count": 40
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "35 visitors",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Construct a column graph with a sensible scale.",
@@ -77,7 +356,50 @@
    "Label the axes and give a title.",
    "Draw each bar to its value."
   ],
-  "tip": "The scale must go up in equal steps."
+  "tip": "The scale must go up in equal steps.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "12",
+       "18",
+       "9"
+      ],
+      "label": "Cupcakes",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Stall 1",
+        "count": 12
+       },
+       {
+        "label": "Stall 2",
+        "count": 18
+       },
+       {
+        "label": "Stall 3",
+        "count": 9
+       }
+      ],
+      "step": 3,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Interpret a column graph by checking statements against it.",
@@ -87,7 +409,47 @@
    "Compare them.",
    "Choose the statement the graph supports."
   ],
-  "tip": "A statement is supported only if the numbers agree."
+  "tip": "A statement is supported only if the numbers agree.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "Mon",
+        "count": 10
+       },
+       {
+        "label": "Tue",
+        "count": 18
+       },
+       {
+        "label": "Wed",
+        "count": 12
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Tuesday had the most: supported",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Data is concentrated where most of the values are.",
@@ -150,7 +512,87 @@
    "Compare the peak values.",
    "The group with the higher peak tends to have higher values."
   ],
-  "tip": "Compare the same thing for both groups."
+  "tip": "Compare the same thing for both groups.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 2
+       },
+       {
+        "label": "2",
+        "count": 4
+       },
+       {
+        "label": "3",
+        "count": 7
+       },
+       {
+        "label": "4",
+        "count": 3
+       },
+       {
+        "label": "5",
+        "count": 1
+       }
+      ],
+      "label": "Group A peaks at 3",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "3",
+        "count": 1
+       },
+       {
+        "label": "4",
+        "count": 3
+       },
+       {
+        "label": "5",
+        "count": 7
+       },
+       {
+        "label": "6",
+        "count": 4
+       },
+       {
+        "label": "7",
+        "count": 2
+       }
+      ],
+      "label": "Group B peaks at 5",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Group B is higher",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Variation is how spread out the data is.",
@@ -160,7 +602,52 @@
    "Set A stays close together; Set B is spread out.",
    "More spread means more variation."
   ],
-  "tip": "Data that is all the same has no variation."
+  "tip": "Data that is all the same has no variation.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "4",
+       "4",
+       "5"
+      ],
+      "label": "Set A",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "chips",
+      "items": [
+       "1",
+       "4",
+       "8"
+      ],
+      "label": "Set B",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Set B varies more",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Compare variation by looking at how far the data spreads.",
@@ -170,7 +657,79 @@
    "Compare how far apart they are.",
    "The wider spread has more variation."
   ],
-  "tip": "Similar peaks can still have different spreads."
+  "tip": "Similar peaks can still have different spreads.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "2",
+        "count": 3
+       },
+       {
+        "label": "3",
+        "count": 6
+       },
+       {
+        "label": "4",
+        "count": 3
+       }
+      ],
+      "label": "Class A: 2 to 4",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "0",
+        "count": 2
+       },
+       {
+        "label": "2",
+        "count": 3
+       },
+       {
+        "label": "4",
+        "count": 2
+       },
+       {
+        "label": "6",
+        "count": 3
+       },
+       {
+        "label": "8",
+        "count": 2
+       }
+      ],
+      "label": "Class B: 0 to 8",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Class B has more variation",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Compare data sets using both the peak and the spread.",
@@ -180,7 +739,76 @@
    "Compare the spreads: B is more spread out.",
    "Describe both in a sentence."
   ],
-  "tip": "Use two features to compare fairly."
+  "tip": "Use two features to compare fairly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "2",
+        "count": 2
+       },
+       {
+        "label": "3",
+        "count": 6
+       },
+       {
+        "label": "4",
+        "count": 2
+       }
+      ],
+      "label": "A: peak 3, spread 2 to 4",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 1
+       },
+       {
+        "label": "3",
+        "count": 2
+       },
+       {
+        "label": "6",
+        "count": 6
+       },
+       {
+        "label": "9",
+        "count": 1
+       }
+      ],
+      "label": "B: peak 6, spread 1 to 9",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "B is higher and more spread out",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Design a survey: choose a question, then plan how to collect the data.",
@@ -190,7 +818,36 @@
    "Decide who to ask.",
    "Decide how to record and display the results."
   ],
-  "tip": "A clear question gives data you can compare."
+  "tip": "A clear question gives data you can compare.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "How many minutes do you read each night?",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Ask: my class",
+       "Record: tally",
+       "Show: column graph"
+      ],
+      "step": 2,
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Investigate again: compare with the first results and look at variation.",
@@ -200,16 +857,114 @@
    "Compare peaks and spread.",
    "Say how the results are the same or different."
   ],
-  "tip": "Different groups usually give different results."
+  "tip": "Different groups usually give different results.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "10",
+        "count": 2
+       },
+       {
+        "label": "20",
+        "count": 9
+       },
+       {
+        "label": "30",
+        "count": 2
+       }
+      ],
+      "label": "First class",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "10",
+        "count": 4
+       },
+       {
+        "label": "20",
+        "count": 3
+       },
+       {
+        "label": "30",
+        "count": 4
+       },
+       {
+        "label": "40",
+        "count": 3
+       }
+      ],
+      "label": "Second class",
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Review: read displays carefully using scales and keys.",
-  "example": "Key: ● = 3. Class 2: ●●●● → 12",
+  "example": "Key: 1 book = 3. Class 2 has 4 books → 12",
   "steps": [
    "Check the key or the scale first.",
    "Read the value you are asked for.",
    "Answer with the total, not the number of symbols."
   ],
-  "tip": "Always check the key or scale before reading."
+  "tip": "Always check the key or scale before reading.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Key: 📚 = 3",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "pictograph",
+      "icon": "📚",
+      "rows": [
+       {
+        "label": "Class 2",
+        "n": 4
+       }
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Total: 12, not 4",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

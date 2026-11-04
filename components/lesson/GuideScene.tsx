@@ -103,9 +103,9 @@ function Fraction({ p, step }: { p: Extract<ScenePart, { type: "fraction" }>; st
     const r = 54, c = 60, seg = (i: number) => { const a0 = (i / p.parts) * 2 * Math.PI - Math.PI / 2, a1 = ((i + 1) / p.parts) * 2 * Math.PI - Math.PI / 2; return `M${c} ${c}L${c + r * Math.cos(a0)} ${c + r * Math.sin(a0)}A${r} ${r} 0 0 1 ${c + r * Math.cos(a1)} ${c + r * Math.sin(a1)}Z`; };
     return <svg viewBox="0 0 120 120" className="h-32 w-32" aria-hidden>{Array.from({ length: p.parts }, (_, i) => <path key={i} d={seg(i)} fill={i < shaded ? TEAL_LIGHT : "#fff"} stroke={INK} strokeWidth={2} />)}</svg>;
   }
-  const cols = p.shape === "bar" ? p.parts : p.parts === 4 ? 2 : p.parts;
+  const cols = p.parts === 100 ? 10 : p.shape === "bar" ? p.parts : p.parts === 4 ? 2 : p.parts;
   const rows = p.shape === "bar" ? 1 : Math.ceil(p.parts / cols);
-  return <div className="grid overflow-hidden rounded-md border-[3px] bg-white" style={{ borderColor: INK, gridTemplateColumns: `repeat(${cols}, ${p.shape === "bar" ? "38px" : "56px"})`, gridTemplateRows: `repeat(${rows}, ${p.shape === "bar" ? "48px" : "56px"})` }}>
+  return <div className="grid overflow-hidden rounded-md border-[3px] bg-white" style={{ borderColor: INK, gridTemplateColumns: `repeat(${cols}, ${p.parts === 100 ? "20px" : p.shape === "bar" ? (p.parts > 10 ? "24px" : "38px") : "56px"})`, gridTemplateRows: `repeat(${rows}, ${p.parts === 100 ? "20px" : p.shape === "bar" ? "48px" : "56px"})` }}>
     {Array.from({ length: p.parts }, (_, i) => <span key={i} className="border transition-colors duration-300" style={{ borderColor: INK, background: i < shaded ? TEAL_LIGHT : "#fff" }} />)}
   </div>;
 }
@@ -210,6 +210,19 @@ function Plot({ p }: { p: Extract<ScenePart, { type: "plot" }> }) {
   return <Level1LookContext.Provider value><div className="guide-plot w-full" data-level1-look="statistics" style={{ zoom: 0.8 }}><style>{`.guide-plot .min-h-\\[68px\\]{min-height:0}.guide-plot [data-statistica-plot]{padding-bottom:.5rem}`}</style><StatisticaPlot display="columns" labelReadAloud={false} categories={p.categories.map((x, i) => ({ id: `${i}`, label: x.label, count: x.count, color: PLOT_COLOURS[i % PLOT_COLOURS.length] }))} /></div></Level1LookContext.Provider>;
 }
 
+// The lesson's symmetry board: a dark tile grid with orange, purple and teal tiles and a glowing mirror line.
+const TILE: Record<string, string> = { orange: "#f59e0b", purple: "#8b5cf6", teal: "#0891b2" };
+function Tiles({ p, step }: { p: Extract<ScenePart, { type: "tiles" }>; step: Step }) {
+  const cell = 36;
+  return <div className="relative rounded-2xl p-2" style={{ background: "#14122b", width: p.size * cell + 16 }}>
+    <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${p.size}, ${cell - 4}px)` }}>
+      {Array.from({ length: p.size * p.size }, (_, i) => { const r = Math.floor(i / p.size), c = i % p.size, t = p.tiles.find((x) => x.r === r && x.c === c);
+        return <span key={i} className="block rounded-md transition-opacity duration-300" style={{ height: cell - 4, background: t ? TILE[t.colour] : "#232044", opacity: t && !after(t.step, step) ? 0.15 : 1 }} />; })}
+    </div>
+    {p.line ? <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute inset-2 h-[calc(100%-16px)] w-[calc(100%-16px)]" aria-hidden>{p.line === "vertical" ? <line x1="50" y1="0" x2="50" y2="100" stroke="#5eead4" strokeWidth="1.5" /> : <line x1="0" y1="0" x2="100" y2="100" stroke="#5eead4" strokeWidth="1.5" />}</svg> : null}
+  </div>;
+}
+
 function Compass({ p, step }: { p: Extract<ScenePart, { type: "compass" }>; step: Step }) {
   const dirs = ["north", "east", "south", "west"], start = dirs.indexOf(p.from), turns = after(p.turnStep, step) ? p.turns : 0, a = (start + turns) * 90;
   return <svg viewBox="0 0 160 160" className="h-40 w-40" aria-hidden>
@@ -240,6 +253,7 @@ function Part({ p, step }: { p: ScenePart; step: Step }) {
     case "column": body = <Column p={p} step={step} />; break;
     case "starmap": body = <StarMap p={p} step={step} />; break;
     case "plot": body = <Plot p={p} />; break;
+    case "tiles": body = <Tiles p={p} step={step} />; break;
     case "object3d": body = <Object3d p={p} />; break;
     case "machine": body = <Machine p={p} step={step} />; break;
     case "chance": { const v = p.visual.type === "scale" && !after(p.highlightStep, step) ? { ...p.visual, highlight: undefined } : p.visual;
