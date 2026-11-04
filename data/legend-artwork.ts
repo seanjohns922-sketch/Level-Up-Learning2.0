@@ -25,18 +25,18 @@ export const LEGEND_ARTWORK: Record<LegendRealmId, Record<string, LegendImages>>
     },
     "Year 4": {
       "avatar": "/guides/numbot-teal-2026-11-04-v1/numbot-solver-y4.png",
-      "cardFront": "/cards/approved-2026-11-04-v1/number-nexus/numbot-solver-y4-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/number-nexus/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-solver-y4-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/number-nexus/back.png"
     },
     "Year 5": {
       "avatar": "/guides/numbot-teal-2026-11-04-v1/numbot-calculator-y5.png",
-      "cardFront": "/cards/approved-2026-11-04-v1/number-nexus/numbot-calculator-y5-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/number-nexus/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-calculator-y5-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/number-nexus/back.png"
     },
     "Year 6": {
       "avatar": "/guides/numbot-teal-2026-11-04-v1/numbot-equationator-y6.png",
-      "cardFront": "/cards/approved-2026-11-04-v1/number-nexus/numbot-equationator-y6-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/number-nexus/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-equationator-y6-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/number-nexus/back.png"
     }
   },
   "measurelands": {
@@ -62,18 +62,18 @@ export const LEGEND_ARTWORK: Record<LegendRealmId, Record<string, LegendImages>>
     },
     "Year 4": {
       "avatar": "/guides/meazurex-balancer-y4.webp",
-      "cardFront": "/cards/approved-2026-11-04-v1/measurelands/meazurex-balancer-y4-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/measurelands/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-balancer-y4-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/measurelands/back.png"
     },
     "Year 5": {
       "avatar": "/guides/meazurex-calibrator-y5.webp",
-      "cardFront": "/cards/approved-2026-11-04-v1/measurelands/meazurex-calibrator-y5-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/measurelands/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-calibrator-y5-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/measurelands/back.png"
     },
     "Year 6": {
       "avatar": "/guides/meazurex-timewielder-y6.webp",
-      "cardFront": "/cards/approved-2026-11-04-v1/measurelands/meazurex-timewielder-y6-front.webp",
-      "cardBack": "/cards/approved-2026-11-04-v1/measurelands/back.webp"
+      "cardFront": "/cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-timewielder-y6-front.png",
+      "cardBack": "/cards/levels-4-6-2026-11-04-v2/measurelands/back.png"
     }
   },
   "starpath": {

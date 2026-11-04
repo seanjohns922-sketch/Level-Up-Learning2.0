@@ -1,0 +1,98 @@
+[
+  {
+    "source": "RELIQ_Number_Nexus_Levels_4-6_Repacked/Numbot_L4_Solver_Front_CMYK.pdf",
+    "sourceSha256": "4892bdf3e5a8c5c30dfa0147f6256eb1a77daba6d580287ca3e6c3db914de03e",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-solver-y4-front.png",
+    "outputSha256": "349a60888480fa9c0301051b2503079419620b0612594d85eddf14c5abf81372"
+  },
+  {
+    "source": "RELIQ_Number_Nexus_Levels_4-6_Repacked/Numbot_L5_Calculator_Front_CMYK.pdf",
+    "sourceSha256": "73c5edf912614cf4ea756ee7f42975685384e1a3b8c169d02a2131e4aecb57a3",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-calculator-y5-front.png",
+    "outputSha256": "e29e2619ecce3c9141ee6364f886dfe39ee1e1bcf259a4a28fd0d797fc9229eb"
+  },
+  {
+    "source": "RELIQ_Number_Nexus_Levels_4-6_Repacked/Numbot_L6_Equationator_Front_CMYK.pdf",
+    "sourceSha256": "3a57b60a98206a72e00b7d932526009cbfea0b982269b5f37b058b13884027e9",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/number-nexus/numbot-equationator-y6-front.png",
+    "outputSha256": "84fdbe5889eb2d6893c4a10a9fdb9d8e1f1a5ed0af5dac67231e88afcd871f92"
+  },
+  {
+    "source": "RELIQ_Number_Nexus_Levels_4-6_Repacked/Numbot_Shared_Teal_RELIQ_Back_CMYK.pdf",
+    "sourceSha256": "a508c89a7ed609543747b8c00e30f261c7e2961250a08555e5795d16973071f0",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/number-nexus/back.png",
+    "outputSha256": "cebdac7d929be57ee79f8b6bcd5d27fcd1a80bef204a400d4cb23b2cac66c144"
+  },
+  {
+    "source": "RELIQ_Measurelands_Levels_4-6_Print_Pack/Meazurex_L4_Balancer_Front_CMYK.pdf",
+    "sourceSha256": "d0802df75b1d8d1a9036e3734b524f1a527408168e592c78276b121aa5940bfd",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-balancer-y4-front.png",
+    "outputSha256": "ba8b8325fe9ebeb083b10ba4522351b99d0b25ada9ff85f37f6a2c135e9c6ff7"
+  },
+  {
+    "source": "RELIQ_Measurelands_Levels_4-6_Print_Pack/Meazurex_L5_Calibrator_Front_CMYK.pdf",
+    "sourceSha256": "c20da5a4094403c950a7cc3aabba32afca2aa1688ec5b51824c69f2a5063ccfe",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-calibrator-y5-front.png",
+    "outputSha256": "985ec6a9eefdea33464209b72d60167ddd304fb59a9fb214f98595e21fce260b"
+  },
+  {
+    "source": "RELIQ_Measurelands_Levels_4-6_Print_Pack/Meazurex_L6_Timewielder_Front_CMYK.pdf",
+    "sourceSha256": "f0cf8092281421e95f71d170c824b283ca1534e43aa8faf6ef2c77d488cd0f94",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/measurelands/meazurex-timewielder-y6-front.png",
+    "outputSha256": "181a85aafb08ef38498db465eede11e08b09487791d1d3717183a0703b81f9b0"
+  },
+  {
+    "source": "RELIQ_Measurelands_Levels_4-6_Print_Pack/Measurelands_Shared_Gold_Q_RELIQ_Back_CMYK.pdf",
+    "sourceSha256": "11dc924bf4e49c65b030c826d7e6648ae5c0210427c2d9de55294a7b2dfd712b",
+    "trimBoxPoints": [
+      8.503936767578125,
+      8.503936767578125,
+      187.08660888671875,
+      257.9527587890625
+    ],
+    "output": "cards/levels-4-6-2026-11-04-v2/measurelands/back.png",
+    "outputSha256": "572d1ef23b263b7a08ac74869034c91356afcd1d392101bd891e26b2948f30b0"
+  }
+]
