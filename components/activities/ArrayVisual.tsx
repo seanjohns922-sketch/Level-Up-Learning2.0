@@ -9,6 +9,7 @@ export default function ArrayVisual({
   title = "Grouped set model",
   rotatable = false,
   splitAfterColumns,
+  leftOver = 0,
 }: {
   rows: number;
   cols: number;
@@ -16,6 +17,8 @@ export default function ArrayVisual({
   title?: string;
   rotatable?: boolean;
   splitAfterColumns?: number;
+  /** Extra items that do not fill a whole row, shown as a short last row. */
+  leftOver?: number;
 }) {
   const [turned, setTurned] = useState(false);
   const [selectedPart, setSelectedPart] = useState<"left" | "right" | null>(null);
@@ -109,10 +112,15 @@ export default function ArrayVisual({
               </div>
             );
           })}
+          {leftOver > 0 && !turned ? (
+            <div className="flex gap-2 rounded-xl border-2 border-dashed border-amber-300 px-2 py-1" aria-label={`${leftOver} left over`}>
+              {Array.from({ length: leftOver }).map((__, c) => <div key={`left-${c}`} className="h-5 w-5 rounded-full bg-amber-500" />)}
+            </div>
+          ) : null}
         </div>
       )}
       <div className="mt-3 text-sm font-bold text-teal-800" aria-live="polite">
-        {displayRows} rows of {displayCols}
+        {displayRows} rows of {displayCols}{leftOver > 0 && !turned ? ` and ${leftOver} more` : ""}
         {rotatable ? (turned ? " — turned" : " — original") : null}
       </div>
       {hasSplit ? (

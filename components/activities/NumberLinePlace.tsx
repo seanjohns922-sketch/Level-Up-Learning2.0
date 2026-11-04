@@ -264,7 +264,7 @@ export default function NumberLinePlace({
                 {isPointPick
                   ? `Find ${targetFraction} on the data rail.`
                   : showPartitions
-                  ? `${denominator} equal jumps from 0 to ${maxWhole}`
+                  ? `${denominator * maxWhole} equal jumps from 0 to ${maxWhole}`
                   : `Estimate where ${targetFraction} belongs between 0 and ${maxWhole}`}
               </div>
             ) : null}

@@ -664,7 +664,7 @@ export function PracticeRunner({
   const alwaysSpeak = /^(y0-|ground-space-)/.test(liveContext?.lessonId ?? "");
   const isLevel1Lesson = /^y[12]-/.test(liveContext?.lessonId ?? "");
   // Level 3 Statistics shares the bright graphs; the look is scoped by its own attribute.
-  const brightPlots = isLevel1Lesson || (isStatistics && (levelNumber === 3 || levelNumber === 4));
+  const brightPlots = isLevel1Lesson || (isStatistics && (levelNumber ?? 0) >= 3 && (levelNumber ?? 0) <= 4);
   const autoReadPrompt = getPracticeTaskSpeechText(task);
   const isIntroTask = isStructuredRealm && isNativeLessonIntro(task);
   const lessonStage: MeasurelandsLessonStage = transitionError
@@ -1500,9 +1500,9 @@ export function PracticeRunner({
     <div
       className="relative"
       data-number-nexus-level={isNumberNexus && levelNumber === 1 ? "1" : undefined}
-      data-chance-level={isChance && (levelNumber === 3 || levelNumber === 4) ? String(levelNumber) : undefined}
-      data-statistica-level={isStatistics && (levelNumber === 3 || levelNumber === 4) ? String(levelNumber) : undefined}
-      data-l3-look={(levelNumber === 3 || levelNumber === 4) && (isStarpath || isMeasurement) ? (isStarpath ? "space" : "measurement") : undefined}
+      data-chance-level={isChance && (levelNumber ?? 0) >= 3 && (levelNumber ?? 0) <= 4 ? String(levelNumber) : undefined}
+      data-statistica-level={isStatistics && (levelNumber ?? 0) >= 3 && (levelNumber ?? 0) <= 4 ? String(levelNumber) : undefined}
+      data-l3-look={(levelNumber ?? 0) >= 3 && (levelNumber ?? 0) <= 4 && (isStarpath || isMeasurement) ? (isStarpath ? "space" : "measurement") : undefined}
       data-level1-look={brightPlots ? (isMeasurement ? "measurement" : isStarpath ? "space" : isStatistics ? "statistics" : "number") : undefined}
     >
       {helpOpen && <LessonHelpDialog onClose={closeHelp}>

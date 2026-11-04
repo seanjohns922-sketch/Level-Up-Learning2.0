@@ -397,6 +397,7 @@ export default function MultipleChoiceActivity({
           highlightedRows={questionData.visual.highlightedRows}
           rotatable={questionData.visual.rotatable}
           splitAfterColumns={questionData.visual.splitAfterColumns}
+          leftOver={questionData.visual.leftOver}
           title="Grouped set model"
         />
       ) : null}

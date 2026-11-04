@@ -535,6 +535,7 @@ export type MixedWordProblemQuestion = {
         highlightedRows?: number[];
         rotatable?: boolean;
         splitAfterColumns?: number;
+  leftOver?: number;
       };
 };
 
@@ -3495,6 +3496,7 @@ export type MultipleChoiceQuestion = {
         highlightedRows?: number[];
         rotatable?: boolean;
         splitAfterColumns?: number;
+        leftOver?: number;
       }
     | MABVisualData
     | DecimalVisualData
@@ -3570,6 +3572,7 @@ export type TypedResponseQuestion = {
         highlightedRows?: number[];
         rotatable?: boolean;
         splitAfterColumns?: number;
+        leftOver?: number;
       }
     | MABVisualData
     | DecimalVisualData
@@ -13793,7 +13796,7 @@ function generateGenericQuestion(
       {
         prompt: "A student claims $12.56 + $24.68 is about $20. Is that reasonable?",
         answer: "No",
-        options: ["Yes", "No", "Only if rounded down", "Cannot tell"],
+        options: ["Yes", "No"],
         helper: "Estimate with $13 + $25.",
       },
       {
@@ -13816,7 +13819,7 @@ function generateGenericQuestion(
         helper: "Quarter-dollar amounts can combine to make whole dollars.",
       },
       {
-        prompt: "Use the receipt. A student says the total should be about $50. Type Yes or No: is that reasonable?",
+        prompt: "Use the receipt. A student says the total should be about $50. Is that reasonable?",
         answer: "No",
         helper: "Estimate the two prices before deciding.",
         visual: {
@@ -19123,16 +19126,16 @@ function generateGenericQuestion(
     const roundedA = Math.round(picked.a / 10) * 10;
     const roundedB = Math.round(picked.b / 10) * 10;
     const estimate = roundedA * roundedB;
-    const options = uniqueStringOptions(String(estimate), [
-      String(Math.max(100, estimate - 200)),
-      String(estimate + 200),
-      String(Math.max(100, estimate - 400)),
+    const options = uniqueStringOptions(formatMathNumber(estimate), [
+      formatMathNumber(Math.max(100, estimate - 200)),
+      formatMathNumber(estimate + 200),
+      formatMathNumber(Math.max(100, estimate - 400)),
     ]);
     return {
       kind: "multiple_choice",
       prompt: `Which is the best estimate for ${picked.a} × ${picked.b}?`,
       options: shuffle(options),
-      answer: String(estimate),
+      answer: formatMathNumber(estimate),
       helper: `Round ${picked.a} to ${roundedA} and ${picked.b} to ${roundedB}, then multiply.`,
     };
   }
@@ -19956,7 +19959,7 @@ function generateGenericQuestion(
           "Ignore the remainder and keep 6 groups",
           "6 groups",
         ],
-        visual: { type: "array" as const, rows: 6, columns: 5 },
+        visual: { type: "array" as const, rows: 6, columns: 5, leftOver: 4 },
       },
       {
         prompt: "34 apples are packed into bags of 5. How many full bags, and how many are left over?",
@@ -19967,7 +19970,7 @@ function generateGenericQuestion(
           "6 bags, 4 left over",
           "Ignore the 4 left over",
         ],
-        visual: { type: "array" as const, rows: 6, columns: 5 },
+        visual: { type: "array" as const, rows: 6, columns: 5, leftOver: 4 },
       },
       {
         prompt: "How many lollies does each child get when 34 lollies are shared equally between 5 children?",
@@ -19978,7 +19981,7 @@ function generateGenericQuestion(
           "7 each",
           "Round up to 7 each",
         ],
-        visual: { type: "array" as const, rows: 5, columns: 6 },
+        visual: { type: "array" as const, rows: 5, columns: 6, leftOver: 4 },
       },
       {
         prompt: "How many rows are needed if 47 students are seated in rows of 6?",
@@ -19989,7 +19992,7 @@ function generateGenericQuestion(
           "7 rows, 5 left over",
           "Ignore the remainder and keep 7 rows",
         ],
-        visual: { type: "array" as const, rows: 7, columns: 6 },
+        visual: { type: "array" as const, rows: 7, columns: 6, leftOver: 5 },
       },
       {
         prompt: "68 oranges are packed into crates of 6. How many full crates, and how many are left over?",

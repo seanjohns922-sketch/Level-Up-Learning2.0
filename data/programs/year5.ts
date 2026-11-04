@@ -115,7 +115,7 @@ const year5Rows: ProgramRow[] = [
     activity: "Find factor pairs, identify multiples, and compare factor and multiple patterns.",
     curriculum: ["AC9M5N02"],
     activities: [
-      makeActivity("arrays", 1, { minRows: 2, maxRows: 12, minColumns: 2, maxColumns: 12, mode: "arrays" }),
+      makeActivity("arrays", 1, { minRows: 6, maxRows: 12, minColumns: 6, maxColumns: 12, mode: "arrays" }),
       makeActivity("multiple_choice", 2, { mode: "factors_multiples" }),
       makeActivity("typed_response", 2, { mode: "factors_multiples" }),
     ],
