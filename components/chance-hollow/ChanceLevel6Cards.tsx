@@ -183,7 +183,11 @@ function randomCount(trials: number, probability: number) {
 
 export function ChanceSimulationLabCard({ task, onCorrect, onWrong, assessmentMode = false }: CardProps<SimulationTask>) {
   const probability = task.winning / task.total;
-  const [prediction, setPrediction] = useState(assessmentMode ? 0 : Math.round(task.stages[0]! * probability));
+  const [prediction, setPrediction] = useState(() => {
+    // Start away from the answer so the counter never shows it before the child works it out.
+    const half = Math.round(task.stages[0]! / 2);
+    return assessmentMode || half === Math.round(task.stages[0]! * probability) ? 0 : half;
+  });
   const [results, setResults] = useState<number[]>([]);
   const [claim, setClaim] = useState<string | null>(null);
   const expectedFirst = Math.round(task.stages[0]! * probability);
@@ -219,7 +223,9 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong, assessmentMo
       analysisOptions = values.map((v) => ({ label: `${v}%`, correct: v === gap }));
     }
   }
-  const part2Options = task.analysis ? analysisOptions.map((option) => option.label) : claims;
+  // Rotate the fixed claims by task so the correct one is not always first.
+  const claimOffset = (task.winning + task.total + task.stages[0]!) % claims.length;
+  const part2Options = task.analysis ? analysisOptions.map((option) => option.label) : [...claims.slice(claimOffset), ...claims.slice(0, claimOffset)];
   const part2CorrectSet = task.analysis ? analysisOptions.filter((option) => option.correct).map((option) => option.label) : [claims[0]!];
   const part2Heading = task.analysis ? "Read the results" : "Choose the evidence claim";
 
@@ -238,7 +244,7 @@ export function ChanceSimulationLabCard({ task, onCorrect, onWrong, assessmentMo
       <div className="grid gap-3 sm:grid-cols-3">{task.stages.map((trials, index) => {
         const observed = results[index];
         const percent = observed === undefined ? 0 : observed / trials * 100;
-        return <div key={`${trials}-${index}`} className={`rounded-lg border-2 p-4 ${observed === undefined ? "border-dashed border-[#cdb9df] bg-white/50" : "border-cyan-300 bg-white"}`}><div className="flex items-center justify-between"><span className="text-xs font-black uppercase text-[#6d3f9c]">Stage {index + 1}</span><span className="font-mono font-black">{trials} trials</span></div><div className="mt-3 h-28 overflow-hidden rounded-md bg-[#251833] p-3"><div className="flex h-full items-end gap-2"><div className="w-1/2 rounded-t bg-fuchsia-500 transition-all" style={{ height: `${Math.round(probability * 100)}%` }} /><div className="w-1/2 rounded-t bg-cyan-400 transition-all" style={{ height: `${Math.round(percent)}%` }} /></div></div><div className="mt-2 text-sm font-bold">{observed === undefined ? "Waiting" : `${observed}/${trials} = ${Math.round(percent)}%`}</div></div>;
+        return <div key={`${trials}-${index}`} className={`rounded-lg border-2 p-4 ${observed === undefined ? "border-dashed border-[#cdb9df] bg-white/50" : "border-cyan-300 bg-white"}`}><div className="flex items-center justify-between"><span className="text-xs font-black uppercase text-[#6d3f9c]">Stage {index + 1}</span><span className="font-mono font-black">{trials} trials</span></div><div className="mt-3 h-28 overflow-hidden rounded-md bg-[#251833] p-3"><div className="flex h-full items-end gap-2"><div className="w-1/2 rounded-t bg-fuchsia-500 transition-all" style={{ height: `${Math.round(probability * 100)}%` }} /><div className="w-1/2 rounded-t bg-cyan-400 transition-all" style={{ height: `${Math.round(percent)}%` }} /></div></div><div className="mt-1 flex justify-between text-[11px] font-black uppercase"><span className="text-fuchsia-600">Expected</span><span className="text-cyan-600">Observed</span></div><div className="mt-1 text-sm font-bold">{observed === undefined ? "Waiting" : `${observed}/${trials} = ${Math.round(percent)}%`}</div></div>;
       })}</div>
       {!allRun ? <div className="mt-5"><ActionButton onClick={launch}><Play className="h-5 w-5" /> Run stage {results.length + 1}</ActionButton></div> : <div className="mt-5 space-y-3"><div className="text-sm font-black uppercase text-[#8b2cf5]">{part2Heading}</div>{analysisQuestion ? <div className="flex items-start gap-2"><p className="font-bold text-[#2b2135]">{analysisQuestion}</p><OptionReadAloudButton text={analysisQuestion} /></div> : null}{part2Options.map((text) => <button key={text} type="button" onClick={() => setClaim(text)} className={`flex w-full items-center justify-between gap-3 rounded-lg border-2 p-3 text-left font-bold transition ${claim === text ? "border-fuchsia-500 bg-fuchsia-50" : "border-[#ddd0e8] bg-white hover:border-cyan-400"}`}><span>{text}</span><OptionReadAloudButton text={text} /></button>)}<ActionButton onClick={finish} disabled={!claim}><Check className="h-5 w-5" /> Lock conclusion</ActionButton></div>}
     </div>

@@ -141,7 +141,7 @@ function simulation(
   return fresh(() => {
     const f = pick(FRACTIONS.filter((item) => item.total <= 10));
     const trialStages = stages ?? (challenge === "predict" ? [pick([20, 30, 40, 50])] : challenge === "compare" ? [pick([20, 30]), pick([80, 100, 120])] : [10, 50, pick([200, 300, 500])]);
-    return { kind: "chanceSimulationLab", prompt, tool: pick(["spinner", "coin", "die"] as const), winning: f.winning, total: f.total, stages: trialStages, targetName: pick(["glow", "shield", "portal", "crystal"]), challenge, ...(analysis ? { analysis } : {}) };
+    return { kind: "chanceSimulationLab", prompt, tool: f.total === 2 ? pick(["spinner", "coin"] as const) : "spinner" as const, winning: f.winning, total: f.total, stages: trialStages, targetName: pick(["glow", "shield", "portal", "crystal"]), challenge, ...(analysis ? { analysis } : {}) };
   });
 }
 

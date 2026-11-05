@@ -221,15 +221,30 @@ function level6(week: number, lesson: number, variant: number): QuizTask {
     return question({ prompt: lesson === 1 ? `Where does ${winning}/${total} sit on a 0 to 1 probability scale?` : lesson === 2 ? "Which three forms name the same probability?" : `Which chance description best matches ${percent}%?`, answer, options: [answer, `${total}/${winning}`, `${100 - percent}%`, percent === 50 ? "Certain" : "Impossible"], correct: "Fractions, decimals and percentages can name the same point from impossible to certain.", wrong: "Divide the fraction, then multiply the decimal by 100 for percent.", visual: { type: "scale", highlight, value: decimal } }, variant, false);
   }
   if (week === 2) {
-    const answer = lesson === 1 ? `${winning}/${total}` : lesson === 2 ? `${total - winning} non-winning outcomes` : `${winning} winning parts out of ${total}`;
-    return question({ prompt: lesson === 1 ? "Calculate the probability of the purple outcome." : lesson === 2 ? `${winning} of ${total} outcomes win. How many do not win?` : `Which tool design has probability ${winning}/${total}?`, answer, options: [answer, `${total}/${winning}`, `${winning}/${total - winning}`, `${total - winning}/${total}`], correct: "Probability compares favourable outcomes with all equally likely outcomes.", wrong: "Put winning outcomes over all outcomes.", visual: countVisual(winning, total) }, variant, false);
+    const nonWin = (n: number) => `${n} non-winning ${n === 1 ? "outcome" : "outcomes"}`;
+    const design = (w: number, t: number) => `${w} winning ${w === 1 ? "part" : "parts"} out of ${t}`;
+    const answer = lesson === 1 ? `${winning}/${total}` : lesson === 2 ? nonWin(total - winning) : design(winning, total);
+    // Every choice uses the same form as the answer, so the answer does not stand out.
+    const week2Options = lesson === 1
+      ? [answer, `${total}/${winning}`, `${winning}/${total - winning}`, `${total - winning}/${total}`]
+      : lesson === 2
+        ? [answer, ...[...new Set([winning, total, total + winning, total - winning + 1])].filter((n) => n !== total - winning).slice(0, 3).map(nonWin)]
+        : [answer, design(total - winning === winning ? winning + 1 : total - winning, total), design(winning, total + winning), design(total, winning + total)];
+    return question({ prompt: lesson === 1 ? "Calculate the probability of the purple outcome." : lesson === 2 ? `${winning} of ${total} outcomes win. How many do not win?` : `Which tool design has probability ${winning}/${total}?`, answer, options: week2Options, correct: "Probability compares favourable outcomes with all equally likely outcomes.", wrong: "Put winning outcomes over all outcomes.", visual: countVisual(winning, total) }, variant, false);
   }
   if (week === 3) {
     const trials = total * 20;
     const expected = winning * 20;
     const observed = expected + variant - 2;
     const answer = lesson === 1 ? `${expected} expected wins` : lesson === 2 ? `Expected ${expected}; observed ${observed}` : "Chance variation can make observed frequency differ from expected frequency";
-    return question({ prompt: lesson === 1 ? `With probability ${winning}/${total} across ${trials} trials, what is the expected frequency?` : lesson === 2 ? "Which statement compares the two frequencies accurately?" : "Why are the expected and observed counts not identical?", answer, options: [answer, "Observed results must equal expected results", "The simulation is automatically invalid", "Expected frequency is the next guaranteed result"], correct: "Expected frequency is probability multiplied by trials; observed results may vary.", wrong: "Calculate the expectation, then allow for chance variation.", visual: { type: "expectedObserved", expected, observed, total: trials } }, variant, false);
+    // Numeric choices for the calculation questions, so the answer is not the only number.
+    const wins = [...new Set([expected, trials - expected, expected + total, expected * 2, Math.max(1, expected - total)])].filter((n) => n !== expected).slice(0, 3);
+    const week3Options = lesson === 1
+      ? [answer, ...wins.map((n) => `${n} expected wins`)]
+      : lesson === 2
+        ? [answer, `Expected ${observed}; observed ${expected}`, `Expected ${trials}; observed ${observed}`, "Observed results must equal expected results"]
+        : [answer, "Observed results must equal expected results", "The simulation is automatically invalid", "Expected frequency is the next guaranteed result"];
+    return question({ prompt: lesson === 1 ? `With probability ${winning}/${total} across ${trials} trials, what is the expected frequency?` : lesson === 2 ? "Which statement compares the two frequencies accurately?" : "Why are the expected and observed counts not identical?", answer, options: week3Options, correct: "Expected frequency is probability multiplied by trials; observed results may vary.", wrong: "Calculate the expectation, then allow for chance variation.", visual: lesson === 1 ? countVisual(winning, total) : { type: "expectedObserved", expected, observed, total: trials } }, variant, false);
   }
   if (week === 4) {
     const small = [0.2, 0.7, 0.3, 0.8, 0.4][variant]!;
@@ -238,14 +253,20 @@ function level6(week: number, lesson: number, variant: number): QuizTask {
     return question({ prompt: lesson === 1 ? "How should the trial-size effect be investigated?" : lesson === 2 ? "Which run is closer to the expected probability of 0.5?" : "What conclusion is supported by both runs?", answer, options: [answer, "Ten trials always give the best estimate", "More trials guarantee exactly 0.5", "Ignore relative frequency"], correct: "Larger samples usually steady relative frequency near the expected probability.", wrong: "Compare proportions without claiming an exact result is guaranteed.", visual: { type: "convergence", expected: 0.5, samples: [{ trials: 10, value: small }, { trials: 200, value: large }] } }, variant, false);
   }
   if (week === 5) {
-    const valid = `An equal ${total}-part spinner with ${winning} winning parts`;
+    const parts = (n: number) => `${n} winning ${n === 1 ? "part" : "parts"}`;
+    const valid = `An equal ${total}-part spinner with ${parts(winning)}`;
     const answer = lesson === 1 ? valid : lesson === 2 ? "Restore every spinner part before the next trial" : "The outcomes, winning share and reset rule match the event";
     const prompt = lesson === 1
       ? `Which simulator models a ${winning}/${total} event?`
       : lesson === 2
         ? "Chanzia removes a winning part after each win. What fixes the simulation?"
         : "Which audit statement validates the simulation?";
-    return question({ prompt, answer, options: [answer, "Keep removing winning parts", "Change the winning rule after each trial", "Choose whichever model wins most often"], correct: "A valid simulation keeps the same probabilities for every independent trial.", wrong: "Check the outcomes, winning share and reset rule.", visual: countVisual(winning, total) }, variant, false);
+    const options = lesson === 1
+      ? [answer, `An equal ${total}-part spinner with ${parts(total - winning === winning ? winning + 1 : total - winning)}`, `An equal ${total + 1}-part spinner with ${parts(winning)}`, "Choose whichever model wins most often"]
+      : [answer, "Keep removing winning parts", "Change the winning rule after each trial", "Choose whichever model wins most often"];
+    // Lesson 1 asks which simulator fits the event, so it shows the event on the scale, not the tool (the tool would be the answer).
+    const scaleVisual: ChanceVisual = { type: "scale", highlight: percent < 50 ? "unlikely" : percent === 50 ? "even" : "likely", value: decimal };
+    return question({ prompt, answer, options, correct: "A valid simulation keeps the same probabilities for every independent trial.", wrong: "Check the outcomes, winning share and reset rule.", visual: lesson === 1 ? scaleVisual : countVisual(winning, total) }, variant, false);
   }
   const trials = total * 25;
   const expected = winning * 25;
