@@ -1,3 +1,4 @@
+import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import { NextResponse } from "next/server";
 import {
   getSchoolInviteEmailContext,
@@ -56,8 +57,31 @@ export async function POST(
   try {
     switch (payload.action) {
       case "getSchoolYearRollover":
-        return NextResponse.json(await runSchoolCommand(schoolId, "get_school_year_rollover", {
-          p_school_id: schoolId,
+        if (payload.targetYear !== undefined && !Number.isInteger(payload.targetYear)) return errorResponse("Choose a calendar year");
+        return NextResponse.json(await runSchoolCommand(schoolId, "get_school_year_rollover_preview", {
+          p_school_id: schoolId, p_target_year: payload.targetYear ?? null,
+        }, accessToken));
+      case "saveSchoolYearPreparation": {
+        const students = objectArray(payload.students);
+        if (!Number.isInteger(payload.targetYear) || !Number.isInteger(payload.highestYear) || !stringValue(payload.reviewToken)
+          || !Array.isArray(payload.students) || students.length !== payload.students.length
+          || students.some(student => !stringValue(student.id) || !Number.isInteger(student.calendarYear) || typeof student.retain !== "boolean")) {
+          return errorResponse("Review the year choices for every student");
+        }
+        return NextResponse.json(await runSchoolCommand(schoolId, "save_school_year_preparation", {
+          p_school_id: schoolId, p_target_year: payload.targetYear, p_highest_year: payload.highestYear,
+          p_students: students.map(({ id, calendarYear, retain }) => ({ id, calendarYear, retain })), p_review_token: stringValue(payload.reviewToken),
+        }, accessToken));
+      }
+      case "startSchoolYear":
+        if (!Number.isInteger(payload.targetYear) || !stringValue(payload.reviewToken)) return errorResponse("Reload and review the school-year preview");
+        return NextResponse.json(await runSchoolCommand(schoolId, "start_school_year", {
+          p_school_id: schoolId, p_target_year: payload.targetYear, p_review_token: stringValue(payload.reviewToken),
+        }, accessToken));
+      case "retainStudentAfterManualRollover":
+        if (!Number.isInteger(payload.targetYear) || !stringValue(payload.studentId)) return errorResponse("Student and rollover year are required");
+        return NextResponse.json(await runSchoolCommand(schoolId, "retain_student_after_manual_rollover", {
+          p_school_id: schoolId, p_student_id: stringValue(payload.studentId), p_target_year: payload.targetYear,
         }, accessToken));
       case "saveSchoolYearRollover": {
         if (!Number.isInteger(payload.highestYear) || !Number.isInteger(payload.targetYear)
@@ -384,6 +408,10 @@ export async function POST(
           const firstName = stringValue(student.firstName);
           const lastName = stringValue(student.lastName);
           try {
+            if (student.schoolYearCalendarYear !== undefined && (!Number.isInteger(student.schoolYearCalendarYear)
+              || Number(student.schoolYearCalendarYear) < schoolCalendarYear() || Number(student.schoolYearCalendarYear) > schoolCalendarYear() + 1)) {
+              throw new Error("Choose this calendar year or next year for the student's year group");
+            }
             const confirmedDuplicateReview = student.confirmCreateNew === true;
             const duplicateRequestId = stringValue(student.duplicateRequestId);
             if (confirmedDuplicateReview) {
@@ -430,13 +458,14 @@ export async function POST(
             }
             const result = await runSchoolCommand<Record<string, unknown>>(
               schoolId,
-              "create_school_student",
+              student.schoolYearCalendarYear === undefined ? "create_school_student" : "create_school_student_for_year",
               {
                 p_school_id: schoolId,
                 p_class_id: stringValue(student.classId) || null,
                 p_first_name: firstName,
                 p_last_name: lastName,
                 p_school_year_level: stringValue(student.schoolYear),
+                ...(student.schoolYearCalendarYear === undefined ? {} : { p_calendar_year: student.schoolYearCalendarYear }),
                 p_username: stringValue(student.username) || null,
                 p_pin: stringValue(student.pin) || null,
                 p_idempotency_key:

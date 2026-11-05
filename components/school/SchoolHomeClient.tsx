@@ -1,5 +1,6 @@
 "use client";
 
+import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import SchoolYearRolloverPanel from "@/components/school/SchoolYearRolloverPanel";
 
 import {
@@ -504,6 +505,7 @@ function OtherSchoolClasses({
 }
 
 type SchoolStudentDraft = {
+  schoolYearCalendarYear?: number;
   firstName: string;
   lastName: string;
   schoolYear: string;
@@ -567,7 +569,7 @@ function emptyStudentDraft(classId = ""): SchoolStudentDraft {
   };
 }
 
-type SkippedImport = { row: TemplateStudent; requestId: string; matches: string[]; sameSchool: boolean; selected: boolean };
+type SkippedImport = { schoolYearCalendarYear: number; row: TemplateStudent; requestId: string; matches: string[]; sameSchool: boolean; selected: boolean };
 
 /** "a Year 4 at Cobram Primary School", "a home learner", for the duplicate summary. */
 function describeMatch(candidate: DuplicateCandidate): string {
@@ -632,6 +634,8 @@ function StudentDirectory({
     requestId: string;
     candidates: DuplicateCandidate[];
   } | null>(null);
+  const calendarYear = schoolCalendarYear();
+  const [importCalendarYear, setImportCalendarYear] = useState<number | "">("");
   const [importRows, setImportRows] = useState<TemplateStudent[]>([]);
   const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
   const [importResult, setImportResult] = useState<{ added: number; skipped: SkippedImport[]; failed: Array<{ name: string; message: string }> } | null>(null);
@@ -802,6 +806,7 @@ function StudentDirectory({
   function closeCreate() {
     setCreateMode(null);
     setImportRows([]);
+    setImportCalendarYear("");
     setImportFileName("");
     setImportMessage("");
     setImportResult(null);
@@ -816,6 +821,7 @@ function StudentDirectory({
   }
 
   async function submitManualStudent() {
+    if (!manualDraft.schoolYearCalendarYear) { setImportMessage("Choose the calendar year this year group applies to."); return; }
     const result = await onCreate([manualDraft]);
     if (result.errors.length === 0) {
       closeCreate();
@@ -919,6 +925,8 @@ function StudentDirectory({
 
   // Sends the list in batches (the server takes up to 100 at a time) so a whole school fits in one upload.
   async function submitImport() {
+    if (!importCalendarYear) { setImportMessage("Choose the calendar year these year groups apply to."); return; }
+    const selectedCalendarYear = importCalendarYear;
     const ready = importRows.filter((row) => !templateRowIssue(row, YEAR_LEVELS));
     const added: string[] = [];
     const skipped: SkippedImport[] = [];
@@ -930,6 +938,7 @@ function StudentDirectory({
         firstName: row.firstName,
         lastName: row.lastName,
         schoolYear: row.schoolYear,
+        schoolYearCalendarYear: selectedCalendarYear,
         username: "",
         pin: "",
         classId: "",
@@ -942,7 +951,7 @@ function StudentDirectory({
           const matches = (error.candidates ?? []).map(describeMatch);
           const sameSchool = (error.candidates ?? []).some((candidate) => candidate.sameSchool ?? candidate.schoolName === schoolName);
           // A name match does not establish identity, even at a different school.
-          skipped.push({ row, requestId: error.requestId, matches, sameSchool, selected: false });
+          skipped.push({ schoolYearCalendarYear: selectedCalendarYear, row, requestId: error.requestId, matches, sameSchool, selected: false });
         } else failed.push({ name: error.name, message: error.message });
       }
       setImportProgress({ done: Math.min(ready.length, start + batch.length), total: ready.length });
@@ -966,6 +975,7 @@ function StudentDirectory({
         firstName: item.row.firstName,
         lastName: item.row.lastName,
         schoolYear: item.row.schoolYear,
+        schoolYearCalendarYear: item.schoolYearCalendarYear,
         username: "",
         pin: "",
         classId: "",
@@ -1308,6 +1318,15 @@ function StudentDirectory({
                 Link existing
               </button>
             </div>
+            <label className="text-sm font-bold text-slate-700 sm:col-span-2">
+              This year group applies to *
+              <select aria-label="Student year group calendar year" value={manualDraft.schoolYearCalendarYear ?? ""} disabled={busy || Boolean(duplicateReview)} onChange={event => setManualDraft(current => ({ ...current, schoolYearCalendarYear: event.target.value ? Number(event.target.value) : undefined }))} className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2">
+                <option value="">Choose a calendar year</option>
+                <option value={calendarYear}>{calendarYear} — current-year student / trial</option>
+                <option value={calendarYear + 1}>{calendarYear + 1} — already entered in next year’s group</option>
+              </select>
+              <span className="mt-1 block font-normal">Students entered directly into next year’s group will not be promoted again by Start new year.</span>
+            </label>
             <label className="text-sm font-bold text-slate-700">
               First name *
               <input
@@ -1480,6 +1499,7 @@ function StudentDirectory({
                       busy ||
                       !manualDraft.firstName.trim() ||
                       !manualDraft.schoolYear ||
+                      !manualDraft.schoolYearCalendarYear ||
                       Boolean(manualDraft.pin && manualDraft.pin.length !== 4)
                     }
                     onClick={() => void submitManualStudent()}
@@ -1647,6 +1667,15 @@ function StudentDirectory({
       {createMode === "import" ? (
         <Modal title="Upload student list" onClose={closeCreate}>
           <div className="space-y-5 p-6">
+            {!importResult ? <label className="block text-sm font-bold text-slate-700">
+              These year groups apply to *
+              <select aria-label="Import year groups calendar year" value={importCalendarYear} disabled={busy || Boolean(importProgress)} onChange={event => setImportCalendarYear(event.target.value ? Number(event.target.value) : "")} className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2">
+                <option value="">Choose a calendar year</option>
+                <option value={calendarYear}>{calendarYear} — current-year students / trial</option>
+                <option value={calendarYear + 1}>{calendarYear + 1} — already entered in next year’s groups</option>
+              </select>
+              <span className="mt-1 block font-normal">This applies to every student in this upload. Upload current-year trial students and next-year students separately. Students already entered for next year will not be promoted twice.</span>
+            </label> : null}
             <input ref={fileInputRef} type="file" accept=".xlsx" onChange={handleRosterFile} className="hidden" />
             {importResult ? (
               <div className="space-y-4">
@@ -1753,7 +1782,7 @@ function StudentDirectory({
                     ) : null}
                     <div className="flex justify-end gap-2">
                       <button type="button" onClick={closeCreate} disabled={Boolean(importProgress)} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-bold disabled:opacity-50">Cancel</button>
-                      <button type="button" disabled={busy || Boolean(importProgress) || ready === 0} onClick={() => void submitImport()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
+                      <button type="button" disabled={busy || Boolean(importProgress) || !importCalendarYear || ready === 0} onClick={() => void submitImport()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
                         {importProgress ? "Adding..." : `Add ${ready} student${ready === 1 ? "" : "s"}`}
                       </button>
                     </div>
