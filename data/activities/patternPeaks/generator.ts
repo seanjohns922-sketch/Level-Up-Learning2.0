@@ -1996,7 +1996,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       `The pattern adds ${growth} each stage. How much does the count grow over 2 stages?`,
       growth * 2,
       [growth, growth * 3],
-      `Two stages means two lots of ${growth}.`,
+      "Add the growth once for each stage.",
       tiles,
     );
   }
@@ -2484,7 +2484,7 @@ function year6Question(week: number, lessonNumber: number, role: RotationRole): 
       return typed(
         "Keep the total the same.",
         secondNumber - shift,
-        `The first number increased by ${shift}, so the second decreases by ${shift}.`,
+        "Compare the first numbers. What must the second number do to keep the total?",
         promptVisual("Linked pairs", [
           { label: "First pair", tokens: [`${firstNumber}`, "+", `${secondNumber}`, "=", `${target}`] },
           { label: "New pair", tokens: [`${firstNumber + shift}`, "+", "?", "=", `${target}`] },
