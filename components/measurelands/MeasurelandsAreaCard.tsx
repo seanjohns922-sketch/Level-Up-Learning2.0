@@ -815,8 +815,8 @@ function WholeShape({ gridW, gridH, rects, candidates, wrongId, onPick, size }: 
 /** The decomposed shape — coloured rectangles that separate, with dim/area labels. */
 // The shape stays whole — the two rectangles just get different colours so the
 // split is visible in place. Each rectangle carries its own "w × h = area" label.
-function Decomposed({ gridW, gridH, rects, activeIndex, showArea, lin, size }: {
-  gridW: number; gridH: number; rects: CRect[]; activeIndex?: number; showArea?: boolean; lin?: string; size?: number;
+function Decomposed({ gridW, gridH, rects, activeIndex, showArea, lin, size, measured }: {
+  gridW: number; gridH: number; rects: CRect[]; activeIndex?: number; showArea?: boolean; lin?: string; size?: number; measured?: boolean;
 }) {
   const cell = cxCell(gridW, gridH, size);
   const PAD = 26, W = gridW * cell + PAD * 2, H = gridH * cell + PAD * 2;
@@ -832,10 +832,18 @@ function Decomposed({ gridW, gridH, rects, activeIndex, showArea, lin, size }: {
           return (
             <g key={i} style={{ opacity: dim ? 0.32 : 1 }}>
               <rect x={rx} y={ry} width={rw} height={rh} rx={5} fill={fill} stroke={stroke} strokeWidth={3.5} />
+              {measured ? (
+                // Question mode: side lengths only, so the child works out each area.
+                <>
+                  <text x={rx + rw / 2} y={ry + 19} textAnchor="middle" fontSize={15} fontWeight={900} fill={stroke}>{r.w}{lin ? ` ${lin}` : ""}</text>
+                  <text x={rx + 7} y={rh < 80 ? ry + rh - 9 : ry + rh / 2 + 6} textAnchor="start" fontSize={15} fontWeight={900} fill={stroke}>{r.h}{lin ? ` ${lin}` : ""}</text>
+                </>
+              ) : <>
               {cells}
               <rect x={rx + rw / 2 - 34} y={ry + rh / 2 - 17} width={68} height={34} rx={9} fill="#fff" stroke={stroke} strokeWidth={2} />
               <text x={rx + rw / 2} y={ry + rh / 2 - 2} textAnchor="middle" fontSize={13} fontWeight={900} fill={stroke}>{r.w} × {r.h}</text>
               <text x={rx + rw / 2} y={ry + rh / 2 + 14} textAnchor="middle" fontSize={13} fontWeight={900} fill={stroke}>{showArea ? `= ${r.w * r.h}${lin ? ` ${lin}²` : ""}` : "= ?"}</text>
+              </>}
             </g>
           );
         })}
@@ -964,7 +972,7 @@ function CompositeSolveScene({ task, onCorrect, onWrong }: { task: AreaTask; onC
   const aArea = rects[0]!.w * rects[0]!.h, bArea = rects[1] ? rects[1].w * rects[1].h : 0;
   const total = task.answerValue ?? aArea + bArea;
   const [phase, setPhase] = useState<"intro" | "a" | "b" | "total">("intro");
-  const fig = (active?: number) => <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} activeIndex={active} showArea={phase === "total"} lin={lin} />;
+  const fig = (active?: number) => <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={rects} activeIndex={active} showArea={phase === "total"} lin={lin} measured={phase !== "total"} />;
   return (
     <Shell badge={task.badgeLabel ?? "Break & Solve"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       {phase === "intro" ? (
@@ -1000,7 +1008,7 @@ function CompositeTotalScene({ task, onCorrect, onWrong }: { task: AreaTask; onC
     <Shell badge={task.badgeLabel ?? "Total Area"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <ContextLine task={task} /> : null}
-        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} />
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} lin={cxLin(task)} measured />
       </div>
       <div className="grid grid-cols-3 gap-3">
         {(task.options ?? []).map((n) => (
@@ -1020,7 +1028,7 @@ function CompositeMistakeScene({ task, onCorrect, onWrong }: { task: AreaTask; o
     <Shell badge={task.badgeLabel ?? "Professor Gauge's Mistake"} prompt={task.prompt} speakText={task.speakText ?? task.prompt}>
       <div className="rounded-[26px] border border-[rgba(214,184,108,0.4)] bg-[rgba(255,252,245,0.96)] p-3">
         {task.context ? <ContextLine task={task} /> : null}
-        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} showArea lin={cxLin(task)} />
+        <Decomposed gridW={comp.gridW} gridH={comp.gridH} rects={comp.rects} lin={cxLin(task)} measured />
       </div>
       {task.statement ? <div className="rounded-[18px] border border-[rgba(192,86,78,0.28)] bg-[rgba(252,224,224,0.5)] px-4 py-2 text-center text-lg font-black text-[#7c2d12]">{task.statement}</div> : null}
       <div className="grid gap-3">

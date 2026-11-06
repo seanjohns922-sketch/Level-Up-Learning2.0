@@ -334,7 +334,8 @@ function ItineraryScene({ task, onCorrect, onWrong }: { task: TimeTask; onCorrec
                 <span className="text-xl">{leg.emoji}</span>
                 <div className="flex-1">
                   <div className="text-[15px] font-black text-[#2c1c07]">{leg.label}</div>
-                  <div className="text-[12px] font-bold text-[#a98b52]">{fmtTime(from)} → {fmtTime(to)}</div>
+                  {/* Clock times are the answers, so only the first leg's times show, and only once it is solved. */}
+                  {i === 0 && idx >= 1 ? <div className="text-[12px] font-bold text-[#a98b52]">{fmtTime(from)} → {fmtTime(to)}</div> : null}
                 </div>
                 <span className="rounded-full px-2.5 py-1 text-[13px] font-black" style={{ color: s.color, background: "rgba(255,255,255,0.7)" }}>{fmtDur(leg.minutes)}</span>
               </div>

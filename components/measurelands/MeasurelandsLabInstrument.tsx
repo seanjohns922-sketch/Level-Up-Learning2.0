@@ -65,7 +65,7 @@ export function MeasurelandsLabInstrument({
       if (isMaj) ticks.push(<text key={`l${v}`} x={x} y={tTop + 32} textAnchor="middle" fontSize={12} fontWeight={800} fill="#5a4423">{fmt(v)}</text>);
     }
     return (
-      <div className="mx-auto" style={{ maxWidth: size }}>
+      <div className="mx-auto" style={{ maxWidth: Math.max(size, 520) /* a long tape needs more width than a jug or dial to stay readable */ }}>
         <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" style={{ touchAction: "none" }} onPointerMove={onChange ? move : undefined} onPointerUp={() => (dragging.current = false)} onPointerLeave={() => (dragging.current = false)}>
           <rect x={tx} y={tTop} width={tw} height={tHt} rx={8} fill="#fff7df" stroke="#c9962a" strokeWidth={2} />
           <rect x={tx} y={tTop} width={px(value) - tx} height={tHt} rx={8} fill="rgba(124,58,237,0.28)" />

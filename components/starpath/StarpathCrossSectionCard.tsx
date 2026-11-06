@@ -120,6 +120,9 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
   const [t, setT] = useState(0.35);
   const [chosen, setChosen] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
+  // Predict tasks keep the 3D cut and slider, but hide the flat slice drawing until the child commits.
+  const hidePreview = assessmentMode;
+  const hideSlice = assessmentMode || (task.mode === "predict" && !settled);
 
   function submit() {
     if (settled || !chosen) return;
@@ -131,11 +134,11 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
     <div className="space-y-4">
       <TaskHeading prompt={task.prompt} speech={task.speakText} />
       <div className="l6cross-stage mx-auto max-w-md rounded-3xl p-4">
-        <div className="grid grid-cols-[1.4fr_1fr] items-center gap-3">
+        <div className={hideSlice && !assessmentMode ? "mx-auto grid max-w-[16rem] items-center" : "grid grid-cols-[1.4fr_1fr] items-center gap-3"}>
           <svg viewBox="0 0 208 210" className="h-auto w-full" role="img" aria-label={`${object.name} being sliced`}>
-            <SceneEls els={buildScene(object, t).filter(element => !assessmentMode || element.fill !== COL.cut)} />
+            <SceneEls els={buildScene(object, t).filter(element => !hidePreview || element.fill !== COL.cut)} />
           </svg>
-          {!assessmentMode && <div className="text-center">
+          {!hideSlice && <div className="text-center">
             <div className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-200/70">The slice</div>
             <SectionShape object={object} t={t} />
             <div className="font-mono text-[11px] tabular-nums text-white/60">
@@ -143,11 +146,11 @@ export default function StarpathCrossSectionCard({ task, onCorrect, onWrong, ass
             </div>
           </div>}
         </div>
-        {!assessmentMode && <div className="mt-3">
+        {!hidePreview && <div className="mt-3">
           <label className="mb-1 block font-sans text-xs font-bold text-white/60">Move the cut up ↑</label>
           <input type="range" min={0} max={100} value={Math.round(t * 100)} onChange={(e) => setT(Number(e.target.value) / 100)} className="w-full" style={{ accentColor: "#22d3ee" }} aria-label="Move the cut plane" />
         </div>}
-        {assessmentMode && <p className="text-center text-sm text-white">Imagine a cut parallel to the base, between the base and the top.</p>}
+        {hidePreview && <p className="text-center text-sm text-white">Imagine a cut parallel to the base, between the base and the top.</p>}
       </div>
 
       <div className="mx-auto grid max-w-md gap-2 sm:grid-cols-2">
