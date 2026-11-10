@@ -1179,7 +1179,7 @@ export default function LoginPage() {
                         <input
                           value={parentExplorerCode}
                           onChange={(event) => setParentExplorerCode(normalizeExplorerCode(event.target.value))}
-                          placeholder="LUL-ABCD-2345"
+                          placeholder="RLQ-ABCD-2345"
                           autoComplete="off"
                           className={`${inputCls} font-bold uppercase tracking-wider`}
                         />

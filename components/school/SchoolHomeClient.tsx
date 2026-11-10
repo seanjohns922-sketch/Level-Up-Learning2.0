@@ -1554,7 +1554,7 @@ function StudentDirectory({
                     setLinkPreview(null);
                     setLinkMessage("");
                   }}
-                  placeholder="LUL-AB12-CD34"
+                  placeholder="RLQ-AB12-CD34"
                   autoComplete="off"
                   className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-normal uppercase"
                 />

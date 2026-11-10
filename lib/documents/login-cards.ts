@@ -150,3 +150,41 @@ export function homeAccessCardsHtml({ cards, websiteHost }: { cards: HomeAccessC
   }
   return documentHtml({ title: "RELIQ home access cards", pages, css });
 }
+
+export type FamilyLinkCard = { name: string; className: string; explorerCode: string; accessCode: string | null };
+
+/** Family link cards, four to a page: how a parent links a school student so
+ * they can learn at home. The parent signs up, chooses Link a child, enters the
+ * Explorer code and confirms with the child's four-digit access code. */
+export function familyLinkCardsHtml({ cards, websiteHost, schoolName, schoolLogo = null }: { cards: FamilyLinkCard[]; websiteHost: string; schoolName: string | null; schoolLogo?: DocumentLogo }): string {
+  const css = `${CSS}
+.cut{height:440px;padding:14px}
+.fl-body{padding:14px 16px;display:flex;flex-direction:column;gap:9px;flex:1}
+.fl-row{display:flex;justify-content:space-between;align-items:baseline;background:${COLORS.paper};border-radius:9px;padding:7px 10px}
+.fl-steps{margin:2px 0 0;padding-left:18px;font-size:12px;line-height:1.5;color:#3A3D40}
+`;
+  const pages: string[] = [];
+  const total = Math.max(1, Math.ceil(cards.length / 4));
+  for (let page = 0; page < total; page += 1) {
+    const slice = cards.slice(page * 4, (page + 1) * 4);
+    pages.push(`${letterhead({ audience: "student", label: "Learn at home with RELIQ", meta: [schoolName, String(new Date().getFullYear())].filter(Boolean).join(" · "), schoolLogo })}
+      <p class="intro">One card per family. It links your parent account to your child's school account, so their progress and rewards carry on at home.</p>
+      <div class="grid">${slice.map((card) => `<div class="cut"><div class="lc">
+        ${cardTop("For families")}
+        <div class="fl-body">
+          <span class="lc-name" style="font-size:22px">${escapeHtml(card.name)}</span>
+          <span style="font-size:12.5px;color:${COLORS.muted}">${escapeHtml([card.className, schoolName].filter(Boolean).join(" · "))}</span>
+          <span class="fl-row" style="background:${COLORS.violetTint}"><span class="label" style="color:${COLORS.violetText}">Explorer code</span><span class="mono" style="font-size:15px">${escapeHtml(card.explorerCode)}</span></span>
+          <span class="fl-row"><span class="label">Child's access code</span>${card.accessCode ? `<span class="mono" style="font-size:15px">${escapeHtml(card.accessCode)}</span>` : `<span style="font-size:13px;font-weight:700">Ask the teacher</span>`}</span>
+          <ol class="fl-steps">
+            <li>Go to <b>${escapeHtml(websiteHost)}</b>, choose <b>Parent</b> and create a free account.</li>
+            <li>Choose <b>Link a child</b> and type the Explorer code.</li>
+            <li>Confirm with your child's access code.</li>
+          </ol>
+          <span style="font-size:11px;line-height:1.4;color:${COLORS.muted};margin-top:auto">Keep this card private. The Explorer code stays the same for your child's whole time with RELIQ.</span>
+        </div>
+      </div></div>`).join("")}</div>
+      ${footer("RELIQ · BrightUp Education", `${generatedOn()} · Page ${page + 1} of ${total}`)}`);
+  }
+  return documentHtml({ title: "RELIQ family link cards", pages, css });
+}
