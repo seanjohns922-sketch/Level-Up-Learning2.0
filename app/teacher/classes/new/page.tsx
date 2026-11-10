@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { recoverInvalidRefreshToken, supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/lib/useAuthGuard";
@@ -12,6 +12,14 @@ import {
 import { buildDisplayName, buildStudentUsername } from "@/lib/studentName";
 
 type AddedStudent = { name: string; username: string; pin: string; claimCode: string };
+type SchoolChoice = { id: string; name: string; years: number[] };
+
+/** The year a new class should default to: this calendar year if the school has it,
+ * otherwise the next year it has set up (a new school preparing for next year). */
+function defaultClassYear(years: number[], now = new Date().getFullYear()) {
+  if (years.includes(now)) return now;
+  return years.find((year) => year > now) ?? years[years.length - 1] ?? now;
+}
 
 function isMissingCreateStudentRpc(message?: string | null) {
   return Boolean(message && /create_student_for_class|schema cache|could not find the function/i.test(message));
@@ -32,6 +40,8 @@ export default function NewClassPage() {
   const [yearLevels, setYearLevels] = useState<string[]>([]);
   const [schoolName, setSchoolName] = useState("");
   const [academicYear, setAcademicYear] = useState(new Date().getFullYear().toString());
+  // The teacher's schools and the school years each has set up (from its licences).
+  const [schoolChoices, setSchoolChoices] = useState<SchoolChoice[]>([]);
   const [creating, setCreating] = useState(false);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [createdClassId, setCreatedClassId] = useState<string | null>(null);
@@ -48,6 +58,50 @@ export default function NewClassPage() {
   const [studentError, setStudentError] = useState<string | null>(null);
 
   const yearLevelOptions = [...SCHOOL_YEAR_LEVEL_OPTIONS];
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth?.user) return;
+      const { data: memberships } = await supabase
+        .from("school_memberships")
+        .select("school_id, schools(id, name, status)")
+        .eq("user_id", auth.user.id)
+        .eq("status", "active")
+        .in("role", ["teacher", "school_admin"]);
+      const schools = ((memberships ?? []) as Array<{ school_id: string; schools: { id: string; name: string; status: string } | { id: string; name: string; status: string }[] | null }>)
+        .map((row) => (Array.isArray(row.schools) ? row.schools[0] : row.schools))
+        .filter((school): school is { id: string; name: string; status: string } => Boolean(school && school.status === "active"));
+      if (!schools.length || cancelled) return;
+      const { data: years } = await supabase
+        .from("academic_years")
+        .select("school_id, calendar_year")
+        .in("school_id", schools.map((school) => school.id))
+        .in("status", ["planned", "active"]);
+      const choices = schools.map((school) => ({
+        id: school.id,
+        name: school.name,
+        years: ((years ?? []) as Array<{ school_id: string; calendar_year: number }>)
+          .filter((row) => row.school_id === school.id)
+          .map((row) => row.calendar_year)
+          .sort((a, b) => a - b),
+      }));
+      if (cancelled) return;
+      setSchoolChoices(choices);
+      setSchoolName(choices[0].name);
+      if (choices[0].years.length) setAcademicYear(String(defaultClassYear(choices[0].years)));
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const chosenSchool = schoolChoices.find((school) => school.name === schoolName) ?? null;
+
+  function chooseSchool(name: string) {
+    setSchoolName(name);
+    const school = schoolChoices.find((entry) => entry.name === name);
+    if (school?.years.length) setAcademicYear(String(defaultClassYear(school.years)));
+  }
 
   function toggleYear(yr: string) {
     setYearLevels((prev) => prev.includes(yr) ? prev.filter((y) => y !== yr) : [...prev, yr]);
@@ -266,11 +320,25 @@ export default function NewClassPage() {
             <div className="grid gap-3 sm:grid-cols-[1fr_140px]">
               <label className="grid gap-1">
                 <span className="text-sm font-bold text-gray-600">School</span>
-                <input value={schoolName} onChange={(event) => setSchoolName(event.target.value)} placeholder="School name" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+                {schoolChoices.length > 1 ? (
+                  <select value={schoolName} onChange={(event) => chooseSchool(event.target.value)} className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base">
+                    {schoolChoices.map((school) => <option key={school.id} value={school.name}>{school.name}</option>)}
+                  </select>
+                ) : schoolChoices.length === 1 ? (
+                  <span className="px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-base font-semibold text-gray-800">{schoolName}</span>
+                ) : (
+                  <input value={schoolName} onChange={(event) => setSchoolName(event.target.value)} placeholder="School name" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+                )}
               </label>
               <label className="grid gap-1">
-                <span className="text-sm font-bold text-gray-600">Academic Year</span>
-                <input value={academicYear} onChange={(event) => setAcademicYear(event.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+                <span className="text-sm font-bold text-gray-600">School year</span>
+                {chosenSchool?.years.length ? (
+                  <select value={academicYear} onChange={(event) => setAcademicYear(event.target.value)} className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base font-semibold">
+                    {chosenSchool.years.map((year) => <option key={year} value={year}>{year}</option>)}
+                  </select>
+                ) : (
+                  <input value={academicYear} onChange={(event) => setAcademicYear(event.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" className="px-4 py-3 rounded-2xl border border-gray-200 bg-white text-base" />
+                )}
               </label>
             </div>
 

@@ -581,6 +581,7 @@ function describeMatch(candidate: DuplicateCandidate): string {
 
 function StudentDirectory({
   schoolName,
+  yearOptions,
   students,
   classes,
   directoryError,
@@ -596,6 +597,8 @@ function StudentDirectory({
   onLinkExisting,
 }: {
   schoolName: string;
+  /** Calendar years this school has set up. When only one of this year and next is set up, uploads use it without asking. */
+  yearOptions?: number[];
   students: SchoolHomeSnapshot["students"];
   classes: SchoolHomeSnapshot["classes"];
   directoryError: string | null;
@@ -627,15 +630,17 @@ function StudentDirectory({
   const [createMode, setCreateMode] = useState<"manual" | "link" | "import" | null>(
     null,
   );
-  const [manualDraft, setManualDraft] = useState<SchoolStudentDraft>(
-    emptyStudentDraft(),
-  );
+  const calendarYear = schoolCalendarYear();
+  const offeredYears = [calendarYear, calendarYear + 1].filter((year) => !yearOptions?.length || yearOptions.includes(year));
+  // A school set up for only one of the two years (e.g. a new school starting next year) is never asked.
+  const onlyYear = offeredYears.length === 1 ? offeredYears[0] : null;
+  const freshDraft = () => ({ ...emptyStudentDraft(), schoolYearCalendarYear: onlyYear ?? undefined });
+  const [manualDraft, setManualDraft] = useState<SchoolStudentDraft>(freshDraft);
   const [duplicateReview, setDuplicateReview] = useState<{
     requestId: string;
     candidates: DuplicateCandidate[];
   } | null>(null);
-  const calendarYear = schoolCalendarYear();
-  const [importCalendarYear, setImportCalendarYear] = useState<number | "">("");
+  const [importCalendarYear, setImportCalendarYear] = useState<number | "">(onlyYear ?? "");
   const [importRows, setImportRows] = useState<TemplateStudent[]>([]);
   const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
   const [importResult, setImportResult] = useState<{ added: number; skipped: SkippedImport[]; failed: Array<{ name: string; message: string }> } | null>(null);
@@ -806,11 +811,11 @@ function StudentDirectory({
   function closeCreate() {
     setCreateMode(null);
     setImportRows([]);
-    setImportCalendarYear("");
+    setImportCalendarYear(onlyYear ?? "");
     setImportFileName("");
     setImportMessage("");
     setImportResult(null);
-    setManualDraft(emptyStudentDraft());
+    setManualDraft(freshDraft());
     setDuplicateReview(null);
     setLinkCode("");
     setLinkPreview(null);
@@ -1320,12 +1325,16 @@ function StudentDirectory({
             </div>
             <label className="text-sm font-bold text-slate-700 sm:col-span-2">
               This year group applies to *
+              {onlyYear ? (
+                <span className="mt-1 block rounded-md border border-slate-200 bg-slate-50 px-3 py-2 font-semibold">{onlyYear} year groups. {schoolName} is set up for {onlyYear}.</span>
+              ) : (<>
               <select aria-label="Student year group calendar year" value={manualDraft.schoolYearCalendarYear ?? ""} disabled={busy || Boolean(duplicateReview)} onChange={event => setManualDraft(current => ({ ...current, schoolYearCalendarYear: event.target.value ? Number(event.target.value) : undefined }))} className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2">
                 <option value="">Choose a calendar year</option>
                 <option value={calendarYear}>{calendarYear} — current-year student / trial</option>
                 <option value={calendarYear + 1}>{calendarYear + 1} — already entered in next year’s group</option>
               </select>
               <span className="mt-1 block font-normal">Students entered directly into next year’s group will not be promoted again by Start new year.</span>
+            </>)}
             </label>
             <label className="text-sm font-bold text-slate-700">
               First name *
@@ -1669,12 +1678,16 @@ function StudentDirectory({
           <div className="space-y-5 p-6">
             {!importResult ? <label className="block text-sm font-bold text-slate-700">
               These year groups apply to *
+              {onlyYear ? (
+                <span className="mt-1 block rounded-md border border-slate-200 bg-slate-50 px-3 py-2 font-semibold">{onlyYear} year groups. {schoolName} is set up for {onlyYear}, so every student in this upload is saved for {onlyYear}.</span>
+              ) : (<>
               <select aria-label="Import year groups calendar year" value={importCalendarYear} disabled={busy || Boolean(importProgress)} onChange={event => setImportCalendarYear(event.target.value ? Number(event.target.value) : "")} className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2">
                 <option value="">Choose a calendar year</option>
                 <option value={calendarYear}>{calendarYear} — current-year students / trial</option>
                 <option value={calendarYear + 1}>{calendarYear + 1} — already entered in next year’s groups</option>
               </select>
               <span className="mt-1 block font-normal">This applies to every student in this upload. Upload current-year trial students and next-year students separately. Students already entered for next year will not be promoted twice.</span>
+            </>)}
             </label> : null}
             <input ref={fileInputRef} type="file" accept=".xlsx" onChange={handleRosterFile} className="hidden" />
             {importResult ? (
@@ -2770,6 +2783,7 @@ export default function SchoolHomeClient({
           {tab === "students" ? (
             <StudentDirectory
               schoolName={snapshot.school.name}
+              yearOptions={snapshot.academicYears.filter((year) => year.status === "planned" || year.status === "active").map((year) => year.calendarYear)}
               students={snapshot.students}
               classes={filteredClasses}
               directoryError={snapshot.studentDirectoryError}
