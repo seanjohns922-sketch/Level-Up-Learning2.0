@@ -2,12 +2,16 @@
 
 import { Html, RoundedBox, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type {
   TowerRealmPortalConfig,
   TowerWorldQuality,
 } from "@/lib/world3d/tower-realm-chamber-config";
+
+// Chronorok is the games realm: it is live but never a lesson choice, so it opens on "live" alone.
+const portalOpen = (config: { realmId: string; realm: { status: string; isSelectable: boolean } }) =>
+  config.realm.status === "live" && (config.realm.isSelectable || config.realmId === "time");
 
 type RealmPortal3DProps = {
   config: TowerRealmPortalConfig;
@@ -75,7 +79,7 @@ function PortalWindow({
   previewAvailable = false,
 }: Pick<RealmPortal3DProps, "config" | "videoActive" | "quality" | "reducedMotion" | "previewAvailable">) {
   const poster = useTexture(config.posterAsset);
-  const available = (config.realm.status === "live" && config.realm.isSelectable) || previewAvailable;
+  const available = portalOpen(config) || previewAvailable;
   const canPlay = videoActive
     && quality !== "low"
     && !reducedMotion
@@ -137,7 +141,7 @@ export function RealmPortal3D({
 }: RealmPortal3DProps) {
   const energyRef = useRef<THREE.Mesh>(null);
   const frameColor = nearby ? "#d6b06b" : "#866a45";
-  const available = (config.realm.status === "live" && config.realm.isSelectable) || previewAvailable;
+  const available = portalOpen(config) || previewAvailable;
 
   useFrame(({ clock }) => {
     if (!energyRef.current) return;
@@ -166,13 +170,41 @@ export function RealmPortal3D({
         <torusGeometry args={[3.15, 0.11, 10, 48]} />
         <meshBasicMaterial color={config.accent} toneMapped={false} transparent opacity={available ? (nearby ? 0.95 : 0.42) : 0.12} />
       </mesh>
-      <Html center position={[0, 12.25, 0]} distanceFactor={22} zIndexRange={[5, 0]} style={{ pointerEvents: "none" }}>
-        <div style={{ width: 260, border: `2px solid ${nearby ? config.accent : "rgba(241,220,177,.72)"}`, borderRadius: 6, padding: "12px 15px", background: "rgba(24,17,15,.96)", boxShadow: nearby ? `0 0 30px ${config.accentSoft}` : "0 12px 28px rgba(0,0,0,.38)", color: "#fff8e9", textAlign: "center", fontFamily: "system-ui, sans-serif" }}>
-          <div style={{ fontSize: 19, lineHeight: 1.15, fontWeight: 950 }}>{config.realm.name}</div>
-          <div style={{ marginTop: 5, color: config.accent, fontSize: 12, lineHeight: 1.25, fontWeight: 950, letterSpacing: "0.1em" }}>{config.subject}</div>
-          <div style={{ marginTop: 8, color: "#fff0d4", fontSize: 13, lineHeight: 1.2, fontWeight: 900 }}>{available ? progressSummary : "COMING SOON"}</div>
-        </div>
-      </Html>
+      {/* A real nameplate on the portal's crest: it sits in the world, so pillars hide it and it scales with distance. */}
+      <RealmNameplate name={config.realm.name} subject={available ? config.subject : "COMING SOON"} accent={config.accent} lit={nearby} />
+    </group>
+  );
+}
+
+function RealmNameplate({ name, subject, accent, lit }: { name: string; subject: string; accent: string; lit: boolean }) {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024; canvas.height = 320;
+    const ctx = canvas.getContext("2d")!;
+    const grad = ctx.createLinearGradient(0, 0, 0, 320);
+    grad.addColorStop(0, "#2b1f19"); grad.addColorStop(1, "#140e0b");
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, 1024, 320);
+    ctx.strokeStyle = "#d9b56f"; ctx.lineWidth = 6; ctx.strokeRect(10, 10, 1004, 300);
+    ctx.strokeStyle = "rgba(217,181,111,.35)"; ctx.lineWidth = 2; ctx.strokeRect(24, 24, 976, 272);
+    ctx.textAlign = "center"; ctx.fillStyle = "#fff6e2";
+    ctx.font = "800 104px system-ui, sans-serif"; ctx.fillText(name, 512, 140, 940);
+    ctx.fillStyle = accent; ctx.fillRect(452, 172, 120, 7);
+    ctx.font = "800 56px system-ui, sans-serif"; ctx.fillText(subject.toUpperCase(), 512, 262, 940);
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8;
+    return map;
+  }, [name, subject, accent]);
+  useEffect(() => () => texture.dispose(), [texture]);
+  return (
+    <group position={[0, 9.15, 0.74]}>
+      <mesh>
+        <planeGeometry args={[5.6, 1.75]} />
+        <meshBasicMaterial map={texture} toneMapped={false} fog={false} />
+      </mesh>
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[5.82, 1.97]} />
+        <meshBasicMaterial color={lit ? accent : "#5a4630"} toneMapped={false} fog={false} />
+      </mesh>
     </group>
   );
 }

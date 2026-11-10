@@ -8,10 +8,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readProgress } from "@/data/progress";
 import {
+  EMPTY_WORLD_LOOK_INPUT,
   EMPTY_WORLD_MOVE_INPUT,
   KeyboardWorldAction,
   SharedThirdPersonPlayer,
-  WorldMovePad,
+  WorldJoystick,
+  WorldLookJoystick,
+  type WorldLookInput,
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { TowerRealmChamberEnvironment } from "@/components/world3d/TowerRealmChamberEnvironment";
@@ -80,6 +83,7 @@ function TowerScene({
   quality,
   reducedMotion,
   moveInput,
+  lookInput,
   activeInteractionId,
   onNearestTarget,
   progressByRealm,
@@ -90,6 +94,7 @@ function TowerScene({
   quality: TowerWorldQuality;
   reducedMotion: boolean;
   moveInput: WorldMoveInput;
+  lookInput: WorldLookInput;
   activeInteractionId: string | null;
   onNearestTarget: (id: string | null) => void;
   progressByRealm: Record<string, string>;
@@ -130,6 +135,7 @@ function TowerScene({
       <SharedThirdPersonPlayer
         initialPosition={initialPosition}
         moveInput={moveInput}
+        lookInput={lookInput}
         bounds={TOWER_CHAMBER_CONFIG.playableBounds}
         roamEllipse={TOWER_CHAMBER_CONFIG.roamEllipse}
         interactionTargets={targets}
@@ -169,6 +175,7 @@ export default function TowerRealmChamber() {
   const requestedQuality = searchParams.get("quality");
   const quality: TowerWorldQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const [activeInteractionId, setActiveInteractionId] = useState<string | null>(null);
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [entryMessage, setEntryMessage] = useState<string | null>(null);
@@ -268,6 +275,7 @@ export default function TowerRealmChamber() {
           quality={quality}
           reducedMotion={reducedMotion}
           moveInput={moveInput}
+          lookInput={lookInput}
           activeInteractionId={activeInteractionId}
           onNearestTarget={setActiveInteractionId}
           progressByRealm={progressByRealm}
@@ -288,7 +296,10 @@ export default function TowerRealmChamber() {
         }}
       />
 
-      <WorldMovePad input={moveInput} onChange={setMoveInput} />
+      {/* Same controls as the central hub: move stick, look stick, Run and Jump. */}
+      <WorldJoystick input={moveInput} onChange={setMoveInput} />
+      <WorldLookJoystick onChange={setLookInput} />
+      <style>{`@media (pointer:coarse){body:has([data-tower-realm-chamber]) .fullscreen-toggle{display:none}}`}</style>
       {atExpedition?<WorldInteractionPrompt location="THE SHATTERED REALMS" status="Six realms · A new challenge" actionLabel="ENTER EXPEDITION" onAction={runActiveAction}/>:null}
       {(activePortal || atExit) ? <WorldInteractionPrompt location={activePortal?.realm.name ?? "CENTRAL WORLD"} status={activePortal ? activePortal.subject : "Return to Tower Valley"} actionLabel={activePortal?.realmId === "time" ? "ENTER CHRONOROK" : activePortal && activePortal.realm.status !== "live" ? "COMING SOON" : atExit ? "EXIT TOWER" : "ENTER REALM"} disabled={Boolean(activePortal && activePortal.realmId !== "time" && activePortal.realm.status !== "live")} busy={Boolean(busyRealmId)} onAction={runActiveAction} /> : null}
       <KeyboardWorldAction enabled={Boolean(activePortal || atExit || atExpedition)} onAction={runActiveAction} />

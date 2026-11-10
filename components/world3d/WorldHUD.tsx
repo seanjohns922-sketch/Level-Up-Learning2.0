@@ -172,18 +172,19 @@ export function WorldHUD({
   );
   const missionSpeech = joinSpeechParts([displayedMission.eyebrow ?? (context === "realm" ? "Current mission" : "Current journey"), displayedMission.title, displayedMission.detail]);
   const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
+  const hubLayout = context === "central" || context === "tower";
   const worldActionsSpeech = joinSpeechParts([
     "World actions",
-    context === "central" ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
+    hubLayout ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
     "Realms. Opens fast travel to the learning realms.",
-    context === "central" ? primaryActionSpeech : null,
-    context === "central" ? null : "2D View. Opens the normal map view.",
+    hubLayout ? primaryActionSpeech : null,
+    hubLayout ? null : "2D View. Opens the normal map view.",
   ]);
 
   return (
     <>
       <div className="worldHud" data-world-hud={context} style={{ "--world-accent": accent } as React.CSSProperties}>
-        {context === "central" ? (
+        {context === "central" || context === "tower" ? (
           <section className="worldHudStart" aria-label="Start learning">
             <svg viewBox="0 0 279 79" className="worldHudLogo" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill={STUDENT_VIOLET} d={RELIQ_Q_PATH} /></svg>
             <div className="worldHudStartCard">
@@ -257,7 +258,7 @@ export function WorldHUD({
 
         <nav className="worldHudActions" aria-label="World actions">
           <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
-          {context === "central" ? (
+          {context === "central" || context === "tower" ? (
             <>
               {/* Central hub: gold Quick Start hero + Realms, with Edit World set
                   slightly apart at the end of the bar (clear of avatar + joysticks). */}
@@ -267,7 +268,7 @@ export function WorldHUD({
                 </button>
               ) : null}
               <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
-              {primaryAction ? <button type="button" className="worldHudSecondary worldHudEditInline" onClick={primaryAction.onClick}><Hammer size={17} />{primaryAction.label}</button> : null}
+              {primaryAction ? <button type="button" className="worldHudSecondary worldHudEditInline" onClick={primaryAction.onClick}>{primaryAction.icon === "door" ? <DoorOpen size={17} /> : <Hammer size={17} />}{primaryAction.label}</button> : null}
             </>
           ) : (
             <>
@@ -322,7 +323,7 @@ export function WorldHUD({
         .worldHud .worldHudCrystals svg{filter:drop-shadow(0 0 6px rgba(255,190,70,.9))}.worldHud .worldHudCrystals small{font-size:10px;opacity:.7;margin-left:1px}
         .worldHud .worldHudCrystals i{position:absolute;left:14px;right:14px;bottom:5px;height:3px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}.worldHud .worldHudCrystals i b{display:block;height:100%;background:linear-gradient(90deg,#ffb347,#ffe08a)}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
         .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button:not(.worldVoiceButton){min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
-        .worldHud[data-world-hud="central"] .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px)}
         .worldHudEditInline{margin-left:8px;background:rgba(24,22,21,.66)!important}
         .worldHudGoBtn{height:40px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,235,195,.28);border-radius:5px;padding:0 11px;background:rgba(24,22,21,.82);color:#fff4dd;font-size:11px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudGoBtn svg{color:var(--world-accent)}
         .worldHudActionRead{border-radius:5px!important}.worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportHeaderActions{display:flex;align-items:center;gap:8px}.worldTeleportPanel header button:not(.worldVoiceButton){width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportTile{position:relative;min-height:118px;border:1px solid;border-radius:5px;padding:13px 48px 46px 13px;background:rgba(12,14,15,.5);color:#fff;text-align:left}.worldTeleportTileRead{position:absolute;right:10px;top:10px}.worldTeleportTileDisabled{opacity:.56}.worldTeleportTile>button:not(.worldVoiceButton){position:absolute;left:13px;right:13px;bottom:10px;height:30px;border:1px solid rgba(255,235,195,.22);border-radius:5px;background:rgba(255,244,221,.1);color:#fff4dd;font-size:11px;font-weight:950;cursor:pointer}.worldTeleportTile>button:disabled{cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
@@ -340,32 +341,32 @@ export function WorldHUD({
         .worldHudPicker b{display:flex;align-items:center;gap:6px;font-size:12px}.worldHudPicker i{width:9px;height:9px;border-radius:9px;display:block}
         .worldHudPicker small{display:block;margin-top:1px;color:#d6d0e4;font-size:10.5px;font-weight:700}
         .worldHudPicker p{grid-column:1/-1;margin:2px 0 0;color:#ffdca0;font-size:12px;font-weight:800}
-        .worldHud[data-world-hud="central"] .worldHudIdentity{align-items:center;gap:9px}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIdentity{align-items:center;gap:9px}
         .worldHudNavGroup{display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(16,14,24,.58);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px)}
-        .worldHud[data-world-hud="central"] .worldHudNavGroup .worldHudGoBtn{height:38px;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;padding:0 13px;font-size:13px;font-weight:800;color:#ECE8F4}
-        .worldHud[data-world-hud="central"] .worldHudNavGroup .worldHudGoBtn:hover{background:rgba(255,255,255,.14)!important}
-        .worldHud[data-world-hud="central"] .worldHudNavGroup .worldHudGoBtn svg{color:#fff}
-        .worldHud[data-world-hud="central"] .worldHudXp{height:44px;border:0!important;border-radius:999px!important;padding:0 10px 0 14px;background:linear-gradient(135deg,#F7C948,#F59E0B)!important;color:#2a1700!important;box-shadow:0 8px 20px rgba(245,158,11,.35)!important}
-        .worldHud[data-world-hud="central"] .worldHudXp svg{color:#2a1700}
-        .worldHud[data-world-hud="central"] .worldHudIcon{width:44px;height:44px;border-radius:999px!important;background:${STUDENT_VIOLET}!important;border-color:rgba(255,255,255,.3)!important;color:#fff}
-        .worldHud[data-world-hud="central"] .worldHudActions{padding:8px!important;border-radius:20px!important;background:rgba(16,14,24,.62)!important;border-color:rgba(255,255,255,.16)!important}
-        .worldHud[data-world-hud="central"] .worldHudSecondary{border-radius:14px!important;background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.16)!important;min-height:48px!important;padding:0 18px!important;font-size:13px!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn{height:38px;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;padding:0 13px;font-size:13px;font-weight:800;color:#ECE8F4}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn:hover{background:rgba(255,255,255,.14)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn svg{color:#fff}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp{height:44px;border:0!important;border-radius:999px!important;padding:0 10px 0 14px;background:linear-gradient(135deg,#F7C948,#F59E0B)!important;color:#2a1700!important;box-shadow:0 8px 20px rgba(245,158,11,.35)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp svg{color:#2a1700}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIcon{width:44px;height:44px;border-radius:999px!important;background:${STUDENT_VIOLET}!important;border-color:rgba(255,255,255,.3)!important;color:#fff}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{padding:8px!important;border-radius:20px!important;background:rgba(16,14,24,.62)!important;border-color:rgba(255,255,255,.16)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudSecondary{border-radius:14px!important;background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.16)!important;min-height:48px!important;padding:0 18px!important;font-size:13px!important}
         .worldHudContext{min-height:48px!important;border:0!important;border-radius:14px!important;padding:0 20px!important;background:#fff!important;color:#16121f!important;font-size:14px!important;box-shadow:0 8px 20px rgba(0,0,0,.25)}
         .worldHudContext kbd{margin-left:4px;padding:2px 7px;border-radius:6px;background:#EEE9F5;color:#5b4a73;font:800 11px var(--font-sans)}
-        .worldHud[data-world-hud="central"] .worldHudMission{border:1px solid rgba(239,189,97,.22);border-left:3px solid var(--world-accent);border-radius:12px;background:linear-gradient(135deg,rgba(29,36,31,.92),rgba(20,27,24,.82));box-shadow:0 8px 24px rgba(12,20,14,.18),inset 0 1px rgba(255,255,255,.06)}
-        .worldHud[data-world-hud="central"] .worldHudMission strong{line-height:1.3}
-        .worldHud[data-world-hud="central"] .worldHudMission small{line-height:1.5}
-        .worldHud[data-world-hud="central"] .worldHudGoBtn,.worldHud[data-world-hud="central"] .worldHudXp,.worldHud[data-world-hud="central"] .worldHudIcon{border-radius:9px;border-color:rgba(255,235,195,.2);background:rgba(24,31,27,.88);box-shadow:0 4px 14px rgba(12,20,14,.16),inset 0 1px rgba(255,255,255,.05)}
-        .worldHud[data-world-hud="central"] .worldHudActions{padding:7px;border:1px solid rgba(239,189,97,.2);border-radius:14px;background:rgba(20,27,24,.82);backdrop-filter:blur(12px);box-shadow:0 10px 28px rgba(12,20,14,.22)}
-        .worldHud[data-world-hud="central"] .worldHudActions button:not(.worldVoiceButton){border-radius:8px;font-weight:800;letter-spacing:.025em}
-        .worldHud[data-world-hud="central"] .worldHudEditInline{margin-left:0}
-        .worldHud[data-world-hud="central"] button:focus-visible{outline:2px solid #ffe1a3;outline-offset:3px}
-        @media(hover:hover){.worldHud[data-world-hud="central"] button:not(:disabled):hover{filter:brightness(1.12)}}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission{border:1px solid rgba(239,189,97,.22);border-left:3px solid var(--world-accent);border-radius:12px;background:linear-gradient(135deg,rgba(29,36,31,.92),rgba(20,27,24,.82));box-shadow:0 8px 24px rgba(12,20,14,.18),inset 0 1px rgba(255,255,255,.06)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission strong{line-height:1.3}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission small{line-height:1.5}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudGoBtn,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIcon{border-radius:9px;border-color:rgba(255,235,195,.2);background:rgba(24,31,27,.88);box-shadow:0 4px 14px rgba(12,20,14,.16),inset 0 1px rgba(255,255,255,.05)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{padding:7px;border:1px solid rgba(239,189,97,.2);border-radius:14px;background:rgba(20,27,24,.82);backdrop-filter:blur(12px);box-shadow:0 10px 28px rgba(12,20,14,.22)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions button:not(.worldVoiceButton){border-radius:8px;font-weight:800;letter-spacing:.025em}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudEditInline{margin-left:0}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) button:focus-visible{outline:2px solid #ffe1a3;outline-offset:3px}
+        @media(hover:hover){.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) button:not(:disabled):hover{filter:brightness(1.12)}}
         @media(max-width:900px){.worldHudLogo{width:120px}.worldHudStart{width:min(320px,calc(100vw - 36px))}.worldHudStartHead strong{font-size:14px}.worldHudNavGroup .worldHudGoBtn span{display:none}}
-        @media(max-width:560px){.worldHudStart{top:max(60px,calc(env(safe-area-inset-top) + 50px))}.worldHudLogo{display:none}.worldHudStartCard{margin-top:0;padding:10px}.worldHudStartQuick,.worldHudStartPick{min-height:42px;font-size:12px}.worldHud[data-world-hud="central"] .worldHudActions{top:auto!important;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px))!important}}
+        @media(max-width:560px){.worldHudStart{top:max(60px,calc(env(safe-area-inset-top) + 50px))}.worldHudLogo{display:none}.worldHudStartCard{margin-top:0;padding:10px}.worldHudStartQuick,.worldHudStartPick{min-height:42px;font-size:12px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{top:auto!important;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px))!important}}
         @media(max-width:1280px){.worldHudIdentity .realm-demo-mode-pill,.worldHudIdentity .realm-demo-long-label{display:none!important}.worldHudIdentity .realm-demo-short-label{display:inline!important}.worldHudIdentity:has(.realm-demo-controls) .worldHudGoBtn span{display:none}}
         @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button:not(.worldVoiceButton){min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:560px){.worldHudIdentity .realm-demo-mode-pill{display:none!important}.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud[data-world-hud="central"] .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+        @media(max-width:560px){.worldHudIdentity .realm-demo-mode-pill{display:none!important}.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
       `}</style>
     </>
   );
