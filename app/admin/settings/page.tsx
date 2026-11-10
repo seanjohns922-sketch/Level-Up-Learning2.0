@@ -22,7 +22,7 @@ export default function PlatformAdminSettingsPage() {
           </div>
         </div>
         <dl className="mt-6 grid gap-4 border-t border-slate-200 pt-6 sm:grid-cols-3">
-          <div><dt className="text-xs font-bold uppercase text-slate-500">Rollout</dt><dd className="mt-2 font-semibold">2026 free access</dd></div>
+          <div><dt className="text-xs font-bold uppercase text-slate-500">Licences</dt><dd className="mt-2 font-semibold">Set per school, per year</dd></div>
           <div><dt className="text-xs font-bold uppercase text-slate-500">School billing</dt><dd className="mt-2 font-semibold">Manual classification</dd></div>
           <div><dt className="text-xs font-bold uppercase text-slate-500">Payment processing</dt><dd className="mt-2 font-semibold">Not active yet</dd></div>
         </dl>

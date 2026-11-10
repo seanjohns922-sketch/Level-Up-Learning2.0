@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
+import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import { supabase } from "@/lib/supabase";
 
 /**
@@ -133,7 +134,7 @@ export default function PlatformAdminShell({
           <div className="hidden items-center justify-between lg:flex">
             <p className="text-sm font-bold text-[#5A5E63]">Business and platform control centre</p>
             <span className="rounded-full border-2 border-[#121314] px-3 py-1 text-[11px] font-black uppercase tracking-wide text-[#121314] [font-family:var(--font-display)]">
-              2026 Free Access
+              {schoolCalendarYear()} school year
             </span>
           </div>
         </header>
