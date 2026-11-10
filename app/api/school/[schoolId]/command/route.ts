@@ -56,6 +56,13 @@ export async function POST(
 
   try {
     switch (payload.action) {
+      case "getSchoolYears":
+        return NextResponse.json(await runSchoolCommand(schoolId, "get_school_years", { p_school_id: schoolId }, accessToken));
+      case "makeSchoolYearCurrent":
+        if (!Number.isInteger(payload.calendarYear)) return errorResponse("Choose a school year");
+        return NextResponse.json(await runSchoolCommand(schoolId, "make_school_year_current", {
+          p_school_id: schoolId, p_calendar_year: payload.calendarYear,
+        }, accessToken));
       case "getSchoolYearRollover":
         if (payload.targetYear !== undefined && !Number.isInteger(payload.targetYear)) return errorResponse("Choose a calendar year");
         return NextResponse.json(await runSchoolCommand(schoolId, "get_school_year_rollover_preview", {

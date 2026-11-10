@@ -310,7 +310,8 @@
     "qa:chronorok-games": "node --no-warnings --experimental-strip-types scripts/rune-blocks-levels-test.mjs && node --no-warnings --experimental-strip-types scripts/relic-rider-tracks-test.mjs",
     "qa:level8-content": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/level8-content-audit.mjs",
     "qa:school-year-manual": "NODE_ENV=test node scripts/school-year-rollover-ui-test.mjs && NODE_ENV=test node scripts/manual-school-year-api-test.mjs && NODE_ENV=test node scripts/school-student-calendar-ui-test.mjs",
-    "qa:school-year-db": "node scripts/manual-school-year-db-test.mjs"
+    "qa:school-year-db": "node scripts/manual-school-year-db-test.mjs",
+    "qa:school-current-year": "node scripts/school-current-year-db-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

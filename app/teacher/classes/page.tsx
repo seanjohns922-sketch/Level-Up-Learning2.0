@@ -120,6 +120,9 @@ export default function TeacherClassesPage() {
   const [moveTargetId, setMoveTargetId] = useState("");
   const [moving, setMoving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  // Each school's current school year: its classes come first, other years sit under their own tab.
+  const [currentYearBySchool, setCurrentYearBySchool] = useState<Record<string, number | null>>({});
+  const [showOtherYears, setShowOtherYears] = useState(false);
   // Already at your school (the school directory).
   const [directoryStudents, setDirectoryStudents] = useState<SchoolDirectoryStudent[]>([]);
   const [directoryQuery, setDirectoryQuery] = useState("");
@@ -165,6 +168,12 @@ export default function TeacherClassesPage() {
       ...entry,
       school_name: entry.school_id ? schoolNamesById[entry.school_id] ?? null : null,
     })));
+    const yearEntries = await Promise.all(schoolIds.map(async (schoolId) => {
+      const { data: years } = await supabase.rpc("get_school_years", { p_school_id: schoolId });
+      const currentYear = (years as { currentYear?: number | null } | null)?.currentYear;
+      return [schoolId, typeof currentYear === "number" ? currentYear : null] as const;
+    }));
+    setCurrentYearBySchool(Object.fromEntries(yearEntries));
     if (cls && cls.length > 0) {
       const classIds = cls.map((c) => c.id);
       const { data: studs } = await supabase
@@ -822,7 +831,11 @@ export default function TeacherClassesPage() {
 
   const activeClasses = classes.filter((c) => !c.archived_at);
   const archivedClasses = classes.filter((c) => c.archived_at);
-  const selectedClass = classes.find((c) => c.id === selectedClassId) ?? activeClasses[0] ?? null;
+  const schoolYearOf = (c: ClassRow) => (c.school_id ? currentYearBySchool[c.school_id] ?? null : null);
+  const isThisYear = (c: ClassRow) => schoolYearOf(c) === null || !c.academic_year || c.academic_year === schoolYearOf(c);
+  const currentClasses = activeClasses.filter(isThisYear);
+  const otherYearClasses = activeClasses.filter((c) => !isThisYear(c)).sort((a, b) => (b.academic_year ?? 0) - (a.academic_year ?? 0));
+  const selectedClass = classes.find((c) => c.id === selectedClassId) ?? currentClasses[0] ?? activeClasses[0] ?? null;
   const yearIndex = (label?: string | null) => {
     if (!label) return Number.POSITIVE_INFINITY;
     const index = YEAR_LEVELS.indexOf(label);
@@ -870,6 +883,7 @@ export default function TeacherClassesPage() {
     setHomeWaitingOnly(false);
     setShowArchivedStudents(false);
     setShowArchivedClasses(false);
+    setShowOtherYears(false);
   }
 
   function toggleStudent(id: string) {
@@ -898,12 +912,16 @@ export default function TeacherClassesPage() {
             <h1 className="font-[Montserrat,sans-serif] text-3xl font-extrabold">My Classes</h1>
             {classes.length ? (
               <nav aria-label="Classes" className="flex max-w-full flex-wrap gap-1 rounded-xl border border-[#e2e2dd] bg-white p-1">
-                {activeClasses.map((c) => (
-                  <button key={c.id} type="button" onClick={() => chooseClass(c.id)} aria-current={!showArchivedClasses && selectedClass?.id === c.id ? "page" : undefined}
-                    className={`rounded-lg px-4 py-2 text-[15px] font-bold ${!showArchivedClasses && selectedClass?.id === c.id ? "bg-[#111] text-white" : "hover:bg-[#f2f2ee]"}`}>{c.name}</button>
+                {currentClasses.map((c) => (
+                  <button key={c.id} type="button" onClick={() => chooseClass(c.id)} aria-current={!showArchivedClasses && !showOtherYears && selectedClass?.id === c.id ? "page" : undefined}
+                    className={`rounded-lg px-4 py-2 text-[15px] font-bold ${!showArchivedClasses && !showOtherYears && selectedClass?.id === c.id ? "bg-[#111] text-white" : "hover:bg-[#f2f2ee]"}`}>{c.name}</button>
                 ))}
+                {otherYearClasses.length ? (
+                  <button type="button" onClick={() => { setShowOtherYears((v) => !v); setShowArchivedClasses(false); }} aria-pressed={showOtherYears}
+                    className={`rounded-lg px-4 py-2 text-[15px] font-semibold ${showOtherYears ? "bg-[#111] text-white" : "text-[#5b5b57] hover:bg-[#f2f2ee]"}`}>Other years ({otherYearClasses.length})</button>
+                ) : null}
                 {archivedClasses.length ? (
-                  <button type="button" onClick={() => setShowArchivedClasses((v) => !v)} aria-pressed={showArchivedClasses}
+                  <button type="button" onClick={() => { setShowArchivedClasses((v) => !v); setShowOtherYears(false); }} aria-pressed={showArchivedClasses}
                     className={`rounded-lg px-4 py-2 text-[15px] font-semibold ${showArchivedClasses ? "bg-[#111] text-white" : "text-[#5b5b57] hover:bg-[#f2f2ee]"}`}>Archived ({archivedClasses.length})</button>
                 ) : null}
               </nav>
@@ -917,6 +935,16 @@ export default function TeacherClassesPage() {
             <p className="text-lg text-[#4a4a46]">No classes yet.</p>
             <button type="button" onClick={() => router.push("/teacher/classes/new")} className={`${btnPrimary} mt-4`}>Create your first class</button>
           </div>
+        ) : showOtherYears ? (
+          <section aria-label="Classes from other years" className="overflow-hidden rounded-[18px] border border-[#e2e2dd] bg-white">
+            <p className="border-b border-[#f0f0ec] px-6 py-3 text-sm text-[#4a4a46]">Classes from other school years. Their students and results are kept. Add students to this year&apos;s classes to move them on.</p>
+            {otherYearClasses.map((c) => (
+              <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f0f0ec] px-6 py-4 last:border-b-0">
+                <span><strong className="text-lg">{c.name}</strong> <span className="text-[#5b5b57]">· {c.academic_year ?? "Year not set"} · {students.filter((s) => s.class_id === c.id && !s.archived_at).length} students</span></span>
+                <button type="button" onClick={() => chooseClass(c.id)} className={btnSecondary}>Open</button>
+              </div>
+            ))}
+          </section>
         ) : showArchivedClasses ? (
           <section aria-label="Archived classes" className="overflow-hidden rounded-[18px] border border-[#e2e2dd] bg-white">
             {archivedClasses.map((c) => (
@@ -939,6 +967,9 @@ export default function TeacherClassesPage() {
                     {[classYears(selectedClass).join(", ") || null, teacherName, selectedClass.school_name, selectedClass.academic_year ? String(selectedClass.academic_year) : null, `${activeStudents.length} student${activeStudents.length === 1 ? "" : "s"}`].filter(Boolean).join(" · ")}
                   </span>
                 </div>
+                {!isThisYear(selectedClass) ? (
+                  <p className="rounded-lg bg-[#fff4e0] px-3 py-1.5 text-sm font-semibold text-[#8a4b00]">{selectedClass.academic_year} class. Your school is now in {schoolYearOf(selectedClass)}, so add students to your {schoolYearOf(selectedClass)} classes.</p>
+                ) : null}
                 <div className="flex items-center gap-2.5 text-[15px] text-[#4a4a46]">
                   Class code
                   <span className="rounded-lg bg-[#f2f2ee] px-2.5 py-1 font-mono text-[17px] font-extrabold tracking-[0.15em] text-[#111]">{selectedClass.class_code}</span>

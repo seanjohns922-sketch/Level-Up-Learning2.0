@@ -2,6 +2,7 @@
 
 import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import SchoolYearRolloverPanel from "@/components/school/SchoolYearRolloverPanel";
+import SchoolYearsPanel from "@/components/school/SchoolYearsPanel";
 
 import {
   BarChart3,
@@ -1692,36 +1693,42 @@ function StudentDirectory({
             <input ref={fileInputRef} type="file" accept=".xlsx" onChange={handleRosterFile} className="hidden" />
             {importResult ? (
               <div className="space-y-4">
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-4">
                   <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{importResult.added}</p><p className="text-xs font-semibold text-slate-600">students added</p></div>
-                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.length}</p><p className="text-xs font-semibold text-slate-600">possible matches — review</p></div>
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.filter((item) => item.sameSchool).length}</p><p className="text-xs font-semibold text-slate-600">already at your school</p></div>
+                  <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#121314]">{importResult.skipped.filter((item) => !item.sameSchool).length}</p><p className="text-xs font-semibold text-slate-600">possible matches — review</p></div>
                   <div className="rounded-xl border border-[#E3E5E0] p-4"><p className={`font-display text-3xl font-black ${importResult.failed.length ? "text-red-700" : "text-[#121314]"}`}>{importResult.failed.length}</p><p className="text-xs font-semibold text-slate-600">couldn&apos;t be added</p></div>
                 </div>
-                {importResult.skipped.length ? (
-                  <div className="rounded-xl border border-[#E3E5E0]">
+                {[
+                  { key: "here", items: importResult.skipped.filter((item) => item.sameSchool), title: "Already at your school: not added again.", body: "These names match students who already have a RELIQ account here, so they keep their account, explorer code and progress. Only tick a child if they are a different person with the same name." },
+                  { key: "elsewhere", items: importResult.skipped.filter((item) => !item.sameSchool), title: "Possible matches elsewhere need your review.", body: "These names match a home learner or a student at another school. Names alone do not confirm they are the same children. Only tick a child after confirming they are a different person. For the same child, ask RELIQ to link their existing account." },
+                ].filter((group) => group.items.length).map((group) => (
+                  <div key={group.key} className="rounded-xl border border-[#E3E5E0]" aria-label={group.key === "here" ? "Already at your school" : "Possible matches elsewhere"} role="region">
                     <p className="border-b border-[#E3E5E0] px-4 py-3 text-sm text-slate-700">
-                      <b>Possible name matches need your review.</b> Names alone do not confirm these are the same children. Only tick a child after confirming they are a <b>different person</b>. For the same child, use their existing account.
+                      <b>{group.title}</b> {group.body}
                     </p>
                     <ul className="max-h-60 divide-y divide-slate-100 overflow-y-auto">
-                      {importResult.skipped.map((item) => (
+                      {group.items.map((item) => (
                         <li key={item.requestId}>
                           <label className="flex cursor-pointer items-start gap-3 px-4 py-2.5 text-sm">
                             <input type="checkbox" className="mt-1 h-4 w-4" checked={item.selected} onChange={(event) => setImportResult((current) => current ? { ...current, skipped: current.skipped.map((entry) => entry.requestId === item.requestId ? { ...entry, selected: event.target.checked } : entry) } : current)} />
                             <span>
                               <b>{item.row.firstName} {item.row.lastName}</b> <span className="text-slate-500">({item.row.schoolYear})</span>
-                              <span className={`block text-xs ${item.sameSchool ? "font-semibold text-amber-800" : "text-slate-500"}`}>
-                                {item.sameSchool ? "Matching name at this school · " : ""}Matches {item.matches.join("; ")}
+                              <span className="block text-xs text-slate-500">
+                                {item.sameSchool ? "Already here as " : "Matches "}{item.matches.join("; ")}
                               </span>
                             </span>
                           </label>
                         </li>
                       ))}
                     </ul>
-                    <div className="flex justify-end border-t border-[#E3E5E0] px-4 py-3">
-                      <button type="button" disabled={addingSkipped || !importResult.skipped.some((item) => item.selected)} onClick={() => void addSkippedAsNew()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
-                        {addingSkipped ? "Adding..." : `Add ${importResult.skipped.filter((item) => item.selected).length} as new students`}
-                      </button>
-                    </div>
+                  </div>
+                ))}
+                {importResult.skipped.some((item) => item.selected) ? (
+                  <div className="flex justify-end">
+                    <button type="button" disabled={addingSkipped} onClick={() => void addSkippedAsNew()} className="rounded-md bg-emerald-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
+                      {addingSkipped ? "Adding..." : `Add ${importResult.skipped.filter((item) => item.selected).length} as different children`}
+                    </button>
                   </div>
                 ) : null}
                 {importResult.failed.length ? (
@@ -1764,7 +1771,7 @@ function StudentDirectory({
                       <div className="rounded-xl border border-[#E3E5E0] p-4"><p className="font-display text-3xl font-black text-[#3D6600]">{ready}</p><p className="text-xs font-semibold text-slate-600">ready to add · {byYear.map(([year, count]) => `${year.replace("Year ", "Y")} ${count}`).join(" · ")}</p></div>
                       <div className={`rounded-xl border p-4 ${issues.length ? "border-red-200 bg-red-50" : "border-[#E3E5E0]"}`}><p className={`font-display text-3xl font-black ${issues.length ? "text-red-700" : "text-[#121314]"}`}>{issues.length}</p><p className="text-xs font-semibold text-slate-600">{issues.length ? "need fixing below (or they'll be left out)" : "need fixing"}</p></div>
                     </div>
-                    <p className="text-xs text-slate-500">Possible name matches are held for review before creating accounts. Check them carefully when uploading a list again.</p>
+                    <p className="text-xs text-slate-500">Uploading a list again is safe: students already at your school keep their account and aren&apos;t added twice. Name matches are shown to you, never merged automatically.</p>
                     {issues.length ? (
                       <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200">
                         <table className="w-full text-left text-xs">
@@ -3001,6 +3008,7 @@ export default function SchoolHomeClient({
 
           {tab === "administration" ? (
             <section className="space-y-6">
+              {snapshot.permissions.canManageSchool ? <SchoolYearsPanel schoolId={snapshot.school.id} onChanged={() => router.refresh()} /> : null}
               {snapshot.permissions.canManageSchool ? <SchoolYearRolloverPanel schoolId={snapshot.school.id} onChanged={() => { void loadStudentDirectory(); router.refresh(); }} /> : null}
               <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
                 <div className="border border-slate-200 bg-white p-5">
