@@ -1,22 +1,22 @@
 {
  "1:1": {
   "idea": "Area of a rectangle is rows × columns, or length × width.",
-  "example": "4 rows of 6 squares → 4 × 6 = 24 square units",
+  "example": "7 rows of 9 squares → 7 × 9 = 63 square units",
   "steps": [
-   "Count the rows: 4.",
-   "Count the squares in each row: 6.",
-   "Multiply: 4 × 6 = 24 square units."
+   "Count the rows: 7.",
+   "Count the squares in each row: 9.",
+   "Multiply: 7 × 9 = 63 square units."
   ],
   "tip": "Multiplying is faster than counting every square.",
   "visual": {
    "kind": "areaGrid",
-   "rows": 4,
-   "cols": 6
+   "rows": 7,
+   "cols": 9
   }
  },
  "1:2": {
   "idea": "Area of a rectangle = length × width.",
-  "example": "8 cm × 5 cm = 40 cm²",
+  "example": "12 cm × 7 cm = 84 cm²",
   "steps": [
    "Find the length.",
    "Find the width.",
@@ -25,30 +25,112 @@
   "tip": "Adding the sides gives perimeter, not area.",
   "visual": {
    "kind": "areaGrid",
-   "rows": 5,
-   "cols": 8,
+   "rows": 7,
+   "cols": 12,
    "unit": "cm"
   }
  },
  "1:3": {
   "idea": "Use length × width to investigate area.",
-  "example": "Two rectangles: 6 × 4 = 24 and 8 × 3 = 24 → same area",
+  "example": "Two rectangles: 9 × 8 = 72 and 12 × 6 = 72 → same area",
   "steps": [
    "Find each length and width.",
    "Multiply for each area.",
    "Compare the areas."
   ],
-  "tip": "Different shapes can share an area."
+  "tip": "Different shapes can share an area.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 8,
+       "cols": 9,
+       "unit": "units"
+      },
+      "focus": [
+       1,
+       2
+      ],
+      "label": "9 × 8 = 72"
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 6,
+       "cols": 12,
+       "unit": "units"
+      },
+      "focus": [
+       1,
+       2
+      ],
+      "label": "12 × 6 = 72"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Same area",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "Split a composite shape into rectangles, find each area, then add.",
-  "example": "L-shape → 12 cm² + 8 cm² = 20 cm²",
+  "example": "L-shape → 6 × 4 = 24 cm² and 3 × 5 = 15 cm² → 39 cm²",
   "steps": [
    "Cut the shape into two rectangles.",
-   "Find each area with length × width.",
-   "Add the areas for the total."
+   "Find each area: 6 × 4 = 24 and 3 × 5 = 15.",
+   "Add the areas: 24 + 15 = 39 cm²."
   ],
-  "tip": "Make sure the rectangles don't overlap."
+  "tip": "Make sure the rectangles don't overlap.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "39 cm²",
+      "parts": [
+       "24 cm²",
+       "15 cm²"
+      ],
+      "unknown": "whole",
+      "answer": "39 cm²",
+      "answerStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "6 × 4 = 24",
+       "3 × 5 = 15"
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Find a composite area by splitting into rectangles.",
@@ -58,7 +140,37 @@
    "Find each area with length × width.",
    "Add them."
   ],
-  "tip": "Find missing side lengths from the ones given."
+  "tip": "Find missing side lengths from the ones given.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "10 × 4 = 40",
+       "3 × 2 = 6"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "46 m²",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Use composite area in design problems.",
@@ -68,17 +180,82 @@
    "Calculate each area.",
    "Add for the total and answer the design question."
   ],
-  "tip": "Don't count any part twice."
+  "tip": "Don't count any part twice.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Split",
+       "Each area",
+       "Add"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Total area of the garden",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Choose a design using area = length × width.",
-  "example": "5 m × 6 m = 30 m² fits a 30 m² brief",
+  "example": "Brief needs 72 m² → 9 m × 8 m = 72 m²",
   "steps": [
    "Read the area the design needs.",
    "Try lengths and widths that multiply to it.",
    "Check other limits like fitting the space."
   ],
-  "tip": "Several rectangles can have the same area."
+  "tip": "Several rectangles can have the same area.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 8,
+       "cols": 9,
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "9 m × 8 m"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "72 m² fits the brief",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Composite area: split, multiply, add.",
@@ -88,7 +265,37 @@
    "Find each rectangle's area.",
    "Add the areas."
   ],
-  "tip": "Check the pieces don't overlap."
+  "tip": "Check the pieces don't overlap.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "8 × 3 = 24",
+       "4 × 2 = 8"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "32 m²",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Meet area constraints by adjusting the design.",
@@ -98,21 +305,103 @@
    "Calculate each option's area.",
    "Choose one that meets every constraint."
   ],
-  "tip": "Check every rule, not just the area."
+  "tip": "Check every rule, not just the area.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 5,
+       "cols": 8,
+       "unit": "m"
+      },
+      "focus": [
+       2,
+       3
+      ],
+      "label": "8 m × 5 m = 40 m²"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "At least 40 m² ✓",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "The same length can be written in different units.",
-  "example": "1.5 m = 150 cm; 0.5 m = 50 cm",
+  "example": "2.35 m = 235 cm; 48 mm = 4.8 cm",
   "steps": [
    "1 m = 100 cm; 1 cm = 10 mm.",
-   "Big to small unit: multiply.",
-   "Small to big unit: divide."
+   "Big to small unit: multiply: 2.35 × 100 = 235.",
+   "Small to big unit: divide: 48 ÷ 10 = 4.8."
   ],
-  "tip": "A smaller unit gives a bigger number."
+  "tip": "A smaller unit gives a bigger number.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "1 m = 100 cm",
+       "1 cm = 10 mm"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2.35 m × 100 = 235 cm"
+      ],
+      "focus": [
+       2
+      ]
+     },
+     {
+      "type": "chips",
+      "items": [
+       "48 mm ÷ 10 = 4.8 cm"
+      ],
+      "focus": [
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "235 cm and 4.8 cm",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Convert mass and capacity by multiplying or dividing by 1000.",
-  "example": "1.5 L = 1500 mL; 250 g = 0.25 kg",
+  "example": "2.75 L = 2750 mL; 375 g = 0.375 kg",
   "steps": [
    "1 L = 1000 mL and 1 kg = 1000 g.",
    "Big unit to small unit: multiply by 1000.",
@@ -120,23 +409,93 @@
   ],
   "tip": "Converting to a smaller unit gives a bigger number.",
   "visual": {
-   "kind": "gauge",
-   "tool": "jug",
-   "max": 2,
-   "step": 0.25,
-   "value": 1.5,
-   "unit": "L"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "jug",
+       "max": 3000,
+       "step": 250,
+       "value": 2750,
+       "unit": "mL"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "2.75 L × 1000 = 2750 mL",
+       "375 g ÷ 1000 = 0.375 kg"
+      ],
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ]
+   ]
   }
  },
  "4:3": {
   "idea": "Use conversions to solve real problems and spot mistakes.",
-  "example": "Is 0.8 kg more than 750 g? 0.8 kg = 800 g → yes",
+  "example": "Is 1.25 kg more than 1300 g? 1.25 kg = 1250 g → no",
   "steps": [
    "Convert both amounts to the same unit.",
    "Compare or calculate.",
    "Check the decimal point moved the right way."
   ],
-  "tip": "Multiplying by 1000 moves digits three places."
+  "tip": "Multiplying by 1000 moves digits three places.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 2000,
+       "step": 250,
+       "value": 1250,
+       "unit": "g"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1.25 kg = 1250 g",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1250 g < 1300 g: no",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Read a 24-hour timetable to find durations and the best service.",
@@ -146,7 +505,68 @@
    "Count on from 09:20 to 10:00 (40 min), then to 10:05 (5 min).",
    "The trip takes 45 minutes."
   ],
-  "tip": "To arrive 'by' a time, choose the latest service that arrives in time."
+  "tip": "To arrive 'by' a time, choose the latest service that arrives in time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 0,
+      "max": 45,
+      "tick": 5,
+      "labelEvery": 45,
+      "jumps": [
+       {
+        "from": 0,
+        "to": 40,
+        "text": "40 min",
+        "step": 2
+       },
+       {
+        "from": 40,
+        "to": 45,
+        "text": "5",
+        "step": 2
+       }
+      ],
+      "marks": [
+       {
+        "value": 0,
+        "text": "09:20"
+       },
+       {
+        "value": 40,
+        "text": "10:00"
+       },
+       {
+        "value": 45,
+        "text": "10:05",
+        "step": 3,
+        "tone": "answer"
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "45 minutes",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Plan a trip by adding each part's time in order.",
@@ -156,17 +576,89 @@
    "Add the minutes: 10:45 + 25 min = 11:10.",
    "Repeat for each part of the trip."
   ],
-  "tip": "Cross the hour carefully: 60 minutes make 1 hour."
+  "tip": "Cross the hour carefully: 60 minutes make 1 hour.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "9:45",
+       "+ 1 h → 10:45",
+       "+ 25 min → 11:10"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "11:10",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Combine time skills: 24-hour time, durations and timetables.",
-  "example": "3:15 pm = 15:15",
+  "example": "7:40 pm = 19:40",
   "steps": [
    "For pm times after 12 noon, add 12 to the hour.",
    "Find durations by counting on.",
    "Plan from the deadline backwards if you must arrive by a time."
   ],
-  "tip": "12:30 am is 00:30; 12:30 pm is 12:30."
+  "tip": "12:30 am is 00:30; 12:30 pm is 12:30.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "clock",
+       "hour": 7,
+       "minute": 40
+      },
+      "focus": [
+       1
+      ],
+      "label": "7:40 pm"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "7 + 12 = 19",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "19:40",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Angles on a straight line add to 180°; around a point, 360°.",
@@ -176,7 +668,47 @@
    "Add the known angles.",
    "Subtract from the total."
   ],
-  "tip": "Reasoning is often faster than measuring."
+  "tip": "Reasoning is often faster than measuring.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "angle",
+       "degrees": 110,
+       "label": "110°"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Straight line: 180°",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "x = 180 − 110 = 70°",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Angles around a point add up to 360°.",
@@ -186,7 +718,46 @@
    "Subtract from 360: 360 − 210 = 150.",
    "x = 150°."
   ],
-  "tip": "Angles on a straight line add up to 180°, not 360°."
+  "tip": "Angles on a straight line add up to 180°, not 360°.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "90°",
+       "120°",
+       "x"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "90 + 120 = 210",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "x = 360 − 210 = 150°",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Use angle rules to find missing angles in real structures.",
@@ -196,7 +767,47 @@
    "Add the known angles.",
    "Subtract from the total."
   ],
-  "tip": "Check: the angles must add to the right total."
+  "tip": "Check: the angles must add to the right total.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "angle",
+       "degrees": 65,
+       "label": "65°"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Straight line: 180°",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "x = 180 − 65 = 115°",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Choose the measurement and tool that suit the problem.",
@@ -206,17 +817,113 @@
    "Match it to a measurement: length, area, mass, capacity, time or angle.",
    "Choose the matching tool or calculation."
   ],
-  "tip": "The slope of a roof is an angle, not a length."
+  "tip": "The slope of a roof is an angle, not a length.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        8,
+        5,
+        8,
+        5
+       ],
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Fence: perimeter"
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "gauge",
+       "tool": "scale",
+       "max": 2000,
+       "step": 500,
+       "value": 1500,
+       "unit": "g"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Parcel: mass"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Match the need to the measure",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Pick the most efficient method, not just one that works.",
-  "example": "Perimeter of a square with side 9 m → 4 × 9 = 36 m",
+  "example": "Perimeter of a 12.5 m by 8 m rectangle → 2 × (12.5 + 8) = 41 m",
   "steps": [
    "List methods that would work.",
-   "Choose the one with the fewest steps.",
-   "Calculate it."
+   "Choose the one with the fewest steps: 2 × (length + width).",
+   "Calculate it: 2 × 20.5 = 41 m."
   ],
-  "tip": "A rule like 180° − known angle beats measuring or estimating."
+  "tip": "A rule like 180° − known angle beats measuring or estimating.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        12.5,
+        8,
+        12.5,
+        8
+       ],
+       "unit": "m"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2 × (12.5 + 8)",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "41 m",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Big projects combine several kinds of measurement.",
@@ -226,7 +933,56 @@
    "Decide which measurement each part needs.",
    "Calculate each part, then put the plan together."
   ],
-  "tip": "Keep units with every answer."
+  "tip": "Keep units with every answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 4,
+       "cols": 6,
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Soft fall: area"
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        6,
+        4,
+        6,
+        4
+       ],
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Fencing: perimeter"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Put the plan together",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "Plan a park by choosing the right measurement for each need.",
@@ -236,17 +992,102 @@
    "Match each need to area, perimeter, capacity or time.",
    "Calculate each one with units."
   ],
-  "tip": "Ask: inside, around, how much it holds, or how long?"
+  "tip": "Ask: inside, around, how much it holds, or how long?",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "areaGrid",
+       "rows": 4,
+       "cols": 6,
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Grass: area"
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "perimeter",
+       "sides": [
+        6,
+        4,
+        6,
+        4
+       ],
+       "unit": "m"
+      },
+      "focus": [
+       2
+      ],
+      "label": "Path edging: perimeter"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Calculate each with units",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Design real spaces using area, conversions, time and angles.",
-  "example": "Classroom 8 m × 6 m → floor area 48 m²",
+  "example": "Classroom 9.5 m × 8 m → floor area 76 m²",
   "steps": [
    "Find the dimensions.",
    "Choose the calculation for each design question.",
    "Convert units so they match before combining."
   ],
-  "tip": "Check your answers make sense for a real building."
+  "tip": "Check your answers make sense for a real building.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Length: 9.5 m",
+       "Width: 8 m"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "9.5 × 8 = 76",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Floor area: 76 m²",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Bring every measurement skill together in one project.",
@@ -256,6 +1097,37 @@
    "Solve each part with the right measurement.",
    "Check the units and that the plan works together."
   ],
-  "tip": "One wrong unit can break the whole plan."
+  "tip": "One wrong unit can break the whole plan.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Tent: area",
+       "Water: litres",
+       "Bus: timetable"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Check the plan works together",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

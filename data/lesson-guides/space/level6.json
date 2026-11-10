@@ -7,7 +7,52 @@
    "Look at the new flat face.",
    "Name its 2D shape."
   ],
-  "tip": "The direction of the cut changes the shape."
+  "tip": "The direction of the cut changes the shape.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "object3d",
+      "id": "cylinder",
+      "name": "Cylinder",
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "circle",
+         "label": "the slice"
+        }
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Circle",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Compare parallel slices taken at different heights.",
@@ -17,7 +62,44 @@
    "Compare the shapes and sizes.",
    "Say whether they stay the same or change."
   ],
-  "tip": "Same slices point to a prism or cylinder."
+  "tip": "Same slices point to a prism or cylinder.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "object3d",
+      "id": "prism",
+      "name": "Prism: slices the same",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "object3d",
+      "id": "pyramid",
+      "name": "Pyramid: slices shrink",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Same or shrinking",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "A horizontal cut makes the same shape as the base.",
@@ -27,7 +109,51 @@
    "A horizontal cut copies the base shape.",
    "Predict it, then check."
   ],
-  "tip": "For a pyramid, the slice is the base shape, but smaller."
+  "tip": "For a pyramid, the slice is the base shape, but smaller.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "triangle",
+         "label": "base of the triangular prism"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A horizontal cut copies the base",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Triangle",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "A right prism has the same cross-section all the way through.",
@@ -37,7 +163,50 @@
    "If every slice is the same polygon, it is a prism.",
    "A cylinder's slices are constant but curved, so it is not a prism."
   ],
-  "tip": "Prisms have flat polygon ends."
+  "tip": "Prisms have flat polygon ends.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "hexagon",
+         "label": "bottom"
+        },
+        {
+         "shape": "hexagon",
+         "label": "middle"
+        },
+        {
+         "shape": "hexagon",
+         "label": "top"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Every slice a hexagon: prism",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:2": {
   "idea": "Classify solids by how their slices behave.",
@@ -47,7 +216,43 @@
    "Constant slices → prism or cylinder.",
    "Shrinking to a point → pyramid or cone."
   ],
-  "tip": "Check whether the slices are polygons or circles."
+  "tip": "Check whether the slices are polygons or circles.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Constant: prism or cylinder",
+       "Shrinking: pyramid or cone"
+      ],
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "object3d",
+      "id": "pyramid",
+      "name": "Pyramid",
+      "focus": [
+       3
+      ]
+     },
+     {
+      "type": "object3d",
+      "id": "cone",
+      "name": "Cone",
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:3": {
   "idea": "Use the slices as evidence for the solid's structure.",
@@ -57,7 +262,46 @@
    "Link it to the structure: constant or shrinking.",
    "Name the solid with your reason."
   ],
-  "tip": "Slices are evidence; explain them."
+  "tip": "Slices are evidence; explain them.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square",
+         "label": "bottom"
+        },
+        {
+         "shape": "square",
+         "label": "top"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Square prism",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "The axes extend past zero into negative numbers.",
@@ -266,7 +510,38 @@
    "Try them in the other order.",
    "Compare the final positions."
   ],
-  "tip": "Turns and flips are where order matters."
+  "tip": "Turns and flips are where order matters.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Slide, then slide: same",
+       "Slide, then turn: may differ"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Order can matter",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Work out the two moves that take a shape to its final image.",
@@ -276,7 +551,38 @@
    "Then compare position: how far did it move?",
    "Write the moves in order."
   ],
-  "tip": "Check your sequence by doing it."
+  "tip": "Check your sequence by doing it.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Flipped?",
+       "How far moved?"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A flip, then a slide",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "A tessellation covers a surface with no gaps and no overlaps.",
@@ -313,7 +619,69 @@
    "Decide whether it slid, turned or flipped.",
    "That move is the pattern rule."
   ],
-  "tip": "The rule must work for every tile."
+  "tip": "The rule must work for every tile.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square",
+         "label": "slide"
+        },
+        {
+         "shape": "square",
+         "label": "slide"
+        },
+        {
+         "shape": "square",
+         "label": "slide"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "triangle",
+         "label": "turn"
+        },
+        {
+         "shape": "triangle",
+         "label": "turn"
+        }
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "The move is the rule",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Tiles fit when the angles at each corner add to 360°.",
@@ -323,7 +691,54 @@
    "Add the angles meeting there.",
    "If they total 360°, there are no gaps."
   ],
-  "tip": "Regular pentagons: 3 × 108° = 324°, which leaves a gap."
+  "tip": "Regular pentagons: 3 × 108° = 324°, which leaves a gap.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square",
+         "label": "90°"
+        },
+        {
+         "shape": "square",
+         "label": "90°"
+        },
+        {
+         "shape": "square",
+         "label": "90°"
+        },
+        {
+         "shape": "square",
+         "label": "90°"
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4 × 90° = 360°",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:1": {
   "idea": "Investigate a pattern by tracking how one tile becomes the next.",
@@ -333,7 +748,40 @@
    "Find the move between them.",
    "Check the same move repeats."
   ],
-  "tip": "Look at several pairs, not just one."
+  "tip": "Look at several pairs, not just one.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Tile",
+       "Half-turn",
+       "Next tile"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Same move repeats",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:2": {
   "idea": "Changing a tile's size or angle breaks a tessellation.",
@@ -343,7 +791,48 @@
    "Changing one copy changes its edges.",
    "Gaps or overlaps appear."
   ],
-  "tip": "Tessellations need identical copies."
+  "tip": "Tessellations need identical copies.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square",
+         "label": "same",
+         "scale": 0.8
+        },
+        {
+         "shape": "square",
+         "label": "bigger",
+         "scale": 1.2
+        }
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Gaps and overlaps",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "7:3": {
   "idea": "Prove a tessellation with evidence, not looks.",
@@ -353,7 +842,38 @@
    "Add the angles.",
    "No gaps and no overlaps proves it."
   ],
-  "tip": "'It looks right' is not evidence."
+  "tip": "'It looks right' is not evidence.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Every corner",
+       "Angles total 360°"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "No gaps, no overlaps",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:1": {
   "idea": "A design brief combines a cross-section, a coordinate and a pattern.",
@@ -363,7 +883,53 @@
    "Answer each with the matching skill.",
    "Check each answer."
   ],
-  "tip": "Do one part at a time."
+  "tip": "Do one part at a time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "object3d",
+      "id": "cylinder",
+      "name": "Slice: circle",
+      "focus": [
+       1,
+       2
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "grid",
+       "min": -3,
+       "max": 3,
+       "points": [
+        {
+         "x": -2,
+         "y": 3,
+         "label": "Star"
+        }
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Each answer checked",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:2": {
   "idea": "Classify the object, place it, then transform it.",
@@ -373,7 +939,50 @@
    "Plot the point in the right quadrant.",
    "Find the transformation sequence."
   ],
-  "tip": "Every part must be right."
+  "tip": "Every part must be right.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "object3d",
+      "id": "prism",
+      "name": "Prism test",
+      "focus": [
+       1
+      ]
+     },
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "grid",
+       "min": -3,
+       "max": 3,
+       "points": [
+        {
+         "x": -2,
+         "y": 1,
+         "label": "(−2, 1)"
+        }
+       ]
+      },
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Then find the move chain",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "8:3": {
   "idea": "Defend every part of the model with evidence.",
@@ -383,6 +992,26 @@
    "Justify the quadrant using signs.",
    "Give evidence the pattern tessellates."
   ],
-  "tip": "Name the evidence in each answer."
+  "tip": "Name the evidence in each answer.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Constant slices → prism",
+       "Signs → quadrant",
+       "360° → tessellates"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

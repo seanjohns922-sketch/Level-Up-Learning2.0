@@ -7,7 +7,48 @@
    "Any value between two measurements is possible.",
    "Use the same unit and precision when recording."
   ],
-  "tip": "Height, mass and time are continuous; number of pets is not."
+  "tip": "Height, mass and time are continuous; number of pets is not.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "ruler",
+       "length": 8,
+       "end": 6.3,
+       "label": "Length 6.3 cm"
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Between 6.2 and 6.4: any value is possible",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "6.3 cm",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:2": {
   "idea": "Counting gives whole numbers; measuring gives values on a scale.",
@@ -17,7 +58,49 @@
    "Counting gives discrete data.",
    "Measuring gives continuous data with units."
   ],
-  "tip": "Measured data needs the same unit for every entry."
+  "tip": "Measured data needs the same unit for every entry.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Number of books: count",
+       "Height: measure"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Discrete",
+       "Continuous"
+      ],
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Count → discrete; measure → continuous",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "1:3": {
   "idea": "Only compare data sets that measure the same thing in the same way.",
@@ -27,11 +110,53 @@
    "Check the units and method match.",
    "Then compare peaks and spread."
   ],
-  "tip": "Convert units before comparing."
+  "tip": "Convert units before comparing.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Class A: minutes",
+       "Class B: minutes"
+      ],
+      "focus": [
+       1,
+       2
+      ],
+      "label": "Fair"
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Minutes",
+       "Hours"
+      ],
+      "focus": [
+       2
+      ],
+      "label": "Not fair"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Then compare peaks and spread",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "2:1": {
   "idea": "The mode is the most common value in a data set.",
-  "example": "Pets: 0, 1, 1, 2, 1 → mode 1",
+  "example": "Goals: 2, 4, 3, 4, 1, 4, 2 → mode 4",
   "steps": [
    "Count each value.",
    "Find the highest count.",
@@ -40,37 +165,40 @@
   "tip": "The mode can be read as the tallest bar.",
   "visual": {
    "kind": "dots",
-   "title": "Pets per family",
+   "title": "Goals scored",
    "min": 0,
-   "max": 3,
+   "max": 5,
    "values": [
-    0,
-    1,
-    1,
     2,
-    1
+    4,
+    3,
+    4,
+    1,
+    4,
+    2
    ]
   }
  },
  "2:2": {
   "idea": "The range is the highest value minus the lowest.",
-  "example": "3, 4, 6, 9 → 9 − 3 = 6",
+  "example": "12, 7, 19, 4, 15 → 19 − 4 = 15",
   "steps": [
-   "Find the highest value: 9.",
-   "Find the lowest value: 3.",
-   "Subtract: 9 − 3 = 6."
+   "Find the highest value: 19.",
+   "Find the lowest value: 4.",
+   "Subtract: 19 − 4 = 15."
   ],
   "tip": "The range measures spread, not the middle.",
   "visual": {
    "kind": "dots",
-   "title": "Values",
-   "min": 2,
-   "max": 10,
+   "title": "Data",
+   "min": 0,
+   "max": 20,
    "values": [
-    3,
+    12,
+    7,
+    19,
     4,
-    6,
-    9
+    15
    ]
   }
  },
@@ -107,7 +235,94 @@
    "Find each group's range.",
    "The bigger range is more spread out."
   ],
-  "tip": "Different scales can make a fair comparison look unfair."
+  "tip": "Different scales can make a fair comparison look unfair.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 2
+       },
+       {
+        "label": "2",
+        "count": 3
+       },
+       {
+        "label": "3",
+        "count": 4
+       },
+       {
+        "label": "4",
+        "count": 2
+       },
+       {
+        "label": "5",
+        "count": 1
+       },
+       {
+        "label": "6",
+        "count": 1
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ],
+      "label": "Group A: range 5"
+     },
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "1",
+        "count": 1
+       },
+       {
+        "label": "3",
+        "count": 2
+       },
+       {
+        "label": "5",
+        "count": 3
+       },
+       {
+        "label": "7",
+        "count": 2
+       },
+       {
+        "label": "9",
+        "count": 1
+       },
+       {
+        "label": "10",
+        "count": 1
+       }
+      ],
+      "focus": [
+       1,
+       2
+      ],
+      "label": "Group B: range 9"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "B is more spread out",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Compare two groups by their peaks and ranges.",
@@ -117,7 +332,76 @@
    "Find each group's range.",
    "Compare both and say which is higher or more varied."
   ],
-  "tip": "Use more than one feature to compare."
+  "tip": "Use more than one feature to compare.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "0",
+        "count": 2
+       },
+       {
+        "label": "1",
+        "count": 5
+       },
+       {
+        "label": "2",
+        "count": 3
+       },
+       {
+        "label": "3",
+        "count": 1
+       }
+      ],
+      "focus": [
+       1
+      ],
+      "label": "Group A: peak 1"
+     },
+     {
+      "type": "plot",
+      "categories": [
+       {
+        "label": "0",
+        "count": 1
+       },
+       {
+        "label": "1",
+        "count": 2
+       },
+       {
+        "label": "2",
+        "count": 6
+       },
+       {
+        "label": "3",
+        "count": 2
+       }
+      ],
+      "focus": [
+       1
+      ],
+      "label": "Group B: peak 2"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Group B peaks higher",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Draw conclusions that the comparison supports.",
@@ -127,17 +411,87 @@
    "State what is different.",
    "Only claim what the data shows."
   ],
-  "tip": "Small samples can't prove a general rule."
+  "tip": "Small samples can't prove a general rule.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "A: range 3",
+       "B: range 8"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "B's results vary more.",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Check a media claim by calculating the real share.",
-  "example": "Sport 30 of 120 → 30 ÷ 120 = 25%",
+  "example": "Sport 54 of 180 → 54 ÷ 180 = 30%",
   "steps": [
    "Find the count and the total.",
    "Divide the count by the total.",
    "Multiply by 100 for a percentage."
   ],
-  "tip": "A share needs the total, not just the count."
+  "tip": "A share needs the total, not just the count.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "180",
+      "parts": [
+       "54",
+       "126"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "54 ÷ 180 = 0.3",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "30%",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "Check the evidence: who was asked, how many and how.",
@@ -147,7 +501,37 @@
    "Look at who was asked.",
    "Decide if the sample represents everyone."
   ],
-  "tip": "A small or one-sided sample gives weak evidence."
+  "tip": "A small or one-sided sample gives weak evidence.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Sample: 20 people",
+       "All at a gym"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Biased sample",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "A conclusion must stay within what the data shows.",
@@ -157,7 +541,45 @@
    "Check the claim only covers that group.",
    "Prefer conclusions that state their limits."
   ],
-  "tip": "Don't stretch a small survey into a claim about everyone."
+  "tip": "Don't stretch a small survey into a claim about everyone.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Data from: one class"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Claim only about that class",
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "State the limits",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "A broken axis can make small differences look big.",
@@ -167,7 +589,48 @@
    "Read the actual values.",
    "Calculate the real difference: 100 − 98 = 2."
   ],
-  "tip": "Always read the numbers, not just the bar heights."
+  "tip": "Always read the numbers, not just the bar heights.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Axis starts at 97",
+       "Bar B looks 3× taller"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "A: 98",
+       "B: 100"
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "100 − 98 = 2",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:2": {
   "idea": "Misleading graphics distort size, scale or labels.",
@@ -177,7 +640,57 @@
    "Look for missing or uneven scales.",
    "Fix it with a fair scale starting at 0."
   ],
-  "tip": "Equal values should look equal."
+  "tip": "Equal values should look equal.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "visual",
+      "visual": {
+       "kind": "shapes",
+       "items": [
+        {
+         "shape": "square",
+         "label": "1×",
+         "scale": 0.6
+        },
+        {
+         "shape": "square",
+         "label": "2× wide and tall",
+         "scale": 1.2
+        }
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Doubling both makes it 4× the area",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Fix: a fair scale from 0",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:3": {
   "idea": "Critique a display using its numbers and its distortion.",
@@ -187,7 +700,37 @@
    "Use the real numbers to show the true change.",
    "Suggest how to fix it."
   ],
-  "tip": "A good critique names the problem and the real numbers."
+  "tip": "A good critique names the problem and the real numbers.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Axis starts at 90",
+       "Real change: 2%"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Start the axis at 0",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Pose a clear question and refine it so it can be measured.",
@@ -197,7 +740,51 @@
    "Name who you will ask.",
    "Make the answer measurable."
   ],
-  "tip": "Specific questions give useful data."
+  "tip": "Specific questions give useful data.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Do kids like sport?"
+      ],
+      "focus": [
+       1
+      ],
+      "label": "Vague"
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Hours of sport each week",
+       "Year 6 students"
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ],
+      "label": "Specific"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Specific, named, measurable",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Analyse and compare groups using mode, range and shape.",
@@ -207,7 +794,37 @@
    "Compare peaks and spread.",
    "State what the comparison shows."
   ],
-  "tip": "Compare the same statistics for each group."
+  "tip": "Compare the same statistics for each group.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Year 5: range 6",
+       "Year 6: range 3"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Year 6 is more consistent",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Communicate findings and defend them with evidence.",
@@ -217,6 +834,39 @@
    "Support it with a calculation.",
    "Say what limits your conclusion."
   ],
-  "tip": "Evidence plus limits makes a strong conclusion."
+  "tip": "Evidence plus limits makes a strong conclusion.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Finding",
+       "9 − 2 = 7",
+       "Limits"
+      ],
+      "arrows": true,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Range 7: results varied a lot",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }

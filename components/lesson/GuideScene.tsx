@@ -172,7 +172,7 @@ function Column({ p, step }: { p: Extract<ScenePart, { type: "column" }>; step: 
     <span />{pad(p.top).map((d, i) => cell(d, `t${i}`, "plain", crossed(i)))}
     <span className="grid place-items-center text-2xl font-black" style={{ color: INK }}>{p.op === "-" ? "−" : "+"}</span>{pad(p.bottom).map((d, i) => cell(d, `b${i}`))}
     <span /><span className="h-1 rounded" style={{ gridColumn: `span ${width}`, background: INK }} />
-    <span />{pad(p.answer ?? "".padStart(width, " ")).map((d, i) => showAnswer && d.trim() ? cell(d, `a${i}`, "answer") : cell("", `a${i}`, "empty"))}
+    <span />{pad(p.answer ?? "".padStart(width, " ")).map((d, i) => p.answer !== undefined && !d.trim() ? cell("", `a${i}`) : showAnswer && d.trim() ? cell(d, `a${i}`, "answer") : cell("", `a${i}`, "empty"))}
   </div>;
 }
 

@@ -9,15 +9,54 @@
   ],
   "tip": "0.25 is a quarter of the way along.",
   "visual": {
-   "kind": "numberLine",
-   "min": 0,
-   "max": 1,
-   "step": 0.25,
-   "marks": [
-    {
-     "value": 0.5,
-     "label": "1/2"
-    }
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 0,
+      "max": 1,
+      "tick": 0.25,
+      "labelEvery": 0.5,
+      "marks": [
+       {
+        "value": 0.5,
+        "text": "1/2",
+        "step": 2,
+        "tone": "answer"
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "0: impossible",
+       "1: certain"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1/2 = 0.5 = 50%",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
@@ -31,15 +70,55 @@
   ],
   "tip": "1/5 = 0.2 = 20%.",
   "visual": {
-   "kind": "numberLine",
-   "min": 0,
-   "max": 1,
-   "step": 0.25,
-   "marks": [
-    {
-     "value": 0.75,
-     "label": "3/4"
-    }
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "line",
+      "min": 0,
+      "max": 1,
+      "tick": 0.25,
+      "labelEvery": 0.5,
+      "marks": [
+       {
+        "value": 0.75,
+        "text": "3/4",
+        "step": 3,
+        "tone": "answer"
+       }
+      ],
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "3 ÷ 4 = 0.75",
+       "0.75 × 100 = 75%"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3/4 = 0.75 = 75%",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
@@ -53,11 +132,46 @@
   ],
   "tip": "An estimate should be close, not exact.",
   "visual": {
-   "kind": "spinner",
-   "sectors": [
-    "red",
-    "blue",
-    "blue"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Red is about a third",
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "About 0.33",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
@@ -71,18 +185,56 @@
   ],
   "tip": "The outcomes must be equally likely.",
   "visual": {
-   "kind": "spinner",
-   "sectors": [
-    "red",
-    "red",
-    "red",
-    "blue",
-    "blue",
-    "blue",
-    "blue",
-    "blue"
-   ],
-   "highlight": "red"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Winning: 3",
+       "All outcomes: 8"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3/8",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
   }
  },
  "2:2": {
@@ -95,16 +247,50 @@
   ],
   "tip": "'Not' means the complement.",
   "visual": {
-   "kind": "spinner",
-   "sectors": [
-    "red",
-    "red",
-    "red",
-    "blue",
-    "blue",
-    "blue",
-    "blue",
-    "blue"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "1 − 3/8",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "P(not red) = 5/8",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
@@ -116,27 +302,166 @@
    "The numerator is the winning outcomes.",
    "Build the tool to match: 2 winners out of 5."
   ],
-  "tip": "Equivalent fractions also work: 4 of 10."
+  "tip": "Equivalent fractions also work: 4 of 10.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "bag",
+       "counters": [
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Total: 5",
+       "Winning: 2"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "2/5",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:1": {
   "idea": "Expected frequency = probability × number of trials.",
-  "example": "P = 1/4, 40 trials → 1/4 × 40 = 10",
+  "example": "P = 3/8, 120 trials → 3/8 × 120 = 45",
   "steps": [
-   "Write the probability.",
-   "Multiply by the number of trials.",
-   "That is the expected count."
+   "Write the probability: 3/8.",
+   "Multiply by the number of trials: 3/8 × 120.",
+   "That is the expected count: 45."
   ],
-  "tip": "Expect about this many, not exactly."
+  "tip": "Expect about this many, not exactly.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "120 ÷ 8 × 3",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Expected: 45",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:2": {
   "idea": "Compare the expected count with what actually happened.",
-  "example": "Expected 10, observed 13 → 3 more than expected",
+  "example": "P = 1/6, 90 rolls → expected 15, observed 19 → 4 more",
   "steps": [
-   "Work out the expected count.",
-   "Read the observed count.",
-   "Find the difference."
+   "Work out the expected count: 1/6 × 90 = 15.",
+   "Read the observed count: 19.",
+   "Find the difference: 19 − 15 = 4 more than expected."
   ],
-  "tip": "Small differences are normal."
+  "tip": "Small differences are normal.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "die",
+       "face": 6
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Expected: 15",
+       "Observed: 19"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "19 − 15 = 4 more",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "3:3": {
   "idea": "Different results can still fit the same model.",
@@ -146,7 +471,48 @@
    "Small gaps come from random variation.",
    "Only a large gap over many trials suggests bias."
   ],
-  "tip": "Don't call a tool biased after one small run."
+  "tip": "Don't call a tool biased after one small run.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "coin"
+      },
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Expected: 25 heads",
+       "Got: 22"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "A small gap: still fair",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:1": {
   "idea": "Bigger runs usually land closer to the expected chance.",
@@ -156,7 +522,46 @@
    "Compare each with the probability.",
    "The larger run is usually closer."
   ],
-  "tip": "Small runs can swing a lot."
+  "tip": "Small runs can swing a lot.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "10 tosses: 0.7",
+       "1000 tosses: 0.51"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Probability of heads: 0.5",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "The larger run is closer",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:2": {
   "idea": "As trials increase, the relative frequency settles near the probability.",
@@ -166,7 +571,57 @@
    "Watch it settle down.",
    "Measure the final gap from the probability."
   ],
-  "tip": "Settling near is not the same as equal."
+  "tip": "Settling near is not the same as equal.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "linegraph",
+      "title": "Relative frequency of red (%)",
+      "points": [
+       {
+        "label": "10",
+        "value": 40
+       },
+       {
+        "label": "50",
+        "value": 30
+       },
+       {
+        "label": "100",
+        "value": 27
+       },
+       {
+        "label": "500",
+        "value": 24
+       }
+      ],
+      "max": 50,
+      "tick": 10,
+      "mark": 3,
+      "markStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "0.24, close to 0.25",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "4:3": {
   "idea": "Small samples vary wildly, so draw careful conclusions.",
@@ -176,7 +631,37 @@
    "Small runs vary more.",
    "Base conclusions on large samples."
   ],
-  "tip": "One small run can mislead."
+  "tip": "One small run can mislead.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "20 spins: 0.45",
+       "20 spins: 0.15"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Use larger samples",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "5:1": {
   "idea": "Choose a simulator with the same probability as the event.",
@@ -188,13 +673,50 @@
   ],
   "tip": "80% = 4/5 = 8/10.",
   "visual": {
-   "kind": "spinner",
-   "sectors": [
-    "green",
-    "green",
-    "green",
-    "green",
-    "red"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "80% = 4/5"
+      ],
+      "focus": [
+       1
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#22c55e",
+        "#22c55e",
+        "#22c55e",
+        "#22c55e",
+        "#e5484d"
+       ]
+      },
+      "focus": [
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "4 of 5 parts winning",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
@@ -208,24 +730,112 @@
   ],
   "tip": "Check the total outcomes too.",
   "visual": {
-   "kind": "spinner",
-   "sectors": [
-    "red",
-    "red",
-    "red",
-    "blue"
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       2
+      ],
+      "label": "Now: 2/4"
+     },
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#e5484d",
+        "#e5484d",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       3
+      ],
+      "label": "Fixed: 3/4"
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "3 of 4 sectors win",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
    ]
   }
  },
  "5:3": {
   "idea": "All outcomes together must cover every result and total 1.",
-  "example": "0.2 + 0.3 + 0.5 = 1",
+  "example": "0.15 + 0.35 + 0.4 = 0.9 → 0.1 is missing",
   "steps": [
    "List every possible outcome.",
    "Add their probabilities.",
    "If the total isn't 1, an outcome is missing or wrong."
   ],
-  "tip": "Probabilities can't add to more than 1."
+  "tip": "Probabilities can't add to more than 1.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "barModel",
+      "whole": "1",
+      "parts": [
+       "0.15",
+       "0.35",
+       "0.4",
+       "0.1"
+      ],
+      "unknown": 3,
+      "answer": "0.1",
+      "answerStep": 3,
+      "focus": [
+       1,
+       2,
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "0.15 + 0.35 + 0.4 = 0.9",
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "0.1 is missing",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:1": {
   "idea": "Plan a fair investigation before running it.",
@@ -235,7 +845,53 @@
    "Fix the tool, method and number of trials.",
    "Plan how to record every result."
   ],
-  "tip": "Change only one thing at a time."
+  "tip": "Change only one thing at a time.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chance",
+      "visual": {
+       "type": "spinner",
+       "wedges": [
+        "#e5484d",
+        "#3b82f6",
+        "#3b82f6",
+        "#3b82f6"
+       ]
+      },
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Same spinner",
+       "Same method",
+       "100 spins"
+      ],
+      "focus": [
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Record every result",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:2": {
   "idea": "Run the investigation and track the evidence.",
@@ -245,7 +901,47 @@
    "Record each result.",
    "Work out the relative frequency."
   ],
-  "tip": "Stop only when the plan says so."
+  "tip": "Stop only when the plan says so.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "text",
+      "text": "Red"
+     },
+     {
+      "type": "tally",
+      "n": 27,
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "27 out of 100",
+      "focus": [
+       3
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Relative frequency: 0.27",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  },
  "6:3": {
   "idea": "Defend a conclusion with evidence and its limits.",
@@ -255,6 +951,36 @@
    "Compare it with the model.",
    "Say how sure you can be, given the number of trials."
   ],
-  "tip": "Avoid saying 'proves' after one investigation."
+  "tip": "Avoid saying 'proves' after one investigation.",
+  "visual": {
+   "kind": "scene",
+   "rows": [
+    [
+     {
+      "type": "chips",
+      "items": [
+       "Observed: 0.27",
+       "Expected: 0.25"
+      ],
+      "focus": [
+       1,
+       2
+      ]
+     }
+    ],
+    [
+     {
+      "type": "text",
+      "text": "Close, from 100 trials",
+      "big": true,
+      "tone": "answer",
+      "step": 3,
+      "focus": [
+       3
+      ]
+     }
+    ]
+   ]
+  }
  }
 }
