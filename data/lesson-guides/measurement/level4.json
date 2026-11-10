@@ -242,7 +242,7 @@
  },
  "4:1": {
   "idea": "Before finding perimeter, measure every side.",
-  "example": "Pond sides: 4 m, 6 m, 4 m, 6 m",
+  "example": "Pond sides: 12 m, 7 m, 12 m, 7 m",
   "steps": [
    "Measure each side carefully.",
    "Write each length.",
@@ -252,17 +252,17 @@
   "visual": {
    "kind": "perimeter",
    "sides": [
-    6,
-    4,
-    6,
-    4
+    12,
+    7,
+    12,
+    7
    ],
    "unit": "m"
   }
  },
  "4:2": {
   "idea": "Perimeter is the total distance around the outside.",
-  "example": "4 + 6 + 4 + 6 = 20 m",
+  "example": "12 + 7 + 12 + 7 = 38 m",
   "steps": [
    "Write every side length.",
    "Add them all together.",
@@ -272,30 +272,30 @@
   "visual": {
    "kind": "perimeter",
    "sides": [
-    6,
-    4,
-    6,
-    4
+    12,
+    7,
+    12,
+    7
    ],
    "unit": "m"
   }
  },
  "4:3": {
   "idea": "Use perimeter to work out fencing or path lengths.",
-  "example": "Patch 5 m by 3 m → fence 16 m",
+  "example": "Patch 9 m by 6 m → fence 30 m",
   "steps": [
    "Find all the side lengths.",
-   "Add them: 5 + 3 + 5 + 3.",
-   "The fence needs 16 m."
+   "Add them: 9 + 6 + 9 + 6.",
+   "The fence needs 30 m."
   ],
   "tip": "Fencing goes around, so use perimeter.",
   "visual": {
    "kind": "perimeter",
    "sides": [
-    5,
-    3,
-    5,
-    3
+    9,
+    6,
+    9,
+    6
    ],
    "unit": "m"
   }
@@ -427,7 +427,7 @@
  },
  "6:1": {
   "idea": "Time units are connected: 60 s = 1 min, 60 min = 1 h, 24 h = 1 day.",
-  "example": "120 minutes = 2 hours",
+  "example": "195 minutes = 3 h 15 min",
   "steps": [
    "Find the link between the units.",
    "Divide to change to a bigger unit.",
@@ -451,7 +451,7 @@
     [
      {
       "type": "text",
-      "text": "120 ÷ 60 = 2",
+      "text": "195 ÷ 60 = 3 r 15",
       "step": 2,
       "focus": [
        2
@@ -461,7 +461,7 @@
     [
      {
       "type": "text",
-      "text": "120 minutes = 2 hours",
+      "text": "195 minutes = 3 h 15 min",
       "big": true,
       "tone": "answer",
       "step": 3,

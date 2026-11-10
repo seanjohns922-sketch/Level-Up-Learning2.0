@@ -485,11 +485,11 @@
  },
  "5:1": {
   "idea": "A fact grid shows products. Turning an array doesn't change the product.",
-  "example": "5 × 6 = 6 × 5 = 30",
+  "example": "7 × 8 = 8 × 7 = 56",
   "steps": [
    "Find the fact on the grid.",
    "Swap the factors: it is the same array turned on its side.",
-   "The product stays 30."
+   "The product stays 56."
   ],
   "tip": "Use the grid's symmetry to find facts you don't know.",
   "visual": {
@@ -498,18 +498,18 @@
     [
      {
       "type": "array",
-      "rows": 5,
-      "cols": 6,
-      "label": "5 × 6",
+      "rows": 7,
+      "cols": 8,
+      "label": "7 × 8",
       "focus": [
        1
       ]
      },
      {
       "type": "array",
-      "rows": 6,
-      "cols": 5,
-      "label": "6 × 5",
+      "rows": 8,
+      "cols": 7,
+      "label": "8 × 7",
       "focus": [
        2
       ]
@@ -518,7 +518,7 @@
     [
      {
       "type": "text",
-      "text": "Both make 30",
+      "text": "Both make 56",
       "big": true,
       "tone": "answer",
       "step": 3,

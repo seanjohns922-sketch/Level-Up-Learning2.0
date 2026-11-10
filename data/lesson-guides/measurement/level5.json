@@ -343,22 +343,22 @@
  },
  "4:1": {
   "idea": "A rectangle of squares is rows × columns.",
-  "example": "4 rows of 6 → 24 squares",
+  "example": "8 rows of 9 → 72 squares",
   "steps": [
    "Count the rows.",
    "Count the squares in one row.",
-   "Multiply: 4 × 6 = 24."
+   "Multiply: 8 × 9 = 72."
   ],
   "tip": "Each row has the same number of squares.",
   "visual": {
    "kind": "areaGrid",
-   "rows": 4,
-   "cols": 6
+   "rows": 8,
+   "cols": 9
   }
  },
  "4:2": {
   "idea": "Area of a rectangle = rows × columns.",
-  "example": "Courtyard 7 rows of 5 → 35 square units",
+  "example": "Courtyard 12 rows of 7 → 84 square units",
   "steps": [
    "Find the rows and columns.",
    "Multiply them.",
@@ -367,13 +367,13 @@
   "tip": "Don't add the rows and columns.",
   "visual": {
    "kind": "areaGrid",
-   "rows": 7,
-   "cols": 5
+   "rows": 12,
+   "cols": 7
   }
  },
  "4:3": {
   "idea": "Use rows × columns to solve area problems.",
-  "example": "Carpet 6 m by 4 m → 24 m²",
+  "example": "Carpet 15 m by 8 m → 120 m²",
   "steps": [
    "Find the length and width.",
    "Multiply them.",
@@ -382,8 +382,8 @@
   "tip": "Area answers use square units.",
   "visual": {
    "kind": "areaGrid",
-   "rows": 4,
-   "cols": 6,
+   "rows": 8,
+   "cols": 15,
    "unit": "m"
   }
  },
@@ -493,20 +493,20 @@
  },
  "5:3": {
   "idea": "Decide if a job needs area or perimeter, then calculate.",
-  "example": "Fence around a 6 m by 4 m pool → perimeter 20 m",
+  "example": "Fence around a 14 m by 9.5 m pool → perimeter 47 m",
   "steps": [
    "Ask: is it covering the inside (area) or going around the edge (perimeter)?",
    "A fence goes around, so find the perimeter.",
-   "6 + 4 + 6 + 4 = 20 m."
+   "14 + 9.5 + 14 + 9.5 = 47 m."
   ],
   "tip": "Covering = area in square units. Edging = perimeter in units.",
   "visual": {
    "kind": "perimeter",
    "sides": [
-    6,
-    4,
-    6,
-    4
+    14,
+    9.5,
+    14,
+    9.5
    ],
    "unit": "m"
   }
