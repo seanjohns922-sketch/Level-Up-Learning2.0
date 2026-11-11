@@ -11,6 +11,7 @@ import CurriculumExplorer from "@/components/teacher/CurriculumExplorer";
 import LiveClassPanel from "@/components/teacher/LiveClassPanel";
 import StrandStudentsPanel from "@/components/teacher/StrandStudentsPanel";
 import PlacementManager from "@/components/teacher/PlacementManager";
+import { classScopeFilter, schoolAdminSchoolIds } from "@/lib/teacher-class-scope";
 import WholeMathsDiagnosticPanel from "@/components/teacher/WholeMathsDiagnosticPanel";
 import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
 import {
@@ -392,7 +393,7 @@ export default function TeacherDashboardPage() {
       let classQuery = supabase.from("classes").select("*");
       classQuery = requestedClassId
         ? classQuery.eq("id", requestedClassId)
-        : classQuery.eq("teacher_id", teacherId);
+        : classQuery.or(classScopeFilter(teacherId, await schoolAdminSchoolIds(teacherId)));
       const { data: cls, error: clsErr } = await classQuery.order(
         "created_at",
         { ascending: false },

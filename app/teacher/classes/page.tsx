@@ -20,6 +20,7 @@ import {
   normalizeClassYearLevels,
   normalizeSchoolYearLabel,
 } from "@/lib/studentLevelLabel";
+import { classScopeFilter, schoolAdminSchoolIds } from "@/lib/teacher-class-scope";
 import { buildDisplayName, buildStudentUsername, resolveStudentNameParts } from "@/lib/studentName";
 
 const YEAR_LEVELS: Array<string> = [...SCHOOL_YEAR_LEVEL_OPTIONS];
@@ -164,10 +165,11 @@ export default function TeacherClassesPage() {
   }
 
   const loadClasses = useCallback(async (teacherId: string) => {
+    const adminSchoolIds = await schoolAdminSchoolIds(teacherId);
     const { data: cls } = await supabase
       .from("classes")
       .select("*")
-      .eq("teacher_id", teacherId)
+      .or(classScopeFilter(teacherId, adminSchoolIds))
       .order("created_at", { ascending: false });
 
     const loadedClasses = (cls ?? []) as ClassRow[];
@@ -603,26 +605,22 @@ export default function TeacherClassesPage() {
     );
   }
 
-  async function deleteClass(cls: ClassRow) {
-    const totalCount = students.filter((s) => s.class_id === cls.id).length;
-    const studentWarning =
-      totalCount > 0
-        ? `\n\nThis class has ${totalCount} student${totalCount !== 1 ? "s" : ""}. All student records and progress will be permanently deleted.`
-        : "";
-    if (!confirm(`Permanently delete "${cls.name}"?${studentWarning}\n\nThis cannot be undone.`)) return;
-
-    setDeletingClassId(cls.id);
-    // Delete students first (in case no cascade FK)
-    if (totalCount > 0) {
-      await supabase.from("students").delete().eq("class_id", cls.id);
+  // The server removes a class only when nothing is tied to it: no current
+  // students, no past enrolments and no saved student work.
+  async function removeEmptyClass(cls: ClassRow) {
+    if (students.some((s) => s.class_id === cls.id)) {
+      alert(`"${cls.name}" still has students. Move them to another class first, or archive the class.`);
+      return;
     }
-    const { error } = await supabase.from("classes").delete().eq("id", cls.id);
+    if (!confirm(`Remove the empty class "${cls.name}"?\n\nRELIQ checks it has never had students first. This cannot be undone.`)) return;
+    setDeletingClassId(cls.id);
+    const { error } = await supabase.rpc("remove_empty_class", { p_class_id: cls.id });
     setDeletingClassId(null);
     if (error) { alert(error.message); return; }
     setClasses((prev) => prev.filter((c) => c.id !== cls.id));
-    setStudents((prev) => prev.filter((s) => s.class_id !== cls.id));
     setEditingClassId(null);
     setSelectedClassId(null);
+    flash(`${cls.name} removed`);
   }
 
   function startClassEdit(cls: ClassRow) {
@@ -965,7 +963,7 @@ export default function TeacherClassesPage() {
                 <span><strong className="text-lg">{c.name}</strong> <span className="text-[#5b5b57]">· {students.filter((s) => s.class_id === c.id).length} students · archived</span></span>
                 <span className="flex gap-2">
                   <button type="button" onClick={() => void unarchiveClass(c)} className={btnSecondary}>Restore</button>
-                  <button type="button" onClick={() => void deleteClass(c)} disabled={deletingClassId === c.id} className={`${btnSecondary} text-[#8a2c00]`}>{deletingClassId === c.id ? "Deleting…" : "Delete"}</button>
+                  <button type="button" onClick={() => void removeEmptyClass(c)} disabled={deletingClassId === c.id} className={`${btnSecondary} text-[#8a2c00]`}>{deletingClassId === c.id ? "Removing…" : "Remove empty class"}</button>
                 </span>
               </div>
             ))}
@@ -1187,7 +1185,7 @@ export default function TeacherClassesPage() {
             archiving={archivingClassId === cls.id}
             onArchive={() => void archiveClass(cls)}
             deleting={deletingClassId === cls.id}
-            onDelete={() => void deleteClass(cls)}
+            onDelete={() => void removeEmptyClass(cls)}
           />
         );
       })() : null}

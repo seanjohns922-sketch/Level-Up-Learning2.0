@@ -50,10 +50,10 @@ export function ClassSettingsDialog(p: Props) {
         </div>
         <section className="flex flex-col gap-3 rounded-2xl border border-[#ececE7] p-4">
           <SectionTitle>CLOSE THIS CLASS</SectionTitle>
-          <p className="text-sm text-[#4a4a46]">Archiving hides the class but keeps every student and result. You can restore it any time. Deleting removes the class and its students for good.</p>
+          <p className="text-sm text-[#4a4a46]">Archiving hides the class but keeps every student and result. You can restore it any time. A class that has never had students, such as a duplicate, can be removed instead.</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={p.onArchive} disabled={p.archiving} className={btnSecondary}>{p.archiving ? "Archiving…" : "Archive class"}</button>
-            <button type="button" onClick={p.onDelete} disabled={p.deleting} className={btnDanger}>{p.deleting ? "Deleting…" : "Delete class"}</button>
+            <button type="button" onClick={p.onDelete} disabled={p.deleting} className={btnDanger}>{p.deleting ? "Removing…" : "Remove empty class"}</button>
           </div>
         </section>
       </div>

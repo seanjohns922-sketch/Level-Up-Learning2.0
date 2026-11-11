@@ -312,7 +312,8 @@
     "qa:school-year-manual": "NODE_ENV=test node scripts/school-year-rollover-ui-test.mjs && NODE_ENV=test node scripts/manual-school-year-api-test.mjs && NODE_ENV=test node scripts/school-student-calendar-ui-test.mjs",
     "qa:school-year-db": "node scripts/manual-school-year-db-test.mjs",
     "qa:school-current-year": "node scripts/school-current-year-db-test.mjs",
-    "qa:realm-locks": "node scripts/student-realm-locks-db-test.mjs"
+    "qa:realm-locks": "node scripts/student-realm-locks-db-test.mjs",
+    "qa:remove-empty-class": "node scripts/remove-empty-class-db-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
