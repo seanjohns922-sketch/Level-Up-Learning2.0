@@ -48,6 +48,8 @@ const PLACEMENT_REALMS = getLiveRealmDefinitions()
     active: true,
   }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);
+// Levels offered by at least one realm, for the grid's "All realms" column.
+const ALL_REALM_LEVELS = LEVEL_CATALOG.filter((l) => PLACEMENT_REALMS.some((realm) => realm.levelLabels.includes(l.id)));
 
 const ENTRY_MODES: { value: PlacementEntryMode; label: string }[] = [
   { value: "pretest", label: "Pre-test first" },
@@ -292,6 +294,11 @@ export default function PlacementManager({
   // How a placed student starts in a realm: the unsaved choice, else the saved one.
   function shownEntry(realm: string, s: PMStudent, level: string): PlacementEntryMode {
     return normalizeEntryMode(realm, level, pendingAll[realm]?.[s.id]?.entry ?? savedPlacement(realm, s.id)?.assigned_entry_mode ?? "pretest");
+  }
+
+  // Grid "All realms": one level for a student in every realm that offers it.
+  function setLevelAcrossRealms(studentId: string, level: string) {
+    for (const realm of PLACEMENT_REALMS) if (realm.levelLabels.includes(level)) setRowLevel(studentId, level, realm.id);
   }
 
   // Grid toolbar: one start choice for every placed cell of the students shown.
@@ -807,6 +814,7 @@ export default function PlacementManager({
                   <tr>
                     <th className="sticky left-0 z-10 border-b border-[#E3E5E0] bg-[#FAFBF8] px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">Student</th>
                     <th className="border-b border-[#E3E5E0] bg-[#FAFBF8] px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">Grade</th>
+                    <th className="border-b border-r border-[#E3E5E0] bg-[#FAFBF8] px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]" title="Set every realm for a student at once">All realms</th>
                     {PLACEMENT_REALMS.map((realm) => (
                       <th key={realm.id} className="border-b border-[#E3E5E0] bg-[#FAFBF8] px-3 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#8A8E89]">
                         <button type="button" onClick={() => openRealm(realm.id)} className="inline-flex items-center gap-1.5 uppercase tracking-[0.12em] hover:text-[#3F4246]" title={`Open ${realm.label}`}>
@@ -824,6 +832,23 @@ export default function PlacementManager({
                         <tr key={s.id} className="hover:bg-[#FAFBF8]">
                           <td className="sticky left-0 border-b border-[#F1F2EE] bg-white px-4 py-2 font-bold text-[#121314]">{s.display_name}</td>
                           <td className="border-b border-[#F1F2EE] px-3 py-2 font-bold text-[#5A5E63]">{gradeLabel(grade).replace("Grade ", "G")}</td>
+                          <td className="border-b border-r border-[#F1F2EE] px-3 py-2">
+                            {(() => {
+                              const rowLevels = PLACEMENT_REALMS.map((realm) => shownLevel(realm.id, s));
+                              const same = rowLevels.every((level) => level && level === rowLevels[0]) ? rowLevels[0] : "";
+                              return (
+                                <select
+                                  value={same ?? ""}
+                                  onChange={(event) => { if (event.target.value) setLevelAcrossRealms(s.id, event.target.value); }}
+                                  aria-label={`${s.display_name} level in all realms`}
+                                  className="cursor-pointer appearance-none rounded-full border border-[#121314] bg-white px-3 py-1 text-[13px] font-extrabold text-[#121314] focus:outline-none focus:ring-2 focus:ring-[#121314]"
+                                >
+                                  {!same ? <option value="">Set all ▾</option> : null}
+                                  {ALL_REALM_LEVELS.map((l) => <option key={l.id} value={l.id}>{shortLevel(l.id)}{same === l.id ? " ▾" : ""}</option>)}
+                                </select>
+                              );
+                            })()}
+                          </td>
                           {PLACEMENT_REALMS.map((realm) => {
                             const level = shownLevel(realm.id, s);
                             const changed = Boolean(pendingAll[realm.id]?.[s.id]);
@@ -866,7 +891,7 @@ export default function PlacementManager({
                 </tbody>
               </table>
             </div>
-            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in black until you save. Under each level, choose whether the student sits the pre-test first or skips it. Open a realm (click its name) to reset a student.</p>
+            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in black until you save. Use &ldquo;All realms&rdquo; to set a student&apos;s level in every realm at once. Under each level, choose whether the student sits the pre-test first or skips it. Open a realm (click its name) to reset a student.</p>
           </div>
         ) : (
           /* Per-realm table: tick students and set levels together */
