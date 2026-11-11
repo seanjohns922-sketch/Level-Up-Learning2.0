@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Check, Search } from "lucide-react";
-import type { ClassRow, SchoolDirectoryStudent } from "@/components/teacher/classes/types";
+import type { ClassRow, SchoolDirectoryStudent, StudentSortMode } from "@/components/teacher/classes/types";
 import { Dialog, btnPrimary, btnSecondary, field, fieldLabel } from "@/components/teacher/classes/ui";
 
 export type AddTab = "school" | "new" | "upload";
@@ -21,6 +21,7 @@ type Props = {
     query: string; setQuery: (v: string) => void;
     year: string; setYear: (v: string) => void;
     unassignedOnly: boolean; setUnassignedOnly: (v: boolean) => void;
+    sort: StudentSortMode; setSort: (v: StudentSortMode) => void;
     selected: Set<string>; toggle: (id: string) => void; toggleAllShown: () => void;
     loading: boolean; error: string; onAdd: () => void;
   };
@@ -86,6 +87,13 @@ export function AddStudentsDialog(p: Props) {
               <select className={field} value={d.year} onChange={(e) => d.setYear(e.target.value)}>
                 <option value="">All years</option>
                 {p.yearLevels.map((yr) => <option key={yr} value={yr}>{yr}</option>)}
+              </select>
+            </label>
+            <label className={fieldLabel}>Sort by
+              <select className={field} value={d.sort} onChange={(e) => d.setSort(e.target.value as StudentSortMode)}>
+                <option value="last_name">Last name</option>
+                <option value="first_name">First name</option>
+                <option value="actual_year">Year group</option>
               </select>
             </label>
             <label className="flex min-h-11 items-center gap-2 text-sm font-semibold">

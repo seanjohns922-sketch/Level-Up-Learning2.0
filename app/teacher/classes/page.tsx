@@ -53,6 +53,18 @@ function generateFallbackPin(existingPins: Set<string>) {
   return nextPin;
 }
 
+/** Orders the school directory in Add students: last name (default), first name or year group. */
+function compareDirectoryStudents(a: SchoolDirectoryStudent, b: SchoolDirectoryStudent, mode: StudentSortMode) {
+  const byText = (x: string, y: string) => x.localeCompare(y, undefined, { sensitivity: "base" });
+  const year = (label: string | null) => { const i = label ? YEAR_LEVELS.indexOf(label) : -1; return i === -1 ? Number.POSITIVE_INFINITY : i; };
+  if (mode === "actual_year" && year(a.yearLevel) !== year(b.yearLevel)) return year(a.yearLevel) - year(b.yearLevel);
+  const an = resolveStudentNameParts({ display_name: a.name });
+  const bn = resolveStudentNameParts({ display_name: b.name });
+  return mode === "first_name"
+    ? byText(an.firstName, bn.firstName) || byText(an.lastName, bn.lastName)
+    : byText(an.lastName, bn.lastName) || byText(an.firstName, bn.firstName);
+}
+
 const classYears = (cls: ClassRow) => normalizeClassYearLevels(cls.year_levels?.length ? cls.year_levels : cls.year_level ? [cls.year_level] : []);
 
 export default function TeacherClassesPage() {
@@ -129,6 +141,7 @@ export default function TeacherClassesPage() {
   const [directoryYear, setDirectoryYear] = useState("");
   // Students not in any class yet: what a teacher building a new class usually wants.
   const [directoryUnassignedOnly, setDirectoryUnassignedOnly] = useState(true);
+  const [directorySort, setDirectorySort] = useState<StudentSortMode>("last_name");
   const [selectedDirectoryIds, setSelectedDirectoryIds] = useState<Set<string>>(new Set());
   const [directoryLoading, setDirectoryLoading] = useState(false);
   const [directoryError, setDirectoryError] = useState("");
@@ -142,7 +155,7 @@ export default function TeacherClassesPage() {
       .filter((student) => !directoryUnassignedOnly || (student.classIds ?? []).length === 0)
       .filter((student) => !directoryYear || student.yearLevel === directoryYear)
       .filter((student) => !directorySearch || [student.name, student.username ?? "", student.explorerCode ?? ""].some((value) => value.toLowerCase().includes(directorySearch)))
-      .sort((left, right) => left.name.localeCompare(right.name))
+      .sort((left, right) => compareDirectoryStudents(left, right, directorySort))
     : [];
 
   function flash(message: string) {
@@ -1111,6 +1124,7 @@ export default function TeacherClassesPage() {
             query: directoryQuery, setQuery: setDirectoryQuery,
             year: directoryYear, setYear: setDirectoryYear,
             unassignedOnly: directoryUnassignedOnly, setUnassignedOnly: setDirectoryUnassignedOnly,
+            sort: directorySort, setSort: setDirectorySort,
             selected: selectedDirectoryIds,
             toggle: (id) => setSelectedDirectoryIds((current) => { const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next; }),
             toggleAllShown: () => setSelectedDirectoryIds((current) => {
