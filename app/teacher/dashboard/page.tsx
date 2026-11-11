@@ -956,7 +956,11 @@ export default function TeacherDashboardPage() {
           <span className="hidden h-12 w-px shrink-0 bg-[#34373A] lg:block" />
 
           <div className="flex min-w-0 items-center gap-3 xl:gap-4">
-            {schoolLogo ? (
+            {schoolLogo?.wide ? (
+              <div className="flex h-[68px] max-w-[190px] shrink-0 items-center rounded-xl bg-white px-3 py-2 xl:h-[74px]">
+                <Image src={schoolLogo.src} alt={schoolLogo.alt} width={160} height={69} priority className="h-full w-auto object-contain" />
+              </div>
+            ) : schoolLogo ? (
               <Image
                 src={schoolLogo.src}
                 alt={schoolLogo.alt}

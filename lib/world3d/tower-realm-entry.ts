@@ -1,5 +1,6 @@
 "use client";
 
+import { getStudentRealmLocks, isRealmLocked } from "@/lib/realm-locks";
 import { setLastRealm } from "@/lib/last-realm";
 import { getRealmAvailability, resolveRealmEntryRoute } from "@/lib/realm-entry";
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
@@ -55,6 +56,11 @@ export async function resolveTowerRealmEntry(args: {
 
   const identity = getActiveStudentIdentity();
   if (!identity.studentId) return { status: "ready", route: "/login" };
+
+  // A realm the teacher has locked for this student stays shut (Placements > Realm access).
+  if (isRealmLocked(await getStudentRealmLocks(identity.studentId), args.realmId)) {
+    return { status: "unavailable", message: `Your teacher has locked ${realm.name} for now.` };
+  }
 
   // Same unlock rule as the realm carousel: a realm below this learner's reach
   // explains itself rather than routing them to a pre-test it does not have.

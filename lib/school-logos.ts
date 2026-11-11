@@ -1,6 +1,8 @@
 export type SchoolLogo = {
   src: string;
   alt: string;
+  /** A wide banner logo on a transparent background: show it whole, on white. */
+  wide?: boolean;
 };
 
 function normaliseSchoolKey(value: string | null | undefined) {
@@ -58,6 +60,7 @@ export function getSchoolLogo(school: { name?: string | null; code?: string | nu
     return {
       src: "/schools/yarrawonga-college-logo.png",
       alt: `${school.name ?? "Yarrawonga College P-12"} logo`,
+      wide: true,
     };
   }
 

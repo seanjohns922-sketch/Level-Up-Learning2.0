@@ -18,7 +18,7 @@ import { buildStarpathWorldHref, STARPATH_REALM_ID, STARPATH_WORLD_ROUTE } from 
 import { markRealmEntryRestored } from "@/lib/realm-entry-handoff";
 import { useAuthorizedDemoSession } from "@/lib/use-authorized-demo-session";
 import { isLiveRealmId, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
-import { getStudentFocusLock, isRealmBlockedByFocus, type StudentFocusLock } from "@/lib/focus-lock";
+import { getStudentRealmLocks, isRealmLocked } from "@/lib/realm-locks";
 import { realmUnlockState } from "@/lib/realm-unlock";
 import { fetchStudentRealmLevels, levelsFromRows } from "@/lib/realm-unlock-client";
 
@@ -65,7 +65,7 @@ export default function RealmCarousel() {
   // Focus Mode: while the teacher has the class "in session" and pinned to a
   // realm, every other portal locks. null = free roam (the usual case, incl. at
   // home). Not applied in teacher preview / demo — that surface isn't a student.
-  const [focusLock, setFocusLock] = useState<StudentFocusLock | null>(null);
+  const [lockedRealms, setLockedRealms] = useState<string[]>([]);
   // Every level this learner has reached, in any realm. Reaching a level
   // anywhere is the evidence that they may attempt another realm's entry
   // pre-test, so Chance Hollow and Pattern Peaks open once they are at Level 3
@@ -102,13 +102,8 @@ export default function RealmCarousel() {
   useEffect(() => {
     if (previewMode || DEMO_MODE) return;
     let cancelled = false;
-    void getStudentFocusLock().then((lock) => {
-      if (cancelled || !lock) return;
-      setFocusLock(lock);
-      // Land the student on their focus realm so the right portal is front and
-      // centre (they can still spin to see the locked ones).
-      const idx = ALL_REALMS.findIndex((r) => tryCanonicalRealmId(r.id) === lock.focusRealmId);
-      if (idx >= 0) setCurrentIndex(idx);
+    void getStudentRealmLocks().then((locks) => {
+      if (!cancelled) setLockedRealms(locks);
     });
     return () => {
       cancelled = true;
@@ -153,9 +148,8 @@ export default function RealmCarousel() {
   const isStatisticaPreview = isStatisticaRealm && (previewMode || DEMO_MODE);
   const isChanceRealm = current.id === "chance-hollow";
   const isChancePreview = isChanceRealm && (previewMode || DEMO_MODE);
-  // A realm the class isn't focused on is locked while Focus Mode is engaged.
-  const blockedByFocus = isRealmBlockedByFocus(focusLock, current.id);
-  const focusRealm = focusLock ? realms.find((r) => tryCanonicalRealmId(r.id) === focusLock.focusRealmId) ?? null : null;
+  // A realm the teacher has locked for this student (Placements > Realm access).
+  const blockedByTeacher = isRealmLocked(lockedRealms, current.id);
   // Realms below the learner's reach stay shut, but they stay visible: the
   // card says when it opens instead of sending them to a missing pre-test.
   const unlockState = current.id === "chronorok" || previewMode || DEMO_MODE
@@ -163,7 +157,7 @@ export default function RealmCarousel() {
     : realmUnlockState(current.id, [...reachedLevels, profileLevel]);
   const isActive =
     (current.id === "chronorok" || DEMO_MODE || isRealmEnabled(current.id) || isStarpathPreview || isStatisticaPreview || isChancePreview) &&
-    !blockedByFocus &&
+    !blockedByTeacher &&
     unlockState.unlocked;
   const isPreviewRealm = previewMode && (current.id === "measurelands" || isStatisticaRealm || isChanceRealm);
   const prevIdx = (currentIndex - 1 + realms.length) % realms.length;
@@ -549,23 +543,6 @@ export default function RealmCarousel() {
                 : {}),
             }}
           >
-            {focusLock ? (
-              <div
-                className="mx-auto mb-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em]"
-                style={{
-                  color: focusRealm?.color ?? "rgb(255,255,255)",
-                  background: focusRealm?.colorDim ?? "rgba(255,255,255,0.08)",
-                  border: `1px solid ${focusRealm?.colorDim ?? "rgba(255,255,255,0.14)"}`,
-                }}
-              >
-                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.4">
-                  <circle cx="12" cy="12" r="9" />
-                  <circle cx="12" cy="12" r="3.5" />
-                </svg>
-                Class focus{focusRealm ? `: ${focusRealm.name}` : ""}
-              </div>
-            ) : null}
-
             <h2
               className="text-2xl md:text-3xl font-black text-white mb-1"
               style={{
@@ -592,13 +569,13 @@ export default function RealmCarousel() {
               >
                 {enteringRealm === current.id ? "Loading..." : isPreviewRealm ? "Preview Realm" : "Enter Realm"}
               </button>
-            ) : blockedByFocus ? (
+            ) : blockedByTeacher ? (
               <span className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white/60 border border-white/10" style={{ background: "rgba(255,255,255,0.05)" }}>
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="4" y="11" width="16" height="9" rx="2" />
                   <path d="M8 11V7a4 4 0 018 0v4" />
                 </svg>
-                {focusRealm ? `Your class is working in ${focusRealm.name}` : "Locked by your teacher"}
+                Locked by your teacher
               </span>
             ) : !unlockState.unlocked && !current.comingSoon ? (
               <span className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white/70 border border-white/15" style={{ background: "rgba(255,255,255,0.06)" }}>

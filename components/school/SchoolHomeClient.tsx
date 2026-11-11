@@ -3020,7 +3020,7 @@ export default function SchoolHomeClient({
                           alt={schoolLogo.alt}
                           width={72}
                           height={72}
-                          className="h-[72px] w-[72px] shrink-0 rounded-md object-cover"
+                          className={schoolLogo.wide ? "h-[72px] w-auto max-w-[180px] shrink-0 object-contain" : "h-[72px] w-[72px] shrink-0 rounded-md object-cover"}
                         />
                       ) : (
                         <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-md bg-emerald-900 text-white">

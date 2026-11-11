@@ -21,7 +21,6 @@ import {
   type LiveStudentStatus,
 } from "@/lib/live-class";
 import { LiveStudentDrawer, type LiveStudentDrawerData, type LiveStudentEventRow } from "@/components/teacher/LiveStudentDrawer";
-import FocusModeControl from "@/components/teacher/FocusModeControl";
 import {
   getRealmActivityCode,
   getRealmDefinition,
@@ -1383,7 +1382,6 @@ export default function LiveClassPanel({
           >
             <Sparkles className="h-4 w-4" aria-hidden="true" />Spotlight
           </button>
-          {selectedClass?.id ? <FocusModeControl classId={selectedClass.id} /> : null}
           <FullscreenToggle inline className="inline-flex items-center gap-1.5 rounded-full bg-[#121314] px-3.5 py-1.5 text-sm font-bold text-white transition hover:bg-black" />
         </div>
 

@@ -23,6 +23,7 @@ import {
   type TeacherRealmPlacementRow,
 } from "@/lib/realm-progress-compat";
 import { normalizeSchoolYearLabel } from "@/lib/studentLevelLabel";
+import RealmAccessGrid from "@/components/teacher/RealmAccessGrid";
 
 // Class placement in three views: realm cards (level spread, pre-test status,
 // who needs placing), a class grid (every student x every realm) and a per-realm
@@ -144,7 +145,7 @@ export default function PlacementManager({
   /** Review pages only: show this sample data instead of loading (nothing is saved). */
   previewData?: { progressByRealm: Record<string, CompatProgressRow[]>; placements: TeacherRealmPlacementRow[] };
 }) {
-  const [view, setView] = useState<"realms" | "grid">("realms");
+  const [view, setView] = useState<"realms" | "grid" | "access">("realms");
   const [realmId, setRealmId] = useState<string | null>(null);
   const [progressByRealm, setProgressByRealm] = useState<Record<string, CompatProgressRow[]>>({});
   const [placements, setPlacements] = useState<TeacherRealmPlacementRow[]>([]);
@@ -286,6 +287,16 @@ export default function PlacementManager({
     const edit = pendingAll[realm]?.[s.id];
     if (edit) return edit.level;
     return isPlaced(realm, s.id) ? defaultLevel(realm, s) : null;
+  }
+
+  // How a placed student starts in a realm: the unsaved choice, else the saved one.
+  function shownEntry(realm: string, s: PMStudent, level: string): PlacementEntryMode {
+    return normalizeEntryMode(realm, level, pendingAll[realm]?.[s.id]?.entry ?? savedPlacement(realm, s.id)?.assigned_entry_mode ?? "pretest");
+  }
+
+  // Grid toolbar: one start choice for every placed cell of the students shown.
+  function setGridEntry(entry: PlacementEntryMode, shown: PMStudent[]) {
+    for (const s of shown) for (const realm of ACTIVE_REALM_IDS) if (shownLevel(realm, s)) setRowEntry(s.id, entry, s, realm);
   }
 
   // Pre-test status for the student's current level in a realm.
@@ -603,6 +614,8 @@ export default function PlacementManager({
   const pillOn = `${pill} bg-[#121314] text-white`;
   const primary = "rounded-full bg-[#83E300] px-4 py-2 text-sm font-extrabold text-[#121314] transition hover:bg-[#9AF01F] disabled:cursor-not-allowed disabled:opacity-40";
 
+  const gridStudents = studentsBySurname.filter((s) => filter === "needs" ? unplaced.some((entry) => entry.student.id === s.id) : filter === "waiting" ? PLACEMENT_REALMS.some((realm) => pretestState(realm.id, s.id).state === "waiting") : true);
+
   function FillEmpty({ realms }: { realms: string[] }) {
     const empty = students.filter((s) => realms.some((realm) => !isPlaced(realm, s.id) && !pendingAll[realm]?.[s.id])).length;
     return (
@@ -650,7 +663,7 @@ export default function PlacementManager({
         </div>
         {!realmId ? (
           <div className="flex rounded-full bg-[#F1F2EE] p-1" role="tablist" aria-label="Placement view">
-            {([["realms", "Realms"], ["grid", "Class grid"]] as const).map(([key, label]) => (
+            {([["realms", "Realms"], ["grid", "Class grid"], ["access", "Realm access"]] as const).map(([key, label]) => (
               <button key={key} role="tab" aria-selected={view === key} onClick={() => setView(key)} className={`rounded-full px-4 py-2 text-sm font-extrabold ${view === key ? "bg-[#121314] text-white" : "text-[#3F4246]"}`}>{label}</button>
             ))}
           </div>
@@ -758,6 +771,8 @@ export default function PlacementManager({
               })}
             </div>
           </div>
+        ) : !realmId && view === "access" ? (
+          <RealmAccessGrid classId={selectedClass?.id ?? null} students={studentsBySurname} realms={PLACEMENT_REALMS} preview={Boolean(previewData)} />
         ) : !realmId ? (
           /* Class grid: every student x every realm, edit in place */
           <div className="space-y-4">
@@ -766,6 +781,19 @@ export default function PlacementManager({
                 <button key={key} type="button" onClick={() => setFilter(key)} className={filter === key ? pillOn : pillOff}>{label}</button>
               ))}
               <FillEmpty realms={ACTIVE_REALM_IDS} />
+              <label className={`inline-flex items-center gap-2 ${pillOff}`} title="Sets how every placed student shown starts, in every realm. Change single cells below.">
+                <span>Set how everyone starts</span>
+                <select
+                  value=""
+                  onChange={(event) => { if (event.target.value) setGridEntry(event.target.value as PlacementEntryMode, gridStudents); }}
+                  className="appearance-none rounded-md border-0 bg-transparent font-extrabold text-[#121314] focus:outline-none"
+                  aria-label="Set how everyone starts"
+                >
+                  <option value="">choose ▾</option>
+                  <option value="pretest">Pre-test first</option>
+                  <option value="full_level">Skip pre-test</option>
+                </select>
+              </label>
               <span className="ml-auto flex flex-wrap items-center gap-3 text-[13px] font-bold text-[#5A5E63]">
                 <span><span className="mr-1 rounded-full bg-[#E4F8C4] px-2 py-0.5 text-[#3D6600]">L5</span>above grade</span>
                 <span><span className="mr-1 rounded-full bg-[#FEF3C7] px-2 py-0.5 text-[#92400E]">L2</span>below grade</span>
@@ -789,8 +817,7 @@ export default function PlacementManager({
                   </tr>
                 </thead>
                 <tbody>
-                  {studentsBySurname
-                    .filter((s) => filter === "needs" ? unplaced.some((entry) => entry.student.id === s.id) : filter === "waiting" ? PLACEMENT_REALMS.some((realm) => pretestState(realm.id, s.id).state === "waiting") : true)
+                  {gridStudents
                     .map((s) => {
                       const grade = schoolYearOf(s);
                       return (
@@ -803,8 +830,9 @@ export default function PlacementManager({
                             const diff = level ? YEAR_ORDER.indexOf(level) - YEAR_ORDER.indexOf(grade) : 0;
                             const tone = !level ? "bg-[#FFEDD5] text-[#9A3412]" : diff > 0 ? "bg-[#E4F8C4] text-[#3D6600]" : diff < 0 ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#F1F2EE] text-[#121314]";
                             const waiting = pretestState(realm.id, s.id).state === "waiting";
+                            const entryModes = level ? entryModesForLevel(realm.id, level) : [];
                             return (
-                              <td key={realm.id} className="border-b border-[#F1F2EE] px-3 py-2">
+                              <td key={realm.id} className="border-b border-[#F1F2EE] px-3 py-2 align-top">
                                 <span className="inline-flex items-center gap-1.5">
                                   <select
                                     value={level ?? ""}
@@ -817,6 +845,18 @@ export default function PlacementManager({
                                   </select>
                                   {waiting && !changed ? <span className="text-[11px] font-extrabold text-[#B45309]">pre-test</span> : null}
                                 </span>
+                                {level && entryModes.length > 1 ? (
+                                  <select
+                                    value={shownEntry(realm.id, s, level)}
+                                    onChange={(event) => setRowEntry(s.id, event.target.value as PlacementEntryMode, s, realm.id)}
+                                    aria-label={`${s.display_name} ${realm.label} how they start`}
+                                    className="mt-1 block cursor-pointer appearance-none bg-transparent text-[11px] font-bold text-[#5A5E63] hover:text-[#121314] focus:outline-none focus:ring-2 focus:ring-[#121314]"
+                                  >
+                                    {entryModes.map((m) => <option key={m.value} value={m.value}>{m.value === "pretest" ? "Pre-test ▾" : m.value === "full_level" ? "Skip pre-test ▾" : "Week 1 ▾"}</option>)}
+                                  </select>
+                                ) : level && entryModes.length === 1 ? (
+                                  <span className="mt-1 block text-[11px] font-bold text-[#8A8E89]">{entryModes[0].value === "ground_week1" ? "Week 1" : entryModes[0].value === "full_level" ? "No pre-test" : "Pre-test"}</span>
+                                ) : null}
                               </td>
                             );
                           })}
@@ -826,7 +866,7 @@ export default function PlacementManager({
                 </tbody>
               </table>
             </div>
-            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in black until you save. New students start with the pre-test for their level. Open a realm (click its name) to change how a student starts or to reset.</p>
+            <p className="text-xs font-semibold text-[#8A8E89]">Changed cells are outlined in black until you save. Under each level, choose whether the student sits the pre-test first or skips it. Open a realm (click its name) to reset a student.</p>
           </div>
         ) : (
           /* Per-realm table: tick students and set levels together */
