@@ -23,7 +23,7 @@ check(number.includes("<WorldHUD") && number.includes('context="realm"'), "Numbe
 check(hud.includes("fetchStudentEconomy") && hud.includes('router.push("/profile")'), "Compact canonical XP/profile controls are incomplete");
 check(hud.includes("resolveWorldJourney") && journey.includes("resolveContinueLearningRoute"), "Current Mission and Quick Start do not share canonical journey resolution");
 check(hud.includes("resolveTowerRealmEntry") && hud.includes("TOWER_REALM_PORTALS"), "Realm Teleport does not share Tower realm resolution");
-check(hud.includes("2D VIEW") && hud.includes("REALMS") && hud.includes("QUICK START"), "Required fast and fallback actions are missing");
+check(hud.includes("2D map view") && hud.includes("router.push(fallbackHref)") && hud.includes("REALMS") && hud.includes("QUICK START") && hud.includes("primaryLabel"), "Required fast, main and 2D fallback actions are missing");
 check(interaction.includes("location") && interaction.includes("action"), "Shared environmental interaction presentation is missing");
 // The hub shows a floating name tag and puts the action on the HUD dock; the tower and realms share the prompt.
 check(central.includes("contextAction={") && central.includes("centralWorldTag") && tower.includes("WorldInteractionPrompt") && number.includes("WorldInteractionPrompt"), "Worlds are not sharing interaction presentation");

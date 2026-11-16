@@ -53,7 +53,8 @@ export default function RealmGuide({ realmId, level, realmName, accent, world }:
   const lines = useMemo(() => guideLines(world, realmName, legend.name), [world, realmName, legend.name]);
   const arrivalKey = `reliq:guide-arrival:${realmId}:${level}`;
   const [arriving, setArriving] = useState(false);
-  const [open, setOpen] = useState(true);
+  // The tip bubble stays tucked away so it never covers the world; tap the guide to hear a tip.
+  const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   // The full welcome plays once per realm and level in each session; later visits go straight to the guide.
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function RealmGuide({ realmId, level, realmName, accent, world }:
   }, [arrivalKey]);
   function finishArrival() {
     setArriving(false);
-    setOpen(true);
+    setOpen(false);
     try { sessionStorage.setItem(arrivalKey, "1"); } catch { /* optional */ }
   }
   if (!image) return null;

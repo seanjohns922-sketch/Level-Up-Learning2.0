@@ -5,7 +5,7 @@ import StatisticsExtensionLinks from "@/components/assessment/StatisticsExtensio
 import SpaceExtensionLinks from "@/components/assessment/SpaceExtensionLinks";
 import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
-import { ChevronDown, DoorOpen, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
+import { DoorOpen, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
@@ -85,7 +85,6 @@ export function WorldHUD({
   const [journey, setJourney] = useState<WorldJourney>(fallbackJourney);
   const [quickStartBusy, setQuickStartBusy] = useState(false);
   const [teleportOpen, setTeleportOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [xp, setXp] = useState<number | null>(null);
@@ -174,6 +173,11 @@ export function WorldHUD({
   const missionSpeech = joinSpeechParts([displayedMission.eyebrow ?? (context === "realm" ? "Current mission" : "Current journey"), displayedMission.title, displayedMission.detail]);
   const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
   const hubLayout = context === "central" || context === "tower";
+  // The main button says exactly what happens next.
+  const lessonMatch = /lesson\s*(\d+)/i.exec(journey.activityLabel);
+  const primaryLabel = context === "realm"
+    ? (/post-?test/i.test(journey.activityLabel) ? "TAKE THE POST-TEST" : /pre-?test/i.test(journey.activityLabel) ? "TAKE THE PRE-TEST" : /quiz/i.test(journey.activityLabel) ? "TAKE THE QUIZ" : lessonMatch ? `START LESSON ${lessonMatch[1]}` : "QUICK START")
+    : "QUICK START";
   const worldActionsSpeech = joinSpeechParts([
     "World actions",
     hubLayout ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
@@ -194,26 +198,6 @@ export function WorldHUD({
                 <div><span>NEXT UP</span><strong>{journey.realmName} · {journey.activityLabel}</strong></div>
                 <WorldVoiceButton text={joinSpeechParts(["Next up", journey.realmName, journey.activityLabel])} compact label="Read next up" />
               </div>
-              <div className="worldHudStartRow">
-                <button type="button" className="worldHudStartQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={15} fill="currentColor" />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
-                <button type="button" className="worldHudStartPick" aria-expanded={pickerOpen} onClick={() => setPickerOpen((open) => !open)}>Choose a realm<ChevronDown size={15} style={{ transform: pickerOpen ? "rotate(180deg)" : undefined }} /></button>
-              </div>
-              {pickerOpen ? (
-                <div className="worldHudPicker">
-                  {TOWER_REALM_PORTALS.filter((portal) => (portal.realm.status === "live" && portal.realm.isSelectable) || (preview && (portal.realmId === "pattern" || portal.realmId === "chance"))).map((portal) => {
-                    // Only realms a learner can open appear here; coming-soon realms stay in Realm Teleport.
-                    const available = true;
-                    const where = realmProgressLabel(portal.realmId) ?? portal.subject;
-                    return (
-                      <button key={portal.realmId} type="button" disabled={!available || Boolean(busyRealmId)} onClick={() => available && void enterRealm(portal.realmId)} style={{ borderColor: portal.accent }} aria-label={`Open ${portal.realm.name}`}>
-                        <b><i style={{ background: portal.accent }} />{portal.realm.name}</b>
-                        <small>{busyRealmId === portal.realmId ? "Opening..." : where}</small>
-                      </button>
-                    );
-                  })}
-                  {message ? <p role="status">{message}</p> : null}
-                </div>
-              ) : null}
             </div>
           </section>
         ) : (
@@ -237,14 +221,16 @@ export function WorldHUD({
             background="rgba(24,22,21,.82)"
             border="1px solid rgba(255,235,195,.28)"
           />
-          {navActions?.length ? (
+          {navActions?.length || (!hubLayout && !preview) ? (
             <div className="worldHudNavGroup">
-              {navActions.map((action) => (
+              {(navActions ?? []).map((action) => (
                 <button key={action.key} type="button" className="worldHudGoBtn" onClick={action.onClick} aria-label={action.label}>{action.icon}<span>{action.label}</span></button>
               ))}
+              {!hubLayout && !preview ? <button type="button" className="worldHudGoBtn" onClick={() => router.push(fallbackHref)} aria-label="2D map view" title="2D map view"><Map size={17} /></button> : null}
             </div>
           ) : null}
-          <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}<WorldVoiceButton text={`Experience points. ${compactXp(xp)}.`} compact label="Read XP" /></div>
+          <div className="worldHudStats">
+          <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}</div>
           {crystals ? (
             <button type="button" className="worldHudCrystals" onClick={() => router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok")}
               title={crystals.open ? `Chrono Crystals: ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}` : `Learn on ${Math.max(0, CHRONOROK_OPEN_DAYS - crystals.learningDays)} more days to open Chronorok`}
@@ -254,36 +240,26 @@ export function WorldHUD({
               <i aria-hidden="true"><b style={{ width: `${(crystals.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></i>
             </button>
           ) : null}
-          <button type="button" className="worldHudIcon" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
-          <WorldVoiceButton text="Profile. Opens your profile." compact label="Read profile" />
+          <button type="button" className="worldHudIcon worldHudAvatar" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
+          <WorldVoiceButton text={joinSpeechParts([`Experience points. ${compactXp(xp)}.`, crystals ? `Chrono Crystals. ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}.` : null, "Profile button."])} compact label="Read my points" />
+          </div>
         </div>
 
         <nav className="worldHudActions" aria-label="World actions">
           <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
-          {context === "central" || context === "tower" ? (
-            <>
-              {/* Central hub: gold Quick Start hero + Realms, with Edit World set
-                  slightly apart at the end of the bar (clear of avatar + joysticks). */}
-              {contextAction ? (
-                <button type="button" className="worldHudContext" onClick={contextAction.onClick}>
-                  {contextAction.icon === "home" ? <Home size={17} /> : <DoorOpen size={17} />}{contextAction.label}<kbd aria-hidden="true">E</kbd>
-                </button>
-              ) : null}
-              <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
-              {primaryAction ? <button type="button" className="worldHudSecondary worldHudEditInline" onClick={primaryAction.onClick}>{primaryAction.icon === "door" ? <DoorOpen size={17} /> : <Hammer size={17} />}{primaryAction.label}</button> : null}
-            </>
-          ) : (
-            <>
-              {primaryAction ? (
-                <button type="button" className={`worldHudSecondary ${primaryAction.icon === "edit" ? "worldHudEdit" : ""}`} onClick={primaryAction.onClick}>
-                  {primaryAction.icon === "map" ? <Map size={17} /> : primaryAction.icon === "edit" ? <Hammer size={17} /> : <DoorOpen size={17} />}{primaryAction.label}
-                </button>
-              ) : null}
-              <button type="button" className="worldHudSecondary" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
-              <button type="button" className="worldHudQuick" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={17} />{quickStartBusy ? "OPENING..." : "QUICK START"}</button>
-              {!preview ? <button type="button" className="worldHudFallback" onClick={() => router.push(fallbackHref)}><Map size={17} />2D VIEW</button> : null}
-            </>
-          )}
+          {contextAction ? (
+            <button type="button" className="worldHudContext" onClick={contextAction.onClick}>
+              {contextAction.icon === "home" ? <Home size={17} /> : <DoorOpen size={17} />}{contextAction.label}<kbd aria-hidden="true">E</kbd>
+            </button>
+          ) : null}
+          {!hubLayout && primaryAction ? (
+            <button type="button" className="worldHudSecondary worldHudWithLabel" onClick={primaryAction.onClick}>
+              {primaryAction.icon === "map" ? <Map size={17} /> : <DoorOpen size={17} />}{primaryAction.label === "RETURN TO TOWER" ? "TOWER" : primaryAction.label}
+            </button>
+          ) : null}
+          <button type="button" className="worldHudSecondary worldHudWithLabel" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
+          <button type="button" className="worldHudPrimary" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={16} fill="currentColor" />{quickStartBusy ? "OPENING..." : primaryLabel}</button>
+          {hubLayout && primaryAction ? <button type="button" className="worldHudSecondary worldHudWithLabel" onClick={primaryAction.onClick}>{primaryAction.icon === "door" ? <DoorOpen size={17} /> : <Hammer size={17} />}{primaryAction.label}</button> : null}
         </nav>
 
       </div>
@@ -305,7 +281,7 @@ export function WorldHUD({
                 return (
                   <div key={portal.realmId} className={`worldTeleportTile ${!available || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>
                     <WorldVoiceButton text={portalSpeech} compact className="worldTeleportTileRead" label={`Read ${portal.realm.name}`} />
-                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{available ? (live ? "ENTER REALM" : "PREVIEW REALM") : gamesWait ? gamesWait.toUpperCase() : "COMING SOON"}</small>
+                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{available ? (live ? (games ? "ENTER REALM" : realmProgressLabel(portal.realmId)?.toUpperCase() ?? "ENTER REALM") : "PREVIEW REALM") : gamesWait ? gamesWait.toUpperCase() : "COMING SOON"}</small>
                     <button type="button" disabled={!available || Boolean(busyRealmId)} onClick={() => { if (!available) return; if (games) { router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok"); return; } void enterRealm(portal.realmId); }} aria-label={`${available ? (live ? "Enter" : "Preview") : gamesWait ?? "Coming soon"} ${portal.realm.name}`}><span>{available ? (live ? "Enter" : "Preview") : gamesWait ? "Not open yet" : "Coming soon"}</span></button>
                   </div>
                 );
@@ -348,32 +324,46 @@ export function WorldHUD({
         .worldHudPicker small{display:block;margin-top:1px;color:#d6d0e4;font-size:10.5px;font-weight:700}
         .worldHudPicker p{grid-column:1/-1;margin:2px 0 0;color:#ffdca0;font-size:12px;font-weight:800}
         @media (max-width:900px) and (orientation:portrait){.worldHudStart{width:min(250px,calc(100vw - 32px))}.worldHudLogo{width:96px}.worldHud .worldHudIdentity{gap:5px}.worldHud .worldHudCrystals{padding:0 10px}.worldHudXp{padding:0 8px!important}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{max-width:calc(100vw - 300px)}.worldHudActions button:not(.worldVoiceButton){padding:8px 10px!important;font-size:12px!important}.worldHudMission{width:min(280px,calc(100vw - 32px))}}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIdentity{align-items:center;gap:9px}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudIdentity{align-items:center;gap:9px}
         .worldHudNavGroup{display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(16,14,24,.58);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px)}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn{height:38px;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;padding:0 13px;font-size:13px;font-weight:800;color:#ECE8F4}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn:hover{background:rgba(255,255,255,.14)!important}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn svg{color:#fff}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp{height:44px;border:0!important;border-radius:999px!important;padding:0 10px 0 14px;background:linear-gradient(135deg,#F7C948,#F59E0B)!important;color:#2a1700!important;box-shadow:0 8px 20px rgba(245,158,11,.35)!important}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp svg{color:#2a1700}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIcon{width:44px;height:44px;border-radius:999px!important;background:${STUDENT_VIOLET}!important;border-color:rgba(255,255,255,.3)!important;color:#fff}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{padding:8px!important;border-radius:20px!important;background:rgba(16,14,24,.62)!important;border-color:rgba(255,255,255,.16)!important}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudSecondary{border-radius:14px!important;background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.16)!important;min-height:48px!important;padding:0 18px!important;font-size:13px!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudNavGroup .worldHudGoBtn{height:38px;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;padding:0 13px;font-size:13px;font-weight:800;color:#ECE8F4}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudNavGroup .worldHudGoBtn:hover{background:rgba(255,255,255,.14)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudNavGroup .worldHudGoBtn svg{color:#fff}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudXp{height:44px;border:0!important;border-radius:999px!important;padding:0 10px 0 14px;background:linear-gradient(135deg,#F7C948,#F59E0B)!important;color:#2a1700!important;box-shadow:0 8px 20px rgba(245,158,11,.35)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudXp svg{color:#2a1700}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudIcon{width:44px;height:44px;border-radius:999px!important;background:${STUDENT_VIOLET}!important;border-color:rgba(255,255,255,.3)!important;color:#fff}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{padding:8px!important;border-radius:20px!important;background:rgba(16,14,24,.62)!important;border-color:rgba(255,255,255,.16)!important}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudSecondary{border-radius:14px!important;background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.16)!important;min-height:48px!important;padding:0 18px!important;font-size:13px!important}
         .worldHudContext{min-height:48px!important;border:0!important;border-radius:14px!important;padding:0 20px!important;background:#fff!important;color:#16121f!important;font-size:14px!important;box-shadow:0 8px 20px rgba(0,0,0,.25)}
         .worldHudContext kbd{margin-left:4px;padding:2px 7px;border-radius:6px;background:#EEE9F5;color:#5b4a73;font:800 11px var(--font-sans)}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission{border:1px solid rgba(239,189,97,.22);border-left:3px solid var(--world-accent);border-radius:12px;background:linear-gradient(135deg,rgba(29,36,31,.92),rgba(20,27,24,.82));box-shadow:0 8px 24px rgba(12,20,14,.18),inset 0 1px rgba(255,255,255,.06)}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission strong{line-height:1.3}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudMission small{line-height:1.5}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudGoBtn,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudXp,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIcon{border-radius:9px;border-color:rgba(255,235,195,.2);background:rgba(24,31,27,.88);box-shadow:0 4px 14px rgba(12,20,14,.16),inset 0 1px rgba(255,255,255,.05)}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{padding:7px;border:1px solid rgba(239,189,97,.2);border-radius:14px;background:rgba(20,27,24,.82);backdrop-filter:blur(12px);box-shadow:0 10px 28px rgba(12,20,14,.22)}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions button:not(.worldVoiceButton){border-radius:8px;font-weight:800;letter-spacing:.025em}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudEditInline{margin-left:0}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) button:focus-visible{outline:2px solid #ffe1a3;outline-offset:3px}
-        @media(hover:hover){.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) button:not(:disabled):hover{filter:brightness(1.12)}}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudMission{border:1px solid rgba(239,189,97,.22);border-left:3px solid var(--world-accent);border-radius:12px;background:linear-gradient(135deg,rgba(29,36,31,.92),rgba(20,27,24,.82));box-shadow:0 8px 24px rgba(12,20,14,.18),inset 0 1px rgba(255,255,255,.06)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudMission strong{line-height:1.3}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudMission small{line-height:1.5}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudGoBtn,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudXp,.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudIcon{border-radius:9px;border-color:rgba(255,235,195,.2);background:rgba(24,31,27,.88);box-shadow:0 4px 14px rgba(12,20,14,.16),inset 0 1px rgba(255,255,255,.05)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{padding:7px;border:1px solid rgba(239,189,97,.2);border-radius:14px;background:rgba(20,27,24,.82);backdrop-filter:blur(12px);box-shadow:0 10px 28px rgba(12,20,14,.22)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions button:not(.worldVoiceButton){border-radius:8px;font-weight:800;letter-spacing:.025em}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudEditInline{margin-left:0}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) button:focus-visible{outline:2px solid #ffe1a3;outline-offset:3px}
+        @media(hover:hover){.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) button:not(:disabled):hover{filter:brightness(1.12)}}
         @media(max-width:900px){.worldHudLogo{width:120px}.worldHudStart{width:min(320px,calc(100vw - 36px))}.worldHudStartHead strong{font-size:14px}.worldHudNavGroup .worldHudGoBtn span{display:none}}
-        @media(max-width:560px){.worldHudStart{top:max(60px,calc(env(safe-area-inset-top) + 50px))}.worldHudLogo{display:none}.worldHudStartCard{margin-top:0;padding:10px}.worldHudStartQuick,.worldHudStartPick{min-height:42px;font-size:12px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{top:auto!important;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px))!important}}
+        @media(max-width:560px){.worldHudStart{top:max(60px,calc(env(safe-area-inset-top) + 50px))}.worldHudLogo{display:none}.worldHudStartCard{margin-top:0;padding:10px}.worldHudStartQuick,.worldHudStartPick{min-height:42px;font-size:12px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{top:auto!important;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px))!important}}
         @media(max-width:1280px){.worldHudIdentity .realm-demo-mode-pill,.worldHudIdentity .realm-demo-long-label{display:none!important}.worldHudIdentity .realm-demo-short-label{display:inline!important}.worldHudIdentity:has(.realm-demo-controls) .worldHudGoBtn span{display:none}}
         @media(max-width:900px){.worldHudMission{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:275px}.worldHudActions{bottom:max(78px,calc(env(safe-area-inset-bottom) + 70px));max-width:calc(100vw - 120px);flex-wrap:wrap}.worldHudActions button:not(.worldVoiceButton){min-height:46px}.worldHudFallback{font-size:0!important;width:46px;padding:0!important}.worldHudFallback svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:560px){.worldHudIdentity .realm-demo-mode-pill{display:none!important}.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+        @media(max-width:560px){.worldHudIdentity .realm-demo-mode-pill{display:none!important}.worldHudMission{top:max(62px,calc(env(safe-area-inset-top) + 50px));width:245px;padding:8px 10px}.worldHudMission strong{font-size:16px}.worldHudMission small{font-size:11px}.worldHudIdentity{right:10px}.worldHudXp{padding:0 8px}.worldHudActions{right:10px;max-width:calc(100vw - 104px);gap:5px}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{top:max(164px,calc(env(safe-area-inset-top) + 158px));bottom:auto;max-width:calc(100vw - 20px)}.worldHudGoBtn span{display:none}.worldHudGoBtn{padding:0 9px}.worldHudActions button:not(.worldVoiceButton){padding:8px 9px;font-size:11px}.worldHudSecondary{font-size:0!important;width:46px;padding:0!important}.worldHudSecondary.worldHudEdit{width:auto!important;padding:8px 9px!important;font-size:11px!important}.worldHudSecondary svg{width:19px;height:19px}.worldTeleportGrid{grid-template-columns:1fr}}
+
+        /* Shared HUD (hub, Tower, realms): one stats pill, one main button, same glass everywhere. */
+        .worldHud .worldHudStats{display:flex;align-items:center;gap:2px;height:46px;padding:0 4px 0 6px;border-radius:999px;background:rgba(16,14,24,.62);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+        .worldHud .worldHudStats .worldHudXp{height:38px!important;background:transparent!important;box-shadow:none!important;border:0!important;color:#fff4d6!important;padding:0 10px!important;gap:6px;font:900 14px var(--font-display)}
+        .worldHud .worldHudStats .worldHudXp svg{color:#FFD25A}
+        .worldHud .worldHudStats .worldHudCrystals{height:38px;background:transparent;border:0;box-shadow:none;border-left:1px solid rgba(255,255,255,.16);border-radius:0;padding:0 12px}
+        .worldHud .worldHudStats .worldHudCrystals i{left:12px;right:12px;bottom:3px}
+        .worldHud .worldHudStats .worldHudAvatar{width:36px;height:36px;border-radius:50%;border:0;margin-left:4px;background:linear-gradient(135deg,#D86BF7,#8C2EAC);color:#fff;box-shadow:none}
+        .worldHud .worldHudStats .worldVoiceButton{margin-left:4px}
+        .worldHud .worldHudActions .worldHudPrimary{min-height:50px!important;padding:0 22px!important;border:0!important;border-radius:14px!important;font-size:13px!important;font-weight:950!important;letter-spacing:.07em!important;color:#120f18!important;background:linear-gradient(135deg,var(--world-accent),color-mix(in srgb,var(--world-accent),#000 22%))!important;box-shadow:0 10px 24px color-mix(in srgb,var(--world-accent) 45%,transparent),inset 0 1px 0 rgba(255,255,255,.4)!important}
+        .worldHud[data-world-hud="central"] .worldHudActions .worldHudPrimary,.worldHud[data-world-hud="tower"] .worldHudActions .worldHudPrimary{background:linear-gradient(135deg,#D86BF7,#8C2EAC)!important;color:#fff!important;box-shadow:0 10px 24px rgba(140,46,172,.45),inset 0 1px 0 rgba(255,255,255,.35)!important}
+        .worldHud .worldHudActions .worldHudPrimary:disabled{opacity:.75}
+        .worldHud .worldHudActions .worldHudWithLabel{font-size:13px!important;width:auto!important;padding:0 16px!important}
+        @media (max-width:900px) and (orientation:portrait){.worldHud .worldHudActions .worldHudWithLabel{font-size:0!important;width:48px!important;padding:0!important}.worldHud .worldHudActions .worldHudPrimary{padding:0 16px!important;font-size:12px!important}.worldHud .worldHudStats .worldHudCrystals{padding:0 8px}}
       `}</style>
     </>
   );
