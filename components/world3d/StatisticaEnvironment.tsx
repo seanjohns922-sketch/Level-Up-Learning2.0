@@ -126,21 +126,53 @@ function PortalLabel({ children, accent, active, minWidth = 150 }: { children: R
   );
 }
 
+// Statistica's bar-chart gate: each pillar is a stack of coloured bars like a
+// column graph, joined by a white marble arch. Current glows, mastered has full
+// bars with gold caps, and locked is grey with a padlock.
+const BAR_COLOURS = ["#E25A4F", "#F2A23B", "#F6D04D", "#4FB0E2", "#7DD36B"];
+
 function PortalFrame({ width, height, state, accent, active }: { width: number; height: number; state: RealmWorldGateState; accent: string; active: boolean }) {
   const visual = stateVisual(state, accent, active);
+  const locked = state === "locked";
+  const mastered = state === "completed";
+  const span = width * 0.42;
+  const pillarHeight = height * 0.66;
+  // Left pillar three bars, right pillar two, like a little column graph.
+  const stacks = [[0.34, 0.33, 0.33], [0.55, 0.45]];
   return (
     <group>
-      <mesh position={[0, 0.11, 0]}><cylinderGeometry args={[width * 0.62, width * 0.72, 0.22, 36]} /><meshStandardMaterial color="#17352e" roughness={0.78} /></mesh>
-      {[-1, 1].map((side) => (
-        <RoundedBox key={side} args={[0.88, height, 1.05]} radius={0.14} smoothness={2} position={[side * width * 0.42, height * 0.5, 0]}>
-          <meshStandardMaterial color={visual.frame} metalness={0.22} roughness={0.48} />
-        </RoundedBox>
-      ))}
-      <RoundedBox args={[width, 0.92, 1.1]} radius={0.15} smoothness={2} position={[0, height, 0]}>
-        <meshStandardMaterial color={visual.frame} metalness={0.22} roughness={0.48} />
-      </RoundedBox>
-      <mesh position={[0, height * 0.48, 0.08]}><planeGeometry args={[width * 0.68, height * 0.76]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.09 : active ? 0.58 : 0.32} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <mesh position={[0, height + 1.05, 0]}><octahedronGeometry args={[0.55, 0]} /><meshStandardMaterial color={visual.energy} emissive={visual.energy} emissiveIntensity={visual.intensity} roughness={0.2} /></mesh>
+      <mesh position={[0, 0.11, 0]}><cylinderGeometry args={[width * 0.62, width * 0.72, 0.22, 36]} /><meshStandardMaterial color="#e9e4d6" roughness={0.6} /></mesh>
+      <mesh position={[0, 0.24, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[width * 0.5, width * 0.56, 36]} /><meshBasicMaterial color={mastered ? "#f5c04a" : visual.energy} transparent opacity={locked ? 0.15 : 0.8} toneMapped={false} /></mesh>
+      {stacks.map((parts, pillar) => {
+        const side = pillar === 0 ? -1 : 1;
+        let y = 0.22;
+        return (
+          <group key={pillar} position={[side * span, 0, 0]}>
+            {parts.map((part, index) => {
+              const h = pillarHeight * part;
+              const colour = locked ? "#8d9a92" : BAR_COLOURS[(pillar * 3 + index) % BAR_COLOURS.length];
+              const mesh = (
+                <RoundedBox key={index} args={[0.95, h - 0.06, 0.95]} radius={0.08} smoothness={2} position={[0, y + h / 2, 0]}>
+                  <meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={locked ? 0 : active ? 0.4 : 0.18} roughness={0.45} />
+                </RoundedBox>
+              );
+              y += h;
+              return mesh;
+            })}
+            <mesh position={[0, pillarHeight + 0.3, 0]}><boxGeometry args={[1.15, 0.16, 1.15]} /><meshStandardMaterial color={mastered ? "#f5c04a" : "#f4f1e8"} metalness={mastered ? 0.6 : 0.05} roughness={0.35} /></mesh>
+          </group>
+        );
+      })}
+      <mesh position={[0, pillarHeight + 0.3, 0]}><torusGeometry args={[span, 0.26, 10, 32, Math.PI]} /><meshStandardMaterial color={locked ? "#b9c0ba" : "#f4f1e8"} roughness={0.35} /></mesh>
+      <mesh position={[0, (pillarHeight + 0.3) / 2 + 0.1, 0.06]}><planeGeometry args={[span * 2 - 1, pillarHeight + 0.1]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.07 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, pillarHeight + 0.3, 0.06]}><circleGeometry args={[span - 0.26, 32, 0, Math.PI]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.07 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, pillarHeight + span + 0.85, 0]}><octahedronGeometry args={[0.5, 0]} /><meshStandardMaterial color={mastered ? "#f5c04a" : visual.energy} emissive={mastered ? "#f5c04a" : visual.energy} emissiveIntensity={locked ? 0.03 : visual.intensity} roughness={0.2} /></mesh>
+      {locked ? (
+        <group position={[0, pillarHeight * 0.55, 0.3]}>
+          <mesh position={[0, 0.32, 0]}><torusGeometry args={[0.3, 0.08, 8, 20, Math.PI]} /><meshStandardMaterial color="#d6d8d0" metalness={0.6} roughness={0.35} /></mesh>
+          <mesh><boxGeometry args={[0.8, 0.62, 0.22]} /><meshStandardMaterial color="#a7ada4" metalness={0.55} roughness={0.4} /></mesh>
+        </group>
+      ) : null}
     </group>
   );
 }

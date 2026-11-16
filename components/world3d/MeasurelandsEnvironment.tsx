@@ -1,8 +1,8 @@
 "use client";
 
 import { Html, RoundedBox } from "@react-three/drei";
-import { useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
@@ -54,24 +54,65 @@ function MeasurelandsGround({ radius, positionZ, asset }: { radius: number; posi
   );
 }
 
+// Measurelands' brass ruler arch: timber pillars marked like rulers, a brass
+// arch and a compass keystone. Current glows warm and the compass needle swings;
+// mastered is polished gold; locked is old dark wood with a padlock.
+const prefersReducedMotion = () => typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+
+function BrassRulerArch({ span, pillarHeight, state, accent, active }: { span: number; pillarHeight: number; state: RealmWorldGateState; accent: string; active: boolean }) {
+  const visual = stateVisual(state, accent, active);
+  const locked = state === "locked";
+  const mastered = state === "completed";
+  const wood = locked ? "#5d4a3b" : "#9a6a3e";
+  const brass = locked ? "#7d6f5c" : mastered ? "#f5c04a" : "#d7a54e";
+  const archY = pillarHeight + 0.2;
+  const needle = useRef<THREE.Group>(null);
+  const still = useMemo(() => prefersReducedMotion(), []);
+  useFrame(({ clock }) => {
+    if (locked || still || !needle.current) return;
+    needle.current.rotation.z = Math.sin(clock.elapsedTime * (active ? 2.4 : 1.2)) * 0.6;
+  });
+  return (
+    <group>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * span, 0, 0]}>
+          <RoundedBox args={[0.95, pillarHeight, 1.05]} radius={0.1} smoothness={2} position={[0, pillarHeight / 2 + 0.2, 0]}>
+            <meshStandardMaterial color={wood} roughness={0.8} />
+          </RoundedBox>
+          {[0.18, 0.92].map((t) => <mesh key={t} position={[0, 0.2 + pillarHeight * t, 0]}><boxGeometry args={[1.05, 0.14, 1.15]} /><meshStandardMaterial color={brass} metalness={0.7} roughness={0.3} /></mesh>)}
+          {Array.from({ length: 11 }, (_, index) => (
+            <mesh key={index} position={[-side * 0.22, 0.2 + pillarHeight * (0.24 + index * 0.06), 0.535]}><boxGeometry args={[index % 5 === 0 ? 0.4 : 0.2, 0.035, 0.02]} /><meshStandardMaterial color={brass} metalness={0.7} roughness={0.3} /></mesh>
+          ))}
+        </group>
+      ))}
+      <mesh position={[0, archY, 0]}><torusGeometry args={[span, 0.26, 10, 32, Math.PI]} /><meshStandardMaterial color={brass} metalness={0.75} roughness={0.28} /></mesh>
+      <mesh position={[0, archY / 2 + 0.1, 0.06]}><planeGeometry args={[span * 2 - 0.95, archY - 0.1]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.07 : active ? 0.55 : state === "current" ? 0.42 : 0.28} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, archY, 0.06]}><circleGeometry args={[span - 0.26, 32, 0, Math.PI]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.07 : active ? 0.55 : state === "current" ? 0.42 : 0.28} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <group position={[0, archY + span + 0.45, 0.2]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.62, 0.62, 0.16, 32]} /><meshStandardMaterial color="#f3e7c8" roughness={0.5} /></mesh>
+        <mesh position={[0, 0, 0.02]}><torusGeometry args={[0.62, 0.09, 8, 32]} /><meshStandardMaterial color={brass} metalness={0.75} roughness={0.28} /></mesh>
+        <group ref={needle} position={[0, 0, 0.1]}>
+          <mesh position={[0, 0.22, 0]}><coneGeometry args={[0.08, 0.44, 4]} /><meshBasicMaterial color={locked ? "#8a7d6a" : "#c0392b"} /></mesh>
+          <mesh position={[0, -0.22, 0]} rotation={[0, 0, Math.PI]}><coneGeometry args={[0.08, 0.44, 4]} /><meshBasicMaterial color="#3a2e24" /></mesh>
+        </group>
+      </group>
+      {locked ? (
+        <group position={[0, pillarHeight * 0.55, 0.3]}>
+          <mesh position={[0, 0.32, 0]}><torusGeometry args={[0.3, 0.08, 8, 20, Math.PI]} /><meshStandardMaterial color="#d9cfbd" metalness={0.6} roughness={0.35} /></mesh>
+          <mesh><boxGeometry args={[0.8, 0.62, 0.22]} /><meshStandardMaterial color="#a8987e" metalness={0.55} roughness={0.4} /></mesh>
+        </group>
+      ) : null}
+    </group>
+  );
+}
+
 function DistrictPortal({ label, weeks, motif, state, accent, active }: { label: string; weeks: string; motif: string; state: RealmWorldGateState; accent: string; active: boolean }) {
   const visual = stateVisual(state, accent, active);
   return (
     <group>
       <mesh position={[0, 0.12, 0]}><cylinderGeometry args={[4.3, 4.7, 0.24, 32]} /><meshStandardMaterial color="#3c332d" roughness={0.84} /></mesh>
-      {[-1, 1].map((side) => (
-        <group key={side} position={[side * 2.65, 0, 0]}>
-          <RoundedBox args={[1.25, 6.6, 1.35]} radius={0.16} smoothness={2} position={[0, 3.3, 0]}>
-            <meshStandardMaterial color={visual.frame} roughness={0.76} metalness={0.18} />
-          </RoundedBox>
-          <mesh position={[-side * 0.48, 3.35, 0.72]}><boxGeometry args={[0.1, 4.8, 0.05]} /><meshStandardMaterial color={visual.energy} emissive={visual.energy} emissiveIntensity={visual.intensity} /></mesh>
-        </group>
-      ))}
-      <RoundedBox args={[6.6, 1.35, 1.4]} radius={0.18} smoothness={2} position={[0, 6.4, 0]}>
-        <meshStandardMaterial color={visual.frame} roughness={0.72} metalness={0.2} />
-      </RoundedBox>
-      <mesh position={[0, 3.15, 0.08]}><planeGeometry args={[3.7, 5.1]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.08 : active ? 0.48 : 0.25} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <Html center position={[0, 8.15, 0]} distanceFactor={16} style={{ pointerEvents: "none" }}>
+      <BrassRulerArch span={2.65} pillarHeight={4.7} state={state} accent={accent} active={active} />
+      <Html center position={[0, 9.5, 0]} distanceFactor={16} style={{ pointerEvents: "none" }}>
         <div style={{ minWidth: 190, border: `2px solid ${visual.energy}`, borderRadius: 5, background: "rgba(31,23,18,.96)", color: "#fff5df", padding: "10px 14px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 28px ${visual.energy}77` : "0 10px 24px rgba(0,0,0,.45)" }}>
           <strong style={{ display: "block", fontSize: 16 }}>{label}</strong>
           <span style={{ display: "block", marginTop: 5, color: "#ead7b5", fontSize: 11, fontWeight: 800 }}>{motif}</span>
@@ -91,10 +132,8 @@ export function MeasurelandsWeekGate({ week, state, accent, active }: { week: nu
   return (
     <group>
       <mesh position={[0, 0.1, 0]}><cylinderGeometry args={[2.25, 2.5, 0.2, 28]} /><meshStandardMaterial color="#3b312b" roughness={0.8} /></mesh>
-      {[-1, 1].map((side) => <RoundedBox key={side} args={[0.8, 4.7, 1]} radius={0.12} smoothness={2} position={[side * 1.65, 2.35, 0]}><meshStandardMaterial color={visual.frame} roughness={0.74} /></RoundedBox>)}
-      <RoundedBox args={[4.1, 0.9, 1.05]} radius={0.13} smoothness={2} position={[0, 4.45, 0]}><meshStandardMaterial color={visual.frame} roughness={0.72} /></RoundedBox>
-      <mesh position={[0, 2.15, 0.08]}><planeGeometry args={[2.45, 3.55]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.09 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <Html center position={[0, 5.8, 0]} distanceFactor={14} style={{ pointerEvents: "none" }}>
+      <BrassRulerArch span={1.65} pillarHeight={3.1} state={state} accent={accent} active={active} />
+      <Html center position={[0, 6.7, 0]} distanceFactor={14} style={{ pointerEvents: "none" }}>
         <div style={{ minWidth: 118, border: `2px solid ${visual.energy}`, borderRadius: 5, padding: "9px 12px", background: "rgba(31,23,18,.96)", color: "#fff5df", textAlign: "center", fontFamily: "system-ui,sans-serif", fontWeight: 950, boxShadow: active ? `0 0 24px ${visual.energy}77` : "0 8px 20px rgba(0,0,0,.4)" }}>
           <div style={{ fontSize: 16 }}>Week {week}</div>
           <div style={{ marginTop: 4, color: visual.energy, fontSize: 10 }}>{statusLabel(state)}</div>

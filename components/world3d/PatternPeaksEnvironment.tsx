@@ -1,8 +1,8 @@
 "use client";
 
 import { Html, RoundedBox } from "@react-three/drei";
-import { useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
@@ -175,21 +175,55 @@ function PortalLabel({ children, accent, active, minWidth = 150 }: { children: R
   );
 }
 
+// Pattern Peaks' hexagon pattern gate: a hexagon frame ringed by a repeating
+// crystal pattern (green, violet, green...). When current the crystals light up
+// in order; mastered is gold; locked is dark slate with a padlock.
+const prefersReducedMotion = () => typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+
 function PortalFrame({ width, height, state, accent, active }: { width: number; height: number; state: RealmWorldGateState; accent: string; active: boolean }) {
   const visual = stateVisual(state, accent, active);
+  const locked = state === "locked";
+  const mastered = state === "completed";
+  const radius = Math.min(width, height) * 0.46;
+  const centreY = radius + 0.75;
+  const crystals = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
+  const still = useMemo(() => prefersReducedMotion(), []);
+  const frame = locked ? "#59656e" : mastered ? "#3f5b4f" : "#2d4a4f";
+  const trim = mastered ? "#f5c04a" : visual.energy;
+  useFrame(({ clock }) => {
+    if (locked || still) return;
+    // The pattern lights crystal by crystal, around the hexagon.
+    const lit = Math.floor(clock.elapsedTime * (active ? 4 : 2.4)) % 12;
+    crystals.current.forEach((material, index) => { if (material) material.emissiveIntensity = index === lit ? 1.4 : 0.35; });
+  });
   return (
     <group>
       <mesh position={[0, 0.11, 0]}><cylinderGeometry args={[width * 0.6, width * 0.7, 0.22, 6]} /><meshStandardMaterial color="#1b2731" roughness={0.78} /></mesh>
+      <mesh position={[0, 0.24, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[width * 0.5, width * 0.56, 6]} /><meshBasicMaterial color={trim} transparent opacity={locked ? 0.15 : 0.8} toneMapped={false} /></mesh>
       {[-1, 1].map((side) => (
-        <RoundedBox key={side} args={[0.74, height, 0.95]} radius={0.11} smoothness={2} position={[side * width * 0.42, height * 0.5, 0]} rotation={[0, 0, side * 0.16]}>
-          <meshStandardMaterial color={visual.frame} emissive={visual.energy} emissiveIntensity={0.08} metalness={0.18} roughness={0.5} />
-        </RoundedBox>
+        <mesh key={side} position={[side * radius * 0.62, 0.55, 0]}><cylinderGeometry args={[0.28, 0.38, 0.9, 6]} /><meshStandardMaterial color={frame} roughness={0.5} flatShading /></mesh>
       ))}
-      <RoundedBox args={[width, 0.8, 1]} radius={0.12} smoothness={2} position={[0, height, 0]}>
-        <meshStandardMaterial color={visual.frame} emissive={visual.energy} emissiveIntensity={0.1} metalness={0.18} roughness={0.5} />
-      </RoundedBox>
-      <mesh position={[0, height * 0.48, 0.08]}><planeGeometry args={[width * 0.64, height * 0.74]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.08 : active ? 0.54 : 0.28} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <mesh position={[0, height + 1.05, 0]} rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[0.58, 0]} /><meshStandardMaterial color={visual.energy} emissive={visual.energy} emissiveIntensity={visual.intensity} roughness={0.22} /></mesh>
+      <group position={[0, centreY, 0]}>
+        <mesh rotation={[0, 0, Math.PI / 6]}><torusGeometry args={[radius, 0.28, 6, 6]} /><meshStandardMaterial color={frame} emissive={trim} emissiveIntensity={locked ? 0.02 : 0.18} metalness={0.2} roughness={0.45} flatShading /></mesh>
+        <mesh rotation={[0, 0, Math.PI / 6]} position={[0, 0, 0.05]}><circleGeometry args={[radius - 0.24, 6]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.07 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+        {Array.from({ length: 12 }, (_, index) => {
+          const angle = (index / 12) * Math.PI * 2 + Math.PI / 2;
+          const colour = locked ? "#7d8a92" : mastered ? "#f5c04a" : index % 2 === 0 ? "#36D39A" : "#B48CFF";
+          return (
+            <mesh key={index} position={[Math.cos(angle) * (radius + 0.42), Math.sin(angle) * (radius + 0.42), 0.12]} rotation={[0, 0, angle - Math.PI / 2]}>
+              <octahedronGeometry args={[index % 2 === 0 ? 0.26 : 0.2, 0]} />
+              <meshStandardMaterial ref={(material) => { crystals.current[index] = material; }} color={colour} emissive={colour} emissiveIntensity={locked ? 0 : 0.35} roughness={0.2} flatShading />
+            </mesh>
+          );
+        })}
+        {locked ? (
+          <group position={[0, -0.2, 0.3]}>
+            <mesh position={[0, 0.32, 0]}><torusGeometry args={[0.3, 0.08, 8, 20, Math.PI]} /><meshStandardMaterial color="#cfd6db" metalness={0.6} roughness={0.35} /></mesh>
+            <mesh><boxGeometry args={[0.8, 0.62, 0.22]} /><meshStandardMaterial color="#a3adb3" metalness={0.55} roughness={0.4} /></mesh>
+          </group>
+        ) : null}
+      </group>
+      <mesh position={[0, centreY + radius + 0.95, 0]}><octahedronGeometry args={[0.5, 0]} /><meshStandardMaterial color={trim} emissive={trim} emissiveIntensity={locked ? 0.03 : visual.intensity} roughness={0.22} flatShading /></mesh>
     </group>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { Html, RoundedBox } from "@react-three/drei";
-import { useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
@@ -136,22 +136,63 @@ function PortalLabel({ children, accent, active, minWidth = 150 }: { children: R
   );
 }
 
+// Chance Hollow's rune stone arch: carved stone pillars and arch with glowing
+// runes, a spinner in the keystone and a die at its foot. Current runes glow and
+// the spinner turns; mastered runes are gold; locked is shadowed with a padlock.
+const prefersReducedMotion = () => typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+const SPINNER_COLOURS = ["#FB7185", "#F6D04D", "#4FB0E2", "#7DD36B", "#B48CFF", "#F2A23B", "#2DD4BF", "#F472B6"];
+
 function PortalFrame({ width, height, state, accent, active }: { width: number; height: number; state: RealmWorldGateState; accent: string; active: boolean }) {
   const visual = stateVisual(state, accent, active);
+  const locked = state === "locked";
+  const mastered = state === "completed";
+  const span = width * 0.42;
+  const pillarHeight = height * 0.6;
+  const archY = pillarHeight + 0.2;
+  const stone = locked ? "#6a6276" : "#9a86b0";
+  const rune = mastered ? "#f5c04a" : visual.energy;
+  const spinner = useRef<THREE.Group>(null);
+  const still = useMemo(() => prefersReducedMotion(), []);
+  useFrame((_, delta) => {
+    if (locked || still || !spinner.current) return;
+    spinner.current.rotation.z -= delta * (active ? 2.2 : 0.9);
+  });
   return (
     <group>
       <mesh position={[0, 0.1, 0]}><cylinderGeometry args={[width * 0.62, width * 0.74, 0.22, 24]} /><meshStandardMaterial color="#261b2c" roughness={0.82} /></mesh>
       {[-1, 1].map((side) => (
-        <RoundedBox key={side} args={[0.9, height, 1.08]} radius={0.15} smoothness={3} position={[side * width * 0.42, height * 0.5, 0]}>
-          <meshStandardMaterial color={visual.stone} emissive={visual.energy} emissiveIntensity={0.08} metalness={0.12} roughness={0.58} />
-        </RoundedBox>
+        <group key={side} position={[side * span, 0, 0]}>
+          <RoundedBox args={[0.95, pillarHeight, 1.05]} radius={0.12} smoothness={2} position={[0, pillarHeight / 2 + 0.2, 0]}>
+            <meshStandardMaterial color={stone} roughness={0.85} />
+          </RoundedBox>
+          {[0.25, 0.45, 0.65, 0.85].map((t) => (
+            <mesh key={t} position={[0, 0.2 + pillarHeight * t, 0.54]}><boxGeometry args={[t === 0.45 ? 0.42 : 0.22, 0.08, 0.02]} /><meshBasicMaterial color={rune} transparent opacity={locked ? 0.12 : 0.9} toneMapped={false} /></mesh>
+          ))}
+        </group>
       ))}
-      <mesh position={[0, height - 0.05, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <torusGeometry args={[width * 0.42, 0.45, 10, 36, Math.PI]} />
-        <meshStandardMaterial color={visual.stone} emissive={visual.energy} emissiveIntensity={0.1} roughness={0.52} />
-      </mesh>
-      <mesh position={[0, height * 0.48, 0.08]}><planeGeometry args={[width * 0.68, height * 0.77]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.08 : active ? 0.58 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <mesh position={[0, height + 0.92, 0]} rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[0.58, 0]} /><meshStandardMaterial color={visual.energy} emissive={visual.energy} emissiveIntensity={visual.intensity} roughness={0.2} /></mesh>
+      <mesh position={[0, archY, 0]}><torusGeometry args={[span, 0.42, 8, 28, Math.PI]} /><meshStandardMaterial color={stone} roughness={0.85} /></mesh>
+      {Array.from({ length: 7 }, (_, index) => {
+        const angle = ((index + 0.5) / 7) * Math.PI;
+        return <mesh key={index} position={[Math.cos(angle) * span, archY + Math.sin(angle) * span, 0.44]} rotation={[0, 0, angle]}><boxGeometry args={[0.08, 0.26, 0.02]} /><meshBasicMaterial color={rune} transparent opacity={locked ? 0.12 : 0.9} toneMapped={false} /></mesh>;
+      })}
+      <mesh position={[0, archY / 2 + 0.1, 0.06]}><planeGeometry args={[span * 2 - 0.95, archY - 0.1]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.06 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, archY, 0.06]}><circleGeometry args={[span - 0.42, 32, 0, Math.PI]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.06 : active ? 0.55 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <group position={[0, archY + span + 0.35, 0.3]} scale={1.35}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.85, 0.85, 0.2, 32]} /><meshStandardMaterial color={mastered ? "#f5c04a" : "#3b2e48"} metalness={0.5} roughness={0.35} /></mesh>
+        <group ref={spinner} position={[0, 0, 0.12]}>
+          {SPINNER_COLOURS.map((colour, index) => (
+            <mesh key={index}><circleGeometry args={[0.72, 6, (index / 8) * Math.PI * 2, Math.PI / 4]} /><meshBasicMaterial color={locked ? "#5e5768" : colour} toneMapped={false} side={THREE.DoubleSide} /></mesh>
+          ))}
+        </group>
+        <mesh position={[0, 0.78, 0.14]} rotation={[0, 0, Math.PI]}><coneGeometry args={[0.13, 0.3, 3]} /><meshBasicMaterial color="#fff1d6" toneMapped={false} /></mesh>
+      </group>
+      <group position={[span + 0.95, 0.42, 0.55]} rotation={[0.3, 0.6, 0.2]} scale={0.32}><RoundedBox args={[1.5, 1.5, 1.5]} radius={0.24} smoothness={3}><meshStandardMaterial color="#f4eeff" roughness={0.4} /></RoundedBox><mesh position={[0, 0.77, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.16, 16]} /><meshBasicMaterial color="#1d1430" /></mesh></group>
+      {locked ? (
+        <group position={[0, pillarHeight * 0.55, 0.3]}>
+          <mesh position={[0, 0.32, 0]}><torusGeometry args={[0.3, 0.08, 8, 20, Math.PI]} /><meshStandardMaterial color="#cfc9d8" metalness={0.6} roughness={0.35} /></mesh>
+          <mesh><boxGeometry args={[0.8, 0.62, 0.22]} /><meshStandardMaterial color="#9f98ab" metalness={0.55} roughness={0.4} /></mesh>
+        </group>
+      ) : null}
     </group>
   );
 }
