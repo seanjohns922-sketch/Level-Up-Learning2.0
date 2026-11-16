@@ -26,7 +26,7 @@ check(hud.includes("resolveTowerRealmEntry") && hud.includes("TOWER_REALM_PORTAL
 check(hud.includes("2D map view") && hud.includes("router.push(fallbackHref)") && hud.includes("REALMS") && hud.includes("QUICK START") && hud.includes("primaryLabel"), "Required fast, main and 2D fallback actions are missing");
 check(interaction.includes("location") && interaction.includes("action"), "Shared environmental interaction presentation is missing");
 // The hub shows a floating name tag and puts the action on the HUD dock; the tower and realms share the prompt.
-check(central.includes("contextAction={") && central.includes("centralWorldTag") && tower.includes("WorldInteractionPrompt") && number.includes("WorldInteractionPrompt"), "Worlds are not sharing interaction presentation");
+check(central.includes("contextAction={") && !central.includes("centralWorldTag") && tower.includes("WorldInteractionPrompt") && number.includes("WorldInteractionPrompt"), "Worlds are not sharing interaction presentation");
 check(!number.includes("TeleportPanel") && !number.includes("CLASS BEST") && !number.includes("LEVEL 4"), "Obsolete Number Nexus 3D dashboard controls remain");
 check(worldNavigation.includes("my-home-exit-spawn") && worldNavigation.includes("sessionStorage"), "My Home return context must be semantic and transient");
 check(!worldNavigation.includes("lul:number-nexus:return-context") && learningReturn.includes("sessionStorage"), "Home and learning return contexts must remain isolated");

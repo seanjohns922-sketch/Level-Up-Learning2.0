@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
@@ -347,20 +347,6 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         onToggleDrawbridge={onToggleDrawbridge}
       />
       {/* A name tag floats over what the learner is near; the dock's main button acts on it. */}
-      {activeTargetId && !editing && !buildPreview ? (() => {
-        const home = activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
-        const at = home ? homeAnchors.entrance : CENTRAL_WORLD_CONFIG.towerMainEntrance;
-        const name = home ? "My Home" : "Tower of Knowledge";
-        return (
-          <Html position={[at[0], at[1] + (home ? 6.2 : 9), at[2]]} center zIndexRange={[20, 0]} style={{ pointerEvents: "auto" }}>
-            <div className="centralWorldTag">
-              {home ? <Home size={15} aria-hidden="true" /> : <Castle size={15} aria-hidden="true" />}
-              <span>{name}</span>
-              <WorldVoiceButton text={home ? "My Home. Your personal RELIQ space." : "Tower of Knowledge. The realm chamber."} compact label={`Read ${name}`} />
-            </div>
-          </Html>
-        );
-      })() : null}
       <SharedThirdPersonPlayer
         initialPosition={spawnTarget ?? CENTRAL_WORLD_CONFIG.spawnPoint}
         spawnTarget={spawnTarget}
@@ -1322,11 +1308,6 @@ export default function CentralWorld() {
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE RELIQ WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The RELIQ World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
       <style>{`
-        .centralWorldTag{position:relative;display:flex;align-items:center;gap:8px;white-space:nowrap;padding:7px 8px 7px 14px;border-radius:999px;background:rgba(16,14,24,.66);border:1px solid rgba(255,255,255,.18);color:#fff;font:900 14px var(--font-display);letter-spacing:.02em;box-shadow:0 8px 22px rgba(0,0,0,.3);backdrop-filter:blur(10px);animation:centralWorldTagBob 2.4s ease-in-out infinite}
-        .centralWorldTag:after{content:"";position:absolute;left:50%;bottom:-6px;width:11px;height:11px;transform:translateX(-50%) rotate(45deg);background:rgba(16,14,24,.66);border-right:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)}
-        @keyframes centralWorldTagBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-        @media (prefers-reduced-motion:reduce){.centralWorldTag{animation:none}}
-        @media (max-width:560px){.centralWorldTag{display:none}} /* on phones the Enter button names the place */
         .worldBuilderReset{inset:0;margin:auto;max-width:440px;width:calc(100vw - 48px);box-sizing:border-box;padding:24px;border:1px solid rgba(255,255,255,.16);border-radius:22px;background:#17131f;color:#fff;font-family:var(--font-sans);box-shadow:0 20px 90px #0008}.worldBuilderReset::backdrop{background:rgba(10,8,16,.7)}.worldBuilderReset h2{margin:0 0 12px;font:900 22px var(--font-display)}.worldBuilderReset p{line-height:1.6;color:#d8d2e4}
         .worldBuilderResetActions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.worldBuilderResetActions button{min-height:48px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:900 14px var(--font-display);cursor:pointer}.worldBuilderResetActions button:last-child{background:#e5484d;border-color:#e5484d}
       `}</style>
