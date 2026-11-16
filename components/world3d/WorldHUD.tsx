@@ -7,6 +7,7 @@ import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtens
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import { ChevronDown, DoorOpen, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
+import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { useRouter } from "next/navigation";
@@ -183,6 +184,7 @@ export function WorldHUD({
 
   return (
     <>
+      <WorldLoadingVeil label={context === "central" ? "Loading your world" : context === "tower" ? "Entering the Tower" : "Entering the realm"} />
       <div className="worldHud" data-world-hud={context} style={{ "--world-accent": accent } as React.CSSProperties}>
         {context === "central" || context === "tower" ? (
           <section className="worldHudStart" aria-label="Start learning">
@@ -293,14 +295,18 @@ export function WorldHUD({
             <header><div><span>FAST TRAVEL</span><h2>REALM TELEPORT</h2></div><div className="worldTeleportHeaderActions"><WorldVoiceButton text="Fast travel. Realm Teleport. Choose a learning realm to enter." label="Read Realm Teleport" /><button type="button" onClick={() => setTeleportOpen(false)} aria-label="Close Realm Teleport" title="Close"><X size={20} /></button></div></header>
             <div className="worldTeleportGrid">
               {TOWER_REALM_PORTALS.map((portal) => {
-                const live = portal.realm.status === "live" && portal.realm.isSelectable;
+                // Chronorok is the games realm: live but never a lesson choice. It opens with the Chrono Crystals.
+                const games = portal.realmId === "time" && portal.realm.status === "live";
+                const gamesOpen = games && (preview || Boolean(crystals?.open));
+                const gamesWait = games && !gamesOpen ? `Opens after ${CHRONOROK_OPEN_DAYS} learning days` : null;
+                const live = (portal.realm.status === "live" && portal.realm.isSelectable) || gamesOpen;
                 const available = live || (preview && (portal.realmId === "pattern" || portal.realmId === "chance"));
-                const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, available ? (live ? "Enter realm" : "Preview realm") : "Coming soon"]);
+                const portalSpeech = joinSpeechParts([portal.realm.name, portal.subject, available ? (live ? "Enter realm" : "Preview realm") : gamesWait ?? "Coming soon"]);
                 return (
                   <div key={portal.realmId} className={`worldTeleportTile ${!available || busyRealmId ? "worldTeleportTileDisabled" : ""}`} style={{ borderColor: portal.accent }}>
                     <WorldVoiceButton text={portalSpeech} compact className="worldTeleportTileRead" label={`Read ${portal.realm.name}`} />
-                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{available ? (live ? "ENTER REALM" : "PREVIEW REALM") : "COMING SOON"}</small>
-                    <button type="button" disabled={!available || Boolean(busyRealmId)} onClick={() => available && void enterRealm(portal.realmId)} aria-label={`${available ? (live ? "Enter" : "Preview") : "Coming soon"} ${portal.realm.name}`}><span>{available ? (live ? "Enter" : "Preview") : "Coming soon"}</span></button>
+                    <strong>{portal.realm.name}</strong><span style={{ color: portal.accent }}>{portal.subject}</span><small>{available ? (live ? "ENTER REALM" : "PREVIEW REALM") : gamesWait ? gamesWait.toUpperCase() : "COMING SOON"}</small>
+                    <button type="button" disabled={!available || Boolean(busyRealmId)} onClick={() => { if (!available) return; if (games) { router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok"); return; } void enterRealm(portal.realmId); }} aria-label={`${available ? (live ? "Enter" : "Preview") : gamesWait ?? "Coming soon"} ${portal.realm.name}`}><span>{available ? (live ? "Enter" : "Preview") : gamesWait ? "Not open yet" : "Coming soon"}</span></button>
                   </div>
                 );
               })}
@@ -323,14 +329,14 @@ export function WorldHUD({
         .worldHud .worldHudCrystals svg{filter:drop-shadow(0 0 6px rgba(255,190,70,.9))}.worldHud .worldHudCrystals small{font-size:10px;opacity:.7;margin-left:1px}
         .worldHud .worldHudCrystals i{position:absolute;left:14px;right:14px;bottom:5px;height:3px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}.worldHud .worldHudCrystals i b{display:block;height:100%;background:linear-gradient(90deg,#ffb347,#ffe08a)}.worldHudIcon{width:40px;display:grid;place-items:center;cursor:pointer}
         .worldHudActions{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 64px));display:flex;align-items:center;justify-content:flex-end;gap:7px;pointer-events:auto}.worldHudActions button:not(.worldVoiceButton){min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}.worldHudSecondary,.worldHudFallback{border:1px solid rgba(255,235,195,.3);background:rgba(24,22,21,.88);color:#fff5df}.worldHudQuick{border:1px solid color-mix(in srgb,var(--world-accent),#fff 20%);background:var(--world-accent);color:#1d2422}.worldHudFallback{padding-inline:10px!important}.worldHudActions button:disabled{opacity:.65;cursor:default}
-        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px)}
+        .worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{left:50%;right:auto;transform:translateX(-50%);max-width:calc(100vw - 340px);flex-wrap:wrap;justify-content:center}
         .worldHudEditInline{margin-left:8px;background:rgba(24,22,21,.66)!important}
         .worldHudGoBtn{height:40px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,235,195,.28);border-radius:5px;padding:0 11px;background:rgba(24,22,21,.82);color:#fff4dd;font-size:11px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.worldHudGoBtn svg{color:var(--world-accent)}
         .worldHudActionRead{border-radius:5px!important}.worldTeleportBackdrop{position:absolute;inset:0;z-index:50;display:grid;place-items:center;padding:18px;background:rgba(10,10,12,.72);backdrop-filter:blur(8px)}.worldTeleportPanel{width:min(760px,100%);max-height:min(760px,calc(100dvh - 36px));overflow:auto;border:1px solid rgba(238,206,148,.35);border-radius:7px;padding:18px;background:#241d1a;color:#fff3dc;box-shadow:0 28px 70px rgba(0,0,0,.5)}.worldTeleportPanel header{display:flex;align-items:center;justify-content:space-between;gap:14px}.worldTeleportPanel header span{color:#efc677;font-size:10px;font-weight:950;letter-spacing:.16em}.worldTeleportPanel h2{margin:3px 0 0;font-size:24px}.worldTeleportHeaderActions{display:flex;align-items:center;gap:8px}.worldTeleportPanel header button:not(.worldVoiceButton){width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,235,195,.28);border-radius:5px;background:#332722;color:#fff;cursor:pointer}.worldTeleportGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin-top:16px}.worldTeleportTile{position:relative;min-height:118px;border:1px solid;border-radius:5px;padding:13px 48px 46px 13px;background:rgba(12,14,15,.5);color:#fff;text-align:left}.worldTeleportTileRead{position:absolute;right:10px;top:10px}.worldTeleportTileDisabled{opacity:.56}.worldTeleportTile>button:not(.worldVoiceButton){position:absolute;left:13px;right:13px;bottom:10px;height:30px;border:1px solid rgba(255,235,195,.22);border-radius:5px;background:rgba(255,244,221,.1);color:#fff4dd;font-size:11px;font-weight:950;cursor:pointer}.worldTeleportTile>button:disabled{cursor:default}.worldTeleportGrid strong,.worldTeleportGrid span,.worldTeleportGrid small{display:block}.worldTeleportGrid strong{font-size:16px}.worldTeleportGrid span{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.08em}.worldTeleportGrid small{margin-top:13px;font-size:11px;font-weight:900}.worldTeleportPanel p{margin:12px 0 0;color:#ffdca0;font-weight:800}
         .worldHudStart{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));width:min(300px,calc(100vw - 32px));pointer-events:auto}
         .worldHudLogo{display:block;width:118px;height:auto;filter:drop-shadow(0 3px 10px rgba(0,0,0,.45))}
         .worldHudStartCard{margin-top:8px;padding:8px;border-radius:14px;background:rgba(16,14,24,.62);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 30px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.14);backdrop-filter:blur(14px)}
-        .worldHudStartHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.worldHudStartHead{padding:0 2px 0 4px}.worldHudStartHead span{display:block;color:#E9B8FA;font-size:9px;font-weight:950;letter-spacing:.16em}.worldHudStartHead strong{display:block;margin-top:1px;font-size:12.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+        .worldHudStartHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.worldHudStartHead{padding:0 2px 0 4px}.worldHudStartHead span{display:block;color:#E9B8FA;font-size:9px;font-weight:950;letter-spacing:.16em}.worldHudStartHead strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;margin-top:1px;font-size:12.5px;line-height:1.25;overflow:hidden;max-width:240px}
         .worldHudStartRow{display:flex;gap:6px;margin-top:7px}
         .worldHud .worldHudStartQuick{flex:1;white-space:nowrap;min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:10px;background:linear-gradient(135deg,#D86BF7,#8C2EAC);color:#fff;font-size:12px;font-weight:950;letter-spacing:.06em;box-shadow:0 8px 20px rgba(140,46,172,.45),inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer}
         .worldHud .worldHudStartPick{white-space:nowrap;min-height:38px;display:inline-flex;align-items:center;gap:5px;border:0;border-radius:10px;padding:0 11px;background:#fff;color:#16121f;font-size:12px;font-weight:900;cursor:pointer}
@@ -341,6 +347,7 @@ export function WorldHUD({
         .worldHudPicker b{display:flex;align-items:center;gap:6px;font-size:12px}.worldHudPicker i{width:9px;height:9px;border-radius:9px;display:block}
         .worldHudPicker small{display:block;margin-top:1px;color:#d6d0e4;font-size:10.5px;font-weight:700}
         .worldHudPicker p{grid-column:1/-1;margin:2px 0 0;color:#ffdca0;font-size:12px;font-weight:800}
+        @media (max-width:900px) and (orientation:portrait){.worldHudStart{width:min(250px,calc(100vw - 32px))}.worldHudLogo{width:96px}.worldHud .worldHudIdentity{gap:5px}.worldHud .worldHudCrystals{padding:0 10px}.worldHudXp{padding:0 8px!important}.worldHud:is([data-world-hud="central"],[data-world-hud="tower"],[data-world-hud="realm"]) .worldHudActions{max-width:calc(100vw - 300px)}.worldHudActions button:not(.worldVoiceButton){padding:8px 10px!important;font-size:12px!important}.worldHudMission{width:min(280px,calc(100vw - 32px))}}
         .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudIdentity{align-items:center;gap:9px}
         .worldHudNavGroup{display:flex;gap:2px;padding:4px;border-radius:999px;background:rgba(16,14,24,.58);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px)}
         .worldHud:is([data-world-hud="central"],[data-world-hud="tower"]) .worldHudNavGroup .worldHudGoBtn{height:38px;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;padding:0 13px;font-size:13px;font-weight:800;color:#ECE8F4}

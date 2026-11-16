@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { Castle, House } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { world3DTowerHref } from "@/lib/world3d/return-context";
 
 const DESTINATIONS = [
   { key: "home", label: "MY HOME", accessibleLabel: "Open My Home", route: "/home-base", Icon: House },
@@ -34,7 +35,7 @@ export default function RealmDashboardNav({
     <button
       key={key}
       type="button"
-      onClick={() => router.push(route)}
+      onClick={() => router.push(route === "/realms" ? world3DTowerHref() ?? route : route)}
       aria-label={accessibleLabel}
       title={accessibleLabel}
       style={buttonStyle}

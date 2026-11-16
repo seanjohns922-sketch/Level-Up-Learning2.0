@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { world3DTowerHref } from "@/lib/world3d/return-context";
 
 // Retired: the vertical level-floors "Tower". In realm-first navigation the
 // realm selector IS the Tower of Knowledge, and level revisiting lives in the
@@ -10,7 +11,7 @@ export default function TowerRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/realms");
+    router.replace(world3DTowerHref() ?? "/realms");
   }, [router]);
 
   return <main className="min-h-screen" style={{ background: "#0a0814" }} />;

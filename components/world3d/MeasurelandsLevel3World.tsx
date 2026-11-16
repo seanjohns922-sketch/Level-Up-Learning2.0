@@ -16,7 +16,10 @@ import {
   EMPTY_WORLD_MOVE_INPUT,
   KeyboardWorldAction,
   SharedThirdPersonPlayer,
-  WorldMovePad,
+  WorldJoystick,
+  WorldLookJoystick,
+  EMPTY_WORLD_LOOK_INPUT,
+  type WorldLookInput,
   type WorldInteractionTarget,
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
@@ -91,6 +94,7 @@ function MeasurelandsScene({
   selectedDistrictId,
   activeId,
   moveInput,
+  lookInput,
   quality,
   guidedAdventure,
   initialYaw,
@@ -100,6 +104,7 @@ function MeasurelandsScene({
   selectedDistrictId: string | null;
   activeId: string | null;
   moveInput: WorldMoveInput;
+  lookInput: WorldLookInput;
   quality: MeasurelandsQuality;
   guidedAdventure: boolean;
   initialYaw: number;
@@ -157,6 +162,7 @@ function MeasurelandsScene({
         key={guidedAdventure ? "guided" : selectedDistrictId ?? "city"}
         initialPosition={guidedAdventure ? GUIDED_START : selectedDistrict ? DISTRICT_START : CITY_START}
         moveInput={moveInput}
+        lookInput={lookInput}
         bounds={guidedAdventure ? DISTRICT_BOUNDS : selectedDistrict ? DISTRICT_BOUNDS : CITY_BOUNDS}
         roamEllipse={guidedAdventure ? { centerZ: 3, radiusX: 14, radiusZ: 22 } : selectedDistrict ? { centerZ: 3, radiusX: 13, radiusZ: 22 } : { centerZ: 2, radiusX: 22, radiusZ: 31 }}
         interactionTargets={targets}
@@ -184,6 +190,7 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(() => guidedAdventure ? null : searchParams.get("district"));
   const [activeId, setActiveId] = useState<string | null>(null);
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const theme = getMeasurelandsLevelTheme(level);
   const returnPath = `/world/measurelands?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`;
   const twoDPath = `/measurelands?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`;
@@ -289,7 +296,7 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
         gl={{ alpha: true, antialias: quality !== "low", powerPreference: "high-performance" }}
         onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >
-        <MeasurelandsScene worldState={worldState} selectedDistrictId={selectedDistrictId} activeId={activeId} moveInput={moveInput} quality={quality} guidedAdventure={guidedAdventure} initialYaw={initialYaw} onNearest={setActiveId} />
+        <MeasurelandsScene worldState={worldState} selectedDistrictId={selectedDistrictId} activeId={activeId} moveInput={moveInput} lookInput={lookInput} quality={quality} guidedAdventure={guidedAdventure} initialYaw={initialYaw} onNearest={setActiveId} />
       </Canvas>
       <WorldHUD
         context="realm"
@@ -301,7 +308,8 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
         onQuickStart={quickStart}
       />
       <RealmGuide realmId="measurement" level={level} realmName="Measurelands" accent={theme.accent} world={worldState} />
-      <WorldMovePad input={moveInput} onChange={setMoveInput} />
+      <WorldJoystick input={moveInput} onChange={setMoveInput} />
+      <WorldLookJoystick onChange={setLookInput} />
       {activeInteraction ? (
         <WorldInteractionPrompt
           location={activeInteraction.label}

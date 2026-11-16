@@ -889,6 +889,14 @@ body:has([data-teacher-dashboard]) .fullscreen-toggle:not([data-inline="true"]) 
   display: none;
 }
 
+/* On touch screens the 3D worlds own the bottom corners (joysticks, Jump, Run), so the floating Full Screen button would sit on a joystick. */
+@media (pointer: coarse) {
+  body:has([data-world-joystick]) .fullscreen-toggle:not([data-inline="true"]),
+  body:has([data-world-jump]) .fullscreen-toggle:not([data-inline="true"]) {
+    display: none;
+  }
+}
+
 /* Measurement assessment chrome uses the same brass/earth palette as its realm.
    Object colours inside question diagrams remain part of the assessment evidence. */
 .assessment-shell[data-assessment-realm="measurement"] {

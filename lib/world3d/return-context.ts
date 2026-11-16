@@ -4,6 +4,10 @@ import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
 
 const RETURN_CONTEXT_KEY = "lul:world3d:return-context:v2";
 const RETURN_CONTEXT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+// Each realm's 3D world, remembered on this device once a student has entered it,
+// so "back" keeps them in 3D across new tabs and days instead of dropping to 2D.
+const REALM_HOMES_KEY = "lul:world3d:realm-homes:v1";
+const REALM_HOME_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
 
 type World3DActivityContext =
   | { activityType: "lesson"; lessonNumber: number; lessonId: string }
@@ -33,6 +37,71 @@ function writeWorld3DReturnContext(context: World3DReturnContext) {
   } catch {
     /* no-op — entry proceeds without a remembered return path */
   }
+  try {
+    rememberRealmHome(context);
+  } catch {
+    /* no-op — entry proceeds without a remembered return path */
+  }
+}
+
+type RealmHome = { level: string; href: string; savedAt: number };
+
+/** The realm's 3D world without the district spawn, keeping preview and level. */
+function realmWorldHref(returnHref: string) {
+  try {
+    const url = new URL(returnHref, "https://reliq.local");
+    const kept = new URLSearchParams();
+    for (const key of ["teacher_preview", "level"]) {
+      const value = url.searchParams.get(key);
+      if (value) kept.set(key, value);
+    }
+    const query = kept.toString();
+    return `${url.pathname}${query ? `?${query}` : ""}`;
+  } catch {
+    return returnHref;
+  }
+}
+
+function readRealmHomes(): Record<string, RealmHome> {
+  if (typeof window === "undefined") return {};
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(REALM_HOMES_KEY) ?? "{}") as Record<string, RealmHome>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function rememberRealmHome(context: World3DReturnContext) {
+  if (typeof window === "undefined") return;
+  try {
+    const homes = readRealmHomes();
+    homes[context.realmId] = { level: context.level, href: realmWorldHref(context.returnHref), savedAt: Date.now() };
+    window.localStorage.setItem(REALM_HOMES_KEY, JSON.stringify(homes));
+  } catch {
+    /* no-op — storage unavailable */
+  }
+}
+
+/** The realm's 3D world when this student has played it on this device recently. */
+function rememberedRealmHome(realmId: CanonicalRealmId, level: string) {
+  const home = readRealmHomes()[realmId];
+  if (!home || typeof home.href !== "string" || !home.href.startsWith("/world/")) return null;
+  if (home.level !== level || Date.now() - home.savedAt > REALM_HOME_MAX_AGE_MS) return null;
+  return home.href;
+}
+
+/** Where "back" goes for this realm when it isn't the exact activity left from 3D:
+ * the same realm's 3D world (from this visit, or remembered on this device). */
+function realmFallback(context: World3DReturnContext | null, input: { realmId: CanonicalRealmId; level: string }) {
+  if (context && context.realmId === input.realmId && context.level === input.level) return realmWorldHref(context.returnHref);
+  return rememberedRealmHome(input.realmId, input.level);
+}
+
+/** The 3D Tower when this student has played any realm in 3D on this device recently. */
+export function world3DTowerHref() {
+  const recent = Object.values(readRealmHomes()).some((home) => home && Date.now() - home.savedAt <= REALM_HOME_MAX_AGE_MS);
+  return recent ? "/world/tower" : null;
 }
 
 export function rememberWorld3DWeekEntry(context: World3DWeekEntry) {
@@ -131,7 +200,7 @@ export function getWorld3DReturnPathForWeek(input: {
   week: number;
 }) {
   const context = readWorld3DReturnContext();
-  if (!context || !contextMatchesWeek(context, input)) return null;
+  if (!context || !contextMatchesWeek(context, input)) return realmFallback(context, input);
   return context.returnHref;
 }
 
@@ -143,10 +212,10 @@ export function getWorld3DReturnPathForLesson(input: {
   lessonId: string;
 }) {
   const context = readWorld3DReturnContext();
-  if (!context || !contextMatchesWeek(context, input)) return null;
-  if (context.activity?.activityType !== "lesson") return null;
-  if (context.activity.lessonNumber !== input.lessonNumber) return null;
-  if (context.activity.lessonId !== input.lessonId) return null;
+  if (!context || !contextMatchesWeek(context, input)) return realmFallback(context, input);
+  if (context.activity?.activityType !== "lesson") return realmFallback(context, input);
+  if (context.activity.lessonNumber !== input.lessonNumber) return realmFallback(context, input);
+  if (context.activity.lessonId !== input.lessonId) return realmFallback(context, input);
   return context.returnHref;
 }
 
@@ -156,8 +225,8 @@ export function getWorld3DReturnPathForQuiz(input: {
   week: number;
 }) {
   const context = readWorld3DReturnContext();
-  if (!context || !contextMatchesWeek(context, input)) return null;
-  if (context.activity?.activityType !== "quiz") return null;
+  if (!context || !contextMatchesWeek(context, input)) return realmFallback(context, input);
+  if (context.activity?.activityType !== "quiz") return realmFallback(context, input);
   return context.returnHref;
 }
 
@@ -166,7 +235,7 @@ export function getWorld3DReturnPathForPosttest(input: {
   level: string;
 }) {
   const context = readWorld3DReturnContext();
-  if (!context || context.realmId !== input.realmId || context.level !== input.level) return null;
-  if (context.activity?.activityType !== "posttest") return null;
+  if (!context || context.realmId !== input.realmId || context.level !== input.level) return realmFallback(context, input);
+  if (context.activity?.activityType !== "posttest") return realmFallback(context, input);
   return context.returnHref;
 }

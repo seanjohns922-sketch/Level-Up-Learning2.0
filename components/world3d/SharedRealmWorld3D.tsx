@@ -7,7 +7,10 @@ import {
   EMPTY_WORLD_MOVE_INPUT,
   KeyboardWorldAction,
   SharedThirdPersonPlayer,
-  WorldMovePad,
+  WorldJoystick,
+  WorldLookJoystick,
+  EMPTY_WORLD_LOOK_INPUT,
+  type WorldLookInput,
   type WorldInteractionTarget,
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
@@ -98,7 +101,7 @@ declare global {
   }
 }
 
-function SharedRealmScene({ config, activeId, selectedDistrictId, moveInput, quality, onNearest }: { config: SharedRealmWorld3DConfig; activeId: string | null; selectedDistrictId: string | null; moveInput: WorldMoveInput; quality: SharedRealmQuality; onNearest: (id: string | null) => void }) {
+function SharedRealmScene({ config, activeId, selectedDistrictId, moveInput, lookInput, quality, onNearest }: { config: SharedRealmWorld3DConfig; activeId: string | null; selectedDistrictId: string | null; moveInput: WorldMoveInput; lookInput: WorldLookInput; quality: SharedRealmQuality; onNearest: (id: string | null) => void }) {
   const {
     Environment, DistrictGate, WeekGate, AdventurePortal, ReturnBeam, worldState,
     guidedAdventure, districtLayout,
@@ -136,6 +139,7 @@ function SharedRealmScene({ config, activeId, selectedDistrictId, moveInput, qua
         key={guidedAdventure ? "guided" : selectedDistrictId ?? "realm"}
         initialPosition={guidedAdventure ? config.guidedStart ?? [0, 0.75, 13] : selectedDistrict ? config.districtStart ?? [0, 0.75, 11] : config.cityStart ?? [0, 0.75, 19]}
         moveInput={moveInput}
+        lookInput={lookInput}
         bounds={selectedDistrict || guidedAdventure ? { minX: -13, maxX: 13, minZ: -17, maxZ: 25 } : { minX: -22, maxX: 22, minZ: -28, maxZ: 33 }}
         roamEllipse={selectedDistrict || guidedAdventure ? { centerZ: 3, radiusX: 13, radiusZ: 22 } : { centerZ: 2, radiusX: 22, radiusZ: 31 }}
         interactionTargets={targets}
@@ -161,6 +165,7 @@ export default function SharedRealmWorld3D({ config }: { config: SharedRealmWorl
   );
   const [activeId, setActiveId] = useState<string | null>(null);
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const requestedQuality = searchParams.get("quality");
   const quality: SharedRealmQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const liveConfig = useMemo(() => ({ ...config, worldState }), [config, worldState]);
@@ -221,11 +226,12 @@ export default function SharedRealmWorld3D({ config }: { config: SharedRealmWorl
   return (
     <main data-world3d-root data-shared-realm-world3d={config.realmId} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", backgroundColor: config.sky, backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined, backgroundPosition: "center", backgroundSize: "cover" }}>
       <Canvas camera={{ position: [0, 6, 12], fov: 52 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ alpha: true, antialias: quality !== "low", powerPreference: "high-performance" }} onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}>
-        <SharedRealmScene config={liveConfig} activeId={activeId} selectedDistrictId={selectedDistrictId} moveInput={moveInput} quality={quality} onNearest={setActiveId} />
+        <SharedRealmScene config={liveConfig} activeId={activeId} selectedDistrictId={selectedDistrictId} moveInput={moveInput} lookInput={lookInput} quality={quality} onNearest={setActiveId} />
       </Canvas>
       <WorldHUD context="realm" preview={config.preview} accent={config.accent} fallbackHref={config.fallbackHref} mission={{ eyebrow: "CURRENT MISSION", title: `${config.realmName} · ${config.level === "Prep" ? "Ground" : config.level.replace("Year", "Level")}`, detail: worldState.nextActivity.label }} primaryAction={selectedDistrict ? { label: "DISTRICTS", icon: "map", onClick: () => { setSelectedDistrictId(null); setActiveId(null); } } : { label: "RETURN TO TOWER", icon: "door", onClick: () => router.push(config.towerHref) }} onQuickStart={quickStart} />
       <RealmGuide realmId={config.realmId} level={config.level} realmName={config.realmName} accent={config.accent} world={worldState} />
-      <WorldMovePad input={moveInput} onChange={setMoveInput} />
+      <WorldJoystick input={moveInput} onChange={setMoveInput} />
+      <WorldLookJoystick onChange={setLookInput} />
       {activeInteraction ? <WorldInteractionPrompt location={activeInteraction.label} status={interactionStatus(activeInteraction.state)} actionLabel={activeInteraction.kind === "adventure" ? "START ADVENTURE" : activeInteraction.kind === "district" ? "ENTER DISTRICT" : activeInteraction.kind === "week" ? "ENTER WEEK" : activeInteraction.kind === "return" ? "RETURN TO REALM" : "ENTER TOWER"} disabled={activeInteraction.state === "locked"} onAction={() => runInteraction(activeInteraction)} /> : null}
       <KeyboardWorldAction enabled={Boolean(activeInteraction)} onAction={() => runInteraction(activeInteraction)} />
     </main>

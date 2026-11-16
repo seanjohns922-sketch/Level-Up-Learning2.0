@@ -16,7 +16,7 @@ class SessionStorageMock {
   }
 }
 
-globalThis.window = { sessionStorage: new SessionStorageMock() };
+globalThis.window = { sessionStorage: new SessionStorageMock(), localStorage: new SessionStorageMock() };
 
 const {
   clearWorld3DReturnContext,
@@ -53,8 +53,13 @@ assert.equal(
 );
 assert.equal(
   getWorld3DReturnPathForWeek({ realmId: "number", level: "Year 3", week: 5 }),
+  "/world/number-nexus",
+  "A different week in the same realm returns to that realm's 3D world, not 2D",
+);
+assert.equal(
+  getWorld3DReturnPathForWeek({ realmId: "measurement", level: "Year 3", week: 5 }),
   null,
-  "A different week must retain its normal 2D map fallback",
+  "A realm never entered in 3D keeps its 2D fallback",
 );
 
 preserveWorld3DReturnContextForLesson({
@@ -99,8 +104,8 @@ assert.equal(
     lessonNumber: 2,
     lessonId: "y3-w4-l2",
   }),
-  null,
-  "The active quiz must not be mistaken for a lesson return",
+  "/world/number-nexus",
+  "A lesson that isn't the remembered activity still returns to the realm's 3D world",
 );
 
 rememberWorld3DPosttestEntry(weekEntry);
@@ -114,8 +119,24 @@ assert.equal(
   null,
   "A post-test must not inherit another realm's return path",
 );
+assert.equal(
+  getWorld3DReturnPathForLesson({ realmId: "number", level: "Year 4", week: 1, lessonNumber: 1, lessonId: "y4-w1-l1" }),
+  null,
+  "Another level of the same realm keeps its own fallback",
+);
 
 clearWorld3DReturnContext();
 assert.equal(readWorld3DReturnContext(), null, "Entering the restored world should consume the transient context");
+assert.equal(
+  getWorld3DReturnPathForLesson({ realmId: "number", level: "Year 3", week: 6, lessonNumber: 1, lessonId: "y3-w6-l1" }),
+  "/world/number-nexus",
+  "A new tab or later day still returns to the realm's 3D world remembered on this device",
+);
+rememberWorld3DWeekEntry({ ...weekEntry, realmId: "chance", returnHref: "/world/chance-hollow?level=Year%203&spawn=x&district=y&teacher_preview=1" });
+assert.equal(
+  getWorld3DReturnPathForQuiz({ realmId: "chance", level: "Year 3", week: 9 }),
+  "/world/chance-hollow?teacher_preview=1&level=Year+3",
+  "The realm world keeps preview and level but drops the district spawn",
+);
 
-console.log("World 3D return-context audit passed.");
+console.log("World 3D return-context audit passed: exact returns, same-realm 3D fallback, remembered realm worlds, 2D only for realms never played in 3D.");

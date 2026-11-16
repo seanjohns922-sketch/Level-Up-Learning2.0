@@ -1,5 +1,7 @@
 "use client";
 
+import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
+
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -62,6 +64,7 @@ export default function ChronorokHub() {
       className="chronorok fixed inset-0 overflow-hidden bg-[#2a1c30] font-sans text-white"
       style={{ touchAction: "none" }}
     >
+      <WorldLoadingVeil label="Entering Chronorok" />
       <Canvas shadows camera={{ position: [0, 6, 26], fov: 55, near: 0.1, far: 900 }} dpr={[1, 1.5]} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }} style={{ filter: open ? undefined : "blur(6px) brightness(.7)" }}>
         <ChronorokWorldScene />
         <SharedThirdPersonPlayer

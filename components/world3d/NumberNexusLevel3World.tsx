@@ -42,7 +42,7 @@ import {
 } from "@/lib/number-nexus-visuals";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import WorldAvatarJump from "./WorldAvatarJump";
-import { TrialStudentAvatar, WorldMovePad, type WorldMoveInput } from "@/components/world3d/SharedWorldPlayer";
+import { EMPTY_WORLD_LOOK_INPUT, TrialStudentAvatar, WorldJoystick, WorldLookJoystick, type WorldLookInput, type WorldMoveInput } from "@/components/world3d/SharedWorldPlayer";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import RealmGuide from "@/components/world3d/RealmGuide";
 import { WorldInteractionPrompt } from "@/components/world3d/WorldInteractionPrompt";
@@ -273,6 +273,7 @@ function WorldScene({
   spawnTarget,
   spawnNonce,
   moveInput,
+  lookInput = EMPTY_WORLD_LOOK_INPUT,
   onNearestGate,
   initialYaw,
   initialPitch,
@@ -290,6 +291,7 @@ function WorldScene({
   spawnTarget: [number, number, number] | null;
   spawnNonce: number;
   moveInput: WorldMoveInput;
+  lookInput?: WorldLookInput;
   onNearestGate: (gate: GateDefinition | null) => void;
   initialYaw: number;
   initialPitch: number;
@@ -369,6 +371,14 @@ function WorldScene({
     const player = playerRef.current;
     if (!player) return;
 
+    // Right joystick turns the camera, as in the hub and Tower.
+    const lookLength = Math.hypot(lookInput.x, lookInput.y);
+    if (lookLength > 0) {
+      const lookIntensity = THREE.MathUtils.clamp(lookInput.magnitude, 0, 1);
+      yaw.current -= (lookInput.x / lookLength) * lookIntensity * 2.1 * delta;
+      pitch.current = THREE.MathUtils.clamp(pitch.current + (lookInput.y / lookLength) * lookIntensity * 1.65 * delta, -1.05, 1.2);
+    }
+
     // Movement is relative to where the camera faces.
     const sy = Math.sin(yaw.current);
     const cy = Math.cos(yaw.current);
@@ -379,11 +389,16 @@ function WorldScene({
     if (keys.current.has("s") || keys.current.has("arrowdown") || moveInput.down) move.sub(forward);
     if (keys.current.has("d") || keys.current.has("arrowright") || moveInput.right) move.add(right);
     if (keys.current.has("a") || keys.current.has("arrowleft") || moveInput.left) move.sub(right);
+    const analogX = THREE.MathUtils.clamp(moveInput.analogX ?? 0, -1, 1);
+    const analogY = THREE.MathUtils.clamp(moveInput.analogY ?? 0, -1, 1);
+    const analog = Math.hypot(analogX, analogY) > 0;
+    move.addScaledVector(forward, analogY).addScaledVector(right, analogX);
     movingRef.current = move.lengthSq() > 0;
     if (move.lengthSq() > 0) {
-      move.normalize().multiplyScalar(4.6 * delta);
+      const intensity = analog && !(moveInput.up || moveInput.down || moveInput.left || moveInput.right) ? THREE.MathUtils.clamp(moveInput.magnitude ?? Math.hypot(analogX, analogY), 0, 1) : 1;
+      move.normalize().multiplyScalar(4.6 * intensity * (moveInput.sprint ? 1.75 : 1) * delta);
       player.position.add(move);
-      player.rotation.y = Math.atan2(forward.x, forward.z);
+      player.rotation.y = Math.atan2(move.x, move.z);
     }
     player.position.x = THREE.MathUtils.clamp(player.position.x, movementBounds.minX, movementBounds.maxX);
     player.position.z = THREE.MathUtils.clamp(player.position.z, movementBounds.minZ, movementBounds.maxZ);
@@ -747,6 +762,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
   const [spawnTarget, setSpawnTarget] = useState<[number, number, number] | null>(null);
   const [spawnNonce, setSpawnNonce] = useState(0);
   const [moveInput, setMoveInput] = useState<WorldMoveInput>({ up: false, down: false, left: false, right: false });
+  const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const districts = useMemo(() => guidedAdventure ? [] : buildDistricts(worldState, selectedDistrictId), [guidedAdventure, selectedDistrictId, worldState]);
   const gates = useMemo(() => buildGates(worldState, selectedDistrictId, guidedAdventure), [guidedAdventure, selectedDistrictId, worldState]);
   const spawnPoints = useMemo(() => buildSpawnPoints(gates, districts), [gates, districts]);
@@ -855,6 +871,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
           spawnTarget={spawnTarget}
           spawnNonce={spawnNonce}
           moveInput={moveInput}
+          lookInput={lookInput}
           onNearestGate={setNearestGate}
           initialYaw={initialYaw}
           initialPitch={initialPitch}
@@ -894,7 +911,8 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
       />
       <RealmGuide realmId="number" level={level} realmName="Number Nexus" accent={theme.energyAccent} world={worldState} />
 
-      <WorldMovePad input={moveInput} onChange={setMoveInput} />
+      <WorldJoystick input={moveInput} onChange={setMoveInput} />
+      <WorldLookJoystick onChange={setLookInput} />
 
       {nearestGate ? <WorldInteractionPrompt location={nearestGate.fullLabel} status={statusText(nearestGate.state)} actionLabel={nearestGate.kind === "city-return" ? "RETURN TO CITY" : nearestGate.kind === "tower" ? "ENTER TOWER" : nearestGate.kind === "district" ? "ENTER DISTRICT" : nearestGate.kind === "adventure" ? "START ADVENTURE" : "ENTER WEEK"} disabled={nearestGate.state === "locked"} onAction={() => enterGate(nearestGate)} /> : null}
 
