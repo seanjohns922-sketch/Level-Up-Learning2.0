@@ -1,0 +1,1216 @@
+{
+  "environment": "isolated local Docker; not hosted capacity",
+  "applicationRevision": "8b1525b3",
+  "configuration": "Official PostgREST 14.8; original pool/runtime; class index present in both runs; index removed afterward",
+  "caveats": [
+    "Profilers add overhead; do not compare these timings causally with unprofiled runs.",
+    "Outstanding pool requests include requests in service, not only connection waiters.",
+    "Resource samples bracket sequential collection; one-second pause produces about three-second spacing.",
+    "Database durations exclude connection waiting and some transaction overhead.",
+    "Connection state samples miss short transactions and are not per-request traces.",
+    "Resource samples do not measure all host processes or prove cloud headroom.",
+    "The available-connection gauge briefly reported -1 in run 1; retain the anomaly and do not treat it as an exact physical connection count."
+  ],
+  "runs": [
+    {
+      "at": "2026-11-16T23:39:49.817Z",
+      "workloadStartedAt": "2026-11-16T23:38:48.553Z",
+      "students": 500,
+      "teachers": 20,
+      "durationSeconds": 61,
+      "failedRequests": 0,
+      "failures": [],
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "preliminaryGatePassed": false,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 88,
+        "eventLoopUtilization": 0.06508816983614554
+      },
+      "label": "burst-1",
+      "windows": {
+        "first10Seconds": {
+          "poolSamples": 38,
+          "peakOutstandingRequests": 588,
+          "poolAvailableMinimum": -1,
+          "connectionSamples": 200,
+          "peakObservedTransactionAgeMs": 45.874,
+          "connectionStateObservations": [
+            {
+              "state": "idle",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 1628
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 276
+            },
+            {
+              "state": "active",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 156
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 59
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalSync",
+              "count": 41
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 21
+            },
+            {
+              "state": "idle",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 12
+            },
+            {
+              "state": "active",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 4
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalInitWrite",
+              "count": 1
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "IO",
+              "waitEvent": "WalWrite",
+              "count": 1
+            },
+            {
+              "state": "active",
+              "waitType": "Timeout",
+              "waitEvent": "SpinDelay",
+              "count": 1
+            }
+          ],
+          "resourceSamples": 4,
+          "peakSampledCpuPercent": {
+            "supabase_db_reliq-scale-local": 132.49,
+            "supabase_kong_reliq-scale-local": 24.94,
+            "supabase_realtime_reliq-scale-local": 2.48,
+            "supabase_rest_reliq-scale-local": 394.26
+          }
+        },
+        "wholeWorkload": {
+          "poolSamples": 240,
+          "peakOutstandingRequests": 588,
+          "poolAvailableMinimum": -1,
+          "connectionSamples": 1225,
+          "peakObservedTransactionAgeMs": 45.874,
+          "connectionStateObservations": [
+            {
+              "state": "idle",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 12635
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 407
+            },
+            {
+              "state": "active",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 246
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 76
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalSync",
+              "count": 54
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 32
+            },
+            {
+              "state": "idle",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 14
+            },
+            {
+              "state": "active",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 7
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalInitWrite",
+              "count": 1
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "IO",
+              "waitEvent": "WalWrite",
+              "count": 1
+            },
+            {
+              "state": "active",
+              "waitType": "Timeout",
+              "waitEvent": "SpinDelay",
+              "count": 1
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "IO",
+              "waitEvent": "WalSync",
+              "count": 1
+            }
+          ],
+          "resourceSamples": 20,
+          "peakSampledCpuPercent": {
+            "supabase_db_reliq-scale-local": 132.49,
+            "supabase_kong_reliq-scale-local": 24.94,
+            "supabase_realtime_reliq-scale-local": 2.48,
+            "supabase_rest_reliq-scale-local": 394.26
+          }
+        }
+      },
+      "acquisitionTimeoutDelta": 0,
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "p95Ms": 299,
+          "p99Ms": 342,
+          "failedRequests": 0
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "p95Ms": 1019,
+          "p99Ms": 1113,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "p95Ms": 547,
+          "p99Ms": 781,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "p95Ms": 750,
+          "p99Ms": 871,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "p95Ms": 813,
+          "p99Ms": 1137,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "p95Ms": 816,
+          "p99Ms": 1070,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "p95Ms": 894,
+          "p99Ms": 1122,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "p95Ms": 1049,
+          "p99Ms": 1133,
+          "failedRequests": 0
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "p95Ms": 650,
+          "p99Ms": 737,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "p95Ms": 850,
+          "p99Ms": 1023,
+          "failedRequests": 0
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "p95Ms": 1094,
+          "p99Ms": 1590,
+          "failedRequests": 0
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "p95Ms": 1254,
+          "p99Ms": 1622,
+          "failedRequests": 0
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "p95Ms": 928,
+          "p99Ms": 1352,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "p95Ms": 4435,
+          "p99Ms": 4441,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "p95Ms": 4430,
+          "p99Ms": 4442,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "p95Ms": 322,
+          "p99Ms": 379,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "p95Ms": 692,
+          "p99Ms": 892,
+          "failedRequests": 0
+        }
+      ],
+      "databaseSettings": {
+        "pg_stat_statements.track_planning": "off",
+        "track_io_timing": "off",
+        "track_wal_io_timing": "off"
+      },
+      "statementDeltas": [
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "teacher event page RPC",
+          "calls": 262,
+          "averageExecutionMs": 6.008344763358764,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student event insert RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.5666985420001,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "presence RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.5241272000000026,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "daily activity RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.4972832740001032,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "daily activity RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.4788517419999043,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "live activity RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.8795060719999965,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student context RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.6452704860000014,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "fixture provisioning",
+          "category": "event history table",
+          "calls": 199,
+          "averageExecutionMs": 3.686387944723121,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "live activity RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.431527298000001,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "live activity RPC",
+          "calls": 60,
+          "averageExecutionMs": 7.554494450000008,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "lesson attempts table",
+          "calls": 60,
+          "averageExecutionMs": 4.21492841666668,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "quiz attempts table",
+          "calls": 60,
+          "averageExecutionMs": 3.2326624166666686,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "assessment table",
+          "calls": 60,
+          "averageExecutionMs": 2.73312486666667,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student login RPC",
+          "calls": 500,
+          "averageExecutionMs": 0.2559313219999985,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "session configuration",
+          "calls": 6000,
+          "averageExecutionMs": 0.020720662499998297,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "teacher daily activity RPC",
+          "calls": 60,
+          "averageExecutionMs": 1.1644395666666678,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "event history table",
+          "calls": 60,
+          "averageExecutionMs": 1.0132069333333484,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 1.5416604499999949,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.7592208999999996,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "session configuration",
+          "calls": 642,
+          "averageExecutionMs": 0.022695989096574824,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.5539603499999999,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.2983291999999992,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.22890615000000025,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "fixture provisioning",
+          "category": "session configuration",
+          "calls": 198,
+          "averageExecutionMs": 0.01202631818181822,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.04509180000000512,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.04175205000000019,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 9,
+          "averageExecutionMs": 0.05155088888899842,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 9,
+          "averageExecutionMs": 0.04923588888889993,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.013329149999999856,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 7,
+          "averageExecutionMs": 0.028958428571428576,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.0084206,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.00534785000000002,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "begin",
+          "calls": 8,
+          "averageExecutionMs": 0.012838499999999975,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 18,
+          "averageExecutionMs": 0.0037500555555555573,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 60,
+          "averageExecutionMs": 0.001047950000000005,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "begin",
+          "calls": 9,
+          "averageExecutionMs": 0.005666666666666659,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "begin",
+          "calls": 20,
+          "averageExecutionMs": 0.0015582500000000054,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 3,
+          "averageExecutionMs": 0.006597000000000482,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "commit",
+          "calls": 20,
+          "averageExecutionMs": 0.0004414499999999988,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 7,
+          "averageExecutionMs": 0.0011964285714285744,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "fixture provisioning",
+          "category": "commit",
+          "calls": 8,
+          "averageExecutionMs": 0.0007498749999999997,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 10,
+          "averageExecutionMs": 0.00042519999999999917,
+          "averagePlanningMs": null
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T23:41:21.396Z",
+      "workloadStartedAt": "2026-11-16T23:40:20.163Z",
+      "students": 500,
+      "teachers": 20,
+      "durationSeconds": 61,
+      "failedRequests": 0,
+      "failures": [],
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "preliminaryGatePassed": false,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 130,
+        "eventLoopUtilization": 0.06677323888020983
+      },
+      "label": "burst-2",
+      "windows": {
+        "first10Seconds": {
+          "poolSamples": 39,
+          "peakOutstandingRequests": 550,
+          "poolAvailableMinimum": 0,
+          "connectionSamples": 200,
+          "peakObservedTransactionAgeMs": 42.9,
+          "connectionStateObservations": [
+            {
+              "state": "idle",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 1624
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 345
+            },
+            {
+              "state": "active",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 131
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 38
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalSync",
+              "count": 27
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 11
+            },
+            {
+              "state": "idle",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 11
+            },
+            {
+              "state": "active",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 6
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 3
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "BufferContent",
+              "count": 2
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "LockManager",
+              "count": 1
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "XactSLRU",
+              "count": 1
+            }
+          ],
+          "resourceSamples": 4,
+          "peakSampledCpuPercent": {
+            "supabase_db_reliq-scale-local": 126.71,
+            "supabase_kong_reliq-scale-local": 24.52,
+            "supabase_realtime_reliq-scale-local": 0.38,
+            "supabase_rest_reliq-scale-local": 409.07
+          }
+        },
+        "wholeWorkload": {
+          "poolSamples": 240,
+          "peakOutstandingRequests": 550,
+          "poolAvailableMinimum": 0,
+          "connectionSamples": 1225,
+          "peakObservedTransactionAgeMs": 43.808,
+          "connectionStateObservations": [
+            {
+              "state": "idle",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 12677
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 443
+            },
+            {
+              "state": "active",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 219
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 44
+            },
+            {
+              "state": "active",
+              "waitType": "IO",
+              "waitEvent": "WalSync",
+              "count": 31
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 25
+            },
+            {
+              "state": "idle",
+              "waitType": null,
+              "waitEvent": null,
+              "count": 20
+            },
+            {
+              "state": "active",
+              "waitType": "Client",
+              "waitEvent": "ClientRead",
+              "count": 9
+            },
+            {
+              "state": "idle in transaction",
+              "waitType": "LWLock",
+              "waitEvent": "WALWrite",
+              "count": 3
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "BufferContent",
+              "count": 2
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "LockManager",
+              "count": 1
+            },
+            {
+              "state": "active",
+              "waitType": "LWLock",
+              "waitEvent": "XactSLRU",
+              "count": 1
+            }
+          ],
+          "resourceSamples": 20,
+          "peakSampledCpuPercent": {
+            "supabase_db_reliq-scale-local": 126.71,
+            "supabase_kong_reliq-scale-local": 24.52,
+            "supabase_realtime_reliq-scale-local": 2.36,
+            "supabase_rest_reliq-scale-local": 409.07
+          }
+        }
+      },
+      "acquisitionTimeoutDelta": 0,
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "p95Ms": 342,
+          "p99Ms": 351,
+          "failedRequests": 0
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "p95Ms": 2012,
+          "p99Ms": 3010,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "p95Ms": 1670,
+          "p99Ms": 3085,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "p95Ms": 1446,
+          "p99Ms": 1872,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "p95Ms": 1206,
+          "p99Ms": 2770,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "p95Ms": 678,
+          "p99Ms": 1373,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "p95Ms": 1960,
+          "p99Ms": 2768,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "p95Ms": 1858,
+          "p99Ms": 3148,
+          "failedRequests": 0
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "p95Ms": 1822,
+          "p99Ms": 2314,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "p95Ms": 1342,
+          "p99Ms": 1831,
+          "failedRequests": 0
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "p95Ms": 1109,
+          "p99Ms": 1778,
+          "failedRequests": 0
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "p95Ms": 934,
+          "p99Ms": 1683,
+          "failedRequests": 0
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "p95Ms": 684,
+          "p99Ms": 1168,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "p95Ms": 4731,
+          "p99Ms": 4733,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "p95Ms": 4726,
+          "p99Ms": 4734,
+          "failedRequests": 0
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "p95Ms": 139,
+          "p99Ms": 152,
+          "failedRequests": 0
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "p95Ms": 549,
+          "p99Ms": 614,
+          "failedRequests": 0
+        }
+      ],
+      "databaseSettings": {
+        "pg_stat_statements.track_planning": "off",
+        "track_io_timing": "off",
+        "track_wal_io_timing": "off"
+      },
+      "statementDeltas": [
+        {
+          "workloadRole": "student anon",
+          "category": "daily activity RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.7752290710001035,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "teacher event page RPC",
+          "calls": 259,
+          "averageExecutionMs": 5.966172162162166,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student event insert RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.5056312549998985,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "presence RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.4801430569999938,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "daily activity RPC",
+          "calls": 1000,
+          "averageExecutionMs": 1.4434750290000957,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "live activity RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.7638900980000034,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student context RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.6313229439999994,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "live activity RPC",
+          "calls": 500,
+          "averageExecutionMs": 1.4725732520000019,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "fixture provisioning",
+          "category": "event history table",
+          "calls": 199,
+          "averageExecutionMs": 3.336435879396986,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "live activity RPC",
+          "calls": 60,
+          "averageExecutionMs": 7.077968016666667,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "lesson attempts table",
+          "calls": 60,
+          "averageExecutionMs": 4.035638950000005,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "quiz attempts table",
+          "calls": 60,
+          "averageExecutionMs": 3.5375861666666726,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "assessment table",
+          "calls": 60,
+          "averageExecutionMs": 3.0243249499999973,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "student login RPC",
+          "calls": 500,
+          "averageExecutionMs": 0.3339613820000013,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "student anon",
+          "category": "session configuration",
+          "calls": 6000,
+          "averageExecutionMs": 0.018353626333331704,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "event history table",
+          "calls": 60,
+          "averageExecutionMs": 1.171917450000001,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "teacher daily activity RPC",
+          "calls": 60,
+          "averageExecutionMs": 1.1211438166666654,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.8988730499999974,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "teacher authenticated",
+          "category": "session configuration",
+          "calls": 639,
+          "averageExecutionMs": 0.023264430359938918,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.5482272999999509,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.33886895000000267,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.1939186999999997,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.17997310000000083,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.13561054999999983,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "fixture provisioning",
+          "category": "session configuration",
+          "calls": 199,
+          "averageExecutionMs": 0.010914391959798509,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.1033747500000004,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 9,
+          "averageExecutionMs": 0.06481988888888976,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 9,
+          "averageExecutionMs": 0.04748155555554471,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.013104150000005177,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 60,
+          "averageExecutionMs": 0.0016639333333333302,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.0046081999999999955,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 20,
+          "averageExecutionMs": 0.003980950000000006,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 18,
+          "averageExecutionMs": 0.004097333333333471,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "begin",
+          "calls": 20,
+          "averageExecutionMs": 0.00204804999999999,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "other statement (redacted)",
+          "calls": 3,
+          "averageExecutionMs": 0.007333333333333414,
+          "averagePlanningMs": null
+        },
+        {
+          "workloadRole": "other role",
+          "category": "commit",
+          "calls": 20,
+          "averageExecutionMs": 0.0002833000000000002,
+          "averagePlanningMs": null
+        }
+      ]
+    }
+  ],
+  "checks": [
+    "Node syntax passed",
+    "Targeted QA ESLint passed",
+    "Invalid intervals rejected before Docker reads",
+    "Two actual profiled 500-student runs completed",
+    "Restored local preflight passed",
+    "Restored 25-student / 175-request smoke passed"
+  ]
+}

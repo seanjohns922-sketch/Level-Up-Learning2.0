@@ -3,6 +3,64 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Indexed burst resource profile — 17 November
+
+Two further 500-student / 20-teacher bursts used the class index and original
+official runtime, adding connection samples every 50 ms, pool metrics every
+250 ms, aggregate SQL deltas and container resource samples. The local resource
+monitor now accepts a bounded `SCALE_MONITOR_INTERVAL_MS` (1,000–30,000 ms),
+retaining its 30-second default. Samples record collection start/end times;
+a one-second pause produced roughly three-second spacing because collection
+itself takes time. No application source, hosted configuration or migration changed.
+
+| Measurement | First run | Repeat |
+| --- | ---: | ---: |
+| Login p95 | 1,019 ms | 2,012 ms |
+| Initial events p95 | 4,435 ms | 4,731 ms |
+| Incremental events p95 | 322 ms | 139 ms |
+| Peak outstanding pool requests in first 10 seconds | 588 | 550 |
+| Largest observed transaction age in first 10 seconds | 45.874 ms | 42.900 ms |
+| Peak sampled API CPU in first 10 seconds | 394.26% | 409.07% |
+| Peak sampled database CPU in first 10 seconds | 132.49% | 126.71% |
+
+Both runs failed the unchanged latency gates, with zero failed requests/journeys,
+500 verified presence records and exactly 1,000 activity increments/new events
+per run. Every new event was observed exactly once. Average login SQL execution
+was 0.256 / 0.334 ms; event pages averaged 6.008 / 5.966 ms and authenticated
+attempt reads averaged 2.733–4.215 ms. These are whole-profile aggregate SQL
+durations, not request-correlated timings; they exclude connection waiting and
+some transaction overhead. Planning and I/O timing settings remained disabled.
+
+Outstanding pool requests include work already being served. They are not the
+exact number waiting for a connection. Acquisition timeout counters did not
+increase. The available-connection gauge briefly reported -1 in the first run;
+retain this instrumentation anomaly rather than interpreting it as a physical
+connection count. Connection samples include internal API activity and miss short
+transactions. Idle/client-input and WAL waits were observed, without attribution
+of any individual request's delay to those states.
+
+CPU percentages count one core as 100%; four resource samples fell in each
+first-ten-second window on the eight-CPU Docker VM. They do not prove CPU
+saturation or spare capacity across the whole host. The load generator's event
+loop p99 was 12 ms in both runs, but this alone cannot establish generator capacity.
+Profiling adds overhead, so these results are not a controlled speed comparison
+against the prior unprofiled runs. The consistent finding is short average SQL
+execution alongside a burst of outstanding API requests, not a validated tuning fix.
+
+Next: improve workload coverage for canonical saves/retries and realtime, and
+prepare an isolated production-equivalent staging test before further runtime
+tuning. Prior pool/runtime experiments already failed to establish a reliable
+fix; another local parameter guess is not justified. Paid provisioning needs a
+reviewed configuration/cost first. Never load-test the trial schools' production.
+
+The local index was removed in cleanup and its original absence verified.
+Restored preflight and the 25-student / 175-request smoke passed. Monitor syntax,
+targeted QA ESLint, invalid-interval rejection and diff checks passed; both actual
+runs exercised the new interval. No release build was needed for local diagnostic
+and documentation changes. Aggregate evidence:
+`indexed-burst-resources-2026-11-17.json`. Private runners, logs and numeric traces:
+`/Users/seanjohns/reliq-audits/2026-11-17/indexed-burst-resources/`.
+
 ## Current dashboard burst versus staggered sign-ins — 17 November
 
 Four isolated local 60-second runs used 500 synthetic students, 20 ordinary
