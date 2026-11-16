@@ -1,5 +1,6 @@
 "use client";
 
+import "./world-hud-phone.css";
 import PatternExtensionLinks from "@/components/assessment/PatternExtensionLinks";
 import StatisticsExtensionLinks from "@/components/assessment/StatisticsExtensionLinks";
 import SpaceExtensionLinks from "@/components/assessment/SpaceExtensionLinks";

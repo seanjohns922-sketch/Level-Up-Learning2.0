@@ -1,0 +1,69 @@
+/*
+ * Phones (up to 560px wide). Tablets and laptops are untouched.
+ * One compact top row, a slim Next Up card with the action buttons right under
+ * it (the explorer sits low on a tall screen, so the bottom stays clear for
+ * movement), and smaller joysticks with RUN and JUMP side by side between them.
+ * Repeated selectors outrank the HUD's built-in rules and inline control styles.
+ */
+@media (max-width: 560px) {
+  /* Top row */
+  .worldHud.worldHud .worldHudIdentity {
+    left: max(8px, env(safe-area-inset-left)) !important;
+    right: max(8px, env(safe-area-inset-right)) !important;
+    top: max(8px, env(safe-area-inset-top)) !important;
+    justify-content: space-between;
+    gap: 4px !important;
+  }
+  .worldHud.worldHud .worldHudNavGroup { padding: 2px; }
+  .worldHud.worldHud .worldHudNavGroup .worldHudGoBtn { height: 34px !important; padding: 0 7px !important; }
+  .worldHud.worldHud .worldHudStats { height: 40px; padding: 0 3px 0 4px; }
+  .worldHud.worldHud .worldHudStats .worldHudXp { height: 34px !important; padding: 0 5px !important; font-size: 11px; white-space: nowrap; }
+  .worldHud.worldHud .worldHudStats .worldHudCrystals { height: 34px; padding: 0 6px; font-size: 12px; }
+  .worldHud.worldHud .worldHudStats .worldHudAvatar { width: 32px; height: 32px; }
+  .worldHud.worldHud .worldHudStats .worldVoiceButton { width: 28px; height: 28px; margin-left: 1px; }
+  .worldHud.worldHud .worldHudIdentity > * { min-width: 0; flex-shrink: 1; }
+
+  /* Next Up: a slim card under the top row */
+  .worldHud.worldHud .worldHudStart {
+    left: max(8px, env(safe-area-inset-left)) !important;
+    top: max(56px, calc(env(safe-area-inset-top) + 48px)) !important;
+    width: calc(100vw - 16px) !important;
+  }
+  .worldHud.worldHud .worldHudStartCard { padding: 6px 8px 6px 10px; }
+  .worldHud.worldHud .worldHudStartHead strong { font-size: 13px; line-height: 1.2; }
+
+  /* Actions: one centred row under Next Up */
+  .worldHud.worldHud.worldHud .worldHudActions {
+    top: max(112px, calc(env(safe-area-inset-top) + 104px)) !important;
+    bottom: auto !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: max-content;
+    max-width: calc(100vw - 16px) !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+  .worldHud.worldHud .worldHudActions button:not(.worldVoiceButton) { min-height: 42px; }
+
+  /* Joysticks, RUN and JUMP */
+  [data-world-joystick][data-world-joystick] {
+    width: 100px !important;
+    height: 100px !important;
+    bottom: max(14px, calc(env(safe-area-inset-bottom) + 10px)) !important;
+  }
+  [data-world-joystick="move"][data-world-joystick="move"] { left: max(12px, calc(env(safe-area-inset-left) + 8px)) !important; }
+  [data-world-joystick="look"][data-world-joystick="look"] { right: max(12px, calc(env(safe-area-inset-right) + 8px)) !important; }
+  [data-world-joystick][data-world-joystick] > div { width: 42px !important; height: 42px !important; }
+  button[data-world-sprint][data-world-sprint],
+  button[data-world-jump][data-world-jump] {
+    width: 56px !important;
+    height: 56px !important;
+    bottom: max(36px, calc(env(safe-area-inset-bottom) + 32px)) !important;
+    font-size: 11px !important;
+  }
+  button[data-world-sprint][data-world-sprint] { left: calc(50% - 62px) !important; right: auto !important; }
+  button[data-world-jump][data-world-jump] { right: calc(50% - 62px) !important; left: auto !important; }
+  button[data-world-jump][data-world-jump] span:last-child { display: none !important; }
+}

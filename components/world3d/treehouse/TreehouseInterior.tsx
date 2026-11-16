@@ -40,10 +40,13 @@ type LookState = { yaw: number; pitch: number; fov: number };
 /** Mounts one room and points a fixed-position camera where the student looks. */
 function RoomScene({ room, look, reduceMotion }: { room: TreehouseRoom; look: React.RefObject<LookState>; reduceMotion: boolean }) {
   useEffect(() => () => room.dispose(), [room]);
-  useFrame(({ clock, camera }) => {
+  useFrame(({ clock, camera, size }) => {
     room.update(clock.elapsedTime, reduceMotion);
     const perspective = camera as THREE.PerspectiveCamera;
-    const { yaw, pitch, fov } = look.current;
+    const { yaw, pitch } = look.current;
+    // Tall phone screens widen the view so the window and furniture still fit across.
+    const aspect = size.width / size.height;
+    const fov = aspect < 1 ? Math.min(80, look.current.fov * (1 + (1 - aspect) * 0.9)) : look.current.fov;
     if (perspective.fov !== fov) { perspective.fov = fov; perspective.updateProjectionMatrix(); }
     const cosPitch = Math.cos(pitch);
     perspective.position.copy(room.eye);
@@ -165,7 +168,7 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
     : room === "legends" ? { label: "Open My RELIQS", detail: "Every realm and Chronorok RELIQ", href: collectionFromTreehouseHref("/legends", "legends", preview) } : null;
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-[#120c08] text-white" style={{ touchAction: "none" }}>
+    <main data-treehouse className="fixed inset-0 overflow-hidden bg-[#120c08] text-white" style={{ touchAction: "none" }}>
       <div className="absolute inset-0" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endDrag} onPointerCancel={endDrag} onWheel={onWheel} onTouchMove={onTouchMove} onTouchEnd={() => { pinch.current = null; }}>
         <Canvas shadows dpr={[1, 1.5]} camera={{ fov: START_LOOK[initialRoom].fov, near: 0.1, far: 400 }} gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }}>
           <Suspense fallback={null}>
