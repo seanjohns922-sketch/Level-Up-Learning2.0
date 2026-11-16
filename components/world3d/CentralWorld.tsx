@@ -17,7 +17,7 @@ import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Cas
 import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
-import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import {
@@ -49,7 +49,7 @@ import { speak } from "@/lib/speak";
 import { CENTRAL_WORLD_STARTER_SCENERY, type WorldSceneryGroup } from "@/lib/world3d/central-world-editor-catalog";
 import {
   selectCentralWorldInventoryPlacement,
-  CENTRAL_WORLD_GRID,
+  CENTRAL_WORLD_BUILD_RULES,
   CENTRAL_WORLD_HOME_KEY,
   CENTRAL_WORLD_HOME_ITEM,
   getCentralWorldHome,
@@ -67,6 +67,8 @@ import {
   applyAccountCentralWorld,
   hasLocalCentralWorld,
   uploadLocalCentralWorld,
+  type CentralWorldBuildRules,
+  type CentralWorldGrid,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
@@ -192,20 +194,20 @@ type BuildSurfaceHandlers = {
   onHover: (gridX: number, gridZ: number) => void;
 };
 
-function BuildModeSurface({ active, paint, continuous, onStrokeState, gestureRef, handlers }: { active: boolean; paint: boolean; continuous: boolean; onStrokeState:(active:boolean)=>void; gestureRef: React.RefObject<BuildGestureState>; handlers: BuildSurfaceHandlers }) {
+function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gestureRef, handlers }: { grid: CentralWorldGrid; active: boolean; paint: boolean; continuous: boolean; onStrokeState:(active:boolean)=>void; gestureRef: React.RefObject<BuildGestureState>; handlers: BuildSurfaceHandlers }) {
   const painting = useRef(false);
   const carrying = useRef(false);
   const lastCell = useRef("");
   const hoverCell = useRef("");
-  const width = (CENTRAL_WORLD_GRID.maxX - CENTRAL_WORLD_GRID.minX + 1) * CENTRAL_WORLD_GRID.cellSize;
-  const depth = (CENTRAL_WORLD_GRID.maxZ - CENTRAL_WORLD_GRID.minZ + 1) * CENTRAL_WORLD_GRID.cellSize;
-  const centreX = ((CENTRAL_WORLD_GRID.minX + CENTRAL_WORLD_GRID.maxX) / 2) * CENTRAL_WORLD_GRID.cellSize;
-  const centreZ = ((CENTRAL_WORLD_GRID.minZ + CENTRAL_WORLD_GRID.maxZ) / 2) * CENTRAL_WORLD_GRID.cellSize;
+  const width = (grid.maxX - grid.minX + 1) * grid.cellSize;
+  const depth = (grid.maxZ - grid.minZ + 1) * grid.cellSize;
+  const centreX = ((grid.minX + grid.maxX) / 2) * grid.cellSize;
+  const centreZ = ((grid.minZ + grid.maxZ) / 2) * grid.cellSize;
 
   function cellOf(event: ThreeEvent<PointerEvent>) {
     return {
-      gridX: THREE.MathUtils.clamp(Math.round(event.point.x / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
-      gridZ: THREE.MathUtils.clamp(Math.round(event.point.z / CENTRAL_WORLD_GRID.cellSize), CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+      gridX: THREE.MathUtils.clamp(Math.round(event.point.x / grid.cellSize), grid.minX, grid.maxX),
+      gridZ: THREE.MathUtils.clamp(Math.round(event.point.z / grid.cellSize), grid.minZ, grid.maxZ),
     };
   }
 
@@ -278,7 +280,7 @@ function BuildModeSurface({ active, paint, continuous, onStrokeState, gestureRef
   );
 }
 
-function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors }: { hubV2?: boolean; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -328,6 +330,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
       ) : null}
       <CentralWorldEnvironment
         hubV2={hubV2}
+        reservedCell={hubV2 ? buildRules.isReservedCell : undefined}
         quality={quality}
         entranceActive={activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance}
         homeActive={activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance}
@@ -383,7 +386,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         positionRef={avatarPosRef}
       />
       <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
-      <BuildModeSurface active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
+      <BuildModeSurface grid={buildRules.grid} active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
       <CentralWorldMetricsReporter quality={quality} />
     </>
   );
@@ -434,6 +437,8 @@ export default function CentralWorld() {
   const hubV2 = isCentralWorldV2Enabled(searchParams);
   // The bigger hub's home is the fixed treehouse; today's hub keeps the movable lodge.
   const homeAnchors = hubV2 ? HUB_V2_TREEHOUSE_ANCHORS : getCentralWorldHomeAnchors(homePlacement);
+  const buildRules = hubV2 ? HUB_V2_BUILD_RULES : CENTRAL_WORLD_BUILD_RULES;
+  const buildGrid = buildRules.grid;
   const requestedQuality = searchParams.get("quality");
   const quality: CentralWorldQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
@@ -515,15 +520,15 @@ export default function CentralWorld() {
   const panView = useCallback((dxPx: number, dyPx: number) => {
     const height = canvasWrapRef.current?.clientHeight || window.innerHeight;
     const { zoom, yaw, pitch } = viewRef.current;
-    const k = (2 * zoom * 1.2 * Math.tan(Math.PI / 6)) / height / CENTRAL_WORLD_GRID.cellSize;
+    const k = (2 * zoom * 1.2 * Math.tan(Math.PI / 6)) / height / buildGrid.cellSize;
     const depth = k / Math.max(0.35, Math.sin(pitch));
     const right = { x: Math.cos(yaw), z: -Math.sin(yaw) };
     const forward = { x: -Math.sin(yaw), z: -Math.cos(yaw) };
     setCameraFocus((f) => ({
-      gridX: THREE.MathUtils.clamp(f.gridX - right.x * dxPx * k + forward.x * dyPx * depth, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
-      gridZ: THREE.MathUtils.clamp(f.gridZ - right.z * dxPx * k + forward.z * dyPx * depth, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+      gridX: THREE.MathUtils.clamp(f.gridX - right.x * dxPx * k + forward.x * dyPx * depth, buildGrid.minX, buildGrid.maxX),
+      gridZ: THREE.MathUtils.clamp(f.gridZ - right.z * dxPx * k + forward.z * dyPx * depth, buildGrid.minZ, buildGrid.maxZ),
     }));
-  }, []);
+  }, [buildGrid]);
   const strokeState = useRef({active:false,recorded:false});
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
@@ -538,16 +543,16 @@ export default function CentralWorld() {
   const heldPlacementId = buildPlacement?.placementId ?? null;
   const placementsWithoutBuildItem = heldPlacementId ? placedCustomisations.filter((placement) => placement.placementId !== heldPlacementId) : placedCustomisations;
   const buildingTrain = isTrainAsset(buildItem?.metadata.worldAssetKey);
-  const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles));
+  const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules));
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
   const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone" || editTool === "water");
   const isEraseTool = !heldItemKey && editTool === "erase";
   const isMoveTool = !heldItemKey && editTool === "move";
   const groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null = editorOpen && (isGroundTool || isEraseTool) ? {
-    cells: isGroundTool && editTool === "water" ? waterBrushCells(editCursor.gridX, editCursor.gridZ, waterBrushWidth).map(cell => ({...cell, valid: validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, "water")})) : undefined,
+    cells: isGroundTool && editTool === "water" ? waterBrushCells(editCursor.gridX, editCursor.gridZ, waterBrushWidth).map(cell => ({...cell, valid: validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, "water", buildRules)})) : undefined,
     tile: { ...editCursor, tileType: isGroundTool ? editTool : groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ)?.tileType ?? "stone" },
-    valid: editTool !== "erase" && validateCentralWorldGroundCell(editCursor.gridX, editCursor.gridZ, placedCustomisations, isGroundTool ? editTool : undefined),
+    valid: editTool !== "erase" && validateCentralWorldGroundCell(editCursor.gridX, editCursor.gridZ, placedCustomisations, isGroundTool ? editTool : undefined, buildRules),
   } : null;
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
@@ -610,8 +615,8 @@ export default function CentralWorld() {
   //   • holding an item  → move that item around the grid, one cell at a time
   //   • nothing in hand  → pan the camera to look around the world
   const moveBuildPlacement = useCallback((dx: number, dz: number) => {
-    const cx = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX);
-    const cz = (v: number) => THREE.MathUtils.clamp(v, CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ);
+    const cx = (v: number) => THREE.MathUtils.clamp(v, buildGrid.minX, buildGrid.maxX);
+    const cz = (v: number) => THREE.MathUtils.clamp(v, buildGrid.minZ, buildGrid.maxZ);
     if (heldRef.current) {
       // Move the item AND carry the camera with it, so you can walk it to a new
       // spot anywhere on the map and drop it there.
@@ -621,7 +626,7 @@ export default function CentralWorld() {
     } else {
       setCameraFocus((f) => ({ gridX: cx(f.gridX + dx * 2), gridZ: cz(f.gridZ + dz * 2) }));
     }
-  }, [setEditCursor, setBuildPlacement, setCameraFocus]);
+  }, [setEditCursor, setBuildPlacement, setCameraFocus, buildGrid]);
 
 
   const rotateHeld = useCallback(() => {
@@ -687,10 +692,10 @@ export default function CentralWorld() {
   function openWorldEditor() {
     // Centre the fixed build camera and the first item on wherever the avatar
     // is standing, so you build right where you are.
-    const cell = CENTRAL_WORLD_GRID.cellSize;
+    const cell = buildGrid.cellSize;
     const cursor = {
-      gridX: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.x / cell), CENTRAL_WORLD_GRID.minX, CENTRAL_WORLD_GRID.maxX),
-      gridZ: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.z / cell), CENTRAL_WORLD_GRID.minZ, CENTRAL_WORLD_GRID.maxZ),
+      gridX: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.x / cell), buildGrid.minX, buildGrid.maxX),
+      gridZ: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.z / cell), buildGrid.minZ, buildGrid.maxZ),
     };
     setCameraFocus(cursor);
     setEditCursor(cursor);
@@ -852,7 +857,7 @@ export default function CentralWorld() {
   function applyGroundAt(gridX: number, gridZ: number, announce = false) {
     if (!editorOpen || heldItemKey) return;
     if (editTool === "erase") {
-      if (!validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations)) return;
+      if (!validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations, undefined, buildRules)) return;
       // Remove whatever the tapped cell belongs to. A placed object counts if the
       // cell is anywhere inside its footprint (not just its centre); only when no
       // object is hit do we rub out the ground tile underneath.
@@ -877,10 +882,10 @@ export default function CentralWorld() {
       if (announce) void speak("Removed.", undefined, "manual", { rate: 0.9 });
       return;
     }
-    if (!isGroundTool || !validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations, isGroundTool ? editTool : undefined)) return;
+    if (!isGroundTool || !validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations, isGroundTool ? editTool : undefined, buildRules)) return;
     recordWorldEdit();
     setGroundTiles((current) => {
-      const cells = (editTool === "water" ? waterBrushCells(gridX, gridZ, waterBrushWidth) : [{gridX,gridZ}]).filter(cell => validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, editTool));
+      const cells = (editTool === "water" ? waterBrushCells(gridX, gridZ, waterBrushWidth) : [{gridX,gridZ}]).filter(cell => validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, editTool, buildRules));
       const keys = new Set(cells.map(cell => cell.gridX+":"+cell.gridZ));
       const next = [...current.filter(entry => !keys.has(entry.gridX+":"+entry.gridZ)), ...cells.map(cell => ({...cell,tileType:editTool}))];
       writeCentralWorldGroundTiles(placementScope, next);
@@ -903,7 +908,7 @@ export default function CentralWorld() {
       setBuildPlacement({ ...buildPlacement, gridX, gridZ });
       return;
     }
-    if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById, groundTiles)) {
+    if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules)) {
       setBuildPlacement({...buildPlacement,gridX,gridZ});
       return;
     }
@@ -911,7 +916,7 @@ export default function CentralWorld() {
     if (strokeState.current.active) strokeLastPlaced.current = { gridX, gridZ };
     setPlacedCustomisations(current => {
       const remaining=current.filter(p=>p.placementId!==candidate.placementId);
-      if(!validateCentralWorldPlacement(candidate,buildItem,remaining,itemsById,groundTiles)) return current;
+      if(!validateCentralWorldPlacement(candidate,buildItem,remaining,itemsById,groundTiles,buildRules)) return current;
       const next=[...remaining,candidate];
       writeCentralWorldPlacements(placementScope,next);
       return next;
@@ -1065,7 +1070,11 @@ export default function CentralWorld() {
   function enterMyHome() {
     if (transitioning) return;
     rememberCentralWorldHomeEntry(preview);
-    window.location.assign(hubV2 ? treehouseHref("main", preview) : "/home-base");
+    if (hubV2) {
+      window.location.assign(treehouseHref("main", preview));
+      return;
+    }
+    window.location.assign("/home-base");
   }
 
   function enterTower() {
@@ -1090,7 +1099,7 @@ export default function CentralWorld() {
     <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
-        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} />
+        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
       </Canvas>
       </div>
 

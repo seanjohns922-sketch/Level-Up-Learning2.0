@@ -11,7 +11,7 @@ import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib
 import { CENTRAL_WORLD_GRID, CENTRAL_WORLD_HOME_ITEM, CENTRAL_WORLD_HOME_KEY, parseGridSize, type CentralWorldGroundTile, type CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
 import {
   HUB_V2_BRIDGES, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PLAY_RADIUS, HUB_V2_RIVER_START_Z, HUB_V2_ROCKS, HUB_V2_TERRAIN_SIZE, HUB_V2_WATER_Y,
-  distanceFromBuildArea, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
+  distanceFromBuildGrid, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
   type HubBridge, type HubScenery,
 } from "@/lib/world3d/central-world-v2";
 
@@ -342,7 +342,7 @@ export function CentralWorldV2Scenery({ quality, animate, placements, groundTile
     const map = new Map<string, HubScenery[]>();
     HUB_V2_DECOR.forEach((d, i) => {
       if (keep < 1 && noise(i + 0.5) > keep) return;
-      if (distanceFromBuildArea(d.x, d.z) === 0 && occupied.has(`${Math.round(d.x / CENTRAL_WORLD_GRID.cellSize)}:${Math.round(d.z / CENTRAL_WORLD_GRID.cellSize)}`)) return;
+      if (distanceFromBuildGrid(d.x, d.z) === 0 && occupied.has(`${Math.round(d.x / CENTRAL_WORLD_GRID.cellSize)}:${Math.round(d.z / CENTRAL_WORLD_GRID.cellSize)}`)) return;
       if (!map.has(d.model)) map.set(d.model, []);
       map.get(d.model)!.push(d);
     });

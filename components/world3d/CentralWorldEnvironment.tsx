@@ -837,13 +837,39 @@ export function PlacedWorldObject({ item, placement, items, neighbours = [], pre
   );
 }
 
-function BuildModeGrid({ cursor }: { cursor: { gridX: number; gridZ: number } }) {
+/** Squares around the build cursor where nothing can go, tinted red. */
+function ReservedCellsOverlay({ cursor, cells, reservedCell }: { cursor: { gridX: number; gridZ: number }; cells: number; reservedCell: (gridX: number, gridZ: number) => boolean }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const reserved = useMemo(() => {
+    const out: Array<[number, number]> = [];
+    const half = cells / 2;
+    for (let dx = -half; dx < half; dx++) for (let dz = -half; dz < half; dz++) if (reservedCell(cursor.gridX + dx, cursor.gridZ + dz)) out.push([dx, dz]);
+    return out;
+  }, [cursor.gridX, cursor.gridZ, cells, reservedCell]);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const matrix = new THREE.Matrix4();
+    reserved.forEach(([dx, dz], index) => mesh.setMatrixAt(index, matrix.makeTranslation(dx * CENTRAL_WORLD_GRID.cellSize, 0.03, dz * CENTRAL_WORLD_GRID.cellSize)));
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [reserved]);
+  if (!reserved.length) return null;
+  return (
+    <instancedMesh key={reserved.length} ref={ref} args={[undefined, undefined, reserved.length]} rotation={[0, 0, 0]}>
+      <boxGeometry args={[CENTRAL_WORLD_GRID.cellSize - 0.12, 0.02, CENTRAL_WORLD_GRID.cellSize - 0.12]} />
+      <meshBasicMaterial color="#ef4444" transparent opacity={0.38} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+function BuildModeGrid({ cursor, reservedCell }: { cursor: { gridX: number; gridZ: number }; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
   const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
   const cells = 16;
   const size = cells * CENTRAL_WORLD_GRID.cellSize;
   return (
     <group position={[x, 0.115, z]}>
       <gridHelper args={[size, cells, "#eafff3", "#67d5b5"]} />
+      {reservedCell ? <ReservedCellsOverlay cursor={cursor} cells={cells} reservedCell={reservedCell} /> : null}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh>
     </group>
   );
@@ -1202,7 +1228,7 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
   return (
     <group>
@@ -1219,7 +1245,7 @@ export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive
       <PaintedGround tiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
-      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
+      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);

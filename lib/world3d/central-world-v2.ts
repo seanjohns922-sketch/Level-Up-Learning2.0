@@ -3,6 +3,7 @@
 // all new land (river, bridges, campsite, lookout, treehouse clearing) sits
 // outside the old build area. The old build area stays perfectly flat at y=0.
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
+import { isCentralWorldProtectedCell, type CentralWorldBuildRules, type CentralWorldGrid } from "./central-world-layout";
 
 /** Off for students until launch: `?hub=v2` or NEXT_PUBLIC_CENTRAL_WORLD_V2=1 turns it on. */
 export function isCentralWorldV2Enabled(search?: { get(name: string): string | null } | null) {
@@ -14,8 +15,10 @@ type Point = readonly [number, number];
 const CENTRAL_TOWER_Z = CENTRAL_WORLD_CONFIG.towerPosition[2];
 const EXISTING_PATHS: ReadonlyArray<ReadonlyArray<Point>> = [CENTRAL_WORLD_CONFIG.pathPoints, CENTRAL_WORLD_CONFIG.myHomePathPoints];
 
-/** Today's build grid in metres, plus a small margin. Nothing new is placed inside. */
+/** Today's build grid in metres, plus a small margin. Saved builds live here; no new feature touches it. */
 export const HUB_V2_BUILD_AREA = { minX: -94, maxX: 90, minZ: -88, maxZ: 86 } as const;
+/** The bigger build grid (2 m squares). Its corners stay inside the walkable world, and all of it is flat. */
+export const HUB_V2_GRID: CentralWorldGrid = { cellSize: 2, minX: -66, maxX: 66, minZ: -66, maxZ: 66 };
 export const HUB_V2_PLAY_RADIUS = 192;
 export const HUB_V2_TERRAIN_SIZE = 640;
 export const HUB_V2_WATER_Y = -0.9;
@@ -31,11 +34,11 @@ const BRIDGE_SPANS = [38, -62].map((z) => ({ z, x0: hubRiverX(z) - 11, x1: hubRi
 
 /** Connecting paths live only in the new land, so they never cross a student's build. */
 export const HUB_V2_PATHS: ReadonlyArray<ReadonlyArray<Point>> = [
-  [[90, 38], [BRIDGE_SPANS[0].x0 - 1, 38]],
+  [[93, 38], [BRIDGE_SPANS[0].x0 - 1, 38]],
   [[BRIDGE_SPANS[0].x1 + 1, 38], [140, 40], [152, 42]],
-  [[90, -62], [BRIDGE_SPANS[1].x0 - 1, -62]],
+  [[93, -62], [BRIDGE_SPANS[1].x0 - 1, -62]],
   [[BRIDGE_SPANS[1].x1 + 1, -62], [146, -76], [155, -92]],
-  [[-94, 4], [-112, 3]],
+  [[-97, 4], [-112, 3]],
 ];
 
 export function smoothstep(a: number, b: number, x: number) {
@@ -48,6 +51,14 @@ export function distanceFromBuildArea(x: number, z: number) {
   const a = HUB_V2_BUILD_AREA;
   const dx = Math.max(a.minX - x, 0, x - a.maxX);
   const dz = Math.max(a.minZ - z, 0, z - a.maxZ);
+  return Math.hypot(dx, dz);
+}
+
+/** Distance from the bigger build grid's edge in metres (0 inside it). */
+export function distanceFromBuildGrid(x: number, z: number) {
+  const half = HUB_V2_GRID.cellSize / 2;
+  const dx = Math.max(HUB_V2_GRID.minX * HUB_V2_GRID.cellSize - half - x, 0, x - HUB_V2_GRID.maxX * HUB_V2_GRID.cellSize - half);
+  const dz = Math.max(HUB_V2_GRID.minZ * HUB_V2_GRID.cellSize - half - z, 0, z - HUB_V2_GRID.maxZ * HUB_V2_GRID.cellSize - half);
   return Math.hypot(dx, dz);
 }
 
@@ -73,9 +84,10 @@ function hill(x: number, z: number, cx: number, cz: number, r: number, h: number
 }
 
 function rawHeight(x: number, z: number) {
-  const outside = smoothstep(4, 34, distanceFromBuildArea(x, z));
+  const outside = smoothstep(4, 34, distanceFromBuildGrid(x, z));
   let h = outside * (0.8 + 0.55 * Math.sin(x * 0.031 + 0.5) * Math.cos(z * 0.027) + 0.3 * Math.sin(x * 0.07 + z * 0.05));
-  h += hill(x, z, 160, -100, 30, 9) + hill(x, z, 122, -188, 48, 22) + hill(x, z, -150, -120, 42, 8) + hill(x, z, -140, 130, 46, 7);
+  // Hills fade out at the build grid's edge so all building land stays flat.
+  h += outside * (hill(x, z, 160, -100, 30, 9) + hill(x, z, 122, -188, 48, 22) + hill(x, z, -150, -120, 42, 8) + hill(x, z, -140, 130, 46, 7));
   const r = Math.hypot(x, z), a = Math.atan2(z, x);
   h += smoothstep(198, 250, r) * (9 + 4 * Math.sin(a * 5) + 2 * Math.sin(a * 13));
   return h;
@@ -167,7 +179,7 @@ export const HUB_V2_ROCKS: HubRock[] = (() => {
   for (let i = 0; i < 900 && out.length < 46; i++) {
     const a = rand() * Math.PI * 2, r = 100 + rand() * 98;
     const x = Math.cos(a) * r, z = Math.sin(a) * r;
-    if (distanceFromBuildArea(x, z) < 8 || !clearOfFeatures(x, z, { path: 5, river: 13 })) continue;
+    if (distanceFromBuildGrid(x, z) < 4 || !clearOfFeatures(x, z, { path: 5, river: 13 })) continue;
     const big = r > 172;
     out.push({ x, z, y: hubTerrainHeight(x, z) - 0.3, s: big ? 4 + rand() * 5 : 1.2 + rand() * 1.6, ry: rand() * Math.PI * 2, model: models[Math.floor(rand() * models.length)] });
   }
@@ -230,7 +242,7 @@ export const HUB_V2_DECOR: HubDecor[] = (() => {
     for (let tries = 0; placed < plan.count && tries < plan.count * 14; tries++) {
       const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * (HUB_V2_PLAY_RADIUS + 4);
       const x = Math.cos(a) * r, z = Math.sin(a) * r;
-      if (plan.edge && distanceFromBuildArea(x, z) < 12 && hubRiverDistance(x, z) > 28) continue;
+      if (plan.edge && distanceFromBuildGrid(x, z) < 4 && hubRiverDistance(x, z) > 28) continue;
       if (!clearOfFeatures(x, z, { path: 3.5, river: plan.edge ? 15 : 12, pad: 2 })) continue;
       if (Math.hypot(x, z - CENTRAL_TOWER_Z) < 16 || nearExistingPath(x, z)) continue;
       const [lo, hi] = plan.size;
@@ -265,3 +277,30 @@ export const HUB_V2_TREEHOUSE_ANCHORS = {
   entrance: [TREEHOUSE.x + 6.5, 0.75, TREEHOUSE.z] as [number, number, number],
   exit: [TREEHOUSE.x + 10, 0.75, TREEHOUSE.z] as [number, number, number],
 };
+
+// ---------- building in the bigger hub ----------
+/** Ground counts as flat (items sit at y=0) within 2 cm. */
+export const HUB_V2_FLAT_TOLERANCE = 0.02;
+let reservedCells: Set<string> | null = null;
+
+function computeReserved(gridX: number, gridZ: number) {
+  if (isCentralWorldProtectedCell(gridX, gridZ)) return true;
+  const x = gridX * HUB_V2_GRID.cellSize, z = gridZ * HUB_V2_GRID.cellSize;
+  if (Math.hypot(x, z) > HUB_V2_PLAY_RADIUS - 3) return true;
+  if (Math.abs(hubTerrainHeight(x, z)) > HUB_V2_FLAT_TOLERANCE) return true; // river and its banks
+  if (hubPathDistance(x, z) < 3) return true;
+  if (HUB_V2_BRIDGES.some((b) => Math.abs(z - b.z) < b.width / 2 + 2 && x > b.x0 - 3 && x < b.x1 + 3)) return true;
+  if (HUB_V2_PADS.some((p) => Math.hypot(x - p.x, z - p.z) < p.r + 3)) return true;
+  return HUB_V2_COLLIDERS.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 1.2);
+}
+
+/** Squares nobody can build on: the Tower, river, bridges, paths, clearings, gums and boulders. Computed once. */
+export function hubIsReservedCell(gridX: number, gridZ: number) {
+  if (!reservedCells) {
+    reservedCells = new Set();
+    for (let gx = HUB_V2_GRID.minX; gx <= HUB_V2_GRID.maxX; gx++) for (let gz = HUB_V2_GRID.minZ; gz <= HUB_V2_GRID.maxZ; gz++) if (computeReserved(gx, gz)) reservedCells.add(`${gx}:${gz}`);
+  }
+  return reservedCells.has(`${gridX}:${gridZ}`);
+}
+
+export const HUB_V2_BUILD_RULES: CentralWorldBuildRules = { grid: HUB_V2_GRID, isReservedCell: hubIsReservedCell, fixedHome: true };
