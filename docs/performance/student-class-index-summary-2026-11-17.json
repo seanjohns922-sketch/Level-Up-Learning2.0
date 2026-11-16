@@ -1,0 +1,758 @@
+{
+  "environment": "isolated local; not production capacity",
+  "runs": [
+    {
+      "label": "baseline",
+      "at": "2026-11-16T23:00:49.641Z",
+      "scenario": "dashboard-mixed",
+      "students": 500,
+      "teachers": 20,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "preliminaryGatePassed": false,
+      "failures": [],
+      "failedRequests": 0,
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 325,
+          "p99Ms": 326,
+          "maximumMs": 326
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2461,
+          "p99Ms": 3875,
+          "maximumMs": 4651
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1819,
+          "p99Ms": 2679,
+          "maximumMs": 2679
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1216,
+          "p99Ms": 2513,
+          "maximumMs": 2513
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2372,
+          "p99Ms": 3619,
+          "maximumMs": 3959
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1994,
+          "p99Ms": 2682,
+          "maximumMs": 2682
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1970,
+          "p99Ms": 2690,
+          "maximumMs": 4201
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1479,
+          "p99Ms": 2212,
+          "maximumMs": 3326
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2031,
+          "p99Ms": 3214,
+          "maximumMs": 3214
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1705,
+          "p99Ms": 3263,
+          "maximumMs": 3263
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1193,
+          "p99Ms": 2026,
+          "maximumMs": 3402
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1033,
+          "p99Ms": 1890,
+          "maximumMs": 2574
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 918,
+          "p99Ms": 1444,
+          "maximumMs": 2222
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 5611,
+          "p99Ms": 5614,
+          "maximumMs": 5614
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 5577,
+          "p99Ms": 5616,
+          "maximumMs": 5616
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "failedRequests": 0,
+          "p95Ms": 412,
+          "p99Ms": 436,
+          "maximumMs": 436
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 597,
+          "p99Ms": 749,
+          "maximumMs": 832
+        }
+      ]
+    },
+    {
+      "label": "candidate",
+      "at": "2026-11-16T23:02:04.836Z",
+      "scenario": "dashboard-mixed",
+      "students": 500,
+      "teachers": 20,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "preliminaryGatePassed": false,
+      "failures": [],
+      "failedRequests": 0,
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 306,
+          "p99Ms": 307,
+          "maximumMs": 307
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2420,
+          "p99Ms": 3570,
+          "maximumMs": 4243
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1831,
+          "p99Ms": 2993,
+          "maximumMs": 3954
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1013,
+          "p99Ms": 2771,
+          "maximumMs": 2771
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1703,
+          "p99Ms": 2735,
+          "maximumMs": 3002
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2472,
+          "p99Ms": 3250,
+          "maximumMs": 3250
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1374,
+          "p99Ms": 2159,
+          "maximumMs": 4218
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1127,
+          "p99Ms": 1835,
+          "maximumMs": 2737
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 945,
+          "p99Ms": 1623,
+          "maximumMs": 2990
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 721,
+          "p99Ms": 1167,
+          "maximumMs": 1554
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1978,
+          "p99Ms": 2540,
+          "maximumMs": 2540
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1477,
+          "p99Ms": 1988,
+          "maximumMs": 1988
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2262,
+          "p99Ms": 4091,
+          "maximumMs": 4091
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 4997,
+          "p99Ms": 4999,
+          "maximumMs": 4999
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 4988,
+          "p99Ms": 5000,
+          "maximumMs": 5000
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "failedRequests": 0,
+          "p95Ms": 131,
+          "p99Ms": 138,
+          "maximumMs": 138
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 915,
+          "p99Ms": 1075,
+          "maximumMs": 1157
+        }
+      ]
+    }
+  ],
+  "representativeOriginalPlans": {
+    "caveat": "Representative original synthetic class; authenticated-role direct read plans outside burst. Not API transaction timing. Filters, SQL and identities omitted. Node execution times include children; do not sum them.",
+    "plans": [
+      {
+        "source": "lesson_attempts",
+        "Planning Time": 0.935,
+        "Execution Time": 81.134,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_lesson_attempts",
+          "Actual Rows": 744,
+          "Actual Loops": 1,
+          "Actual Total Time": 81.024,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 11598,
+          "Shared Read Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_lesson_attempts_student_scope",
+              "Actual Rows": 744,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.071,
+              "Shared Hit Blocks": 33,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 80.632,
+              "Shared Hit Blocks": 11430,
+              "Shared Read Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 3.042,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 646,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 77.585,
+                  "Rows Removed by Filter": 477,
+                  "Shared Hit Blocks": 10784,
+                  "Shared Read Blocks": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "quiz_attempts",
+        "Planning Time": 0.723,
+        "Execution Time": 80.223,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_weekly_quiz_attempts",
+          "Actual Rows": 248,
+          "Actual Loops": 1,
+          "Actual Total Time": 80.143,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 11523,
+          "Shared Read Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_weekly_quiz_attempts_student_scope",
+              "Actual Rows": 248,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.04,
+              "Shared Hit Blocks": 13,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 79.958,
+              "Shared Hit Blocks": 11430,
+              "Shared Read Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 2.872,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 646,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 77.082,
+                  "Rows Removed by Filter": 477,
+                  "Shared Hit Blocks": 10784,
+                  "Shared Read Blocks": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "assessments",
+        "Planning Time": 0.768,
+        "Execution Time": 80.041,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_realm_assessments",
+          "Actual Rows": 496,
+          "Actual Loops": 1,
+          "Actual Total Time": 79.949,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 11565,
+          "Shared Read Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_realm_assessments_student_scope",
+              "Actual Rows": 496,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.054,
+              "Shared Hit Blocks": 28,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 79.664,
+              "Shared Hit Blocks": 11430,
+              "Shared Read Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 2.947,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 646,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 76.712,
+                  "Rows Removed by Filter": 477,
+                  "Shared Hit Blocks": 10784,
+                  "Shared Read Blocks": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "event_head",
+        "Planning Time": 0.267,
+        "Execution Time": 1.219,
+        "Plan": {
+          "Node Type": "Limit",
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Actual Total Time": 1.189,
+          "Shared Hit Blocks": 633,
+          "Shared Read Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Incremental Sort",
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "Actual Total Time": 1.188,
+              "Shared Hit Blocks": 633,
+              "Shared Read Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Index Scan",
+                  "Relation Name": "live_activity_events",
+                  "Index Name": "live_activity_events_class_created_idx",
+                  "Actual Rows": 2,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 1.173,
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 624,
+                  "Shared Read Blocks": 0
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "transactionalIndexPlans": {
+    "caveat": "Transaction-only class index, rolled back; representative original synthetic class; authenticated-role direct read plans outside burst. Not API transaction timing. Filters, SQL and identities omitted. Node execution times include children; do not sum them.",
+    "plans": [
+      {
+        "source": "lesson_attempts",
+        "Planning Time": 1.693,
+        "Execution Time": 16.223,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_lesson_attempts",
+          "Actual Rows": 744,
+          "Actual Loops": 1,
+          "Actual Total Time": 16.061,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1567,
+          "Shared Read Blocks": 1,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_lesson_attempts_student_scope",
+              "Actual Rows": 744,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.241,
+              "Shared Hit Blocks": 33,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 12.155,
+              "Shared Hit Blocks": 1399,
+              "Shared Read Blocks": 1,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 4.487,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 643,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Bitmap Heap Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 7.663,
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 756,
+                  "Shared Read Blocks": 1,
+                  "Plans": [
+                    {
+                      "Node Type": "Bitmap Index Scan",
+                      "Index Name": "reliq_diagnostic_students_class_idx",
+                      "Actual Rows": 26,
+                      "Actual Loops": 1,
+                      "Actual Total Time": 0.023,
+                      "Shared Hit Blocks": 0,
+                      "Shared Read Blocks": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "quiz_attempts",
+        "Planning Time": 0.845,
+        "Execution Time": 9.179,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_weekly_quiz_attempts",
+          "Actual Rows": 248,
+          "Actual Loops": 1,
+          "Actual Total Time": 9.121,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1489,
+          "Shared Read Blocks": 1,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_weekly_quiz_attempts_student_scope",
+              "Actual Rows": 248,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.099,
+              "Shared Hit Blocks": 13,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 8.468,
+              "Shared Hit Blocks": 1396,
+              "Shared Read Blocks": 1,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 3.018,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 643,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Bitmap Heap Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 5.445,
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 753,
+                  "Shared Read Blocks": 1,
+                  "Plans": [
+                    {
+                      "Node Type": "Bitmap Index Scan",
+                      "Index Name": "reliq_diagnostic_students_class_idx",
+                      "Actual Rows": 26,
+                      "Actual Loops": 1,
+                      "Actual Total Time": 0.015,
+                      "Shared Hit Blocks": 0,
+                      "Shared Read Blocks": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "assessments",
+        "Planning Time": 0.802,
+        "Execution Time": 9.119,
+        "Plan": {
+          "Node Type": "Bitmap Heap Scan",
+          "Relation Name": "student_realm_assessments",
+          "Actual Rows": 496,
+          "Actual Loops": 1,
+          "Actual Total Time": 9.057,
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1531,
+          "Shared Read Blocks": 1,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Index Scan",
+              "Index Name": "idx_student_realm_assessments_student_scope",
+              "Actual Rows": 496,
+              "Actual Loops": 1,
+              "Actual Total Time": 0.119,
+              "Shared Hit Blocks": 28,
+              "Shared Read Blocks": 0
+            },
+            {
+              "Node Type": "Nested Loop",
+              "Actual Rows": 26,
+              "Actual Loops": 1,
+              "Actual Total Time": 8.346,
+              "Shared Hit Blocks": 1396,
+              "Shared Read Blocks": 1,
+              "Plans": [
+                {
+                  "Node Type": "Seq Scan",
+                  "Relation Name": "classes",
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 3.183,
+                  "Rows Removed by Filter": 19,
+                  "Shared Hit Blocks": 643,
+                  "Shared Read Blocks": 0
+                },
+                {
+                  "Node Type": "Bitmap Heap Scan",
+                  "Relation Name": "students",
+                  "Actual Rows": 26,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 5.159,
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 753,
+                  "Shared Read Blocks": 1,
+                  "Plans": [
+                    {
+                      "Node Type": "Bitmap Index Scan",
+                      "Index Name": "reliq_diagnostic_students_class_idx",
+                      "Actual Rows": 26,
+                      "Actual Loops": 1,
+                      "Actual Total Time": 0.026,
+                      "Shared Hit Blocks": 0,
+                      "Shared Read Blocks": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "source": "event_head",
+        "Planning Time": 0.277,
+        "Execution Time": 1.298,
+        "Plan": {
+          "Node Type": "Limit",
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Actual Total Time": 1.27,
+          "Shared Hit Blocks": 610,
+          "Shared Read Blocks": 0,
+          "Plans": [
+            {
+              "Node Type": "Incremental Sort",
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "Actual Total Time": 1.269,
+              "Shared Hit Blocks": 610,
+              "Shared Read Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Index Scan",
+                  "Relation Name": "live_activity_events",
+                  "Index Name": "live_activity_events_class_created_idx",
+                  "Actual Rows": 2,
+                  "Actual Loops": 1,
+                  "Actual Total Time": 1.254,
+                  "Rows Removed by Filter": 0,
+                  "Shared Hit Blocks": 604,
+                  "Shared Read Blocks": 0
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

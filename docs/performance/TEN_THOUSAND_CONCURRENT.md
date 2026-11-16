@@ -3,6 +3,17 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Small index candidate — 17 November
+
+A missing `students(class_id)` index caused the existing permission subplan to
+scan roughly 503 students instead of selecting its 26 class students first.
+A single-index migration is prepared; permissions and application code are
+unchanged. Representative attempt-query execution fell from about 80 ms to
+9–16 ms with identical results. A 500-student baseline/candidate pair preserved
+all activity but both failed latency, so this is a targeted query improvement,
+not a scaling sign-off. Local index experiments were rolled back. Production has
+not been changed. See `LOCAL_STUDENT_CLASS_INDEX_2026-11-17.md`.
+
 ## Initial dashboard profile — 17 November
 
 A profiled 500-student run preserved all 1,001 events/increments but still failed
