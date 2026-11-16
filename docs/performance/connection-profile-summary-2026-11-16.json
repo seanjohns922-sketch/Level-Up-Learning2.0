@@ -1,0 +1,612 @@
+[
+  {
+    "run": "connection-profile",
+    "capacity": {
+      "at": "2026-11-16T08:56:53.977Z",
+      "environment": "local protocol rehearsal; not production capacity certification",
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 68,
+        "eventLoopUtilization": 0.05025886086658185
+      },
+      "scenario": "students-only",
+      "restRoute": "gateway",
+      "loginRampSeconds": 0,
+      "students": 500,
+      "teachers": 0,
+      "provisionedStudents": 500,
+      "historyEvents": 100000,
+      "durationSeconds": 61,
+      "requests": 5000,
+      "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+      "snapshotHttpRequests": 0,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "failures": [],
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 675,
+              "p99": 729,
+              "max": 759
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 550,
+              "p99": 602,
+              "max": 630
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 5
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 676,
+          "p99Ms": 729,
+          "maximumMs": 759
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 602,
+              "p99": 625,
+              "max": 719
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 592,
+              "p99": 615,
+              "max": 706
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 602,
+          "p99Ms": 625,
+          "maximumMs": 719
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 627,
+              "p99": 779,
+              "max": 903
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 624,
+              "p99": 773,
+              "max": 899
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 2,
+              "max": 4
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 627,
+          "p99Ms": 779,
+          "maximumMs": 903
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 803,
+              "p99": 971,
+              "max": 1033
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 760,
+              "p99": 920,
+              "max": 1000
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 804,
+          "p99Ms": 971,
+          "maximumMs": 1033
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 614,
+              "p99": 825,
+              "max": 993
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 609,
+              "p99": 824,
+              "max": 992
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 6
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 614,
+          "p99Ms": 825,
+          "maximumMs": 993
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 686,
+              "p99": 824,
+              "max": 944
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 683,
+              "p99": 820,
+              "max": 942
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 8
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 686,
+          "p99Ms": 824,
+          "maximumMs": 944
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 757,
+              "p99": 952,
+              "max": 986
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 750,
+              "p99": 911,
+              "max": 960
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 2
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 757,
+          "p99Ms": 953,
+          "maximumMs": 986
+        }
+      ],
+      "preliminaryGatePassed": true,
+      "exclusions": [
+        "canonical lesson/assessment completion and retry integrity",
+        "full six-read teacher snapshots",
+        "realtime delivery",
+        "browser/iPad rendering",
+        "production-equivalent cloud resources",
+        "long soak"
+      ]
+    },
+    "sampling": {
+      "samples": 1501,
+      "observedTransactions": 663,
+      "maxObservedAgePerTransactionMs": {
+        "0.5": 3.628,
+        "0.95": 15.303,
+        "1": 45.906
+      },
+      "stateSampleCounts": [
+        {
+          "state": "active",
+          "waitType": null,
+          "waitEvent": null,
+          "samples": 195
+        },
+        {
+          "state": "active",
+          "waitType": "IO",
+          "waitEvent": "WalSync",
+          "samples": 42
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": "Client",
+          "waitEvent": "ClientRead",
+          "samples": 322
+        },
+        {
+          "state": "active",
+          "waitType": "LWLock",
+          "waitEvent": "WALWrite",
+          "samples": 70
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": null,
+          "waitEvent": null,
+          "samples": 24
+        },
+        {
+          "state": "active",
+          "waitType": "Client",
+          "waitEvent": "ClientRead",
+          "samples": 7
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": "IO",
+          "waitEvent": "WalSync",
+          "samples": 1
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": "LWLock",
+          "waitEvent": "WALWrite",
+          "samples": 2
+        }
+      ],
+      "caveats": [
+        "Sampling misses transactions shorter than the interval",
+        "Database transaction age excludes waiting for a pool connection",
+        "PostgREST includes non-workload connections; not per-request attribution",
+        "Profiling introduces observer overhead"
+      ]
+    },
+    "pool": {
+      "samples": 295,
+      "maxOutstanding": 490,
+      "timeoutsDelta": 0,
+      "note": "Outstanding includes requests in service, not just waiting for acquisition"
+    }
+  },
+  {
+    "run": "connection-profile-repeat",
+    "capacity": {
+      "at": "2026-11-16T08:58:59.272Z",
+      "environment": "local protocol rehearsal; not production capacity certification",
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 75,
+        "eventLoopUtilization": 0.05611276269794323
+      },
+      "scenario": "students-only",
+      "restRoute": "gateway",
+      "loginRampSeconds": 0,
+      "students": 500,
+      "teachers": 0,
+      "provisionedStudents": 500,
+      "historyEvents": 100000,
+      "durationSeconds": 61,
+      "requests": 5000,
+      "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+      "snapshotHttpRequests": 0,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "failures": [],
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 2175,
+              "p99": 2945,
+              "max": 3424
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 2116,
+              "p99": 2877,
+              "max": 3329
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2175,
+          "p99Ms": 2945,
+          "maximumMs": 3424
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 1750,
+              "p99": 2244,
+              "max": 2977
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 1745,
+              "p99": 2243,
+              "max": 2975
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 6
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1750,
+          "p99Ms": 2244,
+          "maximumMs": 2977
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 1751,
+              "p99": 2445,
+              "max": 3164
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 1749,
+              "p99": 2439,
+              "max": 3163
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1751,
+          "p99Ms": 2445,
+          "maximumMs": 3164
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 1071,
+              "p99": 1573,
+              "max": 2896
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 1036,
+              "p99": 1563,
+              "max": 2892
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1071,
+          "p99Ms": 1573,
+          "maximumMs": 2896
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 963,
+              "p99": 1541,
+              "max": 2337
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 960,
+              "p99": 1539,
+              "max": 2330
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 2
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 963,
+          "p99Ms": 1541,
+          "maximumMs": 2337
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 1000,
+              "p95": 742,
+              "p99": 1347,
+              "max": 2354
+            },
+            "upstreamMs": {
+              "samples": 1000,
+              "p95": 740,
+              "p99": 1344,
+              "max": 2347
+            },
+            "proxyMs": {
+              "samples": 1000,
+              "p95": 1,
+              "p99": 1,
+              "max": 6
+            }
+          },
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 742,
+          "p99Ms": 1347,
+          "maximumMs": 2354
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "timings": {
+            "headersMs": {
+              "samples": 500,
+              "p95": 753,
+              "p99": 952,
+              "max": 1056
+            },
+            "upstreamMs": {
+              "samples": 500,
+              "p95": 747,
+              "p99": 932,
+              "max": 1030
+            },
+            "proxyMs": {
+              "samples": 500,
+              "p95": 1,
+              "p99": 1,
+              "max": 3
+            }
+          },
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 753,
+          "p99Ms": 952,
+          "maximumMs": 1056
+        }
+      ],
+      "preliminaryGatePassed": false,
+      "exclusions": [
+        "canonical lesson/assessment completion and retry integrity",
+        "full six-read teacher snapshots",
+        "realtime delivery",
+        "browser/iPad rendering",
+        "production-equivalent cloud resources",
+        "long soak"
+      ]
+    },
+    "sampling": {
+      "samples": 1501,
+      "observedTransactions": 690,
+      "maxObservedAgePerTransactionMs": {
+        "0.5": 5.329,
+        "0.95": 17.589,
+        "1": 53.872
+      },
+      "stateSampleCounts": [
+        {
+          "state": "active",
+          "waitType": null,
+          "waitEvent": null,
+          "samples": 174
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": "Client",
+          "waitEvent": "ClientRead",
+          "samples": 353
+        },
+        {
+          "state": "active",
+          "waitType": "IO",
+          "waitEvent": "WalSync",
+          "samples": 37
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": null,
+          "waitEvent": null,
+          "samples": 33
+        },
+        {
+          "state": "active",
+          "waitType": "LWLock",
+          "waitEvent": "WALWrite",
+          "samples": 81
+        },
+        {
+          "state": "active",
+          "waitType": "LWLock",
+          "waitEvent": "LockManager",
+          "samples": 1
+        },
+        {
+          "state": "active",
+          "waitType": "Client",
+          "waitEvent": "ClientRead",
+          "samples": 11
+        },
+        {
+          "state": "idle in transaction",
+          "waitType": "IO",
+          "waitEvent": "WalSync",
+          "samples": 1
+        }
+      ],
+      "caveats": [
+        "Sampling misses transactions shorter than the interval",
+        "Database transaction age excludes waiting for a pool connection",
+        "PostgREST includes non-workload connections; not per-request attribution",
+        "Profiling introduces observer overhead"
+      ]
+    },
+    "pool": {
+      "samples": 295,
+      "maxOutstanding": 489,
+      "timeoutsDelta": 0,
+      "note": "Outstanding includes requests in service, not just waiting for acquisition"
+    }
+  }
+]

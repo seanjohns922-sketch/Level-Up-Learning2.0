@@ -49,3 +49,10 @@ This release does not certify the current 500-student mixed-load gate or the
 10,000 simultaneous-user target. Burst latency remains inconsistent; see
 TEN_THOUSAND_CONCURRENT.md. Local integrity checks passed, but further pool and
 transaction timing, mixed-load, realtime and long-soak work remains.
+
+## Hosted migration update
+
+The user reported applying the realm-lock migration in Supabase SQL Editor on
+16 November 2026 after main was pushed at 0456b938. This is user-confirmed
+application, not an independent hosted-database verification. Hosted deployment
+status and a live realm-lock read remain unverified.

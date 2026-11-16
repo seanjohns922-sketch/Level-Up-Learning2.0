@@ -3,6 +3,15 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Higher-frequency connection profile
+
+Two identical local student bursts gave login p95 676 ms (pass) and 2,175 ms
+(fail). Both preserved all tested activity. 50 ms connection samples observed
+short database transactions and pool counters reached roughly 490 outstanding
+requests, including work in service. This narrows the next investigation but is
+not per-request acquisition timing or a proven fix. See
+`LOCAL_CONNECTION_PROFILE_2026-11-16.md`. Mixed-load capacity remains unverified.
+
 ## Gateway comparison follow-up
 
 Four matched local bursts (gateway/direct/direct/gateway) preserved all activity.
