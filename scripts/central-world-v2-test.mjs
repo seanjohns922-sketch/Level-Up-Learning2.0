@@ -14,8 +14,9 @@ let checks = 0;
 const check = (fn, message) => { checks++; assert.ok(fn(), message); };
 
 // The switch is off unless asked for.
-check(() => !isCentralWorldV2Enabled(new URLSearchParams("")), "v2 must be off by default");
-check(() => isCentralWorldV2Enabled(new URLSearchParams("hub=v2")), "?hub=v2 turns the new hub on");
+check(() => isCentralWorldV2Enabled(new URLSearchParams("")), "the bigger hub is the default");
+check(() => isCentralWorldV2Enabled(new URLSearchParams("hub=v2")), "old ?hub=v2 links still open the bigger hub");
+check(() => !isCentralWorldV2Enabled(new URLSearchParams("hub=classic")), "?hub=classic opens the previous hub");
 
 // Today's build grid fits inside the protected build area, so no saved cell is affected.
 const grid = CENTRAL_WORLD_GRID;
@@ -74,8 +75,8 @@ check(() => distanceFromBuildArea(door.position[0], door.position[2]) > 20, "the
 check(() => parseTreehouseRoom("gems") === "gems" && parseTreehouseRoom("legends") === "legends" && parseTreehouseRoom("attic") === "main" && parseTreehouseRoom(null) === "main", "unknown rooms fall back to the main room");
 assert.equal(treehouseHref(), "/world/treehouse");
 assert.equal(treehouseHref("gems", true), "/world/treehouse?teacher_preview=1&room=gems");
-assert.equal(treehouseExitHref(), "/world?hub=v2&spawn=my-home-exit-spawn");
-assert.equal(treehouseExitHref(true), "/world?teacher_preview=1&hub=v2&spawn=my-home-exit-spawn");
+assert.equal(treehouseExitHref(), "/world?spawn=my-home-exit-spawn");
+assert.equal(treehouseExitHref(true), "/world?teacher_preview=1&spawn=my-home-exit-spawn");
 assert.equal(collectionFromTreehouseHref("/gem-vault", "gems"), "/gem-vault?from=treehouse&room=gems");
 assert.equal(collectionFromTreehouseHref("/legends", "legends", true), "/legends?from=treehouse&room=legends&teacher_preview=1");
 checks += 6;

@@ -5,10 +5,14 @@
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
 import { isCentralWorldProtectedCell, type CentralWorldBuildRules, type CentralWorldGrid } from "./central-world-layout";
 
-/** Off for students until launch: `?hub=v2` or NEXT_PUBLIC_CENTRAL_WORLD_V2=1 turns it on. */
+/**
+ * The bigger hub is the hub for everyone. `?hub=classic` opens the previous hub
+ * for comparison, and NEXT_PUBLIC_CENTRAL_WORLD_V2=0 switches it off site-wide
+ * as an emergency rollback without a code change.
+ */
 export function isCentralWorldV2Enabled(search?: { get(name: string): string | null } | null) {
-  if (process.env.NEXT_PUBLIC_CENTRAL_WORLD_V2 === "1") return true;
-  return search?.get("hub") === "v2";
+  if (process.env.NEXT_PUBLIC_CENTRAL_WORLD_V2 === "0") return false;
+  return search?.get("hub") !== "classic";
 }
 
 type Point = readonly [number, number];
