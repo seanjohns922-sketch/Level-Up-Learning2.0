@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BatteryCharging, Box, Cpu, Gem, LockKeyhole, Sparkles } from "lucide-react";
 import EconomyHeader from "@/components/economy/EconomyHeader";
+import { useTreehouseReturn } from "@/lib/world3d/use-treehouse-return";
 import GemCase from "@/components/gems/GemCase";
 import GemIcon, { cutForGem, emblemForGem } from "@/components/gems/GemIcon";
 import GemVaultHeader from "@/components/gems/GemVaultHeader";
@@ -40,6 +41,7 @@ const PANEL = "rounded-2xl border border-white/10 bg-white/[0.03]";
 
 export default function GemVaultPage() {
   const student = useMemo(() => getActiveStudentProfile(), []);
+  const treehouseReturn = useTreehouseReturn();
   const [vault, setVault] = useState<GemVault | null>(null);
   const [tab, setTab] = useState("all");
   const [message, setMessage] = useState<string | null>(null);
@@ -145,6 +147,7 @@ export default function GemVaultPage() {
     <main className="min-h-screen bg-[radial-gradient(1100px_500px_at_50%_-10%,#1a2230,transparent),linear-gradient(#0c0f16,#0a0d13)] text-white">
       <EconomyHeader />
       <div className="mx-auto max-w-[1180px] px-4 py-6 md:px-6">
+        {treehouseReturn ? <a href={treehouseReturn.href} className="mb-4 inline-flex items-center gap-1 text-sm font-bold text-amber-200 hover:text-white">← {treehouseReturn.label}</a> : null}
         <GemVaultHeader collected={collected} total={total} favourite={favourite} rarityCounts={rarityCounts} />
 
         {message ? (

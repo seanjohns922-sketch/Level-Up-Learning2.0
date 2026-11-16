@@ -17,7 +17,7 @@ import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Cas
 import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
-import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_PLAY_RADIUS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import {
@@ -43,6 +43,7 @@ import {
   mergeCentralWorldCatalogue,
 } from "@/lib/world3d/central-world-customisation-catalog";
 import { rememberCentralWorldHomeEntry } from "@/lib/world3d/world-navigation-context";
+import { treehouseHref } from "@/lib/world3d/treehouse-navigation";
 import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 import { speak } from "@/lib/speak";
 import { CENTRAL_WORLD_STARTER_SCENERY, type WorldSceneryGroup } from "@/lib/world3d/central-world-editor-catalog";
@@ -277,7 +278,7 @@ function BuildModeSurface({ active, paint, continuous, onStrokeState, gestureRef
   );
 }
 
-function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false }: { hubV2?: boolean; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors }: { hubV2?: boolean; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -345,7 +346,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
       {/* A name tag floats over what the learner is near; the dock's main button acts on it. */}
       {activeTargetId && !editing && !buildPreview ? (() => {
         const home = activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
-        const at = home ? getCentralWorldHomeAnchors(homePlacement).entrance : CENTRAL_WORLD_CONFIG.towerMainEntrance;
+        const at = home ? homeAnchors.entrance : CENTRAL_WORLD_CONFIG.towerMainEntrance;
         const name = home ? "My Home" : "Tower of Knowledge";
         return (
           <Html position={[at[0], at[1] + (home ? 6.2 : 9), at[2]]} center zIndexRange={[20, 0]} style={{ pointerEvents: "auto" }}>
@@ -370,7 +371,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
         canStandAt={hubV2 ? hubCanStand : undefined}
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
-          { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: getCentralWorldHomeAnchors(homePlacement).entrance, distance: 4.8 },
+          { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
         ]}
         onNearestTargetId={handleNearestTarget}
         cameraDistance={11.5}
@@ -429,9 +430,10 @@ export default function CentralWorld() {
   const placementScope = preview ? "demo-preview" : student?.studentId ?? "guest";
   const [placedCustomisations, setPlacedCustomisations] = useState<CentralWorldPlacement[]>(() => readCentralWorldPlacements(placementScope));
   const homePlacement = getCentralWorldHome(placedCustomisations);
-  const homeAnchors = getCentralWorldHomeAnchors(homePlacement);
   const requestedBuildItemKey = searchParams.get("build");
   const hubV2 = isCentralWorldV2Enabled(searchParams);
+  // The bigger hub's home is the fixed treehouse; today's hub keeps the movable lodge.
+  const homeAnchors = hubV2 ? HUB_V2_TREEHOUSE_ANCHORS : getCentralWorldHomeAnchors(homePlacement);
   const requestedQuality = searchParams.get("quality");
   const quality: CentralWorldQuality = requestedQuality === "low" || requestedQuality === "high" ? requestedQuality : "medium";
   const [moveInput, setMoveInput] = useState<WorldMoveInput>(EMPTY_WORLD_MOVE_INPUT);
@@ -766,7 +768,11 @@ export default function CentralWorld() {
       return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
     });
     if (!hit) return false;
-    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) { moveMyHome(); return true; }
+    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) {
+      if (hubV2) return false;
+      moveMyHome();
+      return true;
+    }
     const item = itemsById.get(hit.itemId);
 
     setSelectedSceneryItemKey(null);
@@ -1059,7 +1065,7 @@ export default function CentralWorld() {
   function enterMyHome() {
     if (transitioning) return;
     rememberCentralWorldHomeEntry(preview);
-    window.location.assign("/home-base");
+    window.location.assign(hubV2 ? treehouseHref("main", preview) : "/home-base");
   }
 
   function enterTower() {
@@ -1084,7 +1090,7 @@ export default function CentralWorld() {
     <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
-        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} />
+        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} />
       </Canvas>
       </div>
 
@@ -1155,7 +1161,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditRound" aria-label="More options" aria-haspopup="menu" aria-expanded={menuOpen} aria-pressed={menuOpen} onClick={() => setMenuOpen((open) => !open)}><MoreHorizontal size={22} /></button>
               {menuOpen ? (
                 <div className="worldEditMenu" role="menu" aria-label="More options">
-                  <button type="button" role="menuitem" onClick={moveMyHome}><Home size={18} />Move my home</button>
+                  {hubV2 ? null : <button type="button" role="menuitem" onClick={moveMyHome}><Home size={18} />Move my home</button>}
                   <button type="button" role="menuitemcheckbox" aria-checked={arrowControls} onClick={() => {
                     const next = !arrowControls;
                     setArrowControls(next);

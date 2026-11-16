@@ -13,6 +13,7 @@ import RealmCard from "@/components/legends/RealmCard";
 import { useChronorokProgress } from "@/lib/useChronorokProgress";
 import { CRYSTALS_TO_AWAKEN } from "@/lib/chronorok";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
+import { useTreehouseReturn } from "@/lib/world3d/use-treehouse-return";
 
 export type RealmDef = {
   id: string;
@@ -111,6 +112,7 @@ const getServerSnapshot = () => false;
 
 export default function LegendsPage() {
   const router = useRouter();
+  const treehouseReturn = useTreehouseReturn();
   // Progress is realm-scoped in storage, so each realm's legends must be read
   // from its own record — otherwise Measurelands unlocks (saved under the
   // "measurement" scope) are invisible on this shared page.
@@ -215,11 +217,11 @@ export default function LegendsPage() {
         <div className="max-w-5xl mx-auto w-full px-5 pt-6 pb-2">
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => router.push("/home-base")}
+              onClick={() => router.push(treehouseReturn?.href ?? "/home-base")}
               className="text-sm font-bold text-amber-200 hover:text-white transition flex items-center gap-1"
               style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
             >
-              ← My Home
+              ← {treehouseReturn?.label ?? "My Home"}
             </button>
             <div
               className="text-sm font-bold px-4 py-1.5 rounded-full border shadow-sm"

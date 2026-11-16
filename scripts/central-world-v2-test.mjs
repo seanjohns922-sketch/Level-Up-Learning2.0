@@ -1,10 +1,12 @@
 // Rules for the bigger central hub: saved builds never move, the old build area
-// stays flat, and new features (river, bridges, paths, gums) stay out of it.
+// stays flat, new features (river, bridges, paths, gums) stay out of it, and the
+// treehouse links in and out correctly.
 import assert from "node:assert/strict";
 import {
   HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WATER_Y,
-  distanceFromBuildArea, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubTerrainHeight, hubV2Spot, isCentralWorldV2Enabled,
+  HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubTerrainHeight, hubV2Spot, isCentralWorldV2Enabled,
 } from "../lib/world3d/central-world-v2.ts";
+import { collectionFromTreehouseHref, parseTreehouseRoom, treehouseExitHref, treehouseHref, treehouseWindowView, DEFAULT_WINDOW_VIEW } from "../lib/world3d/treehouse-navigation.ts";
 import { CENTRAL_WORLD_GRID } from "../lib/world3d/central-world-layout.ts";
 import { CENTRAL_WORLD_CONFIG } from "../lib/world3d/central-world-config.ts";
 
@@ -60,5 +62,28 @@ for (const key of ["hub-river", "hub-camp", "hub-lookout", "hub-treehouse", "hub
   check(() => spot && hubCanStand(spot.position[0], spot.position[2]), `${key} must be a walkable spot`);
 }
 check(() => hubV2Spot("not-a-spot") === null, "unknown spots are ignored");
+
+// The treehouse door and its arrival point are walkable, and the treehouse sits outside the build area.
+const door = HUB_V2_TREEHOUSE_ANCHORS;
+check(() => hubCanStand(door.entrance[0], door.entrance[2]), "treehouse entrance must be walkable");
+check(() => hubCanStand(door.exit[0], door.exit[2]), "treehouse exit must be walkable");
+check(() => !hubCanStand(door.position[0], door.position[2]), "the treehouse trunk must block walking");
+check(() => distanceFromBuildArea(door.position[0], door.position[2]) > 20, "the treehouse must stand outside the build area");
+
+// Treehouse links.
+check(() => parseTreehouseRoom("gems") === "gems" && parseTreehouseRoom("legends") === "legends" && parseTreehouseRoom("attic") === "main" && parseTreehouseRoom(null) === "main", "unknown rooms fall back to the main room");
+assert.equal(treehouseHref(), "/world/treehouse");
+assert.equal(treehouseHref("gems", true), "/world/treehouse?teacher_preview=1&room=gems");
+assert.equal(treehouseExitHref(), "/world?hub=v2&spawn=my-home-exit-spawn");
+assert.equal(treehouseExitHref(true), "/world?teacher_preview=1&hub=v2&spawn=my-home-exit-spawn");
+assert.equal(collectionFromTreehouseHref("/gem-vault", "gems"), "/gem-vault?from=treehouse&room=gems");
+assert.equal(collectionFromTreehouseHref("/legends", "legends", true), "/legends?from=treehouse&room=legends&teacher_preview=1");
+checks += 6;
+
+// Window views: the aurora skin and the stock room show the new painting; other skins keep their art until theirs arrives.
+assert.equal(treehouseWindowView(undefined), DEFAULT_WINDOW_VIEW);
+assert.equal(treehouseWindowView("/images/home-themes/aurora-mountain-cabin.png"), "/images/treehouse-views/aurora.jpg");
+assert.equal(treehouseWindowView("/images/home-themes/crystal-observatory.png"), "/images/home-themes/crystal-observatory.png");
+checks += 3;
 
 console.log(`central world v2: ${checks} checks passed`);

@@ -34,6 +34,8 @@ import { WorldWater } from "./WorldWater";
 import { OrganicPaths } from "@/components/world3d/OrganicPaths";
 import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
 import { CentralWorldV2Scenery } from "@/components/world3d/CentralWorldV2Scenery";
+import { ExplorerTreehouse } from "@/components/world3d/ExplorerTreehouse";
+import { HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
 import { CentralValleyPanorama } from "./CentralValleyPanorama";
 import { CentralMeadowRim } from "./CentralMeadowRim";
 import {
@@ -1207,7 +1209,7 @@ export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive
       <Suspense fallback={null}>
         <CentralValleyPanorama quality={quality} />
       </Suspense>
-      {hubV2 ? <CentralWorldV2Scenery quality={quality} animate={quality !== "low" && !reducedMotion} placements={placedCustomisations} groundTiles={groundTiles} itemsById={itemsById} /> : <>
+      {hubV2 ? <CentralWorldV2Scenery quality={quality} animate={quality !== "low" && !reducedMotion} placements={placedCustomisations.filter((p) => p.itemId !== CENTRAL_WORLD_HOME_KEY)} groundTiles={groundTiles} itemsById={itemsById} /> : <>
         <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
           <MeadowGround />
           <CentralMeadowRim />
@@ -1216,7 +1218,7 @@ export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive
       </>}
       <PaintedGround tiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
-      <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
+      {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {

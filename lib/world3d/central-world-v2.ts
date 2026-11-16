@@ -182,7 +182,9 @@ export const HUB_V2_ROCKS: HubRock[] = (() => {
 })();
 
 const CAMP = HUB_V2_PADS.find((p) => p.key === "camp")!;
+const TREEHOUSE = HUB_V2_PADS.find((p) => p.key === "treehouse")!;
 export const HUB_V2_COLLIDERS: HubCollider[] = [
+  { x: TREEHOUSE.x, z: TREEHOUSE.z, r: 2.8 }, { x: TREEHOUSE.x - 1.5, z: TREEHOUSE.z + 4.2, r: 2 }, { x: TREEHOUSE.x + 10, z: TREEHOUSE.z - 5, r: 0.5 },
   { x: CAMP.x, z: CAMP.z, r: 1 }, { x: CAMP.x - 5, z: CAMP.z - 4, r: 1.7 }, { x: CAMP.x + 4.5, z: CAMP.z - 4.5, r: 1.7 },
   ...HUB_V2_GUMS.map((g) => ({ x: g.x, z: g.z, r: 0.8 * g.s })),
   ...HUB_V2_ROCKS.filter((r) => r.s > 1.8).map((r) => ({ x: r.x, z: r.z, r: r.s * 0.32 })),
@@ -255,3 +257,11 @@ export function hubV2Spot(key: string | null): { position: [number, number, numb
   const spot = key ? SPOTS[key] : undefined;
   return spot ? { position: [spot.x, 0.75, spot.z], yaw: spot.yaw } : null;
 }
+
+/** The treehouse stands in its own clearing, front door facing the meadows (+x). Same shape as the movable home's anchors. */
+export const HUB_V2_TREEHOUSE_ANCHORS = {
+  position: [TREEHOUSE.x, TREEHOUSE.y, TREEHOUSE.z] as [number, number, number],
+  rotationY: Math.PI / 2,
+  entrance: [TREEHOUSE.x + 6.5, 0.75, TREEHOUSE.z] as [number, number, number],
+  exit: [TREEHOUSE.x + 10, 0.75, TREEHOUSE.z] as [number, number, number],
+};

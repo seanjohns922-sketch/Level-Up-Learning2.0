@@ -4,7 +4,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { canvasTexture, disposeGeometries, ghostGumBarkTexture, hash01 as noise, mergeByMaterial } from "@/components/world3d/three-build-utils";
 import type { EconomyItem } from "@/lib/economy";
 import type { CentralWorldQuality } from "@/lib/world3d/central-world-config";
 import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib/world3d/central-meadow-colour";
@@ -14,53 +14,6 @@ import {
   distanceFromBuildArea, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
   type HubBridge, type HubScenery,
 } from "@/lib/world3d/central-world-v2";
-
-function canvasTexture(width: number, height: number, draw: (g: CanvasRenderingContext2D, w: number, h: number) => void, repeat?: [number, number]) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width; canvas.height = height;
-  const context = canvas.getContext("2d");
-  if (context) draw(context, width, height);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 4;
-  if (repeat) { texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.repeat.set(...repeat); }
-  return texture;
-}
-
-function noise(i: number) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
-
-/** Merge static meshes that share a material so a whole structure draws in a few calls. */
-function mergeByMaterial(group: THREE.Group) {
-  group.updateMatrixWorld(true);
-  const buckets = new Map<THREE.Material, THREE.BufferGeometry[]>();
-  group.traverse((object) => {
-    const mesh = object as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const material = mesh.material as THREE.Material;
-    const geometry = (mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()).applyMatrix4(mesh.matrixWorld);
-    for (const name of Object.keys(geometry.attributes)) if (!["position", "normal", "uv"].includes(name)) geometry.deleteAttribute(name);
-    if (!geometry.attributes.uv) geometry.setAttribute("uv", new THREE.Float32BufferAttribute(new Float32Array(geometry.attributes.position.count * 2), 2));
-    if (!buckets.has(material)) buckets.set(material, []);
-    buckets.get(material)!.push(geometry);
-  });
-  const out = new THREE.Group();
-  buckets.forEach((geometries, material) => {
-    const merged = mergeGeometries(geometries, false);
-    geometries.forEach((g) => g.dispose());
-    if (!merged) return;
-    const mesh = new THREE.Mesh(merged, material);
-    mesh.castShadow = true; mesh.receiveShadow = true;
-    out.add(mesh);
-  });
-  return out;
-}
-
-function disposeGroup(group: THREE.Object3D) {
-  group.traverse((object) => {
-    const mesh = object as THREE.Mesh;
-    if (mesh.isMesh) mesh.geometry.dispose();
-  });
-}
 
 // ---------- terrain ----------
 // The meadow uses the same textured grass shader as today's hub; paths, sand,
@@ -123,11 +76,11 @@ function HubRiver({ animate }: { animate: boolean }) {
     g.fillStyle = "#3aa9d6"; g.fillRect(0, 0, w, h);
     g.strokeStyle = "rgba(255,255,255,.32)"; g.lineWidth = 2;
     for (let i = 0; i < 40; i++) { const x = noise(i) * w, y = noise(i + 4) * h, l = 10 + noise(i + 8) * 24; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + l / 2, y - 3, x + l, y); g.stroke(); }
-  }, [6, 60]), []);
+  }, { repeat: [6, 60] }), []);
   const fall = useMemo(() => canvasTexture(64, 256, (g, w, h) => {
     g.fillStyle = "#c4ecfb"; g.fillRect(0, 0, w, h);
     for (let i = 0; i < 30; i++) { g.fillStyle = `rgba(255,255,255,${0.3 + noise(i) * 0.6})`; g.fillRect(noise(i + 1) * w, 0, 1 + noise(i + 2) * 3, h); }
-  }, [2, 1]), []);
+  }, { repeat: [2, 1] }), []);
   useEffect(() => () => { ripple.dispose(); fall.dispose(); }, [ripple, fall]);
   const waterMaterial = useRef<THREE.MeshStandardMaterial>(null), fallMaterial = useRef<THREE.MeshStandardMaterial>(null);
   useFrame(({ clock }) => {
@@ -180,7 +133,7 @@ function HubFallsCliff() {
     const merged = mergeByMaterial(g);
     return { merged, materials: [light, dark], top };
   }, []);
-  useEffect(() => () => { disposeGroup(built.merged); built.materials.forEach((m) => m.dispose()); }, [built]);
+  useEffect(() => () => { disposeGeometries(built.merged); built.materials.forEach((m) => m.dispose()); }, [built]);
   return <primitive object={built.merged} />;
 }
 
@@ -238,7 +191,7 @@ function HubBridges() {
     HUB_V2_BRIDGES.forEach((bridge) => root.add(buildBridge(bridge, materials)));
     return { root, materials };
   }, []);
-  useEffect(() => () => { disposeGroup(built.root); Object.values(built.materials).forEach((m) => m.dispose()); }, [built]);
+  useEffect(() => () => { disposeGeometries(built.root); Object.values(built.materials).forEach((m) => m.dispose()); }, [built]);
   return <primitive object={built.root} />;
 }
 
@@ -247,10 +200,7 @@ const GUM_LEAVES = ["#7c9a52", "#8aa95e", "#6c8a47"];
 function HubGhostGums({ gums }: { gums: HubScenery[] }) {
   const trunkRef = useRef<THREE.InstancedMesh>(null), branchRef = useRef<THREE.InstancedMesh>(null), canopyRef = useRef<THREE.InstancedMesh>(null);
   const assets = useMemo(() => {
-    const bark = canvasTexture(128, 256, (g, w, h) => {
-      g.fillStyle = "#ece5d6"; g.fillRect(0, 0, w, h);
-      for (let i = 0; i < 40; i++) { g.fillStyle = ["#d8cdb8", "#f8f4ea", "#cbbd9f", "#efe3c6"][i % 4]; g.globalAlpha = 0.55; g.beginPath(); g.ellipse(noise(i) * w, noise(i + 9) * h, 4 + noise(i + 3) * 12, 16 + noise(i + 5) * 50, 0, 0, Math.PI * 2); g.fill(); }
-    }, [2, 1]);
+    const bark = ghostGumBarkTexture([2, 1]);
     const trunk = new THREE.CylinderGeometry(0.3, 0.55, 8, 10); trunk.translate(0, 4, 0);
     const branch = new THREE.CylinderGeometry(0.13, 0.25, 3.4, 8); branch.translate(0, 1.7, 0);
     return { bark: new THREE.MeshStandardMaterial({ map: bark, roughness: 0.75 }), leaf: new THREE.MeshStandardMaterial({ color: "#ffffff", flatShading: true, roughness: 0.75 }), trunk, branch, blob: new THREE.IcosahedronGeometry(1, 1), barkTexture: bark };
@@ -367,7 +317,7 @@ function HubLookout() {
     merged.position.set(pad.x, pad.y, pad.z);
     return { merged, materials: [wood, deck, flag] };
   }, [pad]);
-  useEffect(() => () => { disposeGroup(built.merged); built.materials.forEach((m) => m.dispose()); }, [built]);
+  useEffect(() => () => { disposeGeometries(built.merged); built.materials.forEach((m) => m.dispose()); }, [built]);
   return <primitive object={built.merged} />;
 }
 
