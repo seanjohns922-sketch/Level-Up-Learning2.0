@@ -9,7 +9,8 @@ export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?:
   const pathname = usePathname();
   const preview = useDemoPreviewMode();
   const destinations = [
-    { href: preview ? "/world?teacher_preview=1" : "/home-base", label: preview ? "My World" : "My Home", icon: House },
+    // The treehouse is home; its entry sends students on the 2D world to /home-base.
+    { href: preview ? "/world?teacher_preview=1" : "/world/treehouse", label: preview ? "My World" : "My Home", icon: House },
     { href: "/wardrobe", label: "Explorer Outfit", icon: Shirt },
     { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
     { href: "/gem-vault", label: "Gem Vault", icon: Gem },

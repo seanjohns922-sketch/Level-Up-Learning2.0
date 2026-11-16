@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Lock, Plus, Shuffle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EconomyHeader from "@/components/economy/EconomyHeader";
+import TreehouseBackLink from "@/components/world3d/treehouse/TreehouseBackLink";
 import StudentAvatar, { type AvatarOutfit, type BodyType, type BottomStyle, type FaceType, type HairStyle, type ShoeStyle, type TopStyle } from "@/components/avatar/StudentAvatar";
 import {
   AVATAR_BASE_KEYS,
@@ -407,6 +408,7 @@ export default function ExplorerOutfitPage() {
     <main className="min-h-screen bg-[radial-gradient(1200px_600px_at_50%_-10%,#e7eefc,transparent),linear-gradient(#eef2f6,#e6ebf1)] text-slate-900">
       <EconomyHeader xp={state?.wallet.xp_balance} essence={state?.wallet.essence} rankLevel={getExplorerRank(state?.wallet.xp_earned ?? 0).level} />
       <div className="mx-auto max-w-[1180px] px-4 py-6 md:px-6">
+        <TreehouseBackLink tone="light" />
         <div className="mb-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">My Home</p>
           <h1 className="text-3xl font-black md:text-4xl">Explorer Outfit</h1>

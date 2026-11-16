@@ -23,8 +23,9 @@ export function treehouseExitHref(preview = false) {
   return `/world?${params.toString()}`;
 }
 
-/** Full collection pages opened from a room carry where to come back to. */
-export function collectionFromTreehouseHref(page: "/gem-vault" | "/legends", room: TreehouseRoomParam, preview = false) {
+/** Pages opened from a treehouse room (collections, wardrobe, shop) carry where to come back to. */
+export type TreehouseLinkedPage = "/gem-vault" | "/legends" | "/wardrobe" | "/marketplace";
+export function pageFromTreehouseHref(page: TreehouseLinkedPage, room: TreehouseRoomParam, preview = false) {
   const params = new URLSearchParams({ from: "treehouse", room });
   if (preview) params.set("teacher_preview", "1");
   return `${page}?${params.toString()}`;

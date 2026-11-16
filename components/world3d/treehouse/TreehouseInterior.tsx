@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import { ArrowLeft, Gem, Image as ImageIcon, Landmark, Sofa, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Gem, Image as ImageIcon, Landmark, Shirt, ShoppingBag, Sofa, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -13,12 +13,12 @@ import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEc
 import { awardAndReveal } from "@/lib/gem-reveal";
 import { fetchGemVault } from "@/lib/gems";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import { collectionFromTreehouseHref, treehouseExitHref, treehouseHref, treehouseWindowView, type TreehouseRoomParam } from "@/lib/world3d/treehouse-navigation";
+import { pageFromTreehouseHref, treehouseExitHref, treehouseHref, treehouseWindowView, type TreehouseRoomParam } from "@/lib/world3d/treehouse-navigation";
 
 const STOCK_ROOM_IMAGE = "/images/home-themes/explorer-study.png";
 
 const ROOMS: Record<TreehouseRoomParam, { name: string; speech: string; Icon: typeof Sofa }> = {
-  main: { name: "Main room", speech: "Your treehouse main room. The view through the round window is your home skin. Climb the ladder to the Hall of Legends, or go down the glowing hatch to the Gem Cave.", Icon: Sofa },
+  main: { name: "Main room", speech: "Your treehouse main room. The view through the round window is your home skin. Change your outfit at the wardrobe mirror, or visit the trading post to buy new things. Climb the ladder to the Hall of Legends, or go down the glowing hatch to the Gem Cave.", Icon: Sofa },
   gems: { name: "Gem Cave", speech: "The Gem Cave, in the roots of the ghost gum. Your gems glow in the nooks. Open the Gem Vault to see every gem you have earned.", Icon: Gem },
   legends: { name: "Hall of Legends", speech: "The Hall of Legends, where your RELIQS live. Open My RELIQS to see your whole collection.", Icon: Landmark },
 };
@@ -164,8 +164,8 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
   };
 
   const info = ROOMS[room];
-  const collection = room === "gems" ? { label: "Open Gem Vault", detail: `${gemsOwned} gem${gemsOwned === 1 ? "" : "s"} collected`, href: collectionFromTreehouseHref("/gem-vault", "gems", preview) }
-    : room === "legends" ? { label: "Open My RELIQS", detail: "Every realm and Chronorok RELIQ", href: collectionFromTreehouseHref("/legends", "legends", preview) } : null;
+  const collection = room === "gems" ? { label: "Open Gem Vault", detail: `${gemsOwned} gem${gemsOwned === 1 ? "" : "s"} collected`, href: pageFromTreehouseHref("/gem-vault", "gems", preview) }
+    : room === "legends" ? { label: "Open My RELIQS", detail: "Every realm and Chronorok RELIQ", href: pageFromTreehouseHref("/legends", "legends", preview) } : null;
 
   return (
     <main data-treehouse className="fixed inset-0 overflow-hidden bg-[#120c08] text-white" style={{ touchAction: "none" }}>
@@ -220,9 +220,17 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
             );
           })}
           {room === "main" ? (
-            <button type="button" onClick={() => setPickerOpen((open) => !open)} aria-expanded={pickerOpen} className="flex items-center gap-2 rounded-xl bg-[#F5C04A] px-3 py-2 text-sm font-black text-[#1c1406]">
-              <ImageIcon size={16} aria-hidden="true" />Window view
-            </button>
+            <>
+              <button type="button" onClick={() => setPickerOpen((open) => !open)} aria-expanded={pickerOpen} className="flex items-center gap-2 rounded-xl bg-[#F5C04A] px-3 py-2 text-sm font-black text-[#1c1406]">
+                <ImageIcon size={16} aria-hidden="true" />Window view
+              </button>
+              <a href={pageFromTreehouseHref("/wardrobe", "main", preview)} className="flex items-center gap-2 rounded-xl bg-[#F5C04A] px-3 py-2 text-sm font-black text-[#1c1406]">
+                <Shirt size={16} aria-hidden="true" />Wardrobe
+              </a>
+              <a href={pageFromTreehouseHref("/marketplace", "main", preview)} className="flex items-center gap-2 rounded-xl bg-[#F5C04A] px-3 py-2 text-sm font-black text-[#1c1406]">
+                <ShoppingBag size={16} aria-hidden="true" />Shop
+              </a>
+            </>
           ) : null}
           {collection ? (
             <a href={collection.href} className="flex items-center gap-2 rounded-xl bg-[#F5C04A] px-3 py-2 text-sm font-black text-[#1c1406]">

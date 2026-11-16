@@ -6,7 +6,7 @@ import {
   HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WATER_Y,
   HUB_V2_BUILD_RULES, HUB_V2_FLAT_TOLERANCE, HUB_V2_GRID, HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubIsReservedCell, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubTerrainHeight, hubV2Spot, isCentralWorldV2Enabled,
 } from "../lib/world3d/central-world-v2.ts";
-import { collectionFromTreehouseHref, parseTreehouseRoom, treehouseExitHref, treehouseHref, treehouseWindowView, DEFAULT_WINDOW_VIEW } from "../lib/world3d/treehouse-navigation.ts";
+import { pageFromTreehouseHref, parseTreehouseRoom, treehouseExitHref, treehouseHref, treehouseWindowView, DEFAULT_WINDOW_VIEW } from "../lib/world3d/treehouse-navigation.ts";
 import { CENTRAL_WORLD_BUILD_RULES, CENTRAL_WORLD_GRID, CENTRAL_WORLD_HOME_KEY, DEFAULT_HOME_PLACEMENT, isCentralWorldProtectedCell, validateCentralWorldGroundCell, validateCentralWorldPlacement } from "../lib/world3d/central-world-layout.ts";
 import { CENTRAL_WORLD_CONFIG } from "../lib/world3d/central-world-config.ts";
 
@@ -77,8 +77,10 @@ assert.equal(treehouseHref(), "/world/treehouse");
 assert.equal(treehouseHref("gems", true), "/world/treehouse?teacher_preview=1&room=gems");
 assert.equal(treehouseExitHref(), "/world?spawn=my-home-exit-spawn");
 assert.equal(treehouseExitHref(true), "/world?teacher_preview=1&spawn=my-home-exit-spawn");
-assert.equal(collectionFromTreehouseHref("/gem-vault", "gems"), "/gem-vault?from=treehouse&room=gems");
-assert.equal(collectionFromTreehouseHref("/legends", "legends", true), "/legends?from=treehouse&room=legends&teacher_preview=1");
+assert.equal(pageFromTreehouseHref("/gem-vault", "gems"), "/gem-vault?from=treehouse&room=gems");
+assert.equal(pageFromTreehouseHref("/legends", "legends", true), "/legends?from=treehouse&room=legends&teacher_preview=1");
+assert.equal(pageFromTreehouseHref("/wardrobe", "main"), "/wardrobe?from=treehouse&room=main");
+assert.equal(pageFromTreehouseHref("/marketplace", "main", true), "/marketplace?from=treehouse&room=main&teacher_preview=1");
 checks += 6;
 
 // Window views: the aurora skin and the stock room show the new painting; other skins keep their art until theirs arrives.

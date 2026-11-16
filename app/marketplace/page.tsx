@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
 import { centralWorldCategory, marketplaceDepartment, marketplaceCategory, MARKETPLACE_CATEGORIES, type MarketplaceDepartment } from "@/lib/marketplace-categories";
 import EconomyHeader from "@/components/economy/EconomyHeader";
+import TreehouseBackLink from "@/components/world3d/treehouse/TreehouseBackLink";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
 import { AVATAR_LAYER_SLOTS, economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, getExplorerRank, mergeAvatarOutfit, purchaseEconomyItem, RARITY_STYLES, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { isMarketplaceItemAvailable, isMarketplaceItemListed } from "@/lib/marketplace-visuals";
@@ -95,6 +96,7 @@ export default function MarketplacePage() {
     <main className="min-h-screen bg-[#f5f3ed] text-slate-900">
       <EconomyHeader xp={state?.wallet.xp_balance} essence={state?.wallet.essence} rankLevel={getExplorerRank(state?.wallet.xp_earned ?? 0).level} />
       <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
+        <TreehouseBackLink tone="light" />
         <header className="mb-7">
           <p className="text-xs font-black uppercase tracking-[0.22em] text-[#6c765f]">Made possible by your learning</p>
           <h1 className="mt-2 text-4xl font-black tracking-tight md:text-5xl">Make it yours.</h1>

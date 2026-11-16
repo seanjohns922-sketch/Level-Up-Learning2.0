@@ -219,7 +219,9 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   const bookColours = ["#c94df2", "#2f7fb8", "#e5484d", "#f5c04a", "#3a9a6a", "#f08a3c", "#6b4fd8"];
   [-Math.PI * 0.82, -Math.PI * 0.18, Math.PI * 0.15].forEach((a, k) => {
     const shelf = new THREE.Group();
-    shelf.add(at(kit.rbox(3.2, 5, 0.95, 0.08, "#6b3d1d"), 0, 2.5, 0));
+    // An open bookcase: back panel and sides, so the books show.
+    shelf.add(at(kit.rbox(3.2, 5, 0.12, 0.04, "#6b3d1d"), 0, 2.5, -0.42));
+    [-1.55, 1.55].forEach((x) => shelf.add(at(kit.rbox(0.12, 5, 0.95, 0.04, "#6b3d1d"), x, 2.5, 0)));
     [0.35, 1.55, 2.75, 3.95].forEach((y) => shelf.add(at(kit.rbox(3, 0.12, 0.9, 0.04, "#8a5530"), 0, y, 0.05)));
     [0.42, 1.62, 2.82, 4.02].forEach((y, row) => {
       let bx = -1.35, i = k * 41 + row * 13;
@@ -264,6 +266,44 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   const sign = (texture: THREE.Texture, x: number, y: number, z: number, ry: number) => g.add(at(kit.mesh(new THREE.PlaneGeometry(2.4, 0.75), kit.mat("#ffffff", { map: texture, roughness: 0.6 })), x, y, z, ry));
   sign(reliqsSign, -4.2, 6.6, -5.2, 0.6);
   sign(caveSign, -1.2, 1.4, 5.7, Math.PI);
+  // Wardrobe corner (left wall): a gold-framed mirror and a rack of outfits. Opens Explorer Outfit.
+  const wardrobe = new THREE.Group();
+  wardrobe.add(at(kit.rbox(1.5, 3.2, 0.18, 0.08, brass), 0, 1.8, 0));
+  wardrobe.add(at(kit.mesh(new THREE.PlaneGeometry(1.24, 2.9), "#dcecf7", { metalness: 0.6, roughness: 0.1, emissive: "#9cc3de", emissiveIntensity: 0.35 }), 0, 1.8, 0.1));
+  const shine = at(new THREE.Mesh(kit.track(new THREE.PlaneGeometry(0.16, 2.2)), kit.track(new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45 }))), -0.2, 1.95, 0.11);
+  shine.rotation.z = -0.35; wardrobe.add(shine);
+  wardrobe.add(at(kit.rbox(1.7, 0.2, 0.6, 0.06, darkWood), 0, 0.1, 0.1));
+  const rack = new THREE.Group();
+  [-0.9, 0.9].forEach((x) => rack.add(at(kit.mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.6, 8), brass), x, 1.3, 0)));
+  const bar = at(kit.mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.9, 8), brass), 0, 2.55, 0); bar.rotation.z = Math.PI / 2; rack.add(bar);
+  (["#c94df2", "#2dd4bf", "#f5c04a"] as const).forEach((colour, i) => {
+    const x = -0.55 + i * 0.55;
+    rack.add(at(kit.mesh(new THREE.TorusGeometry(0.1, 0.02, 6, 12, Math.PI), brass), x, 2.45, 0));
+    rack.add(at(kit.rbox(0.5, 0.8, 0.12, 0.05, colour), x, 1.95, 0));
+  });
+  rack.position.set(1.7, 0, 0.1);
+  wardrobe.add(rack);
+  wardrobe.position.set(-7.4, 0, 1.2); wardrobe.rotation.y = Math.PI / 2;
+  g.add(wardrobe);
+  // Trading post (right wall): striped awning, counter, treasure chest, gem jar and coins. Opens the Marketplace.
+  const shop = new THREE.Group();
+  shop.add(at(kit.rbox(2.6, 1.1, 0.9, 0.1, "#8a5530"), 0, 0.55, 0), at(kit.rbox(2.8, 0.14, 1.05, 0.05, "#c08a55"), 0, 1.16, 0));
+  [-1.25, 1.25].forEach((x) => shop.add(at(kit.mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.9, 8), darkWood), x, 1.45, -0.35)));
+  for (let i = 0; i < 6; i++) {
+    const stripe = at(kit.mesh(new THREE.BoxGeometry(0.48, 0.05, 1.2), i % 2 ? "#fff1d6" : "#e5484d"), -1.2 + i * 0.48, 2.85, 0.15);
+    stripe.rotation.x = 0.35; shop.add(stripe);
+  }
+  shop.add(at(kit.rbox(0.7, 0.45, 0.45, 0.06, "#6b3d1d"), -0.75, 1.46, 0), at(kit.rbox(0.74, 0.12, 0.49, 0.04, brass), -0.75, 1.72, 0));
+  const jar = at(kit.mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.5, 16), "#dff4ff", { transparent: true, opacity: 0.45, roughness: 0.05 }), 0.15, 1.48, 0);
+  shop.add(jar);
+  ["#c94df2", "#5fe0ff", "#f5c04a", "#7dd36b"].forEach((colour, i) => shop.add(at(kit.mesh(new THREE.OctahedronGeometry(0.08, 0), colour, { emissive: colour, emissiveIntensity: 0.6, flatShading: true }), 0.08 + (i % 2) * 0.14, 1.32 + Math.floor(i / 2) * 0.14, 0)));
+  for (let i = 0; i < 4; i++) shop.add(at(kit.mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.05, 16), "#f5c04a", { metalness: 0.7, roughness: 0.3 }), 0.85, 1.26 + i * 0.055, 0));
+  shop.position.set(7.3, 0, -0.4); shop.rotation.y = -Math.PI / 2;
+  g.add(shop);
+  const shopSign = signBoard((c, w, h) => { c.fillStyle = "#F5C04A"; c.font = "900 40px Montserrat, Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("TRADING POST", w / 2, h / 2 + 4); });
+  const wardrobeSign = signBoard((c, w, h) => { c.fillStyle = "#E9B8FA"; c.font = "900 42px Montserrat, Arial"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("WARDROBE", w / 2, h / 2 + 4); });
+  sign(shopSign, 7.6, 3.75, -0.4, -Math.PI / 2);
+  sign(wardrobeSign, -7.7, 3.9, 2.05, Math.PI / 2);
   lantern(kit, g, updates, -1.8, 6.4, 1.2, 1.6); lantern(kit, g, updates, 2.8, 6.2, -1.6, 1.4); lantern(kit, g, updates, 0.6, 6.6, 4.2, 1.2);
   fairyLights(kit, g, updates, [[-6.8, 6.2, -3.8], [-3, 5.4, -6.6], [0, 5.9, -7.4], [3.2, 5.3, -6.8], [6.6, 6, -3.6]]);
   return { group: finishRoom(g), update: (t, r) => updates.forEach((u) => u(t, r)), dispose: () => kit.dispose(), eye: new THREE.Vector3(-0.4, 4.4, 6.9), yaw: Math.PI + 0.12, pitch: -0.06, background: "#1b120b" };
