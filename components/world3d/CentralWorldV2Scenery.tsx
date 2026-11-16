@@ -275,9 +275,7 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
     }
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), p = new THREE.Vector3(), s = new THREE.Vector3();
     buckets.forEach((list) => {
-      let cx = 0, cz = 0;
-      list.forEach((item) => { cx += item.x; cz += item.z; });
-      parts.forEach((part) => {
+        parts.forEach((part) => {
         const mesh = new THREE.InstancedMesh(part.geometry, part.material, list.length);
         list.forEach((item, i) => {
           q.setFromAxisAngle(up, item.ry);
@@ -285,7 +283,6 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
         });
         mesh.castShadow = cast; mesh.receiveShadow = true;
         mesh.computeBoundingSphere();
-        mesh.userData = { cx: cx / list.length, cz: cz / list.length };
         root.add(mesh);
         meshes.push(mesh);
       });
@@ -294,10 +291,13 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
   }, [items, parts, norm, offset, chunk, cast]);
   useEffect(() => () => group.meshes.forEach((mesh) => mesh.dispose()), [group]);
   const root = useRef<THREE.Group>(null);
-  // Small plants draw only near the camera; each chunk stores its centre.
+  // Small plants draw only when part of their patch is within reach of the camera.
   useFrame(({ camera }) => {
     if (!Number.isFinite(drawDistance) || !root.current) return;
-    for (const child of root.current.children) child.visible = Math.hypot(child.userData.cx - camera.position.x, child.userData.cz - camera.position.z) < drawDistance;
+    for (const child of root.current.children) {
+      const sphere = (child as THREE.InstancedMesh).boundingSphere;
+      if (sphere) child.visible = Math.hypot(sphere.center.x - camera.position.x, sphere.center.z - camera.position.z) - sphere.radius < drawDistance;
+    }
   });
   return <primitive ref={root} object={group.root} />;
 }
@@ -374,7 +374,7 @@ export function CentralWorldV2Scenery({ quality, animate, placements, groundTile
       <HubLookout />
       <Suspense fallback={null}>
         {[...rocksByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} />)}
-        {[...decorByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} chunk={60} drawDistance={drawDistance} cast={model.startsWith("plant") || model.startsWith("log")} />)}
+        {[...decorByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} chunk={100} drawDistance={drawDistance} cast={quality === "high" && (model.startsWith("plant") || model.startsWith("log"))} />)}
         <ModelInstances model="lily_large" items={lilies} cast={false} />
         <ModelInstances model="campfire_stones" items={[{ x: camp.x, z: camp.z, y: camp.y, s: 1.4, ry: 0 }]} />
         <ModelInstances model="tent_detailedOpen" items={[{ x: camp.x - 5, z: camp.z - 4, y: camp.y, s: 3.6, ry: 0.6 }, { x: camp.x + 4.5, z: camp.z - 4.5, y: camp.y, s: 3.6, ry: -0.5 }]} />

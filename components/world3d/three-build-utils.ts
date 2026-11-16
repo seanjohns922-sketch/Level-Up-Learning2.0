@@ -44,33 +44,49 @@ export function ghostGumBarkTexture(repeat: [number, number], size: 128 | 256 = 
 }
 
 /**
- * Bakes a group of static meshes into one mesh per material, so a whole
- * structure draws in a handful of calls. Source geometries are disposed.
+ * Bakes meshes into one mesh per bucket (by default, per material). Geometry is
+ * moved into `toLocal` space when given. Each baked mesh keeps the material and
+ * shadow flags of the first mesh in its bucket. Sources are left untouched.
  */
-export function mergeByMaterial(group: THREE.Group) {
-  group.updateMatrixWorld(true);
-  const buckets = new Map<THREE.Material, THREE.BufferGeometry[]>();
-  group.traverse((object) => {
-    const mesh = object as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const geometry = (mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()).applyMatrix4(mesh.matrixWorld);
-    mesh.geometry.dispose();
+export function bakeMeshes(meshes: THREE.Mesh[], { toLocal, keyOf = (mesh) => mesh.material as THREE.Material }: { toLocal?: THREE.Matrix4; keyOf?: (mesh: THREE.Mesh) => unknown } = {}) {
+  const buckets = new Map<unknown, { first: THREE.Mesh; geometries: THREE.BufferGeometry[] }>();
+  const transform = new THREE.Matrix4();
+  for (const mesh of meshes) {
+    transform.copy(mesh.matrixWorld);
+    if (toLocal) transform.premultiply(toLocal);
+    const geometry = (mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()).applyMatrix4(transform);
     for (const name of Object.keys(geometry.attributes)) if (!["position", "normal", "uv"].includes(name)) geometry.deleteAttribute(name);
+    if (!geometry.attributes.normal) geometry.computeVertexNormals();
     if (!geometry.attributes.uv) geometry.setAttribute("uv", new THREE.Float32BufferAttribute(new Float32Array(geometry.attributes.position.count * 2), 2));
-    const material = mesh.material as THREE.Material;
-    if (!buckets.has(material)) buckets.set(material, []);
-    buckets.get(material)!.push(geometry);
-  });
+    const key = keyOf(mesh);
+    if (!buckets.has(key)) buckets.set(key, { first: mesh, geometries: [] });
+    buckets.get(key)!.geometries.push(geometry);
+  }
   const out = new THREE.Group();
-  buckets.forEach((geometries, material) => {
+  buckets.forEach(({ first, geometries }) => {
     const merged = mergeGeometries(geometries, false);
     geometries.forEach((geometry) => geometry.dispose());
     if (!merged) return;
-    const mesh = new THREE.Mesh(merged, material);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    const mesh = new THREE.Mesh(merged, first.material);
+    mesh.castShadow = first.castShadow;
+    mesh.receiveShadow = first.receiveShadow;
     out.add(mesh);
   });
+  return out;
+}
+
+/**
+ * Bakes a group of static meshes built in code into one mesh per material, so a
+ * whole structure draws in a handful of calls. Source geometries are disposed;
+ * the result casts and receives shadows.
+ */
+export function mergeByMaterial(group: THREE.Group) {
+  group.updateMatrixWorld(true);
+  const meshes: THREE.Mesh[] = [];
+  group.traverse((object) => { if ((object as THREE.Mesh).isMesh) meshes.push(object as THREE.Mesh); });
+  const out = bakeMeshes(meshes);
+  meshes.forEach((mesh) => mesh.geometry.dispose());
+  out.children.forEach((mesh) => { mesh.castShadow = true; mesh.receiveShadow = true; });
   return out;
 }
 

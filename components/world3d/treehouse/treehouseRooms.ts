@@ -4,7 +4,7 @@
 import * as THREE from "three";
 import { RELIQS_WORDMARK_PATHS, RELIQS_WORDMARK_VIEWBOX } from "@/lib/brand/reliqs-wordmark-paths";
 import { getReliqsColor } from "@/lib/reliqs-brand";
-import { canvasTexture, ghostGumBarkTexture, hash01 } from "@/components/world3d/three-build-utils";
+import { canvasTexture, ghostGumBarkTexture, hash01, mergeByMaterial } from "@/components/world3d/three-build-utils";
 
 export type TreehouseRoomKey = "main" | "gems" | "legends";
 export type TreehouseRoom = {
@@ -32,6 +32,12 @@ class Kit {
   private owned: Array<{ dispose(): void }> = [];
   track<T extends { dispose(): void }>(item: T) { this.owned.push(item); return item; }
   dispose() { this.owned.forEach((item) => item.dispose()); this.owned = []; }
+  /** Bakes a group of still meshes into one mesh per material and tracks the result. */
+  merged(group: THREE.Group, castShadow: boolean) {
+    const out = mergeByMaterial(group);
+    out.traverse((object) => { const mesh = object as THREE.Mesh; if (mesh.isMesh) { this.track(mesh.geometry); mesh.castShadow = castShadow; } });
+    return out;
+  }
 
   canvas(width: number, height: number, draw: (g: CanvasRenderingContext2D, w: number, h: number) => void, repeat?: [number, number]) {
     return this.track(canvasTexture(width, height, draw, { repeat, anisotropy: 8 }));
@@ -169,12 +175,13 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   const wallMat = kit.mat("#ffffff", { map: wallTex, roughness: 0.65 });
   const N = 72, plank = kit.track(new THREE.BoxGeometry(1, 1, 0.32));
   const innerR = R - 0.16, span = Math.asin((WR + 0.9) / innerR);
+  const still = new THREE.Group(), shelves = new THREE.Group(); // baked into a few draw calls below
   for (let i = 0; i < N; i++) {
     const a = (i / N) * Math.PI * 2, pw = (2 * Math.PI * R) / N + 0.02;
     if (Math.abs(Math.atan2(Math.sin(a + Math.PI / 2), Math.cos(a + Math.PI / 2))) < span) continue;
     const p = new THREE.Mesh(plank, wallMat);
     p.scale.set(pw, H, 1); p.position.set(Math.cos(a) * R, H / 2, Math.sin(a) * R); p.rotation.y = -a + Math.PI / 2; p.receiveShadow = true;
-    g.add(p);
+    still.add(p);
   }
   // The panel overlaps the neighbouring planks by half a plank so no seam shows.
   const panelSpan = span + Math.PI / N + 0.01, panelWidth = 2 * panelSpan * innerR;
@@ -201,7 +208,7 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   beam.rotation.x = Math.PI / 2.4; beam.position.set(0, WC - 1.8, -R + 5.2); g.add(beam);
   g.add(at(kit.mesh(new THREE.ConeGeometry(R + 0.6, 4.6, 64, 1, true), kit.mat("#ffffff", { map: wallTex, side: THREE.DoubleSide, roughness: 0.7 })), 0, H + 2.3, 0));
   const rafter = kit.track(new THREE.BoxGeometry(0.28, 0.28, R * 1.05));
-  for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; const b = new THREE.Mesh(rafter, darkWood); b.position.set(Math.cos(a) * R * 0.5, H + 2.1, Math.sin(a) * R * 0.5); b.lookAt(0, H + 4.6, 0); g.add(b); }
+  for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; const b = new THREE.Mesh(rafter, darkWood); b.position.set(Math.cos(a) * R * 0.5, H + 2.1, Math.sin(a) * R * 0.5); b.lookAt(0, H + 4.6, 0); still.add(b); }
   // The ghost gum grows right through the room.
   const bark = kit.mat("#ffffff", { map: barkTexture(kit), roughness: 0.75 });
   g.add(at(kit.mesh(new THREE.CylinderGeometry(1.15, 1.5, H + 5, 20), bark), -6.2, (H + 5) / 2 - 0.4, -3.4));
@@ -219,8 +226,9 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
       while (bx < 1.25) { const bw = 0.13 + rnd(i) * 0.12, bh = 0.6 + rnd(i + 4) * 0.4; shelf.add(at(kit.rbox(bw, bh, 0.5, 0.03, bookColours[Math.floor(rnd(i + 2) * bookColours.length)]), bx + bw / 2, y + bh / 2, 0.1)); bx += bw + 0.025; i++; }
     });
     shelf.position.set(Math.cos(a) * (R - 0.75), 0, Math.sin(a) * (R - 0.75)); shelf.rotation.y = -a - Math.PI / 2;
-    g.add(shelf);
+    shelves.add(shelf);
   });
+  g.add(kit.merged(still, false), kit.merged(shelves, true));
   // Explorer's desk with a spinning globe, a telescope, a beanbag and a pet bed.
   const desk = new THREE.Group();
   desk.add(at(kit.rbox(3, 0.25, 1.4, 0.08, "#7a4521"), 0, 1.6, 0));
@@ -274,12 +282,13 @@ export function buildGemCave(gemsShown: number): TreehouseRoom {
   const pool = at(kit.mesh(new THREE.CircleGeometry(2.6, 40), "#4fc3ff", { emissive: "#2a6fd8", emissiveIntensity: 0.6, roughness: 0.05, metalness: 0.2 }), -3.6, 0.03, 2.4);
   pool.rotation.x = -Math.PI / 2; g.add(pool);
   const rockMats = ["#5b4c78", "#4f416a", "#66568a"].map((c) => kit.mat(c, { flatShading: true, roughness: 0.85 }));
-  const rockGeo = kit.track(new THREE.DodecahedronGeometry(1, 0));
+  const rockGeo = kit.track(new THREE.DodecahedronGeometry(1, 0)), rockWall = new THREE.Group();
   for (let i = 0; i < 70; i++) {
     const a = (i / 70) * Math.PI * 2, r = 10.2 + rnd(i) * 0.8, s = 1.5 + rnd(i * 3) * 0.8;
     const rock = new THREE.Mesh(rockGeo, rockMats[i % 3]); rock.scale.setScalar(s); rock.position.set(Math.cos(a) * r, (i % 4) * 1.8 + 0.8, Math.sin(a) * r); rock.rotation.set(i, i * 2, i * 3);
-    g.add(rock);
+    rockWall.add(rock);
   }
+  g.add(kit.merged(rockWall, false));
   const dome = at(kit.mesh(new THREE.SphereGeometry(11.5, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), "#2d2440", { side: THREE.BackSide, flatShading: true, roughness: 0.9 }), 0, 5, 0);
   g.add(dome);
   const bark = kit.mat("#ffffff", { map: barkTexture(kit), roughness: 0.8 });
@@ -337,7 +346,9 @@ export function buildHallOfLegends(): TreehouseRoom {
   const gold = kit.mat("#d9a441", { metalness: 0.7, roughness: 0.3 });
   [-1.5, 1.5].forEach((x) => { const trim = at(kit.mesh(new THREE.PlaneGeometry(0.12, 18), gold), x, 0.03, 0); trim.rotation.x = -Math.PI / 2; g.add(trim); });
   const wallMat = kit.mat("#ffffff", { map: wallTex, roughness: 0.65 }), wallGeo = kit.track(new THREE.BoxGeometry((2 * Math.PI * R) / 80 + 0.02, 9, 0.34));
-  for (let i = 0; i < 80; i++) { const a = (i / 80) * Math.PI * 2; const p = new THREE.Mesh(wallGeo, wallMat); p.position.set(Math.cos(a) * R, 4.5, Math.sin(a) * R); p.rotation.y = -a + Math.PI / 2; p.receiveShadow = true; g.add(p); }
+  const hallWalls = new THREE.Group();
+  for (let i = 0; i < 80; i++) { const a = (i / 80) * Math.PI * 2; const p = new THREE.Mesh(wallGeo, wallMat); p.position.set(Math.cos(a) * R, 4.5, Math.sin(a) * R); p.rotation.y = -a + Math.PI / 2; p.receiveShadow = true; hallWalls.add(p); }
+  g.add(kit.merged(hallWalls, false));
   g.add(at(kit.mesh(new THREE.ConeGeometry(R + 0.6, 5, 64, 1, true), kit.mat("#ffffff", { map: wallTex, side: THREE.DoubleSide, roughness: 0.7 })), 0, 11.5, 0));
   const skylight = at(new THREE.Mesh(kit.track(new THREE.CircleGeometry(1.6, 32)), kit.track(new THREE.MeshBasicMaterial({ color: "#fff2c8" }))), 0, 13.6, 0); skylight.rotation.x = Math.PI / 2; g.add(skylight);
   g.add(at(new THREE.Mesh(kit.track(new THREE.CylinderGeometry(1.4, 3.4, 13, 32, 1, true)), kit.track(new THREE.MeshBasicMaterial({ color: "#fff2c8", transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false }))), 0, 7, 0));

@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { Environment, Html, Lightformer } from "@react-three/drei";
+import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
@@ -387,6 +387,7 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
       />
       <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
       <BuildModeSurface grid={buildRules.grid} active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
+      {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
     </>
   );
@@ -414,6 +415,13 @@ function HubFollowSun({ quality, avatarPosRef }: { quality: CentralWorldQuality;
     current.target.updateMatrixWorld();
   });
   return <directionalLight ref={light} intensity={1.85} color="#ffe1ad" castShadow={quality !== "low"} shadow-mapSize={quality === "high" ? [2048, 2048] : [1024, 1024]} shadow-camera-near={1} shadow-camera-far={220} shadow-camera-left={-70} shadow-camera-right={70} shadow-camera-top={70} shadow-camera-bottom={-70} shadow-bias={-0.0004} shadow-normalBias={0.05} />;
+}
+
+/** The bigger hub drops to 1x resolution if a device can't keep a smooth frame rate, and restores it when it recovers. */
+function HubAdaptiveResolution() {
+  const setDpr = useThree((state) => state.setDpr);
+  const initialDpr = useThree((state) => state.viewport.initialDpr);
+  return <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(initialDpr)} />;
 }
 
 const debugButton: React.CSSProperties = { border: "1px solid rgba(64,42,25,.2)", borderRadius: 5, padding: "9px 11px", background: "rgba(255,250,237,.94)", color: "#3f2b1e", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 24px rgba(45,31,19,.16)" };
