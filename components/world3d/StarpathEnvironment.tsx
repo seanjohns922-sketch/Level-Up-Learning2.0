@@ -1,8 +1,8 @@
 "use client";
 
 import { Html, RoundedBox } from "@react-three/drei";
-import { useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { WorldPanoramaRing } from "./WorldPanoramaRing";
 import { WorldPanorama } from "@/components/world3d/WorldPanorama";
@@ -29,24 +29,59 @@ function statusLabel(state: RealmWorldGateState) {
 
 function stateVisual(state: RealmWorldGateState, accent: string, active: boolean) {
   if (state === "locked") return { frame: "#3c4359", energy: "#697089", intensity: 0.04 };
-  if (state === "completed") return { frame: "#53617d", energy: "#9ae6c0", intensity: 0.42 };
+  if (state === "completed") return { frame: "#53617d", energy: "#f5d27a", intensity: 0.5 };
   return { frame: "#536483", energy: accent, intensity: active ? 1.2 : state === "current" ? 0.85 : 0.5 };
 }
 
+// Starpath's crystal orbit arch: faceted crystal pillars and arch, a slow orbit
+// ring and a glowing portal. Current is lit and turning, mastered is gold, and
+// locked is frosted and still with a padlock.
+const prefersReducedMotion = () => typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+
 function PortalFrame({ width, height, state, accent, active }: { width: number; height: number; state: RealmWorldGateState; accent: string; active: boolean }) {
   const visual = stateVisual(state, accent, active);
+  const locked = state === "locked";
+  const mastered = state === "completed";
+  const ring = useRef<THREE.Group>(null);
+  const keystone = useRef<THREE.Mesh>(null);
+  const still = useMemo(() => prefersReducedMotion(), []);
+  useFrame((_, delta) => {
+    if (still || locked) return;
+    if (ring.current) ring.current.rotation.y += delta * (active ? 0.9 : 0.45);
+    if (keystone.current) keystone.current.rotation.y += delta * 0.8;
+  });
+  const span = width * 0.42;
+  const pillarHeight = height * 0.62;
+  const crystal = locked ? "#9aa1c4" : mastered ? "#f3e6c0" : "#cfe0ff";
+  const trim = mastered ? "#f5c04a" : visual.energy;
   return (
     <group>
-      <mesh position={[0, 0.1, 0]}><cylinderGeometry args={[width * 0.72, width * 0.82, 0.2, 32]} /><meshStandardMaterial color="#151a31" metalness={0.5} roughness={0.35} /></mesh>
+      <mesh position={[0, 0.1, 0]}><cylinderGeometry args={[width * 0.72, width * 0.82, 0.2, 6]} /><meshStandardMaterial color="#1b2142" metalness={0.5} roughness={0.35} /></mesh>
+      <mesh position={[0, 0.22, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[width * 0.58, width * 0.64, 6]} /><meshBasicMaterial color={trim} transparent opacity={locked ? 0.15 : 0.75} toneMapped={false} /></mesh>
       {[-1, 1].map((side) => (
-        <group key={side} position={[side * width * 0.42, height * 0.48, 0]}>
-          <RoundedBox args={[0.78, height, 0.9]} radius={0.16} smoothness={2}><meshStandardMaterial color={visual.frame} metalness={0.62} roughness={0.28} /></RoundedBox>
-          <mesh position={[-side * 0.34, 0, 0.47]}><boxGeometry args={[0.08, height * 0.76, 0.04]} /><meshBasicMaterial color={visual.energy} toneMapped={false} /></mesh>
+        <group key={side} position={[side * span, 0, 0]}>
+          <mesh position={[0, pillarHeight / 2 + 0.2, 0]}><cylinderGeometry args={[0.34, 0.5, pillarHeight, 6]} /><meshStandardMaterial color={crystal} emissive={trim} emissiveIntensity={locked ? 0.02 : visual.intensity * 0.35} metalness={0.15} roughness={locked ? 0.7 : 0.18} transparent opacity={locked ? 1 : 0.92} flatShading /></mesh>
+          <mesh position={[0, pillarHeight + 0.42, 0]}><coneGeometry args={[0.34, 0.5, 6]} /><meshStandardMaterial color={crystal} emissive={trim} emissiveIntensity={locked ? 0.02 : visual.intensity * 0.35} roughness={0.2} flatShading /></mesh>
+          <mesh position={[side * 0.55, 0.45, 0.3]} rotation={[0, 0, side * 0.35]}><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={crystal} emissive={trim} emissiveIntensity={locked ? 0 : 0.4} roughness={0.2} flatShading /></mesh>
+          <mesh position={[side * 0.25, 0.32, -0.35]} rotation={[0, 0, -side * 0.3]}><octahedronGeometry args={[0.22, 0]} /><meshStandardMaterial color={crystal} emissive={trim} emissiveIntensity={locked ? 0 : 0.4} roughness={0.2} flatShading /></mesh>
         </group>
       ))}
-      <RoundedBox args={[width, 0.86, 0.94]} radius={0.16} smoothness={2} position={[0, height * 0.96, 0]}><meshStandardMaterial color={visual.frame} metalness={0.62} roughness={0.28} /></RoundedBox>
-      <mesh position={[0, height * 0.47, 0.08]}><planeGeometry args={[width * 0.68, height * 0.75]} /><meshBasicMaterial color={visual.energy} transparent opacity={state === "locked" ? 0.08 : active ? 0.62 : 0.34} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <mesh position={[0, height + 1.08, 0]} rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[0.54, 0]} /><meshStandardMaterial color={visual.energy} emissive={visual.energy} emissiveIntensity={visual.intensity} metalness={0.25} roughness={0.18} /></mesh>
+      <mesh position={[0, pillarHeight + 0.2, 0]}><torusGeometry args={[span, 0.3, 6, 24, Math.PI]} /><meshStandardMaterial color={crystal} emissive={trim} emissiveIntensity={locked ? 0.02 : visual.intensity * 0.35} roughness={0.2} flatShading /></mesh>
+      <mesh position={[0, (pillarHeight + 0.2) / 2, 0.06]}><planeGeometry args={[span * 2 - 0.5, pillarHeight + 0.2]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.06 : active ? 0.6 : 0.32} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, pillarHeight + 0.2, 0.06]}><circleGeometry args={[span - 0.25, 32, 0, Math.PI]} /><meshBasicMaterial color={visual.energy} transparent opacity={locked ? 0.06 : active ? 0.6 : 0.32} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      {locked ? null : (
+        <group ref={ring} position={[0, pillarHeight + 0.2, 0]}>
+          <mesh rotation={[Math.PI / 2 - 0.28, 0, 0]}><torusGeometry args={[span + 1.1, 0.07, 6, 64]} /><meshBasicMaterial color={trim} transparent opacity={0.85} toneMapped={false} /></mesh>
+          <mesh position={[span + 1.1, 0, 0]}><sphereGeometry args={[0.18, 12, 12]} /><meshBasicMaterial color="#ffffff" toneMapped={false} /></mesh>
+        </group>
+      )}
+      <mesh ref={keystone} position={[0, pillarHeight + span + 0.75, 0]}><octahedronGeometry args={[0.5, 0]} /><meshStandardMaterial color={trim} emissive={trim} emissiveIntensity={locked ? 0.03 : visual.intensity} metalness={0.25} roughness={0.18} flatShading /></mesh>
+      {locked ? (
+        <group position={[0, pillarHeight * 0.55, 0.3]}>
+          <mesh position={[0, 0.32, 0]}><torusGeometry args={[0.3, 0.08, 8, 20, Math.PI]} /><meshStandardMaterial color="#c7cbe0" metalness={0.6} roughness={0.35} /></mesh>
+          <mesh><boxGeometry args={[0.8, 0.62, 0.22]} /><meshStandardMaterial color="#9aa0bd" metalness={0.55} roughness={0.4} /></mesh>
+        </group>
+      ) : null}
     </group>
   );
 }
