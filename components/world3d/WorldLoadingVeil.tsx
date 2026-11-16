@@ -41,7 +41,7 @@ export function WorldLoadingVeil({ label = "Loading your world" }: { label?: str
       <p>{label}</p>
       <div className="worldLoadingBar" aria-hidden="true"><i style={{ width: `${shown}%` }} /></div>
       <style>{`
-        .worldLoadingVeil{position:fixed;inset:0;z-index:200;display:grid;place-content:center;justify-items:center;gap:14px;background:radial-gradient(120% 90% at 50% 40%,#2a1d3d 0%,#141019 60%,#0b0910 100%);color:#efe7fb;font-weight:800;letter-spacing:.04em;transition:opacity .45s ease;pointer-events:auto}
+        .worldLoadingVeil{position:fixed;inset:0;z-index:2147483000;display:grid;place-content:center;justify-items:center;gap:14px;background:radial-gradient(120% 90% at 50% 40%,#2a1d3d 0%,#141019 60%,#0b0910 100%);color:#efe7fb;font-weight:800;letter-spacing:.04em;transition:opacity .45s ease;pointer-events:auto}
         .worldLoadingVeil[data-done]{opacity:0;pointer-events:none}
         .worldLoadingLogo{width:min(200px,46vw);height:auto;filter:drop-shadow(0 6px 22px rgba(201,77,242,.35))}
         .worldLoadingVeil p{margin:0;font-size:15px;color:#cfc3e3}

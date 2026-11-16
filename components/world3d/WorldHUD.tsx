@@ -201,6 +201,9 @@ export function WorldHUD({
             </div>
           </section>
         ) : (
+        <div className="worldHudRealmTop">
+        {/* Real RELIQ logo; in each realm the Q takes the realm's colour. */}
+        <svg viewBox="0 0 279 79" className="worldHudLogo" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill={accent} d={RELIQ_Q_PATH} /></svg>
         <section className="worldHudMission" aria-label={displayedMission.eyebrow ?? "Current mission"}>
           <div className="worldHudMissionText">
             <span>{displayedMission.eyebrow ?? (context === "realm" ? "CURRENT MISSION" : "CURRENT JOURNEY")}</span>
@@ -209,6 +212,7 @@ export function WorldHUD({
           </div>
           <WorldVoiceButton text={missionSpeech} compact className="worldHudRead" label="Read current mission" />
         </section>
+        </div>
         )}
 
         <div className="worldHudIdentity">
@@ -364,6 +368,10 @@ export function WorldHUD({
         .worldHud .worldHudActions .worldHudPrimary:disabled{opacity:.75}
         .worldHud .worldHudActions .worldHudWithLabel{font-size:13px!important;width:auto!important;padding:0 16px!important}
         @media (max-width:900px) and (orientation:portrait){.worldHud .worldHudActions .worldHudWithLabel{font-size:0!important;width:48px!important;padding:0!important}.worldHud .worldHudActions .worldHudPrimary{padding:0 16px!important;font-size:12px!important}.worldHud .worldHudStats .worldHudCrystals{padding:0 8px}}
+
+        .worldHud .worldHudRealmTop{position:absolute;left:max(16px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));width:min(340px,calc(100vw - 32px));display:grid;gap:8px;pointer-events:auto}
+        .worldHud .worldHudRealmTop .worldHudMission{position:static;width:auto;border-radius:14px;border:1px solid rgba(255,255,255,.16);border-left:3px solid var(--world-accent);background:rgba(16,14,24,.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+        @media (max-width:900px) and (orientation:portrait){.worldHud .worldHudRealmTop{width:min(280px,calc(100vw - 32px))}}
       `}</style>
     </>
   );

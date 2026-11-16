@@ -1,6 +1,7 @@
 "use client";
 
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
+import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useState } from "react";
@@ -85,12 +86,16 @@ export default function ChronorokHub() {
       </Canvas>
 
       <header className="pointer-events-none absolute inset-x-5 top-4 z-10 flex items-start justify-between gap-3">
-        <div className="pointer-events-auto flex items-start gap-3">
+        <div className="pointer-events-auto grid gap-2">
+          {/* Real RELIQ logo; the Q takes Chronorok's gold. */}
+          <svg viewBox="0 0 279 79" className="h-auto w-[118px] drop-shadow-[0_3px_10px_rgba(0,0,0,.45)]" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill="#F6B73C" d={RELIQ_Q_PATH} /></svg>
+          <div className="flex items-start gap-3">
           <button type="button" onClick={back} className="chronoGlass flex h-12 items-center gap-2 rounded-full px-5 font-display text-[13px] font-black tracking-[0.05em]"><ArrowLeft className="h-4 w-4" />THE TOWER</button>
           <div className="chronoGlass hidden rounded-2xl px-5 py-2.5 sm:block">
             <p className="chronoTitle">CHRONOROK</p>
             <p className="font-display text-[11px] font-black tracking-[0.32em] text-[#f6d79a]">PAST · PRESENT · FUTURE</p>
           </div>
+        </div>
         </div>
         {progress ? (
           <div className="chronoGlass pointer-events-auto w-[min(340px,60vw)] rounded-2xl px-4 py-3">
