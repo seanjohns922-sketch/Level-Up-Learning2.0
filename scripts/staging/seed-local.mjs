@@ -1,3 +1,4 @@
+/* global fetch, AbortSignal */
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -6,7 +7,7 @@ import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
 const group = process.env.SCALE_FIXTURE_GROUP ?? '';
-assert.ok(group === '' || /^[2-4]$/.test(group), 'Only isolated fixture groups 2–4 are supported');
+assert.ok(group === '' || /^(?:[2-9]|1[0-9]|20)$/.test(group), 'Only isolated fixture groups 2–20 are supported');
 const suffix = group ? `-${group}` : '';
 const fixturePath = path.join(localDir, `synthetic-accounts${suffix}.json`);
 const fixture = fs.existsSync(fixturePath) ? JSON.parse(fs.readFileSync(fixturePath, 'utf8')) : {

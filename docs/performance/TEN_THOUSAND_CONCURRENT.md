@@ -3,11 +3,21 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
-## Follow-up: sustained gate passed; schema rehearsal blocked
+## Latest checkpoint: 500-student performance gate failed
+
+The upgraded local stack completed a 121-second rehearsal with 500 distinct
+students, 20 ordinary teachers and 100,000 historical events. No requests failed;
+all 500 persisted presence checks and 2,001 exact activity increments passed.
+However, login p95 was 2,465 ms / p99 3,286 ms and teacher snapshot p99 was
+5,752 ms. The unchanged latency gate failed. Do not proceed to 1,000 users yet.
+See `LOCAL_500_REHEARSAL_2026-11-16.md` and
+`capacity-local-500-2026-11-16.json`. No production changes were made.
+
+## Earlier checkpoints: sustained gate and schema rehearsal
 
 **Later update:** the crash was isolated and resolved using Supabase image
 `17.6.1.156`, and the complete local stack has now been upgraded and passed HTTP
-checks. See `LOCAL_STACK_UPGRADE_2026-11-16.md`. No cloud or 500+ load test has run.
+checks. See `LOCAL_STACK_UPGRADE_2026-11-16.md`. The later 500-student local result is recorded above; no cloud load test has run.
 
 The clean 1,800-second local run passed with 100 students, four teachers, all 100
 presence checks and 6,001 verified activity increments. There were no unexpected
@@ -53,9 +63,9 @@ larger load stages and cloud cost approval remain outstanding.
   30-minute run failed. Passing short retests did not close that sustained gate.
 - A local gateway connection limit was diagnosed in October. Its temporary
   tuning must be verified before any repeat; container recreation can lose it.
-- The current local capacity runner has exactly 100 identities, activity writes
+- The original local capacity runner had 100 identities, activity writes
   and repeated complete event reads. Increasing a duration variable does not
-  turn it into a 10,000-student test.
+  turn it into a 10,000-student test. It now supports 4–20 groups (100–500 identities), defaulting to 100.
 - The application now uses an incremental event reader and separate 30-second
   event refresh scheduling. The existing runner's complete event snapshot every
   two seconds is a stress scenario, not an exact model of the current UI.

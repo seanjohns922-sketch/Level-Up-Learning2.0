@@ -1,3 +1,4 @@
+/* global performance, fetch, AbortSignal, setInterval, clearInterval */
 // Protocol rehearsal only: never accepts a remote URL or service-role workload.
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -8,8 +9,13 @@ import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
 const seconds = Number(process.env.SCALE_DURATION_SECONDS ?? 120);
 assert.ok(Number.isInteger(seconds) && seconds >= 60 && seconds <= 1800);
-const groups = ['', '-2', '-3', '-4'].map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
-assert.equal(new Set(groups.flatMap(g => g.students.map(s => s.studentId))).size, 100);
+const groupCount = Number(process.env.SCALE_GROUP_COUNT ?? 4);
+assert.ok(Number.isInteger(groupCount) && groupCount >= 4 && groupCount <= 20, 'Local rehearsal supports 4–20 groups only');
+const studentCount = groupCount * 25;
+const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`).map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
+for (const group of groups) assert.equal(group.students.length, 25);
+for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(g => g[key])).size, groupCount);
+assert.equal(new Set(groups.flatMap(g => g.students.map(s => s.studentId))).size, studentCount);
 const samples = [];
 let snapshotHttpRequests = 0;
 const failures = [];
@@ -48,7 +54,7 @@ for (const group of groups) {
     await request('/rest/v1/live_activity_events', rows, config.SERVICE_ROLE_KEY);
   }
 }
-console.log('Prepared 100 distinct students, four ordinary teachers and 20,000 synthetic history events.');
+console.log(`Prepared ${studentCount} distinct students, ${groupCount} ordinary teachers and ${groupCount * 5000} synthetic history events.`);
 const teachers = await Promise.all(groups.map(async group => {
   const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, 'teacher_login');
   return { group, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: (...args) => { snapshotHttpRequests++; return fetch(...args); } } }) };
@@ -56,7 +62,7 @@ const teachers = await Promise.all(groups.map(async group => {
 // Verify cross-school denial before sending load; never use owner/service tokens below.
 for (let i = 0; i < teachers.length; i++) {
   const teacher = teachers[i];
-  await assert.rejects(request('/rest/v1/rpc/get_live_class_events_secure', { p_class_id: groups[(i+1)%4].classId }, teacher.token), /HTTP 403, code 42501/);
+  await assert.rejects(request('/rest/v1/rpc/get_live_class_events_secure', { p_class_id: groups[(i+1)%groupCount].classId }, teacher.token), /HTTP 403, code 42501/);
 }
 const students = groups.flatMap(group => group.students.map(student => ({ group, student })));
 const started = Date.now();
@@ -126,10 +132,10 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
-  students: 100, teachers: 4, historyEvents: 20000, durationSeconds: Math.round((Date.now()-started)/1000),
+  students: studentCount, teachers: groupCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
-fs.writeFileSync(`${localDir}/capacity-100-result.json`, JSON.stringify(report,null,2));
+fs.writeFileSync(`${localDir}/capacity-${studentCount}-result.json`, JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if (!report.preliminaryGatePassed) process.exitCode = 1;
