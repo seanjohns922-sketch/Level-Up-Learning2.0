@@ -1,0 +1,84 @@
+{
+  "at": "2026-11-16T05:44:22.169Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "scenario": "students-only",
+  "students": 500,
+  "teachers": 0,
+  "provisionedStudents": 500,
+  "historyEvents": 100000,
+  "durationSeconds": 61,
+  "requests": 5000,
+  "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+  "snapshotHttpRequests": 0,
+  "failedRequests": 0,
+  "verifiedPresenceStudents": 500,
+  "verifiedActivityWrites": 1000,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "student_login_lookup",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 2853,
+      "p99Ms": 3870,
+      "maximumMs": 4689
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 2092,
+      "p99Ms": 2779,
+      "maximumMs": 3290
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 1710,
+      "p99Ms": 2466,
+      "maximumMs": 3340
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 1000,
+      "failedRequests": 0,
+      "p95Ms": 1246,
+      "p99Ms": 1999,
+      "maximumMs": 3418
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 1000,
+      "failedRequests": 0,
+      "p95Ms": 1090,
+      "p99Ms": 1754,
+      "maximumMs": 2563
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 1000,
+      "failedRequests": 0,
+      "p95Ms": 859,
+      "p99Ms": 1424,
+      "maximumMs": 2301
+    },
+    {
+      "name": "get_live_student_activity_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 713,
+      "p99Ms": 865,
+      "maximumMs": 904
+    }
+  ],
+  "preliminaryGatePassed": false,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "full six-read teacher snapshots",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}

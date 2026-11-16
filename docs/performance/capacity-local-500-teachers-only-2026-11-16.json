@@ -1,0 +1,44 @@
+{
+  "at": "2026-11-16T05:45:46.564Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "scenario": "teachers-only",
+  "students": 0,
+  "teachers": 20,
+  "provisionedStudents": 500,
+  "historyEvents": 100000,
+  "durationSeconds": 60,
+  "requests": 595,
+  "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+  "snapshotHttpRequests": 6354,
+  "failedRequests": 0,
+  "verifiedPresenceStudents": 0,
+  "verifiedActivityWrites": 0,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "requests": 20,
+      "failedRequests": 0,
+      "p95Ms": 322,
+      "p99Ms": 327,
+      "maximumMs": 327
+    },
+    {
+      "name": "teacher_event_snapshot",
+      "requests": 575,
+      "failedRequests": 0,
+      "p95Ms": 287,
+      "p99Ms": 317,
+      "maximumMs": 327
+    }
+  ],
+  "preliminaryGatePassed": true,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "full six-read teacher snapshots",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}

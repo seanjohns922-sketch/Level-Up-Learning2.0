@@ -12,6 +12,14 @@ assert.ok(Number.isInteger(seconds) && seconds >= 60 && seconds <= 1800);
 const groupCount = Number(process.env.SCALE_GROUP_COUNT ?? 4);
 assert.ok(Number.isInteger(groupCount) && groupCount >= 4 && groupCount <= 20, 'Local rehearsal supports 4–20 groups only');
 const studentCount = groupCount * 25;
+const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
+assert.ok(['mixed', 'students-only', 'teachers-only'].includes(scenario), 'Unknown local capacity scenario');
+const runStudents = scenario !== 'teachers-only';
+const runTeachers = scenario !== 'students-only';
+const rampSeconds = Number(process.env.SCALE_LOGIN_RAMP_SECONDS ?? 0);
+assert.ok(Number.isInteger(rampSeconds) && rampSeconds >= 0 && rampSeconds <= 30, 'Login ramp must be 0–30 seconds');
+assert.ok(runStudents || rampSeconds === 0, 'Teacher-only scenario cannot ramp student logins');
+const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (rampSeconds ? `-ramp${rampSeconds}` : '');
 const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`).map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
 for (const group of groups) assert.equal(group.students.length, 25);
 for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(g => g[key])).size, groupCount);
@@ -56,7 +64,7 @@ for (const group of groups) {
 }
 console.log(`Prepared ${studentCount} distinct students, ${groupCount} ordinary teachers and ${groupCount * 5000} synthetic history events.`);
 const teachers = await Promise.all(groups.map(async group => {
-  const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, 'teacher_login');
+  const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, runTeachers ? 'teacher_login' : undefined);
   return { group, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: (...args) => { snapshotHttpRequests++; return fetch(...args); } } }) };
 }));
 // Verify cross-school denial before sending load; never use owner/service tokens below.
@@ -72,7 +80,7 @@ let completedStudentJourneys = 0;
 let initializedStudents = 0;
 function saveProgress(finished = false) {
   fs.writeFileSync(`${localDir}/capacity-progress.json`, JSON.stringify({
-    at: new Date().toISOString(), environment: 'isolated local test', finished,
+    at: new Date().toISOString(), environment: 'isolated local test', scenario, finished,
     plannedSeconds: seconds, elapsedSeconds: Math.round((Date.now()-started)/1000),
     completedStudentJourneys, initializedStudents, verifiedWrites, recordedOperations: samples.length,
     snapshotHttpRequests, observedFailedOperations: samples.filter(s=>s.status<200||s.status>=300).length,
@@ -81,7 +89,8 @@ function saveProgress(finished = false) {
 const progressTimer = setInterval(() => saveProgress(), 30000);
 progressTimer.unref();
 saveProgress();
-async function studentJourney({ group, student }) {
+async function studentJourney({ group, student }, index) {
+  if (rampSeconds) await sleep(index * rampSeconds * 1000 / (students.length - 1));
   const login = await rpc('student_login_lookup', { p_class_id: group.classId, p_display_name: student.username, p_pin: student.pin });
   assert.equal(login[0].student_id, student.studentId);
   const session = login[0].session_token;
@@ -119,7 +128,7 @@ async function teacherJourney({ group, client }) {
     await sleep(Math.min(2000, Math.max(0, deadline - Date.now())));
   } while (Date.now() < deadline);
 }
-const work = [...students.map(studentJourney), ...teachers.map(teacherJourney)];
+const work = [...(runStudents ? students.map(studentJourney) : []), ...(runTeachers ? teachers.map(teacherJourney) : [])];
 const results = await Promise.allSettled(work);
 clearInterval(progressTimer);
 saveProgress(true);
@@ -132,10 +141,10 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
-  students: studentCount, teachers: groupCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
+  scenario, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
-fs.writeFileSync(`${localDir}/capacity-${studentCount}-result.json`, JSON.stringify(report,null,2));
+fs.writeFileSync(`${localDir}/capacity-${studentCount}${outputSuffix}-result.json`, JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if (!report.preliminaryGatePassed) process.exitCode = 1;

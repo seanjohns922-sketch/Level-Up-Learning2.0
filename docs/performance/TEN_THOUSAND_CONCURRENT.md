@@ -3,7 +3,15 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
-## Latest checkpoint: 500-student performance gate failed
+## Isolation follow-up
+
+Student-only simultaneous load also failed (login p95 2,853 ms), while teacher-only
+load passed. Spreading 500 student logins over 30 seconds passed (login p95 6 ms).
+All tested activity persisted correctly. This identifies burst sensitivity, not
+the underlying queueing/resource cause; it does not close the mixed-load gate.
+See `LOCAL_500_ISOLATION_2026-11-16.md`. No product delay or production change was made.
+
+## Latest mixed-load checkpoint: 500-student performance gate failed
 
 The upgraded local stack completed a 121-second rehearsal with 500 distinct
 students, 20 ordinary teachers and 100,000 historical events. No requests failed;
