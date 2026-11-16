@@ -1,0 +1,105 @@
+{
+  "at": "2026-11-16T07:36:14.597Z",
+  "passed": false,
+  "failedRequests": 0,
+  "verifiedPresenceStudents": 500,
+  "verifiedActivityWrites": 1000,
+  "loginP95Ms": 2066,
+  "studentStatementDeltas": [
+    {
+      "key": "16443:5:-1432385697929680542:true",
+      "category": "daily activity RPC",
+      "calls": 1000,
+      "execution_ms": 1801.613379,
+      "planning_ms": 0,
+      "block_hits": 30335,
+      "block_reads": 4,
+      "wal_bytes": 5930,
+      "averageExecutionMs": 1.801613379
+    },
+    {
+      "key": "16443:5:-8399735150547510370:true",
+      "category": "presence RPC",
+      "calls": 1000,
+      "execution_ms": 1553.4565579999999,
+      "planning_ms": 0,
+      "block_hits": 44332,
+      "block_reads": 11,
+      "wal_bytes": 689772,
+      "averageExecutionMs": 1.553456558
+    },
+    {
+      "key": "16443:5:7924705200917212991:true",
+      "category": "daily activity RPC",
+      "calls": 1000,
+      "execution_ms": 1468.475783,
+      "planning_ms": 0,
+      "block_hits": 33870,
+      "block_reads": 0,
+      "wal_bytes": 241494,
+      "averageExecutionMs": 1.4684757830000001
+    },
+    {
+      "key": "16443:5:3964765418948012912:true",
+      "category": "live activity RPC",
+      "calls": 500,
+      "execution_ms": 883.658446,
+      "planning_ms": 0,
+      "block_hits": 19667,
+      "block_reads": 26,
+      "wal_bytes": 176673,
+      "averageExecutionMs": 1.767316892
+    },
+    {
+      "key": "16443:5:-8291786466664630626:true",
+      "category": "live activity RPC",
+      "calls": 500,
+      "execution_ms": 866.307145,
+      "planning_ms": 0,
+      "block_hits": 17290,
+      "block_reads": 0,
+      "wal_bytes": 438,
+      "averageExecutionMs": 1.73261429
+    },
+    {
+      "key": "16443:5:-9123536094687515639:true",
+      "category": "student context RPC",
+      "calls": 500,
+      "execution_ms": 738.2610500000001,
+      "planning_ms": 0,
+      "block_hits": 19845,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averageExecutionMs": 1.4765221000000002
+    },
+    {
+      "key": "16443:5:-5084144446593951227:true",
+      "category": "student login RPC",
+      "calls": 500,
+      "execution_ms": 241.323468,
+      "planning_ms": 0,
+      "block_hits": 13972,
+      "block_reads": 162,
+      "wal_bytes": 1190664,
+      "averageExecutionMs": 0.48264693599999997
+    },
+    {
+      "key": "16443:5:5360251647081715348:true",
+      "category": "session configuration",
+      "calls": 5000,
+      "execution_ms": 112.82221799999999,
+      "planning_ms": 0,
+      "block_hits": 40,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averageExecutionMs": 0.022564443599999998
+    }
+  ],
+  "sampleCount": 69,
+  "caveats": [
+    "Shared database deltas include fixture preparation and background services",
+    "SQL planning tracking and I/O timing are disabled; zero timings do not prove no cost",
+    "Statement execution excludes network, pool waiting and some transaction overhead",
+    "One-second activity samples can miss short waits"
+  ]
+}

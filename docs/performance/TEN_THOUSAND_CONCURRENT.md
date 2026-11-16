@@ -3,6 +3,14 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Supporting SQL and local restart recovery
+
+The resumed baseline burst verified all activity but failed latency again (login
+p95 2,066 ms). Student session configuration averaged 0.0226 ms, so its measured
+SQL execution does not explain the delay. Planning/transaction timing remains
+incomplete. Local API automatic addressing and stronger HTTP preflight repaired
+a test-orchestration restart fault. See `LOCAL_TRANSACTION_PROFILE_2026-11-16.md`.
+
 ## Pool recheck: improvement did not reproduce
 
 Reversing the order gave login p95 2,192 ms at pool 30 versus 1,844 ms at pool 10;
