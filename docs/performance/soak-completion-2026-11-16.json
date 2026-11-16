@@ -1,0 +1,79 @@
+{
+  "at": "2026-11-16T03:39:53.680Z",
+  "environment": "local synthetic completion/retry and realtime burst",
+  "students": 100,
+  "verifiedJourneys": 100,
+  "teacherVerifiedStudents": 100,
+  "requests": 2200,
+  "expectedStudentDenials": 600,
+  "eventsReceived": 100,
+  "realtimeP95Ms": 577,
+  "realtimeMaximumMs": 777,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "failures": 0,
+      "p95Ms": 854,
+      "p99Ms": 990
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 200,
+      "failures": 0,
+      "p95Ms": 753,
+      "p99Ms": 929
+    },
+    {
+      "name": "get_student_realm_assessments_secure",
+      "requests": 200,
+      "failures": 0,
+      "p95Ms": 549,
+      "p99Ms": 809
+    },
+    {
+      "name": "get_student_realm_lesson_attempts_secure",
+      "requests": 200,
+      "failures": 0,
+      "p95Ms": 589,
+      "p99Ms": 1047
+    },
+    {
+      "name": "get_student_realm_weekly_quiz_attempts_secure",
+      "requests": 200,
+      "failures": 0,
+      "p95Ms": 653,
+      "p99Ms": 1074
+    },
+    {
+      "name": "complete_realm_assessment",
+      "requests": 400,
+      "failures": 0,
+      "p95Ms": 547,
+      "p99Ms": 812
+    },
+    {
+      "name": "complete_realm_lesson",
+      "requests": 600,
+      "failures": 0,
+      "p95Ms": 561,
+      "p99Ms": 768
+    },
+    {
+      "name": "complete_realm_quiz",
+      "requests": 200,
+      "failures": 0,
+      "p95Ms": 444,
+      "p99Ms": 744
+    },
+    {
+      "name": "insert_live_activity_event_secure",
+      "requests": 100,
+      "failures": 0,
+      "p95Ms": 235,
+      "p99Ms": 402
+    }
+  ],
+  "passed": true
+}

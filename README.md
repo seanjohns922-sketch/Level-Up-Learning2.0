@@ -27,12 +27,26 @@ Supabase project needs the approved schema and synthetic fixtures before signed-
 journeys will work. The historical migrations alone are not a complete bootstrap:
 the earliest migration assumes `public.students` already exists. Do not run a
 reset against a hosted project or copy a production data export to get started.
-Until the bootstrap is supplied, request access to an approved test environment.
+An isolated local environment already exists on the maintainer's machine, with
+synthetic schools/students and a private schema-only snapshot from 28 October
+2026. Its restart instructions and known parity limits are in
+[Scale readiness](docs/performance/SCALE_READINESS.md). Reuse that environment
+where available; do not create a second one unnecessarily. A fresh checkout on
+another machine still needs the approved schema/bootstrap, and the snapshot must
+be checked against subsequent migrations before testing newer full-app journeys.
 
 For an already-provisioned isolated local fixture, `npm run staging:app` reads
 `.local-archive/scale-local/status.env`, requires a localhost API on port 56521,
 and starts the app on port 3100. It does not create the database. Its provisioning
 service-role key is not passed to the app. See `scripts/staging/local-config.mjs`.
+The [16 November verification](docs/database/local-test-environment-verification-2026-11-16.md)
+records what was rechecked against the existing environment and what was tested
+separately with disposable database fixtures.
+Before larger capacity tests, follow the
+[local stack upgrade and restart notes](docs/performance/LOCAL_STACK_UPGRADE_2026-11-16.md)
+and run `node scripts/staging/preflight-local.mjs` from the prepared fixture
+checkout. They cover the verified database runtime, a gateway setting that resets
+on restart, and the HTTP student realm-lock regression check.
 
 ### Environment settings
 
