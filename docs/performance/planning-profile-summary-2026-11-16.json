@@ -1,0 +1,395 @@
+{
+  "environment": "isolated local baseline; no statistic resets",
+  "settingsDuringProfile": {
+    "pg_stat_statements.track_planning": "on",
+    "track_io_timing": "on",
+    "track_wal_io_timing": "on"
+  },
+  "settingsAfterProfile": [
+    {
+      "name": "pg_stat_statements.track_planning",
+      "setting": "off",
+      "source": "default"
+    },
+    {
+      "name": "track_io_timing",
+      "setting": "off",
+      "source": "default"
+    },
+    {
+      "name": "track_wal_io_timing",
+      "setting": "off",
+      "source": "default"
+    }
+  ],
+  "walDelta": {
+    "wal_write": 2640,
+    "wal_sync": 2627,
+    "wal_write_time": 86.369,
+    "wal_sync_time": 2453.356
+  },
+  "caveats": [
+    "Shared database deltas include fixture preparation and background services",
+    "Consult captured settings before interpreting zero planning/I/O timings; WAL counters cover the entire database including fixture provisioning",
+    "Statement execution excludes network, pool waiting and some transaction overhead",
+    "One-second activity samples can miss short waits"
+  ],
+  "studentStatements": [
+    {
+      "key": "16443:5:-1432385697929680542:true",
+      "workloadRole": "student anon",
+      "category": "daily activity RPC",
+      "calls": 1000,
+      "plans": 60,
+      "execution_ms": 2414.6892710000097,
+      "planning_ms": 6.684752,
+      "block_hits": 31542,
+      "block_reads": 0,
+      "wal_bytes": 5398,
+      "averagePlanningMs": 0.11141253333333333,
+      "averageExecutionMs": 2.4146892710000096
+    },
+    {
+      "key": "16443:5:-8399735150547510370:true",
+      "workloadRole": "student anon",
+      "category": "presence RPC",
+      "calls": 1000,
+      "plans": 60,
+      "execution_ms": 1952.388655,
+      "planning_ms": 7.955792,
+      "block_hits": 44532,
+      "block_reads": 0,
+      "wal_bytes": 731663,
+      "averagePlanningMs": 0.13259653333333332,
+      "averageExecutionMs": 1.952388655
+    },
+    {
+      "key": "16443:5:7924705200917212991:true",
+      "workloadRole": "student anon",
+      "category": "daily activity RPC",
+      "calls": 1000,
+      "plans": 60,
+      "execution_ms": 1867.9577429999997,
+      "planning_ms": 11.938873,
+      "block_hits": 34107,
+      "block_reads": 0,
+      "wal_bytes": 322423,
+      "averagePlanningMs": 0.19898121666666665,
+      "averageExecutionMs": 1.8679577429999996
+    },
+    {
+      "key": "16443:5:3964765418948012912:true",
+      "workloadRole": "student anon",
+      "category": "live activity RPC",
+      "calls": 500,
+      "plans": 60,
+      "execution_ms": 1425.07484,
+      "planning_ms": 4.755835,
+      "block_hits": 20843,
+      "block_reads": 0,
+      "wal_bytes": 254372,
+      "averagePlanningMs": 0.07926391666666667,
+      "averageExecutionMs": 2.85014968
+    },
+    {
+      "key": "16443:5:-9123536094687515639:true",
+      "workloadRole": "student anon",
+      "category": "student context RPC",
+      "calls": 500,
+      "plans": 60,
+      "execution_ms": 1316.485304,
+      "planning_ms": 5.683585,
+      "block_hits": 25107,
+      "block_reads": 0,
+      "wal_bytes": 5745,
+      "averagePlanningMs": 0.09472641666666666,
+      "averageExecutionMs": 2.632970608
+    },
+    {
+      "key": "16443:5:-8291786466664630626:true",
+      "workloadRole": "student anon",
+      "category": "live activity RPC",
+      "calls": 500,
+      "plans": 60,
+      "execution_ms": 1093.166172,
+      "planning_ms": 9.861916,
+      "block_hits": 17220,
+      "block_reads": 0,
+      "wal_bytes": 448,
+      "averagePlanningMs": 0.16436526666666668,
+      "averageExecutionMs": 2.1863323439999998
+    },
+    {
+      "key": "16443:5:-5084144446593951227:true",
+      "workloadRole": "student anon",
+      "category": "student login RPC",
+      "calls": 500,
+      "plans": 60,
+      "execution_ms": 322.71600600000096,
+      "planning_ms": 14.326955,
+      "block_hits": 15759,
+      "block_reads": 2,
+      "wal_bytes": 1611163,
+      "averagePlanningMs": 0.23878258333333333,
+      "averageExecutionMs": 0.6454320120000019
+    },
+    {
+      "key": "16443:5:5360251647081715348:true",
+      "workloadRole": "student anon",
+      "category": "session configuration",
+      "calls": 5000,
+      "plans": 0,
+      "execution_ms": 140.04417600000002,
+      "planning_ms": 0,
+      "block_hits": 94,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.028008835200000005
+    },
+    {
+      "key": "16443:5:-2835399305386018931:true",
+      "workloadRole": "student anon",
+      "category": "commit",
+      "calls": 9,
+      "plans": 0,
+      "execution_ms": 0.006666000000000001,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0007406666666666668
+    }
+  ],
+  "capacity": {
+    "at": "2026-11-16T08:20:46.465Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 12,
+      "eventLoopDelayMaxMs": 119,
+      "eventLoopUtilization": 0.06524098632999617
+    },
+    "scenario": "students-only",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 0,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 61,
+    "requests": 5000,
+    "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+    "snapshotHttpRequests": 0,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1000,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 2363,
+            "p99": 3523,
+            "max": 4114
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 2295,
+            "p99": 3410,
+            "max": 4009
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 2363,
+        "p99Ms": 3523,
+        "maximumMs": 4114
+      },
+      {
+        "name": "get_student_runtime_context_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 2131,
+            "p99": 3290,
+            "max": 3871
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 2124,
+            "p99": 3285,
+            "max": 3865
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 2132,
+        "p99Ms": 3290,
+        "maximumMs": 3871
+      },
+      {
+        "name": "upsert_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1869,
+            "p99": 2687,
+            "max": 3376
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1865,
+            "p99": 2683,
+            "max": 3373
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 2,
+            "max": 2
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1869,
+        "p99Ms": 2687,
+        "maximumMs": 3376
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 1376,
+            "p99": 1929,
+            "max": 3327
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 1371,
+            "p99": 1924,
+            "max": 3317
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 2,
+            "max": 4
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 1376,
+        "p99Ms": 1929,
+        "maximumMs": 3327
+      },
+      {
+        "name": "touch_live_student_presence_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 1071,
+            "p99": 1910,
+            "max": 2182
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 1067,
+            "p99": 1904,
+            "max": 2177
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 6
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 1071,
+        "p99Ms": 1910,
+        "maximumMs": 2182
+      },
+      {
+        "name": "upsert_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 932,
+            "p99": 1715,
+            "max": 3076
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 926,
+            "p99": 1712,
+            "max": 3072
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 5
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 932,
+        "p99Ms": 1715,
+        "maximumMs": 3076
+      },
+      {
+        "name": "get_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 906,
+            "p99": 1134,
+            "max": 1225
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 894,
+            "p99": 1116,
+            "max": 1190
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 2,
+            "max": 4
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 906,
+        "p99Ms": 1134,
+        "maximumMs": 1225
+      }
+    ],
+    "preliminaryGatePassed": false,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "full six-read teacher snapshots",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  }
+}

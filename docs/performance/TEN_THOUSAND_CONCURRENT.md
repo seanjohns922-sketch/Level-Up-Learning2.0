@@ -3,6 +3,14 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Planning and API scheduling follow-up
+
+Measured login planning averaged 0.239 ms; the instrumented baseline still failed
+(login p95 2,363 ms). A separate local GHCRTS=-N2 experiment also failed the gate
+(login p95 1,591 ms). Both verified all tested activity writes with no request
+failures. This is not a proven tuning fix. Original settings/container restored,
+preflight and smoke passed. See `LOCAL_PLANNING_RUNTIME_PROFILE_2026-11-16.md`.
+
 ## Supporting SQL and local restart recovery
 
 The resumed baseline burst verified all activity but failed latency again (login

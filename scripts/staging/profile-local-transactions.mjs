@@ -20,10 +20,13 @@ const totals = () => sql(`select coalesce(json_agg(t),'[]'::json) from (
  when query ilike '%student_activity_daily%' then 'daily activity RPC'
  when query ilike '%touch_live_student_presence%' then 'presence RPC'
  else 'other statement (redacted)' end as category,
- calls, total_exec_time as execution_ms, total_plan_time as planning_ms,
+ calls, plans, total_exec_time as execution_ms, total_plan_time as planning_ms,
  shared_blks_hit as block_hits, shared_blks_read as block_reads, wal_bytes::float8 as wal_bytes
  from extensions.pg_stat_statements where query not ilike '%pg_stat_%'
  ) t;`);
+const settings = sql(`select json_object_agg(name,setting) from pg_settings where name in ('track_io_timing','track_wal_io_timing','pg_stat_statements.track_planning');`);
+const wal = () => sql(`select row_to_json(w) from (select wal_write,wal_sync,wal_write_time,wal_sync_time,stats_reset from pg_stat_wal) w;`);
+const walBefore = wal();
 const before = totals();
 const samples = [], start = Date.now();
 while (Date.now()-start < duration*1000) {
@@ -37,13 +40,17 @@ const previous = new Map(before.map(row => [row.key,row]));
 const deltas = totals().map(row => {
  const old = previous.get(row.key) ?? {};
  const delta = { key:row.key, workloadRole:row.workload_role, category:row.category };
- for (const field of ['calls','execution_ms','planning_ms','block_hits','block_reads','wal_bytes']) delta[field] = row[field]-(old[field]??0);
+ for (const field of ['calls','plans','execution_ms','planning_ms','block_hits','block_reads','wal_bytes']) delta[field] = row[field]-(old[field]??0);
+ delta.averagePlanningMs = delta.plans ? delta.planning_ms/delta.plans : null;
  delta.averageExecutionMs = delta.calls ? delta.execution_ms/delta.calls : null;
  return delta;
 }).filter(row=>row.calls>0).sort((a,b)=>b.execution_ms-a.execution_ms);
+const walAfter = wal();
+if (walAfter.stats_reset !== walBefore.stats_reset) throw new Error('WAL statistics reset during profiling');
+const walDelta = Object.fromEntries(['wal_write','wal_sync','wal_write_time','wal_sync_time'].map(key=>[key,walAfter[key]-walBefore[key]]));
 fs.writeFileSync(`${localDir}/transaction-profile.json`,JSON.stringify({
  environment:'isolated local baseline; no statistic resets',
- caveats:['Shared database deltas include fixture preparation and background services','SQL planning tracking and I/O timing are disabled; zero timings do not prove no cost','Statement execution excludes network, pool waiting and some transaction overhead','One-second activity samples can miss short waits'],
- deltas,samples,
+ caveats:['Shared database deltas include fixture preparation and background services','Consult captured settings before interpreting zero planning/I/O timings; WAL counters cover the entire database including fixture provisioning','Statement execution excludes network, pool waiting and some transaction overhead','One-second activity samples can miss short waits'],
+ settings,walDelta,deltas,samples,
 },null,2));
 console.log(`Saved ${deltas.length} redacted statement deltas and ${samples.length} wait samples.`);
