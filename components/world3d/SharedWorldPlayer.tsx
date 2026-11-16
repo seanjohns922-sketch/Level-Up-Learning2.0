@@ -106,6 +106,26 @@ export function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: Ava
   );
 }
 
+// Explorers can step up onto low, flat surfaces (a dais, a stage, a step) instead
+// of sinking into them. Every world puts its floor at y=0, so the explorer never
+// goes below it; anything taller than a step, or not facing up, is ignored.
+const STEP_HEIGHT = 1.2;
+const UP = new THREE.Vector3(0, -1, 0);
+
+/** Solid, visible meshes worth standing on (instanced scenery like grass is skipped for speed). */
+function collectStandableMeshes(scene: THREE.Object3D, player: THREE.Object3D) {
+  const meshes: THREE.Mesh[] = [];
+  scene.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh || (mesh as THREE.InstancedMesh).isInstancedMesh || !mesh.visible) return;
+    const material = mesh.material as THREE.Material;
+    if (Array.isArray(mesh.material) || (material.transparent && material.opacity < 0.6) || !material.depthWrite) return;
+    for (let node: THREE.Object3D | null = mesh; node; node = node.parent) if (node === player || !node.visible) return;
+    meshes.push(mesh);
+  });
+  return meshes;
+}
+
 export function SharedThirdPersonPlayer({
   initialPosition,
   spawnTarget,
@@ -163,7 +183,10 @@ export function SharedThirdPersonPlayer({
   const nearestIdRef = useRef<string | null>(null);
   const yaw = useRef(initialYaw);
   const pitch = useRef(initialPitch);
-  const { camera, gl } = useThree();
+  const { camera, gl, scene } = useThree();
+  const raycaster = useRef(new THREE.Raycaster());
+  const standable = useRef<{ meshes: THREE.Mesh[]; refreshedAt: number }>({ meshes: [], refreshedAt: -Infinity });
+  const surfaceY = useRef(0);
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => keys.current.add(event.key.toLowerCase());
@@ -211,6 +234,7 @@ export function SharedThirdPersonPlayer({
     if (!spawnTarget || !playerRef.current) return;
     playerRef.current.position.set(...spawnTarget);
     baseY.current = spawnTarget[1];
+    surfaceY.current = 0;
     yaw.current = initialYaw;
     pitch.current = initialPitch;
   }, [initialPitch, initialYaw, spawnNonce, spawnTarget]);
@@ -263,6 +287,22 @@ export function SharedThirdPersonPlayer({
     }
 
     if (groundHeightAt) player.position.y = baseY.current + groundHeightAt(player.position.x, player.position.z);
+    else {
+      // Step onto low flat surfaces; the list of candidates refreshes every 1.5 s.
+      const now = performance.now();
+      if (now - standable.current.refreshedAt > 1500) standable.current = { meshes: collectStandableMeshes(scene, player), refreshedAt: now };
+      const ray = raycaster.current;
+      ray.set(new THREE.Vector3(player.position.x, surfaceY.current + STEP_HEIGHT, player.position.z), UP);
+      ray.far = STEP_HEIGHT + surfaceY.current + 0.5;
+      let target = 0;
+      for (const hit of ray.intersectObjects(standable.current.meshes, false)) {
+        if (!hit.face) continue;
+        const normalY = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y;
+        if (normalY > 0.6) { target = Math.max(0, hit.point.y); break; }
+      }
+      surfaceY.current += (target - surfaceY.current) * Math.min(1, delta * (target > surfaceY.current ? 12 : 16));
+      player.position.y = baseY.current + surfaceY.current;
+    }
 
     if (positionRef) {
       positionRef.current.x = player.position.x;
