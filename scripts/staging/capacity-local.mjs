@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js';
 import { fetchLiveClassEvents } from '../../lib/live-class-events.ts';
 import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
+const traceDatabase = process.env.SCALE_TRACE_DATABASE === '1';
 const seconds = Number(process.env.SCALE_DURATION_SECONDS ?? 120);
 assert.ok(Number.isInteger(seconds) && seconds >= 60 && seconds <= 1800);
 const groupCount = Number(process.env.SCALE_GROUP_COUNT ?? 4);
@@ -36,6 +37,7 @@ const failures = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function request(path, body, token, session, name) {
   const start = performance.now();
+  const startedEpochMs = performance.timeOrigin + start;
   let status = 0;
   let headersMs = null, upstreamMs = null, proxyMs = null;
   const serverTimings = {};
@@ -50,6 +52,12 @@ async function request(path, body, token, session, name) {
     const headerNumber = key => response.headers.has(key) ? Number(response.headers.get(key)) : null;
     upstreamMs = headerNumber('x-kong-upstream-latency');
     proxyMs = headerNumber('x-kong-proxy-latency');
+    if (traceDatabase && name && path.startsWith('/rest/v1/')) {
+      const transactionStartedEpochMs = headerNumber('x-reliq-db-start-ms');
+      const databaseReadyEpochMs = headerNumber('x-reliq-db-ready-ms');
+      assert.ok(Number.isFinite(transactionStartedEpochMs) && Number.isFinite(databaseReadyEpochMs), 'Local trace hook headers missing');
+      Object.assign(serverTimings, { startedEpochMs, transactionStartedEpochMs, databaseReadyEpochMs });
+    }
     for (const match of (response.headers.get('server-timing') ?? '').matchAll(/([a-z_]+);dur=([\d.]+)/gi)) {
       serverTimings[`server_${match[1]}Ms`] = Number(match[2]);
     }
@@ -171,10 +179,16 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
+  databaseTracing: traceDatabase,
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
 fs.writeFileSync(`${localDir}/capacity-${studentCount}${outputSuffix}-result.json`, JSON.stringify(report,null,2));
+if (traceDatabase) fs.writeFileSync(`${localDir}/request-trace.json`, JSON.stringify({
+  environment: 'isolated local diagnostic response timestamps; no identifiers or credentials',
+  caveat: 'Host/database clocks require calibration; transaction start is after pool acquisition, not its exact boundary',
+  samples,
+},null,2));
 console.log(JSON.stringify(report,null,2));
 if (!report.preliminaryGatePassed) process.exitCode = 1;

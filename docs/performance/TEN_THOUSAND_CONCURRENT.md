@@ -3,6 +3,15 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Request-correlated timing follow-up
+
+A temporary local response-header trace captured all 5,000 successful workload
+responses. Login p95 was 2,747 ms; every login taking at least one second spent
+at least 90.66% before the database transaction began, under the calibrated stable-
+clock assumption. This localizes the delay before database execution but does
+not isolate exact pool acquisition. Original API restored, hook removed and
+smoke passed. See `LOCAL_REQUEST_TRACE_2026-11-16.md`.
+
 ## Higher-frequency connection profile
 
 Two identical local student bursts gave login p95 676 ms (pass) and 2,175 ms
