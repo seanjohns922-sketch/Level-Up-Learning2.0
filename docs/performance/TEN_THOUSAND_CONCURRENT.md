@@ -3,6 +3,14 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Pool comparison follow-up
+
+Fresh local API instances with pools of 10 and 30 produced login p95 of 2,131 ms
+and 1,414 ms respectively. Both preserved all tested activity but failed the
+unchanged student-only gate. Original pool/container restored and smoke passed.
+See `LOCAL_POOL_COMPARISON_2026-11-16.md`; no production tuning is approved by this
+single sequential comparison and the mixed 500-student gate remains open.
+
 ## Profiling follow-up
 
 Two more local student bursts preserved write integrity but failed latency gates.
