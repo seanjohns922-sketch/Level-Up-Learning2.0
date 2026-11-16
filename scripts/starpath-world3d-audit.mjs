@@ -23,7 +23,7 @@ assert.match(route, /Starpath3DEntry/, "Starpath world route is missing");
 
 assert.match(world, /SharedRealmWorld3D/, "Starpath must compose the shared realm world");
 assert.doesNotMatch(world, /SharedThirdPersonPlayer|<Canvas|useFrame/, "Starpath must not copy the shared engine");
-for (const sharedContract of ["SharedThirdPersonPlayer", "WorldMovePad", "WorldHUD", "WorldInteractionPrompt", "rememberWorld3DWeekEntry"]) {
+for (const sharedContract of ["SharedThirdPersonPlayer", "WorldJoystick", "WorldLookJoystick", "WorldHUD", "WorldInteractionPrompt", "rememberWorld3DWeekEntry"]) {
   assert.match(sharedWorld, new RegExp(sharedContract), `Shared realm contract missing: ${sharedContract}`);
 }
 assert.match(sharedWorld, /searchParams\.get\("district"\)/, "Lesson return must restore the source district");

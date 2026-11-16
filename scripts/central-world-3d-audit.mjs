@@ -67,7 +67,7 @@ check(environment.includes("PlaceholderKnowledgeTower"), "Placeholder Tower is m
 check(environment.includes("PlaceholderMyHome"), "Physical My Home placeholder is missing");
 check(!environment.includes("CustomisationPaths") && !environment.includes("LockedCustomisationPlot") && !environment.includes("EquippedCustomisationPlot"), "Legacy fixed-slot pads or branch paths must not render in the free-placement hub");
 check(environment.includes("CentralValleyPanorama") && environment.includes("CentralMeadowRim") && environment.includes("MeadowGround") && environment.includes("GrassTufts"), "Central valley panorama and ground layers are incomplete");
-check(sharedPlayer.includes("SharedThirdPersonPlayer") && numberNexus.includes("TrialStudentAvatar") && numberNexus.includes("WorldMovePad"), "Central World and Number Nexus must share player infrastructure");
+check(sharedPlayer.includes("SharedThirdPersonPlayer") && numberNexus.includes("TrialStudentAvatar") && numberNexus.includes("WorldJoystick"), "Central World and Number Nexus must share player infrastructure");
 check(!world.includes("NumberNexus") && !environment.includes("number-nexus"), "Central World must not import Number Nexus art");
 check(navigation.includes('destination: "my-home"') && navigation.includes('spawn=my-home-exit-spawn'), "My Home navigation context is incomplete");
 check(home.includes("Return to World") && home.includes("clearWorldNavigationContext"), "Home must offer a conditional semantic return to Central World");

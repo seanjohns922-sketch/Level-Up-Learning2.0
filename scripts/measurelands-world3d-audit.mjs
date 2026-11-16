@@ -21,7 +21,7 @@ assert.match(entry, /router\.replace\("\/measurelands"\)/, "Measurelands must re
 assert.match(entry, /\["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"\]/, "Measurelands production access must include Ground and Levels 1-6");
 assert.match(route, /Measurelands3DEntry/, "Measurelands world route is missing");
 
-for (const sharedImport of ["SharedThirdPersonPlayer", "WorldMovePad", "WorldHUD", "WorldInteractionPrompt"]) {
+for (const sharedImport of ["SharedThirdPersonPlayer", "WorldJoystick", "WorldLookJoystick", "WorldHUD", "WorldInteractionPrompt"]) {
   assert.match(world, new RegExp(sharedImport), `Missing shared world component: ${sharedImport}`);
 }
 assert.match(world, /rememberWorld3DWeekEntry/, "Week entry must use shared return context");
