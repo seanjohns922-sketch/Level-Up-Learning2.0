@@ -3,6 +3,15 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Pool recheck: improvement did not reproduce
+
+Reversing the order gave login p95 2,192 ms at pool 30 versus 1,844 ms at pool 10;
+both failed. A third pool-30 run with internal metrics also failed (2,119 ms).
+All activity checks passed. Metrics showed outstanding pool work, but their
+semantics do not provide exact queue length. Original local settings restored
+and smoke passed. See `LOCAL_POOL_RECHECK_2026-11-16.md`. Do not promote the earlier
+34% one-pair improvement into a production tuning recommendation.
+
 ## Pool comparison follow-up
 
 Fresh local API instances with pools of 10 and 30 produced login p95 of 2,131 ms

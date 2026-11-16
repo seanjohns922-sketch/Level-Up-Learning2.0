@@ -1,0 +1,234 @@
+{
+  "runs": [
+    {
+      "label": "reverse-first",
+      "pool": 30,
+      "at": "2026-11-16T06:29:06.970Z",
+      "passed": false,
+      "failedRequests": 0,
+      "failures": [],
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 128,
+        "eventLoopUtilization": 0.045935336175765014
+      },
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2192,
+          "p99Ms": 2379,
+          "maximumMs": 2688
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 871,
+          "p99Ms": 1927,
+          "maximumMs": 2207
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 834,
+          "p99Ms": 1265,
+          "maximumMs": 1916
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 547,
+          "p99Ms": 1021,
+          "maximumMs": 1854
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 447,
+          "p99Ms": 768,
+          "maximumMs": 1545
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 401,
+          "p99Ms": 786,
+          "maximumMs": 1170
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 367,
+          "p99Ms": 396,
+          "maximumMs": 400
+        }
+      ]
+    },
+    {
+      "label": "reverse-second",
+      "pool": 10,
+      "at": "2026-11-16T06:30:27.831Z",
+      "passed": false,
+      "failedRequests": 0,
+      "failures": [],
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 80,
+        "eventLoopUtilization": 0.05283602251826789
+      },
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1844,
+          "p99Ms": 2354,
+          "maximumMs": 2763
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1440,
+          "p99Ms": 2100,
+          "maximumMs": 2490
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1435,
+          "p99Ms": 1815,
+          "maximumMs": 2205
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 921,
+          "p99Ms": 1605,
+          "maximumMs": 2677
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 841,
+          "p99Ms": 1293,
+          "maximumMs": 2085
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 664,
+          "p99Ms": 1158,
+          "maximumMs": 2041
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 480,
+          "p99Ms": 524,
+          "maximumMs": 559
+        }
+      ]
+    },
+    {
+      "label": "internal-metrics",
+      "pool": 30,
+      "at": "2026-11-16T06:32:09.613Z",
+      "passed": false,
+      "failedRequests": 0,
+      "failures": [],
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 15,
+        "eventLoopDelayMaxMs": 76,
+        "eventLoopUtilization": 0.06431546029226962
+      },
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2119,
+          "p99Ms": 2454,
+          "maximumMs": 3214
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1403,
+          "p99Ms": 1958,
+          "maximumMs": 2162
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1228,
+          "p99Ms": 1638,
+          "maximumMs": 2352
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 821,
+          "p99Ms": 1372,
+          "maximumMs": 2357
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 784,
+          "p99Ms": 1300,
+          "maximumMs": 1688
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 560,
+          "p99Ms": 983,
+          "maximumMs": 1738
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 123,
+          "p99Ms": 158,
+          "maximumMs": 576
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "samples": 293,
+    "errors": 0,
+    "maxReportedPoolWaiting": 425,
+    "poolAvailableRange": [
+      -1,
+      30
+    ],
+    "poolTimeouts": 0,
+    "warning": "waiting includes pool requests until session completion; available briefly reached -1. Do not interpret as exact queue length."
+  }
+}
