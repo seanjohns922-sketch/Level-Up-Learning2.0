@@ -27,6 +27,7 @@
     "qa:live-class-refresh": "node --experimental-strip-types scripts/live-class-refresh-test.mjs",
     "qa:world-startup-performance": "NODE_ENV=test node scripts/world-startup-performance-test.mjs",
     "qa:central-world3d": "node scripts/central-world-3d-audit.mjs",
+    "qa:central-world-v2": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/central-world-v2-test.mjs",
     "qa:tower-world3d": "node scripts/tower-world3d-audit.mjs",
     "qa:world3d-navigation": "node scripts/world3d-navigation-audit.mjs",
     "qa:world3d-level-mode": "node scripts/world3d-level-mode-audit.mjs",

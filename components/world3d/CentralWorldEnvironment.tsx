@@ -33,6 +33,7 @@ import { CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { WorldWater } from "./WorldWater";
 import { OrganicPaths } from "@/components/world3d/OrganicPaths";
 import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
+import { CentralWorldV2Scenery } from "@/components/world3d/CentralWorldV2Scenery";
 import { CentralValleyPanorama } from "./CentralValleyPanorama";
 import { CentralMeadowRim } from "./CentralMeadowRim";
 import {
@@ -1199,18 +1200,21 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <group>
       <Suspense fallback={null}>
         <CentralValleyPanorama quality={quality} />
       </Suspense>
-      <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
-        <MeadowGround />
-        <CentralMeadowRim />
-      </Suspense>
+      {hubV2 ? <CentralWorldV2Scenery quality={quality} animate={quality !== "low" && !reducedMotion} placements={placedCustomisations} groundTiles={groundTiles} itemsById={itemsById} /> : <>
+        <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
+          <MeadowGround />
+          <CentralMeadowRim />
+        </Suspense>
+        <GrassTufts quality={quality} groundTiles={groundTiles} />
+      </>}
       <PaintedGround tiles={groundTiles} />
-      <GrassTufts quality={quality} groundTiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}

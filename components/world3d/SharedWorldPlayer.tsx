@@ -127,6 +127,8 @@ export function SharedThirdPersonPlayer({
   hidden = false,
   speed = 4.6,
   positionRef,
+  groundHeightAt,
+  canStandAt,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -148,8 +150,13 @@ export function SharedThirdPersonPlayer({
   hidden?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
+  /** Optional terrain: ground height under the player (added to the spawn height). */
+  groundHeightAt?: (x: number, z: number) => number;
+  /** Optional blocking: return false where the player may not walk (water, trees). */
+  canStandAt?: (x: number, z: number) => boolean;
 }) {
   const keys = useRef(new Set<string>());
+  const baseY = useRef(initialPosition[1]);
   const playerRef = useRef<THREE.Group | null>(null);
   const movingRef = useRef(false);
   const sprintingRef = useRef(false);
@@ -203,6 +210,7 @@ export function SharedThirdPersonPlayer({
   useEffect(() => {
     if (!spawnTarget || !playerRef.current) return;
     playerRef.current.position.set(...spawnTarget);
+    baseY.current = spawnTarget[1];
     yaw.current = initialYaw;
     pitch.current = initialPitch;
   }, [initialPitch, initialYaw, spawnNonce, spawnTarget]);
@@ -238,7 +246,9 @@ export function SharedThirdPersonPlayer({
       player.rotation.y = Math.atan2(movement.x, movement.z);
       const movementSpeed = speed * (sprintingRef.current ? 1.75 : 1);
       movement.multiplyScalar(movementSpeed * intensity * delta);
-      player.position.add(movement);
+      if (!canStandAt || canStandAt(player.position.x + movement.x, player.position.z + movement.z)) player.position.add(movement);
+      else if (canStandAt(player.position.x + movement.x, player.position.z)) player.position.x += movement.x;
+      else if (canStandAt(player.position.x, player.position.z + movement.z)) player.position.z += movement.z;
     }
     player.position.x = THREE.MathUtils.clamp(player.position.x, bounds.minX, bounds.maxX);
     player.position.z = THREE.MathUtils.clamp(player.position.z, bounds.minZ, bounds.maxZ);
@@ -252,6 +262,8 @@ export function SharedThirdPersonPlayer({
       }
     }
 
+    if (groundHeightAt) player.position.y = baseY.current + groundHeightAt(player.position.x, player.position.z);
+
     if (positionRef) {
       positionRef.current.x = player.position.x;
       positionRef.current.z = player.position.z;
@@ -262,7 +274,7 @@ export function SharedThirdPersonPlayer({
       const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
       const head = new THREE.Vector3(player.position.x, player.position.y + 1.55 * WORLD_AVATAR_SCALE + WORLD_AVATAR_SCALE_OFFSET, player.position.z);
       const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
-      desiredCamera.y = Math.max(desiredCamera.y, cameraMinY);
+      desiredCamera.y = Math.max(desiredCamera.y, cameraMinY + (groundHeightAt ? groundHeightAt(desiredCamera.x, desiredCamera.z) : 0));
       camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
       camera.lookAt(
         player.position.x + forward.x * cameraLookAhead,
