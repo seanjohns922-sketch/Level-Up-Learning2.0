@@ -68,6 +68,11 @@ try {
  const psql=['exec','-i',container,'psql','-X','-U','postgres','-v','ON_ERROR_STOP=1'];
  docker(psql,fixture);
  docker(psql,readFileSync('supabase/migrations/20261111140000_student_realm_locks.sql','utf8'));
+ docker(psql,readFileSync('supabase/migrations/20261116170000_student_realm_lock_read_volatility.sql','utf8'));
+ docker(psql,`DO $$BEGIN
+ IF (SELECT provolatile FROM pg_proc WHERE oid='public.get_student_realm_locks(uuid)'::regprocedure)<>'v'
+ THEN RAISE EXCEPTION 'Student session validation requires a writable PostgREST transaction'; END IF;
+ END$$;`);
  docker(psql,tests);
  console.log('PASS realm locks: bulk lock/open, repeat-safe, all-or-nothing refusals, class and student boundaries, closed table, private helper, cascade on delete.');
 } finally {docker(['rm','-f',container]);}
