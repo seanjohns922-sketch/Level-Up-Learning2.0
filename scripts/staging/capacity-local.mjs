@@ -179,6 +179,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
+  workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase,
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,

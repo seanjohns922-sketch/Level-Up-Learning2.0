@@ -3,6 +3,17 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Exact acquisition follow-up
+
+A custom local PostgREST 14.8 build measured connection handoff directly. In a
+10 / 30 / 10 pool sequence, login p95 was 1,004 / 637 / 1,051 ms and acquisition
+p95 was 415 / 43 / 346 ms. All 15,000 requests and expected activity checks passed;
+only the pool-30 run passed latency. This supports acquisition waiting as a
+contributor in this diagnostic runtime, but the custom build differs from the
+official image and earlier official-image comparisons were inconsistent. No
+production tuning or 10,000-user capacity claim follows. Original API restored;
+preflight and smoke passed. See `LOCAL_ACQUISITION_TRACE_2026-11-16.md`.
+
 ## Request-correlated timing follow-up
 
 A temporary local response-header trace captured all 5,000 successful workload
