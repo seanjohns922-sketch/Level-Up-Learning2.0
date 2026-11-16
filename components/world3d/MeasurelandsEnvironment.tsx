@@ -1,6 +1,7 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
+import { RoundedBox } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -112,13 +113,13 @@ function DistrictPortal({ label, weeks, motif, state, accent, active }: { label:
     <group>
       <mesh position={[0, 0.12, 0]}><cylinderGeometry args={[4.3, 4.7, 0.24, 32]} /><meshStandardMaterial color="#3c332d" roughness={0.84} /></mesh>
       <BrassRulerArch span={2.65} pillarHeight={4.7} state={state} accent={accent} active={active} />
-      <Html center position={[0, 9.5, 0]} distanceFactor={16} style={{ pointerEvents: "none" }}>
+      <WorldSignHtml center position={[0, 9.5, 0]} distanceFactor={16} style={{ pointerEvents: "none" }}>
         <div style={{ minWidth: 190, border: `2px solid ${visual.energy}`, borderRadius: 5, background: "rgba(31,23,18,.96)", color: "#fff5df", padding: "10px 14px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 28px ${visual.energy}77` : "0 10px 24px rgba(0,0,0,.45)" }}>
           <strong style={{ display: "block", fontSize: 16 }}>{label}</strong>
           <span style={{ display: "block", marginTop: 5, color: "#ead7b5", fontSize: 11, fontWeight: 800 }}>{motif}</span>
           <span style={{ display: "block", marginTop: 6, color: visual.energy, fontSize: 11, fontWeight: 950 }}>{weeks.toUpperCase()} · {statusLabel(state)}</span>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -133,12 +134,12 @@ export function MeasurelandsWeekGate({ week, state, accent, active }: { week: nu
     <group>
       <mesh position={[0, 0.1, 0]}><cylinderGeometry args={[2.25, 2.5, 0.2, 28]} /><meshStandardMaterial color="#3b312b" roughness={0.8} /></mesh>
       <BrassRulerArch span={1.65} pillarHeight={3.1} state={state} accent={accent} active={active} />
-      <Html center position={[0, 6.7, 0]} distanceFactor={14} style={{ pointerEvents: "none" }}>
+      <WorldSignHtml center position={[0, 6.7, 0]} distanceFactor={14} style={{ pointerEvents: "none" }}>
         <div style={{ minWidth: 118, border: `2px solid ${visual.energy}`, borderRadius: 5, padding: "9px 12px", background: "rgba(31,23,18,.96)", color: "#fff5df", textAlign: "center", fontFamily: "system-ui,sans-serif", fontWeight: 950, boxShadow: active ? `0 0 24px ${visual.energy}77` : "0 8px 20px rgba(0,0,0,.4)" }}>
           <div style={{ fontSize: 16 }}>Week {week}</div>
           <div style={{ marginTop: 4, color: visual.energy, fontSize: 10 }}>{statusLabel(state)}</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -156,12 +157,12 @@ export function MeasurelandsAdventurePortal({ accent, active }: { accent: string
         <meshStandardMaterial color="#6f4b2d" roughness={0.7} metalness={0.14} />
       </RoundedBox>
       <mesh position={[0, 3.45, 0.08]}><planeGeometry args={[4.25, 5.8]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.62 : 0.42} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
-      <Html center position={[0, 9.05, 0]} distanceFactor={15} style={{ pointerEvents: "none" }}>
+      <WorldSignHtml center position={[0, 9.05, 0]} distanceFactor={15} style={{ pointerEvents: "none" }}>
         <div style={{ minWidth: 230, border: `2px solid ${accent}`, borderRadius: 6, background: "rgba(54,38,27,.96)", color: "#fff8e8", padding: "12px 17px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 30px ${accent}88` : "0 10px 24px rgba(0,0,0,.4)" }}>
           <strong style={{ display: "block", fontSize: 18 }}>START YOUR ADVENTURE</strong>
           <span style={{ display: "block", marginTop: 6, color: accent, fontSize: 11, fontWeight: 950 }}>CURRENT MISSION</span>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -171,7 +172,7 @@ export function MeasurelandsReturnBeam({ accent, active, label = "RETURN TO MEAS
     <group>
       <mesh position={[0, 0.15, 0]}><cylinderGeometry args={[2.8, 3.2, 0.3, 32]} /><meshStandardMaterial color="#41362e" roughness={0.72} /></mesh>
       <mesh position={[0, 10, 0]}><cylinderGeometry args={[0.7, 1.4, 20, 16, 1, true]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.52 : 0.28} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
-      {active ? <Html center position={[0, 2.1, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(31,23,18,.95)", color: "#fff5df", padding: "8px 11px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></Html> : null}
+      {active ? <WorldSignHtml center position={[0, 2.1, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(31,23,18,.95)", color: "#fff5df", padding: "8px 11px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></WorldSignHtml> : null}
     </group>
   );
 }

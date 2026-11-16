@@ -1,6 +1,7 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
+import { RoundedBox } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -160,18 +161,18 @@ function PatternBlock({ position, color, label }: { position: [number, number, n
       <RoundedBox args={[1.65, 1.65, 1.65]} radius={0.08} smoothness={2}>
         <meshStandardMaterial color="#343044" emissive={color} emissiveIntensity={0.17} roughness={0.55} />
       </RoundedBox>
-      <Html center distanceFactor={12} style={{ pointerEvents: "none" }}>
+      <WorldSignHtml center distanceFactor={12} style={{ pointerEvents: "none" }}>
         <div style={{ color, fontSize: 15, fontWeight: 950, fontFamily: "system-ui,sans-serif", textShadow: "0 2px 8px rgba(0,0,0,.8)" }}>{label}</div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
 
 function PortalLabel({ children, accent, active, minWidth = 150 }: { children: React.ReactNode; accent: string; active: boolean; minWidth?: number }) {
   return (
-    <Html center distanceFactor={15} style={{ pointerEvents: "none" }}>
+    <WorldSignHtml center distanceFactor={15} style={{ pointerEvents: "none" }}>
       <div style={{ minWidth, border: `2px solid ${accent}`, borderRadius: 6, background: "rgba(15,22,29,.96)", color: "#f7fff9", padding: "10px 13px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 30px ${accent}88` : "0 10px 26px rgba(0,0,0,.46)" }}>{children}</div>
-    </Html>
+    </WorldSignHtml>
   );
 }
 
@@ -245,7 +246,7 @@ export function PatternPeaksReturnBeam({ accent, active, label = "RETURN TO PATT
     <group>
       <mesh position={[0, 0.13, 0]}><cylinderGeometry args={[2.65, 3.1, 0.26, 6]} /><meshStandardMaterial color="#1b2731" roughness={0.74} /></mesh>
       <mesh position={[0, 9.8, 0]}><cylinderGeometry args={[0.58, 1.3, 19.6, 6, 1, true]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.58 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
-      {active ? <Html center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(15,22,29,.96)", color: "#f7fff9", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></Html> : null}
+      {active ? <WorldSignHtml center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(15,22,29,.96)", color: "#f7fff9", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></WorldSignHtml> : null}
     </group>
   );
 }

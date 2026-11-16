@@ -1,6 +1,6 @@
 "use client";
 
-import { Html } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -102,12 +102,12 @@ export function ProductionWeekGate({ label, state, active, currentMission, quizR
         />
       </mesh>
       <GateStateMark state={state} color={visual.energy} />
-      <Html center position={[0, 4.12, 0]} distanceFactor={10}>
+      <WorldSignHtml center position={[0, 4.12, 0]} distanceFactor={10}>
         <div style={{ minWidth: 132, border: `1px solid ${visual.energy}`, background: "rgba(4,15,19,0.94)", color: P.white, padding: "7px 11px", textAlign: "center", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", fontWeight: 900, fontSize: 12, letterSpacing: "0.08em", boxShadow: currentMission ? `0 0 22px ${visual.energy}55` : "0 8px 18px rgba(0,0,0,0.4)" }}>
           <div>{label}</div>
           <div style={{ marginTop: 3, color: visual.energy, fontSize: 9, letterSpacing: "0.14em" }}>{visual.symbol}</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -166,9 +166,9 @@ export function NumberGate({ powered }: { powered: boolean }) {
       ))}
       <mesh position={[0, 9.1, 0]}><boxGeometry args={[11.8, 1.5, 2.2]} /><meshStandardMaterial color={P.panel} metalness={0.34} roughness={0.56} /></mesh>
       <mesh position={[0, 9.2, 1.13]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[1.2, 1.2, 0.08]} /><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={powered ? 1.1 : 0.68} /></mesh>
-      <Html center position={[0, 10.7, 0]} distanceFactor={15}>
+      <WorldSignHtml center position={[0, 10.7, 0]} distanceFactor={15}>
         <div style={{ border: `1px solid ${accent}`, background: "rgba(4,15,19,0.9)", color: P.white, padding: "8px 16px", fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 12, letterSpacing: "0.18em", whiteSpace: "nowrap" }}>THE NUMBER GATE</div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -187,12 +187,12 @@ export function CityReturnBeam({ active }: { active: boolean }) {
       <mesh position={[0, 22, 0]}><cylinderGeometry args={[1.15, 2.05, 43, 20, 1, true]} /><meshBasicMaterial ref={beamRef} color={P.paleEnergy} transparent opacity={0.48} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} fog={false} /></mesh>
       <mesh position={[0, 22, 0]}><cylinderGeometry args={[2.2, 3.25, 43, 20, 1, true]} /><meshBasicMaterial color={P.cyan} transparent opacity={active ? 0.22 : 0.13} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} fog={false} /></mesh>
       <pointLight position={[0, 4.5, 0]} color={P.cyan} intensity={active ? 5 : 3.2} distance={28} />
-      <Html center position={[0, 3.8, 0]} distanceFactor={13}>
+      <WorldSignHtml center position={[0, 3.8, 0]} distanceFactor={13}>
         <div style={{ minWidth: 220, border: `2px solid ${P.cyan}`, borderRadius: 4, background: "rgba(2,12,16,0.97)", color: P.white, padding: "11px 16px", textAlign: "center", fontFamily: "ui-rounded, system-ui, sans-serif", fontWeight: 900, boxShadow: active ? `0 0 32px ${P.cyan}77` : "0 9px 22px rgba(0,0,0,0.55)" }}>
           <div style={{ fontSize: 15, lineHeight: 1.15 }}>Back to Number Nexus City</div>
           <div style={{ marginTop: 5, color: P.paleEnergy, fontSize: 11, lineHeight: 1.1 }}>Return Beam</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -268,9 +268,9 @@ export function CountingDistrictEnvironment({
       <WeekBuilding position={[0, 0, -30]} width={6.4} height={7.8} number={2} accent={P.available} />
       <WeekBuilding position={[14, 0, -28]} width={5.8} height={6.9} number={3} accent={P.available} />
 
-      <Html center position={[0, 1.1, 10.2]} distanceFactor={11}>
+      <WorldSignHtml center position={[0, 1.1, 10.2]} distanceFactor={11}>
         <div style={{ color: P.paleEnergy, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 11, letterSpacing: "0.18em", textShadow: "0 0 12px rgba(34,211,197,0.8)", whiteSpace: "nowrap" }}>COUNTING DISTRICT · WEEKS 1–3</div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }

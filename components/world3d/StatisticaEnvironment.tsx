@@ -1,6 +1,7 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
+import { RoundedBox } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
@@ -120,9 +121,9 @@ function DataColumn({ x, z, height, color }: { x: number; z: number; height: num
 
 function PortalLabel({ children, accent, active, minWidth = 150 }: { children: React.ReactNode; accent: string; active: boolean; minWidth?: number }) {
   return (
-    <Html center distanceFactor={15} style={{ pointerEvents: "none" }}>
+    <WorldSignHtml center distanceFactor={15} style={{ pointerEvents: "none" }}>
       <div style={{ minWidth, border: `2px solid ${accent}`, borderRadius: 6, background: "rgba(18,49,42,.96)", color: "#fffaf2", padding: "10px 13px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 28px ${accent}88` : "0 10px 24px rgba(0,0,0,.42)" }}>{children}</div>
-    </Html>
+    </WorldSignHtml>
   );
 }
 
@@ -194,7 +195,7 @@ export function StatisticaReturnBeam({ accent, active, label = "RETURN TO STATIS
     <group>
       <mesh position={[0, 0.13, 0]}><cylinderGeometry args={[2.7, 3.15, 0.26, 36]} /><meshStandardMaterial color="#17352e" roughness={0.7} /></mesh>
       <mesh position={[0, 9.8, 0]}><cylinderGeometry args={[0.58, 1.32, 19.6, 18, 1, true]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.56 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
-      {active ? <Html center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(18,49,42,.96)", color: "#fffaf2", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></Html> : null}
+      {active ? <WorldSignHtml center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(18,49,42,.96)", color: "#fffaf2", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></WorldSignHtml> : null}
     </group>
   );
 }

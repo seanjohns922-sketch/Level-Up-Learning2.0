@@ -1,6 +1,7 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
+import { RoundedBox } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -130,9 +131,9 @@ function ChanceHollowGround({ floor, tint, repeat, accent, secondary }: { floor:
 
 function PortalLabel({ children, accent, active, minWidth = 150 }: { children: React.ReactNode; accent: string; active: boolean; minWidth?: number }) {
   return (
-    <Html center distanceFactor={15} style={{ pointerEvents: "none" }}>
+    <WorldSignHtml center distanceFactor={15} style={{ pointerEvents: "none" }}>
       <div style={{ minWidth, border: `2px solid ${accent}`, borderRadius: 6, background: "rgba(31,18,32,.96)", color: "#fff7ed", padding: "10px 13px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 30px ${accent}88` : "0 10px 26px rgba(0,0,0,.5)" }}>{children}</div>
-    </Html>
+    </WorldSignHtml>
   );
 }
 
@@ -236,7 +237,7 @@ export function ChanceHollowReturnBeam({ accent, active, label = "RETURN TO CHAN
     <group>
       <mesh position={[0, 0.13, 0]}><cylinderGeometry args={[2.7, 3.15, 0.26, 32]} /><meshStandardMaterial color="#261b2c" roughness={0.72} /></mesh>
       <mesh position={[0, 9.8, 0]}><cylinderGeometry args={[0.58, 1.32, 19.6, 18, 1, true]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.56 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
-      {active ? <Html center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(31,18,32,.96)", color: "#fff7ed", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></Html> : null}
+      {active ? <WorldSignHtml center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(31,18,32,.96)", color: "#fff7ed", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></WorldSignHtml> : null}
     </group>
   );
 }

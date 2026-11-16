@@ -1,6 +1,6 @@
 "use client";
 
-import { Html } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -115,9 +115,9 @@ function CivicCity({ quality, showBuildings }: { quality: NumberNexusArtQuality;
       <mesh position={[0, 0.19, 4]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[4.3, 0.08, 6, 36]} /><meshBasicMaterial color={P.teal} toneMapped={false} /></mesh>
       <EnergyPylon position={[-2.2, 0.18, 4]} />
       <EnergyPylon position={[2.2, 0.18, 4]} />
-      <Html center position={[0, 1.05, 4]} distanceFactor={10}>
+      <WorldSignHtml center position={[0, 1.05, 4]} distanceFactor={10}>
         <div style={{ color: P.paleEnergy, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 11, letterSpacing: "0.2em", textShadow: "0 0 12px rgba(34,211,197,0.8)", whiteSpace: "nowrap" }}>NUMBER NEXUS CITY</div>
-      </Html>
+      </WorldSignHtml>
 
       {showBuildings ? <InstancedCityBlocks placements={placements} /> : null}
       {quality === "low" ? null : <ElevatedTransit />}
@@ -152,7 +152,7 @@ export function CityDistrictEntrance({ label, weekRangeLabel, state, active, cur
       <mesh position={[0, 3.35, 0.05]}><planeGeometry args={[4.85, 5.8]} /><meshBasicMaterial color={visual.accent} transparent opacity={visual.opacity} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
       <mesh position={[0, 7.05, 0.96]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.85, 0.85, 0.08]} /><meshStandardMaterial color={visual.accent} emissive={visual.accent} emissiveIntensity={visual.intensity} /></mesh>
       {visual.barrier ? [1.3, 2.5, 3.7, 4.9].map((y) => <mesh key={y} position={[0, y, 0.18]}><boxGeometry args={[4.8, 0.22, 0.24]} /><meshStandardMaterial color={P.barrier} emissive={P.barrier} emissiveIntensity={0.25} /></mesh>) : null}
-      <Html center position={[0, 8.55, 0]} distanceFactor={18}>
+      <WorldSignHtml center position={[0, 8.55, 0]} distanceFactor={18}>
         <div style={{ minWidth: 188, border: `2px solid ${visual.accent}`, borderRadius: 4, background: "rgba(2,12,16,0.97)", color: P.white, padding: "11px 15px", textAlign: "center", fontFamily: "ui-rounded, system-ui, sans-serif", fontWeight: 900, boxShadow: active ? `0 0 28px ${visual.accent}66` : "0 9px 22px rgba(0,0,0,0.55)" }}>
           <div style={{ fontSize: 15, lineHeight: 1.15, whiteSpace: "nowrap" }}>{label}</div>
           {weekRangeLabel ? <div style={{ marginTop: 7, color: P.paleEnergy, fontSize: 12, lineHeight: 1.1 }}>{weekRangeLabel}</div> : null}
@@ -161,7 +161,7 @@ export function CityDistrictEntrance({ label, weekRangeLabel, state, active, cur
             <span>{visual.tag}</span>
           </div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -206,15 +206,15 @@ export function CityTowerEntrance({ active }: { active: boolean }) {
       {[-1, 1].map((side) => <mesh key={side} position={[side * 3.15, 13.3, -0.1]}><boxGeometry args={[2.6, 0.7, 2]} /><meshStandardMaterial color={P.raisedMetal} metalness={0.45} roughness={0.42} /></mesh>)}
       <pointLight position={[0, 7, -4]} color={P.cyan} intensity={active ? 4 : 2.4} distance={28} />
 
-      <Html center position={[0, 11.45, -1.75]} distanceFactor={18}>
+      <WorldSignHtml center position={[0, 11.45, -1.75]} distanceFactor={18}>
         <div style={{ minWidth: 190, border: `1px solid ${P.cyan}`, background: "rgba(4,15,19,0.95)", color: P.white, padding: "9px 15px", textAlign: "center", fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 12, letterSpacing: "0.14em", boxShadow: active ? `0 0 30px ${P.cyan}66` : "0 10px 24px rgba(0,0,0,0.5)" }}>
           <div>THE TOWER</div>
           <div style={{ marginTop: 4, color: P.paleEnergy, fontSize: 9, letterSpacing: "0.18em" }}>NUMBER NEXUS GATEWAY</div>
         </div>
-      </Html>
-      <Html center position={[0, 18.4, -1.25]} distanceFactor={24}>
+      </WorldSignHtml>
+      <WorldSignHtml center position={[0, 18.4, -1.25]} distanceFactor={24}>
         <div style={{ color: P.paleEnergy, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 15, letterSpacing: "0.28em", textShadow: `0 0 16px ${P.cyan}` }}>1 · 2 · 3</div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }

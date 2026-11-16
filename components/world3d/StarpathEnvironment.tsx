@@ -1,6 +1,7 @@
 "use client";
 
-import { Html, RoundedBox } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
+import { RoundedBox } from "@react-three/drei";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -88,9 +89,9 @@ function PortalFrame({ width, height, state, accent, active }: { width: number; 
 
 function PortalLabel({ children, accent, active }: { children: React.ReactNode; accent: string; active: boolean }) {
   return (
-    <Html center distanceFactor={15} style={{ pointerEvents: "none" }}>
+    <WorldSignHtml center distanceFactor={15} style={{ pointerEvents: "none" }}>
       <div style={{ minWidth: 190, border: `2px solid ${accent}`, borderRadius: 6, background: "rgba(8,12,31,.95)", color: "#f8fbff", padding: "10px 14px", textAlign: "center", fontFamily: "system-ui,sans-serif", boxShadow: active ? `0 0 30px ${accent}88` : "0 10px 25px rgba(0,0,0,.48)" }}>{children}</div>
-    </Html>
+    </WorldSignHtml>
   );
 }
 
@@ -113,7 +114,7 @@ export function StarpathReturnBeam({ accent, active, label = "RETURN TO STARPATH
       <mesh position={[0, 0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.75, 2.65, 48]} /><meshBasicMaterial color={accent} transparent opacity={0.9} toneMapped={false} side={THREE.DoubleSide} /></mesh>
       <mesh position={[0, 10, 0]}><cylinderGeometry args={[0.5, 1.5, 20, 20, 1, true]} /><meshBasicMaterial color={accent} transparent opacity={active ? 0.58 : 0.3} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
       <mesh position={[0, 10, 0]}><cylinderGeometry args={[0.34, 0.72, 20, 16]} /><meshBasicMaterial color="#e9fbff" transparent opacity={active ? 0.88 : 0.68} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>
-      {active ? <Html center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(8,12,31,.95)", color: "#fff", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></Html> : null}
+      {active ? <WorldSignHtml center position={[0, 2, 0]} distanceFactor={10} style={{ pointerEvents: "none" }}><div style={{ border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(8,12,31,.95)", color: "#fff", padding: "8px 12px", fontSize: 11, fontWeight: 950, whiteSpace: "nowrap" }}>{label}</div></WorldSignHtml> : null}
     </group>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -171,7 +171,7 @@ function DistrictBlock({ district, active }: { district: DistrictRenderDefinitio
         <boxGeometry args={[district.size[0] - 0.5, 0.55, 0.22]} />
         <meshStandardMaterial color={locked ? "#1f2937" : "#111827"} roughness={0.9} />
       </mesh>
-      <Html center position={[0, 0.95, district.size[2] / 2 + 0.85]} distanceFactor={11}>
+      <WorldSignHtml center position={[0, 0.95, district.size[2] / 2 + 0.85]} distanceFactor={11}>
         <div
           style={{
             minWidth: 176,
@@ -190,7 +190,7 @@ function DistrictBlock({ district, active }: { district: DistrictRenderDefinitio
           <div>{district.label}</div>
           <div style={{ color: locked ? "#cbd5e1" : color, marginTop: 2 }}>{district.weekRangeLabel} · {statusText(district.state)}</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -216,7 +216,7 @@ function Gate({ gate, active }: { gate: GateDefinition; active: boolean }) {
         <cylinderGeometry args={[1.05, 1.05, 0.16, 28]} />
         <meshStandardMaterial color={active ? "#f8fafc" : locked ? "#374151" : gate.color} />
       </mesh>
-      <Html center position={[0, gateHeight + 0.9, 0]} distanceFactor={11}>
+      <WorldSignHtml center position={[0, gateHeight + 0.9, 0]} distanceFactor={11}>
         <div
           style={{
             minWidth: 96,
@@ -236,7 +236,7 @@ function Gate({ gate, active }: { gate: GateDefinition; active: boolean }) {
           <div>{gate.label}</div>
           <div style={{ color: locked ? "#cbd5e1" : gate.color, marginTop: 3 }}>{statusText(gate.state)}</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }

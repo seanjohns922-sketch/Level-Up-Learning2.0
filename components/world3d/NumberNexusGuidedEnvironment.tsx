@@ -1,6 +1,6 @@
 "use client";
 
-import { Html } from "@react-three/drei";
+import { WorldSignHtml } from "@/components/world3d/WorldSignHtml";
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
 import * as THREE from "three";
@@ -35,12 +35,12 @@ export function StartAdventurePortal({ active, accent }: { active: boolean; acce
       <mesh position={[0, 4.45, 0.04]}><planeGeometry args={[5.15, 7.9]} /><meshBasicMaterial ref={field} color={accent} transparent opacity={0.54} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} /></mesh>
       <mesh position={[0, 9.2, 1.03]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.95, 0.95, 0.08]} /><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={active ? 1.4 : 0.95} /></mesh>
       <pointLight position={[0, 5, 3]} color={accent} intensity={active ? 4.5 : 2.8} distance={28} />
-      <Html center position={[0, 11.1, 0]} distanceFactor={16}>
+      <WorldSignHtml center position={[0, 11.1, 0]} distanceFactor={16}>
         <div style={{ minWidth: 260, border: `2px solid ${accent}`, borderRadius: 5, background: "rgba(2,12,16,0.96)", color: P.white, padding: "13px 18px", textAlign: "center", fontFamily: "ui-rounded, system-ui, sans-serif", fontWeight: 950, boxShadow: active ? `0 0 34px ${accent}77` : "0 12px 28px rgba(0,0,0,0.58)" }}>
           <div style={{ fontSize: 19, lineHeight: 1.1 }}>Start Your Adventure</div>
           <div style={{ marginTop: 6, color: P.paleEnergy, fontSize: 11, letterSpacing: "0.1em" }}>ENTER YOUR NEXT MISSION</div>
         </div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
@@ -69,9 +69,9 @@ export function NumberNexusGuidedEnvironment({ quality, theme }: { quality: Numb
       </mesh>
       <CircuitInlay position={[-3.8, 0.07, 5]} size={[0.1, 0.04, 28]} color={theme.energyAccent} />
       <CircuitInlay position={[3.8, 0.07, 5]} size={[0.1, 0.04, 28]} color={theme.energyAccent} />
-      <Html center position={[0, 0.95, 13]} distanceFactor={11}>
+      <WorldSignHtml center position={[0, 0.95, 13]} distanceFactor={11}>
         <div style={{ color: P.paleEnergy, fontFamily: "ui-monospace, monospace", fontWeight: 900, fontSize: 11, letterSpacing: "0.18em", textShadow: `0 0 12px ${theme.energyAccent}`, whiteSpace: "nowrap" }}>NUMBER NEXUS · ADVENTURE PLAZA</div>
-      </Html>
+      </WorldSignHtml>
     </group>
   );
 }
