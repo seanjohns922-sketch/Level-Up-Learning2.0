@@ -306,6 +306,14 @@ export type ParentPreviewData = {
   reports?: Record<string, ParentProgressReport>;
 };
 
+/** The parent gate's reasons, in words a parent can act on (see assert_parent_role). */
+export function parentHomeErrorMessage(reason: string | undefined) {
+  if (reason?.includes("Parent access required")) return "This account isn't set up as a parent account. Sign in with the email you used to create your parent account, or link your child with their Explorer Code.";
+  if (reason?.includes("Account unavailable")) return "This account isn't active yet. Please contact support so we can switch it on.";
+  if (reason?.includes("Login required")) return "Your sign-in has expired. Please sign in again.";
+  return "Parent Home could not be loaded. Please try again.";
+}
+
 export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?: string; preview?: ParentPreviewData }) {
   const router = useRouter();
   const [children, setChildren] = useState<ParentChild[]>(preview?.children ?? []);
@@ -329,7 +337,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
     // Only a name the parent gave us; an email username ("scjohns") reads badly.
     setParentName(displayName.split(/\s+/)[0] ?? "");
     const { data, error: loadError } = await supabase.rpc("get_parent_home_snapshot");
-    if (loadError) setError("Parent Home could not be loaded. Please try again.");
+    if (loadError) setError(parentHomeErrorMessage(loadError.message));
     else {
       const loadedChildren = (data as { children?: ParentChild[] } | null)?.children ?? [];
       setChildren(loadedChildren);
