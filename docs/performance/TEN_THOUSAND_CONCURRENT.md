@@ -3,6 +3,14 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Profiling follow-up
+
+Two more local student bursts preserved write integrity but failed latency gates.
+Gateway/server headers locate most delay in the API transaction stage; login SQL
+averaged 0.415 ms, client event-loop p99 was 12 ms. Pool/transaction waiting is a
+candidate, not a proven root cause. See `LOCAL_BURST_PROFILE_2026-11-16.md`.
+Temporary local timing diagnostics were reset; no production changes occurred.
+
 ## Isolation follow-up
 
 Student-only simultaneous load also failed (login p95 2,853 ms), while teacher-only

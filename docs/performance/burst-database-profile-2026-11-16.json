@@ -1,0 +1,741 @@
+{
+  "environment": "isolated local aggregate profile",
+  "durationSeconds": 75.176,
+  "note": "Statement totals are shared local database deltas, not per-request traces; active/wait samples may miss short events.",
+  "deltas": [
+    {
+      "name": "get_live_student_activity_secure",
+      "calls": 500,
+      "executionMs": 902.7584499999998,
+      "averageExecutionMs": 1.8055168999999995
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "calls": 1000,
+      "executionMs": 1614.9622260000097,
+      "averageExecutionMs": 1.6149622260000096
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "calls": 500,
+      "executionMs": 882.00576,
+      "averageExecutionMs": 1.76401152
+    },
+    {
+      "name": "student_login_lookup",
+      "calls": 500,
+      "executionMs": 207.44809800000007,
+      "averageExecutionMs": 0.41489619600000016
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "calls": 1000,
+      "executionMs": 1667.950905999971,
+      "averageExecutionMs": 1.6679509059999709
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "calls": 500,
+      "executionMs": 902.8909199999898,
+      "averageExecutionMs": 1.8057818399999797
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "calls": 1000,
+      "executionMs": 1606.0850899999896,
+      "averageExecutionMs": 1.6060850899999897
+    }
+  ],
+  "samples": [
+    {
+      "at": "2026-11-16T05:54:13.539Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:14.607Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:15.698Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:16.797Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:17.873Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:18.970Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:20.052Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:21.165Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:22.264Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:23.359Z",
+      "database": {
+        "connections": 26,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 2.329
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:24.426Z",
+      "database": {
+        "connections": 26,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 2.921
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:25.482Z",
+      "database": {
+        "connections": 26,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 1,
+        "longestActiveMs": 0.416
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:26.612Z",
+      "database": {
+        "connections": 26,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0.104
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:27.704Z",
+      "database": {
+        "connections": 26,
+        "active": 2,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0.779
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:28.790Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:29.879Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:30.964Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:32.033Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:33.140Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:34.235Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:35.312Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:36.408Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:37.486Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:38.569Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:39.647Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:40.746Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:41.840Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:42.910Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:44.006Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:45.102Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:46.195Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:47.280Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:48.368Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:49.465Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:50.564Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:51.671Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:52.769Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:53.864Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:54.960Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:56.031Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:57.128Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:58.206Z",
+      "database": {
+        "connections": 26,
+        "active": 2,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0.487
+      }
+    },
+    {
+      "at": "2026-11-16T05:54:59.283Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:00.379Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:01.469Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:02.584Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:03.662Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:04.767Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:05.862Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:06.952Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:08.021Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:09.123Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:10.208Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:11.294Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:12.369Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:13.455Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:14.555Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:15.628Z",
+      "database": {
+        "connections": 27,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 38.483
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:16.725Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:17.815Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:18.878Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:19.966Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:21.051Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:22.117Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:23.207Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:24.298Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:25.373Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:26.481Z",
+      "database": {
+        "connections": 26,
+        "active": 1,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0.333
+      }
+    },
+    {
+      "at": "2026-11-16T05:55:27.573Z",
+      "database": {
+        "connections": 26,
+        "active": 0,
+        "lockWaits": 0,
+        "ioWaits": 0,
+        "longestActiveMs": 0
+      }
+    }
+  ]
+}
