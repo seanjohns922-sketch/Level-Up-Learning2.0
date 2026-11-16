@@ -6,12 +6,59 @@ Read [AGENTS.md](AGENTS.md) before changing student experiences or access contro
 ## Development
 
 Use Node 24 (see `.nvmrc`) and npm. `package-lock.json` is the dependency lockfile.
-Run the app locally:
+Use an approved non-production Supabase project containing synthetic accounts.
+Copy the template, fill in its URL and public anon/publishable key, then start:
 
 ```bash
 npm ci
+cp .env.example .env.local
+# Edit .env.local with the approved test project's connection details.
 npm run dev
 ```
+
+Development fails before serving pages if either connection setting is missing
+or the URL points to the current production project. Do not bypass this by
+changing `NODE_ENV`. The template sets `NEXT_PUBLIC_APP_ENV=staging`, which also
+protects local production builds and test deployments. Never use production
+student data as test fixtures. `.env.local` is ignored; `.env.example` has no keys.
+
+This is a connection safeguard, not a database provisioning command. A new
+Supabase project needs the approved schema and synthetic fixtures before signed-in
+journeys will work. The historical migrations alone are not a complete bootstrap:
+the earliest migration assumes `public.students` already exists. Do not run a
+reset against a hosted project or copy a production data export to get started.
+Until the bootstrap is supplied, request access to an approved test environment.
+
+For an already-provisioned isolated local fixture, `npm run staging:app` reads
+`.local-archive/scale-local/status.env`, requires a localhost API on port 56521,
+and starts the app on port 3100. It does not create the database. Its provisioning
+service-role key is not passed to the app. See `scripts/staging/local-config.mjs`.
+
+### Environment settings
+
+| Setting | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_APP_ENV=staging` | Require an explicit non-production destination, including during builds. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Approved test project URL (or provisioned local API). |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | That project's public anon/publishable key; never a secret/service-role key. |
+| `NEXT_PUBLIC_APP_URL` | Origin for application links; local default in the template is port 3000. |
+| `NEXT_PUBLIC_VOICE_CLIP_BASE` | Optional public voice asset base; if omitted, existing public production clips remain available. |
+
+All `NEXT_PUBLIC_*` values are visible in browser builds. Restart development
+after edits, and rebuild deployed previews when these values change. For an
+isolated hosting preview, set `NEXT_PUBLIC_APP_ENV=staging` and the test connection
+settings in that deployment environment; Vercel previews are not automatically
+isolated by this patch. Production deployment defaults are preserved. Do not copy
+the local template into production deployment settings.
+
+Email delivery is unnecessary for most local UI work. If explicitly testing
+invitations, configure server-only `RESEND_API_KEY` and `EMAIL_FROM` for a test
+sender and controlled recipients. Leave real production email credentials out of
+local development. These guards cover the shared application connection, not
+standalone maintenance scripts; inspect each script and its target before running.
+
+Environment loading and browser inlining follow
+[Next.js environment variable rules](https://nextjs.org/docs/app/guides/environment-variables).
 
 Other useful commands:
 
@@ -60,7 +107,8 @@ the user applies migrations, and test session fixtures must be removed.
 See [engineering release checks](docs/ENGINEERING_RELEASE.md), the
 [G–6 reliability audit](docs/G6_RELIABILITY_AUDIT.md) and the
 [security follow-up](docs/SECURITY_FOLLOW_UP.md). School-launch approval remains
-pending. Application lint has known failures; these remain visible in CI.
+pending. The 16 November 2026 baseline had zero application-lint errors and 323
+warnings; historical failures in the release notes are not the current baseline.
 GitHub checks alone do not configure branch protection or block hosting deployments.
 
 Live screen sharing has been removed from the application; server containment
