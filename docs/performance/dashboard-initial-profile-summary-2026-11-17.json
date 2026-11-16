@@ -1,0 +1,2035 @@
+{
+  "environment": "isolated local official runtime; timing diagnostics only",
+  "capacity": {
+    "at": "2026-11-16T22:47:42.275Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "workloadStartedAt": "2026-11-16T22:46:40.432Z",
+    "databaseTracing": false,
+    "dashboardHttpProfiling": true,
+    "dashboardChecks": [
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5150,
+          0,
+          0,
+          0,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5443,
+          729,
+          243,
+          486,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5445,
+          735,
+          245,
+          490,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 50,
+        "finalRowCounts": [
+          25,
+          5450,
+          723,
+          241,
+          482,
+          25
+        ]
+      },
+      {
+        "refreshes": 3,
+        "observedNewEvents": 51,
+        "finalRowCounts": [
+          25,
+          5449,
+          744,
+          248,
+          496,
+          25
+        ]
+      }
+    ],
+    "dashboardMode": "six-source periodic refresh with production incremental event reader; no realtime subscription",
+    "expectedNewEvents": 1001,
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 12,
+      "eventLoopDelayMaxMs": 107,
+      "eventLoopUtilization": 0.08150254754799618
+    },
+    "scenario": "dashboard-mixed",
+    "restRoute": "gateway",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 20,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 62,
+    "requests": 6443,
+    "requestUnits": "student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total",
+    "snapshotHttpRequests": 616,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1001,
+    "failures": [],
+    "preliminaryGatePassed": false,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  },
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "requests": 20,
+      "failedRequests": 0,
+      "p95Ms": 312,
+      "p99Ms": 312,
+      "maximumMs": 312
+    },
+    {
+      "name": "student_login_lookup",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 2516,
+      "p99Ms": 3293,
+      "maximumMs": 4346
+    },
+    {
+      "name": "dashboard_live_activity",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 1374,
+      "p99Ms": 4294,
+      "maximumMs": 4294
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 2171,
+      "p99Ms": 2885,
+      "maximumMs": 4166
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 1817,
+      "p99Ms": 2733,
+      "maximumMs": 3236
+    },
+    {
+      "name": "dashboard_quiz_attempts",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 1905,
+      "p99Ms": 3122,
+      "maximumMs": 3122
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 1000,
+      "failedRequests": 0,
+      "p95Ms": 1382,
+      "p99Ms": 2101,
+      "maximumMs": 3026
+    },
+    {
+      "name": "dashboard_lesson_attempts",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 1880,
+      "p99Ms": 3717,
+      "maximumMs": 3717
+    },
+    {
+      "name": "dashboard_daily_activity",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 1604,
+      "p99Ms": 2275,
+      "maximumMs": 2275
+    },
+    {
+      "name": "dashboard_assessments",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 1884,
+      "p99Ms": 2756,
+      "maximumMs": 2756
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 1001,
+      "failedRequests": 0,
+      "p95Ms": 1222,
+      "p99Ms": 1810,
+      "maximumMs": 2691
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 1001,
+      "failedRequests": 0,
+      "p95Ms": 988,
+      "p99Ms": 1904,
+      "maximumMs": 2499
+    },
+    {
+      "name": "insert_live_activity_event_secure",
+      "requests": 1001,
+      "failedRequests": 0,
+      "p95Ms": 874,
+      "p99Ms": 1393,
+      "maximumMs": 2404
+    },
+    {
+      "name": "dashboard_events_initial",
+      "requests": 20,
+      "failedRequests": 0,
+      "p95Ms": 5312,
+      "p99Ms": 5314,
+      "maximumMs": 5314
+    },
+    {
+      "name": "dashboard_refresh",
+      "requests": 60,
+      "failedRequests": 0,
+      "p95Ms": 5303,
+      "p99Ms": 5314,
+      "maximumMs": 5314
+    },
+    {
+      "name": "dashboard_events_incremental",
+      "requests": 40,
+      "failedRequests": 0,
+      "p95Ms": 391,
+      "p99Ms": 416,
+      "maximumMs": 416
+    },
+    {
+      "name": "get_live_student_activity_secure",
+      "requests": 500,
+      "failedRequests": 0,
+      "p95Ms": 728,
+      "p99Ms": 1025,
+      "maximumMs": 1195
+    }
+  ],
+  "httpGroups": [
+    {
+      "phase": "incremental",
+      "route": "get_live_class_activity_today",
+      "headersMs": {
+        "samples": 40,
+        "median": 186.869,
+        "p95": 378.59,
+        "max": 389.182
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 181,
+        "p95": 359,
+        "max": 376
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 4
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "get_live_class_event_page_secure",
+      "headersMs": {
+        "samples": 36,
+        "median": 85.128,
+        "p95": 320.45,
+        "max": 377.823
+      },
+      "upstreamMs": {
+        "samples": 36,
+        "median": 78,
+        "p95": 312,
+        "max": 369
+      },
+      "proxyMs": {
+        "samples": 36,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "live_activity_events",
+      "headersMs": {
+        "samples": 40,
+        "median": 38.771,
+        "p95": 226.011,
+        "max": 368.533
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 34,
+        "p95": 204,
+        "max": 365
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "live_student_activity",
+      "headersMs": {
+        "samples": 40,
+        "median": 184.754,
+        "p95": 381.468,
+        "max": 391.208
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 174,
+        "p95": 370,
+        "max": 374
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "student_lesson_attempts",
+      "headersMs": {
+        "samples": 40,
+        "median": 56.625,
+        "p95": 378.186,
+        "max": 429.097
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 52,
+        "p95": 371,
+        "max": 425
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "student_realm_assessments",
+      "headersMs": {
+        "samples": 40,
+        "median": 216.696,
+        "p95": 440.153,
+        "max": 481.745
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 209,
+        "p95": 435,
+        "max": 477
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "incremental",
+      "route": "student_weekly_quiz_attempts",
+      "headersMs": {
+        "samples": 40,
+        "median": 54.577,
+        "p95": 395.864,
+        "max": 422.367
+      },
+      "upstreamMs": {
+        "samples": 40,
+        "median": 50,
+        "p95": 388,
+        "max": 419
+      },
+      "proxyMs": {
+        "samples": 40,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "get_live_class_activity_today",
+      "headersMs": {
+        "samples": 20,
+        "median": 607.282,
+        "p95": 2190.035,
+        "max": 2254.736
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 510,
+        "p95": 2102,
+        "max": 2160
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 1,
+        "max": 2
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "get_live_class_event_page_secure",
+      "headersMs": {
+        "samples": 220,
+        "median": 153.239,
+        "p95": 1094.847,
+        "max": 2715.845
+      },
+      "upstreamMs": {
+        "samples": 220,
+        "median": 150,
+        "p95": 1089,
+        "max": 2705
+      },
+      "proxyMs": {
+        "samples": 220,
+        "median": 0,
+        "p95": 1,
+        "max": 4
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "live_activity_events",
+      "headersMs": {
+        "samples": 20,
+        "median": 1322.168,
+        "p95": 2300.037,
+        "max": 3457.294
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 1215,
+        "p95": 2205,
+        "max": 3341
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 0,
+        "max": 1
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "live_student_activity",
+      "headersMs": {
+        "samples": 20,
+        "median": 493.458,
+        "p95": 2097.326,
+        "max": 4271.874
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 394,
+        "p95": 2003,
+        "max": 4174
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "student_lesson_attempts",
+      "headersMs": {
+        "samples": 20,
+        "median": 801.249,
+        "p95": 3311.19,
+        "max": 3700.576
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 710,
+        "p95": 3197,
+        "max": 3609
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "student_realm_assessments",
+      "headersMs": {
+        "samples": 20,
+        "median": 879.549,
+        "p95": 2558.73,
+        "max": 2736.317
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 779,
+        "p95": 2456,
+        "max": 2634
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    {
+      "phase": "initial",
+      "route": "student_weekly_quiz_attempts",
+      "headersMs": {
+        "samples": 20,
+        "median": 1003.419,
+        "p95": 2611.999,
+        "max": 3104.28
+      },
+      "upstreamMs": {
+        "samples": 20,
+        "median": 920,
+        "p95": 2529,
+        "max": 2999
+      },
+      "proxyMs": {
+        "samples": 20,
+        "median": 0,
+        "p95": 1,
+        "max": 2
+      }
+    }
+  ],
+  "initialEventChains": [
+    {
+      "teacherIndex": 0,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5287.55,
+      "sumHeadersMs": 5274.091,
+      "betweenRequestsMs": 13.458,
+      "sumGatewayUpstreamMs": 5070
+    },
+    {
+      "teacherIndex": 1,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5261.322,
+      "sumHeadersMs": 5239.602,
+      "betweenRequestsMs": 21.72,
+      "sumGatewayUpstreamMs": 5021
+    },
+    {
+      "teacherIndex": 2,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5199.211,
+      "sumHeadersMs": 5186.218,
+      "betweenRequestsMs": 12.993,
+      "sumGatewayUpstreamMs": 4927
+    },
+    {
+      "teacherIndex": 3,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5225.255,
+      "sumHeadersMs": 5206.259,
+      "betweenRequestsMs": 18.996,
+      "sumGatewayUpstreamMs": 4972
+    },
+    {
+      "teacherIndex": 4,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5293.632,
+      "sumHeadersMs": 5282.651,
+      "betweenRequestsMs": 10.981,
+      "sumGatewayUpstreamMs": 5095
+    },
+    {
+      "teacherIndex": 5,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5270.339,
+      "sumHeadersMs": 5251.871,
+      "betweenRequestsMs": 18.468,
+      "sumGatewayUpstreamMs": 5006
+    },
+    {
+      "teacherIndex": 6,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5258.788,
+      "sumHeadersMs": 5246.266,
+      "betweenRequestsMs": 12.522,
+      "sumGatewayUpstreamMs": 5058
+    },
+    {
+      "teacherIndex": 7,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5071.737,
+      "sumHeadersMs": 5058.331,
+      "betweenRequestsMs": 13.406,
+      "sumGatewayUpstreamMs": 4864
+    },
+    {
+      "teacherIndex": 8,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5295.973,
+      "sumHeadersMs": 5283.747,
+      "betweenRequestsMs": 12.226,
+      "sumGatewayUpstreamMs": 5104
+    },
+    {
+      "teacherIndex": 9,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5297.288,
+      "sumHeadersMs": 5290.182,
+      "betweenRequestsMs": 7.107,
+      "sumGatewayUpstreamMs": 5106
+    },
+    {
+      "teacherIndex": 10,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 4600.943,
+      "sumHeadersMs": 4578.912,
+      "betweenRequestsMs": 22.031,
+      "sumGatewayUpstreamMs": 4358
+    },
+    {
+      "teacherIndex": 11,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 4915.26,
+      "sumHeadersMs": 4902.007,
+      "betweenRequestsMs": 13.252,
+      "sumGatewayUpstreamMs": 4697
+    },
+    {
+      "teacherIndex": 12,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5273.336,
+      "sumHeadersMs": 5248.205,
+      "betweenRequestsMs": 25.132,
+      "sumGatewayUpstreamMs": 5026
+    },
+    {
+      "teacherIndex": 13,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5209.616,
+      "sumHeadersMs": 5196.649,
+      "betweenRequestsMs": 12.967,
+      "sumGatewayUpstreamMs": 4977
+    },
+    {
+      "teacherIndex": 14,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 4931.767,
+      "sumHeadersMs": 4902.7,
+      "betweenRequestsMs": 29.067,
+      "sumGatewayUpstreamMs": 4681
+    },
+    {
+      "teacherIndex": 15,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 3719.729,
+      "sumHeadersMs": 3703.471,
+      "betweenRequestsMs": 16.258,
+      "sumGatewayUpstreamMs": 3491
+    },
+    {
+      "teacherIndex": 16,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5261.852,
+      "sumHeadersMs": 5248.55,
+      "betweenRequestsMs": 13.302,
+      "sumGatewayUpstreamMs": 5066
+    },
+    {
+      "teacherIndex": 17,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5216.276,
+      "sumHeadersMs": 5192.289,
+      "betweenRequestsMs": 23.987,
+      "sumGatewayUpstreamMs": 4997
+    },
+    {
+      "teacherIndex": 18,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 4740.697,
+      "sumHeadersMs": 4723.24,
+      "betweenRequestsMs": 17.457,
+      "sumGatewayUpstreamMs": 4519
+    },
+    {
+      "teacherIndex": 19,
+      "pageRequests": 11,
+      "spanThroughFinalHeadersMs": 5231.164,
+      "sumHeadersMs": 5212.731,
+      "betweenRequestsMs": 18.433,
+      "sumGatewayUpstreamMs": 5025
+    }
+  ],
+  "databaseSettings": {
+    "pg_stat_statements.track_planning": "off",
+    "track_io_timing": "off",
+    "track_wal_io_timing": "off"
+  },
+  "databaseDeltas": [
+    {
+      "key": "16444:5:-3163852186990305725:true",
+      "workloadRole": "teacher authenticated",
+      "category": "quiz attempts table",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 2343.4656999999997,
+      "planning_ms": 0,
+      "block_hits": 130553,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 39.057761666666664
+    },
+    {
+      "key": "16443:5:-1432385697929680542:true",
+      "workloadRole": "student anon",
+      "category": "daily activity RPC",
+      "calls": 1000,
+      "plans": 0,
+      "execution_ms": 2319.914595000002,
+      "planning_ms": 0,
+      "block_hits": 30664,
+      "block_reads": 0,
+      "wal_bytes": 7648,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 2.319914595000002
+    },
+    {
+      "key": "16444:5:-5624537170753296036:true",
+      "workloadRole": "teacher authenticated",
+      "category": "lesson attempts table",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 2063.9683339999992,
+      "planning_ms": 0,
+      "block_hits": 131949,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 34.39947223333332
+    },
+    {
+      "key": "16444:5:1005526630032850933:true",
+      "workloadRole": "teacher authenticated",
+      "category": "assessment table",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 1965.7987519999997,
+      "planning_ms": 0,
+      "block_hits": 131160,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 32.76331253333333
+    },
+    {
+      "key": "16443:5:-324833522130778708:true",
+      "workloadRole": "student anon",
+      "category": "student event insert RPC",
+      "calls": 1001,
+      "plans": 0,
+      "execution_ms": 1492.7564549999997,
+      "planning_ms": 0,
+      "block_hits": 46081,
+      "block_reads": 0,
+      "wal_bytes": 1470934,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.4912651898101896
+    },
+    {
+      "key": "16443:5:7924705200917212991:true",
+      "workloadRole": "student anon",
+      "category": "daily activity RPC",
+      "calls": 1001,
+      "plans": 0,
+      "execution_ms": 1466.051821000001,
+      "planning_ms": 0,
+      "block_hits": 33677,
+      "block_reads": 0,
+      "wal_bytes": 601095,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.4645872337662347
+    },
+    {
+      "key": "16443:5:-8399735150547510370:true",
+      "workloadRole": "student anon",
+      "category": "presence RPC",
+      "calls": 1001,
+      "plans": 0,
+      "execution_ms": 1455.2084219999015,
+      "planning_ms": 0,
+      "block_hits": 43717,
+      "block_reads": 0,
+      "wal_bytes": 722713,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.453754667332569
+    },
+    {
+      "key": "16444:5:-4119181131632852878:true",
+      "workloadRole": "teacher authenticated",
+      "category": "teacher event page RPC",
+      "calls": 256,
+      "plans": 0,
+      "execution_ms": 1439.1476719999991,
+      "planning_ms": 0,
+      "block_hits": 208850,
+      "block_reads": 0,
+      "wal_bytes": 190616,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 5.621670593749997
+    },
+    {
+      "key": "16443:5:-8291786466664630626:true",
+      "workloadRole": "student anon",
+      "category": "live activity RPC",
+      "calls": 500,
+      "plans": 0,
+      "execution_ms": 1084.2231159998992,
+      "planning_ms": 0,
+      "block_hits": 15882,
+      "block_reads": 0,
+      "wal_bytes": 60,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 2.1684462319997984
+    },
+    {
+      "key": "16443:5:3964765418948012912:true",
+      "workloadRole": "student anon",
+      "category": "live activity RPC",
+      "calls": 500,
+      "plans": 0,
+      "execution_ms": 966.7463239999997,
+      "planning_ms": 0,
+      "block_hits": 18689,
+      "block_reads": 0,
+      "wal_bytes": 221546,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.9334926479999994
+    },
+    {
+      "key": "16443:5:-9123536094687515639:true",
+      "workloadRole": "student anon",
+      "category": "student context RPC",
+      "calls": 500,
+      "plans": 0,
+      "execution_ms": 887.6925069999998,
+      "planning_ms": 0,
+      "block_hits": 19541,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.7753850139999996
+    },
+    {
+      "key": "16445:5:-58623566434118712:true",
+      "workloadRole": "fixture provisioning",
+      "category": "event history table",
+      "calls": 197,
+      "plans": 0,
+      "execution_ms": 694.1994269999996,
+      "planning_ms": 0,
+      "block_hits": 717683,
+      "block_reads": 0,
+      "wal_bytes": 49979615,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 3.5238549593908606
+    },
+    {
+      "key": "16444:5:-1311191583633700215:true",
+      "workloadRole": "teacher authenticated",
+      "category": "live activity RPC",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 550.418461,
+      "planning_ms": 0,
+      "block_hits": 9999,
+      "block_reads": 0,
+      "wal_bytes": 31598,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 9.173641016666666
+    },
+    {
+      "key": "16443:5:-5084144446593951227:true",
+      "workloadRole": "student anon",
+      "category": "student login RPC",
+      "calls": 500,
+      "plans": 0,
+      "execution_ms": 224.9307429999899,
+      "planning_ms": 0,
+      "block_hits": 14032,
+      "block_reads": 0,
+      "wal_bytes": 2821014,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.44986148599997977
+    },
+    {
+      "key": "16443:5:5360251647081715348:true",
+      "workloadRole": "student anon",
+      "category": "session configuration",
+      "calls": 6003,
+      "plans": 0,
+      "execution_ms": 144.26242999997976,
+      "planning_ms": 0,
+      "block_hits": 36,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.024031722472093914
+    },
+    {
+      "key": "16444:5:-2257637874724202889:true",
+      "workloadRole": "teacher authenticated",
+      "category": "event history table",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 80.08549900000003,
+      "planning_ms": 0,
+      "block_hits": 1078,
+      "block_reads": 0,
+      "wal_bytes": 294,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.3347583166666672
+    },
+    {
+      "key": "16444:5:541205088235778626:true",
+      "workloadRole": "teacher authenticated",
+      "category": "teacher daily activity RPC",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 69.29666500000002,
+      "planning_ms": 0,
+      "block_hits": 4014,
+      "block_reads": 0,
+      "wal_bytes": 2484,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.154944416666667
+    },
+    {
+      "key": "16504:5:-4773853058830272613:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 23.58058399999993,
+      "planning_ms": 0,
+      "block_hits": 8237,
+      "block_reads": 0,
+      "wal_bytes": 98609,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.1790291999999964
+    },
+    {
+      "key": "16504:5:3686211888507386417:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 16.800247000000013,
+      "planning_ms": 0,
+      "block_hits": 2920,
+      "block_reads": 0,
+      "wal_bytes": 93727,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.8400123500000006
+    },
+    {
+      "key": "16444:5:5360251647081715348:true",
+      "workloadRole": "teacher authenticated",
+      "category": "session configuration",
+      "calls": 636,
+      "plans": 0,
+      "execution_ms": 16.37437199999897,
+      "planning_ms": 0,
+      "block_hits": 40,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.025745867924526683
+    },
+    {
+      "key": "16504:5:4265053816704004642:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 11.198543,
+      "planning_ms": 0,
+      "block_hits": 3540,
+      "block_reads": 0,
+      "wal_bytes": 9176,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.55992715
+    },
+    {
+      "key": "16504:5:-4658128774569121432:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 4.926169000000002,
+      "planning_ms": 0,
+      "block_hits": 55,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.24630845000000007
+    },
+    {
+      "key": "16504:5:2217313604625462228:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 2.8494630000000143,
+      "planning_ms": 0,
+      "block_hits": 800,
+      "block_reads": 0,
+      "wal_bytes": 61511,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.14247315000000071
+    },
+    {
+      "key": "16445:5:-7821780334453251234:true",
+      "workloadRole": "fixture provisioning",
+      "category": "session configuration",
+      "calls": 197,
+      "plans": 0,
+      "execution_ms": 2.1947479999998976,
+      "planning_ms": 0,
+      "block_hits": 64,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.011140852791877653
+    },
+    {
+      "key": "16504:5:-7864353741921494888:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 1.8137529999999913,
+      "planning_ms": 0,
+      "block_hits": 1042,
+      "block_reads": 0,
+      "wal_bytes": 43983,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.09068764999999956
+    },
+    {
+      "key": "16504:5:662922153580920099:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 1.3964590000000001,
+      "planning_ms": 0,
+      "block_hits": 120,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.06982295000000001
+    },
+    {
+      "key": "10:5:-7468746122427242884:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 9,
+      "plans": 0,
+      "execution_ms": 0.6813719999999961,
+      "planning_ms": 0,
+      "block_hits": 18,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.07570799999999957
+    },
+    {
+      "key": "10:5:2292109952114017013:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 9,
+      "plans": 0,
+      "execution_ms": 0.6582469999999034,
+      "planning_ms": 0,
+      "block_hits": 18,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.07313855555554483
+    },
+    {
+      "key": "16504:5:-5527426959964239709:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 0.21704099999999826,
+      "planning_ms": 0,
+      "block_hits": 40,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.010852049999999914
+    },
+    {
+      "key": "16504:5:3592842256112130610:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 0.11312500000000014,
+      "planning_ms": 0,
+      "block_hits": 60,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.005656250000000007
+    },
+    {
+      "key": "16446:5:-499908250909300920:true",
+      "workloadRole": "other role",
+      "category": "begin",
+      "calls": 7,
+      "plans": 0,
+      "execution_ms": 0.09454200000000013,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.013506000000000018
+    },
+    {
+      "key": "16504:5:11701968915743190:true",
+      "workloadRole": "other role",
+      "category": "begin",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 0.08154100000000009,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.004077050000000004
+    },
+    {
+      "key": "16504:5:5880662479028159391:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 0.07453800000000044,
+      "planning_ms": 0,
+      "block_hits": 40,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0037269000000000217
+    },
+    {
+      "key": "10:5:-6921458989088773044:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 18,
+      "plans": 0,
+      "execution_ms": 0.07128900000000016,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.003960500000000009
+    },
+    {
+      "key": "16504:5:8482053081020301314:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 60,
+      "plans": 0,
+      "execution_ms": 0.06470599999999971,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0010784333333333286
+    },
+    {
+      "key": "16506:5:2248187231910238261:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 3,
+      "plans": 0,
+      "execution_ms": 0.06074999999999875,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.020249999999999584
+    },
+    {
+      "key": "16446:5:-8390746607827764824:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 6,
+      "plans": 0,
+      "execution_ms": 0.06000099999999975,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.010000166666666624
+    },
+    {
+      "key": "16446:5:-7025816098001848037:true",
+      "workloadRole": "other role",
+      "category": "begin",
+      "calls": 9,
+      "plans": 0,
+      "execution_ms": 0.044499000000000066,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0049443333333333405
+    },
+    {
+      "key": "16446:5:5947864457175217504:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 6,
+      "plans": 0,
+      "execution_ms": 0.007832999999999979,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0013054999999999966
+    },
+    {
+      "key": "16504:5:-2835399305386018931:true",
+      "workloadRole": "other role",
+      "category": "commit",
+      "calls": 20,
+      "plans": 0,
+      "execution_ms": 0.005084000000000005,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.00025420000000000027
+    },
+    {
+      "key": "16445:5:-2835399305386018931:true",
+      "workloadRole": "fixture provisioning",
+      "category": "commit",
+      "calls": 6,
+      "plans": 0,
+      "execution_ms": 0.004751000000000002,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0007918333333333336
+    },
+    {
+      "key": "16446:5:-2646723144215712964:true",
+      "workloadRole": "other role",
+      "category": "other statement (redacted)",
+      "calls": 10,
+      "plans": 0,
+      "execution_ms": 0.003915000000000002,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.0003915000000000002
+    }
+  ],
+  "caveats": [
+    "Shared database deltas include fixture preparation and background services",
+    "Consult captured settings before interpreting zero planning/I/O timings; WAL counters cover the entire database including fixture provisioning",
+    "Statement execution excludes network, pool waiting and some transaction overhead",
+    "One-second activity samples can miss short waits",
+    "Header timings exclude body parsing",
+    "Gateway upstream includes API queueing and SQL, not pure execution",
+    "Database statistics overlap fixture preparation and do not correlate per request"
+  ],
+  "queryPlanComparison": {
+    "baselineFirst": {
+      "caveat": "Representative original synthetic class; authenticated-role direct read plans outside burst. Not API transaction timing. Filters, SQL and identities omitted. Node execution times include children; do not sum them.",
+      "plans": [
+        {
+          "source": "lesson_attempts",
+          "Planning Time": 1.853,
+          "Execution Time": 89.097,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_lesson_attempts",
+            "Actual Rows": 744,
+            "Actual Loops": 1,
+            "Actual Total Time": 88.88,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11598,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_lesson_attempts_student_scope",
+                "Actual Rows": 744,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.099,
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 88.468,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 4.322,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 84.139,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "quiz_attempts",
+          "Planning Time": 0.781,
+          "Execution Time": 79.831,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_weekly_quiz_attempts",
+            "Actual Rows": 248,
+            "Actual Loops": 1,
+            "Actual Total Time": 79.749,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11523,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_weekly_quiz_attempts_student_scope",
+                "Actual Rows": 248,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.052,
+                "Shared Hit Blocks": 13,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 79.527,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 2.859,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 76.664,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "assessments",
+          "Planning Time": 0.851,
+          "Execution Time": 79.791,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_realm_assessments",
+            "Actual Rows": 496,
+            "Actual Loops": 1,
+            "Actual Total Time": 79.698,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11565,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_realm_assessments_student_scope",
+                "Actual Rows": 496,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.06,
+                "Shared Hit Blocks": 28,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 79.398,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 2.916,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 76.477,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "event_head",
+          "Planning Time": 0.376,
+          "Execution Time": 1.351,
+          "Plan": {
+            "Node Type": "Limit",
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Actual Total Time": 1.318,
+            "Shared Hit Blocks": 633,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Incremental Sort",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Actual Total Time": 1.318,
+                "Shared Hit Blocks": 633,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Index Scan",
+                    "Relation Name": "live_activity_events",
+                    "Index Name": "live_activity_events_class_created_idx",
+                    "Actual Rows": 2,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 1.292,
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 624,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "legacyPoliciesRemovedInsideRolledBackTransaction": {
+      "caveat": "Transactional diagnostic removal of three legacy permissive read policies, rolled back; representative original synthetic class; authenticated-role direct read plans outside burst. Not API transaction timing. Filters, SQL and identities omitted. Node execution times include children; do not sum them.",
+      "plans": [
+        {
+          "source": "lesson_attempts",
+          "Planning Time": 0.416,
+          "Execution Time": 357.519,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_lesson_attempts",
+            "Actual Rows": 744,
+            "Actual Loops": 1,
+            "Actual Total Time": 357.456,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 20432,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_lesson_attempts_student_scope",
+                "Actual Rows": 744,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.18,
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0
+              }
+            ]
+          }
+        },
+        {
+          "source": "quiz_attempts",
+          "Planning Time": 0.289,
+          "Execution Time": 111.989,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_weekly_quiz_attempts",
+            "Actual Rows": 248,
+            "Actual Loops": 1,
+            "Actual Total Time": 111.959,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 7461,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_weekly_quiz_attempts_student_scope",
+                "Actual Rows": 248,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.076,
+                "Shared Hit Blocks": 13,
+                "Shared Read Blocks": 0
+              }
+            ]
+          }
+        },
+        {
+          "source": "assessments",
+          "Planning Time": 0.282,
+          "Execution Time": 229.195,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_realm_assessments",
+            "Actual Rows": 496,
+            "Actual Loops": 1,
+            "Actual Total Time": 229.153,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 13951,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_realm_assessments_student_scope",
+                "Actual Rows": 496,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.109,
+                "Shared Hit Blocks": 28,
+                "Shared Read Blocks": 0
+              }
+            ]
+          }
+        },
+        {
+          "source": "event_head",
+          "Planning Time": 0.241,
+          "Execution Time": 1.228,
+          "Plan": {
+            "Node Type": "Limit",
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Actual Total Time": 1.205,
+            "Shared Hit Blocks": 623,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Incremental Sort",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Actual Total Time": 1.204,
+                "Shared Hit Blocks": 623,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Index Scan",
+                    "Relation Name": "live_activity_events",
+                    "Index Name": "live_activity_events_class_created_idx",
+                    "Actual Rows": 2,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 1.192,
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 614,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "baselineRestored": {
+      "caveat": "Representative original synthetic class; authenticated-role direct read plans outside burst. Not API transaction timing. Filters, SQL and identities omitted. Node execution times include children; do not sum them.",
+      "plans": [
+        {
+          "source": "lesson_attempts",
+          "Planning Time": 0.935,
+          "Execution Time": 81.134,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_lesson_attempts",
+            "Actual Rows": 744,
+            "Actual Loops": 1,
+            "Actual Total Time": 81.024,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11598,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_lesson_attempts_student_scope",
+                "Actual Rows": 744,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.071,
+                "Shared Hit Blocks": 33,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 80.632,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 3.042,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 77.585,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "quiz_attempts",
+          "Planning Time": 0.723,
+          "Execution Time": 80.223,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_weekly_quiz_attempts",
+            "Actual Rows": 248,
+            "Actual Loops": 1,
+            "Actual Total Time": 80.143,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11523,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_weekly_quiz_attempts_student_scope",
+                "Actual Rows": 248,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.04,
+                "Shared Hit Blocks": 13,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 79.958,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 2.872,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 77.082,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "assessments",
+          "Planning Time": 0.768,
+          "Execution Time": 80.041,
+          "Plan": {
+            "Node Type": "Bitmap Heap Scan",
+            "Relation Name": "student_realm_assessments",
+            "Actual Rows": 496,
+            "Actual Loops": 1,
+            "Actual Total Time": 79.949,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 11565,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Index Name": "idx_student_realm_assessments_student_scope",
+                "Actual Rows": 496,
+                "Actual Loops": 1,
+                "Actual Total Time": 0.054,
+                "Shared Hit Blocks": 28,
+                "Shared Read Blocks": 0
+              },
+              {
+                "Node Type": "Nested Loop",
+                "Actual Rows": 26,
+                "Actual Loops": 1,
+                "Actual Total Time": 79.664,
+                "Shared Hit Blocks": 11430,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "classes",
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 2.947,
+                    "Rows Removed by Filter": 19,
+                    "Shared Hit Blocks": 646,
+                    "Shared Read Blocks": 0
+                  },
+                  {
+                    "Node Type": "Seq Scan",
+                    "Relation Name": "students",
+                    "Actual Rows": 26,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 76.712,
+                    "Rows Removed by Filter": 477,
+                    "Shared Hit Blocks": 10784,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source": "event_head",
+          "Planning Time": 0.267,
+          "Execution Time": 1.219,
+          "Plan": {
+            "Node Type": "Limit",
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Actual Total Time": 1.189,
+            "Shared Hit Blocks": 633,
+            "Shared Read Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Incremental Sort",
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Actual Total Time": 1.188,
+                "Shared Hit Blocks": 633,
+                "Shared Read Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Index Scan",
+                    "Relation Name": "live_activity_events",
+                    "Index Name": "live_activity_events_class_created_idx",
+                    "Actual Rows": 2,
+                    "Actual Loops": 1,
+                    "Actual Total Time": 1.173,
+                    "Rows Removed by Filter": 0,
+                    "Shared Hit Blocks": 624,
+                    "Shared Read Blocks": 0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

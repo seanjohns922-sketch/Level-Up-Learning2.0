@@ -3,6 +3,17 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Initial dashboard profile — 17 November
+
+A profiled 500-student run preserved all 1,001 events/increments but still failed
+latency. At least 99.41% of each initial event chain was inside response-header
+waiting intervals; gateway upstream accounted for at least 93.85%. Attempt-history
+permission subplans cost about 80 ms in representative authenticated query plans.
+Temporarily removing the legacy permissive policies made those reads slower;
+transactions rolled back and originals were verified. Investigate shared access-
+scope evaluation with full role-equivalence checks, not policy deletion or pool
+tuning. See `LOCAL_DASHBOARD_INITIAL_PROFILE_2026-11-17.md`.
+
 ## Incremental dashboard scenario — 17 November
 
 Added a separate six-source periodic dashboard workload using the production

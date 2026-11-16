@@ -7,9 +7,16 @@ const duration = Number(process.env.SCALE_PROFILE_SECONDS ?? 75);
 if (!Number.isInteger(duration) || duration < 30 || duration > 180) throw new Error('Profile duration must be 30–180 seconds');
 const sql = query => JSON.parse(execFileSync('docker', ['exec', 'supabase_db_reliq-scale-local', 'psql', '-X', '-U', 'postgres', '-d', 'postgres', '-At', '-v', 'ON_ERROR_STOP=1', '-c', query], { encoding:'utf8', timeout:10000 }).trim());
 const totals = () => sql(`select coalesce(json_agg(t),'[]'::json) from (
- select case when userid=(select oid from pg_roles where rolname='anon') then 'student anon' when userid=(select oid from pg_roles where rolname='service_role') then 'fixture provisioning' else 'other role' end as workload_role,
+ select case when userid=(select oid from pg_roles where rolname='anon') then 'student anon' when userid=(select oid from pg_roles where rolname='service_role') then 'fixture provisioning' when userid=(select oid from pg_roles where rolname='authenticated') then 'teacher authenticated' else 'other role' end as workload_role,
  userid::text || ':' || dbid::text || ':' || queryid::text || ':' || toplevel::text as key,
  case
+ when query ilike '%get_live_class_event_page_secure%' then 'teacher event page RPC'
+ when query ilike '%get_live_class_activity_today%' then 'teacher daily activity RPC'
+ when query ilike '%student_lesson_attempts%' then 'lesson attempts table'
+ when query ilike '%student_weekly_quiz_attempts%' then 'quiz attempts table'
+ when query ilike '%student_realm_assessments%' then 'assessment table'
+ when query ilike '%live_activity_events%' then 'event history table'
+ when query ilike '%insert_live_activity_event_secure%' then 'student event insert RPC'
  when query ilike '%student_login_lookup%' then 'student login RPC'
  when query ilike '%get_student_runtime_context_secure%' then 'student context RPC'
  when query ilike '%set_config%' then 'session configuration'

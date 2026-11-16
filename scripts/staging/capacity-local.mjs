@@ -17,6 +17,9 @@ const studentCount = groupCount * 25;
 const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
 assert.ok(['mixed', 'students-only', 'teachers-only', 'dashboard-mixed'].includes(scenario), 'Unknown local capacity scenario');
 const dashboard = scenario === 'dashboard-mixed';
+const profileDashboard = process.env.SCALE_PROFILE_DASHBOARD === '1';
+assert.ok(!profileDashboard || dashboard, 'Dashboard profiling requires dashboard-mixed');
+const dashboardHttp = [];
 const eventRun = crypto.randomUUID();
 const expectedEvents = new Map();
 const dashboardChecks = [];
@@ -91,9 +94,27 @@ for (const group of groups) {
   }
 }
 console.log(`Prepared ${studentCount} distinct students, ${groupCount} ordinary teachers and ${groupCount * 5000} synthetic history events.`);
-const teachers = await Promise.all(groups.map(async group => {
+const teachers = await Promise.all(groups.map(async (group, teacherIndex) => {
+  const profile = { phase: 'initial' };
   const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, runTeachers ? 'teacher_login' : undefined);
-  return { group, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: (...args) => { snapshotHttpRequests++; return fetch(...args); } } }) };
+  return { group, profile, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: async (...args) => {
+    snapshotHttpRequests++;
+    if (!profileDashboard) return fetch(...args);
+    const start = performance.now();
+    // Export fixed route labels only: never URLs, filters, headers or bodies.
+    const route = new URL(typeof args[0] === 'string' || args[0] instanceof URL ? args[0] : args[0].url).pathname.split('/').at(-1);
+    const labels = ['live_student_activity','live_activity_events','get_live_class_event_page_secure','student_lesson_attempts','student_weekly_quiz_attempts','student_realm_assessments','get_live_class_activity_today'];
+    const row = { teacherIndex, phase: profile.phase, route: labels.includes(route) ? route : 'other', startedEpochMs: performance.timeOrigin + start, status: 0 };
+    try {
+      const response = await fetch(...args);
+      row.status = response.status;
+      for (const [key, header] of [['upstreamMs','x-kong-upstream-latency'],['proxyMs','x-kong-proxy-latency']]) {
+        const value = response.headers.get(header);
+        row[key] = value !== null && Number.isFinite(Number(value)) ? Number(value) : null;
+      }
+      return response;
+    } finally { row.headersMs = performance.now()-start; dashboardHttp.push(row); }
+  } } }) };
 }));
 // Verify cross-school denial before sending load; never use owner/service tokens below.
 for (let i = 0; i < teachers.length; i++) {
@@ -150,7 +171,7 @@ async function studentJourney({ group, student }, index) {
   verifiedWrites += writes;
   completedStudentJourneys++;
 }
-async function dashboardJourney({ group, client }) {
+async function dashboardJourney({ group, client, profile }) {
   const ids = group.students.map(s => s.studentId);
   const allowed = new Set(ids);
   const reader = createLiveClassEventReader(client, { classId: group.classId, studentIds: ids,
@@ -171,6 +192,7 @@ async function dashboardJourney({ group, client }) {
     } finally { samples.push({ name, ms: performance.now()-start, status }); }
   }
   async function refresh() {
+    profile.phase = refreshes ? 'incremental' : 'initial';
     const start = performance.now();
     let status = 0;
     try {
@@ -247,7 +269,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
   workloadStartedAt: new Date(started).toISOString(),
-  databaseTracing: traceDatabase,
+  databaseTracing: traceDatabase, dashboardHttpProfiling: profileDashboard,
   ...(dashboard ? { dashboardChecks, dashboardMode: 'six-source periodic refresh with production incremental event reader; no realtime subscription', expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: dashboard ? 'student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total' : 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
@@ -261,3 +283,8 @@ if (traceDatabase) fs.writeFileSync(`${localDir}/request-trace.json`, JSON.strin
 },null,2));
 console.log(JSON.stringify(report,null,2));
 if (!report.preliminaryGatePassed) process.exitCode = 1;
+
+if (profileDashboard) fs.writeFileSync(`${localDir}/dashboard-http-profile.json`, JSON.stringify({
+  caveat: 'Fetch-to-response-headers timing only; excludes body parsing. Upstream includes API waiting, not pure SQL. Teacher indexes are synthetic ordinals.',
+  samples: dashboardHttp,
+}, null, 2));
