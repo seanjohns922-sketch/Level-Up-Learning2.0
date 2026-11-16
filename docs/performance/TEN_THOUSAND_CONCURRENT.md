@@ -3,6 +3,52 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Current dashboard burst versus staggered sign-ins — 17 November
+
+Four isolated local 60-second runs used 500 synthetic students, 20 ordinary
+teachers, 100,000 historical events and the production incremental event reader
+at `f49898ae`. The new class index was present in every run. Official PostgREST
+14.8, its existing pool configuration and eight Docker CPUs were unchanged.
+Run order was burst / 30-second ramp / 30-second ramp / burst to check repetition
+and reduce simple warm-up/order bias. This extends the earlier staggered test to
+the current six-source dashboard workload; it is not a production benchmark.
+
+| Run | Login p95 | Initial events p95 | Incremental events p95 | All endpoint latency gates |
+| --- | ---: | ---: | ---: | --- |
+| Burst 1 | 2,600 ms | 5,255 ms | 156 ms | Fail |
+| 30-second ramp 1 | 6 ms | 726 ms | 182 ms | Pass |
+| 30-second ramp 2 | 5 ms | 671 ms | 176 ms | Pass |
+| Burst 2 | 2,346 ms | 5,142 ms | 137 ms | Fail |
+
+Each run verified all 500 persisted presence records, zero failed requests or
+journeys, exact activity increments and every newly emitted event exactly once.
+One ramp emitted 999 increments/events rather than 1,000 because the fixed run
+deadline also applies to students who start later; expected counts are measured
+per student, not assumed. All gates retained p95 below 1 second and p99 below
+3 seconds for every measured endpoint. No assertion or threshold was relaxed.
+
+The repeated difference identifies simultaneous-start congestion as a remaining
+problem in this local workload. It does not prove where all upstream waiting
+occurs or that cloud capacity is sufficient. Do not insert artificial login
+delays into the application to make a test pass. Next, measure resource headroom
+and request waiting during the burst with the class index in place; any batching
+or runtime candidate needs an unchanged-workload comparison and isolation checks.
+
+Limitations: short runs, one laptop, no browser rendering or realtime delivery,
+uneven historical completion fixtures and no canonical completion/retry workload.
+These passing staggered runs do not supersede the failing simultaneous-start
+gate or establish 10,000-user readiness. The application already coalesces live
+refreshes; another refresh-control layer is not justified by this evidence.
+
+Only diagnostic evidence and documentation changed. The temporary local index
+was removed after the comparison, restoring its original local state. Restored
+preflight and the 25-student / 175-request smoke passed. Existing event-reader and
+dashboard-loading regression tests passed. No application build was repeated
+for documentation-only changes, and no new hosted migration is required.
+Aggregate evidence: `dashboard-ramp-summary-2026-11-17.json`. Private runner,
+logs and per-request numeric traces:
+`/Users/seanjohns/reliq-audits/2026-11-17/dashboard-ramp/`.
+
 ## Small index candidate — 17 November
 
 A missing `students(class_id)` index caused the existing permission subplan to
@@ -11,8 +57,10 @@ A single-index migration is prepared; permissions and application code are
 unchanged. Representative attempt-query execution fell from about 80 ms to
 9–16 ms with identical results. A 500-student baseline/candidate pair preserved
 all activity but both failed latency, so this is a targeted query improvement,
-not a scaling sign-off. Local index experiments were rolled back. Production has
-not been changed. See `LOCAL_STUDENT_CLASS_INDEX_2026-11-17.md`.
+not a scaling sign-off. Local index experiments were rolled back. The owner
+subsequently reported applying this migration to hosted Supabase; that application
+has not been independently verified here. See
+`LOCAL_STUDENT_CLASS_INDEX_2026-11-17.md`.
 
 ## Initial dashboard profile — 17 November
 
