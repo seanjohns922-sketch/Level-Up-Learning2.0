@@ -532,6 +532,20 @@ export default function LoginPage() {
       return;
     }
 
+    // A correct password is not enough: the account must be a parent account.
+    // Ask the parent gate directly; only its refusals stop sign-in (a network
+    // hiccup lets a real parent through to Parent Home, which shows its own error).
+    const { error: accessError } = await supabase.rpc("get_parent_home_snapshot");
+    const refusal = accessError?.message ?? "";
+    if (refusal.includes("Parent access required") || refusal.includes("Account unavailable")) {
+      await supabase.auth.signOut();
+      setParentError(refusal.includes("Parent access required")
+        ? "That email belongs to a teacher or school account, not a parent account. Use Teacher sign-in, or create a parent account."
+        : "This account isn't active yet. Please contact support so we can switch it on.");
+      setParentLoading(false);
+      return;
+    }
+
     router.push(hasPendingParentExplorerCode() ? "/parent/link" : "/parent");
   }
 

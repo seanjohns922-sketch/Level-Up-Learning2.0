@@ -209,6 +209,7 @@ check("no billing implementation", ![parent, schoolUi, adminUi].some((source) =>
 for (const heading of ["Identity invariant", "Parent linking", "School transfer", "Duplicate handling", "Merge recovery", "Manual QA"]) check(`runbook documents ${heading}`, docs.includes(heading));
 check("master architecture links PA4 runbook", architecture.includes("PLATFORM_ADMIN_PHASE_PA4_IDENTITY_PARENT_HOME.md"));
 check("parent home explains why access was refused", has(parent, "parentHomeErrorMessage", "Parent access required", "Account unavailable", "Login required"));
+check("parent sign-in refuses accounts that are not parent accounts", has(login, "get_parent_home_snapshot", "Parent access required", "auth.signOut()"));
 check("historical school reporting boundary is documented", has(docs, "Historical reporting", "Reporting resolves school ownership", "cannot see learning completed under the new school"));
 for (const scenario of ["Home Only to School + Home", "School A to School B", "Multiple parents", "Multiple children", "Duplicate prevention", "Merge integrity", "Mobile parent portal"]) check(`manual test: ${scenario}`, docs.includes(scenario));
 
