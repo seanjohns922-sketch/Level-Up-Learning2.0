@@ -890,6 +890,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
 
       <WorldHUD
         context="realm"
+        realmId="number"
         preview={preview}
         accent={theme.energyAccent}
         fallbackHref={twoDWorldPath}

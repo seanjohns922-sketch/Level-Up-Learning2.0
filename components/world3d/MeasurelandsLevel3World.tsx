@@ -300,6 +300,7 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
       </Canvas>
       <WorldHUD
         context="realm"
+        realmId="measurement"
         preview={preview}
         accent={theme.accent}
         fallbackHref={twoDPath}

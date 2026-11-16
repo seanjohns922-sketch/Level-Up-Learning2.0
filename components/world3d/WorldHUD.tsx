@@ -8,6 +8,7 @@ import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import { DoorOpen, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
+import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { useRouter } from "next/navigation";
@@ -69,6 +70,7 @@ export function WorldHUD({
   fallbackHref,
   onQuickStart,
   contextAction,
+  realmId,
 }: {
   context: WorldHUDContext;
   preview?: boolean;
@@ -80,6 +82,8 @@ export function WorldHUD({
   onQuickStart?: () => void | Promise<void>;
   /** Central hub: what the main dock button does near an object ("Enter my home"). */
   contextAction?: WorldHUDAction;
+  /** Realm worlds: colours the logo's Q with the realm's official RELIQS colour. */
+  realmId?: CanonicalRealmId;
 }) {
   const router = useRouter();
   const [journey, setJourney] = useState<WorldJourney>(fallbackJourney);
@@ -189,7 +193,7 @@ export function WorldHUD({
   return (
     <>
       <WorldLoadingVeil label={context === "central" ? "Loading your world" : context === "tower" ? "Entering the Tower" : "Entering the realm"} />
-      <div className="worldHud" data-world-hud={context} style={{ "--world-accent": accent } as React.CSSProperties}>
+      <div className="worldHud" data-world-hud={context} style={{ "--world-accent": realmId ? reliqRealmColor(realmId) : accent } as React.CSSProperties}>
         {context === "central" || context === "tower" ? (
           <section className="worldHudStart" aria-label="Start learning">
             <svg viewBox="0 0 279 79" className="worldHudLogo" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill={STUDENT_VIOLET} d={RELIQ_Q_PATH} /></svg>
@@ -203,7 +207,7 @@ export function WorldHUD({
         ) : (
         <div className="worldHudRealmTop">
         {/* Real RELIQ logo; in each realm the Q takes the realm's colour. */}
-        <svg viewBox="0 0 279 79" className="worldHudLogo" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill={accent} d={RELIQ_Q_PATH} /></svg>
+        <svg viewBox="0 0 279 79" className="worldHudLogo" role="img" aria-label="RELIQ"><path fill="#fff" d={RELIQ_LETTERS_PATH} /><path fill={realmId ? reliqRealmColor(realmId) : accent} d={RELIQ_Q_PATH} /></svg>
         <section className="worldHudMission" aria-label={displayedMission.eyebrow ?? "Current mission"}>
           <div className="worldHudMissionText">
             <span>{displayedMission.eyebrow ?? (context === "realm" ? "CURRENT MISSION" : "CURRENT JOURNEY")}</span>
