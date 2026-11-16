@@ -3,6 +3,16 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Official-runtime mixed validation — 17 November
+
+Four fresh official PostgREST 14.8 local runs (pools 10 / 30 / 30 / 10) combined
+500 students with 20 teachers. Every integrity check passed, but all four failed
+the unchanged latency gate. The custom-runtime improvement therefore does not
+justify production pool tuning. This workload repeatedly reloads full event
+histories; add a separate scenario for the actual incremental dashboard plus
+its associated reads, retaining this stress case. Original local API restored
+and smoke passed. See `LOCAL_OFFICIAL_MIXED_2026-11-17.md`.
+
 ## Exact acquisition follow-up
 
 A custom local PostgREST 14.8 build measured connection handoff directly. In a
