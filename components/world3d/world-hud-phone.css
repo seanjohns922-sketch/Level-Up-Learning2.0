@@ -23,13 +23,23 @@
   .worldHud.worldHud .worldHudStats .worldVoiceButton { width: 28px; height: 28px; margin-left: 1px; }
   .worldHud.worldHud .worldHudIdentity > * { min-width: 0; flex-shrink: 1; }
 
-  /* Next Up: a slim card under the top row */
+  /* Next Up (hub and Tower): a slim card under the top row */
   .worldHud.worldHud .worldHudStart {
     left: max(8px, env(safe-area-inset-left)) !important;
     top: max(56px, calc(env(safe-area-inset-top) + 48px)) !important;
     width: calc(100vw - 16px) !important;
   }
   .worldHud.worldHud .worldHudStartCard { padding: 6px 8px 6px 10px; }
+  /* Realm worlds: their Current Mission card takes the same slim spot */
+  .worldHud.worldHud .worldHudRealmTop {
+    left: max(8px, env(safe-area-inset-left)) !important;
+    top: max(56px, calc(env(safe-area-inset-top) + 48px)) !important;
+    width: calc(100vw - 16px) !important;
+  }
+  .worldHud.worldHud .worldHudRealmTop .worldHudLogo { display: none; }
+  .worldHud.worldHud .worldHudRealmTop .worldHudMission { padding: 6px 8px 6px 10px; }
+  .worldHud.worldHud .worldHudRealmTop .worldHudMission strong { font-size: 14px; margin-top: 2px; }
+  .worldHud.worldHud .worldHudRealmTop .worldHudMission small { font-size: 11px; margin-top: 1px; }
   .worldHud.worldHud .worldHudStartHead strong { font-size: 13px; line-height: 1.2; }
 
   /* Actions: one centred row under Next Up */
@@ -46,6 +56,8 @@
     gap: 6px !important;
   }
   .worldHud.worldHud .worldHudActions button:not(.worldVoiceButton) { min-height: 42px; }
+  /* The realm mission card has a third line, so the actions sit a little lower there */
+  .worldHud.worldHud.worldHud:has(.worldHudRealmTop) .worldHudActions { top: max(134px, calc(env(safe-area-inset-top) + 126px)) !important; }
 
   /* Joysticks, RUN and JUMP */
   [data-world-joystick][data-world-joystick] {
