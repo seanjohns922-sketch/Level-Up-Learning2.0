@@ -889,10 +889,11 @@ body:has([data-teacher-dashboard]) .fullscreen-toggle:not([data-inline="true"]) 
   display: none;
 }
 
-/* On touch screens the 3D worlds own the bottom corners (joysticks, Jump, Run), so the floating Full Screen button would sit on a joystick. */
+/* On touch screens the 3D worlds own the bottom corners (joysticks, Jump, Run, the treehouse room bar), so the floating Full Screen button would sit on them. */
 @media (pointer: coarse) {
   body:has([data-world-joystick]) .fullscreen-toggle:not([data-inline="true"]),
-  body:has([data-world-jump]) .fullscreen-toggle:not([data-inline="true"]) {
+  body:has([data-world-jump]) .fullscreen-toggle:not([data-inline="true"]),
+  body:has([data-treehouse]) .fullscreen-toggle:not([data-inline="true"]) {
     display: none;
   }
 }

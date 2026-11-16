@@ -34,6 +34,7 @@ export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: C
 // Expand around the existing landmarks without shifting any saved coordinates.
 // The complete grid, including its corners, fits inside the walkable meadow.
 export const CENTRAL_WORLD_GRID = { cellSize: 2, minX: -46, maxX: 44, minZ: -43, maxZ: 42 } as const;
+export type CentralWorldGrid = { readonly cellSize: number; readonly minX: number; readonly maxX: number; readonly minZ: number; readonly maxZ: number };
 const STORAGE_PREFIX = "lul:central-world:layout:v1";
 const GROUND_STORAGE_PREFIX = "lul:central-world:ground:v2";
 const LEGACY_GROUND_STORAGE_PREFIX = "lul:central-world:ground:v1";
@@ -156,6 +157,22 @@ export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
   return false;
 }
 
+/**
+ * Where a world allows building: its grid, the squares nothing may cover, and
+ * whether the home is fixed scenery (the bigger hub's treehouse) rather than a
+ * movable placement. Today's hub uses CENTRAL_WORLD_BUILD_RULES.
+ */
+export type CentralWorldBuildRules = {
+  readonly grid: CentralWorldGrid;
+  readonly isReservedCell: (gridX: number, gridZ: number) => boolean;
+  readonly fixedHome: boolean;
+};
+export const CENTRAL_WORLD_BUILD_RULES: CentralWorldBuildRules = { grid: CENTRAL_WORLD_GRID, isReservedCell: isCentralWorldProtectedCell, fixedHome: false };
+
+function insideGrid(grid: CentralWorldGrid, gridX: number, gridZ: number) {
+  return gridX >= grid.minX && gridX <= grid.maxX && gridZ >= grid.minZ && gridZ <= grid.maxZ;
+}
+
 // Free nature and décor (trees, plants, rocks, small furniture, animals) only
 // block the square they stand on, so they can sit side by side and branches can
 // overlap like real bush. Their full footprint still sets how big they look and
@@ -174,15 +191,16 @@ export function isCompactScenery(item: EconomyItem) {
     && !FULL_SPACE_SCENERY.has(String(item.metadata.worldAssetKey));
 }
 
-export function validateCentralWorldPlacement(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = []) {
+export function validateCentralWorldPlacement(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = [], rules: CentralWorldBuildRules = CENTRAL_WORLD_BUILD_RULES) {
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
+    if (rules.fixedHome) return false;
     const anchors = getCentralWorldHomeAnchors(placement);
     if (!reachablePoint(anchors.entrance) || !reachablePoint(anchors.exit)) return false;
   }
   const cells = occupiedCells(placement, item);
   for (const key of cells) {
     const [x, z] = key.split(":").map(Number);
-    if (x < CENTRAL_WORLD_GRID.minX || x > CENTRAL_WORLD_GRID.maxX || z < CENTRAL_WORLD_GRID.minZ || z > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(x, z)) return false;
+    if (!insideGrid(rules.grid, x, z) || rules.isReservedCell(x, z)) return false;
   }
   const compact = isCompactScenery(item);
   const ownCell = `${placement.gridX}:${placement.gridZ}`;
@@ -194,7 +212,9 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
     for (const tile of groundTiles) if (tile.tileType === "water") blocked.add(`${tile.gridX}:${tile.gridZ}`);
   }
-  for (const existing of normaliseHomes(placements)) {
+  // A fixed home is scenery outside the grid, so the saved movable home blocks nothing.
+  const existingPlacements = rules.fixedHome ? placements.filter((p) => p.itemId !== CENTRAL_WORLD_HOME_KEY) : normaliseHomes(placements);
+  for (const existing of existingPlacements) {
     if (support?.source === existing) continue;
     if (placement.itemId === CENTRAL_WORLD_HOME_KEY && existing.itemId === CENTRAL_WORLD_HOME_KEY) continue;
     const existingItem = existing.itemId === CENTRAL_WORLD_HOME_KEY ? CENTRAL_WORLD_HOME_ITEM : itemsById.get(existing.itemId);
@@ -261,8 +281,9 @@ export function uploadLocalCentralWorld(scope: string) {
   syncWorldToAccount(scope);
 }
 
-export function validateCentralWorldGroundCell(gridX: number, gridZ: number, placements: CentralWorldPlacement[] = [], tileType?: CentralWorldGroundType) {
-  if (gridX < CENTRAL_WORLD_GRID.minX || gridX > CENTRAL_WORLD_GRID.maxX || gridZ < CENTRAL_WORLD_GRID.minZ || gridZ > CENTRAL_WORLD_GRID.maxZ || isCentralWorldProtectedCell(gridX, gridZ)) return false;
+export function validateCentralWorldGroundCell(gridX: number, gridZ: number, placements: CentralWorldPlacement[] = [], tileType?: CentralWorldGroundType, rules: CentralWorldBuildRules = CENTRAL_WORLD_BUILD_RULES) {
+  if (!insideGrid(rules.grid, gridX, gridZ) || rules.isReservedCell(gridX, gridZ)) return false;
+  if (rules.fixedHome) return true;
   const home = getCentralWorldHome(placements);
   if (placementOccupiesCell(home, CENTRAL_WORLD_HOME_ITEM, gridX, gridZ)) return false;
   return tileType !== "water" || !homeAccessCells(home).includes(`${gridX}:${gridZ}`);

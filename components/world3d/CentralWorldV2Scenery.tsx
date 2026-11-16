@@ -11,7 +11,7 @@ import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib
 import { CENTRAL_WORLD_GRID, CENTRAL_WORLD_HOME_ITEM, CENTRAL_WORLD_HOME_KEY, parseGridSize, type CentralWorldGroundTile, type CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
 import {
   HUB_V2_BRIDGES, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PLAY_RADIUS, HUB_V2_RIVER_START_Z, HUB_V2_ROCKS, HUB_V2_TERRAIN_SIZE, HUB_V2_WATER_Y,
-  distanceFromBuildArea, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
+  distanceFromBuildGrid, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
   type HubBridge, type HubScenery,
 } from "@/lib/world3d/central-world-v2";
 
@@ -275,9 +275,7 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
     }
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), p = new THREE.Vector3(), s = new THREE.Vector3();
     buckets.forEach((list) => {
-      let cx = 0, cz = 0;
-      list.forEach((item) => { cx += item.x; cz += item.z; });
-      parts.forEach((part) => {
+        parts.forEach((part) => {
         const mesh = new THREE.InstancedMesh(part.geometry, part.material, list.length);
         list.forEach((item, i) => {
           q.setFromAxisAngle(up, item.ry);
@@ -285,7 +283,6 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
         });
         mesh.castShadow = cast; mesh.receiveShadow = true;
         mesh.computeBoundingSphere();
-        mesh.userData = { cx: cx / list.length, cz: cz / list.length };
         root.add(mesh);
         meshes.push(mesh);
       });
@@ -294,10 +291,13 @@ function ModelInstances({ model, items, cast = true, chunk = 0, drawDistance = I
   }, [items, parts, norm, offset, chunk, cast]);
   useEffect(() => () => group.meshes.forEach((mesh) => mesh.dispose()), [group]);
   const root = useRef<THREE.Group>(null);
-  // Small plants draw only near the camera; each chunk stores its centre.
+  // Small plants draw only when part of their patch is within reach of the camera.
   useFrame(({ camera }) => {
     if (!Number.isFinite(drawDistance) || !root.current) return;
-    for (const child of root.current.children) child.visible = Math.hypot(child.userData.cx - camera.position.x, child.userData.cz - camera.position.z) < drawDistance;
+    for (const child of root.current.children) {
+      const sphere = (child as THREE.InstancedMesh).boundingSphere;
+      if (sphere) child.visible = Math.hypot(sphere.center.x - camera.position.x, sphere.center.z - camera.position.z) - sphere.radius < drawDistance;
+    }
   });
   return <primitive ref={root} object={group.root} />;
 }
@@ -342,7 +342,7 @@ export function CentralWorldV2Scenery({ quality, animate, placements, groundTile
     const map = new Map<string, HubScenery[]>();
     HUB_V2_DECOR.forEach((d, i) => {
       if (keep < 1 && noise(i + 0.5) > keep) return;
-      if (distanceFromBuildArea(d.x, d.z) === 0 && occupied.has(`${Math.round(d.x / CENTRAL_WORLD_GRID.cellSize)}:${Math.round(d.z / CENTRAL_WORLD_GRID.cellSize)}`)) return;
+      if (distanceFromBuildGrid(d.x, d.z) === 0 && occupied.has(`${Math.round(d.x / CENTRAL_WORLD_GRID.cellSize)}:${Math.round(d.z / CENTRAL_WORLD_GRID.cellSize)}`)) return;
       if (!map.has(d.model)) map.set(d.model, []);
       map.get(d.model)!.push(d);
     });
@@ -374,7 +374,7 @@ export function CentralWorldV2Scenery({ quality, animate, placements, groundTile
       <HubLookout />
       <Suspense fallback={null}>
         {[...rocksByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} />)}
-        {[...decorByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} chunk={60} drawDistance={drawDistance} cast={model.startsWith("plant") || model.startsWith("log")} />)}
+        {[...decorByModel].map(([model, items]) => <ModelInstances key={model} model={model} items={items} chunk={100} drawDistance={drawDistance} cast={quality === "high" && (model.startsWith("plant") || model.startsWith("log"))} />)}
         <ModelInstances model="lily_large" items={lilies} cast={false} />
         <ModelInstances model="campfire_stones" items={[{ x: camp.x, z: camp.z, y: camp.y, s: 1.4, ry: 0 }]} />
         <ModelInstances model="tent_detailedOpen" items={[{ x: camp.x - 5, z: camp.z - 4, y: camp.y, s: 3.6, ry: 0.6 }, { x: camp.x + 4.5, z: camp.z - 4.5, y: camp.y, s: 3.6, ry: -0.5 }]} />

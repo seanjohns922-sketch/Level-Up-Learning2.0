@@ -1,5 +1,4 @@
-// Links in and out of the walk-in treehouse. The treehouse belongs to the
-// bigger hub, so returning outside keeps `hub=v2` until it becomes the default.
+// Links in and out of the walk-in treehouse in the central hub.
 import { CENTRAL_WORLD_ANCHORS } from "./central-world-config";
 
 export type TreehouseRoomParam = "main" | "gems" | "legends";
@@ -20,7 +19,6 @@ export function treehouseHref(room: TreehouseRoomParam = "main", preview = false
 export function treehouseExitHref(preview = false) {
   const params = new URLSearchParams();
   if (preview) params.set("teacher_preview", "1");
-  params.set("hub", "v2");
   params.set("spawn", CENTRAL_WORLD_ANCHORS.myHomeExitSpawn);
   return `/world?${params.toString()}`;
 }

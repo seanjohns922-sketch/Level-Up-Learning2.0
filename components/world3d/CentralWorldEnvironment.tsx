@@ -34,6 +34,7 @@ import { WorldWater } from "./WorldWater";
 import { OrganicPaths } from "@/components/world3d/OrganicPaths";
 import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
 import { CentralWorldV2Scenery } from "@/components/world3d/CentralWorldV2Scenery";
+import { KEEP_LIVE, MergeStatic } from "@/components/world3d/MergeStatic";
 import { ExplorerTreehouse } from "@/components/world3d/ExplorerTreehouse";
 import { HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
 import { CentralValleyPanorama } from "./CentralValleyPanorama";
@@ -837,13 +838,39 @@ export function PlacedWorldObject({ item, placement, items, neighbours = [], pre
   );
 }
 
-function BuildModeGrid({ cursor }: { cursor: { gridX: number; gridZ: number } }) {
+/** Squares around the build cursor where nothing can go, tinted red. */
+function ReservedCellsOverlay({ cursor, cells, reservedCell }: { cursor: { gridX: number; gridZ: number }; cells: number; reservedCell: (gridX: number, gridZ: number) => boolean }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const reserved = useMemo(() => {
+    const out: Array<[number, number]> = [];
+    const half = cells / 2;
+    for (let dx = -half; dx < half; dx++) for (let dz = -half; dz < half; dz++) if (reservedCell(cursor.gridX + dx, cursor.gridZ + dz)) out.push([dx, dz]);
+    return out;
+  }, [cursor.gridX, cursor.gridZ, cells, reservedCell]);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const matrix = new THREE.Matrix4();
+    reserved.forEach(([dx, dz], index) => mesh.setMatrixAt(index, matrix.makeTranslation(dx * CENTRAL_WORLD_GRID.cellSize, 0.03, dz * CENTRAL_WORLD_GRID.cellSize)));
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [reserved]);
+  if (!reserved.length) return null;
+  return (
+    <instancedMesh key={reserved.length} ref={ref} args={[undefined, undefined, reserved.length]} rotation={[0, 0, 0]}>
+      <boxGeometry args={[CENTRAL_WORLD_GRID.cellSize - 0.12, 0.02, CENTRAL_WORLD_GRID.cellSize - 0.12]} />
+      <meshBasicMaterial color="#ef4444" transparent opacity={0.38} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+function BuildModeGrid({ cursor, reservedCell }: { cursor: { gridX: number; gridZ: number }; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
   const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
   const cells = 16;
   const size = cells * CENTRAL_WORLD_GRID.cellSize;
   return (
     <group position={[x, 0.115, z]}>
       <gridHelper args={[size, cells, "#eafff3", "#67d5b5"]} />
+      {reservedCell ? <ReservedCellsOverlay cursor={cursor} cells={cells} reservedCell={reservedCell} /> : null}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh>
     </group>
   );
@@ -1097,11 +1124,11 @@ function TowerClock({ animate }: { animate: boolean }) {
         {/* hour ticks */}
         {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <mesh key={i} position={[Math.sin(a) * 2.62, Math.cos(a) * 2.62, 0.12]} rotation={[0, 0, -a]}><boxGeometry args={[0.12, 0.46, 0.06]} /><meshStandardMaterial color={T.bronze} metalness={0.5} roughness={0.4} /></mesh>; })}
         {/* exposed gear train (lower centre, like the reference) */}
-        <group ref={gearA} position={[-0.7, -0.55, 0.16]}><Gear r={1.15} teeth={12} /></group>
-        <group ref={gearB} position={[0.95, -0.05, 0.2]}><Gear r={0.72} teeth={9} /></group>
-        <group ref={gearC} position={[0.15, 1.0, 0.16]}><Gear r={0.5} teeth={8} /></group>
+        <group ref={gearA} position={[-0.7, -0.55, 0.16]} userData={KEEP_LIVE}><Gear r={1.15} teeth={12} /></group>
+        <group ref={gearB} position={[0.95, -0.05, 0.2]} userData={KEEP_LIVE}><Gear r={0.72} teeth={9} /></group>
+        <group ref={gearC} position={[0.15, 1.0, 0.16]} userData={KEEP_LIVE}><Gear r={0.5} teeth={8} /></group>
         {/* dimensional hands */}
-        <group ref={minute} position={[0, 0, 0.34]}><mesh position={[0, 1.05, 0]}><boxGeometry args={[0.13, 2.3, 0.09]} /><meshStandardMaterial color={T.stoneHi} metalness={0.5} roughness={0.32} /></mesh></group>
+        <group ref={minute} position={[0, 0, 0.34]} userData={KEEP_LIVE}><mesh position={[0, 1.05, 0]}><boxGeometry args={[0.13, 2.3, 0.09]} /><meshStandardMaterial color={T.stoneHi} metalness={0.5} roughness={0.32} /></mesh></group>
         <mesh position={[0.62, 0.42, 0.4]} rotation={[0, 0, -0.95]}><boxGeometry args={[0.15, 1.5, 0.09]} /><meshStandardMaterial color={T.stoneHi} metalness={0.5} roughness={0.32} /></mesh>
         <mesh position={[0, 0, 0.46]}><sphereGeometry args={[0.2, 12, 12]} /><meshStandardMaterial color={T.gold} metalness={0.5} roughness={0.4} /></mesh>
       </group>
@@ -1120,6 +1147,8 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
   const upperTopY = 40.2;
   return (
     <group position={CENTRAL_WORLD_CONFIG.towerPosition} onClick={(event) => { if (!onEnter) return; event.stopPropagation(); onEnter(); }} onPointerOver={() => { if (onEnter) document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = ""; }}>
+      {/* The still stonework bakes into a few draw calls; the clock and door stay live. */}
+      <MergeStatic version={quality}>
       {/* ---- stepped stone base / apron, blending into the hill ---- */}
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow><boxGeometry args={[15, 1, 14]} /><meshStandardMaterial color={T.stoneDeep} roughness={0.9} /></mesh>
       <mesh position={[0, 1.3, 0]} castShadow receiveShadow><boxGeometry args={[12.5, 1, 12]} /><meshStandardMaterial color={T.stoneMid} roughness={0.86} /></mesh>
@@ -1159,13 +1188,15 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
         <group position={[0, 0.8, 0.95]}><PointedPanel w={4.0} h={8.0} d={0.6} color={T.stoneDeep} /></group>
         <group position={[0, 1.2, 1.3]}><PointedPanel w={3.2} h={7.2} d={0.5} color={T.recess} /></group>
         {/* dark door with gold knowledge emblem */}
-        <group position={[0, 1.4, 1.55]}><PointedPanel w={2.5} h={6.0} d={0.3} color={T.door} emissive={doorEmissive} ei={doorGlow} /></group>
+        <group position={[0, 1.4, 1.55]} userData={KEEP_LIVE}><PointedPanel w={2.5} h={6.0} d={0.3} color={T.door} emissive={doorEmissive} ei={doorGlow} /></group>
         {detail ? [-0.9, -0.6, -0.3, 0, 0.3, 0.6, 0.9].map((x) => <mesh key={`door-seam-${x}`} position={[x, 4.1, 1.75]}><boxGeometry args={[0.022, 5.2, 0.025]} /><meshStandardMaterial color="#574027" roughness={0.9} /></mesh>) : null}
         {detail ? [-1, 1].map((side) => <group key={`hinges-${side}`} position={[side * 0.82, 0, 1.76]}>{[2.2, 5.6].map((y) => <mesh key={y} position={[0, y, 0]} castShadow><boxGeometry args={[0.64, 0.14, 0.07]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.7} roughness={0.38} /></mesh>)}</group>) : null}
-        <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><torusGeometry args={[0.6, 0.14, 8, 20]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.4} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
-        <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.38} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
-        {/* keystone lantern above the arch */}
-        <mesh position={[0, 9.6, 1.4]} castShadow receiveShadow><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.stoneHi} emissive="#f2c257" emissiveIntensity={active ? 0.95 : 0.4} /></mesh>
+        <group userData={KEEP_LIVE}>
+          <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><torusGeometry args={[0.6, 0.14, 8, 20]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.4} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+          <mesh position={[0, 3.4, 1.85]} castShadow receiveShadow><octahedronGeometry args={[0.32, 0]} /><meshStandardMaterial color={T.gold} metalness={0.55} roughness={0.38} emissive="#7a5316" emissiveIntensity={active ? 0.6 : 0.15} /></mesh>
+          {/* keystone lantern above the arch */}
+          <mesh position={[0, 9.6, 1.4]} castShadow receiveShadow><sphereGeometry args={[0.5, 16, 16]} /><meshStandardMaterial color={T.stoneHi} emissive="#f2c257" emissiveIntensity={active ? 0.95 : 0.4} /></mesh>
+        </group>
         {/* mounted plaque */}
         <mesh position={[0, 11.2, 1.1]} castShadow receiveShadow><boxGeometry args={[6.0, 1.5, 0.4]} /><meshStandardMaterial color={T.bronzeLit} metalness={0.5} roughness={0.45} /></mesh>
         <mesh position={[0, 11.2, 1.31]} castShadow receiveShadow><boxGeometry args={[5.6, 1.1, 0.06]} /><meshStandardMaterial color="#2a1d12" roughness={0.7} /></mesh>
@@ -1190,6 +1221,8 @@ export function PlaceholderKnowledgeTower({ active, onEnter, quality = "medium" 
       {detail ? ([[-6.5, 5, 0.35], [6.8, 4.5, -0.3], [-5.5, -5.5, 0.4], [6, -5, 0.3]] as const).map(([x, z, r], i) => <mesh key={`rk${i}`} position={[x, r * 0.7, z]} castShadow receiveShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color="#7c8792" roughness={0.9} flatShading /></mesh>) : null}
       {detail ? ([[-5.8, 4.2], [5.6, 4.8], [-6.2, -3.5], [5.2, -4.6]] as const).map(([x, z], i) => <group key={`sh${i}`} position={[x, 0, z]}>{[[0, 0.5, 0, 0.5], [-0.35, 0.4, 0.1, 0.36], [0.34, 0.42, -0.06, 0.38]].map(([dx, dy, dz, rr], j) => <mesh key={j} position={[dx, dy, dz]} castShadow receiveShadow><sphereGeometry args={[rr, 10, 8]} /><meshStandardMaterial color={j % 2 ? "#4d9b46" : "#3f8f3a"} roughness={0.95} /></mesh>)}</group>) : null}
 
+      </MergeStatic>
+
       {/* warm stone uplight so the sandstone reads golden */}
       <pointLight position={[0, 8, 13]} color="#ffcf85" intensity={(active ? 2.4 : 1.7) * (detail ? 1 : 0.7)} distance={40} />
 
@@ -1202,7 +1235,7 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
   return (
     <group>
@@ -1219,7 +1252,7 @@ export function CentralWorldEnvironment({ hubV2 = false, quality, entranceActive
       <PaintedGround tiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
-      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} /> : null}
+      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
