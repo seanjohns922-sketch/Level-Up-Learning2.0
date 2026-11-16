@@ -17,10 +17,15 @@ const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
 assert.ok(['mixed', 'students-only', 'teachers-only'].includes(scenario), 'Unknown local capacity scenario');
 const runStudents = scenario !== 'teachers-only';
 const runTeachers = scenario !== 'students-only';
+const restRoute = process.env.SCALE_REST_ROUTE ?? 'gateway';
+assert.ok(['gateway', 'direct'].includes(restRoute), 'REST route must be gateway or direct');
+assert.ok(restRoute !== 'direct' || scenario === 'students-only', 'Direct REST comparison supports student-only runs');
+// Fixed loopback-only diagnostic port. Auth still uses the guarded local gateway.
+const restUrl = restRoute === 'direct' ? 'http://127.0.0.1:56523' : `${config.API_URL}/rest/v1`;
 const rampSeconds = Number(process.env.SCALE_LOGIN_RAMP_SECONDS ?? 0);
 assert.ok(Number.isInteger(rampSeconds) && rampSeconds >= 0 && rampSeconds <= 30, 'Login ramp must be 0–30 seconds');
 assert.ok(runStudents || rampSeconds === 0, 'Teacher-only scenario cannot ramp student logins');
-const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (rampSeconds ? `-ramp${rampSeconds}` : '');
+const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (rampSeconds ? `-ramp${rampSeconds}` : '') + (restRoute === 'direct' ? '-direct' : '');
 const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`).map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
 for (const group of groups) assert.equal(group.students.length, 25);
 for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(g => g[key])).size, groupCount);
@@ -35,7 +40,8 @@ async function request(path, body, token, session, name) {
   let headersMs = null, upstreamMs = null, proxyMs = null;
   const serverTimings = {};
   try {
-    const response = await fetch(config.API_URL + path, {
+    const url = path.startsWith('/rest/v1/') ? restUrl + path.slice('/rest/v1'.length) : config.API_URL + path;
+    const response = await fetch(url, {
       method: 'POST', headers: { apikey: config.ANON_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
         ...(session ? { 'x-student-session': session } : {}), ...(name ? {} : { Prefer: 'resolution=merge-duplicates' }) },
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000),
@@ -165,7 +171,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
-  clientProfile, scenario, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
+  clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };

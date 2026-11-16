@@ -3,6 +3,14 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Gateway comparison follow-up
+
+Four matched local bursts (gateway/direct/direct/gateway) preserved all activity.
+Gateway login p95 was 1,808 and 2,233 ms; direct was 1,902 and 886 ms. Only the
+second direct run passed. Bypassing the gateway does not reliably remove the
+latency, and local variability remains material. Original container restored;
+preflight and smoke passed. See `LOCAL_GATEWAY_COMPARISON_2026-11-16.md`.
+
 ## Planning and API scheduling follow-up
 
 Measured login planning averaged 0.239 ms; the instrumented baseline still failed

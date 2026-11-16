@@ -1,0 +1,1630 @@
+[
+  {
+    "run": "gateway-first",
+    "at": "2026-11-16T08:31:23.075Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 12,
+      "eventLoopDelayMaxMs": 147,
+      "eventLoopUtilization": 0.05307047127463928
+    },
+    "scenario": "students-only",
+    "restRoute": "gateway",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 0,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 61,
+    "requests": 5000,
+    "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+    "snapshotHttpRequests": 0,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1000,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1808,
+            "p99": 2351,
+            "max": 2733
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1749,
+            "p99": 2293,
+            "max": 2674
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 12
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 13
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 9
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 10
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1589,
+            "p99": 2136,
+            "max": 2499
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 14
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1808,
+        "p99Ms": 2351,
+        "maximumMs": 2733
+      },
+      {
+        "name": "get_student_runtime_context_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1591,
+            "p99": 2210,
+            "max": 2752
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1585,
+            "p99": 2207,
+            "max": 2750
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 2
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1571,
+            "p99": 2117,
+            "max": 2738
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1591,
+        "p99Ms": 2210,
+        "maximumMs": 2752
+      },
+      {
+        "name": "upsert_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1462,
+            "p99": 1903,
+            "max": 2488
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1458,
+            "p99": 1902,
+            "max": 2485
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1445,
+            "p99": 1895,
+            "max": 2476
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 8
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1462,
+        "p99Ms": 1903,
+        "maximumMs": 2488
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 1097,
+            "p99": 1664,
+            "max": 2710
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 1085,
+            "p99": 1661,
+            "max": 2706
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 7
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 10
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 8
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 1081,
+            "p99": 1646,
+            "max": 2690
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 1097,
+        "p99Ms": 1665,
+        "maximumMs": 2710
+      },
+      {
+        "name": "touch_live_student_presence_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 868,
+            "p99": 1445,
+            "max": 2351
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 865,
+            "p99": 1442,
+            "max": 2350
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 9
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 9
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 859,
+            "p99": 1438,
+            "max": 2331
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 868,
+        "p99Ms": 1445,
+        "maximumMs": 2351
+      },
+      {
+        "name": "upsert_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 683,
+            "p99": 1136,
+            "max": 1601
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 681,
+            "p99": 1131,
+            "max": 1599
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 2
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 9
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 11
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 8
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 674,
+            "p99": 1128,
+            "max": 1593
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 9
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 683,
+        "p99Ms": 1136,
+        "maximumMs": 1601
+      },
+      {
+        "name": "get_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 800,
+            "p99": 915,
+            "max": 974
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 796,
+            "p99": 908,
+            "max": 947
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 5
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 651,
+            "p99": 827,
+            "max": 912
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 18
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 800,
+        "p99Ms": 915,
+        "maximumMs": 974
+      }
+    ],
+    "preliminaryGatePassed": false,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "full six-read teacher snapshots",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  },
+  {
+    "run": "direct-first",
+    "at": "2026-11-16T08:32:43.405Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 12,
+      "eventLoopDelayMaxMs": 103,
+      "eventLoopUtilization": 0.05226197648763166
+    },
+    "scenario": "students-only",
+    "restRoute": "direct",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 0,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 61,
+    "requests": 5000,
+    "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+    "snapshotHttpRequests": 0,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1000,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1902,
+            "p99": 2799,
+            "max": 3214
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 8
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 17
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1594,
+            "p99": 2442,
+            "max": 2833
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1902,
+        "p99Ms": 2799,
+        "maximumMs": 3214
+      },
+      {
+        "name": "get_student_runtime_context_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1599,
+            "p99": 2123,
+            "max": 2627
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 1
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 14
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1590,
+            "p99": 2121,
+            "max": 2621
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1599,
+        "p99Ms": 2123,
+        "maximumMs": 2627
+      },
+      {
+        "name": "upsert_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1435,
+            "p99": 2117,
+            "max": 2414
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 8
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 7
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 11
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1424,
+            "p99": 2114,
+            "max": 2406
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1435,
+        "p99Ms": 2117,
+        "maximumMs": 2414
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 1072,
+            "p99": 1543,
+            "max": 2445
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 7
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 13
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 10
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 1017,
+            "p99": 1541,
+            "max": 2441
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 25
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 1072,
+        "p99Ms": 1544,
+        "maximumMs": 2445
+      },
+      {
+        "name": "touch_live_student_presence_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 846,
+            "p99": 1367,
+            "max": 1797
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 28
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 836,
+            "p99": 1354,
+            "max": 1795
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 9
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 846,
+        "p99Ms": 1367,
+        "maximumMs": 1798
+      },
+      {
+        "name": "upsert_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 736,
+            "p99": 1231,
+            "max": 1843
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 7
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 733,
+            "p99": 1221,
+            "max": 1837
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 5
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 736,
+        "p99Ms": 1231,
+        "maximumMs": 1843
+      },
+      {
+        "name": "get_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 684,
+            "p99": 917,
+            "max": 1037
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 12
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 3
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 673,
+            "p99": 894,
+            "max": 1002
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 684,
+        "p99Ms": 917,
+        "maximumMs": 1037
+      }
+    ],
+    "preliminaryGatePassed": false,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "full six-read teacher snapshots",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  },
+  {
+    "run": "direct-repeat",
+    "at": "2026-11-16T08:34:03.543Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 11,
+      "eventLoopDelayMaxMs": 114,
+      "eventLoopUtilization": 0.046292064747458825
+    },
+    "scenario": "students-only",
+    "restRoute": "direct",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 0,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 61,
+    "requests": 5000,
+    "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+    "snapshotHttpRequests": 0,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1000,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 886,
+            "p99": 1001,
+            "max": 1118
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 16
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 11
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 6
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 526,
+            "p99": 614,
+            "max": 699
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 886,
+        "p99Ms": 1001,
+        "maximumMs": 1118
+      },
+      {
+        "name": "get_student_runtime_context_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 544,
+            "p99": 641,
+            "max": 941
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 5
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 5
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 532,
+            "p99": 588,
+            "max": 645
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 545,
+        "p99Ms": 641,
+        "maximumMs": 942
+      },
+      {
+        "name": "upsert_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 545,
+            "p99": 601,
+            "max": 640
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 9
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 540,
+            "p99": 590,
+            "max": 637
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 15
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 545,
+        "p99Ms": 601,
+        "maximumMs": 640
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 868,
+            "p99": 1014,
+            "max": 1061
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 7
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 8
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 788,
+            "p99": 938,
+            "max": 985
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 868,
+        "p99Ms": 1014,
+        "maximumMs": 1061
+      },
+      {
+        "name": "touch_live_student_presence_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 535,
+            "p99": 671,
+            "max": 853
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 8
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 11
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 525,
+            "p99": 668,
+            "max": 848
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 8
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 535,
+        "p99Ms": 671,
+        "maximumMs": 853
+      },
+      {
+        "name": "upsert_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 490,
+            "p99": 568,
+            "max": 757
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 2,
+            "max": 11
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 8
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 486,
+            "p99": 566,
+            "max": 752
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 490,
+        "p99Ms": 568,
+        "maximumMs": 757
+      },
+      {
+        "name": "get_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 661,
+            "p99": 894,
+            "max": 985
+          },
+          "upstreamMs": null,
+          "proxyMs": null,
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 2
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 16
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 5
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 653,
+            "p99": 879,
+            "max": 951
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 1
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 661,
+        "p99Ms": 894,
+        "maximumMs": 985
+      }
+    ],
+    "preliminaryGatePassed": true,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "full six-read teacher snapshots",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  },
+  {
+    "run": "gateway-repeat",
+    "at": "2026-11-16T08:35:23.915Z",
+    "environment": "local protocol rehearsal; not production capacity certification",
+    "clientProfile": {
+      "eventLoopDelayP99Ms": 12,
+      "eventLoopDelayMaxMs": 102,
+      "eventLoopUtilization": 0.062190367565388954
+    },
+    "scenario": "students-only",
+    "restRoute": "gateway",
+    "loginRampSeconds": 0,
+    "students": 500,
+    "teachers": 0,
+    "provisionedStudents": 500,
+    "historyEvents": 100000,
+    "durationSeconds": 61,
+    "requests": 5000,
+    "requestUnits": "student/teacher-login HTTP requests plus logical teacher snapshots",
+    "snapshotHttpRequests": 0,
+    "failedRequests": 0,
+    "verifiedPresenceStudents": 500,
+    "verifiedActivityWrites": 1000,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 2233,
+            "p99": 2984,
+            "max": 3522
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 2145,
+            "p99": 2875,
+            "max": 3435
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 6
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 9
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 3
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1753,
+            "p99": 2584,
+            "max": 3124
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 29
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 2233,
+        "p99Ms": 2985,
+        "maximumMs": 3522
+      },
+      {
+        "name": "get_student_runtime_context_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1863,
+            "p99": 2498,
+            "max": 3128
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1854,
+            "p99": 2492,
+            "max": 3122
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 2,
+            "max": 10
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 2
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1835,
+            "p99": 2481,
+            "max": 3114
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1863,
+        "p99Ms": 2498,
+        "maximumMs": 3128
+      },
+      {
+        "name": "upsert_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 1719,
+            "p99": 2405,
+            "max": 3257
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 1714,
+            "p99": 2395,
+            "max": 3250
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 1,
+            "max": 8
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 5
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 7
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 1714,
+            "p99": 2382,
+            "max": 3248
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 14
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 1719,
+        "p99Ms": 2405,
+        "maximumMs": 3257
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 1304,
+            "p99": 1935,
+            "max": 2951
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 1294,
+            "p99": 1929,
+            "max": 2947
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 3
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 14
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 14
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 11
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 1289,
+            "p99": 1926,
+            "max": 2945
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 9
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 1305,
+        "p99Ms": 1935,
+        "maximumMs": 2951
+      },
+      {
+        "name": "touch_live_student_presence_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 923,
+            "p99": 1641,
+            "max": 2679
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 919,
+            "p99": 1635,
+            "max": 2670
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 4
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 7
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 4
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 908,
+            "p99": 1634,
+            "max": 2670
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 5
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 923,
+        "p99Ms": 1641,
+        "maximumMs": 2679
+      },
+      {
+        "name": "upsert_student_activity_daily_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 1000,
+            "p95": 777,
+            "p99": 1454,
+            "max": 2434
+          },
+          "upstreamMs": {
+            "samples": 1000,
+            "p95": 774,
+            "p99": 1450,
+            "max": 2430
+          },
+          "proxyMs": {
+            "samples": 1000,
+            "p95": 1,
+            "p99": 1,
+            "max": 4
+          },
+          "server_jwtMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 2
+          },
+          "server_parseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 6
+          },
+          "server_planMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 1,
+            "max": 13
+          },
+          "server_transactionMs": {
+            "samples": 1000,
+            "p95": 766,
+            "p99": 1437,
+            "max": 2421
+          },
+          "server_responseMs": {
+            "samples": 1000,
+            "p95": 0,
+            "p99": 0,
+            "max": 6
+          }
+        },
+        "requests": 1000,
+        "failedRequests": 0,
+        "p95Ms": 777,
+        "p99Ms": 1454,
+        "maximumMs": 2434
+      },
+      {
+        "name": "get_live_student_activity_secure",
+        "timings": {
+          "headersMs": {
+            "samples": 500,
+            "p95": 707,
+            "p99": 862,
+            "max": 940
+          },
+          "upstreamMs": {
+            "samples": 500,
+            "p95": 691,
+            "p99": 847,
+            "max": 929
+          },
+          "proxyMs": {
+            "samples": 500,
+            "p95": 1,
+            "p99": 2,
+            "max": 2
+          },
+          "server_jwtMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 3
+          },
+          "server_parseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 3,
+            "max": 8
+          },
+          "server_planMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 1,
+            "max": 5
+          },
+          "server_transactionMs": {
+            "samples": 500,
+            "p95": 595,
+            "p99": 767,
+            "max": 852
+          },
+          "server_responseMs": {
+            "samples": 500,
+            "p95": 0,
+            "p99": 0,
+            "max": 4
+          }
+        },
+        "requests": 500,
+        "failedRequests": 0,
+        "p95Ms": 708,
+        "p99Ms": 862,
+        "maximumMs": 940
+      }
+    ],
+    "preliminaryGatePassed": false,
+    "exclusions": [
+      "canonical lesson/assessment completion and retry integrity",
+      "full six-read teacher snapshots",
+      "realtime delivery",
+      "browser/iPad rendering",
+      "production-equivalent cloud resources",
+      "long soak"
+    ]
+  }
+]
