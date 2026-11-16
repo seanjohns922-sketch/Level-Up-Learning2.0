@@ -3,6 +3,18 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Incremental dashboard scenario — 17 November
+
+Added a separate six-source periodic dashboard workload using the production
+incremental event reader alongside secure student event writes. The 100-student
+run and two 500-student runs preserved all activity and delivered all 2,200 new
+events exactly once. All three failed latency. At 500, initial event p95 was
+7,261 / 5,371 ms versus 585 / 437 ms for later incremental reads. Profile the
+initial dashboard overlap next; realtime delivery and five-minute reconciliation
+remain untested in this scenario. Canonical attempt fixtures are uneven across
+classes, so completion-history volume coverage is limited. See
+`LOCAL_INCREMENTAL_DASHBOARD_2026-11-17.md`. Production settings are unchanged.
+
 ## Official-runtime mixed validation — 17 November
 
 Four fresh official PostgREST 14.8 local runs (pools 10 / 30 / 30 / 10) combined

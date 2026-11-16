@@ -1,0 +1,1040 @@
+{
+  "environment": "isolated local official PostgREST 14.8, default pool, no production capacity claim",
+  "runs": [
+    {
+      "at": "2026-11-16T22:37:58.303Z",
+      "scenario": "dashboard-mixed",
+      "students": 100,
+      "teachers": 4,
+      "durationSeconds": 61,
+      "requests": 1288,
+      "requestUnits": "student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total",
+      "snapshotHttpRequests": 124,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "dashboardChecks": [
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5300,
+            723,
+            241,
+            482,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5298,
+            744,
+            248,
+            496,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5295,
+            735,
+            245,
+            490,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5293,
+            729,
+            243,
+            486,
+            25
+          ]
+        }
+      ],
+      "failures": [],
+      "preliminaryGatePassed": false,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 13,
+        "eventLoopDelayMaxMs": 77,
+        "eventLoopUtilization": 0.029818614328376805
+      },
+      "exclusions": [
+        "canonical lesson/assessment completion and retry integrity",
+        "realtime delivery",
+        "browser/iPad rendering",
+        "production-equivalent cloud resources",
+        "long soak"
+      ],
+      "run": "100",
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 118,
+          "p99Ms": 118,
+          "maximumMs": 118
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 769,
+          "p99Ms": 932,
+          "maximumMs": 992
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 511,
+          "p99Ms": 511,
+          "maximumMs": 511
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 626,
+          "p99Ms": 844,
+          "maximumMs": 939
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 928,
+          "p99Ms": 928,
+          "maximumMs": 928
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 482,
+          "p99Ms": 566,
+          "maximumMs": 580
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 707,
+          "p99Ms": 707,
+          "maximumMs": 707
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 471,
+          "p99Ms": 471,
+          "maximumMs": 471
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 360,
+          "p99Ms": 516,
+          "maximumMs": 651
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 572,
+          "p99Ms": 572,
+          "maximumMs": 572
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 305,
+          "p99Ms": 470,
+          "maximumMs": 693
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 371,
+          "p99Ms": 417,
+          "maximumMs": 533
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 264,
+          "p99Ms": 333,
+          "maximumMs": 400
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 1371,
+          "p99Ms": 1371,
+          "maximumMs": 1371
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1372,
+          "p99Ms": 1372,
+          "maximumMs": 1372
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 8,
+          "failedRequests": 0,
+          "p95Ms": 380,
+          "p99Ms": 380,
+          "maximumMs": 380
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 146,
+          "p99Ms": 183,
+          "maximumMs": 185
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T22:39:22.541Z",
+      "scenario": "dashboard-mixed",
+      "students": 500,
+      "teachers": 20,
+      "durationSeconds": 62,
+      "requests": 6440,
+      "requestUnits": "student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total",
+      "snapshotHttpRequests": 604,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "dashboardChecks": [
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5345,
+            735,
+            245,
+            490,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5050,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5348,
+            744,
+            248,
+            496,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5350,
+            723,
+            241,
+            482,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5343,
+            729,
+            243,
+            486,
+            25
+          ]
+        }
+      ],
+      "failures": [],
+      "preliminaryGatePassed": false,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 15,
+        "eventLoopDelayMaxMs": 232,
+        "eventLoopUtilization": 0.10829818125058753
+      },
+      "exclusions": [
+        "canonical lesson/assessment completion and retry integrity",
+        "realtime delivery",
+        "browser/iPad rendering",
+        "production-equivalent cloud resources",
+        "long soak"
+      ],
+      "run": "500",
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 410,
+          "p99Ms": 411,
+          "maximumMs": 411
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2922,
+          "p99Ms": 4775,
+          "maximumMs": 5638
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 3310,
+          "p99Ms": 5543,
+          "maximumMs": 6352
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 3182,
+          "p99Ms": 3977,
+          "maximumMs": 5224
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1794,
+          "p99Ms": 3135,
+          "maximumMs": 4422
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 3484,
+          "p99Ms": 4955,
+          "maximumMs": 4955
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2459,
+          "p99Ms": 5251,
+          "maximumMs": 5251
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2204,
+          "p99Ms": 2901,
+          "maximumMs": 2901
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2446,
+          "p99Ms": 6197,
+          "maximumMs": 6197
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2423,
+          "p99Ms": 2665,
+          "maximumMs": 2665
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1819,
+          "p99Ms": 2921,
+          "maximumMs": 5277
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1590,
+          "p99Ms": 2654,
+          "maximumMs": 4959
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1260,
+          "p99Ms": 2054,
+          "maximumMs": 3727
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 7261,
+          "p99Ms": 7267,
+          "maximumMs": 7267
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 7226,
+          "p99Ms": 7268,
+          "maximumMs": 7268
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "failedRequests": 0,
+          "p95Ms": 585,
+          "p99Ms": 720,
+          "maximumMs": 720
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 889,
+          "p99Ms": 1078,
+          "maximumMs": 1253
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T22:40:49.041Z",
+      "scenario": "dashboard-mixed",
+      "students": 500,
+      "teachers": 20,
+      "durationSeconds": 62,
+      "requests": 6440,
+      "requestUnits": "student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total",
+      "snapshotHttpRequests": 617,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 500,
+      "verifiedActivityWrites": 1000,
+      "expectedNewEvents": 1000,
+      "dashboardChecks": [
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5393,
+            729,
+            243,
+            486,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5100,
+            0,
+            0,
+            0,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5400,
+            723,
+            241,
+            482,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5398,
+            744,
+            248,
+            496,
+            25
+          ]
+        },
+        {
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            5395,
+            735,
+            245,
+            490,
+            25
+          ]
+        }
+      ],
+      "failures": [],
+      "preliminaryGatePassed": false,
+      "clientProfile": {
+        "eventLoopDelayP99Ms": 12,
+        "eventLoopDelayMaxMs": 120,
+        "eventLoopUtilization": 0.08191572756879874
+      },
+      "exclusions": [
+        "canonical lesson/assessment completion and retry integrity",
+        "realtime delivery",
+        "browser/iPad rendering",
+        "production-equivalent cloud resources",
+        "long soak"
+      ],
+      "run": "500-repeat",
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 376,
+          "p99Ms": 379,
+          "maximumMs": 379
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2567,
+          "p99Ms": 3522,
+          "maximumMs": 4110
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 2045,
+          "p99Ms": 2738,
+          "maximumMs": 3719
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 1998,
+          "p99Ms": 2927,
+          "maximumMs": 3566
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1534,
+          "p99Ms": 2422,
+          "maximumMs": 4106
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2206,
+          "p99Ms": 3227,
+          "maximumMs": 3227
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2231,
+          "p99Ms": 3879,
+          "maximumMs": 3879
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1147,
+          "p99Ms": 1740,
+          "maximumMs": 3844
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 1585,
+          "p99Ms": 2526,
+          "maximumMs": 2526
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2527,
+          "p99Ms": 4453,
+          "maximumMs": 4453
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 994,
+          "p99Ms": 1576,
+          "maximumMs": 3200
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 2412,
+          "p99Ms": 3179,
+          "maximumMs": 3179
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 1000,
+          "failedRequests": 0,
+          "p95Ms": 1040,
+          "p99Ms": 1684,
+          "maximumMs": 3493
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 20,
+          "failedRequests": 0,
+          "p95Ms": 5371,
+          "p99Ms": 5382,
+          "maximumMs": 5382
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 60,
+          "failedRequests": 0,
+          "p95Ms": 5347,
+          "p99Ms": 5382,
+          "maximumMs": 5382
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 40,
+          "failedRequests": 0,
+          "p95Ms": 437,
+          "p99Ms": 452,
+          "maximumMs": 452
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 500,
+          "failedRequests": 0,
+          "p95Ms": 508,
+          "p99Ms": 736,
+          "maximumMs": 967
+        }
+      ]
+    }
+  ]
+}

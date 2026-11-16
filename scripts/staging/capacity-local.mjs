@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { monitorEventLoopDelay, performance as nodePerformance } from 'node:perf_hooks';
 import assert from 'node:assert/strict';
 import { createClient } from '@supabase/supabase-js';
-import { fetchLiveClassEvents } from '../../lib/live-class-events.ts';
+import { createLiveClassEventReader, fetchLiveClassEvents } from '../../lib/live-class-events.ts';
 import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
 const traceDatabase = process.env.SCALE_TRACE_DATABASE === '1';
@@ -15,7 +15,11 @@ const groupCount = Number(process.env.SCALE_GROUP_COUNT ?? 4);
 assert.ok(Number.isInteger(groupCount) && groupCount >= 4 && groupCount <= 20, 'Local rehearsal supports 4–20 groups only');
 const studentCount = groupCount * 25;
 const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
-assert.ok(['mixed', 'students-only', 'teachers-only'].includes(scenario), 'Unknown local capacity scenario');
+assert.ok(['mixed', 'students-only', 'teachers-only', 'dashboard-mixed'].includes(scenario), 'Unknown local capacity scenario');
+const dashboard = scenario === 'dashboard-mixed';
+const eventRun = crypto.randomUUID();
+const expectedEvents = new Map();
+const dashboardChecks = [];
 const runStudents = scenario !== 'teachers-only';
 const runTeachers = scenario !== 'students-only';
 const restRoute = process.env.SCALE_REST_ROUTE ?? 'gateway';
@@ -131,6 +135,11 @@ async function studentJourney({ group, student }, index) {
     assert.equal(await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: group.classId }, session), true, 'Heartbeat must update a live activity row');
     await rpc('upsert_student_activity_daily_secure', { p_student_id: student.studentId, p_class_id: group.classId, p_seconds_active: 30 }, session);
     writes++;
+    if (dashboard) {
+      await rpc('insert_live_activity_event_secure', { p_student_id: student.studentId, p_class_id: group.classId,
+        p_session_id: null, p_event_type: 'answer_correct', p_payload: { capacity_run: eventRun, sequence: writes } }, session);
+      expectedEvents.set(student.studentId, writes);
+    }
     await sleep(Math.min(30000, Math.max(0, deadline - Date.now())));
   } while (Date.now() < deadline);
   const after = sum(await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session));
@@ -140,6 +149,63 @@ async function studentJourney({ group, student }, index) {
   assert.ok(Date.now()-Date.parse(live.last_active_at)<90000,'Persisted heartbeat must be recent');
   verifiedWrites += writes;
   completedStudentJourneys++;
+}
+async function dashboardJourney({ group, client }) {
+  const ids = group.students.map(s => s.studentId);
+  const allowed = new Set(ids);
+  const reader = createLiveClassEventReader(client, { classId: group.classId, studentIds: ids,
+    eventTypes: ['activity_started','lesson_started','quiz_started','question_loaded','answer_correct','answer_incorrect','hint_used','lesson_completed','quiz_completed','idle_detected'] });
+  let refreshes = 0;
+  let latestRows = [];
+  async function measured(name, query) {
+    const start = performance.now();
+    let status = 0;
+    try {
+      const result = await query;
+      status = result.error ? (result.status >= 400 ? result.status : 0) : result.status;
+      assert.equal(result.error, null, name);
+      assert.ok(Array.isArray(result.data), name);
+      assert.ok(result.data.every(row => allowed.has(row.student_id)), `${name}: student isolation`);
+      assert.ok(result.data.every(row => !row.class_id || row.class_id === group.classId), `${name}: class isolation`);
+      return result.data;
+    } finally { samples.push({ name, ms: performance.now()-start, status }); }
+  }
+  async function refresh() {
+    const start = performance.now();
+    let status = 0;
+    try {
+      latestRows = await Promise.all([
+        measured('dashboard_live_activity', client.from('live_student_activity').select('*').eq('class_id', group.classId).order('last_active_at',{ascending:false})),
+        measured(refreshes ? 'dashboard_events_incremental' : 'dashboard_events_initial', reader.read()),
+        measured('dashboard_lesson_attempts', client.from('student_lesson_attempts').select('student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at').in('student_id',ids).eq('completed',true)),
+        measured('dashboard_quiz_attempts', client.from('student_weekly_quiz_attempts').select('student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at').in('student_id',ids)),
+        measured('dashboard_assessments', client.from('student_realm_assessments').select('student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at').in('student_id',ids)),
+        measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
+      ]);
+      assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
+      assert.equal(new Set(latestRows[1].map(row => row.id)).size, latestRows[1].length, 'No duplicate events');
+      refreshes++;
+      status = 200;
+    } finally { samples.push({name:'dashboard_refresh',ms:performance.now()-start,status}); }
+  }
+  try {
+    do {
+      await refresh();
+      await sleep(Math.min(30000, Math.max(0, deadline-Date.now())));
+    } while (Date.now()<deadline);
+    await studentResults;
+    await refresh();
+    const observed = latestRows[1].filter(row => row.payload?.capacity_run === eventRun);
+    for (const id of ids) {
+      const count = expectedEvents.get(id);
+      assert.ok(count > 0, 'Student emitted events');
+      const sequences = observed.filter(row => row.student_id===id).map(row=>row.payload.sequence).sort((a,b)=>a-b);
+      assert.deepEqual(sequences, Array.from({length:count},(_,i)=>i+1), 'All student events reach incremental reader exactly once');
+    }
+    assert.equal(new Set(latestRows[0].map(row=>row.student_id)).size, ids.length, 'Final live activity includes every student');
+    assert.equal(new Set(latestRows[5].map(row=>row.student_id)).size, ids.length, 'Final daily activity includes every student');
+    dashboardChecks.push({refreshes, observedNewEvents:observed.length, finalRowCounts:latestRows.map(rows=>rows.length)});
+  } finally { reader.dispose(); }
 }
 async function teacherJourney({ group, client }) {
   do {
@@ -155,8 +221,9 @@ async function teacherJourney({ group, client }) {
     await sleep(Math.min(2000, Math.max(0, deadline - Date.now())));
   } while (Date.now() < deadline);
 }
-const work = [...(runStudents ? students.map(studentJourney) : []), ...(runTeachers ? teachers.map(teacherJourney) : [])];
-const results = await Promise.allSettled(work);
+const studentResults = Promise.allSettled(runStudents ? students.map(studentJourney) : []);
+const teacherResults = Promise.allSettled(runTeachers ? teachers.map(dashboard ? dashboardJourney : teacherJourney) : []);
+const results = (await Promise.all([studentResults, teacherResults])).flat();
 clearInterval(progressTimer);
 eventLoop.disable();
 const clientProfile = {
@@ -181,10 +248,11 @@ const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
   workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase,
+  ...(dashboard ? { dashboardChecks, dashboardMode: 'six-source periodic refresh with production incremental event reader; no realtime subscription', expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
-  requests: samples.length, requestUnits: 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
+  requests: samples.length, requestUnits: dashboard ? 'student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total' : 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
-  exclusions: ['canonical lesson/assessment completion and retry integrity','full six-read teacher snapshots','realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
+  exclusions: ['canonical lesson/assessment completion and retry integrity',...(dashboard ? [] : ['full six-read teacher snapshots']),'realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
 fs.writeFileSync(`${localDir}/capacity-${studentCount}${outputSuffix}-result.json`, JSON.stringify(report,null,2));
 if (traceDatabase) fs.writeFileSync(`${localDir}/request-trace.json`, JSON.stringify({
   environment: 'isolated local diagnostic response timestamps; no identifiers or credentials',
