@@ -1,0 +1,647 @@
+{
+  "environment": "isolated custom PostgREST 14.8 timing build, pool comparison; not production capacity",
+  "binarySha256": "7d7e4b5ce41bf807b50e68f0a62117478698b7aa67317884a33b25bc56b53f8c",
+  "patchSha256": "6fd6cff82a00df71afad7ad49ce4a0431a8ef2975796379c956f2eccdb0e0786",
+  "runs": [
+    {
+      "name": "pool10",
+      "workload": {
+        "at": "2026-11-17T21:36:55.047Z",
+        "environment": "local synthetic completion/retry and realtime burst",
+        "students": 500,
+        "teachers": 20,
+        "privateChannels": true,
+        "verifiedJourneys": 500,
+        "teacherVerifiedStudents": 500,
+        "requests": 11000,
+        "expectedStudentDenials": 3000,
+        "eventsReceived": 500,
+        "realtimeP95Ms": 732,
+        "realtimeMaximumMs": 914,
+        "failures": [],
+        "endpoints": [
+          {
+            "name": "student_login_lookup",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 3907,
+            "p99Ms": 3939
+          },
+          {
+            "name": "get_student_realm_lesson_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2431,
+            "p99Ms": 3041
+          },
+          {
+            "name": "get_student_activity_daily_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2580,
+            "p99Ms": 3065
+          },
+          {
+            "name": "get_student_realm_assessments_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2619,
+            "p99Ms": 3186
+          },
+          {
+            "name": "get_student_realm_weekly_quiz_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2458,
+            "p99Ms": 3035
+          },
+          {
+            "name": "complete_realm_assessment",
+            "requests": 2000,
+            "failures": 0,
+            "p95Ms": 2181,
+            "p99Ms": 2457
+          },
+          {
+            "name": "complete_realm_lesson",
+            "requests": 3000,
+            "failures": 0,
+            "p95Ms": 1757,
+            "p99Ms": 2054
+          },
+          {
+            "name": "complete_realm_quiz",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1877,
+            "p99Ms": 2115
+          },
+          {
+            "name": "insert_live_activity_event_secure",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 1550,
+            "p99Ms": 1621
+          }
+        ],
+        "passed": false
+      },
+      "poolTimings": [
+        {
+          "label": "student_login",
+          "calls": 500,
+          "acquisitionMs": {
+            "p50": 747.384,
+            "p95": 2137.667,
+            "p99": 2315.758,
+            "maximum": 2364.315
+          },
+          "connectionUseMs": {
+            "p50": 15.227,
+            "p95": 47.11,
+            "p99": 57.059,
+            "maximum": 81.957
+          },
+          "poolSpansAtLeastOneSecond": 200,
+          "minimumAcquisitionShareForSlowSpans": 0.9415
+        },
+        {
+          "label": "lesson_save",
+          "calls": 6000,
+          "acquisitionMs": {
+            "p50": 32.771,
+            "p95": 390.374,
+            "p99": 686.072,
+            "maximum": 1369.359
+          },
+          "connectionUseMs": {
+            "p50": 10.577,
+            "p95": 30.372,
+            "p99": 48.984,
+            "maximum": 153.689
+          },
+          "poolSpansAtLeastOneSecond": 19,
+          "minimumAcquisitionShareForSlowSpans": 0.9487
+        },
+        {
+          "label": "quiz_save",
+          "calls": 1000,
+          "acquisitionMs": {
+            "p50": 59.59,
+            "p95": 460.54,
+            "p99": 763.311,
+            "maximum": 1079.681
+          },
+          "connectionUseMs": {
+            "p50": 13.607,
+            "p95": 32.48,
+            "p99": 60.418,
+            "maximum": 109.997
+          },
+          "poolSpansAtLeastOneSecond": 3,
+          "minimumAcquisitionShareForSlowSpans": 0.9874
+        },
+        {
+          "label": "assessment_save",
+          "calls": 2000,
+          "acquisitionMs": {
+            "p50": 75.093,
+            "p95": 1259.604,
+            "p99": 1547.197,
+            "maximum": 1707.41
+          },
+          "connectionUseMs": {
+            "p50": 13.423,
+            "p95": 39.722,
+            "p99": 66.772,
+            "maximum": 185.356
+          },
+          "poolSpansAtLeastOneSecond": 192,
+          "minimumAcquisitionShareForSlowSpans": 0.9577
+        }
+      ]
+    },
+    {
+      "name": "pool10-repeat",
+      "workload": {
+        "at": "2026-11-17T21:37:36.667Z",
+        "environment": "local synthetic completion/retry and realtime burst",
+        "students": 500,
+        "teachers": 20,
+        "privateChannels": true,
+        "verifiedJourneys": 500,
+        "teacherVerifiedStudents": 500,
+        "requests": 11000,
+        "expectedStudentDenials": 3000,
+        "eventsReceived": 500,
+        "realtimeP95Ms": 506,
+        "realtimeMaximumMs": 856,
+        "failures": [],
+        "endpoints": [
+          {
+            "name": "student_login_lookup",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 3088,
+            "p99Ms": 3526
+          },
+          {
+            "name": "get_student_realm_assessments_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2652,
+            "p99Ms": 3055
+          },
+          {
+            "name": "get_student_realm_lesson_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2544,
+            "p99Ms": 2964
+          },
+          {
+            "name": "get_student_realm_weekly_quiz_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2646,
+            "p99Ms": 3006
+          },
+          {
+            "name": "get_student_activity_daily_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2648,
+            "p99Ms": 3066
+          },
+          {
+            "name": "complete_realm_assessment",
+            "requests": 2000,
+            "failures": 0,
+            "p95Ms": 2093,
+            "p99Ms": 2372
+          },
+          {
+            "name": "complete_realm_lesson",
+            "requests": 3000,
+            "failures": 0,
+            "p95Ms": 1815,
+            "p99Ms": 2182
+          },
+          {
+            "name": "complete_realm_quiz",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2082,
+            "p99Ms": 2291
+          },
+          {
+            "name": "insert_live_activity_event_secure",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 1526,
+            "p99Ms": 1906
+          }
+        ],
+        "passed": false
+      },
+      "poolTimings": [
+        {
+          "label": "student_login",
+          "calls": 500,
+          "acquisitionMs": {
+            "p50": 253.901,
+            "p95": 1252.26,
+            "p99": 1877.004,
+            "maximum": 2299.848
+          },
+          "connectionUseMs": {
+            "p50": 10.506,
+            "p95": 27.566,
+            "p99": 40.133,
+            "maximum": 56.317
+          },
+          "poolSpansAtLeastOneSecond": 47,
+          "minimumAcquisitionShareForSlowSpans": 0.9706
+        },
+        {
+          "label": "lesson_save",
+          "calls": 6000,
+          "acquisitionMs": {
+            "p50": 32.139,
+            "p95": 674.986,
+            "p99": 1085.829,
+            "maximum": 1628.041
+          },
+          "connectionUseMs": {
+            "p50": 10.106,
+            "p95": 32.766,
+            "p99": 62.333,
+            "maximum": 260.946
+          },
+          "poolSpansAtLeastOneSecond": 88,
+          "minimumAcquisitionShareForSlowSpans": 0.9795
+        },
+        {
+          "label": "quiz_save",
+          "calls": 1000,
+          "acquisitionMs": {
+            "p50": 88.581,
+            "p95": 516.894,
+            "p99": 721.176,
+            "maximum": 1516.663
+          },
+          "connectionUseMs": {
+            "p50": 13.472,
+            "p95": 32.171,
+            "p99": 56.632,
+            "maximum": 126.017
+          },
+          "poolSpansAtLeastOneSecond": 3,
+          "minimumAcquisitionShareForSlowSpans": 0.9852
+        },
+        {
+          "label": "assessment_save",
+          "calls": 2000,
+          "acquisitionMs": {
+            "p50": 30.027,
+            "p95": 368.151,
+            "p99": 602.377,
+            "maximum": 1086.577
+          },
+          "connectionUseMs": {
+            "p50": 13.269,
+            "p95": 33.237,
+            "p99": 57.4,
+            "maximum": 145.427
+          },
+          "poolSpansAtLeastOneSecond": 1,
+          "minimumAcquisitionShareForSlowSpans": 0.9781
+        }
+      ]
+    },
+    {
+      "name": "pool30",
+      "workload": {
+        "at": "2026-11-17T21:38:17.719Z",
+        "environment": "local synthetic completion/retry and realtime burst",
+        "students": 500,
+        "teachers": 20,
+        "privateChannels": true,
+        "verifiedJourneys": 500,
+        "teacherVerifiedStudents": 500,
+        "requests": 11000,
+        "expectedStudentDenials": 3000,
+        "eventsReceived": 500,
+        "realtimeP95Ms": 1078,
+        "realtimeMaximumMs": 1427,
+        "failures": [],
+        "endpoints": [
+          {
+            "name": "student_login_lookup",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 1851,
+            "p99Ms": 1960
+          },
+          {
+            "name": "get_student_activity_daily_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1857,
+            "p99Ms": 1908
+          },
+          {
+            "name": "get_student_realm_lesson_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1839,
+            "p99Ms": 1903
+          },
+          {
+            "name": "get_student_realm_weekly_quiz_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1843,
+            "p99Ms": 1900
+          },
+          {
+            "name": "get_student_realm_assessments_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1841,
+            "p99Ms": 1905
+          },
+          {
+            "name": "complete_realm_assessment",
+            "requests": 2000,
+            "failures": 0,
+            "p95Ms": 1248,
+            "p99Ms": 1400
+          },
+          {
+            "name": "complete_realm_lesson",
+            "requests": 3000,
+            "failures": 0,
+            "p95Ms": 1508,
+            "p99Ms": 1731
+          },
+          {
+            "name": "complete_realm_quiz",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 1176,
+            "p99Ms": 1217
+          },
+          {
+            "name": "insert_live_activity_event_secure",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 1114,
+            "p99Ms": 1312
+          }
+        ],
+        "passed": false
+      },
+      "poolTimings": [
+        {
+          "label": "student_login",
+          "calls": 500,
+          "acquisitionMs": {
+            "p50": 25.77,
+            "p95": 142.6,
+            "p99": 162.235,
+            "maximum": 200.065
+          },
+          "connectionUseMs": {
+            "p50": 17.143,
+            "p95": 84.388,
+            "p99": 101.285,
+            "maximum": 121.815
+          },
+          "poolSpansAtLeastOneSecond": 0,
+          "minimumAcquisitionShareForSlowSpans": null
+        },
+        {
+          "label": "lesson_save",
+          "calls": 6000,
+          "acquisitionMs": {
+            "p50": 0.02,
+            "p95": 167.555,
+            "p99": 293.908,
+            "maximum": 626.984
+          },
+          "connectionUseMs": {
+            "p50": 19.491,
+            "p95": 76.921,
+            "p99": 145.389,
+            "maximum": 299.638
+          },
+          "poolSpansAtLeastOneSecond": 0,
+          "minimumAcquisitionShareForSlowSpans": null
+        },
+        {
+          "label": "quiz_save",
+          "calls": 1000,
+          "acquisitionMs": {
+            "p50": 14.807,
+            "p95": 115.356,
+            "p99": 161.568,
+            "maximum": 234.327
+          },
+          "connectionUseMs": {
+            "p50": 28.943,
+            "p95": 67.739,
+            "p99": 85.691,
+            "maximum": 106.953
+          },
+          "poolSpansAtLeastOneSecond": 0,
+          "minimumAcquisitionShareForSlowSpans": null
+        },
+        {
+          "label": "assessment_save",
+          "calls": 2000,
+          "acquisitionMs": {
+            "p50": 0.017,
+            "p95": 54.81,
+            "p99": 87.141,
+            "maximum": 164.938
+          },
+          "connectionUseMs": {
+            "p50": 26.363,
+            "p95": 61.566,
+            "p99": 79.897,
+            "maximum": 137.456
+          },
+          "poolSpansAtLeastOneSecond": 0,
+          "minimumAcquisitionShareForSlowSpans": null
+        }
+      ]
+    },
+    {
+      "name": "pool10-restored",
+      "workload": {
+        "at": "2026-11-17T21:38:46.527Z",
+        "environment": "local synthetic completion/retry and realtime burst",
+        "students": 500,
+        "teachers": 20,
+        "privateChannels": true,
+        "verifiedJourneys": 500,
+        "teacherVerifiedStudents": 500,
+        "requests": 11000,
+        "expectedStudentDenials": 3000,
+        "eventsReceived": 500,
+        "realtimeP95Ms": 442,
+        "realtimeMaximumMs": 998,
+        "failures": [],
+        "endpoints": [
+          {
+            "name": "student_login_lookup",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 3293,
+            "p99Ms": 3576
+          },
+          {
+            "name": "get_student_realm_lesson_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2833,
+            "p99Ms": 3046
+          },
+          {
+            "name": "get_student_realm_assessments_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2924,
+            "p99Ms": 3158
+          },
+          {
+            "name": "get_student_activity_daily_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2939,
+            "p99Ms": 3243
+          },
+          {
+            "name": "get_student_realm_weekly_quiz_attempts_secure",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2901,
+            "p99Ms": 3155
+          },
+          {
+            "name": "complete_realm_assessment",
+            "requests": 2000,
+            "failures": 0,
+            "p95Ms": 1994,
+            "p99Ms": 2203
+          },
+          {
+            "name": "complete_realm_lesson",
+            "requests": 3000,
+            "failures": 0,
+            "p95Ms": 2213,
+            "p99Ms": 2877
+          },
+          {
+            "name": "complete_realm_quiz",
+            "requests": 1000,
+            "failures": 0,
+            "p95Ms": 2324,
+            "p99Ms": 2967
+          },
+          {
+            "name": "insert_live_activity_event_secure",
+            "requests": 500,
+            "failures": 0,
+            "p95Ms": 1219,
+            "p99Ms": 1602
+          }
+        ],
+        "passed": false
+      },
+      "poolTimings": [
+        {
+          "label": "student_login",
+          "calls": 500,
+          "acquisitionMs": {
+            "p50": 89.464,
+            "p95": 726.45,
+            "p99": 1225.579,
+            "maximum": 2283.149
+          },
+          "connectionUseMs": {
+            "p50": 10.948,
+            "p95": 28.612,
+            "p99": 76.218,
+            "maximum": 89.224
+          },
+          "poolSpansAtLeastOneSecond": 12,
+          "minimumAcquisitionShareForSlowSpans": 0.9769
+        },
+        {
+          "label": "lesson_save",
+          "calls": 6000,
+          "acquisitionMs": {
+            "p50": 34.11,
+            "p95": 747.418,
+            "p99": 1418.524,
+            "maximum": 2521.706
+          },
+          "connectionUseMs": {
+            "p50": 10.135,
+            "p95": 30.009,
+            "p99": 49.525,
+            "maximum": 147.905
+          },
+          "poolSpansAtLeastOneSecond": 161,
+          "minimumAcquisitionShareForSlowSpans": 0.9091
+        },
+        {
+          "label": "quiz_save",
+          "calls": 1000,
+          "acquisitionMs": {
+            "p50": 174.231,
+            "p95": 941.77,
+            "p99": 1588.545,
+            "maximum": 2818.948
+          },
+          "connectionUseMs": {
+            "p50": 14.644,
+            "p95": 40.986,
+            "p99": 65.975,
+            "maximum": 101.879
+          },
+          "poolSpansAtLeastOneSecond": 46,
+          "minimumAcquisitionShareForSlowSpans": 0.9715
+        },
+        {
+          "label": "assessment_save",
+          "calls": 2000,
+          "acquisitionMs": {
+            "p50": 40.752,
+            "p95": 350.77,
+            "p99": 577.441,
+            "maximum": 1271.58
+          },
+          "connectionUseMs": {
+            "p50": 12.151,
+            "p95": 32.837,
+            "p99": 56.078,
+            "maximum": 97.782
+          },
+          "poolSpansAtLeastOneSecond": 1,
+          "minimumAcquisitionShareForSlowSpans": 0.9949
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Acquisition includes connection establishment and runtime scheduling, not solely queue time",
+    "Connection use includes query, transaction and release time",
+    "Lesson labels combine 3000 save/retry calls and 3000 deliberate access denials",
+    "Fixed endpoint labels do not individually correlate API and client request timings",
+    "Custom compiler/dependencies and logging differ from official runtime; no causal speed comparison",
+    "Repeated retakes grow synthetic history; neither test certifies 10000 users"
+  ]
+}

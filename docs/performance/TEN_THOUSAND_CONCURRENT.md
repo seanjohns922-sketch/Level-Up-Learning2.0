@@ -3,6 +3,18 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Completion acquisition comparison — 18 November
+
+Four custom-runtime traced runs at pool sizes 10 / 10 / 30 / 10 all preserved
+500 completion journeys, retries, XP and teacher results, but all failed latency.
+Increasing to 30 reduced acquisition waiting; returning to 10 increased it again.
+Connection-use time increased at 30 and HTTP latency still failed, so this is a
+measured contributor rather than a released fix. No hosted setting changed.
+Next: verify this completion-specific comparison on the official API runtime;
+do not assume the custom diagnostic binary predicts hosted performance.
+See `LOCAL_COMPLETION_ACQUISITION_2026-11-18.md` and its JSON evidence for counts,
+limits, restoration and the passing final smoke. No migration is required.
+
 ## Completion SQL profile — 18 November
 
 One instrumented 500-student / 20-teacher completion burst preserved all 500
