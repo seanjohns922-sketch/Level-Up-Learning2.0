@@ -6,6 +6,8 @@ type EventRead = {
   eventTypes?: string[];
   newestFirst?: boolean;
   limit?: number;
+  /** Live Class progress only: latest attempt per activity plus activity context. */
+  compact?: boolean;
 };
 
 /** Preserve complete snapshots; explicitly limited timelines remain a single read. */
@@ -54,18 +56,19 @@ async function fetchCompleteSnapshot(
   // Fix the upper cursor so incoming events cannot keep extending this refresh.
   const head = await filteredTable().order("created_at", { ascending: false })
     .order("id", { ascending: false }).limit(1);
-  if (head.error || !head.data?.length) return head;
+  if (head.error || !head.data?.length) return { ...head, scannedThrough: null };
   const through = head.data[0] as EventCursor;
-  if (startAfter && through.id === startAfter.id) return { ...head, data: [], count: null };
+  if (startAfter && through.id === startAfter.id) return { ...head, data: [], count: null, scannedThrough: through };
   const rows: NonNullable<typeof head.data> = [];
   let after: EventCursor | null = startAfter;
   let useLegacy = false;
+  let compactAvailable = options.compact === true;
   for (;;) {
     if (!isActive()) throw new Error("Live event read cancelled");
     const afterCursor: EventCursor | null = after;
     let page;
     if (!useLegacy) {
-      page = await client.rpc("get_live_class_event_page_secure", {
+      const args = {
         p_class_id: options.classId,
         p_student_ids: options.studentIds ?? null,
         p_event_types: options.eventTypes ?? null,
@@ -73,7 +76,14 @@ async function fetchCompleteSnapshot(
         p_after_id: afterCursor?.id ?? null,
         p_through_created_at: through.created_at,
         p_through_id: through.id,
-      }).select(columns).order("created_at", { ascending: true }).order("id", { ascending: true });
+      };
+      const readPage = (name: string) => client.rpc(name, args).select(columns)
+        .order("created_at", { ascending: true }).order("id", { ascending: true });
+      page = await readPage(compactAvailable ? "get_live_class_compact_event_page_secure" : "get_live_class_event_page_secure");
+      if (compactAvailable && page.error?.code === "PGRST202") {
+        compactAvailable = false;
+        page = await readPage("get_live_class_event_page_secure");
+      }
       if (page.error?.code === "PGRST202") useLegacy = true;
     }
     if (useLegacy) {
@@ -83,7 +93,7 @@ async function fetchCompleteSnapshot(
       page = await query.order("created_at", { ascending: true }).order("id", { ascending: true }).limit(500);
     }
     if (!page) throw new Error("Live event page was not returned");
-    if (page.error) return { ...head, data: null, error: page.error };
+    if (page.error) return { ...head, data: null, error: page.error, scannedThrough: null };
     if (!Array.isArray(page.data)) throw new Error("Invalid live event page");
     if (!page.data.length) break;
     rows.push(...page.data);
@@ -94,7 +104,7 @@ async function fetchCompleteSnapshot(
     if (last.id === through.id) break;
   }
   if (options.newestFirst) rows.reverse();
-  return { ...head, data: rows, count: null };
+  return { ...head, data: rows, count: null, scannedThrough: through };
 }
 
 /** One reader per mounted class; never share private event data between sessions.
@@ -130,7 +140,9 @@ export function createLiveClassEventReader(
       // Do not install a snapshot invalidated while a page was in flight.
       if (version === generation) {
         snapshot = data;
-        cursor = (data.at(-1) as EventCursor | undefined) ?? null;
+        // A compact page may omit the newest event. Remember the scanned head
+        // so unchanged history does not trigger another full selection.
+        cursor = result.scannedThrough;
         if (full) reconciledAt = Date.now();
       }
       return { ...result, data };

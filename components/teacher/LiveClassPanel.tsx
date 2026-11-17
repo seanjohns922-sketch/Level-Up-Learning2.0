@@ -1006,6 +1006,7 @@ export default function LiveClassPanel({
     }
 
     const eventReader = createLiveClassEventReader(supabase, {
+      compact: true,
       classId: selectedClass?.id ?? "",
       studentIds,
       eventTypes: [

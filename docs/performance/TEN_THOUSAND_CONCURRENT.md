@@ -3,6 +3,60 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Compact Live Class read implemented — 18 November
+
+The panel now opts into `get_live_class_compact_event_page_secure`. Migration
+`20261118120000_compact_live_class_event_reads.sql` adds two read-only functions;
+it changes no tables, historical events, RLS policies or student progression.
+The endpoint requires an authenticated user and the existing `can_view_class`
+authorisation. Its private payload-predicate helper has no client execute grant.
+
+The SQL implementation uses a safe superset of the earlier two-stage probe:
+retain each student's latest attempt **for every activity key**, plus their latest
+meaningful activity event. Keep all matching events when no start exists. This
+preserves stale-row and legacy-title fallbacks without coupling SQL to the resolved
+UI row. Exact payload types and JS millisecond tie ordering are preserved.
+The UI calculations are unchanged. Other event readers and latest-15 timelines
+continue to request full history.
+
+The existing bounded keyset reader still retrieves every selected page. Its cache
+tracks the scanned upper cursor even when that event is omitted by selection.
+New starts append a tail that the existing reducers interpret; old attempts can
+remain in the cache until reconciliation without affecting the latest-attempt
+result. Realtime mutations, late inserts and reconnections invalidate the cache;
+the five-minute complete refresh also repairs missed changes. A missing new RPC
+falls back to the previous secure page endpoint. Denials and timeouts never fall
+back or publish partial data.
+
+Validation in the isolated local database/API:
+
+- 409 actual SQL selections matched the production activity/performance reducers:
+  36,410 input rows versus 8,315 returned rows across the synthetic cases.
+- Role/revocation matrix passed, with actual HTTP denials for anonymous and
+  unauthorised callers. Empty filters, malformed cursors and numeric/string
+  predicate edge cases passed.
+- Real API/client comparison: 1,345 rows / 375,194 serialized bytes became
+  11 rows / 3,073 bytes, with identical displayed activity and performance.
+- Five alternating sequential reads: full 201/200/207/201/200 ms; compact
+  195/197/198/202/207 ms. This demonstrates a payload reduction, **not a latency
+  improvement**. SQL still examines history and recomputes selection per page;
+  larger-class/concurrent measurements remain necessary.
+- Reader tests cover complete pagination, omitted newest events, empty selection,
+  late inserts, missing-migration fallback and fail-closed errors. Existing
+  invalidation, periodic repair and in-flight race tests also pass.
+
+Release verification: 17/17 critical checks, QA lint, targeted test-script lint,
+standalone typecheck and the full production build (including prebuild audits)
+passed. No visual styles, learning content or progression rules changed.
+
+Reproduce SQL/API checks from the checkout containing the isolated local fixture
+configuration, using the absolute path to `scripts/staging/compact-events-local.mjs`
+with `node --experimental-strip-types`. The runner rejects non-local API settings,
+rolls back SQL fixtures, and removes temporary API functions/events in `finally`.
+No hosted migration has been applied. For rollback, drop the compact endpoint
+before its helper; the app will use the previous secure endpoint. Browser visual
+inspection and 10,000-user capacity have not been established by these checks.
+
 ## Compact event-selection probe — 18 November
 
 Added `scripts/live-class-projection-test.mjs`, a design probe that executes the

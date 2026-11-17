@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { setImmediate } from 'node:timers';
 import { createLiveClassEventReader, fetchLiveClassEvents } from '../lib/live-class-events.ts';
 const a={id:'a',created_at:'2026-01-01T00:00:00Z'}, b={id:'b',created_at:a.created_at}, c={id:'c',created_at:'2026-01-02T00:00:00Z'};
 const ok=data=>({data,error:null});
@@ -104,3 +105,29 @@ finishPage(ok([c]));
 await assert.rejects(()=>pendingRead,/invalidated/,'invalidated delta must not publish only the tail of a cleared snapshot');
 assert.deepEqual((await raceReader.read()).data,[a,b,c]);
 console.log('PASS: stable snapshots avoid recalculation; invalidation races cannot publish partial history.');
+
+const compactOptions = {...options, compact:true};
+const compact = mock([ok([c]),ok([c]),ok([c])],[ok([a,b]),ok([]),ok([a,b]),ok([])]);
+const compactReader = createLiveClassEventReader(compact.client,compactOptions);
+assert.deepEqual((await compactReader.read()).data,[a,b]);
+assert.deepEqual((await compactReader.read()).data,[a,b]);
+assert.equal(compact.calls.filter(c=>c[0]==='rpc' && c[1].startsWith('get_')).length,2,'Omitted head is still scanned; no repeat page download');
+compactReader.inserted(b.created_at);
+assert.deepEqual((await compactReader.read()).data,[a,b],'Backdated inserts reconcile compact snapshots');
+assert.equal(compact.calls.filter(c=>c[0]==='rpc' && c[1].startsWith('get_'))[2][2].p_after_id,null);
+const compactMissing = mock([ok([c])],[{data:null,error:{code:'PGRST202'}},ok([a,b]),ok([c])]);
+assert.deepEqual((await fetchLiveClassEvents(compactMissing.client,compactOptions)).data,[a,b,c]);
+assert.deepEqual(compactMissing.calls.filter(c=>c[0]==='rpc' && c[1].startsWith('get_')).map(c=>c[1]),['get_live_class_compact_event_page_secure','get_live_class_event_page_secure','get_live_class_event_page_secure']);
+for(const code of ['42501','57014','42883','PGRST301']) {
+ const failure=mock([ok([c])],[ok([a]),{data:null,error:{code}}]);
+ const result=await fetchLiveClassEvents(failure.client,compactOptions);
+ assert.equal(result.data,null);
+ assert.equal(result.error.code,code);
+ assert(failure.calls.filter(c=>c[0]==='rpc' && c[1].startsWith('get_')).every(c=>c[1]==='get_live_class_compact_event_page_secure'),'No permission or timeout fallback');
+}
+const compactEmpty = mock([ok([c]),ok([c])],[ok([])]);
+const emptyReader = createLiveClassEventReader(compactEmpty.client,compactOptions);
+assert.deepEqual((await emptyReader.read()).data,[]);
+assert.deepEqual((await emptyReader.read()).data,[]);
+assert.equal(compactEmpty.calls.filter(c=>c[0]==='rpc' && c[1].startsWith('get_')).length,1);
+console.log('PASS: compact selection pagination, omitted head, empty selection, late inserts, missing-migration fallback and fail-closed errors.');
