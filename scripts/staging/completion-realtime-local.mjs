@@ -1,10 +1,18 @@
+/* global performance, fetch, AbortSignal */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import { createClient } from '@supabase/supabase-js';
 import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
-const groups = ['', '-2', '-3', '-4'].map(s => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${s}.json`, 'utf8')));
+const groupCount = Number(process.env.SCALE_GROUP_COUNT ?? 4);
+assert.ok(Number.isInteger(groupCount) && groupCount >= 4 && groupCount <= 20, 'Local completion rehearsal supports 4–20 groups only');
+const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`)
+  .map(s => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${s}.json`, 'utf8')));
+for (const group of groups) assert.equal(group.students.length, 25);
+for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(group => group[key])).size, groupCount);
+const studentCount = groupCount * 25;
+assert.equal(new Set(groups.flatMap(group => group.students.map(student => student.studentId))).size, studentCount);
 const run = crypto.randomUUID();
 let denialChecks = 0;
 const samples = [], clients = [], failures = [], received = new Map(), sent = new Map();
@@ -40,7 +48,7 @@ try {
     assert.equal(auth.error,null);
     await new Promise((resolve,reject) => {
       const timeout = setTimeout(() => reject(new Error('Realtime subscription timeout')),15000);
-      client.channel(`capacity-${run}-${group.classId}`).on('postgres_changes', {event:'INSERT',schema:'public',table:'live_activity_events',filter:`class_id=eq.${group.classId}`}, payload => {
+      client.channel(`live-class-${group.classId}`, { config: { private: true } }).on('postgres_changes', {event:'INSERT',schema:'public',table:'live_activity_events',filter:`class_id=eq.${group.classId}`}, payload => {
         const row = payload.new;
         if (row.payload?.capacity_run !== run) return;
         if (row.class_id !== group.classId || !group.students.some(s => s.studentId === row.student_id)) failures.push('Realtime class scope mismatch');
@@ -51,7 +59,7 @@ try {
       });
     });
   }
-  console.log('Four authenticated teacher subscriptions ready; starting 100 student completion/retry journeys.');
+  console.log(`${groupCount} authenticated teacher subscriptions ready; starting ${studentCount} student completion/retry journeys.`);
   const results = await Promise.allSettled(groups.flatMap(group => group.students.map(async student => {
     const id = student.studentId;
     const login = await rpc('student_login_lookup',{p_class_id:group.classId,p_display_name:student.username,p_pin:student.pin});
@@ -99,7 +107,7 @@ try {
   for (const result of results) if (result.status === 'rejected') failures.push(result.reason.message);
   const deadline = Date.now()+5000;
   while (received.size < sent.size && Date.now()<deadline) await sleep(100);
-  assert.equal(received.size,100,'Every student event must reach the correct teacher');
+  assert.equal(received.size,studentCount,'Every student event must reach the correct teacher');
   for (let i = 0; i < groups.length; i++) {
     const {data,error} = await clients[i].rpc('get_class_realm_progress_compat',{p_class_id:groups[i].classId,p_realm_id:'number',p_working_level:'Year 4'});
     assert.equal(error,null);
@@ -117,8 +125,9 @@ const endpoints = [...new Set(samples.map(s=>s.name))].map(name=>{
   return {name,requests:rows.length,failures:rows.filter(s=>s.status<200||s.status>=400).length,p95Ms:Math.round(times[Math.ceil(times.length*.95)-1]),p99Ms:Math.round(times[Math.ceil(times.length*.99)-1])};
 });
 const lag=[...received].filter(([id])=>sent.has(id)).map(([id,t])=>t-sent.get(id)).sort((a,b)=>a-b);
-const report={at:new Date().toISOString(),environment:'local synthetic completion/retry and realtime burst',students:100,verifiedJourneys:checked,teacherVerifiedStudents:teacherVerified,requests:samples.length,expectedStudentDenials:denialChecks,eventsReceived:received.size,realtimeP95Ms:Math.round(lag[Math.ceil(lag.length*.95)-1]??0),realtimeMaximumMs:Math.round(lag.at(-1)??0),failures,endpoints};
-report.passed=checked===100&&denialChecks===600&&teacherVerified===100&&endpoints.every(e=>e.failures===0&&e.p95Ms<1000&&e.p99Ms<3000)&&failures.length===0&&lag.length===100&&report.realtimeMaximumMs<5000;
-fs.writeFileSync(`${localDir}/completion-realtime-result.json`,JSON.stringify(report,null,2));
+const report={at:new Date().toISOString(),environment:'local synthetic completion/retry and realtime burst',students:studentCount,teachers:groupCount,privateChannels:true,verifiedJourneys:checked,teacherVerifiedStudents:teacherVerified,requests:samples.length,expectedStudentDenials:denialChecks,eventsReceived:received.size,realtimeP95Ms:Math.round(lag[Math.ceil(lag.length*.95)-1]??0),realtimeMaximumMs:Math.round(lag.at(-1)??0),failures,endpoints};
+report.passed=checked===studentCount&&denialChecks===studentCount*6&&teacherVerified===studentCount&&endpoints.every(e=>e.failures===0&&e.p95Ms<1000&&e.p99Ms<3000)&&failures.length===0&&lag.length===studentCount&&report.realtimeMaximumMs<5000;
+const suffix = studentCount === 100 ? '' : `-${studentCount}`;
+fs.writeFileSync(`${localDir}/completion-realtime${suffix}-result.json`,JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 if(!report.passed)process.exitCode=1;

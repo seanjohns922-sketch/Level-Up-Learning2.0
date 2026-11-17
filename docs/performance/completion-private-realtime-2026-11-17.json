@@ -1,0 +1,259 @@
+{
+  "environment": "isolated local Supabase; not production capacity",
+  "configuration": "Class index and prepared private-channel policies temporarily applied, then removed to restore initial local state. Public-channel service setting unchanged.",
+  "runs": [
+    {
+      "label": "100-student",
+      "at": "2026-11-17T00:04:12.439Z",
+      "environment": "local synthetic completion/retry and realtime burst",
+      "students": 100,
+      "teachers": 4,
+      "privateChannels": true,
+      "verifiedJourneys": 100,
+      "teacherVerifiedStudents": 100,
+      "requests": 2200,
+      "expectedStudentDenials": 600,
+      "eventsReceived": 100,
+      "realtimeP95Ms": 578,
+      "realtimeMaximumMs": 831,
+      "failures": [],
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failures": 0,
+          "p95Ms": 915,
+          "p99Ms": 1209
+        },
+        {
+          "name": "get_student_realm_lesson_attempts_secure",
+          "requests": 200,
+          "failures": 0,
+          "p95Ms": 633,
+          "p99Ms": 790
+        },
+        {
+          "name": "get_student_realm_weekly_quiz_attempts_secure",
+          "requests": 200,
+          "failures": 0,
+          "p95Ms": 646,
+          "p99Ms": 858
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failures": 0,
+          "p95Ms": 625,
+          "p99Ms": 844
+        },
+        {
+          "name": "get_student_realm_assessments_secure",
+          "requests": 200,
+          "failures": 0,
+          "p95Ms": 513,
+          "p99Ms": 773
+        },
+        {
+          "name": "complete_realm_assessment",
+          "requests": 400,
+          "failures": 0,
+          "p95Ms": 453,
+          "p99Ms": 723
+        },
+        {
+          "name": "complete_realm_lesson",
+          "requests": 600,
+          "failures": 0,
+          "p95Ms": 399,
+          "p99Ms": 675
+        },
+        {
+          "name": "complete_realm_quiz",
+          "requests": 200,
+          "failures": 0,
+          "p95Ms": 456,
+          "p99Ms": 725
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 100,
+          "failures": 0,
+          "p95Ms": 266,
+          "p99Ms": 357
+        }
+      ],
+      "passed": true
+    },
+    {
+      "label": "500-student",
+      "at": "2026-11-17T00:04:32.689Z",
+      "environment": "local synthetic completion/retry and realtime burst",
+      "students": 500,
+      "teachers": 20,
+      "privateChannels": true,
+      "verifiedJourneys": 500,
+      "teacherVerifiedStudents": 500,
+      "requests": 11000,
+      "expectedStudentDenials": 3000,
+      "eventsReceived": 500,
+      "realtimeP95Ms": 1557,
+      "realtimeMaximumMs": 2590,
+      "failures": [],
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failures": 0,
+          "p95Ms": 2586,
+          "p99Ms": 3373
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2599,
+          "p99Ms": 3010
+        },
+        {
+          "name": "get_student_realm_lesson_attempts_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2526,
+          "p99Ms": 2968
+        },
+        {
+          "name": "get_student_realm_weekly_quiz_attempts_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2478,
+          "p99Ms": 2855
+        },
+        {
+          "name": "get_student_realm_assessments_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2598,
+          "p99Ms": 2996
+        },
+        {
+          "name": "complete_realm_assessment",
+          "requests": 2000,
+          "failures": 0,
+          "p95Ms": 1542,
+          "p99Ms": 1933
+        },
+        {
+          "name": "complete_realm_lesson",
+          "requests": 3000,
+          "failures": 0,
+          "p95Ms": 1427,
+          "p99Ms": 1947
+        },
+        {
+          "name": "complete_realm_quiz",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 1598,
+          "p99Ms": 2136
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 500,
+          "failures": 0,
+          "p95Ms": 1429,
+          "p99Ms": 1533
+        }
+      ],
+      "passed": false
+    },
+    {
+      "label": "500-student-repeat",
+      "at": "2026-11-17T00:05:40.426Z",
+      "environment": "local synthetic completion/retry and realtime burst",
+      "students": 500,
+      "teachers": 20,
+      "privateChannels": true,
+      "verifiedJourneys": 500,
+      "teacherVerifiedStudents": 500,
+      "requests": 11000,
+      "expectedStudentDenials": 3000,
+      "eventsReceived": 500,
+      "realtimeP95Ms": 1483,
+      "realtimeMaximumMs": 2845,
+      "failures": [],
+      "endpoints": [
+        {
+          "name": "student_login_lookup",
+          "requests": 500,
+          "failures": 0,
+          "p95Ms": 2888,
+          "p99Ms": 4202
+        },
+        {
+          "name": "get_student_realm_weekly_quiz_attempts_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2658,
+          "p99Ms": 3851
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2574,
+          "p99Ms": 3886
+        },
+        {
+          "name": "get_student_realm_lesson_attempts_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2527,
+          "p99Ms": 3543
+        },
+        {
+          "name": "get_student_realm_assessments_secure",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 2340,
+          "p99Ms": 3666
+        },
+        {
+          "name": "complete_realm_assessment",
+          "requests": 2000,
+          "failures": 0,
+          "p95Ms": 1868,
+          "p99Ms": 2945
+        },
+        {
+          "name": "complete_realm_lesson",
+          "requests": 3000,
+          "failures": 0,
+          "p95Ms": 2015,
+          "p99Ms": 3309
+        },
+        {
+          "name": "complete_realm_quiz",
+          "requests": 1000,
+          "failures": 0,
+          "p95Ms": 1387,
+          "p99Ms": 2339
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 500,
+          "failures": 0,
+          "p95Ms": 1073,
+          "p99Ms": 1511
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "limitations": [
+    "Number Nexus Year 4 synthetic protocol completions only",
+    "No browser answering/rendering or automatic network reconnect",
+    "No simultaneous six-source dashboard load",
+    "No full private-only containment or negative teacher-channel authorization audit",
+    "No hosted settings verification or 10000-user certification"
+  ]
+}

@@ -41,10 +41,21 @@ and backups. Record counts, owners and retention, without copying child data.
 ## Prepared server changes requiring approval
 
 `supabase/manual/screen-sharing-retirement/prepare.sql` is deliberately outside
-automatic migrations. It has **not been executed in Supabase or production**. Its SQL and row-policy
+automatic migrations. It has **not been applied to hosted Supabase or production by this work**. Its SQL and row-policy
 behaviour passed in a disposable PostgreSQL 17 container with a controlled
 `can_view_class` permission stub, including a deliberately broad legacy policy.
 This does not verify Supabase WebSocket joins, caching or actual school permissions.
+
+17 November local follow-up: the prepared policies were temporarily applied to
+the isolated local Supabase stack. Actual authenticated teachers successfully
+joined private `live-class-<UUID>` topics and received synthetic completion events
+in 100- and 500-student tests. Before policy preparation, private subscription
+failed and the local catalog contained no Realtime policies. Temporary policies
+were removed afterward, restoring the local starting state. This validates the
+positive local join/delivery path only: public-channel settings, cached old
+clients, negative channel roles and hosted configuration were not tested here.
+See `performance/completion-private-realtime-2026-11-17.json`. The full rollout
+and containment acceptance below remains required.
 
 1. Deny `screen-*` private topics with a restrictive policy, even if another
    permissive policy exists.

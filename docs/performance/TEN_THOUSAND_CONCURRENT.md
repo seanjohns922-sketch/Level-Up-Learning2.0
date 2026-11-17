@@ -3,6 +3,59 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Completion retries and private realtime — 17 November
+
+Extended the existing completion runner to accept `SCALE_GROUP_COUNT=4..20`
+(default four), validate distinct fixture identities and use the application's
+private `live-class-<UUID>` topic. This avoids a second save/retry implementation.
+The 100-student output name remains unchanged; larger runs use a count suffix.
+
+An initial private subscription failed before any student writes because the
+isolated local database had no `realtime.messages` policies. Both the existing
+`supabase/manual/screen-sharing-retirement/prepare.sql` policies and class index
+were temporarily applied locally for these runs, then removed and their original
+absence verified. The final runner uses the exact app topic, not the earlier
+test-only public topic. No hosted settings were inspected or changed.
+
+| Scenario | Verified students | Expected access denials | Live event p95 / maximum | Whole latency gate |
+| --- | ---: | ---: | ---: | --- |
+| 100 students / 4 teachers | 100 | 600 | 578 / 831 ms | Pass |
+| 500 students / 20 teachers | 500 | 3,000 | 1,557 / 2,590 ms | Fail |
+| 500-student retake repeat | 500 | 3,000 | 1,483 / 2,845 ms | Fail |
+
+Every student submits pretest, three ordered lessons, weekly quiz and posttest.
+Each completion is sent twice concurrently with the same completion key. Secure
+reads verify exactly three new lesson attempts, one quiz attempt, two assessment
+attempts, preserved lesson scores and exact daily XP deltas. Retakes are saved
+without paying lesson/quiz XP again. Missing-session and cross-student lesson
+writes are denied. Each teacher sees the expected canonical pre/post scores and
+receives every student's explicit completion marker within the five-second gate.
+This checks delivery, not exactly-once WebSocket semantics or the entire Live
+Class refresh workflow. The teacher subscription is established before writes.
+
+The two 500-student runs each completed 11,000 expected student RPC requests with
+zero failed requests or journeys, plus 3,000 separately counted expected denials.
+Teacher setup and final class-progress reads are outside that request count.
+Lesson-save p95 was 1,427 / 2,015 ms; quiz-save p95 1,598 / 1,387 ms; assessment-save
+p95 1,542 / 1,868 ms. Thus correctness passes but the unchanged p95 < 1 second /
+p99 < 3 seconds gate fails. Repeating the same size checks retake correctness;
+it does not authorize advancing to 1,000 students.
+
+Only synthetic attempts, receipts, activity and sessions remain in the isolated
+database. No app code, historical migration or permission rule was rewritten.
+Syntax, targeted QA ESLint, invalid-group guards, completion-reward QA (23/23),
+restored local preflight and the 25-student / 175-request smoke passed. No release
+build was required for diagnostic-only changes. Evidence:
+`completion-private-realtime-2026-11-17.json`; private runners and logs in
+`/Users/seanjohns/reliq-audits/2026-11-17/completion-realtime/`.
+
+Next: verify private-channel prerequisites in the approved hosted rollout and
+exercise reconnect recovery using the current incremental reader/private topic.
+Full containment remains pending as documented in `../SCREEN_SHARING_RETIREMENT.md`.
+The standalone completion scenario still excludes simultaneous six-source
+dashboard load, browser answering/rendering, other realms, long soaks and cloud
+parity. The separate mixed workload's completion exclusion remains accurate.
+
 ## Indexed burst resource profile — 17 November
 
 Two further 500-student / 20-teacher bursts used the class index and original
