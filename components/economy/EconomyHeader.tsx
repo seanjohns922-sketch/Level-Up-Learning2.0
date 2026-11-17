@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { ArrowLeft, Gem, House, Medal, Shirt, ShoppingBag, Sparkles, User, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
@@ -36,6 +37,7 @@ export default function EconomyHeader({ xp, essence = 0, rankLevel = 1 }: { xp?:
           <div className="hidden items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-800 md:flex"><Medal className="h-3.5 w-3.5" />Rank {rankLevel}</div>
           <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800"><Zap className="h-3.5 w-3.5" />{xp == null ? "—" : xp.toLocaleString()} XP</div>
           <div className="hidden items-center gap-1.5 rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-black text-cyan-800 sm:flex"><Sparkles className="h-3.5 w-3.5" />{essence}</div>
+          <FullscreenToggle icon className="h-10 w-10 rounded-md border border-slate-200 text-slate-700 transition hover:bg-slate-50" />
           <button type="button" onClick={() => router.push("/profile")} className="flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Open student profile" title="Student profile">
             <User className="h-4 w-4" aria-hidden="true" />
           </button>

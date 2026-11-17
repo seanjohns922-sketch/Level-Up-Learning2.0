@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import SchoolYearRolloverPanel from "@/components/school/SchoolYearRolloverPanel";
 import SchoolYearsPanel from "@/components/school/SchoolYearsPanel";
@@ -2476,6 +2477,7 @@ export default function SchoolHomeClient({
               {isAdministrator ? "For admin" : "For teachers"}
             </p>
           </div>
+          <FullscreenToggle icon className="h-10 w-10 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:bg-[#222426] hover:text-white lg:hidden" />
           <button
             type="button"
             onClick={() => void signOut()}
@@ -2562,6 +2564,7 @@ export default function SchoolHomeClient({
               <span className="block truncate text-sm font-bold">{actorFullName}</span>
               <span className="block truncate text-xs text-[#8F948C]">{roleLine}</span>
             </span>
+            <FullscreenToggle icon className="h-9 w-9 rounded-lg text-[#C9CCC6] hover:bg-[#222426] hover:text-white" />
             <button
               type="button"
               onClick={() => void signOut()}

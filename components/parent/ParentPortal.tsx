@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import Link from "next/link";
 import { homeAccessCardsHtml } from "@/lib/documents/login-cards";
 import { openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
@@ -262,14 +263,20 @@ export function ParentShell({ children }: { children: ReactNode }) {
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
           <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[var(--reliq-lime)]">Home Access</p><p className="mt-2 font-black">2026 Free Access</p><p className="mt-1 text-xs text-white/60">Access status appears for each child.</p></div>
-          <button type="button" onClick={signOut} className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white"><LogOut className="h-5 w-5" /> Sign out</button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={signOut} className="flex min-h-11 flex-1 items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white"><LogOut className="h-5 w-5" /> Sign out</button>
+            <FullscreenToggle icon className="h-11 w-11 rounded-md text-white/75 hover:bg-white/10 hover:text-white" />
+          </div>
         </div>
       </aside>
       <div className="min-w-0">
         <header className="border-b border-slate-200 bg-white lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
             <Link href="/parent" className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">For parents</span></Link>
-            <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
+            <div className="flex items-center gap-2">
+              <FullscreenToggle icon className="h-10 w-10 rounded-md border border-slate-200 text-slate-700" />
+              <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
+            </div>
           </div>
           <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
             <ParentMobileNav href="/parent" label="Overview" active={pathname === "/parent"} />

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react";
-import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { supabase } from "@/lib/supabase";
 import { createLiveClassEventReader, fetchLiveClassEvents } from "@/lib/live-class-events";
@@ -1382,7 +1381,6 @@ export default function LiveClassPanel({
           >
             <Sparkles className="h-4 w-4" aria-hidden="true" />Spotlight
           </button>
-          <FullscreenToggle inline className="inline-flex items-center gap-1.5 rounded-full bg-[#121314] px-3.5 py-1.5 text-sm font-bold text-white transition hover:bg-black" />
         </div>
 
         {loading ? (

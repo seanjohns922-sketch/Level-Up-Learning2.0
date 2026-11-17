@@ -9,6 +9,7 @@ import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import { DoorOpen, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
@@ -249,6 +250,7 @@ export function WorldHUD({
               <i aria-hidden="true"><b style={{ width: `${(crystals.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></i>
             </button>
           ) : null}
+          <FullscreenToggle icon className="h-9 w-9 rounded-full text-white transition hover:bg-white/10" />
           <button type="button" className="worldHudIcon worldHudAvatar" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
           <WorldVoiceButton text={joinSpeechParts([`Experience points. ${compactXp(xp)}.`, crystals ? `Chrono Crystals. ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}.` : null, "Profile button."])} compact label="Read my points" />
           </div>

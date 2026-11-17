@@ -1,5 +1,6 @@
 "use client";
 
+import { Maximize2, Minimize2 } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
 function isFullscreenActive() {
@@ -18,7 +19,13 @@ function isFullscreenSupported() {
 
 function serverFullscreenSnapshot() { return false; }
 
-export function FullscreenToggle({ inline = false, className }: { inline?: boolean; className?: string } = {}) {
+/**
+ * Full screen on and off. Pages put it in their own top bar (`inline`, or the
+ * compact `icon` look); the floating bottom-right copy in the root layout only
+ * shows on pages that have no top-bar button. Hidden where the browser can't
+ * go full screen (iPhone Safari).
+ */
+export function FullscreenToggle({ inline = false, icon = false, className, style }: { inline?: boolean; icon?: boolean; className?: string; style?: React.CSSProperties } = {}) {
   const isFullscreen = useSyncExternalStore(subscribeFullscreen, isFullscreenActive, serverFullscreenSnapshot);
   const isSupported = useSyncExternalStore(subscribeFullscreen, isFullscreenSupported, serverFullscreenSnapshot);
 
@@ -37,6 +44,16 @@ export function FullscreenToggle({ inline = false, className }: { inline?: boole
   }
 
   if (!isSupported) return null;
+
+  const label = isFullscreen ? "Exit full screen" : "Full screen";
+  if (icon) {
+    return (
+      <button type="button" onClick={toggleFullscreen} data-inline="true" aria-label={label} title={label} style={style}
+        className={`fullscreen-toggle inline-flex items-center justify-center ${className ?? "h-10 w-10 rounded-full border border-white/20 bg-slate-950/70 text-white transition hover:bg-slate-900"}`}>
+        {isFullscreen ? <Minimize2 size={17} aria-hidden="true" /> : <Maximize2 size={17} aria-hidden="true" />}
+      </button>
+    );
+  }
 
   return (
     <button

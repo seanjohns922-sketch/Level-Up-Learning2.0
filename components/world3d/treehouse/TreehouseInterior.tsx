@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { buildGemCave, buildHallOfLegends, buildMainRoom, type TreehouseRoom } from "@/components/world3d/treehouse/treehouseRooms";
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, unequipEconomySlot, type EconomyItem, type EconomyState } from "@/lib/economy";
@@ -185,9 +186,12 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
           <h1 className="font-[Montserrat] text-sm font-black uppercase tracking-wide">{info.name}</h1>
           <WorldVoiceButton text={info.speech} compact label={`Read ${info.name}`} />
         </div>
-        <a href={treehouseExitHref(preview)} className="pointer-events-auto flex items-center gap-2 rounded-2xl border border-white/15 bg-black/50 px-4 py-2 text-sm font-extrabold backdrop-blur-md hover:bg-black/65">
-          <ArrowLeft size={16} aria-hidden="true" />Back outside
-        </a>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <FullscreenToggle icon className="h-10 w-10 rounded-2xl border border-white/15 bg-black/50 text-white backdrop-blur-md hover:bg-black/65" />
+          <a href={treehouseExitHref(preview)} className="flex items-center gap-2 rounded-2xl border border-white/15 bg-black/50 px-4 py-2 text-sm font-extrabold backdrop-blur-md hover:bg-black/65">
+            <ArrowLeft size={16} aria-hidden="true" />Back outside
+          </a>
+        </div>
       </div>
 
       {message ? <p role="status" className="absolute left-1/2 top-20 -translate-x-1/2 rounded-xl bg-black/70 px-4 py-2 text-sm font-bold">{message}</p> : null}

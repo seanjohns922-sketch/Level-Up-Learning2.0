@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
 import type { CSSProperties, ReactNode } from "react";
@@ -106,6 +107,7 @@ export default function RealmTopNavigation({
         background={realmChipBackground}
         border={`1px solid ${realmChipBorder}`}
       />
+      <FullscreenToggle icon className="h-[34px] w-[34px] shrink-0 rounded-full transition hover:brightness-110" style={{ background: realmChipBackground, border: `1px solid ${realmChipBorder}`, color: accent }} />
       <button
         type="button"
         onClick={onProfile}

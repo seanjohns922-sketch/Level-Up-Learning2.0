@@ -883,6 +883,11 @@ html:fullscreen .measurelands-month-grid {
   }
 }
 
+/* Pages with a Full Screen button in their own top bar hide the floating bottom-right copy. */
+body:has(.fullscreen-toggle[data-inline="true"]) .fullscreen-toggle:not([data-inline="true"]) {
+  display: none;
+}
+
 /* Assessment headers and the teacher dashboard (Live Class toolbar) own this control so it cannot cover their content. */
 body:has(.assessment-shell) .fullscreen-toggle:not([data-inline="true"]),
 body:has([data-teacher-dashboard]) .fullscreen-toggle:not([data-inline="true"]) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import layout from "./Number7LessonLayout.module.css";
@@ -94,6 +95,7 @@ export function RealmActiveLessonShell({
         <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accentSoft }}>
           <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
           {isCoreHunt ? `Hunt for the ${theme.realmName} Core · Level ${levelNumber}` : theme.realmName}{demoMode && !isCoreHunt ? " · Demo Mode" : ""}
+          <FullscreenToggle icon className="h-11 w-11 rounded-lg border transition hover:bg-white/10" style={{ borderColor: theme.panelBorder, color: theme.accentSoft }} />
         </div>
       </header>
 

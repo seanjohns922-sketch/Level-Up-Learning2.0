@@ -1,5 +1,6 @@
 "use client";
 
+import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
@@ -1144,6 +1145,7 @@ export default function TeacherDashboardPage() {
               )}
             </div>
 
+            <FullscreenToggle icon className="h-9 w-9 rounded-lg text-[#8F948C] transition hover:bg-[#222426] hover:text-white" />
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
