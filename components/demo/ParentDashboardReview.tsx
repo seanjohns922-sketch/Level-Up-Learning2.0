@@ -8,6 +8,7 @@ import {
   FIXTURE_PARENT_CHILDREN,
   FIXTURE_PARENT_NAME,
   FIXTURE_PARENT_REPORTS,
+  FIXTURE_PARENT_SKIPS,
 } from "@/components/demo/parent-dashboard-fixture";
 
 /**
@@ -42,13 +43,14 @@ export default function ParentDashboardReview() {
         </div>
       </header>
 
-      <ParentShell>
+      <ParentShell preview>
         <ParentHome
           preview={{
             parentName: FIXTURE_PARENT_NAME,
             children: FIXTURE_PARENT_CHILDREN,
             activity: FIXTURE_PARENT_ACTIVITY,
             reports: FIXTURE_PARENT_REPORTS,
+            skips: FIXTURE_PARENT_SKIPS,
           }}
         />
       </ParentShell>

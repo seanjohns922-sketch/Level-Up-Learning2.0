@@ -15,7 +15,17 @@ const schoolRecentActivity = read("supabase/migrations/20260817100000_platform_a
 const schoolActiveTodayDrilldown = read("supabase/migrations/20260910150000_platform_admin_active_today_drilldown.sql");
 const schoolDetailUi = read("app/admin/schools/[schoolId]/page.tsx");
 const safetyTests = read("supabase/tests/platform_admin_pa4_safety.sql");
-const parent = read("components/parent/ParentPortal.tsx");
+// The parent surface is the portal plus the overview, skip dialog and the
+// parent data helpers it renders from.
+const parent = [
+  "components/parent/ParentPortal.tsx",
+  "components/parent/ParentChildOverview.tsx",
+  "components/parent/SkipWeekDialog.tsx",
+  "lib/parent-curriculum.ts",
+  "lib/parent-realm-status.ts",
+  "lib/parent-week-skips.ts",
+].map(read).join("\n");
+const parentOverview = read("components/parent/ParentChildOverview.tsx");
 const parentRewardsRoute = read("app/parent/rewards/page.tsx");
 const login = read("app/login/page.tsx");
 const schoolApi = read("app/api/school/[schoolId]/command/route.ts");
@@ -104,28 +114,24 @@ check("parent detail has compact metrics", parent.includes("sm:grid-cols-3"));
 check("parent snapshot returns canonical Gem identity", has(parentGemArtwork, "'gemId', definition.id", "student_gems", "gem_definitions"));
 check("parent achievements use canonical Gem artwork", has(parent, "GemIcon", "cutForGem(item.gemId, item.rarity)"));
 check("parent weekly journey includes saved activity weeks", has(parentWeeklyJourney, "student_lesson_attempts lesson", "student_weekly_quiz_attempts quiz", "union all"));
-check("parent weekly journey uses canonical curriculum labels", has(parent, "curriculumWeek", "planned?.title", "plan?.title"));
-check("parent realm detail lists the complete canonical level", has(parent, "curriculumWeeks", "allWeeks", '"Not started"'));
+check("parent weekly journey uses canonical curriculum labels", has(parent, "parentCurriculumWeek(realmId, workingLevel, week.week)", "planned.title", "plan?.title"));
+check("parent realm detail lists the complete canonical level", has(parent, "parentCurriculumWeeks(realmId, current.workingLevel)", "allWeeks", '"coming-up"'));
 check("parent realm detail removes required pathway metric", !parent.includes('<SummaryMetric label="Required pathway"'));
 check("parent assessments include the working level", parent.includes("{levelLabel} {assessmentName(item.type)}"));
 check("parent realm progress counts unique completed lessons", has(parentRealmProgress, "'completedLessons'", "select distinct attempt.week, attempt.lesson", "attempt.completed=true"));
-check("parent realm percentage uses complete level lessons", has(parent, "completedLessons / totalLessons", "of {totalLessons} lessons completed"));
+check("parent realm percentage uses complete level lessons", has(parent, "realm.completedLessons / realm.totalLessons", "parentCurriculumLessonCount(realmId, workingLevel)"));
 check("parent overview removes pathway metric", !parent.includes('<HeroMetric label="Pathway"'));
 check("parent collection returns every active earned Gem", has(parentUnlockedCollection, "'gems'", "student_gems gem", "definition.is_active"));
 check("parent collection returns canonical Legend unlock ids", has(parentUnlockedCollection, "'unlockedLegends'", "progress.unlocked_legends"));
 check("parent collection uses the Hall of Legends rules", has(parent, "getEffectiveUnlockedLegendIds", "normalizeLegendRealmId"));
 check("parent collection renders real card fronts without cropping", has(parent, "LegendCardArtwork", "legend.images.cardFront", "object-contain") || has(read("components/legends/LegendCardArtwork.tsx"), "object-contain"));
 check("parent collection remains read-only", !parent.match(/buy|purchase|checkout|order card/i));
-check("parent rewards use a dedicated navigation tab", has(parent, 'href="/parent/rewards"', 'label="Rewards"') && parentRewardsRoute.includes("ParentRewards"));
-const parentOverviewBody = parent.slice(
-  parent.indexOf("function SelectedChildDashboard"),
-  parent.indexOf("export function ParentRewards"),
-);
-check("parent overview does not render the full collection", !parentOverviewBody.includes("<UnlockedCollection"));
+check("parent rewards use a dedicated navigation tab", has(parent, 'href: "/parent/rewards", label: "Rewards"') && parentRewardsRoute.includes("ParentRewards"));
+check("parent overview does not render the full collection", !parentOverview.includes("<UnlockedCollection"));
 // The parent shell uses the RELIQ adult brand (Carbon, White, Lime), never a
 // realm theme; teacher and school screens share the same scoped theme.
 check("parent shell uses the RELIQ adult brand theme", has(parent, "reliq-adult", "ReliqAdultLogo", "bg-[#121314]", "bg-[var(--reliq-lime)]"));
-check("parent green is reserved for positive status", has(parent, "Active — Free Access", "border-emerald-200 bg-emerald-50", "text-emerald-900"));
+check("parent green is reserved for positive status", has(parentOverview, "Active — Free Access", "bg-[var(--reliq-lime)]", "border-amber-200 bg-amber-50"));
 check("parent signup captures a full name", has(login, "parentFirstName", "parentLastName", "first_name: firstName", "display_name: `${firstName} ${lastName}`"));
 
 // Curriculum progress and assessment reporting.

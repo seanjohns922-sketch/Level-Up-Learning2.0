@@ -9,25 +9,21 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
-  BookOpen,
   ChevronDown,
-  ChevronRight,
   Copy,
   Gem,
-  Home,
   KeyRound,
   LayoutDashboard,
   LogOut,
+  Menu,
   Plus,
   Printer,
   RotateCcw,
-  School,
-  Settings,
   ShieldCheck,
-  Target,
   Trophy,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import { stoneForGem } from "@/lib/gem-stones";
@@ -38,18 +34,18 @@ import {
   normalizeLegendRealmId,
   type Legend,
 } from "@/data/legends";
-import { getCurriculumPlan } from "@/data/programs/genres";
-import { getStarpathProgram } from "@/data/starpath/program-registry";
 import type { GemRarity } from "@/lib/gems";
-import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
-import { formatStudentLevelLabel, normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
+import { normalizeWorkingLevelLabel } from "@/lib/studentLevelLabel";
 import { supabase } from "@/lib/supabase";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
-import ParentActivityCard from "@/components/parent/ParentActivityCard";
-import ParentReportButton from "@/components/parent/ParentReportButton";
-import ParentGrowthCard from "@/components/parent/ParentGrowthCard";
+import ParentChildOverview from "@/components/parent/ParentChildOverview";
+import SkipWeekDialog, { type SkipWeekRequest } from "@/components/parent/SkipWeekDialog";
+import { ASSESSMENT_THRESHOLDS, weeklyQuizPassed } from "@/lib/assessment-rules";
+import { parentCurriculumWeek, parentCurriculumWeeks, parentLevelLabel } from "@/lib/parent-curriculum";
+import { realmSkipState, type ParentWeekSkips } from "@/lib/parent-realm-status";
+import { fetchParentWeekSkips } from "@/lib/parent-week-skips";
 import { getLiveRealmDefinitions } from "@/lib/realms/realm-registry";
-import { realmEntryLevel, realmFloorLevel } from "@/lib/realm-unlock";
+import { realmEntryLevel } from "@/lib/realm-unlock";
 import {
   formatFeedTime,
   parentRealmName,
@@ -170,59 +166,11 @@ function realmName(realmId: string) {
   return parentRealmName(realmId);
 }
 
-function curriculumWeek(realmId: string, workingLevel: string, weekNumber: number) {
-  if (realmId === "space" || realmId === "starpath") {
-    const level = tryNormalizeStarpathLevel(workingLevel);
-    const week = level ? getStarpathProgram(level).weeks.find((item) => item.week === weekNumber) : null;
-    return week ? {
-      title: week.title,
-      lessons: week.lessons.map((lesson, index) => ({ lesson: index + 1, title: lesson.title, focus: lesson.focus })),
-    } : null;
-  }
-
-  const yearLabel = normalizeWorkingLevelLabel(workingLevel) ?? workingLevel;
-  const canonicalGenreId = realmId === "pattern" ? "algebra" : realmId;
-  const genreId = canonicalGenreId === "chance" || canonicalGenreId === "chance-hollow"
-    ? "probability"
-    : canonicalGenreId;
-  const week = getCurriculumPlan(yearLabel, genreId).find((item) => item.week === weekNumber);
-  return week ? {
-    title: week.topic,
-    lessons: week.lessons.map((lesson) => ({ lesson: lesson.lesson, title: lesson.title, focus: lesson.focus })),
-  } : null;
-}
-
-function curriculumWeeks(realmId: string, workingLevel: string) {
-  if (realmId === "space" || realmId === "starpath") {
-    const level = tryNormalizeStarpathLevel(workingLevel);
-    return level ? getStarpathProgram(level).weeks.map((week) => ({
-      week: week.week,
-      title: week.title,
-      lessons: week.lessons.map((lesson, index) => ({ lesson: index + 1, title: lesson.title, focus: lesson.focus })),
-    })) : [];
-  }
-
-  const yearLabel = normalizeWorkingLevelLabel(workingLevel) ?? workingLevel;
-  return getCurriculumPlan(yearLabel, realmId).map((week) => ({
-    week: week.week,
-    title: week.topic,
-    lessons: week.lessons.map((lesson) => ({ lesson: lesson.lesson, title: lesson.title, focus: lesson.focus })),
-  }));
-}
-
-function displayLevel(workingLevel: string) {
-  return formatStudentLevelLabel(normalizeWorkingLevelLabel(workingLevel) ?? workingLevel);
-}
-
-function formatLastActive(value: string | null) {
-  if (!value) return "Learning has not started yet";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Activity recorded";
-  return `Last active ${new Intl.DateTimeFormat("en-AU", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date)}`;
+/** "Learned 2 hours ago" on a child's button; quiet children read amber after a week. */
+function lastLearnedLabel(value: string | null) {
+  if (!value) return { text: "Not started yet", quiet: true };
+  const days = (Date.now() - Date.parse(value)) / 86_400_000;
+  return { text: `Learned ${formatFeedTime(value).replace(/^Yesterday$/, "yesterday").replace(/^Just now$/, "just now")}`, quiet: days > 7 };
 }
 
 function assessmentName(type: string) {
@@ -238,9 +186,24 @@ function formatAchievementDate(value: string) {
   return new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "short" }).format(date);
 }
 
-export function ParentShell({ children }: { children: ReactNode }) {
+const PARENT_NAV = [
+  { href: "/parent", label: "Overview", icon: LayoutDashboard, isActive: (path: string) => path === "/parent" },
+  { href: "/parent/children", label: "My children", icon: Users, isActive: (path: string) => path.startsWith("/parent/children") },
+  { href: "/parent/rewards", label: "Rewards", icon: Trophy, isActive: (path: string) => path === "/parent/rewards" },
+  { href: "/parent/add-child", label: "Add a child", icon: Plus, isActive: (path: string) => path === "/parent/add-child" },
+  { href: "/parent/link-child", label: "Link a child", icon: UserPlus, isActive: (path: string) => path === "/parent/link-child" },
+] as const;
+
+/**
+ * The parent frame: Carbon sidebar on desktop, a menu button on phones. In the
+ * Demo Review preview the menu is shown but goes nowhere, because the other
+ * parent pages need a real parent login.
+ */
+export function ParentShell({ children, preview = false }: { children: ReactNode; preview?: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const activePath = preview ? "/parent" : pathname;
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -250,55 +213,57 @@ export function ParentShell({ children }: { children: ReactNode }) {
   return (
     <div className="reliq-adult min-h-screen text-slate-950 lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
       <aside className="hidden flex-col bg-[#121314] px-4 py-7 text-white lg:sticky lg:top-0 lg:flex lg:h-screen">
-        <Link href="/parent" className="block px-2" aria-label="Parent Home">
+        <Link href={preview ? "#" : "/parent"} className="block px-2" aria-label="Parent Home">
           <ReliqAdultLogo className="w-[118px]" />
           <span className="mt-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-[#8F948C]">For parents</span>
         </Link>
         <nav className="mt-9 space-y-1" aria-label="Parent navigation">
-          <ParentNavLink href="/parent" active={pathname === "/parent"} icon={<LayoutDashboard className="h-5 w-5" />} label="Overview" />
-          <ParentNavLink href="/parent/children" active={pathname.startsWith("/parent/children")} icon={<Users className="h-5 w-5" />} label="My children" />
-          <ParentNavLink href="/parent/rewards" active={pathname === "/parent/rewards"} icon={<Trophy className="h-5 w-5" />} label="Rewards" />
-          <ParentNavLink href="/parent/add-child" active={pathname === "/parent/add-child"} icon={<Plus className="h-5 w-5" />} label="Add a child" />
-          <ParentNavLink href="/parent/link-child" active={pathname === "/parent/link-child"} icon={<UserPlus className="h-5 w-5" />} label="Link a child" />
+          {PARENT_NAV.map((item) => <ParentNavLink key={item.href} item={item} active={item.isActive(activePath)} preview={preview} />)}
         </nav>
-        <div className="mt-auto border-t border-white/10 pt-5">
-          <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.04] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[var(--reliq-lime)]">Home Access</p><p className="mt-2 font-black">2026 Free Access</p><p className="mt-1 text-xs text-white/60">Access status appears for each child.</p></div>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={signOut} className="flex min-h-11 flex-1 items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white"><LogOut className="h-5 w-5" /> Sign out</button>
-            <FullscreenToggle icon className="h-11 w-11 rounded-md text-white/75 hover:bg-white/10 hover:text-white" />
-          </div>
+        <div className="mt-auto flex items-center gap-2 border-t border-white/10 pt-5">
+          <button type="button" onClick={signOut} disabled={preview} className="flex min-h-11 flex-1 items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-60"><LogOut className="h-5 w-5" /> Sign out</button>
+          <FullscreenToggle icon className="h-11 w-11 rounded-md text-white/75 hover:bg-white/10 hover:text-white" />
         </div>
       </aside>
       <div className="min-w-0">
         <header className="border-b border-slate-200 bg-white lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
-            <Link href="/parent" className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">For parents</span></Link>
+            <Link href={preview ? "#" : "/parent"} className="flex items-center gap-3" aria-label="Parent Home"><ReliqAdultLogo variant="onLight" className="w-[92px]" /><span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">For parents</span></Link>
             <div className="flex items-center gap-2">
-              <FullscreenToggle icon className="h-10 w-10 rounded-md border border-slate-200 text-slate-700" />
-              <button type="button" onClick={signOut} className="grid h-10 w-10 place-items-center rounded-md border border-slate-200" aria-label="Sign out"><LogOut className="h-5 w-5" /></button>
+              <FullscreenToggle icon className="h-11 w-11 rounded-md border border-slate-200 text-slate-700" />
+              <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="parent-mobile-menu" aria-label={menuOpen ? "Close menu" : "Open menu"} className="grid h-11 w-11 place-items-center rounded-md border border-slate-200">
+                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
             </div>
           </div>
-          <nav className="flex gap-1 overflow-x-auto border-t border-slate-100 px-3 py-2" aria-label="Parent navigation">
-            <ParentMobileNav href="/parent" label="Overview" active={pathname === "/parent"} />
-            <ParentMobileNav href="/parent/children" label="Children" active={pathname.startsWith("/parent/children")} />
-            <ParentMobileNav href="/parent/rewards" label="Rewards" active={pathname === "/parent/rewards"} />
-            <ParentMobileNav href="/parent/add-child" label="Add child" active={pathname === "/parent/add-child"} />
-            <ParentMobileNav href="/parent/link-child" label="Link child" active={pathname === "/parent/link-child"} />
-          </nav>
+          {menuOpen ? (
+            <nav id="parent-mobile-menu" className="grid gap-1 border-t border-slate-100 px-3 py-3" aria-label="Parent navigation">
+              {PARENT_NAV.map((item) => <ParentMobileNav key={item.href} item={item} active={item.isActive(activePath)} preview={preview} onNavigate={() => setMenuOpen(false)} />)}
+              <button type="button" onClick={signOut} disabled={preview} className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-left font-bold text-slate-700 disabled:opacity-60"><LogOut className="h-5 w-5" /> Sign out</button>
+            </nav>
+          ) : null}
         </header>
-        {pathname !== "/parent" && pathname !== "/parent/children" && pathname !== "/parent/rewards" ? <div className="mx-auto max-w-[1320px] px-4 pt-4 sm:px-6"><Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700"><ArrowLeft className="h-4 w-4" /> Parent Home</Link></div> : null}
+        {!preview && pathname !== "/parent" && pathname !== "/parent/children" && pathname !== "/parent/rewards" ? <div className="mx-auto max-w-[1320px] px-4 pt-4 sm:px-6"><Link href="/parent" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#3F7A00]"><ArrowLeft className="h-4 w-4" /> Parent Home</Link></div> : null}
         <main className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>
       </div>
     </div>
   );
 }
 
-function ParentNavLink({ href, active, icon, label }: { href: string; active: boolean; icon: ReactNode; label: string }) {
-  return <Link href={href} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-lg px-3 font-semibold transition ${active ? "bg-[var(--reliq-lime)] text-[#121314]" : "text-[#C9CCC6] hover:bg-[#222426] hover:text-white"}`}>{icon}{label}</Link>;
+type ParentNavItem = (typeof PARENT_NAV)[number];
+
+function ParentNavLink({ item, active, preview }: { item: ParentNavItem; active: boolean; preview: boolean }) {
+  const Icon = item.icon;
+  const className = `flex min-h-11 items-center gap-3 rounded-lg px-3 font-semibold transition ${active ? "bg-[var(--reliq-lime)] text-[#121314]" : "text-[#C9CCC6] hover:bg-[#222426] hover:text-white"}`;
+  if (preview) return <span aria-current={active ? "page" : undefined} title={active ? undefined : "Not available in the preview"} className={className}><Icon className="h-5 w-5" />{item.label}</span>;
+  return <Link href={item.href} aria-current={active ? "page" : undefined} className={className}><Icon className="h-5 w-5" />{item.label}</Link>;
 }
 
-function ParentMobileNav({ href, label, active }: { href: string; label: string; active: boolean }) {
-  return <Link href={href} className={`shrink-0 rounded-md px-3 py-2 text-sm font-bold ${active ? "bg-blue-100 text-blue-900" : "text-slate-600"}`}>{label}</Link>;
+function ParentMobileNav({ item, active, preview, onNavigate }: { item: ParentNavItem; active: boolean; preview: boolean; onNavigate: () => void }) {
+  const Icon = item.icon;
+  const className = `flex min-h-11 items-center gap-3 rounded-lg px-3 font-bold ${active ? "bg-[var(--reliq-lime)] text-[#121314]" : "text-slate-700 hover:bg-slate-50"}`;
+  if (preview) return <span aria-current={active ? "page" : undefined} className={className}><Icon className="h-5 w-5" />{item.label}</span>;
+  return <Link href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} className={className}><Icon className="h-5 w-5" />{item.label}</Link>;
 }
 
 /**
@@ -311,6 +276,7 @@ export type ParentPreviewData = {
   children: ParentChild[];
   activity?: Record<string, ParentActivity>;
   reports?: Record<string, ParentProgressReport>;
+  skips?: Record<string, ParentWeekSkips>;
 };
 
 /** The parent gate's reasons, in words a parent can act on (see assert_parent_role). */
@@ -375,18 +341,11 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
         </div>
         {!selectedStudentId ? (
           <div className="flex flex-wrap items-start gap-2">
-            <details className="relative">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 font-bold text-slate-800 hover:border-slate-900 [&::-webkit-details-marker]:hidden">
-                More <ChevronDown className="h-4 w-4" />
-              </summary>
-              <div className="absolute right-0 z-20 mt-2 grid w-64 gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
-                <Link href="/parent/link-child" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 font-bold text-slate-800 hover:bg-slate-50">
-                  <UserPlus className="h-5 w-5" /> Link existing child
-                </Link>
-                {children.length ? <PrintAllHomeAccessCardsButton students={children} /> : null}
-              </div>
-            </details>
-            <Link href="/parent/add-child" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--reliq-lime)] px-4 font-bold text-[#121314] hover:bg-[var(--reliq-lime-hover)]">
+            {children.length && !preview ? <PrintAllHomeAccessCardsButton students={children} /> : null}
+            <Link href={preview ? "#" : "/parent/link-child"} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 font-bold text-slate-800 hover:border-slate-900">
+              <UserPlus className="h-5 w-5" /> Link a child
+            </Link>
+            <Link href={preview ? "#" : "/parent/add-child"} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--reliq-lime)] px-4 font-bold text-[#121314] hover:bg-[var(--reliq-lime-hover)]">
               <Plus className="h-5 w-5" /> Add child
             </Link>
           </div>
@@ -405,82 +364,37 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
         </section>
       ) : (
         <>
-          {!selectedStudentId ? <section><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-black">Your children</h2><span className="text-sm font-semibold text-slate-500">{children.length} linked</span></div><div className="flex gap-3 overflow-x-auto pb-2">{children.map((child) => <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} aria-pressed={activeChild?.studentId === child.studentId} className={`flex min-w-[230px] items-center gap-3 rounded-xl border bg-white p-3 text-left transition ${activeChild?.studentId === child.studentId ? "border-[#121314] ring-1 ring-[#121314]" : "border-slate-200 hover:border-slate-400"}`}><span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-lg font-black text-[#121314] ${activeChild?.studentId === child.studentId ? "bg-[var(--reliq-lime)]" : "bg-slate-100"}`}>{child.firstName.slice(0, 1).toUpperCase()}</span><span className="min-w-0 flex-1"><span className="block truncate font-black">{child.displayName}</span><span className="block truncate text-xs text-slate-500">{child.yearLevel ?? "Year not set"} · {child.schoolName ?? "Home learner"}</span></span><ChevronRight className="h-4 w-4 text-slate-400" /></button>)}</div></section> : null}
+          {!selectedStudentId && children.length > 1 ? (
+            <section aria-label="Choose a child" className="flex gap-3 overflow-x-auto pb-1">
+              {children.map((child) => {
+                const selected = activeChild?.studentId === child.studentId;
+                const learned = lastLearnedLabel(child.lastActiveAt);
+                return (
+                  <button type="button" key={child.studentId} onClick={() => setActiveStudentId(child.studentId)} aria-pressed={selected} className={`flex min-w-[220px] items-center gap-3 rounded-xl border bg-white p-3 text-left transition ${selected ? "border-[#121314] ring-1 ring-[#121314]" : "border-slate-200 hover:border-slate-400"}`}>
+                    <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full font-display text-lg font-black text-[#121314] ${selected ? "bg-[var(--reliq-lime)]" : "bg-slate-100"}`}>{child.firstName.slice(0, 1).toUpperCase()}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-black">{child.displayName}</span>
+                      <span className={`block truncate text-sm ${learned.quiet ? "font-semibold text-amber-700" : "text-slate-600"}`}>{learned.text}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </section>
+          ) : null}
           {activeChild ? (
-            <SelectedChildDashboard
+            <ParentChildOverview
+              key={activeChild.studentId}
               child={activeChild}
-              onActivated={load}
-              previewActivity={preview?.activity?.[activeChild.studentId]}
-              previewReport={preview?.reports?.[activeChild.studentId]}
+              onChanged={load}
+              preview={preview ? {
+                activity: preview.activity?.[activeChild.studentId],
+                report: preview.reports?.[activeChild.studentId],
+                skips: preview.skips?.[activeChild.studentId],
+              } : undefined}
             />
           ) : null}
         </>
       )}
-    </div>
-  );
-}
-
-function SelectedChildDashboard({
-  child,
-  onActivated,
-  previewActivity,
-  previewReport,
-}: {
-  child: ParentChild;
-  onActivated: () => Promise<void>;
-  previewActivity?: ParentActivity;
-  previewReport?: ParentProgressReport;
-}) {
-  const [activating, setActivating] = useState(false);
-  const [activationError, setActivationError] = useState<string | null>(null);
-
-  async function activate() {
-    setActivating(true);
-    setActivationError(null);
-    const { error } = await supabase.rpc("activate_free_home_access", { p_student_id: child.studentId });
-    if (error) setActivationError("Home Access could not be activated. Please try again.");
-    else await onActivated();
-    setActivating(false);
-  }
-
-  const focusRealm = child.realms.find((realm) => realm.currentFocus) ?? child.realms[0] ?? null;
-  const focusWeek = focusRealm?.currentWeek ? curriculumWeek(focusRealm.realmId, focusRealm.workingLevel, focusRealm.currentWeek) : null;
-  const currentFocus = focusWeek?.title ?? focusRealm?.currentFocus ?? null;
-  const completedLessons = child.realms.reduce((total, realm) => total + (realm.completedLessons ?? 0), 0);
-  const heroPalette = parentRealmPalette(focusRealm?.realmId ?? "number");
-
-  return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.8fr)]">
-        <div className="min-w-0 space-y-5">
-        <section className="relative min-h-[240px] overflow-hidden rounded-2xl border border-slate-200 text-white shadow-md" style={{ backgroundColor: "#121314" }}><div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: `url('${heroPalette.image}')` }} /><div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(100deg, #121314 0%, #121314f5 48%, #12131480 100%)" }} /><div className="relative flex h-full min-h-[240px] flex-col justify-between p-6 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--reliq-lime)]">Child overview</p><h2 className="mt-2 text-3xl font-black sm:text-4xl">{child.displayName}</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/70"><School className="h-4 w-4" /> {child.yearLevel ?? "Year level not set"} · {child.schoolName ?? "Home learner"}</p></div><span className={`rounded-md px-3 py-1.5 text-xs font-black ${child.homeAccess ? "bg-[var(--reliq-lime)] text-[#121314]" : "bg-white/15 text-white"}`}>{child.homeAccess ? "Active — Free Access" : "Home Access inactive"}</span></div><div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4"><HeroMetric label="Realms" value={String(child.realms.length)} /><HeroMetric label="Current week" value={focusRealm?.currentWeek ? `Week ${focusRealm.currentWeek}` : "Not started"} /><HeroMetric label="Lessons completed" value={String(completedLessons)} /><HeroMetric label="Last learned" value={child.lastActiveAt ? formatFeedTime(child.lastActiveAt) : "Not started"} /></div></div></section>
-
-        <ParentActivityCard studentId={child.studentId} previewActivity={previewActivity} />
-
-        <section>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Learning journey</p>
-              <h3 className="mt-1 text-xl font-black">Progress by realm</h3>
-            </div>
-            <ParentReportButton studentId={child.studentId} previewReport={previewReport} previewActivity={previewActivity} />
-          </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {child.realms.length
-              ? child.realms.map((realm) => <RealmProgressCard key={realm.realmId} studentId={child.studentId} realm={realm} />)
-              : <p className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600 shadow-sm">Learning hasn’t started yet.</p>}
-          </div>
-        </section>
-        </div>
-
-        <div className="min-w-0 space-y-5">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-lg bg-[var(--reliq-lime)] text-[#121314]"><Target className="h-5 w-5" /></span><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">This week&apos;s focus</p><h3 className="font-black">{focusRealm ? realmName(focusRealm.realmId) : "Journey not started"}</h3></div></div><p className="mt-4 text-lg font-black leading-snug">{currentFocus ?? (focusRealm ? `${child.firstName}'s first week starts after the ${realmName(focusRealm.realmId)} pre-test.` : "A learning focus will appear when the weekly journey begins.")}</p>{focusRealm ? <><p className="mt-2 text-sm text-slate-500">{focusRealm.workingLevel}{focusRealm.currentWeek ? ` · Week ${focusRealm.currentWeek}` : ""}</p><Link href={`/parent/children/${child.studentId}/realm/${focusRealm.realmId}`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700">View realm progress <ChevronRight className="h-4 w-4" /></Link></> : null}</section>
-
-        <ParentGrowthCard studentId={child.studentId} previewReport={previewReport} />
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><h3 className="flex items-center gap-2 text-lg font-black"><Gem className="h-5 w-5 text-violet-600" /> Recent achievements</h3><Link href="/parent/rewards" className="shrink-0 text-sm font-bold text-violet-700">View all</Link></div><div className="mt-4 divide-y divide-slate-100">{child.recentAchievements.length ? child.recentAchievements.map((item) => <div key={`${item.gemId ?? item.name}-${item.earnedAt}`} className="flex items-center gap-3 py-3"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-slate-50">{item.gemId && isGemRarity(item.rarity) ? <GemIcon rarity={item.rarity} cut={cutForGem(item.gemId, item.rarity)} stone={stoneForGem({ name: item.name })} size={42} /> : <Gem className="h-5 w-5 text-violet-600" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-bold">{item.name}</span><span className="text-xs capitalize text-slate-500">{item.rarity}</span></span><span className="text-xs font-semibold text-slate-400">{formatAchievementDate(item.earnedAt)}</span></div>) : <p className="py-3 text-sm text-slate-500">No recent achievements yet.</p>}</div></section>
-
-        <section className={`rounded-lg border p-5 shadow-sm ${child.homeAccess ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Home access</p><h3 className="mt-1 text-lg font-black">{child.homeAccess ? "Active — Free Access" : "Not active"}</h3></div><Home className={`h-5 w-5 ${child.homeAccess ? "text-emerald-700" : "text-amber-700"}`} /></div>{!child.homeAccess ? <><p className="mt-2 text-sm text-amber-900">Activate free Home access for the 2026 rollout.</p><button type="button" disabled={activating} onClick={activate} className="mt-3 min-h-11 rounded-md bg-blue-600 px-4 font-bold text-white disabled:opacity-50">{activating ? "Activating…" : "Activate Home access"}</button>{activationError ? <p className="mt-2 text-sm font-bold text-red-700">{activationError}</p> : null}</> : <p className="mt-2 text-sm text-emerald-900">Learning access is available outside school as part of the 2026 rollout.</p>}<Link href={`/parent/children/${child.studentId}/settings`} className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700"><Settings className="h-4 w-4" /> Login &amp; placement</Link></section>
-        </div>
     </div>
   );
 }
@@ -598,77 +512,6 @@ function ParentLegendCard({ legend }: { legend: Legend }) {
   );
 }
 
-function HeroMetric({ label, value }: { label: string; value: string }) {
-  return <div className="border-l-2 border-cyan-300/60 pl-3"><p className="text-[10px] font-bold uppercase tracking-wider text-white/55">{label}</p><p className="mt-1 truncate font-black text-white">{value}</p></div>;
-}
-
-function RealmProgressCard({ studentId, realm }: { studentId: string; realm: ParentRealm }) {
-  const palette = parentRealmPalette(realm.realmId);
-  const weeks = curriculumWeeks(realm.realmId, realm.workingLevel);
-  const totalLessons = weeks.reduce((total, week) => total + week.lessons.length, 0);
-  const completedLessons = realm.completedLessons ?? 0;
-  const progress = totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
-  const currentWeek = realm.currentWeek ? weeks.find((week) => week.week === realm.currentWeek) : null;
-  const focus = currentWeek?.title ?? realm.currentFocus;
-  const circumference = 2 * Math.PI * 26;
-
-  return (
-    <Link
-      href={`/parent/children/${studentId}/realm/${realm.realmId}`}
-      className="group relative overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-      style={{ borderColor: palette.border }}
-    >
-      <div
-        className="h-24 bg-cover bg-center"
-        style={{
-          backgroundImage: `linear-gradient(100deg, ${palette.accentDeep}e6 0%, ${palette.accentDeep}73 62%, ${palette.accentDeep}26 100%), url('${palette.image}')`,
-        }}
-      >
-        <div className="flex h-full items-center justify-between gap-3 px-4">
-          <div className="min-w-0">
-            <h4 className="truncate text-lg font-black text-white">{realmName(realm.realmId)}</h4>
-            <p className="mt-0.5 text-xs font-bold text-white/80">
-              {displayLevel(realm.workingLevel)}
-              {realm.currentWeek ? ` · Week ${realm.currentWeek}` : ""}
-            </p>
-          </div>
-          <span className="relative grid h-14 w-14 shrink-0 place-items-center">
-            <svg viewBox="0 0 60 60" className="h-14 w-14 -rotate-90">
-              <circle cx="30" cy="30" r="28" fill="rgba(6,14,20,0.42)" />
-              <circle cx="30" cy="30" r="26" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.4)" strokeWidth="5" />
-              <circle
-                cx="30"
-                cy="30"
-                r="26"
-                fill="none"
-                stroke="#fff"
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={circumference - (circumference * progress) / 100}
-              />
-            </svg>
-            <span className="absolute text-xs font-black text-white">{progress}%</span>
-          </span>
-        </div>
-      </div>
-      <div className="p-4">
-        <p className="text-sm font-bold" style={{ color: palette.accentDeep }}>
-          {focus ?? "Current focus will appear after learning begins."}
-        </p>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <span className="rounded-full px-2.5 py-1 text-xs font-black" style={{ backgroundColor: palette.soft, color: palette.accentDeep }}>
-            {completedLessons} of {totalLessons} lessons completed
-          </span>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-500 transition group-hover:text-slate-800">
-            View progress <ChevronRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 export function AddHomeChild() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
@@ -743,7 +586,7 @@ export function AddHomeChild() {
               <p className="text-sm text-slate-500">
                 {realm.levels[0] === "Prep"
                   ? `Suggested from school year: ${created.schoolYearLevel}`
-                  : `Starts at ${displayLevel(realm.levels[0]!)}`}
+                  : `Starts at ${parentLevelLabel(realm.levels[0]!)}`}
               </p>
             </div>
             <SelectLevel
@@ -888,7 +731,7 @@ export function HomeChildSettings({ studentId }: { studentId: string }) {
                   <p className="text-sm text-slate-500">
                     {placement
                       ? placement.entryMode === "pretest" ? "Pre-test entry" : "Ground Level entry"
-                      : `Not started · starts at ${displayLevel(realm.levels[0]!)}`}
+                      : `Not started · starts at ${parentLevelLabel(realm.levels[0]!)}`}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -996,110 +839,220 @@ export function LinkChild() {
   );
 }
 
+type WeekStatus = "done" | "skipped" | "current" | "in-progress" | "not-done" | "not-needed" | "coming-up";
+
+const WEEK_STATUS_CHIP: Record<WeekStatus, { label: string; className: string }> = {
+  done: { label: "Done", className: "bg-lime-100 text-lime-900" },
+  skipped: { label: "Skipped", className: "bg-slate-200 text-slate-800" },
+  current: { label: "This week", className: "bg-[#121314] text-white" },
+  "in-progress": { label: "In progress", className: "bg-amber-100 text-amber-900" },
+  "not-done": { label: "Not done", className: "bg-slate-100 text-slate-700" },
+  "not-needed": { label: "Not needed", className: "text-slate-600" },
+  "coming-up": { label: "Coming up", className: "text-slate-600" },
+};
+
 export function ParentRealmDetail({ studentId, realmId }: { studentId: string; realmId: string }) {
   const router = useRouter();
   const [data, setData] = useState<RealmSnapshot | null>(null);
+  const [skips, setSkips] = useState<ParentWeekSkips | null>(null);
   const [error, setError] = useState(false);
+  const [skipRequest, setSkipRequest] = useState<SkipWeekRequest | null>(null);
+
+  const load = useCallback(async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) {
+      router.replace("/login");
+      return;
+    }
+    const [result, skipResult] = await Promise.all([
+      supabase.rpc("get_parent_child_realm_snapshot", { p_student_id: studentId, p_realm_id: realmId }),
+      fetchParentWeekSkips(studentId).catch(() => null),
+    ]);
+    if (result.error || !result.data) setError(true);
+    else setData(result.data as RealmSnapshot);
+    setSkips(skipResult);
+  }, [realmId, router, studentId]);
 
   useEffect(() => {
-    void (async () => {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) {
-        router.replace("/login");
-        return;
-      }
-      const result = await supabase.rpc("get_parent_child_realm_snapshot", { p_student_id: studentId, p_realm_id: realmId });
-      if (result.error || !result.data) setError(true);
-      else setData(result.data as RealmSnapshot);
-    })();
-  }, [realmId, router, studentId]);
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
 
   if (error) return <Notice message="This child or realm is not available to your account." />;
   if (!data) return <ParentSkeleton />;
   if (!data.current) {
-    return <div className="space-y-4"><h1 className="text-3xl font-black">{realmName(realmId)}</h1><div className="border border-slate-200 bg-white p-6"><p className="text-lg font-bold">Not placed</p><p className="mt-2 text-slate-600">No progress is available for this child in this realm.</p></div></div>;
+    return <div className="space-y-4"><h1 className="font-display text-3xl font-black">{realmName(realmId)}</h1><div className="rounded-2xl border border-slate-200 bg-white p-6"><p className="text-lg font-bold">Not started</p><p className="mt-2 text-slate-600">{data.displayName} starts this realm with a pre-test, which sets the level.</p></div></div>;
   }
 
-  const currentWeekPlan = data.current.currentWeek ? curriculumWeek(realmId, data.current.workingLevel, data.current.currentWeek) : null;
-  const plannedWeeks = curriculumWeeks(realmId, data.current.workingLevel);
+  const current = data.current;
+  const childName = data.displayName.split(" ")[0] ?? data.displayName;
+  const levelLabel = parentLevelLabel(current.workingLevel);
+  const plannedWeeks = parentCurriculumWeeks(realmId, current.workingLevel);
   const allWeeks = plannedWeeks.length
     ? plannedWeeks.map((planned) => data.weeks.find((week) => week.week === planned.week) ?? {
       week: planned.week,
-      required: data.current?.requiredWeeks.includes(planned.week) ?? false,
+      required: current.requiredWeeks.includes(planned.week),
       focus: planned.title,
       lessons: [],
       quiz: null,
     })
     : data.weeks;
-  const levelLabel = displayLevel(data.current.workingLevel);
+  const skip = realmSkipState(skips, realmId, current.workingLevel, current.currentWeek);
+  const skippedOn = new Map(skip.skippedWeeks.map((entry) => [entry.week, entry.skippedAt]));
+  const pretest = data.assessments.find((item) => item.type.toLowerCase().includes("pre"));
+  const posttest = data.assessments.find((item) => item.type.toLowerCase().includes("post"));
+  const weekCount = skip.weekCount ?? allWeeks.length;
+  const palette = parentRealmPalette(realmId);
+
+  function statusFor(week: WeekResult): WeekStatus {
+    if (week.quiz?.status === "Completed") return "done";
+    if (skippedOn.has(week.week)) return "skipped";
+    if (week.week === current.currentWeek) return "current";
+    if (week.quiz || week.lessons.length) return "in-progress";
+    if (current.currentWeek && week.week < current.currentWeek) return week.required ? "not-done" : "not-needed";
+    return "coming-up";
+  }
+
+  function requestSkip() {
+    if (!current.currentWeek) return;
+    setSkipRequest({
+      studentId,
+      childName,
+      realmId,
+      levelLabel,
+      week: current.currentWeek,
+      weekTitle: parentCurriculumWeek(realmId, current.workingLevel, current.currentWeek)?.title ?? null,
+      skipsLeft: skip.skipsLeft,
+      limit: skip.limit,
+    });
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">{data.displayName}</p>
-        <h1 className="mt-1 text-3xl font-black">{realmName(realmId)}</h1>
-        <p className="mt-2 text-slate-600">Read-only progress. Level mastery uses the same {data.passThreshold}% threshold as the learning program.</p>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <SummaryMetric label="Current level" value={levelLabel} />
-        <SummaryMetric label="Current week" value={data.current.currentWeek ? `Week ${data.current.currentWeek}` : "Not started"} />
-        <SummaryMetric label="Current focus" value={currentWeekPlan?.title ?? data.current.currentFocus ?? (data.current.currentWeek ? "Not available" : "Starts after the pre-test")} />
-      </div>
-
-      <section className="border border-slate-200 bg-white p-5">
-        <h2 className="flex items-center gap-2 text-xl font-black"><BookOpen className="h-5 w-5 text-blue-700" /> Weekly Journey</h2>
-        <div className="mt-4 space-y-3">
-          {allWeeks.length ? allWeeks.map((week) => <WeekCard key={week.week} week={week} currentWeek={data.current?.currentWeek ?? null} realmId={realmId} workingLevel={data.current?.workingLevel ?? ""} />) : <p className="text-slate-500">No weekly curriculum is available for this level yet.</p>}
+      <section className="relative overflow-hidden rounded-2xl bg-[#121314] text-white">
+        <div className="absolute inset-y-0 right-0 w-full bg-cover bg-center opacity-30 sm:w-3/5 sm:opacity-45" style={{ backgroundImage: `url('${palette.image}')` }} aria-hidden="true" />
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,#121314_0%,#121314_42%,rgba(18,19,20,0.3)_100%)]" aria-hidden="true" />
+        <div className="relative space-y-6 p-6 sm:p-8">
+          <div>
+            <p className="text-sm text-white/75">{data.displayName}</p>
+            <h1 className="mt-1 font-display text-3xl font-black sm:text-4xl">{palette.name}</h1>
+          </div>
+          <dl className="grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+            <RealmStat label="Level" value={levelLabel} />
+            <RealmStat label="Up to" value={current.currentWeek ? `Week ${current.currentWeek} of ${weekCount}` : "Pre-test next"} />
+            <RealmStat label="Pre-test" value={pretest ? `${pretest.score}%` : "Not done"} />
+            {skip.known ? <RealmStat label={skip.offered ? "Skips left" : "Weeks"} value={skip.offered ? `${skip.skipsLeft} of ${skip.limit}` : "Set by teacher"} /> : null}
+          </dl>
         </div>
       </section>
 
-      <section className="border border-slate-200 bg-white p-5">
-        <h2 className="text-xl font-black">Assessments</h2>
-        <div className="mt-4 space-y-2">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 px-5 pb-3 pt-5 sm:px-7">
+          <h2 className="font-display text-xl font-black">Week by week</h2>
+          <p className="text-sm text-slate-600">Each week&apos;s quiz needs {ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% to open the next week</p>
+        </div>
+        {allWeeks.length ? (
+          <ul>
+            {allWeeks.map((week) => (
+              <WeekRow
+                key={week.week}
+                week={week}
+                status={statusFor(week)}
+                realmId={realmId}
+                workingLevel={current.workingLevel}
+                skippedAt={skippedOn.get(week.week) ?? null}
+                skipAction={week.week === current.currentWeek && skip.canSkipNow ? requestSkip : null}
+              />
+            ))}
+            <li className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-100 bg-[#FAFAF8] px-5 py-4 sm:px-7">
+              <span className="w-20 font-black">Post-test</span>
+              <span className="min-w-0 flex-1 text-slate-700">
+                {posttest
+                  ? `${posttest.correct} / ${posttest.attempted} · ${posttest.score}% (${posttest.status})`
+                  : `Checks all of ${levelLabel}${pretest ? ` against ${childName}'s ${pretest.score}% pre-test` : ""}.`}
+              </span>
+              <span className="text-sm text-slate-600">{posttest ? formatAchievementDate(posttest.completedAt) : `After Week ${weekCount}`}</span>
+            </li>
+          </ul>
+        ) : <p className="px-5 pb-5 text-slate-600 sm:px-7">No weekly curriculum is available for this level yet.</p>}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+        <h2 className="font-display text-xl font-black">Test results</h2>
+        <div className="mt-3 divide-y divide-slate-100">
           {data.assessments.length ? data.assessments.map((item) => (
-            <div key={item.id} className="grid gap-2 border-b border-slate-100 py-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
+            <div key={item.id} className="grid gap-1 py-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-6">
               <span className="font-bold">{levelLabel} {assessmentName(item.type)}</span>
               <span>{item.correct} / {item.attempted} · {item.score}%</span>
-              <span className="font-bold text-emerald-800">{item.status}</span>
+              <span className="text-slate-600">{formatAchievementDate(item.completedAt)}</span>
             </div>
-          )) : <p className="text-slate-500">No assessments completed yet.</p>}
+          )) : <p className="py-3 text-slate-600">No assessments completed yet.</p>}
         </div>
       </section>
+
+      <SkipWeekDialog request={skipRequest} onClose={() => setSkipRequest(null)} onSkipped={() => { setSkipRequest(null); void load(); }} />
     </div>
   );
 }
 
-function SummaryMetric({ label, value }: { label: string; value: string }) {
-  return <div className="border border-slate-200 bg-white p-4"><p className="text-xs font-bold uppercase text-slate-500">{label}</p><p className="mt-2 text-xl font-black">{value}</p></div>;
+function RealmStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-l-2 border-[var(--reliq-lime)] pl-3">
+      <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/60">{label}</dt>
+      <dd className="mt-1 font-display text-lg font-black sm:text-xl">{value}</dd>
+    </div>
+  );
 }
 
-function WeekCard({ week, currentWeek, realmId, workingLevel }: { week: WeekResult; currentWeek: number | null; realmId: string; workingLevel: string }) {
-  const plan = curriculumWeek(realmId, workingLevel, week.week);
+function WeekRow({ week, status, realmId, workingLevel, skippedAt, skipAction }: {
+  week: WeekResult;
+  status: WeekStatus;
+  realmId: string;
+  workingLevel: string;
+  skippedAt: string | null;
+  skipAction: (() => void) | null;
+}) {
+  const plan = parentCurriculumWeek(realmId, workingLevel, week.week);
   const plannedLessons = plan?.lessons ?? [];
-  const hasActivity = Boolean(week.quiz || week.lessons.length);
-  const completed = week.quiz?.status === "Completed" || (plannedLessons.length > 0 && plannedLessons.every((planned) => week.lessons.some((lesson) => lesson.lesson === planned.lesson && lesson.status === "Completed")));
-  const label = completed ? "Completed" : hasActivity ? "In progress" : week.week === currentWeek ? "Current" : "Not started";
   const lessons = plannedLessons.length
-    ? plannedLessons.map((planned) => ({ planned, result: week.lessons.find((lesson) => lesson.lesson === planned.lesson) }))
-    : week.lessons.map((result) => ({ planned: null, result }));
+    ? plannedLessons.map((planned) => ({ number: planned.lesson, title: planned.title, result: week.lessons.find((lesson) => lesson.lesson === planned.lesson) }))
+    : week.lessons.map((result) => ({ number: result.lesson, title: result.lessonName, result }));
+  const lessonsDone = lessons.filter((lesson) => lesson.result?.status === "Completed").length;
+  const chip = WEEK_STATUS_CHIP[status];
+  const muted = status === "coming-up" || status === "skipped" || status === "not-needed";
+
   return (
-    <details className="rounded-md border border-slate-200">
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
-        <span><span className="font-black">Week {week.week}</span><span className="ml-2 text-sm text-slate-500">{plan?.title ?? week.focus ?? "Learning focus"}</span></span>
-        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">{label}</span>
-      </summary>
-      <div className="space-y-3 border-t border-slate-100 p-4">
-        {lessons.map(({ planned, result }) => {
-          const lessonNumber = planned?.lesson ?? result?.lesson ?? 0;
-          return (
-          <div key={lessonNumber} className="rounded-md bg-slate-50 p-3 text-sm">
-            <div className="flex flex-wrap justify-between gap-2"><span className="font-bold">Lesson {lessonNumber}: {planned?.title ?? result?.lessonName ?? `Lesson ${lessonNumber}`}</span><span className={`font-bold ${result ? "text-slate-700" : "text-slate-400"}`}>{result?.status ?? "Not started"}</span></div>
-            {planned?.focus || result?.focus ? <p className="mt-1 text-slate-600">{planned?.focus ?? result?.focus}</p> : null}
-            {result ? <p className="mt-2">{result.correct} / {result.attempted} correct · {result.accuracy}% accuracy · {result.attempts} {result.attempts === 1 ? "attempt" : "attempts"}</p> : null}
+    <li className={`border-t border-slate-100 ${status === "current" ? "border-l-4 border-l-[var(--reliq-lime)] bg-[#FBFEF5]" : status === "skipped" ? "bg-[#FAFAF8]" : ""}`}>
+      <details open={status === "current"} className="group">
+        <summary className="flex min-h-14 cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3 sm:px-7 [&::-webkit-details-marker]:hidden">
+          <span className={`w-20 font-black ${muted ? "text-slate-600" : ""}`}>Week {week.week}</span>
+          <span className="min-w-0 flex-1">
+            <span className={`block font-semibold ${muted ? "text-slate-600" : ""}`}>{plan?.title ?? week.focus ?? "Learning focus"}</span>
+            {skippedAt ? <span className="block text-sm text-slate-600">Skipped on {formatAchievementDate(skippedAt)}. Still open to revisit; no XP or Chrono Crystals.</span> : null}
+          </span>
+          {status !== "coming-up" && status !== "not-needed" ? <span className="text-sm text-slate-600">{lessonsDone} of {lessons.length} lessons</span> : null}
+          {week.quiz ? <span className={`w-24 text-right font-black ${weeklyQuizPassed(week.quiz.accuracy) ? "text-[#3F7A00]" : "text-orange-700"}`}>Quiz {week.quiz.accuracy}%</span> : null}
+          <span className={`rounded-full px-2.5 py-1 text-xs font-black ${chip.className}`}>{chip.label}</span>
+          <ChevronDown className="h-4 w-4 text-slate-500 transition group-open:rotate-180" aria-hidden="true" />
+        </summary>
+        <div className="space-y-1 px-5 pb-4 sm:pl-[124px] sm:pr-7">
+          {lessons.map(({ number, title, result }) => (
+            <div key={number} className="flex flex-wrap items-center gap-x-4 gap-y-0.5 border-b border-slate-100 py-2.5 text-sm last:border-b-0">
+              <span className="w-16 font-bold text-slate-600">Lesson {number}</span>
+              <span className="min-w-0 flex-1">{title}</span>
+              {result ? <span className="text-slate-600">{result.attempts} {result.attempts === 1 ? "try" : "tries"}</span> : null}
+              <span className={`w-14 text-right font-black ${result ? (weeklyQuizPassed(result.accuracy) ? "text-[#3F7A00]" : "text-amber-700") : "text-slate-400"}`}>{result ? `${result.accuracy}%` : "—"}</span>
+            </div>
+          ))}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 py-2.5 text-sm">
+            <span className="w-16 font-bold text-slate-600">Quiz</span>
+            <span className="min-w-0 flex-1">{week.quiz ? `${week.quiz.correct} / ${week.quiz.attempted} correct · ${week.quiz.attempts} ${week.quiz.attempts === 1 ? "try" : "tries"}` : `Week ${week.week} quiz · needs ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% to open the next week`}</span>
+            <span className={`w-14 text-right font-black ${week.quiz ? (weeklyQuizPassed(week.quiz.accuracy) ? "text-[#3F7A00]" : "text-orange-700") : "text-slate-400"}`}>{week.quiz ? `${week.quiz.accuracy}%` : "—"}</span>
           </div>
-        )})}
-        {week.quiz ? <div className="rounded-md border border-emerald-100 bg-emerald-50 p-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="font-bold">Weekly Quiz</span><span className="font-bold text-emerald-900">{week.quiz.status}</span></div><p className="mt-2">{week.quiz.correct} / {week.quiz.attempted} correct · {week.quiz.accuracy}% · {week.quiz.attempts} {week.quiz.attempts === 1 ? "attempt" : "attempts"}</p></div> : null}
-      </div>
-    </details>
+          {skipAction ? <button type="button" onClick={skipAction} className="mt-2 min-h-10 rounded-lg border border-slate-300 bg-white px-3.5 text-sm font-bold hover:border-slate-900">Skip Week {week.week}</button> : null}
+        </div>
+      </details>
+    </li>
   );
 }
 
