@@ -7,12 +7,13 @@ export function createCoalescedRefresh(
   let disposed = false;
   let running = false;
   let pending = false;
+  let immediate = false;
   let lastStarted = -Infinity;
   let timer: ReturnType<typeof setTimeout> | null = null;
 
   function schedule() {
     if (disposed || running || timer !== null || !pending) return;
-    const delay = Math.max(0, minIntervalMs - (Date.now() - lastStarted));
+    const delay = immediate ? 0 : Math.max(0, minIntervalMs - (Date.now() - lastStarted));
     if (delay === 0) {
       void run();
     } else {
@@ -26,6 +27,7 @@ export function createCoalescedRefresh(
   async function run() {
     if (disposed) return;
     pending = false;
+    immediate = false;
     running = true;
     lastStarted = Date.now();
     try {
@@ -39,9 +41,15 @@ export function createCoalescedRefresh(
   }
 
   return {
-    request() {
+    // Reserved for connection recovery; ordinary events retain the rate limit.
+    request(options?: { immediate?: boolean }) {
       if (disposed) return;
       pending = true;
+      if (options?.immediate) {
+        immediate = true;
+        if (timer !== null) clearTimeout(timer);
+        timer = null;
+      }
       schedule();
     },
     dispose() {

@@ -1015,6 +1015,8 @@ export default function LiveClassPanel({
       ],
     });
     let connectedBefore = false;
+    let streamReady = false;
+    let reconcileOnVisible = false;
 
     async function loadEvents() {
       if (cancelled || document.visibilityState !== "visible" || !selectedClass?.id || !studentIds.length) return;
@@ -1136,7 +1138,12 @@ export default function LiveClassPanel({
       console.warn("[LiveClassPanel] Event refresh failed", error);
     }, 30_000);
     const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") { refresh.request(); eventRefresh.request(); }
+      if (document.visibilityState === "visible") {
+        const immediate = reconcileOnVisible;
+        reconcileOnVisible = false;
+        refresh.request({ immediate });
+        eventRefresh.request({ immediate });
+      }
     };
     void ensureLiveSession();
     refreshWhenVisible();
@@ -1169,9 +1176,21 @@ export default function LiveClassPanel({
         { event: "*", schema: "public", table: "student_weekly_quiz_attempts", filter: `class_id=eq.${selectedClass?.id}` },
         refreshWhenVisible,
       )
+      .on("system", {}, (payload) => {
+        if (cancelled || payload.extension !== "postgres_changes") return;
+        if (payload.status !== "ok") { streamReady = false; return; }
+        if (streamReady) return;
+        streamReady = true;
+        // SUBSCRIBED can precede database-stream readiness. Reconcile saved
+        // activity from that gap, including commits older than our cursor.
+        eventReader.invalidate();
+        reconcileOnVisible = true;
+        refreshWhenVisible();
+      })
       .subscribe((status) => {
+        if (status !== "SUBSCRIBED") streamReady = false;
         if (status === "SUBSCRIBED") {
-          if (connectedBefore) eventReader.invalidate();
+          if (connectedBefore && !streamReady) eventReader.invalidate();
           connectedBefore = true;
           refreshWhenVisible();
         }

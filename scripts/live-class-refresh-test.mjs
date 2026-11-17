@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { mock } from 'node:test';
 import fs from 'node:fs';
+import ts from 'typescript';
 import { createCoalescedRefresh } from '../lib/coalesced-refresh.ts';
 
 mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 0 });
@@ -67,6 +68,66 @@ try {
   assert.ok(source.includes('const result = await eventReader.read()'));
   const loadRows = source.slice(source.indexOf('async function loadRows()'), source.indexOf('const refresh = createCoalescedRefresh'));
   assert.ok(!loadRows.includes('eventReader') && !loadRows.includes('fetchLiveClassEvents'), 'current rows never wait for historical events');
+  // Execute the actual panel subscription/scheduler wiring with controlled reads.
+  const wiring = source.slice(source.indexOf('    const refresh = createCoalescedRefresh'), source.indexOf('  }, [selectedClass?.id, studentIdsKey]'));
+  const compiled = ts.transpileModule(wiring, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
+  const handlers = new Map();
+  let statusCallback, reads = 0, invalidations = 0, finishRead;
+  let visible = 'visible';
+  const listeners = new Map();
+  const fakeChannel = {
+    on(kind, _filter, callback) { if (kind === 'system') handlers.set(kind, callback); return this; },
+    subscribe(callback) { statusCallback = callback; return this; },
+  };
+  const env = {
+    createCoalescedRefresh,
+    loadRows: async () => {},
+    loadEvents: async () => { reads++; await new Promise(resolve => { finishRead = resolve; }); },
+    document: { get visibilityState() { return visible; }, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener() {} },
+    window: { addEventListener() {}, removeEventListener() {} },
+    ensureLiveSession: async () => {},
+    setInterval: () => 1, clearInterval() {},
+    supabase: { channel: () => fakeChannel, removeChannel: async () => {} },
+    selectedClass: { id: 'test-class' },
+    eventReader: { invalidate: () => invalidations++, dispose() {} },
+    console,
+  };
+  const cleanup = new Function(...Object.keys(env), 'let cancelled = false, connectedBefore = false, streamReady = false, reconcileOnVisible = false, intervalId, channel;\n' + compiled)(...Object.values(env));
+  const ready = () => handlers.get('system')({ extension: 'postgres_changes', status: 'ok' });
+  statusCallback('SUBSCRIBED');
+  handlers.get('system')({ extension: 'broadcast', status: 'ok' });
+  assert.equal(invalidations, 0, 'unrelated readiness messages do not invalidate events');
+  ready();
+  assert.equal(reads, 1, 'readiness never overlaps the initial read');
+  finishRead(); await settle();
+  assert.equal(reads, 2, 'ready reconciles immediately after an in-flight startup read');
+  assert.equal(invalidations, 1);
+  ready(); finishRead(); await settle();
+  assert.equal(reads, 2, 'duplicate ready messages do not produce repeated snapshots');
+  listeners.get('visibilitychange')(); // queue an ordinary throttled refresh
+  statusCallback('CHANNEL_ERROR'); statusCallback('SUBSCRIBED');
+  ready();
+  assert.equal(reads, 3, 'recovery bypasses an already scheduled 30-second timer');
+  finishRead(); await settle();
+  statusCallback('CHANNEL_ERROR');
+  ready();
+  const readyInvalidations = invalidations;
+  statusCallback('SUBSCRIBED');
+  assert.equal(invalidations, readyInvalidations, 'late channel acknowledgement does not invalidate the readiness snapshot');
+  finishRead(); await settle();
+  const readsBeforeHidden = reads;
+  visible = 'hidden';
+  statusCallback('CHANNEL_ERROR'); statusCallback('SUBSCRIBED'); ready();
+  assert.equal(reads, readsBeforeHidden, 'hidden tabs defer recovery reads');
+  visible = 'visible'; listeners.get('visibilitychange')();
+  assert.equal(reads, readsBeforeHidden + 1, 'returning to a visible tab immediately reconciles');
+  finishRead(); await settle();
+  listeners.get('visibilitychange')();
+  mock.timers.tick(29999); await settle();
+  assert.equal(reads, readsBeforeHidden + 1, 'ordinary events still respect the polling interval');
+  cleanup(); ready();
+  mock.timers.tick(30000); await settle();
+  assert.equal(reads, readsBeforeHidden + 1, 'cleanup cancels pending reads and ignores late readiness');
   console.log('PASS: burst coalescing, no overlapping reads, trailing freshness, errors, cleanup and visible-tab wiring.');
 } finally {
   refresh.dispose();

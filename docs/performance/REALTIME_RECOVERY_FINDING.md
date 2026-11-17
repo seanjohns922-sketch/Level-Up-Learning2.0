@@ -1,5 +1,34 @@
 # Realtime recovery regression — 28 October 2026
 
+## Application readiness reconciliation — 18 November
+
+LiveClassPanel now invalidates its event snapshot and requests a prompt refresh
+when Postgres Changes reports system status `ok`, once per ready connection.
+Channel SUBSCRIBED alone is not database-stream readiness. A late SUBSCRIBED
+acknowledgement does not invalidate a snapshot already started at readiness.
+Hidden tabs defer this refresh until visible. The shared coalescer's explicit
+recovery option bypasses the timer, but never overlaps an in-flight read;
+ordinary event bursts retain their existing intervals. No schema, permissions,
+student saves or screen-sharing functionality changed.
+
+The executable panel-wiring test covers readiness during an in-flight initial
+read, an already queued timer, duplicate/unrelated readiness messages, reconnect,
+late channel acknowledgement, hidden/visible transitions, normal rate limits and
+cleanup. The existing event-reader tests separately cover complete snapshots,
+invalidations, pagination, deduplication and isolation.
+
+The 18 November local controlled-subscription diagnostic still fails its raw
+`initialDelivery` check: SUBSCRIBED at 385 ms, saved marker response at 424 ms,
+Postgres readiness at 1,517 ms. All nine other recovery checks pass, with the
+initial marker recovered in the snapshot. This diagnostic does not run the panel
+scheduler and is deliberately not reclassified as a pass. Local temporary
+policies were restored. This fix reconciles saved activity; it does not guarantee
+delivery of notifications emitted before stream readiness. Browser/device and
+concurrent-load verification of this new hook remain outstanding.
+
+Validation: all 17 critical checks, QA lint, targeted test lint, typecheck and the
+full npm build (including prebuild audits) passed. No migration is required.
+
 ## Automatic socket recovery and startup gap — 17 November
 
 `SCALE_RECONNECT_MODE=socket` now routes only the synthetic teacher WebSocket

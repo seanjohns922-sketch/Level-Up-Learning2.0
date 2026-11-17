@@ -3,6 +3,18 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Application startup reconciliation — 18 November
+
+The live panel now reconciles its saved event snapshot when the database stream
+reports readiness. Controlled execution of the actual panel wiring verifies
+immediate, non-overlapping recovery, visibility handling, duplicate readiness and
+normal refresh throttling. See `REALTIME_RECOVERY_FINDING.md` for implementation
+and the separate local diagnostic, which still reproduces the raw notification
+gap while recovering all saved markers. No migration or hosted settings change.
+Browser and concurrent-load verification remain open. Next performance work is
+the unresolved 500-student simultaneous-start/save latency gate; 10,000-user
+capacity is not established.
+
 ## Automatic transport recovery and startup finding — 17 November
 
 The recovery runner now has a loopback-only socket-fault mode. Three warm runs
