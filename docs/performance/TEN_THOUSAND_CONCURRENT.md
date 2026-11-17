@@ -3,6 +3,48 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Compact event-selection probe — 18 November
+
+Added `scripts/live-class-projection-test.mjs`, a design probe that executes the
+actual `LiveClassPanel` activity and performance reducers extracted with the
+TypeScript parser. It does not change the production reader or database.
+Run with `node --experimental-strip-types scripts/live-class-projection-test.mjs`.
+
+The candidate is a two-stage read: retain the latest meaningful activity event,
+resolve the current activity using unchanged presence/canonical-attempt/daily
+rules, then select matching events from the latest lesson/quiz start onward.
+Retain the meaningful event even when it falls outside that selected attempt.
+Preserve original ordering and timestamp ties. If there is no matching start,
+retain every matching event. The full-history and candidate reducers must produce
+identical resolved activity rows and performance summaries.
+
+409 comparisons pass, including 400 deterministic generated mixtures, retries,
+duplicate answers, same-title quizzes with distinct IDs, timestamp ties, backdated
+ordering, missing metadata/start events, canonical completion superseding telemetry,
+row fallback, daily-only activity, cross-student rows and pagination boundaries.
+A reviewed 100-repeat fixture selects 11 of 1,100 events with unchanged 5/10 score.
+Serialized fixture size falls from 213,701 to 2,138 bytes. This is potential payload
+reduction in one synthetic case, not measured HTTP or browser improvement.
+Missing-start history retains 1,000 answers; a long single attempt retains 1,201
+events. Therefore a fixed latest-N limit would still be incorrect. Complete keyset
+pagination remains necessary even for the compact read.
+
+Targeted QA lint, the executable probe and whitespace checks passed. No migration,
+application code, role boundaries or hosted settings changed; no release build
+is needed for this test-only checkpoint. The probe currently receives full history
+in memory, so the live dashboard has no request/payload reduction from it yet.
+
+Implementation gate: translate both selections into authenticated, class-scoped
+reads and compare database results against these reducers. Preserve the exact
+payload-type/string/number predicates and tie ordering used by the UI. Fix a
+snapshot upper cursor across the two stages; test concurrent new starts, late
+commits, deletion/update, role revocation, empty students, rollout fallback and
+API row caps. Do not fall back on permission errors. Avoid reusing the existing
+incremental-history cache without addressing changes to the selected attempt.
+Only switch the panel after SQL/API permission tests and representative local
+payload/latency measurements pass. These fixture comparisons do not prove
+arbitrary production equivalence or 10,000-user capacity.
+
 ## Standard API completion pool comparison — 18 November
 
 Repeated the completion workload on the exact same standard Supabase PostgREST
