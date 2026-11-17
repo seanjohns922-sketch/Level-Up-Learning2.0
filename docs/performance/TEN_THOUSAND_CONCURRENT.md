@@ -3,6 +3,22 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Private reconnect recovery checkpoint — 17 November
+
+The existing recovery test now exercises the current incremental reader and
+private teacher topic. It verifies missed-event polling, rejoin reconciliation,
+class/student isolation and duplicate-free snapshots over more than 5,900 events.
+One initial notification missed its five-second deadline; its cause remains
+unresolved. Two unchanged repeats and two final-reporting runs passed. The test
+now records channel statuses and continues polling checks after a notification
+miss, while still failing the delivery gate. No timeout was relaxed.
+
+Prepared channel policies were applied and restored locally only. No application
+or hosted configuration changed. This is controlled unsubscribe/rejoin, not a
+physical network interruption or concurrent reconnect capacity result. See
+`REALTIME_RECOVERY_FINDING.md` and `private-reconnect-2026-11-17.json`; the earlier
+500-student latency failure and 10,000-user acceptance gates remain open.
+
 ## Completion retries and private realtime — 17 November
 
 Extended the existing completion runner to accept `SCALE_GROUP_COUNT=4..20`

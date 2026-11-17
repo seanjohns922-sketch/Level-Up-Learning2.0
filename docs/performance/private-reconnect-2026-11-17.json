@@ -1,0 +1,139 @@
+{
+  "environment": "isolated local Supabase, synthetic events only",
+  "configuration": "Prepared private-channel policies temporarily applied and restored; no hosted changes",
+  "unresolved": "Initial run missed its first live event within five seconds; cause not isolated. Four subsequent runs passed. No timeout relaxed.",
+  "runs": [
+    {
+      "label": "initial-failure",
+      "at": "2026-11-17T08:27:16.501Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "checks": {},
+      "failures": [
+        "Missing before realtime event"
+      ],
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not an automatic socket reconnect or physical network outage",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": false
+    },
+    {
+      "label": "unchanged-repeat-1",
+      "at": "2026-11-17T08:28:05.827Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "checks": {
+        "initialDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "subscriptionRemoved": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5927,
+      "snapshotRows": 5928,
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not an automatic socket reconnect or physical network outage",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "unchanged-repeat-2",
+      "at": "2026-11-17T08:28:07.523Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "checks": {
+        "initialDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "subscriptionRemoved": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5931,
+      "snapshotRows": 5932,
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not an automatic socket reconnect or physical network outage",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "final-reporting-1",
+      "at": "2026-11-17T08:28:57.289Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CLOSED",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "subscriptionRemoved": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5935,
+      "snapshotRows": 5936,
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not an automatic socket reconnect or physical network outage",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "final-reporting-2",
+      "at": "2026-11-17T08:28:58.394Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CLOSED",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "subscriptionRemoved": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5939,
+      "snapshotRows": 5940,
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not an automatic socket reconnect or physical network outage",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    }
+  ]
+}
