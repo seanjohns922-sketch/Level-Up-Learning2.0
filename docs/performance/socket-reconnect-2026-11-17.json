@@ -1,0 +1,624 @@
+{
+  "environment": "isolated local only; synthetic events",
+  "method": "Loopback TCP proxy interrupts only teacher WebSocket; SDK retry/backoff unchanged; REST remains direct. Temporary channel policies restored.",
+  "runs": [
+    {
+      "label": "initial-socket",
+      "at": "2026-11-17T08:54:01.998Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 3266,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 13747,
+          "status": "ok"
+        }
+      ],
+      "checks": {
+        "initialDelivery": false,
+        "initialIncrementalReaderSnapshot": true,
+        "transportDisconnected": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "automaticRejoin": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [
+        "initialDelivery"
+      ],
+      "initialSnapshotRows": 5943,
+      "snapshotRows": 5944,
+      "rejoinAfterRestoreMs": 6547,
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": false
+    },
+    {
+      "label": "warm-1",
+      "at": "2026-11-17T08:55:39.124Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 301,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 1617,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 1617,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2632,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2632,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 9662,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 10351,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 334,
+          "postgres": true,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 9676,
+          "postgres": true,
+          "status": "ok"
+        }
+      ],
+      "markers": [
+        {
+          "phase": "before",
+          "startedMs": 301,
+          "completedMs": 339
+        },
+        {
+          "phase": "ready",
+          "startedMs": 753,
+          "completedMs": 878
+        },
+        {
+          "phase": "offline",
+          "startedMs": 2817,
+          "completedMs": 2834
+        },
+        {
+          "phase": "offline-unpolled",
+          "startedMs": 3111,
+          "completedMs": 3122
+        },
+        {
+          "phase": "after",
+          "startedMs": 9701,
+          "completedMs": 9724
+        }
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "readyStreamDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "transportDisconnected": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "automaticRejoin": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5948,
+      "snapshotRows": 5949,
+      "rejoinAfterRestoreMs": 6579,
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "warm-2",
+      "at": "2026-11-17T08:55:49.733Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 267,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 1139,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 1139,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2153,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2154,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 9186,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 9944,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 319,
+          "postgres": true,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 9201,
+          "postgres": true,
+          "status": "ok"
+        }
+      ],
+      "markers": [
+        {
+          "phase": "before",
+          "startedMs": 268,
+          "completedMs": 325
+        },
+        {
+          "phase": "ready",
+          "startedMs": 477,
+          "completedMs": 488
+        },
+        {
+          "phase": "offline",
+          "startedMs": 2339,
+          "completedMs": 2348
+        },
+        {
+          "phase": "offline-unpolled",
+          "startedMs": 2638,
+          "completedMs": 2652
+        },
+        {
+          "phase": "after",
+          "startedMs": 9198,
+          "completedMs": 9215
+        }
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "readyStreamDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "transportDisconnected": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "automaticRejoin": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5953,
+      "snapshotRows": 5954,
+      "rejoinAfterRestoreMs": 6546,
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "warm-3",
+      "at": "2026-11-17T08:55:59.940Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 272,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 1220,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 1220,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2234,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 2234,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 9291,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 9910,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 282,
+          "postgres": true,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 9305,
+          "postgres": true,
+          "status": "ok"
+        }
+      ],
+      "markers": [
+        {
+          "phase": "before",
+          "startedMs": 272,
+          "completedMs": 288
+        },
+        {
+          "phase": "ready",
+          "startedMs": 594,
+          "completedMs": 606
+        },
+        {
+          "phase": "offline",
+          "startedMs": 2420,
+          "completedMs": 2436
+        },
+        {
+          "phase": "offline-unpolled",
+          "startedMs": 2714,
+          "completedMs": 2718
+        },
+        {
+          "phase": "after",
+          "startedMs": 9326,
+          "completedMs": 9336
+        }
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "readyStreamDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "transportDisconnected": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "automaticRejoin": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5958,
+      "snapshotRows": 5959,
+      "rejoinAfterRestoreMs": 6608,
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    },
+    {
+      "label": "before-service-health",
+      "at": "2026-11-17T08:56:48.187Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 345,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 345,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 346,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [],
+      "markers": [],
+      "checks": {},
+      "failures": [
+        "CHANNEL_ERROR"
+      ],
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": false
+    },
+    {
+      "label": "fresh-healthy-service",
+      "at": "2026-11-17T08:58:10.510Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "socket",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "CHANNEL_ERROR",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 256,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 6127,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 6127,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 7142,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 7142,
+          "status": "CHANNEL_ERROR"
+        },
+        {
+          "elapsedMs": 14174,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 15010,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 1464,
+          "postgres": true,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 14268,
+          "postgres": true,
+          "status": "ok"
+        }
+      ],
+      "markers": [
+        {
+          "phase": "before",
+          "startedMs": 257,
+          "completedMs": 294
+        },
+        {
+          "phase": "ready",
+          "startedMs": 5310,
+          "completedMs": 5371
+        },
+        {
+          "phase": "offline",
+          "startedMs": 7328,
+          "completedMs": 7366
+        },
+        {
+          "phase": "offline-unpolled",
+          "startedMs": 7640,
+          "completedMs": 7648
+        },
+        {
+          "phase": "after",
+          "startedMs": 14181,
+          "completedMs": 14279
+        }
+      ],
+      "checks": {
+        "initialDelivery": false,
+        "readyStreamDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "transportDisconnected": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "automaticRejoin": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [
+        "initialDelivery"
+      ],
+      "initialSnapshotRows": 5963,
+      "snapshotRows": 5964,
+      "rejoinAfterRestoreMs": 6533,
+      "privateChannels": true,
+      "limitations": [
+        "Forced local TCP interruption; REST stays available, not whole-device/browser network loss",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": false
+    },
+    {
+      "label": "default-subscription-regression",
+      "at": "2026-11-17T08:59:42.021Z",
+      "environment": "isolated local reconnect and application event-read regression",
+      "mode": "subscription",
+      "channelStatuses": [
+        "SUBSCRIBED",
+        "CLOSED",
+        "SUBSCRIBED",
+        "CLOSED"
+      ],
+      "channelTransitions": [
+        {
+          "elapsedMs": 169,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 1202,
+          "status": "CLOSED"
+        },
+        {
+          "elapsedMs": 1495,
+          "status": "SUBSCRIBED"
+        },
+        {
+          "elapsedMs": 2062,
+          "status": "CLOSED"
+        }
+      ],
+      "systemStatuses": [
+        {
+          "elapsedMs": 177,
+          "postgres": true,
+          "status": "ok"
+        },
+        {
+          "elapsedMs": 1499,
+          "postgres": true,
+          "status": "ok"
+        }
+      ],
+      "markers": [
+        {
+          "phase": "before",
+          "startedMs": 169,
+          "completedMs": 184
+        },
+        {
+          "phase": "ready",
+          "startedMs": 389,
+          "completedMs": 416
+        },
+        {
+          "phase": "offline",
+          "startedMs": 1203,
+          "completedMs": 1209
+        },
+        {
+          "phase": "offline-unpolled",
+          "startedMs": 1480,
+          "completedMs": 1485
+        },
+        {
+          "phase": "after",
+          "startedMs": 1495,
+          "completedMs": 1500
+        }
+      ],
+      "checks": {
+        "initialDelivery": true,
+        "readyStreamDelivery": true,
+        "initialIncrementalReaderSnapshot": true,
+        "notificationPathUnavailable": true,
+        "pollRecoversMissedEvent": true,
+        "timelineContainsMissedEvent": true,
+        "reconnectedDelivery": true,
+        "rejoinRecoversUnpolledEvent": true,
+        "refreshContainsLatestEvent": true,
+        "unchangedRefreshHasNoDuplicates": true
+      },
+      "failures": [],
+      "initialSnapshotRows": 5968,
+      "snapshotRows": 5969,
+      "privateChannels": true,
+      "limitations": [
+        "Controlled subscription removal/rejoin, not automatic socket recovery",
+        "Polling invoked directly, not the browser 30-second scheduler",
+        "Single synthetic class, not concurrent 500-student reconnects"
+      ],
+      "passed": true
+    }
+  ]
+}

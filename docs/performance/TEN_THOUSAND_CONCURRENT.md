@@ -3,6 +3,23 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Automatic transport recovery and startup finding — 17 November
+
+The recovery runner now has a loopback-only socket-fault mode. Three warm runs
+automatically rejoined the same private channel in roughly 6.5–6.6 seconds after
+restoration, with complete, duplicate-free snapshot recovery. A healthy fresh
+local service reproduced the earlier notification issue: an event saved after
+channel join but before Postgres Changes readiness missed live delivery, while
+the post-readiness event arrived. The persisted event was recovered by snapshot.
+The failed initial-delivery gate is retained; this is a diagnosed local startup
+gap, not a released fix. One premature-service-start join failure is also recorded.
+
+No production code or hosted settings changed. Next: verify readiness-triggered
+snapshot reconciliation without weakening the existing refresh limits or polling.
+See `REALTIME_RECOVERY_FINDING.md` and `socket-reconnect-2026-11-17.json` for all
+seven outcomes, exact timestamps, restoration and testing limits. Physical browser
+network loss, concurrent reconnects and hosted capacity are still unverified.
+
 ## Private reconnect recovery checkpoint — 17 November
 
 The existing recovery test now exercises the current incremental reader and

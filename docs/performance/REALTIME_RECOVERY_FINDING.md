@@ -1,5 +1,65 @@
 # Realtime recovery regression — 28 October 2026
 
+## Automatic socket recovery and startup gap — 17 November
+
+`SCALE_RECONNECT_MODE=socket` now routes only the synthetic teacher WebSocket
+through a loopback TCP proxy. It closes the connection, refuses reconnections
+during the fault and restores forwarding while leaving the same channel mounted.
+No explicit reconnect/subscribe call is made after the fault; SDK retry/backoff
+defaults are unchanged. Student saves and teacher REST polling remain direct.
+Proxy bytes and handshake URLs are never inspected or logged. Its listener and
+sockets are closed in cleanup. Default controlled-subscription mode remains.
+
+Three warm instrumented runs passed all twelve checks. Automatic private rejoin
+took 6,579 / 6,546 / 6,608 ms after forwarding was restored, within the test's
+explicit 15-second rejoin bound. Offline polling recovered one marker, rejoin
+reconciliation recovered another, and every marker appeared exactly once in
+class-isolated snapshots over more than 5,900 events. Live delivery retains its
+separate five-second deadline. These results do not establish a browser SLA or
+whole-device network-loss recovery: REST stayed available and polling was called
+directly rather than through the component scheduler.
+
+The initial socket run missed its first notification but passed all recovery
+checks. Instrumentation was added for relative channel transition, database-stream
+system status and marker send/response times, without identities or credentials.
+A fresh local Realtime-service start reproduced the notification gap after a
+successful fresh container health check:
+
+| Signal | Milliseconds from test start |
+| --- | ---: |
+| Channel SUBSCRIBED | 256 |
+| Early marker request / successful response | 257 / 294 |
+| Postgres Changes system `ok` | 1,464 |
+| Post-readiness marker request / successful response | 5,310 / 5,371 |
+
+The early notification missed its five-second deadline; the post-readiness marker
+arrived. Both were present in the subsequent complete snapshot. Automatic rejoin
+after the later fault took 6,533 ms and recovered all offline markers. This is
+concrete evidence of a local startup notification gap between channel join and
+database-stream readiness, not lost persisted learning data. It does not prove
+the cause of every earlier intermittent notification miss. This run still fails
+the initial-delivery gate; its failure is not discarded or reclassified as a pass.
+
+One preceding cold-start attempt ran before service readiness and failed its
+join before student writes; that setup failure is retained separately. The final
+default subscription-mode regression passed. All seven outcomes are preserved
+in `socket-reconnect-2026-11-17.json`. Private orchestration/logs:
+`/Users/seanjohns/reliq-audits/2026-11-17/socket-reconnect/`.
+
+Only local test code changed. The local Realtime container was restarted for the
+cold-start checks, then verified healthy. Prepared private-channel policies were
+temporarily applied and removed; original policy absence was verified. Hosted
+settings, application code, lessons and visuals are unchanged. Synthetic markers
+remain locally. Syntax, targeted QA ESLint, invalid-mode guard, event-reader and
+dashboard-loading tests, final preflight, 175-request smoke and diff checks passed.
+No release build was needed for these diagnostic-only changes.
+
+Next targeted application work: reconcile a snapshot when the database stream
+becomes ready, preserving coalesced refreshes, polling and private permissions.
+Test the startup gap against that behavior before calling it fixed. Do not assume
+SUBSCRIBED alone means events saved during startup were delivered. The separate
+500-student latency failures and 10,000-user gate remain open.
+
 ## Current private-channel and incremental-reader check — 17 November
 
 The runner now uses `createLiveClassEventReader` and the same private
