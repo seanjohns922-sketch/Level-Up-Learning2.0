@@ -1,0 +1,143 @@
+{
+  "environment": "isolated local completion/retry burst, original API runtime; temporary class index and private-channel policies restored",
+  "workload": {
+    "at": "2026-11-17T21:15:48.667Z",
+    "environment": "local synthetic completion/retry and realtime burst",
+    "students": 500,
+    "teachers": 20,
+    "privateChannels": true,
+    "verifiedJourneys": 500,
+    "teacherVerifiedStudents": 500,
+    "requests": 11000,
+    "expectedStudentDenials": 3000,
+    "eventsReceived": 500,
+    "realtimeP95Ms": 2246,
+    "realtimeMaximumMs": 4646,
+    "failures": [],
+    "endpoints": [
+      {
+        "name": "student_login_lookup",
+        "requests": 500,
+        "failures": 0,
+        "p95Ms": 5162,
+        "p99Ms": 6300
+      },
+      {
+        "name": "get_student_activity_daily_secure",
+        "requests": 1000,
+        "failures": 0,
+        "p95Ms": 3904,
+        "p99Ms": 5212
+      },
+      {
+        "name": "get_student_realm_weekly_quiz_attempts_secure",
+        "requests": 1000,
+        "failures": 0,
+        "p95Ms": 3757,
+        "p99Ms": 5053
+      },
+      {
+        "name": "get_student_realm_lesson_attempts_secure",
+        "requests": 1000,
+        "failures": 0,
+        "p95Ms": 4148,
+        "p99Ms": 5145
+      },
+      {
+        "name": "get_student_realm_assessments_secure",
+        "requests": 1000,
+        "failures": 0,
+        "p95Ms": 4299,
+        "p99Ms": 5254
+      },
+      {
+        "name": "complete_realm_assessment",
+        "requests": 2000,
+        "failures": 0,
+        "p95Ms": 2386,
+        "p99Ms": 3474
+      },
+      {
+        "name": "complete_realm_lesson",
+        "requests": 3000,
+        "failures": 0,
+        "p95Ms": 1937,
+        "p99Ms": 2812
+      },
+      {
+        "name": "complete_realm_quiz",
+        "requests": 1000,
+        "failures": 0,
+        "p95Ms": 2896,
+        "p99Ms": 3993
+      },
+      {
+        "name": "insert_live_activity_event_secure",
+        "requests": 500,
+        "failures": 0,
+        "p95Ms": 2081,
+        "p99Ms": 2548
+      }
+    ],
+    "passed": false
+  },
+  "database": {
+    "settings": {
+      "pg_stat_statements.track_planning": "off",
+      "track_io_timing": "off",
+      "track_wal_io_timing": "off"
+    },
+    "statements": [
+      {
+        "category": "lesson completion RPC",
+        "calls": 3000,
+        "averageExecutionMs": 5.083
+      },
+      {
+        "category": "quiz completion RPC",
+        "calls": 1000,
+        "averageExecutionMs": 5.587
+      },
+      {
+        "category": "assessment completion RPC",
+        "calls": 2000,
+        "averageExecutionMs": 5.649
+      },
+      {
+        "category": "student login RPC",
+        "calls": 500,
+        "averageExecutionMs": 1.197
+      },
+      {
+        "category": "student lesson attempts RPC",
+        "calls": 1000,
+        "averageExecutionMs": 3.185
+      },
+      {
+        "category": "student quiz attempts RPC",
+        "calls": 1000,
+        "averageExecutionMs": 3.123
+      },
+      {
+        "category": "student assessments RPC",
+        "calls": 1000,
+        "averageExecutionMs": 3.083
+      },
+      {
+        "category": "teacher canonical progress RPC",
+        "calls": 20,
+        "averageExecutionMs": 50.969
+      }
+    ],
+    "waitSamples": 68,
+    "samplesWithLockWait": 0,
+    "samplesWithWalWait": 4
+  },
+  "limitations": [
+    "Single profiled run; not a controlled comparison with earlier runs",
+    "Database execution averages cannot be subtracted from HTTP percentiles",
+    "Shared statement deltas and one-second samples cannot locate exact request queuing or exclude short lock waits",
+    "Planning and I/O timing disabled",
+    "No browser or 10000-user capacity validation"
+  ]
+}

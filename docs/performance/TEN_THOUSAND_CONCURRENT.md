@@ -3,6 +3,46 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Completion SQL profile — 18 November
+
+One instrumented 500-student / 20-teacher completion burst preserved all 500
+journeys, canonical teacher results and realtime events. All 11,000 measured
+requests succeeded; 3,000 expected access denials were verified. Concurrent
+retries saved each attempt once and did not duplicate XP. The latency gate still
+failed: login p95 5,162 ms, lesson saves 1,937 ms, quiz saves 2,896 ms and assessment
+saves 2,386 ms. Realtime maximum was 4,646 ms. These worse timings are not a
+controlled regression comparison: profiler overhead, accumulated synthetic
+history and local resource variation differ from earlier runs.
+
+The aggregate transaction profiler now distinguishes all three completion RPCs,
+their secure student reads and canonical teacher progress. SQL execution averages
+were 5.083 / 5.587 / 5.649 ms for lesson / quiz / assessment saves, respectively,
+across the exact 3,000 / 1,000 / 2,000 calls. Login SQL averaged 1.197 ms over 500
+calls. This supports investigating request handling/acquisition rather than
+rewriting completion rules. It does not identify per-request waiting time:
+averages and HTTP percentiles cannot be subtracted, and SQL timings exclude
+network, pool waits and some transaction overhead. No new index or pool tuning
+is justified by this run alone.
+
+There were 68 approximately one-second activity samples: four saw WAL-related
+waits and none saw heavyweight lock waits. Short waits may be missed. Planning
+and I/O timing remained disabled. No statement text, credentials or student IDs
+are exported. Report: `completion-profile-2026-11-18.json`; private orchestration
+and raw aggregates: `/Users/seanjohns/reliq-audits/2026-11-18/completion-profile/`.
+
+The temporary local class index and four private-channel policies were removed
+and absence verified, restoring the original isolated setup. The subsequent
+preflight and 25-student / 175-request smoke passed. Profiler syntax, targeted
+QA lint and diff checks passed. Only diagnostic labels and documentation changed;
+no application build or migration is required, and no hosted settings changed.
+
+Next: correlate completion requests with API acquisition/use timing, using the
+existing local diagnostic approach, before selecting a remedy. The earlier
+instrumented acquisition trace covered logins only. Full-history dashboard reads
+remain a separate request-volume candidate; preserving current-attempt semantics
+requires a tested projection, not an arbitrary history limit. Keep the 500-user
+gate open and do not advance to 10,000-user claims.
+
 ## Application startup reconciliation — 18 November
 
 The live panel now reconciles its saved event snapshot when the database stream

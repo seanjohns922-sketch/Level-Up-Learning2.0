@@ -10,6 +10,13 @@ const totals = () => sql(`select coalesce(json_agg(t),'[]'::json) from (
  select case when userid=(select oid from pg_roles where rolname='anon') then 'student anon' when userid=(select oid from pg_roles where rolname='service_role') then 'fixture provisioning' when userid=(select oid from pg_roles where rolname='authenticated') then 'teacher authenticated' else 'other role' end as workload_role,
  userid::text || ':' || dbid::text || ':' || queryid::text || ':' || toplevel::text as key,
  case
+ when query ilike '%complete_realm_lesson%' then 'lesson completion RPC'
+ when query ilike '%complete_realm_quiz%' then 'quiz completion RPC'
+ when query ilike '%complete_realm_assessment%' then 'assessment completion RPC'
+ when query ilike '%get_student_realm_lesson_attempts_secure%' then 'student lesson attempts RPC'
+ when query ilike '%get_student_realm_weekly_quiz_attempts_secure%' then 'student quiz attempts RPC'
+ when query ilike '%get_student_realm_assessments_secure%' then 'student assessments RPC'
+ when query ilike '%get_class_realm_progress_compat%' then 'teacher canonical progress RPC'
  when query ilike '%get_live_class_event_page_secure%' then 'teacher event page RPC'
  when query ilike '%get_live_class_activity_today%' then 'teacher daily activity RPC'
  when query ilike '%student_lesson_attempts%' then 'lesson attempts table'
