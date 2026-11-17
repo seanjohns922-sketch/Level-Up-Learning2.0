@@ -31,14 +31,28 @@ export function pageFromTreehouseHref(page: TreehouseLinkedPage, room: Treehouse
   return `${page}?${params.toString()}`;
 }
 
-/** Each skin's window painting. Skins without their new painting yet show their original art. */
-const WINDOW_PAINTINGS: Record<string, string> = {
-  "aurora-mountain-cabin": "/images/treehouse-views/aurora.jpg",
+/**
+ * The painting outside the treehouse window for each home skin: a light copy
+ * (about 350 KB) in /images/treehouse-views, since the original skin art is
+ * 8–9 MB and made the room slow to appear. Aurora has its own repainted view.
+ * A skin without a light copy yet shows its original art.
+ */
+const WINDOW_VIEW_FILES: Record<string, string> = {
+  "aurora-mountain-cabin": "aurora",
+  "ancient-hall-of-explorers": "ancient-hall-of-explorers",
+  "crystal-observatory": "crystal-observatory",
+  "enchanted-forest-clearing": "enchanted-forest-clearing",
+  "explorer-study": "explorer-study",
+  "floating-sky-sanctuary": "floating-sky-sanctuary",
+  "grand-explorer-lodge": "grand-explorer-lodge",
+  "hall-of-infinite-portals": "hall-of-infinite-portals",
+  "hidden-waterfall-retreat": "hidden-waterfall-retreat",
 };
 export const DEFAULT_WINDOW_VIEW = "/images/treehouse-views/aurora.jpg";
 
 export function treehouseWindowView(themeImage: string | undefined) {
   if (!themeImage) return DEFAULT_WINDOW_VIEW;
   const name = themeImage.split("/").pop()?.replace(/\.[a-z]+$/i, "") ?? "";
-  return WINDOW_PAINTINGS[name] ?? themeImage;
+  const file = WINDOW_VIEW_FILES[name];
+  return file ? `/images/treehouse-views/${file}.jpg` : themeImage;
 }

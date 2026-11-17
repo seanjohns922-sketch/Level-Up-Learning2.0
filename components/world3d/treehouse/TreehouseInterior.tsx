@@ -8,7 +8,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
-import { buildGemCave, buildHallOfLegends, buildMainRoom, type TreehouseRoom } from "@/components/world3d/treehouse/treehouseRooms";
+import { buildGemCave, buildHallOfLegends, buildMainRoom, type MainTreehouseRoom, type TreehouseRoom } from "@/components/world3d/treehouse/treehouseRooms";
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { economyErrorMessage, equipEconomyItem, fetchDemoEconomy, fetchStudentEconomy, unequipEconomySlot, type EconomyItem, type EconomyState } from "@/lib/economy";
 import { awardAndReveal } from "@/lib/gem-reveal";
@@ -62,15 +62,30 @@ function RoomScene({ room, look, reduceMotion }: { room: TreehouseRoom; look: Re
   );
 }
 
-function MainRoom({ viewUrl, look, reduceMotion }: { viewUrl: string; look: React.RefObject<LookState>; reduceMotion: boolean }) {
-  const source = useTexture(viewUrl);
-  const room = useMemo(() => {
+/**
+ * The main room is built once; the window painting loads on its own, so a
+ * slow or changed view never blanks or rebuilds the room.
+ */
+function MainRoom({ viewUrl, look, reduceMotion }: { viewUrl: string | null; look: React.RefObject<LookState>; reduceMotion: boolean }) {
+  const room = useMemo(() => buildMainRoom(), []);
+  return (
+    <>
+      <RoomScene room={room} look={look} reduceMotion={reduceMotion} />
+      {viewUrl ? <Suspense fallback={null}><WindowView room={room} url={viewUrl} /></Suspense> : null}
+    </>
+  );
+}
+
+function WindowView({ room, url }: { room: MainTreehouseRoom; url: string }) {
+  const source = useTexture(url);
+  useEffect(() => {
     const view = source.clone();
     view.colorSpace = THREE.SRGBColorSpace;
     view.needsUpdate = true;
-    return buildMainRoom(view);
-  }, [source]);
-  return <RoomScene room={room} look={look} reduceMotion={reduceMotion} />;
+    room.setView(view);
+    return () => view.dispose();
+  }, [room, source]);
+  return null;
 }
 
 function GemCave({ gemsShown, look, reduceMotion }: { gemsShown: number; look: React.RefObject<LookState>; reduceMotion: boolean }) {
@@ -119,7 +134,8 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
   const owned = useMemo(() => new Set(economy?.inventory.map((entry) => entry.item_key) ?? []), [economy?.inventory]);
   const equippedKey = preview ? previewTheme : economy?.equipped.background ?? null;
   const equippedImage = (themes.find((item) => item.item_key === equippedKey)?.metadata as { image?: string } | undefined)?.image;
-  const viewUrl = treehouseWindowView(equippedImage);
+  // Wait until the equipped skin is known, so only one painting is downloaded.
+  const viewUrl = economy || message ? treehouseWindowView(equippedImage) : null;
 
   function go(next: TreehouseRoomParam) {
     look.current = { ...START_LOOK[next] };
@@ -203,7 +219,7 @@ export default function TreehouseInterior({ initialRoom, preview }: { initialRoo
             <button type="button" onClick={() => setPickerOpen(false)} aria-label="Close window views" className="rounded-lg p-1 hover:bg-white/10"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <ViewChoice image={STOCK_ROOM_IMAGE} name="Explorer Study" selected={!equippedKey} onChoose={() => void chooseView(null)} />
+            <ViewChoice image={treehouseWindowView(STOCK_ROOM_IMAGE)} name="Explorer Study" selected={!equippedKey} onChoose={() => void chooseView(null)} />
             {themes.map((item) => {
               const image = (item.metadata as { image?: string })?.image ?? STOCK_ROOM_IMAGE;
               return <ViewChoice key={item.item_key} image={treehouseWindowView(image)} name={item.name} selected={equippedKey === item.item_key} locked={!preview && !owned.has(item.item_key)} onChoose={() => void chooseView(item)} />;

@@ -151,7 +151,10 @@ function gumLeafFrame(kit: Kit) {
 }
 
 // ---------- main room ----------
-export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
+/** The main room; its window painting can change without rebuilding the room. */
+export type MainTreehouseRoom = TreehouseRoom & { setView: (view: THREE.Texture) => void };
+
+export function buildMainRoom(): MainTreehouseRoom {
   const kit = new Kit();
   const g = new THREE.Group();
   const updates: Array<(t: number, reduce: boolean) => void> = [];
@@ -200,7 +203,9 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   g.add(at(kit.mesh(new THREE.BoxGeometry(0.1, WR * 2, 0.1), darkWood), 0, WC, -R + 0.05));
   g.add(at(kit.rbox(4.2, 0.3, 1.1, 0.12, "#7a4521"), 0, WC - WR - 0.05, -R + 0.6));
   // The view: the equipped skin's painting, framed by gum leaves for depth.
-  const viewPlane = new THREE.Mesh(kit.track(new THREE.PlaneGeometry(34, 14.6)), kit.track(new THREE.MeshBasicMaterial({ map: view, fog: false })));
+  // Dusk sky until the painting arrives, so the window is never a hole.
+  const viewMaterial = kit.track(new THREE.MeshBasicMaterial({ color: "#c9a77a", fog: false }));
+  const viewPlane = new THREE.Mesh(kit.track(new THREE.PlaneGeometry(34, 14.6)), viewMaterial);
   viewPlane.position.set(0, WC - 2.6, -R - 14); g.add(viewPlane);
   const leaves = new THREE.Mesh(kit.track(new THREE.PlaneGeometry(9, 7)), gumLeafFrame(kit));
   leaves.position.set(0, WC, -R - 1.4); g.add(leaves);
@@ -306,7 +311,17 @@ export function buildMainRoom(view: THREE.Texture): TreehouseRoom {
   sign(wardrobeSign, -7.7, 3.9, 2.05, Math.PI / 2);
   lantern(kit, g, updates, -1.8, 6.4, 1.2, 1.6); lantern(kit, g, updates, 2.8, 6.2, -1.6, 1.4); lantern(kit, g, updates, 0.6, 6.6, 4.2, 1.2);
   fairyLights(kit, g, updates, [[-6.8, 6.2, -3.8], [-3, 5.4, -6.6], [0, 5.9, -7.4], [3.2, 5.3, -6.8], [6.6, 6, -3.6]]);
-  return { group: finishRoom(g), update: (t, r) => updates.forEach((u) => u(t, r)), dispose: () => kit.dispose(), eye: new THREE.Vector3(-0.4, 4.4, 6.9), yaw: Math.PI + 0.12, pitch: -0.06, background: "#1b120b" };
+  return {
+    group: finishRoom(g),
+    update: (t, r) => updates.forEach((u) => u(t, r)),
+    dispose: () => kit.dispose(),
+    setView: (view) => {
+      viewMaterial.map = view;
+      viewMaterial.color.set("#ffffff");
+      viewMaterial.needsUpdate = true;
+    },
+    eye: new THREE.Vector3(-0.4, 4.4, 6.9), yaw: Math.PI + 0.12, pitch: -0.06, background: "#1b120b",
+  };
 }
 
 // ---------- Gem Cave ----------

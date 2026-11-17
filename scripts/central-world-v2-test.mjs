@@ -2,6 +2,7 @@
 // stays flat, new features (river, bridges, paths, gums) stay out of it, and the
 // treehouse links in and out correctly.
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import {
   HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WATER_Y,
   HUB_V2_BUILD_RULES, HUB_V2_FLAT_TOLERANCE, HUB_V2_GRID, HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubIsReservedCell, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubTerrainHeight, hubV2Spot, isCentralWorldV2Enabled,
@@ -86,7 +87,15 @@ checks += 6;
 // Window views: the aurora skin and the stock room show the new painting; other skins keep their art until theirs arrives.
 assert.equal(treehouseWindowView(undefined), DEFAULT_WINDOW_VIEW);
 assert.equal(treehouseWindowView("/images/home-themes/aurora-mountain-cabin.png"), "/images/treehouse-views/aurora.jpg");
-assert.equal(treehouseWindowView("/images/home-themes/crystal-observatory.png"), "/images/home-themes/crystal-observatory.png");
+assert.equal(treehouseWindowView("/images/home-themes/crystal-observatory.png"), "/images/treehouse-views/crystal-observatory.jpg");
+assert.equal(treehouseWindowView("/images/home-themes/not-yet-repainted.png"), "/images/home-themes/not-yet-repainted.png");
+// Every home skin has a light window view, so the treehouse never downloads 8 MB art.
+for (const png of fs.readdirSync("public/images/home-themes").filter((file) => file.endsWith(".png"))) {
+  const view = treehouseWindowView(`/images/home-themes/${png}`);
+  assert.ok(view.startsWith("/images/treehouse-views/"), `${png} has no light window view`);
+  const size = fs.statSync(`public${view}`).size;
+  assert.ok(size < 600 * 1024, `${view} is ${Math.round(size / 1024)} KB; window views must stay light`);
+}
 checks += 3;
 
 // ---------- building in the bigger hub ----------
