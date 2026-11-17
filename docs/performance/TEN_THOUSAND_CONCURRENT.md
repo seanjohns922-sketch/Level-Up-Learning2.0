@@ -3,6 +3,53 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Standard API completion pool comparison — 18 November
+
+Repeated the completion workload on the exact same standard Supabase PostgREST
+v14.8 image ID at pool sizes 10 / 30 / 10. Each disposable API inherited the
+original configuration with only `PGRST_DB_POOL` overridden. No custom binary,
+timing hook or tracing headers were enabled. Each received the same 25-student
+smoke before the 500-student / 20-teacher workload.
+
+| Pool / run | Login p95 ms | Lesson save p95 ms | Quiz save p95 ms | Assessment save p95 ms | Gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 10 | 2,288 | 2,047 | 2,712 | 2,107 | Fail |
+| 30 | 2,212 | 1,050 | 1,931 | 1,847 | Fail |
+| 10 restored | 3,717 | 2,033 | 2,720 | 2,600 | Fail |
+
+Each run verified all 500 completion journeys, canonical teacher results and
+realtime events. All 11,000 measured RPC requests succeeded; all 3,000 expected
+access denials passed. Duplicate requests did not duplicate attempts or rewards.
+The original strict p95/p99 and event-delivery gates were unchanged.
+
+Pool 30 improved completion timings in this sequence, especially lessons and
+quizzes; those timings increased again at 10. Login timings did not improve
+materially against the first baseline, and all secure before/after student-read
+p95 values were worse at 30 than in that first run. This supports a limited
+completion-workload benefit, not a sufficient or universal remedy. Do not promote
+the setting to hosted Supabase: every run still failed overall, local variation
+is substantial, and retakes grow synthetic history. Earlier inconsistent mixed-
+dashboard comparisons remain relevant contrary evidence. No additional blind
+pool-size sweeps are warranted by this checkpoint.
+
+The original API container and automatic networking were restored after every
+run. Temporary local class index and four private-channel policies were removed
+and their absence verified. Final local preflight and 25-student / 175-request
+smoke passed. Report validation checked the identical image ID, all expected
+counts and restoration logs. Only documentation/evidence changed in this checkout;
+no application build, migration or production setting change is required.
+
+Evidence: `completion-official-pools-2026-11-18.json`. Private runner and complete
+logs: `/Users/seanjohns/reliq-audits/2026-11-18/completion-official/`.
+This is not a cloud-capacity, browser or long-soak test. The workload excludes
+concurrent six-source dashboard refreshes. 10,000-user capacity remains unproven.
+
+Next code investigation: a compact current-attempt event read for Live Class,
+with equivalence tests against the existing full-history reconstruction before
+replacing it. Preserve fallback behaviour, repeat attempts, late events, score
+semantics and all role boundaries. This targets independently measured dashboard
+request volume; it must not be presented as a proven fix for student-only bursts.
+
 ## Completion acquisition comparison — 18 November
 
 Four custom-runtime traced runs at pool sizes 10 / 10 / 30 / 10 all preserved
