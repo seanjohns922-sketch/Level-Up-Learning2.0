@@ -520,7 +520,7 @@ export function ParentRewards() {
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p>
         <h1 className="mt-1 text-3xl font-black sm:text-4xl">Unlocked collection</h1>
-        <p className="mt-2 text-slate-600">See the Gems and Legend Cards each child has earned.</p>
+        <p className="mt-2 text-slate-600">See the Gems and RELIQS each child has earned.</p>
       </div>
 
       {children.length ? (
@@ -557,9 +557,9 @@ function UnlockedCollection({ child, compactHeading = false }: { child: ParentCh
         <div>
           {!compactHeading ? <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Rewards</p> : null}
           <h3 id="unlocked-collection-title" className="text-xl font-black">{child.displayName}&apos;s collection</h3>
-          <p className="mt-1 text-sm text-slate-600">Gems and Legend Cards earned through learning.</p>
+          <p className="mt-1 text-sm text-slate-600">Gems and RELIQS earned through learning.</p>
         </div>
-        <p className="text-sm font-bold text-slate-500">{gems.length} Gems · {legends.length} Cards</p>
+        <p className="text-sm font-bold text-slate-500">{gems.length} {gems.length === 1 ? "Gem" : "Gems"} · {legends.length} {legends.length === 1 ? "RELIQ" : "RELIQS"}</p>
       </div>
 
       <div className="mt-4 grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -574,7 +574,7 @@ function UnlockedCollection({ child, compactHeading = false }: { child: ParentCh
           ))}
         </CollectionGroup>
 
-        <CollectionGroup title="Legend Cards" emptyText="No Legend Cards unlocked yet.">
+        <CollectionGroup title="RELIQS" emptyText="No RELIQS unlocked yet.">
           {legends.map((legend) => <ParentLegendCard key={legend.id} legend={legend} />)}
         </CollectionGroup>
       </div>
@@ -591,7 +591,7 @@ function ParentLegendCard({ legend }: { legend: Legend }) {
   return (
     <div className="grid grid-cols-[92px_minmax(0,1fr)] gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
       <div className="flex aspect-[63/88] items-center justify-center overflow-hidden rounded-md bg-slate-950 p-1.5">
-        <LegendCardArtwork src={legend.images.cardFront} alt={`${legend.name} Legend Card`} className="h-full w-full" />
+        <LegendCardArtwork src={legend.images.cardFront} alt={`${legend.name} RELIQ card`} className="h-full w-full" />
       </div>
       <div className="min-w-0 self-center"><p className="font-black leading-snug">{legend.name}</p><p className="mt-1 text-xs font-semibold text-slate-500">{realmName(legend.realmId)}</p><p className="mt-1 text-xs text-slate-500">{legend.yearLabel}</p></div>
     </div>
@@ -1042,7 +1042,7 @@ export function ParentRealmDetail({ studentId, realmId }: { studentId: string; r
       <div className="grid gap-3 sm:grid-cols-3">
         <SummaryMetric label="Current level" value={levelLabel} />
         <SummaryMetric label="Current week" value={data.current.currentWeek ? `Week ${data.current.currentWeek}` : "Not started"} />
-        <SummaryMetric label="Current focus" value={currentWeekPlan?.title ?? data.current.currentFocus ?? "Not available"} />
+        <SummaryMetric label="Current focus" value={currentWeekPlan?.title ?? data.current.currentFocus ?? (data.current.currentWeek ? "Not available" : "Starts after the pre-test")} />
       </div>
 
       <section className="border border-slate-200 bg-white p-5">
