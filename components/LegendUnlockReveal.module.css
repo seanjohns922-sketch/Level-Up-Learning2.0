@@ -165,7 +165,7 @@
 
 .flipper {
   position: relative;
-  width: 200px;
+  width: 240px;
   transform-style: preserve-3d;
   transition: transform 0.9s cubic-bezier(0.45, 0, 0.2, 1.25);
 }
@@ -175,7 +175,12 @@
 }
 
 @media (min-width: 640px) {
-  .flipper { width: 236px; }
+  .flipper { width: 300px; }
+}
+
+/* On an iPad and up the card is the hero of the screen. */
+@media (min-width: 1024px) {
+  .flipper { width: 380px; }
 }
 
 .face {
@@ -274,9 +279,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
   font-weight: 900;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.3em;
   color: rgb(var(--realm-rgb));
   text-shadow: 0 0 24px rgb(var(--realm-rgb) / 0.6);
 }
@@ -284,8 +290,8 @@
 .unlockedTag::before,
 .unlockedTag::after {
   content: "";
-  width: 28px;
-  height: 1px;
+  width: 36px;
+  height: 2px;
   background: linear-gradient(90deg, transparent, rgb(var(--realm-rgb)));
 }
 

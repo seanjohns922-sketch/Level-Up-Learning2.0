@@ -210,8 +210,8 @@ export default function LegendUnlockReveal({
       {flipped && stage === "flip" && <div className={styles.flash} aria-hidden />}
 
       <div className="relative flex min-h-full w-full items-center justify-center overflow-hidden px-4 py-8">
-        <div className="relative z-10 flex w-full max-w-[400px] flex-col items-center lg:max-w-[920px]">
-          <div className={`flex w-full flex-col items-center ${showInfo ? "lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:items-center lg:gap-10" : ""}`}>
+        <div className="relative z-10 flex w-full max-w-[480px] flex-col items-center lg:max-w-[1120px]">
+          <div className={`flex w-full flex-col items-center ${showInfo ? "lg:grid lg:grid-cols-[400px_minmax(0,1fr)] lg:items-center lg:gap-14" : ""}`}>
             {/* ── Card: sealed, then flipped to the front ── */}
             {showCard && (
               <div
@@ -249,24 +249,32 @@ export default function LegendUnlockReveal({
               <div className="relative z-10 mt-8 flex w-full flex-col items-center lg:mt-0 lg:items-stretch">
                 <div className={`text-center lg:text-left ${styles.rise}`}>
                   <p className={styles.unlockedTag}>RELIQ UNLOCKED</p>
-                  <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{legend.name}</h2>
-                  <p className="mt-1 text-sm font-semibold text-white/55">
+                  <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl font-black leading-none tracking-normal text-white sm:text-6xl">{legend.name}</h2>
+                  <p
+                    className="mt-3 inline-flex rounded-full border px-3.5 py-1.5 font-[family-name:var(--font-display)] text-sm font-extrabold text-white"
+                    style={{ background: `rgb(${realmRgb} / 0.18)`, borderColor: `rgb(${realmRgb} / 0.45)` }}
+                  >
                     {legend.strand} · {legend.yearLabel}
                   </p>
 
                   {scorePercent !== undefined && (
                     <div
-                      className="mt-4 inline-flex items-center gap-3 rounded-xl px-4 py-2"
-                      style={{ background: `rgb(${realmRgb} / 0.12)`, border: `1px solid rgb(${realmRgb} / 0.35)` }}
+                      className="mt-5 flex items-center gap-4 rounded-3xl p-3 pr-5 sm:inline-flex"
+                      style={{ background: `rgb(${realmRgb} / 0.1)`, border: `1px solid rgb(${realmRgb} / 0.4)` }}
                     >
-                      <span className="text-3xl font-black" style={{ color: realmColor }}>
-                        {scorePercent}%
+                      <span
+                        className="grid h-20 w-20 shrink-0 place-items-center rounded-full"
+                        style={{ background: `conic-gradient(${realmColor} 0 ${scorePercent}%, rgb(255 255 255 / 0.12) ${scorePercent}% 100%)` }}
+                      >
+                        <span className="grid h-16 w-16 place-items-center rounded-full bg-[#0b0d14] font-[family-name:var(--font-display)] text-2xl font-black" style={{ color: realmColor }}>
+                          {scorePercent}%
+                        </span>
                       </span>
-                      <span className="text-sm font-bold text-white/75">{scoreLabel}</span>
+                      <span className="font-[family-name:var(--font-display)] text-2xl font-black text-white">{scoreLabel}</span>
                     </div>
                   )}
 
-                  <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/65 lg:mx-0">{legend.description}</p>
+                  <p className="mx-auto mt-5 max-w-lg text-lg font-semibold leading-relaxed text-white/80 lg:mx-0">{legend.description}</p>
 
                   <ReadAloudBtn
                     text={revealSpeech}
@@ -276,11 +284,11 @@ export default function LegendUnlockReveal({
                   />
 
                   {hasUnlockVideo ? (
-                    <div className="mt-4 w-full rounded-xl border border-white/12 bg-black/30 p-2 backdrop-blur-sm">
-                      <div className="mb-2 text-[11px] font-bold tracking-[0.22em]" style={{ color: realmColor }}>
+                    <div className="mt-5 w-full rounded-3xl border-2 bg-black/35 p-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-sm" style={{ borderColor: `rgb(${realmRgb} / 0.5)` }}>
+                      <div className="mb-2 px-1.5 font-[family-name:var(--font-display)] text-xs font-black tracking-[0.18em]" style={{ color: realmColor }}>
                         RELIQ CINEMATIC
                       </div>
-                      <div className="overflow-hidden rounded-lg bg-black shadow-2xl">
+                      <div className="overflow-hidden rounded-2xl bg-black shadow-2xl">
                         <div className="aspect-video w-full">
                           {videoFailed ? (
                             <div className="flex h-full items-center justify-center px-5 text-center text-sm text-white/75">
@@ -316,13 +324,13 @@ export default function LegendUnlockReveal({
                       if (hasUnlockVideo) finishUnlockVideo();
                       onViewLegends();
                     }}
-                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-[#0b0d14] transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
+                    className="flex min-h-16 w-full items-center justify-center gap-2.5 rounded-2xl px-4 py-3 font-[family-name:var(--font-display)] text-lg font-black text-[#0b0d14] transition-all duration-150 hover:brightness-110 active:translate-y-1"
                     style={{
-                      background: `linear-gradient(135deg, rgb(${realmRgb}), rgb(${realmRgb} / 0.8))`,
-                      boxShadow: `0 6px 28px rgb(${realmRgb} / 0.45)`,
+                      background: `linear-gradient(180deg, rgb(${realmRgb} / 0.85), rgb(${realmRgb}))`,
+                      boxShadow: `0 6px 0 rgb(0 0 0 / 0.45), 0 14px 32px rgb(${realmRgb} / 0.4)`,
                     }}
                   >
-                    <Library className="h-5 w-5" aria-hidden />
+                    <Library className="h-6 w-6" aria-hidden />
                     View My RELIQS
                   </button>
                   <button
@@ -330,11 +338,11 @@ export default function LegendUnlockReveal({
                       if (hasUnlockVideo) finishUnlockVideo();
                       onContinue();
                     }}
-                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 font-bold text-white/90 transition-all duration-200 hover:bg-white/15 active:scale-[0.98]"
-                    style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.2)" }}
+                    className="flex min-h-16 w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-white/25 bg-white/10 px-4 py-3 font-[family-name:var(--font-display)] text-lg font-black text-white transition-all duration-150 hover:bg-white/15 active:translate-y-1"
+                    style={{ boxShadow: "0 6px 0 rgb(0 0 0 / 0.35)" }}
                   >
                     Continue
-                    <ArrowRight className="h-5 w-5" aria-hidden />
+                    <ArrowRight className="h-6 w-6" aria-hidden />
                   </button>
                 </div>
               </div>
