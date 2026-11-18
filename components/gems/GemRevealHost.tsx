@@ -26,6 +26,8 @@ const TIER: Record<GemRarity, number> = {
   epic: 3,
   legendary: 4,
 };
+/** Lowest to highest, for the rarity ladder under the gem. */
+const RARITY_LADDER = Object.keys(TIER) as GemRarity[];
 const PARTICLES = [10, 18, 28, 40, 56];
 const SPIN_SECS = [0, 18, 15, 12, 9];
 /** Charge-up before the gem appears, in ms; common and uncommon skip it. */
@@ -280,7 +282,7 @@ function GemReveal({ gem, position, total, canDisplay, busy, onDisplay, onVault,
               <SparkleBurst colors={sparkColors} count={PARTICLES[tier]} />
               <div className={styles.gemIn}>
                 <div className={styles.gemFloat} style={{ filter: `drop-shadow(0 10px 34px rgb(${stoneTriple} / 0.7))` }}>
-                  <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} emblem={emblemForGem(gem.realm_id, gem.milestone_type)} stone={stone} size={168} />
+                  <GemIcon rarity={gem.rarity} cut={cutForGem(gem.id, gem.rarity)} emblem={emblemForGem(gem.realm_id, gem.milestone_type)} stone={stone} size={220} />
                   {tier >= 1 ? <div className={styles.glint} aria-hidden="true" /> : null}
                 </div>
               </div>
@@ -289,23 +291,52 @@ function GemReveal({ gem, position, total, canDisplay, busy, onDisplay, onVault,
         </div>
 
         {shown ? (
-          <div className="pointer-events-auto relative z-10 mt-4 flex w-full max-w-sm flex-col items-center text-center">
-            <p className={`${styles.tag} ${styles.rise1}`}>{RARITY_LABEL[gem.rarity].toUpperCase()} GEM</p>
-            <h2 className={`${styles.rise1} mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl`}>{gem.name}</h2>
-            {stone ? <p className={`${styles.rise2} mt-1 text-sm font-semibold text-white/55`}>{stone.label}</p> : null}
-            <p className={`${styles.rise2} mt-3 text-sm font-semibold text-white/70`}>
+          <div className="pointer-events-auto relative z-10 mt-4 flex w-full max-w-xl flex-col items-center text-center">
+            <p
+              className={`${styles.rise1} rounded-full border px-5 py-2 font-[family-name:var(--font-display)] text-sm font-black tracking-[0.28em]`}
+              style={{ color: rarity.light, borderColor: rarity.light, background: `linear-gradient(90deg, ${rarity.dark}99, ${rarity.mid}55, ${rarity.dark}99)` }}
+            >
+              {RARITY_LABEL[gem.rarity].toUpperCase()} GEM
+            </p>
+            <h2 className={`${styles.rise1} mt-4 font-[family-name:var(--font-display)] text-4xl font-black tracking-normal text-white sm:text-6xl`} style={{ textShadow: `0 6px 30px rgb(${stoneTriple} / 0.4)` }}>{gem.name}</h2>
+            {stone ? <p className={`${styles.rise2} mt-2 text-lg font-bold text-white/70`}>{stone.label}</p> : null}
+            <p className={`${styles.rise2} mt-2 text-xl font-semibold text-white/85`}>
               Earned for {earnedFor(gem.description)}
             </p>
 
-            <div className={`${styles.rise3} mt-6 flex w-full flex-col gap-2`}>
+            <ol className={`${styles.rise2} mt-5 flex items-end gap-1`} aria-label={`Rarity: ${RARITY_LABEL[gem.rarity]}, ${tier + 1} of ${RARITY_LADDER.length}`}>
+              {RARITY_LADDER.map((step) => {
+                const here = step === gem.rarity;
+                return (
+                  <li key={step} className="flex w-[4.6rem] flex-col items-center gap-2" aria-hidden="true">
+                    <span
+                      className={here ? "h-6 w-6 rounded-md" : "h-4 w-4 rounded"}
+                      style={{
+                        transform: "rotate(45deg)",
+                        background: GEM_RARITY[step].mid,
+                        opacity: here ? 1 : 0.45,
+                        boxShadow: here ? `0 0 18px ${GEM_RARITY[step].mid}` : undefined,
+                        outline: here ? `3px solid ${GEM_RARITY[step].light}80` : undefined,
+                        outlineOffset: 3,
+                      }}
+                    />
+                    <span className={here ? "font-[family-name:var(--font-display)] text-xs font-black" : "text-xs font-bold text-white/50"} style={here ? { color: rarity.light } : undefined}>
+                      {RARITY_LABEL[step]}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <div className={`${styles.rise3} mt-7 flex w-full max-w-md flex-col gap-3`}>
               {canDisplay ? (
-                <button type="button" onClick={onDisplay} disabled={busy} className="min-h-11 rounded-xl px-4 py-2.5 text-sm font-black text-slate-950 transition hover:brightness-110 disabled:opacity-60" style={{ background: `linear-gradient(135deg, rgb(${stoneTriple}), rgb(${stoneTriple} / 0.8))`, boxShadow: `0 6px 24px rgb(${stoneTriple} / 0.45)` }}>
+                <button type="button" onClick={onDisplay} disabled={busy} className="min-h-14 rounded-2xl px-4 font-[family-name:var(--font-display)] text-lg font-black text-slate-950 transition hover:brightness-110 active:translate-y-1 disabled:opacity-60" style={{ background: `linear-gradient(180deg, rgb(${stoneTriple} / 0.85), rgb(${stoneTriple}))`, boxShadow: `0 6px 0 rgb(0 0 0 / 0.4), 0 14px 30px rgb(${stoneTriple} / 0.4)` }}>
                   Display in My Home
                 </button>
               ) : null}
-              <div className="flex gap-2">
-                <button type="button" onClick={onVault} className="min-h-11 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">View Gem Vault</button>
-                <button type="button" onClick={onNext} className="min-h-11 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-black text-white/85 transition hover:bg-white/10">
+              <div className="flex gap-3">
+                <button type="button" onClick={onVault} className="min-h-16 flex-1 rounded-2xl border-2 border-white/25 bg-white/10 px-4 font-[family-name:var(--font-display)] text-lg font-black text-white transition hover:bg-white/15 active:translate-y-1" style={{ boxShadow: "0 6px 0 rgb(0 0 0 / 0.35)" }}>View Gem Vault</button>
+                <button type="button" onClick={onNext} className="min-h-16 flex-1 rounded-2xl px-4 font-[family-name:var(--font-display)] text-lg font-black text-slate-950 transition hover:brightness-110 active:translate-y-1" style={{ background: `linear-gradient(180deg, ${rarity.light}, ${rarity.mid})`, boxShadow: `0 6px 0 ${rarity.dark}, 0 14px 30px ${rarity.glow}` }}>
                   {position < total - 1 ? `Next (${total - position - 1})` : "Continue"}
                 </button>
               </div>
