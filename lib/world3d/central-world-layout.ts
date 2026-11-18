@@ -136,14 +136,32 @@ export function placementOccupiesCell(placement: CentralWorldPlacement, item: Ec
   return gridX >= startX && gridX < startX + width && gridZ >= startZ && gridZ < startZ + depth;
 }
 
+// Trees, plants, décor and animals stand on a base of at most 2 × 2 squares, so
+// their branches can hang over paths, the river bank and each other. Everything
+// else takes its whole footprint.
+const COMPACT_BASE_LIMIT = 2;
+
+function groundSize(item: EconomyItem, rotation: CentralWorldPlacement["rotation"]): [number, number] {
+  const [width, depth] = rotatedGridSize(item, rotation);
+  return isCompactScenery(item) ? [Math.min(width, COMPACT_BASE_LIMIT), Math.min(depth, COMPACT_BASE_LIMIT)] : [width, depth];
+}
+
 function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
-  const [width, depth] = rotatedGridSize(item, placement.rotation);
+  const [width, depth] = groundSize(item, placement.rotation);
   const cells: string[] = [];
   const startX = placement.gridX - Math.floor(width / 2);
   const startZ = placement.gridZ - Math.floor(depth / 2);
   for (let x = 0; x < width; x += 1) for (let z = 0; z < depth; z += 1) cells.push(`${startX + x}:${startZ + z}`);
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) cells.push(...homeAccessCells(placement));
   return cells;
+}
+
+/** The squares a placement stands on and needs clear: what the build preview colours in. */
+export function placementGroundCells(placement: CentralWorldPlacement, item: EconomyItem): Array<{ gridX: number; gridZ: number }> {
+  return occupiedCells(placement, item).map((key) => {
+    const [gridX, gridZ] = key.split(":").map(Number);
+    return { gridX, gridZ };
+  });
 }
 
 export function isCentralWorldProtectedCell(gridX: number, gridZ: number) {
@@ -191,24 +209,28 @@ export function isCompactScenery(item: EconomyItem) {
     && !FULL_SPACE_SCENERY.has(String(item.metadata.worldAssetKey));
 }
 
-export function validateCentralWorldPlacement(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = [], rules: CentralWorldBuildRules = CENTRAL_WORLD_BUILD_RULES) {
+/** Why an item cannot go where it is held, so the builder can say so. */
+export type CentralWorldPlacementProblem = "outside" | "reserved" | "occupied" | "needs-track" | "home-doorway";
+
+export function centralWorldPlacementProblem(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = [], rules: CentralWorldBuildRules = CENTRAL_WORLD_BUILD_RULES): CentralWorldPlacementProblem | null {
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
-    if (rules.fixedHome) return false;
+    if (rules.fixedHome) return "reserved";
     const anchors = getCentralWorldHomeAnchors(placement);
-    if (!reachablePoint(anchors.entrance) || !reachablePoint(anchors.exit)) return false;
+    if (!reachablePoint(anchors.entrance) || !reachablePoint(anchors.exit)) return "home-doorway";
   }
   const cells = occupiedCells(placement, item);
   for (const key of cells) {
     const [x, z] = key.split(":").map(Number);
-    if (!insideGrid(rules.grid, x, z) || rules.isReservedCell(x, z)) return false;
+    if (!insideGrid(rules.grid, x, z)) return "outside";
+    if (rules.isReservedCell(x, z)) return "reserved";
   }
   const compact = isCompactScenery(item);
   const ownCell = `${placement.gridX}:${placement.gridZ}`;
-  // Squares taken by big things (whole footprint) and by compact things (their one square).
+  // Squares taken by big things (whole footprint) and by compact things (their base).
   const blocked = new Set<string>();
   const compactCells = new Set<string>();
   const support = isTrainAsset(item.metadata.worldAssetKey) ? trainTrackSupport(placement, placements, itemsById) : null;
-  if (isTrainAsset(item.metadata.worldAssetKey) && item.metadata.worldAssetKey !== "rail_train" && !support) return false;
+  if (isTrainAsset(item.metadata.worldAssetKey) && item.metadata.worldAssetKey !== "rail_train" && !support) return "needs-track";
   if (placement.itemId === CENTRAL_WORLD_HOME_KEY) {
     for (const tile of groundTiles) if (tile.tileType === "water") blocked.add(`${tile.gridX}:${tile.gridZ}`);
   }
@@ -219,17 +241,23 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
     if (placement.itemId === CENTRAL_WORLD_HOME_KEY && existing.itemId === CENTRAL_WORLD_HOME_KEY) continue;
     const existingItem = existing.itemId === CENTRAL_WORLD_HOME_KEY ? CENTRAL_WORLD_HOME_ITEM : itemsById.get(existing.itemId);
     // Do not guess an unloaded reward footprint when deciding where a home fits.
-    if (!existingItem) return false;
+    if (!existingItem) return "occupied";
     if (isCompactScenery(existingItem)) {
       compactCells.add(`${existing.gridX}:${existing.gridZ}`);
-      // A big item still needs the compact item's whole footprint clear.
+      // A big item still needs the compact item's base clear.
       if (!compact) occupiedCells(existing, existingItem).forEach((cell) => blocked.add(cell));
     } else {
       occupiedCells(existing, existingItem).forEach((cell) => blocked.add(cell));
     }
   }
-  if (compact) return !compactCells.has(ownCell) && cells.every((cell) => !blocked.has(cell));
-  return cells.every((cell) => !blocked.has(cell) && !compactCells.has(cell));
+  const clear = compact
+    ? !compactCells.has(ownCell) && cells.every((cell) => !blocked.has(cell))
+    : cells.every((cell) => !blocked.has(cell) && !compactCells.has(cell));
+  return clear ? null : "occupied";
+}
+
+export function validateCentralWorldPlacement(placement: CentralWorldPlacement, item: EconomyItem, placements: CentralWorldPlacement[], itemsById: Map<string, EconomyItem>, groundTiles: CentralWorldGroundTile[] = [], rules: CentralWorldBuildRules = CENTRAL_WORLD_BUILD_RULES) {
+  return centralWorldPlacementProblem(placement, item, placements, itemsById, groundTiles, rules) === null;
 }
 
 export function readCentralWorldPlacements(scope: string) {

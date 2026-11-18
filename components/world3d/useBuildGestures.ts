@@ -4,9 +4,10 @@ import { useEffect, useRef, type RefObject } from "react";
 
 /** Camera gestures for Edit World, on whatever wraps the 3D canvas.
  *
- *  Touch:    one finger is left to the build surface (place, paint, drag an
- *            item); dragging empty ground pans (the surface asks for it);
- *            two fingers pinch to zoom, twist to turn and slide to pan.
+ *  Touch:    one finger is left to the build surface: it moves around the world
+ *            (the surface asks for a pan), or paints when a paint tool is on.
+ *            Two fingers pinch to zoom and twist to turn; sliding them tilts the
+ *            view, or moves around while painting (one finger is busy then).
  *  Mouse:    left button is the build surface; right-drag turns the view;
  *            the wheel zooms.
  *  Trackpad: pinch zooms (the browser sends ctrl+wheel); a two-finger swipe pans.
@@ -15,9 +16,14 @@ import { useEffect, useRef, type RefObject } from "react";
  *  never drops an item or paints a path by accident. */
 
 export type BuildGestureMode = "none" | "surface" | "pan" | "orbit" | "pinch";
-export type BuildGestureState = { mode: BuildGestureMode; block: boolean };
+/** `travel` is how far, in pixels, the current press has moved and `multi`
+ *  whether a second finger joined it, so the surface can tell a tap from a drag. */
+export type BuildGestureState = { mode: BuildGestureMode; block: boolean; travel: number; multi: boolean };
+export const TAP_TRAVEL_PX = 10;
 
 type Handlers = {
+  /** What a two-finger slide does: tilt the view, or move around it. */
+  twoFingerSlide: "tilt" | "pan";
   onPan: (dxPx: number, dyPx: number) => void;
   onOrbit: (dYaw: number, dPitch: number) => void;
   onZoom: (factor: number) => void;
@@ -47,7 +53,7 @@ export function useBuildGestures(
   active: boolean,
   handlers: Handlers,
 ): RefObject<BuildGestureState> {
-  const gesture = useRef<BuildGestureState>({ mode: "none", block: false });
+  const gesture = useRef<BuildGestureState>({ mode: "none", block: false, travel: 0, multi: false });
   const latest = useRef(handlers);
   useEffect(() => { latest.current = handlers; });
 
@@ -60,17 +66,17 @@ export function useBuildGestures(
     const down = (event: PointerEvent) => {
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (event.pointerType === "mouse" && event.button === 2) {
-        gesture.current = { mode: "orbit", block: true };
+        gesture.current = { mode: "orbit", block: true, travel: 0, multi: false };
         return;
       }
       if (pointers.size >= 2) {
         // A second finger turns whatever the first one started into a camera move.
         latest.current.onCancelStroke();
-        gesture.current = { mode: "pinch", block: true };
+        gesture.current = { ...gesture.current, mode: "pinch", block: true, multi: true };
         lastPinch = pinchShape([...pointers.values()].slice(0, 2));
         return;
       }
-      gesture.current = { mode: "surface", block: false };
+      gesture.current = { mode: "surface", block: false, travel: 0, multi: false };
     };
 
     const move = (event: PointerEvent) => {
@@ -78,6 +84,7 @@ export function useBuildGestures(
       if (!previous) return;
       const next = { x: event.clientX, y: event.clientY };
       pointers.set(event.pointerId, next);
+      gesture.current.travel += Math.hypot(next.x - previous.x, next.y - previous.y);
       const { mode } = gesture.current;
       if (mode === "pan" && pointers.size === 1) {
         latest.current.onPan(next.x - previous.x, next.y - previous.y);
@@ -89,20 +96,22 @@ export function useBuildGestures(
         let turn = shape.angle - lastPinch.angle;
         if (turn > Math.PI) turn -= 2 * Math.PI;
         if (turn < -Math.PI) turn += 2 * Math.PI;
-        latest.current.onOrbit(-turn, 0);
-        latest.current.onPan(shape.mid.x - lastPinch.mid.x, shape.mid.y - lastPinch.mid.y);
+        const slideX = shape.mid.x - lastPinch.mid.x, slideY = shape.mid.y - lastPinch.mid.y;
+        if (latest.current.twoFingerSlide === "tilt") latest.current.onOrbit(-turn, slideY * 0.004);
+        else { latest.current.onOrbit(-turn, 0); latest.current.onPan(slideX, slideY); }
         lastPinch = shape;
       }
     };
 
     const up = (event: PointerEvent) => {
       pointers.delete(event.pointerId);
+      // Travel and multi outlive the press, so the surface can read them as it ends.
       if (pointers.size === 0) {
-        gesture.current = { mode: "none", block: false };
+        gesture.current = { ...gesture.current, mode: "none", block: false };
         lastPinch = null;
       } else if (gesture.current.mode === "pinch") {
         // One finger still down after a pinch: hold still until it lifts too.
-        gesture.current = { mode: "none", block: true };
+        gesture.current = { ...gesture.current, mode: "none", block: true };
         lastPinch = null;
       }
     };
@@ -129,7 +138,7 @@ export function useBuildGestures(
       element.removeEventListener("pointercancel", up, true);
       element.removeEventListener("wheel", wheel);
       element.removeEventListener("contextmenu", menu);
-      gesture.current = { mode: "none", block: false };
+      gesture.current = { mode: "none", block: false, travel: 0, multi: false };
     };
   }, [active, elementRef]);
 

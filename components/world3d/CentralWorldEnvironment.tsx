@@ -44,7 +44,7 @@ import {
   CENTRAL_WORLD_HOME_KEY,
   DEFAULT_HOME_PLACEMENT,
   gridToWorld,
-  parseGridSize,
+  placementGroundCells,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
@@ -786,10 +786,9 @@ function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: s
   );
 }
 
-export function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, valid = true, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; valid?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
+export function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
-  const [width, depth] = parseGridSize(item);
   const position = gridToWorld(placement.gridX, placement.gridZ);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const trainSupport = isTrainAsset(assetKey) ? trainTrackSupport(placement, neighbours, items) : null;
@@ -813,11 +812,6 @@ export function PlacedWorldObject({ item, placement, items, neighbours = [], pre
 
   return (
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
-      {preview && <mesh position={[0, RAIL_KEYS.has(assetKey) ? 0.005 : 0.13, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[width * CENTRAL_WORLD_GRID.cellSize - 0.18, depth * CENTRAL_WORLD_GRID.cellSize - 0.18]} />
-        <meshBasicMaterial color={preview ? valid ? "#22c55e" : "#ef4444" : "#315f36"} transparent opacity={preview ? 0.58 : 0.18} depthWrite={false} />
-        {preview ? <Edges color={valid ? "#bbf7d0" : "#fecaca"} lineWidth={4} /> : null}
-      </mesh>}
       {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
@@ -835,6 +829,28 @@ export function PlacedWorldObject({ item, placement, items, neighbours = [], pre
       )}
       {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, getItemPresentation(item).height + .5, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
     </group>
+  );
+}
+
+const FOOTPRINT_TONES = {
+  fits: { fill: "#22c55e", edge: "#ecfdf3", opacity: 0.55 },
+  blocked: { fill: "#ef4444", edge: "#fee2e2", opacity: 0.55 },
+  selected: { fill: "#ffffff", edge: "#ffffff", opacity: 0.18 },
+} as const;
+
+/** The squares an item stands on: green when it fits, red when it doesn't, white when picked. */
+export function BuildFootprint({ placement, item, tone }: { placement: CentralWorldPlacement; item: EconomyItem; tone: keyof typeof FOOTPRINT_TONES }) {
+  const cells = placementGroundCells(placement, item);
+  const xs = cells.map((cell) => cell.gridX), zs = cells.map((cell) => cell.gridZ);
+  const [minX, maxX, minZ, maxZ] = [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)];
+  const size = CENTRAL_WORLD_GRID.cellSize;
+  const colours = FOOTPRINT_TONES[tone];
+  return (
+    <mesh position={[((minX + maxX) / 2) * size, 0.16, ((minZ + maxZ) / 2) * size]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+      <planeGeometry args={[(maxX - minX + 1) * size - 0.14, (maxZ - minZ + 1) * size - 0.14]} />
+      <meshBasicMaterial color={colours.fill} transparent opacity={colours.opacity} depthWrite={false} />
+      <Edges color={colours.edge} lineWidth={4} />
+    </mesh>
   );
 }
 
@@ -1258,7 +1274,10 @@ export function CentralWorldEnvironment({ hubV2 = false, reservedCell, quality, 
         const item = itemsById.get(placement.itemId);
         return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} items={itemsById} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
       })}
-      {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview valid={buildPreview.valid} /> : null}
+      {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
+        <BuildFootprint placement={buildPreview.placement} item={buildPreview.item} tone={buildPreview.valid ? "fits" : "blocked"} />
+        <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview />
+      </> : null}
       {groundPreview ? groundPreview.cells?.map(cell => <GroundTile key={cell.gridX+":"+cell.gridZ} tile={{...groundPreview.tile,...cell}} preview valid={cell.valid}/>) ?? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>
   );

@@ -12,11 +12,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
-import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, Plus, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
-import { useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
+import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
-import { CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
+import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
@@ -49,6 +49,7 @@ import { speak } from "@/lib/speak";
 import { CENTRAL_WORLD_STARTER_SCENERY, type WorldSceneryGroup } from "@/lib/world3d/central-world-editor-catalog";
 import {
   selectCentralWorldInventoryPlacement,
+  centralWorldPlacementProblem,
   CENTRAL_WORLD_BUILD_RULES,
   CENTRAL_WORLD_HOME_KEY,
   CENTRAL_WORLD_HOME_ITEM,
@@ -56,7 +57,6 @@ import {
   freshCentralWorldLayout,
   getCentralWorldHomeAnchors,
   gridToWorld,
-  parseGridSize,
   placementOccupiesCell,
   readCentralWorldGroundTiles,
   readCentralWorldPlacements,
@@ -72,11 +72,33 @@ import {
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
+  type CentralWorldPlacementProblem,
 } from "@/lib/world3d/central-world-layout";
 
 const ARROW_CONTROLS_KEY = "lul:world-edit:arrow-controls:v1";
 type WorldEditTool = CentralWorldGroundType | "move" | "scenery" | "erase";
 const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", water: "Water", scenery: "Scenery", erase: "Eraser" };
+// Three set camera angles, so nobody has to fiddle with tilting to see their build.
+type BuildView = "close" | "normal" | "above";
+const BUILD_VIEWS: Record<BuildView, { label: string; pitch: number; zoom: number; Icon: LucideIcon }> = {
+  close: { label: "Close", pitch: 0.4, zoom: 18, Icon: PersonStanding },
+  normal: { label: "Normal", pitch: 0.82, zoom: 28, Icon: ScanEye },
+  above: { label: "Bird's-eye", pitch: 1.45, zoom: 38, Icon: Grid2x2 },
+};
+const BUILD_VIEW_ORDER: BuildView[] = ["close", "normal", "above"];
+const BUILD_PITCH = { min: 0.32, max: 1.45 } as const;
+const BUILD_ZOOM = { min: 14, max: 44 } as const;
+function activeBuildView(pitch: number): BuildView | null {
+  return BUILD_VIEW_ORDER.find((view) => Math.abs(BUILD_VIEWS[view].pitch - pitch) < 0.06) ?? null;
+}
+// What the builder says when a held item can't go where it is.
+const PLACEMENT_PROBLEM_TEXT: Record<CentralWorldPlacementProblem, string> = {
+  outside: "That's the edge of your world. Move it back in.",
+  reserved: "Paths, the river and the Tower stay clear. Move it onto open grass.",
+  occupied: "Something is already here. Move it to a clear spot.",
+  "needs-track": "Trains go on an empty railway track.",
+  "home-doorway": "Your house and its doorway need clear ground.",
+};
 // The free scenery palette is driven entirely off CENTRAL_WORLD_STARTER_SCENERY,
 // grouped into these sections. Add an item to the catalogue (and a mesh in
 // StarterScenery) and it appears here automatically.
@@ -170,33 +192,40 @@ function CentralWorldMetricsReporter({ quality }: { quality: CentralWorldQuality
 
 function BuildModeCamera({ active, cursor, zoom, yaw, pitch }: { active: boolean; cursor: { gridX: number; gridZ: number }; zoom: number; yaw: number; pitch: number }) {
   const { camera } = useThree();
+  const target = useRef<THREE.Vector3 | null>(null);
   useFrame((_, delta) => {
-    if (!active) return;
+    if (!active) { target.current = null; return; }
     const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
-    // Orbit the focus point: yaw spins 360° around it, pitch tilts from low
+    // The look point glides too, so a tap on the ground eases the view across
+    // instead of snapping it there.
+    const ease = 1 - Math.pow(0.00001, delta);
+    if (!target.current) target.current = new THREE.Vector3(x, 0, z);
+    else target.current.lerp(new THREE.Vector3(x, 0, z), ease);
+    const look = target.current;
+    // Orbit the look point: yaw spins 360° around it, pitch tilts from low
     // (see behind walls) to nearly top-down.
     const dist = zoom * 1.2;
     const horiz = Math.cos(pitch) * dist;
-    const desired = new THREE.Vector3(x + Math.sin(yaw) * horiz, Math.max(2, Math.sin(pitch) * dist), z + Math.cos(yaw) * horiz);
-    camera.position.lerp(desired, 1 - Math.pow(0.00001, delta));
-    camera.lookAt(x, 0, z);
+    const desired = new THREE.Vector3(look.x + Math.sin(yaw) * horiz, Math.max(2, Math.sin(pitch) * dist), look.z + Math.cos(yaw) * horiz);
+    camera.position.lerp(desired, ease);
+    camera.lookAt(look);
   });
   return null;
 }
 
-// What a press on the build surface turned into: picking up an item to drag, or
-// (on empty ground with nothing chosen) a drag that pans the view.
-type BuildCellResult = "carry" | "pan" | void;
+// What a press on the build surface turned into: painting (handled as it
+// happens), or a drag that moves around the world, which becomes a tap if the
+// finger lifts without travelling.
+type BuildCellResult = "pan" | void;
 type BuildSurfaceHandlers = {
   onCell: (gridX: number, gridZ: number, paint: boolean) => BuildCellResult;
-  onCarry: (gridX: number, gridZ: number) => void;
-  onCarryEnd: () => void;
+  onTap: (gridX: number, gridZ: number) => void;
   onHover: (gridX: number, gridZ: number) => void;
 };
 
 function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gestureRef, handlers }: { grid: CentralWorldGrid; active: boolean; paint: boolean; continuous: boolean; onStrokeState:(active:boolean)=>void; gestureRef: React.RefObject<BuildGestureState>; handlers: BuildSurfaceHandlers }) {
   const painting = useRef(false);
-  const carrying = useRef(false);
+  const pendingTap = useRef<{ gridX: number; gridZ: number } | null>(null);
   const lastCell = useRef("");
   const hoverCell = useRef("");
   const width = (grid.maxX - grid.minX + 1) * grid.cellSize;
@@ -229,7 +258,10 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
     onStrokeState(false);
     painting.current = false;
     lastCell.current = "";
-    if (carrying.current) { carrying.current = false; handlers.onCarryEnd(); }
+    const tap = pendingTap.current;
+    pendingTap.current = null;
+    const gesture = gestureRef.current;
+    if (tap && gesture && gesture.travel < TAP_TRAVEL_PX && !gesture.multi) handlers.onTap(tap.gridX, tap.gridZ);
     const target = event.nativeEvent.target as HTMLElement | null;
     if (target?.hasPointerCapture?.(event.pointerId)) target.releasePointerCapture(event.pointerId);
   }
@@ -246,17 +278,11 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
         painting.current = paint;
         (event.nativeEvent.target as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
         const result = selectCell(event, paint);
-        if (result === "carry") carrying.current = true;
+        pendingTap.current = result === "pan" ? cellOf(event) : null;
         if (result === "pan" && gestureRef.current) gestureRef.current.mode = "pan";
       }}
       onPointerMove={(event) => {
-        if (gestureRef.current?.block) { painting.current = false; carrying.current = false; return; }
-        if (carrying.current) {
-          event.stopPropagation();
-          const { gridX, gridZ } = cellOf(event);
-          handlers.onCarry(gridX, gridZ);
-          return;
-        }
+        if (gestureRef.current?.block) { painting.current = false; pendingTap.current = null; return; }
         if (painting.current && paint) {
           event.stopPropagation();
           selectCell(event, true);
@@ -272,7 +298,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
         }
       }}
       onPointerUp={endPress}
-      onPointerCancel={() => { onStrokeState(false); painting.current = false; carrying.current = false; lastCell.current = ""; }}
+      onPointerCancel={() => { onStrokeState(false); painting.current = false; pendingTap.current = null; lastCell.current = ""; }}
     >
       <planeGeometry args={[width, depth]} />
       <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -280,7 +306,10 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
   );
 }
 
-function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+/** A placed item the builder tapped: outlined, with its menu floating beside it. */
+type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
+
+function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -373,6 +402,10 @@ function CentralWorldScene({ onStrokeState, homePlacement, quality, moveInput, l
       />
       <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
       <BuildModeSurface grid={buildRules.grid} active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
+      {selection ? <>
+        <BuildFootprint placement={selection.placement} item={selection.item} tone="selected" />
+        <Html position={gridToWorld(selection.placement.gridX, selection.placement.gridZ)} zIndexRange={[37, 37]}>{selection.menu}</Html>
+      </> : null}
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
     </>
@@ -411,6 +444,14 @@ function HubAdaptiveResolution() {
 }
 
 const debugButton: React.CSSProperties = { border: "1px solid rgba(64,42,25,.2)", borderRadius: 5, padding: "9px 11px", background: "rgba(255,250,237,.94)", color: "#3f2b1e", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 24px rgba(45,31,19,.16)" };
+
+/** The little picture of the held item in the placing bar. */
+function HeldItemArt({ item }: { item: EconomyItem }) {
+  const picture = inventoryImage(item) ?? freeBuildRender(String(item.metadata.worldAssetKey));
+  if (picture) return <Image src={picture} alt="" fill sizes="56px" style={{ objectFit: "contain" }} />;
+  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
+  return <Icon size={30} color={item.accent} />;
+}
 
 function inventoryImage(item: EconomyItem) {
   const visual = item.metadata.marketplace_visual;
@@ -501,14 +542,36 @@ export default function CentralWorld() {
   // The build camera orbits this focus point; the right-hand pad spins (yaw) and
   // tilts (pitch) it a full turn so you can see your build from any angle.
   const [cameraFocus, setCameraFocus] = useState({ gridX: 0, gridZ: 9 });
-  const [buildOrbit, setBuildOrbit] = useState({ yaw: 0.67, pitch: 0.78 });
+  const [buildOrbit, setBuildOrbit] = useState({ yaw: 0.67, pitch: BUILD_VIEWS.normal.pitch });
   const orbitCamera = useCallback((dYaw: number, dPitch: number) => {
-    setBuildOrbit((o) => ({ yaw: o.yaw + dYaw, pitch: THREE.MathUtils.clamp(o.pitch + dPitch, 0.32, 1.45) }));
+    setBuildOrbit((o) => ({ yaw: o.yaw + dYaw, pitch: THREE.MathUtils.clamp(o.pitch + dPitch, BUILD_PITCH.min, BUILD_PITCH.max) }));
   }, [setBuildOrbit]);
-  const [buildZoom, setBuildZoom] = useState(28);
-  const viewRef = useRef({ zoom: 28, yaw: 0.67, pitch: 0.78 });
+  const [buildZoom, setBuildZoom] = useState(BUILD_VIEWS.normal.zoom);
+  const viewRef = useRef({ zoom: buildZoom, yaw: buildOrbit.yaw, pitch: buildOrbit.pitch });
   useEffect(() => { viewRef.current = { zoom: buildZoom, yaw: buildOrbit.yaw, pitch: buildOrbit.pitch }; }, [buildZoom, buildOrbit]);
-  const zoomView = useCallback((factor: number) => setBuildZoom((z) => THREE.MathUtils.clamp(z * factor, 14, 44)), []);
+  const zoomView = useCallback((factor: number) => setBuildZoom((z) => THREE.MathUtils.clamp(z * factor, BUILD_ZOOM.min, BUILD_ZOOM.max)), []);
+  const setBuildView = useCallback((view: BuildView) => {
+    setBuildOrbit((o) => ({ ...o, pitch: BUILD_VIEWS[view].pitch }));
+    setBuildZoom(BUILD_VIEWS[view].zoom);
+  }, []);
+  // Picking something up from low down lifts the view so its squares show.
+  const liftViewForPlacing = useCallback(() => {
+    if (viewRef.current.pitch < BUILD_VIEWS.normal.pitch - 0.06) setBuildView("normal");
+  }, [setBuildView]);
+  // Whether an item is in hand, mirrored to a ref so stable handlers can branch
+  // without re-binding every render.
+  const heldRef = useRef(false);
+  // The held item sits in the middle of the view, so moving the view moves it.
+  const focusRef = useRef(cameraFocus);
+  useEffect(() => { focusRef.current = cameraFocus; }, [cameraFocus]);
+  const moveFocus = useCallback((next: { gridX: number; gridZ: number }) => {
+    focusRef.current = next;
+    setCameraFocus(next);
+    if (!heldRef.current) return;
+    const cell = { gridX: Math.round(next.gridX), gridZ: Math.round(next.gridZ) };
+    setEditCursor(cell);
+    setBuildPlacement((held) => (held && (held.gridX !== cell.gridX || held.gridZ !== cell.gridZ) ? { ...held, ...cell } : held));
+  }, []);
   // Drag the ground and it follows your finger: turn screen pixels into grid
   // cells along the camera's current heading.
   const panView = useCallback((dxPx: number, dyPx: number) => {
@@ -518,11 +581,12 @@ export default function CentralWorld() {
     const depth = k / Math.max(0.35, Math.sin(pitch));
     const right = { x: Math.cos(yaw), z: -Math.sin(yaw) };
     const forward = { x: -Math.sin(yaw), z: -Math.cos(yaw) };
-    setCameraFocus((f) => ({
+    const f = focusRef.current;
+    moveFocus({
       gridX: THREE.MathUtils.clamp(f.gridX - right.x * dxPx * k + forward.x * dyPx * depth, buildGrid.minX, buildGrid.maxX),
       gridZ: THREE.MathUtils.clamp(f.gridZ - right.z * dxPx * k + forward.z * dyPx * depth, buildGrid.minZ, buildGrid.maxZ),
-    }));
-  }, [buildGrid]);
+    });
+  }, [buildGrid, moveFocus]);
   const strokeState = useRef({active:false,recorded:false});
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
@@ -536,13 +600,22 @@ export default function CentralWorld() {
   // so moving one of several identical scenery items leaves the others intact.
   const heldPlacementId = buildPlacement?.placementId ?? null;
   const placementsWithoutBuildItem = heldPlacementId ? placedCustomisations.filter((placement) => placement.placementId !== heldPlacementId) : placedCustomisations;
-  const buildingTrain = isTrainAsset(buildItem?.metadata.worldAssetKey);
-  const buildValid = Boolean(buildItem && buildPlacement && validateCentralWorldPlacement(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules));
+  const buildProblem = buildItem && buildPlacement ? centralWorldPlacementProblem(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules) : null;
+  const buildValid = Boolean(buildItem && buildPlacement) && buildProblem === null;
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
   const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone" || editTool === "water");
   const isEraseTool = !heldItemKey && editTool === "erase";
   const isMoveTool = !heldItemKey && editTool === "move";
+  // Fences and walls are laid in a line under the finger; everything else is
+  // moved into place and then placed with the Place button.
+  const laysLine = Boolean(buildPreview && editorOpen && CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey)));
+  const paintMode = editorOpen && (isGroundTool || isEraseTool || laysLine);
+  // A placed item the builder tapped with Move, waiting for Move, Turn or Put away.
+  const [selectedPlacementId, setSelectedPlacementId] = useState<string | null>(null);
+  const selectedPlacement = editorOpen && !buildPlacement && selectedPlacementId ? placedCustomisations.find((placement) => placement.placementId === selectedPlacementId) ?? null : null;
+  const selectedItem = selectedPlacement ? itemsById.get(selectedPlacement.itemId) ?? null : null;
+  const [buildNotice, setBuildNotice] = useState<string | null>(null);
   const groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null = editorOpen && (isGroundTool || isEraseTool) ? {
     cells: isGroundTool && editTool === "water" ? waterBrushCells(editCursor.gridX, editCursor.gridZ, waterBrushWidth).map(cell => ({...cell, valid: validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, "water", buildRules)})) : undefined,
     tile: { ...editCursor, tileType: isGroundTool ? editTool : groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ)?.tileType ?? "stone" },
@@ -599,9 +672,6 @@ export default function CentralWorld() {
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
   // grid. Stable identity so the keyboard listener can depend on it.
-  // Whether an item is currently in hand, mirrored to a ref so the stable
-  // move handler can branch without re-binding every render.
-  const heldRef = useRef(false);
   useEffect(() => { heldRef.current = Boolean(buildPlacement); }, [buildPlacement]);
 
   // The arrows / WASD / on-screen arrows do double duty (and the avatar never
@@ -671,11 +741,8 @@ export default function CentralWorld() {
     return { gridX: Math.round(cameraFocus.gridX), gridZ: Math.round(cameraFocus.gridZ) };
   }
 
-  // Last item planted in this drag, so a row of trees gets a gap between each.
-  const strokeLastPlaced = useRef<{ gridX: number; gridZ: number } | null>(null);
   function setStrokeActive(active:boolean) {
     strokeState.current={active,recorded:false};
-    strokeLastPlaced.current=null;
   }
   function recordWorldEdit() {
     if(strokeState.current.active&&strokeState.current.recorded)return;
@@ -697,13 +764,14 @@ export default function CentralWorld() {
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
-    setBuildZoom(28);
+    setSelectedPlacementId(null);
+    setBuildView("normal");
     setMenuOpen(false);
     setTrayOpen(true);
     if (ownedWorldItems.length) setLibrarySection("owned");
     setEditorOpen(true);
     // Leave the avatar where it was standing — only the build camera moves.
-    void speak("Edit World. Choose something from the tray, then tap the ground to place it. Drag an item to move it. Drag the ground to look around, and pinch to zoom.", undefined, "manual", { rate: 0.9 });
+    void speak("Edit World. Choose something from the tray and it appears in the middle. Drag the ground to move it, then press Place. Tap something you have placed to move, turn or put it away.", undefined, "manual", { rate: 0.9 });
   }
 
   function closeWorldEditor() {
@@ -711,16 +779,19 @@ export default function CentralWorld() {
     setMenuOpen(false);
     setEditorOpen(false);
     setBuildPlacement(null);
+    setSelectedPlacementId(null);
   }
 
   function chooseEditTool(tool: WorldEditTool) {
+    setSelectedPlacementId(null);
+    setBuildNotice(null);
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setEditTool(tool);
     if (tool === "water") setWaterBrushWidth(1);
     void speak(
       tool === "move"
-        ? "Move selected. Tap anything you have placed to pick it up."
+        ? "Move selected. Tap anything you have placed to move it, turn it or put it away."
         : tool === "erase"
           ? "Eraser selected. Tap an item to remove it, or tap the ground to remove one square of water, path or road."
           : tool === "water"
@@ -738,8 +809,13 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(item.item_key);
     setEditTool("scenery");
 
+    setSelectedPlacementId(null);
+    setBuildNotice(null);
     setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focusCell(), rotation: 0 });
-    void speak(`${item.name} selected. Tap the grass to place it, and drag to lay a whole row. Place as many as you like.`, undefined, "manual", { rate: 0.9 });
+    liftViewForPlacing();
+    void speak(CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey))
+      ? `${item.name} selected. Drag along the ground to build a line. Use two fingers to move around.`
+      : `${item.name} selected. Drag the ground to move it, then press Place. It stays in your hand so you can place more.`, undefined, "manual", { rate: 0.9 });
   }
 
   function setHeldTint(tint: string | undefined) {
@@ -749,8 +825,14 @@ export default function CentralWorld() {
   function chooseInventoryItem(item: EconomyItem) {
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
-    setBuildPlacement(selectCentralWorldInventoryPlacement(item, placedCustomisations, focusCell()));
-    void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Tap an empty railway track to place it. The train follows the track direction.` : `${item.name} selected. Tap the grass to place it. Rotate first if you need to.`, undefined, "manual", { rate: 0.9 });
+    setSelectedPlacementId(null);
+    setBuildNotice(null);
+    const held = selectCentralWorldInventoryPlacement(item, placedCustomisations, focusCell());
+    setBuildPlacement(held);
+    // An item already in the world is picked up where it stands; bring the view to it.
+    moveFocus({ gridX: held.gridX, gridZ: held.gridZ });
+    liftViewForPlacing();
+    void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Move it onto an empty railway track, then press Place. The train follows the track direction.` : `${item.name} selected. Drag the ground to move it, then press Place. Turn it first if you need to.`, undefined, "manual", { rate: 0.9 });
   }
 
   function closeBuildMode() {
@@ -758,28 +840,66 @@ export default function CentralWorld() {
     router.replace(preview ? "/world?teacher_preview=1" : "/world");
   }
 
-  // Move tool: tap anywhere on a placed object to pick it up, then nudge / rotate
-  // / delete / place it. Reuses the held-item flow (selecting its item hides it
-  // from the placed set while it's in hand).
-  function pickUpPlacementAt(gridX: number, gridZ: number): boolean {
-    const hit = [...placedCustomisations].reverse().find((placement) => {
+  // The placed item under a tap. Big trees overlap their neighbours, so the one
+  // standing closest to the tapped square wins (the newest on a tie).
+  function placementAt(gridX: number, gridZ: number): CentralWorldPlacement | null {
+    let best: CentralWorldPlacement | null = null;
+    let bestDistance = Infinity;
+    for (const placement of placedCustomisations) {
       const item = itemsById.get(placement.itemId);
-      return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
-    });
-    if (!hit) return false;
-    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) {
-      if (hubV2) return false;
-      moveMyHome();
-      return true;
+      if (!item || !placementOccupiesCell(placement, item, gridX, gridZ)) continue;
+      const distance = Math.hypot(placement.gridX - gridX, placement.gridZ - gridZ);
+      if (distance <= bestDistance) { best = placement; bestDistance = distance; }
     }
-    const item = itemsById.get(hit.itemId);
+    return best;
+  }
 
+  // Move tool: a tapped item shows Move / Turn / Put away. Move puts it in hand
+  // (selecting its item hides it from the placed set while it's held).
+  function selectPlacedAt(gridX: number, gridZ: number) {
+    const hit = placementAt(gridX, gridZ);
+    setBuildNotice(null);
+    if (!hit || (hubV2 && hit.itemId === CENTRAL_WORLD_HOME_KEY)) { setSelectedPlacementId(null); return; }
+    setSelectedPlacementId(hit.placementId ?? null);
+    void speak(`${itemsById.get(hit.itemId)?.name ?? "Item"}. Move it, turn it or put it away.`, undefined, "manual", { rate: 0.9 });
+  }
+
+  function pickUpPlacement(hit: CentralWorldPlacement) {
+    setSelectedPlacementId(null);
+    if (hit.itemId === CENTRAL_WORLD_HOME_KEY) { moveMyHome(); return; }
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(hit.itemId);
     setBuildPlacement({ ...hit, placementId: hit.placementId ?? newWorldPlacementId(hit.itemId) });
     setEditCursor({ gridX: hit.gridX, gridZ: hit.gridZ });
-    void speak(`${item?.name ?? "Item"} picked up. Drag it to a new spot, or tap where it should go.`, undefined, "manual", { rate: 0.9 });
-    return true;
+    moveFocus({ gridX: hit.gridX, gridZ: hit.gridZ });
+    liftViewForPlacing();
+    void speak(`${itemsById.get(hit.itemId)?.name ?? "Item"} picked up. Drag the ground to move it, then press Place.`, undefined, "manual", { rate: 0.9 });
+  }
+
+  function savePlacements(next: CentralWorldPlacement[]) {
+    recordWorldEdit();
+    writeCentralWorldPlacements(placementScope, next);
+    setPlacedCustomisations(next);
+  }
+
+  function turnPlaced(placement: CentralWorldPlacement, item: EconomyItem) {
+    const others = placedCustomisations.filter((other) => other !== placement);
+    const turned = { ...placement, rotation: ((placement.rotation + 90) % 360) as CentralWorldPlacement["rotation"] };
+    const problem = centralWorldPlacementProblem(turned, item, others, itemsById, groundTiles, buildRules);
+    if (problem) {
+      const text = `There isn't room to turn it here. ${PLACEMENT_PROBLEM_TEXT[problem]}`;
+      setBuildNotice(text);
+      void speak(text, undefined, "manual", { rate: 0.9 });
+      return;
+    }
+    setBuildNotice(null);
+    savePlacements(placedCustomisations.map((other) => (other === placement ? turned : other)));
+  }
+
+  function putAwayPlaced(placement: CentralWorldPlacement, item: EconomyItem) {
+    savePlacements(placedCustomisations.filter((other) => other !== placement));
+    setSelectedPlacementId(null);
+    void speak(`${item.name} put away.`, undefined, "manual", { rate: 0.9 });
   }
 
   function moveMyHome() {
@@ -790,7 +910,7 @@ export default function CentralWorld() {
     setEditCursor({ gridX: homePlacement.gridX, gridZ: homePlacement.gridZ });
     setCameraFocus({ gridX: homePlacement.gridX, gridZ: homePlacement.gridZ });
     setMenuOpen(false);
-    void speak("Move My Home. Drag your house or tap a clear space. Turn rotates the house. Green means the house and doorway fit. Place saves it. Cancel keeps your home where it was. Existing paths stay where they are; use Ground and Erase to redesign them.", undefined, "manual", { rate: 0.9 });
+    void speak("Move My Home. Drag the ground to move your house, or tap a clear space. Turn rotates the house. Green means the house and doorway fit. Place saves it. Cancel keeps your home where it was. Existing paths stay where they are; use Ground and Erase to redesign them.", undefined, "manual", { rate: 0.9 });
   }
 
   function commitHomePlacement(candidate: CentralWorldPlacement) {
@@ -820,7 +940,7 @@ export default function CentralWorld() {
     setSelectedSceneryItemKey(null);
     setBuildPlacement(null);
     setEditTool("move");
-    void speak(`${buildItem.name} deleted.`, undefined, "manual", { rate: 0.9 });
+    void speak(`${buildItem.name} put away.`, undefined, "manual", { rate: 0.9 });
   }
 
   function confirmBuildPlacement() {
@@ -852,17 +972,14 @@ export default function CentralWorld() {
     if (!editorOpen || heldItemKey) return;
     if (editTool === "erase") {
       if (!validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations, undefined, buildRules)) return;
-      // Remove whatever the tapped cell belongs to. A placed object counts if the
-      // cell is anywhere inside its footprint (not just its centre); only when no
-      // object is hit do we rub out the ground tile underneath.
-      const covering = placedCustomisations.filter((placement) => {
-        const item = itemsById.get(placement.itemId);
-        return item ? placementOccupiesCell(placement, item, gridX, gridZ) : false;
-      });
+      // Remove the item the tapped cell belongs to (anywhere inside its footprint,
+      // the closest one when trees overlap); only when no item is hit do we rub
+      // out the ground tile underneath.
+      const covering = placementAt(gridX, gridZ);
       recordWorldEdit();
-      if (covering.length > 0) {
+      if (covering) {
         setPlacedCustomisations((current) => {
-          const next = current.filter((placement) => !covering.includes(placement));
+          const next = current.filter((placement) => placement !== covering);
           writeCentralWorldPlacements(placementScope, next);
           return next;
         });
@@ -888,26 +1005,19 @@ export default function CentralWorld() {
     if (announce) void speak(`${EDIT_TOOL_NAMES[editTool]} added.`, undefined, "manual", { rate: 0.9 });
   }
 
-  // Minecraft-style: tap a cell to drop the held item right there (and keep it in
-  // hand for the next), drag to lay a whole run. Invalid cells just show the red
-  // ghost without placing.
+  // Fences and walls: a tap or drag lays them under the finger and keeps one
+  // in hand for the next. Invalid cells just show the red ghost.
   function placeHeldAt(gridX: number, gridZ: number) {
     if (!buildItem || !buildPlacement || buildPlacement.itemId === CENTRAL_WORLD_HOME_KEY) return;
     const repeat = Boolean(selectedSceneryItemKey);
 
     const candidate = { ...buildPlacement, gridX, gridZ, placementId: repeat ? newWorldPlacementId(buildPlacement.itemId) : buildPlacement.placementId };
     setEditCursor({ gridX, gridZ });
-    const last = strokeLastPlaced.current;
-    if (repeat && last && Math.max(...parseGridSize(buildItem)) >= 2 && Math.max(Math.abs(gridX - last.gridX), Math.abs(gridZ - last.gridZ)) < 2) {
-      setBuildPlacement({ ...buildPlacement, gridX, gridZ });
-      return;
-    }
     if (!validateCentralWorldPlacement(candidate, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules)) {
       setBuildPlacement({...buildPlacement,gridX,gridZ});
       return;
     }
     recordWorldEdit();
-    if (strokeState.current.active) strokeLastPlaced.current = { gridX, gridZ };
     setPlacedCustomisations(current => {
       const remaining=current.filter(p=>p.placementId!==candidate.placementId);
       if(!validateCentralWorldPlacement(candidate,buildItem,remaining,itemsById,groundTiles,buildRules)) return current;
@@ -916,7 +1026,6 @@ export default function CentralWorld() {
       return next;
     });
     if(repeat){
-
       setBuildPlacement({ ...candidate, placementId: newWorldPlacementId(candidate.itemId) });
     } else {
       setBuildPlacement(null);setSelectedInventoryItemKey(null);setSelectedSceneryItemKey(null);setEditTool("move");
@@ -926,39 +1035,25 @@ export default function CentralWorld() {
   function selectBuildCell(gridX: number, gridZ: number, paint: boolean): BuildCellResult {
     setMenuOpen(false);
     if (buildPlacement) {
-      if (buildPlacement.itemId === CENTRAL_WORLD_HOME_KEY) {
-        setBuildPlacement({ ...buildPlacement, gridX, gridZ });
-        setEditCursor({ gridX, gridZ });
-        return "carry";
-      }
-      // Editor: tap/drag drops the item. Marketplace deep-link (no editor): keep
-      // the old move-the-cursor-then-Place flow so a single item isn't duplicated.
-      if (editorOpen) placeHeldAt(gridX, gridZ);
-      else setBuildPlacement({ ...buildPlacement, gridX, gridZ });
-      return;
+      if (paint && laysLine) { placeHeldAt(gridX, gridZ); return; }
+      return "pan";
     }
     setEditCursor({ gridX, gridZ });
-    if (isMoveTool) {
-      // Press on an item to pick it up and drag it; press on open ground to look around.
-      if (!editorOpen) return;
-      carryMoved.current = false;
-      return pickUpPlacementAt(gridX, gridZ) ? "carry" : "pan";
-    }
-    if (paint) applyGroundAt(gridX, gridZ);
-    else return "pan";
+    if (paint) { applyGroundAt(gridX, gridZ); return; }
+    return "pan";
   }
 
-  // Dragging a picked-up item: it follows the finger, and lands where it is let go.
-  const carryMoved = useRef(false);
-  function carryHeldTo(gridX: number, gridZ: number) {
-    if (!buildPlacement || (buildPlacement.gridX === gridX && buildPlacement.gridZ === gridZ)) return;
-    carryMoved.current = true;
-    setBuildPlacement({ ...buildPlacement, gridX, gridZ });
-    setEditCursor({ gridX, gridZ });
-  }
-  function dropCarried() {
-    if (carryMoved.current && buildValid) confirmBuildPlacement();
-    carryMoved.current = false;
+  // A tap (a press that didn't travel). Holding something: tap the item to place
+  // it, or tap somewhere else and the view glides there, carrying the item.
+  // Nothing held: tap a placed item to pick it.
+  function tapBuildCell(gridX: number, gridZ: number) {
+    if (buildPlacement && buildItem) {
+      if (!placementOccupiesCell(buildPlacement, buildItem, gridX, gridZ)) { moveFocus({ gridX, gridZ }); return; }
+      if (buildValid) confirmBuildPlacement();
+      else if (buildProblem) void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 });
+      return;
+    }
+    if (editorOpen && isMoveTool) selectPlacedAt(gridX, gridZ);
   }
   // Mouse hover: the held item (or the paint brush) previews where a click lands.
   function hoverAt(gridX: number, gridZ: number) {
@@ -981,8 +1076,10 @@ export default function CentralWorld() {
     }
     setStrokeActive(false);
   }
-  const surfaceHandlers: BuildSurfaceHandlers = { onCell: selectBuildCell, onCarry: carryHeldTo, onCarryEnd: dropCarried, onHover: hoverAt };
+  const surfaceHandlers: BuildSurfaceHandlers = { onCell: selectBuildCell, onTap: tapBuildCell, onHover: hoverAt };
   const gestureRef = useBuildGestures(canvasWrapRef, editorOpen || Boolean(buildPreview), {
+    // One finger is busy painting, so two fingers move around; otherwise they tilt.
+    twoFingerSlide: paintMode ? "pan" : "tilt",
     onPan: panView,
     onOrbit: orbitCamera,
     onZoom: zoomView,
@@ -1029,8 +1126,11 @@ export default function CentralWorld() {
   useEffect(() => {
     keyActions.current = {
       rotate: rotateHeld,
-      remove: () => { if (buildPlacement && selectedInventoryItemKey) deleteHeldPlacement(); },
-      cancel: () => { if (menuOpen) setMenuOpen(false); else if (buildPlacement || heldItemKey || isGroundTool || isEraseTool) chooseEditTool("move"); },
+      remove: () => {
+        if (buildPlacement && selectedInventoryItemKey) deleteHeldPlacement();
+        else if (selectedPlacement && selectedItem && selectedPlacement.itemId !== CENTRAL_WORLD_HOME_KEY) putAwayPlaced(selectedPlacement, selectedItem);
+      },
+      cancel: () => { if (menuOpen) setMenuOpen(false); else if (buildPlacement || heldItemKey || isGroundTool || isEraseTool || selectedPlacementId) chooseEditTool("move"); },
       undo: undoWorldEdit,
       tool: chooseEditTool,
     };
@@ -1093,7 +1193,16 @@ export default function CentralWorld() {
     <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
-        <CentralWorldScene onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={editorOpen && (isGroundTool || isEraseTool || Boolean(heldItemKey))} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
+        <CentralWorldScene selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
+          <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
+            <b>{selectedItem.name}</b>
+            <button type="button" className="worldEditPickedMove" onClick={() => pickUpPlacement(selectedPlacement)}><Move size={20} aria-hidden="true" />Move</button>
+            {selectedPlacement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
+              <button type="button" onClick={() => turnPlaced(selectedPlacement, selectedItem)}><RotateCw size={20} aria-hidden="true" />Turn</button>
+              <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
+            </> : null}
+          </div>
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
       </Canvas>
       </div>
 
@@ -1116,7 +1225,7 @@ export default function CentralWorld() {
             <button type="button" onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}><RotateCw size={18} /> Rotate</button>
             <div style={{ display: "grid", gap: 6 }}><button type="button" disabled={!buildValid} onClick={confirmBuildPlacement} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: buildValid ? "#22c55e" : "#64748b", color: "white", opacity: buildValid ? 1 : .65 }}><Check size={19} /> Place</button><button type="button" onClick={closeBuildMode} style={{ ...debugButton, minHeight: 36, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}><X size={17} /> Cancel</button></div>
           </div>
-          <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildValid ? "This space is ready." : buildingTrain ? "Choose an empty railway track or the station’s rails." : "This space is protected or already occupied."}</div>
+          <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildProblem ? PLACEMENT_PROBLEM_TEXT[buildProblem] : "This space is ready."}</div>
         </section>
       ) : null}
       {editorOpen ? (() => {
@@ -1141,22 +1250,30 @@ export default function CentralWorld() {
           else if (trayTab === "ground") chooseEditTool("path");
           else if (sceneryInTab[0]) chooseSceneryItem(sceneryInTab[0]);
         };
-        const hint = buildPreview
-          ? buildValid
-            ? isHome ? "House and doorway fit · choose Place to save" : buildingTrain ? "Track ready · tap to place your train" : touchFirst ? "Tap the ground to place · Two fingers to look around" : "Click to place · R to turn · Esc to put it down"
-            : buildingTrain ? "Choose an empty railway track or the station’s rails" : "Red means no room here · choose clear ground"
-          : isGroundTool
-            ? touchFirst ? "Tap or drag the ground to paint · Two fingers to look around" : "Click or drag to paint · Right-drag to turn the view"
-            : isEraseTool
-              ? touchFirst ? "Tap an item or tile to remove it" : "Click an item or tile to remove it"
-              : touchFirst ? "Tap the tray to choose · Drag an item to move it · Drag the ground to look around · Pinch to zoom" : "Pick from the tray · Drag an item to move it · Drag to look around · Scroll to zoom · Q / E to turn";
+        const repeatPlacing = Boolean(selectedSceneryItemKey);
+        const hint = buildNotice
+          ?? (buildPreview
+            ? buildProblem
+              ? PLACEMENT_PROBLEM_TEXT[buildProblem]
+              : laysLine
+                ? touchFirst ? "Drag along the ground to build a line · Two fingers to move around" : "Click or drag to build a line"
+                : touchFirst ? "Fits here · Press Place, or drag the ground to move it" : "Fits here · Click to place · R to turn · Esc to stop"
+            : isGroundTool
+              ? touchFirst ? "Tap or drag the ground to paint · Two fingers to move around" : "Click or drag to paint · Right-drag to turn the view"
+              : isEraseTool
+                ? touchFirst ? "Tap an item or tile to remove it" : "Click an item or tile to remove it"
+                : selectedPlacement
+                  ? `${selectedItem?.name ?? "Item"} picked · What do you want to do?`
+                  : touchFirst ? "Choose from the tray · Tap an item to change it · Drag to move around · Two fingers to zoom, turn and tilt" : "Pick from the tray · Click an item to change it · Drag to move around · Scroll to zoom · Q / E to turn");
+        const hintTone = buildNotice || buildProblem ? "bad" : buildPreview ? "ok" : "info";
+        const currentView = activeBuildView(buildOrbit.pitch);
         return (
         <>
         <header className="worldEditBar" aria-label="World builder toolbar">
           <div className="worldEditTitle">
             <b>EDIT WORLD</b>
             <span className="worldEditSaved"><Check size={15} aria-hidden="true" />{preview ? "Preview · this browser only" : "Saved to your account"}</span>
-            <WorldVoiceButton compact label="Read edit world instructions" text="Choose something from the tray at the bottom, then tap the ground to place it. Drag an item to move it. Drag the ground to look around, pinch to zoom, and use two fingers to turn. Erase removes things. Undo brings back your last change. Your world saves by itself." />
+            <WorldVoiceButton compact label="Read edit world instructions" text="Choose something from the tray at the bottom and it appears in the middle. Drag the ground to move it, then press Place. Green squares mean it fits; red means find another spot. Tap something you have placed to move it, turn it or put it away. Pinch to zoom, twist two fingers to turn, and slide two fingers to look up or down. The View buttons jump to Close, Normal or Bird's-eye. Undo brings back your last change. Your world saves by itself." />
           </div>
           <div className="worldEditActions">
             <button type="button" className="worldEditRound" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit" title={`Undo (${undoKeyLabel})`}><Undo2 size={22} /></button>
@@ -1178,11 +1295,26 @@ export default function CentralWorld() {
             <button type="button" className="worldEditDone" onClick={closeWorldEditor}><Check size={18} />DONE</button>
           </div>
         </header>
-        <div className="worldEditHint" role="status" data-tone={buildPreview ? (buildValid ? "ok" : "bad") : "info"}>{hint}</div>
+        <div className="worldEditHint" role="status" data-tone={hintTone}>{hintTone === "ok" ? <Check size={16} aria-hidden="true" /> : hintTone === "bad" ? <X size={16} aria-hidden="true" /> : null}{hint}</div>
 
-        <div className="worldEditZoom" aria-label="Zoom">
-          <button type="button" className="worldEditRound" onClick={() => zoomView(0.85)} aria-label="Zoom camera in" title="Zoom in (+)"><Plus size={22} /></button>
-          <button type="button" className="worldEditRound" onClick={() => zoomView(1 / 0.85)} aria-label="Zoom camera out" title="Zoom out (−)"><Minus size={22} /></button>
+        <div className="worldEditView" role="group" aria-label="View">
+          <span className="worldEditViewLabel">VIEW</span>
+          {BUILD_VIEW_ORDER.map((view) => {
+            const { label, Icon } = BUILD_VIEWS[view];
+            return <button key={view} type="button" className="worldEditViewPreset" aria-pressed={currentView === view} aria-label={`${label} view`} onClick={() => setBuildView(view)}><Icon size={20} aria-hidden="true" /><span>{label}</span></button>;
+          })}
+          {(() => {
+            // Phones have room for one button that steps through the three views.
+            const next = BUILD_VIEW_ORDER[(BUILD_VIEW_ORDER.indexOf(currentView ?? "above") + 1) % BUILD_VIEW_ORDER.length];
+            const shown = BUILD_VIEWS[currentView ?? "normal"];
+            return <button type="button" className="worldEditViewCycle" aria-label={`View: ${shown.label}. Change to ${BUILD_VIEWS[next].label}`} onClick={() => setBuildView(next)}><shown.Icon size={20} aria-hidden="true" /><span>{shown.label}</span></button>;
+          })()}
+          <div className="worldEditViewGrid">
+            <button type="button" onClick={() => orbitCamera(0.5, 0)} aria-label="Turn the view left" title="Turn left (Q)"><RotateCcw size={20} /></button>
+            <button type="button" onClick={() => orbitCamera(-0.5, 0)} aria-label="Turn the view right" title="Turn right (E)"><RotateCw size={20} /></button>
+            <button type="button" onClick={() => zoomView(0.85)} aria-label="Zoom camera in" title="Zoom in (+)"><Plus size={22} /></button>
+            <button type="button" onClick={() => zoomView(1 / 0.85)} aria-label="Zoom camera out" title="Zoom out (−)"><Minus size={22} /></button>
+          </div>
         </div>
 
         {arrowControls ? (
@@ -1202,12 +1334,12 @@ export default function CentralWorld() {
           </div>
         ) : null}
 
-        <section className="worldEditTray" data-open={trayOpen ? "true" : "false"} aria-label="Edit world controls">
-          {buildPreview || (isGroundTool && editTool === "water") ? (
-            <div className="worldEditItemBar" aria-label={buildPreview ? "Build mode controls" : "Water brush"}>
-              {buildPreview ? <>
-                <b className="worldEditItemName">{buildPreview.item.name}</b>
-                <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn (R)"><RotateCw size={18} />Turn<kbd>R</kbd></button>
+        {buildPreview ? (
+          <section className="worldEditHold" aria-label={`Placing ${buildPreview.item.name}`}>
+            <div className="worldEditHoldTop">
+              <span className="worldEditHoldArt" aria-hidden="true"><HeldItemArt item={buildPreview.item} /></span>
+              <span className="worldEditHoldName"><b>{buildPreview.item.name}</b><small>{laysLine ? "Builds in a line" : repeatPlacing ? "Place as many as you like" : touchFirst ? "Drag the ground to move it" : "Click where it should go"}</small></span>
+              {tintable || styled || (selectedInventoryItemKey && !isHome) ? <span className="worldEditHoldExtras">
                 {tintable ? (
                   <div className="worldEditTints" aria-label="Recolour item">
                     <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default colour" className="worldEditTintDefault" />
@@ -1223,14 +1355,22 @@ export default function CentralWorld() {
                     {Object.entries(VILLAGE_STYLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
                   </select>
                 ) : null}
-                <span className="worldEditItemSpacer" />
-                {selectedInventoryItemKey && !isHome ? <button type="button" className="worldEditDanger" onClick={deleteHeldPlacement} aria-label="Delete item" title="Delete"><Trash2 size={18} /></button> : null}
-                <button type="button" onClick={() => chooseEditTool("move")} title="Put it down (Esc)"><X size={18} />{isHome ? "Cancel" : "Put away"}<kbd>Esc</kbd></button>
-                {!selectedSceneryItemKey ? <button type="button" className="worldEditPlace" disabled={!buildValid} onClick={confirmBuildPlacement}><Check size={18} />Place</button> : null}
-              </> : <>
-                <b className="worldEditItemName">Water brush</b>
-                {([[1, "1 square"], [3, "River"], [5, "Lake"]] as const).map(([width, label]) => <button key={width} type="button" aria-pressed={waterBrushWidth === width} onClick={() => { setWaterBrushWidth(width); void speak(width === 1 ? "One square. Tap to place water, or drag to join squares." : `${label} brush selected. Drag to paint a wider area.`, undefined, "manual", { rate: .9 }); }}>{label}</button>)}
-              </>}
+                {selectedInventoryItemKey && !isHome ? <button type="button" className="worldEditDanger" onClick={deleteHeldPlacement} aria-label="Put it away" title="Put it away (Delete)"><Trash2 size={18} /></button> : null}
+              </span> : null}
+            </div>
+            <div className="worldEditHoldButtons">
+              <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn (R)"><RotateCw size={22} />Turn</button>
+              <button type="button" className="worldEditHoldPlace" disabled={!buildValid} onClick={confirmBuildPlacement}><Check size={26} strokeWidth={3} />Place</button>
+              <button type="button" className="worldEditHoldCancel" onClick={() => chooseEditTool("move")} aria-label={repeatPlacing || laysLine ? "Stop placing" : "Cancel"} title={repeatPlacing || laysLine ? "Stop placing (Esc)" : "Cancel (Esc)"}><X size={24} /></button>
+            </div>
+          </section>
+        ) : null}
+
+        <section className="worldEditTray" data-open={trayOpen ? "true" : "false"} hidden={Boolean(buildPreview)} aria-label="Edit world controls">
+          {isGroundTool && editTool === "water" ? (
+            <div className="worldEditItemBar" aria-label="Water brush">
+              <b className="worldEditItemName">Water brush</b>
+              {([[1, "1 square"], [3, "River"], [5, "Lake"]] as const).map(([width, label]) => <button key={width} type="button" aria-pressed={waterBrushWidth === width} onClick={() => { setWaterBrushWidth(width); void speak(width === 1 ? "One square. Tap to place water, or drag to join squares." : `${label} brush selected. Drag to paint a wider area.`, undefined, "manual", { rate: .9 }); }}>{label}</button>)}
             </div>
           ) : null}
           <div className="worldEditTrayTop">

@@ -79,7 +79,8 @@ check(marketplace.includes("Place in world") && marketplace.includes("build=${en
 check(environment.includes("SizedWorldModel") && environment.includes("getItemPresentation"), "Purchased items must render at a true per-item footprint scale (the AFL oval towers over a cubby)");
 check(environment.includes("BuildModeGrid") && environment.includes("PlacedWorldObject"), "Grid placement preview or placed world objects are missing");
 check(world.includes("BuildModeCamera") && world.includes("BuildModeSurface") && world.includes("onCell: selectBuildCell"), "Focused build camera or tap-to-place surface is missing");
-check(world.includes("useBuildGestures(canvasWrapRef") && world.includes("onCarry: carryHeldTo") && world.includes("cancelStroke"), "Edit World must support drag, pinch, twist and scroll gestures");
+check(world.includes("useBuildGestures(canvasWrapRef") && world.includes("onTap: tapBuildCell") && world.includes("cancelStroke") && world.includes('twoFingerSlide: paintMode ? "pan" : "tilt"'), "Edit World must support drag, tap, pinch, twist, tilt and scroll gestures");
+check(world.includes("BUILD_VIEWS") && world.includes("worldEditHoldPlace") && world.includes("PLACEMENT_PROBLEM_TEXT"), "Placing must offer set views, a Place button and a reason when an item does not fit");
 check(world.includes("ARROW_CONTROLS_KEY") && world.includes("Arrow controls"), "Arrow buttons must stay available as an option");
 check(world.includes("Owned world inventory") && world.includes("ownedWorldItems") && world.includes("chooseInventoryItem"), "Owned marketplace inventory is missing from Edit World");
 check(world.includes("paintMode") && world.includes("applyGroundAt"), "Path and ground drag painting is missing");
