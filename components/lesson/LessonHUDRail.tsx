@@ -6,6 +6,7 @@ import { LessonXPBar } from "@/components/lesson/LessonXPBar";
 import { LessonTimer } from "@/components/lesson/LessonTimer";
 import { LessonMasteryTile } from "@/components/lesson/LessonMasteryTile";
 import { ComboCounter } from "@/components/lesson/ComboCounter";
+import { lessonBarTheme } from "@/lib/lesson-bar-theme";
 import { MathFormattedText } from "@/components/FractionText";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
@@ -56,76 +57,15 @@ export function LessonHUDRail({
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
 
+  const theme = lessonBarTheme(realmId);
+  const hintLabel = isMeasurement ? "Clue" : isChance ? "Chance Hint" : "Hint";
+  const HintIcon = isChance ? Dices : Lightbulb;
+
   return (
     <div data-lesson-hud className="relative">
-      {/* Bezel */}
-      <div
-        aria-hidden
-        className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement ? {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(200,160,48,0.42) 0%, rgba(120,90,15,0.18) 50%, rgba(200,160,48,0.36) 100%)",
-        } : isStarpath ? {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(103,232,249,0.72) 0%, rgba(124,58,237,0.68) 48%, rgba(240,171,252,0.52) 100%)",
-        } : isStatistics ? {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(242,188,69,0.65) 0%, rgba(240,107,100,0.58) 48%, rgba(143,191,127,0.54) 100%)",
-        } : isPattern ? {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(16,185,129,0.62) 0%, rgba(124,58,237,0.5) 48%, rgba(52,211,153,0.5) 100%)",
-        } : isChance ? {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.34) 48%, rgba(34,211,238,0.36) 100%)",
-        } : {
-          borderRadius: 18,
-          background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
-        }}
-      />
-      <div
-        className="relative overflow-hidden p-2.5"
-        style={isMeasurement ? {
-          borderRadius: 16,
-          background: "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
-          boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), inset 0 -10px 20px rgba(0,0,0,0.45), 0 0 18px rgba(109,40,217,0.08)",
-        } : isStarpath ? {
-          borderRadius: 16,
-          background: "linear-gradient(145deg, #10062b 0%, #17164c 48%, #073448 100%)",
-          boxShadow: "inset 0 1px 0 rgba(165,243,252,0.20), inset 0 -14px 28px rgba(2,6,23,0.58), 0 0 26px rgba(124,58,237,0.20)",
-        } : isStatistics ? {
-          borderRadius: 16,
-          background: "linear-gradient(145deg, #13251d 0%, #244531 52%, #3b3020 100%)",
-          boxShadow: "inset 0 1px 0 rgba(255,244,223,0.18), inset 0 -14px 28px rgba(8,18,13,0.52), 0 0 26px rgba(240,107,100,0.12)",
-        } : isPattern ? {
-          borderRadius: 16,
-          background: "linear-gradient(145deg, #0a110e 0%, #12261f 52%, #1b1638 100%)",
-          boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -14px 28px rgba(6,14,10,0.55), 0 0 26px rgba(124,58,237,0.16)",
-        } : isChance ? {
-          borderRadius: 16,
-          background: "linear-gradient(145deg, #1f1220 0%, #351d2b 52%, #4b2a14 100%)",
-          boxShadow: "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -14px 28px rgba(18,10,24,0.55), 0 0 26px rgba(251,113,133,0.16)",
-        } : {
-          borderRadius: 16,
-          background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
-          boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
-        }}
-      >
-        {isStarpath || isStatistics || isPattern || isChance ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              backgroundImage: isStatistics
-                ? "radial-gradient(circle, rgba(242,188,69,0.55) 1px, transparent 1.5px)"
-                : isChance
-                ? "radial-gradient(circle, rgba(251,191,36,0.46) 1px, transparent 1.5px), radial-gradient(circle, rgba(251,113,133,0.42) 1px, transparent 1.5px)"
-                : isPattern
-                ? "radial-gradient(circle, rgba(52,211,153,0.5) 1px, transparent 1.5px)"
-                : "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1.4px)",
-              backgroundSize: isStatistics || isPattern || isChance ? "22px 22px" : "26px 26px",
-            }}
-          />
-        ) : null}
+      <div aria-hidden className="pointer-events-none absolute -inset-[2px] rounded-[18px]" style={{ background: theme.bezel }} />
+      <div className="relative overflow-hidden rounded-2xl p-2.5" style={{ background: theme.plate, boxShadow: theme.plateShadow }}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: theme.dots, backgroundSize: "22px 22px" }} />
         <div className="relative flex flex-wrap items-stretch gap-2.5">
           <div className="min-w-[220px] flex-[2_1_260px]">
             <LessonXPBar
@@ -156,90 +96,32 @@ export function LessonHUDRail({
           </div>
           {hint ? (
             <div className="flex-[0_1_170px]">
-            <button
-              type="button"
-              onClick={() => setHintOpen((v) => !v)}
-              className="group relative flex h-full min-h-12 w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition"
-              aria-expanded={hintOpen}
-              style={isMeasurement ? {
-                border: "1px solid rgba(200,160,48,0.3)",
-                background: hintOpen ? "rgba(200,160,48,0.1)" : "rgba(200,160,48,0.07)",
-                boxShadow: hintOpen ? "0 0 14px rgba(200,160,48,0.15)" : undefined,
-              } : isPattern ? {
-                border: "1px solid rgba(52,211,153,0.32)",
-                background: hintOpen ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)",
-                boxShadow: hintOpen ? "0 0 14px rgba(16,185,129,0.16)" : undefined,
-              } : isChance ? {
-                border: "1px solid rgba(251,191,36,0.32)",
-                background: hintOpen ? "rgba(251,113,133,0.14)" : "rgba(251,113,133,0.09)",
-                boxShadow: hintOpen ? "0 0 14px rgba(251,113,133,0.18)" : undefined,
-              } : {
-                border: "1px solid rgba(251,191,36,0.3)",
-                background: "rgba(245,158,11,0.1)",
-                boxShadow: hintOpen ? "0 0 14px rgba(251,191,36,0.18)" : undefined,
-              }}
-            >
-              <span
-                className="flex h-6 w-6 flex-shrink-0 items-center justify-center"
-                style={isMeasurement ? {
-                  borderRadius: "50%",
-                  background: "radial-gradient(circle at 35% 30%, #c8a030 0%, #4a3010 65%, #1a0e04 100%)",
-                  boxShadow: "inset 0 0 4px rgba(200,160,48,0.6)",
-                } : isChance ? {
-                  borderRadius: "50%",
-                  background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 62%, #4c0519 100%)",
-                  boxShadow: "inset 0 0 4px rgba(255,241,242,0.6), 0 0 10px rgba(251,113,133,0.35)",
-                } : {
-                  clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-                  background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 65%, #451a03 100%)",
-                  boxShadow: "inset 0 0 4px rgba(254,240,138,0.6)",
-                }}
+              <button
+                type="button"
+                onClick={() => setHintOpen((open) => !open)}
+                aria-expanded={hintOpen}
+                className="flex h-full min-h-12 w-full items-center gap-2 rounded-xl border px-3 py-2 text-left transition hover:brightness-125"
+                style={{ background: theme.tint, borderColor: theme.tintEdge }}
               >
-                {isChance ? <Dices className="h-3 w-3 text-rose-50" /> : <Lightbulb className="h-3 w-3 text-amber-50" />}
-              </span>
-              <span
-                className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]"
-                style={{ color: isChance ? "rgba(255,228,230,0.92)" : isMeasurement ? "rgba(240,210,150,0.85)" : "rgba(253,230,138,0.9)" }}
-              >
-                {isMeasurement ? "Clue" : isChance ? "Chance Hint" : "Hint"}
-              </span>
-              <ChevronDown
-                className={`ml-auto h-3.5 w-3.5 transition-transform ${hintOpen ? "rotate-180" : ""}`}
-                style={{ color: isChance ? "rgba(255,228,230,0.72)" : isMeasurement ? "rgba(240,210,150,0.6)" : "rgba(253,230,138,0.7)" }}
-              />
-            </button>
+                <span
+                  className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full"
+                  style={{ background: "radial-gradient(circle at 35% 30%, #fde68a 0%, #f59e0b 60%, #78350f 100%)", boxShadow: "inset 0 0 4px rgba(254,240,138,0.6)" }}
+                >
+                  <HintIcon className="h-3.5 w-3.5 text-amber-50" />
+                </span>
+                <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-amber-100">{hintLabel}</span>
+                <ChevronDown className={`ml-auto h-4 w-4 text-amber-100/70 transition-transform ${hintOpen ? "rotate-180" : ""}`} />
+              </button>
             </div>
           ) : null}
         </div>
-        {hint ? (
-          <>
-            {hintOpen && (
-              <div
-                className="relative mt-2.5 rounded-lg px-3 py-2.5 text-[15px] font-medium leading-relaxed"
-                style={isMeasurement ? {
-                  border: "1px solid rgba(200,160,48,0.22)",
-                  background: "linear-gradient(135deg, #1a1304 0%, #2e1f05 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.15)",
-                  color: "rgba(240,220,175,0.92)",
-                } : isChance ? {
-                  border: "1px solid rgba(251,113,133,0.24)",
-                  background: "linear-gradient(135deg, #211421 0%, #351d2b 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(255,241,242,0.12)",
-                  color: "rgba(255,241,242,0.95)",
-                } : {
-                  border: "1px solid rgba(251,191,36,0.25)",
-                  background: "linear-gradient(135deg, #1a1305 0%, #2e1f05 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(251,191,36,0.18)",
-                  color: "rgba(255,251,235,0.95)",
-                }}
-              >
-                <div className="mb-2 flex justify-end">
-                  <ReadAloudBtn text={hint} />
-                </div>
-                <MathFormattedText text={hint} />
-              </div>
-            )}
-          </>
+        {hint && hintOpen ? (
+          <div className="relative mt-2.5 rounded-xl border px-3 py-2.5 text-[15px] font-medium leading-relaxed text-white" style={{ background: theme.tint, borderColor: theme.tintEdge }}>
+            <div className="mb-2 flex justify-end">
+              <ReadAloudBtn text={hint} />
+            </div>
+            <MathFormattedText text={hint} />
+          </div>
         ) : null}
       </div>
     </div>

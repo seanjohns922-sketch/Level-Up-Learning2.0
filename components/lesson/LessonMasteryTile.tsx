@@ -1,107 +1,36 @@
 "use client";
 
 import { Sparkles, Target } from "lucide-react";
+import { lessonBarTheme } from "@/lib/lesson-bar-theme";
+
+const ACCURACY_LABEL: Record<string, string> = {
+  measurement: "Mastery",
+  pattern: "Mastery",
+  space: "Mission Accuracy",
+  statistics: "Data Accuracy",
+  chance: "Chance Accuracy",
+};
 
 /** The lesson bar's accuracy tile ("Mastery" in most realms), in the realm's colours. */
 export function LessonMasteryTile({ accuracy, realmId }: { accuracy: number; realmId?: string }) {
-  const isMeasurement = realmId === "measurement";
-  const isStarpath = realmId === "space";
-  const isStatistics = realmId === "statistics";
-  const isPattern = realmId === "pattern";
-  const isChance = realmId === "chance";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
-
-  const stats = [
-    {
-      label: isMeasurement || isPattern ? "Mastery" : isStarpath ? "Mission Accuracy" : isStatistics ? "Data Accuracy" : isChance ? "Chance Accuracy" : "Accuracy",
-      value: `${accuracy}%`,
-      icon: isRounded ? Sparkles : Target,
-      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-fuchsia-200" : isStatistics ? "text-[#f06b64]" : isPattern ? "text-violet-200" : isChance ? "text-pink-200" : "text-teal-200",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(240,171,252,0.5)" : isStatistics ? "rgba(240,107,100,0.5)" : isPattern ? "rgba(124,58,237,0.5)" : isChance ? "rgba(251,113,133,0.52)" : "rgba(94,234,212,0.5)",
-    },
-  ];
-
-  const bezelBg = isMeasurement
-    ? "linear-gradient(135deg, rgba(200,160,48,0.42) 0%, rgba(120,90,15,0.18) 50%, rgba(200,160,48,0.36) 100%)"
-    : isStarpath
-      ? "linear-gradient(135deg, rgba(103,232,249,0.58) 0%, rgba(124,58,237,0.52) 50%, rgba(240,171,252,0.42) 100%)"
-      : isStatistics
-        ? "linear-gradient(135deg, rgba(242,188,69,0.6) 0%, rgba(240,107,100,0.5) 50%, rgba(143,191,127,0.46) 100%)"
-      : isPattern
-        ? "linear-gradient(135deg, rgba(16,185,129,0.6) 0%, rgba(124,58,237,0.48) 50%, rgba(52,211,153,0.46) 100%)"
-      : isChance
-        ? "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.38) 50%, rgba(34,211,238,0.36) 100%)"
-      : "linear-gradient(135deg, rgba(94,234,212,0.45) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.35) 100%)";
-
-  const plateBg = isMeasurement
-    ? "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)"
-    : isStarpath
-      ? "linear-gradient(135deg, #170a35 0%, #23205f 52%, #08364a 100%)"
-      : isStatistics
-        ? "linear-gradient(135deg, #17281f 0%, #2d4932 54%, #493821 100%)"
-      : isPattern
-        ? "linear-gradient(135deg, #0a110e 0%, #12261f 54%, #1b1638 100%)"
-      : isChance
-        ? "linear-gradient(135deg, #1f1220 0%, #351d2b 54%, #4b2a14 100%)"
-      : "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)";
-
-  const plateShadow = isMeasurement
-    ? "inset 0 1px 0 rgba(200,160,48,0.22), inset 0 -8px 16px rgba(0,0,0,0.4)"
-    : isStarpath
-      ? "inset 0 1px 0 rgba(165,243,252,0.20), inset 0 -8px 18px rgba(2,6,23,0.48)"
-      : isStatistics
-        ? "inset 0 1px 0 rgba(255,240,199,0.2), inset 0 -8px 18px rgba(8,18,13,0.48)"
-      : isPattern
-        ? "inset 0 1px 0 rgba(167,243,208,0.2), inset 0 -8px 18px rgba(6,14,10,0.5)"
-      : isChance
-        ? "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(18,10,24,0.5)"
-      : "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)";
-
-  const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : isStarpath ? "rgba(207,250,254,0.88)" : isStatistics ? "rgba(255,240,199,0.86)" : isPattern ? "rgba(167,243,208,0.85)" : isChance ? "rgba(255,228,230,0.86)" : "rgba(94,234,212,0.8)";
+  const theme = lessonBarTheme(realmId);
+  const label = ACCURACY_LABEL[realmId ?? ""] ?? "Accuracy";
+  const Icon = realmId && realmId !== "number" ? Sparkles : Target;
 
   return (
-    <div className="h-full">
-      {stats.map((s) => (
-        <div key={s.label} className="relative h-full">
-          {/* Bezel frame */}
-          <div
-            aria-hidden
-            className="absolute -inset-[2px] pointer-events-none"
-            style={{
-              borderRadius: 10,
-              background: bezelBg,
-            }}
-          />
-          {/* Inner plate */}
-          <div
-            className="relative h-full px-3 py-2.5 overflow-hidden"
-            style={{
-              borderRadius: 8,
-              background: plateBg,
-              boxShadow: plateShadow,
-            }}
-          >
-            <div className="relative mb-1 flex items-center gap-1.5">
-              <s.icon
-                className={`h-3.5 w-3.5 ${s.iconColor}`}
-                style={{ filter: `drop-shadow(0 0 3px ${s.glow})` }}
-              />
-              <span
-                className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]"
-                style={{ color: labelColor }}
-              >
-                {s.label}
-              </span>
-            </div>
-            <div
-              className="relative text-2xl font-black text-white tabular-nums md:text-[1.7rem]"
-              style={{ textShadow: `0 0 14px ${s.glow}` }}
-            >
-              {s.value}
-            </div>
-          </div>
+    <div className="relative h-full">
+      <div aria-hidden className="pointer-events-none absolute -inset-[2px] rounded-xl" style={{ background: theme.bezel }} />
+      <div className="relative h-full overflow-hidden rounded-[10px] px-3 py-2.5" style={{ background: theme.plate, boxShadow: theme.plateShadow }}>
+        <div className="relative mb-1 flex items-center gap-1.5">
+          <Icon className="h-3.5 w-3.5" style={{ color: theme.accent, filter: `drop-shadow(0 0 3px ${theme.glow})` }} />
+          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em]" style={{ color: theme.label }}>
+            {label}
+          </span>
         </div>
-      ))}
+        <div className="relative text-2xl font-black tabular-nums text-white md:text-[1.7rem]" style={{ textShadow: `0 0 14px ${theme.glow}` }}>
+          {accuracy}%
+        </div>
+      </div>
     </div>
   );
 }

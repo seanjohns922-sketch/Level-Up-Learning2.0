@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartColumn, Dices, Hourglass, Orbit, Sigma, Zap } from "lucide-react";
+import { lessonBarTheme } from "@/lib/lesson-bar-theme";
 
 // The bar fills as answers come in. XP itself is banked once, when the lesson
 // is finished (LESSON_XP), so the bar counts correct answers, not XP.
@@ -53,193 +54,28 @@ export function LessonXPBar({
       : (mode === "progress" ? "Session Progress" : "Lesson Progress");
   const trailingLabel = rightLabel ?? defaultRight;
 
+  const theme = lessonBarTheme(realmId);
+  const Icon = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : isPattern ? Sigma : isChance ? Dices : Zap;
+
   return (
-    <div className="relative">
-      <div
-        aria-hidden
-        className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement ? {
-          borderRadius: 12,
-          background:
-            "linear-gradient(135deg, rgba(200,160,48,0.55) 0%, rgba(139,92,246,0.25) 50%, rgba(200,160,48,0.5) 100%)",
-        } : isStarpath ? {
-          borderRadius: 12,
-          background: "linear-gradient(135deg, rgba(103,232,249,0.62) 0%, rgba(124,58,237,0.62) 52%, rgba(240,171,252,0.48) 100%)",
-        } : isStatistics ? {
-          borderRadius: 12,
-          background: "linear-gradient(135deg, rgba(242,188,69,0.68) 0%, rgba(240,107,100,0.58) 52%, rgba(143,191,127,0.5) 100%)",
-        } : isPattern ? {
-          borderRadius: 12,
-          background: "linear-gradient(135deg, rgba(16,185,129,0.66) 0%, rgba(124,58,237,0.52) 52%, rgba(52,211,153,0.5) 100%)",
-        } : isChance ? {
-          borderRadius: 12,
-          background: "linear-gradient(135deg, rgba(251,113,133,0.66) 0%, rgba(251,191,36,0.36) 52%, rgba(34,211,238,0.38) 100%)",
-        } : {
-          borderRadius: 12,
-          background:
-            "linear-gradient(135deg, rgba(251,191,36,0.45) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.4) 100%)",
-        }}
-      />
-      <div
-        className="relative px-2.5 py-2 overflow-hidden"
-        style={isMeasurement ? {
-          borderRadius: 10,
-          background:
-            "linear-gradient(135deg, #1a1004 0%, #2e1d06 50%, #3d2808 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgba(200,160,48,0.28), inset 0 -8px 16px rgba(0,0,0,0.45)",
-        } : isStarpath ? {
-          borderRadius: 10,
-          background: "linear-gradient(135deg, #170a35 0%, #23205f 52%, #08364a 100%)",
-          boxShadow: "inset 0 1px 0 rgba(165,243,252,0.22), inset 0 -8px 18px rgba(2,6,23,0.48)",
-        } : isStatistics ? {
-          borderRadius: 10,
-          background: "linear-gradient(135deg, #17281f 0%, #2d4932 55%, #493821 100%)",
-          boxShadow: "inset 0 1px 0 rgba(255,240,199,0.22), inset 0 -8px 18px rgba(8,18,13,0.48)",
-        } : isPattern ? {
-          borderRadius: 10,
-          background: "linear-gradient(135deg, #0a110e 0%, #12261f 55%, #1b1638 100%)",
-          boxShadow: "inset 0 1px 0 rgba(167,243,208,0.22), inset 0 -8px 18px rgba(6,14,10,0.5)",
-        } : isChance ? {
-          borderRadius: 10,
-          background: "linear-gradient(135deg, #1f1220 0%, #351d2b 55%, #4b2a14 100%)",
-          boxShadow: "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(18,10,24,0.5)",
-        } : {
-          borderRadius: 10,
-          background:
-            "linear-gradient(135deg, #021a18 0%, #0a3d36 50%, #154d3a 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgba(251,191,36,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)",
-        }}
-      >
-        <div className="relative flex items-center gap-2.5">
-          <div
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center"
-            style={isMeasurement ? {
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 35% 30%, #e8c878 0%, #8b6520 60%, #2a1a04 100%)",
-              boxShadow:
-                "inset 0 0 6px rgba(240,210,150,0.55), 0 0 10px rgba(200,160,48,0.4)",
-            } : isStarpath ? {
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 30%, #a5f3fc 0%, #7c3aed 58%, #1e1b4b 100%)",
-              boxShadow: "inset 0 0 6px rgba(207,250,254,0.55), 0 0 14px rgba(103,232,249,0.48)",
-            } : isStatistics ? {
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 30%, #ffd47e 0%, #f06b64 58%, #5b2e27 100%)",
-              boxShadow: "inset 0 0 6px rgba(255,244,223,0.55), 0 0 12px rgba(242,188,69,0.42)",
-            } : isPattern ? {
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 30%, #6ee7b7 0%, #7c3aed 62%, #0a110e 100%)",
-              boxShadow: "inset 0 0 6px rgba(167,243,208,0.55), 0 0 12px rgba(52,211,153,0.42)",
-            } : isChance ? {
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 62%, #4c0519 100%)",
-              boxShadow: "inset 0 0 6px rgba(255,241,242,0.55), 0 0 12px rgba(251,113,133,0.42)",
-            } : {
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 70%, #451a03 100%)",
-              boxShadow:
-                "inset 0 0 6px rgba(254,240,138,0.6), 0 0 10px rgba(251,191,36,0.45)",
-            }}
-          >
-            {isMeasurement ? (
-              <Hourglass
-                className="h-4 w-4 text-amber-50"
-                style={{ filter: "drop-shadow(0 0 3px rgba(240,210,150,0.85))" }}
-              />
-            ) : isStarpath ? (
-              <Orbit
-                className="h-4 w-4 text-cyan-50"
-                style={{ filter: "drop-shadow(0 0 4px rgba(165,243,252,0.95))" }}
-              />
-            ) : isStatistics ? (
-              <ChartColumn
-                className="h-4 w-4 text-amber-50"
-                style={{ filter: "drop-shadow(0 0 4px rgba(242,188,69,0.9))" }}
-              />
-            ) : isPattern ? (
-              <Sigma
-                className="h-4 w-4 text-emerald-50"
-                style={{ filter: "drop-shadow(0 0 4px rgba(52,211,153,0.9))" }}
-              />
-            ) : isChance ? (
-              <Dices
-                className="h-4 w-4 text-rose-50"
-                style={{ filter: "drop-shadow(0 0 4px rgba(251,113,133,0.9))" }}
-              />
-            ) : (
-              <Zap
-                className="h-4 w-4 text-amber-50"
-                style={{ filter: "drop-shadow(0 0 3px rgba(254,240,138,0.9))" }}
-              />
-            )}
+    <div className="relative h-full">
+      <div aria-hidden className="pointer-events-none absolute -inset-[2px] rounded-xl" style={{ background: theme.bezel }} />
+      <div className="relative flex h-full items-center overflow-hidden rounded-[10px] px-2.5 py-2" style={{ background: theme.plate, boxShadow: theme.plateShadow }}>
+        <div className="relative flex w-full items-center gap-2.5">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full" style={{ background: theme.orb, boxShadow: theme.orbShadow }}>
+            <Icon className="h-4 w-4 text-white" style={{ filter: `drop-shadow(0 0 4px ${theme.glow})` }} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center justify-between gap-2">
-              <span
-                className="text-xs font-mono font-extrabold uppercase tracking-[0.16em] md:text-sm"
-                style={{
-                  color: isMeasurement ? "#fceec1" : isStarpath ? "#cffafe" : isStatistics ? "#fff0c7" : isPattern ? "#d1fae5" : isChance ? "#ffe4e6" : "#fef3c7",
-                  textShadow: isMeasurement ? "0 0 10px rgba(200,160,48,0.4)" : isStarpath ? "0 0 10px rgba(103,232,249,0.45)" : isStatistics ? "0 0 10px rgba(242,188,69,0.42)" : isPattern ? "0 0 10px rgba(52,211,153,0.42)" : isChance ? "0 0 10px rgba(251,113,133,0.42)" : "0 0 10px rgba(251,191,36,0.4)",
-                }}
-              >
+              <span className="text-xs font-mono font-extrabold uppercase tracking-[0.16em] md:text-sm" style={{ color: theme.text, textShadow: `0 0 10px ${theme.glow}` }}>
                 {leftLabel}
               </span>
-              <span
-                className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] md:text-[11px]"
-                style={{ color: isMeasurement ? "rgba(240,210,150,0.78)" : isStarpath ? "rgba(196,181,253,0.92)" : isStatistics ? "rgba(255,217,213,0.9)" : isPattern ? "rgba(167,243,208,0.85)" : isChance ? "rgba(253,230,138,0.84)" : "rgba(153,246,228,0.7)" }}
-              >
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] md:text-[11px]" style={{ color: theme.label }}>
                 {trailingLabel}
               </span>
             </div>
-            <div
-              className="h-2 overflow-hidden rounded-full"
-              style={{
-                background: "rgba(0,0,0,0.5)",
-                boxShadow: isMeasurement
-                  ? "inset 0 1px 2px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(200,160,48,0.18)"
-                  : isStarpath
-                    ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(165,243,252,0.18)"
-                    : isStatistics
-                      ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(242,188,69,0.2)"
-                    : isPattern
-                      ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(52,211,153,0.2)"
-                    : isChance
-                      ? "inset 0 1px 2px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(251,113,133,0.2)"
-                    : "inset 0 1px 2px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(94,234,212,0.1)",
-              }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
-                style={{
-                  width: `${pct}%`,
-                  background: isMeasurement
-                    ? "linear-gradient(90deg, #e8c878 0%, #c8a030 45%, #a78bfa 100%)"
-                    : isStarpath
-                      ? "linear-gradient(90deg, #7c3aed 0%, #a855f7 45%, #22d3ee 100%)"
-                      : isStatistics
-                        ? "linear-gradient(90deg, #8fbf7f 0%, #f2bc45 50%, #f06b64 100%)"
-                      : isPattern
-                        ? "linear-gradient(90deg, #10b981 0%, #34d399 45%, #7c3aed 100%)"
-                      : isChance
-                        ? "linear-gradient(90deg, #fb7185 0%, #fbbf24 50%, #22d3ee 100%)"
-                      : "linear-gradient(90deg, #fbbf24 0%, #f59e0b 40%, #34d399 100%)",
-                  boxShadow: isMeasurement
-                    ? "0 0 10px rgba(200,160,48,0.55)"
-                    : isStarpath
-                      ? "0 0 12px rgba(103,232,249,0.62)"
-                      : isStatistics
-                        ? "0 0 12px rgba(242,188,69,0.58)"
-                      : isPattern
-                        ? "0 0 12px rgba(52,211,153,0.58)"
-                      : isChance
-                        ? "0 0 12px rgba(251,113,133,0.58)"
-                      : "0 0 10px rgba(251,191,36,0.6)",
-                }}
-              />
+            <div className="h-2 overflow-hidden rounded-full bg-black/50 shadow-[inset_0_1px_2px_rgba(0,0,0,0.65)]">
+              <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${pct}%`, background: theme.fill, boxShadow: theme.fillGlow }} />
             </div>
           </div>
         </div>

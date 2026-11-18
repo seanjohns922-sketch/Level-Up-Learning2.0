@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartColumn, Dices, Hourglass, Orbit, Sigma, Timer } from "lucide-react";
+import { lessonBarTheme } from "@/lib/lesson-bar-theme";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -20,7 +21,6 @@ export function LessonTimer({
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
   const clamped = Math.max(0, seconds);
   const minutes = Math.floor(clamped / 60);
   const remaining = clamped % 60;
@@ -30,177 +30,26 @@ export function LessonTimer({
   const state =
     pct > 50 ? "ok" : pct > 12 ? "warn" : "danger";
 
-  const nexusPalette = {
-    ok: {
-      bezel:
-        "linear-gradient(135deg, rgba(94,234,212,0.45) 0%, rgba(15,118,110,0.25) 50%, rgba(94,234,212,0.35) 100%)",
-      bg: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
-      text: "text-teal-100",
-      icon: "text-teal-200",
-      glow: "rgba(94,234,212,0.45)",
-    },
-    warn: {
-      bezel:
-        "linear-gradient(135deg, rgba(251,191,36,0.5) 0%, rgba(120,53,15,0.25) 50%, rgba(251,191,36,0.4) 100%)",
-      bg: "linear-gradient(135deg, #1a1305 0%, #2e1f05 50%, #4a3a0a 100%)",
-      text: "text-amber-100",
-      icon: "text-amber-200",
-      glow: "rgba(251,191,36,0.5)",
-    },
-    danger: {
-      bezel:
-        "linear-gradient(135deg, rgba(248,113,113,0.55) 0%, rgba(127,29,29,0.3) 50%, rgba(248,113,113,0.45) 100%)",
-      bg: "linear-gradient(135deg, #1a0505 0%, #2e0a0a 50%, #4a1010 100%)",
-      text: "text-red-100",
-      icon: "text-red-300",
-      glow: "rgba(248,113,113,0.55)",
-    },
-  } as const;
-
-  const measurementPalette = {
-    ok: {
-      bezel:
-        "linear-gradient(135deg, rgba(200,160,48,0.5) 0%, rgba(120,90,15,0.25) 50%, rgba(200,160,48,0.42) 100%)",
-      bg: "linear-gradient(135deg, #1a1004 0%, #2e1d06 50%, #3d2808 100%)",
-      text: "text-amber-50",
-      icon: "text-amber-200",
-      glow: "rgba(200,160,48,0.5)",
-    },
-    warn: {
-      bezel:
-        "linear-gradient(135deg, rgba(167,139,250,0.55) 0%, rgba(76,29,149,0.3) 50%, rgba(200,160,48,0.45) 100%)",
-      bg: "linear-gradient(135deg, #1a0e1f 0%, #2a1640 50%, #3d2808 100%)",
-      text: "text-amber-50",
-      icon: "text-violet-200",
-      glow: "rgba(167,139,250,0.55)",
-    },
-    danger: {
-      bezel:
-        "linear-gradient(135deg, rgba(248,113,113,0.55) 0%, rgba(120,30,15,0.3) 50%, rgba(248,113,113,0.45) 100%)",
-      bg: "linear-gradient(135deg, #1a0505 0%, #2e0a0a 50%, #4a1010 100%)",
-      text: "text-red-100",
-      icon: "text-red-300",
-      glow: "rgba(248,113,113,0.55)",
-    },
-  } as const;
-
-  const starpathPalette = {
-    ok: {
-      bezel: "linear-gradient(135deg, rgba(103,232,249,0.60) 0%, rgba(124,58,237,0.55) 52%, rgba(240,171,252,0.42) 100%)",
-      bg: "linear-gradient(135deg, #170a35 0%, #25205f 52%, #08364a 100%)",
-      text: "text-cyan-50",
-      icon: "text-cyan-200",
-      glow: "rgba(103,232,249,0.55)",
-    },
-    warn: {
-      bezel: "linear-gradient(135deg, rgba(253,224,71,0.58) 0%, rgba(124,58,237,0.46) 52%, rgba(240,171,252,0.45) 100%)",
-      bg: "linear-gradient(135deg, #24102f 0%, #3b1e58 52%, #49320b 100%)",
-      text: "text-amber-100",
-      icon: "text-violet-200",
-      glow: "rgba(240,171,252,0.52)",
-    },
-    danger: nexusPalette.danger,
-  } as const;
-
-  const statisticsPalette = {
-    ok: {
-      bezel: "linear-gradient(135deg, rgba(242,188,69,0.62) 0%, rgba(240,107,100,0.54) 52%, rgba(143,191,127,0.48) 100%)",
-      bg: "linear-gradient(135deg, #15271e 0%, #2b4932 55%, #493821 100%)",
-      text: "text-amber-50",
-      icon: "text-[#f2bc45]",
-      glow: "rgba(242,188,69,0.52)",
-    },
-    warn: {
-      bezel: "linear-gradient(135deg, rgba(242,188,69,0.7) 0%, rgba(240,107,100,0.62) 100%)",
-      bg: "linear-gradient(135deg, #332617 0%, #593428 100%)",
-      text: "text-amber-50",
-      icon: "text-[#ffd07a]",
-      glow: "rgba(240,107,100,0.52)",
-    },
-    danger: nexusPalette.danger,
-  } as const;
-
-  const patternPalette = {
-    ok: {
-      bezel: "linear-gradient(135deg, rgba(16,185,129,0.6) 0%, rgba(124,58,237,0.5) 52%, rgba(52,211,153,0.46) 100%)",
-      bg: "linear-gradient(135deg, #0a110e 0%, #12261f 55%, #1b1638 100%)",
-      text: "text-emerald-50",
-      icon: "text-emerald-200",
-      glow: "rgba(52,211,153,0.5)",
-    },
-    warn: {
-      bezel: "linear-gradient(135deg, rgba(253,224,71,0.55) 0%, rgba(124,58,237,0.48) 52%, rgba(52,211,153,0.42) 100%)",
-      bg: "linear-gradient(135deg, #1e1a0c 0%, #2a1640 55%, #12261f 100%)",
-      text: "text-amber-100",
-      icon: "text-violet-200",
-      glow: "rgba(167,139,250,0.52)",
-    },
-    danger: nexusPalette.danger,
-  } as const;
-
-  const chancePalette = {
-    ok: {
-      bezel: "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.42) 52%, rgba(34,211,238,0.36) 100%)",
-      bg: "linear-gradient(135deg, #1f1220 0%, #351d2b 55%, #4b2a14 100%)",
-      text: "text-rose-50",
-      icon: "text-amber-200",
-      glow: "rgba(251,113,133,0.52)",
-    },
-    warn: {
-      bezel: "linear-gradient(135deg, rgba(251,191,36,0.68) 0%, rgba(251,113,133,0.56) 100%)",
-      bg: "linear-gradient(135deg, #3a2413 0%, #582336 100%)",
-      text: "text-amber-100",
-      icon: "text-rose-200",
-      glow: "rgba(251,191,36,0.54)",
-    },
-    danger: nexusPalette.danger,
-  } as const;
-
-  const palette = (isMeasurement ? measurementPalette : isStarpath ? starpathPalette : isStatistics ? statisticsPalette : isPattern ? patternPalette : isChance ? chancePalette : nexusPalette)[state];
+  // Normal time in the realm's colours; running low and almost out look the same in every realm.
+  const theme = lessonBarTheme(realmId);
+  const palette = state === "ok"
+    ? { bezel: theme.bezel, bg: theme.plate, text: theme.text, icon: theme.accent, glow: theme.glow }
+    : state === "warn"
+      ? { bezel: "linear-gradient(135deg, rgba(251,191,36,0.6) 0%, rgba(120,53,15,0.3) 50%, rgba(251,191,36,0.48) 100%)", bg: "linear-gradient(135deg, #1a1305 0%, #2e1f05 50%, #4a3a0a 100%)", text: "#fef3c7", icon: "#fcd34d", glow: "rgba(251,191,36,0.5)" }
+      : { bezel: "linear-gradient(135deg, rgba(248,113,113,0.6) 0%, rgba(127,29,29,0.32) 50%, rgba(248,113,113,0.5) 100%)", bg: "linear-gradient(135deg, #1a0505 0%, #2e0a0a 50%, #4a1010 100%)", text: "#fee2e2", icon: "#fca5a5", glow: "rgba(248,113,113,0.55)" };
   const IconCmp = isMeasurement ? Hourglass : isStarpath ? Orbit : isStatistics ? ChartColumn : isPattern ? Sigma : isChance ? Dices : Timer;
 
   return (
-    <div className="relative inline-block min-w-[100px]">
+    <div className="relative inline-block h-full min-w-[100px]">
+      <div aria-hidden className="pointer-events-none absolute -inset-[2px] rounded-xl" style={{ background: palette.bezel }} />
       <div
-        aria-hidden
-        className="absolute -inset-[2px] pointer-events-none"
-        style={isRounded ? {
-          borderRadius: 12,
-          background: palette.bezel,
-        } : {
-          borderRadius: 12,
-          background: palette.bezel,
-        }}
-      />
-      <div
-        className="relative inline-flex w-full items-center justify-center gap-1.5 px-3 py-2 overflow-hidden transition-colors duration-500"
-        style={isRounded ? {
-          borderRadius: 10,
-          background: palette.bg,
-          boxShadow:
-            isMeasurement
-              ? "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 16px rgba(0,0,0,0.45)"
-              : isStarpath
-                ? "inset 0 1px 0 rgba(165,243,252,0.18), inset 0 -8px 16px rgba(2,6,23,0.48)"
-                : isPattern
-                  ? "inset 0 1px 0 rgba(167,243,208,0.18), inset 0 -8px 16px rgba(6,14,10,0.5)"
-                : isChance
-                  ? "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -8px 16px rgba(18,10,24,0.5)"
-                : "inset 0 1px 0 rgba(255,240,199,0.18), inset 0 -8px 16px rgba(8,18,13,0.48)",
-        } : {
-          borderRadius: 10,
-          background: palette.bg,
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -8px 16px rgba(0,0,0,0.4)",
-        }}
+        className="relative inline-flex h-full w-full items-center justify-center gap-1.5 overflow-hidden rounded-[10px] px-3 py-2 transition-colors duration-500"
+        style={{ background: palette.bg, boxShadow: theme.plateShadow }}
       >
-        <IconCmp
-          className={`relative h-3.5 w-3.5 ${palette.icon}`}
-          style={{ filter: `drop-shadow(0 0 3px ${palette.glow})` }}
-        />
+        <IconCmp className="relative h-3.5 w-3.5" style={{ color: palette.icon, filter: `drop-shadow(0 0 3px ${palette.glow})` }} />
         <span
-          className={`relative text-sm font-mono font-extrabold tabular-nums tracking-wider md:text-[15px] ${palette.text}`}
-          style={{ textShadow: `0 0 8px ${palette.glow}` }}
+          className="relative text-sm font-mono font-extrabold tabular-nums tracking-wider md:text-[15px]"
+          style={{ color: palette.text, textShadow: `0 0 8px ${palette.glow}` }}
         >
           {minutes}:{pad2(remaining)}
         </span>
