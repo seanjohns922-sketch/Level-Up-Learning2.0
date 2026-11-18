@@ -255,7 +255,9 @@ export default function DemoReviewPanel() {
     : realm !== "space" || selectedStarpathWeek?.status === "implemented";
   const weeklyQuizAvailable = isLevel8 || isNumber7 ? true : realm === "chance" && levelNumber > 6 ? false : realm === "statistics" || realm === "chance"
     ? week <= 5
-    : realm !== "pattern" && (realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented");
+    : realm === "pattern"
+      ? levelNumber >= 3 && levelNumber <= 6 && week < maxWeek
+      : realm !== "space" || selectedStarpathWeek?.quiz?.status === "implemented";
 
   useEffect(() => {
     if (!isDemoPreviewMode() || localStorage.getItem(ACTIVE_STUDENT_KEY) !== "demo-preview") {
@@ -404,6 +406,7 @@ export default function DemoReviewPanel() {
     if (realm === "space") return buildStarpathWeeklyQuizHref({ selectedLevel: starpathLevel }, week);
     if (realm === "statistics") return `/statistica/quiz/${encodeURIComponent(year)}/${week}`;
     if (realm === "chance") return `/chance-hollow/quiz/${encodeURIComponent(year)}/${week}?teacher_preview=1`;
+    if (realm === "pattern") return `/pattern-peaks/quiz/${levelNumber}/${week}?teacher_preview=1`;
     const params = new URLSearchParams({ year, week: String(week), type: "quiz", n: "1", realm_id: realm });
     return `/session?${params.toString()}`;
   }
