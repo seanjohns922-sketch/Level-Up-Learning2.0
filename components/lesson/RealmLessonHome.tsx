@@ -233,8 +233,12 @@ function childFacingCriterion(criterion: string) {
 }
 
 function uniqueCriteria(criteria: readonly string[], focus: string) {
+  // Some lessons pack several notes into one entry ("…lines. Fluency (2-3 min): …. Reasoning prompt: …"),
+  // so each sentence is its own criterion, and teacher-only fluency notes are left out.
   const cleaned = criteria
-    .filter((item) => !/^fluency\s*\(/i.test(item.trim()))
+    .flatMap((item) => item.split(/(?<=\.)\s+(?=[A-Z])/))
+    .map((item) => item.trim().replace(/\.+$/, ""))
+    .filter((item) => item && !/^fluency\s*\(/i.test(item))
     .map(childFacingCriterion)
     .filter(Boolean);
   return [...new Set(cleaned)].slice(0, 3).length
@@ -242,52 +246,16 @@ function uniqueCriteria(criteria: readonly string[], focus: string) {
     : [focus];
 }
 
-function trimStudentSentence(value: string) {
-  const cleaned = value
-    .replace(/\s+/g, " ")
-    .replace(/^(?:Fluency|Core concept|Reasoning prompt|Application task)\s*(?:\([^)]*\))?:\s*/i, "")
-    .replace(/^(?:Explain why|How do you know|Is this reasonable)\??\s*/i, "explain my thinking")
-    .trim();
-  const firstSentence = cleaned.split(/[.!?]/)[0]?.trim() ?? cleaned;
-  return firstSentence.replace(/[.,;:]+$/g, "");
+/** A lesson sentence carried on after "I am learning to" or "I can": lower case, but acronyms (MAB) stay as written. */
+function continueSentence(value: string) {
+  const text = value.trim().replace(/\.+$/, "");
+  return /^[A-Z][a-z]/.test(text) ? `${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
 }
 
-function sentenceFragment(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return trimmed;
-  return `${trimmed.charAt(0).toLowerCase()}${trimmed.slice(1)}`;
-}
-
-export function numberNexusLearningStatement(focus: string) {
-  const shortFocus = trimStudentSentence(focus)
-    .replace(/\s+(?:with|using|through|by|in)\s+.+$/i, "")
-    .replace(/\s+and\s+.+$/i, "")
-    .trim();
-
-  return sentenceFragment(shortFocus || "practise today's number skill");
-}
-
-function numberNexusSuccessCriteria(criteria: readonly string[], focus: string) {
-  const concise = criteria
-    .map((rawCriterion) => {
-      if (/^\s*fluency\b/i.test(rawCriterion)) return "practise number facts accurately";
-      const criterion = trimStudentSentence(rawCriterion);
-      if (/reasoning|explain|justify|reasonable|how do you know/i.test(criterion)) return "explain my number thinking";
-      if (/apply|solve|real|context|problem|task/i.test(criterion)) return "solve number problems";
-      return sentenceFragment(criterion
-        .replace(/\s+(?:with|using|through|by|in|such as)\s+.+$/i, "")
-        .replace(/\s+and\s+.+$/i, "")
-        .trim());
-    })
-    .filter(Boolean);
-
-  const fallback = [
-    numberNexusLearningStatement(focus),
-    "explain my number thinking",
-    "solve number problems",
-  ];
-
-  return uniqueCriteria(concise.length > 0 ? concise : fallback, focus);
+/** "I am learning to …" from a lesson's focus, in full. */
+export function learningStatementFor(focus: string) {
+  const text = focus.trim().replace(/\.+$/, "");
+  return /^I\s+am\s+learning\s+to\b/i.test(text) ? text : `I am learning to ${continueSentence(text)}`;
 }
 
 export type LessonConceptIntroData = {
@@ -490,16 +458,9 @@ export function RealmLessonHome({
   };
   const isCave=levelNumber >= 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:levelNumber===8?"Stronghold Mission":"Cave Mission",startLabel:"Learn the skill",intro:levelNumber===8?"Enter the stronghold, learn the skill, and work towards recovering the Core.":"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
-  const displayFocus = realm === "number" && !isCave ? numberNexusLearningStatement(focus) : focus;
-  const criteria =
-    realm === "number" && !isCave
-      ? numberNexusSuccessCriteria(successCriteria, focus)
-      : uniqueCriteria(successCriteria, focus);
-  const learningStatement = /^I\s+am\s+learning\s+to\b/i.test(displayFocus)
-    ? displayFocus
-    : `I am learning to ${displayFocus}`;
-  const criteriaStatements = criteria.map((criterion) =>
-    /^I\s+can\b/i.test(criterion) ? criterion : `I can ${criterion}`,
+  const learningStatement = learningStatementFor(focus);
+  const criteriaStatements = uniqueCriteria(successCriteria, focus).map((criterion) =>
+    /^I\s+can\b/i.test(criterion) ? criterion : `I can ${continueSentence(criterion)}`,
   );
   const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
   const learningText = learningStatement;
