@@ -16,7 +16,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Sigma, Sparkle, Zap } from "lucide-react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
-import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
+import { LESSON_HUD_ROW, LESSON_LAYOUT, LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
@@ -1625,17 +1625,13 @@ export function Year2LessonEngine({
         />
       )}
 
-      <div className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
-        <aside className="lg:sticky lg:top-4 lg:self-start">
+      <div className={LESSON_LAYOUT}>
+        <aside className={LESSON_HUD_ROW}>
           {(lowerGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { skillGuideOpenRef.current = true; setSkillGuideOpen(true); }} />}
           {isCave7 && <button type="button" className={`mb-3 w-full rounded-lg border px-4 py-3 font-bold text-white ${newCaveRealm ? "border-white/30 bg-slate-900" : isSpace7 ? "border-violet-200 bg-violet-950" : isMeasurement7 ? "border-amber-200 bg-amber-950" : "border-teal-200 bg-teal-950"}`} onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
           <LessonHUDRail
             levelNumber={levelNumber}
-            week={lesson.week}
-            lessonNumber={lesson.lesson}
-            lessonTitle={lesson.title}
             correctAnswers={correctAnswers}
-            questionsAnswered={questionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}

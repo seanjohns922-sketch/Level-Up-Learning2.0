@@ -19,7 +19,7 @@ import { TaskRenderer } from "@/components/TaskRenderer";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import { LessonHUDRail } from "@/components/lesson/LessonHUDRail";
+import { LESSON_HUD_ROW, LESSON_LAYOUT, LessonHUDRail } from "@/components/lesson/LessonHUDRail";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import LessonCoachReview from "@/components/lesson/LessonCoachReview";
@@ -1474,7 +1474,6 @@ export function PracticeRunner({
     correctAnswer: currentCorrectAnswer,
     explanation: currentWrongExplanation,
   });
-  const hudLessonNumber = Number(liveContext?.lessonId.match(/-l(\d+)$/)?.[1] ?? NaN);
   const taskSurfaceStyle = isMeasurement
     ? {
         background: "linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%)",
@@ -1549,18 +1548,14 @@ export function PracticeRunner({
         />
       )}
 
-      {/* Two-column landscape: sticky HUD rail + question workspace */}
-      <div ref={attachGroundStage} data-ground-lesson={isGroundLesson ? "true" : undefined} className="grid gap-3 lg:grid-cols-[300px_1fr] lg:items-start lg:gap-5">
-        <aside className="lg:sticky lg:top-4 lg:self-start">
+      {/* The slim lesson bar across the top, then the question workspace */}
+      <div ref={attachGroundStage} data-ground-lesson={isGroundLesson ? "true" : undefined} className={LESSON_LAYOUT}>
+        <aside className={LESSON_HUD_ROW}>
           {(groundGuide || lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
             levelNumber={levelNumber}
-            week={liveContext?.week}
-            lessonNumber={Number.isFinite(hudLessonNumber) ? hudLessonNumber : undefined}
-            lessonTitle={lessonTitle ?? null}
             correctAnswers={safeCorrectAnswers}
             xpCorrectAnswers={cappedCorrectAnswers}
-            questionsAnswered={safeQuestionsAnswered}
             accuracy={accuracy}
             secondsLeft={Math.max(0, secondsLeft)}
             totalSeconds={totalSeconds}

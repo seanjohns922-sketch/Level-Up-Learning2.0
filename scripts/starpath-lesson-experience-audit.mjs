@@ -72,7 +72,7 @@ const xpBar = read("components/lesson/LessonXPBar.tsx");
 assert.match(xpBar, /Mission Progress/);
 assert.match(xpBar, /Starpath Progress/);
 
-const stats = read("components/lesson/LessonStatStrip.tsx");
+const stats = read("components/lesson/LessonMasteryTile.tsx");
 assert.match(stats, /Mission Accuracy/);
 
 const combo = read("components/lesson/ComboCounter.tsx");

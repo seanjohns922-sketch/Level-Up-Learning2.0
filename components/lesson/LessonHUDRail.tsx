@@ -4,20 +4,22 @@ import { useState } from "react";
 import { ChevronDown, Dices, Lightbulb } from "lucide-react";
 import { LessonXPBar } from "@/components/lesson/LessonXPBar";
 import { LessonTimer } from "@/components/lesson/LessonTimer";
-import { LessonStatStrip } from "@/components/lesson/LessonStatStrip";
+import { LessonMasteryTile } from "@/components/lesson/LessonMasteryTile";
 import { ComboCounter } from "@/components/lesson/ComboCounter";
 import { MathFormattedText } from "@/components/FractionText";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 
+/** A lesson's layout: the slim bar across the top, then the question underneath. */
+export const LESSON_LAYOUT = "grid gap-4";
+/** The bar's row. The "Learn the skill" button sits at the end of the bar on wider screens. */
+export const LESSON_HUD_ROW =
+  "flex flex-col gap-3 lg:flex-row lg:items-stretch [&>button]:mb-0 lg:[&>button]:order-last lg:[&>button]:w-auto lg:[&>button]:max-w-[220px] lg:[&>button]:shrink-0 [&>[data-lesson-hud]]:min-w-0 [&>[data-lesson-hud]]:flex-1";
+
+/** The lesson bar: progress, timer, mastery, streak and a hint, in the realm's colours. */
 export function LessonHUDRail({
   levelNumber,
-  week,
-  lessonNumber,
-  lessonTitle,
-  targetLabel,
   correctAnswers,
   xpCorrectAnswers,
-  questionsAnswered,
   accuracy,
   secondsLeft,
   totalSeconds,
@@ -32,13 +34,8 @@ export function LessonHUDRail({
   realmId,
 }: {
   levelNumber?: number;
-  week?: number;
-  lessonNumber?: number;
-  lessonTitle?: string | null;
-  targetLabel?: string | null;
   correctAnswers: number;
   xpCorrectAnswers?: number;
-  questionsAnswered: number;
   accuracy: number;
   secondsLeft: number;
   totalSeconds: number;
@@ -58,11 +55,6 @@ export function LessonHUDRail({
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-
-  const showCrumb =
-    typeof levelNumber === "number" &&
-    typeof week === "number" &&
-    typeof lessonNumber === "number";
 
   return (
     <div data-lesson-hud className="relative">
@@ -91,7 +83,7 @@ export function LessonHUDRail({
         }}
       />
       <div
-        className="relative p-3.5 space-y-3 overflow-hidden"
+        className="relative overflow-hidden p-2.5"
         style={isMeasurement ? {
           borderRadius: 16,
           background: "linear-gradient(135deg, #140e04 0%, #2a1a06 50%, #3d2808 100%)",
@@ -134,83 +126,8 @@ export function LessonHUDRail({
             }}
           />
         ) : null}
-        {/* Compact crumb + title */}
-        {/* Below laptop width the banner already shows the title; save space for the question. */}
-        {showCrumb && (
-          <div className="hidden lg:block">
-            <div
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-[0.2em]"
-              style={isMeasurement ? {
-                border: "1px solid rgba(200,160,48,0.35)",
-                background: "rgba(60,30,5,0.4)",
-                color: "rgba(240,210,150,0.88)",
-              } : isStarpath ? {
-                border: "1px solid rgba(103,232,249,0.34)",
-                background: "rgba(124,58,237,0.18)",
-                color: "#cffafe",
-              } : isStatistics ? {
-                border: "1px solid rgba(242,188,69,0.38)",
-                background: "rgba(255,244,223,0.08)",
-                color: "#fff0c7",
-              } : isPattern ? {
-                border: "1px solid rgba(52,211,153,0.38)",
-                background: "rgba(16,185,129,0.1)",
-                color: "#a7f3d0",
-              } : isChance ? {
-                border: "1px solid rgba(251,113,133,0.38)",
-                background: "rgba(251,113,133,0.12)",
-                color: "#ffe4e6",
-              } : {
-                border: "1px solid rgba(94,234,212,0.3)",
-                background: "rgba(94,234,212,0.1)",
-                color: "rgba(167,243,208,0.9)",
-              }}
-            >
-              {levelNumber === 0 ? "Ground" : `L${levelNumber}`} · W{week} · L{lessonNumber}
-            </div>
-            {lessonTitle ? (
-              <div className="mt-1.5 text-[13px] font-bold leading-snug text-white/95 line-clamp-2">
-                {lessonTitle}
-              </div>
-            ) : null}
-            {targetLabel ? (
-              <div
-                className="mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.16em]"
-                style={isMeasurement ? {
-                  border: "1px solid rgba(139,92,246,0.3)",
-                  background: "rgba(109,40,217,0.12)",
-                  color: "rgba(196,181,253,0.9)",
-              } : isStarpath ? {
-                border: "1px solid rgba(240,171,252,0.30)",
-                background: "rgba(217,70,239,0.12)",
-                color: "#f5d0fe",
-              } : isStatistics ? {
-                border: "1px solid rgba(240,107,100,0.36)",
-                background: "rgba(240,107,100,0.12)",
-                color: "#ffd9d5",
-              } : isPattern ? {
-                border: "1px solid rgba(124,58,237,0.4)",
-                background: "rgba(124,58,237,0.16)",
-                color: "#ddd6fe",
-              } : isChance ? {
-                border: "1px solid rgba(251,191,36,0.34)",
-                background: "rgba(251,191,36,0.1)",
-                color: "#fde68a",
-              } : {
-                  border: "1px solid rgba(110,231,183,0.3)",
-                  background: "rgba(110,231,183,0.1)",
-                  color: "#d1fae5",
-                }}
-              >
-                {targetLabel}
-              </div>
-            ) : null}
-          </div>
-        )}
-
-        {/* XP + Timer */}
-        <div className="flex items-stretch gap-2 lg:flex-col lg:items-stretch">
-          <div className="flex-1 min-w-0">
+        <div className="relative flex flex-wrap items-stretch gap-2.5">
+          <div className="min-w-[220px] flex-[2_1_260px]">
             <LessonXPBar
               correct={xpCorrectAnswers ?? correctAnswers}
               totalTarget={xpTarget}
@@ -222,38 +139,28 @@ export function LessonHUDRail({
               realmId={realmId}
             />
           </div>
-          <div className="flex-shrink-0 lg:self-end">
+          <div className="shrink-0">
             <LessonTimer seconds={Math.max(0, secondsLeft)} total={totalSeconds} realmId={realmId} />
           </div>
-        </div>
-
-        {/* Stats strip */}
-        <div data-lesson-stats className="hidden lg:block lg:[&>div]:!grid-cols-1">
-          <LessonStatStrip
-            questionsAnswered={questionsAnswered}
-            correctAnswers={correctAnswers}
-            accuracy={accuracy}
-            realmId={realmId}
-          />
-        </div>
-
-        {/* Combo chain counter (on tablets and phones only once a streak is running) */}
-        <div className={comboCount > 0 ? undefined : "hidden lg:block"}>
-        <ComboCounter
-          count={comboCount}
-          cave={levelNumber === 7}
-          chainLabel={levelNumber === 7 ? "CRYSTAL STREAK" : isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
-          realmId={realmId}
-        />
-        </div>
-
-        {/* Collapsible hint */}
-        {hint ? (
-          <div>
+          <div data-lesson-stats className="hidden flex-[1_1_170px] sm:block">
+            <LessonMasteryTile accuracy={accuracy} realmId={realmId} />
+          </div>
+          {/* On phones the streak shows only once one is running. */}
+          <div className={comboCount > 0 ? "flex-[1_1_190px]" : "hidden flex-[1_1_190px] sm:block"}>
+            <ComboCounter
+              count={comboCount}
+              cave={levelNumber === 7}
+              chainLabel={levelNumber === 7 ? "CRYSTAL STREAK" : isMeasurement ? "EXPLORER STREAK" : isStarpath ? "STAR CHAIN" : isStatistics ? "DATA STREAK" : isPattern ? "PATTERN STREAK" : isChance ? "CHANCE STREAK" : undefined}
+              realmId={realmId}
+            />
+          </div>
+          {hint ? (
+            <div className="flex-[0_1_170px]">
             <button
               type="button"
               onClick={() => setHintOpen((v) => !v)}
-              className="group relative flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition"
+              className="group relative flex h-full min-h-12 w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition"
+              aria-expanded={hintOpen}
               style={isMeasurement ? {
                 border: "1px solid rgba(200,160,48,0.3)",
                 background: hintOpen ? "rgba(200,160,48,0.1)" : "rgba(200,160,48,0.07)",
@@ -301,9 +208,14 @@ export function LessonHUDRail({
                 style={{ color: isChance ? "rgba(255,228,230,0.72)" : isMeasurement ? "rgba(240,210,150,0.6)" : "rgba(253,230,138,0.7)" }}
               />
             </button>
+            </div>
+          ) : null}
+        </div>
+        {hint ? (
+          <>
             {hintOpen && (
               <div
-                className="mt-1.5 rounded-lg px-3 py-2.5 text-[13px] font-medium leading-relaxed"
+                className="relative mt-2.5 rounded-lg px-3 py-2.5 text-[15px] font-medium leading-relaxed"
                 style={isMeasurement ? {
                   border: "1px solid rgba(200,160,48,0.22)",
                   background: "linear-gradient(135deg, #1a1304 0%, #2e1f05 100%)",
@@ -327,7 +239,7 @@ export function LessonHUDRail({
                 <MathFormattedText text={hint} />
               </div>
             )}
-          </div>
+          </>
         ) : null}
       </div>
     </div>

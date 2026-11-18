@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
 import { number7Quiz } from "@/data/activities/year7Number/questions";
@@ -42,6 +42,8 @@ import MoneyChange from "@/components/week7/MoneyChange";
 import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
+import { QUIZ_BUTTON, QuizRuneProgress } from "@/components/quiz/QuizUi";
+import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
 import {
@@ -9394,10 +9396,6 @@ function SessionPage({
         : 0),
     0
   );
-  const progressPct = quizQuestions.length
-    ? Math.round(((quizIndex + 1) / quizQuestions.length) * 100)
-    : 0;
-
   // ---------------------------
   // UI
   // ---------------------------
@@ -9421,6 +9419,7 @@ function SessionPage({
       className={isLesson
         ? "min-h-screen bg-background flex items-center justify-center px-6 py-10"
         : "relative isolate min-h-screen px-3 py-4 sm:px-6"}
+      style={isLesson ? undefined : (getWeeklyQuizTheme(quizRealmId) as CSSProperties)}
     >
       <ActiveLearningTracker context="session" />
       <div className={isLesson ? "w-full max-w-5xl" : "mx-auto w-full max-w-[1500px]"}>
@@ -9456,11 +9455,7 @@ function SessionPage({
         <div
           className={isLesson
             ? "rounded-3xl overflow-hidden shadow-xl border border-border/50 bg-card"
-            : "overflow-hidden rounded-b-lg border shadow-[0_24px_90px_rgba(0,0,0,0.42)]"}
-          style={!isLesson ? {
-            borderColor: quizChromeTheme.panelBorder,
-            background: quizChromeTheme.workspaceBg,
-          } : undefined}
+            : "rounded-[30px] bg-[image:var(--quiz-frame)] p-[3px] shadow-[0_30px_80px_rgba(0,0,0,0.5)]"}
         >
           {/* Hero gradient header */}
           {isLesson ? (
@@ -9476,7 +9471,7 @@ function SessionPage({
           ) : null}
 
           <div
-            className={isLesson ? "bg-background px-6 py-8" : "px-3 py-5 sm:px-6 sm:py-7"}
+            className={isLesson ? "bg-background px-6 py-8" : "overflow-clip rounded-[27px] px-3 py-5 sm:px-6 sm:py-7"}
             style={!isLesson ? { background: quizChromeTheme.workspaceBg } : undefined}
           >
 
@@ -9570,112 +9565,41 @@ function SessionPage({
                     "inset 0 1px 0 rgba(94,234,212,0.12), 0 8px 20px -12px rgba(0,0,0,0.55)",
                 }}
               >
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={[
-                      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em]",
-                      isMeasurementRealm
-                        ? "border-yellow-800/35 bg-yellow-400/10 text-yellow-100"
-                        : "border-teal-300/30 bg-teal-500/10 text-teal-200",
-                    ].join(" ")}>
-                      <span className={[
-                        "h-1.5 w-1.5 rounded-full",
-                        isMeasurementRealm
-                          ? "bg-yellow-200 shadow-[0_0_8px_rgba(200,160,48,0.85)]"
-                          : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]",
-                      ].join(" ")} />
-                      Q {quizIndex + 1}<span className="opacity-60">/{quizQuestions.length}</span>
+                <QuizRuneProgress
+                  total={quizQuestions.length}
+                  current={quizIndex}
+                  isDone={(index) => isQuestionAnswered(quizQuestions[index])}
+                  // Only answered questions (or the current one) can be revisited; no skipping ahead.
+                  onJump={(index) => { if (index === quizIndex || isQuestionAnswered(quizQuestions[index])) setQuizIndex(index); }}
+                />
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {currentQuiz?.lessonTag ? (
+                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.1em] text-white">
+                      Lesson {currentQuiz.lessonTag}
                     </span>
-                    {currentQuiz?.lessonTag ? (
-                      <span className={[
-                        "rounded-full border px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.18em]",
-                        isMeasurementRealm
-                          ? "border-violet-300/25 bg-violet-500/10 text-violet-100"
-                          : "border-emerald-300/25 bg-emerald-500/10 text-emerald-100",
-                      ].join(" ")}>
-                        Lesson {currentQuiz.lessonTag}
-                      </span>
-                    ) : null}
-                    <label className={[
-                      "flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.14em]",
-                      isMeasurementRealm
-                        ? "border-yellow-900/20 bg-black/15 text-amber-50/85"
-                        : "border-white/10 bg-white/5 text-white/80",
-                    ].join(" ")}>
-                      <span className={isMeasurementRealm ? "text-yellow-100" : "text-teal-200"}>Jump</span>
-                      <select
-                        value={quizIndex}
-                        onChange={(e) => {
-                          // Only allow jumping to already-answered questions (or
-                          // staying on the current one) — no skipping ahead.
-                          const target = Number(e.target.value);
-                          if (target === quizIndex || isQuestionAnswered(quizQuestions[target])) {
-                            setQuizIndex(target);
-                          }
-                        }}
-                        className={[
-                          "rounded-full border px-3 py-1 text-[11px] font-bold text-white outline-none transition",
-                          isMeasurementRealm
-                            ? "border-yellow-900/25 bg-[#2a1a06] hover:border-yellow-400/40"
-                            : "border-teal-300/20 bg-[#0b1220] hover:border-teal-200/50",
-                        ].join(" ")}
-                      >
-                        {quizQuestions.map((question, index) => {
-                          const answered = isQuestionAnswered(question);
-                          const selectable = answered || index === quizIndex;
-                          return (
-                            <option key={question.id} value={index} disabled={!selectable}>
-                              {`Q${index + 1} · L${question.lessonTag ?? question.lessonNumber ?? 1}${answered ? ' (done)' : index === quizIndex ? ' (current)' : ''}`}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </label>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-100">
-                      <Zap className="h-3.5 w-3.5" /> {liveCorrectCount} correct
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => speak(currentQuizPrompt)}
-                      aria-label="Read question aloud"
-                      className={[
-                        "rounded-full border px-3 py-1 text-[11px] font-bold transition",
-                        isCurrentQuizReading
-                          ? isMeasurementRealm
-                            ? "border-yellow-300/50 bg-yellow-400/15 text-yellow-50"
-                            : "border-teal-300/60 bg-teal-400/20 text-teal-100"
-                          : isMeasurementRealm
-                            ? "border-yellow-900/20 bg-white/5 text-amber-50/85 hover:bg-white/10"
-                            : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
-                      ].join(" ")}
-                    >
-                      <span className="inline-flex items-center gap-1.5"><Volume2 className="h-4 w-4" /> Read</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/5">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${progressPct}%`,
-                      background: isMeasurementRealm
-                        ? "linear-gradient(90deg, #8b6520 0%, #c8a030 55%, #e8d5a8 100%)"
-                        : "linear-gradient(90deg, #00C2A8 0%, #00E5C3 100%)",
-                      boxShadow: isMeasurementRealm
-                        ? "0 0 12px rgba(200,160,48,0.45)"
-                        : "0 0 12px rgba(0,229,195,0.55)",
-                    }}
-                  />
+                  ) : null}
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/15 px-3 py-1.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.1em] text-amber-100">
+                    <Zap className="h-3.5 w-3.5" /> {liveCorrectCount} correct
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => speak(currentQuizPrompt)}
+                    aria-label="Read question aloud"
+                    className={[
+                      "ml-auto inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 text-sm font-bold transition",
+                      isCurrentQuizReading ? "border-white/50 bg-white/20 text-white" : "border-white/20 bg-white/10 text-white hover:bg-white/15",
+                    ].join(" ")}
+                  >
+                    <Volume2 className="h-4 w-4" /> Read
+                  </button>
                 </div>
               </div>
             ) : null}
 
-            <div className="mb-6 rounded-lg border border-border bg-white/90 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.12)] sm:p-6">
+            <div className="mb-6">
 
               {quizQuestions.length ? (
-                <div data-level1-look={(newLookLevel === 1 || newLookLevel === 2) && quizRealmId === "number" ? "number" : undefined} data-number-nexus-level={newLookLevel >= 3 && quizRealmId === "number" ? String(newLookLevel) : undefined} className="rounded-lg border border-border/60 bg-white/75 p-3 sm:p-5">
+                <div data-level1-look={(newLookLevel === 1 || newLookLevel === 2) && quizRealmId === "number" ? "number" : undefined} data-number-nexus-level={newLookLevel >= 3 && quizRealmId === "number" ? String(newLookLevel) : undefined} data-premium-task className="rounded-[22px] border-2 border-[var(--quiz-border)] bg-white/80 p-3 shadow-[0_6px_0_rgba(15,23,42,0.05)] sm:p-6">
                   {!isMoneyQuiz && currentQuiz?.kind !== "lessonActivity" ? (
                     <div
                       className={[
@@ -9687,13 +9611,13 @@ function SessionPage({
                     >
                       <div
                         className={[
-                          "mb-1 text-[10px] font-mono font-bold uppercase tracking-[0.2em]",
-                          isMeasurementRealm ? "text-amber-700/80" : "text-teal-700/80",
+                          "mb-2 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]",
+                          isMeasurementRealm ? "text-amber-800" : "text-teal-800",
                         ].join(" ")}
                       >
                         Prompt
                       </div>
-                      <div className="text-[1.05rem] md:text-[1.15rem] font-semibold leading-snug text-foreground">
+                      <div className="font-[family-name:var(--font-display)] text-[1.5rem] font-extrabold leading-tight text-foreground md:text-[1.75rem]">
                         <MathFormattedText text={currentQuiz?.prompt ?? ""} compactFractions />
                       </div>
                     </div>
@@ -10465,16 +10389,9 @@ function SessionPage({
               <button
                 onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
                 disabled={quizIndex === 0}
-                 className={[
-                  "px-5 py-2.5 rounded-md font-extrabold tracking-[0.22em] text-sm transition active:scale-[0.97]",
-                  quizIndex === 0
-                    ? "text-white/30 border border-white/10 bg-[#0b1220]/60 cursor-not-allowed"
-                    : isMeasurementRealm
-                      ? "text-white border border-amber-300/40 bg-[#1b1030]/80 hover:border-amber-200/70 hover:bg-[#241544]/80 shadow-[inset_0_0_0_1px_rgba(214,184,108,0.1)]"
-                      : "text-white border border-teal-300/40 bg-[#0b1220]/80 hover:border-teal-200/70 hover:bg-[#0e1830]/80 shadow-[inset_0_0_0_1px_rgba(94,234,212,0.08)]",
-                ].join(" ")}
+                className={QUIZ_BUTTON.secondary}
               >
-                ← BACK
+                ← Back
               </button>
 
               <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
@@ -10489,7 +10406,7 @@ function SessionPage({
                 <div className="flex items-center gap-3">
                   <button
                     onClick={backToWeek}
-                    className="px-5 py-3 rounded-2xl font-bold transition bg-secondary text-secondary-foreground hover:bg-muted"
+                    className={QUIZ_BUTTON.secondary}
                   >
                     Back to Week
                   </button>
@@ -10497,7 +10414,7 @@ function SessionPage({
                     <button
                       type="button"
                       onClick={() => window.location.reload()}
-                      className="rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 px-5 py-3 font-bold text-white shadow-lg transition hover:brightness-110"
+                      className={QUIZ_BUTTON.secondary}
                     >
                       Try Quiz Again
                     </button>
@@ -10506,7 +10423,7 @@ function SessionPage({
                     <button
                       type="button"
                       onClick={() => setShowQuizMistakeReview(true)}
-                      className={`px-5 py-3 rounded-2xl font-bold transition ${quizTheme.goToWeek}`}
+                      className={QUIZ_BUTTON.secondary}
                     >
                       Review My Quiz
                     </button>
@@ -10520,7 +10437,7 @@ function SessionPage({
                           ? `/posttest?year=${encodeURIComponent(year)}${realmParam}`
                           : `/program?year=${encodeURIComponent(year)}&week=${encodeURIComponent(String(Number(week) + 1))}&legacy=1${realmParam}`)
                       }
-                      className={`px-5 py-3 rounded-2xl font-bold transition ${quizTheme.goToWeek}`}
+                      className={QUIZ_BUTTON.primary}
                     >
                       {isFinalQuizWeek ? "Continue to Post-Test" : `Go to Week ${Number(week) + 1}`}
                     </button>
@@ -10534,14 +10451,7 @@ function SessionPage({
                     )
                   }
                   disabled={!currentAnswered}
-                   className={[
-                    "px-6 py-3 rounded-2xl font-extrabold transition active:scale-[0.97]",
-                    currentAnswered
-                      ? isMeasurementRealm
-                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-[0_8px_24px_-10px_rgba(251,191,36,0.7)] hover:brightness-110"
-                        : "bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-[0_8px_24px_-10px_rgba(0,229,195,0.7)] hover:brightness-110"
-                      : "bg-muted text-muted-foreground cursor-not-allowed",
-                  ].join(" ")}
+                  className={QUIZ_BUTTON.primary}
                 >
                   Next →
                 </button>
@@ -10549,12 +10459,7 @@ function SessionPage({
                 <button
                   onClick={submitQuiz}
                   disabled={!quizComplete}
-                   className={[
-                    "px-6 py-3 rounded-2xl font-extrabold transition active:scale-[0.97]",
-                    quizComplete
-                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-[0_8px_24px_-10px_rgba(251,191,36,0.7)] hover:brightness-110"
-                      : "bg-muted text-muted-foreground cursor-not-allowed",
-                  ].join(" ")}
+                  className={QUIZ_BUTTON.primary}
                 >
                   <span className="inline-flex items-center justify-center gap-1.5">Submit <Check className="h-4 w-4" /></span>
                 </button>

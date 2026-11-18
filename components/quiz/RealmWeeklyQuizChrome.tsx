@@ -111,6 +111,8 @@ function getQuizArtwork(realm: RealmQuizThemeId, levelNumber: number, year: stri
   return getRealmLessonArtwork(realm, levelNumber, year);
 }
 
+const HERO_FADE = "linear-gradient(180deg, #000 55%, transparent 100%)";
+
 export function RealmWeeklyQuizChrome({
   realm,
   levelNumber,
@@ -167,47 +169,46 @@ export function RealmWeeklyQuizChrome({
         )}
       </div>
 
-      <header
-        className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border px-3 py-3 backdrop-blur-md sm:px-5"
-        style={{ background: theme.shellBg, borderColor: theme.panelBorder }}
-      >
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-11 items-center gap-2 rounded-lg border px-4 text-sm font-bold transition hover:bg-white/10"
-          style={{ borderColor: theme.panelBorder, color: theme.accentSoft }}
+          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/20 bg-black/40 px-5 text-base font-bold text-white backdrop-blur-md transition hover:bg-black/55"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Week {week}
+          <ArrowLeft className="h-5 w-5" /> Back to Week {week}
         </button>
         <div
-          className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]"
-          style={{ color: theme.accentSoft }}
+          className="flex items-center gap-2 rounded-full border bg-black/40 px-4 py-2.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.14em] backdrop-blur-md"
+          style={{ borderColor: theme.panelBorder, color: theme.accent }}
         >
-          <theme.ThemeIcon className="h-5 w-5" style={{ color: theme.accent }} />
+          <theme.ThemeIcon className="h-5 w-5" />
           {theme.realmName}{demoMode ? " · Demo Mode" : ""}
         </div>
       </header>
 
-      <section
-        className="relative overflow-hidden rounded-t-lg border border-b-0 px-5 py-6 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:px-8"
-        style={{ background: theme.shellBg, borderColor: theme.panelBorder }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={artworkSrc} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0" style={{ background: theme.heroOverlay }} />
+      {/* The realm's art fades into the page behind the title, rather than sitting in a box. */}
+      <section className="relative mb-6 overflow-hidden rounded-[30px] px-5 pb-8 pt-10 sm:px-10 sm:pt-14">
+        <div className="absolute inset-0" style={{ maskImage: HERO_FADE, WebkitMaskImage: HERO_FADE }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={artworkSrc} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
+          <div className="absolute inset-0" style={{ background: theme.heroOverlay }} />
+        </div>
         <div className="relative max-w-4xl">
-          <div className="font-mono text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
+          <span
+            className="inline-flex rounded-full border bg-black/35 px-3.5 py-1.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]"
+            style={{ borderColor: theme.panelBorder, color: theme.accentSoft }}
+          >
             {levelLabel} · Week {week} · {theme.eyebrow}
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-black tracking-normal text-white sm:text-4xl">{theme.quizName}</h1>
+          </span>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl font-black tracking-normal text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] sm:text-6xl">{theme.quizName}</h1>
             <ReadAloudBtn
               text={readText}
               label="Read"
               className="!border-white/20 !bg-black/25 !text-white hover:!border-white/35 hover:!bg-black/40 hover:!text-white"
             />
           </div>
-          <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 sm:text-base" style={{ color: theme.accentSoft }}>
+          <p className="mt-2 max-w-3xl text-base font-semibold leading-7 sm:text-lg" style={{ color: theme.accentSoft }}>
             {questionCount} questions · {focus ?? "Show what you know from this week"}
           </p>
         </div>

@@ -1,18 +1,9 @@
 "use client";
 
-import { BarChart3, CheckCircle, Compass, Dices, HelpCircle, Orbit, Sigma, Sparkles, Target } from "lucide-react";
+import { Sparkles, Target } from "lucide-react";
 
-export function LessonStatStrip({
-  questionsAnswered,
-  correctAnswers,
-  accuracy,
-  realmId,
-}: {
-  questionsAnswered: number;
-  correctAnswers: number;
-  accuracy: number;
-  realmId?: string;
-}) {
+/** The lesson bar's accuracy tile ("Mastery" in most realms), in the realm's colours. */
+export function LessonMasteryTile({ accuracy, realmId }: { accuracy: number; realmId?: string }) {
   const isMeasurement = realmId === "measurement";
   const isStarpath = realmId === "space";
   const isStatistics = realmId === "statistics";
@@ -22,23 +13,9 @@ export function LessonStatStrip({
 
   const stats = [
     {
-      label: isMeasurement || isStarpath || isPattern ? "Challenges" : isStatistics ? "Data Tasks" : isChance ? "Trials" : "Questions",
-      value: questionsAnswered,
-      icon: isMeasurement ? Compass : isStarpath ? Orbit : isStatistics ? BarChart3 : isPattern ? Sigma : isChance ? Dices : HelpCircle,
-      iconColor: isMeasurement ? "text-amber-300" : isStarpath ? "text-violet-200" : isStatistics ? "text-[#f2bc45]" : isPattern ? "text-emerald-300" : isChance ? "text-rose-300" : "text-cyan-300",
-      glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(167,139,250,0.55)" : isStatistics ? "rgba(242,188,69,0.5)" : isPattern ? "rgba(52,211,153,0.5)" : isChance ? "rgba(251,113,133,0.5)" : "rgba(34,211,238,0.45)",
-    },
-    {
-      label: isMeasurement || isStarpath || isStatistics || isPattern || isChance ? "Solved" : "Correct",
-      value: correctAnswers,
-      icon: CheckCircle,
-      iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-cyan-200" : isStatistics ? "text-[#8fbf7f]" : isPattern ? "text-emerald-200" : isChance ? "text-amber-200" : "text-emerald-300",
-      glow: isMeasurement ? "rgba(232,200,120,0.55)" : isStarpath ? "rgba(103,232,249,0.55)" : isStatistics ? "rgba(143,191,127,0.5)" : isPattern ? "rgba(52,211,153,0.55)" : isChance ? "rgba(251,191,36,0.5)" : "rgba(16,185,129,0.5)",
-    },
-    {
       label: isMeasurement || isPattern ? "Mastery" : isStarpath ? "Mission Accuracy" : isStatistics ? "Data Accuracy" : isChance ? "Chance Accuracy" : "Accuracy",
       value: `${accuracy}%`,
-      icon: isMeasurement || isStarpath || isStatistics || isPattern || isChance ? Sparkles : Target,
+      icon: isRounded ? Sparkles : Target,
       iconColor: isMeasurement ? "text-amber-200" : isStarpath ? "text-fuchsia-200" : isStatistics ? "text-[#f06b64]" : isPattern ? "text-violet-200" : isChance ? "text-pink-200" : "text-teal-200",
       glow: isMeasurement ? "rgba(200,160,48,0.5)" : isStarpath ? "rgba(240,171,252,0.5)" : isStatistics ? "rgba(240,107,100,0.5)" : isPattern ? "rgba(124,58,237,0.5)" : isChance ? "rgba(251,113,133,0.52)" : "rgba(94,234,212,0.5)",
     },
@@ -83,9 +60,9 @@ export function LessonStatStrip({
   const labelColor = isMeasurement ? "rgba(240,210,150,0.75)" : isStarpath ? "rgba(207,250,254,0.88)" : isStatistics ? "rgba(255,240,199,0.86)" : isPattern ? "rgba(167,243,208,0.85)" : isChance ? "rgba(255,228,230,0.86)" : "rgba(94,234,212,0.8)";
 
   return (
-    <div className="grid grid-cols-3 gap-2.5">
+    <div className="h-full">
       {stats.map((s) => (
-        <div key={s.label} className="relative">
+        <div key={s.label} className="relative h-full">
           {/* Bezel frame */}
           <div
             aria-hidden
@@ -100,7 +77,7 @@ export function LessonStatStrip({
           />
           {/* Inner plate */}
           <div
-            className="relative px-3 py-2.5 overflow-hidden"
+            className="relative h-full px-3 py-2.5 overflow-hidden"
             style={{
               clipPath: isRounded
                 ? undefined

@@ -35,6 +35,7 @@
     "qa:measurelands-world3d": "node scripts/measurelands-world3d-audit.mjs",
     "qa:starpath-world3d": "node scripts/starpath-world3d-audit.mjs",
     "qa:realm-weekly-quiz": "node scripts/realm-weekly-quiz-chrome-audit.mjs",
+    "qa:quiz-lesson-look": "node scripts/quiz-lesson-look-audit.mjs",
     "qa:weekly-quiz-contract": "node --no-warnings --experimental-strip-types scripts/weekly-quiz-contract-audit.mjs",
     "qa:guided-lesson-feedback": "node scripts/guided-lesson-feedback-audit.mjs",
     "qa:question-read-aloud": "node scripts/question-read-aloud-audit.mjs",

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
+import { QUIZ_BUTTON, QuizRuneProgress, QuizStage } from "@/components/quiz/QuizUi";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { NewLookScope } from "@/lib/level1-look";
@@ -450,21 +451,32 @@ export default function StarpathVoyageQuiz({
           onBack={() => router.push(backHref)}
         />
 
-        <section
-          className="rounded-b-lg border px-4 py-6 text-slate-950 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:px-7"
-          style={{ background: theme.workspaceBg, borderColor: theme.panelBorder }}
-        >
+        {phase === "quiz" && total ? (
+          <div className="mb-4 px-1">
+            <QuizRuneProgress
+              total={total}
+              current={index}
+              isDone={(questionIndex) => answers[String(questionIndex)] !== undefined}
+              onJump={(questionIndex) => {
+                setIndex(questionIndex);
+                setNonce((value) => value + 1);
+              }}
+            />
+          </div>
+        ) : null}
+
+        <QuizStage background={theme.workspaceBg}>
           {phase === "home" ? (
             <div className="mx-auto max-w-4xl">
-              <div className="overflow-hidden rounded-lg border shadow-xl" style={{ borderColor: theme.panelBorder, background: "var(--quiz-hero)" }}>
+              <div className="overflow-hidden rounded-[26px] border shadow-xl" style={{ borderColor: theme.panelBorder, background: "var(--quiz-hero)" }}>
                 <div className="relative px-6 py-9 text-white sm:px-10">
                   <div className="absolute inset-0" style={{ background: "var(--quiz-halo)" }} />
                   <div className="relative">
-                    <div className="font-mono text-xs font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
+                    <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accent }}>
                       {realmTitle}
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <h1 className="text-3xl font-black sm:text-5xl">{quiz.title}</h1>
+                      <h1 className="font-[family-name:var(--font-display)] text-3xl font-black sm:text-5xl">{quiz.title}</h1>
                       <ReadAloudBtn
                         text={quizIntroduction}
                         speechKey={`${realm}-weekly-quiz-${quiz.level}-${quiz.week}`}
@@ -473,7 +485,7 @@ export default function StarpathVoyageQuiz({
                         className="!border-white/40 !bg-black/30 !text-white hover:!bg-white/15"
                       />
                     </div>
-                    <p className="mt-4 max-w-2xl text-base font-semibold leading-7" style={{ color: theme.accentSoft }}>
+                    <p className="mt-4 max-w-2xl text-lg font-semibold leading-8" style={{ color: theme.accentSoft }}>
                       Great work completing this week&apos;s {unitLabel}s! It&apos;s time to show what you discovered across all three {unitLabel}s.
                     </p>
                   </div>
@@ -486,47 +498,32 @@ export default function StarpathVoyageQuiz({
                     { icon: Trophy, value: "80% pass mark", label: "Show your mastery" },
                     { icon: Gem, value: `${QUIZ_PASS_XP} XP`, label: "For passing · plus gems" },
                   ].map(({ icon: Icon, value, label }) => (
-                    <div key={value} className="rounded-lg border border-white/10 bg-white/5 p-4 text-white">
-                      <Icon className="h-6 w-6" style={{ color: theme.accent }} />
-                      <div className="mt-3 font-black">{value}</div>
-                      <div className="mt-1 text-sm" style={{ color: theme.accentSoft }}>{label}</div>
+                    <div key={value} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                      <span className="grid h-11 w-11 place-items-center rounded-xl bg-[image:var(--quiz-frame)] shadow-[0_4px_0_var(--quiz-edge)]">
+                        <Icon className="h-6 w-6 text-white" aria-hidden="true" />
+                      </span>
+                      <div className="mt-3 font-[family-name:var(--font-display)] text-lg font-black">{value}</div>
+                      <div className="mt-1 text-sm font-semibold" style={{ color: theme.accentSoft }}>{label}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={beginQuiz}
-                className="mx-auto mt-6 flex min-h-14 items-center justify-center gap-2 rounded-lg px-8 text-lg font-black text-white shadow-lg transition hover:brightness-110 active:scale-[0.98]"
-                style={{ background: "var(--quiz-action)" }}
-              >
-                <Sparkles className="h-5 w-5" />
-                {hasResume ? "Resume Quiz" : "Begin Quiz"}
-              </button>
+              <div className="mt-8 flex justify-center">
+                <button type="button" onClick={beginQuiz} className={`${QUIZ_BUTTON.primary} min-h-16 px-10 text-xl`}>
+                  <Sparkles className="h-6 w-6" />
+                  {hasResume ? "Resume Quiz" : "Begin Quiz"}
+                </button>
+              </div>
             </div>
           ) : null}
 
           {phase === "quiz" ? (
-            <div className={`mx-auto ${wideLevel7Quiz ? "max-w-5xl" : "max-w-3xl"}`}>
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: "var(--quiz-ink)" }}>
-                  Question {index + 1} of {total}
-                </span>
-                <span className="font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: "var(--quiz-ink)" }}>
-                  {answeredCount} answered
-                </span>
-              </div>
-              <div className="mb-6 h-2 overflow-hidden rounded-full" style={{ background: "var(--quiz-tint)" }}>
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${total ? (answeredCount / total) * 100 : 0}%`, background: "var(--quiz-action)" }}
-                />
-              </div>
-
+            <div className={`mx-auto ${wideLevel7Quiz ? "max-w-5xl" : "max-w-4xl"}`}>
               {task ? (
                 <div className={!answersAreEditable && currentAnswer !== undefined ? "pointer-events-none opacity-75" : ""}>
                   <NewLookScope level={levelNumber} realm={realm}>
+                  <div data-premium-task>
                   <TaskRenderer
                     key={`${index}-${nonce}`}
                     task={task}
@@ -541,27 +538,28 @@ export default function StarpathVoyageQuiz({
                       recordAssessmentAnswer: (correct, response) => answer(correct, response),
                     }}
                   />
+                  </div>
                   </NewLookScope>
                 </div>
               ) : null}
 
               {currentAnswer !== undefined ? (
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border-2 px-4 py-3 border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
-                  <div className="flex items-center gap-2 font-bold text-[var(--quiz-ink)]">
-                    <Check className="h-5 w-5 text-[var(--quiz-ink)]" />
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 px-4 py-3 border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                  <div className="flex items-center gap-3 text-base font-bold text-[var(--quiz-ink)]">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[image:var(--quiz-action)]"><Check className="h-5 w-5 text-white" aria-hidden="true" /></span>
                     Answer recorded. You can change it before finishing the quiz.
                   </div>
                   <button
                     type="button"
                     onClick={changeAnswer}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-lg border bg-white px-4 text-sm font-black transition border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border-2 bg-white px-4 text-sm font-black transition border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
                   >
                     <RotateCcw className="h-4 w-4" /> Change answer
                   </button>
                 </div>
               ) : null}
 
-              <div className="mt-6 flex items-center justify-between gap-3">
+              <div className="mt-8 flex items-center justify-between gap-3">
                 <button
                   type="button"
                   disabled={index === 0}
@@ -569,7 +567,7 @@ export default function StarpathVoyageQuiz({
                     setIndex((value) => Math.max(0, value - 1));
                     setNonce((value) => value + 1);
                   }}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-5 font-black disabled:cursor-not-allowed disabled:opacity-40 border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
+                  className={QUIZ_BUTTON.secondary}
                 >
                   <ArrowLeft className="h-5 w-5" /> Back
                 </button>
@@ -582,7 +580,7 @@ export default function StarpathVoyageQuiz({
                       setIndex((value) => Math.min(total - 1, value + 1));
                       setNonce((value) => value + 1);
                     }}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 bg-[image:var(--quiz-action)] hover:brightness-110"
+                    className={QUIZ_BUTTON.primary}
                   >
                     Next <ArrowRight className="h-5 w-5" />
                   </button>
@@ -591,7 +589,7 @@ export default function StarpathVoyageQuiz({
                     type="button"
                     disabled={answeredCount !== total || saving}
                     onClick={finishQuiz}
-                    className="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-black text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40 bg-[image:var(--quiz-action)] hover:brightness-110"
+                    className={QUIZ_BUTTON.primary}
                   >
                     {saving ? "Saving…" : "Finish Quiz"} <Check className="h-5 w-5" />
                   </button>
@@ -602,21 +600,19 @@ export default function StarpathVoyageQuiz({
 
           {phase === "results" ? (
             <div className="mx-auto max-w-xl text-center">
-              <div className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[var(--quiz-ink)]">
+              <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
                 {quiz.title}
               </div>
               <div
-                className={[
-                  "mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-full text-white shadow-lg",
-                  passed
-                    ? "bg-[image:var(--quiz-action)]"
-                    : "bg-gradient-to-br from-amber-500 to-amber-700",
-                ].join(" ")}
+                className="mx-auto mt-5 grid h-36 w-36 place-items-center rounded-full shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
+                style={{ background: `conic-gradient(${passed ? "var(--quiz-ink)" : "#d97706"} 0 ${percent}%, rgba(15,23,42,0.08) ${percent}% 100%)` }}
               >
-                <span className="text-3xl font-black">{percent}%</span>
+                <span className="grid h-28 w-28 place-items-center rounded-full bg-white">
+                  <span className={`font-[family-name:var(--font-display)] text-4xl font-black ${passed ? "text-[var(--quiz-ink)]" : "text-amber-700"}`}>{percent}%</span>
+                </span>
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-                <h2 className="text-3xl font-black text-slate-950">{resultsTitle}</h2>
+                <h2 className="font-[family-name:var(--font-display)] text-3xl font-black text-slate-950 sm:text-4xl">{resultsTitle}</h2>
                 <ReadAloudBtn
                   text={resultsSpeech}
                   speechKey={`${realm}-weekly-quiz-results-${quiz.level}-${quiz.week}`}
@@ -624,14 +620,14 @@ export default function StarpathVoyageQuiz({
                   className="!border-[var(--quiz-border)] !bg-white !text-[var(--quiz-ink)] hover:!bg-[var(--quiz-tint)]"
                 />
               </div>
-              <p className="mt-2 text-base font-semibold text-slate-600">
+              <p className="mt-2 text-lg font-semibold text-slate-600">
                 You answered {finalScore}/{total} correctly.
                 {passed
                   ? ` You passed the ${ASSESSMENT_THRESHOLDS.weeklyQuizPassPercent}% mark and ${passXpText}.`
                   : ` You need ${requiredCorrect}/${total} to pass and unlock Week ${quiz.week + 1}.`}
               </p>
               {!passed ? (
-                <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 font-bold text-amber-950">
+                <div className="mt-4 rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-3 font-bold text-amber-950">
                   Week {quiz.week + 1} is not unlocked yet. Review a {unitLabel} below, then try the quiz again.
                 </div>
               ) : null}
@@ -640,23 +636,23 @@ export default function StarpathVoyageQuiz({
                   <div
                     key={result.lesson}
                     className={[
-                      "rounded-lg border-2 p-4",
+                      "rounded-2xl border-2 p-4 shadow-[0_5px_0_rgba(15,23,42,0.06)]",
                       result.score >= 4
                         ? "border-emerald-200 bg-emerald-50"
                         : "border-amber-200 bg-amber-50",
                     ].join(" ")}
                   >
-                    <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
+                    <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em] text-[var(--quiz-ink)]">
                       {isLessonRealm ? "Lesson" : "Mission"} {result.lesson}
                     </div>
-                    <div className="mt-2 text-2xl font-black text-slate-950">{result.score}/5</div>
+                    <div className="mt-2 font-[family-name:var(--font-display)] text-3xl font-black text-slate-950">{result.score}/5</div>
                     <div className="mt-1 text-sm font-bold text-slate-700">{result.title}</div>
                   </div>
                 ))}
               </div>
               {wrongIndexes.length ? (
-                <div className="mt-5 rounded-lg border-2 p-4 text-left border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
-                  <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
+                <div className="mt-5 rounded-2xl border-2 p-4 text-left border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                  <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em] text-[var(--quiz-ink)]">
                     Where to practise
                   </div>
                   <p className="mt-2 font-bold text-slate-900">
@@ -671,7 +667,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={restart}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 bg-white px-6 text-base font-black border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
+                    className={QUIZ_BUTTON.secondary}
                   >
                     <RotateCcw className="h-5 w-5" /> Retry Quiz
                   </button>
@@ -680,7 +676,7 @@ export default function StarpathVoyageQuiz({
                   <button
                     type="button"
                     onClick={() => setPhase("review")}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white bg-[image:var(--quiz-action)] hover:brightness-110"
+                    className={QUIZ_BUTTON.secondary}
                   >
                     Review Answers <BookOpen className="h-5 w-5" />
                   </button>
@@ -688,7 +684,7 @@ export default function StarpathVoyageQuiz({
                 <button
                   type="button"
                   onClick={() => router.push(passed && quiz.nextWeekHref ? quiz.nextWeekHref : backHref)}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-base font-black text-white shadow-lg bg-[image:var(--quiz-action)] hover:brightness-110"
+                  className={QUIZ_BUTTON.primary}
                 >
                   {passed && quiz.nextWeekHref
                     ? `Continue to Week ${quiz.week + 1}`
@@ -702,18 +698,18 @@ export default function StarpathVoyageQuiz({
           {phase === "review" ? (
             <div className="mx-auto max-w-3xl">
               <div className="text-center">
-                <div className="font-mono text-xs font-black uppercase tracking-[0.2em] text-[var(--quiz-ink)]">
+                <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.16em] text-[var(--quiz-ink)]">
                   Quiz Review
                 </div>
-                <h2 className="mt-2 text-3xl font-black text-slate-950">Questions to revisit</h2>
+                <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-black text-slate-950 sm:text-4xl">Questions to revisit</h2>
               </div>
               <div className="mt-6 space-y-3">
                 {wrongIndexes.map((questionIndex) => {
                   const reviewTask = orderedTasks[questionIndex]!;
                   return (
-                    <div key={questionIndex} className="rounded-lg border-2 p-4 border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                    <div key={questionIndex} className="rounded-2xl border-2 bg-white p-5 shadow-[0_5px_0_rgba(15,23,42,0.06)] border-[var(--quiz-border)] text-[var(--quiz-ink)]">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="font-mono text-xs font-black uppercase tracking-[0.16em] text-rose-700">
+                        <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em] text-orange-700">
                           Question {questionIndex + 1}
                         </div>
                         <ReadAloudBtn
@@ -730,32 +726,34 @@ export default function StarpathVoyageQuiz({
                           className="!border-[var(--quiz-border)] !bg-white !text-[var(--quiz-ink)] hover:!bg-[var(--quiz-tint)]"
                         />
                       </div>
-                      <div className="mt-2 text-lg font-black text-slate-950"><MathFormattedText text={taskPrompt(reviewTask)} compactFractions /></div>
+                      <div className="mt-2 font-[family-name:var(--font-display)] text-xl font-black text-slate-950"><MathFormattedText text={taskPrompt(reviewTask)} compactFractions /></div>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                        <div className="rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-800">
+                        <div className="rounded-xl border-2 border-orange-200 bg-orange-50 px-4 py-3 text-base font-bold text-orange-900">
                           <span className="font-black">Your answer:</span> <FeedbackValue value={studentAnswerForReview(reviewTask, responses[String(questionIndex)])} unit={reviewUnit(reviewTask)} labels={reviewLabels(reviewTask)} />
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
+                        <div className="rounded-xl border-2 border-emerald-300 bg-emerald-50 px-4 py-3 text-base font-bold text-emerald-900">
                           <span className="font-black">Correct answer:</span> <FeedbackValue value={correctAnswerForReview(reviewTask)} unit={reviewUnit(reviewTask)} labels={reviewLabels(reviewTask)} />
                         </div>
                       </div>
-                      <div className="mt-2 rounded-lg border px-3 py-2 font-semibold border-[var(--quiz-border)] bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
+                      <div className="mt-2 rounded-xl px-4 py-3 font-semibold bg-[var(--quiz-tint)] text-[var(--quiz-ink)]">
                         <MathFormattedText text={taskFeedback(reviewTask)?.wrong ?? "Review this question and try the quiz again."} compactFractions />
                       </div>
                     </div>
                   );
                 })}
               </div>
+              <div className="mt-6 flex justify-center">
               <button
                 type="button"
                 onClick={() => setPhase("results")}
-                className="mx-auto mt-6 flex min-h-12 items-center gap-2 rounded-lg border-2 bg-white px-6 font-black border-[var(--quiz-border)] text-[var(--quiz-ink)] hover:bg-[var(--quiz-tint)]"
+                className={QUIZ_BUTTON.secondary}
               >
                 <ArrowLeft className="h-5 w-5" /> Back to Results
               </button>
+              </div>
             </div>
           ) : null}
-        </section>
+        </QuizStage>
       </div>
     </main>
   );

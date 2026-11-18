@@ -1,0 +1,56 @@
+/* The new look inside quiz and practice questions, scoped to [data-premium-task].
+   Only the shared parts lift: the prompt, the main action buttons and rounded
+   answer boxes. Diagrams, fraction boxes and every maths visual stay exactly as
+   drawn. The realm colours come from the --quiz-* variables on the page. */
+
+/* The question's own white card melts into the stage, so it isn't a box in a box. */
+[data-premium-task] .rounded-3xl.border.bg-white.p-6 {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 0.25rem 0;
+}
+
+[data-premium-task] h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+[data-premium-task] h2.text-2xl {
+  font-size: 1.875rem;
+  line-height: 1.2;
+}
+
+/* The main action (Check answer and friends): a chunky lip that presses down. */
+[data-premium-task] button.rounded-xl.font-black.text-white,
+[data-premium-task] button.rounded-2xl.font-black.text-white {
+  min-height: 3.5rem;
+  border-radius: 1rem;
+  font-family: var(--font-display);
+  transition: transform 80ms ease, box-shadow 80ms ease, background-color 120ms ease;
+}
+[data-premium-task] button.rounded-xl.font-black.text-white:not(:disabled),
+[data-premium-task] button.rounded-2xl.font-black.text-white:not(:disabled) {
+  box-shadow: 0 5px 0 var(--quiz-edge, rgba(15, 23, 42, 0.35));
+}
+/* In the realm's colours rather than a generic teal. */
+[data-premium-task] button.rounded-xl.font-black.text-white[class*="bg-teal-6"],
+[data-premium-task] button.rounded-xl.font-black.text-white[class*="bg-emerald-6"],
+[data-premium-task] button.rounded-2xl.font-black.text-white[class*="bg-teal-6"],
+[data-premium-task] button.rounded-2xl.font-black.text-white[class*="bg-violet-7"] {
+  background-image: var(--quiz-action);
+}
+[data-premium-task] button.rounded-xl.font-black.text-white:not(:disabled):active,
+[data-premium-task] button.rounded-2xl.font-black.text-white:not(:disabled):active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--quiz-edge, rgba(15, 23, 42, 0.35));
+}
+
+/* Answer boxes: taller, bigger digits, a soft realm glow when typing. */
+[data-premium-task] input.rounded-xl:not([type="checkbox"]):not([type="radio"]) {
+  min-height: 3.5rem;
+  border-width: 2px;
+  font-size: 1.5rem;
+}
+[data-premium-task] input.rounded-xl:focus {
+  box-shadow: 0 0 0 4px var(--quiz-tint, rgba(20, 184, 166, 0.15));
+}
