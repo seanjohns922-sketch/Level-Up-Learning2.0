@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Gem, BarChart3, Compass, Dices, Orbit, Sigma, Volume2, VolumeX, Zap } from "lucide-react";
 import { setStreakSoundsEnabled, streakSoundsEnabled, subscribeStreakSounds } from "@/lib/audio/streak-sfx";
+import { LESSON_CHIP, LESSON_CHIP_LABEL, LESSON_CHIP_NUMBER } from "@/lib/lesson-bar-theme";
 
 type ComboTier = "cold" | "spark" | "surge" | "overdrive" | "nexus";
 
@@ -322,134 +323,66 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
     }
   }, [count, TIER_CONFIG]);
 
-  const soundsOn = useSyncExternalStore(subscribeStreakSounds, streakSoundsEnabled, () => false);
   const activeTier = broken ? "cold" : getTier(count);
   const config = TIER_CONFIG[activeTier];
+  const lit = activeTier !== "cold" && !broken;
+  const label = broken
+    ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : isStatistics ? "TRAIL RESET" : isChance ? "STREAK RESET" : "CHAIN BROKEN")
+    : cave ? "CRYSTAL STREAK" : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label);
 
   return (
-    <div className="relative" data-combo-counter>
-      {/* Animated bezel */}
-      <div
+    <div
+      data-combo-counter
+      className={LESSON_CHIP}
+      style={{
+        background: config.bgGradient,
+        boxShadow: lit ? `inset 0 1px 0 ${config.glowColor}, 0 0 16px ${config.glowColor}` : undefined,
+        transition: "background 0.5s ease, box-shadow 0.5s ease",
+      }}
+    >
+      <IconCmp
         aria-hidden
-        className="absolute -inset-[2px] pointer-events-none"
-        style={isMeasurement || isStarpath || isStatistics || isPattern || isChance ? {
-          borderRadius: 12,
-          background: config.borderGradient,
-          transition: "background 0.5s ease",
-        } : {
-          borderRadius: 12,
-          background: config.borderGradient,
-          transition: "background 0.5s ease",
+        className="h-[22px] w-[22px] shrink-0"
+        style={{
+          color: config.iconColor,
+          filter: lit ? `drop-shadow(0 0 5px ${config.glowColor})` : undefined,
+          transition: "color 0.5s ease",
         }}
       />
-
-      {/* Inner plate */}
-      <div
-        className="relative overflow-hidden px-3 py-2.5"
-        style={isMeasurement || isStarpath || isStatistics || isPattern || isChance ? {
-          borderRadius: 10,
-          background: config.bgGradient,
-          boxShadow:
-            activeTier !== "cold"
-              ? `inset 0 1px 0 ${config.glowColor}, inset 0 -8px 16px rgba(0,0,0,0.5), 0 0 16px ${config.glowColor}`
-              : isMeasurement
-                ? "inset 0 1px 0 rgba(200,160,48,0.12), inset 0 -8px 16px rgba(0,0,0,0.4)"
-                : isStarpath
-                  ? "inset 0 1px 0 rgba(165,243,252,0.14), inset 0 -8px 18px rgba(2,6,23,0.48)"
-                  : isChance
-                    ? "inset 0 1px 0 rgba(255,241,242,0.14), inset 0 -8px 18px rgba(18,10,24,0.48)"
-                    : "inset 0 1px 0 rgba(255,240,199,0.14), inset 0 -8px 18px rgba(8,18,13,0.48)",
-          transition: "background 0.5s ease, box-shadow 0.5s ease",
-        } : {
-          borderRadius: 10,
-          background: config.bgGradient,
-          boxShadow:
-            activeTier !== "cold"
-              ? `inset 0 1px 0 ${config.glowColor}, inset 0 -8px 16px rgba(0,0,0,0.5), 0 0 16px ${config.glowColor}`
-              : "inset 0 1px 0 rgba(94,234,212,0.08), inset 0 -8px 16px rgba(0,0,0,0.4)",
-          transition: "background 0.5s ease, box-shadow 0.5s ease",
+      <span
+        className={LESSON_CHIP_NUMBER}
+        style={{
+          color: broken ? "rgba(248,113,113,0.9)" : lit ? config.counterColor : "#ffffff",
+          textShadow: lit ? `0 0 14px ${config.glowColor}` : undefined,
+          transform: bump ? "scale(1.2)" : "scale(1)",
+          transition: "color 0.4s ease, text-shadow 0.4s ease, transform 0.15s ease-out",
         }}
       >
-        {/* Pulsing ambient glow for overdrive/nexus */}
-        {(activeTier === "overdrive" || activeTier === "nexus") && !broken && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 animate-pulse"
-            style={{
-              background: `radial-gradient(ellipse at 50% 0%, ${config.glowColor} 0%, transparent 70%)`,
-              opacity: 0.4,
-            }}
-          />
-        )}
-
-        {/* Header row: icon + label + count badge */}
-        <div className="relative flex items-center gap-1.5">
-          <IconCmp
-            className="h-3.5 w-3.5 flex-shrink-0"
-            style={{
-              color: config.iconColor,
-              filter:
-                activeTier !== "cold"
-                  ? `drop-shadow(0 0 5px ${config.glowColor})`
-                  : undefined,
-              transition: "color 0.5s ease",
-            }}
-          />
-          <span
-            className="text-[10px] font-mono font-bold uppercase tracking-[0.18em]"
-            style={{
-              color: broken ? "rgba(248,113,113,0.9)" : config.labelColor,
-              transition: "color 0.4s ease",
-            }}
-          >
-            {broken
-              ? (isMeasurement ? "STREAK LOST" : isStarpath ? "SIGNAL LOST" : isStatistics ? "TRAIL RESET" : isChance ? "STREAK RESET" : "CHAIN BROKEN")
-              : cave ? "CRYSTAL STREAK" : milestone ?? (activeTier === "cold" && chainLabel ? chainLabel : config.label)}
-          </span>
-          {activeTier !== "cold" && !broken && (
-            <span
-              className="ml-auto text-[10px] font-mono font-bold"
-              style={{
-                color: config.counterColor,
-                textShadow: `0 0 8px ${config.glowColor}`,
-              }}
-            >
-              ×{count}
-            </span>
-          )}
-        </div>
-
-        {/* Streak sounds toggle: off by default, remembered on this device */}
-        <button
-          type="button"
-          onClick={() => setStreakSoundsEnabled(!soundsOn)}
-          aria-pressed={soundsOn}
-          aria-label={soundsOn ? "Turn streak sounds off" : "Turn streak sounds on"}
-          title={soundsOn ? "Streak sounds on" : "Streak sounds off"}
-          className="absolute bottom-1.5 right-1.5 z-10 grid h-8 w-8 place-items-center rounded-lg text-white/55 transition hover:bg-white/10 hover:text-white"
-        >
-          {soundsOn ? <Volume2 className="h-4 w-4" aria-hidden /> : <VolumeX className="h-4 w-4" aria-hidden />}
-        </button>
-
-        {/* Big counter number */}
-        <div
-          className="relative mt-0.5 text-2xl font-black tabular-nums md:text-[1.7rem]"
-          style={{
-            color: broken ? "rgba(248,113,113,0.85)" : config.counterColor,
-            textShadow:
-              activeTier !== "cold" && !broken
-                ? `0 0 18px ${config.glowColor}, 0 0 36px ${config.glowColor}`
-                : broken
-                ? "0 0 14px rgba(248,113,113,0.4)"
-                : undefined,
-            transform: bump ? "scale(1.2)" : "scale(1)",
-            transition:
-              "color 0.4s ease, text-shadow 0.4s ease, transform 0.15s ease-out",
-          }}
-        >
-          {broken ? brokenFromCount : count}
-        </div>
-      </div>
+        {broken ? brokenFromCount : count}
+      </span>
+      <span
+        className={LESSON_CHIP_LABEL}
+        style={{ color: broken ? "rgba(248,113,113,0.9)" : lit ? config.labelColor : "rgba(255,255,255,0.8)", transition: "color 0.4s ease" }}
+      >
+        {label.toLowerCase()}
+      </span>
     </div>
+  );
+}
+
+/** Streak sounds on/off: off by default, remembered on this device. */
+export function StreakSoundToggle({ className = "" }: { className?: string }) {
+  const soundsOn = useSyncExternalStore(subscribeStreakSounds, streakSoundsEnabled, () => false);
+  return (
+    <button
+      type="button"
+      onClick={() => setStreakSoundsEnabled(!soundsOn)}
+      aria-pressed={soundsOn}
+      aria-label={soundsOn ? "Turn streak sounds off" : "Turn streak sounds on"}
+      title={soundsOn ? "Streak sounds on" : "Streak sounds off"}
+      className={`grid h-[52px] w-[52px] shrink-0 place-items-center rounded-[14px] border border-white/20 bg-white/[0.06] text-white transition hover:bg-white/15 ${className}`}
+    >
+      {soundsOn ? <Volume2 className="h-[22px] w-[22px]" aria-hidden /> : <VolumeX className="h-[22px] w-[22px]" aria-hidden />}
+    </button>
   );
 }

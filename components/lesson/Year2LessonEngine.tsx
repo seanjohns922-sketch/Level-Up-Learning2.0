@@ -1628,8 +1628,6 @@ export function Year2LessonEngine({
 
       <div className={LESSON_LAYOUT}>
         <aside className={LESSON_HUD_ROW}>
-          {(lowerGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { skillGuideOpenRef.current = true; setSkillGuideOpen(true); }} />}
-          {isCave7 && <button type="button" className={`mb-3 w-full rounded-lg border px-4 py-3 font-bold text-white ${newCaveRealm ? "border-white/30 bg-slate-900" : isSpace7 ? "border-violet-200 bg-violet-950" : isMeasurement7 ? "border-amber-200 bg-amber-950" : "border-teal-200 bg-teal-950"}`} onClick={()=>{skillGuideOpenRef.current=true;setSkillGuideOpen(true);}}>Learn the skill · open guide</button>}
           <LessonHUDRail
             levelNumber={levelNumber}
             correctAnswers={correctAnswers}
@@ -1640,6 +1638,7 @@ export function Year2LessonEngine({
             hint={hint}
             comboCount={comboCount}
             realmId={realmId}
+            onLearnSkill={lowerGuide || lessonHelp || isCave7 ? () => { skillGuideOpenRef.current = true; setSkillGuideOpen(true); } : undefined}
           />
         </aside>
 

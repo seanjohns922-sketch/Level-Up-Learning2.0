@@ -1,7 +1,7 @@
 "use client";
 
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
-import LowerLessonGuide, { LessonHelpDialog, LessonHelpButton } from "@/components/lesson/LowerLessonGuide";
+import LowerLessonGuide, { LessonHelpDialog } from "@/components/lesson/LowerLessonGuide";
 import { level1Answer, level1Speech } from "@/lib/level1-answer";
 import { Level1LookContext } from "@/lib/level1-look";
 import GroupPicture from "@/components/week4/GroupPicture";
@@ -1553,7 +1553,6 @@ export function PracticeRunner({
       {/* The slim lesson bar across the top, then the question workspace */}
       <div ref={attachGroundStage} data-ground-lesson={isGroundLesson ? "true" : undefined} className={LESSON_LAYOUT}>
         <aside className={LESSON_HUD_ROW}>
-          {(groundGuide || lowerGuide || nativeGuide || lessonHelp) && <LessonHelpButton realm={realmId ?? "number"} onClick={() => { helpOpenRef.current = true; setHelpOpen(true); }} />}
           <LessonHUDRail
             levelNumber={levelNumber}
             correctAnswers={safeCorrectAnswers}
@@ -1570,6 +1569,7 @@ export function PracticeRunner({
             hint={hint}
             comboCount={comboCount}
             realmId={realmId}
+            onLearnSkill={groundGuide || lowerGuide || nativeGuide || lessonHelp ? () => { helpOpenRef.current = true; setHelpOpen(true); } : undefined}
           />
         </aside>
 

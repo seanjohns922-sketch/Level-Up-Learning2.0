@@ -54,3 +54,9 @@
 [data-premium-task] input.rounded-xl:focus {
   box-shadow: 0 0 0 4px var(--quiz-tint, rgba(20, 184, 166, 0.15));
 }
+
+/* Small capital labels ("The data we collect", "Example answers", the activity tag)
+   lift to a size young readers can read. Maths visuals keep their own sizes. */
+[data-premium-task] .uppercase:is(.text-\[9px\], .text-\[10px\], .text-\[11px\], .text-xs) {
+  font-size: 0.8125rem;
+}
