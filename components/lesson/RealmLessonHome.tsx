@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import LowerLessonGuide from "./LowerLessonGuide";
 import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
@@ -8,6 +8,7 @@ import GroundLessonGuide from "./GroundLessonGuide";
 import Level7JourneyLinks from "./Level7JourneyLinks";
 
 import {getRealmTheme} from "@/lib/useRealmTheme";
+import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import layout from "./Number7LessonLayout.module.css";
 import caveLayout from "./cave7/Cave7LessonLayout.module.css";
 import spaceLayout from "./Space7LessonLayout.module.css";
@@ -459,6 +460,8 @@ export function LessonConceptIntro({
   );
 }
 
+const HERO_FADE = "linear-gradient(180deg, #000 55%, transparent 100%)";
+
 export function RealmLessonHome({
   realm,
   levelNumber,
@@ -513,7 +516,7 @@ export function RealmLessonHome({
   </div>;
 
   return (
-    <div className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${levelNumber === 7 ? (realm === "pattern" || realm === "statistics" || realm === "chance" ? caveLayout.home : realm === "space" ? spaceLayout.home : realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
+    <div style={getWeeklyQuizTheme(realm) as CSSProperties} className={`relative isolate min-h-[calc(100vh-3rem)] text-white ${levelNumber === 7 ? (realm === "pattern" || realm === "statistics" || realm === "chance" ? caveLayout.home : realm === "space" ? spaceLayout.home : realm === "measurement" ? measurementLayout.home : layout.home) : ""}`}>
       <div className="fixed inset-0 -z-20" aria-hidden="true" style={{ background: theme.pageBg }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -539,170 +542,159 @@ export function RealmLessonHome({
         )}
       </div>
 
-      <header
-        className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-3 py-3 backdrop-blur-md sm:px-5"
-        style={{ background: theme.shellBg, borderColor: theme.panelBorder }}
-      >
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-11 items-center gap-2 rounded-lg border px-4 text-sm font-bold transition hover:bg-white/10"
-          style={{ borderColor: theme.panelBorder, color: theme.accentSoft }}
+          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/20 bg-black/40 px-5 text-base font-bold text-white backdrop-blur-md transition hover:bg-black/55"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Week {week}
+          <ArrowLeft className="h-5 w-5" /> Back to Week {week}
         </button>
         {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} />}
-        <div className="flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em]" style={{ color: theme.accent }}>
+        <div
+          className="flex items-center gap-2 rounded-full border bg-black/40 px-4 py-2.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.14em] backdrop-blur-md"
+          style={{ borderColor: theme.panelBorder, color: theme.accent }}
+        >
           <theme.ThemeIcon className="h-5 w-5" /> {theme.realmName}
         </div>
       </header>
 
-      <section
-        className="mt-4 overflow-hidden rounded-lg border shadow-[0_24px_90px_rgba(0,0,0,0.42)] backdrop-blur-xl"
-        style={{ background: theme.shellBg, borderColor: theme.panelBorder }}
-      >
-        <div className="relative min-h-[280px] overflow-hidden border-b px-6 py-8 sm:px-10 sm:py-10" style={{ borderColor: theme.panelBorder }}>
+      {/* The realm's art fades into the page behind the title, rather than sitting in a box. */}
+      <section className="relative mt-4 overflow-hidden rounded-[30px] px-5 pb-10 pt-10 sm:px-10 sm:pt-14">
+        <div className="absolute inset-0" style={{ maskImage: HERO_FADE, WebkitMaskImage: HERO_FADE }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={artworkSrc} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
           <div className="absolute inset-0" style={{ background: theme.heroOverlay }} />
-          <div className="relative max-w-3xl">
-            <div className="font-mono text-[11px] font-black uppercase tracking-[0.22em] sm:text-xs" style={{ color: theme.accentSoft }}>
-              {levelLabel} · Week {week} · Lesson {lessonNumber}
-            </div>
-            <div
-              className="mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em]"
-              style={{ borderColor: theme.panelBorder, background: `${theme.accent}18`, color: theme.accentSoft }}
-            >
-              <Sparkles className="h-4 w-4" /> {theme.experienceLabel}
-            </div>
-            <div className="mt-4 flex max-w-3xl flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-black tracking-tight text-white sm:text-5xl">{lessonTitle}</h1>
-              <ReadAloudBtn
-                text={readAllText}
-                speechKey={`${realm}-lesson-home-${year}-${week}-${lessonNumber}`}
-                size="md"
-                label="Read lesson"
-                className="!border-white/25 !bg-white/10 !text-white hover:!bg-white/20"
-              />
-            </div>
-            <p className="mt-4 max-w-2xl text-base font-semibold leading-7 sm:text-lg" style={{ color: theme.accentSoft }}>
-              {theme.intro}
-            </p>
-          </div>
         </div>
-
-        <div className="space-y-5 p-5 sm:p-7">
-          {conceptIntro ? <LessonConceptIntro realm={realm} conceptIntro={conceptIntro} /> : null}
-
-          <div className="grid gap-5 lg:grid-cols-2">
-            <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-950" style={{ background: theme.accent }}>
-                  <Video className="h-4 w-4" />
-                </span>
-                <span className="text-sm font-black uppercase tracking-[0.14em]" style={{ color: theme.accentSoft }}>{theme.videoLabel}</span>
-                <span className="ml-auto inline-flex items-center gap-1 font-mono text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: theme.accent, boxShadow: `0 0 7px ${theme.accent}` }} />
-                  {embeddedVideoSrc ? "Ready" : "Coming soon"}
-                </span>
-              </div>
-              {embeddedVideoSrc ? (
-                <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
-                  <iframe
-                    src={embeddedVideoSrc}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    className="absolute inset-0 h-full w-full"
-                    title={`${lessonTitle} video`}
-                  />
-                </div>
-              ) : (
-                <div className="relative flex aspect-video flex-col items-center justify-center gap-3 overflow-hidden rounded-lg" style={{ background: theme.videoBg }}>
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      backgroundImage: `linear-gradient(${theme.gridColor} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)`,
-                      backgroundSize: "28px 28px",
-                    }}
-                  />
-                  <span className="relative inline-flex h-14 w-14 items-center justify-center rounded-full border bg-black/25" style={{ borderColor: theme.accent }}>
-                    <Play className="ml-0.5 h-5 w-5 fill-current" style={{ color: theme.accent }} />
-                  </span>
-                  <span className="relative font-mono text-[10px] uppercase tracking-[0.25em]" style={{ color: theme.accentSoft }}>Video coming soon</span>
-                </div>
-              )}
-            </section>
-
-            <div className="space-y-5">
-              <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.accent }}>Today I am learning to...</div>
-                  <ReadAloudBtn text={learningText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
-                </div>
-                <p className="mt-3 text-xl font-bold leading-8 text-white">{learningStatement}</p>
-              </section>
-
-              <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.secondary }}>I can...</div>
-                  <ReadAloudBtn text={criteriaText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
-                </div>
-                <ul className="mt-3 space-y-3">
-                  {criteriaStatements.map((criterion) => (
-                    <li key={criterion} className="flex items-start gap-3 text-base font-semibold text-slate-100">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-950" style={{ background: theme.accent }}>
-                        <Check className="h-4 w-4" strokeWidth={3} />
-                      </span>
-                      <span>{criterion}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
+        <div className="relative max-w-3xl">
+          <div
+            className="inline-flex rounded-full border bg-black/35 px-3.5 py-1.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]"
+            style={{ borderColor: theme.panelBorder, color: theme.accentSoft }}
+          >
+            {levelLabel} · Week {week} · Lesson {lessonNumber}
           </div>
-
-          <section className="rounded-lg border p-5" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: theme.accent }}>{theme.rewardLabel}</div>
-                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {[
-                    { label: "XP", Icon: Star },
-                    { label: "Chain", Icon: Flame },
-                    { label: "Gems", Icon: Gem },
-                    { label: theme.completionLabel, Icon: Medal },
-                  ].map(({ label, Icon }) => (
-                    <div key={label} className="flex min-h-20 flex-col items-center justify-center rounded-lg border border-white/10 bg-black/20 p-3 text-center">
-                      <Icon className="h-6 w-6" style={{ color: theme.secondary }} />
-                      <span className="mt-2 text-xs font-black text-white">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center xl:shrink-0">
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-black/20 px-4 py-3" style={{ color: theme.accentSoft }}>
-                  <Clock3 className="h-5 w-5" style={{ color: theme.accent }} />
-                  <span className="whitespace-nowrap font-bold">Approximately 9 minutes</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={startLesson}
-                  disabled={startDisabled}
-                  className="flex min-h-14 w-full items-center justify-center gap-3 rounded-lg px-10 text-lg font-black text-white transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:saturate-50 disabled:opacity-65 sm:w-auto"
-                  style={{ background: theme.buttonBg, boxShadow: theme.buttonShadow }}
-                >
-                  <Play className="h-6 w-6 fill-current" /> {startDisabled ? (startDisabledLabel ?? theme.startLabel) : theme.startLabel}
-                </button>
-              </div>
-            </div>
-            <div className="sr-only">Completing this lesson can unlock {theme.legendLabel} rewards.</div>
-          </section>
+          <div
+            className="ml-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]"
+            style={{ borderColor: theme.panelBorder, background: `${theme.accent}24`, color: theme.accentSoft }}
+          >
+            <Sparkles className="h-4 w-4" /> {theme.experienceLabel}
+          </div>
+          <div className="mt-4 flex max-w-3xl flex-wrap items-center gap-3">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl font-black tracking-normal text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)] sm:text-6xl">{lessonTitle}</h1>
+            <ReadAloudBtn
+              text={readAllText}
+              speechKey={`${realm}-lesson-home-${year}-${week}-${lessonNumber}`}
+              size="md"
+              label="Read lesson"
+              className="!border-white/25 !bg-white/10 !text-white hover:!bg-white/20"
+            />
+          </div>
+          <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 sm:text-xl" style={{ color: theme.accentSoft }}>
+            {theme.intro}
+          </p>
         </div>
       </section>
+
+      <div className="space-y-5">
+        {conceptIntro ? <LessonConceptIntro realm={realm} conceptIntro={conceptIntro} /> : null}
+
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
+          <section className="rounded-[28px] border-2 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.42)]" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
+            <div className="mb-3 flex items-center gap-2 px-1">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-950" style={{ background: theme.accent }}>
+                <Video className="h-5 w-5" />
+              </span>
+              <span className="font-[family-name:var(--font-display)] text-sm font-black uppercase tracking-[0.1em]" style={{ color: theme.accentSoft }}>{theme.videoLabel}</span>
+              <span className="ml-auto rounded-full bg-black/30 px-3 py-1 text-sm font-bold" style={{ color: theme.accentSoft }}>
+                {embeddedVideoSrc ? "Ready" : "Video coming soon"}
+              </span>
+            </div>
+            {embeddedVideoSrc ? (
+              <div className="relative aspect-video overflow-hidden rounded-[20px] bg-black">
+                <iframe
+                  src={embeddedVideoSrc}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                  title={`${lessonTitle} video`}
+                />
+              </div>
+            ) : (
+              <div className="relative flex aspect-video flex-col items-center justify-center overflow-hidden rounded-[20px]" style={{ background: theme.videoBg }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={artworkSrc} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+                <span className="relative inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-white/60 bg-white/15 backdrop-blur-sm">
+                  <Play className="ml-1 h-8 w-8 fill-current text-white" />
+                </span>
+              </div>
+            )}
+          </section>
+
+          <section className="rounded-[28px] border p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_24px_60px_rgba(0,0,0,0.4)]" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]" style={{ color: theme.accent }}>Today I am learning to...</div>
+                <p className="mt-2 font-[family-name:var(--font-display)] text-xl font-extrabold leading-8 text-white sm:text-2xl">{learningStatement}</p>
+              </div>
+              <ReadAloudBtn text={learningText} label="Read" className="shrink-0 !border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
+            </div>
+            <div className="my-5 h-px bg-white/12" aria-hidden="true" />
+            <div className="flex items-center justify-between gap-2">
+              <div className="font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]" style={{ color: theme.secondary }}>I can...</div>
+              <ReadAloudBtn text={criteriaText} label="Read" className="!border-white/20 !bg-white/10 !text-white hover:!bg-white/20" />
+            </div>
+            <ul className="mt-3 space-y-2.5">
+              {criteriaStatements.map((criterion) => (
+                <li key={criterion} className="flex items-start gap-3 rounded-2xl bg-white/[0.05] px-3 py-3 text-lg font-semibold text-slate-100">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2" style={{ borderColor: theme.accent }}>
+                    <Check className="h-4 w-4" strokeWidth={3} style={{ color: theme.accent }} />
+                  </span>
+                  <span>{criterion}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        <section className="flex flex-col gap-4 rounded-[28px] border p-4 sm:p-5 2xl:flex-row 2xl:items-center" style={{ background: theme.panelBg, borderColor: theme.panelBorder }}>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+            <span className="mr-1 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.12em]" style={{ color: theme.accent }}>{theme.rewardLabel}</span>
+            {[
+              { label: "XP", Icon: Star, chip: "linear-gradient(135deg, #fde047, #f59e0b)", tint: "rgba(250,204,21,0.12)", edge: "rgba(250,204,21,0.4)", ink: "#78350f" },
+              { label: "Chain", Icon: Flame, chip: "linear-gradient(135deg, #fb923c, #ea580c)", tint: "rgba(249,115,22,0.12)", edge: "rgba(249,115,22,0.4)", ink: "#ffffff" },
+              { label: "Gems", Icon: Gem, chip: `linear-gradient(135deg, ${theme.accentSoft}, ${theme.accent})`, tint: `${theme.accent}1f`, edge: `${theme.accent}66`, ink: "#0f172a" },
+              { label: theme.completionLabel, Icon: Medal, chip: `linear-gradient(135deg, ${theme.accentSoft}, ${theme.secondary})`, tint: `${theme.secondary}24`, edge: `${theme.secondary}73`, ink: "#0f172a" },
+            ].map(({ label, Icon, chip, tint, edge, ink }) => (
+              <span key={label} className="inline-flex items-center gap-2 rounded-2xl border py-1.5 pl-1.5 pr-3.5 font-[family-name:var(--font-display)] text-[15px] font-black text-white" style={{ background: tint, borderColor: edge }}>
+                <span className="grid h-8 w-8 place-items-center rounded-xl" style={{ background: chip }}>
+                  <Icon className="h-5 w-5" style={{ color: ink }} aria-hidden="true" />
+                </span>
+                {label}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end 2xl:shrink-0">
+            <div className="flex items-center justify-center gap-2 px-2 font-bold" style={{ color: theme.accentSoft }}>
+              <Clock3 className="h-5 w-5" style={{ color: theme.accent }} />
+              <span className="whitespace-nowrap">Approximately 9 minutes</span>
+            </div>
+            <button
+              type="button"
+              onClick={startLesson}
+              disabled={startDisabled}
+              className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl px-10 font-[family-name:var(--font-display)] text-xl font-black text-white transition hover:brightness-110 active:translate-y-1 disabled:cursor-not-allowed disabled:saturate-50 disabled:opacity-65 sm:w-auto"
+              style={{ background: theme.buttonBg, boxShadow: `0 7px 0 var(--quiz-edge), ${theme.buttonShadow}` }}
+            >
+              <Play className="h-6 w-6 fill-current" /> {startDisabled ? (startDisabledLabel ?? theme.startLabel) : theme.startLabel}
+            </button>
+          </div>
+          <div className="sr-only">Completing this lesson can unlock {theme.legendLabel} rewards.</div>
+        </section>
+      </div>
     </div>
   );
 }
