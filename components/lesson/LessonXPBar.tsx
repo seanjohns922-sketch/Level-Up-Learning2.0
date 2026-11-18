@@ -34,7 +34,6 @@ export function LessonXPBar({
   const isStatistics = realmId === "statistics";
   const isPattern = realmId === "pattern";
   const isChance = realmId === "chance";
-  const isRounded = isMeasurement || isStarpath || isStatistics || isPattern || isChance;
   const earned = mode === "progress" ? Math.max(0, currentValue ?? 0) : calcPoints(correct ?? 0);
   const max = mode === "progress"
     ? Math.max(1, maxValue ?? 1)
@@ -76,8 +75,7 @@ export function LessonXPBar({
           borderRadius: 12,
           background: "linear-gradient(135deg, rgba(251,113,133,0.66) 0%, rgba(251,191,36,0.36) 52%, rgba(34,211,238,0.38) 100%)",
         } : {
-          clipPath:
-            "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+          borderRadius: 12,
           background:
             "linear-gradient(135deg, rgba(251,191,36,0.45) 0%, rgba(94,234,212,0.3) 50%, rgba(251,191,36,0.4) 100%)",
         }}
@@ -107,24 +105,13 @@ export function LessonXPBar({
           background: "linear-gradient(135deg, #1f1220 0%, #351d2b 55%, #4b2a14 100%)",
           boxShadow: "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(18,10,24,0.5)",
         } : {
-          clipPath:
-            "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
+          borderRadius: 10,
           background:
             "linear-gradient(135deg, #021a18 0%, #0a3d36 50%, #154d3a 100%)",
           boxShadow:
             "inset 0 1px 0 rgba(251,191,36,0.25), inset 0 -8px 16px rgba(0,0,0,0.4)",
         }}
       >
-        {!isRounded && (
-          <div
-            aria-hidden
-            className="absolute inset-0 opacity-[0.15] pointer-events-none"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, rgba(251,191,36,0.4) 0px, rgba(251,191,36,0.4) 1px, transparent 1px, transparent 3px)",
-            }}
-          />
-        )}
         <div className="relative flex items-center gap-2.5">
           <div
             className="flex h-8 w-8 flex-shrink-0 items-center justify-center"
@@ -151,8 +138,7 @@ export function LessonXPBar({
               background: "radial-gradient(circle at 35% 30%, #fbbf24 0%, #fb7185 62%, #4c0519 100%)",
               boxShadow: "inset 0 0 6px rgba(255,241,242,0.55), 0 0 12px rgba(251,113,133,0.42)",
             } : {
-              clipPath:
-                "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
+              borderRadius: "50%",
               background:
                 "radial-gradient(circle at 35% 30%, #fbbf24 0%, #b45309 70%, #451a03 100%)",
               boxShadow:

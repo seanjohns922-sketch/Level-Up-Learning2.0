@@ -68,10 +68,7 @@ export function LessonMasteryTile({ accuracy, realmId }: { accuracy: number; rea
             aria-hidden
             className="absolute -inset-[2px] pointer-events-none"
             style={{
-              clipPath: isRounded
-                ? undefined
-                : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-              borderRadius: isRounded ? 10 : undefined,
+              borderRadius: 10,
               background: bezelBg,
             }}
           />
@@ -79,25 +76,11 @@ export function LessonMasteryTile({ accuracy, realmId }: { accuracy: number; rea
           <div
             className="relative h-full px-3 py-2.5 overflow-hidden"
             style={{
-              clipPath: isRounded
-                ? undefined
-                : "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
-              borderRadius: isRounded ? 8 : undefined,
+              borderRadius: 8,
               background: plateBg,
               boxShadow: plateShadow,
             }}
           >
-            {/* Scanlines — Nexus only */}
-            {!isRounded && (
-              <div
-                aria-hidden
-                className="absolute inset-0 opacity-[0.18] pointer-events-none"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(0deg, rgba(94,234,212,0.5) 0px, rgba(94,234,212,0.5) 1px, transparent 1px, transparent 3px)",
-                }}
-              />
-            )}
             <div className="relative mb-1 flex items-center gap-1.5">
               <s.icon
                 className={`h-3.5 w-3.5 ${s.iconColor}`}

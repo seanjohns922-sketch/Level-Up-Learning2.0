@@ -337,8 +337,7 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
           background: config.borderGradient,
           transition: "background 0.5s ease",
         } : {
-          clipPath:
-            "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+          borderRadius: 12,
           background: config.borderGradient,
           transition: "background 0.5s ease",
         }}
@@ -362,8 +361,7 @@ export function ComboCounter({ count, chainLabel, realmId, cave=false }: { count
                     : "inset 0 1px 0 rgba(255,240,199,0.14), inset 0 -8px 18px rgba(8,18,13,0.48)",
           transition: "background 0.5s ease, box-shadow 0.5s ease",
         } : {
-          clipPath:
-            "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
+          borderRadius: 10,
           background: config.bgGradient,
           boxShadow:
             activeTier !== "cold"

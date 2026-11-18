@@ -168,8 +168,7 @@ export function LessonTimer({
           borderRadius: 12,
           background: palette.bezel,
         } : {
-          clipPath:
-            "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+          borderRadius: 12,
           background: palette.bezel,
         }}
       />
@@ -189,23 +188,12 @@ export function LessonTimer({
                   ? "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -8px 16px rgba(18,10,24,0.5)"
                 : "inset 0 1px 0 rgba(255,240,199,0.18), inset 0 -8px 16px rgba(8,18,13,0.48)",
         } : {
-          clipPath:
-            "polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)",
+          borderRadius: 10,
           background: palette.bg,
           boxShadow:
             "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -8px 16px rgba(0,0,0,0.4)",
         }}
       >
-        {!isRounded && (
-          <div
-            aria-hidden
-            className="absolute inset-0 opacity-[0.15] pointer-events-none"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, rgba(255,255,255,0.4) 0px, rgba(255,255,255,0.4) 1px, transparent 1px, transparent 3px)",
-            }}
-          />
-        )}
         <IconCmp
           className={`relative h-3.5 w-3.5 ${palette.icon}`}
           style={{ filter: `drop-shadow(0 0 3px ${palette.glow})` }}

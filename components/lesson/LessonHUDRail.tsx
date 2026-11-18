@@ -78,7 +78,7 @@ export function LessonHUDRail({
           borderRadius: 18,
           background: "linear-gradient(135deg, rgba(251,113,133,0.62) 0%, rgba(251,191,36,0.34) 48%, rgba(34,211,238,0.36) 100%)",
         } : {
-          clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
+          borderRadius: 18,
           background: "linear-gradient(135deg, rgba(94,234,212,0.4) 0%, rgba(15,118,110,0.2) 50%, rgba(94,234,212,0.3) 100%)",
         }}
       />
@@ -105,7 +105,7 @@ export function LessonHUDRail({
           background: "linear-gradient(145deg, #1f1220 0%, #351d2b 52%, #4b2a14 100%)",
           boxShadow: "inset 0 1px 0 rgba(255,241,242,0.18), inset 0 -14px 28px rgba(18,10,24,0.55), 0 0 26px rgba(251,113,133,0.16)",
         } : {
-          clipPath: "polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px)",
+          borderRadius: 16,
           background: "linear-gradient(135deg, #021716 0%, #042925 50%, #053b35 100%)",
           boxShadow: "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.45)",
         }}
