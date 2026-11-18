@@ -13,11 +13,12 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { HubWadingRipples } from "@/components/world3d/CentralWorldV2Scenery";
+import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/components/world3d/HubNight";
 import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
@@ -310,7 +311,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -321,15 +322,19 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
   }, [onActiveTarget]);
   return (
     <>
+      {hubV2 ? <>
+        <HubSkyLights night={night} quality={quality} avatarPosRef={avatarPosRef} />
+        <HubNightGlow night={night} animate={quality !== "low"} avatarPosRef={avatarPosRef} />
+      </> : <>
       <color attach="background" args={["#69afe4"]} />
-      {hubV2 ? <fog attach="fog" args={["#a8af8d", 170, 520]} /> : <fog attach="fog" args={["#a8af8d", 90, 300]} />}
+      <fog attach="fog" args={["#a8af8d", 90, 300]} />
       {/* Base rig, dialled back to leave room for the image-based lighting below
          so the scene reads lit rather than flat-shaded. */}
       <hemisphereLight args={["#d9efff", "#38522f", 0.7]} />
       <ambientLight intensity={0.18} color="#fff3da" />
       {/* Warm key light. On high quality it casts real soft shadows over the
          whole roam area, which is what grounds the buildings and animals. */}
-      {hubV2 ? <HubFollowSun quality={quality} avatarPosRef={avatarPosRef} /> : <directionalLight
+      <directionalLight
         position={[-24, 35, 18]}
         intensity={1.85}
         color="#ffe1ad"
@@ -343,8 +348,9 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
         shadow-camera-bottom={-82}
         shadow-bias={-0.0004}
         shadow-normalBias={0.05}
-      />}
+      />
       <directionalLight position={[18, 16, -16]} intensity={0.45} color="#b9dcff" />
+      </>}
       {/* Static image-based lighting (rendered once) so metal roofs, gold trim
          and water pick up soft sky/ground reflections instead of reading as flat
          paint. Built from Lightformers — no external HDR, so CSP-safe. Skipped on
@@ -360,6 +366,7 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
       ) : null}
       <CentralWorldEnvironment
         hubV2={hubV2}
+        night={hubV2 && night}
         reservedCell={hubV2 ? buildRules.isReservedCell : undefined}
         quality={quality}
         entranceActive={activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance}
@@ -417,27 +424,6 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
 
 const HUB_V2_BOUNDS = { minX: -HUB_V2_PLAY_RADIUS, maxX: HUB_V2_PLAY_RADIUS, minZ: -HUB_V2_PLAY_RADIUS, maxZ: HUB_V2_PLAY_RADIUS };
 const HUB_V2_ROAM = { centerZ: 0, radiusX: HUB_V2_PLAY_RADIUS, radiusZ: HUB_V2_PLAY_RADIUS };
-
-/** The bigger hub's sun follows the explorer so shadows work anywhere in the world. */
-function HubFollowSun({ quality, avatarPosRef }: { quality: CentralWorldQuality; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
-  const light = useRef<THREE.DirectionalLight>(null);
-  const { scene } = useThree();
-  useEffect(() => {
-    const current = light.current;
-    if (!current) return;
-    scene.add(current.target);
-    return () => { scene.remove(current.target); };
-  }, [scene]);
-  useFrame(() => {
-    const current = light.current;
-    if (!current) return;
-    const { x, z } = avatarPosRef.current;
-    current.position.set(x - 48, 70, z + 36);
-    current.target.position.set(x, 0, z);
-    current.target.updateMatrixWorld();
-  });
-  return <directionalLight ref={light} intensity={1.85} color="#ffe1ad" castShadow={quality !== "low"} shadow-mapSize={quality === "high" ? [2048, 2048] : [1024, 1024]} shadow-camera-near={1} shadow-camera-far={220} shadow-camera-left={-70} shadow-camera-right={70} shadow-camera-top={70} shadow-camera-bottom={-70} shadow-bias={-0.0004} shadow-normalBias={0.05} />;
-}
 
 /** The bigger hub drops to 1x resolution if a device can't keep a smooth frame rate, and restores it when it recovers. */
 function HubAdaptiveResolution() {
@@ -498,6 +484,13 @@ export default function CentralWorld() {
   const [spawnNonce, setSpawnNonce] = useState(0);
   const [spawnYaw, setSpawnYaw] = useState(() => searchParams.get("spawn") === CENTRAL_WORLD_ANCHORS.myHomeExitSpawn ? homeAnchors.rotationY : hubV2 ? hubV2Spot(searchParams.get("spawn"))?.yaw ?? 0 : 0);
   const [showIntro, setShowIntro] = useState(false);
+  const [night, setNight] = useState(readHubNight);
+  const toggleNight = () => {
+    const next = !night;
+    setNight(next);
+    writeHubNight(next);
+    void speak(next ? "Night time." : "Day time.", undefined, "manual", { rate: 0.9 });
+  };
   const [waterBrushWidth, setWaterBrushWidth] = useState(1);
   const [scenerySearch, setScenerySearch] = useState("");
   const [itemsById, setItemsById] = useState<Map<string, EconomyItem>>(() => new Map([...CENTRAL_WORLD_CUSTOMISATION_CATALOG, CENTRAL_WORLD_HOME_ITEM, ...CENTRAL_WORLD_STARTER_SCENERY].map((item) => [item.item_key, item])));
@@ -1196,7 +1189,7 @@ export default function CentralWorld() {
     <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
-        <CentralWorldScene selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
+        <CentralWorldScene night={night} selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
           <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
             <b>{selectedItem.name}</b>
             <button type="button" className="worldEditPickedMove" onClick={() => pickUpPlacement(selectedPlacement)}><Move size={20} aria-hidden="true" />Move</button>
@@ -1212,6 +1205,7 @@ export default function CentralWorld() {
       {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
+        ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
       {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
