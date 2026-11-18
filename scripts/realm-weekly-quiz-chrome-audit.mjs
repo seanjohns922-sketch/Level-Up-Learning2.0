@@ -47,6 +47,8 @@ assert.match(starpathVoyage, /studentAnswerForReview/);
 assert.match(starpathVoyage, /correctAnswerForReview/);
 assert.match(starpathVoyage, /Your answer:/);
 assert.match(starpathVoyage, /Correct answer:/);
-assert.match(starpathVoyage, /isStatistica \? "bg-gradient-to-br from-\[#a83e4b\]/);
+// Statistica's colours reach every quiz screen through the shared realm theme variables.
+assert.match(starpathVoyage, /getWeeklyQuizTheme\(realm\)/);
+assert.match(starpathVoyage, /conic-gradient\(\$\{passed \? "var\(--quiz-ink\)"/);
 
 console.log("Realm weekly quiz audit passed: shared presentation, Statistica theming, editable answers and mistake review are intact.");

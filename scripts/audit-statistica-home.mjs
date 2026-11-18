@@ -109,7 +109,7 @@ assert(previewControls.includes("Preview Mode"), "Shared realm preview controls 
 assert(previewControls.includes("Exit Preview"), "Shared realm preview controls must use Exit Preview language");
 
 const lessonHome = read("components/lesson/RealmLessonHome.tsx");
-assert(lessonHome.includes('RealmLessonThemeId = "number" | "measurement" | "statistics"'), "Shared lesson home must include the Statistica theme");
+assert(/RealmLessonThemeId = [^;]*"statistics"/.test(lessonHome), "Shared lesson home must include the Statistica theme");
 assert(lessonHome.includes('realmName: "Statistica"'), "Statistica lesson home must use the Statistica identity");
 assert(lessonHome.includes("getStatisticaBackground"), "Statistica lesson home must use its level background artwork");
 for (const widget of ["Data Briefing", "Today I am learning to...", "I can...", "Investigation Rewards", "Approximately 9 minutes"]) {
