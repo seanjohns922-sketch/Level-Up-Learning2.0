@@ -17,6 +17,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Sigma, Sparkle, Zap } from "lucide-react";
 import { LessonRenderer } from "@/components/lesson/LessonRenderer";
 import { LESSON_HUD_ROW, LESSON_LAYOUT, LessonHUDRail } from "@/components/lesson/LessonHUDRail";
+import { LessonWrongSheet } from "@/components/lesson/LessonWrongSheet";
+import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import { ComboMilestonePop } from "@/components/lesson/ComboMilestonePop";
 import SurgeAmbience from "@/components/lesson/SurgeAmbience";
@@ -52,7 +54,6 @@ import { pickWeightedIndex } from "@/lib/weightedRandom";
 import type { Lesson } from "@/data/programs/year1";
 import type { LessonActivity } from "@/data/programs/types";
 import { isLessonQuestionSafe } from "@/lib/task-safety";
-import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { buildIncorrectFeedbackSpeech } from "@/lib/incorrect-feedback";
 
 function getWorkingLevelForLesson(lesson: Lesson) {
@@ -1506,14 +1507,14 @@ export function Year2LessonEngine({
       : status === "correct"
       ? "border-emerald-300 shadow-emerald-100/50"
       : status === "wrong"
-      ? "border-red-300 shadow-red-100/50"
+      ? "border-orange-300 shadow-orange-100/50"
       : getComboBorder(comboCount);
 
   const feedbackOverlay =
     status === "correct"
       ? "bg-emerald-400/12"
       : status === "wrong"
-      ? "bg-red-400/12"
+      ? "bg-orange-400/[0.05]"
       : "bg-transparent";
 
   const statusMotion = status === "wrong" ? "animate-[shake_0.35s_ease-in-out]" : "";
@@ -1642,7 +1643,7 @@ export function Year2LessonEngine({
           />
         </aside>
 
-        <div data-lesson-workspace className="min-w-0 space-y-3">
+        <div data-lesson-workspace data-premium-task style={getWeeklyQuizTheme(realmId ?? "number") as React.CSSProperties} className="min-w-0 space-y-3">
           {showStrategySwitchPrompt ? (
             <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm font-black text-sky-800 shadow-sm">
               Try a different strategy for the next question.
@@ -1654,7 +1655,8 @@ export function Year2LessonEngine({
             </div>
           ) : null}
 
-          {(status !== "idle" || advanceError) && (
+          {/* A wrong answer with feedback gets the sheet under the question instead. */}
+          {(advanceError || status === "correct" || (status === "wrong" && !wrongFeedback)) && (
             <div
               className={`flex flex-wrap items-center justify-center gap-3 rounded-xl px-4 py-2.5 text-center text-sm font-extrabold shadow-sm transition-all ${
                 status === "correct"
@@ -1823,47 +1825,26 @@ export function Year2LessonEngine({
                   />
                 </fieldset>
                 {status === "wrong" && wrongFeedback ? (
-                  <div data-lesson-wrong-feedback className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-slate-900" role="status">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-lg font-black text-red-800">Not quite.</div>
-                      <ReadAloudBtn
-                        text={buildIncorrectFeedbackSpeech({
-                          prompt: currentQuestion?.prompt,
-                          studentAnswer: wrongFeedback.studentAnswer,
-                          correctAnswer: wrongFeedback.correctAnswer,
-                          explanation: wrongFeedback.explanation,
-                        })}
-                        speechKey={`incorrect-feedback:${resumeLessonKey}:${currentQuestionSequence}`}
-                        label="Read feedback"
-                        className="shrink-0 border-red-200 bg-white text-red-800"
-                      />
-                    </div>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <div className="rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-800">
-                        <span className="font-black">{isConstructedAnswer ? "You entered:" : "You chose:"}</span> <FeedbackValue value={wrongFeedback.studentAnswer} unit={feedbackUnit} labels={feedbackLabels} />
-                      </div>
-                      <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
-                        <span className="font-black">Correct answer:</span> <FeedbackValue value={wrongFeedback.correctAnswer} unit={feedbackUnit} labels={feedbackLabels} />
-                      </div>
-                    </div>
-                    <p className="mt-3 whitespace-pre-line text-sm font-semibold leading-relaxed text-slate-700">{wrongFeedback.explanation}</p>
-                    {advanceError ? (
-                      <p className="mt-3 text-sm font-bold text-red-800">{advanceError}</p>
-                    ) : null}
-                    <div className="mt-4 flex justify-end">
-                      <button
-                        type="button"
-                        onClick={handleNextQuestion}
-                        disabled={turnState === "advancing"}
-                        className={`pointer-events-auto inline-flex items-center gap-2 rounded-xl px-5 py-3 font-black text-white transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70 ${
-                          isMeasurement ? "bg-[#8a6422]" : isPattern ? "bg-violet-700" : "bg-teal-700"
-                        }`}
-                      >
-                        {turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}
-                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
+                  <LessonWrongSheet
+                    realmId={realmId}
+                    answerLabel={isConstructedAnswer ? "You entered" : "You chose"}
+                    studentAnswer={<FeedbackValue value={wrongFeedback.studentAnswer} unit={feedbackUnit} labels={feedbackLabels} />}
+                    correctAnswer={<FeedbackValue value={wrongFeedback.correctAnswer} unit={feedbackUnit} labels={feedbackLabels} />}
+                    explanation={wrongFeedback.explanation}
+                    speech={{
+                      text: buildIncorrectFeedbackSpeech({
+                        prompt: currentQuestion?.prompt,
+                        studentAnswer: wrongFeedback.studentAnswer,
+                        correctAnswer: wrongFeedback.correctAnswer,
+                        explanation: wrongFeedback.explanation,
+                      }),
+                      speechKey: `incorrect-feedback:${resumeLessonKey}:${currentQuestionSequence}`,
+                    }}
+                    error={advanceError}
+                    nextLabel={turnState === "advancing" ? "Loading..." : advanceError ? "Try Again" : "Next Question"}
+                    nextDisabled={turnState === "advancing"}
+                    onNext={handleNextQuestion}
+                  />
                 ) : null}
               </div>
             </ComboMilestonePop>

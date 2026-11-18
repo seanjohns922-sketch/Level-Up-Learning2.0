@@ -11,7 +11,7 @@ import GroundLessonGuide from "@/components/lesson/GroundLessonGuide";
 import GroundCheer from "@/components/ground/GroundCheer";
 import { groundAnswer } from "@/lib/ground-answer";
 import { Volume2 } from "lucide-react";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PracticeTask, Difficulty } from "@/data/activities/year1/practice-task";
 import { getDifficultyFromTime } from "@/data/activities/year1/practice-task";
@@ -20,6 +20,8 @@ import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent 
 import { speak, useAutoReadSetting, useSpeechInteractionReady } from "@/lib/speak";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { LESSON_HUD_ROW, LESSON_LAYOUT, LessonHUDRail } from "@/components/lesson/LessonHUDRail";
+import { LessonWrongSheet } from "@/components/lesson/LessonWrongSheet";
+import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { LessonCompleteCard } from "@/components/lesson/LessonCompleteCard";
 import LessonReflection from "@/components/lesson/LessonReflection";
 import LessonCoachReview from "@/components/lesson/LessonCoachReview";
@@ -1571,7 +1573,7 @@ export function PracticeRunner({
           />
         </aside>
 
-        <div className="min-w-0 space-y-3">
+        <div data-premium-task style={getWeeklyQuizTheme(realmId ?? "number") as CSSProperties} className="min-w-0 space-y-3">
           {/* Status feedback pill */}
           {status !== "idle" && !awaitingWrongNext && (
             <div
@@ -1595,29 +1597,6 @@ export function PracticeRunner({
                 <ReadAloudBtn text={groundWrongLine} speechKey={`incorrect-feedback:${currentWrongFeedback.id}`} size="md" className="shrink-0 border-amber-300 bg-white text-amber-900" />
               </div>
               {groundWrongAnswer?.pictures ? <div className="mt-2 flex items-end justify-center gap-4">{groundWrongAnswer.pictures.map((picture, index) => <img key={index} src={picture.src} alt={picture.label} className="object-contain" style={{ height: 36 + picture.size * 5 }} />)}</div> : null}
-            </div>
-          ) : awaitingWrongNext && currentWrongFeedback ? (
-            <div className="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <div>Not quite.</div>
-                <ReadAloudBtn
-                  text={level1WrongLine ?? incorrectFeedbackSpeech}
-                  speechKey={`incorrect-feedback:${currentWrongFeedback.id}`}
-                  label="Read feedback"
-                  className="shrink-0 border-red-200 bg-white text-red-800"
-                />
-              </div>
-              {currentWrongFeedback.studentAnswer && currentWrongFeedback.studentAnswer !== "Incorrect attempt" ? (
-                <div className="mt-1">
-                  Your answer: <span className="font-black">{currentWrongFeedback.studentAnswer}</span>
-                </div>
-              ) : null}
-              {currentCorrectAnswer ? (
-                <div className="mt-1 text-emerald-800">
-                  Correct answer: <span className="font-black">{typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer}</span>
-                </div>
-              ) : null}
-              {level1WrongLine && currentWrongExplanation === GENERIC_WRONG_EXPLANATION ? null : <div className="mt-1 text-red-900">{currentWrongExplanation}</div>}
             </div>
           ) : null}
 
@@ -1815,7 +1794,18 @@ export function PracticeRunner({
         {!isBuiltinKind && (
           isIntroTask && levelNumber && levelNumber >= 1 && levelNumber <= 6 ? <NarratedLessonGuide title={lessonTitle}><TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} /></NarratedLessonGuide> : <TaskRenderer task={task} taskNonce={taskNonce} callbacks={callbacks} />
         )}
-        {awaitingWrongNext ? (
+        {awaitingWrongNext && currentWrongFeedback && !alwaysSpeak ? (
+          <LessonWrongSheet
+            realmId={realmId}
+            answerLabel="Your answer"
+            studentAnswer={currentWrongFeedback.studentAnswer && currentWrongFeedback.studentAnswer !== "Incorrect attempt" ? currentWrongFeedback.studentAnswer : undefined}
+            correctAnswer={currentCorrectAnswer ? (typeof currentCorrectAnswer === "string" ? <MathFormattedText text={currentCorrectAnswer} /> : currentCorrectAnswer) : undefined}
+            explanation={level1WrongLine && currentWrongExplanation === GENERIC_WRONG_EXPLANATION ? undefined : currentWrongExplanation}
+            speech={{ text: level1WrongLine ?? incorrectFeedbackSpeech, speechKey: `incorrect-feedback:${currentWrongFeedback.id}` }}
+            nextLabel="Next Question"
+            onNext={continueAfterWrong}
+          />
+        ) : awaitingWrongNext ? (
           <div className="mt-5 flex justify-end">
             <button
               type="button"
