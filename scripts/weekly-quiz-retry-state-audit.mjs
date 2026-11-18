@@ -28,7 +28,8 @@ requireText(weekPage, "previousQuizNeedsRetry", "A locked next week does not exp
 requireText(sharedQuiz, "is not unlocked yet", "Number Nexus and Measurelands results do not explain the progression block.");
 requireText(sharedQuiz, "Try Quiz Again", "The shared quiz result does not provide a direct retry action.");
 requireText(starpathQuiz, "requiredCorrect", "Starpath results do not show the exact score needed to pass.");
-requireText(starpathQuiz, "bg-gradient-to-br from-amber-500", "Starpath unsuccessful results do not use the amber retry state.");
+requireText(starpathQuiz, '${passed ? "var(--quiz-ink)" : "#d97706"}', "Starpath unsuccessful results do not use the amber retry state.");
+requireText(starpathQuiz, 'passed ? "text-[var(--quiz-ink)]" : "text-amber-700"', "Starpath unsuccessful results do not show the score in amber.");
 
 if (failures.length > 0) {
   console.error(`Weekly quiz retry-state audit failed (${failures.length}):`);

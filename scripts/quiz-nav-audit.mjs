@@ -2,9 +2,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Weekly Quiz navigation audit
 //
-// Verifies that the quiz header (the "Q n/N" + "Lesson" titles and the "Jump"
-// dropdown) always REGISTER the question the student is currently on and MOVE
-// WITH the student, while the student can still TOGGLE back and forth.
+// Verifies that the quiz header (the rune progress "Question n of N", the
+// "Lesson" chip and the tappable runes) always REGISTERS the question the
+// student is currently on and MOVES WITH the student, while the student can
+// still TOGGLE back and forth.
 //
 // Two layers:
 //   1. Source contract — the JSX in app/session/page.tsx is wired so the title
@@ -52,10 +53,10 @@ has(
   /const currentQuiz = quizQuestions\[quizIndex\]/
 );
 
-// Title chip registers the current question number / total.
+// The rune progress registers the current question number / total.
 has(
-  'Title chip shows "Q {quizIndex + 1}" of total',
-  /Q \{quizIndex \+ 1\}.*\/\{quizQuestions\.length\}/
+  "Rune progress shows the current question of the total (current={quizIndex})",
+  /<QuizRuneProgress total=\{quizQuestions\.length\} current=\{quizIndex\}/
 );
 
 // Lesson title chip registers the current question's lesson.
@@ -64,31 +65,22 @@ has(
   /Lesson \{currentQuiz\.lessonTag\}/
 );
 
-// The dropdown is a CONTROLLED select bound to quizIndex → it always reflects
-// (moves with) the current question.
+// Each rune lights up once its question is answered.
 has(
-  "Jump dropdown is controlled by quizIndex (value={quizIndex})",
-  /<select value=\{quizIndex\}/
-);
-has(
-  "Jump dropdown changes the active question (onChange → setQuizIndex)",
-  /const target = Number\(e\.target\.value\);[\s\S]*setQuizIndex\(target\)/
+  "Runes mark answered questions (isDone → isQuestionAnswered)",
+  /isDone=\{\(index\) => isQuestionAnswered\(quizQuestions\[index\]\)\}/
 );
 
-// The dropdown lists every question with its real index.
+// Tapping a rune moves to that question, but only an answered one or the current one.
 has(
-  "Dropdown lists every question with its index",
-  /quizQuestions\.map\(\(question, index\) => \{[\s\S]*<option key=\{question\.id\} value=\{index\}/
+  "Tapping a rune only jumps to answered questions (no skipping ahead)",
+  /onJump=\{\(index\) => \{ if \(index === quizIndex \|\| isQuestionAnswered\(quizQuestions\[index\]\)\) setQuizIndex\(index\); \}\}/
 );
-
-// Jumping is restricted to already-answered questions (or the current one).
-has(
-  "Dropdown disables questions that are not answered (no skipping ahead)",
-  /disabled=\{!selectable\}/
-);
-has(
-  "Dropdown onChange only allows jumping to answered questions",
-  /if \(target === quizIndex \|\| isQuestionAnswered\(quizQuestions\[target\]\)\)/
+const runes = fs.readFileSync(path.resolve(repoRoot, "components/quiz/QuizUi.tsx"), "utf8");
+check(
+  "Only answered runes and the current rune are tappable",
+  runes.includes("onJump && (done || now)"),
+  "expected QuizRuneProgress to render buttons only for answered or current questions"
 );
 
 // The quiz builder must be stable across renders. Questions are initialized from

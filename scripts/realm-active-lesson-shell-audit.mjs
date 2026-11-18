@@ -47,7 +47,8 @@ assert.match(practice, /const isStatistics = realmId === "statistics"/);
 assert.match(practice, /isStructuredRealm = isMeasurement \|\| isStarpath \|\| isStatistics/);
 assert.match(practice, /linear-gradient\(180deg, #fffaf0 0%, #f1f5e8 100%\)/);
 assert.match(engine, /Activity: \{activityLabel\}/);
-assert.match(hud, /levelNumber === 0 \? "Ground"/);
+// The level (Ground Level included) sits in the lesson banner above the slim lesson bar.
+assert.match(shell, /\{levelLabel\} · Week \{week\}/);
 assert.match(hud, /"DATA STREAK"/);
 assert.match(practice, /hasStatisticaFeedback/);
 

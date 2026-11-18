@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => fs.readFileSync(path.join(repoRoot, file), "utf8");
 const engine = read("components/lesson/Year2LessonEngine.tsx");
+const wrongSheet = read("components/lesson/LessonWrongSheet.tsx");
 const practiceRunner = read("components/PracticeRunner.tsx");
 const lessonPage = read("app/lesson/page.tsx");
 const sessionPage = read("app/session/page.tsx");
@@ -160,9 +161,12 @@ check(
 );
 check(
   "Every shared lesson runner offers read aloud for held incorrect feedback",
-  practiceRunner.includes('label="Read feedback"') &&
+  // Both runners show held feedback in the shared sheet, which carries the Read feedback button.
+  wrongSheet.includes('label="Read feedback"') &&
+    wrongSheet.includes("text={speech.text}") &&
+    practiceRunner.includes("<LessonWrongSheet") &&
     practiceRunner.includes("buildIncorrectFeedbackSpeech") &&
-    engine.includes('label="Read feedback"') &&
+    engine.includes("<LessonWrongSheet") &&
     engine.includes("buildIncorrectFeedbackSpeech")
 );
 check(
