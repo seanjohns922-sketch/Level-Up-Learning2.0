@@ -122,6 +122,7 @@ export function RealmWeeklyQuizChrome({
   questionCount = 15,
   focus,
   demoMode = false,
+  compact = false,
   onBack,
 }: {
   realm: RealmQuizThemeId;
@@ -132,6 +133,8 @@ export function RealmWeeklyQuizChrome({
   questionCount?: number;
   focus?: string | null;
   demoMode?: boolean;
+  /** A slimmer header while questions are on screen, so the question gets the room. */
+  compact?: boolean;
   onBack: () => void;
 }) {
   const theme = REALM_QUIZ_THEMES[realm];
@@ -187,7 +190,7 @@ export function RealmWeeklyQuizChrome({
       </header>
 
       {/* The realm's art fades into the page behind the title, rather than sitting in a box. */}
-      <section className="relative mb-6 overflow-hidden rounded-[30px] px-5 pb-8 pt-10 sm:px-10 sm:pt-14">
+      <section className={`relative overflow-hidden rounded-[30px] ${compact ? "mb-3 px-5 pb-4 pt-4 sm:px-8" : "mb-6 px-5 pb-8 pt-10 sm:px-10 sm:pt-14"}`}>
         <div className="absolute inset-0" style={{ maskImage: HERO_FADE, WebkitMaskImage: HERO_FADE }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={artworkSrc} alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
@@ -200,15 +203,15 @@ export function RealmWeeklyQuizChrome({
           >
             {levelLabel} · Week {week} · {theme.eyebrow}
           </span>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <h1 className="font-[family-name:var(--font-display)] text-4xl font-black tracking-normal text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] sm:text-6xl">{theme.quizName}</h1>
+          <div className={`flex flex-wrap items-center gap-3 ${compact ? "mt-1.5" : "mt-3"}`}>
+            <h1 className={`font-[family-name:var(--font-display)] font-black tracking-normal text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)] ${compact ? "text-3xl sm:text-4xl" : "text-4xl sm:text-6xl"}`}>{theme.quizName}</h1>
             <ReadAloudBtn
               text={readText}
               label="Read"
               className="!border-white/20 !bg-black/25 !text-white hover:!border-white/35 hover:!bg-black/40 hover:!text-white"
             />
           </div>
-          <p className="mt-2 max-w-3xl text-base font-semibold leading-7 sm:text-lg" style={{ color: theme.accentSoft }}>
+          <p className={`max-w-3xl font-semibold ${compact ? "mt-1 text-sm leading-6 sm:text-base" : "mt-2 text-base leading-7 sm:text-lg"}`} style={{ color: theme.accentSoft }}>
             {questionCount} questions · {focus ?? "Show what you know from this week"}
           </p>
         </div>

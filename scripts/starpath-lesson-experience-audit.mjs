@@ -23,19 +23,15 @@ const route = read("app/starpath/lesson/[level]/[week]/[lesson]/page.tsx");
 assert.match(route, /StarpathGroundLesson/);
 assert.match(route, /StarpathDevelopmentLesson/);
 
+// Starpath missions use the shared lesson start page, with each mission's own brief and artwork.
 const missionHome = read("components/starpath/StarpathMissionHome.tsx");
-for (const required of [
-  "Today I am learning to...",
-  "I can...",
-  "Mission rewards",
-  "Approximately 9 minutes",
-  "Start Mission",
-  "Mission preparation in progress",
-]) {
-  assert.match(missionHome, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+for (const required of ["<RealmLessonHome", 'realm="space"', "intro={content?.missionBrief", "artworkSrc={content?.artworkSrc", "Mission preparation in progress", "focus={lesson.learningIntention}"]) {
+  assert.ok(missionHome.includes(required), `Starpath mission home must pass ${required}`);
 }
-assert.match(missionHome, /Read mission/);
-assert.match(missionHome, /ReadAloudBtn/);
+const sharedHome = read("components/lesson/RealmLessonHome.tsx");
+for (const required of ["Today I am learning to...", "I can...", "Approximately 9 minutes", 'rewardLabel:"Mission Rewards"', 'startLabel:"Begin Mission"', "ReadAloudBtn"]) {
+  assert.ok(sharedHome.includes(required), `Shared lesson home must show ${required}`);
+}
 
 const implementedMission = read("components/starpath/StarpathGroundLesson.tsx");
 assert.match(implementedMission, /StarpathLessonShell/);
@@ -45,6 +41,8 @@ assert.doesNotMatch(implementedMission, /PracticeRunner/);
 const lessonShell = read("components/starpath/StarpathLessonShell.tsx");
 for (const required of [
   "StarpathMissionHome",
+  "<RealmActiveLessonShell",
+  'realm="space"',
   "PracticeRunner",
   'brainBreakFrequency="normal"',
   "showResultsAfterReflection",
@@ -56,7 +54,8 @@ for (const required of [
 ]) {
   assert.match(lessonShell, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 }
-assert.match(lessonShell, /ReadAloudBtn/);
+// Read-aloud for the mission title and learning goal comes from the shared lesson frame.
+assert.match(read("components/lesson/RealmActiveLessonShell.tsx"), /ReadAloudBtn/);
 assert.doesNotMatch(lessonShell, /getTaskTransition/);
 assert.doesNotMatch(lessonShell, /StarpathChallengeTransition/);
 assert.doesNotMatch(lessonShell, /activityNoun="Challenge"/);

@@ -32,6 +32,7 @@ import {
   Zap,
 } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { FitToScreen } from "@/components/FitToScreen";
 import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
 import type { ChanceVisual as ChanceVisualData } from "@/data/activities/year1/practice-task";
 import { getHomeBg } from "@/lib/levelBand";
@@ -57,6 +58,10 @@ type RealmLessonHomeProps = {
   hasNativeStartGuide?: boolean;
   startDisabled?: boolean;
   startDisabledLabel?: string;
+  /** Replaces the realm's standard intro line (Starpath shows each mission's own brief). */
+  intro?: string;
+  /** Replaces the realm's standard artwork for this lesson. */
+  artworkSrc?: string;
   onBack: () => void;
   onStart: () => void;
 };
@@ -252,9 +257,9 @@ function continueSentence(value: string) {
   return /^[A-Z][a-z]/.test(text) ? `${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
 }
 
-/** "I am learning to …" from a lesson's focus, in full. */
+/** "I am learning to …" from a lesson's focus, in full. A focus written as "I can …" reads on from the verb. */
 export function learningStatementFor(focus: string) {
-  const text = focus.trim().replace(/\.+$/, "");
+  const text = focus.trim().replace(/\.+$/, "").replace(/^I\s+can\s+/i, "");
   return /^I\s+am\s+learning\s+to\b/i.test(text) ? text : `I am learning to ${continueSentence(text)}`;
 }
 
@@ -445,6 +450,8 @@ export function RealmLessonHome({
   hasNativeStartGuide = false,
   startDisabled = false,
   startDisabledLabel,
+  intro,
+  artworkSrc: artworkOverride,
   onBack,
   onStart,
 }: RealmLessonHomeProps) {
@@ -462,13 +469,14 @@ export function RealmLessonHome({
   const criteriaStatements = uniqueCriteria(successCriteria, focus).map((criterion) =>
     /^I\s+can\b/i.test(criterion) ? criterion : `I can ${continueSentence(criterion)}`,
   );
-  const artworkSrc = getRealmLessonArtwork(realm, levelNumber, year);
+  const artworkSrc = artworkOverride ?? getRealmLessonArtwork(realm, levelNumber, year);
+  const introText = intro ?? theme.intro;
   const learningText = learningStatement;
   const criteriaText = `${criteriaStatements.join(". ")}.`;
   const conceptText = conceptIntro
     ? `${conceptIntro.term}. ${conceptIntro.title}. ${conceptIntro.meaning} For example, ${conceptIntro.example}. ${conceptIntro.exampleExplanation}`
     : "";
-  const readAllText = `${lessonTitle}. ${theme.intro} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
+  const readAllText = `${lessonTitle}. ${introText} ${conceptText} ${learningText}. ${criteriaText} This lesson takes approximately nine minutes.`;
 
   if (guideOpen && groundGuide) return <div className="mx-auto max-w-5xl py-4"><GroundLessonGuide guide={groundGuide} title={lessonTitle} realm={realm} onContinue={onStart} /></div>;
   if (guideOpen && lowerGuide) return <div className="mx-auto max-w-6xl py-4">
@@ -503,6 +511,7 @@ export function RealmLessonHome({
         )}
       </div>
 
+      <FitToScreen>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="button"
@@ -551,7 +560,7 @@ export function RealmLessonHome({
             />
           </div>
           <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 sm:text-xl" style={{ color: theme.accentSoft }}>
-            {theme.intro}
+            {introText}
           </p>
         </div>
       </section>
@@ -656,6 +665,7 @@ export function RealmLessonHome({
           <div className="sr-only">Completing this lesson can unlock {theme.legendLabel} rewards.</div>
         </section>
       </div>
+      </FitToScreen>
     </div>
   );
 }

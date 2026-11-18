@@ -33,4 +33,17 @@ for (const engine of ["components/PracticeRunner.tsx", "components/lesson/Year2L
 const rail = read("components/lesson/LessonHUDRail.tsx");
 assert.ok(rail.includes("<LessonMasteryTile") && !rail.includes("Solved"), "the lesson bar shows mastery, not the dropped Solved / Challenges tiles");
 
-console.log("PASS quiz and lesson look: framed stage, rune progress, chunky buttons, scoped question styles, slim lesson bar");
+// One lesson bar design: every piece takes its colours from the shared recipe, no realm branches.
+for (const piece of ["LessonHUDRail", "LessonXPBar", "LessonTimer", "LessonMasteryTile"]) {
+  const source = read(`components/lesson/${piece}.tsx`);
+  assert.ok(source.includes("lessonBarTheme(realmId)"), `${piece} must use the shared lesson bar recipe`);
+  assert.ok(!source.includes("clipPath"), `${piece} must not bring back angled corners`);
+}
+
+// Lessons, lesson start pages and quizzes shrink to fit the screen.
+for (const screen of ["components/lesson/RealmActiveLessonShell.tsx", "components/lesson/RealmLessonHome.tsx", "components/starpath/StarpathVoyageQuiz.tsx", "app/session/page.tsx"]) {
+  assert.ok(read(screen).includes("<FitToScreen"), `${screen} must fit the screen`);
+}
+assert.ok(read("components/FitToScreen.tsx").includes('typeof ResizeObserver === "undefined"'), "FitToScreen must be safe outside a browser");
+
+console.log("PASS quiz and lesson look: framed stage, rune progress, chunky buttons, scoped question styles, one lesson bar design, fit to screen");

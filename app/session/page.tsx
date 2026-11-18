@@ -43,6 +43,7 @@ import MoneyEnough from "@/components/week7/MoneyEnough";
 import { MathFormattedText } from "@/components/FractionText";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import { QUIZ_BUTTON, QuizRuneProgress } from "@/components/quiz/QuizUi";
+import { FitToScreen } from "@/components/FitToScreen";
 import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import MistakeReviewPanel, { type MistakeReviewItem } from "@/components/review/MistakeReviewPanel";
 import { clearIdleLiveEventTimer, scheduleIdleLiveEvent, trackLiveLearningEvent } from "@/lib/live-class-client";
@@ -9422,7 +9423,7 @@ function SessionPage({
       style={isLesson ? undefined : (getWeeklyQuizTheme(quizRealmId) as CSSProperties)}
     >
       <ActiveLearningTracker context="session" />
-      <div className={isLesson ? "w-full max-w-5xl" : "mx-auto w-full max-w-[1500px]"}>
+      <FitToScreen className={isLesson ? "w-full max-w-5xl" : "mx-auto w-full max-w-[1500px]"}>
         {isLesson ? <div className="mb-4">
           <button
             onClick={backToWeek}
@@ -9447,6 +9448,7 @@ function SessionPage({
             questionCount={quizQuestions.length || 15}
             focus={measurementQuizFocus}
             demoMode={previewMode || DEMO_MODE}
+            compact
             onBack={backToWeek}
           />
         )}
@@ -10683,7 +10685,7 @@ function SessionPage({
         )}
           </div>{/* end bg-background px-6 py-8 */}
         </div>{/* end wrapper card */}
-      </div>{/* end max-w-5xl */}
+      </FitToScreen>{/* end max-w-5xl */}
     </main>
   );
 }

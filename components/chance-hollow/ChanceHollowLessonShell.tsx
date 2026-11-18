@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PracticeRunner } from "@/components/PracticeRunner";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
+import { QUIZ_BUTTON } from "@/components/quiz/QuizUi";
 import { LessonConceptIntro, RealmLessonHome, type LessonConceptIntroData } from "@/components/lesson/RealmLessonHome";
 import { createRandomRealmLessonGenerator, type RealmLessonTaskGenerator } from "@/data/activities/realm-lesson-blueprint";
 import { getChanceHollowLevel3TaskSet } from "@/data/activities/chanceHollow/level3";
@@ -603,34 +604,26 @@ export default function ChanceHollowLessonShell({
   if (phase === "concept") {
     return (
       <main className="min-h-screen bg-[#17111b] p-3 sm:p-5">
-        <div className="mx-auto w-full max-w-[1100px] space-y-5">
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setPhase("home")}
-              className="rounded-lg border border-rose-300/25 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] text-rose-50 transition hover:brightness-110"
-            >
-              Back
-            </button>
-            <span className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-rose-200/70">
-              Level {levelNumber} · Week {week} · Lesson {lesson.lesson}
-            </span>
-          </div>
-          <div>
-            <div className="text-[11px] font-black uppercase tracking-[0.2em] text-rose-300">Chance Challenge</div>
-            <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">{lesson.title}</h1>
-            <p className="mt-2 max-w-3xl text-base font-semibold text-white/70">{lesson.focus}</p>
-          </div>
-          <NarratedLessonGuide title={`${lesson.title}. ${lesson.focus}`}><LessonConceptIntro realm="chance" conceptIntro={conceptIntro} /></NarratedLessonGuide>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setPhase("active")}
-              className="rounded-xl bg-gradient-to-r from-rose-600 via-pink-500 to-amber-400 px-8 py-3 text-base font-black text-white shadow-[0_16px_40px_rgba(244,63,94,0.24)] transition hover:brightness-110"
-            >
-              Start the Trial
-            </button>
-          </div>
+        <div className="mx-auto w-full max-w-[1500px]">
+          <RealmActiveLessonShell
+            realm="chance"
+            levelNumber={levelNumber}
+            levelLabel={`Level ${levelNumber}`}
+            year={level}
+            week={week}
+            lessonNumber={lesson.lesson}
+            lessonTitle={lesson.title}
+            focus={lesson.focus}
+            demoMode={previewMode}
+            onBack={() => setPhase("home")}
+          >
+            <NarratedLessonGuide title={`${lesson.title}. ${lesson.focus}`}><LessonConceptIntro realm="chance" conceptIntro={conceptIntro} /></NarratedLessonGuide>
+            <div className="mt-5 flex justify-end">
+              <button type="button" onClick={() => setPhase("active")} className={QUIZ_BUTTON.primary}>
+                Start the Trial
+              </button>
+            </div>
+          </RealmActiveLessonShell>
         </div>
       </main>
     );

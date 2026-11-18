@@ -24,6 +24,7 @@ import {
 import { getWeeklyQuizTheme } from "@/lib/weekly-quiz-theme";
 import { REALM_QUIZ_THEMES, RealmWeeklyQuizChrome } from "@/components/quiz/RealmWeeklyQuizChrome";
 import { QUIZ_BUTTON, QuizRuneProgress, QuizStage } from "@/components/quiz/QuizUi";
+import { FitToScreen } from "@/components/FitToScreen";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { TaskRenderer } from "@/components/TaskRenderer";
 import { NewLookScope } from "@/lib/level1-look";
@@ -438,7 +439,7 @@ export default function StarpathVoyageQuiz({
 
   return (
     <main data-quiz-realm={realm} style={getWeeklyQuizTheme(realm) as CSSProperties} className="relative isolate min-h-screen px-3 py-4 text-white sm:px-6 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-4 [&_button:focus-visible]:outline-[var(--quiz-ink)]">
-      <div className="mx-auto w-full max-w-[1200px]">
+      <FitToScreen className="mx-auto w-full max-w-[1200px]">
         <RealmWeeklyQuizChrome
           realm={realm}
           levelNumber={levelNumber}
@@ -448,6 +449,7 @@ export default function StarpathVoyageQuiz({
           questionCount={total || 15}
           focus={quiz.coverage}
           demoMode={demoMode}
+          compact={phase === "quiz"}
           onBack={() => router.push(backHref)}
         />
 
@@ -754,7 +756,7 @@ export default function StarpathVoyageQuiz({
             </div>
           ) : null}
         </QuizStage>
-      </div>
+      </FitToScreen>
     </main>
   );
 }
