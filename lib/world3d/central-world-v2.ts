@@ -26,6 +26,10 @@ export const HUB_V2_GRID: CentralWorldGrid = { cellSize: 2, minX: -66, maxX: 66,
 export const HUB_V2_PLAY_RADIUS = 192;
 export const HUB_V2_TERRAIN_SIZE = 640;
 export const HUB_V2_WATER_Y = -0.9;
+/** Explorers wade: their feet never go further than this under the water, so the river is a paddle, never a swim. */
+export const HUB_V2_WADE_DEPTH = 0.7;
+/** Wading is slower than walking. */
+export const HUB_V2_WADE_SPEED = 0.6;
 export const HUB_V2_RIVER_START_Z = -150;
 const RIVER_BED_Y = -2.4;
 
@@ -136,11 +140,22 @@ function bridgeAt(x: number, z: number) {
   return HUB_V2_BRIDGES.find((b) => Math.abs(z - b.z) < b.width / 2 - 0.3 && x > b.x0 - 1.2 && x < b.x1 + 1.2);
 }
 
-/** Ground height for walking: bridge decks, then terrain. The old build area is always 0. */
+/** Ground height for walking: bridge decks, then terrain, and in the river a wading depth under the surface. The old build area is always 0. */
 export function hubGroundHeight(x: number, z: number) {
   const bridge = bridgeAt(x, z);
   if (bridge) return Math.max(hubBridgeDeckY(bridge, x), hubTerrainHeight(x, z));
-  return hubTerrainHeight(x, z);
+  return Math.max(hubTerrainHeight(x, z), HUB_V2_WATER_Y - HUB_V2_WADE_DEPTH);
+}
+
+/** How deep the water is where an explorer stands: 0 on land and on bridges. */
+export function hubWaterDepth(x: number, z: number) {
+  if (bridgeAt(x, z)) return 0;
+  return Math.max(0, HUB_V2_WATER_Y - hubTerrainHeight(x, z));
+}
+
+/** Walking speed where an explorer stands: slower in the water. */
+export function hubSpeedFactor(x: number, z: number) {
+  return hubWaterDepth(x, z) > 0.15 ? HUB_V2_WADE_SPEED : 1;
 }
 
 // ---------- fixed scenery: seeded so rendering and collisions always agree ----------
@@ -206,10 +221,11 @@ export const HUB_V2_COLLIDERS: HubCollider[] = [
   ...HUB_V2_ROCKS.filter((r) => r.s > 1.8).map((r) => ({ x: r.x, z: r.z, r: r.s * 0.32 })),
 ];
 
-/** Where the player may stand: inside the world, out of the river (bridges are fine), not inside a gum or boulder. */
+/** Where the player may stand: inside the world, anywhere along the river (wading) but not up the waterfall, not inside a gum or boulder. */
 export function hubCanStand(x: number, z: number) {
   if (Math.hypot(x, z) > HUB_V2_PLAY_RADIUS) return false;
-  if (!bridgeAt(x, z) && hubTerrainHeight(x, z) < HUB_V2_WATER_Y + 0.45) return false;
+  // The plunge pool's back edge stops anyone wading up into the falls.
+  if (z < HUB_V2_RIVER_START_Z + 1.5 && hubTerrainHeight(x, z) < HUB_V2_WATER_Y + 0.45) return false;
   if (distanceFromBuildArea(x, z) === 0) return true;
   for (const c of HUB_V2_COLLIDERS) {
     const dx = x - c.x, dz = z - c.z;

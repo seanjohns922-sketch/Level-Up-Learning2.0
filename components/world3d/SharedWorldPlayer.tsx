@@ -149,6 +149,7 @@ export function SharedThirdPersonPlayer({
   positionRef,
   groundHeightAt,
   canStandAt,
+  speedFactorAt,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -174,6 +175,8 @@ export function SharedThirdPersonPlayer({
   groundHeightAt?: (x: number, z: number) => number;
   /** Optional blocking: return false where the player may not walk (water, trees). */
   canStandAt?: (x: number, z: number) => boolean;
+  /** Optional terrain speed: 1 is normal, less is slower (wading). */
+  speedFactorAt?: (x: number, z: number) => number;
 }) {
   const keys = useRef(new Set<string>());
   const baseY = useRef(initialPosition[1]);
@@ -268,7 +271,7 @@ export function SharedThirdPersonPlayer({
       const intensity = keyboardActive ? 1 : THREE.MathUtils.clamp(moveInput.magnitude ?? Math.hypot(analogX, analogY), 0, 1);
       movement.normalize();
       player.rotation.y = Math.atan2(movement.x, movement.z);
-      const movementSpeed = speed * (sprintingRef.current ? 1.75 : 1);
+      const movementSpeed = speed * (sprintingRef.current ? 1.75 : 1) * (speedFactorAt ? speedFactorAt(player.position.x, player.position.z) : 1);
       movement.multiplyScalar(movementSpeed * intensity * delta);
       if (!canStandAt || canStandAt(player.position.x + movement.x, player.position.z + movement.z)) player.position.add(movement);
       else if (canStandAt(player.position.x + movement.x, player.position.z)) player.position.x += movement.x;

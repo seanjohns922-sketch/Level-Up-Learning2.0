@@ -17,7 +17,8 @@ import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Cas
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
-import { hubCanStand, hubGroundHeight, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { HubWadingRipples } from "@/components/world3d/CentralWorldV2Scenery";
+import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import {
@@ -387,6 +388,7 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
         roamEllipse={hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse}
         groundHeightAt={hubV2 ? hubGroundHeight : undefined}
         canStandAt={hubV2 ? hubCanStand : undefined}
+        speedFactorAt={hubV2 ? hubSpeedFactor : undefined}
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
@@ -406,6 +408,7 @@ function CentralWorldScene({ selection, onStrokeState, homePlacement, quality, m
         <BuildFootprint placement={selection.placement} item={selection.item} tone="selected" />
         <Html position={gridToWorld(selection.placement.gridX, selection.placement.gridZ)} zIndexRange={[37, 37]}>{selection.menu}</Html>
       </> : null}
+      {hubV2 && !editing && !buildPreview ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
     </>

@@ -11,7 +11,7 @@ import { CENTRAL_MEADOW_MAP_FRAGMENT, CENTRAL_MEADOW_SHADER_COMMON } from "@/lib
 import { CENTRAL_WORLD_GRID, CENTRAL_WORLD_HOME_ITEM, CENTRAL_WORLD_HOME_KEY, parseGridSize, type CentralWorldGroundTile, type CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
 import {
   HUB_V2_BRIDGES, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PLAY_RADIUS, HUB_V2_RIVER_START_Z, HUB_V2_ROCKS, HUB_V2_TERRAIN_SIZE, HUB_V2_WATER_Y,
-  distanceFromBuildGrid, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, smoothstep,
+  distanceFromBuildGrid, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, hubWaterDepth, smoothstep,
   type HubBridge, type HubScenery,
 } from "@/lib/world3d/central-world-v2";
 
@@ -380,6 +380,48 @@ export function CentralWorldV2Scenery({ quality, animate, placements, groundTile
         <ModelInstances model="tent_detailedOpen" items={[{ x: camp.x - 5, z: camp.z - 4, y: camp.y, s: 3.6, ry: 0.6 }, { x: camp.x + 4.5, z: camp.z - 4.5, y: camp.y, s: 3.6, ry: -0.5 }]} />
         <ModelInstances model="log_large" items={[{ x: camp.x - 0.6, z: camp.z + 3, y: camp.y, s: 2.4, ry: 0 }, { x: camp.x + 3, z: camp.z + 1.2, y: camp.y, s: 2.4, ry: 1.4 }]} />
       </Suspense>
+    </group>
+  );
+}
+
+// ---------- ripples where an explorer wades ----------
+const RIPPLE_COUNT = 6;
+const RIPPLE_LIFE = 1.3;
+
+/** Rings spread out on the water around an explorer's legs while they wade. */
+export function HubWadingRipples({ positionRef }: { positionRef: React.RefObject<{ x: number; z: number }> }) {
+  const rings = useRef<Array<THREE.Mesh | null>>([]);
+  const state = useRef({ born: new Array<number>(RIPPLE_COUNT).fill(-Infinity), next: 0, spawnAt: 0, last: { x: NaN, z: NaN } });
+  const geometry = useMemo(() => new THREE.RingGeometry(0.42, 0.55, 32), []);
+  const materials = useMemo(() => Array.from({ length: RIPPLE_COUNT }, () => new THREE.MeshBasicMaterial({ color: "#eaf8ff", transparent: true, opacity: 0, depthWrite: false })), []);
+  useEffect(() => () => { geometry.dispose(); materials.forEach((m) => m.dispose()); }, [geometry, materials]);
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    const s = state.current;
+    const { x, z } = positionRef.current;
+    const moved = Math.hypot(x - s.last.x, z - s.last.z);
+    s.last = { x, z };
+    // A ring every so often while standing in the water, faster while moving.
+    if (hubWaterDepth(x, z) > 0.05 && t >= s.spawnAt) {
+      const ring = rings.current[s.next];
+      if (ring) { ring.position.set(x, HUB_V2_WATER_Y + 0.03, z); s.born[s.next] = t; }
+      s.next = (s.next + 1) % RIPPLE_COUNT;
+      s.spawnAt = t + (moved > 0.01 ? 0.22 : 0.7);
+    }
+    rings.current.forEach((ring, i) => {
+      if (!ring) return;
+      const age = (t - s.born[i]) / RIPPLE_LIFE;
+      ring.visible = age >= 0 && age < 1;
+      if (!ring.visible) return;
+      ring.scale.setScalar(1 + age * 3.2);
+      materials[i].opacity = 0.65 * (1 - age);
+    });
+  });
+  return (
+    <group>
+      {materials.map((material, i) => (
+        <mesh key={i} ref={(mesh) => { rings.current[i] = mesh; }} geometry={geometry} material={material} rotation={[-Math.PI / 2, 0, 0]} visible={false} renderOrder={3} />
+      ))}
     </group>
   );
 }

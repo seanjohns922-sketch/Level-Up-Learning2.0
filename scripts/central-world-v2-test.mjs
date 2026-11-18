@@ -4,8 +4,8 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import {
-  HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WATER_Y,
-  HUB_V2_BUILD_RULES, HUB_V2_FLAT_TOLERANCE, HUB_V2_GRID, HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubIsReservedCell, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubTerrainHeight, hubV2Spot, isCentralWorldV2Enabled,
+  HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WADE_DEPTH, HUB_V2_WATER_Y, HUB_V2_RIVER_START_Z,
+  HUB_V2_BUILD_RULES, HUB_V2_FLAT_TOLERANCE, HUB_V2_GRID, HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubIsReservedCell, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubSpeedFactor, hubTerrainHeight, hubV2Spot, hubWaterDepth, isCentralWorldV2Enabled,
 } from "../lib/world3d/central-world-v2.ts";
 import { pageFromTreehouseHref, parseTreehouseRoom, treehouseExitHref, treehouseHref, treehouseWindowView, DEFAULT_WINDOW_VIEW } from "../lib/world3d/treehouse-navigation.ts";
 import { CENTRAL_WORLD_BUILD_RULES, CENTRAL_WORLD_GRID, CENTRAL_WORLD_HOME_KEY, DEFAULT_HOME_PLACEMENT, isCentralWorldProtectedCell, validateCentralWorldGroundCell, validateCentralWorldPlacement } from "../lib/world3d/central-world-layout.ts";
@@ -46,14 +46,20 @@ checks += 5;
 check(() => HUB_V2_GUMS.length >= 15 && HUB_V2_GUMS.length <= 30, `expected a few ghost gums, got ${HUB_V2_GUMS.length}`);
 check(() => HUB_V2_DECOR.every((d) => !d.model.startsWith("plant") || distanceFromBuildArea(d.x, d.z) >= 12 || Math.abs(d.x - hubRiverX(d.z)) <= 28), "bushes must keep to the edges and riverbanks");
 
-// The river blocks walking, the bridges carry you over it.
+// Explorers can wade in the river (waist deep at most, and slower); the bridges carry them over it.
 for (const bridge of HUB_V2_BRIDGES) {
   const mid = hubRiverX(bridge.z);
-  check(() => !hubCanStand(mid, bridge.z + 6), `river next to the bridge at z=${bridge.z} must block walking`);
+  check(() => hubCanStand(mid, bridge.z + 6), `the river next to the bridge at z=${bridge.z} must be wadeable`);
+  check(() => hubGroundHeight(mid, bridge.z + 6) >= HUB_V2_WATER_Y - HUB_V2_WADE_DEPTH - 1e-9, "wading never goes deeper than the wade depth");
+  check(() => hubWaterDepth(mid, bridge.z + 6) > 0 && hubSpeedFactor(mid, bridge.z + 6) < 1, "wading is slower than walking");
+  check(() => hubWaterDepth(mid, bridge.z) === 0 && hubSpeedFactor(mid, bridge.z) === 1, "on the bridge you are dry");
   check(() => hubTerrainHeight(mid, bridge.z) < HUB_V2_WATER_Y, "riverbed must sit under the water");
   for (let x = bridge.x0 - 1; x <= bridge.x1 + 1; x += 0.5) assert.ok(hubCanStand(x, bridge.z), `bridge deck at x=${x.toFixed(1)} must be walkable`);
   check(() => hubGroundHeight(mid, bridge.z) > hubBridgeDeckY(bridge, bridge.x0), "the bridge arches up over the water");
 }
+
+// Nobody wades up into the waterfall.
+check(() => !hubCanStand(hubRiverX(HUB_V2_RIVER_START_Z), HUB_V2_RIVER_START_Z), "the waterfall must block wading");
 
 // The edge of the world blocks walking.
 check(() => !hubCanStand(HUB_V2_PLAY_RADIUS + 1, 0), "the world edge must block walking");
