@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import StatisticaLessonShell from "@/components/statistica/StatisticaLessonShell";
 import { CanonicalRealmActivityGate } from "@/components/realms/CanonicalRealmActivityGate";
 import { getStatisticaProgramForYearLabel } from "@/data/programs/statistica";
+import { STATISTICA_STATEMENTS } from "@/data/programs/statistica-statements";
 
 function parseInteger(value: string, minimum: number, maximum: number) {
   if (!/^\d+$/.test(value)) return null;
@@ -38,8 +39,9 @@ export default async function StatisticaLessonPage({
   const lesson = weekPlan?.lessons.find((candidate) => candidate.lesson === lessonNumber);
   if (!weekPlan || !lesson) notFound();
 
-  const lessonConcept = lesson.title.toLowerCase();
-  const weekConcept = weekPlan.topic.toLowerCase();
+  // Child-facing goal and "I can" lines, written for each lesson; a lesson without
+  // them falls back to its title.
+  const statements = STATISTICA_STATEMENTS[lesson.id];
 
   return (
     <CanonicalRealmActivityGate
@@ -56,12 +58,8 @@ export default async function StatisticaLessonPage({
         lessonNumber={lessonNumber}
         lessonId={lesson.id}
         lessonTitle={lesson.title}
-        focus={`use ${lessonConcept} to explore ${weekConcept}`}
-        successCriteria={[
-          `recognise and use ${lessonConcept}`,
-          "use evidence from the data to answer a question",
-          `explain how my result connects to ${weekConcept}`,
-        ]}
+        focus={statements?.goal ?? lesson.title}
+        successCriteria={statements?.criteria ?? []}
       />
     </CanonicalRealmActivityGate>
   );

@@ -19,7 +19,8 @@ const ACTION_WORDS = new Set(
   practise predict preserve put quantify quickly read reason recall recognise reclassify record reflect regroup reject
   relate remove repair repeat represent review rotate round run say see select separate sequence set share show skip start slice
   solve sort split spot state strengthen subtract tally talk tell test trace track transform translate trust turn
-  understand use work write`.split(/\s+/),
+  understand use work write answer ask clean colour communicate critique display improve keep label pose present
+  report rewrite suggest support`.split(/\s+/),
 );
 
 const firstWord = (text: string) => text.trim().split(/\s+/)[0]?.toLowerCase().replace(/[^a-z]/g, "") ?? "";

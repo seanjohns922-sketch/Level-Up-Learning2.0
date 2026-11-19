@@ -6,6 +6,8 @@ const { learningStatementFor, successCriteriaStatementsFor } = await import("../
 const { getProgramForYear } = await import("../data/programs/index.ts");
 const { getCurriculumPlan } = await import("../data/programs/genres.ts");
 const { getStatisticaProgramForYearLabel } = await import("../data/programs/statistica.ts");
+const { STATISTICA_STATEMENTS } = await import("../data/programs/statistica-statements.ts");
+const missing = [];
 const { getPatternPeaksProgramForYearLabel } = await import("../data/programs/patternPeaks.ts");
 const { getChanceHollowProgramForYearLabel } = await import("../data/programs/chanceHollow.ts");
 const { chanceHollowSuccessCriteria } = await import("../lib/chance-hollow-success-criteria.ts");
@@ -26,11 +28,11 @@ for (const year of LEVELS) {
   for (const week of getCurriculumPlan(year, "measurement") ?? []) {
     week.lessons.forEach((l, i) => add("measurement", year, week.week, i + 1, l.displayTitle ?? l.title, l.focus, goals(l.activityIdeas)));
   }
-  const stat = getStatisticaProgramForYearLabel(year);
-  for (const week of stat ?? []) {
+  for (const week of getStatisticaProgramForYearLabel(year) ?? []) {
     for (const l of week.lessons) {
-      const lc = l.title.toLowerCase(), wc = week.topic.toLowerCase();
-      add("statistics", year, week.week, l.lesson, l.title, `use ${lc} to explore ${wc}`, [`recognise and use ${lc}`, "use evidence from the data to answer a question", `explain how my result connects to ${wc}`]);
+      const statements = STATISTICA_STATEMENTS[l.id];
+      if (!statements) missing.push(l.id);
+      add("statistics", year, week.week, l.lesson, l.title, statements?.goal ?? l.title, statements?.criteria ?? []);
     }
   }
   for (const week of getPatternPeaksProgramForYearLabel(year) ?? []) {
@@ -59,9 +61,13 @@ for (const program of STARPATH_PROGRAMS) {
 }
 
 if (process.argv.includes("--check")) {
-  // Statistica's statements are still template text and are being rewritten lesson by lesson.
-  const checked = rows.filter(([realm]) => realm !== "statistics");
-  const awkward = checked.filter((row) => row.slice(5).some((line) => /^I am learning about |^I can explain what I know about |Open-ended:|^I (am learning to|can) [a-z]+:|learning to learn|^I can learn /.test(String(line))));
+  if (missing.length) {
+    console.error(`FAIL Statistica lessons without written statements: ${missing.join(", ")}`);
+    process.exit(1);
+  }
+  const checked = rows;
+  // Every "I can" line must start with something the learner does; every goal must read on from "I am learning".
+  const awkward = checked.filter((row) => row.length < 7 || row.slice(5).some((line) => /^I am learning about |^I can explain what I know about |Open-ended:|^I (am learning to|can) [a-z]+:|learning to learn|^I can learn /.test(String(line))));
   if (awkward.length) {
     console.error(`FAIL ${awkward.length} lessons have statements that don't read properly:`);
     for (const row of awkward.slice(0, 20)) console.error(`- ${row.slice(0, 4).join(" ")}: ${row.slice(5).join(" / ")}`);
