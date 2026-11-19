@@ -1,0 +1,434 @@
+{
+  "environment": "isolated local synthetic workload; no production changes",
+  "executionSettings": {
+    "pg_stat_statements.track_planning": "off",
+    "track_io_timing": "off",
+    "track_wal_io_timing": "off"
+  },
+  "statementTotals": [
+    {
+      "role": "teacher authenticated",
+      "category": "lesson attempts table",
+      "calls": 144,
+      "executionMs": 29140.204,
+      "meanExecutionMs": 202.363
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "assessment table",
+      "calls": 132,
+      "executionMs": 17141.227,
+      "meanExecutionMs": 129.858
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "quiz attempts table",
+      "calls": 72,
+      "executionMs": 15244.616,
+      "meanExecutionMs": 211.731
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "teacher compact event page RPC",
+      "calls": 61,
+      "executionMs": 2615.007,
+      "meanExecutionMs": 42.869
+    },
+    {
+      "role": "student anon",
+      "category": "lesson completion RPC",
+      "calls": 198,
+      "executionMs": 1103.214,
+      "meanExecutionMs": 5.572
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "live activity RPC",
+      "calls": 60,
+      "executionMs": 691.96,
+      "meanExecutionMs": 11.533
+    },
+    {
+      "role": "student anon",
+      "category": "student event insert RPC",
+      "calls": 99,
+      "executionMs": 312.224,
+      "meanExecutionMs": 3.154
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "teacher daily activity RPC",
+      "calls": 60,
+      "executionMs": 97.637,
+      "meanExecutionMs": 1.627
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "event history table",
+      "calls": 60,
+      "executionMs": 92.042,
+      "meanExecutionMs": 1.534
+    },
+    {
+      "role": "student anon",
+      "category": "student login RPC",
+      "calls": 100,
+      "executionMs": 54.874,
+      "meanExecutionMs": 0.549
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "session configuration",
+      "calls": 590,
+      "executionMs": 13.733,
+      "meanExecutionMs": 0.023
+    },
+    {
+      "role": "student anon",
+      "category": "session configuration",
+      "calls": 597,
+      "executionMs": 10.632,
+      "meanExecutionMs": 0.018
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "teacher scoped attempt probe RPC",
+      "calls": 1,
+      "executionMs": 3.238,
+      "meanExecutionMs": 3.238
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "commit",
+      "calls": 5,
+      "executionMs": 0.004,
+      "meanExecutionMs": 0.001
+    },
+    {
+      "role": "student anon",
+      "category": "commit",
+      "calls": 4,
+      "executionMs": 0.001,
+      "meanExecutionMs": 0.0
+    }
+  ],
+  "connectionSampling": {
+    "samples": 1801,
+    "activeCategorySamples": {
+      "other statement (redacted)": 38,
+      "compact event page RPC": 50,
+      "lesson completion RPC": 53,
+      "quiz attempts table": 306,
+      "assessment table": 343,
+      "lesson attempts table": 588,
+      "live presence table": 10,
+      "event history table": 4,
+      "student event insert RPC": 8
+    },
+    "waitSamples": {
+      "none/none": 1375,
+      "LWLock/WALWrite": 7,
+      "IO/WalSync": 13,
+      "Client/ClientRead": 2,
+      "Lock/transactionid": 2,
+      "IO/WalWrite": 1
+    },
+    "samplesWithBlockers": 1,
+    "maximumSampledQueryAgeMs": 372.653
+  },
+  "baselineWorkload": {
+    "at": "2026-11-19T04:11:19.332Z",
+    "teachers": 20,
+    "studentsWriting": 100,
+    "rounds": [],
+    "passedCorrectness": false,
+    "temporaryFunctionsRemoved": true,
+    "limitation": "Local synthetic six-source HTTP snapshots; no browser/realtime rendering or 10,000-user proof. Student completions and login sessions remain in the isolated fixture database. Both modes use compact events; only attempt reads differ.",
+    "failedRound": {
+      "round": 1,
+      "mode": "direct",
+      "completedDashboardReads": {
+        "samples": 60,
+        "p95Ms": 4209,
+        "maximumMs": 6945
+      },
+      "sources": {
+        "attempts": {
+          "samples": 60,
+          "p95Ms": 4209,
+          "maximumMs": 6945
+        },
+        "presence": {
+          "samples": 60,
+          "p95Ms": 2119,
+          "maximumMs": 2766
+        },
+        "events": {
+          "samples": 60,
+          "p95Ms": 2493,
+          "maximumMs": 3516
+        },
+        "daily": {
+          "samples": 60,
+          "p95Ms": 2403,
+          "maximumMs": 3402
+        }
+      },
+      "completedSubmissionPairs": {
+        "samples": 99,
+        "p95Ms": 2689,
+        "maximumMs": 4142
+      }
+    },
+    "error": "fetch failed"
+  },
+  "baselinePlan": {
+    "planningMs": 0.911,
+    "executionMs": 92.011,
+    "nodes": [
+      {
+        "Node Type": "Limit",
+        "Actual Rows": 500,
+        "Actual Loops": 1,
+        "Actual Total Time": 91.885,
+        "Shared Hit Blocks": 12090,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Sort",
+        "Actual Rows": 500,
+        "Actual Loops": 1,
+        "Actual Total Time": 91.86,
+        "Shared Hit Blocks": 12090,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Bitmap Heap Scan",
+        "Relation Name": "student_lesson_attempts",
+        "Actual Rows": 1608,
+        "Actual Loops": 1,
+        "Actual Total Time": 91.512,
+        "Rows Removed by Filter": 0,
+        "Shared Hit Blocks": 12087,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Bitmap Index Scan",
+        "Index Name": "idx_student_lesson_attempts_student_scope",
+        "Actual Rows": 1608,
+        "Actual Loops": 1,
+        "Actual Total Time": 0.191,
+        "Shared Hit Blocks": 49,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Nested Loop",
+        "Actual Rows": 26,
+        "Actual Loops": 1,
+        "Actual Total Time": 90.355,
+        "Shared Hit Blocks": 11430,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Seq Scan",
+        "Relation Name": "classes",
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Actual Total Time": 2.994,
+        "Rows Removed by Filter": 19,
+        "Shared Hit Blocks": 646,
+        "Shared Read Blocks": 0
+      },
+      {
+        "Node Type": "Seq Scan",
+        "Relation Name": "students",
+        "Actual Rows": 26,
+        "Actual Loops": 1,
+        "Actual Total Time": 87.354,
+        "Rows Removed by Filter": 477,
+        "Shared Hit Blocks": 10784,
+        "Shared Read Blocks": 0
+      }
+    ]
+  },
+  "indexExperiment": {
+    "experiment": "Temporary students(class_id) index; all access policies unchanged",
+    "indexRemoved": true,
+    "workloadProcess": {
+      "code": 1,
+      "signal": null
+    },
+    "workload": {
+      "at": "2026-11-19T04:13:46.771Z",
+      "teachers": 20,
+      "studentsWriting": 100,
+      "rounds": [
+        {
+          "round": 1,
+          "mode": "direct",
+          "dashboard": {
+            "samples": 60,
+            "p95Ms": 1321,
+            "maximumMs": 1843
+          },
+          "sources": {
+            "attempts": {
+              "samples": 60,
+              "p95Ms": 1321,
+              "maximumMs": 1843
+            },
+            "presence": {
+              "samples": 60,
+              "p95Ms": 880,
+              "maximumMs": 1173
+            },
+            "events": {
+              "samples": 60,
+              "p95Ms": 1038,
+              "maximumMs": 1296
+            },
+            "daily": {
+              "samples": 60,
+              "p95Ms": 642,
+              "maximumMs": 1226
+            }
+          },
+          "completionPair": {
+            "samples": 100,
+            "p95Ms": 949,
+            "maximumMs": 1571
+          },
+          "overlappingSnapshots": 56,
+          "verifiedCompletions": 100
+        },
+        {
+          "round": 1,
+          "mode": "scoped",
+          "dashboard": {
+            "samples": 60,
+            "p95Ms": 1357,
+            "maximumMs": 1941
+          },
+          "sources": {
+            "attempts": {
+              "samples": 60,
+              "p95Ms": 1233,
+              "maximumMs": 1941
+            },
+            "presence": {
+              "samples": 60,
+              "p95Ms": 540,
+              "maximumMs": 1105
+            },
+            "events": {
+              "samples": 60,
+              "p95Ms": 863,
+              "maximumMs": 1357
+            },
+            "daily": {
+              "samples": 60,
+              "p95Ms": 577,
+              "maximumMs": 987
+            }
+          },
+          "completionPair": {
+            "samples": 100,
+            "p95Ms": 880,
+            "maximumMs": 1280
+          },
+          "overlappingSnapshots": 54,
+          "verifiedCompletions": 100
+        },
+        {
+          "round": 2,
+          "mode": "scoped",
+          "dashboard": {
+            "samples": 60,
+            "p95Ms": 1419,
+            "maximumMs": 1762
+          },
+          "sources": {
+            "attempts": {
+              "samples": 60,
+              "p95Ms": 1348,
+              "maximumMs": 1762
+            },
+            "presence": {
+              "samples": 60,
+              "p95Ms": 896,
+              "maximumMs": 1129
+            },
+            "events": {
+              "samples": 60,
+              "p95Ms": 1022,
+              "maximumMs": 1524
+            },
+            "daily": {
+              "samples": 60,
+              "p95Ms": 484,
+              "maximumMs": 1111
+            }
+          },
+          "completionPair": {
+            "samples": 100,
+            "p95Ms": 838,
+            "maximumMs": 1082
+          },
+          "overlappingSnapshots": 53,
+          "verifiedCompletions": 100
+        },
+        {
+          "round": 2,
+          "mode": "direct",
+          "dashboard": {
+            "samples": 60,
+            "p95Ms": 1215,
+            "maximumMs": 1565
+          },
+          "sources": {
+            "attempts": {
+              "samples": 60,
+              "p95Ms": 1079,
+              "maximumMs": 1565
+            },
+            "presence": {
+              "samples": 60,
+              "p95Ms": 618,
+              "maximumMs": 1425
+            },
+            "events": {
+              "samples": 60,
+              "p95Ms": 1001,
+              "maximumMs": 1379
+            },
+            "daily": {
+              "samples": 60,
+              "p95Ms": 635,
+              "maximumMs": 888
+            }
+          },
+          "completionPair": {
+            "samples": 100,
+            "p95Ms": 809,
+            "maximumMs": 1193
+          },
+          "overlappingSnapshots": 60,
+          "verifiedCompletions": 100
+        }
+      ],
+      "passedCorrectness": true,
+      "temporaryFunctionsRemoved": true,
+      "limitation": "Local synthetic six-source HTTP snapshots; no browser/realtime rendering or 10,000-user proof. Student completions and login sessions remain in the isolated fixture database. Both modes use compact events; only attempt reads differ.",
+      "expectedDenials": 800,
+      "verifiedCompletions": 400,
+      "passedLatencyGate": false
+    }
+  },
+  "caveats": [
+    "Profiling adds overhead; SQL means cannot be subtracted from HTTP percentiles to calculate pool wait.",
+    "Sampling can miss short waits; no-wait samples do not measure CPU utilization.",
+    "Profiled baseline failed before scoped mode; index experiment was unprofiled and both rounds completed.",
+    "Fixtures accumulate synthetic attempts across runs; results are local and not a controlled hosted capacity test.",
+    "Index experiment still fails the one-second latency gate; no 10,000-user proof."
+  ]
+}

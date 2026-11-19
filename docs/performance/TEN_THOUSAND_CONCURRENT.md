@@ -3,6 +3,58 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Mixed-load query profile and class index experiment — 19 November
+
+The review branch now includes redacted query categories and blocker counts in
+the 50 ms connection sampler, plus a separate category for the scoped-attempt
+probe in the SQL profiler. A 90-second local profile alongside the same workload
+captured 1,801 connection samples. Most active samples concerned the three
+attempt tables (1,237 of 1,400 active connection observations). There were two
+transaction-ID lock observations, only one with a reported blocker. The maximum
+sampled active query age was 373 ms. These observations make widespread lock
+contention a weaker explanation for this run; sampling cannot rule it out.
+
+Authenticated SQL execution averaged 202 ms for lesson attempt reads, 212 ms for
+quiz attempts and 130 ms for assessment reads. Compact event pages averaged 43 ms;
+student lesson completion SQL averaged 5.6 ms. Planning/I/O timing collection was
+off. SQL averages exclude API queueing and cannot be subtracted from HTTP p95 to
+calculate pool wait. The profiled workload failed on a dropped local connection
+after 99 completed submission pairs; all 60 dashboard snapshots finished, at
+4,209 ms p95. Docker/Postgres start metadata showed no service restart. This
+failure remains in the evidence, rather than being described as a passing run.
+
+A separate authenticated `EXPLAIN ANALYZE` of the first lesson-attempt page took
+92 ms. Its existing attempt-scope index found 1,608 rows quickly, while the nested
+legacy permission subplan spent about 87 ms scanning the students table (26 rows
+kept, 477 filtered). Plan structure/timings are recorded without SQL or IDs.
+
+`scripts/staging/indexed-dashboard-mixed-local.mjs` then temporarily created a
+`students(class_id)` index, ran the same complete mixed workload, and dropped the
+index in `finally`. It changes no access policy, grant, function body or student
+identity. This is a local experiment, not a migration or application integration.
+
+| Read mode with temporary index | Dashboard p95, rounds 1 / 2 | Completion/retry pair p95, rounds 1 / 2 |
+| --- | ---: | ---: |
+| Existing direct attempts + compact events | 1,321 / 1,215 ms | 949 / 809 ms |
+| Scoped attempt prototype + compact events | 1,357 / 1,419 ms | 880 / 838 ms |
+
+All 400 correct completions, 400 live events and 800 expected denials passed;
+post-write attempt reads matched direct RLS. The index and temporary functions
+were confirmed removed. Compared with the earlier unprofiled direct results of
+4,749 / 5,669 ms p95, this is a promising simpler optimisation. It does **not** meet
+the one-second latency gate, and the scoped prototype did not improve on direct
+reads in this indexed run. Do not introduce the more complex API solely on the
+earlier SQL-only speedup. Next, confirm the index on staging with representative
+data and assess the real incremental dashboard refresh path before deciding
+which changes to release. Index build time/storage and student/class write costs
+also need checking before production adoption.
+
+Evidence: `docs/performance/mixed-query-profile-2026-11-19.json`. Profiling adds
+overhead; index results were collected without profilers. Fixtures retain prior
+synthetic completions, so these are local diagnostic comparisons, not a controlled
+hosted capacity test. Syntax, targeted ESLint and diff checks passed. No production
+change, migration, application build or 10,000-user claim is included.
+
 ## Mixed dashboard and student completion rehearsal — 19 November
 
 `scripts/staging/scoped-dashboard-mixed-local.mjs` tests all six dashboard read
