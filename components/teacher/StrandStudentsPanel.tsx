@@ -1014,7 +1014,7 @@ export default function StrandStudentsPanel({ yearLabel, students, progress, liv
                     ))}
                   </div>
                   <div className="min-w-0">
-                    <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
+                    <span className={`inline-block max-w-full whitespace-normal break-words rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] ${PLACEMENT_STATUS_STYLE[placementStatus]}`}>
                       {placementStatus}
                     </span>
                   </div>

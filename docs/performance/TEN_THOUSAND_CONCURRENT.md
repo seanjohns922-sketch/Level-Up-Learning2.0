@@ -1142,6 +1142,57 @@ or duplicate canonical saves, no identity leakage, verified teacher freshness
 and measured resource headroom. Report each endpoint separately. Explicit denial
 tests must pass but must not be miscounted as unexpected workload failures.
 
+## Dashboard browser check — 19 November 2026
+
+Checked review commit `5bd8707d` in native Chrome against an isolated development
+app on port 3100 and the synthetic Supabase database on port 56521. No hosted
+school data was used. The class contained 26 synthetic students.
+
+- Desktop: opened Live Class, selected Not started, switched through Students
+  and Diagnostic, then returned. The filter and its single matching student
+  remained. Clearing the filter restored all 26 rows. A student's detail drawer
+  opened with score and recent activity, then closed successfully.
+- Chrome's iPad Mini emulation (768 × 1024): inspected Live Class, Students and
+  Diagnostic. Live Class summary cards wrapped and tab controls remained usable.
+  Students has a remaining narrow-layout issue: the unwrapped pathway badge
+  crowds the progress column. Review the six-column grid before claiming tablet
+  layout sign-off. This check did not change the UI or curriculum.
+- The local fixture database lacked the existing
+  `20261118120000_compact_live_class_event_reads.sql` migration. The initial
+  compact request returned 404 and the existing missing-RPC fallback loaded the
+  data. Applied that existing read-only migration locally, refreshed the API
+  schema cache and reloaded. Chrome Network then showed successful HTTP 200
+  compact event fetches. The two functions remain installed in the local test
+  database; no hosted migration was applied and none was newly authored.
+- Reran the actual-component Live Class lifecycle test and all 20 critical QA
+  checks successfully. Class isolation and immediate refresh on return are
+  covered by those automated tests; this browser session used only one class
+  and did not inject a new student completion while the tab was hidden.
+
+This was development-mode functional/layout verification, not a controlled
+cold/warm latency benchmark, physical iPad/Safari test or production-build load
+test. Diagnostic's synthetic rows had no diagnostic scores; their pending state
+does not validate populated diagnostic reports. No merge or deployment occurred.
+Next: verify browser freshness with a new synthetic completion, then repeat
+sustained capacity gates with schema parity.
+
+### Portrait pathway badge fix — 20 November 2026
+
+Removed the pathway badge's forced single-line text and constrained it to its
+existing grid column (`max-w-full`, normal wrapping and word breaking). No grid
+columns, data calculations, status wording, scoring or progression changed.
+In Chrome iPad Mini emulation (768 × 1024), Not placed and Level complete now
+wrap within their badges without overlapping year progress. At normal desktop
+width, those same badges remain single-line and the six-column layout is intact.
+This was checked with the synthetic class only; physical iPad/Safari remains
+untested. The school-home preview control also crowds the class header at narrow
+width in the ordinary teacher route; that separate existing layout needs review.
+
+All 20 critical checks, QA lint, typecheck and the full production build passed.
+Component ESLint had no errors and one existing unused-import warning.
+Build log: `/Users/seanjohns/reliq-audits/2026-11-20/student-pathway-wrap-build.log`.
+This is a CSS-only fix and does not require a database migration.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
