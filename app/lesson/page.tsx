@@ -241,6 +241,14 @@ function getLessonPractisedSkills(lessonId: string): string[] | undefined {
   );
 }
 
+// A lesson's activity ideas are often activity names ("Start at zero", "Number
+// flashcards"), not goals. Only entries written as goal sentences (with a full
+// stop, or a "Core concept:" style label) become "I can" statements; when there
+// are none, the lesson start page restates the lesson's own goal.
+function lessonGoalCriteria(activityIdeas: readonly string[] | undefined): string[] {
+  return (activityIdeas ?? []).filter((idea) => /^(core concept|application task|reasoning prompt):/i.test(idea.trim()) || idea.includes("."));
+}
+
 function LessonPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -1026,7 +1034,7 @@ function LessonPage() {
             lessonNumber={lessonNumber}
             lessonTitle={safeLessonTitle ?? `Week ${week} Lesson ${lessonNumber}`}
             focus={safeLessonFocus ?? "practise today’s lesson skill"}
-            successCriteria={lessonMeta?.activityIdeas ?? getLessonPractisedSkills(effectiveLessonId) ?? []}
+            successCriteria={lessonGoalCriteria(lessonMeta?.activityIdeas)}
             embeddedVideoSrc={
               hasEmbeddedLessonVideo
                 ? "https://player.vimeo.com/video/1183966051?h=ff99ab69f7"

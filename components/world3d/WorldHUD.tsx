@@ -236,7 +236,6 @@ export function WorldHUD({
               {(navActions ?? []).map((action) => (
                 <button key={action.key} type="button" className="worldHudGoBtn" onClick={action.onClick} aria-label={action.label}>{action.icon}<span>{action.label}</span></button>
               ))}
-              {!hubLayout && !preview ? <button type="button" className="worldHudGoBtn" onClick={() => router.push(fallbackHref)} aria-label="2D map view" title="2D map view"><Map size={17} /></button> : null}
             </div>
           ) : null}
           <div className="worldHudStats">

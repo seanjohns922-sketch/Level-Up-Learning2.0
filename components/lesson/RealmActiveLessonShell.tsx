@@ -15,10 +15,10 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { FitToScreen } from "@/components/FitToScreen";
 import {
   getRealmLessonArtwork,
-  learningStatementFor,
   REALM_LESSON_THEMES,
   type RealmLessonThemeId,
 } from "@/components/lesson/RealmLessonHome";
+import { learningStatementFor } from "@/lib/lesson-statements";
 
 const BANNER_FADE = "linear-gradient(180deg, #000 60%, transparent 100%)";
 
@@ -54,7 +54,7 @@ export function RealmActiveLessonShell({
   const theme = REALM_LESSON_THEMES[realm];
   const artworkSrc = artworkOverride ?? getRealmLessonArtwork(realm, levelNumber, year);
   const experienceNoun = realm === "measurement" ? "Quest" : realm === "statistics" ? "Investigation" : realm === "pattern" ? "Challenge" : realm === "chance" ? "Trial" : "Mission";
-  const learningStatement = focus ? learningStatementFor(focus) : null;
+  const learningStatement = focus ? learningStatementFor(focus, lessonTitle) : null;
   const readText = `${lessonTitle}. ${learningStatement ?? "Practise today's lesson skill."}`;
 
   return (

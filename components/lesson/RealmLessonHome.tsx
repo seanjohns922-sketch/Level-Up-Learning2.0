@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
+import { learningStatementFor, successCriteriaStatementsFor } from "@/lib/lesson-statements";
 import LowerLessonGuide from "./LowerLessonGuide";
 import { getLowerLessonGuide } from "@/data/lesson-guides/lower-level";
 import { getGroundGuide } from "@/data/lesson-guides/ground";
@@ -227,42 +228,6 @@ export function getRealmLessonArtwork(realm: RealmLessonThemeId, levelNumber: nu
   return MEASURELANDS_BACKGROUNDS[levelNumber] ?? "/images/measurelands-home-bg.png";
 }
 
-function childFacingCriterion(criterion: string) {
-  const cleaned = criterion
-    .replace(/^core concept:\s*/i, "")
-    .replace(/^application task:\s*/i, "")
-    .trim();
-
-  if (/^reasoning prompt:/i.test(cleaned)) return "explain how I know";
-  return cleaned;
-}
-
-function uniqueCriteria(criteria: readonly string[], focus: string) {
-  // Some lessons pack several notes into one entry ("…lines. Fluency (2-3 min): …. Reasoning prompt: …"),
-  // so each sentence is its own criterion, and teacher-only fluency notes are left out.
-  const cleaned = criteria
-    .flatMap((item) => item.split(/(?<=\.)\s+(?=[A-Z])/))
-    .map((item) => item.trim().replace(/\.+$/, ""))
-    .filter((item) => item && !/^fluency\s*\(/i.test(item))
-    .map(childFacingCriterion)
-    .filter(Boolean);
-  return [...new Set(cleaned)].slice(0, 3).length
-    ? [...new Set(cleaned)].slice(0, 3)
-    : [focus];
-}
-
-/** A lesson sentence carried on after "I am learning to" or "I can": lower case, but acronyms (MAB) stay as written. */
-function continueSentence(value: string) {
-  const text = value.trim().replace(/\.+$/, "");
-  return /^[A-Z][a-z]/.test(text) ? `${text.charAt(0).toLowerCase()}${text.slice(1)}` : text;
-}
-
-/** "I am learning to …" from a lesson's focus, in full. A focus written as "I can …" reads on from the verb. */
-export function learningStatementFor(focus: string) {
-  const text = focus.trim().replace(/\.+$/, "").replace(/^I\s+can\s+/i, "");
-  return /^I\s+am\s+learning\s+to\b/i.test(text) ? text : `I am learning to ${continueSentence(text)}`;
-}
-
 export type LessonConceptIntroData = {
   term: string;
   title: string;
@@ -465,10 +430,8 @@ export function RealmLessonHome({
   };
   const isCave=levelNumber >= 7;
   const theme = isCave ? {...REALM_LESSON_THEMES[realm],experienceLabel:levelNumber===8?"Stronghold Mission":"Cave Mission",startLabel:"Learn the skill",intro:levelNumber===8?"Enter the stronghold, learn the skill, and work towards recovering the Core.":"Follow the crystal trail, learn the skill, and continue the search for the stolen Core."} : REALM_LESSON_THEMES[realm];
-  const learningStatement = learningStatementFor(focus);
-  const criteriaStatements = uniqueCriteria(successCriteria, focus).map((criterion) =>
-    /^I\s+can\b/i.test(criterion) ? criterion : `I can ${continueSentence(criterion)}`,
-  );
+  const learningStatement = learningStatementFor(focus, lessonTitle);
+  const criteriaStatements = successCriteriaStatementsFor(successCriteria, focus, lessonTitle);
   const artworkSrc = artworkOverride ?? getRealmLessonArtwork(realm, levelNumber, year);
   const introText = intro ?? theme.intro;
   const learningText = learningStatement;
