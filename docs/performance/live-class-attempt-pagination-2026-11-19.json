@@ -1,0 +1,208 @@
+{
+  "at": "2026-11-19T05:03:49.492Z",
+  "environment": "isolated local authenticated HTTP; no schema or fixture writes",
+  "cases": [
+    {
+      "teacher": 1,
+      "rowCounts": [
+        1630,
+        523,
+        1046
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 2,
+      "rowCounts": [
+        1622,
+        520,
+        1040
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 3,
+      "rowCounts": [
+        1614,
+        518,
+        1036
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 4,
+      "rowCounts": [
+        1609,
+        516,
+        1032
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 5,
+      "rowCounts": [
+        810,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 6,
+      "rowCounts": [
+        812,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 7,
+      "rowCounts": [
+        812,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 8,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 9,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 10,
+      "rowCounts": [
+        810,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 11,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 12,
+      "rowCounts": [
+        812,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 13,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 14,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 15,
+      "rowCounts": [
+        810,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 16,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 17,
+      "rowCounts": [
+        812,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 18,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 19,
+      "rowCounts": [
+        812,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    },
+    {
+      "teacher": 20,
+      "rowCounts": [
+        811,
+        250,
+        500
+      ],
+      "complete": true,
+      "foreignClassHidden": true
+    }
+  ],
+  "passed": true,
+  "limitations": "Static synthetic data. Not browser rendering, concurrent writes or a throughput benchmark."
+}

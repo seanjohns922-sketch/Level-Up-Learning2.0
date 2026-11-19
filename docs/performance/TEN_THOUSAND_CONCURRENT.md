@@ -3,6 +3,44 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Live Class attempt-history pagination — 19 November
+
+`LiveClassPanel` now uses `fetchLiveClassAttempts` for its lesson, weekly quiz and
+assessment history. Previously, each source used one unpaginated query and could
+silently stop at the API row limit. The shared reader retains the same projections,
+student scope and completed-lesson filter, with an extra UUID for pagination.
+Every page uses the original table RLS; there is no new RPC, authorisation helper,
+grant, migration or database write.
+
+The reader fixes an upper UUID before paging, advances strictly by ID, and does
+not treat short pages as end-of-history (a server may enforce a smaller cap).
+It stops at the upper ID or an empty page. An access error, transport failure,
+malformed/non-advancing page or cancelled class selection returns no partial data.
+The panel's existing all-three-success guard retains the previous completed
+attempt state when any source fails. The normal refresh reconciles concurrent
+inserts/updates; this is not a transactionally frozen database snapshot.
+
+The new `qa:live-class-attempt-read` regression is included in `qa:critical`.
+It covers 1,207 rows with a 137-row server cap for all three tables, empty scopes,
+completed-only filtering, fixed upper bounds, new/deleted rows, cancellation,
+later-page access/transport failures and malformed/foreign rows. The critical
+suite passed 18/18, along with typecheck, lint:qa and targeted ESLint. The full
+`npm run build`, including all prebuild audits, compilation, TypeScript and static
+page generation, passed. No browser visual check was performed for this data-only
+change.
+
+The production helper was also exercised through real local authenticated HTTP
+requests for 20 synthetic teachers. All 60 result sets matched the independent
+paginated direct-RLS reads. The first class returned 1,630 lessons, 523 quizzes and
+1,046 assessments. All 20 foreign-class checks returned no rows. Evidence:
+`docs/performance/live-class-attempt-pagination-2026-11-19.json`; runner:
+`scripts/staging/live-class-attempts-local.mjs`. No fixture or schema writes were
+needed for this check.
+
+This closes the row-limit gap, not the remaining throughput work. Reading complete
+history can cost more requests than the former truncated read. Browser rendering,
+hosted performance and 10,000-user capacity have not been verified by this change.
+
 ## Incremental refresh validation and existing-index status — 19 November
 
 **The class index is existing work, not a newly discovered production fix.**

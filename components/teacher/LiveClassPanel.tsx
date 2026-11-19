@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
+import { fetchLiveClassAttempts } from "@/lib/live-class-attempts";
 import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { supabase } from "@/lib/supabase";
 import { createLiveClassEventReader, fetchLiveClassEvents } from "@/lib/live-class-events";
@@ -1046,25 +1047,9 @@ export default function LiveClassPanel({
           .select("*")
           .eq("class_id", selectedClass.id)
           .order("last_active_at", { ascending: false }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_lesson_attempts")
-            .select("student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at")
-            .in("student_id", studentIds)
-            .eq("completed", true)
-          : Promise.resolve({ data: [], error: null }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_weekly_quiz_attempts")
-            .select("student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at")
-            .in("student_id", studentIds)
-          : Promise.resolve({ data: [], error: null }),
-        studentIds.length > 0
-          ? supabase
-            .from("student_realm_assessments")
-            .select("student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at")
-            .in("student_id", studentIds)
-          : Promise.resolve({ data: [], error: null }),
+        fetchLiveClassAttempts(supabase, "student_lesson_attempts", studentIds, () => !cancelled),
+        fetchLiveClassAttempts(supabase, "student_weekly_quiz_attempts", studentIds, () => !cancelled),
+        fetchLiveClassAttempts(supabase, "student_realm_assessments", studentIds, () => !cancelled),
         supabase.rpc("get_live_class_activity_today", { p_class_id: selectedClass.id }),
       ]);
       const { data, error } = activityResult;
