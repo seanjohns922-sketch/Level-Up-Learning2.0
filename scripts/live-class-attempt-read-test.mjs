@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { fetchLiveClassAttempts } from '../lib/live-class-attempts.ts';
+import { fetchClassRealmHistory } from '../lib/class-realm-history.ts';
 
 const id = n => `00000000-0000-0000-0000-${String(n).padStart(12,'0')}`;
 const rows = Array.from({ length: 1207 }, (_, i) => ({ id: id(i+1), student_id: 'ours', completed: true, correct_count: i%10 }));
@@ -17,11 +18,13 @@ function fixture({ data = rows, cap = 137, failAt, mutate, malformed } = {}) {
       gt(key,value) { assert.equal(key,'id'); call.after = value; return chain; },
       async then(resolve,reject) {
         try {
+          call.rpcParams = chain.rpcParams;
           calls.push(call);
           mutate?.(calls.length, data);
           if (calls.length === failAt) return resolve({ data: null, error: { code: '42501' } });
           let result = data.filter(row => filters.student_id.includes(row.student_id) &&
             (filters.completed === undefined || row.completed === filters.completed) &&
+            (filters.realm_id === undefined || row.realm_id === filters.realm_id) &&
             (!call.after || row.id>call.after) && (!call.through || row.id<=call.through));
           result = result.toSorted((a,b) => a.id.localeCompare(b.id) * (call.ascending ? 1 : -1)).slice(0, Math.min(cap,call.limit));
           if (malformed && calls.length > 1) result = malformed;
@@ -30,7 +33,7 @@ function fixture({ data = rows, cap = 137, failAt, mutate, malformed } = {}) {
       },
     };
     return chain;
-  } };
+  }, rpc(name, params) { const chain = this.from(name); chain.rpcParams = params; return chain; } };
   return { client, calls };
 }
 for (const table of ['student_lesson_attempts','student_weekly_quiz_attempts','student_realm_assessments']) {
@@ -79,3 +82,19 @@ assert.deepEqual((await fetchLiveClassAttempts(incomplete.client,'student_lesson
 const transport = fixture({mutate: n => { if(n === 3) throw new Error('network unavailable'); }});
 assert.equal((await fetchLiveClassAttempts(transport.client,'student_lesson_attempts',['ours'])).data,null);
 console.log('PASS: complete scoped history across API caps, fixed upper bound, failed-page/transport protection, cancellation, malformed pages and concurrent-write recovery.');
+
+const classRows = rows.map(row => ({...row, realm_id:'number', question_results:[{correct:true}], passed:true, placement_result:{week:2}, notes:'Retained override'}));
+for (const [kind,endpoint] of Object.entries({lessons:'get_class_realm_lesson_attempts',quizzes:'get_class_realm_weekly_quiz_attempts',assessments:'student_realm_assessments',overrides:'student_progress_overrides'})) {
+  const test = fixture({data:[...classRows,{...classRows[0],id:id(2001),realm_id:'space'},{...classRows[0],id:id(2002),student_id:'foreign'}]});
+  const result = await fetchClassRealmHistory(test.client,kind,'class-a','number',['ours']);
+  assert.deepEqual(result.data,classRows,`${kind} complete history retains detailed fields`);
+  assert(test.calls.every(call => call.table===endpoint && call.filters.realm_id==='number' && call.filters.student_id[0]==='ours'));
+  if (kind==='lessons' || kind==='quizzes') assert(test.calls.every(call => call.rpcParams.p_class_id==='class-a' && call.rpcParams.p_realm_id==='number'));
+  else assert(test.calls.slice(1).every(call => call.projection.includes(kind==='assessments'?'placement_result,question_results':'teacher_id,reason,notes')));
+  const failed = fixture({data:classRows,failAt:3});
+  assert.equal((await fetchClassRealmHistory(failed.client,kind,'class-a','number',['ours'])).data,null);
+  const emptyClass = fixture();
+  assert.deepEqual(await fetchClassRealmHistory(emptyClass.client,kind,'class-a','number',[]),{data:[],error:null});
+  assert.equal(emptyClass.calls.length,0);
+}
+console.log('PASS: all four canonical class history sources page completely, retain details and scope, and fail without partial data.');

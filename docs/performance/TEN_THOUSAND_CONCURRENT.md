@@ -3,6 +3,28 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Canonical class history pagination — 19 November
+
+The placement compatibility loader now pages its existing lesson/quiz RPCs and
+assessment/teacher-override table reads. Every page keeps the selected roster and
+realm filters and existing permissions. The UUID paging algorithm is shared with
+Live Class and diagnostic reports; no schema, grants, migration or student-side
+endpoint changes are included. A failed page rejects the load without returning
+partial history. Canonical progression calculations are unchanged.
+
+Regression coverage checks all four sources with 1,207 records under a 137-row
+server cap, detailed fields, empty rosters and later-page errors. Local authenticated
+API verification (`scripts/staging/class-realm-history-local.mjs`) matched independent
+table reads for two synthetic teachers: 1,630/1,622 lessons, 523/520 quizzes and
+1,046/1,040 assessments. All eight foreign-class reads returned empty. Local override
+fixtures were empty; populated override pagination is covered by the mock regression.
+Run the local script with the TypeScript alias loader and the existing local fixture
+working directory. No schema or fixture writes are performed (teacher logins create
+auth sessions). Browser flows, concurrent writes and hosted capacity are not covered.
+Complete history can increase requests; this is a correctness fix, not proof of
+10,000-user throughput. The existing compact progress-summary read and student-side
+history queries are unchanged.
+
 ## Live Class attempt-history pagination — 19 November
 
 Follow-up: `WholeMathsDiagnosticPanel` also uses this reader for its class-wide

@@ -4,6 +4,7 @@ import { hasComparableAssessmentGrowth } from "@/lib/assessment-growth";
 
 
 import { supabase } from "@/lib/supabase";
+import { fetchClassRealmHistory } from "@/lib/class-realm-history";
 import { calculateAccuracy } from "@/lib/learning-score";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
@@ -456,26 +457,10 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
   }
 
   const [lessonAttemptsResponse, quizAttemptsResponse, assessmentsResponse, overridesResponse] = await Promise.all([
-    supabase.rpc("get_class_realm_lesson_attempts", {
-      p_class_id: classId,
-      p_realm_id: realmId,
-      p_working_level: null,
-    }),
-    supabase.rpc("get_class_realm_weekly_quiz_attempts", {
-      p_class_id: classId,
-      p_realm_id: realmId,
-      p_working_level: null,
-    }),
-    supabase
-      .from("student_realm_assessments")
-      .select("id,student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,passed,placement_result,question_results,completed_at")
-      .in("student_id", studentIds)
-      .eq("realm_id", realmId),
-    supabase
-      .from("student_progress_overrides")
-      .select("id,student_id,realm_id,working_level,week,advanced_to_week,teacher_id,reason,notes,created_at")
-      .in("student_id", studentIds)
-      .eq("realm_id", realmId),
+    fetchClassRealmHistory(supabase, "lessons", classId, realmId, studentIds),
+    fetchClassRealmHistory(supabase, "quizzes", classId, realmId, studentIds),
+    fetchClassRealmHistory(supabase, "assessments", classId, realmId, studentIds),
+    fetchClassRealmHistory(supabase, "overrides", classId, realmId, studentIds),
   ]);
 
   if (lessonAttemptsResponse.error) {
@@ -493,7 +478,7 @@ export async function fetchRealmCompatProgressForClass(realmId: string, classId:
 
   const builtRows = buildRowsFromRealmData(
     realmRows,
-    (lessonAttemptsResponse.data ?? []) as LessonAttemptRow[],
+    (lessonAttemptsResponse.data ?? []) as unknown as LessonAttemptRow[],
     (quizAttemptsResponse.data ?? []) as WeeklyQuizAttemptRow[],
     (assessmentsResponse.data ?? []) as RealmAssessmentRow[],
     (overridesResponse.data ?? []) as StudentProgressOverrideRow[],

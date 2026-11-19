@@ -73,7 +73,11 @@ assert(migration.includes("public.can_manage_student_progress(p_student_id)"));
 
 assert(teacherDashboard.includes("LIVE_REALM_IDS.map"), "Teacher reporting must remain registry-driven at launch.");
 assert(teacherSnapshot.includes("assessment_attempts"));
-assert(realmCompat.includes('.from("student_realm_assessments")'));
+assert(realmCompat.includes('fetchClassRealmHistory(supabase, "assessments", classId, realmId, studentIds)'));
+const classHistory = read("lib/class-realm-history.ts");
+assert(classHistory.includes('"student_realm_assessments"'));
+assert(classHistory.includes("placement_result,question_results,completed_at"));
+assert(classHistory.includes('.in("student_id", studentIds).eq("realm_id", realmId)'));
 assert(realmCompat.includes("question_results"));
 assert(teacherReplay.includes("getRealmDefinition(realmId).name"));
 // The parent-facing realm label moved to the palette in lib/parent-insights.ts,
