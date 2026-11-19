@@ -589,6 +589,12 @@ function buildDistricts(worldState: NumberNexusLevel3WorldState, selectedDistric
 
 function buildGates(worldState: NumberNexusLevel3WorldState, selectedDistrictId: string | null, guidedAdventure = false): GateDefinition[] {
   if (guidedAdventure) {
+    // The adventure portal opens the week page for the learner's next activity, like every other realm.
+    // The end-of-level test has no week page, so it still opens directly.
+    const next = new URL(worldState.nextActivity.route, "https://reliq.local");
+    const nextWeek = Number(next.searchParams.get("week"));
+    const weekNode = next.pathname === "/posttest" ? undefined : worldState.weekNodes.find((node) => node.week === nextWeek)
+      ?? worldState.weekNodes.find((node) => node.id === worldState.nextActivity.gateId);
     return [{
       id: worldState.nextActivity.gateId,
       label: "START",
@@ -597,8 +603,8 @@ function buildGates(worldState: NumberNexusLevel3WorldState, selectedDistrictId:
       position: [0, 0, -4],
       color: "#22d3c5",
       state: "current",
-      route: worldState.nextActivity.route,
-      week: worldState.currentWeek,
+      route: weekNode?.route ?? worldState.nextActivity.route,
+      week: weekNode?.week ?? worldState.currentWeek,
       interactionDistance: 3.4,
       spawnPointId: `number-${worldState.level.toLowerCase().replace(/\s+/g, "-")}-adventure`,
     }];
