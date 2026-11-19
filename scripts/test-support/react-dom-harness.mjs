@@ -21,6 +21,15 @@ export function domHarness(mocks = {}) {
   dom.window.clearTimeout = id => timers.delete(id);
   dom.window.setInterval = fn => { timers.set(++timerId, { fn, repeat: true }); return timerId; };
   dom.window.clearInterval = dom.window.clearTimeout;
+  // Keep animation callbacks deterministic alongside the other browser timers.
+  // JSDOM has no layout; scrolling is deliberately outside this harness's scope.
+  dom.window.requestAnimationFrame = fn => dom.window.setTimeout(() => fn(dom.window.performance.now()), 16);
+  dom.window.cancelAnimationFrame = dom.window.clearTimeout;
+  dom.window.HTMLElement.prototype.scrollIntoView = () => {};
+  for (const name of ['requestAnimationFrame', 'cancelAnimationFrame']) {
+    previous.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
+    Object.defineProperty(globalThis, name, { configurable: true, writable: true, value: dom.window[name] });
+  }
   const root = createRoot(dom.window.document.getElementById('root'));
   const cache = new Map();
   const Speech = () => null;

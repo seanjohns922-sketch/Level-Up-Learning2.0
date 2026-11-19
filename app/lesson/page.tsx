@@ -1,13 +1,13 @@
 "use client";
 import NumbotArtwork from "@/components/legends/NumbotArtwork";
+import dynamic from "next/dynamic";
 
 import { useBankedXp } from "@/components/lesson/useBankedXp";
 import { Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PracticeRunner } from "@/components/PracticeRunner";
 import { PerformanceSummaryCard } from "@/components/lesson/PerformanceSummaryCard";
-import { Year2LessonEngine, type LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
+import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
 import { generateWeek1Task } from "@/data/activities/year1/week1";
 import { generateWeek2Task } from "@/data/activities/year1/week2";
 import { generateWeek3Task } from "@/data/activities/year1/week3";
@@ -134,6 +134,21 @@ import { generateNumber7Question } from "@/data/activities/year7Number/questions
 import { NUMBER7_READABILITY_REVISION } from "@/data/activities/year7Number/curriculum";
 import { cavernWeekHref } from "@/lib/world3d/shattered-realms";
 import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
+
+function LessonEngineLoading() {
+  return <div role="status" className="grid min-h-40 place-items-center p-6">Preparing your lesson…</div>;
+}
+
+// Keep both engines out of the route's initial bundle. Only the engine selected
+// by the existing lesson branch mounts, so its timers start after it is ready.
+const PracticeRunner = dynamic(
+  () => import("@/components/PracticeRunner").then((module) => module.PracticeRunner),
+  { loading: LessonEngineLoading },
+);
+const Year2LessonEngine = dynamic(
+  () => import("@/components/lesson/Year2LessonEngine").then((module) => module.Year2LessonEngine),
+  { loading: LessonEngineLoading },
+);
 
 function LessonRouteGate() {
  const q=useSearchParams(),pathname=usePathname();

@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-19",
+  "baselineBuildId": "L-HNYNY_gqBB7ahLU-3sY",
+  "candidateBuildId": "2Gjxi_xDCg8k1NxM1hrSa",
+  "caveats": [
+    "Production HTML references only; later dynamic imports and media are excluded.",
+    "Gzip sizes are estimates, not observed HTTP transfer sizes.",
+    "Modern browsers skip nomodule scripts. Cache reuse assumes unchanged chunk URLs.",
+    "This does not measure hydration, rendering, gameplay frame rate or network latency."
+  ],
+  "baseline": [
+    {
+      "route": "/home-base",
+      "modernScripts": 17,
+      "bytes": 827726,
+      "gzipBytes": 243471,
+      "newJourneyBytes": 827726,
+      "newJourneyGzipBytes": 243471,
+      "legacyOnlyBytes": 112594
+    },
+    {
+      "route": "/program",
+      "modernScripts": 22,
+      "bytes": 1268491,
+      "gzipBytes": 360039,
+      "newJourneyBytes": 487059,
+      "newJourneyGzipBytes": 131526,
+      "legacyOnlyBytes": 112594
+    },
+    {
+      "route": "/lesson",
+      "modernScripts": 52,
+      "bytes": 6603831,
+      "gzipBytes": 1660273,
+      "newJourneyBytes": 5502551,
+      "newJourneyGzipBytes": 1345594,
+      "legacyOnlyBytes": 112594
+    }
+  ],
+  "candidate": [
+    {
+      "route": "/home-base",
+      "modernScripts": 17,
+      "bytes": 828311,
+      "gzipBytes": 243685,
+      "newJourneyBytes": 828311,
+      "newJourneyGzipBytes": 243685,
+      "legacyOnlyBytes": 112594
+    },
+    {
+      "route": "/program",
+      "modernScripts": 22,
+      "bytes": 1269076,
+      "gzipBytes": 360253,
+      "newJourneyBytes": 487059,
+      "newJourneyGzipBytes": 131526,
+      "legacyOnlyBytes": 112594
+    },
+    {
+      "route": "/lesson",
+      "modernScripts": 42,
+      "bytes": 4064498,
+      "gzipBytes": 1133703,
+      "newJourneyBytes": 2962633,
+      "newJourneyGzipBytes": 818810,
+      "legacyOnlyBytes": 112594
+    }
+  ],
+  "selectedEngineScenarios": [
+    {
+      "component": "@/components/PracticeRunner",
+      "bytes": 5823682,
+      "gzipBytes": 1497475,
+      "note": "Initial HTML scripts plus the selected engine manifest chunks; not an observed browser trace."
+    },
+    {
+      "component": "@/components/lesson/Year2LessonEngine",
+      "bytes": 5301737,
+      "gzipBytes": 1408750,
+      "note": "Initial HTML scripts plus the selected engine manifest chunks; not an observed browser trace."
+    }
+  ],
+  "browserSmoke": {
+    "environment": "local production build, desktop Chrome, teacher preview with no student account",
+    "passed": [
+      "Year 1 intro, guide, deferred PracticeRunner, correct answer and next question",
+      "Year 2 intro, guide, deferred Year2LessonEngine, correct answer and next question"
+    ],
+    "notTested": [
+      "Mobile and Windows devices",
+      "Throttled network and chunk failure recovery",
+      "Audible speech and server persistence",
+      "Gameplay frame rate",
+      "10,000 users"
+    ]
+  }
+}
