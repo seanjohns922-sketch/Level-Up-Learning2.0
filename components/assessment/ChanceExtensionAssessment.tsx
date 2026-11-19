@@ -1,7 +1,8 @@
 "use client";
 
 import {getRealmTheme} from '@/lib/useRealmTheme';
-import {ExtensionPostTestNotYet,extensionPlanWeeks,extensionPostTestResult} from './ExtensionPostTestNotYet';
+import {ExtensionPostTestNotYet,extensionPostTestResult} from './ExtensionPostTestNotYet';
+import {extensionPlanWeeks} from '@/lib/extension-plan-weeks';
 import {ASSESSMENT_THRESHOLDS} from '@/lib/assessment-rules';
 import {useEffect,useState} from 'react';
 import {useRouter} from 'next/navigation';

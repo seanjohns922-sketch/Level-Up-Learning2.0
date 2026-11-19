@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from 'react';
-import {ExtensionPostTestNotYet,extensionPlanWeeks,extensionPostTestResult} from './ExtensionPostTestNotYet';
+import {ExtensionPostTestNotYet,extensionPostTestResult} from './ExtensionPostTestNotYet';
+import {extensionPlanWeeks} from '@/lib/extension-plan-weeks';
 import {ASSESSMENT_THRESHOLDS} from '@/lib/assessment-rules';
 import {useRouter} from 'next/navigation';
 import AssessmentShell from './AssessmentShell';
