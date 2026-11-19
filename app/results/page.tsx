@@ -1,6 +1,9 @@
 "use client";
 
 import { comparableAssessmentGrowth, hasComparableAssessmentGrowth, isGroundBaseline } from "@/lib/assessment-growth";
+import { useInBrowser } from "@/lib/use-in-browser";
+import { PostTestNotYet, postTestNotYetMessage } from "@/components/assessment/PostTestNotYet";
+import type { RealmLessonThemeId } from "@/components/lesson/RealmLessonHome";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -160,8 +163,15 @@ function assessmentProfileFromRow(value: unknown): AssessmentResultProfile | nul
     : null;
 }
 
+const RESULTS_LOADING = <div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading…</p></div>;
+
 export default function ResultsPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-muted-foreground">Loading…</p></div>}><ResultsPage /></Suspense>;
+  return <Suspense fallback={RESULTS_LOADING}><ResultsInBrowser /></Suspense>;
+}
+
+/** Results are built from saved progress, so they render only in the browser (no server/browser mismatch). */
+function ResultsInBrowser() {
+  return useInBrowser() ? <ResultsPage /> : RESULTS_LOADING;
 }
 
 /* ── animated circular progress ring ── */
@@ -449,7 +459,10 @@ function ResultsPage() {
   const getMessage = () => {
     if (baselineOnly) return { icon: "play", title: "Starting Point Recorded", sub: "Your first score is saved. Start your Ground program and see what you learn." };
     if (passed) return { icon: "star", title: isPostTest ? "Level Mastered" : "Pre-Test Passed", sub: isPostTest ? "You've proven your skills — collect your Legend." : "Strong result — moving to the next level." };
-    if (isPostTest) return { icon: "arrow", title: "Not Quite Yet", sub: `You need ${POSTTEST_PASS_THRESHOLD}% to pass. Review the suggested weeks and try again.` };
+    if (isPostTest) {
+      const notYet = postTestNotYetMessage(score, total, scorePercent);
+      return { icon: "arrow", title: notYet.title, sub: notYet.sub };
+    }
     if (scorePercent >= 70) return { icon: "arrow", title: "Nearly There", sub: "Strong attempt. Your personalised program will close the gap." };
     return { icon: "play", title: "Program Assigned", sub: "Your learning path is ready — work through it week by week." };
   };
@@ -485,13 +498,14 @@ function ResultsPage() {
         ? `You can choose Start ${formatStudentLevelLabel(nextYear)} Pre-Test or Go to Levels.`
         : "You can choose Enter the Tower or Go to Levels."
     : isPostTest
-      ? "You can choose Continue, Practise weak areas, or Retry Post-Test."
+      ? `You can choose ${assignedReviewWeek ? `Start Week ${assignedReviewWeek}, ` : ""}Practise weak areas${assessmentReviewItems.length > 0 ? ", Review my answers" : ""}, Retry post-test, or Back to realm.`
       : `You can choose ${requiresFullPathway ? "Start Full Pathway" : `Start Required Pathway at Week ${assignedStartWeek}`} or Go to Levels.`;
   const nextSteps = isPostTest && !passed
     ? [
-        "Review any week's lessons.",
-        "Retry the post-test when ready.",
-        `Score ${POSTTEST_PASS_THRESHOLD} percent or more to unlock your Legend.`,
+        assignedReviewWeek ? `Start with Week ${assignedReviewWeek}.` : "Replay the weeks you found tricky.",
+        "Then retry the post-test.",
+        `Score ${POSTTEST_PASS_THRESHOLD} percent or more to unlock your RELIQ card.`,
+        "Once you've finished your plan, you can replay any week and retry the post-test whenever you're ready.",
       ]
     : [
         "Complete 3 lessons every week.",
@@ -557,6 +571,43 @@ function ResultsPage() {
             realmId,
           }));
         } : undefined}
+      />
+    );
+  }
+
+  if (isPostTest && !passed) {
+    const planWeeks = (storedPosttestProfile?.recommendedWeeks ?? []).slice(0, 3).map((week) => ({
+      week,
+      skill: storedPosttestProfile?.weakAreas.find((area) => area.linkedWeeks.includes(week))?.skillLabel,
+    }));
+    const firstLessonTarget = storedPosttestProfile?.recommendedLessonTargets[0];
+    return (
+      <PostTestNotYet
+        realmId={progressRealmId as RealmLessonThemeId}
+        realmName={realmSpokenName}
+        levelLabel={studentLevelLabel}
+        levelNumber={year === "Prep" ? 0 : Number.parseInt(year.replace(/\D/g, ""), 10) || 1}
+        year={year}
+        score={score}
+        total={total}
+        percent={displayPercent}
+        planWeeks={planWeeks}
+        strengths={topStrengths.slice(0, 2).map((item) => item.skillLabel)}
+        growth={storedPretestProfile && storedPosttestProfile ? {
+          from: storedPretestProfile.percentage,
+          to: storedPosttestProfile.percentage,
+          strongest: strongestGrowth?.skillLabel,
+          keepPractising: keepPractising?.skillLabel,
+        } : null}
+        speech={resultsSpeech}
+        speechKey={`assessment-results-${progressRealmId}-${year}-posttest`}
+        onStartWeek={(week) => router.push(`/program?${new URLSearchParams({ year, week: String(week) }).toString()}&legacy=1${realmParam}`)}
+        onPractise={() => firstLessonTarget
+          ? router.push(buildLessonRoute({ yearLabel: year, week: firstLessonTarget.week, lessonNumber: firstLessonTarget.lessons?.[0] ?? 1, realmId }))
+          : goAssignedWeek()}
+        onReview={assessmentReviewItems.length > 0 ? () => setShowAssessmentReview(true) : undefined}
+        onRetry={goRetryPostTest}
+        onBack={goContinue}
       />
     );
   }
@@ -691,19 +742,6 @@ function ResultsPage() {
                     : nextYear
                     ? `Pre-test passed. Up next: ${nextStudentLevelLabel}.`
                     : "Final pre-test passed — all Legends are ready to collect."}
-                </p>
-              </div>
-            ) : isPostTest ? (
-              <div className="rounded-2xl p-4 border border-amber-400/20 bg-amber-500/5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="rgb(252 211 77)" strokeWidth="2.5" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 8v4M12 16h.01" />
-                  </svg>
-                  <span className="font-bold text-sm text-amber-200">Keep Going</span>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {POSTTEST_PASS_THRESHOLD}% required to pass. Revisit the recommended weeks below and retry when ready.
                 </p>
               </div>
             ) : (
@@ -875,18 +913,6 @@ function ResultsPage() {
                   </div>
                 ) : null}
 
-                {!passed && storedPosttestProfile.recommendedWeeks.length > 0 ? (
-                  <div className="rounded-2xl bg-white/5 border border-white/10 p-4">
-                    <div className="font-bold text-sm text-white mb-2">Start here</div>
-                    <div className="space-y-2">
-                      {storedPosttestProfile.recommendedWeeks.slice(0, 3).map((week, index) => (
-                        <div key={week} className="text-xs text-slate-300">
-                          {index === 0 ? `Start with Week ${week}` : `Then revisit Week ${week}`}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
               </>
             ) : null}
 
@@ -904,18 +930,11 @@ function ResultsPage() {
                 What&apos;s next?
               </div>
               <div className="space-y-2.5">
-                {(isPostTest && !passed
-                  ? [
-                      "Review any week's lessons",
-                      "Retry the post-test when ready",
-                      `Score ${POSTTEST_PASS_THRESHOLD}%+ to unlock your Legend`,
-                    ]
-                  : [
-                      "3 lessons every week",
-                      "1 quiz to test your skills",
-                      "Legends unlock with mastery",
-                    ]
-                ).map((text) => (
+                {[
+                  "3 lessons every week",
+                  "1 quiz to test your skills",
+                  "Legends unlock with mastery",
+                ].map((text) => (
                   <div key={text} className="flex items-center gap-3 text-xs text-slate-300">
                     <span
                       className="flex-shrink-0 w-1.5 h-1.5 rounded-full"
@@ -964,29 +983,6 @@ function ResultsPage() {
                   className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
                 >
                   Go to Levels
-                </button>
-              </>
-            ) : isPostTest ? (
-              <>
-                <button
-                  onClick={goContinue}
-                  className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-[0.98]"
-                  style={{ background: theme.ctaGradientCss, boxShadow: theme.ctaShadow }}
-                >
-                  Continue
-                </button>
-                <button
-                  onClick={goAssignedWeek}
-                  className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 transition-all active:scale-[0.98]"
-                  style={{ boxShadow: "0 10px 30px -8px rgba(245, 158, 11, 0.5)" }}
-                >
-                  Practise weak areas
-                </button>
-                <button
-                  onClick={goRetryPostTest}
-                  className="w-full py-3 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
-                >
-                  Retry Post-Test
                 </button>
               </>
             ) : (

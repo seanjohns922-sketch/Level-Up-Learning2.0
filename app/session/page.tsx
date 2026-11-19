@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useInBrowser } from "@/lib/use-in-browser";
 import { taskNeedsPagePrompt } from "@/lib/task-prompt";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
@@ -7965,7 +7966,6 @@ function makeSubtractionCountUpQuestion(): QuizQuestion {
 }
 
 const SESSION_LOADING = <div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>;
-const subscribeNever = () => () => {};
 
 export default function SessionPageWrapper() {
   return <Suspense fallback={SESSION_LOADING}><SessionPageRouteInstance /></Suspense>;
@@ -7974,7 +7974,7 @@ export default function SessionPageWrapper() {
 function SessionPageRouteInstance() {
   // Quizzes pick their questions at random, so the page is drawn only in the browser:
   // a server render would choose different questions and the browser would redraw it.
-  const inBrowser = useSyncExternalStore(subscribeNever, () => true, () => false);
+  const inBrowser = useInBrowser();
   const sp = useSearchParams();
   const pathname=usePathname();
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 3");
