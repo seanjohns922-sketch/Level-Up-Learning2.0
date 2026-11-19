@@ -150,6 +150,7 @@ export function SharedThirdPersonPlayer({
   groundHeightAt,
   canStandAt,
   speedFactorAt,
+  bounceAt,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -177,6 +178,8 @@ export function SharedThirdPersonPlayer({
   canStandAt?: (x: number, z: number) => boolean;
   /** Optional terrain speed: 1 is normal, less is slower (wading). */
   speedFactorAt?: (x: number, z: number) => number;
+  /** Optional trampolines: bounce power at a spot (0 means no bounce). */
+  bounceAt?: (x: number, z: number) => number;
 }) {
   const keys = useRef(new Set<string>());
   const baseY = useRef(initialPosition[1]);
@@ -341,7 +344,7 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></WorldAvatarJump></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></WorldAvatarJump></group>;
 }
 
 function WorldJumpButton({ onJump }: { onJump: () => void }) {

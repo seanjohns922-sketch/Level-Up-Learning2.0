@@ -3,6 +3,8 @@
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
 import type { PremiumHomeLevel, PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
+import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
 import { C, M, Apartment, Ball, BigTrunk, Block, Bush, Chimney, Deck, Door, FairyLights, FlatRoof, GableRoof, GlassRail, GlassWall, GoldSparkle, Lantern, LeafCloud, LedStrip, Mat, Picket, Planter, Pod, Pool, RopeLadder, Slats, Slide, Solar, Stones, Walls, Window , type V3 } from "./HomeKit";
 
 type Night = { night: boolean };
@@ -286,9 +288,11 @@ const MODELS: Record<PremiumHomeStyle, readonly [(p: Night) => ReactElement, (p:
   modern: [ModernL1, ModernL2, ModernL3, ModernL4],
   treehouse: [TreeL1, TreeL2, TreeL3, TreeL4],
   apartment: [AptL1, AptL2, AptL3, AptL4],
+  fair: FAIR_RIDE_MODELS,
+  trampoline: TRAMPOLINE_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
-const STYLE_DEPTH_OFFSET: Record<PremiumHomeStyle, number> = { cottage: -1.3, modern: -0.75, treehouse: -1.15, apartment: -0.6 };
+const STYLE_DEPTH_OFFSET: Record<PremiumHomeStyle, number> = { cottage: -1.3, modern: -0.75, treehouse: -1.15, apartment: -0.6, fair: 0, trampoline: 0 };
 /** Wider levels add a wing or a second tree to one side; this keeps each level centred on its plot. */
 const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, number>> = {
   "cottage-4": -0.6,

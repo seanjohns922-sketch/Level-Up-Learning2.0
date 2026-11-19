@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
-import { advanceWorldJump, createWorldJump, startWorldJump, resetWorldJump, WORLD_JUMP_DURATION, WORLD_JUMP_HEIGHT } from '../lib/world3d/avatar-jump.ts';
+import { advanceWorldJump, createWorldJump, isWorldJumpGrounded, startWorldJump, resetWorldJump, WORLD_JUMP_DURATION, WORLD_JUMP_HEIGHT } from '../lib/world3d/avatar-jump.ts';
 
 // Same landing/height at different frame rates, no airborne double-jump or queue.
 for (const fps of [20, 30, 60, 120]) {
@@ -20,6 +20,19 @@ for (const fps of [20, 30, 60, 120]) {
   assert.equal(startWorldJump(state), true);
   resetWorldJump(state);
   assert.equal(advanceWorldJump(state, 1 / fps), 0);
+}
+
+// Trampoline bounces: power 2 goes twice as high and lands; mid-air presses never restart.
+{
+  const state = createWorldJump();
+  assert.equal(startWorldJump(state, 2), true);
+  let peak = 0, frames = 0;
+  while (!isWorldJumpGrounded(state) && frames < 500) { assert.equal(startWorldJump(state, 3), false); peak = Math.max(peak, advanceWorldJump(state, 1 / 60)); frames++; }
+  assert.ok(Math.abs(peak - WORLD_JUMP_HEIGHT * 2) < .02, 'power 2 doubles the height');
+  assert.ok(frames > WORLD_JUMP_DURATION * 60, 'a bigger bounce stays in the air longer');
+  assert.equal(advanceWorldJump(state, 1 / 60), 0);
+  resetWorldJump(state);
+  assert.equal(state.power, 1);
 }
 
 // Execute actual jump component handlers with shallow controlled hooks.
@@ -48,7 +61,7 @@ new Function('require', 'module', 'exports', 'window', 'document', 'HTMLElement'
   if (name === 'react') return hooks;
   if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }) };
   if (name === '@react-three/fiber') return { useFrame: fn => { frame = fn; } };
-  if (name === '@/lib/world3d/avatar-jump') return { advanceWorldJump, createWorldJump, startWorldJump, resetWorldJump };
+  if (name === '@/lib/world3d/avatar-jump') return { advanceWorldJump, createWorldJump, isWorldJumpGrounded, startWorldJump, resetWorldJump };
   throw Error(`Unexpected import: ${name}`);
 }, module, module.exports, events, { ...events, querySelector: () => modal }, Element);
 const group = { position: { y: 0 } };

@@ -1,10 +1,11 @@
 import type { EconomyItem } from "@/lib/economy";
 
-/** Premium homes: four styles, each with four levels.
+/** Premium upgradeable items: the four home styles plus the Fair Ride and the trampoline,
+ * each with four levels. ("Home" in the names is historical; the live shop rows use it.)
  * Unlocking a style and each upgrade are ordinary XP purchases, so the server
  * checks the balance and records ownership. A style's level is the highest
  * upgrade the learner owns; every copy they place shows that level. */
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline"] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -18,7 +19,13 @@ type StyleSpec = {
   gridSize: `${number}x${number}`;
   accent: string;
   icon: string;
+  /** World model key; the shop row is central_world_plot_1_<assetKey>. */
+  assetKey: string;
+  marketplaceCategory: "buildings" | "pools_play";
+  upgradePrefix: string;
 };
+const HOME = { marketplaceCategory: "buildings", upgradePrefix: "central_world_home_upgrade_" } as const;
+const SET_PIECE = { marketplaceCategory: "pools_play", upgradePrefix: "central_world_set_upgrade_" } as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -29,6 +36,8 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     gridSize: "8x5",
     accent: "#ff5e57",
     icon: "house",
+    assetKey: "home_cottage",
+    ...HOME,
   },
   modern: {
     name: "Modern Home",
@@ -38,6 +47,8 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     gridSize: "5x5",
     accent: "#3a3f4a",
     icon: "house",
+    assetKey: "home_modern",
+    ...HOME,
   },
   treehouse: {
     name: "Treehouse Home",
@@ -47,6 +58,8 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     gridSize: "7x6",
     accent: "#48c25a",
     icon: "trees",
+    assetKey: "home_treehouse",
+    ...HOME,
   },
   apartment: {
     name: "Apartment Block",
@@ -56,13 +69,36 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     gridSize: "5x4",
     accent: "#7fa8c9",
     icon: "building-2",
+    assetKey: "home_apartment",
+    ...HOME,
+  },
+  fair: {
+    name: "Fair Ride",
+    description: "A whole fairground that grows with you: carousel, swing ride, then a towering Ferris wheel that glows at night.",
+    levels: ["Grand Carousel", "Carousel and Swing Ride", "Ferris Wheel Fair", "Giant Neon Fair"],
+    prices: [900, 700, 1400, 2800],
+    gridSize: "20x13",
+    accent: "#ff4fd8",
+    icon: "ferris-wheel",
+    assetKey: "ride_fair",
+    ...SET_PIECE,
+  },
+  trampoline: {
+    name: "Trampoline",
+    description: "Jump on and bounce! Every upgrade bounces you higher, up to a glowing trampoline park.",
+    levels: ["Mini Trampoline", "Big Trampoline", "Trampoline and Foam Pit", "Trampoline Park"],
+    prices: [250, 250, 500, 1000],
+    gridSize: "6x6",
+    accent: "#3fd0ff",
+    icon: "party-popper",
+    assetKey: "play_trampoline",
+    ...SET_PIECE,
   },
 };
 
-const ASSET_PREFIX = "home_";
-export const premiumHomeAssetKey = (style: PremiumHomeStyle) => `${ASSET_PREFIX}${style}`;
+export const premiumHomeAssetKey = (style: PremiumHomeStyle) => PREMIUM_HOME_SPECS[style].assetKey;
 export const premiumHomeItemKey = (style: PremiumHomeStyle) => `central_world_plot_1_${premiumHomeAssetKey(style)}`;
-export const premiumHomeUpgradeKey = (style: PremiumHomeStyle, level: 2 | 3 | 4) => `central_world_home_upgrade_${style}_${level}`;
+export const premiumHomeUpgradeKey = (style: PremiumHomeStyle, level: 2 | 3 | 4) => `${PREMIUM_HOME_SPECS[style].upgradePrefix}${style}_${level}`;
 
 const STYLE_BY_ASSET = new Map(PREMIUM_HOME_STYLES.map((style) => [premiumHomeAssetKey(style), style]));
 export function premiumHomeStyle(assetKey: unknown): PremiumHomeStyle | null {
@@ -106,14 +142,14 @@ export const PREMIUM_HOME_SHOP_ITEMS: EconomyItem[] = PREMIUM_HOME_STYLES.map((s
     item_key: premiumHomeItemKey(style),
     name: spec.name,
     description: `${spec.description} Unlock once, place as many as you like, and upgrade it through four levels.`,
-    rarity: index < 2 ? "rare" : "epic",
+    rarity: style === "fair" ? "legendary" : index < 2 || style === "trampoline" ? "rare" : "epic",
     price: spec.prices[0],
     icon: spec.icon,
     accent: spec.accent,
     sort_order: 5 + index,
     metadata: {
       slot: "world_plot_1", worldPlotId: "customisation-plot-1",
-      worldAssetKey: assetKey, worldArea: "buildings", marketplaceCategory: "buildings",
+      worldAssetKey: assetKey, worldArea: spec.marketplaceCategory, marketplaceCategory: spec.marketplaceCategory,
       worldCollection: "country", gridSize: spec.gridSize, tier: 1, premiumHome: style,
       marketplace_visual: { type: "asset", src: `/marketplace/world-renders/${assetKey}.webp`, alt: `${spec.name}: the actual world model`, previewMode: "world" },
     },
@@ -140,3 +176,16 @@ export const PREMIUM_HOME_UPGRADE_ITEMS: EconomyItem[] = PREMIUM_HOME_STYLES.fla
 );
 
 export const PREMIUM_HOME_ITEM_KEYS = new Set([...PREMIUM_HOME_SHOP_ITEMS, ...PREMIUM_HOME_UPGRADE_ITEMS].map((item) => item.item_key));
+
+/** Trampoline bounce by level: how far from the centre it catches the avatar (world metres) and how high it throws. */
+export const TRAMPOLINE_BOUNCE: Record<PremiumHomeLevel, { radius: number; power: number }> = {
+  1: { radius: 1.6, power: 1.6 },
+  2: { radius: 2.4, power: 2.0 },
+  3: { radius: 3.2, power: 2.4 },
+  4: { radius: 4.2, power: 3.0 },
+};
+/** Bounce power at a spot, given the trampolines placed in the world and the learner's trampoline level. */
+export function trampolineBounceAt(x: number, z: number, trampolines: readonly { x: number; z: number }[], level: PremiumHomeLevel) {
+  const { radius, power } = TRAMPOLINE_BOUNCE[level];
+  return trampolines.some((t) => (x - t.x) ** 2 + (z - t.z) ** 2 <= radius * radius) ? power : 0;
+}

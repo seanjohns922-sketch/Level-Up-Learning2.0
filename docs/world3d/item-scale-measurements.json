@@ -176,5 +176,7 @@
   {"key":"home_cottage","name":"Cottage","native":[14.400024,12.336,9.48],"size":[14.400024,12.336,9.48],"footprint":[16,10]},
   {"key":"home_modern","name":"Modern Home","native":[9.504012,9.492024,8.112],"size":[9.504012,9.492024,8.112],"footprint":[10,10]},
   {"key":"home_treehouse","name":"Treehouse Home","native":[13.0098,17.872317,11.687193],"size":[13.0098,17.872317,11.687193],"footprint":[14,12]},
-  {"key":"home_apartment","name":"Apartment Block","native":[8.736,21.912012,7.008],"size":[8.736,21.912012,7.008],"footprint":[10,8]}
+  {"key":"home_apartment","name":"Apartment Block","native":[8.736,21.912012,7.008],"size":[8.736,21.912012,7.008],"footprint":[10,8]},
+  {"key":"ride_fair","name":"Fair Ride","native":[38.400023,33.734412,24],"size":[38.400023,33.734412,24],"footprint":[40,26]},
+  {"key":"play_trampoline","name":"Trampoline","native":[10.512,4.514366,10.512],"size":[10.512,4.514366,10.512],"footprint":[12,12]}
 ]

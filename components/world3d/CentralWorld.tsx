@@ -5,13 +5,13 @@ import "./world-editor-mobile.css";
 import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
-import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeLevels, PREMIUM_HOME_SPECS, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/PremiumHomeUpgradeRows";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
@@ -324,6 +324,14 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     setActiveTargetId(id);
     onActiveTarget(id);
   }, [onActiveTarget]);
+  // Placed trampolines make the avatar bounce; higher trampoline levels bounce higher.
+  const trampolineLevel = useContext(PremiumHomeWorldContext).levels.trampoline;
+  const trampolines = useMemo(() => placedCustomisations.flatMap((placement) => {
+    if (premiumHomeStyle(itemsById.get(placement.itemId)?.metadata.worldAssetKey) !== "trampoline") return [];
+    const [x, , z] = gridToWorld(placement.gridX, placement.gridZ);
+    return [{ x, z }];
+  }), [placedCustomisations, itemsById]);
+  const bounceAt = useMemo(() => trampolines.length ? (x: number, z: number) => trampolineBounceAt(x, z, trampolines, trampolineLevel) : undefined, [trampolines, trampolineLevel]);
   return (
     <>
       {hubV2 ? <>
@@ -400,6 +408,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         groundHeightAt={hubV2 ? hubGroundHeight : undefined}
         canStandAt={hubV2 ? hubCanStand : undefined}
         speedFactorAt={hubV2 ? hubSpeedFactor : undefined}
+        bounceAt={bounceAt}
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
