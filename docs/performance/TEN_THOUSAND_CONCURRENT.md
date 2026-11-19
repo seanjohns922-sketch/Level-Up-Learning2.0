@@ -3,6 +3,52 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Shared authorised attempt scope prototype — 19 November
+
+`scripts/staging/scoped-attempts-local.mjs` tests a local SQL prototype that checks
+`can_view_student_learning` once for each requested student, then reuses that
+authorised list for the lesson, quiz and assessment reads. It returns only the
+columns requested by the existing dashboard. All functions live in `pg_temp`;
+membership experiments run inside rollback transactions. There is no public API,
+application change, migration or production permission change.
+
+The prototype supports only explicit lists of at most 500 IDs. It deduplicates IDs
+and supports an empty list. If any requested student is missing or unauthorised,
+or an element is null, it returns `supported:false` with **no data**. That is an
+explicit compatibility signal: a future client would use the original RLS reads
+for the whole request, preserving legacy access semantics. It must never treat an
+unsupported scope as an empty successful dashboard. Missing authentication is an
+error; anonymous execute is revoked. Arbitrary errors must not trigger fallback.
+
+The final rollback-only run passed 147 cases:
+
+- 80 own-class comparisons across 20 synthetic teachers, with baseline/candidate
+  order alternated equally. All three complete projected result sets matched.
+- 20 mixed-school scopes declined without returning data; 20 empty and 20
+  duplicated-ID cases retained the existing query semantics.
+- Support, principal, school-admin and platform-admin cross-school reads matched
+  direct RLS. Revoked membership, null elements and unknown students declined.
+- Additional assertions rejected null/oversized lists and missing identity, and
+  verified that anonymous execute was not granted.
+
+Mean time for the **combined three SQL reads**, including deterministic JSON
+aggregation, was 259.974 ms for direct RLS versus 28.316 ms for the prototype
+(about 9.2x faster). An initial 124-case run measured 257.209 versus 28.009 ms.
+These are sequential local SQL measurements, **not concurrent HTTP latency or a
+production capacity result**. Both sides return the same projected rows; the
+prototype avoids repeated per-attempt authorisation work.
+
+Next: validate the compatibility fallback with actual API roles, legacy ownership,
+individual assignments and assignment revocation; resolve transport pagination
+(JSON arrays do not inherit PostgREST's row limit); measure the complete six-source
+dashboard under concurrent teacher and student load. Keep production unchanged
+until those checks pass. This prototype is not a migration ready to apply.
+
+Summary: `docs/performance/scoped-attempts-probe-2026-11-19.json`. Full local evidence:
+`/Users/seanjohns/reliq-audits/2026-11-19/scoped-attempts/scoped-attempts-result.json`.
+Run the absolute script path with Node 24 from the checkout containing the isolated
+local fixtures. Targeted ESLint, Node syntax and whitespace checks passed.
+
 ## Compact workload database profile — 19 November
 
 The existing local transaction profiler now labels compact-event RPC statements

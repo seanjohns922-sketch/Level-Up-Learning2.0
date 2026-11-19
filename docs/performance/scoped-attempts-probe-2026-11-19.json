@@ -1,0 +1,73 @@
+{
+  "at": "2026-11-19T01:08:46.085Z",
+  "environment": "local rollback-only scoped attempt prototype",
+  "baselineMeanMs": 259.9739624999999,
+  "candidateMeanMs": 28.315650000000012,
+  "limitation": "SQL prototype only; unsupported scopes require original RLS reads. No HTTP endpoint, application integration, browser test or 10,000-user proof.",
+  "caseCount": 147,
+  "caseSummary": {
+    "teacher": {
+      "cases": 80,
+      "supported": 80,
+      "unsupported": 0
+    },
+    "mixed-school": {
+      "cases": 20,
+      "supported": 0,
+      "unsupported": 20
+    },
+    "empty": {
+      "cases": 20,
+      "supported": 20,
+      "unsupported": 0
+    },
+    "duplicates": {
+      "cases": 20,
+      "supported": 20,
+      "unsupported": 0
+    },
+    "support_staff": {
+      "cases": 1,
+      "supported": 1,
+      "unsupported": 0
+    },
+    "principal": {
+      "cases": 1,
+      "supported": 1,
+      "unsupported": 0
+    },
+    "school_admin": {
+      "cases": 1,
+      "supported": 1,
+      "unsupported": 0
+    },
+    "revoked": {
+      "cases": 1,
+      "supported": 0,
+      "unsupported": 1
+    },
+    "platform-admin-cross-school": {
+      "cases": 1,
+      "supported": 1,
+      "unsupported": 0
+    },
+    "null-element": {
+      "cases": 1,
+      "supported": 0,
+      "unsupported": 1
+    },
+    "unknown-student": {
+      "cases": 1,
+      "supported": 0,
+      "unsupported": 1
+    }
+  },
+  "additionalAssertions": [
+    "Missing authenticated identity rejected",
+    "Anonymous EXECUTE not granted",
+    "Null scope rejected",
+    "Over-500 scope rejected",
+    "Every supported response equals all three direct RLS result sets",
+    "Unsupported responses contain no data"
+  ]
+}
