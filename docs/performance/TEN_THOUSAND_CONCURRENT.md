@@ -3,6 +3,50 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Production-reader load baseline — 19 November
+
+The local `dashboard-mixed` capacity scenario now uses the application's shared
+`fetchLiveClassAttempts` reader for lessons, quizzes and assessments instead of
+single capped queries. Final exact counts independently check completeness and
+unique IDs for each history. Logical helper successes without an HTTP `status`
+are recorded as 200; API errors remain failures. The report identifies this as
+`production-attempt-pagination-v2` and explicitly describes its closed-loop pacing.
+
+Two sequential 60-second runs used 100 distinct synthetic students and four ordinary
+teachers, with the production incremental event reader and 30-second dashboard
+refreshes. These are API protocol rehearsals, not actual browser sessions.
+
+| Local setup | Dashboard p95 | Login p95 | Request failures | Preliminary gate |
+| --- | ---: | ---: | ---: | --- |
+| No students(class_id) index | 2,522 ms | 771 ms | 0 | Failed |
+| Temporary equivalent of existing class index | 979 ms | 373 ms | 0 | Passed |
+
+Both runs verified all 100 students' persisted activity, 201 activity writes and
+201 new events reaching teachers exactly once. Each class returned 1,609–1,630
+lessons, 516–523 quizzes and 1,032–1,046 assessments, matching independent counts.
+The indexed run had event-loop p99 delay of 11 ms and about 2.3% utilization.
+Only 12 dashboard refreshes were measured per run; p95 is effectively the maximum
+at this sample size. Sequential runs also differ in cache warmth and event history.
+This comparison does not establish a controlled performance improvement or capacity.
+
+The class index is **already existing migration work**, not a new deployment change.
+Its hosted presence remains independently unverified. The local temporary index was
+removed and the gateway configuration restored, both verified after testing.
+Synthetic activity/event fixtures remain in the isolated local database. No product,
+permission, migration, scoring or display changes were made in this step.
+
+Evidence: `capacity-pagination-100-unindexed-2026-11-19.json` and
+`capacity-pagination-100-indexed-2026-11-19.json`. Syntax, targeted ESLint,
+`qa:live-class-attempt-read` and `qa:staging-config` passed. No production build was
+needed for this test-runner/documentation-only change.
+
+Next gate: repeat a longer 100-student run with the existing-index equivalent,
+then progress to 250 and 500 only while integrity and latency targets pass.
+Canonical completions/retries, realtime subscriptions, browser/device rendering,
+fixed arrival-rate overload, production-like hosting and long soaks remain separate
+requirements. This short pass does not supersede earlier failed 500-student tests
+and is not evidence for 10,000 concurrent users.
+
 ## Canonical class history pagination — 19 November
 
 The placement compatibility loader now pages its existing lesson/quiz RPCs and

@@ -1,0 +1,467 @@
+{
+  "at": "2026-11-19T09:01:49.270Z",
+  "environment": "local protocol rehearsal; not production capacity certification",
+  "workloadStartedAt": "2026-11-19T09:00:48.393Z",
+  "databaseTracing": false,
+  "dashboardHttpProfiling": false,
+  "dashboardChecks": [
+    {
+      "historyCounts": [
+        1622,
+        520,
+        1040
+      ],
+      "refreshes": 3,
+      "observedNewEvents": 50,
+      "finalRowCounts": [
+        25,
+        6281,
+        1622,
+        520,
+        1040,
+        25
+      ]
+    },
+    {
+      "historyCounts": [
+        1630,
+        523,
+        1046
+      ],
+      "refreshes": 3,
+      "observedNewEvents": 50,
+      "finalRowCounts": [
+        25,
+        6284,
+        1630,
+        523,
+        1046,
+        25
+      ]
+    },
+    {
+      "historyCounts": [
+        1614,
+        518,
+        1036
+      ],
+      "refreshes": 3,
+      "observedNewEvents": 51,
+      "finalRowCounts": [
+        25,
+        6277,
+        1614,
+        518,
+        1036,
+        25
+      ]
+    },
+    {
+      "historyCounts": [
+        1609,
+        516,
+        1032
+      ],
+      "refreshes": 3,
+      "observedNewEvents": 50,
+      "finalRowCounts": [
+        25,
+        6337,
+        1609,
+        516,
+        1032,
+        25
+      ]
+    }
+  ],
+  "dashboardMode": "six-source periodic refresh with production incremental event reader; no realtime subscription",
+  "expectedNewEvents": 201,
+  "clientProfile": {
+    "eventLoopDelayP99Ms": 11,
+    "eventLoopDelayMaxMs": 47,
+    "eventLoopUtilization": 0.023075728222833023
+  },
+  "scenario": "dashboard-mixed",
+  "restRoute": "gateway",
+  "loginRampSeconds": 0,
+  "students": 100,
+  "teachers": 4,
+  "provisionedStudents": 100,
+  "historyEvents": 20000,
+  "durationSeconds": 61,
+  "requests": 1291,
+  "requestUnits": "student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total",
+  "snapshotHttpRequests": 251,
+  "failedRequests": 0,
+  "verifiedPresenceStudents": 100,
+  "verifiedActivityWrites": 201,
+  "failures": [],
+  "endpoints": [
+    {
+      "name": "teacher_login",
+      "timings": {
+        "headersMs": {
+          "samples": 4,
+          "p95": 110,
+          "p99": 110,
+          "max": 110
+        },
+        "upstreamMs": {
+          "samples": 4,
+          "p95": 99,
+          "p99": 99,
+          "max": 99
+        },
+        "proxyMs": {
+          "samples": 4,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      },
+      "requests": 4,
+      "failedRequests": 0,
+      "p95Ms": 110,
+      "p99Ms": 110,
+      "maximumMs": 110
+    },
+    {
+      "name": "student_login_lookup",
+      "timings": {
+        "headersMs": {
+          "samples": 100,
+          "p95": 373,
+          "p99": 507,
+          "max": 512
+        },
+        "upstreamMs": {
+          "samples": 100,
+          "p95": 345,
+          "p99": 479,
+          "max": 483
+        },
+        "proxyMs": {
+          "samples": 100,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        }
+      },
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 373,
+      "p99Ms": 508,
+      "maximumMs": 512
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 100,
+          "p95": 415,
+          "p99": 553,
+          "max": 603
+        },
+        "upstreamMs": {
+          "samples": 100,
+          "p95": 411,
+          "p99": 545,
+          "max": 598
+        },
+        "proxyMs": {
+          "samples": 100,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        }
+      },
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 415,
+      "p99Ms": 553,
+      "maximumMs": 603
+    },
+    {
+      "name": "dashboard_daily_activity",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 310,
+      "p99Ms": 310,
+      "maximumMs": 310
+    },
+    {
+      "name": "dashboard_live_activity",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 250,
+      "p99Ms": 250,
+      "maximumMs": 250
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 100,
+          "p95": 355,
+          "p99": 523,
+          "max": 608
+        },
+        "upstreamMs": {
+          "samples": 100,
+          "p95": 352,
+          "p99": 519,
+          "max": 603
+        },
+        "proxyMs": {
+          "samples": 100,
+          "p95": 1,
+          "p99": 1,
+          "max": 2
+        }
+      },
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 355,
+      "p99Ms": 523,
+      "maximumMs": 608
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 200,
+          "p95": 289,
+          "p99": 445,
+          "max": 531
+        },
+        "upstreamMs": {
+          "samples": 200,
+          "p95": 275,
+          "p99": 442,
+          "max": 519
+        },
+        "proxyMs": {
+          "samples": 200,
+          "p95": 1,
+          "p99": 1,
+          "max": 4
+        }
+      },
+      "requests": 200,
+      "failedRequests": 0,
+      "p95Ms": 289,
+      "p99Ms": 445,
+      "maximumMs": 531
+    },
+    {
+      "name": "dashboard_quiz_attempts",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 629,
+      "p99Ms": 629,
+      "maximumMs": 629
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 201,
+          "p95": 229,
+          "p99": 430,
+          "max": 486
+        },
+        "upstreamMs": {
+          "samples": 201,
+          "p95": 222,
+          "p99": 423,
+          "max": 484
+        },
+        "proxyMs": {
+          "samples": 201,
+          "p95": 1,
+          "p99": 1,
+          "max": 2
+        }
+      },
+      "requests": 201,
+      "failedRequests": 0,
+      "p95Ms": 229,
+      "p99Ms": 430,
+      "maximumMs": 486
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 201,
+          "p95": 191,
+          "p99": 356,
+          "max": 498
+        },
+        "upstreamMs": {
+          "samples": 201,
+          "p95": 186,
+          "p99": 352,
+          "max": 492
+        },
+        "proxyMs": {
+          "samples": 201,
+          "p95": 1,
+          "p99": 1,
+          "max": 4
+        }
+      },
+      "requests": 201,
+      "failedRequests": 0,
+      "p95Ms": 191,
+      "p99Ms": 356,
+      "maximumMs": 498
+    },
+    {
+      "name": "insert_live_activity_event_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 201,
+          "p95": 132,
+          "p99": 209,
+          "max": 359
+        },
+        "upstreamMs": {
+          "samples": 201,
+          "p95": 129,
+          "p99": 204,
+          "max": 356
+        },
+        "proxyMs": {
+          "samples": 201,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        }
+      },
+      "requests": 201,
+      "failedRequests": 0,
+      "p95Ms": 132,
+      "p99Ms": 209,
+      "maximumMs": 359
+    },
+    {
+      "name": "dashboard_lesson_attempts",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 920,
+      "p99Ms": 920,
+      "maximumMs": 920
+    },
+    {
+      "name": "dashboard_assessments",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 917,
+      "p99Ms": 917,
+      "maximumMs": 917
+    },
+    {
+      "name": "dashboard_events_initial",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 4,
+      "failedRequests": 0,
+      "p95Ms": 977,
+      "p99Ms": 977,
+      "maximumMs": 977
+    },
+    {
+      "name": "dashboard_refresh",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 12,
+      "failedRequests": 0,
+      "p95Ms": 979,
+      "p99Ms": 979,
+      "maximumMs": 979
+    },
+    {
+      "name": "dashboard_events_incremental",
+      "timings": {
+        "headersMs": null,
+        "upstreamMs": null,
+        "proxyMs": null
+      },
+      "requests": 8,
+      "failedRequests": 0,
+      "p95Ms": 54,
+      "p99Ms": 54,
+      "maximumMs": 54
+    },
+    {
+      "name": "get_live_student_activity_secure",
+      "timings": {
+        "headersMs": {
+          "samples": 100,
+          "p95": 145,
+          "p99": 155,
+          "max": 157
+        },
+        "upstreamMs": {
+          "samples": 100,
+          "p95": 136,
+          "p99": 148,
+          "max": 154
+        },
+        "proxyMs": {
+          "samples": 100,
+          "p95": 1,
+          "p99": 1,
+          "max": 1
+        }
+      },
+      "requests": 100,
+      "failedRequests": 0,
+      "p95Ms": 145,
+      "p99Ms": 155,
+      "maximumMs": 157
+    }
+  ],
+  "workloadVersion": "production-attempt-pagination-v2",
+  "scheduling": "Closed-loop journeys: each operation completes before its sleep; not a fixed arrival-rate or 10,000-user test",
+  "preliminaryGatePassed": true,
+  "exclusions": [
+    "canonical lesson/assessment completion and retry integrity",
+    "realtime delivery",
+    "browser/iPad rendering",
+    "production-equivalent cloud resources",
+    "long soak"
+  ]
+}

@@ -6,6 +6,7 @@ import { monitorEventLoopDelay, performance as nodePerformance } from 'node:perf
 import assert from 'node:assert/strict';
 import { createClient } from '@supabase/supabase-js';
 import { createLiveClassEventReader, fetchLiveClassEvents } from '../../lib/live-class-events.ts';
+import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 const config = localConfig();
 const traceDatabase = process.env.SCALE_TRACE_DATABASE === '1';
@@ -183,7 +184,7 @@ async function dashboardJourney({ group, client, profile }) {
     let status = 0;
     try {
       const result = await query;
-      status = result.error ? (result.status >= 400 ? result.status : 0) : result.status;
+      status = result.error ? (result.status >= 400 ? result.status : 0) : (result.status ?? 200);
       assert.equal(result.error, null, name);
       assert.ok(Array.isArray(result.data), name);
       assert.ok(result.data.every(row => allowed.has(row.student_id)), `${name}: student isolation`);
@@ -199,9 +200,9 @@ async function dashboardJourney({ group, client, profile }) {
       latestRows = await Promise.all([
         measured('dashboard_live_activity', client.from('live_student_activity').select('*').eq('class_id', group.classId).order('last_active_at',{ascending:false})),
         measured(refreshes ? 'dashboard_events_incremental' : 'dashboard_events_initial', reader.read()),
-        measured('dashboard_lesson_attempts', client.from('student_lesson_attempts').select('student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at').in('student_id',ids).eq('completed',true)),
-        measured('dashboard_quiz_attempts', client.from('student_weekly_quiz_attempts').select('student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at').in('student_id',ids)),
-        measured('dashboard_assessments', client.from('student_realm_assessments').select('student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at').in('student_id',ids)),
+        measured('dashboard_lesson_attempts', fetchLiveClassAttempts(client, 'student_lesson_attempts', ids)),
+        measured('dashboard_quiz_attempts', fetchLiveClassAttempts(client, 'student_weekly_quiz_attempts', ids)),
+        measured('dashboard_assessments', fetchLiveClassAttempts(client, 'student_realm_assessments', ids)),
         measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
       ]);
       assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
@@ -226,7 +227,20 @@ async function dashboardJourney({ group, client, profile }) {
     }
     assert.equal(new Set(latestRows[0].map(row=>row.student_id)).size, ids.length, 'Final live activity includes every student');
     assert.equal(new Set(latestRows[5].map(row=>row.student_id)).size, ids.length, 'Final daily activity includes every student');
-    dashboardChecks.push({refreshes, observedNewEvents:observed.length, finalRowCounts:latestRows.map(rows=>rows.length)});
+    // Independently verify complete attempt history, including classes beyond the API cap.
+    // Student activity traffic in this scenario does not create new attempt rows.
+    const historyTables = ['student_lesson_attempts','student_weekly_quiz_attempts','student_realm_assessments'];
+    const historyCounts = [];
+    for (const [index, table] of historyTables.entries()) {
+      let query = client.from(table).select('id', { count: 'exact', head: true }).in('student_id', ids);
+      if (table === 'student_lesson_attempts') query = query.eq('completed', true);
+      const countResult = await query;
+      assert.equal(countResult.error, null);
+      assert.equal(latestRows[index+2].length, countResult.count, `${table}: complete persisted history`);
+      assert.equal(new Set(latestRows[index+2].map(row=>row.id)).size, countResult.count, `${table}: no duplicate attempts`);
+      historyCounts.push(countResult.count);
+    }
+    dashboardChecks.push({historyCounts, refreshes, observedNewEvents:observed.length, finalRowCounts:latestRows.map(rows=>rows.length)});
   } finally { reader.dispose(); }
 }
 async function teacherJourney({ group, client }) {
@@ -273,6 +287,8 @@ const report = { at: new Date().toISOString(), environment: 'local protocol rehe
   ...(dashboard ? { dashboardChecks, dashboardMode: 'six-source periodic refresh with production incremental event reader; no realtime subscription', expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: dashboard ? 'student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total' : 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
+  workloadVersion: 'production-attempt-pagination-v2',
+  scheduling: 'Closed-loop journeys: each operation completes before its sleep; not a fixed arrival-rate or 10,000-user test',
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity',...(dashboard ? [] : ['full six-read teacher snapshots']),'realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
 fs.writeFileSync(`${localDir}/capacity-${studentCount}${outputSuffix}-result.json`, JSON.stringify(report,null,2));
