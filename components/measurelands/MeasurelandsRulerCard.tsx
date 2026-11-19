@@ -39,6 +39,19 @@ const OBJECT_FILL: Record<string, [string, string]> = {
   "🪵": ["#C89A5B", "#9A6E38"],
 };
 
+/* Real pictures of the objects, trimmed so the object's two tips are the image's
+ * left and right edges: drawn at the object's exact length, the far tip lands on
+ * the answer mark. aspect = width / height. Objects without art keep the bar. */
+const RULER_OBJECT_ART: Record<string, { src: string; aspect: number }> = {
+  feather: { src: "/images/measurelands/ruler-objects/feather.webp", aspect: 2.415 },
+  leaf: { src: "/images/measurelands/ruler-objects/leaf.webp", aspect: 1.561 },
+  spoon: { src: "/images/measurelands/ruler-objects/spoon.webp", aspect: 4.295 },
+  pencil: { src: "/images/measurelands/ruler-objects/pencil.webp", aspect: 18.824 },
+  crayon: { src: "/images/measurelands/ruler-objects/crayon.webp", aspect: 8.377 },
+  "toy car": { src: "/images/measurelands/ruler-objects/toy-car.webp", aspect: 1.429 },
+  stick: { src: "/images/measurelands/ruler-objects/stick.webp", aspect: 13.617 },
+};
+
 const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C" };
 const MARK = "#3B2A14"; // engraved dark-brown markings
 const BRASS = { lo: "#B8860B", hi: "#F0D888", mid: "#D9B25A" };
@@ -86,7 +99,11 @@ export function RulerWithObject({
   const withTaps = !!taps;
   const objTop = 8;
   const tapGap = withTaps ? 40 : 0;
-  const rulerTop = objTop + OBJ_H + tapGap;
+  const art = object ? RULER_OBJECT_ART[object.label.toLowerCase()] : undefined;
+  const objW = object ? object.lengthCm * CM_PX : 0;
+  // A real picture keeps its true shape, so its height follows its length; it rests on the ruler's top edge.
+  const objH = art ? objW / art.aspect : OBJ_H;
+  const rulerTop = objTop + objH + tapGap - (art && !withTaps ? 3 : 0);
   const tapCy = rulerTop - 20;
   const svgH = rulerTop + RULER_H + 6;
 
@@ -169,11 +186,11 @@ export function RulerWithObject({
 
   const x0 = xForCm(0);
   const objX = xForCm(object?.startCm ?? 0);
-  const objW = object ? object.lengthCm * CM_PX : 0;
   const [oc1, oc2] = object ? OBJECT_FILL[object.icon] ?? ["#B9A6D6", "#8B76B4"] : ["", ""];
 
+  // Drawn 1.5× larger than its coordinates so objects and numbers read clearly on a tablet.
   return (
-    <div className="mx-auto w-full" style={{ maxWidth: Math.min(w, 580) }}>
+    <div className="mx-auto w-full" style={{ maxWidth: Math.min(w * 1.5, 800) }}>
       <svg viewBox={`0 0 ${w} ${svgH}`} width="100%" role="img" aria-label={object ? `${object.label} on a ruler` : "A ruler"}>
         <defs>
           <linearGradient id={`timber-${uid}`} x1="0" y1="0" x2="0" y2="1">
@@ -239,8 +256,10 @@ export function RulerWithObject({
         {/* ── Object resting on the ruler, left edge on the selected start mark ── */}
         {object ? (
           <g>
-            <ellipse cx={objX + objW / 2} cy={objTop + OBJ_H + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
-            {objectShape === "pencil" ? <>
+            <ellipse cx={objX + objW / 2} cy={objTop + objH + 1} rx={objW / 2} ry={4} fill="#3A2712" opacity={0.14} filter={`url(#soft-${uid})`} />
+            {art ? (
+              <image href={art.src} x={objX} y={objTop} width={objW} height={objH} preserveAspectRatio="none" />
+            ) : objectShape === "pencil" ? <>
               <rect x={objX} y={objTop} width={objW - 25} height={OBJ_H} fill="#e4b345" stroke="#82561b" />
               <path d={`M${objX+objW-25} ${objTop}L${objX+objW} ${objTop+OBJ_H/2}L${objX+objW-25} ${objTop+OBJ_H}Z`} fill="#eed1a0" stroke="#82561b" />
               <path d={`M${objX+objW-8} ${objTop+10}L${objX+objW} ${objTop+OBJ_H/2}L${objX+objW-8} ${objTop+20}Z`} fill="#333" />
@@ -252,7 +271,7 @@ export function RulerWithObject({
               {object.icon}
             </text>
             </>}
-            {showZeroHero ? <line x1={objX} x2={objX} y1={objTop + OBJ_H} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
+            {showZeroHero ? <line x1={objX} x2={objX} y1={objTop + objH} y2={rulerTop} stroke={BRASS.lo} strokeWidth={1.2} opacity={0.6} /> : null}
           </g>
         ) : null}
 
