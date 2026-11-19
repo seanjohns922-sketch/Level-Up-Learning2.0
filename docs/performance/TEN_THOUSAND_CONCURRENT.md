@@ -3,6 +3,49 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Paginated attempt API experiment — 19 November
+
+`scripts/staging/scoped-attempts-http-local.mjs` extends the SQL experiment below
+through the actual local PostgREST API. It temporarily installs a uniquely named
+read function, authenticates 20 synthetic teachers, and removes the function in
+`finally`. It refuses to overwrite an existing function. No migration, application
+integration, production data or production permission changes are included.
+
+The function checks the complete student scope on every request and returns at
+most 500 rows per attempt table. Three UUID cursors paginate the fixed projections.
+The direct-RLS comparison also paginates all results: neither side silently stops
+at the API's row limit. The first class contained 1,569 lesson, 523 quiz and 1,046
+assessment rows. A separate 37-row-page test took 43 requests and matched the
+complete direct results without duplicates. Duplicate and empty scopes passed.
+Anonymous execute was denied; mixed-school, null and unknown-student scopes
+returned only `supported:false`; invalid bounds and cursor shape were rejected.
+
+Three alternating-order rounds at each concurrency level matched every complete
+result set (150 snapshots across both modes):
+
+| Concurrent teachers | Direct reads p95 | Scoped reads p95 |
+| --- | ---: | ---: |
+| 1 | 446 ms | 144 ms |
+| 4 | 1,042 ms | 197 ms |
+| 20 | 2,427 ms | 426 ms |
+
+At 20 teachers, the 60 snapshots used 348 direct requests versus 144 scoped
+requests. Maximum snapshot latency was 2,541 ms versus 494 ms. Evidence:
+`docs/performance/scoped-attempts-http-2026-11-19.json`. Node syntax, targeted
+ESLint and diff whitespace checks passed. The temporary function was confirmed
+absent after cleanup; fixture records were not changed.
+
+These are the three attempt sources only, with static fixtures on one local
+machine. They do not measure a full dashboard, student writes, browser rendering,
+hosted latency or 10,000-user capacity. UUID pagination does not provide a frozen
+snapshot under concurrent inserts or updates. Before application integration,
+test the complete dashboard with compact events and student writes, and extend
+HTTP coverage to legacy access, individual assignments and access revocation
+between pages. An unsupported response must discard accumulated candidate data
+and use the original RLS reads for the whole scope; an arbitrary error must not
+trigger fallback. That production client behavior is not implemented by this
+experiment.
+
 ## Shared authorised attempt scope prototype — 19 November
 
 `scripts/staging/scoped-attempts-local.mjs` tests a local SQL prototype that checks

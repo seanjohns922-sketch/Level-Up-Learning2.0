@@ -1,0 +1,67 @@
+{
+  "at": "2026-11-19T02:04:45.066Z",
+  "environment": "isolated local PostgREST; synthetic accounts only",
+  "cases": [
+    {
+      "concurrency": 1,
+      "direct": {
+        "snapshots": 3,
+        "p95Ms": 446,
+        "maximumMs": 446,
+        "requests": 27
+      },
+      "scoped": {
+        "snapshots": 3,
+        "p95Ms": 144,
+        "maximumMs": 144,
+        "requests": 12
+      }
+    },
+    {
+      "concurrency": 4,
+      "direct": {
+        "snapshots": 12,
+        "p95Ms": 1042,
+        "maximumMs": 1042,
+        "requests": 108
+      },
+      "scoped": {
+        "snapshots": 12,
+        "p95Ms": 197,
+        "maximumMs": 197,
+        "requests": 48
+      }
+    },
+    {
+      "concurrency": 20,
+      "direct": {
+        "snapshots": 60,
+        "p95Ms": 2427,
+        "maximumMs": 2541,
+        "requests": 348
+      },
+      "scoped": {
+        "snapshots": 60,
+        "p95Ms": 426,
+        "maximumMs": 494,
+        "requests": 144
+      }
+    }
+  ],
+  "checks": [
+    "anonymous execute denied",
+    "mixed-school, null and unknown scopes return no data",
+    "invalid scope, page size and cursor shape rejected",
+    "empty and duplicate scopes; 37-row pages match full direct RLS results"
+  ],
+  "restored": true,
+  "limitation": "Attempt reads only, with static fixtures. Not a full dashboard, concurrent student writes, legacy-role matrix, hosted latency or 10,000-user capacity proof. No application integration.",
+  "pagination": {
+    "rows": [
+      1569,
+      523,
+      1046
+    ],
+    "smallPageRequests": 43
+  }
+}
